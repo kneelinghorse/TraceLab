@@ -24,7 +24,7 @@ deliverables:
 domainFields:
   type: "Build.Implementation.v1"
 
-  researchFoundation:
+  read for context researchFoundation:
     - finding: "Optimized embedding + caching strategy recommending text-embedding-3-small and tiered model usage."
       sourceMission: "cmos/missions/research/TR-03.RAG-Cost-Optimization.md"
     - finding: "Qdrant collection configuration requires on_disk storage, scalar quantization, and rescoring pipeline."

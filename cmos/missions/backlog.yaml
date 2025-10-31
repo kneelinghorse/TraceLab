@@ -53,8 +53,8 @@ domainFields:
       missions:
         - { id: "R1.1", name: "Presidio Evaluation Strategic Framework", status: "Completed", reference: "cmos/missions/research/R1.1_Presidio-Evaluation-Strategic-Framework.md" }
         - { id: "R1.2", name: "UX Research Document Types Taxonomy", status: "Completed", reference: "cmos/missions/research/R1.2_UX-Research-Document-types.md" }
-        - { id: "B1.1", name: "Core Service Bootstrap", status: "Current", reference: "cmos/missions/sprint-01/B1.1_Core-Service-Bootstrap.yaml" }
-        - { id: "B1.2", name: "Synthetic Corpus Pipeline", status: "Queued", reference: "cmos/missions/sprint-01/B1.2_Synthetic-Corpus-Pipeline.yaml" }
+        - { id: "B1.1", name: "Core Service Bootstrap", status: "Completed", completed_at: "2025-10-31T16:50:56.319057Z", notes: "FastAPI scaffold with PostgreSQL, Alembic migrations, Docker setup, and health checks created" }
+        - { id: "B1.2", name: "Synthetic Corpus Pipeline", status: "Current", reference: "cmos/missions/sprint-01/B1.2_Synthetic-Corpus-Pipeline.yaml" }
         - { id: "B1.3", name: "Presidio Redaction Service", status: "Queued", reference: "cmos/missions/sprint-01/B1.3_Presidio-Redaction-Service.yaml" }
         - { id: "B1.4", name: "Document Ingestion Pipeline", status: "Queued", reference: "cmos/missions/sprint-01/B1.4_Document-Ingestion-Pipeline.yaml" }
         - { id: "B1.5", name: "Embedding & Qdrant Bootstrap", status: "Queued", reference: "cmos/missions/sprint-01/B1.5_Embedding-and-Qdrant-Bootstrap.yaml" }

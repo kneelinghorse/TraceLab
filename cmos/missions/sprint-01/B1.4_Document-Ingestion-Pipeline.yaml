@@ -25,7 +25,7 @@ deliverables:
 domainFields:
   type: "Build.Implementation.v1"
 
-  researchFoundation:
+  read for context researchFoundation:
     - finding: "Sprint 1 format priorities (.pdf text-based, .docx, .pptx, .csv, .xlsx) with recommended parsers."
       sourceMission: "cmos/missions/research/R1.2_UX-Research-Document-types.md"
     - finding: "Redaction must occur before chunking/embedding in ingestion flow."
