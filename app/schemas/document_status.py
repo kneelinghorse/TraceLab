@@ -1,0 +1,28 @@
+"""Pydantic schemas for document processing status entries."""
+from __future__ import annotations
+
+from datetime import datetime
+from typing import Any, Dict, Optional
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict
+
+
+class DocumentProcessingStatusBase(BaseModel):
+    """Shared attributes for processing status operations."""
+
+    document_id: UUID
+    stage: str
+    status: str
+    message: Optional[str] = None
+    details: Optional[Dict[str, Any]] = None
+
+
+class DocumentProcessingStatusRead(DocumentProcessingStatusBase):
+    """Representation of a persisted processing event."""
+
+    id: UUID
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)

@@ -6,6 +6,7 @@ from app.schemas.document import (
     DocumentUpdate,
     DocumentRead,
 )
+from app.schemas.document_status import DocumentProcessingStatusRead
 from app.schemas.chunk import (
     DocumentChunkBase,
     DocumentChunkCreate,
@@ -42,6 +43,11 @@ from app.schemas.quality import (
     QualityCheckUpdate,
     QualityCheckRead,
 )
+from app.schemas.retrieval import (
+    RetrievalQuery,
+    RetrievalResponse,
+    RetrievedChunk,
+)
 
 __all__ = [
     "ProjectBase",
@@ -52,6 +58,7 @@ __all__ = [
     "DocumentCreate",
     "DocumentUpdate",
     "DocumentRead",
+    "DocumentProcessingStatusRead",
     "DocumentChunkBase",
     "DocumentChunkCreate",
     "DocumentChunkUpdate",
@@ -78,4 +85,7 @@ __all__ = [
     "QualityCheckCreate",
     "QualityCheckUpdate",
     "QualityCheckRead",
+    "RetrievalQuery",
+    "RetrievalResponse",
+    "RetrievedChunk",
 ]

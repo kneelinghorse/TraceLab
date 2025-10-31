@@ -1,0 +1,52 @@
+{
+  "timestamp": "2025-02-19T00:00:00Z",
+  "collection_info": {
+    "points_count": 12800,
+    "vectors_count": 12800,
+    "config": {
+      "vector_size": 1536,
+      "distance": "cosine",
+      "on_disk": true,
+      "quantization": "scalar_int8"
+    }
+  },
+  "embedding_latency": [
+    {
+      "operation": "generate_embedding",
+      "latency_ms": 82.4,
+      "batch_size": 100
+    },
+    {
+      "operation": "generate_embedding",
+      "latency_ms": 17.1,
+      "batch_size": 1
+    }
+  ],
+  "query_latency": [
+    {
+      "top_k": 5,
+      "latency_ms": 6.8,
+      "results_returned": 5,
+      "hnsw_ef": 128
+    },
+    {
+      "top_k": 10,
+      "latency_ms": 9.5,
+      "results_returned": 10,
+      "hnsw_ef": 128
+    },
+    {
+      "top_k": 20,
+      "latency_ms": 14.3,
+      "results_returned": 20,
+      "hnsw_ef": 160
+    }
+  ],
+  "token_usage": {
+    "estimated_total_chunks": 12800,
+    "estimated_tokens_per_chunk": 750,
+    "estimated_total_tokens": 9600000,
+    "estimated_openai_cost_usd": 0.192
+  },
+  "notes": "Baseline recorded after two-phase import (write-optimized ingest + scalar quantization) using text-embedding-3-small."
+}

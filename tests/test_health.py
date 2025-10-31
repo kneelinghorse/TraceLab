@@ -5,7 +5,7 @@ os.environ.setdefault("DATABASE_URL", "sqlite:///./tests/test.db")
 os.environ.setdefault("ENVIRONMENT", "test")
 
 import pytest
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 from app.main import app
 from app.core.database import get_db
 
@@ -36,7 +36,8 @@ def override_db_dependency():
 @pytest.mark.asyncio
 async def test_root_endpoint():
     """Test root endpoint."""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/")
         assert response.status_code == 200
         data = response.json()
@@ -48,7 +49,8 @@ async def test_root_endpoint():
 @pytest.mark.asyncio
 async def test_health_endpoint():
     """Test health endpoint."""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/api/v1/health")
         assert response.status_code == 200
         data = response.json()
@@ -58,7 +60,8 @@ async def test_health_endpoint():
 @pytest.mark.asyncio
 async def test_db_health_endpoint(override_db_dependency):
     """Test database health endpoint with dependency override."""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/api/v1/health/db")
         assert response.status_code == 200
         data = response.json()

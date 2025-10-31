@@ -13,7 +13,7 @@ pytest.importorskip("presidio_analyzer")
 pytest.importorskip("presidio_anonymizer")
 pytest.importorskip("presidio_evaluator")
 
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 
 os.environ.setdefault("ENVIRONMENT", "test")
 os.environ.setdefault("DATABASE_URL", "sqlite:///./tests/test.db")
@@ -170,7 +170,8 @@ async def test_redaction_endpoint(monkeypatch, dummy_redaction_service):
     monkeypatch.setattr(redaction_module, "_service_init_error", None)
     monkeypatch.setattr(redaction_module, "get_redaction_service", lambda: service)
 
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.post(
             "/api/v1/redaction/redact",
             json={

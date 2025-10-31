@@ -7,6 +7,7 @@ from app.models.tag import Tag, DocumentTag
 from app.models.insight import Insight, InsightSource
 from app.models.mission import Mission
 from app.models.quality import QualityCheck
+from app.models.processing_status import DocumentProcessingStatus
 
 __all__ = [
     "Base",
@@ -19,5 +20,5 @@ __all__ = [
     "InsightSource",
     "Mission",
     "QualityCheck",
+    "DocumentProcessingStatus",
 ]
-
