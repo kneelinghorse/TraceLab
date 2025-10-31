@@ -56,8 +56,8 @@ domainFields:
         - { id: "B1.1", name: "Core Service Bootstrap", status: "Completed", completed_at: "2025-10-31T16:50:56.319057Z", notes: "FastAPI scaffold with PostgreSQL, Alembic migrations, Docker setup, and health checks created" }
         - { id: "B1.2", name: "Synthetic Corpus Pipeline", status: "Completed", completed_at: "2025-10-31T18:11:31.324870Z", notes: "Corpus generator, Presidio evaluator, CLI scripts, and documentation implemented. Ready for corpus generation and baseline evaluation." }
         - { id: "B1.3", name: "Presidio Redaction Service", status: "Completed", completed_at: "2025-10-31T19:23:53.523961Z", notes: "Presidio service with en_core_web_lg, custom recognizers (PARTICIPANT_ID, PROJECT_ID), Faker-based pseudonymization, FastAPI routes, and regression evaluation script. Ready for corpus-based testing once corpus is generated." }
-        - { id: "B1.4", name: "Document Ingestion Pipeline", status: "Current", reference: "cmos/missions/sprint-01/B1.4_Document-Ingestion-Pipeline.yaml" }
-        - { id: "B1.5", name: "Embedding & Qdrant Bootstrap", status: "Queued", reference: "cmos/missions/sprint-01/B1.5_Embedding-and-Qdrant-Bootstrap.yaml" }
+        - { id: "B1.4", name: "Document Ingestion Pipeline", status: "Completed", completed_at: "2025-10-31T20:29:59.638320Z", notes: "Upload endpoints, format parsers (PDF/DOCX/PPTX/CSV/XLSX), redaction integration, chunking service (500-1000 tokens with overlap), status tracking, and coverage report generator implemented" }
+        - { id: "B1.5", name: "Embedding & Qdrant Bootstrap", status: "Current", reference: "cmos/missions/sprint-01/B1.5_Embedding-and-Qdrant-Bootstrap.yaml" }
         - { id: "B1.6", name: "Sprint Efficacy Evaluator", status: "Queued", reference: "cmos/missions/sprint-01/B1.6_Sprint-Efficacy-Evaluator.yaml" }
 
     - sprintId: "Sprint 02"

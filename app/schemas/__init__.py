@@ -6,6 +6,7 @@ from app.schemas.document import (
     DocumentUpdate,
     DocumentRead,
 )
+from app.schemas.document_status import DocumentProcessingStatusRead
 from app.schemas.chunk import (
     DocumentChunkBase,
     DocumentChunkCreate,
@@ -52,6 +53,7 @@ __all__ = [
     "DocumentCreate",
     "DocumentUpdate",
     "DocumentRead",
+    "DocumentProcessingStatusRead",
     "DocumentChunkBase",
     "DocumentChunkCreate",
     "DocumentChunkUpdate",

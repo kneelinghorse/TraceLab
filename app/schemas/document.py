@@ -11,6 +11,7 @@ from pydantic import BaseModel, ConfigDict
 if TYPE_CHECKING:
     from app.schemas.chunk import DocumentChunkRead
     from app.schemas.tag import DocumentTagRead
+    from app.schemas.document_status import DocumentProcessingStatusRead
 
 
 class DocumentBase(BaseModel):
@@ -69,8 +70,13 @@ class DocumentRead(DocumentBase):
     id: UUID
     chunks: Optional[List["DocumentChunkRead"]] = None
     tags: Optional[List["DocumentTagRead"]] = None
+    processing_events: Optional[List["DocumentProcessingStatusRead"]] = None
 
     model_config = ConfigDict(from_attributes=True)
 
+
+from app.schemas.chunk import DocumentChunkRead  # noqa: E402
+from app.schemas.tag import DocumentTagRead  # noqa: E402
+from app.schemas.document_status import DocumentProcessingStatusRead  # noqa: E402
 
 DocumentRead.model_rebuild()

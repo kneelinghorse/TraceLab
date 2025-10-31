@@ -2,19 +2,19 @@
 import uuid
 from datetime import datetime
 from sqlalchemy import Column, String, Text, Integer, DateTime, CheckConstraint
-from sqlalchemy.dialects.postgresql import UUID
 from app.core.database import Base
+from app.models.types import GUID
 
 
 class Project(Base):
     """Project entity representing a research project."""
     __tablename__ = "projects"
     
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(GUID(), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
     description = Column(Text)
-    user_id = Column(UUID(as_uuid=True))  # Placeholder for auth
-    mission_protocol_id = Column(UUID(as_uuid=True))  # References missions table
+    user_id = Column(GUID())  # Placeholder for auth
+    mission_protocol_id = Column(GUID())  # References missions table
     
     # Metadata
     research_type = Column(String)  # 'strategic' | 'tactical' | 'generative' | 'evaluative'
@@ -35,4 +35,3 @@ class Project(Base):
             name='valid_research_type'
         ),
     )
-

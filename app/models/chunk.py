@@ -2,17 +2,17 @@
 import uuid
 from datetime import datetime
 from sqlalchemy import Column, String, Text, Integer, DateTime, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from app.core.database import Base
+from app.models.types import GUID
 
 
 class DocumentChunk(Base):
     """Document chunk entity for RAG embeddings."""
     __tablename__ = "document_chunks"
     
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    document_id = Column(UUID(as_uuid=True), ForeignKey("documents.id", ondelete="CASCADE"), nullable=False)
+    id = Column(GUID(), primary_key=True, default=uuid.uuid4)
+    document_id = Column(GUID(), ForeignKey("documents.id", ondelete="CASCADE"), nullable=False)
     chunk_index = Column(Integer, nullable=False)
     content = Column(Text, nullable=False)
     
@@ -23,8 +23,8 @@ class DocumentChunk(Base):
     end_char = Column(Integer)
     
     # Context preservation
-    prev_chunk_id = Column(UUID(as_uuid=True), ForeignKey("document_chunks.id"))
-    next_chunk_id = Column(UUID(as_uuid=True), ForeignKey("document_chunks.id"))
+    prev_chunk_id = Column(GUID(), ForeignKey("document_chunks.id"))
+    next_chunk_id = Column(GUID(), ForeignKey("document_chunks.id"))
     
     created_at = Column(DateTime, default=datetime.utcnow)
     
@@ -34,4 +34,3 @@ class DocumentChunk(Base):
     __table_args__ = (
         {'extend_existing': True},
     )
-
