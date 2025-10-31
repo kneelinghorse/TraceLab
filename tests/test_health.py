@@ -1,4 +1,9 @@
 """Basic health check tests."""
+import os
+
+os.environ.setdefault("DATABASE_URL", "sqlite:///./tests/test.db")
+os.environ.setdefault("ENVIRONMENT", "test")
+
 import pytest
 from httpx import AsyncClient
 from app.main import app

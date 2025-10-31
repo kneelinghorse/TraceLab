@@ -125,6 +125,8 @@ class CorpusGenerator:
         add_entity("US_SSN", entities.get("US_SSN"))
         add_entity("AGE", entities.get("AGE"))
         add_entity("IP_ADDRESS", entities.get("IP_ADDRESS"))
+        add_entity("PARTICIPANT_ID", entities.get("PARTICIPANT_ID"))
+        add_entity("PROJECT_ID", entities.get("PROJECT_ID"))
 
         location = entities.get("LOCATION")
         if isinstance(location, dict):
@@ -155,6 +157,9 @@ class CorpusGenerator:
             "full_address": fake.address(),
         }
 
+        participant_id = fake.bothify(text="PID-####-####").upper()
+        project_id = fake.bothify(text="PROJ-????-####").upper()
+
         entities = {
             "PERSON": full_name,
             "FIRST_NAME": first_name,
@@ -168,6 +173,8 @@ class CorpusGenerator:
             "US_SSN": fake.ssn() if locale == "en_US" else None,
             "OCCUPATION": fake.job(),
             "ORGANIZATION": fake.company(),
+            "PARTICIPANT_ID": participant_id,
+            "PROJECT_ID": project_id,
         }
 
         return locale, entities
@@ -240,14 +247,16 @@ class CorpusGenerator:
 
         transcript = f"""User Interview Transcript - Session {doc_id}
 Interview Date: {entities['DATE_TIME'][:10]}
+Participant ID: {entities['PARTICIPANT_ID']}
 Participant: {entities['PERSON']}
+Project Code: {entities['PROJECT_ID']}
 Email: {entities['EMAIL_ADDRESS']}
 Phone: {entities['PHONE_NUMBER']}
 Location: {entities['LOCATION']['city']}, {entities['LOCATION']['state']}
 
 Interviewer: Thank you for taking the time to speak with us today. Can you start by telling us a bit about yourself?
 
-Participant: Sure. My name is {entities['PERSON']}, and I'm {entities['AGE']} years old. I work as a {entities['OCCUPATION']} at {entities['ORGANIZATION']}, which is located in {entities['LOCATION']['city']}, {entities['LOCATION']['state']}.
+Participant: Sure. My name is {entities['PERSON']}, and I'm {entities['AGE']} years old. I work as a {entities['OCCUPATION']} at {entities['ORGANIZATION']}, which is located in {entities['LOCATION']['city']}, {entities['LOCATION']['state']}. I'm currently participating in project {entities['PROJECT_ID']}.
 
 Interviewer: Can you tell us about your experience with the product?
 
@@ -298,6 +307,8 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
 
         header = [
             "response_id",
+            "participant_id",
+            "project_id",
             "timestamp",
             "age",
             "gender",
@@ -322,12 +333,14 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
             feedback = (
                 f"I'm a {entities['AGE']}-year-old {gender.lower()} working as a {entities['OCCUPATION']} "
                 f"in {entities['LOCATION']['city']}, {entities['LOCATION']['state']}. "
-                f"The product has been useful for my work at {entities['ORGANIZATION']}. "
+                f"The product has been useful for my work at {entities['ORGANIZATION']} under project {entities['PROJECT_ID']}. "
                 f"Contact me at {entities['EMAIL_ADDRESS']} or {entities['PHONE_NUMBER']} for follow-up."
             )
 
             row = [
                 f"R{index + 1:03d}",
+                entities["PARTICIPANT_ID"],
+                entities["PROJECT_ID"],
                 entities["DATE_TIME"],
                 entities["AGE"],
                 gender,
@@ -381,6 +394,8 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
             Email: {entities['EMAIL_ADDRESS']}
             Phone: {entities['PHONE_NUMBER']}
             Location: {entities['LOCATION']['full_address']}
+            Participant ID: {entities['PARTICIPANT_ID']}
+            Project Code: {entities['PROJECT_ID']}
             """
         ).strip()
 
@@ -420,6 +435,8 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
             Email: {entities['EMAIL_ADDRESS']}
             Phone: {entities['PHONE_NUMBER']}
             Location: {entities['LOCATION']['full_address']}
+            Participant ID: {entities['PARTICIPANT_ID']}
+            Project Code: {entities['PROJECT_ID']}
             """
         ).strip()
 
@@ -450,8 +467,9 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
             f"""
             Usability Test Notes - Session {doc_id}
             Date: {entities['DATE_TIME'][:10]}
-            Participant ID: P{doc_id}
+            Participant ID: {entities['PARTICIPANT_ID']}
             Participant: {entities['PERSON']}
+            Project Code: {entities['PROJECT_ID']}
             Email: {entities['EMAIL_ADDRESS']}
 
             Session Overview:
@@ -494,6 +512,8 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
             author_email: "{entities['EMAIL_ADDRESS']}"
             interview_date: "{entities['DATE_TIME'][:10]}"
             locale: "{locale}"
+            participant_id: "{entities['PARTICIPANT_ID']}"
+            project_id: "{entities['PROJECT_ID']}"
             ---
 
             # Executive Summary
@@ -501,6 +521,8 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
 
             # Participant Snapshot
             - Name: {entities['PERSON']}
+            - Participant ID: {entities['PARTICIPANT_ID']}
+            - Project Code: {entities['PROJECT_ID']}
             - Email: {entities['EMAIL_ADDRESS']}
             - Phone: {entities['PHONE_NUMBER']}
             - Age: {entities['AGE']}

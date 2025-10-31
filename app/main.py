@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.api.v1 import health
+from app.api.v1 import health, redaction
 
 # Create tables in development (use migrations in production)
 if settings.environment == "development":
@@ -26,6 +26,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(health.router, prefix=settings.api_v1_prefix, tags=["health"])
+app.include_router(redaction.router, prefix=f"{settings.api_v1_prefix}/redaction", tags=["redaction"])
 
 
 @app.get("/")
