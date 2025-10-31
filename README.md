@@ -138,6 +138,29 @@ curl http://localhost:8000/api/v1/health
 curl http://localhost:8000/api/v1/health/db
 ```
 
+## Synthetic Corpus Pipeline (B1.2)
+
+Regenerate the synthetic UX research corpus (Markdown, TXT, DOCX, PDF, CSV) populated with locale-aware Faker PII:
+
+```bash
+python scripts/generate_corpus.py
+```
+
+Evaluate Presidio against the corpus and capture the baseline metrics artifact:
+
+```bash
+python scripts/evaluate_presidio.py
+```
+
+Package the corpus for secure upload (creates archive, manifest, and baseline copy):
+
+```bash
+python scripts/package_corpus.py
+python scripts/upload_corpus.py --destination /secure/presidio/upload
+```
+
+Refer to `data/corpus/README.md` for detailed options (document counts, survey rows, research briefs) and storage guidance.
+
 ## Development Notes
 
 - The application creates tables automatically in development mode
@@ -147,9 +170,11 @@ curl http://localhost:8000/api/v1/health/db
 
 ## Next Steps
 
-This is the core service bootstrap (B1.1). Next missions will add:
-- B1.2: Synthetic Corpus Pipeline
+This repo now includes:
+- B1.1: Core Service Bootstrap
+- B1.2: Synthetic Corpus Pipeline (corpus generator, annotations, evaluation harness)
+
+Upcoming missions:
 - B1.3: Presidio Redaction Service
 - B1.4: Document Ingestion Pipeline
 - B1.5: Embedding & Qdrant Bootstrap
-
