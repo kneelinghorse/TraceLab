@@ -43,6 +43,11 @@ from app.schemas.quality import (
     QualityCheckUpdate,
     QualityCheckRead,
 )
+from app.schemas.retrieval import (
+    RetrievalQuery,
+    RetrievalResponse,
+    RetrievedChunk,
+)
 
 __all__ = [
     "ProjectBase",
@@ -80,4 +85,7 @@ __all__ = [
     "QualityCheckCreate",
     "QualityCheckUpdate",
     "QualityCheckRead",
+    "RetrievalQuery",
+    "RetrievalResponse",
+    "RetrievedChunk",
 ]
