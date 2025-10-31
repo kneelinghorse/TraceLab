@@ -1,0 +1,45 @@
+missionId: "TR-PII-Detection-Redaction-001"
+objective: "Research methods for detecting and redacting personally identifiable information (PII) in research documents before storage and embedding, ensuring GDPR/CCPA compliance for personal research repository."
+
+context: |
+  Research documents may contain:
+  - Participant names, emails, phone numbers
+  - Demographic information
+  - Location data
+  - Other sensitive identifiers
+  Need automated PII detection and redaction before vector embedding and storage.
+
+successCriteria:
+  - "PII detection method selected (library or service)"
+  - "Redaction strategy determined (masking vs removal)"
+  - "Performance impact assessed"
+  - "False positive/negative rates documented"
+  - "Integration pattern with document processing pipeline defined"
+
+deliverables:
+  - "PII detection library/service recommendation"
+  - "Redaction implementation approach"
+  - "Performance benchmarks"
+
+domainFields:
+  type: "Build.TechnicalResearch.v1"
+  
+  researchQuestions:
+    - "What Python libraries (presidio, spaCy, regex-based) provide the best PII detection for research transcripts and survey responses?"
+    - "Should we use local libraries or cloud APIs (AWS Comprehend, Azure Text Analytics) for PII detection? What are cost and privacy tradeoffs?"
+    - "How do we handle redacted content in embeddings? Does redaction affect semantic search quality?"
+    - "What is the performance overhead of PII detection on document processing pipeline?"
+    - "Should we store original + redacted versions, or just redacted? What are storage and compliance implications?"
+    - "How do we handle false positives (legitimate mentions vs PII) in research context?"
+  
+  keyFindings: []
+  
+  contradictionsAndUncertainties: ""
+  
+  buildImplications:
+    recommendedAlgorithm: ""
+    performanceTarget: ""
+    constraintToRespect: ""
+  
+  evidenceCollection: []
+

@@ -1,0 +1,91 @@
+# pack.yaml - Metadata for the "Sprint Plan" Domain Pack
+name: "Planning.SprintPlan.v1"
+version: "1.0.0"
+displayName: "Sprint Plan Orchestrator"
+description: "Master backlog tracking research and build missions across sprints for the UX Research Repository."
+author: "TraceLab Team"
+schema: "./schemas/SprintPlan.v1.json"
+
+---
+
+# Mission File: project-main-backlog.yaml
+
+missionId: "SP-TRACE-001"
+
+objective: "Keep the TraceLab UX Research Repository roadmap, research, and build missions synchronized across sprints."
+
+context: |
+  This backlog reflects completed Sprint 00 research, Sprint 01 planning artifacts, and the current Sprint 01 execution plan.
+  It is the single source of truth for mission status, dependencies, and success metrics.
+
+successCriteria:
+  - "All Sprint 1 research and build missions complete with documented outcomes."
+  - "Backlog updated whenever mission status changes or new research is initiated."
+  - "Sprint transitions capture retrospectives and inform next-sprint planning."
+
+deliverables:
+  - "Continuously updated backlog.yaml with accurate mission states and dependencies."
+
+domainFields:
+  type: "Planning.SprintPlan.v1"
+
+  sprints:
+    - sprintId: "Sprint 00"
+      title: "Foundational Research & Strategy"
+      focus: "Establish architecture, roadmap, and technical research pillars."
+      status: "Completed"
+      missions:
+        - { id: "R00.1", name: "UX Research Methods Landscape", status: "Completed" }
+        - { id: "R00.2", name: "UX Research Lifecycle Synthesis", status: "Completed" }
+        - { id: "R00.3", name: "Tool Adoption & Limitations Study", status: "Completed" }
+        - { id: "R00.4", name: "AI Scale & Strategy Analysis", status: "Completed" }
+        - { id: "R00.5", name: "Methodological Framework for AI-Assisted Research", status: "Completed" }
+        - { id: "R00.6", name: "Augmenting UX Research with AI", status: "Completed" }
+        - { id: "TR-01", name: "Mission Protocol Validation", status: "Completed" }
+        - { id: "TR-02", name: "PII Detection & Redaction", status: "Completed" }
+        - { id: "TR-03", name: "RAG Cost Optimization", status: "Completed" }
+        - { id: "TR-04", name: "Qdrant Railway Optimization", status: "Completed" }
+
+    - sprintId: "Sprint 01"
+      title: "Foundation Build - Ingestion & Redaction"
+      focus: "Build the core service, synthetic corpus workflow, redaction pipeline, ingestion, and vector storage."
+      status: "In Progress"
+      missions:
+        - { id: "R1.1", name: "Presidio Evaluation Strategic Framework", status: "Completed", reference: "cmos/missions/research/R1.1_Presidio-Evaluation-Strategic-Framework.md" }
+        - { id: "R1.2", name: "UX Research Document Types Taxonomy", status: "Completed", reference: "cmos/missions/research/R1.2_UX-Research-Document-types.md" }
+        - { id: "B1.1", name: "Core Service Bootstrap", status: "Current", reference: "cmos/missions/sprint-01/B1.1_Core-Service-Bootstrap.yaml" }
+        - { id: "B1.2", name: "Synthetic Corpus Pipeline", status: "Queued", reference: "cmos/missions/sprint-01/B1.2_Synthetic-Corpus-Pipeline.yaml" }
+        - { id: "B1.3", name: "Presidio Redaction Service", status: "Queued", reference: "cmos/missions/sprint-01/B1.3_Presidio-Redaction-Service.yaml" }
+        - { id: "B1.4", name: "Document Ingestion Pipeline", status: "Queued", reference: "cmos/missions/sprint-01/B1.4_Document-Ingestion-Pipeline.yaml" }
+        - { id: "B1.5", name: "Embedding & Qdrant Bootstrap", status: "Queued", reference: "cmos/missions/sprint-01/B1.5_Embedding-and-Qdrant-Bootstrap.yaml" }
+        - { id: "B1.6", name: "Sprint Efficacy Evaluator", status: "Queued", reference: "cmos/missions/sprint-01/B1.6_Sprint-Efficacy-Evaluator.yaml" }
+
+    - sprintId: "Sprint 02"
+      title: "RAG Query & Semantic Optimization"
+      focus: "Implement RAG query interface, semantic caching, and tiered LLM responses."
+      status: "Planned"
+      missions:
+        - { id: "B2.1", name: "RAG Query API", status: "Planned" }
+        - { id: "B2.2", name: "Context Compression Pipeline", status: "Planned" }
+        - { id: "B2.3", name: "Semantic Cache Layer", status: "Planned" }
+        - { id: "B2.4", name: "Tiered LLM Routing", status: "Planned" }
+
+  missionDependencies:
+    - { from: "R1.1", to: "B1.2", type: "Research informs Build" }
+    - { from: "R1.1", to: "B1.3", type: "Research informs Build" }
+    - { from: "R1.2", to: "B1.4", type: "Research informs Build" }
+    - { from: "TR-02", to: "B1.3", type: "Research informs Build" }
+    - { from: "TR-03", to: "B1.5", type: "Research informs Build" }
+    - { from: "TR-04", to: "B1.5", type: "Research informs Build" }
+    - { from: "B1.1", to: "B1.2", type: "Blocks" }
+    - { from: "B1.2", to: "B1.3", type: "Blocks" }
+    - { from: "B1.3", to: "B1.4", type: "Blocks" }
+    - { from: "B1.4", to: "B1.5", type: "Blocks" }
+    - { from: "B1.5", to: "B1.6", type: "Blocks" }
+
+  successMetrics:
+    - "Sprint 1: Presidio recall ≥ 0.95 on synthetic corpus priority entities."
+    - "Sprint 1: Five priority formats ingested end-to-end with sanitized chunks in PostgreSQL."
+    - "Sprint 1: Embedding pipeline stores ≥1 sample project in Qdrant with <10ms p99 query latency (local)."
+    - "Sprint 1: Sprint evaluation script executes and produces retrospective report in `cmos/reports/`."
+    - "Sprint 2: Semantic cache hit rate ≥ 15% (planned target)."

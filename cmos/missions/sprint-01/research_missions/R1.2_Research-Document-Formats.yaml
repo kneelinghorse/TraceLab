@@ -1,0 +1,41 @@
+# Mission File: R1.2_Research-Document-Formats.yaml
+
+missionId: "TR-S01-002"
+
+objective: "Compile a defensible list of UX-research document formats and prioritize parser requirements for near-term and future ingestion work."
+
+context: |
+  Sprint 1 will implement ingestion for a focused set of document types, but we need foresight into additional formats that appear in UX research libraries.
+  Establishing a clear taxonomy and prioritization now will guide parser selection, backlog grooming, and data model extensions.
+  This mission gathers industry norms, tool usage data, and edge cases so the build phase can scope near-term coverage while planning for expansion.
+
+successCriteria:
+  - "Produce a categorized inventory of common UX research document formats with prevalence indicators and canonical examples."
+  - "Identify the minimum viable subset to implement in Sprint 1 and explicitly list secondary formats to stage for future sprints."
+  - "Map each format to recommended parsing/ingestion strategies, highlighting existing Python libraries or services where feasible."
+  - "Document risks, unknowns, or licensing/infrastructure implications for handling specialized formats (e.g., multimedia, survey exports)."
+
+deliverables:
+  - "Format taxonomy table with prioritization rationale and references."
+  - "Parser capability matrix covering native support, required preprocessing, and gaps."
+  - "Recommendation memo summarizing near-term vs. future ingestion scope."
+
+domainFields:
+  type: "Build.TechnicalResearch.v1"
+
+  researchQuestions:
+    - "Which document formats are most frequently used in UX research repositories and knowledge bases?"
+    - "For each format, what open-source or commercial parsing tools are available, and what are their limitations?"
+    - "How should we prioritize format support to balance immediate Sprint 1 goals with long-term coverage?"
+    - "What special handling is required for formats that embed PII differently (e.g., survey CSVs, JSON exports, multimedia transcripts)?"
+
+  keyFindings: []
+
+  contradictionsAndUncertainties: ""
+
+  buildImplications:
+    recommendedNextStep: ""
+    blockingRisks: ""
+    notesForImplementation: ""
+
+  evidenceCollection: []

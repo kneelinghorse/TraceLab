@@ -1,0 +1,56 @@
+# Mission File: B1.3_Presidio-Redaction-Service.yaml
+
+missionId: "B1.3"
+
+objective: "Integrate Microsoft Presidio with custom recognizers, pseudonymization, and evaluation feedback loops for document redaction."
+
+context: |
+  Consumes corpus + metrics from B1.2 to tune SpaCy-based Presidio recognizers.
+  Implements the redaction microservice that executes before chunking/embedding.
+
+successCriteria:
+  - "Presidio AnalyzerEngine configured with spaCy en_core_web_lg and domain-specific recognizers."
+  - "Custom PatternRecognizer / deny-list logic covers UX research-specific entities (e.g., participant IDs)."
+  - "Pseudonymization operators leverage Faker with locale-aware substitutions."
+  - "Service exposes callable interface (module or FastAPI route) returning redacted text + entity audit trail."
+  - "Regression suite executes evaluation harness from B1.2 and reports recall/precision deltas."
+  - "`cmos/reports/sprint-01/presidio_tuned_results.json` written with comparison against baseline metrics."
+
+deliverables:
+  - "Presidio configuration package with analyzer/anonymizer setup."
+  - "Custom recognizer definitions and tests."
+  - "Documentation outlining redaction flow and how to run regression metrics."
+  - "Tuned metric artifact stored at `cmos/reports/sprint-01/presidio_tuned_results.json`."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Quality gates require multi-layer validation and pseudonymization prior to embedding."
+      sourceMission: "cmos/missions/research/TR-02.PII-Detection-Redaction.md"
+    - finding: "Synthetic corpus + evaluation protocol defines tuning workflow and recall targets."
+      sourceMission: "cmos/missions/research/R1.1_Presidio-Evaluation-Strategic-Framework.md"
+    - finding: "Architecture mandates redaction before chunking in ingestion pipeline."
+      sourceMission: "cmos/docs/technical_architecture.md"
+
+  implementationScope:
+    coreDeliverable: "Presidio-based redaction module/service with custom recognizers, pseudonymization, and automated evaluation."
+    outOfScope:
+      - "Document upload API integration (handled in B1.4)."
+      - "Production deployment hardening (rate limiting, auth)."
+      - "Real PII datasets—only synthetic corpus is used for tests."
+
+  validationProtocol:
+    - validator: "Presidio Evaluation Suite"
+      focus: "Recall > 0.95 on priority entities; track precision for regressions."
+    - validator: "Peer Review"
+      focus: "Security/privacy compliance of pseudonymization logic."
+
+  handoffContext:
+    completed: []
+    interfaces:
+      - "Python function or service endpoint `redact_document(document_id, text, metadata)` returning sanitized text + entities."
+    assumptions:
+      - "Corpus + metrics artifacts from B1.2 are available."
+    nextMission: "B1.4: Document Ingestion Pipeline"
+    blockers: []

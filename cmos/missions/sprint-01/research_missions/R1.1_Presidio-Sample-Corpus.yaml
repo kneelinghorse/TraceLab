@@ -1,0 +1,41 @@
+# Mission File: R1.1_Presidio-Sample-Corpus.yaml
+
+missionId: "TR-S01-001"
+
+objective: "Identify and curate a representative, privacy-compliant corpus of UX research documents to support Presidio tuning and evaluation for Sprint 1."
+
+context: |
+  Sprint 1 requires a working Microsoft Presidio redaction pipeline before document ingestion and embedding.
+  We need realistic, anonymized sample documents covering our highest-priority formats so we can benchmark detection accuracy and tune custom recognizers without risking sensitive data.
+  This mission determines the minimum viable corpus and evaluation protocol that the build team will use while keeping future growth and additional document types in mind.
+
+successCriteria:
+  - "Document and deliver an anonymization workflow that preserves semantic fidelity while removing PII."
+  - "Produce an inventory of sample documents covering prioritized formats (Markdown, plain text, DOCX, PDF) with at least one artifact per format."
+  - "Define measurable evaluation criteria (precision/recall targets) and a repeatable test harness for Presidio customization."
+  - "Capture risks, gaps, and open questions that must be addressed before onboarding additional formats."
+
+deliverables:
+  - "Written corpus plan describing sources, anonymization steps, storage location, and maintenance expectations."
+  - "Curated sample documents (or secure pointers) for each prioritized format."
+  - "Evaluation checklist or script outline for Presidio regression testing."
+
+domainFields:
+  type: "Build.TechnicalResearch.v1"
+
+  researchQuestions:
+    - "What representative document samples do we need across Markdown, TXT, DOCX, and PDF to exercise Presidio's default recognizers?"
+    - "How can we anonymize or synthesize content so it remains realistic for detection benchmarking without retaining real PII?"
+    - "What metric thresholds (precision/recall or false-positive rates) should we target to consider Presidio tuned for Sprint 1?"
+    - "Which storage and access patterns keep these artifacts available to developers while respecting privacy constraints?"
+
+  keyFindings: []
+
+  contradictionsAndUncertainties: ""
+
+  buildImplications:
+    recommendedNextStep: ""
+    blockingRisks: ""
+    notesForImplementation: ""
+
+  evidenceCollection: []

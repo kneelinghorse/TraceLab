@@ -1,0 +1,53 @@
+# Mission File: B1.6_Sprint-Efficacy-Evaluator.yaml
+
+missionId: "B1.6"
+
+objective: "Deliver an automated script that evaluates sprint missions against their success criteria and produces planning feedback."
+
+context: |
+  Supports continuous planning by quantifying how Sprint 1 build missions performed relative to targets.
+  Outputs will feed retrospectives and planning updates captured in MASTER_CONTEXT.json.
+
+successCriteria:
+  - "Script ingests mission metadata (backlog.yaml, mission YAMLs) and assembles a checklist of success criteria."
+  - "Integrates telemetry artifacts (`presidio_corpus_baseline.json`, `presidio_tuned_results.json`, `ingestion_format_coverage.json`, `qdrant_performance.json`)."
+  - "Generates a Markdown/JSON report highlighting met vs unmet targets and recommended follow-ups."
+  - "Documented runbook ensures script is executed at the end of each sprint and results appended to project history."
+
+deliverables:
+  - "`scripts/evaluate_sprint.py` (or equivalent) executable from repository root."
+  - "Configuration/readme describing required input artifacts and how to publish the report."
+  - "Baseline report template stored under `cmos/reports/` (e.g., `sprint-01-summary.md`)."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Backlog success metrics require measurement to inform next-sprint planning."
+      sourceMission: "cmos/missions/backlog.yaml"
+    - finding: "Presidio evaluation outputs provide recall/precision metrics for comparison."
+      sourceMission: "cmos/missions/research/R1.1_Presidio-Evaluation-Strategic-Framework.md"
+    - finding: "Roadmap emphasizes iterative learning and success metric tracking each sprint."
+      sourceMission: "cmos/docs/roadmap.md"
+
+  implementationScope:
+    coreDeliverable: "Reusable sprint evaluation script consuming mission artifacts and writing a summary report."
+    outOfScope:
+      - "Automated scheduling (handled later via CI or cron)."
+      - "Integration with third-party dashboards."
+      - "Real-time monitoring; focus is end-of-sprint analysis."
+
+  validationProtocol:
+    - validator: "Manual Dry Run"
+      focus: "Execute script with dummy metrics to verify report output."
+    - validator: "Peer Review"
+      focus: "Ensure coverage of all sprint success metrics and clarity of recommendations."
+
+  handoffContext:
+    completed: []
+    interfaces:
+      - "CLI command `python scripts/evaluate_sprint.py --sprint 1` outputting Markdown/JSON report."
+    assumptions:
+      - "Metric artifacts (evaluation outputs, latency logs) are available from build missions."
+    nextMission: "Sprint 1 Retrospective & Sprint 2 Planning"
+    blockers: []

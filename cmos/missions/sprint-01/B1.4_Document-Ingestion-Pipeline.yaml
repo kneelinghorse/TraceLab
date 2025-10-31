@@ -1,0 +1,57 @@
+# Mission File: B1.4_Document-Ingestion-Pipeline.yaml
+
+missionId: "B1.4"
+
+objective: "Deliver the ingestion workflow for prioritized UX research formats (.pdf, .docx, .pptx, .csv, .xlsx) with redaction and chunking."
+
+context: |
+  Uses the redaction service from B1.3 and aligns with Sprint 1 scope defined in R1.2_UX-Research-Document-types.md.
+  Implements upload endpoints, format-specific parsing, and processing state tracking.
+
+successCriteria:
+  - "FastAPI endpoints (or background jobs) accept uploads for the five prioritized formats."
+  - "Format detection routes files to appropriate parsers (pypdf/py-pdf-parser, python-docx, python-pptx, pandas)."
+  - "Presidio redaction invoked prior to persistence or chunking."
+  - "Chunking service produces 500-1000 token segments with overlap and metadata from architecture doc."
+  - "Processing status persisted (uploaded, extracted, chunked, redacted) with audit fields."
+  - "`cmos/reports/sprint-01/ingestion_format_coverage.json` summarizes ingestion success/failure counts per format."
+
+deliverables:
+  - "Upload + processing pipeline code with unit/integration tests for each format."
+  - "Configuration for background worker/queue if asynchronous processing is used."
+  - "Developer guide describing ingestion flow and sample payloads."
+  - "Coverage metric artifact stored at `cmos/reports/sprint-01/ingestion_format_coverage.json`."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Sprint 1 format priorities (.pdf text-based, .docx, .pptx, .csv, .xlsx) with recommended parsers."
+      sourceMission: "cmos/missions/research/R1.2_UX-Research-Document-types.md"
+    - finding: "Redaction must occur before chunking/embedding in ingestion flow."
+      sourceMission: "cmos/missions/research/R1.1_Presidio-Evaluation-Strategic-Framework.md"
+    - finding: "Chunking parameters and data model requirements defined in architecture."
+      sourceMission: "cmos/docs/technical_architecture.md"
+
+  implementationScope:
+    coreDeliverable: "End-to-end ingestion pipeline for Sprint 1 formats with parsing, redaction, chunking, and status tracking."
+    outOfScope:
+      - "OCR pipeline for image-based PDFs (planned for future sprint)."
+      - "Direct integrations with SaaS research tools."
+      - "LLM answer generation or semantic caching."
+
+  validationProtocol:
+    - validator: "Integration Tests"
+      focus: "Round-trip ingestion scenarios producing chunks and sanitized storage."
+    - validator: "Manual QA"
+      focus: "Verify sample files (from B1.2 corpus) survive ingestion with expected metadata."
+
+  handoffContext:
+    completed: []
+    interfaces:
+      - "Background job or service entrypoint `process_document(document_id)`."
+      - "Database records in documents/document_chunks tables populated with sanitized content."
+    assumptions:
+      - "Redaction service from B1.3 is deployed and callable."
+    nextMission: "B1.5: Embedding & Qdrant Bootstrap"
+    blockers: []

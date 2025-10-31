@@ -1,0 +1,53 @@
+# Mission File: B1.1_Core-Service-Bootstrap.yaml
+
+missionId: "B1.1"
+
+objective: "Stand up the core FastAPI service, PostgreSQL schema, and migration tooling that underpin the research repository."
+
+context: |
+  Implements Sprint 1 Week 1 deliverables from the roadmap.
+  Establishes the baseline application structure so downstream ingestion, redaction, and storage components have a stable foundation.
+
+successCriteria:
+  - "FastAPI project skeleton created with dependency injection and settings management."
+  - "Docker/Docker Compose (or equivalent) spins up app + PostgreSQL locally."
+  - "Alembic migrations define core tables: projects, documents, document_chunks, tags, insights, missions, quality_checks."
+  - "SQLAlchemy models and Pydantic schemas cover the same entities with parity."
+  - "Smoke tests or health checks confirm DB connectivity and migrations run cleanly."
+
+deliverables:
+  - "Repository scaffold with FastAPI app package, config, and entrypoints."
+  - "Alembic migration history and SQLAlchemy models aligned with the technical architecture."
+  - "Developer bootstrap documentation (README snippet or script) describing how to run the stack."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Core data schema tables and relationships are specified in the architecture document."
+      sourceMission: "cmos/docs/technical_architecture.md"
+    - finding: "Roadmap Week 1 requires FastAPI + PostgreSQL with Alembic migrations and Pydantic models."
+      sourceMission: "cmos/docs/roadmap.md"
+    - finding: "Mission Protocol validation must persist JSONB with generated schemas."
+      sourceMission: "cmos/missions/research/TR-01.Mission-Protocol-Validation.md"
+
+  implementationScope:
+    coreDeliverable: "FastAPI service scaffolded with configuration management, SQLAlchemy ORM models, Alembic setup, and initial migrations for all core entities."
+    outOfScope:
+      - "Document ingestion endpoints (handled in B1.4_Document-Ingestion-Pipeline)."
+      - "Presidio integration or PII handling."
+      - "Vector DB connectivity and embeddings."
+
+  validationProtocol:
+    - validator: "Internal Unit Tests"
+      focus: "Model/migration parity and CRUD smoke tests."
+    - validator: "Static Analysis"
+      focus: "Linting and typing across new modules."
+
+  handoffContext:
+    completed: []
+    interfaces: []
+    assumptions:
+      - "Local developer environment can run Docker or equivalent containerization."
+    nextMission: "B1.2: Synthetic Corpus Pipeline"
+    blockers: []

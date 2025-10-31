@@ -1,0 +1,121 @@
+{
+  "project": {
+    "name": "TraceLab UX Research Repository",
+    "version": "0.1.0",
+    "description": "Personal-scale research repository with RAG search, Presidio-powered redaction, and mission protocol governance.",
+    "status": "in_progress",
+    "start_date": "2025-01-01",
+    "deployment": {
+      "platform": "FastAPI + PostgreSQL + Qdrant",
+      "integration_target": "Internal research teams",
+      "environment": "development"
+    }
+  },
+  "working_memory": {
+    "active_domain": "main",
+    "session_count": 0,
+    "last_session": "Sprint 01 planning alignment",
+    "domains": {
+      "main": {
+        "status": "active",
+        "priority": 1,
+        "critical_facts": [
+          "Sprint 01 delivers the ingestion and redaction foundation needed for later RAG features.",
+          "Presidio must be tuned using a synthetic corpus before any embeddings are generated.",
+          "Vector storage relies on Qdrant configured for on-disk segments with scalar quantization."
+        ],
+        "constraints": [
+          "All document processing workflows must execute redaction prior to persistence or embedding.",
+          "Synthetic data only for evaluation until governance approves real corpus usage.",
+          "Local developer environment must function offline except for OpenAI API calls."
+        ],
+        "decisions_made": [
+          "Adopt FastAPI + PostgreSQL + Alembic for core service bootstrapping.",
+          "Leverage Fake PII generation and presidio-research evaluator for regression testing.",
+          "Prioritize .pdf (text-based), .docx, .pptx, .csv, .xlsx ingestion in Sprint 01."
+        ],
+        "files_created": [
+          "cmos/missions/sprint-01/B1.1_Core-Service-Bootstrap.yaml",
+          "cmos/missions/sprint-01/B1.2_Synthetic-Corpus-Pipeline.yaml",
+          "cmos/missions/sprint-01/B1.3_Presidio-Redaction-Service.yaml",
+          "cmos/missions/sprint-01/B1.4_Document-Ingestion-Pipeline.yaml",
+          "cmos/missions/sprint-01/B1.5_Embedding-and-Qdrant-Bootstrap.yaml",
+          "cmos/missions/sprint-01/B1.6_Sprint-Efficacy-Evaluator.yaml",
+          "cmos/missions/backlog.yaml",
+          "cmos/docs/sprint-01_metrics_plan.md",
+          "cmos/reports/README.md",
+          "cmos/reports/sprint-01/.gitkeep"
+        ],
+        "achievements": [
+          "Completed Sprint 00 strategic research artifacts.",
+          "Documented Sprint 01 missions with direct research cross-links.",
+          "Established automated sprint evaluation mission to support continuous planning.",
+          "Defined Sprint 01 telemetry plan and artifact naming for evaluator automation."
+        ],
+        "sprint_evaluation": {
+          "script_path": "scripts/evaluate_sprint.py",
+          "report_directory": "cmos/reports/",
+          "run_protocol": "Execute after each sprint demo; compare mission successCriteria against telemetry and append report reference here."
+        }
+      }
+    }
+  },
+  "technical_context": {
+    "dependencies": [
+      "Python 3.11+",
+      "FastAPI",
+      "SQLAlchemy + Alembic",
+      "PostgreSQL 15+",
+      "Qdrant",
+      "OpenAI text-embedding-3-small",
+      "Microsoft Presidio (Analyzer & Anonymizer)",
+      "spaCy en_core_web_lg",
+      "Faker",
+      "python-docx",
+      "python-pptx",
+      "pypdf / py-pdf-parser",
+      "pandas"
+    ],
+    "system_components": {
+      "ingestion": "Upload endpoints, format routing, redaction, chunking, and processing state tracking.",
+      "redaction": "Presidio-based pipeline with custom recognizers and pseudonymization operators.",
+      "vector_store": "Qdrant collection with on-disk storage, scalar quantization, and rescoring.",
+      "evaluation": "Synthetic corpus generation + presidio-research metrics, sprint efficacy script."
+    },
+    "integration_points": [
+      "cmos/docs/technical_architecture.md",
+      "cmos/docs/roadmap.md",
+      "cmos/missions/backlog.yaml",
+      "cmos/docs/sprint-01_metrics_plan.md"
+    ]
+  },
+  "planning": {
+    "current_sprint": "Sprint 01 - Foundation Build",
+    "next_checkpoint": "Complete B1.1 → B1.3 to unlock ingestion pipeline.",
+    "research_to_build_links": [
+      { "research": "cmos/missions/research/R1.1_Presidio-Evaluation-Strategic-Framework.md", "build": "B1.2, B1.3" },
+      { "research": "cmos/missions/research/R1.2_UX-Research-Document-types.md", "build": "B1.4" },
+      { "research": "cmos/missions/research/TR-03.RAG-Cost-Optimization.md", "build": "B1.5" },
+      { "research": "cmos/missions/research/TR-04Optimizing-Qdrant-on-Railway.md", "build": "B1.5" }
+    ],
+    "sprint_close_process": [
+      "Run scripts/evaluate_sprint.py with --sprint <n> to generate report in cmos/reports/.",
+      "Update cmos/missions/backlog.yaml statuses and success metric outcomes.",
+      "Capture retrospective highlights in MASTER_CONTEXT.json under working_memory.domains.main.achievements."
+    ]
+  },
+  "context_health": {
+    "size_kb": 0,
+    "size_limit_kb": 256,
+    "sessions_since_reset": 0,
+    "last_reset": "",
+    "compression_enabled": true,
+    "anti_pattern_detection": true
+  },
+  "ai_instructions": {
+    "preferred_language": "python",
+    "code_style": "typed_fastapi_service",
+    "testing_required": true,
+    "documentation_level": "task_oriented"
+  }
+}

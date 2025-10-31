@@ -1,0 +1,57 @@
+# Mission File: B1.2_Synthetic-Corpus-Pipeline.yaml
+
+missionId: "B1.2"
+
+objective: "Implement the synthetic UX research corpus generator and Presidio evaluation harness to support redaction tuning."
+
+context: |
+  Builds directly on the findings in R1.1_Presidio-Evaluation-Strategic-Framework.md.
+  Provides the repeatable data pipeline and testing utilities that the Presidio redaction service will rely on for calibration.
+
+successCriteria:
+  - "Python scripts generate Markdown, TXT, DOCX, PDF, and CSV exemplars populated with synthetic PII via Faker."
+  - "Corpus generation enforces locale-aware PII, logical consistency, and excludes output from version control."
+  - "Artifacts stored in a secure local path with clear instructions for future cloud bucket promotion."
+  - "Presidio evaluation harness (presidio-research based) loads corpus annotations and reports precision/recall per entity."
+  - "`cmos/reports/sprint-01/presidio_corpus_baseline.json` captured with entity-level precision/recall and corpus configuration metadata."
+  - "README snippet documents how to regenerate the corpus and run evaluations."
+
+deliverables:
+  - "Automation scripts/notebooks for corpus generation and upload."
+  - "Ground-truth annotation JSON compatible with presidio-research evaluator."
+  - "Baseline metric artifact written to `cmos/reports/sprint-01/presidio_corpus_baseline.json`."
+  - "Evaluation command or script producing metric summaries."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Corpus must be synthetic, locale-aware, and generated programmatically (python-docx, fpdf2/ReportLab, Faker)."
+      sourceMission: "cmos/missions/research/R1.1_Presidio-Evaluation-Strategic-Framework.md"
+    - finding: "Evaluation should leverage microsoft/presidio-research with precision/recall emphasis on recall."
+      sourceMission: "cmos/missions/research/R1.1_Presidio-Evaluation-Strategic-Framework.md"
+    - finding: "Prior PII detection analysis mandates pseudonymization and privacy-by-design storage."
+      sourceMission: "cmos/missions/research/TR-02.PII-Detection-Redaction.md"
+
+  implementationScope:
+    coreDeliverable: "Automated corpus generator plus evaluation harness producing reproducible Presidio performance metrics."
+    outOfScope:
+      - "Runtime integration of Presidio into the ingestion pipeline."
+      - "CI/CD automation for the evaluation suite."
+      - "Cloud bucket provisioning (document manual steps only)."
+
+  validationProtocol:
+    - validator: "Presidio Evaluator Metrics"
+      focus: "Entity-level recall ≥ target thresholds defined in R1.1."
+    - validator: "Code Review"
+      focus: "Data generation scripts for maintainability and reproducibility."
+
+  handoffContext:
+    completed: []
+    interfaces:
+      - "CLI or script entrypoint to regenerate corpus."
+      - "Evaluation report artifact (JSON/Markdown) summarizing metrics."
+    assumptions:
+      - "Local machine has access to Faker locales and required Python deps."
+    nextMission: "B1.3: Presidio Redaction Service"
+    blockers: []

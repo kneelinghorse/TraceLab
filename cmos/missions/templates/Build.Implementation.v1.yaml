@@ -1,0 +1,68 @@
+# pack.yaml - Metadata for the "Implementation" Domain Pack
+name: "Build.Implementation.v1"
+version: "1.0.0"
+displayName: "Implementation Mission"
+description: "A mission to implement a specific, well-scoped technical component based on the findings of a prior research mission. Sized for a single, focused development session." #
+author: "Your Name/Team"
+schema: "./schemas/Implementation.v1.json"
+
+---
+
+# Mission File: B#.#_component-name.yaml
+
+missionId: "BI-20251004-001" # Build Implementation
+
+objective: "To implement the core logic for the 'GraphAnalysisService' component, ensuring it meets specified performance targets and has passing unit tests."
+
+context: |
+  This mission implements the findings from the Technical Research mission <TR-20251004-001>.
+  The scope is intentionally limited to a single developer session to ensure high focus and a clean, testable deliverable.
+
+successCriteria:
+  - "The core functionality is implemented according to the 'implementationScope'."
+  - "All unit tests are passing with >80% code coverage."
+  - "The implemented code meets the performance target defined in the 'researchFoundation'."
+  - "The handoff context is fully populated for the next mission."
+
+deliverables:
+  - "The implemented and documented source code for the component."
+  - "A suite of passing unit tests."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  # Creates a direct, auditable link to the justifying research.
+  researchFoundation:
+    - finding: "Implement using the 'igraph' library."
+      sourceMission: "TR-20251004-001"
+    - finding: "Target query performance of < 100ms."
+      sourceMission: "TR-20251004-001"
+    - finding: "Must use the bulk-loading pattern for graph creation."
+      sourceMission: "TR-20251004-001"
+      
+  # Sized for a single session.
+  implementationScope:
+    coreDeliverable: "A Python class `GraphAnalysisService` with methods for `load_graph_from_edges` and `find_shortest_path`."
+    outOfScope:
+      - "API endpoint exposure (next mission: BI-20251004-002)."
+      - "Performance optimization beyond the initial target."
+      - "Integration with the main application."
+
+  # Defines the cross-AI validation strategy.
+  validationProtocol:
+    - validator: "Gemini"
+      focus: "Production readiness and adherence to Python best practices."
+    - validator: "Claude"
+      focus: "Algorithmic correctness and logical clarity."
+
+  # The structured output that enables mission chaining.
+  handoffContext:
+    completed:
+      - "`GraphAnalysisService` class created."
+      - "`load_graph_from_edges` and `find_shortest_path` methods implemented and tested."
+    interfaces:
+      - "Class: `GraphAnalysisService`, Method: `find_shortest_path(start_node, end_node)` returns `List[node]`."
+    assumptions:
+      - "Input data will be a clean list of edge tuples."
+    nextMission: "BI-20251004-002: Expose GraphAnalysisService via FastAPI."
+    blockers: []

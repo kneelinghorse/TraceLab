@@ -1,0 +1,56 @@
+# Mission File: B1.5_Embedding-and-Qdrant-Bootstrap.yaml
+
+missionId: "B1.5"
+
+objective: "Implement embedding generation, Qdrant collection setup, and retrieval plumbing for sanitized document chunks."
+
+context: |
+  Executes Week 4 roadmap goals and operationalizes cost/performance strategies from prior research.
+  Connects chunked documents to vector storage, enabling RAG features in later sprints.
+
+successCriteria:
+  - "OpenAI `text-embedding-3-small` integration with batch support and exponential backoff."
+  - "Embeddings persisted to Qdrant collection configured for on_disk storage, scalar quantization, and payload indexes."
+  - "Two-phase ingestion workflow (write-optimized import → enable HNSW + quantization) implemented."
+  - "Retrieval service can fetch top-k chunks for a query with metadata filters."
+  - "Cost/performance metrics captured (token usage, latency) for baseline reporting in `cmos/reports/sprint-01/qdrant_performance.json`."
+
+deliverables:
+  - "Embedding service module with CLI or background job to process pending chunks."
+  - "Infrastructure scripts/config to deploy/manage Qdrant (local and Railway-ready)."
+  - "Retrieval function or endpoint demonstrating query → vector search → chunk return."
+  - "Performance metric artifact stored at `cmos/reports/sprint-01/qdrant_performance.json`."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Optimized embedding + caching strategy recommending text-embedding-3-small and tiered model usage."
+      sourceMission: "cmos/missions/research/TR-03.RAG-Cost-Optimization.md"
+    - finding: "Qdrant collection configuration requires on_disk storage, scalar quantization, and rescoring pipeline."
+      sourceMission: "cmos/missions/research/TR-04Optimizing-Qdrant-on-Railway.md"
+    - finding: "Architecture demands chunk metadata and retrieval parameters (k, overlap, caching hooks)."
+      sourceMission: "cmos/docs/technical_architecture.md"
+
+  implementationScope:
+    coreDeliverable: "Embedding + vector storage pipeline with baselined retrieval service leveraging sanitized chunks."
+    outOfScope:
+      - "LLM answer synthesis (Sprint 2)."
+      - "Semantic cache layer (future enhancement per roadmap Week 6)."
+      - "Production observability dashboards."
+
+  validationProtocol:
+    - validator: "Integration Test"
+      focus: "End-to-end chunk → embed → store → retrieve cycle using sample documents."
+    - validator: "Performance Check"
+      focus: "Baseline latency/throughput vs. research targets."
+
+  handoffContext:
+    completed: []
+    interfaces:
+      - "Job or service `embed_pending_chunks()` scheduling."
+      - "Retrieval module API `search_chunks(project_id, query, top_k)`."
+    assumptions:
+      - "Sanitized chunks exist courtesy of B1.4 pipeline."
+    nextMission: "Sprint 2 RAG Query Implementation"
+    blockers: []

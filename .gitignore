@@ -1,0 +1,35 @@
+# General
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-wheel-metadata/
+
+# Packaging
+build/
+dist/
+develop-eggs/
+eggs/
+.eggs/
+*.egg-info/
+
+# Tooling caches
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+
+# Editors
+.idea/
+.vscode/
+
+# Local environment
+.env
+.env.*
