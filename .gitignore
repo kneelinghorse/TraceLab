@@ -38,3 +38,12 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
+
+# Corpus data (synthetic PII - exclude from version control)
+data/corpus/
+data/corpus/**/*
+!.gitkeep
+
+# Local packaging outputs
+artifacts/
+artifacts/**/*
