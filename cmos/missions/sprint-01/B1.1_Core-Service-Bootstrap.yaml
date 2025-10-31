@@ -23,7 +23,7 @@ deliverables:
 domainFields:
   type: "Build.Implementation.v1"
 
-  researchFoundation:
+  read for context researchFoundation:
     - finding: "Core data schema tables and relationships are specified in the architecture document."
       sourceMission: "cmos/docs/technical_architecture.md"
     - finding: "Roadmap Week 1 requires FastAPI + PostgreSQL with Alembic migrations and Pydantic models."

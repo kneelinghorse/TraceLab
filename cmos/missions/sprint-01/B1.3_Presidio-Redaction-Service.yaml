@@ -25,7 +25,7 @@ deliverables:
 domainFields:
   type: "Build.Implementation.v1"
 
-  researchFoundation:
+  read for context researchFoundation:
     - finding: "Quality gates require multi-layer validation and pseudonymization prior to embedding."
       sourceMission: "cmos/missions/research/TR-02.PII-Detection-Redaction.md"
     - finding: "Synthetic corpus + evaluation protocol defines tuning workflow and recall targets."

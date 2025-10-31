@@ -25,7 +25,7 @@ deliverables:
 domainFields:
   type: "Build.Implementation.v1"
 
-  researchFoundation:
+  read for context researchFoundation:
     - finding: "Corpus must be synthetic, locale-aware, and generated programmatically (python-docx, fpdf2/ReportLab, Faker)."
       sourceMission: "cmos/missions/research/R1.1_Presidio-Evaluation-Strategic-Framework.md"
     - finding: "Evaluation should leverage microsoft/presidio-research with precision/recall emphasis on recall."

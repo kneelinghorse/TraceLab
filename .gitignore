@@ -1,35 +1,40 @@
-# General
-.DS_Store
-
 # Python
 __pycache__/
 *.py[cod]
+*$py.class
 *.so
 .Python
 env/
 venv/
-.venv/
-pip-wheel-metadata/
+ENV/
+.venv
 
-# Packaging
-build/
-dist/
-develop-eggs/
-eggs/
-.eggs/
-*.egg-info/
-
-# Tooling caches
-.mypy_cache/
-.pytest_cache/
-.ruff_cache/
-.coverage
-coverage.xml
-
-# Editors
-.idea/
-.vscode/
-
-# Local environment
+# Environment
 .env
-.env.*
+.env.local
+
+# Database
+*.db
+*.sqlite
+
+# Alembic
+alembic/versions/*.pyc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.log
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
