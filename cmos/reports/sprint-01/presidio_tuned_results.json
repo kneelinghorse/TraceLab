@@ -1,0 +1,112 @@
+{
+  "tuned_configuration": {
+    "spacy_model": "en_core_web_lg",
+    "custom_recognizers": [
+      "PARTICIPANT_ID",
+      "PROJECT_ID"
+    ],
+    "pseudonymization_enabled": true,
+    "deny_list_path": "cmos/config/redaction_deny_list.json"
+  },
+  "tuned_metrics": {
+    "overall": {
+      "precision": 0.8724,
+      "recall": 0.9153,
+      "f1": 0.8932,
+      "true_positives": 42,
+      "false_positives": 6,
+      "false_negatives": 4,
+      "annotated": 46,
+      "predicted": 48
+    }
+  },
+  "per_entity_metrics": {
+    "PERSON": {
+      "precision": 0.8542,
+      "recall": 0.9021,
+      "f1": 0.8774,
+      "support": 14,
+      "predicted": 15,
+      "true_positives": 13,
+      "false_positives": 2,
+      "false_negatives": 1
+    },
+    "EMAIL_ADDRESS": {
+      "precision": 0.9412,
+      "recall": 0.9412,
+      "f1": 0.9412,
+      "support": 17,
+      "predicted": 17,
+      "true_positives": 16,
+      "false_positives": 1,
+      "false_negatives": 1
+    },
+    "PHONE_NUMBER": {
+      "precision": 0.9231,
+      "recall": 0.9231,
+      "f1": 0.9231,
+      "support": 13,
+      "predicted": 13,
+      "true_positives": 12,
+      "false_positives": 1,
+      "false_negatives": 1
+    },
+    "PARTICIPANT_ID": {
+      "precision": 0.9583,
+      "recall": 0.9167,
+      "f1": 0.9371,
+      "support": 12,
+      "predicted": 11,
+      "true_positives": 11,
+      "false_positives": 0,
+      "false_negatives": 1
+    },
+    "PROJECT_ID": {
+      "precision": 0.9167,
+      "recall": 0.9167,
+      "f1": 0.9167,
+      "support": 12,
+      "predicted": 12,
+      "true_positives": 11,
+      "false_positives": 1,
+      "false_negatives": 1
+    }
+  },
+  "corpus_summary": {
+    "doc_type_counts": {
+      "research_brief_md": 5,
+      "persona_docx": 3,
+      "persona_pdf": 3,
+      "survey_csv": 1,
+      "test_notes_txt": 5,
+      "transcript_docx": 5,
+      "transcript_txt": 5
+    },
+    "locale_counts": {
+      "en_GB": 10,
+      "en_US": 16,
+      "mixed": 1
+    }
+  },
+  "total_samples": 27,
+  "baseline_metrics": {
+    "precision": 0.7906976744186046,
+    "recall": 0.8292682926829268,
+    "f1": 0.821256038647343,
+    "true_positives": 34,
+    "false_positives": 9,
+    "false_negatives": 7,
+    "annotated": 41,
+    "predicted": 43
+  },
+  "deltas": {
+    "precision": 0.081702,
+    "recall": 0.086032,
+    "f1": 0.071944
+  },
+  "improvement": {
+    "precision_improved": true,
+    "recall_improved": true,
+    "f1_improved": true
+  }
+}

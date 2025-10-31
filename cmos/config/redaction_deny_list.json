@@ -1,0 +1,11 @@
+{
+  "PARTICIPANT_ID": [
+    "PID-TEST-0000",
+    "PID-CONTROL-9999",
+    "PARTICIPANT-DEMO-0001"
+  ],
+  "PROJECT_ID": [
+    "PROJ-DEMO-0000",
+    "PROJECT-SANDBOX-9999"
+  ]
+}
