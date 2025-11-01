@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -33,29 +34,195 @@ class PresidioEvaluator:
 
     SUPPORTED_EXTENSIONS = {".txt", ".md", ".markdown", ".csv", ".docx", ".pdf"}
 
-    def __init__(self, corpus_dir: str = "data/corpus", spacy_model: str = "en_core_web_sm") -> None:
+    def __init__(
+        self,
+        corpus_dir: str = "data/corpus",
+        spacy_model: str = "en_core_web_sm",
+        analyzer_engine: Optional[AnalyzerEngine] = None,
+    ) -> None:
         """
         Args:
             corpus_dir: Directory containing corpus documents and annotations.
             spacy_model: spaCy model used by the Presidio analyzer.
+            analyzer_engine: Optional preconfigured AnalyzerEngine to reuse.
         """
         self.corpus_dir = Path(corpus_dir).resolve()
         self.annotations_dir = self.corpus_dir / "annotations"
         self.spacy_model = spacy_model
 
-        # Ensure the requested spaCy model is available for Presidio.
-        self._ensure_spacy_model(spacy_model)
+        if analyzer_engine is not None:
+            self.analyzer = analyzer_engine
+        else:
+            # Ensure the requested spaCy model is available for Presidio.
+            self._ensure_spacy_model(spacy_model)
 
-        nlp_configuration = {
-            "nlp_engine_name": "spacy",
-            "models": [{"lang_code": "en", "model_name": spacy_model}],
-        }
-        provider = NlpEngineProvider(nlp_configuration=nlp_configuration)
-        nlp_engine = provider.create_engine()
+            nlp_configuration = {
+                "nlp_engine_name": "spacy",
+                "models": [{"lang_code": "en", "model_name": spacy_model}],
+            }
+            provider = NlpEngineProvider(nlp_configuration=nlp_configuration)
+            nlp_engine = provider.create_engine()
 
-        self.analyzer = AnalyzerEngine(nlp_engine=nlp_engine)
+            self.analyzer = AnalyzerEngine(nlp_engine=nlp_engine)
+
         self.wrapper = PresidioAnalyzerWrapper(analyzer_engine=self.analyzer, language="en")
         self.evaluator = SpanEvaluator(model=self.wrapper)
+
+    # ------------------------------------------------------------------ priority evaluation helpers
+
+    PRIORITY_NORMALIZATION_RULES: Dict[str, Any] = {
+        "EMAIL_ADDRESS": lambda value: value.strip().lower(),
+        "PHONE_NUMBER": lambda value: re.sub(r"\D", "", value),
+        "PARTICIPANT_ID": lambda value: value.replace(" ", "").upper(),
+        "PROJECT_ID": lambda value: value.replace(" ", "").upper(),
+        "PERSON": lambda value: " ".join(value.strip().split()),
+    }
+
+    def evaluate_priority_entities(
+        self,
+        target_entities: List[str],
+        language: str = "en",
+    ) -> Dict[str, Any]:
+        """
+        Evaluate recall/precision for a targeted set of entities using corpus metadata.
+
+        The synthetic corpus metadata includes canonical values for priority entities
+        (e.g., participant/contact fields). This evaluation focuses on those high-value
+        fields to measure tuned recognizer performance.
+        """
+        samples = self.load_corpus_samples()
+        priority = set(target_entities)
+
+        metrics: Dict[str, Dict[str, int]] = {
+            entity: {"true_positives": 0, "false_positives": 0, "false_negatives": 0}
+            for entity in priority
+        }
+        sample_coverage = 0
+
+        for sample in samples:
+            metadata = sample.metadata or {}
+            entities_meta = metadata.get("entities") or {}
+
+            expected_map: Dict[str, set] = {}
+            for entity in priority:
+                if entity not in entities_meta:
+                    continue
+                expected_values = self._normalize_expected_values(entity, entities_meta[entity])
+                if expected_values:
+                    expected_map[entity] = expected_values
+
+            if not expected_map:
+                continue
+
+            sample_coverage += 1
+            analysis_results = self.analyzer.analyze(text=sample.full_text, language=language)
+
+            detected: Dict[str, set] = {entity: set() for entity in priority}
+            for result in analysis_results:
+                entity_type = result.entity_type
+                if entity_type not in priority:
+                    continue
+                span_text = sample.full_text[result.start : result.end]
+                normalized = self._normalize_detected_value(entity_type, span_text)
+                if normalized:
+                    detected[entity_type].add(normalized)
+
+            for entity in priority:
+                expected = expected_map.get(entity)
+                if not expected:
+                    continue
+                found = detected.get(entity, set())
+                matches = expected & found
+
+                metrics[entity]["true_positives"] += len(matches)
+                metrics[entity]["false_negatives"] += len(expected - matches)
+                metrics[entity]["false_positives"] += len(found - matches)
+
+        per_entity_metrics: Dict[str, Dict[str, Any]] = {}
+        overall_tp = overall_fp = overall_fn = 0
+
+        for entity in priority:
+            counts = metrics[entity]
+            tp = counts["true_positives"]
+            fp = counts["false_positives"]
+            fn = counts["false_negatives"]
+
+            precision = tp / (tp + fp) if (tp + fp) else 0.0
+            recall = tp / (tp + fn) if (tp + fn) else 0.0
+            f1 = (
+                (2 * precision * recall) / (precision + recall)
+                if (precision + recall) > 0
+                else 0.0
+            )
+
+            per_entity_metrics[entity] = {
+                "precision": precision,
+                "recall": recall,
+                "f1": f1,
+                "support": tp + fn,
+                "predicted": tp + fp,
+                "true_positives": tp,
+                "false_positives": fp,
+                "false_negatives": fn,
+            }
+
+            overall_tp += tp
+            overall_fp += fp
+            overall_fn += fn
+
+        overall_precision = overall_tp / (overall_tp + overall_fp) if (overall_tp + overall_fp) else 0.0
+        overall_recall = overall_tp / (overall_tp + overall_fn) if (overall_tp + overall_fn) else 0.0
+        overall_f1 = (
+            (2 * overall_precision * overall_recall) / (overall_precision + overall_recall)
+            if (overall_precision + overall_recall) > 0
+            else 0.0
+        )
+
+        return {
+            "total_samples": sample_coverage,
+            "priority_entities": list(priority),
+            "metrics": {
+                "overall": {
+                    "precision": overall_precision,
+                    "recall": overall_recall,
+                    "f1": overall_f1,
+                    "true_positives": overall_tp,
+                    "false_positives": overall_fp,
+                    "false_negatives": overall_fn,
+                    "annotated": overall_tp + overall_fn,
+                    "predicted": overall_tp + overall_fp,
+                }
+            },
+            "per_entity": per_entity_metrics,
+        }
+
+    def _normalize_detected_value(self, entity: str, value: str) -> Optional[str]:
+        """Normalize detected text for comparison."""
+        if not value:
+            return None
+        processor = self.PRIORITY_NORMALIZATION_RULES.get(entity)
+        normalized = processor(value) if processor else value.strip()
+        return normalized or None
+
+    def _normalize_expected_values(self, entity: str, raw_value: Any) -> set:
+        """Normalize metadata-defined expected entity values to a comparable set."""
+        values: List[str]
+        if raw_value is None:
+            return set()
+        if isinstance(raw_value, (list, tuple, set)):
+            values = [str(item) for item in raw_value if item]
+        elif isinstance(raw_value, dict):
+            # Metadata may wrap values in dict (e.g., location). Use best-effort extraction.
+            values = [str(val) for val in raw_value.values() if isinstance(val, str)]
+        else:
+            values = [str(raw_value)]
+
+        normalized_set = set()
+        for item in values:
+            normalized = self._normalize_detected_value(entity, item)
+            if normalized:
+                normalized_set.add(normalized)
+        return normalized_set
 
     # ------------------------------------------------------------------ helpers
 

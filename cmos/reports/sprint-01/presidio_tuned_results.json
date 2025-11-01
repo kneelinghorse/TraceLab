@@ -5,90 +5,79 @@
       "PARTICIPANT_ID",
       "PROJECT_ID"
     ],
-    "pseudonymization_enabled": true,
-    "deny_list_path": "cmos/config/redaction_deny_list.json"
+    "pseudonymization_enabled": true
   },
+  "priority_entities": [
+    "PERSON",
+    "EMAIL_ADDRESS",
+    "PHONE_NUMBER",
+    "PARTICIPANT_ID",
+    "PROJECT_ID"
+  ],
   "tuned_metrics": {
     "overall": {
-      "precision": 0.8724,
-      "recall": 0.9153,
-      "f1": 0.8932,
-      "true_positives": 42,
-      "false_positives": 6,
-      "false_negatives": 4,
-      "annotated": 46,
-      "predicted": 48
+      "precision": 0.6714309456539804,
+      "recall": 0.9943391582574452,
+      "f1": 0.8015873015873016,
+      "true_positives": 4040,
+      "false_positives": 1977,
+      "false_negatives": 23,
+      "annotated": 4063,
+      "predicted": 6017
     }
   },
   "per_entity_metrics": {
-    "PERSON": {
-      "precision": 0.8542,
-      "recall": 0.9021,
-      "f1": 0.8774,
-      "support": 14,
-      "predicted": 15,
-      "true_positives": 13,
-      "false_positives": 2,
-      "false_negatives": 1
-    },
-    "EMAIL_ADDRESS": {
-      "precision": 0.9412,
-      "recall": 0.9412,
-      "f1": 0.9412,
-      "support": 17,
-      "predicted": 17,
-      "true_positives": 16,
-      "false_positives": 1,
-      "false_negatives": 1
+    "PARTICIPANT_ID": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 800,
+      "predicted": 800,
+      "true_positives": 800,
+      "false_positives": 0,
+      "false_negatives": 0
     },
     "PHONE_NUMBER": {
-      "precision": 0.9231,
-      "recall": 0.9231,
-      "f1": 0.9231,
-      "support": 13,
-      "predicted": 13,
-      "true_positives": 12,
-      "false_positives": 1,
-      "false_negatives": 1
+      "precision": 0.7782063645130183,
+      "recall": 0.9829476248477467,
+      "f1": 0.8686759956942949,
+      "support": 821,
+      "predicted": 1037,
+      "true_positives": 807,
+      "false_positives": 230,
+      "false_negatives": 14
     },
-    "PARTICIPANT_ID": {
-      "precision": 0.9583,
-      "recall": 0.9167,
-      "f1": 0.9371,
-      "support": 12,
-      "predicted": 11,
-      "true_positives": 11,
+    "EMAIL_ADDRESS": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 821,
+      "predicted": 821,
+      "true_positives": 821,
       "false_positives": 0,
-      "false_negatives": 1
+      "false_negatives": 0
+    },
+    "PERSON": {
+      "precision": 0.3173114497850723,
+      "recall": 0.9890377588306942,
+      "f1": 0.4804733727810651,
+      "support": 821,
+      "predicted": 2559,
+      "true_positives": 812,
+      "false_positives": 1747,
+      "false_negatives": 9
     },
     "PROJECT_ID": {
-      "precision": 0.9167,
-      "recall": 0.9167,
-      "f1": 0.9167,
-      "support": 12,
-      "predicted": 12,
-      "true_positives": 11,
-      "false_positives": 1,
-      "false_negatives": 1
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 800,
+      "predicted": 800,
+      "true_positives": 800,
+      "false_positives": 0,
+      "false_negatives": 0
     }
   },
-  "corpus_summary": {
-    "doc_type_counts": {
-      "research_brief_md": 5,
-      "persona_docx": 3,
-      "persona_pdf": 3,
-      "survey_csv": 1,
-      "test_notes_txt": 5,
-      "transcript_docx": 5,
-      "transcript_txt": 5
-    },
-    "locale_counts": {
-      "en_GB": 10,
-      "en_US": 16,
-      "mixed": 1
-    }
-  },
-  "total_samples": 27,
   "baseline_metrics": {
     "precision": 0.7906976744186046,
     "recall": 0.8292682926829268,
@@ -100,13 +89,126 @@
     "predicted": 43
   },
   "deltas": {
-    "precision": 0.081702,
-    "recall": 0.086032,
-    "f1": 0.071944
+    "precision": -0.11926672876462419,
+    "recall": 0.16507086557451844,
+    "f1": -0.019668737060041352
   },
   "improvement": {
-    "precision_improved": true,
+    "precision_improved": false,
     "recall_improved": true,
-    "f1_improved": true
-  }
+    "f1_improved": false
+  },
+  "baseline_per_entity": {
+    "PERSON": {
+      "precision": 0.3465346534653465,
+      "recall": 0.625,
+      "f1": 0.5384615384615383,
+      "support": 56,
+      "predicted": 101,
+      "true_positives": 35,
+      "false_positives": 66,
+      "false_negatives": 21
+    },
+    "EMAIL_ADDRESS": {
+      "precision": 1.0,
+      "recall": 0.989010989010989,
+      "f1": 0.9911894273127754,
+      "support": 91,
+      "predicted": 90,
+      "true_positives": 90,
+      "false_positives": 0,
+      "false_negatives": 1
+    },
+    "DATE_TIME": {
+      "precision": 0.22,
+      "recall": 0.55,
+      "f1": 0.4230769230769231,
+      "support": 40,
+      "predicted": 100,
+      "true_positives": 22,
+      "false_positives": 78,
+      "false_negatives": 18
+    },
+    "ORGANIZATION": {
+      "precision": 0.25806451612903225,
+      "recall": 0.5217391304347826,
+      "f1": 0.4332129963898917,
+      "support": 46,
+      "predicted": 93,
+      "true_positives": 24,
+      "false_positives": 69,
+      "false_negatives": 22
+    },
+    "LOCATION": {
+      "precision": 0.22807017543859648,
+      "recall": 0.14444444444444443,
+      "f1": 0.15587529976019185,
+      "support": 90,
+      "predicted": 57,
+      "true_positives": 13,
+      "false_positives": 44,
+      "false_negatives": 77
+    },
+    "NRP": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 0,
+      "predicted": 16,
+      "true_positives": 0,
+      "false_positives": 16,
+      "false_negatives": 0
+    },
+    "PHONE_NUMBER": {
+      "precision": 0.7368421052631579,
+      "recall": 0.5833333333333334,
+      "f1": 0.6086956521739131,
+      "support": 72,
+      "predicted": 57,
+      "true_positives": 42,
+      "false_positives": 15,
+      "false_negatives": 30
+    },
+    "AGE": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 50,
+      "predicted": 0,
+      "true_positives": 0,
+      "false_positives": 0,
+      "false_negatives": 50
+    },
+    "UK_NHS": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 0,
+      "predicted": 1,
+      "true_positives": 0,
+      "false_positives": 1,
+      "false_negatives": 0
+    },
+    "URL": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "support": 0,
+      "predicted": 6,
+      "true_positives": 0,
+      "false_positives": 6,
+      "false_negatives": 0
+    },
+    "IP_ADDRESS": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 5,
+      "predicted": 5,
+      "true_positives": 5,
+      "false_positives": 0,
+      "false_negatives": 0
+    }
+  },
+  "total_samples": 821
 }
