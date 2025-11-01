@@ -24,10 +24,15 @@ def reset_database_and_reports():
     """Reset the SQLite database and coverage artifact before each test."""
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
+    original_bytes = None
     if _COVERAGE_PATH.exists():
+        original_bytes = _COVERAGE_PATH.read_bytes()
         _COVERAGE_PATH.unlink()
     yield
-    if _COVERAGE_PATH.exists():
+    if original_bytes is not None:
+        _COVERAGE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        _COVERAGE_PATH.write_bytes(original_bytes)
+    elif _COVERAGE_PATH.exists():
         _COVERAGE_PATH.unlink()
 
 
