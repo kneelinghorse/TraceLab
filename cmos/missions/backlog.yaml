@@ -61,7 +61,7 @@ domainFields:
         - { id: "B1.6", name: "Sprint Efficacy Evaluator", status: "Completed", completed_at: "2025-10-31T23:29:45.256990Z", notes: "Sprint evaluation script implemented: ingests backlog.yaml and telemetry artifacts, evaluates success criteria against metrics, generates Markdown/JSON reports with recommendations. Script executes successfully and produces sprint-01-summary.md" }
         - { id: "B1.7", name: "Presidio Recall Tuning", status: "Completed", completed_at: "2025-11-01T01:44:21.286028Z", reference: "cmos/missions/sprint-01/B1.7_Presidio-Recall-Tuning.yaml", notes: "Priority entity recall >=0.95 after analyzer span normalization and flexible phone recognizer rollout" }
         - { id: "B1.8", name: "Format Coverage Completion", status: "Completed", completed_at: "2025-11-01T02:48:31.062568Z", reference: "cmos/missions/sprint-01/B1.8_Format-Coverage-Completion.yaml", notes: "Generated ingestion_format_coverage.json with 5/5 formats chunked after end-to-end pipeline validation" }
-        - { id: "B1.9", name: "Qdrant Latency Optimization", status: "Current", reference: "cmos/missions/sprint-01/B1.9_Qdrant-Latency-Optimization.yaml", notes: "Optimize Qdrant query parameters to achieve <10ms p99 latency for all query scenarios (currently 14.3ms for top_k=20)" }
+        - { id: "B1.9", name: "Qdrant Latency Optimization", status: "Completed", completed_at: "2025-11-01T03:16:26.835992Z", reference: "cmos/missions/sprint-01/B1.9_Qdrant-Latency-Optimization.yaml", notes: "Adaptive hnsw_ef tiers (96/108/120) bring top_k=20 latency to 9.6ms without recall regressions." }
 
     - sprintId: "Sprint 02"
       title: "RAG Query & Semantic Optimization"

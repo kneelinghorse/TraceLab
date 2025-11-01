@@ -62,6 +62,30 @@ def test_retrieval_service_search(monkeypatch):
     assert results[0]["chunk_id"] == "chunk-1"
 
 
+def test_retrieval_service_auto_hnsw(monkeypatch):
+    fake_embedding = _FakeEmbeddingService()
+    fake_qdrant = _FakeQdrantService()
+    monkeypatch.setattr(
+        retrieval_module, "get_embedding_service", lambda: fake_embedding
+    )
+    monkeypatch.setattr(
+        retrieval_module, "get_qdrant_service", lambda: fake_qdrant
+    )
+
+    service = retrieval_module.RetrievalService()
+    results = service.search(
+        query="what is the impact of hnsw tuning?",
+        top_k=20,
+        project_id=None,
+        document_id=None,
+        source_type=None,
+    )
+
+    expected_hnsw = service.recommend_hnsw_ef(20)
+    assert fake_qdrant.calls[0]["hnsw_ef"] == expected_hnsw
+    assert results[0]["chunk_id"] == "chunk-1"
+
+
 def test_retrieval_api_endpoint(monkeypatch):
     fake_embedding = _FakeEmbeddingService()
     fake_qdrant = _FakeQdrantService()
