@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
 """CLI script to collect Qdrant performance metrics."""
 import json
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any
 from qdrant_client import QdrantClient
@@ -26,12 +28,12 @@ def collect_metrics() -> Dict[str, Any]:
             - embedding_latency: Sample embedding generation latency
             - token_usage: Estimated token counts
     """
-    metrics = {
-        "timestamp": time.time(),
+    metrics: Dict[str, Any] = {
+        "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "collection_info": {},
         "query_latency": [],
         "embedding_latency": [],
-        "token_usage": {}
+        "token_usage": {},
     }
     
     try:
@@ -70,19 +72,21 @@ def collect_metrics() -> Dict[str, Any]:
                 
                 # Perform sample searches
                 for top_k in [5, 10, 20]:
+                    tuned_hnsw_ef = retrieval_service.recommend_hnsw_ef(top_k)
                     start = time.time()
                     results = qdrant_service.search_chunks(
                         query_vector=query_embedding,
                         top_k=top_k,
-                        hnsw_ef=128
+                        hnsw_ef=tuned_hnsw_ef
                     )
                     query_time = time.time() - start
                     metrics["query_latency"].append({
                         "top_k": top_k,
                         "latency_ms": query_time * 1000,
-                        "results_returned": len(results)
+                        "results_returned": len(results),
+                        "hnsw_ef": tuned_hnsw_ef,
                     })
-                
+
             except Exception as e:
                 metrics["query_error"] = str(e)
         
@@ -128,4 +132,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

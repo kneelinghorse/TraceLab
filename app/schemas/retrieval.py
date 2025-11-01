@@ -11,7 +11,12 @@ class RetrievalQuery(BaseModel):
     project_id: Optional[UUID] = Field(None, description="Filter by project UUID.")
     document_id: Optional[UUID] = Field(None, description="Filter by document UUID.")
     source_type: Optional[str] = Field(None, description="Filter by document source type.")
-    hnsw_ef: int = Field(128, ge=1, le=512, description="HNSW ef parameter for recall/performance tradeoffs.")
+    hnsw_ef: Optional[int] = Field(
+        default=None,
+        ge=1,
+        le=512,
+        description="Optional HNSW ef override; defaults to tuned mission latency tiers."
+    )
 
 
 class RetrievedChunk(BaseModel):
