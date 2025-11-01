@@ -58,7 +58,10 @@ domainFields:
         - { id: "B1.3", name: "Presidio Redaction Service", status: "Completed", completed_at: "2025-10-31T19:23:53.523961Z", notes: "Presidio service with en_core_web_lg, custom recognizers (PARTICIPANT_ID, PROJECT_ID), Faker-based pseudonymization, FastAPI routes, and regression evaluation script. Ready for corpus-based testing once corpus is generated." }
         - { id: "B1.4", name: "Document Ingestion Pipeline", status: "Completed", completed_at: "2025-10-31T20:29:59.638320Z", notes: "Upload endpoints, format parsers (PDF/DOCX/PPTX/CSV/XLSX), redaction integration, chunking service (500-1000 tokens with overlap), status tracking, and coverage report generator implemented" }
         - { id: "B1.5", name: "Embedding & Qdrant Bootstrap", status: "Completed", completed_at: "2025-10-31T21:32:11.112294Z", notes: "OpenAI text-embedding-3-small service with batch support and exponential backoff, Qdrant collection with on_disk storage, scalar quantization (int8), HNSW indexing (m=16, ef_construct=100), payload indexes for filtering, retrieval service, CLI for processing pending chunks, and performance metrics collection implemented" }
-        - { id: "B1.6", name: "Sprint Efficacy Evaluator", status: "Current", reference: "cmos/missions/sprint-01/B1.6_Sprint-Efficacy-Evaluator.yaml" }
+        - { id: "B1.6", name: "Sprint Efficacy Evaluator", status: "Completed", completed_at: "2025-10-31T23:29:45.256990Z", notes: "Sprint evaluation script implemented: ingests backlog.yaml and telemetry artifacts, evaluates success criteria against metrics, generates Markdown/JSON reports with recommendations. Script executes successfully and produces sprint-01-summary.md" }
+        - { id: "B1.7", name: "Presidio Recall Tuning", status: "Completed", completed_at: "2025-11-01T01:44:21.286028Z", reference: "cmos/missions/sprint-01/B1.7_Presidio-Recall-Tuning.yaml", notes: "Priority entity recall >=0.95 after analyzer span normalization and flexible phone recognizer rollout" }
+        - { id: "B1.8", name: "Format Coverage Completion", status: "Current", reference: "cmos/missions/sprint-01/B1.8_Format-Coverage-Completion.yaml", notes: "Complete end-to-end ingestion verification for all five priority formats and generate coverage artifact" }
+        - { id: "B1.9", name: "Qdrant Latency Optimization", status: "Queued", reference: "cmos/missions/sprint-01/B1.9_Qdrant-Latency-Optimization.yaml", notes: "Optimize Qdrant query parameters to achieve <10ms p99 latency for all query scenarios (currently 14.3ms for top_k=20)" }
 
     - sprintId: "Sprint 02"
       title: "RAG Query & Semantic Optimization"
@@ -82,6 +85,9 @@ domainFields:
     - { from: "B1.3", to: "B1.4", type: "Blocks" }
     - { from: "B1.4", to: "B1.5", type: "Blocks" }
     - { from: "B1.5", to: "B1.6", type: "Blocks" }
+    - { from: "B1.6", to: "B1.7", type: "Blocks" }
+    - { from: "B1.6", to: "B1.8", type: "Blocks" }
+    - { from: "B1.6", to: "B1.9", type: "Blocks" }
 
   successMetrics:
     - "Sprint 1: Presidio recall ≥ 0.95 on synthetic corpus priority entities."
