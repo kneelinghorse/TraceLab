@@ -1,0 +1,30 @@
+{
+  "dashboard": "ingestion-overview",
+  "description": "Key ingestion KPIs for Markdown integration",
+  "charts": [
+    {
+      "title": "Queue Depth",
+      "type": "timeseries",
+      "metric": "ingestion_queue_depth",
+      "stat": "avg",
+      "labels": {
+        "queue": "markdown_ingest"
+      }
+    },
+    {
+      "title": "Markdown Chunk Throughput",
+      "type": "timeseries",
+      "metric": "ingestion_chunks_processed",
+      "stat": "sum",
+      "labels": {
+        "content_type": "markdown"
+      }
+    },
+    {
+      "title": "Qdrant Upsert Errors",
+      "type": "timeseries",
+      "metric": "ingestion_upsert_failures",
+      "stat": "sum"
+    }
+  ]
+}
