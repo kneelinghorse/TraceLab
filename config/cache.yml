@@ -1,0 +1,11 @@
+defaults:
+  enabled: true
+  similarity_threshold: 0.92
+  ttl_seconds: 86400
+  max_items: 20000
+  warm_start_queries: []
+metrics:
+  exporters:
+    - prometheus
+  labels:
+    service: semantic-cache
