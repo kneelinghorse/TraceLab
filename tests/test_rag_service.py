@@ -1,4 +1,5 @@
 """Tests for the RAG service orchestration and API endpoint."""
+import copy
 import time
 
 import pytest
@@ -73,6 +74,30 @@ class _FakeOpenAIClient:
         self.chat = _FakeChat(content)
 
 
+class _TieredFakeChatCompletions:
+    def __init__(self, responses):
+        self._responses = responses
+        self.requests = []
+
+    def create(self, **kwargs):
+        model = kwargs.get("model")
+        content = self._responses.get(model, "")
+        self.requests.append({"model": model})
+        message = type("Message", (), {"content": content})
+        choice = type("Choice", (), {"message": message})
+        return type("Response", (), {"choices": [choice]})
+
+
+class _TieredFakeChat:
+    def __init__(self, responses):
+        self.completions = _TieredFakeChatCompletions(responses)
+
+
+class _TieredFakeOpenAIClient:
+    def __init__(self, responses):
+        self.chat = _TieredFakeChat(responses)
+
+
 class _NoOpCacheService:
     def __init__(self):
         self.checked = 0
@@ -129,6 +154,8 @@ class _WorkloadCacheService:
             "sources": result["sources"],
             "compression": result["compression"],
             "cache": {"hit": True, "score": 0.99, "age_seconds": 0.0, "ttl_seconds": None},
+            "quality": copy.deepcopy(result["quality"]),
+            "routing": copy.deepcopy(result["routing"]),
         }
         self._entries[metadata.get("query")] = {
             "payload": payload,
@@ -177,6 +204,12 @@ def test_rag_service_run_query(monkeypatch):
     assert result["cache"]["hit"] is False
     assert cache.checked == 1
     assert cache.stored == 1
+    assert result["quality"]["composite_score"] >= settings.tiered_routing_threshold
+    assert result["quality"]["hard_failures"] == []
+    assert result["routing"]["selected_model"] == "gpt-test"
+    assert result["routing"]["estimated_cost_usd"] == 0.0
+    assert result["routing"]["metrics"]["total_queries"] == 1
+    assert result["routing"]["metrics"]["escalations"] == 0
 
 
 def test_rag_service_uses_cache_hit(monkeypatch):
@@ -214,6 +247,33 @@ def test_rag_service_uses_cache_hit(monkeypatch):
             "compression_ms": 0.1,
         },
         "cache": {"hit": True, "score": 0.98, "age_seconds": 4.2},
+        "quality": {
+            "composite_score": 0.92,
+            "threshold": settings.tiered_routing_threshold,
+            "pillar_scores": {
+                "linguistic_uncertainty": 0.95,
+                "answer_integrity": 0.9,
+                "source_provenance": 0.92,
+            },
+            "hard_failures": [],
+            "reasons": [],
+            "pre_escalation_score": None,
+        },
+        "routing": {
+            "selected_model": settings.openai_chat_model,
+            "escalated": False,
+            "attempts": [
+                {
+                    "model": settings.openai_chat_model,
+                    "quality_score": 0.92,
+                    "below_threshold": False,
+                    "hard_failures": [],
+                    "citation_count": 1,
+                }
+            ],
+            "estimated_cost_usd": 0.00018,
+            "metrics": {"total_queries": 5, "escalations": 1},
+        },
     }
 
     cache = _HitCacheService(cached_payload)
@@ -238,6 +298,54 @@ def test_rag_service_uses_cache_hit(monkeypatch):
     assert result["cache"]["hit"] is True
     assert fake_retrieval.calls == []
     assert cache.checked == 1
+    assert result["quality"]["composite_score"] == pytest.approx(0.92)
+    assert result["routing"]["selected_model"] == settings.openai_chat_model
+    assert result["routing"]["escalated"] is False
+
+
+def test_tiered_routing_escalates_on_low_quality(monkeypatch):
+    fake_retrieval = _FakeRetrievalService()
+    fake_embedding = _FakeEmbeddingService()
+    responses = {
+        settings.openai_chat_model: "I'm sorry, I cannot help with that request.",
+        settings.openai_escalation_model: (
+            "Tiered routing ensures high quality answers while controlling cost. "
+            "[Document: doc-1, Chunk: 0]"
+        ),
+    }
+    fake_client = _TieredFakeOpenAIClient(responses)
+    cache = _NoOpCacheService()
+
+    monkeypatch.setattr(rag_module, "_openai_import_error", None, raising=False)
+    monkeypatch.setattr(rag_module, "OpenAI", object, raising=False)
+
+    service = rag_module.RagService(
+        retrieval_service=fake_retrieval,
+        embedding_service=fake_embedding,
+        cache_service=cache,
+        client=fake_client,
+        model=settings.openai_chat_model,
+        escalation_model=settings.openai_escalation_model,
+        default_temperature=0.0,
+    )
+
+    result = service.run_query(
+        query="Explain how tiered routing improves quality.",
+        top_k=3,
+        project_id="proj-1",
+    )
+
+    assert result["routing"]["escalated"] is True
+    assert result["routing"]["selected_model"] == settings.openai_escalation_model
+    assert result["quality"]["pre_escalation_score"] is not None
+    assert result["quality"]["pre_escalation_score"] < settings.tiered_routing_threshold
+    assert result["quality"]["composite_score"] >= settings.tiered_routing_threshold
+    assert any(
+        entry["model"] == settings.openai_escalation_model
+        for entry in fake_client.chat.completions.requests
+    )
+    assert cache.checked == 1
+    assert cache.stored == 1
 
 
 class _FakeRagService:
@@ -280,6 +388,33 @@ class _FakeRagService:
                 "compression_ms": 12.4,
             },
             "cache": {"hit": False, "score": None, "age_seconds": None, "ttl_seconds": None},
+            "quality": {
+                "composite_score": 0.93,
+                "threshold": settings.tiered_routing_threshold,
+                "pillar_scores": {
+                    "linguistic_uncertainty": 0.96,
+                    "answer_integrity": 0.92,
+                    "source_provenance": 0.91,
+                },
+                "hard_failures": [],
+                "reasons": [],
+                "pre_escalation_score": None,
+            },
+            "routing": {
+                "selected_model": settings.openai_chat_model,
+                "escalated": False,
+                "attempts": [
+                    {
+                        "model": settings.openai_chat_model,
+                        "quality_score": 0.93,
+                        "below_threshold": False,
+                        "hard_failures": [],
+                        "citation_count": 1,
+                    }
+                ],
+                "estimated_cost_usd": 0.00018,
+                "metrics": {"total_queries": 4, "escalations": 0},
+            },
         }
 
 
@@ -311,6 +446,9 @@ def test_rag_search_endpoint(monkeypatch):
     assert fake_service.calls[0]["temperature"] == 0.25
     assert fake_service.calls[0]["max_tokens"] == 256
     assert body["cache"]["hit"] is False
+    assert body["quality"]["composite_score"] == pytest.approx(0.93)
+    assert body["routing"]["selected_model"] == settings.openai_chat_model
+    assert body["routing"]["escalated"] is False
 
 
 def test_semantic_cache_hit_rate_reaches_target(monkeypatch):
