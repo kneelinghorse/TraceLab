@@ -227,7 +227,8 @@ class QdrantService:
         project_id: Optional[str] = None,
         document_id: Optional[str] = None,
         source_type: Optional[str] = None,
-        hnsw_ef: int = 128
+        hnsw_ef: int = 128,
+        with_vectors: bool = False
     ) -> List[Dict[str, Any]]:
         """
         Search for similar chunks using vector similarity.
@@ -272,11 +273,13 @@ class QdrantService:
             limit=top_k,
             query_filter=query_filter,
             with_payload=True,
-            search_params={"hnsw_ef": hnsw_ef} if hnsw_ef else None
+            search_params={"hnsw_ef": hnsw_ef} if hnsw_ef else None,
+            with_vectors=with_vectors
         )
-        
-        return [
-            {
+
+        chunk_results: List[Dict[str, Any]] = []
+        for result in results:
+            chunk_payload = {
                 "chunk_id": str(result.id),
                 "content": result.payload.get("content", ""),
                 "document_id": result.payload.get("document_id"),
@@ -285,8 +288,15 @@ class QdrantService:
                 "source_type": result.payload.get("source_type"),
                 "score": result.score
             }
-            for result in results
-        ]
+            if with_vectors:
+                vector = getattr(result, "vector", None)
+                if isinstance(vector, dict):
+                    vector = next(iter(vector.values()), None)
+                if vector is not None:
+                    chunk_payload["embedding"] = vector
+            chunk_results.append(chunk_payload)
+
+        return chunk_results
 
 
 # Singleton instance (lazy initialization)

@@ -48,6 +48,11 @@ from app.schemas.retrieval import (
     RetrievalResponse,
     RetrievedChunk,
 )
+from app.schemas.rag import (
+    RagQuery,
+    RagResponse,
+    RagCitation,
+)
 
 __all__ = [
     "ProjectBase",
@@ -88,4 +93,7 @@ __all__ = [
     "RetrievalQuery",
     "RetrievalResponse",
     "RetrievedChunk",
+    "RagQuery",
+    "RagResponse",
+    "RagCitation",
 ]

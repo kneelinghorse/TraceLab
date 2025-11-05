@@ -18,7 +18,9 @@ class RetrievalService:
         project_id: Optional[str] = None,
         document_id: Optional[str] = None,
         source_type: Optional[str] = None,
-        hnsw_ef: Optional[int] = None
+        hnsw_ef: Optional[int] = None,
+        query_embedding: Optional[List[float]] = None,
+        include_embeddings: bool = False
     ) -> List[Dict[str, Any]]:
         """
         Search for relevant chunks using semantic similarity.
@@ -36,17 +38,20 @@ class RetrievalService:
         """
         resolved_hnsw_ef = self.recommend_hnsw_ef(top_k) if hnsw_ef is None else hnsw_ef
 
-        # Generate query embedding
-        query_embedding = self.embedding_service.generate_embedding(query)
+        # Generate query embedding (can be precomputed by caller)
+        effective_query_embedding = (
+            query_embedding if query_embedding is not None else self.embedding_service.generate_embedding(query)
+        )
 
         # Search Qdrant
         results = self.qdrant_service.search_chunks(
-            query_vector=query_embedding,
+            query_vector=effective_query_embedding,
             top_k=top_k,
             project_id=project_id,
             document_id=document_id,
             source_type=source_type,
-            hnsw_ef=resolved_hnsw_ef
+            hnsw_ef=resolved_hnsw_ef,
+            with_vectors=include_embeddings
         )
 
         return results
