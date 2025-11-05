@@ -1,0 +1,328 @@
+"""FastAPI router implementing the onboarding workflow."""
+from __future__ import annotations
+
+from pathlib import Path
+from typing import List, Optional
+from uuid import UUID
+
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    Header,
+    HTTPException,
+    Request,
+    Response,
+    status,
+)
+from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
+
+from app.core.config import settings
+from app.core.database import get_db
+from app.models.document import Document
+from app.models.project import Project
+from app.models.ingestion_job import IngestionJob
+from app.onboarding.idempotency import IdempotencyService
+from app.onboarding.jobs import create_job, process_job
+from app.onboarding.schemas import JobRead
+from app.schemas.document import DocumentCreate, DocumentRead, DocumentUpdate
+from app.schemas.project import ProjectCreate, ProjectRead, ProjectUpdate
+from app.services.processing_status import ProcessingStatusRecorder
+
+router = APIRouter(tags=["onboarding"])
+
+_status_recorder = ProcessingStatusRecorder()
+
+
+def _idempotency(
+    *,
+    request: Request,
+    key: Optional[str],
+    db: Session,
+) -> IdempotencyService:
+    return IdempotencyService(
+        db,
+        method=request.method,
+        path=request.url.path,
+        key=key,
+    )
+
+
+@router.get("/projects", response_model=List[ProjectRead])
+def list_projects(db: Session = Depends(get_db)) -> List[ProjectRead]:
+    """Return all projects ordered by name."""
+    projects = db.query(Project).order_by(Project.created_at.asc()).all()
+    return [ProjectRead.model_validate(project) for project in projects]
+
+
+@router.post(
+    "/projects",
+    response_model=ProjectRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_project(
+    payload: ProjectCreate,
+    request: Request,
+    db: Session = Depends(get_db),
+    idempotency_key: Optional[str] = Header(default=None, alias="Idempotency-Key"),
+) -> Response:
+    """Create a new project record with idempotent semantics."""
+    idempotency = _idempotency(request=request, key=idempotency_key, db=db)
+    cached = idempotency.check_replay(payload.model_dump())
+    if cached:
+        return JSONResponse(content=cached.data, status_code=cached.status_code)
+
+    project = Project(**payload.model_dump(exclude_none=True))
+    db.add(project)
+    db.flush()
+    db.refresh(project)
+
+    resource = ProjectRead.model_validate(project)
+    response_body = resource.model_dump(mode="json")
+
+    idempotency.save_response(
+        request_payload=payload.model_dump(),
+        response_payload=response_body,
+        status_code=status.HTTP_201_CREATED,
+    )
+    db.commit()
+    return JSONResponse(content=response_body, status_code=status.HTTP_201_CREATED)
+
+
+@router.get("/projects/{project_id}", response_model=ProjectRead)
+def get_project(project_id: UUID, db: Session = Depends(get_db)) -> ProjectRead:
+    """Fetch a single project."""
+    project = db.query(Project).filter(Project.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+    return ProjectRead.model_validate(project)
+
+
+@router.patch("/projects/{project_id}", response_model=ProjectRead)
+def update_project(
+    project_id: UUID,
+    payload: ProjectUpdate,
+    request: Request,
+    db: Session = Depends(get_db),
+    idempotency_key: Optional[str] = Header(default=None, alias="Idempotency-Key"),
+) -> Response:
+    """Update project metadata with idempotent replay support."""
+    idempotency = _idempotency(request=request, key=idempotency_key, db=db)
+    payload_dict = payload.model_dump(exclude_unset=True)
+    cached = idempotency.check_replay(payload_dict)
+    if cached:
+        return JSONResponse(content=cached.data, status_code=cached.status_code)
+
+    project = db.query(Project).filter(Project.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+
+    for field, value in payload_dict.items():
+        setattr(project, field, value)
+    db.flush()
+    db.refresh(project)
+
+    resource = ProjectRead.model_validate(project)
+    response_body = resource.model_dump(mode="json")
+
+    idempotency.save_response(
+        request_payload=payload_dict,
+        response_payload=response_body,
+        status_code=status.HTTP_200_OK,
+    )
+    db.commit()
+    return JSONResponse(content=response_body, status_code=status.HTTP_200_OK)
+
+
+@router.post(
+    "/documents",
+    response_model=DocumentRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def register_document(
+    payload: DocumentCreate,
+    request: Request,
+    db: Session = Depends(get_db),
+    idempotency_key: Optional[str] = Header(default=None, alias="Idempotency-Key"),
+) -> Response:
+    """Register a document for ingestion via the onboarding workflow."""
+    payload_dict = payload.model_dump()
+    idempotency = _idempotency(request=request, key=idempotency_key, db=db)
+    cached = idempotency.check_replay(payload_dict)
+    if cached:
+        return JSONResponse(content=cached.data, status_code=cached.status_code)
+
+    project = db.query(Project).filter(Project.id == payload.project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail=f"Project {payload.project_id} not found")
+
+    if not payload.file_path:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="file_path is required for onboarding document registration",
+        )
+
+    path = Path(payload.file_path)
+    if not path.exists():
+        raise HTTPException(status_code=404, detail=f"File not found at {payload.file_path}")
+
+    mutable_payload = payload.model_dump(exclude_none=True)
+    mutable_payload.setdefault("file_size", path.stat().st_size)
+    mutable_payload.setdefault("mime_type", _infer_mime_type(path))
+
+    document = Document(**mutable_payload)
+    db.add(document)
+    db.flush()
+    db.refresh(document)
+
+    _status_recorder.record(
+        db,
+        document.id,
+        stage="registered",
+        status="succeeded",
+        details={"file_path": document.file_path, "mime_type": document.mime_type},
+        commit=False,
+    )
+    db.flush()
+    db.refresh(document)
+
+    resource = DocumentRead.model_validate(document)
+    response_body = resource.model_dump(mode="json")
+
+    idempotency.save_response(
+        request_payload=payload_dict,
+        response_payload=response_body,
+        status_code=status.HTTP_201_CREATED,
+    )
+    db.commit()
+    return JSONResponse(content=response_body, status_code=status.HTTP_201_CREATED)
+
+
+@router.patch("/documents/{document_id}", response_model=DocumentRead)
+def update_document(
+    document_id: UUID,
+    payload: DocumentUpdate,
+    request: Request,
+    db: Session = Depends(get_db),
+    idempotency_key: Optional[str] = Header(default=None, alias="Idempotency-Key"),
+) -> Response:
+    """Update document metadata."""
+    payload_dict = payload.model_dump(exclude_unset=True)
+    idempotency = _idempotency(request=request, key=idempotency_key, db=db)
+    cached = idempotency.check_replay(payload_dict)
+    if cached:
+        return JSONResponse(content=cached.data, status_code=cached.status_code)
+
+    document = db.query(Document).filter(Document.id == document_id).first()
+    if not document:
+        raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+
+    for field, value in payload_dict.items():
+        setattr(document, field, value)
+    db.flush()
+    db.refresh(document)
+
+    resource = DocumentRead.model_validate(document)
+    response_body = resource.model_dump(mode="json")
+
+    idempotency.save_response(
+        request_payload=payload_dict,
+        response_payload=response_body,
+        status_code=status.HTTP_200_OK,
+    )
+    db.commit()
+    return JSONResponse(content=response_body, status_code=status.HTTP_200_OK)
+
+
+@router.get("/documents/{document_id}", response_model=DocumentRead)
+def get_document(document_id: UUID, db: Session = Depends(get_db)) -> DocumentRead:
+    """Retrieve document details."""
+    document = db.query(Document).filter(Document.id == document_id).first()
+    if not document:
+        raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+    return DocumentRead.model_validate(document)
+
+
+@router.post(
+    "/jobs",
+    response_model=JobRead,
+    status_code=status.HTTP_202_ACCEPTED,
+)
+def enqueue_ingestion_job(
+    *,
+    document_id: UUID,
+    background_tasks: BackgroundTasks,
+    request: Request,
+    db: Session = Depends(get_db),
+    idempotency_key: Optional[str] = Header(default=None, alias="Idempotency-Key"),
+) -> Response:
+    """Create an ingestion job and dispatch it to the background runner."""
+    payload_dict = {"document_id": str(document_id)}
+    idempotency = _idempotency(request=request, key=idempotency_key, db=db)
+    cached = idempotency.check_replay(payload_dict)
+    if cached:
+        return JSONResponse(
+            content=cached.data,
+            status_code=cached.status_code,
+            headers={"Location": f"{settings.api_v1_prefix}/jobs/{cached.data['id']}"},
+        )
+
+    document = db.query(Document).filter(Document.id == document_id).first()
+    if not document:
+        raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+    if not document.file_path:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Document is missing file_path; cannot enqueue ingestion job",
+        )
+
+    job = create_job(db, document=document)
+    db.flush()
+    db.refresh(job)
+
+    background_tasks.add_task(process_job, job.id)
+
+    resource = JobRead.model_validate(job)
+    response_body = resource.model_dump(mode="json")
+
+    idempotency.save_response(
+        request_payload=payload_dict,
+        response_payload=response_body,
+        status_code=status.HTTP_202_ACCEPTED,
+    )
+    db.commit()
+
+    headers = {"Location": f"{settings.api_v1_prefix}/jobs/{job.id}"}
+    return JSONResponse(content=response_body, status_code=status.HTTP_202_ACCEPTED, headers=headers)
+
+
+@router.get("/jobs/{job_id}", response_model=JobRead)
+def get_job(job_id: UUID, db: Session = Depends(get_db)) -> JobRead:
+    """Return ingestion job status."""
+    job = db.query(IngestionJob).filter(IngestionJob.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail=f"Job {job_id} not found")
+    return JobRead.model_validate(job)
+
+
+@router.get("/jobs", response_model=List[JobRead])
+def list_jobs(db: Session = Depends(get_db)) -> List[JobRead]:
+    """List all ingestion jobs."""
+    jobs = db.query(IngestionJob).order_by(IngestionJob.created_at.desc()).all()
+    return [JobRead.model_validate(job) for job in jobs]
+
+
+def _infer_mime_type(path: Path) -> Optional[str]:
+    """Infer MIME type based on file extension."""
+    mapping = {
+        ".pdf": "application/pdf",
+        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        ".csv": "text/csv",
+        ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ".md": "text/markdown",
+        ".markdown": "text/markdown",
+        ".txt": "text/plain",
+    }
+    return mapping.get(path.suffix.lower())
