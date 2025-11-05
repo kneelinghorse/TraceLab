@@ -43,6 +43,14 @@ class CompressionMetrics(BaseModel):
     compression_ms: float
 
 
+class CacheInfo(BaseModel):
+    """Metadata describing semantic cache evaluation."""
+    hit: bool
+    score: Optional[float] = None
+    age_seconds: Optional[float] = None
+    ttl_seconds: Optional[float] = None
+
+
 class RagResponse(BaseModel):
     """Response containing the generated answer alongside supporting metadata."""
     answer: str
@@ -50,3 +58,4 @@ class RagResponse(BaseModel):
     sources: List[RetrievedChunk]
     latency_ms: float
     compression: CompressionMetrics
+    cache: CacheInfo

@@ -7,6 +7,7 @@ from app.core.config import settings
 from app.services.context_compression import compress_context
 from app.services.embedding_service import EmbeddingService, get_embedding_service
 from app.services.retrieval_service import RetrievalService, get_retrieval_service
+from app.services.semantic_cache import SemanticCacheService, get_semantic_cache_service
 
 try:  # pragma: no cover - allow import without OpenAI SDK in some environments
     from openai import OpenAI
@@ -32,6 +33,7 @@ class RagService:
         self,
         retrieval_service: Optional[RetrievalService] = None,
         embedding_service: Optional[EmbeddingService] = None,
+        cache_service: Optional[SemanticCacheService] = None,
         client: Optional[OpenAI] = None,  # type: ignore[name-defined]
         model: Optional[str] = None,
         default_temperature: Optional[float] = None,
@@ -50,6 +52,11 @@ class RagService:
         self.client = client
         self.retrieval_service = retrieval_service or get_retrieval_service()
         self.embedding_service = embedding_service or get_embedding_service()
+        self.cache_service = (
+            cache_service
+            if cache_service is not None
+            else (get_semantic_cache_service() if settings.semantic_cache_enabled else None)
+        )
         self.model = model or settings.openai_chat_model
         self.default_temperature = (
             default_temperature if default_temperature is not None else settings.openai_chat_temperature
@@ -73,6 +80,29 @@ class RagService:
         """
         start = time.perf_counter()
         query_embedding = self.embedding_service.generate_embedding(query)
+        cache_metadata = {
+            "query": query,
+            "project_id": project_id,
+            "document_id": document_id,
+            "source_type": source_type,
+            "top_k": top_k,
+            "temperature": temperature if temperature is not None else self.default_temperature,
+            "max_tokens": max_tokens if max_tokens is not None else self.default_max_tokens,
+        }
+
+        if self.cache_service is not None:
+            cached_result = self.cache_service.check_cache(
+                query_embedding=query_embedding,
+                metadata=cache_metadata,
+            )
+            if cached_result:
+                response = dict(cached_result)
+                response["latency_ms"] = round((time.perf_counter() - start) * 1000, 2)
+                cache_info = response.get("cache") or {}
+                cache_info["hit"] = True
+                response["cache"] = cache_info
+                return response
+
         retrieved_chunks = self.retrieval_service.search(
             query=query,
             top_k=top_k,
@@ -100,13 +130,27 @@ class RagService:
         citations = self._extract_citations(answer, compressed_chunks)
         latency_ms = (time.perf_counter() - start) * 1000
 
-        return {
+        result = {
             "answer": answer,
             "citations": citations,
             "sources": compressed_chunks,
             "latency_ms": round(latency_ms, 2),
             "compression": compression_metrics,
+            "cache": {"hit": False},
         }
+
+        if self.cache_service is not None:
+            try:
+                self.cache_service.store_in_cache(
+                    query_embedding=query_embedding,
+                    result=result,
+                    metadata=cache_metadata,
+                )
+            except Exception:
+                # Cache writes must never impact the primary query path.
+                pass
+
+        return result
 
     def _build_messages(self, query: str, chunks: List[Dict[str, Any]]) -> List[Dict[str, str]]:
         """Compose chat messages incorporating retrieved context."""
