@@ -8,6 +8,8 @@ from app.models.insight import Insight, InsightSource
 from app.models.mission import Mission
 from app.models.quality import QualityCheck
 from app.models.processing_status import DocumentProcessingStatus
+from app.models.ingestion_job import IngestionJob
+from app.models.idempotency import IdempotencyRecord
 
 __all__ = [
     "Base",
@@ -21,4 +23,6 @@ __all__ = [
     "Mission",
     "QualityCheck",
     "DocumentProcessingStatus",
+    "IngestionJob",
+    "IdempotencyRecord",
 ]

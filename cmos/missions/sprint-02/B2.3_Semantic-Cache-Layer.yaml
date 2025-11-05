@@ -2,14 +2,14 @@
 
 missionId: "B2.3"
 
-objective: "Implement semantic caching layer to store query embeddings and responses in Qdrant, achieving 15-20% cache hit rate, backed by a Markdown-native ingestion pipeline and scripted onboarding workflow."
+objective: "Implement semantic caching layer to store query embeddings and responses in Qdrant, achieving 15-20% cache hit rate, backed by the Markdown-native ingestion pipeline and onboarding API."
 
 context: |
   Implements the semantic caching roadmap goal while resolving the ingestion blockers documented in R2.2 and R2.3. The cache can only be validated once Markdown research assets stream into Qdrant through a first-class ingestion service and projects/documents can be registered without manual SQL.
   
   Key architectural guidance:
   - R2.2 (Markdown Ingestion Service) mandates a Node.js/unified pipeline with chokidar-based file watching, a durable message queue, remark plugins for chunking, and a Qdrant payload schema that preserves heading hierarchies and front matter.
-  - R2.3 (Project Bootstrap Workflow) defines the ingest-cli (Python/Typer), an asynchronous onboarding API, OAuth device-flow authentication, idempotent endpoints, and saga-style compensating actions for resilience.
+  - R2.3 (Project Bootstrap Workflow) defines the asynchronous onboarding API with idempotent endpoints, saga-style compensating actions, and seams for future authentication if a multi-user deployment is ever required.
   - Semantic cache collections must coexist with ingestion output—cache metadata should reference the same project/document identifiers produced by the onboarding workflow so operations remain consistent end-to-end.
 
 successCriteria:
@@ -20,7 +20,7 @@ successCriteria:
   - "Cache miss: proceed with full RAG pipeline, then store query+response in cache."
   - "Cache management: TTL and size limits implemented to prevent unbounded growth."
   - "Cache hit rate achieves 15-20% target (measured over representative query volume)."
-  - "ingest-cli + onboarding API delivered per R2.3 with device authorization, idempotency keys, and asynchronous ingestion job polling so agents can register projects/documents without SQL."
+  - "Onboarding API delivered per R2.3 with idempotency keys and asynchronous ingestion job polling so projects/documents can be registered without direct SQL."
   - "Operational telemetry (OpenTelemetry traces, ingestion metrics, cache hit/miss counters) emitted for ingestion, onboarding, and cache lookups."
 
 deliverables:
@@ -30,7 +30,7 @@ deliverables:
   - "Cache management utilities (TTL expiration, size-based eviction)."
   - "Integration with B2.1/B2.2 pipeline (check cache before RAG, store after generation)."
   - "Markdown ingestion service components: chokidar watcher, message queue configuration, unified/remark ingestion worker, Qdrant payload schema implementation."
-  - "ingest-cli (Typer) and onboarding API (FastAPI) implementing device authorization flow, asynchronous job pattern, idempotency safeguards, and saga-based compensations."
+  - "Onboarding API (FastAPI) implementing asynchronous job pattern, idempotency safeguards, and saga-based compensations."
   - "Telemetry + tracing instrumentation covering ingestion pipeline, onboarding API, and cache operations."
   - "Metrics collection for cache performance analysis."
   - "Configuration for similarity threshold (default 0.90-0.95 range)."
@@ -51,11 +51,11 @@ domainFields:
       sourceMission: "cmos/missions/sprint-02/B2.1_RAG-Query-API.yaml"
     - finding: "Markdown ingestion architecture should use chokidar → message queue → Node.js unified/remark worker with rich Qdrant payload schema."
       sourceMission: "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md"
-    - finding: "Project bootstrap workflow requires ingest-cli (Typer), FastAPI onboarding service, OAuth device flow, idempotency keys, and async job polling."
+    - finding: "Project bootstrap workflow requires a FastAPI onboarding service with idempotency keys and async job polling; authentication is optional for personal deployments."
       sourceMission: "cmos/missions/research/R2.3_Bootstrap-Workflow.md"
 
   implementationScope:
-    coreDeliverable: "Semantic caching layer integrated into RAG pipeline with cache hit/miss logic, backed by Markdown-native ingestion and scripted onboarding workflow."
+    coreDeliverable: "Semantic caching layer integrated into RAG pipeline with cache hit/miss logic, backed by Markdown-native ingestion and API-based onboarding workflow."
     outOfScope:
       - "Exact-match caching (semantic approach selected)."
       - "Cache warming strategies (future optimization)."
@@ -72,7 +72,7 @@ domainFields:
     - validator: "Markdown Ingestion Pipeline Test"
       focus: "Ingestion service processes Markdown corpus end-to-end with correct payload schema and telemetry."
     - validator: "Onboarding Workflow Test"
-      focus: "ingest-cli + onboarding API demonstrate device auth flow, idempotent project/document creation, and async job status polling."
+      focus: "Onboarding API demonstrates idempotent project/document creation and async job status polling."
 
   handoffContext:
     completed: []
@@ -81,12 +81,11 @@ domainFields:
       - "Cache storage: `store_in_cache(query_embedding: List[float], response: str, metadata: Dict) -> None`."
       - "Ingestion service: `queue.ingest_event(event: IngestionEvent) -> None`."
       - "Onboarding API: `POST /projects`, `POST /documents`, `POST /documents/{id}/ingest` (async)."
-      - "ingest-cli commands: `ingest project create`, `ingest document add`, `ingest document ingest --wait`."
     assumptions:
       - "Qdrant instance accessible (same as document chunks from B1.5)."
       - "Query embeddings available from B2.1 pipeline."
       - "Message queue (RabbitMQ/SQS) provisioned per R2.2 architecture."
-      - "Auth provider supports OAuth device authorization flow."
+      - "Trusted single-user deployment; onboarding API operates without authentication."
     nextMission: "B2.4: Tiered LLM Routing"
     blockers:
       - "Markdown ingestion pipeline and onboarding workflow must align with R2.2/R2.3 specifications to provide reliable corpus for cache validation."

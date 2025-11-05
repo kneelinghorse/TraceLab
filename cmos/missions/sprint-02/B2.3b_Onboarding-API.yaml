@@ -1,0 +1,70 @@
+# Mission File: B2.3b_Onboarding-API.yaml
+
+missionId: "B2.3b"
+
+objective: "Deliver the ingest onboarding API defined in R2.3 so projects and documents can be registered without direct database access in a trusted single-user environment."
+
+context: |
+  Research mission R2.3 established the blueprint for a production-ready onboarding workflow: FastAPI backend with asynchronous ingestion jobs, idempotency keys, saga-based compensations, and an agent-facing interface. Our current deployment, however, is a single trusted operator running locally alongside the Markdown ingestion service from B2.3a. This mission adapts the research design to that reality: no OAuth/device auth, no external identity provider, and no separate orchestration tier. We will still honor the long-term seams (idempotency headers, async job contracts), but implement them with lightweight components suitable for a personal environment.
+  
+  Key components for the single-user profile:
+  - FastAPI onboarding service exposing RESTful endpoints (`/projects`, `/documents`, `/jobs`) with async ingestion triggers.
+  - Idempotency key handling backed by PostgreSQL tables and transaction guards—no Redis/third-party cache required.
+  - Asynchronous ingestion coordination that writes job metadata locally and enqueues work onto the existing Markdown ingestion queue (memory or RabbitMQ) provided by B2.3a. A FastAPI background task acts as the default runner when the queue is in-memory.
+  - Telemetry coverage for onboarding requests and ingestion job transitions, consistent with the OpenTelemetry conventions delivered in B2.3a/B2.3c.
+
+successCriteria:
+  - "FastAPI onboarding service implements project/document CRUD and ingestion job creation with transactional guards; partial failures roll back cleanly without requiring external saga orchestration."
+  - "All POST/PATCH endpoints accept `Idempotency-Key` headers and return cached responses on retries using the PostgreSQL-backed idempotency store."
+  - "Ingestion trigger endpoints respond with HTTP 202 Accepted + Location header; polling endpoint returns job status (PENDING/INGESTING/COMPLETED/FAILED) sourced from the local job table."
+  - "Administrative workflow remains accessible without authentication (trusted single-user) while preserving an interface contract to add auth later."
+  - "Telemetry (OpenTelemetry traces/logs) emitted for onboarding API requests and ingestion jobs, reusing the metrics conventions from B2.3a/B2.3c."
+
+deliverables:
+  - "FastAPI service module (`app/onboarding/api.py`) with routers, Pydantic schemas, and async job orchestration that targets the B2.3a ingestion queue."
+  - "PostgreSQL-backed idempotency middleware with migration, helper utilities, and tests demonstrating replay behavior."
+  - "Local job registry (`jobs` table + background task runner) coordinating queue dispatch and status polling logic."
+  - "Integration tests demonstrating API → queue sequence across success and failure paths in both in-memory and RabbitMQ modes."
+  - "Documentation/runbook covering trusted single-user assumptions, configuration knobs, and troubleshooting."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  read for context researchFoundation:
+    - finding: "Onboarding API requires idempotency keys, async ingestion pattern (HTTP 202 + Location), and saga compensations."
+      sourceMission: "cmos/missions/research/R2.3_Bootstrap-Workflow.md"
+    - finding: "Telemetry and distributed tracing should span onboarding API and ingestion pipeline."
+      sourceMission: "cmos/missions/research/R2.3_Bootstrap-Workflow.md"
+    - finding: "Markdown ingestion pipeline (B2.3a) consumes onboarding output to maintain consistent identifiers."
+      sourceMission: "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md"
+    - finding: "Device authorization is optional for personal deployments (decision logged 2025-11-05); interfaces must keep seams for future auth."
+      sourceMission: "cmos/missions/research/R2.3_Bootstrap-Workflow.md"
+
+  implementationScope:
+    coreDeliverable: "Trusted local onboarding surface (API) that the operator can use to register projects/documents and trigger ingestion jobs."
+    outOfScope:
+      - "UI front-end for onboarding (tracked in roadmap Phase 3)."
+      - "Actual ingestion worker implementation (B2.3a)."
+      - "Semantic cache logic (B2.3d)."
+
+  validationProtocol:
+    - validator: "Idempotency Test"
+      focus: "Repeated POST requests with identical idempotency key return cached response without duplicate records, powered by the PostgreSQL store."
+    - validator: "Async Job Test"
+      focus: "Polling the job endpoint reflects status transitions PENDING → INGESTING → COMPLETED/FAILED sourced from the local job registry."
+    - validator: "Integration Test"
+      focus: "API calls create project, register document, trigger ingestion, and confirm job success using the Markdown ingestion pipeline from B2.3a."
+
+  handoffContext:
+    completed: [
+      "R2.3_Bootstrap-Workflow research"
+    ]
+    interfaces:
+      - "API endpoints: `/api/v1/projects`, `/api/v1/documents`, `/api/v1/jobs/{id}`."
+      - "Queue producer: `enqueue_ingestion_job(document_id: UUID) -> None` (wrapping the B2.3a queue abstraction)."
+    assumptions:
+      - "Trusted single-user deployment; no authentication required."
+      - "PostgreSQL available for onboarding data + idempotency storage."
+      - "Message queue aligns with B2.3a configuration; in-memory driver acceptable for local use."
+    nextMission: "B2.3c: Integration & Parity Validation"
+    blockers: []
