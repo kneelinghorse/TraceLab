@@ -1,0 +1,57 @@
+# Mission File: B2.5_Sprint-Efficacy-Evaluator.yaml
+
+missionId: "B2.5"
+
+objective: "Deliver an automated script that evaluates Sprint 02 missions against success criteria and produces retrospective report for sprint review."
+
+context: |
+  Supports Sprint 02 retrospective by quantifying how RAG and optimization missions performed relative to targets.
+  Outputs will feed sprint review discussions and inform Sprint 03 planning updates in MASTER_CONTEXT.json.
+
+successCriteria:
+  - "Script ingests Sprint 02 mission metadata (backlog.yaml, mission YAMLs) and assembles success criteria checklist."
+  - "Integrates telemetry artifacts from Sprint 02 missions: RAG query metrics, semantic cache hit rate, context compression metrics, tiered routing escalation rate, cost metrics."
+  - "Generates Markdown/JSON report highlighting met vs unmet targets with recommendations."
+  - "Report includes RAG performance metrics, cost analysis, and quality assessment statistics."
+  - "Documented runbook ensures script is executed at end of Sprint 02 and results stored in `cmos/reports/sprint-02/`."
+
+deliverables:
+  - "Updated `scripts/evaluate_sprint.py` with Sprint 02-specific metrics evaluation logic."
+  - "Telemetry artifact specification document for Sprint 02 build missions."
+  - "Sprint 02 evaluation report template (`cmos/reports/sprint-02/sprint-02-summary.md`)."
+  - "Runbook documentation for executing sprint evaluation and interpreting results."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  read for context researchFoundation:
+    - finding: "Sprint 02 success metrics require measurement: semantic cache hit rate ≥15%, tiered routing escalation <10%, cost per query targets."
+      sourceMission: "cmos/missions/backlog.yaml"
+    - finding: "RAG query performance, context compression effectiveness, and tiered routing quality metrics need evaluation."
+      sourceMission: "cmos/docs/roadmap.md"
+    - finding: "Sprint evaluation script pattern established in B1.6 for Sprint 01 evaluation."
+      sourceMission: "cmos/missions/sprint-01/B1.6_Sprint-Efficacy-Evaluator.yaml"
+
+  implementationScope:
+    coreDeliverable: "Sprint 02 evaluation script extending B1.6 functionality with Sprint 02-specific metrics."
+    outOfScope:
+      - "Real-time monitoring dashboards (covered separately)."
+      - "Automated scheduling (handled later via CI or cron)."
+      - "Integration with third-party analytics platforms."
+
+  validationProtocol:
+    - validator: "Dry Run Test"
+      focus: "Execute script with sample Sprint 02 telemetry to verify all metrics are evaluated correctly."
+    - validator: "Sprint Review Readiness"
+      focus: "Report contains all data needed for Sprint 02 retrospective and Sprint 03 planning."
+
+  handoffContext:
+    completed: []
+    interfaces:
+      - "CLI command `python scripts/evaluate_sprint.py --sprint 2` outputting Sprint 02 report."
+      - "Expected telemetry artifacts from B2.1-B2.4 missions."
+    assumptions:
+      - "Sprint 02 build missions (B2.1-B2.4) generate required telemetry artifacts."
+      - "Script pattern from B1.6 is reusable/extensible."
+    nextMission: "Sprint 02 Retrospective & Sprint 03 Planning"
+    blockers: []

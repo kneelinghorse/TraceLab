@@ -1,0 +1,67 @@
+# Mission File: R2.1_Quality-Assessment-Heuristics.yaml
+
+missionId: "R2.1"
+
+objective: "Research and document specific quality assessment heuristics, patterns, and algorithms for detecting low-confidence LLM responses to enable effective tiered routing."
+
+context: |
+  Sprint 02's tiered LLM routing (B2.4) requires a quality assessment service to determine when to escalate from GPT-4o-mini to GPT-4o.
+  While TR-03 and the technical architecture mention quality checks conceptually, specific implementation details (patterns, thresholds, algorithms) are not deeply documented.
+  This research mission produces actionable heuristics that can be directly implemented in the quality assessment service.
+
+successCriteria:
+  - "Comprehensive catalog of hedging language patterns with regex/algorithm specifications."
+  - "Documented heuristics for detecting answer incompleteness (question detection, coverage analysis)."
+  - "Citation quality validation criteria and failure detection patterns."
+  - "Defined confidence thresholds and escalation decision logic."
+  - "Research artifact documenting all heuristics with implementation examples."
+
+deliverables:
+  - "Research document cataloging quality assessment heuristics."
+  - "Pattern libraries (regex patterns, keyword lists) for hedging language detection."
+  - "Algorithms and pseudo-code for answer completeness checks."
+  - "Citation validation rules and failure detection criteria."
+  - "Recommended thresholds and escalation decision tree."
+  - "Implementation examples showing how to apply heuristics in code."
+
+domainFields:
+  type: "Research.Technical.v1"
+
+  read for context researchFoundation:
+    - finding: "Tiered LLM strategy requires quality assessment to detect low-confidence responses."
+      sourceMission: "cmos/missions/research/TR-03.RAG-Cost-Optimization.md"
+    - finding: "Quality heuristics over confidence scores (simpler, effective) - escalation only on clear failures."
+      sourceMission: "cmos/docs/roadmap.md"
+    - finding: "Quality check should analyze: hedging language, failure to answer question, low relevance scores."
+      sourceMission: "cmos/docs/technical_architecture.md"
+
+  researchScope:
+    coreFocus: "Actionable quality assessment heuristics for tiered LLM routing implementation."
+    areasToCover:
+      - "Hedging language pattern detection (specific phrases, linguistic markers)"
+      - "Answer completeness algorithms (question detection, content coverage)"
+      - "Citation validation (format checking, source verification)"
+      - "Low-confidence indicators (uncertainty markers, refusal patterns)"
+      - "Threshold selection and escalation decision logic"
+    outOfScope:
+      - "LLM confidence score APIs (focus on rule-based heuristics per roadmap)"
+      - "Machine learning models for quality assessment"
+      - "Production monitoring/observability (covered separately)"
+
+  validationProtocol:
+    - validator: "Heuristic Completeness"
+      focus: "All identified patterns have concrete implementation specifications (regex, keywords, algorithms)."
+    - validator: "Threshold Rationale"
+      focus: "Escalation thresholds are justified with expected escalation rate (~10% per roadmap)."
+    - validator: "Implementation Readiness"
+      focus: "Heuristics can be directly translated into code without additional research."
+
+  handoffContext:
+    completed: []
+    interfaces:
+      - "Research document with pattern libraries and algorithms."
+    assumptions:
+      - "Quality assessment is rule-based (not ML-based) per roadmap decision."
+      - "Target escalation rate: <10% (90%+ handled by GPT-4o-mini)."
+    nextMission: "B2.4: Tiered LLM Routing"
+    blockers: []

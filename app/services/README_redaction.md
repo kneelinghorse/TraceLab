@@ -10,7 +10,7 @@ The Presidio Redaction Service integrates Microsoft Presidio with custom recogni
 - **Custom Recognizers**:
   - `PARTICIPANT_ID`: Recognizes patterns like `PID-2024-1234`, `PARTICIPANT-ABC-1234`, `P-2024-0001`
   - `PROJECT_ID`: Recognizes patterns like `PROJ-ALPHA-1234`, `PROJECT-BETA-9999`
-- **Deny Lists**: Configurable at `cmos/config/redaction_deny_list.json` to suppress known false positives for participant and project identifiers
+- **Deny Lists**: Configurable at `config/redaction_deny_list.json` to suppress known false positives for participant and project identifiers
 - **Pseudonymization**: Uses Faker to generate realistic but fake replacements for detected entities
 - **FastAPI Integration**: RESTful API endpoint for document redaction
 
@@ -94,6 +94,6 @@ PresidioRedactionService
 ## Files
 
 - `app/services/presidio_redaction.py`: Core service implementation
-- `cmos/config/redaction_deny_list.json`: Domain-specific deny-list configuration for Presidio recognizers
+- `config/redaction_deny_list.json`: Domain-specific deny-list configuration for Presidio recognizers
 - `app/api/v1/redaction.py`: FastAPI routes
 - `scripts/run_regression_evaluation.py`: Regression evaluation script

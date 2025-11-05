@@ -1,0 +1,75 @@
+# Mission File: B2.4_Tiered-LLM-Routing.yaml
+
+missionId: "B2.4"
+
+objective: "Implement tiered LLM routing with quality assessment: default to GPT-4o-mini, escalate to GPT-4o on low-confidence responses, achieving <10% escalation rate."
+
+context: |
+  Implements Week 7 roadmap goal for tiered LLM strategy.
+  Uses quality assessment heuristics from R2.1 to detect low-confidence responses and trigger escalation.
+  Achieves cost optimization by handling 90%+ queries with GPT-4o-mini while maintaining quality.
+
+successCriteria:
+  - "Quality assessment service implements three-pillar framework from R2.1: Linguistic Uncertainty, Answer Integrity, Source Provenance."
+  - "Quality heuristics detect hedging language, answer incompleteness, and citation failures."
+  - "Composite quality score calculation with weighted pillar scores and escalation threshold (default 0.85)."
+  - "Tiered routing: default to GPT-4o-mini, escalate to GPT-4o on quality failure."
+  - "Escalation decision tree implements hard-fail checks (refusals, placeholders) before composite scoring."
+  - "Escalation rate achieves <10% target (90%+ queries handled by GPT-4o-mini)."
+  - "Logging tracks escalation events, quality scores, and cost implications."
+  - "Average cost per query <$0.0003 (with optimizations from B2.1-B2.4 combined)."
+
+deliverables:
+  - "Quality assessment service module implementing R2.1 heuristics framework."
+  - "Pattern libraries for hedging language, refusals, and citation validation (from R2.1)."
+  - "Scoring algorithms for three pillars with configurable weights and thresholds."
+  - "Escalation decision tree logic (hard-fail checks + composite scoring)."
+  - "Tiered routing service integrating with B2.1 RAG pipeline."
+  - "Configuration management for weights, thresholds, and escalation logic."
+  - "Logging and metrics collection for escalation events and cost tracking."
+  - "Integration tests demonstrating escalation scenarios and threshold behavior."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  read for context researchFoundation:
+    - finding: "Three-pillar quality assessment framework: Linguistic Uncertainty, Answer Integrity, Source Provenance."
+      sourceMission: "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md"
+    - finding: "Pattern libraries, scoring algorithms, and escalation decision tree documented in R2.1."
+      sourceMission: "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md"
+    - finding: "Quality heuristics over confidence scores (simpler, effective) per roadmap decision."
+      sourceMission: "cmos/docs/roadmap.md"
+    - finding: "Escalation only on clear failures, target <10% escalation rate."
+      sourceMission: "cmos/docs/roadmap.md"
+    - finding: "90%+ queries handled by GPT-4o-mini, escalated queries receive better answers."
+      sourceMission: "cmos/docs/roadmap.md"
+    - finding: "RAG query pipeline from B2.1 provides generation integration point."
+      sourceMission: "cmos/missions/sprint-02/B2.1_RAG-Query-API.yaml"
+
+  implementationScope:
+    coreDeliverable: "Tiered LLM routing with quality assessment enabling cost-effective query handling while maintaining quality."
+    outOfScope:
+      - "LLM confidence score APIs (rule-based heuristics selected)."
+      - "Machine learning models for quality assessment (rule-based approach per roadmap)."
+      - "Real-time monitoring dashboards (logging sufficient for initial implementation)."
+
+  validationProtocol:
+    - validator: "Escalation Rate Test"
+      focus: "Escalation rate <10% over representative query set."
+    - validator: "Quality Assessment Test"
+      focus: "Heuristics correctly identify low-confidence responses requiring escalation."
+    - validator: "Cost Validation"
+      focus: "Average cost per query <$0.0003 with tiered routing active."
+    - validator: "Integration Test"
+      focus: "End-to-end tiered routing flow: GPT-4o-mini → quality check → escalation if needed."
+
+  handoffContext:
+    completed: []
+    interfaces:
+      - "Quality assessor: `assess_quality(prompt: str, response: str) -> Tuple[bool, float, Dict]` (escalate, score, details)."
+      - "Tiered router: `generate_with_tiered_routing(query: str, context: str) -> Dict` (handles escalation logic)."
+    assumptions:
+      - "RAG query pipeline from B2.1-B2.3 is functional."
+      - "OpenAI API keys for GPT-4o-mini and GPT-4o configured."
+    nextMission: "B2.5: Sprint Efficacy Evaluator"
+    blockers: []

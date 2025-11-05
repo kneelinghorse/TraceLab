@@ -26,7 +26,7 @@ from presidio_anonymizer.entities import OperatorConfig
 
 from app.services.presidio_evaluator import PresidioEvaluator
 
-DEFAULT_DENY_LIST_PATH = Path("cmos/config/redaction_deny_list.json")
+DEFAULT_DENY_LIST_PATH = Path("config/redaction_deny_list.json")
 
 
 class ParticipantIDRecognizer(PatternRecognizer):

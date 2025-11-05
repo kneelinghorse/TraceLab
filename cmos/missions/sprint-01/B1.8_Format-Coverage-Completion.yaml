@@ -1,0 +1,58 @@
+# Mission File: B1.8_Format-Coverage-Completion.yaml
+
+missionId: "B1.8"
+
+objective: "Complete end-to-end ingestion verification for all five priority formats (PDF, DOCX, PPTX, CSV, XLSX) with coverage artifact generation."
+
+context: |
+  Sprint 01 evaluation identified missing ingestion_format_coverage.json artifact.
+  Ingestion pipeline code (B1.4) is complete, but no documents have been uploaded/processed to generate the coverage report.
+  This mission completes the verification by uploading, processing, and validating all five priority formats.
+
+successCriteria:
+  - "All 5 priority formats (PDF, DOCX, PPTX, CSV, XLSX) successfully uploaded and processed through ingestion pipeline."
+  - "Coverage artifact generated at `cmos/reports/sprint-01/ingestion_format_coverage.json` showing all formats with chunked > 0."
+  - "Each format shows successful processing through stages: uploaded → extracted → redacted → chunked."
+  - "Evaluation script confirms metric: '5/5 priority formats successfully ingested and chunked'."
+
+deliverables:
+  - "Test documents for each priority format (can use synthetic corpus from B1.2 or create minimal samples)."
+  - "Verification script or manual API calls demonstrating end-to-end ingestion for each format."
+  - "Generated ingestion_format_coverage.json artifact with complete format statistics."
+  - "Documentation or notes confirming successful processing of all formats."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  read for context researchFoundation:
+    - finding: "Five priority formats are: PDF, DOCX, PPTX, CSV, XLSX per UX research document taxonomy."
+      sourceMission: "cmos/missions/research/R1.2_UX-Research-Document-types.md"
+    - finding: "Ingestion pipeline supports all formats via format-specific parsers (pdfminer.six, python-docx, python-pptx, pandas/openpyxl)."
+      sourceMission: "cmos/missions/sprint-01/B1.4_Document-Ingestion-Pipeline.yaml"
+    - finding: "Coverage report generator is implemented but artifact missing due to no processed documents."
+      sourceMission: "cmos/reports/sprint-01/SPRINT-01-DELTA-ANALYSIS.md"
+
+  implementationScope:
+    coreDeliverable: "End-to-end format coverage verification with artifact generation."
+    outOfScope:
+      - "Ingestion pipeline code changes (already implemented in B1.4)."
+      - "New format parsers beyond the five priority formats."
+      - "Production-scale document processing."
+
+  validationProtocol:
+    - validator: "Coverage Artifact Check"
+      focus: "Verify ingestion_format_coverage.json exists and shows all 5 formats with chunked > 0."
+    - validator: "Sprint Evaluation Script"
+      focus: "Run scripts/evaluate_sprint.py and confirm ingestion metric shows '✅' status."
+
+  handoffContext:
+    completed: []
+    interfaces:
+      - "Upload API endpoint: POST /api/v1/documents/upload"
+      - "Process API endpoint: POST /api/v1/documents/{id}/process"
+    assumptions:
+      - "FastAPI service is running and database is initialized."
+      - "At least one project exists in database for document upload."
+      - "Synthetic corpus or test documents are available for upload."
+    nextMission: "Sprint 02 planning"
+    blockers: []

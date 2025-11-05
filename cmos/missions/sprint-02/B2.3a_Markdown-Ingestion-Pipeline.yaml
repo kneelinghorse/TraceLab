@@ -1,0 +1,72 @@
+# Mission File: B2.3a_Markdown-Ingestion-Pipeline.yaml
+
+missionId: "B2.3a"
+
+objective: "Implement the Markdown-native ingestion pipeline defined in R2.2 so research corpus assets flow into Qdrant without format conversion."
+
+context: |
+  Research mission R2.2 established the architecture for a resilient Markdown ingestion service: chokidar-based file watching, queue-backed processing, unified/remark chunking, and a rich Qdrant payload schema. This mission delivers that implementation so B2.3 can consume Markdown documents directly.
+  
+  Scope highlights:
+  - Node.js ingestion worker with unified/remark plugins that preserve heading hierarchy, front matter, and chunk metadata.
+  - Durable message queue decoupling file detection from processing (RabbitMQ or SQS per environment).
+  - Telemetry and tracing using OpenTelemetry to monitor throughput, failures, and retry activity.
+  - CLI/automation hooks to backfill existing corpus and trigger targeted re-ingests.
+
+successCriteria:
+  - "File watcher service monitors research directories (default `cmos/missions/research/`) using chokidar with debounce/back-pressure controls."
+  - "Message queue integration delivers add/change/delete events to ingestion workers with retry semantics and DLQ for failures."
+  - "Ingestion worker parses Markdown via unified/remark, applies custom chunking plugin, and assembles payloads matching the R2.2 schema (doc_type, source_uri, heading_trail, chunk_hash, etc.)."
+  - "Embeddings generated for parent + chunk content with metadata persisted to Qdrant using stable UUIDs for idempotency."
+  - "Telemetry exported (OpenTelemetry traces/metrics + structured logs) capturing documents processed, chunk counts, latency, and failures."
+  - "Backfill command ingests existing Markdown corpus and records completion status."
+
+deliverables:
+  - "Watcher service package with configuration for directories, ignore patterns, debounce intervals, and queue endpoints."
+  - "Queue bootstrap (infrastructure scripts, config) plus ingestion worker implementation using unified/remark plugins."
+  - "Qdrant client utilities implementing R2.2 payload schema, stable UUID derivation, and delete-by-filter handling."
+  - "Telemetry instrumentation (metrics + traces) and dashboard/runbook describing key signals."
+  - "Backfill CLI/automation script for bulk ingestion and status reporting."
+  - "Developer guide updates documenting how to operate and extend the ingestion pipeline."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  read for context researchFoundation:
+    - finding: "Ingestion pipeline should follow chokidar → message queue → Node.js unified/remark worker architecture with AST-first chunking."
+      sourceMission: "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md"
+    - finding: "Qdrant payload schema requires doc_type, source_uri, heading_trail, content_type, chunk_hash, and front matter payloads."
+      sourceMission: "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md"
+    - finding: "Telemetry must use OpenTelemetry and include ingestion metrics (documents processed, chunk counts, failures)."
+      sourceMission: "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md"
+
+  implementationScope:
+    coreDeliverable: "Production-ready Markdown ingestion service feeding Qdrant with structured payloads."
+    outOfScope:
+      - "Non-Markdown parsers (handled in prior formats)."
+      - "Onboarding API / CLI (B2.3b)."
+      - "Semantic cache read/write logic (B2.3d)."
+
+  validationProtocol:
+    - validator: "End-to-End Ingestion Test"
+      focus: "Markdown file change triggers watcher → queue → worker pipeline and writes expected payload to Qdrant."
+    - validator: "Schema Compliance Test"
+      focus: "Payload documents conform to R2.2 schema with accurate heading trails and metadata."
+    - validator: "Idempotency & Deletion Test"
+      focus: "Reprocessing and deletions update/remove points without duplication."
+    - validator: "Telemetry Coverage Test"
+      focus: "Metrics and traces emitted for success and failure paths."
+
+  handoffContext:
+    completed: []
+    interfaces:
+      - "Watcher configuration: `watcher.config.ts` exporting directories and queue endpoints."
+      - "Queue event contract: `{ eventType: 'upsert'|'delete', sourceUri: string }`."
+      - "Ingestion worker entry point: `ingest-worker/main.ts` with dependency injection for queue + Qdrant client."
+      - "Qdrant client utility: `qdrantClient.upsertMarkdownDocument(payload: MarkdownPayload) -> Promise<void>`."
+    assumptions:
+      - "Queue infrastructure (RabbitMQ/SQS) available per environment."
+      - "Embedding service credentials configured."
+      - "Qdrant cluster reachable with required API keys."
+    nextMission: "B2.3b: Onboarding API & CLI"
+    blockers: []

@@ -15,7 +15,7 @@ missionId: "SP-TRACE-001"
 objective: "Keep the TraceLab UX Research Repository roadmap, research, and build missions synchronized across sprints."
 
 context: |
-  This backlog reflects completed Sprint 00 research, Sprint 01 planning artifacts, and the current Sprint 01 execution plan.
+  This backlog reflects completed Sprint 00 research, completed Sprint 01, and Sprint 02 planning artifacts.
   It is the single source of truth for mission status, dependencies, and success metrics.
 
 successCriteria:
@@ -49,7 +49,7 @@ domainFields:
     - sprintId: "Sprint 01"
       title: "Foundation Build - Ingestion & Redaction"
       focus: "Build the core service, synthetic corpus workflow, redaction pipeline, ingestion, and vector storage."
-      status: "In Progress"
+      status: "Completed"
       missions:
         - { id: "R1.1", name: "Presidio Evaluation Strategic Framework", status: "Completed", reference: "cmos/missions/research/R1.1_Presidio-Evaluation-Strategic-Framework.md" }
         - { id: "R1.2", name: "UX Research Document Types Taxonomy", status: "Completed", reference: "cmos/missions/research/R1.2_UX-Research-Document-types.md" }
@@ -68,10 +68,16 @@ domainFields:
       focus: "Implement RAG query interface, semantic caching, and tiered LLM responses."
       status: "Planned"
       missions:
-        - { id: "B2.1", name: "RAG Query API", status: "Planned" }
-        - { id: "B2.2", name: "Context Compression Pipeline", status: "Planned" }
-        - { id: "B2.3", name: "Semantic Cache Layer", status: "Planned" }
-        - { id: "B2.4", name: "Tiered LLM Routing", status: "Planned" }
+        - { id: "R2.1", name: "Quality Assessment Heuristics", status: "Completed", reference: "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md", notes: "Comprehensive heuristics framework for detecting low-confidence LLM responses: three-pillar approach (Linguistic Uncertainty, Answer Integrity, Source Provenance) with pattern libraries, scoring algorithms, and escalation decision tree documented." }
+        - { id: "B2.1", name: "RAG Query API", status: "Completed", completed_at: "2025-11-01T15:12:07.554158Z", reference: "cmos/missions/sprint-02/B2.1_RAG-Query-API.yaml", notes: "FastAPI /api/v1/search endpoint returns GPT-4o-mini answers with citations, latency metrics, and integration tests." }
+        - { id: "B2.2", name: "Context Compression Pipeline", status: "Completed", completed_at: "2025-11-04T15:05:39.648853Z", reference: "cmos/missions/sprint-02/B2.2_Context-Compression-Pipeline.yaml", notes: "Context compression service filters chunks at 0.7 cosine threshold, exposes metrics, integrates with RAG run path, and ships unit coverage for threshold + fallback behaviour." }
+        - { id: "B2.3", name: "Semantic Cache Layer", status: "Blocked", reference: "cmos/missions/sprint-02/B2.3_Semantic-Cache-Layer.yaml", notes: "Blocked pending Markdown ingestion and onboarding workflow implementation (see B2.3a–B2.3d)." }
+        - { id: "B2.3a", name: "Markdown Ingestion Pipeline", status: "In Progress", reference: "cmos/missions/sprint-02/B2.3a_Markdown-Ingestion-Pipeline.yaml", notes: "Build chokidar → queue → unified/remark ingestion service per R2.2 research." }
+        - { id: "B2.3b", name: "Onboarding API & CLI", status: "Queued", reference: "cmos/missions/sprint-02/B2.3b_Onboarding-API-and-CLI.yaml", notes: "Implement FastAPI onboarding service + Typer CLI with device auth and idempotency." }
+        - { id: "B2.3c", name: "Ingestion Integration & Parity", status: "Queued", reference: "cmos/missions/sprint-02/B2.3c_Ingestion-Integration-Parity.yaml", notes: "Validate end-to-end ingestion flow, parity reports, and observability." }
+        - { id: "B2.3d", name: "Semantic Cache Implementation", status: "Queued", reference: "cmos/missions/sprint-02/B2.3d_Semantic-Cache-Implementation.yaml", notes: "Integrate cache service with RAG pipeline and achieve 15–20% hit rate." }
+        - { id: "B2.4", name: "Tiered LLM Routing", status: "Queued", reference: "cmos/missions/sprint-02/B2.4_Tiered-LLM-Routing.yaml", notes: "Implement tiered routing with R2.1 quality assessment: default GPT-4o-mini, escalate to GPT-4o on low-confidence, target <10% escalation rate." }
+        - { id: "B2.5", name: "Sprint Efficacy Evaluator", status: "Queued", reference: "cmos/missions/sprint-02/B2.5_Sprint-Efficacy-Evaluator.yaml", notes: "Automated evaluation script for Sprint 02 metrics: RAG performance, semantic cache hit rate, context compression effectiveness, tiered routing escalation rate, and cost analysis." }
 
   missionDependencies:
     - { from: "R1.1", to: "B1.2", type: "Research informs Build" }
@@ -88,10 +94,36 @@ domainFields:
     - { from: "B1.6", to: "B1.7", type: "Blocks" }
     - { from: "B1.6", to: "B1.8", type: "Blocks" }
     - { from: "B1.6", to: "B1.9", type: "Blocks" }
+    - { from: "TR-03", to: "B2.1", type: "Research informs Build" }
+    - { from: "TR-03", to: "B2.2", type: "Research informs Build" }
+    - { from: "TR-03", to: "B2.3", type: "Research informs Build" }
+    - { from: "R2.2", to: "B2.3a", type: "Research informs Build" }
+    - { from: "R2.3", to: "B2.3b", type: "Research informs Build" }
+    - { from: "R2.2", to: "B2.3d", type: "Research informs Build" }
+    - { from: "R2.3", to: "B2.3d", type: "Research informs Build" }
+    - { from: "TR-03", to: "B2.4", type: "Research informs Build" }
+    - { from: "R2.1", to: "B2.4", type: "Research informs Build" }
+    - { from: "B1.5", to: "B2.1", type: "Blocks" }
+    - { from: "B2.1", to: "B2.2", type: "Blocks" }
+    - { from: "B2.2", to: "B2.3", type: "Blocks" }
+    - { from: "B2.3a", to: "B2.3c", type: "Blocks" }
+    - { from: "B2.3b", to: "B2.3c", type: "Blocks" }
+    - { from: "B2.3a", to: "B2.3d", type: "Blocks" }
+    - { from: "B2.3b", to: "B2.3d", type: "Blocks" }
+    - { from: "B2.3c", to: "B2.3d", type: "Blocks" }
+    - { from: "B2.3d", to: "B2.4", type: "Blocks" }
+    - { from: "B2.3", to: "B2.4", type: "Blocks" }
+    - { from: "B2.4", to: "B2.5", type: "Blocks" }
 
   successMetrics:
     - "Sprint 1: Presidio recall ≥ 0.95 on synthetic corpus priority entities."
     - "Sprint 1: Five priority formats ingested end-to-end with sanitized chunks in PostgreSQL."
     - "Sprint 1: Embedding pipeline stores ≥1 sample project in Qdrant with <10ms p99 query latency (local)."
     - "Sprint 1: Sprint evaluation script executes and produces retrospective report in `cmos/reports/`."
-    - "Sprint 2: Semantic cache hit rate ≥ 15% (planned target)."
+    - "Sprint 2: RAG query API successfully retrieves relevant chunks and generates answers with citations."
+    - "Sprint 2: Context compression reduces input tokens by 60-70% (from ~3000 to ~1000 tokens)."
+    - "Sprint 2: Semantic cache achieves hit rate ≥ 15% (target 15-20%)."
+    - "Sprint 2: Tiered routing escalation rate < 10% (90%+ queries handled by GPT-4o-mini)."
+    - "Sprint 2: Average cost per query < $0.0003 (with all optimizations applied)."
+    - "Sprint 2: Query latency < 5 seconds end-to-end for RAG queries."
+    - "Sprint 2: Sprint evaluation script executes and produces retrospective report in `cmos/reports/sprint-02/`."

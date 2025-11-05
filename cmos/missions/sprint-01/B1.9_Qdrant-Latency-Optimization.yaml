@@ -1,0 +1,57 @@
+# Mission File: B1.9_Qdrant-Latency-Optimization.yaml
+
+missionId: "B1.9"
+
+objective: "Optimize Qdrant query parameters and HNSW configuration to achieve <10ms p99 latency for all query scenarios (top_k=5, 10, 20)."
+
+context: |
+  Sprint 01 evaluation identified Qdrant latency gap: top_k=20 query at 14.3ms exceeds <10ms target.
+  Current configuration uses hnsw_ef=160 for top_k=20, which increases search scope and latency.
+  This mission optimizes query parameters and potentially HNSW index settings to meet latency targets.
+
+successCriteria:
+  - "All query scenarios (top_k=5, 10, 20) achieve <10ms max latency."
+  - "Updated qdrant_performance.json demonstrates max_latency_ms < 10.0."
+  - "Evaluation script confirms metric: '✓ Points stored, max latency <10.00ms'."
+  - "No significant degradation in search recall/accuracy (maintains existing quality)."
+
+deliverables:
+  - "Optimized Qdrant search parameters (hnsw_ef tuning) or HNSW index configuration updates."
+  - "Performance test script or updated CLI demonstrating latency improvements."
+  - "Updated qdrant_performance.json artifact with improved metrics."
+  - "Documentation of parameter changes and performance trade-offs."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  read for context researchFoundation:
+    - finding: "Target latency <10ms p99 for local Qdrant deployment with on_disk storage."
+      sourceMission: "cmos/missions/sprint-01/B1.5_Embedding-and-Qdrant-Bootstrap.yaml"
+    - finding: "hnsw_ef parameter controls query-time candidate pool; lower values reduce latency but may impact recall."
+      sourceMission: "cmos/missions/research/TR-04Optimizing-Qdrant-on-Railway.md"
+    - finding: "Current gap: top_k=20 uses hnsw_ef=160 → 14.3ms, exceeding target."
+      sourceMission: "cmos/reports/sprint-01/SPRINT-01-DELTA-ANALYSIS.md"
+
+  implementationScope:
+    coreDeliverable: "Qdrant query latency optimization to meet <10ms target for all top_k values."
+    outOfScope:
+      - "Qdrant collection recreation or migration (unless configuration requires it)."
+      - "Embedding pipeline changes (already implemented in B1.5)."
+      - "Production deployment infrastructure changes."
+
+  validationProtocol:
+    - validator: "Performance Test"
+      focus: "Re-run Qdrant performance measurement and verify max latency <10ms across all top_k scenarios."
+    - validator: "Sprint Evaluation Script"
+      focus: "Run scripts/evaluate_sprint.py and confirm Qdrant metric shows '✅' status."
+
+  handoffContext:
+    completed: []
+    interfaces:
+      - "Updated QdrantService.search_chunks() with optimized hnsw_ef parameters."
+      - "Performance measurement script or CLI that generates qdrant_performance.json."
+    assumptions:
+      - "Qdrant collection exists with data from B1.5."
+      - "Current performance artifact exists at cmos/reports/sprint-01/qdrant_performance.json."
+    nextMission: "Sprint 02 planning"
+    blockers: []

@@ -1,0 +1,64 @@
+# Mission File: B2.2_Context-Compression-Pipeline.yaml
+
+missionId: "B2.2"
+
+objective: "Implement embedding-based context compression to filter retrieved chunks by relevance threshold, reducing input tokens by 60-70%."
+
+context: |
+  Implements Week 6 roadmap goal for context compression optimization.
+  Reduces LLM input tokens by filtering low-relevance chunks before answer generation.
+  Enables significant cost savings while maintaining answer quality.
+
+successCriteria:
+  - "Embedding-based context filtering implemented: re-score retrieved chunks against query embedding."
+  - "Relevance threshold filtering (similarity >0.7) applied to reduce context size."
+  - "Context compression achieves 60-70% token reduction (from ~3000 to ~1000 tokens typical)."
+  - "Compressed context passed to LLM generation service (integrates with B2.1 RAG pipeline)."
+  - "Performance metrics tracked: token reduction rate, compression latency."
+  - "Integration test demonstrates token savings without significant quality degradation."
+
+deliverables:
+  - "Context compression service module with embedding-based filtering."
+  - "Relevance scoring utilities for chunk-query similarity calculation."
+  - "Configuration for relevance threshold (default 0.7, adjustable)."
+  - "Integration with B2.1 RAG pipeline to compress context before LLM generation."
+  - "Metrics tracking for compression effectiveness."
+  - "Unit tests for filtering logic and threshold behavior."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  read for context researchFoundation:
+    - finding: "Embedding-based filtering recommended over LLM compression for speed and cost."
+      sourceMission: "cmos/missions/research/TR-03.RAG-Cost-Optimization.md"
+    - finding: "Context compression reduces tokens by 60-70%, achieving up to 80% cost savings on generation."
+      sourceMission: "cmos/docs/roadmap.md"
+    - finding: "Relevance threshold 0.7+ recommended for filtering chunks."
+      sourceMission: "cmos/docs/technical_architecture.md"
+    - finding: "RAG query API from B2.1 provides retrieval baseline to compress."
+      sourceMission: "cmos/missions/sprint-02/B2.1_RAG-Query-API.yaml"
+
+  implementationScope:
+    coreDeliverable: "Context compression pipeline that filters retrieved chunks by relevance before LLM generation."
+    outOfScope:
+      - "LLM-based compression (slower alternative, not selected)."
+      - "Semantic caching (handled in B2.3)."
+      - "Answer quality assessment (handled in B2.4 tiered routing)."
+
+  validationProtocol:
+    - validator: "Token Reduction Test"
+      focus: "Compression achieves 60-70% reduction in input tokens for typical queries."
+    - validator: "Quality Preservation Test"
+      focus: "Compressed context maintains answer quality compared to uncompressed baseline."
+    - validator: "Performance Test"
+      focus: "Compression adds minimal latency (<100ms) to query pipeline."
+
+  handoffContext:
+    completed: []
+    interfaces:
+      - "Compression service: `compress_context(chunks: List[Dict], query_embedding: List[float], threshold: float = 0.7) -> List[Dict]`."
+    assumptions:
+      - "RAG query API from B2.1 is functional."
+      - "Query embeddings available from B2.1 pipeline."
+    nextMission: "B2.3: Semantic Cache Layer"
+    blockers: []

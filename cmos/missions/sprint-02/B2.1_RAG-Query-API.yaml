@@ -1,0 +1,69 @@
+# Mission File: B2.1_RAG-Query-API.yaml
+
+missionId: "B2.1"
+
+objective: "Implement core RAG query functionality: query embedding, vector search, LLM answer generation with citations, and search API endpoint."
+
+context: |
+  Implements Week 5 roadmap goals for basic RAG functionality.
+  Builds on Qdrant retrieval infrastructure from B1.5 to enable semantic search and answer generation.
+  Establishes the foundation for optimization missions (B2.2-B2.4) in Sprint 02.
+
+successCriteria:
+  - "Query embedding generation service integrates OpenAI text-embedding-3-small for user queries."
+  - "Vector search service queries Qdrant with metadata filters (project_id, document_id, source_type)."
+  - "Retrieval returns top-k chunks (5-10) with relevance scores and metadata."
+  - "GPT-4o-mini integration for answer generation from retrieved context."
+  - "RAG prompt template includes context, user query, and citation format requirements."
+  - "Citation extraction and formatting implemented ([Document: X, Chunk: Y] format)."
+  - "FastAPI search endpoint (`POST /api/v1/search` or equivalent) accepts queries and returns answers with citations."
+  - "End-to-end query latency <5 seconds for typical queries."
+
+deliverables:
+  - "Query embedding service module."
+  - "RAG retrieval service that combines vector search with metadata filtering."
+  - "LLM answer generation service with GPT-4o-mini integration."
+  - "Citation extraction and formatting utilities."
+  - "FastAPI search endpoint with request/response schemas."
+  - "Integration tests demonstrating end-to-end RAG query flow."
+  - "Performance metrics logged/captured for baseline analysis."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  read for context researchFoundation:
+    - finding: "GPT-4o-mini recommended as primary model for cost-effective RAG synthesis."
+      sourceMission: "cmos/missions/research/TR-03.RAG-Cost-Optimization.md"
+    - finding: "Top-k retrieval: 5-10 chunks recommended for balanced performance/quality."
+      sourceMission: "cmos/docs/roadmap.md"
+    - finding: "Citation format: [Document: X, Chunk: Y] per roadmap specifications."
+      sourceMission: "cmos/docs/roadmap.md"
+    - finding: "Qdrant collection and retrieval service established in B1.5."
+      sourceMission: "cmos/missions/sprint-01/B1.5_Embedding-and-Qdrant-Bootstrap.yaml"
+
+  implementationScope:
+    coreDeliverable: "End-to-end RAG query pipeline: query embedding → vector search → LLM generation → citation formatting → API response."
+    outOfScope:
+      - "Context compression (handled in B2.2)."
+      - "Semantic caching (handled in B2.3)."
+      - "Tiered LLM routing (handled in B2.4)."
+      - "Cost optimization beyond model selection."
+
+  validationProtocol:
+    - validator: "Integration Tests"
+      focus: "End-to-end RAG query flow with sample queries and document corpus."
+    - validator: "Performance Test"
+      focus: "Query latency meets <5 seconds target for typical queries."
+    - validator: "Citation Validation"
+      focus: "Generated answers include accurate citations linking to source chunks."
+
+  handoffContext:
+    completed: []
+    interfaces:
+      - "FastAPI endpoint: `POST /api/v1/search` with query parameter, returns answer + citations."
+      - "RAG service: `generate_answer(query: str, project_id: UUID, top_k: int = 5) -> Dict`."
+    assumptions:
+      - "Qdrant collection with embedded chunks exists from B1.5."
+      - "OpenAI API key configured and accessible."
+    nextMission: "B2.2: Context Compression Pipeline"
+    blockers: []
