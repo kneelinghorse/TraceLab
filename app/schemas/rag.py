@@ -1,5 +1,5 @@
 """Schemas for RAG query requests and responses."""
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -51,6 +51,47 @@ class CacheInfo(BaseModel):
     ttl_seconds: Optional[float] = None
 
 
+class QualityPillarScores(BaseModel):
+    """Breakdown of the heuristic pillar scores."""
+    linguistic_uncertainty: float
+    answer_integrity: float
+    source_provenance: float
+
+
+class QualityReport(BaseModel):
+    """Composite quality assessment report."""
+    composite_score: float
+    threshold: float
+    pillar_scores: QualityPillarScores
+    hard_failures: List[str]
+    reasons: List[str]
+    pre_escalation_score: Optional[float] = None
+
+
+class RoutingAttempt(BaseModel):
+    """Metadata describing a single routing attempt."""
+    model: str
+    quality_score: float
+    below_threshold: bool
+    hard_failures: List[str]
+    citation_count: int
+
+
+class RoutingMetrics(BaseModel):
+    """Simple counters tracking routing behaviour."""
+    total_queries: int
+    escalations: int
+
+
+class RoutingDetails(BaseModel):
+    """Routing outcome including whether escalation occurred."""
+    selected_model: str
+    escalated: bool
+    attempts: List[RoutingAttempt]
+    estimated_cost_usd: float
+    metrics: RoutingMetrics
+
+
 class RagResponse(BaseModel):
     """Response containing the generated answer alongside supporting metadata."""
     answer: str
@@ -59,3 +100,5 @@ class RagResponse(BaseModel):
     latency_ms: float
     compression: CompressionMetrics
     cache: CacheInfo
+    quality: QualityReport
+    routing: RoutingDetails

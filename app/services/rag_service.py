@@ -1,4 +1,5 @@
 """RAG service that orchestrates retrieval, compression, and answer generation."""
+import logging
 import re
 import time
 from typing import Any, Dict, List, Optional
@@ -8,6 +9,11 @@ from app.services.context_compression import compress_context
 from app.services.embedding_service import EmbeddingService, get_embedding_service
 from app.services.retrieval_service import RetrievalService, get_retrieval_service
 from app.services.semantic_cache import SemanticCacheService, get_semantic_cache_service
+from app.services.quality_assessment import (
+    QualityAssessor,
+    QualityAssessmentConfig,
+    QualityAssessmentResult,
+)
 
 try:  # pragma: no cover - allow import without OpenAI SDK in some environments
     from openai import OpenAI
@@ -20,10 +26,19 @@ else:
     _openai_import_error = None
 
 
+logger = logging.getLogger(__name__)
+
+
 _CITATION_PATTERN = re.compile(
     r"\[Document:\s*(?P<document>[^\],]+),\s*Chunk:\s*(?P<chunk>[^\]]+)\]",
     re.IGNORECASE,
 )
+
+
+MODEL_COST_ESTIMATES = {
+    "gpt-4o-mini": 0.00018,
+    "gpt-4o": 0.00075,
+}
 
 
 class RagService:
@@ -36,7 +51,9 @@ class RagService:
         cache_service: Optional[SemanticCacheService] = None,
         client: Optional[OpenAI] = None,  # type: ignore[name-defined]
         model: Optional[str] = None,
+        escalation_model: Optional[str] = None,
         default_temperature: Optional[float] = None,
+        quality_assessor: Optional[QualityAssessor] = None,
     ) -> None:
         if _openai_import_error is not None:
             raise RuntimeError(
@@ -57,12 +74,24 @@ class RagService:
             if cache_service is not None
             else (get_semantic_cache_service() if settings.semantic_cache_enabled else None)
         )
-        self.model = model or settings.openai_chat_model
+        self.primary_model = model or settings.openai_chat_model
+        self.model = self.primary_model  # maintain backwards compatibility for callers accessing .model
+        self.escalation_model = escalation_model or getattr(settings, "openai_escalation_model", "gpt-4o")
         self.default_temperature = (
             default_temperature if default_temperature is not None else settings.openai_chat_temperature
         )
         self.default_max_tokens = settings.rag_default_max_tokens
         self.compression_threshold = settings.rag_context_threshold
+        if quality_assessor is None:
+            quality_config = QualityAssessmentConfig(
+                escalation_threshold=getattr(settings, "tiered_routing_threshold", 0.85),
+                linguistic_weight=getattr(settings, "tiered_weight_linguistic", 0.35),
+                integrity_weight=getattr(settings, "tiered_weight_integrity", 0.35),
+                provenance_weight=getattr(settings, "tiered_weight_provenance", 0.30),
+            )
+            quality_assessor = QualityAssessor(quality_config)
+        self.quality_assessor = quality_assessor
+        self.routing_metrics = {"total_queries": 0, "escalations": 0}
 
     def run_query(
         self,
@@ -121,13 +150,13 @@ class RagService:
         )
 
         messages = self._build_messages(query=query, chunks=compressed_chunks)
-        answer = self._generate_answer(
+        answer, citations, quality_report, routing_details = self._generate_with_tiered_routing(
+            query=query,
             messages=messages,
+            chunks=compressed_chunks,
             temperature=temperature if temperature is not None else self.default_temperature,
             max_tokens=max_tokens if max_tokens is not None else self.default_max_tokens,
         )
-
-        citations = self._extract_citations(answer, compressed_chunks)
         latency_ms = (time.perf_counter() - start) * 1000
 
         result = {
@@ -137,6 +166,8 @@ class RagService:
             "latency_ms": round(latency_ms, 2),
             "compression": compression_metrics,
             "cache": {"hit": False},
+            "quality": quality_report,
+            "routing": routing_details,
         }
 
         if self.cache_service is not None:
@@ -190,18 +221,117 @@ class RagService:
             {"role": "user", "content": user_prompt},
         ]
 
+    def _generate_with_tiered_routing(
+        self,
+        *,
+        query: str,
+        messages: List[Dict[str, str]],
+        chunks: List[Dict[str, Any]],
+        temperature: float,
+        max_tokens: int,
+    ) -> tuple[str, List[Dict[str, Any]], Dict[str, Any], Dict[str, Any]]:
+        """Generate an answer using tiered routing and quality assessment."""
+        attempts: List[Dict[str, Any]] = []
+
+        primary_answer = self._generate_answer(
+            messages=messages,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            model=self.primary_model,
+        )
+        primary_citations = self._extract_citations(primary_answer, chunks)
+        primary_quality = self.quality_assessor.assess(
+            query=query,
+            answer=primary_answer,
+            citations=primary_citations,
+            context_chunks=chunks,
+        )
+        attempts.append(
+            self._format_attempt_record(
+                model=self.primary_model,
+                quality=primary_quality,
+                citation_count=len(primary_citations),
+            )
+        )
+
+        final_answer = primary_answer
+        final_citations = primary_citations
+        final_quality = primary_quality
+        escalated = False
+
+        if primary_quality.escalate and self.escalation_model:
+            escalated = True
+            escalation_answer = self._generate_answer(
+                messages=messages,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                model=self.escalation_model,
+            )
+            final_answer = escalation_answer
+            final_citations = self._extract_citations(escalation_answer, chunks)
+            final_quality = self.quality_assessor.assess(
+                query=query,
+                answer=final_answer,
+                citations=final_citations,
+                context_chunks=chunks,
+            )
+            attempts.append(
+                self._format_attempt_record(
+                    model=self.escalation_model,
+                    quality=final_quality,
+                    citation_count=len(final_citations),
+                )
+            )
+
+        self.routing_metrics["total_queries"] += 1
+        if escalated:
+            self.routing_metrics["escalations"] += 1
+            logger.info(
+                "Tiered routing escalation triggered: %.2f (threshold %.2f)",
+                primary_quality.composite_score,
+                primary_quality.threshold,
+            )
+        else:
+            logger.debug(
+                "Tiered routing primary model sufficient: %.2f (threshold %.2f)",
+                final_quality.composite_score,
+                final_quality.threshold,
+            )
+
+        cost_estimate = sum(MODEL_COST_ESTIMATES.get(attempt["model"], 0.0) for attempt in attempts)
+        quality_report: Dict[str, Any] = {
+            "composite_score": final_quality.composite_score,
+            "threshold": final_quality.threshold,
+            "pillar_scores": final_quality.pillar_scores,
+            "hard_failures": final_quality.hard_failures,
+            "reasons": final_quality.reasons,
+        }
+        if escalated:
+            quality_report["pre_escalation_score"] = primary_quality.composite_score
+
+        routing_details = {
+            "selected_model": self.escalation_model if escalated else self.primary_model,
+            "escalated": escalated,
+            "attempts": attempts,
+            "estimated_cost_usd": round(cost_estimate, 6),
+            "metrics": dict(self.routing_metrics),
+        }
+
+        return final_answer, final_citations, quality_report, routing_details
+
     def _generate_answer(
         self,
         messages: List[Dict[str, str]],
         temperature: float,
         max_tokens: int,
         retry_max: int = 3,
+        model: Optional[str] = None,
     ) -> str:
         """Call the OpenAI chat completion API with simple exponential backoff."""
         for attempt in range(retry_max):
             try:
                 response = self.client.chat.completions.create(
-                    model=self.model,
+                    model=model if model is not None else self.primary_model,
                     messages=messages,
                     temperature=temperature,
                     max_tokens=max_tokens,
@@ -291,6 +421,21 @@ class RagService:
             "source_type": chunk.get("source_type") if chunk is not None else None,
             "score": chunk.get("score") if chunk is not None else None,
             "snippet": (chunk.get("content")[:280] if chunk is not None and chunk.get("content") else None),
+        }
+
+    @staticmethod
+    def _format_attempt_record(
+        *,
+        model: str,
+        quality: QualityAssessmentResult,
+        citation_count: int,
+    ) -> Dict[str, Any]:
+        return {
+            "model": model,
+            "quality_score": quality.composite_score,
+            "below_threshold": quality.composite_score < quality.threshold,
+            "hard_failures": quality.hard_failures,
+            "citation_count": citation_count,
         }
 
 

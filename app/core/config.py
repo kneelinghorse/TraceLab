@@ -25,9 +25,14 @@ class Settings(BaseSettings):
     openai_embedding_model: str = "text-embedding-3-small"
     openai_embedding_dimension: int = 1536
     openai_chat_model: str = "gpt-4o-mini"
+    openai_escalation_model: str = "gpt-4o"
     openai_chat_temperature: float = 0.2
     rag_default_max_tokens: int = 350
     rag_context_threshold: float = 0.7
+    tiered_routing_threshold: float = 0.85
+    tiered_weight_linguistic: float = 0.35
+    tiered_weight_integrity: float = 0.35
+    tiered_weight_provenance: float = 0.30
     
     # Semantic cache
     semantic_cache_enabled: bool = True
