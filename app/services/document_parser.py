@@ -74,6 +74,8 @@ class DocumentParser:
             return DocumentParser._parse_csv(file_content)
         elif suffix == ".xlsx":
             return DocumentParser._parse_xlsx(file_content)
+        elif suffix in {".md", ".markdown", ".txt"}:
+            return DocumentParser._parse_markdown(file_content)
         else:
             raise ValueError(f"Unsupported file format: {suffix}")
 
@@ -200,5 +202,27 @@ class DocumentParser:
         if file_path is None:
             return False
         suffix = file_path.suffix.lower()
-        return suffix in {".pdf", ".docx", ".pptx", ".csv", ".xlsx"}
+        return suffix in {".pdf", ".docx", ".pptx", ".csv", ".xlsx", ".md", ".markdown", ".txt"}
 
+    @staticmethod
+    def _parse_markdown(content: bytes) -> str:
+        """Return Markdown content as plain text while stripping YAML front matter."""
+        try:
+            text = content.decode("utf-8")
+        except UnicodeDecodeError:
+            text = content.decode("utf-8", errors="ignore")
+
+        stripped = text.lstrip()
+        if stripped.startswith("---"):
+            # YAML front matter ends at the next line starting with ---.
+            front_matter_end = stripped.find("\n---", 3)
+            if front_matter_end != -1:
+                candidate = stripped[front_matter_end + 4 :]
+                # Handle optional YAML document terminator ("...").
+                candidate_stripped = candidate.lstrip()
+                if candidate_stripped.startswith("..."):
+                    terminator_end = candidate_stripped.find("\n")
+                    candidate = candidate_stripped[terminator_end + 1 :] if terminator_end != -1 else ""
+                text = candidate
+
+        return text.strip()

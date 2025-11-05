@@ -1,0 +1,17 @@
+rules:
+  - name: ingestion_pipeline_stalled
+    description: Detected when no markdown documents complete ingestion for 10 minutes.
+    condition: |
+      rate(ingestion_chunks_processed{content_type="markdown"}[10m]) == 0
+    severity: high
+    annotations:
+      summary: "Markdown ingestion stalled"
+      runbook: "docs/ingestion_onboarding_runbook.md#recovering-from-stalls"
+  - name: qdrant_upserts_failing
+    description: Error budget guardrail for Qdrant upserts.
+    condition: |
+      rate(ingestion_upsert_failures[5m]) > 0.1
+    severity: critical
+    annotations:
+      summary: "Sustained Qdrant upsert failures"
+      runbook: "docs/ingestion_onboarding_runbook.md#qdrant"

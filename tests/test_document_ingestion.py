@@ -109,23 +109,23 @@ def build_xlsx(path: Path, text: str) -> Path:
     return path
 
 
+def build_markdown(path: Path, text: str) -> Path:
+    """Create Markdown document with YAML front matter and rich headings."""
+    headings = [f"## Insight {i+1}\n\n{sentence.strip()}" for i, sentence in enumerate(text.split(". ")[:10], 1)]
+    body = "\n\n".join(headings) + "\n\n" + text
+    payload = "---\nproject_id: stub-project\ndoc_type: research_brief\n---\n\n# Markdown Ingestion Test\n\n" + body
+    path.write_text(payload)
+    return path
+
+
 FORMAT_BUILDERS: Tuple[Tuple[str, Callable[[Path, str], Path]], ...] = (
     ("pdf", build_pdf),
     ("docx", build_docx),
     ("pptx", build_pptx),
     ("csv", build_csv),
     ("xlsx", build_xlsx),
+    ("md", build_markdown),
 )
-
-
-@pytest.fixture
-def project(db_session) -> Project:
-    """Persist a project for document associations."""
-    project = Project(name="TraceLab Test Project", description="Pipeline validation")
-    db_session.add(project)
-    db_session.commit()
-    db_session.refresh(project)
-    return project
 
 
 @pytest.mark.parametrize("format_name,builder", FORMAT_BUILDERS, ids=[fmt for fmt, _ in FORMAT_BUILDERS])
@@ -133,18 +133,29 @@ def test_ingestion_pipeline_handles_all_formats(format_name: str, builder, db_se
     """Ensure each prioritized format runs through parsing, redaction, chunking, and audit logging."""
     file_path = builder(tmp_path / f"sample.{format_name}", LONG_TEXT)
 
+    mime_types = {
+        "pdf": "application/pdf",
+        "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "csv": "text/csv",
+        "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "md": "text/markdown",
+    }
+    file_types = {
+        "pdf": "report",
+        "docx": "report",
+        "pptx": "report",
+        "csv": "survey",
+        "xlsx": "survey",
+        "md": "notes",
+    }
+
     document = Document(
         project_id=project.id,
         name=file_path.name,
         file_path=str(file_path),
-        file_type="report" if format_name in {"pdf", "docx", "pptx"} else "survey",
-        mime_type={
-            "pdf": "application/pdf",
-            "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-            "csv": "text/csv",
-            "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        }[format_name],
+        file_type=file_types.get(format_name, "report"),
+        mime_type=mime_types[format_name],
         processed=False,
         chunked=False,
         validation_status="pending",
