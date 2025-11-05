@@ -1,0 +1,86 @@
+name: "build.technical-research"
+version: "1.0.0"
+displayName: "Markdown Ingestion Service Research"
+description: "Investigate and define the architecture for a native Markdown ingestion service that feeds the semantic cache pipeline without format conversion."
+author: "CMOS Enhancement Team"
+schema: "./schemas/TechnicalResearch.v1.json"
+
+---
+
+# Mission File: R2.1_markdown-ingestion-service.yaml
+
+missionId: "R2.1-INGEST-001"
+
+objective: "Deliver a research-backed design for a Markdown-first ingestion service that parses, chunks, and indexes `.md` sources directly into the existing Qdrant-backed semantic cache."
+
+context: |
+  Mission B2.3 (Semantic Cache Layer) is blocked because the current ingestion tooling rejects Markdown, even though the research corpus under `cmos/missions/research/` is >95% `.md`. Prior attempts to work around this via manual conversion were rejected; the service must understand Markdown natively.
+  
+  This research explores:
+  - Parser/library selection (front matter, embedded assets, code blocks).
+  - Chunking and metadata strategies that preserve heading hierarchy.
+  - Integration points with the existing ingestion pipeline and Qdrant vector store.
+  - Validation requirements so agents can trust the service before a UI exists.
+
+successCriteria:
+  - "Annotated comparison of viable Markdown parsing/alignment libraries with recommendation."
+  - "Proposed data model for representing Markdown sections, metadata, and assets in the ingestion pipeline."
+  - "Integration blueprint covering service boundaries, CLI/API entry points, and how data flows into Qdrant."
+  - "Testing matrix outlining unit, integration, and regression coverage for Markdown ingestion edge cases."
+  - "Risk assessment addressing large files, malformed Markdown, and asset handling."
+
+deliverables:
+  - "Research brief summarizing parser evaluation and selected approach."
+  - "Architecture diagram + sequence flow for the Markdown ingestion service."
+  - "Interface proposal for CLI/API commands agents will use during testing."
+  - "Validation checklist and sample test plan for Markdown ingestion."
+
+domainFields:
+  type: "architectural discovery"
+
+  researchObjectives:
+    - "Survey Markdown parsing libraries/tooling (Python and Node) for accuracy, performance, and extensibility."
+    - "Define chunking strategy respecting headings, lists, and code fences for high-quality vector embeddings."
+    - "Establish metadata schema (front matter, tags, source attribution) stored alongside embeddings."
+    - "Determine how the service authenticates and writes to Qdrant within existing guardrails."
+    - "Outline operational telemetry required to monitor Markdown ingestion health."
+    - "Identify migration considerations for existing research corpus without downtime."
+
+  technologiesUnderInvestigation:
+    - "CommonMark, Markdown-it, mdformat, and remark/rehype ecosystems."
+    - "Sentence segmentation libraries for embedding-friendly chunks."
+    - "Qdrant collections and payload schemas."
+    - "File system watchers or queue-based ingestion triggers."
+    - "OWASP-aligned sanitization approaches for Markdown content."
+
+  evaluationCriteria:
+    - "Parser fidelity (headings, tables, embedded code) vs. engineering complexity."
+    - "Chunk coherence and embedding quality for downstream RAG."
+    - "Integration effort with existing ingestion service interfaces."
+    - "Operational safeguards (retry behavior, telemetry, failure isolation)."
+    - "Maintainability and ecosystem maturity of chosen tooling."
+
+  prototypeRequirements:
+    - "Proof-of-concept script ingesting sample Markdown corpus into Qdrant test collection."
+    - "Demonstration of metadata preservation (source path, heading trail, tags)."
+    - "Error-handling scenarios for invalid Markdown and oversized documents."
+    - "Telemetry sample emitting ingestion metrics (documents processed, chunk counts, failures)."
+
+---
+
+# Research Execution Plan
+
+## Phase 1: Parser & Chunking Investigation
+- Evaluate at least three Markdown parsing stacks (Python and Node) for structure fidelity.
+- Prototype chunk extraction preserving heading hierarchy and code blocks.
+- Measure embedding input quality using representative research files.
+
+## Phase 2: Pipeline Integration Blueprint
+- Map ingestion flow from file discovery → parsing → chunk metadata → Qdrant upsert.
+- Define CLI/API surface for project/collection selection and batch ingestion.
+- Document telemetry, error handling, and retry semantics.
+
+## Phase 3: Validation & Risk Mitigation
+- Draft testing matrix (unit + integration) covering formatting edge cases.
+- Identify security considerations (sanitization, deny list handling relocation).
+- Produce final research brief with recommendations, risks, and implementation tasks for B2.3.

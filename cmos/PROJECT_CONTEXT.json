@@ -13,10 +13,10 @@
   },
   "working_memory": {
     "active_domain": "main",
-    "session_count": 9,
-    "last_session": "2025-11-01T03:16:51.039933Z",
-    "last_mission": "B1.9",
-    "active_mission": null,
+    "session_count": 12,
+    "last_session": "2025-11-04T16:33:55.975409Z",
+    "last_mission": "B2.3",
+    "active_mission": "B2.3",
     "domains": {
       "main": {
         "status": "active",

@@ -1,0 +1,85 @@
+name: "build.technical-research"
+version: "1.0.0"
+displayName: "Project Bootstrap Workflow Research"
+description: "Design a scripted onboarding workflow so agents can provision projects and register documents without direct database access."
+author: "CMOS Enhancement Team"
+schema: "./schemas/TechnicalResearch.v1.json"
+
+---
+
+# Mission File: R2.2_project-bootstrap-workflow.yaml
+
+missionId: "R2.2-INGEST-002"
+
+objective: "Define the CLI/API workflow, data contracts, and validation requirements that let teams initialize projects and ingest documents end-to-end during Sprint 02."
+
+context: |
+  Current ingestion setup requires manual SQL/REPL steps to create projects and attach documents, blocking realistic testing for B2.3. Until a richer UI exists, agents must rely on scripted commands that encapsulate those steps with clear validation and telemetry.
+  
+  This research mission determines:
+  - Command design (CLI verbs, arguments, environment configuration).
+  - Service boundaries (APIs backing the commands, authentication).
+  - Error handling, logging, and rollback expectations.
+  - How onboarding integrates with the forthcoming Markdown ingestion service.
+
+successCriteria:
+  - "Command design spec covering project create/list/show, document register/list/status, and ingestion triggers."
+  - "API contract (if applicable) detailing request/response payloads or gRPC equivalents."
+  - "Operational workflow documenting prerequisites, environment configuration, and telemetry."
+  - "Validation strategy ensuring commands can be exercised by agents and automated tests."
+  - "Risk register for failure recovery (partial ingests, duplicate uploads, permission issues)."
+
+deliverables:
+  - "CLI/API workflow design document with example invocations."
+  - "Sequence diagrams showing how commands interact with storage, Qdrant, and telemetry."
+  - "Checklist for environment bootstrap (env vars, credentials, sandbox expectations)."
+  - "Testing plan describing how to simulate project/document lifecycle end-to-end."
+
+domainFields:
+  type: "architectural discovery"
+
+  researchObjectives:
+    - "Inventory existing services to determine reuse vs. new onboarding endpoints."
+    - "Define command ergonomics so agents can script onboarding without manual SQL."
+    - "Specify telemetry/logging emitted for each onboarding step."
+    - "Outline authentication/authorization needs (local development vs. production)."
+    - "Identify how onboarding commands integrate with Markdown ingestion pipeline."
+    - "Determine cleanup/rollback commands for failed ingests."
+
+  technologiesUnderInvestigation:
+    - "Node/Python CLI frameworks (Commander, Click, Typer)."
+    - "REST/gRPC service patterns suitable for ingestion management."
+    - "Configuration management (dotenv, YAML manifests) for project definitions."
+    - "Telemetry/logging stacks compatible with existing CMOS tooling."
+
+  evaluationCriteria:
+    - "Ease-of-use for agents during testing (minimal manual steps)."
+    - "Extensibility for future UI/UX layers."
+    - "Security posture (no raw SQL exposure, validation on inputs)."
+    - "Observability (clear success/failure signals)."
+    - "Compatibility with Markdown ingestion milestones."
+
+  prototypeRequirements:
+    - "Command stubs or API mocks demonstrating project + document lifecycle."
+    - "Sample telemetry output for onboarding success/failure."
+    - "Error-handling scenarios (duplicate project, missing file, invalid metadata)."
+    - "Scripted integration test plan using representative Markdown corpus."
+
+---
+
+# Research Execution Plan
+
+## Phase 1: Command Surface Exploration
+- Interview existing developer workflows to capture required verbs/flags.
+- Evaluate CLI frameworks and determine standard conventions (config files, env vars).
+- Draft initial command catalog with sample outputs and error messaging.
+
+## Phase 2: Service/Contract Definition
+- Map commands to backend services (existing or new) and define data contracts.
+- Document authentication/authorization expectations for local vs. production use.
+- Specify telemetry/logging payloads and failure recovery paths.
+
+## Phase 3: Validation & Handoff
+- Produce testing plan covering onboarding + ingestion integration scenarios.
+- Create sample scripts demonstrating project bootstrap and Markdown ingestion trigger.
+- Deliver final research brief with implementation backlog for B2.3.

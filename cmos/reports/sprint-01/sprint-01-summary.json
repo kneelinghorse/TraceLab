@@ -1,0 +1,90 @@
+{
+  "sprint": "Sprint 01",
+  "generated_at": "2025-11-01T03:35:39.696736Z",
+  "evaluations": [
+    {
+      "metric": "Presidio recall \u2265 0.95 on synthetic corpus priority entities.",
+      "met": true,
+      "status": "Min priority entity recall: 0.9829 (target: \u22650.95)",
+      "details": {
+        "min_recall": 0.9829476248477467,
+        "target": 0.95,
+        "per_entity": {
+          "PARTICIPANT_ID": {
+            "recall": 1.0,
+            "met": true
+          },
+          "PROJECT_ID": {
+            "recall": 1.0,
+            "met": true
+          },
+          "EMAIL_ADDRESS": {
+            "recall": 1.0,
+            "met": true
+          },
+          "PHONE_NUMBER": {
+            "recall": 0.9829476248477467,
+            "met": true
+          },
+          "PERSON": {
+            "recall": 0.9890377588306942,
+            "met": true
+          }
+        },
+        "overall_recall": 0.9943391582574452
+      }
+    },
+    {
+      "metric": "Five priority formats ingested end-to-end with sanitized chunks in PostgreSQL.",
+      "met": false,
+      "status": "ingestion_format_coverage.json missing",
+      "details": {}
+    },
+    {
+      "metric": "Embedding pipeline stores \u22651 sample project in Qdrant with <10ms p99 query latency (local).",
+      "met": true,
+      "status": "\u2713 12800 points stored, max latency 9.60ms",
+      "details": {
+        "points_count": 12800,
+        "target_points": 1,
+        "query_latencies": [
+          {
+            "top_k": 5,
+            "latency_ms": 6.4,
+            "results_returned": 5,
+            "hnsw_ef": 96
+          },
+          {
+            "top_k": 10,
+            "latency_ms": 8.7,
+            "results_returned": 10,
+            "hnsw_ef": 108
+          },
+          {
+            "top_k": 20,
+            "latency_ms": 9.6,
+            "results_returned": 20,
+            "hnsw_ef": 120
+          }
+        ],
+        "max_latency_ms": 9.6,
+        "target_latency_ms": 10.0,
+        "has_data": true,
+        "latency_met": true
+      }
+    },
+    {
+      "metric": "Sprint evaluation script executes and produces retrospective report in `cmos/reports/`.",
+      "met": true,
+      "status": "Script executed successfully",
+      "details": {}
+    }
+  ],
+  "mission_summary": {
+    "total": 11,
+    "completed": 11,
+    "in_progress": 0,
+    "current": 0,
+    "queued": 0
+  }
+}

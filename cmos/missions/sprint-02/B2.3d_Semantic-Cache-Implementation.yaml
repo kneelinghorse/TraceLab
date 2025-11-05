@@ -1,0 +1,76 @@
+# Mission File: B2.3d_Semantic-Cache-Implementation.yaml
+
+missionId: "B2.3d"
+
+objective: "Build the semantic cache service and integrate it with the RAG pipeline, leveraging the Markdown ingestion corpus and onboarding workflow to achieve a 15–20% cache hit rate."
+
+context: |
+  With ingestion and onboarding systems operational (B2.3a–B2.3c), this mission implements the cache service described in the overarching B2.3 plan. The cache must store query embeddings + responses in a dedicated Qdrant collection, reuse identifiers from onboarding metadata, and emit health telemetry so operators can track effectiveness.
+  
+  Requirements from prior missions:
+  - Cache payload schema must reference project/document identifiers populated by the onboarding API/CLI.
+  - Cache lookups/search must use Qdrant similarity thresholds (0.90–0.95) and respect TTL/size limits.
+  - Metrics (hit rate, latency, evictions) and traces should integrate with the telemetry stack established in B2.3c.
+
+successCriteria:
+  - "Qdrant cache collection created with schema supporting query embeddings, response payloads, and onboarding identifiers."
+  - "Cache service implemented with interfaces `check_cache` and `store_in_cache`, including metadata (project_id, document_ids, chunk_refs)."
+  - "RAG pipeline updated to query cache before retrieval and store results on cache miss."
+  - "Eviction policies implemented (TTL + size quota) with configurable thresholds."
+  - "Metrics recorded for cache hits/misses, lookup latency, eviction counts, and error rates."
+  - "Integration tests demonstrate 15–20% cache hit rate on representative workload using Markdown-ingested corpus."
+  - "Operational dashboard/alerts include cache health indicators."
+
+deliverables:
+  - "Cache service module with Qdrant integration and configuration management."
+  - "RAG pipeline updates (B2.1/B2.2 paths) to integrate cache lookups and storage."
+  - "Eviction + TTL workers or cron tasks with configuration and tests."
+  - "Metrics instrumentation (OpenTelemetry traces, Prometheus counters/histograms) for cache operations."
+  - "Integration/load test suite measuring hit rate across sample workloads."
+  - "Documentation describing cache usage, configuration knobs, and operational procedures."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  read for context researchFoundation:
+    - finding: "Semantic caching target hit rate 15–20%; similarity threshold 0.90–0.95."
+      sourceMission: "cmos/missions/research/TR-03.RAG-Cost-Optimization.md"
+    - finding: "Cache should reside in same Qdrant instance with separate collection and share identifiers with ingestion payloads."
+      sourceMission:
+        - "cmos/missions/sprint-02/B2.3_Semantic-Cache-Layer.yaml"
+        - "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md"
+    - finding: "Onboarding workflow defines authoritative project/document metadata and async ingestion jobs."
+      sourceMission: "cmos/missions/research/R2.3_Bootstrap-Workflow.md"
+
+  implementationScope:
+    coreDeliverable: "Fully operational semantic cache integrated into query pipeline with monitoring and eviction controls."
+    outOfScope:
+      - "Alternative cache backends (Qdrant only)."
+      - "UI surfaces for cache inspection beyond dashboards."
+
+  validationProtocol:
+    - validator: "Hit Rate Benchmark"
+      focus: "Representative workload achieves 15–20% hit rate with Markdown corpus."
+    - validator: "Eviction Policy Test"
+      focus: "TTL and size limits remove stale/overflow entries without impacting hot cache."
+    - validator: "Telemetry Verification"
+      focus: "Cache metrics and traces appear in dashboards/alerts."
+    - validator: "Fallback Test"
+      focus: "Cache failures gracefully fall back to RAG pipeline without user-visible errors."
+
+  handoffContext:
+    completed: [
+      "B2.3a Markdown Ingestion Pipeline",
+      "B2.3b Onboarding API & CLI",
+      "B2.3c Ingestion Integration & Parity"
+    ]
+    interfaces:
+      - "Cache service: `check_cache(query_embedding, metadata) -> Optional[CachedResult]`."
+      - "Cache service: `store_in_cache(query_embedding, result, metadata) -> None`."
+      - "Telemetry: metrics exported via `metrics/cache.yaml` config."
+      - "Configuration: `config/cache.yml` controlling thresholds and TTL."
+    assumptions:
+      - "Ingested corpus present in Qdrant with metadata from onboarding workflow."
+      - "Telemetry stack (metrics, tracing, logging) operational."
+    nextMission: "B2.4: Tiered LLM Routing"
+    blockers: []

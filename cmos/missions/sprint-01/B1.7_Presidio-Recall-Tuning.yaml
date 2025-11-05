@@ -1,0 +1,56 @@
+# Mission File: B1.7_Presidio-Recall-Tuning.yaml
+
+missionId: "B1.7"
+
+objective: "Tune Presidio recognizers and analyzer settings to achieve ≥0.95 recall on all priority entities (PERSON, EMAIL_ADDRESS, PHONE_NUMBER, PARTICIPANT_ID, PROJECT_ID)."
+
+context: |
+  Sprint 01 evaluation identified Presidio recall gap: minimum recall 0.9021 (PERSON entity), missing target of ≥0.95.
+  Current tuned results show 1 false negative each for PERSON, EMAIL_ADDRESS, PHONE_NUMBER, PARTICIPANT_ID, and PROJECT_ID entities.
+  This mission addresses the gap through recognizer tuning, threshold adjustment, and pattern optimization.
+
+successCriteria:
+  - "Re-run Presidio evaluation against synthetic corpus and achieve min recall ≥0.95 for all priority entities."
+  - "Updated `presidio_tuned_results.json` demonstrates recall improvement from baseline 0.9021 to ≥0.95."
+  - "All 5 priority entities (PERSON, EMAIL_ADDRESS, PHONE_NUMBER, PARTICIPANT_ID, PROJECT_ID) individually meet ≥0.95 recall."
+  - "Evaluation script confirms metric: 'Min priority entity recall: ≥0.9500 (target: ≥0.95)'."
+
+deliverables:
+  - "Tuned Presidio configuration with optimized recognizer patterns and analyzer thresholds."
+  - "Error analysis documentation identifying false negative patterns from corpus evaluation."
+  - "Updated presidio_tuned_results.json artifact with improved metrics."
+  - "Regression test validation ensuring no precision degradation below acceptable thresholds."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  read for context researchFoundation:
+    - finding: "Recall target ≥0.95 is critical for PII detection in UX research documents."
+      sourceMission: "cmos/missions/research/R1.1_Presidio-Evaluation-Strategic-Framework.md"
+    - finding: "Custom PatternRecognizer classes enable domain-specific entity patterns."
+      sourceMission: "cmos/missions/research/TR-02.PII-Detection-Redaction.md"
+    - finding: "Current gap analysis identifies 5 false negatives across priority entities."
+      sourceMission: "cmos/reports/sprint-01/SPRINT-01-DELTA-ANALYSIS.md"
+
+  implementationScope:
+    coreDeliverable: "Presidio analyzer tuning to close recall gap from 0.9021 to ≥0.95."
+    outOfScope:
+      - "Presidio service architecture changes (already implemented in B1.3)."
+      - "Corpus regeneration (existing corpus from B1.2 is sufficient)."
+      - "New entity recognizers beyond priority set."
+
+  validationProtocol:
+    - validator: "Presidio Evaluation Suite"
+      focus: "Run scripts/evaluate_presidio.py and verify min_recall ≥0.95 for all priority entities."
+    - validator: "Sprint Evaluation Script"
+      focus: "Run scripts/evaluate_sprint.py and confirm Presidio metric shows '✅' status."
+
+  handoffContext:
+    completed: []
+    interfaces:
+      - "Updated PresidioRedactionService with tuned recognizer configurations."
+    assumptions:
+      - "Synthetic corpus from B1.2 is available for re-evaluation."
+      - "Current tuned results artifact exists at cmos/reports/sprint-01/presidio_tuned_results.json."
+    nextMission: "Sprint 02 planning"
+    blockers: []

@@ -1,0 +1,70 @@
+# Mission File: B2.3c_Ingestion-Integration-Parity.yaml
+
+missionId: "B2.3c"
+
+objective: "Validate the end-to-end ingestion workflow by integrating B2.3a/B2.3b components, ensuring Markdown corpus parity in Qdrant and full observability."
+
+context: |
+  With the Markdown ingestion pipeline (B2.3a) and onboarding surface (B2.3b) in place, this mission focuses on integration, parity verification, and documentation. It confirms that Markdown corpus assets ingest cleanly, identifiers align across systems, and telemetry provides operational visibility.
+  
+  Goals include:
+  - Running corpus backfill using ingest-cli and verifying payloads in Qdrant match the R2.2 schema.
+  - Ensuring onboarding metadata (projects/documents/jobs) align with Qdrant payloads for downstream semantic caching.
+  - Capturing runbooks, dashboards, and alerting rules so the ingestion system is production-ready.
+
+successCriteria:
+  - "End-to-end test suite exercises project creation, document registration, ingestion trigger, queue processing, and Qdrant verification using representative Markdown files."
+  - "Parity report generated comparing ingested chunks against source files (heading trails, chunk counts, metadata)."
+  - "Telemetry dashboards (metrics + traces) display ingestion throughput, queue depth, failure rates, and job status distribution."
+  - "Operational runbook documents troubleshooting steps, backfill commands, and failure recovery procedures."
+  - "Alerts configured for ingestion failures, queue backlogs, and Qdrant upsert errors."
+  - "Integration results captured in developer documentation and linked from mission handoff."
+
+deliverables:
+  - "Automated integration test suite (pytest or similar) covering CLI → API → ingestion pipeline flow."
+  - "Parity verification script/report stored in `artifacts/ingestion-parity/`."
+  - "Observability assets: OpenTelemetry collector config, dashboards, alert definitions."
+  - "Operational runbook and FAQ for ingestion/onboarding workflows."
+  - "Documentation updates (developer guide, README sections) describing end-to-end ingestion usage."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  read for context researchFoundation:
+    - finding: "Ingestion pipeline and onboarding workflow architecture from R2.2/R2.3 define required identifiers and telemetry."
+      sourceMission:
+        - "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md"
+        - "cmos/missions/research/R2.3_Bootstrap-Workflow.md"
+    - finding: "Semantic cache mission requires consistent identifiers between ingestion payloads and onboarding metadata."
+      sourceMission: "cmos/missions/sprint-02/B2.3_Semantic-Cache-Layer.yaml"
+
+  implementationScope:
+    coreDeliverable: "Validated ingestion system with parity guarantees, observability, and documentation."
+    outOfScope:
+      - "New ingestion features beyond Markdown."
+      - "Semantic cache implementation (B2.3d)."
+
+  validationProtocol:
+    - validator: "Integration Regression Suite"
+      focus: "Full workflow completes without manual steps; failures produce actionable telemetry."
+    - validator: "Parity Report Review"
+      focus: "Chunk metadata matches source documents within acceptable tolerance."
+    - validator: "Runbook Drill"
+      focus: "Operational runbook covers failure scenarios and recovery steps."
+    - validator: "Alert Test"
+      focus: "Simulated ingestion failure triggers alerting pipeline."
+
+  handoffContext:
+    completed: [
+      "B2.3a Markdown Ingestion Pipeline",
+      "B2.3b Onboarding API & CLI"
+    ]
+    interfaces:
+      - "Integration tests: `tests/integration/test_ingestion_flow.py`."
+      - "Parity script: `scripts/verify_ingestion_parity.py`."
+      - "Dashboards/alerts located under `infra/observability/ingestion/`."
+    assumptions:
+      - "Ingestion pipeline and onboarding services deployed to target environment."
+      - "Telemetry stack (OpenTelemetry collector, metrics backend) available."
+    nextMission: "B2.3d: Semantic Cache Layer"
+    blockers: []
