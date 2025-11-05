@@ -58,7 +58,7 @@ async def upload_document(
     """
     Upload a document file.
     
-    Supports: .pdf, .docx, .pptx, .csv, .xlsx
+    Supports: .pdf, .docx, .pptx, .csv, .xlsx, .md, .markdown, .txt
     
     The file is saved and a document record is created.
     Processing (parsing, redaction, chunking) can be triggered separately
@@ -74,7 +74,10 @@ async def upload_document(
     if not DocumentParser.is_format_supported(file_path):
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported file format: {file_path.suffix}. Supported: .pdf, .docx, .pptx, .csv, .xlsx"
+            detail=(
+                "Unsupported file format: {suffix}. Supported: .pdf, .docx, .pptx, .csv, "
+                ".xlsx, .md, .markdown, .txt"
+            ).format(suffix=file_path.suffix)
         )
     
     # Read file content
@@ -92,7 +95,10 @@ async def upload_document(
         ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         ".csv": "text/csv",
-        ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ".md": "text/markdown",
+        ".markdown": "text/markdown",
+        ".txt": "text/plain",
     }
     mime_type = mime_types.get(file_path.suffix.lower())
     
@@ -103,7 +109,10 @@ async def upload_document(
             ".docx": "report",
             ".pptx": "report",
             ".csv": "survey",
-            ".xlsx": "survey"
+            ".xlsx": "survey",
+            ".md": "notes",
+            ".markdown": "notes",
+            ".txt": "notes",
         }
         file_type = file_type_map.get(file_path.suffix.lower(), "report")
     

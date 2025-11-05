@@ -15,6 +15,7 @@ os.environ.setdefault("DATABASE_URL", "sqlite:///./tests/test_ingestion.db")
 os.environ.setdefault("ENVIRONMENT", "test")
 
 from app.core.database import Base, engine, SessionLocal
+from app.models.project import Project
 
 _COVERAGE_PATH = Path("cmos/reports/sprint-01/ingestion_format_coverage.json")
 
@@ -45,3 +46,13 @@ def db_session():
         session.commit()
     finally:
         session.close()
+
+
+@pytest.fixture
+def project(db_session):
+    """Create a project record for ingestion scenarios."""
+    instance = Project(name="TraceLab Test Project", description="Pipeline validation")
+    db_session.add(instance)
+    db_session.commit()
+    db_session.refresh(instance)
+    return instance
