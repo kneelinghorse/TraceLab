@@ -1,0 +1,60 @@
+[
+  {
+    "id": "11111111-1111-1111-1111-111111111111",
+    "project_id": "22222222-2222-2222-2222-222222222222",
+    "mission_data": {
+      "mission_id": "B3.4",
+      "version": "1.0.0",
+      "title": "UI Integration",
+      "summary": "Next.js UI for Mission Protocol quality gate orchestration.",
+      "status": "in_progress",
+      "owner": "Research Ops",
+      "research_statement": {
+        "topic": "Mission Protocol UI",
+        "objective": "Expose validators to researchers",
+        "scope": "Sprint 03 UI layers",
+        "success_metrics": ["Mission creation under 5 minutes"],
+        "risks": ["RAG coupling delays"],
+        "methodology": "Product design review"
+      },
+      "key_questions": [
+        {
+          "question": "How do we surface quality gates?",
+          "status": "researching",
+          "answer": "Dedicated panel per gate"
+        }
+      ],
+      "synthesis": {
+        "key_insights": ["Design tokens must mirror Mission Protocol doc"],
+        "surprising_findings": [],
+        "contradictory_information": [],
+        "contradiction_resolutions": [],
+        "recommendations": ["Provide inline gate hints"],
+        "next_steps": ["Ship UI kit"]
+      },
+      "evidence": [
+        {
+          "evidence_id": "EV-001",
+          "source": "Research doc",
+          "summary": "Researchers need gate level clarity",
+          "chunk_id": "chunk_a1",
+          "insight_id": "INS-1",
+          "tags": []
+        }
+      ],
+      "quality_checkpoints": [
+        { "gate": "research_statement", "status": "pass" },
+        { "gate": "evidence_links", "status": "pass" },
+        { "gate": "contradictions_resolved", "status": "pending" },
+        { "gate": "synthesis_quality", "status": "pass" },
+        { "gate": "traceability", "status": "fail" }
+      ],
+      "tags": ["mission-protocol", "ui"]
+    },
+    "quality_gates": {},
+    "status": "in_progress",
+    "completion_percentage": 72,
+    "created_at": "2025-11-08T15:00:00Z",
+    "updated_at": "2025-11-08T18:00:00Z"
+  }
+]

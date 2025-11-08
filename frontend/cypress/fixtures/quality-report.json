@@ -1,0 +1,51 @@
+{
+  "mission_id": "11111111-1111-1111-1111-111111111111",
+  "protocol_mission_id": "B3.4",
+  "evaluated_at": "2025-11-08T18:05:00Z",
+  "all_passed": false,
+  "failing_gates": ["traceability"],
+  "gates": {
+    "research_statement": {
+      "gate": "research_statement",
+      "status": "pass",
+      "blocking": true,
+      "details": null,
+      "evaluated_at": "2025-11-08T18:05:00Z",
+      "metadata": null
+    },
+    "evidence_links": {
+      "gate": "evidence_links",
+      "status": "pass",
+      "blocking": true,
+      "details": null,
+      "evaluated_at": "2025-11-08T18:05:00Z",
+      "metadata": null
+    },
+    "contradictions_resolved": {
+      "gate": "contradictions_resolved",
+      "status": "pending",
+      "blocking": true,
+      "details": "Need explicit resolution for contradictory finding.",
+      "evaluated_at": "2025-11-08T18:05:00Z",
+      "metadata": null
+    },
+    "synthesis_quality": {
+      "gate": "synthesis_quality",
+      "status": "pass",
+      "blocking": true,
+      "details": null,
+      "evaluated_at": "2025-11-08T18:05:00Z",
+      "metadata": null
+    },
+    "traceability": {
+      "gate": "traceability",
+      "status": "fail",
+      "blocking": true,
+      "details": "Evidence EV-001 missing chunk_id linkage.",
+      "evaluated_at": "2025-11-08T18:05:00Z",
+      "metadata": {
+        "evidence_ids": ["EV-001"]
+      }
+    }
+  }
+}
