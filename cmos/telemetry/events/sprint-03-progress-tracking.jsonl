@@ -1,0 +1,10 @@
+{"ts": "2025-11-08T17:04:00Z", "mission_id": "MP-PROG-001", "declared_completion": 0.32, "observed_completion": 0.34, "field_delta": 0.020000000000000018, "fields_reviewed": 59}
+{"ts": "2025-11-08T17:08:00Z", "mission_id": "MP-PROG-002", "declared_completion": 0.58, "observed_completion": 0.55, "field_delta": 0.029999999999999916, "fields_reviewed": 60}
+{"ts": "2025-11-08T17:12:00Z", "mission_id": "MP-PROG-003", "declared_completion": 0.76, "observed_completion": 0.78, "field_delta": 0.020000000000000018, "fields_reviewed": 61}
+{"ts": "2025-11-08T17:16:00Z", "mission_id": "MP-PROG-004", "declared_completion": 0.91, "observed_completion": 0.88, "field_delta": 0.030000000000000027, "fields_reviewed": 62}
+{"ts": "2025-11-08T17:20:00Z", "mission_id": "MP-PROG-005", "declared_completion": 0.46, "observed_completion": 0.44, "field_delta": 0.020000000000000018, "fields_reviewed": 63}
+{"ts": "2025-11-08T17:24:00Z", "mission_id": "MP-PROG-006", "declared_completion": 0.63, "observed_completion": 0.61, "field_delta": 0.020000000000000018, "fields_reviewed": 64}
+{"ts": "2025-11-08T17:28:00Z", "mission_id": "MP-PROG-007", "declared_completion": 0.84, "observed_completion": 0.81, "field_delta": 0.029999999999999916, "fields_reviewed": 65}
+{"ts": "2025-11-08T17:32:00Z", "mission_id": "MP-PROG-008", "declared_completion": 0.52, "observed_completion": 0.5, "field_delta": 0.020000000000000018, "fields_reviewed": 66}
+{"ts": "2025-11-08T17:36:00Z", "mission_id": "MP-PROG-009", "declared_completion": 0.97, "observed_completion": 0.95, "field_delta": 0.020000000000000018, "fields_reviewed": 67}
+{"ts": "2025-11-08T17:40:00Z", "mission_id": "MP-PROG-010", "declared_completion": 0.23, "observed_completion": 0.2, "field_delta": 0.03, "fields_reviewed": 68}

@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-08T18:26:02.652738+00:00'
+generatedAt: '2025-11-08T19:20:25.339503+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -232,13 +232,17 @@ domainFields:
         completed_at: '2025-11-08T18:25:52Z'
     - id: B3.5
       name: Sprint Efficacy Evaluator
-      status: Current
-      notes: 'Sprint 03 metrics: Mission Protocol adoption, validation coverage, quality
-        gate effectiveness, API stability'
+      status: In Progress
+      notes: Created Sprint 03 telemetry artifacts (validation, quality gate, API,
+        YAML, evidence, progress) feeding scripts/evaluate_sprint_03.py. Script now
+        generates cmos/reports/sprint-03/metrics.json plus sprint-03-summary.md with
+        validation coverage >95%. Added tests in tests/sprint_03 and ran pytest tests/sprint_03
+        to keep Mission Protocol quality gates enforced.
       metadata:
         type: Build.Implementation.v1
         description: 'Sprint 03 metrics: Mission Protocol adoption, validation coverage,
           quality gate effectiveness, API stability'
+        started_at: '2025-11-08T19:13:58Z'
   missionDependencies:
   - from: B1.1
     to: B1.2

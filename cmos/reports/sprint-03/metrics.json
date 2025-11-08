@@ -1,0 +1,125 @@
+{
+  "sprint": "Sprint 03",
+  "generated_at": "2025-11-08T19:19:37.544822+00:00",
+  "results": [
+    {
+      "name": "Mission Protocol validation coverage >95% across API/service/database layers",
+      "met": true,
+      "actual": 0.975,
+      "target": 0.95,
+      "details": {
+        "total_validations": 40,
+        "successful_validations": 39,
+        "coverage": 0.975,
+        "failed_missions": [
+          {
+            "mission_id": "MP-VAL-017",
+            "missing_layers": [
+              "database"
+            ],
+            "detail": "Constraint enforcement rejected payload due to missing timestamps."
+          }
+        ],
+        "reference": "docs/quality_gates.md"
+      }
+    },
+    {
+      "name": "Quality gates block invalid missions with actionable remediation guidance",
+      "met": true,
+      "actual": 1.0,
+      "target": 1.0,
+      "details": {
+        "gate_activity": {
+          "research_statement": {
+            "total": 6,
+            "fails": 0
+          },
+          "evidence_links": {
+            "total": 6,
+            "fails": 1
+          },
+          "contradictions_resolved": {
+            "total": 6,
+            "fails": 0
+          },
+          "synthesis_quality": {
+            "total": 6,
+            "fails": 1
+          },
+          "traceability": {
+            "total": 6,
+            "fails": 1
+          }
+        },
+        "failure_count": 3,
+        "actionable_failures": 3,
+        "actionable_ratio": 1.0
+      }
+    },
+    {
+      "name": "API stability (>99% uptime, <500ms p95 latency)",
+      "met": true,
+      "actual": {
+        "min_uptime": 0.9991,
+        "p95_latency_ms": 320
+      },
+      "target": {
+        "uptime": 0.99,
+        "p95_latency_ms": 500
+      },
+      "details": {
+        "avg_uptime": 0.9995200000000001,
+        "min_uptime": 0.9991,
+        "aggregated_p95_latency_ms": 320,
+        "avg_error_rate": 0.0013,
+        "samples": 5
+      }
+    },
+    {
+      "name": "YAML round-trip accuracy (import/export/import parity)",
+      "met": true,
+      "actual": 15,
+      "target": 15,
+      "details": {
+        "total_round_trips": 15,
+        "perfect_round_trips": 15,
+        "round_trip_failures": 0,
+        "total_fields_reviewed": 630
+      }
+    },
+    {
+      "name": "Evidence linking integrity (chunk presence + relevance >= 0.8)",
+      "met": true,
+      "actual": {
+        "missing_chunk_events": 0,
+        "average_relevance": 0.8649999999999999
+      },
+      "target": {
+        "missing_chunk_events": 0,
+        "average_relevance": 0.8
+      },
+      "details": {
+        "checked_missions": 12,
+        "missing_chunk_events": 0,
+        "average_relevance": 0.8649999999999999
+      }
+    },
+    {
+      "name": "Progress tracking accuracy within \u00b15% of field population",
+      "met": true,
+      "actual": {
+        "within_tolerance": 10,
+        "samples": 10
+      },
+      "target": {
+        "tolerance": 0.05
+      },
+      "details": {
+        "samples": 10,
+        "within_tolerance": 10,
+        "out_of_tolerance": 0,
+        "tolerance": 0.05
+      }
+    }
+  ]
+}
