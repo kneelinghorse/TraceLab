@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-08T19:20:25.339503+00:00'
+generatedAt: '2025-11-08T20:51:18.469321+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -168,7 +168,7 @@ domainFields:
   - sprintId: sprint-03
     title: Sprint 03 - Mission Protocol Integration
     focus: null
-    status: Planning
+    status: Completed
     startDate: '2025-11-08'
     endDate: '2025-12-05'
     totalMissions: 5
@@ -232,17 +232,57 @@ domainFields:
         completed_at: '2025-11-08T18:25:52Z'
     - id: B3.5
       name: Sprint Efficacy Evaluator
-      status: In Progress
-      notes: Created Sprint 03 telemetry artifacts (validation, quality gate, API,
-        YAML, evidence, progress) feeding scripts/evaluate_sprint_03.py. Script now
-        generates cmos/reports/sprint-03/metrics.json plus sprint-03-summary.md with
-        validation coverage >95%. Added tests in tests/sprint_03 and ran pytest tests/sprint_03
-        to keep Mission Protocol quality gates enforced.
+      status: Completed
+      completed_at: '2025-11-08T19:21:17Z'
+      notes: Telemetry sources for validation/quality/API/YAML/evidence/progress now
+        live under cmos/telemetry/events/sprint-03-*.jsonl. Added scripts/evaluate_sprint_03.py
+        to aggregate metrics and emit cmos/reports/sprint-03/metrics.json plus sprint-03-summary.md.
+        Added regression tests in tests/sprint_03/ and pytest tests/sprint_03 passes
+        to keep coverage on the new evaluators.
       metadata:
         type: Build.Implementation.v1
         description: 'Sprint 03 metrics: Mission Protocol adoption, validation coverage,
           quality gate effectiveness, API stability'
         started_at: '2025-11-08T19:13:58Z'
+        completed_at: '2025-11-08T19:21:17Z'
+  - sprintId: sprint-04
+    title: Sprint 04 - Quality Assurance & Tech Debt
+    focus: null
+    status: Planning
+    startDate: '2025-11-09'
+    endDate: '2025-11-23'
+    totalMissions: 5
+    completedMissions: 0
+    missions:
+    - id: B4.1
+      name: Playwright Migration
+      status: Completed
+      completed_at: '2025-11-08T20:48:34Z'
+      notes: "- Swapped Cypress for Playwright, including webServer config + chromium\
+        \ project tied to Mission Protocol flows.\n- Ported backlog + detail specs\
+        \ with fixtures under tests/fixtures and added data-testid coverage for traceability\
+        \ gate.\n- Removed Cypress deps/configs (root + frontend), updated docs/.gitignore,\
+        \ and documented npm run test:e2e usage.\n- Tests: npm run test:e2e (frontend)\
+        \ \u2014 2025-11-08T20:48Z UTC."
+      metadata:
+        started_at: '2025-11-08T20:31:17Z'
+        completed_at: '2025-11-08T20:48:34Z'
+    - id: B4.2
+      name: Quality Gate Automation
+      status: Current
+      notes: Automate bias detection, enhance traceability, methodology rigor checks
+    - id: B4.3
+      name: Performance Optimization
+      status: Queued
+      notes: Query caching, cost monitoring, load testing, database optimization
+    - id: B4.4
+      name: Testing & Documentation Consolidation
+      status: Queued
+      notes: Test coverage >80%, load testing suite, comprehensive documentation
+    - id: B4.5
+      name: Sprint Efficacy Evaluator
+      status: Queued
+      notes: 'Sprint 04 metrics: tech debt, quality, performance, coverage'
   missionDependencies:
   - from: B1.1
     to: B1.2
@@ -303,6 +343,18 @@ domainFields:
     type: blocks
   - from: B3.4
     to: B3.5
+    type: blocks
+  - from: B4.1
+    to: B4.5
+    type: blocks
+  - from: B4.2
+    to: B4.5
+    type: blocks
+  - from: B4.3
+    to: B4.5
+    type: blocks
+  - from: B4.4
+    to: B4.5
     type: blocks
   promptMapping:
     prompts: []

@@ -46,3 +46,7 @@
 {"ts": "2025-11-08T16:50:31Z", "agent": "codex", "mission": "B3.3", "action": "complete", "status": "completed", "summary": "Quality gate backend shipped", "next_hint": "B3.4 is now Current"}
 {"ts": "2025-11-08T17:59:48Z", "agent": "codex", "mission": "B3.4", "action": "start", "status": "in_progress", "summary": "Starting Protocol Engine UI integration alignment"}
 {"ts": "2025-11-08T18:25:52Z", "agent": "codex", "mission": "B3.4", "action": "complete", "status": "completed", "summary": "Mission Protocol UI integration delivered", "next_hint": "B3.5 is now Current"}
+{"ts": "2025-11-08T19:13:58Z", "agent": "", "mission": "B3.5", "action": "start", "status": "in_progress", "summary": "Starting Protocol Engine"}
+{"ts": "2025-11-08T19:21:17Z", "agent": "codex", "mission": "B3.5", "action": "complete", "status": "completed", "summary": "Sprint 03 metrics + telemetry shipped", "next_hint": null}
+{"ts": "2025-11-08T20:31:17Z", "agent": "", "mission": "B4.1", "action": "start", "status": "in_progress", "summary": "Starting Protocol Engine"}
+{"ts": "2025-11-08T20:48:34Z", "agent": "codex", "mission": "B4.1", "action": "complete", "status": "completed", "summary": "Playwright suite replaces Cypress for Mission Protocol UI", "next_hint": "B4.2 is now Current"}

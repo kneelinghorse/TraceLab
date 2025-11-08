@@ -77,7 +77,11 @@ export function QualityGatePanel({ report, mission }: Props) {
       </div>
       <div className="grid gap-3">
         {gates.map((gate) => (
-          <div key={gate.name} className="border border-white/5 rounded-xl p-4 bg-white/5 bg-opacity-10 backdrop-blur">
+          <div
+            key={gate.name}
+            data-testid={`gate-${gate.name}`}
+            className="border border-white/5 rounded-xl p-4 bg-white/5 bg-opacity-10 backdrop-blur"
+          >
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-lg font-semibold capitalize">{gate.name.replace("_", " ")}</p>
