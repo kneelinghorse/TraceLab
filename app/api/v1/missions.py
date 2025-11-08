@@ -19,9 +19,11 @@ from app.services.mission_protocol_service import (
     MissionProtocolService,
     MissionProtocolServiceError,
 )
+from app.services.quality_checks import QualityAutomationRunner
 
 router = APIRouter()
-_service = MissionProtocolService()
+_quality_runner = QualityAutomationRunner(async_enabled=True)
+_service = MissionProtocolService(quality_runner=_quality_runner)
 
 
 def _mission_read(instance) -> MissionRead:

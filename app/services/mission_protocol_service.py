@@ -13,6 +13,7 @@ from app.schemas.mission import MissionCreate, MissionUpdate
 from app.services.evidence_linking import EvidenceLinkingService
 from app.services.mission_progress import MissionProgressSnapshot, derive_status, evaluate_progress
 from app.services.quality_gate_service import QualityGateReport, QualityGateService
+from app.services.quality_checks import QualityAutomationRunner
 from app.services.yaml_handler import dump_mission_yaml, load_mission_yaml
 
 
@@ -32,9 +33,11 @@ class MissionProtocolService:
         *,
         evidence_service: EvidenceLinkingService | None = None,
         quality_gate_service: QualityGateService | None = None,
+        quality_runner: QualityAutomationRunner | None = None,
     ) -> None:
         self.evidence_service = evidence_service or EvidenceLinkingService()
         self.quality_gate_service = quality_gate_service or QualityGateService()
+        self.quality_runner = quality_runner or QualityAutomationRunner(async_enabled=False)
 
     # ------------------------------------------------------------------
     # CRUD
@@ -69,6 +72,7 @@ class MissionProtocolService:
         self._sync_evidence_links(db, draft)
         db.commit()
         db.refresh(mission)
+        self._trigger_quality_automation(mission.id)
         return mission
 
     def update_mission(self, db: Session, mission_id: UUID, payload: MissionUpdate) -> Mission:
@@ -87,6 +91,7 @@ class MissionProtocolService:
         self._sync_evidence_links(db, draft)
         db.commit()
         db.refresh(mission)
+        self._trigger_quality_automation(mission.id)
         return mission
 
     def delete_mission(self, db: Session, mission_id: UUID) -> None:
@@ -162,3 +167,7 @@ class MissionProtocolService:
             return
         evidence_payloads = [item.model_dump() for item in draft.evidence]
         self.evidence_service.sync_from_evidence(db, evidence_payloads)
+
+    def _trigger_quality_automation(self, mission_id: UUID) -> None:
+        if self.quality_runner:
+            self.quality_runner.schedule(mission_id, performed_by="mission_protocol_service")

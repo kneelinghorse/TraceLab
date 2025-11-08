@@ -52,6 +52,11 @@ from app.schemas.quality import (
     QualityCheckUpdate,
     QualityCheckRead,
 )
+from app.schemas.quality_automation import (
+    QualityAutomationHistoryResponse,
+    QualityAutomationRunRequest,
+    QualityAutomationRunResponse,
+)
 from app.schemas.retrieval import (
     RetrievalQuery,
     RetrievalResponse,
@@ -104,6 +109,9 @@ __all__ = [
     "QualityCheckCreate",
     "QualityCheckUpdate",
     "QualityCheckRead",
+    "QualityAutomationRunRequest",
+    "QualityAutomationRunResponse",
+    "QualityAutomationHistoryResponse",
     "RetrievalQuery",
     "RetrievalResponse",
     "RetrievedChunk",
