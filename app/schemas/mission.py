@@ -7,12 +7,14 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
+from app.models.mission_protocol import MissionProtocolDraft
+
 
 class MissionBase(BaseModel):
     """Shared attributes for mission operations."""
 
     project_id: Optional[UUID] = None
-    mission_data: Dict[str, Any]
+    mission_data: MissionProtocolDraft
     quality_gates: Optional[Dict[str, Any]] = None
     status: Optional[str] = None
     completion_percentage: Optional[int] = None
@@ -27,7 +29,7 @@ class MissionCreate(MissionBase):
 class MissionUpdate(BaseModel):
     """Payload for updating a mission."""
 
-    mission_data: Optional[Dict[str, Any]] = None
+    mission_data: Optional[MissionProtocolDraft] = None
     quality_gates: Optional[Dict[str, Any]] = None
     status: Optional[str] = None
     completion_percentage: Optional[int] = None
