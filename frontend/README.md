@@ -15,7 +15,7 @@ npm run build       # Production build
 npm run start       # Production server (after build)
 npm run lint        # next lint (uses eslint.config.mjs)
 npm run type-check  # tsc --noEmit
-npm run test:e2e    # Cypress runner with stubbed API fixtures
+npm run test:e2e    # Playwright runner with stubbed API fixtures
 ```
 
 ## Environment
@@ -27,7 +27,7 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 NEXT_PUBLIC_DEFAULT_PROJECT_ID=<uuid from projects table>
 ```
 
-The Cypress suite reads `CYPRESS_BASE_URL` when UI runs on a non-default port.
+Playwright reads `PLAYWRIGHT_BASE_URL` / `PLAYWRIGHT_PORT` when the UI runs on a non-default port.
 
 ## Architecture
 
@@ -35,6 +35,6 @@ The Cypress suite reads `CYPRESS_BASE_URL` when UI runs on a non-default port.
 - Mission CRUD, progress indicator, and quality gate panel reside in `src/components`.
 - API helpers + SWR hooks live under `src/lib`.
 - Type definitions mirroring the Pydantic models are in `src/types`.
-- E2E guardrails under `cypress/` stub the FastAPI endpoints to validate form behavior and telemetry rendering.
+- E2E guardrails under `tests/e2e/` stub the FastAPI endpoints to validate form behavior and telemetry rendering.
 
 Refer to `docs/frontend_architecture.md` for a deeper dive into component responsibilities and data flow.

@@ -22,7 +22,8 @@ frontend/
 │  │  ├─ mission.ts           # Pydantic-aligned types
 │  │  └─ forms.ts             # React Hook Form schema definition
 │  └─ styles/globals.css      # Tailwind tokens + glassmorphism theme
-└─ cypress/                   # E2E guardrails for critical flows
+└─ tests/
+   └─ e2e/                    # Playwright guardrails for critical flows
 ```
 
 ### Routing
@@ -48,7 +49,7 @@ frontend/
 
 ### Testing
 
-`cypress/e2e/mission-protocol.cy.ts` stubs backend responses to guarantee:
+`tests/e2e/mission-protocol.spec.ts` stubs backend responses to guarantee:
 
 - `/missions` renders backlog cards, quality hints, and React Hook Form validation errors.
 - `/missions/[id]` displays live gate statuses and exposes the Mission update workflow.
@@ -59,7 +60,7 @@ Run the suite from `frontend/`:
 npm run test:e2e
 ```
 
-Set `CYPRESS_BASE_URL` if the UI runs on a non-default port.
+Set `PLAYWRIGHT_BASE_URL` / `PLAYWRIGHT_PORT` if the UI runs on a non-default port.
 
 ### Configuration & Env
 
