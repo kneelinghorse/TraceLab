@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-08T17:38:45.048986+00:00'
+generatedAt: '2025-11-08T18:26:02.652738+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -218,16 +218,21 @@ domainFields:
         completed_at: '2025-11-08T16:50:31Z'
     - id: B3.4
       name: UI Integration
-      status: Current
-      notes: Next.js with React Hook Form + Pydantic validation, progress visualization,
-        quality gate indicators, evidence link UX
+      status: Completed
+      completed_at: '2025-11-08T18:25:52Z'
+      notes: Next.js 14 Mission Protocol workspace (React Hook Form draft editor,
+        progress indicator, quality gate panel, evidence linking UI, SWR client) plus
+        docs/frontend_architecture.md. npm run lint + type-check pass; Cypress run
+        blocked because bundled binary rejects --no-sandbox on macOS.
       metadata:
         type: Build.Implementation.v1
         description: Next.js with React Hook Form + Pydantic validation, progress
           visualization, quality gate indicators, evidence link UX
+        started_at: '2025-11-08T17:59:48Z'
+        completed_at: '2025-11-08T18:25:52Z'
     - id: B3.5
       name: Sprint Efficacy Evaluator
-      status: Queued
+      status: Current
       notes: 'Sprint 03 metrics: Mission Protocol adoption, validation coverage, quality
         gate effectiveness, API stability'
       metadata:
