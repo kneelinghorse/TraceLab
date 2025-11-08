@@ -1,0 +1,76 @@
+# Mission File: B3.5_Sprint-Efficacy-Evaluator.yaml
+
+missionId: "B3.5"
+
+objective: "Evaluate Sprint 03 Mission Protocol Integration efficacy by measuring validation coverage, quality gate effectiveness, API stability, and developer adoption metrics."
+
+context: |
+  Follows the established sprint evaluation pattern from B1.6 and B2.5.
+  Validates that Sprint 03 delivered a production-ready Mission Protocol system.
+  Collects telemetry to inform Sprint 04 planning and retrospective discussions.
+
+successCriteria:
+  - "Mission Protocol validation coverage: >95% of test missions successfully validate through all three layers."
+  - "Quality gate effectiveness: Quality gates correctly block invalid missions and provide actionable feedback."
+  - "API stability: Mission Protocol CRUD endpoints achieve >99% uptime with <500ms p95 latency."
+  - "YAML import/export accuracy: 100% round-trip fidelity (import → export → import produces identical results)."
+  - "Evidence linking integrity: All linked chunks exist in Qdrant and have valid relevance scores."
+  - "Progress tracking accuracy: Completion percentage correctly reflects mission field population within ±5%."
+  - "Sprint evaluation report generated in cmos/reports/sprint-03/sprint-03-summary.md with all metrics."
+  - "Telemetry data collected for: validation events, quality gate results, API performance, error rates."
+
+deliverables:
+  - "Sprint evaluation script: scripts/evaluate_sprint_03.py with all Sprint 03 metrics."
+  - "Validation coverage test suite: tests/sprint_03/test_validation_coverage.py."
+  - "Quality gate effectiveness tests: tests/sprint_03/test_quality_gate_effectiveness.py."
+  - "API stability tests: tests/sprint_03/test_api_stability.py with load testing."
+  - "YAML round-trip tests: tests/sprint_03/test_yaml_roundtrip.py."
+  - "Evidence linking integrity tests: tests/sprint_03/test_evidence_integrity.py."
+  - "Sprint 03 summary report: cmos/reports/sprint-03/sprint-03-summary.md."
+  - "Telemetry artifacts: cmos/telemetry/events/sprint-03-*.jsonl with all evaluation events."
+  - "Metrics dashboard: cmos/reports/sprint-03/metrics.json with structured data."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Sprint evaluation pattern established in B1.6 and refined in B2.5."
+      sourceMission: "cmos/missions/sprint-01/B1.6_Sprint-Efficacy-Evaluator.yaml"
+    - finding: "Telemetry collection pattern from Sprint 02 evaluation."
+      sourceMission: "cmos/missions/sprint-02/B2.5_Sprint-Efficacy-Evaluator.yaml"
+    - finding: "Sprint 03 success criteria defined in master_context planning section."
+      sourceMission: "cmos/db/cmos.sqlite"
+
+  implementationScope:
+    coreDeliverable: "Complete Sprint 03 evaluation with validation coverage, quality gate effectiveness, API stability, and evidence integrity metrics."
+    outOfScope:
+      - "User satisfaction surveys (no external users yet)."
+      - "Performance optimization beyond measurement."
+      - "Cross-sprint trend analysis (single sprint evaluation only)."
+      - "Automated remediation of failed metrics."
+
+  validationProtocol:
+    - validator: "Metrics Verification"
+      focus: "All Sprint 03 success criteria measured and reported with actual values."
+    - validator: "Telemetry Completeness"
+      focus: "Evaluation events logged to telemetry directory with required fields."
+    - validator: "Report Quality"
+      focus: "Summary report contains actionable insights for Sprint 04 planning."
+
+  handoffContext:
+    completed:
+      - "Sprint 03 evaluation complete with all success criteria measured."
+      - "Validation coverage, quality gate effectiveness, and API stability metrics collected."
+      - "YAML round-trip accuracy and evidence linking integrity verified."
+      - "Sprint 03 summary report generated with retrospective insights."
+    interfaces:
+      - "Evaluation script: python scripts/evaluate_sprint_03.py --generate-report."
+      - "Metrics API: access metrics via cmos/reports/sprint-03/metrics.json."
+      - "Telemetry query: grep/analyze cmos/telemetry/events/sprint-03-*.jsonl."
+    assumptions:
+      - "B3.1-B3.4 missions are complete and stable."
+      - "Mission Protocol test corpus exists with valid and invalid mission samples."
+      - "Telemetry infrastructure accepts and persists JSONL events."
+    nextMission: "Sprint 03 Retrospective & Sprint 04 Planning"
+    blockers: []
+

@@ -1,0 +1,78 @@
+# Mission File: B3.1_Validation-Framework.yaml
+
+missionId: "B3.1"
+
+objective: "Implement Pydantic-based Mission Protocol validation framework with MissionProtocolDraft and MissionProtocolComplete models, multi-layer validation architecture, and structured error transformation service."
+
+context: |
+  Implements Week 9 roadmap goals (Phase 3: Mission Protocol Integration).
+  Establishes the validation foundation that will enforce research quality standards across the application.
+  Creates the Pydantic models that B3.2 (Protocol Engine) will use for CRUD operations.
+
+successCriteria:
+  - "MissionProtocolDraft Pydantic model accepts optional fields for draft-state missions."
+  - "MissionProtocolComplete Pydantic model enforces required fields and quality gates via @model_validator."
+  - "Multi-layer validation: API layer (FastAPI request parsing), business layer (@model_validator), database layer (JSON Schema CHECK constraints)."
+  - "Error transformation service converts Pydantic ValidationError into structured API responses with field paths and actionable messages."
+  - "Nested Pydantic models defined: ResearchStatement, Synthesis, Evidence, QualityCheckpoint."
+  - "Database CHECK constraints generated programmatically from Pydantic model_json_schema() to maintain single source of truth."
+  - "Unit tests cover draft→complete state transitions and quality gate violation scenarios."
+  - "Integration tests validate end-to-end YAML→Pydantic→PostgreSQL→API error flow."
+
+deliverables:
+  - "Pydantic models module: app/models/mission_protocol.py with MissionProtocolDraft and MissionProtocolComplete."
+  - "Nested models: ResearchStatement, Synthesis, Evidence, KeyQuestion, QualityCheckpoint."
+  - "Error transformation service: app/services/validation_errors.py for Pydantic→API error conversion."
+  - "Database migration: Add CHECK constraint to missions.mission_data using generated JSON Schema."
+  - "Validation utilities: YAML parsing helpers with Pydantic integration."
+  - "Unit tests: tests/test_mission_protocol_validation.py covering all validation scenarios."
+  - "Integration tests: tests/integration/test_mission_validation_flow.py for end-to-end validation."
+  - "Documentation: docs/mission_protocol_validation.md explaining validation layers and error handling."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Pydantic v2 recommended for Mission Protocol validation (5-10x faster than jsonschema)."
+      sourceMission: "cmos/foundational-docs/technical_architecture.md"
+    - finding: "Multi-layer validation architecture: API → business logic → database layers."
+      sourceMission: "cmos/foundational-docs/technical_architecture.md"
+    - finding: "Mission Protocol JSONB schema structure defined in missions table."
+      sourceMission: "cmos/foundational-docs/technical_architecture.md"
+    - finding: "Quality gates implemented as Pydantic validators, not separate rules engine."
+      sourceMission: "cmos/foundational-docs/roadmap.md"
+
+  implementationScope:
+    coreDeliverable: "Complete Pydantic validation framework for Mission Protocol with multi-layer validation and structured error responses."
+    outOfScope:
+      - "CRUD API endpoints (handled in B3.2)."
+      - "YAML import/export functionality (handled in B3.2)."
+      - "Progress tracking logic (handled in B3.2)."
+      - "Quality gate validators (handled in B3.3)."
+      - "UI integration (handled in B3.4)."
+
+  validationProtocol:
+    - validator: "Unit Tests"
+      focus: "Pydantic model validation, state transitions, quality gate enforcement."
+    - validator: "Integration Tests"
+      focus: "End-to-end YAML→Pydantic→PostgreSQL validation flow with error handling."
+    - validator: "Database Constraint Tests"
+      focus: "CHECK constraint prevents invalid JSONB writes to missions.mission_data."
+
+  handoffContext:
+    completed:
+      - "MissionProtocolDraft and MissionProtocolComplete Pydantic models defined."
+      - "Multi-layer validation architecture implemented across API, business, and database layers."
+      - "Error transformation service provides actionable API error responses."
+      - "Database CHECK constraints generated from Pydantic schemas."
+    interfaces:
+      - "Pydantic models: MissionProtocolDraft, MissionProtocolComplete with nested models."
+      - "Error service: transform_validation_error(e: ValidationError) -> APIErrorResponse."
+      - "Validation helpers: parse_mission_yaml(yaml_str: str) -> MissionProtocolDraft."
+    assumptions:
+      - "PostgreSQL missions table exists with mission_data JSONB column from existing schema."
+      - "Pydantic v2 installed and configured in requirements.txt."
+      - "FastAPI integration uses Pydantic models for request/response validation."
+    nextMission: "B3.2: Protocol Engine - CRUD APIs and YAML import/export"
+    blockers: []
+

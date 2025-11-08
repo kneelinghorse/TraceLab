@@ -1,0 +1,83 @@
+# Mission File: B3.2_Protocol-Engine.yaml
+
+missionId: "B3.2"
+
+objective: "Build Mission Protocol Engine with CRUD APIs, YAML import/export, progress tracking, and evidence linking to insight_sources table."
+
+context: |
+  Implements Week 10 roadmap goals (Phase 3: Mission Protocol Integration).
+  Builds on B3.1 validation framework to create the operational Mission Protocol management system.
+  Enables researchers to create, manage, and track Mission Protocol research projects.
+
+successCriteria:
+  - "Mission Protocol CRUD operations: create, read, update, delete missions via FastAPI endpoints."
+  - "YAML import functionality: parse Mission Protocol YAML files using B3.1 Pydantic models."
+  - "YAML export functionality: serialize mission_data JSONB to valid Mission Protocol YAML."
+  - "Progress tracking: calculate completion_percentage based on required vs completed fields."
+  - "Quality gate status tracking: track which gates are passed/failed in quality_gates JSONB column."
+  - "Evidence linking: connect insights to source chunks via insight_sources many-to-many table."
+  - "Status enum transitions: draft → in_progress → review → complete with validation."
+  - "FastAPI endpoints expose full Mission Protocol API with OpenAPI documentation."
+
+deliverables:
+  - "Mission Protocol CRUD service: app/services/mission_protocol_service.py."
+  - "YAML import/export utilities: app/services/yaml_handler.py with Pydantic integration."
+  - "Progress tracking service: app/services/mission_progress.py for completion percentage calculation."
+  - "Evidence linking service: app/services/evidence_linking.py for insight-chunk associations."
+  - "FastAPI endpoints: app/api/v1/missions.py with full CRUD operations."
+  - "Database models: Update app/models/mission.py with Mission Protocol fields and relationships."
+  - "API schemas: app/schemas/mission_protocol.py for request/response models."
+  - "Unit tests: tests/test_mission_protocol_service.py for all service methods."
+  - "Integration tests: tests/integration/test_mission_api.py for end-to-end API flow."
+  - "Documentation: docs/mission_protocol_api.md with API usage examples."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Store full Mission Protocol as JSONB in PostgreSQL missions table."
+      sourceMission: "cmos/foundational-docs/technical_architecture.md"
+    - finding: "Track validation_status in separate column, evidence links in insight_sources table."
+      sourceMission: "cmos/foundational-docs/technical_architecture.md"
+    - finding: "Status enum: draft/in_progress/review/complete per roadmap specifications."
+      sourceMission: "cmos/foundational-docs/roadmap.md"
+    - finding: "Progress tracking monitors completion of quality gates."
+      sourceMission: "cmos/foundational-docs/roadmap.md"
+    - finding: "Pydantic validation models from B3.1 enforce quality gates."
+      sourceMission: "cmos/missions/sprint-03/B3.1_Validation-Framework.yaml"
+
+  implementationScope:
+    coreDeliverable: "Complete Mission Protocol Engine with CRUD APIs, YAML import/export, progress tracking, and evidence linking."
+    outOfScope:
+      - "Quality gate validators (handled in B3.3)."
+      - "Automated quality checks (handled in B3.3)."
+      - "UI components (handled in B3.4)."
+      - "Advanced search/filtering of missions."
+      - "Multi-user collaboration features."
+
+  validationProtocol:
+    - validator: "Unit Tests"
+      focus: "CRUD operations, YAML parsing, progress calculation, evidence linking."
+    - validator: "Integration Tests"
+      focus: "End-to-end API flow: create mission → update → track progress → export YAML."
+    - validator: "API Contract Tests"
+      focus: "OpenAPI schema validation and response format compliance."
+
+  handoffContext:
+    completed:
+      - "Mission Protocol CRUD APIs operational via FastAPI endpoints."
+      - "YAML import/export functionality integrated with B3.1 Pydantic models."
+      - "Progress tracking calculates completion percentage based on field requirements."
+      - "Evidence linking connects insights to document chunks via insight_sources table."
+    interfaces:
+      - "API endpoints: POST/GET/PUT/DELETE /api/v1/missions/:id."
+      - "YAML handlers: import_mission_yaml(yaml_str) → Mission, export_mission_yaml(mission_id) → str."
+      - "Progress service: calculate_progress(mission_id) → completion_percentage."
+      - "Evidence service: link_evidence(insight_id, chunk_ids, relevance_scores)."
+    assumptions:
+      - "B3.1 Pydantic validation models are complete and stable."
+      - "PostgreSQL missions and insight_sources tables exist from existing schema."
+      - "Document chunks are indexed in Qdrant from Sprint 01-02 work."
+    nextMission: "B3.3: Quality Gates - Three-pillar heuristics as blocking validators"
+    blockers: []
+

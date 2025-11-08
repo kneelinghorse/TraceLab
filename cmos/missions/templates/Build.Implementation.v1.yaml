@@ -48,12 +48,154 @@ domainFields:
       - "Performance optimization beyond the initial target."
       - "Integration with the main application."
 
-  # Defines the cross-AI validation strategy.
+  orchestrationPatterns:
+    selectedPattern: "none"  # Allowed: none|rsip|delegation|boomerang
+    mutuallyExclusive: true  # Enforce single-pattern execution for Sprint 08
+    allowedPatterns:
+      - "none"
+      - "rsip"
+      - "delegation"
+      - "boomerang"
+    configuration:
+      rsip:
+        enabled: false
+        maxIterations: 5
+        convergenceCriteria: "evaluation_score >= 0.9"
+        refinementPrompt: |
+          Apply RSIP refinement focusing on correctness, quality, and security.
+      delegation:
+        enabled: false
+        workerManifest: "workers/manifest.yaml"
+        contextIsolation: true
+        maxDelegatedWorkers: 3
+        coordinationNotes: |
+          Sub-agent instructions must be isolated per worker and scrubbed of sensitive data.
+      boomerang:
+        enabled: false
+        checkpointDirectory: "runtime/boomerang"
+        telemetryStream: "telemetry/events/{{ mission_id }}.jsonl"
+        maxStepRetries: 2
+        autoFallback: true
+    validationRules:
+      - "Exactly one pattern may be enabled at a time (mutual exclusivity)."
+      - "When selectedPattern is not `none`, only the matching configuration block may set enabled: true."
+      - "Delegation requires workerManifest entries for each referenced worker."
+
+  runtimeTopology:
+    stateDirectories:
+      - "runtime/boomerang"
+      - "telemetry/events"
+      - "workers"
+    telemetry:
+      streamFormat: "jsonl"
+      retention: "mission"
+      requiredEvents:
+        - "worker_dispatch"
+        - "step_start"
+        - "step_complete"
+        - "fallback"
+    workerManifestPath: "workers/manifest.yaml"
+
+  # Defines the cross-AI validation strategy with LLM-as-Judge integration.
   validationProtocol:
     - validator: "Gemini"
       focus: "Production readiness and adherence to Python best practices."
     - validator: "Claude"
       focus: "Algorithmic correctness and logical clarity."
+
+  # LLM-as-Judge automated code review framework
+  llmAsJudgeValidation:
+    enabled: true
+
+    validationCriteria:
+      - "Security vulnerabilities (OWASP Top 10 compliance)"
+      - "Code quality and maintainability standards"
+      - "Performance and efficiency requirements"
+      - "Testing coverage and quality assurance"
+      - "Documentation completeness and accuracy"
+
+    reviewerPrompt: |
+      You are a senior security engineer and code reviewer with expertise in secure software development.
+      Review the following code implementation for security vulnerabilities, code quality, and adherence to best practices:
+
+      Code to review: [code_content]
+      Implementation context: [implementation_context]
+      Security requirements: [security_requirements]
+
+      Evaluation criteria:
+      1. Security: Check for OWASP Top 10 vulnerabilities and secure coding practices
+      2. Quality: Assess code maintainability, readability, and adherence to language best practices
+      3. Performance: Evaluate efficiency, resource usage, and algorithmic complexity
+      4. Testing: Review test coverage, test quality, and edge case handling
+      5. Documentation: Check code comments, API documentation, and implementation clarity
+
+      Provide specific feedback:
+      - Security issues found (if any) with severity levels and remediation steps
+      - Quality improvements needed with specific code examples
+      - Performance optimizations suggested with complexity analysis
+      - Testing gaps identified with recommended test cases
+      - Overall assessment (PASS/FAIL/WARN) with confidence level
+
+      Be constructive, specific, and actionable in your feedback.
+      Flag any critical security issues that would prevent deployment.
+
+    outputFormat:
+      securityFindings:
+        critical: []  # Issues that block deployment
+        high: []      # Issues requiring immediate attention
+        medium: []    # Issues to address before next release
+        low: []       # Issues to address in future maintenance
+      qualityAssessment:
+        maintainability: ""  # Rating: Excellent/Good/Fair/Poor
+        readability: ""      # Rating: Excellent/Good/Fair/Poor
+        bestPractices: ""    # Compliance level: Full/Partial/Minimal/None
+        recommendations: []  # Specific improvement suggestions
+      performanceNotes:
+        complexity: ""       # Big O analysis
+        bottlenecks: []      # Identified performance issues
+        optimizations: []    # Suggested improvements
+      testingEvaluation:
+        coverage: ""         # Percentage or qualitative assessment
+        quality: ""          # Rating: Excellent/Good/Fair/Poor
+        gaps: []            # Missing test scenarios
+      overallStatus: ""      # PASS/FAIL/WARN
+      confidence: ""         # High/Medium/Low
+      actionItems: []        # Prioritized list of required fixes
+
+  failureEscalation:
+    tier_1_automatic_retry:
+      conditions:
+        - "worker_timeout"
+        - "evaluation_call_failure"
+        - "network_errors"
+      behavior: "Auto retry once per worker or iteration"
+    tier_2_pattern_thresholds:
+      rsip: "maxIterations reached without convergence → trigger fallback"
+      delegation: "2 failed worker executions → halt delegation"
+      boomerang: "Step fails twice OR checkpoint write fails once → stop sequence"
+    tier_3_fallback_to_linear:
+      behavior: "Degrade to single agent run without pattern"
+      telemetry:
+        emit:
+          - status: "fallback"
+          - fallbackTriggered: true
+    tier_4_human_escalation:
+      enforcement: "Missions hitting fallback require manual review before closing"
+      mechanism: "Checklist item or approval gate logged in summary"
+
+  # Proactive quality gates for implementation validation
+  qualityGates:
+    preCommit:
+      - "Run LLM-as-Judge security validation"
+      - "Block commit if critical security issues found"
+      - "Require security review for high-risk changes"
+      - "Validate code against OWASP Top 10 requirements"
+
+    postImplementation:
+      - "Automated security scan integration"
+      - "Performance benchmark validation"
+      - "Dependency vulnerability assessment"
+      - "Code quality metrics verification"
 
   # The structured output that enables mission chaining.
   handoffContext:
