@@ -12,6 +12,7 @@ from app.models.mission_protocol import MissionProtocolDraft
 from app.schemas.mission import MissionCreate, MissionUpdate
 from app.services.evidence_linking import EvidenceLinkingService
 from app.services.mission_progress import MissionProgressSnapshot, derive_status, evaluate_progress
+from app.services.quality_gate_service import QualityGateReport, QualityGateService
 from app.services.yaml_handler import dump_mission_yaml, load_mission_yaml
 
 
@@ -26,8 +27,14 @@ class MissionNotFoundError(MissionProtocolServiceError):
 class MissionProtocolService:
     """Encapsulates Mission Protocol CRUD + YAML workflows."""
 
-    def __init__(self, *, evidence_service: EvidenceLinkingService | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        evidence_service: EvidenceLinkingService | None = None,
+        quality_gate_service: QualityGateService | None = None,
+    ) -> None:
         self.evidence_service = evidence_service or EvidenceLinkingService()
+        self.quality_gate_service = quality_gate_service or QualityGateService()
 
     # ------------------------------------------------------------------
     # CRUD
@@ -49,12 +56,13 @@ class MissionProtocolService:
             raise MissionProtocolServiceError("project_id is required to create a mission")
 
         draft = self._ensure_draft(payload.mission_data)
+        report = self.quality_gate_service.evaluate(draft, db=db)
         snapshot = evaluate_progress(draft)
         mission = Mission(
             project_id=payload.project_id,
-            mission_data=draft.model_dump(mode="python"),
+            mission_data=draft.model_dump(mode="json"),
             quality_gates=self._merged_quality_gates(snapshot, payload.quality_gates),
-            status=derive_status(snapshot, payload.status),
+            status=self._determine_status(snapshot, payload.status, report),
             completion_percentage=snapshot.completion_percentage,
         )
         db.add(mission)
@@ -68,12 +76,13 @@ class MissionProtocolService:
         source_payload: MissionProtocolDraft | Dict[str, Any]
         source_payload = payload.mission_data or mission.mission_data
         draft = self._ensure_draft(source_payload)
+        report = self.quality_gate_service.evaluate(draft, db=db, mission_uuid=mission.id)
         snapshot = evaluate_progress(draft)
 
-        mission.mission_data = draft.model_dump(mode="python")
+        mission.mission_data = draft.model_dump(mode="json")
         mission.quality_gates = self._merged_quality_gates(snapshot, payload.quality_gates)
         mission.completion_percentage = snapshot.completion_percentage
-        mission.status = derive_status(snapshot, payload.status or mission.status)
+        mission.status = self._determine_status(snapshot, payload.status or mission.status, report)
 
         self._sync_evidence_links(db, draft)
         db.commit()
@@ -125,6 +134,28 @@ class MissionProtocolService:
             for key, value in overrides.items():
                 merged[key] = value
         return merged
+
+    def _determine_status(
+        self,
+        snapshot: MissionProgressSnapshot,
+        requested_status: Optional[str],
+        report: QualityGateReport,
+    ) -> str:
+        status = derive_status(snapshot, requested_status)
+        if report.all_passed():
+            return status
+
+        failing = ", ".join(report.failing_gates()) or "quality gates"
+        normalized_request = (requested_status or "").strip().lower()
+
+        if normalized_request in {"complete", "review"}:
+            raise MissionProtocolServiceError(
+                f"Cannot transition mission to {normalized_request}: failing gates ({failing})."
+            )
+
+        if status == "complete":
+            return "review"
+        return status
 
     def _sync_evidence_links(self, db: Session, draft: MissionProtocolDraft) -> None:
         if not draft.evidence:

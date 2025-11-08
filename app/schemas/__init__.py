@@ -42,6 +42,10 @@ from app.schemas.mission_protocol import (
     MissionImportRequest,
     MissionImportResponse,
 )
+from app.schemas.quality_gates import (
+    QualityGateReportResponse,
+    QualityGateStatus,
+)
 from app.schemas.quality import (
     QualityCheckBase,
     QualityCheckCreate,
@@ -94,6 +98,8 @@ __all__ = [
     "MissionImportRequest",
     "MissionImportResponse",
     "MissionExportResponse",
+    "QualityGateReportResponse",
+    "QualityGateStatus",
     "QualityCheckBase",
     "QualityCheckCreate",
     "QualityCheckUpdate",

@@ -42,3 +42,5 @@
 {"ts": "2025-11-07T22:20:49Z", "agent": "Codex", "mission": "B3.1", "action": "complete", "status": "completed", "summary": "Mission Protocol validation models, DB constraints, and tests landed.", "next_hint": "B3.2 can now build CRUD + YAML workflows on top of the validated models."}
 {"ts": "2025-11-08T15:46:02Z", "agent": "codex", "mission": "B3.2", "action": "start", "status": "in_progress", "summary": "Starting Protocol Engine implementation for CRUD+import/export stack"}
 {"ts": "2025-11-08T16:06:06Z", "agent": "codex", "mission": "B3.2", "action": "complete", "status": "completed", "summary": "Protocol Engine shipped with CRUD/YAML APIs, services, docs, and tests", "next_hint": "Ready for B3.3 Quality Gates to build on the new CRUD + telemetry surfaces"}
+{"ts": "2025-11-08T16:31:16Z", "agent": "Claude", "mission": "B3.3", "action": "start", "status": "in_progress", "summary": "Starting Protocol Engine"}
+{"ts": "2025-11-08T16:50:31Z", "agent": "codex", "mission": "B3.3", "action": "complete", "status": "completed", "summary": "Quality gate backend shipped", "next_hint": "B3.4 is now Current"}

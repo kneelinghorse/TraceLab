@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-08T16:06:11.236304+00:00'
+generatedAt: '2025-11-08T17:38:45.048986+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -203,16 +203,22 @@ domainFields:
         completed_at: '2025-11-08T16:06:06Z'
     - id: B3.3
       name: Quality Gates
-      status: Current
-      notes: Three-pillar heuristics as blocking validators, status endpoint, telemetry
-        wiring
+      status: Completed
+      completed_at: '2025-11-08T16:50:31Z'
+      notes: Quality gate validators (research statement, evidence links, contradictions,
+        synthesis, traceability) plus orchestration service and FastAPI endpoint shipped
+        with telemetry logging. Updated Mission Protocol models/docs and added pytest
+        suites (quality_gates, mission service/api/integration) to enforce blocking
+        behavior.
       metadata:
         type: Build.Implementation.v1
         description: Three-pillar heuristics as blocking validators, status endpoint,
           telemetry wiring
+        started_at: '2025-11-08T16:31:16Z'
+        completed_at: '2025-11-08T16:50:31Z'
     - id: B3.4
       name: UI Integration
-      status: Queued
+      status: Current
       notes: Next.js with React Hook Form + Pydantic validation, progress visualization,
         quality gate indicators, evidence link UX
       metadata:

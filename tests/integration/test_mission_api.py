@@ -29,18 +29,27 @@ def _api_payload(project_id):
             "key_questions": [
                 {"question": "How do we test?", "status": "answered", "answer": "with pytest"}
             ],
-            "synthesis": {"key_insights": ["API works"]},
+            "synthesis": {
+                "key_insights": [
+                    "API works end-to-end and persists telemetry-friendly quality gate outcomes."
+                ],
+                "recommendations": ["Monitor quality gate endpoint from UI"],
+                "next_steps": ["Publish integration test coverage"],
+            },
             "evidence": [
                 {
                     "evidence_id": "EV-api",
                     "source": "docs/mission_protocol_validation.md",
                     "summary": "Spec",
+                    "chunk_id": "00000000-0000-0000-0000-000000000002",
                 }
             ],
             "quality_checkpoints": [
-                {"gate": "research_alignment", "status": "pass"},
-                {"gate": "evidence_traceability", "status": "pass"},
-                {"gate": "synthesis_depth", "status": "pass"},
+                {"gate": "research_statement", "status": "pass"},
+                {"gate": "evidence_links", "status": "pass"},
+                {"gate": "synthesis_quality", "status": "pass"},
+                {"gate": "traceability", "status": "pass"},
+                {"gate": "contradictions_resolved", "status": "pass"},
             ],
         },
     }
@@ -77,17 +86,26 @@ def test_import_yaml_endpoint(client: TestClient, project):
             answer: Submit YAML payload
         synthesis:
           key_insights:
-            - import works
+            - import works and emits telemetry.
+          recommendations:
+            - Watch the new quality gate endpoint.
+          next_steps:
+            - Hook UI widgets to the endpoint.
         evidence:
           - evidence_id: EV-API
             source: docs
             summary: Example
+            chunk_id: 00000000-0000-0000-0000-000000000003
         quality_checkpoints:
-          - gate: research_alignment
+          - gate: research_statement
             status: pass
-          - gate: evidence_traceability
+          - gate: evidence_links
             status: pass
-          - gate: synthesis_depth
+          - gate: synthesis_quality
+            status: pass
+          - gate: traceability
+            status: pass
+          - gate: contradictions_resolved
             status: pass
         """
     ).strip()
@@ -108,3 +126,15 @@ def test_import_yaml_endpoint(client: TestClient, project):
     assert list_resp.status_code == 200
     missions = list_resp.json()
     assert any(item["mission_data"]["mission_id"] == "B3.2-import" for item in missions)
+
+
+def test_quality_endpoint_reports_gate_status(client: TestClient, project):
+    create_resp = client.post("/api/v1/missions/", json=_api_payload(project.id))
+    assert create_resp.status_code == 201
+    mission_id = create_resp.json()["id"]
+
+    quality_resp = client.get(f"/api/v1/missions/{mission_id}/quality")
+    assert quality_resp.status_code == 200
+    payload = quality_resp.json()
+    assert payload["all_passed"] is True
+    assert "research_statement" in payload["gates"]

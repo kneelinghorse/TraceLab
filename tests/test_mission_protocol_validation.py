@@ -30,20 +30,26 @@ def _complete_payload(**overrides):
             {"question": "What layers are required?", "status": "answered", "answer": "API + business + DB"},
         ],
         "synthesis": {
-            "key_insights": ["Pydantic + JSON schema keeps parity"],
+            "key_insights": [
+                "Pydantic + JSON schema keeps parity across API, services, and database layers."
+            ],
             "recommendations": ["Adopt MissionProtocolDraft and MissionProtocolComplete"],
+            "next_steps": ["Publish schema diffs to docs"],
         },
         "evidence": [
             {
                 "evidence_id": "EV-1",
                 "source": "design-doc",
                 "summary": "Architecture doc mandates Pydantic models",
+                "chunk_id": "00000000-0000-0000-0000-000000000004",
             }
         ],
         "quality_checkpoints": [
-            {"gate": "research_alignment", "status": "pass"},
-            {"gate": "evidence_traceability", "status": "pass"},
-            {"gate": "synthesis_depth", "status": "pass"},
+            {"gate": "research_statement", "status": "pass"},
+            {"gate": "evidence_links", "status": "pass"},
+            {"gate": "synthesis_quality", "status": "pass"},
+            {"gate": "traceability", "status": "pass"},
+            {"gate": "contradictions_resolved", "status": "pass"},
         ],
     }
     payload.update(overrides)
@@ -82,4 +88,3 @@ def test_constraint_expression_contains_required_fields():
     assert "mission_id" in constraint
     assert "research_statement" in constraint
     assert "?&" in constraint
-

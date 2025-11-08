@@ -30,18 +30,27 @@ def _mission_payload(**overrides: Any) -> Dict[str, Any]:
         "key_questions": [
             {"question": "How do we track progress?", "status": "answered", "answer": "Derived metrics"}
         ],
-        "synthesis": {"key_insights": ["Mission Protocol gating"]},
+        "synthesis": {
+            "key_insights": [
+                "Mission Protocol gating enforces rigor with automated validators and telemetry hooks."
+            ],
+            "recommendations": ["Document gating outcomes in quality_gates.md"],
+            "next_steps": ["Wire UI indicators to the quality status endpoint"],
+        },
         "evidence": [
             {
                 "evidence_id": "EV-101",
                 "source": "docs/mission_protocol_validation.md",
                 "summary": "Validation rules",
+                "chunk_id": "00000000-0000-0000-0000-000000000001",
             }
         ],
         "quality_checkpoints": [
-            {"gate": "research_alignment", "status": "pass"},
-            {"gate": "evidence_traceability", "status": "pass"},
-            {"gate": "synthesis_depth", "status": "pass"},
+            {"gate": "research_statement", "status": "pass"},
+            {"gate": "evidence_links", "status": "pass"},
+            {"gate": "synthesis_quality", "status": "pass"},
+            {"gate": "traceability", "status": "pass"},
+            {"gate": "contradictions_resolved", "status": "pass"},
         ],
     }
     payload.update(overrides)
@@ -61,7 +70,7 @@ def test_create_mission_uses_progress_metrics(db_session, project):
     )
     assert mission.status == "complete"
     assert mission.completion_percentage == 100
-    assert mission.quality_gates["research_alignment"]["status"] == "pass"
+    assert mission.quality_gates["research_statement"]["status"] == "pass"
 
 
 def test_update_mission_promotes_status_when_ready(db_session, project):
@@ -104,17 +113,26 @@ def test_import_and_export_yaml_round_trip(db_session, project):
             answer: Via helper
         synthesis:
           key_insights:
-            - YAML works
+            - YAML works and feeds the automated quality gating pipeline.
+          recommendations:
+            - Publish the import results to telemetry.
+          next_steps:
+            - Build UI wiring for quality gates.
         evidence:
           - evidence_id: EV-1
             source: docs
             summary: YAML proof
+            chunk_id: 00000000-0000-0000-0000-000000000001
         quality_checkpoints:
-          - gate: research_alignment
+          - gate: research_statement
             status: pass
-          - gate: evidence_traceability
+          - gate: evidence_links
             status: pass
-          - gate: synthesis_depth
+          - gate: synthesis_quality
+            status: pass
+          - gate: traceability
+            status: pass
+          - gate: contradictions_resolved
             status: pass
         """
     ).strip()

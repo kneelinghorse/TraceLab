@@ -13,6 +13,7 @@ Mission Protocol endpoints expose CRUD + YAML workflows powered by the validatio
 | `DELETE` | `/api/v1/missions/{mission_id}` | Remove a mission. |
 | `POST` | `/api/v1/missions/import` | Import Mission Protocol YAML (optional promotion to complete state). |
 | `GET` | `/api/v1/missions/{mission_id}/export` | Export Mission Protocol YAML derived from `mission_data`. |
+| `GET` | `/api/v1/missions/{mission_id}/quality` | Run quality gates and return pass/fail state for each validator. |
 
 ## Request/Response Schemas
 
@@ -37,8 +38,8 @@ status = derive_status(snapshot, requested_status)
 Each response includes:
 
 - `completion_percentage` – ratio of satisfied structural requirements (research statement, answered question, evidence, checkpoints, etc.).
-- `quality_gates` – map of every gate (`research_alignment`, `evidence_traceability`, `synthesis_depth`, plus optional gates detected in payload) with current status + validation metadata.
-- `status` – normalized lifecycle stage (`draft`, `in_progress`, `review`, `complete`). Attempting to mark a mission `complete` before gates pass automatically downgrades to `review`.
+- `quality_gates` – map of every gate (`research_statement`, `evidence_links`, `synthesis_quality`, `traceability`, `contradictions_resolved`, plus optional gates detected in payload) with current status + validation metadata derived from the automated validators.
+- `status` – normalized lifecycle stage (`draft`, `in_progress`, `review`, `complete`). Requests to advance to `review`/`complete` while any gate fails now return a 400 error; implicit promotions are downgraded to `review` until the gates pass.
 
 ## YAML Workflow
 

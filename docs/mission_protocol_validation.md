@@ -12,14 +12,14 @@ Mission Protocol data is represented by the classes in `app/models/mission_proto
   - At least one answered key question.
   - At least one evidence item.
   - `synthesis.key_insights` populated.
-  - Required checkpoints (`research_alignment`, `evidence_traceability`, `synthesis_depth`) marked `pass`.
+  - Required checkpoints (`research_statement`, `evidence_links`, `synthesis_quality`, `traceability`, `contradictions_resolved`) marked `pass`.
 
 Developers can promote drafts using `MissionProtocolDraft.promote()` or the service helper `promote_to_complete`.
 
 ## Multi-Layer Validation
 
 1. **API Layer** – `app/schemas/mission.py` now binds request bodies to `MissionProtocolDraft`, giving FastAPI automatic structural validation for every mission endpoint.
-2. **Business Layer** – `MissionProtocolComplete` encapsulates promotion logic and quality gates. The helper in `app/services/mission_protocol_validation.py` exposes:
+2. **Business Layer** – `MissionProtocolComplete` encapsulates promotion logic while `app/services/quality_gate_service.py` runs the blocking gates (research statement, evidence links, contradictions, synthesis quality, traceability) and logs telemetry. The helper in `app/services/mission_protocol_validation.py` exposes:
    - `parse_mission_yaml` – YAML → `MissionProtocolDraft`.
    - `validate_mission_payload(payload, state=...)` – dict validation for draft/complete states.
    - `promote_to_complete` – upgrade drafts before persisting.
