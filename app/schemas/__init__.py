@@ -37,6 +37,11 @@ from app.schemas.mission import (
     MissionUpdate,
     MissionRead,
 )
+from app.schemas.mission_protocol import (
+    MissionExportResponse,
+    MissionImportRequest,
+    MissionImportResponse,
+)
 from app.schemas.quality import (
     QualityCheckBase,
     QualityCheckCreate,
@@ -86,6 +91,9 @@ __all__ = [
     "MissionCreate",
     "MissionUpdate",
     "MissionRead",
+    "MissionImportRequest",
+    "MissionImportResponse",
+    "MissionExportResponse",
     "QualityCheckBase",
     "QualityCheckCreate",
     "QualityCheckUpdate",

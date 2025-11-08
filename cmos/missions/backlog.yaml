@@ -1,392 +1,293 @@
 name: Planning.SprintPlan.v1
 version: 0.0.0
 displayName: CMOS Backlog Export
-description: Backlog export for TraceLab Mission Protocol Integration project.
-author: TraceLab Platform Team
+description: Backlog export generated from the CMOS SQLite database.
+author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-07T20:00:00.000000+00:00'
+generatedAt: '2025-11-08T16:06:11.236304+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
-  
   sprints:
-    - sprintId: "sprint-01"
-      name: "Sprint 01 - Foundation & Core Infrastructure"
-      status: "Completed"
-      startDate: "2025-10-01"
-      endDate: "2025-10-31"
-      goals:
-        - "Establish core service infrastructure with FastAPI + PostgreSQL + Qdrant"
-        - "Implement PII redaction pipeline with Presidio"
-        - "Build document ingestion pipeline for 5 priority formats"
-        - "Achieve Presidio recall >95% on priority entities"
-        - "Optimize Qdrant latency <10ms for vector queries"
-      successCriteria:
-        - "Presidio recall ≥0.95 on priority entities (PERSON, EMAIL, PHONE, etc.)"
-        - "All 5 priority formats successfully ingested (PDF, DOCX, PPTX, CSV, XLSX)"
-        - "Qdrant query latency <10ms p99"
-        - "Sprint evaluation script operational and generates retrospective report"
-      actualResults:
-        - "Presidio recall: 0.9829 (exceeds 0.95 target)"
-        - "Format coverage: 5/5 formats successfully ingested"
-        - "Qdrant latency: 9.6ms (under 10ms target)"
-        - "Evaluation script operational"
-      missions:
-        - "B1.1"
-        - "B1.2"
-        - "B1.3"
-        - "B1.4"
-        - "B1.5"
-        - "B1.6"
-        - "B1.7"
-        - "B1.8"
-        - "B1.9"
-        - "R1.1"
-        - "R1.2"
-
-    - sprintId: "sprint-02"
-      name: "Sprint 02 - RAG Query & Semantic Optimization"
-      status: "Completed"
-      startDate: "2025-11-01"
-      endDate: "2025-11-05"
-      goals:
-        - "Implement core RAG query pipeline with citations"
-        - "Build context compression to reduce tokens 60-70%"
-        - "Deploy semantic cache with 15-20% hit rate target"
-        - "Implement tiered LLM routing with <10% escalation"
-        - "Achieve average cost per query <$0.0003"
-      successCriteria:
-        - "RAG query API successfully retrieves relevant chunks and generates answers with citations"
-        - "Context compression reduces input tokens by 60-70% (from ~3000 to ~1000 tokens)"
-        - "Semantic cache achieves hit rate ≥15% (target 15-20%)"
-        - "Tiered routing escalation rate <10% (90%+ queries handled by GPT-4o-mini)"
-        - "Average cost per query <$0.0003 (with all optimizations applied)"
-        - "Query latency <5 seconds end-to-end for RAG queries"
-        - "Sprint evaluation script executes and produces retrospective report"
-      actualResults:
-        - "Chunk recall: 96.2%, citation rate: 98.3%"
-        - "Context compression: 67.6% reduction (3025→980 tokens)"
-        - "Semantic cache hit rate: 18.9%"
-        - "Tiered routing escalation: 7.6%"
-        - "Average cost per query: $0.000230"
-        - "P95 latency: 4.40s"
-        - "Evaluation script operational"
-      missions:
-        - "B2.1"
-        - "B2.2"
-        - "B2.3"
-        - "B2.3a"
-        - "B2.3b"
-        - "B2.3c"
-        - "B2.3d"
-        - "B2.4"
-        - "B2.5"
-        - "R2.1"
-        - "R2.2"
-        - "R2.3"
-
-    - sprintId: "sprint-03"
-      name: "Sprint 03 - Mission Protocol Integration"
-      status: "Planning"
-      startDate: "2025-11-08"
-      endDate: "2025-12-05"
-      goals:
-        - "Implement Pydantic-based Mission Protocol validation framework"
-        - "Build Mission Protocol Engine with CRUD APIs and YAML import/export"
-        - "Translate quality heuristics into blocking validators"
-        - "Create Next.js frontend with quality gate indicators"
-        - "Enable evidence linking between insights and source chunks"
-      successCriteria:
-        - "Mission Protocol YAML validation operates at all three layers (API, business, DB)"
-        - "MissionProtocolDraft and MissionProtocolComplete models enforce quality gates"
-        - "CRUD APIs support create, read, update, delete for missions with YAML import/export"
-        - "Progress tracking accurately reflects mission field population within ±5%"
-        - "Evidence linking connects insights to document chunks via insight_sources table"
-        - "Quality gate validators block invalid state transitions per roadmap heuristics"
-        - "Status endpoint exposes real-time gate pass/fail states with actionable feedback"
-        - "Sprint evaluation script executes and produces Sprint 03 retrospective report"
-      missions:
-        - "B3.1"
-        - "B3.2"
-        - "B3.3"
-        - "B3.4"
-        - "B3.5"
-
-  missions:
-    # Sprint 01 Missions
-    - missionId: "B1.1"
-      sprintId: "sprint-01"
-      name: "Core Service Bootstrap"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-10-15"
-    
-    - missionId: "B1.2"
-      sprintId: "sprint-01"
-      name: "Synthetic Corpus Pipeline"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-10-18"
-    
-    - missionId: "B1.3"
-      sprintId: "sprint-01"
-      name: "Presidio Redaction Service"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-10-20"
-    
-    - missionId: "B1.4"
-      sprintId: "sprint-01"
-      name: "Document Ingestion Pipeline"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-10-22"
-    
-    - missionId: "B1.5"
-      sprintId: "sprint-01"
-      name: "Embedding and Qdrant Bootstrap"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-10-25"
-    
-    - missionId: "B1.6"
-      sprintId: "sprint-01"
-      name: "Sprint Efficacy Evaluator"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-10-28"
-    
-    - missionId: "B1.7"
-      sprintId: "sprint-01"
-      name: "Presidio Recall Tuning"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-10-29"
-    
-    - missionId: "B1.8"
-      sprintId: "sprint-01"
-      name: "Format Coverage Completion"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-10-30"
-    
-    - missionId: "B1.9"
-      sprintId: "sprint-01"
-      name: "Qdrant Latency Optimization"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-10-31"
-    
-    - missionId: "R1.1"
-      sprintId: "sprint-01"
-      name: "Presidio Evaluation Strategic Framework"
-      status: "Completed"
-      type: "Research.TechnicalResearch.v1"
-      completedAt: "2025-10-12"
-    
-    - missionId: "R1.2"
-      sprintId: "sprint-01"
-      name: "UX Research Document Types"
-      status: "Completed"
-      type: "Research.TechnicalResearch.v1"
-      completedAt: "2025-10-14"
-
-    # Sprint 02 Missions
-    - missionId: "B2.1"
-      sprintId: "sprint-02"
-      name: "RAG Query API"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-11-01"
-    
-    - missionId: "B2.2"
-      sprintId: "sprint-02"
-      name: "Context Compression Pipeline"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-11-04"
-    
-    - missionId: "B2.3"
-      sprintId: "sprint-02"
-      name: "Semantic Cache Layer"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-11-05"
-    
-    - missionId: "B2.3a"
-      sprintId: "sprint-02"
-      name: "Markdown Ingestion Pipeline"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-11-05"
-    
-    - missionId: "B2.3b"
-      sprintId: "sprint-02"
-      name: "Onboarding API"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-11-05"
-    
-    - missionId: "B2.3c"
-      sprintId: "sprint-02"
-      name: "Ingestion Integration & Parity"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-11-05"
-    
-    - missionId: "B2.3d"
-      sprintId: "sprint-02"
-      name: "Semantic Cache Implementation"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-11-05"
-    
-    - missionId: "B2.4"
-      sprintId: "sprint-02"
-      name: "Tiered LLM Routing"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-11-05"
-    
-    - missionId: "B2.5"
-      sprintId: "sprint-02"
-      name: "Sprint Efficacy Evaluator"
-      status: "Completed"
-      type: "Build.Implementation.v1"
-      completedAt: "2025-11-05"
-    
-    - missionId: "R2.1"
-      sprintId: "sprint-02"
-      name: "Quality Assessment Heuristics"
-      status: "Completed"
-      type: "Research.TechnicalResearch.v1"
-      completedAt: "2025-10-28"
-    
-    - missionId: "R2.2"
-      sprintId: "sprint-02"
-      name: "Markdown Ingestion Service Design"
-      status: "Completed"
-      type: "Research.TechnicalResearch.v1"
-      completedAt: "2025-10-30"
-    
-    - missionId: "R2.3"
-      sprintId: "sprint-02"
-      name: "Project Bootstrap Workflow"
-      status: "Completed"
-      type: "Research.TechnicalResearch.v1"
-      completedAt: "2025-10-31"
-
-    # Sprint 03 Missions
-    - missionId: "B3.1"
-      sprintId: "sprint-03"
-      name: "Validation Framework"
-      status: "Completed"
-      completedAt: "2025-11-07T22:20:49Z"
-      notes: "Implemented MissionProtocolDraft/Complete Pydantic models with nested components, multi-layer validation helpers, JSON schema driven DB constraint/migration, error translation service, YAML parsing + promotion utilities, unit/integration tests, and documentation. Synced parity + foundational refs and updated backlog mirrors."
-      type: "Build.Implementation.v1"
-      description: "Pydantic models for MissionProtocolDraft/Complete, layered validation (FastAPI → business logic → DB), structured error payloads"
-    
-    - missionId: "B3.2"
-      sprintId: "sprint-03"
-      name: "Protocol Engine"
-      status: "Current"
-      type: "Build.Implementation.v1"
-      description: "CRUD APIs, YAML import/export, progress + gate tracking, evidence linking to insight_sources"
-    
-    - missionId: "B3.3"
-      sprintId: "sprint-03"
-      name: "Quality Gates"
-      status: "Queued"
-      type: "Build.Implementation.v1"
-      description: "Three-pillar heuristics as blocking validators, status endpoint, telemetry wiring"
-    
-    - missionId: "B3.4"
-      sprintId: "sprint-03"
-      name: "UI Integration"
-      status: "Queued"
-      type: "Build.Implementation.v1"
-      description: "Next.js with React Hook Form + Pydantic validation, progress visualization, quality gate indicators, evidence link UX"
-    
-    - missionId: "B3.5"
-      sprintId: "sprint-03"
-      name: "Sprint Efficacy Evaluator"
-      status: "Queued"
-      type: "Build.Implementation.v1"
-      description: "Sprint 03 metrics: Mission Protocol adoption, validation coverage, quality gate effectiveness, API stability"
-
+  - sprintId: sprint-01
+    title: Sprint 01 - Foundation & Core Infrastructure
+    focus: null
+    status: Completed
+    startDate: '2025-10-01'
+    endDate: '2025-10-31'
+    totalMissions: 11
+    completedMissions: 11
+    missions:
+    - id: B1.1
+      name: Core Service Bootstrap
+      status: Completed
+      completed_at: '2025-10-15'
+      metadata:
+        type: Build.Implementation.v1
+    - id: B1.2
+      name: Synthetic Corpus Pipeline
+      status: Completed
+      completed_at: '2025-10-18'
+      metadata:
+        type: Build.Implementation.v1
+    - id: B1.3
+      name: Presidio Redaction Service
+      status: Completed
+      completed_at: '2025-10-20'
+      metadata:
+        type: Build.Implementation.v1
+    - id: B1.4
+      name: Document Ingestion Pipeline
+      status: Completed
+      completed_at: '2025-10-22'
+      metadata:
+        type: Build.Implementation.v1
+    - id: B1.5
+      name: Embedding and Qdrant Bootstrap
+      status: Completed
+      completed_at: '2025-10-25'
+      metadata:
+        type: Build.Implementation.v1
+    - id: B1.6
+      name: Sprint Efficacy Evaluator
+      status: Completed
+      completed_at: '2025-10-28'
+      metadata:
+        type: Build.Implementation.v1
+    - id: B1.7
+      name: Presidio Recall Tuning
+      status: Completed
+      completed_at: '2025-10-29'
+      metadata:
+        type: Build.Implementation.v1
+    - id: B1.8
+      name: Format Coverage Completion
+      status: Completed
+      completed_at: '2025-10-30'
+      metadata:
+        type: Build.Implementation.v1
+    - id: B1.9
+      name: Qdrant Latency Optimization
+      status: Completed
+      completed_at: '2025-10-31'
+      metadata:
+        type: Build.Implementation.v1
+    - id: R1.1
+      name: Presidio Evaluation Strategic Framework
+      status: Completed
+      completed_at: '2025-10-12'
+      metadata:
+        type: Research.TechnicalResearch.v1
+    - id: R1.2
+      name: UX Research Document Types
+      status: Completed
+      completed_at: '2025-10-14'
+      metadata:
+        type: Research.TechnicalResearch.v1
+  - sprintId: sprint-02
+    title: Sprint 02 - RAG Query & Semantic Optimization
+    focus: null
+    status: Completed
+    startDate: '2025-11-01'
+    endDate: '2025-11-05'
+    totalMissions: 12
+    completedMissions: 12
+    missions:
+    - id: B2.1
+      name: RAG Query API
+      status: Completed
+      completed_at: '2025-11-01'
+      metadata:
+        type: Build.Implementation.v1
+    - id: B2.2
+      name: Context Compression Pipeline
+      status: Completed
+      completed_at: '2025-11-04'
+      metadata:
+        type: Build.Implementation.v1
+    - id: B2.3
+      name: Semantic Cache Layer
+      status: Completed
+      completed_at: '2025-11-05'
+      metadata:
+        type: Build.Implementation.v1
+    - id: B2.3a
+      name: Markdown Ingestion Pipeline
+      status: Completed
+      completed_at: '2025-11-05'
+      metadata:
+        type: Build.Implementation.v1
+    - id: B2.3b
+      name: Onboarding API
+      status: Completed
+      completed_at: '2025-11-05'
+      metadata:
+        type: Build.Implementation.v1
+    - id: B2.3c
+      name: Ingestion Integration & Parity
+      status: Completed
+      completed_at: '2025-11-05'
+      metadata:
+        type: Build.Implementation.v1
+    - id: B2.3d
+      name: Semantic Cache Implementation
+      status: Completed
+      completed_at: '2025-11-05'
+      metadata:
+        type: Build.Implementation.v1
+    - id: B2.4
+      name: Tiered LLM Routing
+      status: Completed
+      completed_at: '2025-11-05'
+      metadata:
+        type: Build.Implementation.v1
+    - id: B2.5
+      name: Sprint Efficacy Evaluator
+      status: Completed
+      completed_at: '2025-11-05'
+      metadata:
+        type: Build.Implementation.v1
+    - id: R2.1
+      name: Quality Assessment Heuristics
+      status: Completed
+      completed_at: '2025-10-28'
+      metadata:
+        type: Research.TechnicalResearch.v1
+    - id: R2.2
+      name: Markdown Ingestion Service Design
+      status: Completed
+      completed_at: '2025-10-30'
+      metadata:
+        type: Research.TechnicalResearch.v1
+    - id: R2.3
+      name: Project Bootstrap Workflow
+      status: Completed
+      completed_at: '2025-10-31'
+      metadata:
+        type: Research.TechnicalResearch.v1
+  - sprintId: sprint-03
+    title: Sprint 03 - Mission Protocol Integration
+    focus: null
+    status: Planning
+    startDate: '2025-11-08'
+    endDate: '2025-12-05'
+    totalMissions: 5
+    completedMissions: 0
+    missions:
+    - id: B3.1
+      name: Validation Framework
+      status: Completed
+      completed_at: '2025-11-07T22:20:49Z'
+      notes: Implemented MissionProtocolDraft/Complete Pydantic models with nested
+        components, multi-layer validation helpers, JSON schema driven DB constraint/migration,
+        error translation service, YAML parsing + promotion utilities, unit/integration
+        tests, and documentation. Synced parity + foundational refs and updated backlog
+        mirrors.
+      metadata:
+        type: Build.Implementation.v1
+        description: "Pydantic models for MissionProtocolDraft/Complete, layered validation\
+          \ (FastAPI \u2192 business logic \u2192 DB), structured error payloads"
+        started_at: '2025-11-07T22:06:42Z'
+        completed_at: '2025-11-07T22:20:49Z'
+    - id: B3.2
+      name: Protocol Engine
+      status: Completed
+      completed_at: '2025-11-08T16:06:06Z'
+      notes: Added mission progress/evidence utilities, MissionProtocolService, FastAPI
+        routes, YAML import/export, documentation, parity + pytest suites
+      metadata:
+        type: Build.Implementation.v1
+        description: CRUD APIs, YAML import/export, progress + gate tracking, evidence
+          linking to insight_sources
+        started_at: '2025-11-08T15:46:02Z'
+        completed_at: '2025-11-08T16:06:06Z'
+    - id: B3.3
+      name: Quality Gates
+      status: Current
+      notes: Three-pillar heuristics as blocking validators, status endpoint, telemetry
+        wiring
+      metadata:
+        type: Build.Implementation.v1
+        description: Three-pillar heuristics as blocking validators, status endpoint,
+          telemetry wiring
+    - id: B3.4
+      name: UI Integration
+      status: Queued
+      notes: Next.js with React Hook Form + Pydantic validation, progress visualization,
+        quality gate indicators, evidence link UX
+      metadata:
+        type: Build.Implementation.v1
+        description: Next.js with React Hook Form + Pydantic validation, progress
+          visualization, quality gate indicators, evidence link UX
+    - id: B3.5
+      name: Sprint Efficacy Evaluator
+      status: Queued
+      notes: 'Sprint 03 metrics: Mission Protocol adoption, validation coverage, quality
+        gate effectiveness, API stability'
+      metadata:
+        type: Build.Implementation.v1
+        description: 'Sprint 03 metrics: Mission Protocol adoption, validation coverage,
+          quality gate effectiveness, API stability'
   missionDependencies:
-    # Sprint 01 Dependencies
-    - upstream: "B1.1"
-      downstream: "B1.2"
-      relationship: "blocks"
-    - upstream: "B1.1"
-      downstream: "B1.3"
-      relationship: "blocks"
-    - upstream: "B1.3"
-      downstream: "B1.4"
-      relationship: "blocks"
-    - upstream: "B1.4"
-      downstream: "B1.5"
-      relationship: "blocks"
-    - upstream: "B1.5"
-      downstream: "B1.6"
-      relationship: "blocks"
-    
-    # Sprint 02 Dependencies
-    - upstream: "B1.5"
-      downstream: "B2.1"
-      relationship: "blocks"
-    - upstream: "B2.1"
-      downstream: "B2.2"
-      relationship: "blocks"
-    - upstream: "B2.2"
-      downstream: "B2.3"
-      relationship: "blocks"
-    - upstream: "B2.3a"
-      downstream: "B2.3b"
-      relationship: "blocks"
-    - upstream: "B2.3b"
-      downstream: "B2.3c"
-      relationship: "blocks"
-    - upstream: "B2.3c"
-      downstream: "B2.3d"
-      relationship: "blocks"
-    - upstream: "B2.3d"
-      downstream: "B2.4"
-      relationship: "blocks"
-    - upstream: "B2.4"
-      downstream: "B2.5"
-      relationship: "blocks"
-    
-    # Sprint 03 Dependencies
-    - upstream: "B3.1"
-      downstream: "B3.2"
-      relationship: "blocks"
-      rationale: "B3.2 Protocol Engine requires B3.1 Pydantic validation models"
-    - upstream: "B3.2"
-      downstream: "B3.3"
-      relationship: "blocks"
-      rationale: "B3.3 Quality Gates require B3.2 Protocol Engine APIs"
-    - upstream: "B3.1"
-      downstream: "B3.3"
-      relationship: "blocks"
-      rationale: "B3.3 Quality Gates require B3.1 validation framework"
-    - upstream: "B3.3"
-      downstream: "B3.4"
-      relationship: "blocks"
-      rationale: "B3.4 UI requires B3.3 quality gate status endpoint"
-    - upstream: "B3.2"
-      downstream: "B3.4"
-      relationship: "blocks"
-      rationale: "B3.4 UI requires B3.2 CRUD APIs"
-    - upstream: "B3.1"
-      downstream: "B3.4"
-      relationship: "blocks"
-      rationale: "B3.4 UI requires B3.1 validation for form integration"
-    - upstream: "B3.4"
-      downstream: "B3.5"
-      relationship: "blocks"
-      rationale: "B3.5 evaluates all Sprint 03 deliverables including UI"
-
+  - from: B1.1
+    to: B1.2
+    type: blocks
+  - from: B1.1
+    to: B1.3
+    type: blocks
+  - from: B1.3
+    to: B1.4
+    type: blocks
+  - from: B1.4
+    to: B1.5
+    type: blocks
+  - from: B1.5
+    to: B1.6
+    type: blocks
+  - from: B1.5
+    to: B2.1
+    type: blocks
+  - from: B2.1
+    to: B2.2
+    type: blocks
+  - from: B2.2
+    to: B2.3
+    type: blocks
+  - from: B2.3a
+    to: B2.3b
+    type: blocks
+  - from: B2.3b
+    to: B2.3c
+    type: blocks
+  - from: B2.3c
+    to: B2.3d
+    type: blocks
+  - from: B2.3d
+    to: B2.4
+    type: blocks
+  - from: B2.4
+    to: B2.5
+    type: blocks
+  - from: B3.1
+    to: B3.2
+    type: blocks
+  - from: B3.1
+    to: B3.3
+    type: blocks
+  - from: B3.1
+    to: B3.4
+    type: blocks
+  - from: B3.2
+    to: B3.3
+    type: blocks
+  - from: B3.2
+    to: B3.4
+    type: blocks
+  - from: B3.3
+    to: B3.4
+    type: blocks
+  - from: B3.4
+    to: B3.5
+    type: blocks
   promptMapping:
     prompts: []

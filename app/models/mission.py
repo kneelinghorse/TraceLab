@@ -2,6 +2,7 @@
 import uuid
 from datetime import datetime
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, JSON, CheckConstraint
+from sqlalchemy.orm import relationship
 from app.core.database import Base
 from app.core.config import settings
 from app.models.types import GUID
@@ -41,6 +42,9 @@ class Mission(Base):
     # Progress tracking
     status = Column(String, default='draft')  # 'draft' | 'in_progress' | 'review' | 'complete'
     completion_percentage = Column(Integer, default=0)
-    
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    project = relationship("Project", backref="missions")

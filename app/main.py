@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.api.v1 import health, redaction, documents, retrieval, search
+from app.api.v1 import health, redaction, documents, retrieval, search, missions
 from app.onboarding import router as onboarding_router
 
 # Create tables in development (use migrations in production)
@@ -31,6 +31,7 @@ app.include_router(redaction.router, prefix=f"{settings.api_v1_prefix}/redaction
 app.include_router(documents.router, prefix=f"{settings.api_v1_prefix}/documents", tags=["documents"])
 app.include_router(search.router, prefix=settings.api_v1_prefix, tags=["search"])
 app.include_router(retrieval.router, prefix=f"{settings.api_v1_prefix}/retrieval", tags=["retrieval"])
+app.include_router(missions.router, prefix=f"{settings.api_v1_prefix}/missions", tags=["missions"])
 app.include_router(onboarding_router, prefix=settings.api_v1_prefix)
 
 

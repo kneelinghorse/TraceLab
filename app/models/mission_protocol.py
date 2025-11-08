@@ -83,6 +83,10 @@ class Evidence(BaseModel):
         default=None,
         description="Document chunk identifier used for traceability",
     )
+    insight_id: Optional[str] = Field(
+        default=None,
+        description="Insight identifier associated with this evidence (UUID string)",
+    )
     source_type: Optional[str] = Field(
         default=None,
         description="Type of source (interview, survey, log, etc.)",
