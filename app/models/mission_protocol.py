@@ -9,17 +9,20 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 MissionStatus = Literal["draft", "in_progress", "review", "complete"]
 KeyQuestionStatus = Literal["open", "researching", "answered"]
 QualityGateName = Literal[
-    "research_alignment",
-    "evidence_traceability",
-    "synthesis_depth",
-    "bias_review",
+    "research_statement",
+    "evidence_links",
+    "contradictions_resolved",
+    "synthesis_quality",
+    "traceability",
 ]
 QualityGateStatus = Literal["pending", "pass", "fail"]
 
 REQUIRED_COMPLETION_GATES: tuple[QualityGateName, ...] = (
-    "research_alignment",
-    "evidence_traceability",
-    "synthesis_depth",
+    "research_statement",
+    "evidence_links",
+    "synthesis_quality",
+    "traceability",
+    "contradictions_resolved",
 )
 
 
@@ -83,6 +86,10 @@ class Evidence(BaseModel):
         default=None,
         description="Document chunk identifier used for traceability",
     )
+    insight_id: Optional[str] = Field(
+        default=None,
+        description="Insight identifier associated with this evidence (UUID string)",
+    )
     source_type: Optional[str] = Field(
         default=None,
         description="Type of source (interview, survey, log, etc.)",
@@ -99,6 +106,10 @@ class Synthesis(BaseModel):
     key_insights: List[str] = Field(default_factory=list)
     surprising_findings: List[str] = Field(default_factory=list)
     contradictory_information: List[str] = Field(default_factory=list)
+    contradiction_resolutions: List[str] = Field(
+        default_factory=list,
+        description="Resolution notes for each contradiction or uncertainty",
+    )
     recommendations: List[str] = Field(default_factory=list)
     next_steps: List[str] = Field(default_factory=list)
 

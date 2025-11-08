@@ -29,16 +29,23 @@ synthesis:
     - MissionProtocolComplete enforces quality gates
   recommendations:
     - Generate JSON Schema from the same models
+  next_steps:
+    - Wire UI indicators once gates pass
 evidence:
   - evidence_id: EV-001
     source: docs/roadmap.md
     summary: Roadmap documents validation requirements
+    chunk_id: 00000000-0000-0000-0000-000000000005
 quality_checkpoints:
-  - gate: research_alignment
+  - gate: research_statement
     status: pass
-  - gate: evidence_traceability
+  - gate: evidence_links
     status: pass
-  - gate: synthesis_depth
+  - gate: synthesis_quality
+    status: pass
+  - gate: traceability
+    status: pass
+  - gate: contradictions_resolved
     status: pass
 """
 
@@ -72,4 +79,3 @@ def test_invalid_yaml_reports_structured_error():
     response = transform_validation_error(excinfo.value)
     assert response["error"] == "validation_error"
     assert response["details"]
-
