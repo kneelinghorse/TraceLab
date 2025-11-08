@@ -1,9 +1,9 @@
 {
   "project": {
-    "name": "TraceLab UX Research Repository",
-    "version": "0.1.0",
-    "description": "Personal-scale research repository with RAG search, Presidio-powered redaction, and mission protocol governance.",
-    "status": "in_progress",
+    "name": "CMOS Starter Template",
+    "version": "0.0.0",
+    "description": "Blank master context for new CMOS starter projects.",
+    "status": "uninitialised",
     "start_date": "2025-01-01",
     "deployment": {
       "platform": "FastAPI + PostgreSQL + Qdrant",
@@ -13,8 +13,8 @@
   },
   "working_memory": {
     "active_domain": "main",
-    "session_count": 0,
-    "last_session": "Sprint 01 closure and Sprint 02 planning",
+    "session_count": 2,
+    "last_session": "2025-11-07T22:20:49Z",
     "domains": {
       "main": {
         "status": "active",
@@ -41,7 +41,8 @@
           "Use GPT-4o-mini as default LLM for RAG queries (per TR-03 research).",
           "Implement rule-based quality assessment heuristics (not ML-based) per R2.1 research.",
           "Adaptive Qdrant hnsw_ef tiers (96/108/120) based on top_k for latency optimization.",
-          "Three-pillar quality assessment framework: Linguistic Uncertainty, Answer Integrity, Source Provenance."
+          "Three-pillar quality assessment framework: Linguistic Uncertainty, Answer Integrity, Source Provenance.",
+          "Onboarding workflow operates in trusted single-user mode; authentication deferred indefinitely (no device flow or CLI mandate)."
         ],
         "files_created": [
           "cmos/missions/sprint-01/B1.1_Core-Service-Bootstrap.yaml",
@@ -57,7 +58,7 @@
           "cmos/missions/sprint-02/B2.2_Context-Compression-Pipeline.yaml",
           "cmos/missions/sprint-02/B2.3_Semantic-Cache-Layer.yaml",
           "cmos/missions/sprint-02/B2.3a_Markdown-Ingestion-Pipeline.yaml",
-          "cmos/missions/sprint-02/B2.3b_Onboarding-API-and-CLI.yaml",
+          "cmos/missions/sprint-02/B2.3b_Onboarding-API.yaml",
           "cmos/missions/sprint-02/B2.3c_Ingestion-Integration-Parity.yaml",
           "cmos/missions/sprint-02/B2.3d_Semantic-Cache-Implementation.yaml",
           "cmos/missions/sprint-02/B2.4_Tiered-LLM-Routing.yaml",
@@ -80,17 +81,40 @@
           "Completed Sprint 01 gap-filling missions (B1.7-B1.9) to close all unmet criteria.",
           "Completed Sprint 02 research (R2.1): comprehensive quality assessment heuristics framework with three-pillar approach.",
           "Completed Sprint 02 ingestion research (R2.2 Markdown service, R2.3 onboarding workflow) defining architecture for B2.3 sub-missions.",
-          "Planned Sprint 02: all 5 build missions (B2.1-B2.5) defined with success criteria and dependencies."
+          "Planned Sprint 02: all 5 build missions (B2.1-B2.5) defined with success criteria and dependencies.",
+          "Updated B2.3b onboarding mission for single-user deployment and realigned backlog sequencing (B2.3b Current, B2.3d Queued)."
         ],
         "sprint_evaluation": {
           "script_path": "scripts/evaluate_sprint.py",
           "report_directory": "cmos/reports/",
           "run_protocol": "Execute after each sprint demo; compare mission successCriteria against telemetry and append report reference here.",
           "sprint_01_report": "cmos/reports/sprint-01/sprint-01-summary.md",
-          "sprint_01_status": "Completed - 4/4 metrics met, 11/11 missions completed"
+          "sprint_01_status": "Completed - 4/4 metrics met, 11/11 missions completed",
+          "sprint_02_report": "cmos/reports/sprint-02/sprint-02-summary.md",
+          "sprint_02_status": "Completed - 7/7 metrics met, 9/9 missions completed",
+          "sprint_02_metrics": "cmos/reports/sprint-02/"
         }
       }
-    }
+    },
+    "session_history": [
+      {
+        "mission": "B3.1",
+        "agent": "Codex",
+        "summary": "Kickoff Validation Framework mission to implement Mission Protocol validation models",
+        "action": "start",
+        "ts": "2025-11-07T22:06:42Z"
+      },
+      {
+        "mission": "B3.1",
+        "agent": "Codex",
+        "summary": "Mission Protocol validation models, DB constraints, and tests landed.",
+        "action": "complete",
+        "ts": "2025-11-07T22:20:49Z"
+      }
+    ],
+    "active_mission": null,
+    "blocked_missions": [],
+    "last_completed_mission": "B3.1"
   },
   "technical_context": {
     "dependencies": [
@@ -109,21 +133,59 @@
       "pandas",
       "tiktoken (for token counting in chunking and compression)"
     ],
+    "research_findings": {},
+    "enhanced_features": {},
+    "integration_points": [
+      "foundational-docs/roadmap_template.md",
+      "foundational-docs/tech_arch_template.md",
+      "foundational-docs/tech_arch_template.md",
+      "foundational-docs/roadmap_template.md",
+      "cmos/missions/backlog.yaml",
+      "cmos/docs/sprint-01_metrics_plan.md",
+      "cmos/reports/sprint-01/sprint-01-summary.md",
+      "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md"
+    ],
     "system_components": {
       "ingestion": "Upload endpoints, format routing (PDF/DOCX/PPTX/CSV/XLSX), redaction, chunking (500-1000 tokens with overlap), and processing state tracking.",
       "redaction": "Presidio-based pipeline with custom recognizers (PARTICIPANT_ID, PROJECT_ID), pseudonymization operators, recall 0.9829+ on priority entities.",
       "vector_store": "Qdrant collection with on-disk storage, scalar quantization (int8), HNSW indexing (m=16), adaptive hnsw_ef tiers, 12,800 chunks indexed, <10ms query latency.",
       "evaluation": "Synthetic corpus generation + presidio-research metrics, sprint efficacy script (B1.6).",
       "rag_pipeline": "Planned for Sprint 02: query embedding, vector search, GPT-4o-mini generation, context compression, semantic caching, tiered routing."
-    },
-    "integration_points": [
-      "cmos/docs/technical_architecture.md",
-      "cmos/docs/roadmap.md",
-      "cmos/missions/backlog.yaml",
-      "cmos/docs/sprint-01_metrics_plan.md",
-      "cmos/reports/sprint-01/sprint-01-summary.md",
-      "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md"
+    }
+  },
+  "sprint_tracking": {},
+  "context_health": {
+    "anti_pattern_detection": true,
+    "compression_enabled": true,
+    "last_reset": "",
+    "sessions_since_reset": 2,
+    "size_kb": 13.37,
+    "size_limit_kb": 100,
+    "last_update": "2025-11-07T22:20:49Z"
+  },
+  "ai_instructions": {
+    "preferred_language": "yaml",
+    "code_style": "mission_protocol_v2",
+    "testing_required": true,
+    "documentation_level": "comprehensive",
+    "special_instructions": [
+      "Always load agents.md before starting missions.",
+      "Apply OWASP Top 10 security guidelines during implementation.",
+      "Keep PROJECT_CONTEXT.json and missions/backlog.yaml in sync with the SQLite database."
     ]
+  },
+  "next_session_context": {
+    "key_reference_documents": [
+      "foundational-docs/roadmap_template.md",
+      "foundational-docs/tech_arch_template.md"
+    ],
+    "when_we_resume": [
+      "Pick up B3.2"
+    ]
+  },
+  "metadata": {
+    "migrated_at": "2025-11-07T17:10:19.679844+00:00",
+    "source_version": "cmos-v1"
   },
   "planning": {
     "current_sprint": "Sprint 02 - RAG Query & Semantic Optimization",
@@ -153,14 +215,14 @@
         "name": "Markdown Ingestion Service Design",
         "status": "Completed",
         "reference": "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md",
-        "deliverable": "Architecture for chokidar → queue → unified/remark ingestion pipeline, Qdrant payload schema, telemetry, and resilience patterns"
+        "deliverable": "Architecture for chokidar \u2192 queue \u2192 unified/remark ingestion pipeline, Qdrant payload schema, telemetry, and resilience patterns"
       },
       {
         "id": "R2.3",
         "name": "Project Bootstrap Workflow",
         "status": "Completed",
         "reference": "cmos/missions/research/R2.3_Bootstrap-Workflow.md",
-        "deliverable": "FastAPI onboarding API + Typer CLI design with OAuth device flow, idempotency keys, saga compensations, and async ingestion jobs"
+        "deliverable": "FastAPI onboarding API design with idempotency keys, async ingestion jobs, and optional auth seams (device flow deferred for single-user deployment)"
       }
     ],
     "sprint_02_build_missions": [
@@ -174,25 +236,25 @@
         "id": "B2.2",
         "name": "Context Compression Pipeline",
         "status": "Completed",
-        "focus": "Embedding-based filtering to reduce tokens 60-70% (3000→1000 tokens)"
+        "focus": "Embedding-based filtering to reduce tokens 60-70% (3000\u21921000 tokens)"
       },
       {
         "id": "B2.3",
         "name": "Semantic Cache Layer",
         "status": "Blocked",
-        "focus": "Qdrant-based cache with 0.90-0.95 similarity threshold, target 15-20% hit rate; unblocked by sub-missions B2.3a–B2.3d"
+        "focus": "Qdrant-based cache with 0.90-0.95 similarity threshold, target 15-20% hit rate; unblocked by sub-missions B2.3a\u2013B2.3d"
       },
       {
         "id": "B2.3a",
         "name": "Markdown Ingestion Pipeline",
         "status": "In Progress",
-        "focus": "Implement chokidar → queue → unified/remark ingestion service per R2.2 research"
+        "focus": "Implement chokidar \u2192 queue \u2192 unified/remark ingestion service per R2.2 research"
       },
       {
         "id": "B2.3b",
-        "name": "Onboarding API & CLI",
-        "status": "Queued",
-        "focus": "FastAPI onboarding service + Typer CLI with device-flow auth, idempotency, async ingestion jobs"
+        "name": "Onboarding API",
+        "status": "Current",
+        "focus": "FastAPI onboarding service with idempotent endpoints and async ingestion jobs (trusted single-user, no auth)."
       },
       {
         "id": "B2.3c",
@@ -204,7 +266,7 @@
         "id": "B2.3d",
         "name": "Semantic Cache Implementation",
         "status": "Queued",
-        "focus": "Integrate cache service with RAG pipeline and achieve 15–20% hit rate"
+        "focus": "Integrate cache service with RAG pipeline and achieve 15\u201320% hit rate"
       },
       {
         "id": "B2.4",
@@ -222,18 +284,30 @@
     "sprint_02_success_criteria": [
       "RAG query API successfully retrieves relevant chunks and generates answers with citations",
       "Context compression reduces input tokens by 60-70% (from ~3000 to ~1000 tokens)",
-      "Semantic cache achieves hit rate ≥ 15% (target 15-20%)",
+      "Semantic cache achieves hit rate \u2265 15% (target 15-20%)",
       "Tiered routing escalation rate < 10% (90%+ queries handled by GPT-4o-mini)",
       "Average cost per query < $0.0003 (with all optimizations applied)",
       "Query latency < 5 seconds end-to-end for RAG queries",
       "Sprint evaluation script executes and produces retrospective report"
     ],
-    "next_checkpoint": "Complete B2.3a (Markdown Ingestion Pipeline) to unblock the semantic cache track, then sequence B2.3b–B2.3d.",
+    "next_checkpoint": "Execute B2.3b (Onboarding API) to unblock B2.3d semantic cache implementation, then proceed with cache integration.",
     "research_to_build_links": [
-      { "research": "cmos/missions/research/TR-03.RAG-Cost-Optimization.md", "build": "B2.1, B2.2, B2.3, B2.4" },
-      { "research": "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md", "build": "B2.4" },
-      { "research": "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md", "build": "B2.3a, B2.3c, B2.3d" },
-      { "research": "cmos/missions/research/R2.3_Bootstrap-Workflow.md", "build": "B2.3b, B2.3c, B2.3d" }
+      {
+        "research": "cmos/missions/research/TR-03.RAG-Cost-Optimization.md",
+        "build": "B2.1, B2.2, B2.3, B2.4"
+      },
+      {
+        "research": "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md",
+        "build": "B2.4"
+      },
+      {
+        "research": "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md",
+        "build": "B2.3a, B2.3c, B2.3d"
+      },
+      {
+        "research": "cmos/missions/research/R2.3_Bootstrap-Workflow.md",
+        "build": "B2.3b, B2.3c, B2.3d"
+      }
     ],
     "sprint_close_process": [
       "Run scripts/evaluate_sprint.py with --sprint 2 to generate report in cmos/reports/sprint-02/",
@@ -244,24 +318,10 @@
     ],
     "important_for_sprint_02_review": [
       "Telemetry artifacts needed: RAG query performance logs, semantic cache hit/miss statistics, context compression metrics, tiered routing escalation events, cost tracking data",
-      "Key metrics to validate: cache hit rate (target ≥15%), escalation rate (target <10%), token compression ratio (target 60-70%), average cost per query (target <$0.0003)",
+      "Key metrics to validate: cache hit rate (target \u226515%), escalation rate (target <10%), token compression ratio (target 60-70%), average cost per query (target <$0.0003)",
       "R2.1 research provides complete implementation blueprint: pattern libraries, scoring algorithms, escalation decision tree - ready for B2.4 implementation",
-      "All Sprint 02 missions have clear dependencies: B2.1 → B2.2 → B2.3 → B2.4 → B2.5",
+      "All Sprint 02 missions have clear dependencies: B2.1 \u2192 B2.2 \u2192 B2.3 \u2192 B2.4 \u2192 B2.5",
       "Qdrant infrastructure from B1.5 is operational: 12,800 chunks indexed, <10ms latency, ready for RAG queries"
     ]
-  },
-  "context_health": {
-    "size_kb": 0,
-    "size_limit_kb": 256,
-    "sessions_since_reset": 0,
-    "last_reset": "",
-    "compression_enabled": true,
-    "anti_pattern_detection": true
-  },
-  "ai_instructions": {
-    "preferred_language": "python",
-    "code_style": "typed_fastapi_service",
-    "testing_required": true,
-    "documentation_level": "task_oriented"
   }
 }

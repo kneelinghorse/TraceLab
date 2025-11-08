@@ -1,14 +1,29 @@
 """Mission model for Mission Protocol integration."""
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, JSON
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, JSON, CheckConstraint
 from app.core.database import Base
+from app.core.config import settings
 from app.models.types import GUID
+from app.services.mission_protocol_validation import build_mission_data_check_constraint
+
+
+def _mission_constraint_sql() -> str:
+    """Return the backend-specific constraint SQL for mission_data."""
+    db_url = settings.database_url.lower()
+    backend = "sqlite" if db_url.startswith("sqlite") else "postgresql"
+    return build_mission_data_check_constraint(backend=backend)
 
 
 class Mission(Base):
     """Mission entity storing Mission Protocol YAML structures."""
     __tablename__ = "missions"
+    __table_args__ = (
+        CheckConstraint(
+            _mission_constraint_sql(),
+            name="missions_mission_data_check",
+        ),
+    )
     
     id = Column(GUID(), primary_key=True, default=uuid.uuid4)
     project_id = Column(GUID(), ForeignKey("projects.id", ondelete="CASCADE"))

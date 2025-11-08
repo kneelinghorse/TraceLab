@@ -1,75 +1,87 @@
 {
   "project": {
-    "name": "CMOS v1.0",
-    "version": "1.0.0",
-    "description": "Context + Mission Orchestration System - Simple, powerful context management for AI-assisted development",
-    "status": "template",
+    "name": "CMOS Starter",
+    "version": "2.0.0",
+    "description": "Mission orchestration starter kit with SQLite runtime helpers, security guardrails, and Mission Protocol templates.",
+    "status": "starter-template",
     "start_date": "",
     "deployment": {
       "platform": "Local/Node.js",
-      "integration_target": "Any project",
+      "integration_target": "Mission Protocol v2 projects",
       "environment": "development"
     }
   },
   "working_memory": {
-    "active_domain": "main",
-    "session_count": 19,
-    "last_session": "2025-11-05T20:55:06.281776Z",
-    "last_mission": "B2.4",
-    "active_mission": "B2.5",
+    "active_domain": "starter",
+    "session_count": 22,
+    "last_session": "2025-11-07T22:20:49Z",
+    "agents_md_path": "./agents.md",
+    "agents_md_loaded": false,
+    "active_mission": null,
     "domains": {
-      "main": {
-        "status": "active",
+      "starter": {
+        "status": "planning",
         "priority": 1,
+        "current_mission": null,
+        "missions": {},
         "critical_facts": [
-          "CMOS provides context management through domain compartmentalization",
-          "Smart compression achieves 4x-10x reduction based on state",
-          "Health monitoring uses statistical metrics for real-time assessment"
+          "Populate this list with the most important truths about your project before starting missions.",
+          "foundational-docs/roadmap_template.md and foundational-docs/tech_arch_template.md are the default templates for roadmap and architecture hand-offs."
         ],
         "constraints": [
-          "Zero external dependencies",
-          "File-based storage only",
-          "Single-project focus"
+          "Keep the distributed starter free of seeded mission or sprint data.",
+          "Maintain parity between the SQLite database and whichever file mirrors your team elects to manage.",
+          "Document updates to foundational references or runtime helpers in MASTER_CONTEXT.json."
         ],
-        "decisions_made": [
-          "Removed protocol suite dependency for v1.0 simplicity",
-          "Self-contained statistical metrics for health monitoring",
-          "Graceful degradation for all advanced features"
-        ],
-        "files_created": [],
-        "achievements": [
-          "Clean v1.0 release without external dependencies",
-          "Simple migration tool for existing projects",
-          "Comprehensive documentation"
-        ]
+        "decisions_made": [],
+        "files_created": []
       }
-    }
+    },
+    "session_history": [
+      {
+        "mission": "B3.1",
+        "agent": "Codex",
+        "summary": "Kickoff Validation Framework mission to implement Mission Protocol validation models",
+        "action": "start",
+        "ts": "2025-11-07T22:06:42Z"
+      },
+      {
+        "mission": "B3.1",
+        "agent": "Codex",
+        "summary": "Mission Protocol validation models, DB constraints, and tests landed.",
+        "action": "complete",
+        "ts": "2025-11-07T22:20:49Z"
+      }
+    ],
+    "blocked_missions": [],
+    "last_completed_mission": "B3.1"
   },
   "technical_context": {
     "dependencies": [
-      "Python 3.x (required)",
-      "Node.js (optional for advanced features)"
+      "Python 3.11+",
+      "Node.js 20+ (for optional tooling and tests)"
     ],
-    "cmos_features": {
-      "compression": "4x-10x context reduction",
-      "state_monitoring": "4D vector tracking (Form, Function, Behavior, Context)",
-      "domain_management": "Intelligent compartmentalization",
-      "health_assessment": "Real-time statistical metrics",
-      "anti_patterns": "Automated detection and recovery"
+    "tooling": {
+      "seed_database": "python scripts/seed_sqlite.py --data-root <path-to-planning-repo>",
+      "validate_parity": "python scripts/validate_parity.py --data-root <path-to-planning-repo>",
+      "mission_runtime": "python scripts/mission_runtime.py --help"
     },
-    "integration_points": [
-      "project_context.py - main Python interface",
-      "context/cmos/ - JavaScript modules for advanced features",
-      "smart_migrate.js - migration tool for existing projects"
+    "reference_docs": [
+      "foundational-docs/roadmap_template.md",
+      "foundational-docs/tech_arch_template.md"
     ]
   },
   "context_health": {
-    "size_kb": 0,
+    "size_kb": 2.53,
     "size_limit_kb": 100,
-    "sessions_since_reset": 0,
+    "sessions_since_reset": 2,
     "last_reset": "",
-    "compression_enabled": true,
-    "anti_pattern_detection": true
+    "compression_enabled": false,
+    "last_update": "2025-11-07T22:20:49Z"
+  },
+  "metadata": {
+    "migrated_at": "2025-11-07T17:10:19.679087+00:00",
+    "source_version": "cmos-v1"
   },
   "ai_instructions": {
     "preferred_language": "javascript",
