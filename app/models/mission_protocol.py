@@ -128,6 +128,37 @@ class QualityCheckpoint(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
+class ParticipantSegment(BaseModel):
+    """Distribution slice used for bias and rigor evaluations."""
+
+    segment: str = Field(..., min_length=1, description="Participant cohort name")
+    count: Optional[int] = Field(default=None, ge=0)
+    percentage: Optional[float] = Field(
+        default=None,
+        ge=0.0,
+        description="Normalized ratio between 0 and 1 (values >1 are interpreted as percentages)",
+    )
+
+    model_config = ConfigDict(extra="forbid")
+
+
+class MethodologyDetails(BaseModel):
+    """Operational metadata that powers the quality automation checks."""
+
+    participant_segments: List[ParticipantSegment] = Field(default_factory=list)
+    total_participants: Optional[int] = Field(default=None, ge=0)
+    recruitment_method: Optional[str] = None
+    consent_documented: bool = False
+    validation_steps_completed: List[str] = Field(default_factory=list)
+    artifacts_verified: List[str] = Field(
+        default_factory=list,
+        description="Artifacts (scripts, transcripts, datasets) that passed QA",
+    )
+    notes: Optional[str] = None
+
+    model_config = ConfigDict(extra="forbid")
+
+
 class MissionProtocolBase(BaseModel):
     """Shared fields for both draft and complete states."""
 
@@ -150,6 +181,11 @@ class MissionProtocolBase(BaseModel):
     evidence: List[Evidence] = Field(default_factory=list)
     quality_checkpoints: List[QualityCheckpoint] = Field(default_factory=list)
     tags: List[str] = Field(default_factory=list)
+    discussion_guide: List[str] = Field(
+        default_factory=list,
+        description="Ordered moderator prompts/questions used during sessions",
+    )
+    methodology_details: Optional[MethodologyDetails] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
