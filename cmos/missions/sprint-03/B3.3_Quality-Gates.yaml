@@ -1,0 +1,85 @@
+# Mission File: B3.3_Quality-Gates.yaml
+
+missionId: "B3.3"
+
+objective: "Translate Sprint 02 three-pillar quality heuristics into blocking Mission Protocol validators, expose status endpoint, and wire telemetry for quality gate events."
+
+context: |
+  Implements Week 11 roadmap goals (Phase 3: Mission Protocol Integration).
+  Builds on B3.1 validation framework and B3.2 Protocol Engine to enforce research quality standards.
+  Adapts R2.1 quality assessment heuristics (Linguistic Uncertainty, Answer Integrity, Source Provenance) into Mission Protocol validators.
+
+successCriteria:
+  - "Research statement completeness validator: blocks missions without topic, scope, and hypothesis."
+  - "Evidence linking validator: requires minimum number of source chunks per insight (configurable threshold)."
+  - "Contradiction resolution validator: ensures contradictory_information items have resolution notes."
+  - "Synthesis quality validator: validates key_insights have recommendations and action items."
+  - "Traceability validator: verifies all insights have valid source chunk links via insight_sources."
+  - "Quality gate status endpoint: GET /api/v1/missions/:id/quality exposes real-time gate pass/fail states."
+  - "Blocking logic prevents status transitions (e.g., draft → complete) when quality gates fail."
+  - "Telemetry integration: quality gate events logged to telemetry/events/ for Sprint 03 evaluation."
+
+deliverables:
+  - "Quality gate validators: app/services/quality_gates.py with all validator functions."
+  - "Research statement validator: check_research_statement_completeness(mission)."
+  - "Evidence linking validator: check_evidence_links(mission, min_sources_per_insight)."
+  - "Contradiction validator: check_contradictions_resolved(mission)."
+  - "Synthesis validator: check_synthesis_quality(mission)."
+  - "Traceability validator: check_source_traceability(mission)."
+  - "Quality gate service: app/services/quality_gate_service.py orchestrates all validators."
+  - "FastAPI endpoint: app/api/v1/quality.py with quality gate status endpoint."
+  - "Telemetry integration: log quality gate events with gate name, status, timestamp, mission_id."
+  - "Unit tests: tests/test_quality_gates.py covering all validator scenarios."
+  - "Integration tests: tests/integration/test_quality_gate_enforcement.py for blocking behavior."
+  - "Documentation: docs/quality_gates.md explaining each validator and enforcement rules."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Three-pillar quality framework: Linguistic Uncertainty, Answer Integrity, Source Provenance."
+      sourceMission: "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md"
+    - finding: "Quality gates as Pydantic validators, not separate rules engine."
+      sourceMission: "cmos/foundational-docs/technical_architecture.md"
+    - finding: "Quality gates block invalid state transitions per roadmap specifications."
+      sourceMission: "cmos/foundational-docs/roadmap.md"
+    - finding: "Traceability validator ensures all insights have source links."
+      sourceMission: "cmos/foundational-docs/technical_architecture.md"
+    - finding: "B3.1 Pydantic models provide validation framework for gate enforcement."
+      sourceMission: "cmos/missions/sprint-03/B3.1_Validation-Framework.yaml"
+
+  implementationScope:
+    coreDeliverable: "Complete quality gate validation system with blocking behavior, status endpoint, and telemetry integration."
+    outOfScope:
+      - "ML-based quality assessment (rule-based only per R2.1)."
+      - "Bias detection (demographic imbalance checks deferred)."
+      - "Methodology rigor checks (participant count validation deferred)."
+      - "UI quality gate indicators (handled in B3.4)."
+      - "Automated quality improvement suggestions."
+
+  validationProtocol:
+    - validator: "Unit Tests"
+      focus: "Each quality gate validator with pass/fail scenarios."
+    - validator: "Integration Tests"
+      focus: "Blocking behavior prevents invalid state transitions when gates fail."
+    - validator: "Telemetry Verification"
+      focus: "Quality gate events logged correctly to telemetry/events/ directory."
+
+  handoffContext:
+    completed:
+      - "Quality gate validators implemented for all five pillars (research, evidence, contradictions, synthesis, traceability)."
+      - "Blocking logic prevents mission completion when quality gates fail."
+      - "Status endpoint exposes real-time quality gate pass/fail states with actionable feedback."
+      - "Telemetry integration logs all quality gate events for Sprint 03 evaluation."
+    interfaces:
+      - "Quality gate service: run_quality_gates(mission_id) → QualityGateReport."
+      - "Individual validators: check_*_gate(mission) → GateResult with pass/fail and feedback."
+      - "API endpoint: GET /api/v1/missions/:id/quality → QualityGateStatus."
+      - "Telemetry: log_quality_gate_event(mission_id, gate_name, status, details)."
+    assumptions:
+      - "B3.1 validation models and B3.2 Protocol Engine APIs are stable."
+      - "Insight_sources table populated with evidence links from B3.2."
+      - "Telemetry infrastructure accepts JSONL events per existing patterns."
+    nextMission: "B3.4: UI Integration - Next.js frontend with quality gate indicators"
+    blockers: []
+

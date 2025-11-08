@@ -1,0 +1,84 @@
+# Mission File: B3.4_UI-Integration.yaml
+
+missionId: "B3.4"
+
+objective: "Stand up Next.js frontend with React Hook Form + Pydantic-powered validation, progress visualization, quality gate indicators, and evidence linking UX."
+
+context: |
+  Implements Week 12 roadmap goals (Phase 3: Mission Protocol Integration).
+  Builds on B3.1-B3.3 backend APIs to create the user-facing Mission Protocol interface.
+  Provides researchers with visual tools to create, manage, and track Mission Protocol projects.
+
+successCriteria:
+  - "Next.js 14 application initialized with TypeScript and Tailwind CSS."
+  - "Mission Protocol creation form with React Hook Form integration."
+  - "Form validation powered by B3.1 Pydantic models (via OpenAPI-generated TypeScript types)."
+  - "Progress visualization: circular or bar progress indicator showing completion percentage."
+  - "Quality gate indicators: visual status for each gate (passed/failed/pending) with actionable feedback."
+  - "Evidence linking interface: drag-and-drop or selection UI to link insights to source chunks."
+  - "Mission Protocol list view: displays all missions with status, progress, and quality gate summary."
+  - "Mission Protocol detail view: full mission display with edit capabilities and quality gate status."
+
+deliverables:
+  - "Next.js application: frontend/ directory with Next.js 14 + TypeScript setup."
+  - "Mission Protocol form: components/MissionProtocolForm.tsx with React Hook Form."
+  - "Progress visualization: components/ProgressIndicator.tsx showing completion percentage."
+  - "Quality gate panel: components/QualityGatePanel.tsx displaying gate status and feedback."
+  - "Evidence linking UI: components/EvidenceLinking.tsx for insight-chunk associations."
+  - "Mission list view: pages/missions/index.tsx with mission cards/table."
+  - "Mission detail view: pages/missions/[id].tsx with full mission display."
+  - "API client: lib/api/missions.ts with TypeScript types from OpenAPI schema."
+  - "Styling: Tailwind CSS configuration and component styling."
+  - "E2E tests: cypress/e2e/mission-protocol.cy.ts for critical user flows."
+  - "Documentation: docs/frontend_architecture.md explaining component structure and data flow."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "UI framework: Next.js 14 with React and React Hook Form for Pydantic validation."
+      sourceMission: "cmos/foundational-docs/roadmap.md"
+    - finding: "Progress and quality gates must be visible in UI per roadmap requirements."
+      sourceMission: "cmos/foundational-docs/roadmap.md"
+    - finding: "Evidence linking works from UI to connect insights to source chunks."
+      sourceMission: "cmos/foundational-docs/roadmap.md"
+    - finding: "B3.1-B3.3 APIs provide backend for all UI operations."
+      sourceMission: "cmos/missions/sprint-03/B3.1_Validation-Framework.yaml"
+    - finding: "Quality gate status endpoint provides real-time gate states for UI."
+      sourceMission: "cmos/missions/sprint-03/B3.3_Quality-Gates.yaml"
+
+  implementationScope:
+    coreDeliverable: "Complete Next.js frontend for Mission Protocol creation, management, progress tracking, and quality gate visualization."
+    outOfScope:
+      - "Advanced analytics and reporting dashboards."
+      - "Multi-user collaboration features (comments, assignments)."
+      - "Real-time updates via WebSockets."
+      - "Mobile-responsive optimizations (basic responsive only)."
+      - "Export to PDF or other formats (YAML export via API only)."
+
+  validationProtocol:
+    - validator: "Component Tests"
+      focus: "React component rendering, form validation, user interactions."
+    - validator: "E2E Tests"
+      focus: "Critical user flows: create mission → track progress → check quality gates → complete."
+    - validator: "Accessibility Tests"
+      focus: "WCAG 2.1 AA compliance for forms and navigation."
+
+  handoffContext:
+    completed:
+      - "Next.js frontend operational with Mission Protocol CRUD interface."
+      - "React Hook Form integrated with B3.1 Pydantic validation via OpenAPI types."
+      - "Progress visualization and quality gate indicators provide real-time feedback."
+      - "Evidence linking UI enables researchers to connect insights to source chunks."
+    interfaces:
+      - "Mission form: components/MissionProtocolForm with validation and submission."
+      - "Quality gate panel: components/QualityGatePanel fetches gate status from API."
+      - "Evidence linking: components/EvidenceLinking manages insight-chunk associations."
+      - "API client: lib/api/missions provides typed API methods for all operations."
+    assumptions:
+      - "B3.1-B3.3 backend APIs are stable and documented via OpenAPI."
+      - "FastAPI serves OpenAPI schema at /openapi.json for TypeScript generation."
+      - "Document chunks are searchable via existing RAG search API from Sprint 02."
+    nextMission: "B3.5: Sprint Efficacy Evaluator - Sprint 03 metrics assessment"
+    blockers: []
+
