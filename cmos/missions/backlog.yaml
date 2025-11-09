@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-09T01:03:10.345223+00:00'
+generatedAt: '2025-11-09T04:01:24.925967+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -295,11 +295,17 @@ domainFields:
         completed_at: '2025-11-09T01:01:33Z'
     - id: B4.4
       name: Testing & Documentation Consolidation
-      status: Current
-      notes: Test coverage >80%, load testing suite, comprehensive documentation
+      status: Completed
+      completed_at: '2025-11-09T04:01:16Z'
+      notes: Added advanced coverage suites (Presidio evaluator, embedding service,
+        RAG integration, monitoring API) plus getting-started / mission protocol /
+        best practices docs. Generated coverage HTML + synced mirrors/parity.
+      metadata:
+        started_at: '2025-11-09T02:33:21Z'
+        completed_at: '2025-11-09T04:01:16Z'
     - id: B4.5
       name: Sprint Efficacy Evaluator
-      status: Queued
+      status: Current
       notes: 'Sprint 04 metrics: tech debt, quality, performance, coverage'
   missionDependencies:
   - from: B1.1
