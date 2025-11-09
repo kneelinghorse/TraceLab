@@ -13,8 +13,8 @@
   },
   "working_memory": {
     "active_domain": "main",
-    "session_count": 20,
-    "last_session": "2025-11-09T04:52:44Z",
+    "session_count": 22,
+    "last_session": "2025-11-09T23:48:47Z",
     "domains": {
       "main": {
         "status": "active",
@@ -236,6 +236,20 @@
         "summary": "Sprint 04 efficacy evaluator + telemetry delivered",
         "action": "complete",
         "ts": "2025-11-09T04:52:44Z"
+      },
+      {
+        "mission": "B5.1",
+        "agent": "codex",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-09T21:04:12Z"
+      },
+      {
+        "mission": "B5.1",
+        "agent": "codex",
+        "summary": "Standalone Railway frontend is live",
+        "action": "complete",
+        "ts": "2025-11-09T23:48:47Z"
       }
     ],
     "active_mission": null,
@@ -248,7 +262,7 @@
         "ts": "2025-11-09T01:54:56.075694Z"
       }
     ],
-    "last_completed_mission": "B4.5"
+    "last_completed_mission": "B5.1"
   },
   "technical_context": {
     "dependencies": [
@@ -292,10 +306,10 @@
     "anti_pattern_detection": true,
     "compression_enabled": true,
     "last_reset": "",
-    "sessions_since_reset": 20,
-    "size_kb": 16.29,
+    "sessions_since_reset": 22,
+    "size_kb": 17.47,
     "size_limit_kb": 100,
-    "last_update": "2025-11-09T04:52:44Z"
+    "last_update": "2025-11-09T23:48:47Z"
   },
   "ai_instructions": {
     "preferred_language": "yaml",
@@ -311,7 +325,39 @@
   "next_session_context": {
     "key_reference_documents": [
       "foundational-docs/roadmap_template.md",
-      "foundational-docs/tech_arch_template.md"
+      "foundational-docs/tech_arch_template.md",
+      "docs/frontend_deployment_decisions.md",
+      "docs/auth_and_cors_guidance.md"
+    ],
+    "upcoming_missions": [
+      {
+        "id": "B5.1",
+        "summary": "Stand up dedicated Railway Next.js service with build/start commands and env var runbook.",
+        "links": [
+          "cmos/missions/sprint-05/B5.1_Railway-Frontend-Service.yaml"
+        ]
+      },
+      {
+        "id": "B5.2",
+        "summary": "Implement JWT auth + restrictive CORS per docs/auth_and_cors_guidance.md.",
+        "links": [
+          "cmos/missions/sprint-05/B5.2_FastAPI-Auth-CORS-Hardening.yaml"
+        ]
+      },
+      {
+        "id": "B5.3",
+        "summary": "Cloudflare DNS + telemetry validation for hosted UI/API.",
+        "links": [
+          "cmos/missions/sprint-05/B5.3_Domain-Wiring-Telemetry.yaml"
+        ]
+      }
+    ],
+    "open_questions": [
+      "Confirm whether API will live on api.<domain> or be proxied through the UI.",
+      "Decide on storage for Railway JWT secrets (env panel vs secret manager)."
+    ],
+    "when_we_resume": [
+      "Pick up B5.2"
     ]
   },
   "metadata": {
@@ -319,7 +365,7 @@
     "source_version": "cmos-v1"
   },
   "planning": {
-    "current_sprint": "Sprint 04 - Quality Assurance & Tech Debt",
+    "current_sprint": "Sprint 05 - Frontend Deployment & Auth Hardening",
     "sprint_01_status": "Completed",
     "sprint_01_summary": {
       "missions_completed": 11,
@@ -421,7 +467,7 @@
       "Query latency < 5 seconds end-to-end for RAG queries",
       "Sprint evaluation script executes and produces retrospective report"
     ],
-    "next_checkpoint": "Execute B4.1 (Playwright Migration) to resolve Cypress tech debt, then proceed with quality automation and performance optimization.",
+    "next_checkpoint": "Kick off B5.1 to provision the Railway frontend service and capture deployment telemetry.",
     "research_to_build_links": [
       {
         "research": "cmos/missions/research/TR-03.RAG-Cost-Optimization.md",
@@ -455,6 +501,8 @@
       "Qdrant infrastructure from B1.5 is operational: 12,800 chunks indexed, <10ms latency, ready for RAG queries"
     ],
     "sprint_03_status": "Completed",
-    "sprint_04_status": "Planning"
+    "sprint_04_status": "Planning",
+    "sprint_05_status": "Planned",
+    "sprint_05_focus": "Hosted Next.js deployment, JWT/CORS hardening, and Cloudflare wiring with telemetry."
   }
 }
