@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional
 from app.core.config import settings
 from app.services.context_compression import compress_context
 from app.services.embedding_service import EmbeddingService, get_embedding_service
+from app.services.cost_monitor import CostMonitor, get_cost_monitor
 from app.services.retrieval_service import RetrievalService, get_retrieval_service
 from app.services.semantic_cache import SemanticCacheService, get_semantic_cache_service
 from app.services.quality_assessment import (
@@ -27,6 +28,9 @@ else:
 
 
 logger = logging.getLogger(__name__)
+
+
+_UNSET = object()
 
 
 _CITATION_PATTERN = re.compile(
@@ -54,6 +58,7 @@ class RagService:
         escalation_model: Optional[str] = None,
         default_temperature: Optional[float] = None,
         quality_assessor: Optional[QualityAssessor] = None,
+        cost_monitor: Optional[CostMonitor] | object = _UNSET,
     ) -> None:
         if _openai_import_error is not None:
             raise RuntimeError(
@@ -92,6 +97,7 @@ class RagService:
             quality_assessor = QualityAssessor(quality_config)
         self.quality_assessor = quality_assessor
         self.routing_metrics = {"total_queries": 0, "escalations": 0}
+        self.cost_monitor = get_cost_monitor() if cost_monitor is _UNSET else cost_monitor
 
     def run_query(
         self,
@@ -126,10 +132,16 @@ class RagService:
             )
             if cached_result:
                 response = dict(cached_result)
-                response["latency_ms"] = round((time.perf_counter() - start) * 1000, 2)
+                latency_ms = round((time.perf_counter() - start) * 1000, 2)
+                response["latency_ms"] = latency_ms
                 cache_info = response.get("cache") or {}
                 cache_info["hit"] = True
                 response["cache"] = cache_info
+                self._record_cache_hit_event(
+                    query=query,
+                    project_id=project_id,
+                    latency_ms=latency_ms,
+                )
                 return response
 
         retrieved_chunks = self.retrieval_service.search(
@@ -150,7 +162,13 @@ class RagService:
         )
 
         messages = self._build_messages(query=query, chunks=compressed_chunks)
-        answer, citations, quality_report, routing_details = self._generate_with_tiered_routing(
+        (
+            answer,
+            citations,
+            quality_report,
+            routing_details,
+            attempt_usages,
+        ) = self._generate_with_tiered_routing(
             query=query,
             messages=messages,
             chunks=compressed_chunks,
@@ -180,6 +198,16 @@ class RagService:
             except Exception:
                 # Cache writes must never impact the primary query path.
                 pass
+
+        total_cost = self._record_cost_events(
+            attempts=routing_details.get("attempts", []),
+            usage_records=attempt_usages,
+            query=query,
+            project_id=project_id,
+            latency_ms=result["latency_ms"],
+            cache_hit=False,
+        )
+        routing_details["estimated_cost_usd"] = round(total_cost, 6)
 
         return result
 
@@ -229,16 +257,18 @@ class RagService:
         chunks: List[Dict[str, Any]],
         temperature: float,
         max_tokens: int,
-    ) -> tuple[str, List[Dict[str, Any]], Dict[str, Any], Dict[str, Any]]:
+    ) -> tuple[str, List[Dict[str, Any]], Dict[str, Any], Dict[str, Any], List[Optional[Dict[str, int]]]]:
         """Generate an answer using tiered routing and quality assessment."""
         attempts: List[Dict[str, Any]] = []
+        attempt_usages: List[Optional[Dict[str, int]]] = []
 
-        primary_answer = self._generate_answer(
+        primary_answer, primary_usage = self._generate_answer(
             messages=messages,
             temperature=temperature,
             max_tokens=max_tokens,
             model=self.primary_model,
         )
+        attempt_usages.append(primary_usage)
         primary_citations = self._extract_citations(primary_answer, chunks)
         primary_quality = self.quality_assessor.assess(
             query=query,
@@ -251,6 +281,7 @@ class RagService:
                 model=self.primary_model,
                 quality=primary_quality,
                 citation_count=len(primary_citations),
+                usage=primary_usage,
             )
         )
 
@@ -261,7 +292,7 @@ class RagService:
 
         if primary_quality.escalate and self.escalation_model:
             escalated = True
-            escalation_answer = self._generate_answer(
+            escalation_answer, escalation_usage = self._generate_answer(
                 messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,
@@ -275,11 +306,13 @@ class RagService:
                 citations=final_citations,
                 context_chunks=chunks,
             )
+            attempt_usages.append(escalation_usage)
             attempts.append(
                 self._format_attempt_record(
                     model=self.escalation_model,
                     quality=final_quality,
                     citation_count=len(final_citations),
+                    usage=escalation_usage,
                 )
             )
 
@@ -317,7 +350,7 @@ class RagService:
             "metrics": dict(self.routing_metrics),
         }
 
-        return final_answer, final_citations, quality_report, routing_details
+        return final_answer, final_citations, quality_report, routing_details, attempt_usages
 
     def _generate_answer(
         self,
@@ -326,7 +359,7 @@ class RagService:
         max_tokens: int,
         retry_max: int = 3,
         model: Optional[str] = None,
-    ) -> str:
+    ) -> tuple[str, Optional[Dict[str, int]]]:
         """Call the OpenAI chat completion API with simple exponential backoff."""
         for attempt in range(retry_max):
             try:
@@ -337,14 +370,39 @@ class RagService:
                     max_tokens=max_tokens,
                 )
                 content = response.choices[0].message.content if response.choices else ""
-                return (content or "").strip()
+                usage = self._extract_usage(response)
+                return (content or "").strip(), usage
             except (RateLimitError, APIError) as exc:  # pragma: no cover - requires live API
                 if attempt < retry_max - 1:
                     wait_time = (2 ** attempt) * 1.5
                     time.sleep(wait_time)
                     continue
                 raise exc
-        return ""
+        return "", None
+
+    @staticmethod
+    def _extract_usage(response: Any) -> Optional[Dict[str, int]]:
+        usage = getattr(response, "usage", None)
+        if usage is None:
+            return None
+        if isinstance(usage, dict):
+            prompt = usage.get("prompt_tokens")
+            completion = usage.get("completion_tokens")
+            total = usage.get("total_tokens")
+        else:
+            prompt = getattr(usage, "prompt_tokens", None)
+            completion = getattr(usage, "completion_tokens", None)
+            total = getattr(usage, "total_tokens", None)
+        if prompt is None and completion is None and total is None:
+            return None
+        prompt_int = int(prompt or 0)
+        completion_int = int(completion or 0)
+        total_int = int(total or (prompt_int + completion_int))
+        return {
+            "prompt_tokens": prompt_int,
+            "completion_tokens": completion_int,
+            "total_tokens": total_int,
+        }
 
     def _extract_citations(self, answer: str, chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Parse citations in the model output and align them with retrieved chunks."""
@@ -423,12 +481,85 @@ class RagService:
             "snippet": (chunk.get("content")[:280] if chunk is not None and chunk.get("content") else None),
         }
 
+    def _record_cost_events(
+        self,
+        *,
+        attempts: List[Dict[str, Any]],
+        usage_records: List[Optional[Dict[str, int]]],
+        query: str,
+        project_id: Optional[str],
+        latency_ms: float,
+        cache_hit: bool,
+    ) -> float:
+        if not attempts:
+            return 0.0
+
+        total_cost = 0.0
+        effective_usage = usage_records or [attempt.get("usage") for attempt in attempts]
+
+        for index, attempt in enumerate(attempts):
+            usage = effective_usage[index] if index < len(effective_usage) else attempt.get("usage")
+            model_name = attempt.get("model", self.primary_model)
+            estimated_cost = MODEL_COST_ESTIMATES.get(model_name, 0.0)
+
+            if self.cost_monitor is not None:
+                try:
+                    event = self.cost_monitor.track_usage(
+                        model=model_name,
+                        prompt_tokens=(usage or {}).get("prompt_tokens") if usage else None,
+                        completion_tokens=(usage or {}).get("completion_tokens") if usage else None,
+                        total_tokens=(usage or {}).get("total_tokens") if usage else None,
+                        latency_ms=latency_ms,
+                        cache_hit=cache_hit,
+                        project_id=project_id,
+                        query=query,
+                        route="escalation" if index > 0 else "primary",
+                        metadata={
+                            "quality_score": attempt.get("quality_score"),
+                            "citation_count": attempt.get("citation_count"),
+                        },
+                        estimated_cost=estimated_cost if usage is None else None,
+                    )
+                    attempt["usage"] = event["usage"]
+                    attempt["cost_usd"] = round(event["cost_usd"], 6)
+                    total_cost += event["cost_usd"]
+                    continue
+                except Exception:  # pragma: no cover - diagnostics only
+                    logger.debug("Cost monitor logging failed", exc_info=True)
+
+            if usage is not None:
+                attempt["usage"] = usage
+            fallback_cost = round(estimated_cost or 0.0, 6)
+            attempt["cost_usd"] = fallback_cost
+            total_cost += fallback_cost
+
+        return total_cost
+
+    def _record_cache_hit_event(
+        self,
+        *,
+        query: str,
+        project_id: Optional[str],
+        latency_ms: float,
+    ) -> None:
+        if self.cost_monitor is None:
+            return
+        try:
+            self.cost_monitor.record_cache_hit(
+                latency_ms=latency_ms,
+                project_id=project_id,
+                query=query,
+            )
+        except Exception:  # pragma: no cover - diagnostics only
+            logger.debug("Cost monitor cache logging failed", exc_info=True)
+
     @staticmethod
     def _format_attempt_record(
         *,
         model: str,
         quality: QualityAssessmentResult,
         citation_count: int,
+        usage: Optional[Dict[str, int]] = None,
     ) -> Dict[str, Any]:
         return {
             "model": model,
@@ -436,6 +567,7 @@ class RagService:
             "below_threshold": quality.composite_score < quality.threshold,
             "hard_failures": quality.hard_failures,
             "citation_count": citation_count,
+            "usage": usage,
         }
 
 
@@ -447,4 +579,9 @@ def get_rag_service() -> RagService:
     global _rag_service
     if _rag_service is None:
         _rag_service = RagService()
+    return _rag_service
+
+
+def current_rag_service() -> Optional[RagService]:
+    """Return the existing RAG service instance without creating a new one."""
     return _rag_service

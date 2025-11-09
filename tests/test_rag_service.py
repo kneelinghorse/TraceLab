@@ -61,7 +61,12 @@ class _FakeChatCompletions:
         self.requests.append(kwargs)
         message = type("Message", (), {"content": self._content})
         choice = type("Choice", (), {"message": message})
-        return type("Response", (), {"choices": [choice]})
+        usage = type(
+            "Usage",
+            (),
+            {"prompt_tokens": 120, "completion_tokens": 64, "total_tokens": 184},
+        )
+        return type("Response", (), {"choices": [choice], "usage": usage})
 
 
 class _FakeChat:
@@ -85,7 +90,16 @@ class _TieredFakeChatCompletions:
         self.requests.append({"model": model})
         message = type("Message", (), {"content": content})
         choice = type("Choice", (), {"message": message})
-        return type("Response", (), {"choices": [choice]})
+        usage = type(
+            "Usage",
+            (),
+            {
+                "prompt_tokens": 100 if model == settings.openai_chat_model else 140,
+                "completion_tokens": 60 if model == settings.openai_chat_model else 90,
+                "total_tokens": 0,
+            },
+        )
+        return type("Response", (), {"choices": [choice], "usage": usage})
 
 
 class _TieredFakeChat:
@@ -163,6 +177,32 @@ class _WorkloadCacheService:
         }
 
 
+class _FakeCostMonitor:
+    def __init__(self, cost: float = 0.001):
+        self.cost = cost
+        self.usage_events = []
+        self.cache_hits = []
+
+    def track_usage(self, **kwargs):
+        prompt = kwargs.get("prompt_tokens") or 0
+        completion = kwargs.get("completion_tokens") or 0
+        usage = {
+            "prompt_tokens": prompt,
+            "completion_tokens": completion,
+            "total_tokens": kwargs.get("total_tokens") or (prompt + completion),
+        }
+        event = {
+            "model": kwargs.get("model"),
+            "route": kwargs.get("route"),
+            "project_id": kwargs.get("project_id"),
+        }
+        self.usage_events.append(event)
+        return {"usage": usage, "cost_usd": self.cost, "event": event}
+
+    def record_cache_hit(self, **kwargs):
+        self.cache_hits.append(kwargs)
+
+
 def test_rag_service_run_query(monkeypatch):
     fake_retrieval = _FakeRetrievalService()
     fake_embedding = _FakeEmbeddingService()
@@ -180,6 +220,7 @@ def test_rag_service_run_query(monkeypatch):
         client=fake_client,
         model="gpt-test",
         default_temperature=0.0,
+        cost_monitor=None,
     )
 
     result = service.run_query(
@@ -286,6 +327,7 @@ def test_rag_service_uses_cache_hit(monkeypatch):
         client=fake_client,
         model="gpt-test",
         default_temperature=0.0,
+        cost_monitor=None,
     )
 
     result = service.run_query(
@@ -327,6 +369,7 @@ def test_tiered_routing_escalates_on_low_quality(monkeypatch):
         model=settings.openai_chat_model,
         escalation_model=settings.openai_escalation_model,
         default_temperature=0.0,
+        cost_monitor=None,
     )
 
     result = service.run_query(
@@ -346,6 +389,35 @@ def test_tiered_routing_escalates_on_low_quality(monkeypatch):
     )
     assert cache.checked == 1
     assert cache.stored == 1
+
+
+def test_rag_service_emits_cost_metrics(monkeypatch):
+    fake_retrieval = _FakeRetrievalService()
+    fake_embedding = _FakeEmbeddingService()
+    fake_client = _FakeOpenAIClient(
+        "Performance metrics with telemetry. [Document: doc-1, Chunk: 0]"
+    )
+    cache = _NoOpCacheService()
+    monitor = _FakeCostMonitor(cost=0.002)
+
+    monkeypatch.setattr(rag_module, "_openai_import_error", None, raising=False)
+    monkeypatch.setattr(rag_module, "OpenAI", object, raising=False)
+
+    service = rag_module.RagService(
+        retrieval_service=fake_retrieval,
+        embedding_service=fake_embedding,
+        cache_service=cache,
+        client=fake_client,
+        model="gpt-test",
+        default_temperature=0.0,
+        cost_monitor=monitor,
+    )
+
+    result = service.run_query(query="Record telemetry?", top_k=2, project_id="proj-telemetry")
+
+    assert result["routing"]["estimated_cost_usd"] == pytest.approx(0.002)
+    assert result["routing"]["attempts"][0]["cost_usd"] == pytest.approx(0.002)
+    assert monitor.usage_events[0]["project_id"] == "proj-telemetry"
 
 
 class _FakeRagService:
@@ -468,6 +540,7 @@ def test_semantic_cache_hit_rate_reaches_target(monkeypatch):
         client=fake_client,
         model="gpt-test",
         default_temperature=0.0,
+        cost_monitor=None,
     )
 
     queries = [

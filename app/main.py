@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.api.v1 import health, redaction, documents, retrieval, search, missions, quality, quality_automated
+from app.api.v1 import health, redaction, documents, retrieval, search, missions, quality, quality_automated, monitoring
 from app.onboarding import router as onboarding_router
 
 # Create tables in development (use migrations in production)
@@ -38,6 +38,7 @@ app.include_router(
     prefix=f"{settings.api_v1_prefix}/quality/automated",
     tags=["quality-automation"],
 )
+app.include_router(monitoring.router, prefix=f"{settings.api_v1_prefix}/monitoring", tags=["monitoring"])
 app.include_router(onboarding_router, prefix=settings.api_v1_prefix)
 
 
