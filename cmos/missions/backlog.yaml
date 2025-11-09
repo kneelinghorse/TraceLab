@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-09T05:41:19.189967+00:00'
+generatedAt: '2025-11-09T23:49:28.007432+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -248,11 +248,11 @@ domainFields:
   - sprintId: sprint-04
     title: Sprint 04 - Quality Assurance & Tech Debt
     focus: null
-    status: Planning
+    status: Completed
     startDate: '2025-11-09'
     endDate: '2025-11-23'
     totalMissions: 5
-    completedMissions: 0
+    completedMissions: 5
     missions:
     - id: B4.1
       name: Playwright Migration
@@ -315,6 +315,72 @@ domainFields:
       metadata:
         started_at: '2025-11-09T04:45:29Z'
         completed_at: '2025-11-09T04:52:44Z'
+  - sprintId: sprint-05
+    title: Sprint 05 - Frontend Deployment & Auth Hardening
+    focus: Ship hosted Next.js UI, secure API access, and production domain wiring
+    status: Planned
+    startDate: '2025-11-24'
+    endDate: '2025-12-06'
+    totalMissions: 3
+    completedMissions: 0
+    missions:
+    - id: B5.1
+      name: Railway Frontend Service Deployment
+      status: Completed
+      completed_at: '2025-11-09T23:48:47Z'
+      notes: Provisioned frontend Railway service with npm install && npm run build
+        / npm run start, configured env vars (NEXT_PUBLIC_API_BASE_URL=https://tracelab-production.up.railway.app/api/v1,
+        NEXT_PUBLIC_DEFAULT_PROJECT_ID seed), and verified https://frontend-production-43c3.up.railway.app/missions
+        renders against production FastAPI API. Telemetry recorded in cmos/telemetry/events/sprint-05-frontend-deployment.jsonl.
+      metadata:
+        description: Host the Mission Protocol Next.js workspace on its own Railway
+          service with documented build/start commands and env vars.
+        successCriteria:
+        - Railway frontend service builds with npm install && npm run build and starts
+          via npm run start -- --port .
+        - NEXT_PUBLIC_* env vars configured in Railway and mirrored in docs.
+        - Hosted /missions view reaches FastAPI backend; smoke test captured.
+        - Deployment runbook + telemetry artifacts committed for future agents.
+        deliverables:
+        - railway.frontend.json (or documented service settings).
+        - Updated deployment runbook covering env vars + rollback.
+        - Telemetry + screenshot/logs proving hosted UI works.
+        started_at: '2025-11-09T21:04:12Z'
+        completed_at: '2025-11-09T23:48:47Z'
+    - id: B5.2
+      name: FastAPI Auth & CORS Hardening
+      status: Current
+      metadata:
+        description: Implement JWT auth endpoints and lock down CORS/methods to the
+          hosted UI domain per docs/auth_and_cors_guidance.md.
+        successCriteria:
+        - Login endpoint issues JWTs signed with python-jose and passlib-hashed credentials.
+        - Protected routes require Authorization bearer tokens; unauthenticated calls
+          return 401 with helpful errors.
+        - CORS middleware loads explicit origins/methods/headers from settings (prod
+          vs dev).
+        - Frontend stores/uses tokens and docs describe the auth flow.
+        deliverables:
+        - New auth routes, schemas, and settings toggles.
+        - pytest coverage for login/refresh + CORS behavior.
+        - Docs/README updates covering token handling + allowed origins.
+    - id: B5.3
+      name: Domain Wiring & Telemetry Validation
+      status: Queued
+      metadata:
+        description: Point Cloudflare DNS at the hosted UI/API, propagate env vars,
+          and capture telemetry proving production parity.
+        successCriteria:
+        - Cloudflare DNS + SSL mapped to Railway frontend + API domains and documented.
+        - NEXT_PUBLIC_API_BASE_URL and FastAPI allowed origins updated to production
+          URLs with env templates refreshed.
+        - validate_parity.py plus smoke tests executed against production endpoints;
+          results stored in telemetry.
+        - Mission notes document DNS checklist, troubleshooting, and rollback path.
+        deliverables:
+        - DNS change log + doc updates describing production URL.
+        - Telemetry artifacts (parity check, smoke test) committed.
+        - Updated env templates / README pointing to public domains.
   missionDependencies:
   - from: B1.1
     to: B1.2
@@ -388,5 +454,11 @@ domainFields:
   - from: B4.4
     to: B4.5
     type: blocks
+  - from: B5.1
+    to: B5.2
+    type: Blocks
+  - from: B5.2
+    to: B5.3
+    type: Blocks
   promptMapping:
     prompts: []
