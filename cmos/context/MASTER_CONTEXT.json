@@ -211,7 +211,15 @@
       }
     ],
     "active_mission": null,
-    "blocked_missions": [],
+    "blocked_missions": [
+      {
+        "item": "Monitoring API telemetry",
+        "reason": "Direct imports of app.services.rag_service still initialise Qdrant, so standalone monitoring.read_performance() calls hang when qdrant-client isn't installed.",
+        "impact": "Blocks offline diagnostics for sprint-04 monitoring dashboard until init path is stubbed or dependency added.",
+        "status": "tracking",
+        "ts": "2025-11-09T01:54:56.075694Z"
+      }
+    ],
     "last_completed_mission": "B4.3"
   },
   "technical_context": {
