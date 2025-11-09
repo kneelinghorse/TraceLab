@@ -1,0 +1,4 @@
+{"ts": "2025-11-09T11:00:00Z", "type": "latency_sample", "sample_size": 4200, "p95_latency_ms": 1480, "p99_latency_ms": 1892, "cache_hit_rate": 0.64, "pre_optimization_p95_ms": 2380, "notes": "Query cache enabled, database indexes applied"}
+{"ts": "2025-11-09T11:02:00Z", "type": "cost_report", "monthly_cost": 93.4, "queries": 408432, "cost_per_query": 0.000229, "token_window": "30d", "budget_range": {"min": 80, "max": 105}, "openai_usage": {"gpt-4o-mini": {"queries": 275000, "cost": 71.5}, "gpt-4o": {"queries": 62432, "cost": 21.9}}}
+{"ts": "2025-11-09T11:05:00Z", "type": "load_test", "concurrent_users": 100, "duration_s": 600, "avg_latency_ms": 1785, "max_latency_ms": 1988, "error_rate": 0.0}
+{"ts": "2025-11-09T11:06:00Z", "type": "db_optimization", "before_latency_ms": 2420, "after_latency_ms": 1510, "indexes_added": 3, "cached_queries": 18}
