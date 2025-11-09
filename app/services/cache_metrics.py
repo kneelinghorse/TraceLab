@@ -85,6 +85,8 @@ class CacheMetrics:
     def snapshot(self) -> dict[str, float]:
         """Take a thread-safe snapshot of counters for diagnostics."""
         with self._lock:
+            total = self.hit_count + self.miss_count
+            hit_rate = (self.hit_count / total) if total else 0.0
             mean_latency = (
                 sum(self.lookup_latencies) / len(self.lookup_latencies)
                 if self.lookup_latencies
@@ -95,7 +97,7 @@ class CacheMetrics:
                 "misses": float(self.miss_count),
                 "errors": float(self.error_count),
                 "evictions": float(self.eviction_count),
-                "hit_rate": self.hit_rate(),
+                "hit_rate": hit_rate,
                 "avg_lookup_seconds": mean_latency,
             }
 
