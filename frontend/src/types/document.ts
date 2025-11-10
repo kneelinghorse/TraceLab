@@ -2,6 +2,8 @@
  * Document type definitions
  */
 
+export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
 export interface Document {
   id: string;
   project_id: string;
@@ -25,7 +27,7 @@ export interface ProcessingEvent {
   stage: string;
   status: string;
   message?: string;
-  details?: Record<string, any>;
+  details?: Record<string, JsonValue>;
   created_at: string;
   updated_at: string;
 }
@@ -60,4 +62,3 @@ export interface DocumentProcessResult {
   };
   error?: string;
 }
-

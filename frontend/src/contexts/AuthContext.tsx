@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
 import { login as loginRequest, refresh as refreshRequest } from "@/lib/api/auth";
@@ -39,16 +39,13 @@ function persistSession(response: TokenResponse) {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AuthState>(initialState);
-
-  useEffect(() => {
+  const [state, setState] = useState<AuthState>(() => {
     const stored = getStoredAuth();
     if (stored) {
-      setState({ token: stored.token, user: { username: stored.username }, isReady: true });
-    } else {
-      setState((prev) => ({ ...prev, isReady: true }));
+      return { token: stored.token, user: { username: stored.username }, isReady: true } satisfies AuthState;
     }
-  }, []);
+    return { ...initialState, isReady: true } satisfies AuthState;
+  });
 
   const login = useCallback(async (username: string, password: string) => {
     const response = await loginRequest({ username, password });
