@@ -30,7 +30,8 @@ export default function DocumentDetailPage() {
       // Poll for updated status
       setTimeout(() => mutate(), 2000);
     } catch (error) {
-      alert("Failed to process document");
+      const message = error instanceof Error ? error.message : "Failed to process document";
+      alert(message);
     } finally {
       setProcessing(false);
     }
@@ -43,7 +44,8 @@ export default function DocumentDetailPage() {
       await documentsApi.deleteDocument(id as string);
       router.push("/documents");
     } catch (error) {
-      alert("Failed to delete document");
+      const message = error instanceof Error ? error.message : "Failed to delete document";
+      alert(message);
     }
   };
 
@@ -207,4 +209,3 @@ function StatusRow({ label, status }: { label: string; status: boolean }) {
     </div>
   );
 }
-

@@ -35,7 +35,8 @@ export default function DocumentsPage() {
       await documentsApi.deleteDocument(documentId);
       mutate();
     } catch (error) {
-      alert("Failed to delete document");
+      const message = error instanceof Error ? error.message : "Failed to delete document";
+      alert(message);
     }
   };
 
@@ -190,4 +191,3 @@ function StatusBadge({ label, status }: { label: string; status: boolean }) {
     </span>
   );
 }
-
