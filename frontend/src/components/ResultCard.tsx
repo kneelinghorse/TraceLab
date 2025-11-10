@@ -10,7 +10,7 @@ type ResultCardProps = {
   result: SearchResultChunk;
   document?: Document;
   missions: Mission[];
-  onQuickAddEvidence: (missionId: string, result: SearchResultChunk) => Promise<void>;
+  onQuickAddEvidence: (missionId: string, result: SearchResultChunk, note?: string) => Promise<void>;
   isHighlighted?: boolean;
 };
 
@@ -26,6 +26,7 @@ export const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function R
   const [selectedMission, setSelectedMission] = useState<string>("");
   const [isLinking, setIsLinking] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
+  const [note, setNote] = useState("");
 
   const documentLabel = document?.name ?? document?.file_path ?? result.document_id ?? "Unlinked document";
   const chunkPreview = result.content.length > 360 ? `${result.content.slice(0, 357)}…` : result.content;
@@ -40,7 +41,7 @@ export const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function R
     setFeedback(null);
     setIsLinking(true);
     try {
-      await onQuickAddEvidence(selectedMission, result);
+      await onQuickAddEvidence(selectedMission, result, note.trim() || undefined);
       const mission = missions.find((item) => item.id === selectedMission);
       setFeedback({
         type: "success",
@@ -48,6 +49,7 @@ export const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function R
           ? `Linked to ${mission.mission_data.title ?? mission.mission_data.mission_id}`
           : "Evidence added",
       });
+      setNote("");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to add evidence";
       setFeedback({ type: "error", message });
@@ -124,6 +126,13 @@ export const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function R
             {isLinking ? "Linking…" : "Quick add"}
           </button>
         </div>
+        <textarea
+          value={note}
+          onChange={(event) => setNote(event.target.value)}
+          className="w-full rounded-xl border border-white/15 bg-black/20 px-3 py-2 text-sm text-slate-100 focus:outline-none"
+          placeholder="Optional note captured with the evidence"
+          rows={2}
+        />
         {feedback && (
           <p className={clsx("text-sm", feedback.type === "success" ? "text-emerald-300" : "text-rose-300")}>{feedback.message}</p>
         )}

@@ -1,11 +1,15 @@
-import { useEffect, useMemo } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useEffect, useMemo, useState } from "react";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import { createMission, updateMission } from "@/lib/api/missions";
 import type { Mission } from "@/types/mission";
 import { EvidenceLinking } from "@/components/EvidenceLinking";
 import { missionFormSchema, type MissionFormValues } from "@/lib/schemas/missionForm";
+
+const SECTION_CLASS = "rounded-3xl border border-slate-200 bg-white p-6 shadow-sm";
 
 type MissionProtocolFormProps = {
   mission?: Mission;
@@ -23,6 +27,52 @@ const DEFAULT_EVIDENCE = {
 };
 
 const DEFAULT_PROJECT_ID = process.env.NEXT_PUBLIC_DEFAULT_PROJECT_ID ?? "";
+
+const MISSION_TEMPLATES: Array<{
+  id: string;
+  name: string;
+  description: string;
+  values: Partial<MissionFormValues>;
+}> = [
+  {
+    id: "competitive-analysis",
+    name: "Competitive Analysis",
+    description: "Evaluate rival offerings, capture differentiators, and record risks.",
+    values: {
+      title: "Competitive analysis mission",
+      summary: "Assess competitor positioning, feature gaps, and buyer blockers.",
+      topic: "Competitive intelligence",
+      objective: "Document differentiators and opportunities",
+      scope: "Mission Protocol + RAG search",
+      successMetrics: "3 insights on differentiators\nActionable blockers",
+      risks: "Incomplete data\nBiased samples",
+      keyQuestions: [
+        { question: "Where does the competitor outperform us?", status: "open", answer: "", owner: "" },
+        { question: "What risks block adoption?", status: "open", answer: "", owner: "" },
+      ],
+      methodology: "Document review + SME interviews",
+      tags: "competitive,analysis",
+    },
+  },
+  {
+    id: "technical-dive",
+    name: "Technical Deep Dive",
+    description: "Capture architecture, trade-offs, and implementation recommendations.",
+    values: {
+      title: "Technical deep dive",
+      summary: "Research architecture choices, integration risks, and performance levers.",
+      topic: "Technical evaluation",
+      objective: "Outline architecture + integration approach",
+      scope: "API layer + Mission Protocol UI",
+      methodology: "Code review + RAG references",
+      successMetrics: "Architecture diagram\nList of integration blockers",
+      keyQuestions: [
+        { question: "Which services must we touch?", status: "open", answer: "", owner: "" },
+      ],
+      tags: "tech,evaluation",
+    },
+  },
+];
 
 const convertArrayToMultiline = (items?: string[] | null) => (items && items.length ? items.join("\n") : "");
 
@@ -117,6 +167,7 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
     control,
     register,
     handleSubmit,
+    getValues,
     formState: { errors, isSubmitting },
     reset,
   } = useForm<MissionFormValues>({
@@ -124,6 +175,8 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
     resolver: zodResolver(missionFormSchema),
     mode: "onBlur",
   });
+
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
 
   useEffect(() => {
     reset(defaultValues);
@@ -138,6 +191,26 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
     control,
     name: "evidence",
   });
+
+  const keyInsightsValue = useWatch({ control, name: "keyInsights" });
+  const selectedTemplate = MISSION_TEMPLATES.find((item) => item.id === selectedTemplateId);
+
+  const handleTemplateApply = () => {
+    const template = MISSION_TEMPLATES.find((item) => item.id === selectedTemplateId);
+    if (!template) {
+      return;
+    }
+    const current = getValues();
+    const templateQuestions = template.values.keyQuestions
+      ? template.values.keyQuestions.map((question) => ({ ...question }))
+      : current.keyQuestions;
+
+    reset({
+      ...current,
+      ...template.values,
+      keyQuestions: templateQuestions,
+    });
+  };
 
   const onSubmit = handleSubmit(async (values) => {
     const missionPayload = {
@@ -199,10 +272,10 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
-      <section className="glass-card p-6 space-y-4">
+      <section className={`${SECTION_CLASS} space-y-4`}>
         <header>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Mission Metadata</p>
-          <h2 className="text-2xl font-semibold text-white">Mission Protocol Draft</h2>
+          <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Mission Metadata</p>
+          <h2 className="text-2xl font-semibold text-slate-900">Mission Protocol Draft</h2>
         </header>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
@@ -238,12 +311,38 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
             {errors.summary && <p className="form-error">{errors.summary.message}</p>}
           </div>
         </div>
+        <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4">
+          <p className="text-sm font-semibold text-slate-800">Mission templates</p>
+          <div className="mt-2 flex flex-col gap-3 md:flex-row">
+            <select
+              value={selectedTemplateId}
+              onChange={(event) => setSelectedTemplateId(event.target.value)}
+              className="form-input md:flex-1"
+            >
+              <option value="">Choose template…</option>
+              {MISSION_TEMPLATES.map((template) => (
+                <option key={template.id} value={template.id}>
+                  {template.name}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={handleTemplateApply}
+              disabled={!selectedTemplateId}
+              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Apply template
+            </button>
+          </div>
+          {selectedTemplate && <p className="mt-2 text-xs text-slate-500">{selectedTemplate.description}</p>}
+        </div>
       </section>
 
-      <section className="glass-card p-6 space-y-4">
+      <section className={`${SECTION_CLASS} space-y-4`}>
         <header>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Research Statement</p>
-          <h2 className="text-2xl font-semibold text-white">Anchor the Mission</h2>
+          <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Research Statement</p>
+          <h2 className="text-2xl font-semibold text-slate-900">Anchor the Mission</h2>
         </header>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
@@ -280,23 +379,23 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
         </div>
       </section>
 
-      <section className="glass-card p-6 space-y-4">
+      <section className={`${SECTION_CLASS} space-y-4`}>
         <header className="flex items-center justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Key Questions</p>
-            <h2 className="text-2xl font-semibold text-white">Decision Frame</h2>
+            <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Key Questions</p>
+            <h2 className="text-2xl font-semibold text-slate-900">Decision Frame</h2>
           </div>
           <button
             type="button"
             onClick={() => appendQuestion(DEFAULT_QUESTION)}
-            className="px-3 py-2 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition"
+            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
           >
             Add Key Question
           </button>
         </header>
         <div className="space-y-4">
           {questionFields.map((field, index) => (
-            <div key={field.id} className="border border-white/10 rounded-2xl p-4 grid gap-3 md:grid-cols-4">
+            <div key={field.id} className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-4">
               <div className="md:col-span-2">
                 <label className="form-label">Question</label>
                 <input {...register(`keyQuestions.${index}.question` as const)} className="form-input" />
@@ -321,7 +420,7 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
                 <textarea {...register(`keyQuestions.${index}.answer` as const)} className="form-input min-h-[70px]" />
               </div>
               <div className="flex items-center justify-end">
-                <button type="button" onClick={() => removeQuestion(index)} className="text-sm text-rose-300">
+                <button type="button" onClick={() => removeQuestion(index)} className="text-sm font-medium text-rose-600 hover:text-rose-700">
                   Remove
                 </button>
               </div>
@@ -330,17 +429,29 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
         </div>
       </section>
 
-      <section className="glass-card p-6 space-y-4">
+      <section className={`${SECTION_CLASS} space-y-4`}>
         <header>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Synthesis</p>
-          <h2 className="text-2xl font-semibold text-white">Insights & Next Steps</h2>
+          <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Synthesis</p>
+          <h2 className="text-2xl font-semibold text-slate-900">Insights & Next Steps</h2>
         </header>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 lg:grid-cols-2">
           <div>
-            <label className="form-label">Key Insights</label>
-            <textarea {...register("keyInsights")} className="form-input min-h-[140px]" placeholder="One per line" />
+            <label className="form-label">Key Insights (Markdown supported)</label>
+            <textarea {...register("keyInsights")} className="form-input min-h-[180px]" placeholder="* Insight with citation" />
             {errors.keyInsights && <p className="form-error">{errors.keyInsights.message}</p>}
           </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Preview</p>
+            <div className="markdown-preview mt-2 min-h-[140px]">
+              {keyInsightsValue ? (
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{keyInsightsValue}</ReactMarkdown>
+              ) : (
+                <p className="text-slate-500">Write insights on the left to render Markdown preview.</p>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="form-label">Recommendations</label>
             <textarea {...register("recommendations")} className="form-input min-h-[140px]" placeholder="One per line" />
@@ -378,7 +489,7 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
         remove={removeEvidence}
       />
 
-      <section className="glass-card p-6 space-y-4">
+      <section className={`${SECTION_CLASS} space-y-4`}>
         <div>
           <label className="form-label">Tags (comma separated)</label>
           <input {...register("tags")} placeholder="mission protocol, ui" className="form-input" />

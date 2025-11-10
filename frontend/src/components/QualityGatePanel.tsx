@@ -3,17 +3,25 @@ import { formatDistanceToNow } from "date-fns";
 import type { Mission, QualityGateName, QualityGateReport } from "@/types/mission";
 
 const GATE_DESCRIPTIONS: Record<string, string> = {
-  research_statement: "Topic, scope, and objective must be populated.",
-  evidence_links: "Each insight references at least one supporting chunk.",
-  contradictions_resolved: "Contradictions include an explicit resolution.",
-  synthesis_quality: "Synthesis includes ≥40 chars, recommendations, and next steps.",
-  traceability: "Evidence maintains chunk + insight references for auditability.",
+  research_statement: "Topic, scope, objective, methodology, and success metrics anchor the mission.",
+  evidence_links: "Each key insight has at least one linked chunk supporting the claim.",
+  contradictions_resolved: "Conflicting findings include a resolution statement.",
+  synthesis_quality: "Synthesis contains insights, recommendations, and next steps with Markdown support.",
+  traceability: "Evidence tracks chunk + insight IDs for audit trails.",
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  pass: "text-emerald-400 bg-emerald-400/10 border-emerald-400/40",
-  fail: "text-rose-300 bg-rose-400/10 border-rose-400/40",
-  pending: "text-yellow-300 bg-yellow-300/10 border-yellow-300/40",
+const STATUS_TOKENS: Record<string, { label: string; className: string; icon: string }> = {
+  pass: { label: "Pass", className: "border-emerald-200 bg-emerald-50 text-emerald-700", icon: "✓" },
+  fail: { label: "Fail", className: "border-rose-200 bg-rose-50 text-rose-700", icon: "!" },
+  pending: { label: "Pending", className: "border-amber-200 bg-amber-50 text-amber-700", icon: "…" },
+};
+
+const RECOMMENDATIONS: Record<string, string> = {
+  research_statement: "Fill in topic, objective, scope, and at least one success metric.",
+  evidence_links: "Attach summaries + chunk IDs for every key insight.",
+  contradictions_resolved: "Call out the contradiction and describe how you resolved it.",
+  synthesis_quality: "Add Markdown insights plus next steps to clear this gate.",
+  traceability: "Use Quick Add from search to capture chunk + mission linkage automatically.",
 };
 
 type GateSnapshot = QualityGateReport["gates"][QualityGateName];
@@ -55,52 +63,48 @@ export function QualityGatePanel({ report, mission }: Props) {
   const failing = gates.filter((gate) => gate.status === "fail").length;
 
   return (
-    <div className="glass-card p-6 space-y-4">
-      <div>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Quality Gates</p>
-            <h3 className="text-2xl font-semibold text-white mt-1">Research Readiness</h3>
-          </div>
-          <div className="text-sm text-slate-300">
-            {failing === 0 ? (
-              <span className="text-emerald-300">All gates passing</span>
-            ) : (
-              <span className="text-rose-300">{failing} blocking gate(s)</span>
-            )}
-          </div>
+    <div className="rounded-3xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Quality gates</p>
+          <h3 className="text-2xl font-semibold text-slate-900">Research readiness</h3>
         </div>
-        <p className="text-sm text-slate-400 mt-2">
-          Gates mirror the heuristics documented in <code>docs/quality_gates.md</code>. UI polls{" "}
-          <code>/api/v1/quality/missions/:id/quality</code> every 15s for fresh evaluations.
-        </p>
+        <div className={`text-sm font-medium ${failing === 0 ? "text-emerald-700" : "text-rose-700"}`}>
+          {failing === 0 ? "All gates passing" : `${failing} blocking gate(s)`}
+        </div>
       </div>
-      <div className="grid gap-3">
-        {gates.map((gate) => (
-          <div
-            key={gate.name}
-            data-testid={`gate-${gate.name}`}
-            className="border border-white/5 rounded-xl p-4 bg-white/5 bg-opacity-10 backdrop-blur"
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-lg font-semibold capitalize">{gate.name.replace("_", " ")}</p>
-                <p className="text-sm text-slate-300">{GATE_DESCRIPTIONS[gate.name]}</p>
+      <p className="mt-2 text-sm text-slate-600">
+        Evaluations mirror docs/quality_gates.md. Refresh mission data after editing fields to re-run automation.
+      </p>
+      <div className="mt-4 space-y-3">
+        {gates.map((gate) => {
+          const token = STATUS_TOKENS[gate.status] ?? STATUS_TOKENS.pending;
+          return (
+            <div
+              key={gate.name}
+              data-testid={`gate-${gate.name}`}
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-lg font-semibold capitalize">{gate.name.replace("_", " ")}</p>
+                  <p className="text-sm text-slate-600">{GATE_DESCRIPTIONS[gate.name]}</p>
+                </div>
+                <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${token.className}`}>
+                  <span>{token.icon}</span>
+                  {token.label}
+                </span>
               </div>
-              <span
-                className={`px-3 py-1 text-xs font-semibold rounded-full border ${STATUS_COLORS[gate.status] ?? STATUS_COLORS.pending}`}
-              >
-                {gate.status}
-              </span>
+              <div className="mt-3 text-sm text-slate-600">
+                <p>{RECOMMENDATIONS[gate.name]}</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  {gate.evaluatedAt ? `Evaluated ${formatDistanceToNow(new Date(gate.evaluatedAt))} ago` : "Awaiting evaluation"}
+                  {gate.details && <span className="ml-1 text-rose-600">· {gate.details}</span>}
+                </p>
+              </div>
             </div>
-            <div className="mt-3 text-sm text-slate-300 flex items-center gap-2">
-              <span className="opacity-70">
-                {gate.evaluatedAt ? `Evaluated ${formatDistanceToNow(new Date(gate.evaluatedAt))} ago` : "Awaiting evaluation"}
-              </span>
-              {gate.details && <span className="text-rose-200">· {gate.details}</span>}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
