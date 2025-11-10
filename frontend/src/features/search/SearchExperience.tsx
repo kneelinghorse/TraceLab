@@ -265,7 +265,7 @@ function SearchExperience({ initialSection }: SearchPageProps) {
     target?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
-  const handleQuickAddEvidence = async (missionId: string, chunk: SearchResultChunk) => {
+  const handleQuickAddEvidence = async (missionId: string, chunk: SearchResultChunk, note?: string) => {
     const mission = missions.find((item) => item.id === missionId);
     if (!mission) {
       throw new Error("Mission not found.");
@@ -273,7 +273,9 @@ function SearchExperience({ initialSection }: SearchPageProps) {
 
     const doc = chunk.document_id ? documentIndex.get(chunk.document_id) : undefined;
     const evidenceId = chunk.chunk_id ? `EV-${chunk.chunk_id}` : `EV-${Date.now()}`;
-    const summary = chunk.content.length > 280 ? `${chunk.content.slice(0, 277)}…` : chunk.content;
+    const baseSummary = chunk.content.length > 280 ? `${chunk.content.slice(0, 277)}…` : chunk.content;
+    const trimmedNote = note?.trim();
+    const summary = trimmedNote ? `${baseSummary}\n\nResearcher note: ${trimmedNote}` : baseSummary;
     const evidence = {
       evidence_id: evidenceId,
       source: doc?.name ?? "Semantic Search Result",

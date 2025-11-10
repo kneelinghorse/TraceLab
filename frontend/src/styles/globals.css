@@ -70,35 +70,59 @@ body {
 .form-label {
   display: block;
   font-size: 0.7rem;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.6);
+  color: #475467;
   margin-bottom: 0.35rem;
 }
 
 .form-input {
   width: 100%;
   border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid #d0d5dd;
+  background: #fff;
   padding: 0.85rem 1.1rem;
-  color: hsl(var(--foreground));
-  transition: border 0.2s, box-shadow 0.2s, background 0.2s;
+  color: #0f172a;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
 .form-input:focus {
   outline: none;
-  border-color: rgba(56, 189, 248, 0.8);
-  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
-  background: rgba(255, 255, 255, 0.08);
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
 }
 
 .form-input::placeholder {
-  color: rgba(255, 255, 255, 0.35);
+  color: #98a2b3;
 }
 
 .form-error {
   margin-top: 0.35rem;
   font-size: 0.75rem;
-  color: hsl(var(--danger));
+  color: #b42318;
+}
+
+.markdown-preview {
+  font-size: 0.9rem;
+  color: #334155;
+}
+
+.markdown-preview :where(p, ul, ol) {
+  margin: 0 0 0.75rem;
+}
+
+.markdown-preview ul {
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.markdown-preview ol {
+  padding-left: 1.25rem;
+  list-style: decimal;
+}
+
+.markdown-preview code {
+  background: #f4f6fb;
+  border-radius: 0.35rem;
+  padding: 0.1rem 0.35rem;
 }
