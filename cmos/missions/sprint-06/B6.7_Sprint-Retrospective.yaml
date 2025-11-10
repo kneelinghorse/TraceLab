@@ -1,0 +1,59 @@
+# Mission File: B6.7_Sprint-Retrospective.yaml
+
+missionId: "B6.7"
+
+objective: "Conduct end-to-end validation of agent workflows, generate Sprint 06 telemetry report, and document findings for Sprint 07 planning."
+
+context: |
+  Sprint 06 delivers complete functional TraceLab with CLI, document UI, search UI, mission tracking,
+  and report export. Need to validate the full workflow works: agent uploads documents via CLI,
+  searches via RAG, collects evidence, synthesizes findings, exports report. Capture telemetry on
+  what works, what breaks, where agents struggle, and what features are missing. Sprint 06 success
+  means agents and humans can both use TraceLab for real research workflows.
+
+successCriteria:
+  - "End-to-end agent workflow tested: CLI login -> project create -> document upload -> RAG query -> mission create -> add evidence -> export report."
+  - "End-to-end human workflow tested: UI login -> upload documents -> search -> create mission -> link evidence -> export report."
+  - "Issues documented with severity (blocker, major, minor) and recommendations for Sprint 07."
+  - "Telemetry collected: CLI usage logs, UI interaction patterns, API performance, error rates."
+  - "Sprint 06 retrospective report generated in cmos/reports/sprint-06/SPRINT-06-RETROSPECTIVE.md."
+  - "Sprint 07 backlog seeded with fixes and enhancements from validation."
+
+deliverables:
+  - "cmos/reports/sprint-06/sprint-06-summary.md - Sprint metrics report."
+  - "cmos/reports/sprint-06/SPRINT-06-RETROSPECTIVE.md - Retrospective with lessons learned."
+  - "cmos/telemetry/events/sprint-06-validation.jsonl - End-to-end test telemetry."
+  - "Sprint 07 mission stubs based on identified gaps."
+  - "Updated MASTER_CONTEXT with Sprint 06 achievements."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Sprint evaluation framework established in Sprint 01 (B1.6)."
+      sourceMission: "scripts/evaluate_sprint.py"
+
+  implementationScope:
+    coreDeliverable: "Sprint 06 validation and retrospective with Sprint 07 backlog."
+    outOfScope:
+      - "Sprint 07 mission implementation (next sprint)."
+
+  validationProtocol:
+    - validator: "Agent workflow test"
+      focus: "Full CLI workflow completes successfully."
+    - validator: "Human workflow test"
+      focus: "Full UI workflow completes successfully."
+    - validator: "Documentation review"
+      focus: "All mission deliverables documented."
+
+  handoffContext:
+    completed:
+      - "Sprint 06 validated end-to-end."
+      - "Retrospective complete."
+      - "Sprint 07 backlog ready."
+    interfaces: []
+    assumptions:
+      - "All B6.1-B6.6 missions complete."
+    nextMission: "Sprint 07 missions (TBD based on findings)"
+    blockers: []
+
