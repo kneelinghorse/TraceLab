@@ -60,3 +60,6 @@
 {"ts": "2025-11-09T04:52:44Z", "agent": "assistant", "mission": "B4.5", "action": "complete", "status": "completed", "summary": "Sprint 04 efficacy evaluator + telemetry delivered", "next_hint": null}
 {"ts": "2025-11-09T21:04:12Z", "agent": "codex", "mission": "B5.1", "action": "start", "status": "in_progress", "summary": "Starting Protocol Engine"}
 {"ts": "2025-11-09T23:48:47Z", "agent": "codex", "mission": "B5.1", "action": "complete", "status": "completed", "summary": "Standalone Railway frontend is live", "next_hint": "B5.2: align FastAPI CORS + auth with the new frontend domain."}
+{"ts": "2025-11-10T00:00:23Z", "agent": "", "mission": "B5.2", "action": "start", "status": "in_progress", "summary": "Starting Protocol Engine"}
+{"ts": "2025-11-10T00:20:47Z", "agent": "codex", "mission": "B5.2", "action": "complete", "status": "completed", "summary": "JWT auth + CORS hardening delivered", "next_hint": "B5.3 is now Current"}
+{"ts": "2025-11-10T04:35:54Z", "agent": "codex", "mission": "B5.3", "action": "start", "status": "in_progress", "summary": "Starting Domain Wiring & Telemetry Validation"}

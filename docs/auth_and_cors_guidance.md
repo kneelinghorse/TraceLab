@@ -81,6 +81,26 @@ Here's a high-level overview of how to implement token-based authentication:
 2.  **Implement authentication:** Implement token-based authentication in the FastAPI backend.
 3.  **Update the frontend:** Update the frontend to handle the authentication flow, including storing the JWT and sending it with requests.
 
+### Production Reference Configuration (Sprint 05)
+
+Use the following `.env` fragment when deploying the FastAPI service behind Cloudflare/ Railway:
+
+```
+ENVIRONMENT=production
+DEBUG=false
+CORS_ALLOWED_ORIGINS_PROD=["https://namozine.com", "https://www.namozine.com"]
+CORS_ALLOWED_METHODS=["GET","POST","PUT","PATCH","DELETE","OPTIONS"]
+CORS_ALLOWED_HEADERS=["Authorization","Content-Type"]
+
+# Railway origins documented for incident response
+CORS_ALLOWED_ORIGINS_DEV=["http://localhost:3000"]
+
+# Frontend (Next.js) picks up the vanity domain through NEXT_PUBLIC_API_BASE_URL
+NEXT_PUBLIC_API_BASE_URL=https://api.namozine.com/api/v1
+```
+
+After updating the environment variables, restart the FastAPI process and re-run the production Playwright smoke suite to verify that `https://namozine.com/missions` and `https://api.namozine.com/api/v1/health` both succeed with `access-control-allow-origin: https://namozine.com`.
+
 ## TraceLab Implementation Notes
 
 - **Environment variables:**

@@ -13,8 +13,8 @@
   },
   "working_memory": {
     "active_domain": "main",
-    "session_count": 22,
-    "last_session": "2025-11-09T23:48:47Z",
+    "session_count": 25,
+    "last_session": "2025-11-10T04:35:54Z",
     "domains": {
       "main": {
         "status": "active",
@@ -42,7 +42,8 @@
           "Implement rule-based quality assessment heuristics (not ML-based) per R2.1 research.",
           "Adaptive Qdrant hnsw_ef tiers (96/108/120) based on top_k for latency optimization.",
           "Three-pillar quality assessment framework: Linguistic Uncertainty, Answer Integrity, Source Provenance.",
-          "Onboarding workflow operates in trusted single-user mode; authentication deferred indefinitely (no device flow or CLI mandate)."
+          "Onboarding workflow operates in trusted single-user mode; authentication deferred indefinitely (no device flow or CLI mandate).",
+          "Cloudflare vanity (namozine.com / api.namozine.com) now fronts the Railway UI/API with Full (Strict) TLS; env templates pin NEXT_PUBLIC_API_BASE_URL=https://api.namozine.com/api/v1 and CORS_ALLOWED_ORIGINS_PROD includes https://namozine.com + https://www.namozine.com."
         ],
         "files_created": [
           "cmos/missions/sprint-01/B1.1_Core-Service-Bootstrap.yaml",
@@ -250,9 +251,30 @@
         "summary": "Standalone Railway frontend is live",
         "action": "complete",
         "ts": "2025-11-09T23:48:47Z"
+      },
+      {
+        "mission": "B5.2",
+        "agent": "",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-10T00:00:23Z"
+      },
+      {
+        "mission": "B5.2",
+        "agent": "codex",
+        "summary": "JWT auth + CORS hardening delivered",
+        "action": "complete",
+        "ts": "2025-11-10T00:20:47Z"
+      },
+      {
+        "mission": "B5.3",
+        "agent": "codex",
+        "summary": "Starting Domain Wiring & Telemetry Validation",
+        "action": "start",
+        "ts": "2025-11-10T04:35:54Z"
       }
     ],
-    "active_mission": null,
+    "active_mission": "B5.3",
     "blocked_missions": [
       {
         "item": "Monitoring API telemetry",
@@ -262,7 +284,7 @@
         "ts": "2025-11-09T01:54:56.075694Z"
       }
     ],
-    "last_completed_mission": "B5.1"
+    "last_completed_mission": "B5.2"
   },
   "technical_context": {
     "dependencies": [
@@ -306,10 +328,10 @@
     "anti_pattern_detection": true,
     "compression_enabled": true,
     "last_reset": "",
-    "sessions_since_reset": 22,
-    "size_kb": 17.47,
+    "sessions_since_reset": 25,
+    "size_kb": 17.84,
     "size_limit_kb": 100,
-    "last_update": "2025-11-09T23:48:47Z"
+    "last_update": "2025-11-10T04:35:54Z"
   },
   "ai_instructions": {
     "preferred_language": "yaml",
@@ -355,9 +377,6 @@
     "open_questions": [
       "Confirm whether API will live on api.<domain> or be proxied through the UI.",
       "Decide on storage for Railway JWT secrets (env panel vs secret manager)."
-    ],
-    "when_we_resume": [
-      "Pick up B5.2"
     ]
   },
   "metadata": {
