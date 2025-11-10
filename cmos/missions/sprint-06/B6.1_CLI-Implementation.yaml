@@ -61,4 +61,22 @@ domainFields:
       - "Backend API endpoints operational (B5.2 auth complete)."
     nextMission: "B6.2: Document Library UI"
     blockers: []
+    
+  agentNotes: |
+    ⚠️ EXISTING WORK: CLI code already implemented in cli/ directory with complete command structure.
+    
+    Your task:
+    1. VERIFY functionality: Test all commands (auth, projects, documents, search, rag, missions, config)
+    2. FIX issues: Check for bugs, missing features, error handling
+    3. TEST: Run pytest cli/tests/ and add missing tests
+    4. DOCUMENT: Ensure docs/cli_usage.md is complete with examples
+    
+    DO NOT rebuild from scratch. Code is in:
+    - cli/main.py (entry point)
+    - cli/commands/*.py (all command groups)
+    - cli/utils/*.py (auth, api, config, errors, output)
+    - setup.py (pip installation)
+    - requirements.txt (updated with click, rich, httpx)
+    
+    Test with: python cli/main.py --help
 

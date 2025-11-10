@@ -62,4 +62,23 @@ domainFields:
       - "Auth working (B5.2)."
     nextMission: "B6.3: RAG Search UI"
     blockers: []
+    
+  agentNotes: |
+    ⚠️ EXISTING WORK: Document UI pages already implemented in frontend.
+    
+    Your task:
+    1. VERIFY functionality: Test upload, list, detail pages
+    2. FIX TypeScript errors: Run npm run type-check and fix issues
+    3. TEST rendering: Ensure pages load and work with auth
+    4. POLISH: Fix any UI bugs, improve UX if needed
+    
+    DO NOT rebuild from scratch. Code is in:
+    - frontend/src/pages/documents/index.tsx (list page)
+    - frontend/src/pages/documents/upload.tsx (upload with drag-drop)
+    - frontend/src/pages/documents/[id].tsx (detail page)
+    - frontend/src/lib/api/documents.ts (API client)
+    - frontend/src/types/document.ts (type definitions)
+    - frontend/src/components/Navigation.tsx (nav with Documents link)
+    
+    Test with: npm run dev, visit /documents
 
