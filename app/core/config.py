@@ -1,6 +1,8 @@
 """Application configuration and settings management."""
+from typing import List, Optional
+
+from pydantic import Field
 from pydantic_settings import BaseSettings
-from typing import Optional
 
 
 class Settings(BaseSettings):
@@ -44,12 +46,31 @@ class Settings(BaseSettings):
     # API
     api_v1_prefix: str = "/api/v1"
     
-    # Security
-    secret_key: Optional[str] = None
-    
+    # Security & authentication
+    secret_key: str = "change-me"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60
+    auth_username: str = "tracelab-admin"
+    auth_password: Optional[str] = "changeme"
+    auth_password_hash: Optional[str] = None
+    cors_allowed_origins_dev: List[str] = Field(default_factory=lambda: ["http://localhost:3000"])
+    cors_allowed_origins_prod: List[str] = Field(default_factory=list)
+    cors_allowed_methods: List[str] = Field(
+        default_factory=lambda: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+    )
+    cors_allowed_headers: List[str] = Field(default_factory=lambda: ["Authorization", "Content-Type"])
+    cors_allow_credentials: bool = True
+
     class Config:
         env_file = ".env"
         case_sensitive = False
+
+    @property
+    def cors_origins(self) -> List[str]:
+        """Return CORS origins based on deployment environment."""
+        if self.environment.lower() in {"production", "prod"}:
+            return self.cors_allowed_origins_prod or []
+        return self.cors_allowed_origins_dev or []
 
 
 settings = Settings()

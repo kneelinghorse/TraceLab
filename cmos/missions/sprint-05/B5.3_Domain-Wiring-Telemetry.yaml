@@ -1,0 +1,68 @@
+# Mission File: B5.3_Domain-Wiring-Telemetry.yaml
+
+missionId: "B5.3"
+
+objective: "Wire Cloudflare DNS + SSL to the hosted UI/API, finalize environment variables, and capture telemetry showing the production path is validated end-to-end."
+
+context: |
+  With the UI hosted (B5.1) and auth/CORS hardened (B5.2), we need to finish the production runway.
+  `docs/auth_and_cors_guidance.md` (Next Steps, lines 78-82) calls for updating `app/main.py`,
+  implementing auth, and aligning the frontend. This mission focuses on the external pieces: DNS
+  entries (Cloudflare -> Railway), environment propagation, parity validation, and telemetry.
+  References:
+  - `docs/implementation_guide.md` (Railway deployment + packaging guidance, lines 1018-1088)
+  - `docs/frontend_deployment_decisions.md` (runtime expectations, lines 6-16)
+  - Cloudflare account/DNS settings (documented outcomes only; no secrets in repo).
+
+successCriteria:
+  - "Cloudflare CNAMEs (root + www) point to the Railway frontend domain with SSL/TLS mode documented; API subdomain mapped to FastAPI service or proxied path."
+  - "`NEXT_PUBLIC_API_BASE_URL`, FastAPI allowed origins, and any CDN cache rules updated to match the production domains; values captured in docs or env templates."
+  - "`python cmos/scripts/validate_parity.py --check` plus relevant pytest/Playwright smoke tests executed against production endpoints; results logged in telemetry."
+  - "Mission runtime + docs updated with DNS checklist, troubleshooting steps, and rollback guidance."
+  - "Session events/telemetry confirm the public URL serves `/missions`, completes login, and reaches `/api/v1/missions`."
+
+deliverables:
+  - "DNS change log + Cloudflare config summary (placed in docs or sprint README)."
+  - "Updated env templates (.env, .env.production.local) reflecting production domains."
+  - "Telemetry artifacts (validate_parity output, Playwright smoke run, mission runtime note)."
+  - "README/docs additions describing the production URL + health checks."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Next steps after auth guidance include updating `app/main.py` and coordinating frontend changes."
+      sourceMission: "docs/auth_and_cors_guidance.md:78-82"
+    - finding: "Railway deployment guide enumerates required validation + packaging steps."
+      sourceMission: "docs/implementation_guide.md:1018-1088"
+    - finding: "Frontend runtime decision requires Node.js server mode with env-driven API URL."
+      sourceMission: "docs/frontend_deployment_decisions.md:6-16"
+
+  implementationScope:
+    coreDeliverable: "Production DNS + telemetry proof ensuring hosted UI/API path is operational."
+    outOfScope:
+      - "UI feature changes (handled elsewhere)."
+      - "Auth implementation (B5.2)."
+      - "Railway service creation (B5.1)."
+      - "Long-term observability stack beyond telemetry events."
+
+  validationProtocol:
+    - validator: "Cloudflare DNS check"
+      focus: "CNAME/SSL configuration recorded."
+    - validator: "validate_parity.py"
+      focus: "Ensure DB↔file parity post-migration."
+    - validator: "Playwright smoke vs production URL"
+      focus: "Login + `/missions` load succeed via hosted domain."
+
+  handoffContext:
+    completed:
+      - "DNS + SSL mapping documented."
+      - "Env templates + settings files updated."
+      - "Telemetry + parity reports stored."
+    interfaces:
+      - "Public URL: https://<vanity-domain>"
+      - "API URL: https://api.<vanity-domain>/api/v1"
+    assumptions:
+      - "Cloudflare + Railway access available to operator; secrets not checked into repo."
+    nextMission: null
+    blockers: []

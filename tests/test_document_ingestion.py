@@ -215,7 +215,7 @@ def test_ingestion_pipeline_handles_all_formats(format_name: str, builder, db_se
 
 
 @pytest.mark.asyncio
-async def test_upload_and_process_endpoints_record_statuses(db_session, project, tmp_path, monkeypatch):
+async def test_upload_and_process_endpoints_record_statuses(db_session, project, tmp_path, monkeypatch, auth_headers):
     """Verify FastAPI endpoints create audit events and trigger the ingestion pipeline."""
 
     stub_service = DocumentIngestionService(
@@ -238,7 +238,7 @@ async def test_upload_and_process_endpoints_record_statuses(db_session, project,
 
     try:
         transport = ASGITransport(app=app)
-        async with AsyncClient(transport=transport, base_url="http://test") as client:
+        async with AsyncClient(transport=transport, base_url="http://test", headers=auth_headers) as client:
             upload_response = await client.post(
                 "{prefix}/documents/upload".format(prefix=documents_api.settings.api_v1_prefix),
                 params={"project_id": str(project.id)},

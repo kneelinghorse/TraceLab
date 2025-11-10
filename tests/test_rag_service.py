@@ -490,7 +490,7 @@ class _FakeRagService:
         }
 
 
-def test_rag_search_endpoint(monkeypatch):
+def test_rag_search_endpoint(monkeypatch, auth_headers):
     fake_service = _FakeRagService()
     monkeypatch.setattr(
         search_router, "get_rag_service", lambda: fake_service
@@ -506,6 +506,7 @@ def test_rag_search_endpoint(monkeypatch):
             "temperature": 0.25,
             "max_tokens": 256,
         },
+        headers=auth_headers,
     )
 
     assert response.status_code == 200

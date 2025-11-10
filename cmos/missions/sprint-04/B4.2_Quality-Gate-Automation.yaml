@@ -1,0 +1,82 @@
+# Mission File: B4.2_Quality-Gate-Automation.yaml
+
+missionId: "B4.2"
+
+objective: "Automate bias detection, enhance traceability validation, and implement methodology rigor checks beyond basic quality gates from Sprint 03."
+
+context: |
+  Implements Roadmap Week 13: Quality Gate Automation (Phase 4).
+  Builds on B3.3 quality gates with advanced automated checks.
+  Technical architecture provides implementation patterns (lines 560-720).
+  Uses rule-based checks for performance and deterministic results.
+
+successCriteria:
+  - "Bias detection service identifies leading questions and demographic imbalance."
+  - "Enhanced traceability validator checks for broken links and low relevance scores."
+  - "Methodology rigor checker validates participant counts and required metadata."
+  - "Synthesis quality analyzer ensures depth and actionable recommendations."
+  - "Quality check results stored in audit trail (quality_checks table)."
+  - "Automated quality checks API endpoints operational (/api/v1/quality/automated)."
+  - "Quality checks run automatically on mission update events."
+  - "All quality checkers have unit tests with >80% coverage."
+
+deliverables:
+  - "Bias detection service: app/services/bias_detection.py with pattern matching."
+  - "Enhanced traceability: app/services/traceability_validator.py with link validation."
+  - "Methodology rigor: app/services/methodology_rigor.py with requirement checks."
+  - "Synthesis analyzer: app/services/synthesis_analyzer.py with depth checks."
+  - "Quality audit trail: Database migration for quality_checks table."
+  - "Automated quality API: app/api/v1/quality_automated.py endpoints."
+  - "Background job: Async quality check runner on mission updates."
+  - "Unit tests: tests/test_bias_detection.py, tests/test_traceability_validator.py, etc."
+  - "Integration tests: tests/integration/test_quality_automation.py."
+  - "Documentation: docs/quality_automation.md with check descriptions."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Bias detection patterns: leading questions, demographic imbalance checks."
+      sourceMission: "cmos/foundational-docs/technical_architecture.md"
+    - finding: "Traceability validation rules: source links, relevance scores, broken links."
+      sourceMission: "cmos/foundational-docs/technical_architecture.md"
+    - finding: "Rule-based checks for performance (not ML-based)."
+      sourceMission: "cmos/foundational-docs/roadmap.md"
+    - finding: "B3.3 quality gates provide foundation (research, evidence, contradictions, synthesis, traceability)."
+      sourceMission: "cmos/missions/sprint-03/B3.3_Quality-Gates.yaml"
+
+  implementationScope:
+    coreDeliverable: "Automated quality check system with bias detection, enhanced traceability, rigor checks, and synthesis analysis."
+    outOfScope:
+      - "ML-based quality assessment (rule-based only)."
+      - "Natural language processing for deep analysis (defer to future)."
+      - "Multi-language bias detection (English only)."
+      - "Real-time quality check UI (batch processing only)."
+      - "Quality check scheduling (on-demand and event-driven only)."
+
+  validationProtocol:
+    - validator: "Unit Tests"
+      focus: "Each quality checker service with pass/fail scenarios."
+    - validator: "Integration Tests"
+      focus: "End-to-end quality check workflow on mission updates."
+    - validator: "Performance Tests"
+      focus: "Quality checks complete within acceptable time (<5 seconds per mission)."
+
+  handoffContext:
+    completed:
+      - "Bias detection service operational with pattern matching."
+      - "Enhanced traceability validator checks links and relevance."
+      - "Methodology rigor checker validates requirements."
+      - "Synthesis analyzer ensures depth and recommendations."
+      - "Quality checks run automatically on mission updates."
+    interfaces:
+      - "Quality automation API: POST /api/v1/quality/automated/run."
+      - "Audit trail query: GET /api/v1/quality/automated/history/:mission_id."
+      - "Services: BiasDetector, TraceabilityValidator, MethodologyRigor, SynthesisAnalyzer."
+    assumptions:
+      - "B3.3 quality gates operational from Sprint 03."
+      - "Mission Protocol models support quality_checks relationship."
+      - "PostgreSQL quality_checks table exists or migration provided."
+    nextMission: "B4.3: Performance Optimization - Query caching and cost monitoring"
+    blockers: []
+

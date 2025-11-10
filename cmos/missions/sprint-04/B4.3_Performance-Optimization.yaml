@@ -1,0 +1,80 @@
+# Mission File: B4.3_Performance-Optimization.yaml
+
+missionId: "B4.3"
+
+objective: "Optimize query performance, implement cost monitoring, and ensure system handles target load while staying within budget."
+
+context: |
+  Implements Roadmap Week 14: Performance Optimization (Phase 4).
+  Current state: RAG query latency ~2-5s, cost per query $0.000230 (Sprint 02).
+  Target: <2s P95 latency, $80-105/month total API costs, 100 concurrent queries.
+  Qdrant already optimized (9.6ms latency from Sprint 01).
+
+successCriteria:
+  - "Query latency <2 seconds (P95) for RAG queries."
+  - "Cost monitoring operational: dashboard tracks OpenAI API usage with daily/monthly totals."
+  - "Cost per query baseline maintained or improved (≤$0.000230 from Sprint 02)."
+  - "System handles 100 concurrent queries without degradation."
+  - "Query result caching operational (in-memory or Redis)."
+  - "Database query optimization measurable (before/after metrics)."
+  - "Performance profiling identifies bottlenecks with actionable recommendations."
+  - "Load testing suite validates concurrent query handling."
+
+deliverables:
+  - "Query caching service: app/services/query_cache.py (in-memory first, Redis-ready)."
+  - "Database optimization: Index analysis and N+1 query fixes."
+  - "Qdrant tuning: hnsw_ef parameter optimization for query patterns."
+  - "Cost monitoring: app/services/cost_monitor.py with OpenAI usage tracking."
+  - "Cost dashboard: API endpoint /api/v1/monitoring/costs."
+  - "Performance profiling: cProfile or py-spy results with optimization report."
+  - "Load testing suite: tests/performance/test_load.py with pytest-benchmark."
+  - "Optimization report: cmos/reports/sprint-04/performance-optimization.md."
+  - "Telemetry: Performance metrics logged to sprint-04-performance.jsonl."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Query latency target: <2 seconds P95 per roadmap."
+      sourceMission: "cmos/foundational-docs/roadmap.md"
+    - finding: "API cost target: $80-105/month for 500K chunks, 500 queries/month."
+      sourceMission: "cmos/foundational-docs/roadmap.md"
+    - finding: "Current performance: $0.000230 per query from Sprint 02."
+      sourceMission: "cmos/reports/sprint-02/sprint-02-summary.md"
+    - finding: "Qdrant already optimized: 9.6ms latency from Sprint 01."
+      sourceMission: "cmos/reports/sprint-01/sprint-01-summary.md"
+
+  implementationScope:
+    coreDeliverable: "Performance optimization with caching, DB tuning, cost monitoring, and load testing validation."
+    outOfScope:
+      - "Redis deployment (start with in-memory, add Redis if needed)."
+      - "CDN integration (backend-only optimizations)."
+      - "Horizontal scaling (single instance optimization)."
+      - "Advanced profiling tools (Locust, New Relic - use pytest-benchmark)."
+      - "Database migration to PostgreSQL 16+ (current version adequate)."
+
+  validationProtocol:
+    - validator: "Performance Tests"
+      focus: "Query latency <2s P95, before/after comparison."
+    - validator: "Load Tests"
+      focus: "100 concurrent queries handled without degradation."
+    - validator: "Cost Monitoring"
+      focus: "OpenAI API usage tracked accurately, alerts functional."
+
+  handoffContext:
+    completed:
+      - "Query caching reduces latency for repeated queries."
+      - "Database queries optimized with indexes and N+1 fixes."
+      - "Cost monitoring dashboard tracks API usage."
+      - "Load testing validates concurrent query handling."
+    interfaces:
+      - "Cache service: QueryCache with get/set/invalidate methods."
+      - "Cost monitor: CostMonitor with track_usage and get_daily_costs methods."
+      - "Monitoring API: GET /api/v1/monitoring/costs, /api/v1/monitoring/performance."
+    assumptions:
+      - "Sprint 02 RAG pipeline operational (B2.1-B2.4 completed)."
+      - "PostgreSQL database tunable with indexes."
+      - "OpenAI API usage trackable via response headers or logging."
+    nextMission: "B4.4: Testing & Documentation Consolidation - >80% coverage target"
+    blockers: []
+

@@ -19,8 +19,9 @@ from app.services.quality_checks import QualityAutomationRunner
 
 
 @pytest.fixture
-def client():
+def client(auth_headers):
     with TestClient(app) as test_client:
+        test_client.headers.update(auth_headers)
         yield test_client
 
 

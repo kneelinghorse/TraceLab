@@ -1,0 +1,66 @@
+# Mission File: B5.1_Railway-Frontend-Service.yaml
+
+missionId: "B5.1"
+
+objective: "Deploy the Mission Protocol Next.js workspace as a standalone Railway service with documented build/start commands and smoke-tested connectivity to the FastAPI backend."
+
+context: |
+  Guided by `docs/frontend_deployment_decisions.md` (Node.js server mode, lines 6-16) and
+  `docs/frontend_architecture.md` (UI routes + data flow, lines 3-70). Deployment expectations are
+  defined in `docs/implementation_guide.md` (Railway config, lines 1018-1088). FastAPI already ships
+  under the existing Railway service; this mission adds a dedicated UI service with the correct env
+  vars (`NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_DEFAULT_PROJECT_ID`) and a written runbook that future
+  agents can follow without re-discovery.
+
+successCriteria:
+  - "Railway service created for `frontend/` with explicit build (`npm install && npm run build`) and start (`npm run start -- --hostname 0.0.0.0 --port $PORT`) commands captured in config."
+  - "Environment variables (`NEXT_PUBLIC_API_BASE_URL`, `NEXT_PUBLIC_DEFAULT_PROJECT_ID`, optional telemetry toggles) stored in Railway and mirrored in docs for future rotations."
+  - "Deployment logs show successful build + start, and `/missions` responds over HTTPS via the Railway-provided domain referencing the backend API."
+  - "Smoke test + telemetry event recorded (e.g., curl screenshot or Playwright snippet) and linked in mission notes."
+  - "Runbook updates committed (README + docs/frontend_deployment_decisions.md) outlining redeploy steps, env expectations, and rollback plan."
+
+deliverables:
+  - "Railway service definition (either `railway.frontend.json` or documented dashboard settings)."
+  - "Env var checklist + `.env.production.example` updates for UI build parity."
+  - "Updated docs/readme describing hosted vs local UX and deployment flow."
+  - "Telemetry artifact proving deployment + smoke test." 
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Next.js UI must run in Node.js server mode due to SWR polling + API dependencies."
+      sourceMission: "docs/frontend_deployment_decisions.md:6-16"
+    - finding: "Frontend architecture + data flow defined in Sprint 03 docs; reuse existing structure."
+      sourceMission: "docs/frontend_architecture.md:3-70"
+    - finding: "Railway build/start expectations captured in implementation guide (lines 1018-1088)."
+      sourceMission: "docs/implementation_guide.md:1018-1088"
+
+  implementationScope:
+    coreDeliverable: "Hosted Next.js service on Railway with documented build pipeline + env var guidance."
+    outOfScope:
+      - "FastAPI release engineering (handled by existing service)."
+      - "Auth/CORS changes (B5.2)."
+      - "Cloudflare DNS cutover (B5.3)."
+      - "UI feature work unrelated to deployment."
+
+  validationProtocol:
+    - validator: "npm run build && npm run start"
+      focus: "Ensure production bundle compiles and serves over $PORT."
+    - validator: "Playwright or curl smoke"
+      focus: "Confirm `/missions` renders data via hosted API."
+    - validator: "Telemetry event"
+      focus: "Record deployment log + status in `cmos/telemetry/events/`."
+
+  handoffContext:
+    completed:
+      - "Railway UI service URL + env var settings documented."
+      - "Deployment runbook added to docs."
+      - "Smoke test + telemetry artifacts stored."
+    interfaces:
+      - "NEXT_PUBLIC_API_BASE_URL -> https://<api-domain>/api/v1"
+      - "Service start command -> npm run start -- --hostname 0.0.0.0 --port $PORT"
+    assumptions:
+      - "FastAPI backend remains reachable under current Railway project."
+    nextMission: "B5.2: FastAPI Auth & CORS Hardening"
+    blockers: []

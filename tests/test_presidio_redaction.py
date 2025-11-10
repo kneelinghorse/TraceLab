@@ -160,7 +160,7 @@ def test_redact_document_uses_pseudonymization_and_audit(dummy_redaction_service
 
 
 @pytest.mark.asyncio
-async def test_redaction_endpoint(monkeypatch, dummy_redaction_service):
+async def test_redaction_endpoint(monkeypatch, dummy_redaction_service, auth_headers):
     """Validate API surface using the stubbed redaction service."""
     service, analyzer, anonymizer = dummy_redaction_service
     analyzer.set_results([])
@@ -180,6 +180,7 @@ async def test_redaction_endpoint(monkeypatch, dummy_redaction_service):
                 "metadata": {"doc_type": "brief"},
                 "use_pseudonymization": True,
             },
+            headers=auth_headers,
         )
 
     assert response.status_code == 200
