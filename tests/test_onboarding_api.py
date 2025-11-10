@@ -32,13 +32,13 @@ def client():
         yield app_client
 
 
-def test_project_creation_is_idempotent(client: TestClient):
+def test_project_creation_is_idempotent(client: TestClient, auth_headers):
     """Ensure POST /projects caches responses via Idempotency-Key header."""
     payload = {
         "name": "Onboarding Test Project",
         "description": "Verifies idempotent project creation",
     }
-    headers = {"Idempotency-Key": "project-key-001"}
+    headers = {**auth_headers, "Idempotency-Key": "project-key-001"}
 
     first = client.post("/api/v1/projects", json=payload, headers=headers)
     assert first.status_code == 201
@@ -55,7 +55,7 @@ def test_project_creation_is_idempotent(client: TestClient):
     assert conflict.status_code == 409
 
 
-def test_document_registration_and_job_flow(client: TestClient, project, tmp_path, monkeypatch):
+def test_document_registration_and_job_flow(client: TestClient, project, tmp_path, monkeypatch, auth_headers):
     """Register document, enqueue ingestion job, and observe completion."""
     # Ensure ingestion service uses deterministic stubbed dependencies
     stub_service = DocumentIngestionService(
@@ -78,14 +78,14 @@ def test_document_registration_and_job_flow(client: TestClient, project, tmp_pat
         "mime_type": "text/markdown",
         "validation_status": "pending",
     }
-    doc_headers = {"Idempotency-Key": "document-key-001"}
+    doc_headers = {**auth_headers, "Idempotency-Key": "document-key-001"}
     document_response = client.post("/api/v1/documents", json=document_payload, headers=doc_headers)
     assert document_response.status_code == 201, document_response.json()
     document_data = document_response.json()
     document_id = document_data["id"]
     assert document_data["file_path"] == str(file_path)
 
-    job_headers = {"Idempotency-Key": "job-key-001"}
+    job_headers = {**auth_headers, "Idempotency-Key": "job-key-001"}
     job_response = client.post(f"/api/v1/jobs?document_id={document_id}", headers=job_headers)
     assert job_response.status_code == 202, job_response.json()
     job_data = job_response.json()
@@ -99,7 +99,7 @@ def test_document_registration_and_job_flow(client: TestClient, project, tmp_pat
 
     # Poll job endpoint for completion
     for _ in range(20):
-        status_response = client.get(f"/api/v1/jobs/{job_id}")
+        status_response = client.get(f"/api/v1/jobs/{job_id}", headers=auth_headers)
         status_payload = status_response.json()
         if status_payload["status"] == "COMPLETED":
             break

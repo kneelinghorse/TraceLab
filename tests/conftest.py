@@ -13,8 +13,11 @@ if str(REPO_ROOT) not in sys.path:
 
 os.environ.setdefault("DATABASE_URL", "sqlite:///./tests/test_ingestion.db")
 os.environ.setdefault("ENVIRONMENT", "test")
+os.environ.setdefault("AUTH_USERNAME", "tracelab-admin")
+os.environ.setdefault("AUTH_PASSWORD", "changeme")
 
 from app.core.database import Base, engine, SessionLocal
+from app.core.security import get_configured_credentials, issue_token_response
 from app.models.project import Project
 
 _COVERAGE_PATH = Path("cmos/reports/sprint-01/ingestion_format_coverage.json")
@@ -56,3 +59,11 @@ def project(db_session):
     db_session.commit()
     db_session.refresh(instance)
     return instance
+
+
+@pytest.fixture(scope="session")
+def auth_headers():
+    """Provide Authorization header for API tests."""
+    credentials = get_configured_credentials()
+    token = issue_token_response(credentials)["access_token"]
+    return {"Authorization": f"Bearer {token}"}

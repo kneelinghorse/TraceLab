@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 
+import { AuthGate } from "@/components/AuthGate";
 import { MissionProtocolForm } from "@/components/MissionProtocolForm";
 import { ProgressIndicator } from "@/components/ProgressIndicator";
 import { QualityGatePanel } from "@/components/QualityGatePanel";
 import { useMissionDetail, useQualityReport } from "@/lib/hooks/useMissions";
 
-export default function MissionDetailPage() {
+function MissionDetailContent() {
   const router = useRouter();
   const missionId = typeof router.query.id === "string" ? router.query.id : undefined;
 
@@ -74,5 +75,13 @@ export default function MissionDetailPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function MissionDetailPage() {
+  return (
+    <AuthGate>
+      <MissionDetailContent />
+    </AuthGate>
   );
 }

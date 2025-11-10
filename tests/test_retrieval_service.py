@@ -86,7 +86,7 @@ def test_retrieval_service_auto_hnsw(monkeypatch):
     assert results[0]["chunk_id"] == "chunk-1"
 
 
-def test_retrieval_api_endpoint(monkeypatch):
+def test_retrieval_api_endpoint(monkeypatch, auth_headers):
     fake_embedding = _FakeEmbeddingService()
     fake_qdrant = _FakeQdrantService()
     monkeypatch.setattr(
@@ -109,6 +109,7 @@ def test_retrieval_api_endpoint(monkeypatch):
             "source_type": "report",
             "hnsw_ef": 64,
         },
+        headers=auth_headers,
     )
 
     assert response.status_code == 200

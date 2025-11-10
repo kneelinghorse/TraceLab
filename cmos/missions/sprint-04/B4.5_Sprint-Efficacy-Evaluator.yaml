@@ -1,0 +1,74 @@
+# Mission File: B4.5_Sprint-Efficacy-Evaluator.yaml
+
+missionId: "B4.5"
+
+objective: "Evaluate Sprint 04 efficacy by measuring tech debt resolution, quality automation effectiveness, performance improvements, and test coverage achievements."
+
+context: |
+  Follows established sprint evaluation pattern from B1.6, B2.5, B3.5.
+  Sprint 04 focus: Tech debt (Cypress), Quality automation, Performance optimization, Testing consolidation.
+  Validates all Sprint 04 success criteria met and provides retrospective insights.
+
+successCriteria:
+  - "Tech debt resolution: Cypress removed, $0/month E2E testing cost verified."
+  - "Quality automation: Bias detection + traceability checks operational with test validation."
+  - "Performance optimization: Query latency <2s P95, API costs within $80-105/month budget."
+  - "Test coverage: >80% across Python codebase verified."
+  - "Load testing: 100 concurrent queries handled successfully."
+  - "Sprint evaluation report generated in cmos/reports/sprint-04/sprint-04-summary.md."
+  - "Telemetry data collected: Playwright migration, quality automation, performance, coverage."
+
+deliverables:
+  - "Sprint evaluation script: scripts/evaluate_sprint_04.py."
+  - "Telemetry sources:"
+  - "  - sprint-04-playwright-migration.jsonl (test migration metrics)"
+  - "  - sprint-04-quality-automation.jsonl (bias/traceability effectiveness)"
+  - "  - sprint-04-performance.jsonl (latency, cost, load test results)"
+  - "  - sprint-04-test-coverage.jsonl (coverage metrics by module)"
+  - "Sprint 04 summary: cmos/reports/sprint-04/sprint-04-summary.md."
+  - "Metrics JSON: cmos/reports/sprint-04/metrics.json with structured data."
+  - "Regression tests: tests/sprint_04/ for evaluator coverage."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Sprint evaluation pattern established in B1.6, B2.5, B3.5."
+      sourceMission: "cmos/missions/sprint-01/B1.6_Sprint-Efficacy-Evaluator.yaml"
+    - finding: "Sprint 04 success criteria: 7 metrics (tech debt, quality, performance, coverage, load, report)."
+      sourceMission: "cmos/reports/sprint-04/SPRINT-04-PLANNING.md"
+    - finding: "Telemetry structure: JSONL events per metric category."
+      sourceMission: "cmos/reports/sprint-03/sprint-03-summary.md"
+
+  implementationScope:
+    coreDeliverable: "Complete Sprint 04 evaluation with tech debt resolution, quality automation, performance, and coverage metrics."
+    outOfScope:
+      - "Cross-sprint trend analysis (single sprint evaluation only)."
+      - "Automated remediation of failed metrics (reporting only)."
+      - "User satisfaction surveys (no external users yet)."
+
+  validationProtocol:
+    - validator: "Metrics Verification"
+      focus: "All 7 Sprint 04 success criteria measured and reported."
+    - validator: "Telemetry Completeness"
+      focus: "Evaluation events logged with required fields."
+    - validator: "Report Quality"
+      focus: "Summary report contains actionable insights for Sprint 05 planning."
+
+  handoffContext:
+    completed:
+      - "Sprint 04 evaluation complete with all success criteria measured."
+      - "Tech debt resolution verified (Cypress removed, $840/year saved)."
+      - "Quality automation, performance, and coverage metrics collected."
+      - "Sprint 04 summary report generated with retrospective insights."
+    interfaces:
+      - "Evaluation script: python scripts/evaluate_sprint_04.py --generate-report."
+      - "Metrics API: access metrics via cmos/reports/sprint-04/metrics.json."
+      - "Telemetry query: grep/analyze cmos/telemetry/events/sprint-04-*.jsonl."
+    assumptions:
+      - "B4.1-B4.4 missions complete and stable."
+      - "Telemetry infrastructure accepts JSONL events."
+      - "Playwright migration measurable (Cypress removal verified)."
+    nextMission: "Sprint 04 Retrospective & Sprint 05 Planning"
+    blockers: []
+

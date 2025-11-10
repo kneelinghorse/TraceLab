@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 
+import { AuthGate } from "@/components/AuthGate";
 import { MissionProtocolForm } from "@/components/MissionProtocolForm";
 import { ProgressIndicator } from "@/components/ProgressIndicator";
 import { QualityGatePanel } from "@/components/QualityGatePanel";
@@ -16,7 +17,7 @@ const gateSummary = (mission?: Mission) => {
   return { failing, passing };
 };
 
-export default function MissionsPage() {
+function MissionsContent() {
   const { missions, isLoading, error, refresh } = useMissionList();
   const [mode, setMode] = useState<FormMode>("edit");
   const [selectedMissionId, setSelectedMissionId] = useState<string | undefined>(undefined);
@@ -147,5 +148,13 @@ export default function MissionsPage() {
         )}
       </section>
     </main>
+  );
+}
+
+export default function MissionsPage() {
+  return (
+    <AuthGate>
+      <MissionsContent />
+    </AuthGate>
   );
 }

@@ -76,6 +76,13 @@ Personal-scale research repository with RAG-powered semantic search, structured 
    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
    ```
 
+## Authentication & CORS
+
+- The FastAPI backend exposes `/api/v1/auth/login` and `/api/v1/auth/refresh` for JWT issuance. Configure credentials with `AUTH_USERNAME` plus either `AUTH_PASSWORD` (stored securely via passlib) or `AUTH_PASSWORD_HASH`.
+- Tokens are signed with `SECRET_KEY` and expire after `ACCESS_TOKEN_EXPIRE_MINUTES` (default: 60). Protected routes reject requests without the `Authorization: Bearer <token>` header.
+- Frontend clients (Next.js in `frontend/`) persist the token locally and automatically attach it to mission and quality API calls. Users must sign in before accessing `/missions` routes.
+- CORS settings are loaded from `CORS_ALLOWED_ORIGINS_DEV` and `CORS_ALLOWED_ORIGINS_PROD`, along with customizable headers/methods. See `docs/auth_and_cors_guidance.md` for deployment examples.
+
 ## Project Structure
 
 ```
@@ -166,7 +173,9 @@ Refer to `data/corpus/README.md` for detailed options (document counts, survey r
 - The application creates tables automatically in development mode
 - Use Alembic migrations for production deployments
 - Database connection settings are managed via environment variables
-- CORS is enabled for development (configure appropriately for production)
+- JWT authentication is enforced for every API route except `/api/v1/health`; obtain a token via `/api/v1/auth/login` and include it as a bearer token in the `Authorization` header.
+- Configure credentials with `AUTH_USERNAME` plus either `AUTH_PASSWORD` (auto-hashed at runtime) or `AUTH_PASSWORD_HASH`; override the signing key via `SECRET_KEY`.
+- Explicit CORS configuration is required—set `CORS_ALLOWED_ORIGINS_DEV` for localhost (default: `http://localhost:3000`) and `CORS_ALLOWED_ORIGINS_PROD` for deployed UI domains along with `CORS_ALLOWED_METHODS` / `CORS_ALLOWED_HEADERS` if you need to extend the defaults.
 
 ## Next Steps
 

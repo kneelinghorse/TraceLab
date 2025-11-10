@@ -1,0 +1,81 @@
+# Mission File: B4.4_Testing-Documentation-Consolidation.yaml
+
+missionId: "B4.4"
+
+objective: "Consolidate test coverage to >80%, fill gaps in critical paths, and ensure comprehensive documentation for maintainability."
+
+context: |
+  Implements Roadmap Week 16: Testing & Documentation (Phase 4).
+  Current coverage estimated ~60-70%. Target: >80% across Python codebase.
+  Comprehensive testing foundation enables future features and reduces regression risk.
+  Documentation consolidation improves onboarding and maintainability.
+
+successCriteria:
+  - "Test coverage >80% across Python codebase (app/, scripts/)."
+  - "PII redaction accuracy tests validate Presidio recall targets."
+  - "Embedding generation tests cover OpenAI API integration."
+  - "Mission Protocol validation tests expanded beyond basic scenarios."
+  - "RAG query pipeline has end-to-end integration tests."
+  - "Load testing suite operational with pytest-benchmark (100 concurrent queries)."
+  - "API documentation complete and accurate (OpenAPI/Swagger)."
+  - "User documentation covers all major workflows (getting started, Mission Protocol tutorial, best practices)."
+
+deliverables:
+  - "Test coverage audit: pytest-cov report identifying gaps."
+  - "PII tests: tests/test_presidio_advanced.py with recall validation."
+  - "Embedding tests: tests/test_embedding_generation.py with OpenAI mocking."
+  - "Mission Protocol tests: tests/test_mission_protocol_advanced.py with edge cases."
+  - "RAG integration tests: tests/integration/test_rag_pipeline.py end-to-end."
+  - "Load testing: tests/performance/test_concurrent_queries.py with pytest-benchmark."
+  - "API docs review: OpenAPI schema validation and completeness check."
+  - "User docs: docs/getting-started.md, docs/mission-protocol-tutorial.md, docs/best-practices.md."
+  - "Coverage report: cmos/reports/sprint-04/test-coverage-report.html."
+  - "Documentation index: docs/README.md with navigation."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Test coverage >80% target per roadmap Week 16."
+      sourceMission: "cmos/foundational-docs/roadmap.md"
+    - finding: "Comprehensive testing for PII, embeddings, Mission Protocol, RAG required."
+      sourceMission: "cmos/foundational-docs/roadmap.md"
+    - finding: "Load testing target: 500 concurrent queries, start with 100 for Sprint 04."
+      sourceMission: "cmos/foundational-docs/roadmap.md"
+    - finding: "FastAPI auto-generates OpenAPI docs, review for completeness."
+      sourceMission: "cmos/foundational-docs/roadmap.md"
+
+  implementationScope:
+    coreDeliverable: "Test coverage >80% with filled gaps, load testing operational, and comprehensive user documentation."
+    outOfScope:
+      - "Locust load testing (use pytest-benchmark for simplicity)."
+      - "Stress testing 1M+ vectors (defer to future sprint)."
+      - "Visual regression testing (not applicable for API-focused sprint)."
+      - "Multi-language documentation (English only)."
+      - "Video tutorials (written docs only)."
+
+  validationProtocol:
+    - validator: "Coverage Analysis"
+      focus: "pytest-cov reports >80% coverage across Python codebase."
+    - validator: "Load Tests"
+      focus: "100 concurrent queries handled without degradation."
+    - validator: "Documentation Review"
+      focus: "User documentation complete, accurate, and accessible."
+
+  handoffContext:
+    completed:
+      - "Test coverage >80% achieved with gaps filled."
+      - "Load testing suite validates concurrent query handling."
+      - "API documentation complete and accurate."
+      - "User documentation covers all major workflows."
+    interfaces:
+      - "Coverage report: pytest --cov=app --cov-report=html."
+      - "Load tests: pytest tests/performance/test_concurrent_queries.py."
+      - "API docs: /docs (FastAPI auto-generated)."
+    assumptions:
+      - "pytest already used for testing (from Sprints 01-03)."
+      - "OpenAI API mocking needed for embedding tests."
+      - "FastAPI OpenAPI schema available at /openapi.json."
+    nextMission: "B4.5: Sprint Efficacy Evaluator - Sprint 04 metrics assessment"
+    blockers: []
+

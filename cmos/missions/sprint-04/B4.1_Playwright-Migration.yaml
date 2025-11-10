@@ -1,0 +1,80 @@
+# Mission File: B4.1_Playwright-Migration.yaml
+
+missionId: "B4.1"
+
+objective: "Migrate E2E tests from Cypress to Playwright to eliminate $70/month cost and improve CI/CD integration for solo builder deployment."
+
+context: |
+  Resolves critical tech debt identified in Sprint 03 (TECH-DEBT-cypress-cost.md).
+  Cypress paid tier ($70/month, $840/year) is inappropriate for solo builder scale.
+  Playwright is truly free (no paid tiers), Microsoft-backed, and Next.js industry standard.
+
+successCriteria:
+  - "All existing E2E tests migrated from Cypress to Playwright syntax."
+  - "Playwright installed and configured for Next.js 14 in frontend/."
+  - "All migrated tests pass successfully with Playwright test runner."
+  - "Playwright trace viewer functional for debugging failed tests."
+  - "CI/CD configuration updated to run Playwright tests (GitHub Actions or Railway)."
+  - "Cypress dependencies removed from package.json (root and frontend)."
+  - "Cypress directories removed (frontend/cypress/ and root cypress/)."
+  - "Frontend documentation updated with Playwright usage instructions."
+  - "Zero monthly cost for E2E testing (vs $70/month with Cypress)."
+
+deliverables:
+  - "Playwright installation: @playwright/test in frontend/package.json."
+  - "Playwright config: frontend/playwright.config.ts with Next.js integration."
+  - "Migrated E2E tests: frontend/tests/e2e/*.spec.ts (converted from Cypress syntax)."
+  - "CI/CD config: Updated GitHub Actions or Railway config for Playwright."
+  - "Cleanup: Cypress removed from package.json, cypress/ directories deleted."
+  - "Documentation: frontend/README.md updated with Playwright commands."
+  - "Trace artifacts: .gitignore updated for test-results/ and playwright-report/."
+  - "Migration validation: All tests passing screenshot evidence."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Cypress Team Plan costs $70/month ($840/year), inappropriate for solo builder."
+      sourceMission: "cmos/reports/sprint-03/TECH-DEBT-cypress-cost.md"
+    - finding: "Playwright is completely free (all features, no paid tiers), Microsoft-backed."
+      sourceMission: "cmos/reports/sprint-03/TECH-DEBT-cypress-cost.md"
+    - finding: "Playwright better performance, CI/CD integration, and Next.js standard."
+      sourceMission: "cmos/reports/sprint-03/TECH-DEBT-cypress-cost.md"
+    - finding: "B3.4 implemented Cypress E2E tests for Mission Protocol UI flows."
+      sourceMission: "cmos/missions/sprint-03/B3.4_UI-Integration.yaml"
+
+  implementationScope:
+    coreDeliverable: "Complete E2E test migration from Cypress to Playwright with zero monthly cost."
+    outOfScope:
+      - "New E2E test creation (migrate existing only)."
+      - "Component testing migration (keep existing setup)."
+      - "Visual regression testing (defer to future sprint)."
+      - "Performance testing with Playwright (separate concern)."
+      - "Mobile browser testing (desktop only for MVP)."
+
+  validationProtocol:
+    - validator: "E2E Test Execution"
+      focus: "All migrated tests pass with Playwright test runner."
+    - validator: "Cost Validation"
+      focus: "Cypress dependencies removed, no paid tier required."
+    - validator: "CI/CD Integration"
+      focus: "Playwright tests run successfully in CI/CD pipeline."
+    - validator: "Trace Viewer"
+      focus: "Test failures generate trace files for debugging."
+
+  handoffContext:
+    completed:
+      - "E2E tests migrated from Cypress to Playwright syntax."
+      - "Cypress dependencies removed from package.json."
+      - "CI/CD running Playwright tests successfully."
+      - "Zero monthly cost for E2E testing achieved."
+    interfaces:
+      - "Playwright test runner: npm run test:e2e (in frontend/)."
+      - "Trace viewer: playwright show-trace <trace-file>."
+      - "Test files: frontend/tests/e2e/*.spec.ts."
+    assumptions:
+      - "Next.js 14 frontend exists from B3.4 (completed)."
+      - "Existing Cypress tests cover critical Mission Protocol flows."
+      - "CI/CD environment (GitHub Actions or Railway) supports Playwright."
+    nextMission: "B4.2: Quality Gate Automation - Bias detection and enhanced traceability"
+    blockers: []
