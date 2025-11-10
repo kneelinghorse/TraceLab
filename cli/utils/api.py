@@ -41,7 +41,7 @@ class APIClient:
 
         return headers
 
-    def _handle_response(self, response: httpx.Response) -> Dict[str, Any]:
+    def _handle_response(self, response: httpx.Response) -> Any:
         """Handle API response and errors."""
         try:
             response.raise_for_status()
@@ -79,37 +79,43 @@ class APIClient:
             else:
                 raise APIError(message=message, status_code=status_code)
 
-    def get(self, path: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def get(self, path: str, params: Optional[Dict[str, Any]] = None) -> Any:
         """Make GET request."""
         url = f"{self.base_url}{path}"
         with httpx.Client(timeout=self.timeout) as client:
             response = client.get(url, headers=self.headers, params=params)
             return self._handle_response(response)
 
-    def post(self, path: str, data: Optional[Dict[str, Any]] = None, files: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def post(
+        self,
+        path: str,
+        data: Optional[Dict[str, Any]] = None,
+        files: Optional[Dict[str, Any]] = None,
+        params: Optional[Dict[str, Any]] = None
+    ) -> Any:
         """Make POST request."""
         url = f"{self.base_url}{path}"
         with httpx.Client(timeout=self.timeout) as client:
             if files:
                 # For file uploads, don't set Content-Type (let httpx handle it)
                 headers = {k: v for k, v in self.headers.items() if k != "Content-Type"}
-                response = client.post(url, headers=headers, data=data, files=files)
+                response = client.post(url, headers=headers, data=data, files=files, params=params)
             else:
-                response = client.post(url, headers=self.headers, json=data)
+                response = client.post(url, headers=self.headers, json=data, params=params)
             return self._handle_response(response)
 
-    def put(self, path: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    def put(self, path: str, data: Dict[str, Any], params: Optional[Dict[str, Any]] = None) -> Any:
         """Make PUT request."""
         url = f"{self.base_url}{path}"
         with httpx.Client(timeout=self.timeout) as client:
-            response = client.put(url, headers=self.headers, json=data)
+            response = client.put(url, headers=self.headers, json=data, params=params)
             return self._handle_response(response)
 
-    def delete(self, path: str) -> Optional[Dict[str, Any]]:
+    def delete(self, path: str, params: Optional[Dict[str, Any]] = None) -> Optional[Any]:
         """Make DELETE request."""
         url = f"{self.base_url}{path}"
         with httpx.Client(timeout=self.timeout) as client:
-            response = client.delete(url, headers=self.headers)
+            response = client.delete(url, headers=self.headers, params=params)
             # DELETE may return 204 with no content
             if response.status_code == 204:
                 return None
@@ -153,4 +159,3 @@ class APIClient:
                     message=message,
                     details={"status_code": response.status_code}
                 )
-

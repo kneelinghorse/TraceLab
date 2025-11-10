@@ -2,6 +2,7 @@
 
 import json
 import sys
+from contextlib import contextmanager
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -136,17 +137,18 @@ class OutputFormatter:
         }
         print(json.dumps(output, indent=2), file=sys.stderr)
 
+    @contextmanager
     def progress_spinner(self, message: str):
-        """Create progress spinner context manager."""
+        """Context manager that renders a spinner with the provided message."""
         if self.json_mode or self.quiet:
-            # No-op context manager for JSON/quiet mode
-            from contextlib import nullcontext
-            return nullcontext()
+            yield None
+            return
 
-        return Progress(
+        with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
             console=self.console,
             transient=True
-        )
-
+        ) as progress:
+            progress.add_task(description=message, total=None)
+            yield progress

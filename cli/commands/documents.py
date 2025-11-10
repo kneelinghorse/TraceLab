@@ -29,14 +29,17 @@ def upload(ctx, project_id, file_path, process, wait):
         if not file_path.is_file():
             raise ValidationError(f"Not a file: {file_path}")
 
+        if wait and not process:
+            raise ValidationError("--wait option requires --process", field="wait")
+
         client = APIClient(base_url=ctx.api_url, token=ctx.token)
 
         # Upload document
         with ctx.output.progress_spinner(f"Uploading {file_path.name}..."):
             with open(file_path, "rb") as f:
                 files = {"file": (file_path.name, f)}
-                params = {"project_id": project_id}
-                document = client.post(f"/api/v1/documents/upload?project_id={project_id}", files=files)
+                form_fields = {"project_id": project_id}
+                document = client.post("/api/v1/documents/upload", data=form_fields, files=files)
 
         document_id = document["id"]
 
@@ -216,4 +219,3 @@ def delete(ctx, document_id, confirm):
         else:
             print(format_error_human(e), file=sys.stderr)
         sys.exit(e.exit_code)
-
