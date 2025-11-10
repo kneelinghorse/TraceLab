@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-09T23:49:28.007432+00:00'
+generatedAt: '2025-11-10T04:39:20.575843+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -349,7 +349,18 @@ domainFields:
         completed_at: '2025-11-09T23:48:47Z'
     - id: B5.2
       name: FastAPI Auth & CORS Hardening
-      status: Current
+      status: Completed
+      completed_at: '2025-11-10T00:20:47Z'
+      notes: 'JWT auth + CORS hardening shipped: added /api/v1/auth login+refresh
+        using passlib+jose, centralized security helpers, locked routers behind bearer
+        dependencies, and loaded explicit origins/methods from settings. Frontend
+        now gates missions behind AuthGate/LoginPanel, persists tokens, and routes
+        API calls through an auth-aware client. README + docs/auth_and_cors_guidance.md
+        cover the new env vars and flow. Tests: pytest tests/test_auth_api.py tests/test_onboarding_api.py::test_project_creation_is_idempotent
+        tests/test_onboarding_api.py::test_document_registration_and_job_flow tests/test_retrieval_service.py::test_retrieval_api_endpoint
+        tests/test_rag_service.py::test_rag_search_endpoint tests/test_presidio_redaction.py::test_redaction_endpoint
+        tests/integration/test_mission_api.py::test_create_and_export_mission tests/integration/test_quality_automation.py::test_quality_automation_api_run_and_history
+        tests/test_document_ingestion.py::test_upload_and_process_endpoints_record_statuses.'
       metadata:
         description: Implement JWT auth endpoints and lock down CORS/methods to the
           hosted UI domain per docs/auth_and_cors_guidance.md.
@@ -364,9 +375,11 @@ domainFields:
         - New auth routes, schemas, and settings toggles.
         - pytest coverage for login/refresh + CORS behavior.
         - Docs/README updates covering token handling + allowed origins.
+        started_at: '2025-11-10T00:00:23Z'
+        completed_at: '2025-11-10T00:20:47Z'
     - id: B5.3
       name: Domain Wiring & Telemetry Validation
-      status: Queued
+      status: In Progress
       metadata:
         description: Point Cloudflare DNS at the hosted UI/API, propagate env vars,
           and capture telemetry proving production parity.
@@ -381,6 +394,7 @@ domainFields:
         - DNS change log + doc updates describing production URL.
         - Telemetry artifacts (parity check, smoke test) committed.
         - Updated env templates / README pointing to public domains.
+        started_at: '2025-11-10T04:35:54Z'
   missionDependencies:
   - from: B1.1
     to: B1.2

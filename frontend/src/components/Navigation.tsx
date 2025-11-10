@@ -4,12 +4,19 @@
 
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function Navigation() {
   const router = useRouter();
+  const { user, logout } = useAuth();
 
   const isActive = (path: string) => {
     return router.pathname.startsWith(path);
+  };
+
+  const handleLogout = () => {
+    logout();
+    router.push("/");
   };
 
   return (
@@ -43,6 +50,20 @@ export function Navigation() {
               </Link>
             </div>
           </div>
+          
+          {user && (
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {user.username}
+              </span>
+              <button
+                onClick={handleLogout}
+                className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </nav>

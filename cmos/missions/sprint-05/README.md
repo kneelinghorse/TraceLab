@@ -25,6 +25,15 @@
 3. **B5.3 – Domain Wiring & Telemetry Validation**
    - Scope: Point Cloudflare DNS at the hosted frontend, expose an API subdomain, update env vars + docs, rerun parity/tests, and add telemetry/health checks proving the production path works end-to-end.
    - Dependencies: requires auth/CORS changes from B5.2.
+   - DNS results (2025-11-10):
+     | Hostname | Record | Target | Mode | Notes |
+     | --- | --- | --- | --- | --- |
+     | `namozine.com` | CNAME | `frontend-production-43c3.up.railway.app` | Proxied | `curl https://namozine.com/missions` → `HTTP/2 200`, `x-railway-edge` present |
+     | `www.namozine.com` | CNAME | `frontend-production-43c3.up.railway.app` | Proxied | Enable Always-Use-HTTPS redirect so `/missions` resolves identically to apex |
+     | `api.namozine.com` | CNAME | `tracelab-production.up.railway.app` | Proxied | `curl https://api.namozine.com/api/v1/health` → `{"status":"healthy"}` |
+   - TLS: Cloudflare universal cert (`issuer=Google Trust Services WE1`, `notBefore=2025-11-08`, `notAfter=2026-02-06`) with **Full (Strict)** mode to maintain encrypted hops between Cloudflare and Railway.
+   - Env templates updated (`frontend/.env.production.example`, `frontend/.env.production.local`) so `NEXT_PUBLIC_API_BASE_URL` defaults to `https://api.namozine.com/api/v1`; `.env` snippets in `docs/auth_and_cors_guidance.md` show the matching CORS origins (`https://namozine.com`, `https://www.namozine.com`).
+   - Telemetry: `cmos/telemetry/events/sprint-05-domain-wiring.jsonl` captures parity + smoke commands plus the Playwright production suite execution ID.
 
 ## Definition of Done
 - Hosted UI reachable at the Cloudflare vanity domain, serving `/missions` without console errors.

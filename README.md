@@ -83,6 +83,21 @@ Personal-scale research repository with RAG-powered semantic search, structured 
 - Frontend clients (Next.js in `frontend/`) persist the token locally and automatically attach it to mission and quality API calls. Users must sign in before accessing `/missions` routes.
 - CORS settings are loaded from `CORS_ALLOWED_ORIGINS_DEV` and `CORS_ALLOWED_ORIGINS_PROD`, along with customizable headers/methods. See `docs/auth_and_cors_guidance.md` for deployment examples.
 
+## Production URLs & Health Checks
+
+- **UI (Cloudflare vanity domain):** `https://namozine.com/missions` points to the Railway Next.js frontend (`frontend-production-43c3.up.railway.app`). Verify availability with `curl -sS -o /dev/null -w "%{http_code}\n" https://namozine.com/missions` (expect `200`).
+- **API domain:** `https://api.namozine.com/api/v1` proxies to the FastAPI service on Railway (`tracelab-production.up.railway.app`). Validate with `curl https://api.namozine.com/api/v1/health` (returns `{ "status": "healthy" }`).
+- **CORS origins:** Add both `https://namozine.com` and `https://www.namozine.com` to `CORS_ALLOWED_ORIGINS_PROD` in your `.env` when running the backend in production mode. Keep `Full (Strict)` TLS enabled within Cloudflare to preserve end-to-end encryption.
+- **Playwright smoke:** Run the production smoke suite from `frontend/` whenever DNS or env vars change:
+  ```bash
+  cd frontend
+  PLAYWRIGHT_BASE_URL=https://namozine.com \
+  PLAYWRIGHT_API_BASE_URL=https://api.namozine.com/api/v1 \
+  PLAYWRIGHT_SKIP_SERVER=1 \
+  npx playwright test tests/e2e/production-smoke.spec.ts
+  ```
+  The suite loads `/missions` through Cloudflare and pings the `/api/v1/health` endpoint to prove the path is wired correctly.
+
 ## Project Structure
 
 ```
