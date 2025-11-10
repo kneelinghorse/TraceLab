@@ -3,7 +3,8 @@
  */
 
 import type { Document, DocumentProcessResult, DocumentUploadResponse, Project } from "@/types/document";
-import { httpClient } from "./http";
+import { httpClient, API_BASE_URL } from "./http";
+import { getStoredAuth } from "@/lib/auth/storage";
 
 export const documentsApi = {
   /**
@@ -54,11 +55,12 @@ export const documentsApi = {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/documents/upload?project_id=${projectId}`, {
+    const auth = getStoredAuth();
+    const token = auth?.token ?? "";
+    const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+    const response = await fetch(`${API_BASE_URL}/api/v1/documents/upload?project_id=${projectId}`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("tracelab_token") || ""}`,
-      },
+      headers,
       body: formData,
     });
 
@@ -85,4 +87,3 @@ export const documentsApi = {
     await httpClient.delete(`/api/v1/documents/${documentId}`);
   },
 };
-
