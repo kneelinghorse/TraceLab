@@ -13,8 +13,8 @@
   },
   "working_memory": {
     "active_domain": "main",
-    "session_count": 25,
-    "last_session": "2025-11-10T04:35:54Z",
+    "session_count": 29,
+    "last_session": "2025-11-10T06:48:08Z",
     "domains": {
       "main": {
         "status": "active",
@@ -272,9 +272,37 @@
         "summary": "Starting Domain Wiring & Telemetry Validation",
         "action": "start",
         "ts": "2025-11-10T04:35:54Z"
+      },
+      {
+        "mission": "B5.3",
+        "agent": "codex",
+        "summary": "Cloudflare vanity paths + API wiring validated",
+        "action": "complete",
+        "ts": "2025-11-10T04:57:46Z"
+      },
+      {
+        "mission": "B5.3",
+        "agent": "codex",
+        "summary": "Domain wiring and telemetry validation complete",
+        "action": "complete",
+        "ts": "2025-11-10T05:49:28Z"
+      },
+      {
+        "mission": "B6.1",
+        "agent": "codex",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-10T06:27:29Z"
+      },
+      {
+        "mission": "B6.1",
+        "agent": "codex",
+        "summary": "CLI functionality verified",
+        "action": "complete",
+        "ts": "2025-11-10T06:48:08Z"
       }
     ],
-    "active_mission": "B5.3",
+    "active_mission": null,
     "blocked_missions": [
       {
         "item": "Monitoring API telemetry",
@@ -284,7 +312,7 @@
         "ts": "2025-11-09T01:54:56.075694Z"
       }
     ],
-    "last_completed_mission": "B5.2"
+    "last_completed_mission": "B6.1"
   },
   "technical_context": {
     "dependencies": [
@@ -328,10 +356,10 @@
     "anti_pattern_detection": true,
     "compression_enabled": true,
     "last_reset": "",
-    "sessions_since_reset": 25,
-    "size_kb": 17.84,
+    "sessions_since_reset": 29,
+    "size_kb": 18.69,
     "size_limit_kb": 100,
-    "last_update": "2025-11-10T04:35:54Z"
+    "last_update": "2025-11-10T06:48:08Z"
   },
   "ai_instructions": {
     "preferred_language": "yaml",
@@ -377,6 +405,9 @@
     "open_questions": [
       "Confirm whether API will live on api.<domain> or be proxied through the UI.",
       "Decide on storage for Railway JWT secrets (env panel vs secret manager)."
+    ],
+    "when_we_resume": [
+      "Pick up B6.2"
     ]
   },
   "metadata": {
