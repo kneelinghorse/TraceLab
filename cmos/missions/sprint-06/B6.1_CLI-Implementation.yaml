@@ -1,0 +1,64 @@
+# Mission File: B6.1_CLI-Implementation.yaml
+
+missionId: "B6.1"
+
+objective: "Build comprehensive agent-first CLI with Click framework providing complete CRUD operations for all TraceLab resources with token auth and JSON output modes."
+
+context: |
+  TraceLab backend APIs are functional but inaccessible without curl/Postman. Agents need a CLI for
+  automated workflows: bulk document upload, RAG queries, mission evidence collection, report generation.
+  B5.2 delivered JWT auth, so CLI must support token storage in ~/.tracelab/token and auto-include
+  bearer tokens. Design spec in docs/cli_architecture.md defines command structure, error handling,
+  and agent workflow patterns.
+
+successCriteria:
+  - "CLI executable as `tracelab` command with subgroups: auth, projects, documents, search, rag, missions, config."
+  - "Token-based auth: `tracelab auth login` stores JWT in ~/.tracelab/token (chmod 600); subsequent commands auto-include Authorization header."
+  - "JSON output mode: all commands support --json flag for agent parsing with consistent success/error format."
+  - "Complete CRUD: projects (list/get/create/update/delete), documents (upload/list/get/process/status/delete), missions (list/get/create/import/add-evidence/validate/export/delete)."
+  - "Search commands: semantic search and RAG query with configurable parameters (top-k, model selection)."
+  - "Exit codes: 0=success, 1=error, 2=validation, 3=auth, 4=not found, 5=permission denied."
+  - "Tests: unit tests for all command groups, integration tests against test API."
+
+deliverables:
+  - "cli/ directory with Click app: main.py, commands/, utils/ (auth, api, config, errors, output)."
+  - "setup.py for pip installable package (tracelab-cli)."
+  - "~/.tracelab/ config directory with token storage and config.json."
+  - "docs/cli_usage.md with command reference and agent workflow examples."
+  - "requirements.txt updated with click, rich, httpx dependencies."
+  - "Pytest suite for CLI commands in cli/tests/."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Agent workflows require deterministic JSON output, non-interactive auth, batch operations."
+      sourceMission: "docs/cli_architecture.md"
+    - finding: "Token storage pattern from existing scripts/ingest_cli.py can be extended."
+      sourceMission: "scripts/ingest_cli.py:96-118"
+
+  implementationScope:
+    coreDeliverable: "Agent-first CLI with complete CRUD access to all TraceLab resources."
+    outOfScope:
+      - "Interactive shell mode (defer to Sprint 07)."
+      - "Shell completion (bash/zsh) (defer to Sprint 07)."
+      - "Watch mode for document processing (defer to Sprint 07)."
+
+  validationProtocol:
+    - validator: "pytest cli/tests/"
+      focus: "Unit tests for all command groups, mock API responses."
+    - validator: "Manual CLI test"
+      focus: "tracelab --help, auth flow, document upload, search query."
+
+  handoffContext:
+    completed:
+      - "CLI functional with all CRUD operations."
+      - "Token auth working with ~/.tracelab/token storage."
+      - "JSON output mode for agent parsing."
+    interfaces:
+      - "tracelab <resource> <action> [args] [--json]"
+    assumptions:
+      - "Backend API endpoints operational (B5.2 auth complete)."
+    nextMission: "B6.2: Document Library UI"
+    blockers: []
+

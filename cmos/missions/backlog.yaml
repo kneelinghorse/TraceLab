@@ -379,7 +379,9 @@ domainFields:
         completed_at: '2025-11-10T00:20:47Z'
     - id: B5.3
       name: Domain Wiring & Telemetry Validation
-      status: In Progress
+      status: Completed
+      completed_at: '2025-11-10T05:49:28Z'
+      notes: 'Cloudflare DNS configured, Railway domains mapped, env vars set for production, validation and smoke tests executed.'
       metadata:
         description: Point Cloudflare DNS at the hosted UI/API, propagate env vars,
           and capture telemetry proving production parity.
@@ -395,6 +397,116 @@ domainFields:
         - Telemetry artifacts (parity check, smoke test) committed.
         - Updated env templates / README pointing to public domains.
         started_at: '2025-11-10T04:35:54Z'
+        completed_at: '2025-11-10T05:49:28Z'
+  - sprintId: sprint-06
+    title: Sprint 06 - CLI & Document Repository UI
+    focus: Complete functional TraceLab with agent-first CLI and document management UI
+    status: Planned
+    startDate: '2025-11-10'
+    endDate: '2025-11-20'
+    totalMissions: 6
+    completedMissions: 0
+    missions:
+    - id: B6.1
+      name: CLI Implementation
+      status: Current
+      metadata:
+        type: Build.Implementation.v1
+        description: Build comprehensive agent-first CLI with Click framework for all TraceLab operations.
+        successCriteria:
+        - CLI executable with auth, projects, documents, search, rag, missions, config commands.
+        - Token-based auth stores JWT in ~/.tracelab/token with auto-inclusion.
+        - JSON output mode for agent parsing with --json flag.
+        - Complete CRUD for all resources with exit codes 0-5.
+        deliverables:
+        - cli/ directory with Click app and command modules.
+        - setup.py for pip installation.
+        - docs/cli_usage.md with examples.
+        - Pytest suite for CLI.
+    - id: B6.2
+      name: Document Library UI
+      status: Queued
+      metadata:
+        type: Build.Implementation.v1
+        description: Build document management interface with upload, browse, and processing status.
+        successCriteria:
+        - Document list page with project/status filters.
+        - Upload page with drag-drop multi-file support.
+        - Detail page with processing pipeline visualization.
+        - Navigation component with logout.
+        deliverables:
+        - frontend/src/pages/documents/ pages.
+        - frontend/src/lib/api/documents.ts client.
+        - frontend/src/components/Navigation.tsx.
+    - id: B6.3
+      name: RAG Search UI
+      status: Queued
+      metadata:
+        type: Build.Implementation.v1
+        description: Build semantic search and RAG query interface with results and citations.
+        successCriteria:
+        - Search page with query input and filters.
+        - Semantic search results with scores and document links.
+        - RAG synthesis with numbered citations.
+        - Quick-add evidence to missions.
+        deliverables:
+        - frontend/src/pages/search/ pages.
+        - Search components and API client.
+    - id: B6.4
+      name: Mission UI Overhaul
+      status: Queued
+      metadata:
+        type: Build.Implementation.v1
+        description: Fix Mission Protocol UI readability and add evidence linking.
+        successCriteria:
+        - Readable theme with proper contrast and spacing.
+        - Evidence cards show source documents.
+        - Quality gate status visualization.
+        - Evidence quick-add from search.
+        deliverables:
+        - Updated missions pages for readability.
+        - EvidenceCard and QualityGateStatus components.
+    - id: B6.5
+      name: Report Export System
+      status: Queued
+      metadata:
+        type: Build.Implementation.v1
+        description: Export missions as formatted MD/PDF/DOCX reports with full traceability.
+        successCriteria:
+        - Backend export service supports MD, PDF, DOCX.
+        - Report structure includes research statement, evidence, synthesis, citations.
+        - CLI and UI export functional.
+        - Citations formatted with document attribution.
+        deliverables:
+        - app/services/report_export.py.
+        - Export endpoint and templates.
+        - CLI export command.
+    - id: B6.6
+      name: Integration API
+      status: Queued
+      metadata:
+        type: Build.Implementation.v1
+        description: Integration endpoints for external Mission Protocol MCP server.
+        successCriteria:
+        - Project lookup/create by name endpoint.
+        - Mission creation from YAML with auto project lookup.
+        - Status polling endpoint for external tools.
+        deliverables:
+        - app/api/v1/integration.py.
+        - docs/mission_protocol_integration.md.
+    - id: B6.7
+      name: Sprint Retrospective
+      status: Queued
+      metadata:
+        type: Build.Implementation.v1
+        description: Validate end-to-end workflows and generate Sprint 06 report.
+        successCriteria:
+        - Agent and human workflows tested end-to-end.
+        - Issues documented with severity and recommendations.
+        - Sprint retrospective report generated.
+        deliverables:
+        - cmos/reports/sprint-06/ reports.
+        - Sprint 07 backlog seeded.
   missionDependencies:
   - from: B1.1
     to: B1.2

@@ -1,0 +1,65 @@
+# Mission File: B6.2_Document-Library-UI.yaml
+
+missionId: "B6.2"
+
+objective: "Build document management interface in Next.js frontend with upload, browse, filtering, and processing status visualization."
+
+context: |
+  TraceLab has document upload/processing APIs but no UI. Users need to see their uploaded documents,
+  monitor processing status (uploaded -> parsed -> redacted -> chunked -> embedded), organize by
+  project/tags, and upload via drag-drop interface. Authentication from B5.2 protects these routes.
+  Document APIs exist in app/api/v1/documents.py with upload, process, list, get, delete endpoints.
+
+successCriteria:
+  - "Document list page at /documents shows all documents with filters (project, status) and processing indicators."
+  - "Upload page at /documents/upload provides drag-drop interface with multi-file support and auto-process option."
+  - "Detail page at /documents/[id] displays metadata, processing status, events timeline, and actions (process, delete)."
+  - "Navigation component added to _app.tsx with Documents and Missions links plus logout button."
+  - "All pages wrapped in AuthGate for authentication protection."
+  - "API client in frontend/src/lib/api/documents.ts handles all document CRUD operations."
+  - "Type definitions in frontend/src/types/document.ts for Document, Project, ProcessingEvent."
+
+deliverables:
+  - "frontend/src/pages/documents/index.tsx - Document list with filters."
+  - "frontend/src/pages/documents/upload.tsx - Multi-file upload with drag-drop."
+  - "frontend/src/pages/documents/[id].tsx - Document detail with status."
+  - "frontend/src/components/Navigation.tsx - Nav bar with links and logout."
+  - "frontend/src/lib/api/documents.ts - Documents API client."
+  - "frontend/src/types/document.ts - Type definitions."
+  - "Updated frontend/src/pages/_app.tsx to include Navigation."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Document upload API supports multipart form data with project_id parameter."
+      sourceMission: "app/api/v1/documents.py:49-154"
+    - finding: "Processing pipeline has distinct stages tracked in processing_events table."
+      sourceMission: "app/models/document.py"
+
+  implementationScope:
+    coreDeliverable: "Full document management UI for upload, browse, organize."
+    outOfScope:
+      - "Document preview/viewer (defer to Sprint 07)."
+      - "Batch operations UI (defer to Sprint 07)."
+      - "Tag management UI (defer to Sprint 07)."
+
+  validationProtocol:
+    - validator: "Manual UI test"
+      focus: "Upload document, view list, check processing status, delete document."
+    - validator: "TypeScript type-check"
+      focus: "npm run type-check passes."
+
+  handoffContext:
+    completed:
+      - "Document list/upload/detail pages functional."
+      - "Navigation integrated with auth."
+      - "Processing status visible."
+    interfaces:
+      - "Routes: /documents, /documents/upload, /documents/[id]"
+    assumptions:
+      - "Backend document APIs operational."
+      - "Auth working (B5.2)."
+    nextMission: "B6.3: RAG Search UI"
+    blockers: []
+

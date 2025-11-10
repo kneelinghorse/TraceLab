@@ -1,0 +1,65 @@
+# Mission File: B6.4_Mission-UI-Overhaul.yaml
+
+missionId: "B6.4"
+
+objective: "Fix Mission Protocol UI readability and functionality, add evidence linking from search results, and improve quality gate visualization."
+
+context: |
+  Existing Mission Protocol UI at /missions is dark, unreadable, and non-functional. Mission Protocol
+  backend is solid (Sprint 03) - structured research tracking, evidence linking to document chunks,
+  quality gates - but UI makes it unusable. Need to fix CSS/layout for readability, add evidence
+  linking workflow from search page, visualize quality gate status clearly, and add mission templates
+  for quick-start. This UI serves human users tracking research missions and agents collecting evidence.
+
+successCriteria:
+  - "Mission list and detail pages readable with proper contrast, spacing, and typography (light theme or readable dark theme)."
+  - "Evidence cards show source document name, chunk text preview, and relevance notes."
+  - "Evidence quick-add from search page: button adds chunk as evidence with optional note."
+  - "Quality gate status panel shows gate name, pass/fail status, and recommendations clearly."
+  - "Progress indicator shows completion percentage and missing required fields."
+  - "Synthesis editor with markdown preview for key insights section."
+  - "Mission templates available: pre-fill structure for common research types."
+
+deliverables:
+  - "Updated frontend/src/pages/missions/[id].tsx with readability fixes."
+  - "Updated frontend/src/pages/missions/index.tsx with better list view."
+  - "New frontend/src/components/EvidenceCard.tsx for evidence display."
+  - "New frontend/src/components/QualityGateStatus.tsx for gate visualization."
+  - "Updated CSS/Tailwind for readable theme."
+  - "Integration with search page for evidence quick-add."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Mission Protocol backend provides complete CRUD, quality gates, and evidence linking."
+      sourceMission: "app/api/v1/missions.py"
+    - finding: "Evidence linking uses insight_sources table to connect chunks to missions."
+      sourceMission: "app/models/mission_protocol.py"
+
+  implementationScope:
+    coreDeliverable: "Readable, functional Mission Protocol UI for research tracking."
+    outOfScope:
+      - "Mission collaboration features (defer to Sprint 07)."
+      - "Mission templates library (defer to Sprint 07)."
+      - "Advanced synthesis tools (defer to Sprint 07)."
+
+  validationProtocol:
+    - validator: "Manual UI test"
+      focus: "Create mission, add evidence from search, view quality gates, export."
+    - validator: "Visual review"
+      focus: "Readability and usability on light/dark themes."
+
+  handoffContext:
+    completed:
+      - "Mission UI readable and functional."
+      - "Evidence linking from search works."
+      - "Quality gates visible."
+    interfaces:
+      - "Routes: /missions, /missions/[id]"
+    assumptions:
+      - "Mission APIs operational (Sprint 03)."
+      - "Search UI complete (B6.3)."
+    nextMission: "B6.5: Report Export System"
+    blockers: []
+

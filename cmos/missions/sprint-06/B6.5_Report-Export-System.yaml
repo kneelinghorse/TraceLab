@@ -1,0 +1,66 @@
+# Mission File: B6.5_Report-Export-System.yaml
+
+missionId: "B6.5"
+
+objective: "Implement report generation system that exports missions as formatted Markdown, PDF, or DOCX reports with full traceability and citations."
+
+context: |
+  Mission Protocol currently exports as YAML (agent-to-agent format) but needs human-readable report
+  formats. When research mission completes, users/agents should generate comprehensive reports showing
+  research statement, evidence with citations, synthesis findings, and quality gate results. Output
+  formats: Markdown (clean, version-controllable), PDF (formatted via pandoc or reportlab), DOCX
+  (Word-compatible via python-docx). Reports must include full traceability: evidence chunks linked
+  to source documents with page/section references where available.
+
+successCriteria:
+  - "Backend export service in app/services/report_export.py supports MD, PDF, DOCX formats."
+  - "API endpoint GET /api/v1/missions/{id}/export?format=md|pdf|docx returns formatted report."
+  - "Report structure: Title, Research Statement, Key Questions (with answers), Evidence (with sources), Synthesis, Quality Gates, Appendix (full evidence text)."
+  - "Citations formatted with document names, chunk IDs, and relevance scores."
+  - "CLI command: tracelab missions export <id> --format md --output report.md."
+  - "UI export button on mission detail page with format selector."
+  - "Generated reports are well-formatted, readable, and include complete attribution."
+
+deliverables:
+  - "app/services/report_export.py - Report generation service."
+  - "app/templates/reports/ - Report templates for each format."
+  - "Updated app/api/v1/missions.py with export endpoint."
+  - "CLI command in cli/commands/missions.py."
+  - "UI export button in frontend/src/pages/missions/[id].tsx."
+  - "Dependencies: pandoc (for PDF) or reportlab, python-docx."
+  - "docs/report_export.md documenting format options and customization."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  researchFoundation:
+    - finding: "Mission Protocol data structure provides all elements for report generation."
+      sourceMission: "app/models/mission_protocol.py"
+    - finding: "Evidence links to document chunks via chunk_id references."
+      sourceMission: "app/models/document.py"
+
+  implementationScope:
+    coreDeliverable: "Multi-format report export with full traceability."
+    outOfScope:
+      - "Custom report templates (defer to Sprint 07)."
+      - "Batch report generation (defer to Sprint 07)."
+      - "Report scheduling/automation (defer to Sprint 07)."
+
+  validationProtocol:
+    - validator: "Export test"
+      focus: "Generate MD/PDF/DOCX, verify formatting, check citations."
+    - validator: "pytest tests/test_report_export.py"
+      focus: "Report generation logic, format handling."
+
+  handoffContext:
+    completed:
+      - "Report export working for all formats."
+      - "Citations traceable to source documents."
+      - "CLI and UI export functional."
+    interfaces:
+      - "GET /api/v1/missions/{id}/export?format=md|pdf|docx"
+    assumptions:
+      - "Missions have evidence and synthesis populated."
+    nextMission: "B6.6: Mission Protocol Integration API"
+    blockers: []
+
