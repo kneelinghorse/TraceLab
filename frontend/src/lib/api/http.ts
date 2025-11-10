@@ -6,17 +6,32 @@ type ApiRequestOptions = RequestInit & {
   skipAuth?: boolean;
 };
 
+type RequestParams = Record<string, string | number | boolean | undefined>;
+
+const buildUrl = (path: string, params?: RequestParams): string => {
+  if (!params || Object.keys(params).length === 0) {
+    return path;
+  }
+  const searchParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null) {
+      return;
+    }
+    searchParams.append(key, String(value));
+  });
+  const query = searchParams.toString();
+  return query ? `${path}?${query}` : path;
+};
+
 export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
   const { skipAuth = false, headers, ...rest } = options;
-  const resolvedHeaders: HeadersInit = {
-    "Content-Type": "application/json",
-    ...(headers ?? {}),
-  };
+  const resolvedHeaders = new Headers(headers ?? undefined);
+  resolvedHeaders.set("Content-Type", "application/json");
 
   if (!skipAuth) {
     const auth = getStoredAuth();
     if (auth?.token) {
-      resolvedHeaders.Authorization = `Bearer ${auth.token}`;
+      resolvedHeaders.set("Authorization", `Bearer ${auth.token}`);
     }
   }
 
@@ -47,3 +62,41 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
 
   return (await response.json()) as T;
 }
+
+type HttpClientRequestConfig = {
+  params?: RequestParams;
+  skipAuth?: boolean;
+  headers?: HeadersInit;
+};
+
+export const httpClient = {
+  get<T>(path: string, config: HttpClientRequestConfig = {}): Promise<T> {
+    const url = buildUrl(path, config.params);
+    return apiRequest<T>(url, { method: "GET", skipAuth: config.skipAuth, headers: config.headers });
+  },
+
+  post<T>(path: string, body?: unknown, config: HttpClientRequestConfig = {}): Promise<T> {
+    const url = buildUrl(path, config.params);
+    return apiRequest<T>(url, {
+      method: "POST",
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+      skipAuth: config.skipAuth,
+      headers: config.headers,
+    });
+  },
+
+  put<T>(path: string, body?: unknown, config: HttpClientRequestConfig = {}): Promise<T> {
+    const url = buildUrl(path, config.params);
+    return apiRequest<T>(url, {
+      method: "PUT",
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+      skipAuth: config.skipAuth,
+      headers: config.headers,
+    });
+  },
+
+  delete<T>(path: string, config: HttpClientRequestConfig = {}): Promise<T> {
+    const url = buildUrl(path, config.params);
+    return apiRequest<T>(url, { method: "DELETE", skipAuth: config.skipAuth, headers: config.headers });
+  },
+};
