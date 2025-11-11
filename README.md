@@ -76,6 +76,8 @@ Personal-scale research repository with RAG-powered semantic search, structured 
    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
    ```
 
+> Need the full local stack (Docker, scripts, frontend) in one place? See `docs/local-development.md`.
+
 ## Authentication & CORS
 
 - The FastAPI backend exposes `/api/v1/auth/login` and `/api/v1/auth/refresh` for JWT issuance. Configure credentials with `AUTH_USERNAME` plus either `AUTH_PASSWORD` (stored securely via passlib) or `AUTH_PASSWORD_HASH`.

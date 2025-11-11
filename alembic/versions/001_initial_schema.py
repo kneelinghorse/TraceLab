@@ -161,10 +161,19 @@ def upgrade() -> None:
         sa.Column('performed_at', sa.DateTime(), server_default=sa.func.now())
     )
     
+    # Metadata key-value store
+    op.create_table(
+        'metadata',
+        sa.Column('key', sa.String(), primary_key=True),
+        sa.Column('value', sa.JSON(), nullable=False),
+        sa.Column('updated_at', sa.DateTime(), server_default=sa.func.now(), onupdate=sa.func.now()),
+    )
+    
     op.create_index('idx_quality_checks_entity', 'quality_checks', ['entity_type', 'entity_id'])
 
 
 def downgrade() -> None:
+    op.drop_table('metadata')
     op.drop_index('idx_quality_checks_entity', 'quality_checks')
     op.drop_table('quality_checks')
     op.drop_table('missions')

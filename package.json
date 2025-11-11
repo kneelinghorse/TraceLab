@@ -8,7 +8,11 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:all": "bash scripts/dev-setup.sh",
+    "dev:stack": "bash -lc 'if docker compose version >/dev/null 2>&1; then docker compose -f docker-compose.dev.yml up -d --build; else docker-compose -f docker-compose.dev.yml up -d --build; fi'",
+    "dev:down": "bash -lc 'if docker compose version >/dev/null 2>&1; then docker compose -f docker-compose.dev.yml down -v; else docker-compose -f docker-compose.dev.yml down -v; fi'",
+    "dev:frontend": "bash -lc 'cd frontend && npm run dev'"
   },
   "repository": {
     "type": "git",

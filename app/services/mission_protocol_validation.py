@@ -77,47 +77,48 @@ def build_mission_data_check_constraint(
 
 
 def _build_postgres_constraint() -> str:
-    clauses: list[str] = ["jsonb_typeof(mission_data) = 'object'"]
+    jsonb_mission = "(mission_data)::jsonb"
+    clauses: list[str] = [f"jsonb_typeof({jsonb_mission}) = 'object'"]
 
     if _DRAFT_REQUIRED_FIELDS:
-        clauses.append(f"mission_data ?& {_array_literal(_DRAFT_REQUIRED_FIELDS)}")
+        clauses.append(f"{jsonb_mission} ?& {_array_literal(_DRAFT_REQUIRED_FIELDS)}")
 
     if _COMPLETE_ONLY_FIELDS:
         clauses.append(
             "("
-            "coalesce(mission_data->>'status', 'draft') NOT IN ('complete', 'review') "
-            f"OR mission_data ?& {_array_literal(_COMPLETE_ONLY_FIELDS)}"
+            f"coalesce({jsonb_mission}->>'status', 'draft') NOT IN ('complete', 'review') "
+            f"OR {jsonb_mission} ?& {_array_literal(_COMPLETE_ONLY_FIELDS)}"
             ")"
         )
 
     clauses.append(
         "("
-        "coalesce(mission_data->>'status', 'draft') NOT IN ('complete', 'review') "
-        "OR COALESCE(jsonb_typeof(mission_data->'research_statement') = 'object', FALSE)"
+        f"coalesce({jsonb_mission}->>'status', 'draft') NOT IN ('complete', 'review') "
+        f"OR COALESCE(jsonb_typeof({jsonb_mission}->'research_statement') = 'object', FALSE)"
         ")"
     )
     clauses.append(
         "("
-        "coalesce(mission_data->>'status', 'draft') NOT IN ('complete', 'review') "
-        "OR COALESCE(jsonb_typeof(mission_data->'synthesis') = 'object', FALSE)"
+        f"coalesce({jsonb_mission}->>'status', 'draft') NOT IN ('complete', 'review') "
+        f"OR COALESCE(jsonb_typeof({jsonb_mission}->'synthesis') = 'object', FALSE)"
         ")"
     )
     clauses.append(
         "("
-        "coalesce(mission_data->>'status', 'draft') NOT IN ('complete', 'review') "
-        "OR jsonb_array_length(COALESCE(mission_data->'evidence', '[]'::jsonb)) >= 1"
+        f"coalesce({jsonb_mission}->>'status', 'draft') NOT IN ('complete', 'review') "
+        f"OR jsonb_array_length(COALESCE({jsonb_mission}->'evidence', '[]'::jsonb)) >= 1"
         ")"
     )
     clauses.append(
         "("
-        "coalesce(mission_data->>'status', 'draft') NOT IN ('complete', 'review') "
-        "OR jsonb_array_length(COALESCE(mission_data->'key_questions', '[]'::jsonb)) >= 1"
+        f"coalesce({jsonb_mission}->>'status', 'draft') NOT IN ('complete', 'review') "
+        f"OR jsonb_array_length(COALESCE({jsonb_mission}->'key_questions', '[]'::jsonb)) >= 1"
         ")"
     )
     clauses.append(
         "("
-        "coalesce(mission_data->>'status', 'draft') NOT IN ('complete', 'review') "
-        "OR jsonb_array_length(COALESCE(mission_data->'quality_checkpoints', '[]'::jsonb)) >= 1"
+        f"coalesce({jsonb_mission}->>'status', 'draft') NOT IN ('complete', 'review') "
+        f"OR jsonb_array_length(COALESCE({jsonb_mission}->'quality_checkpoints', '[]'::jsonb)) >= 1"
         ")"
     )
     return " AND ".join(f"({clause})" for clause in clauses)
