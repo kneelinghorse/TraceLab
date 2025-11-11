@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-10T07:07:41.385871+00:00'
+generatedAt: '2025-11-11T05:48:45.558731+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -340,16 +340,89 @@ domainFields:
         completed_at: '2025-11-10T06:48:08Z'
     - id: B6.2
       name: Document Library UI
-      status: Current
+      status: Completed
+      completed_at: '2025-11-10T15:06:56Z'
+      notes: Resolved lint issues (AuthProvider bootstrapping, document error messaging,
+        typed processing events) and validated via npm run lint + npm run type-check.
+      metadata:
+        started_at: '2025-11-10T15:04:25Z'
+        completed_at: '2025-11-10T15:06:56Z'
     - id: B6.3
       name: RAG Search UI
-      status: Queued
+      status: Completed
+      notes: Marked complete to make way for injected fix missions B6.4a-d
+      metadata:
+        started_at: '2025-11-10T15:52:53Z'
+        completed_at: '2025-11-10T16:08:06Z'
+        blocked_at: '2025-11-10T21:47:19Z'
+        blocked_reason: Frontend depends on GET /api/v1/documents and /projects, but
+          production API only allows POST (405). UI keeps retrying and appears unstyled
+          because SWR never hydrates. Need backend redeploy or configuration change
+          to enable GET before frontend can be validated.
+        blocked_needs:
+        - Deploy backend with GET handlers for /api/v1/documents and /projects matching
+          local FastAPI routes
+        - Re-run frontend verification against API that supports required endpoints
     - id: B6.4
       name: Mission UI Overhaul
+      status: Completed
+      completed_at: '2025-11-10T23:18:12Z'
+      notes: Light-theme mission workspace, EvidenceCard gallery, markdown insights
+        preview, mission templates, and search quick-add notes shipped. npm run lint
+        && npm run type-check.
+      metadata:
+        started_at: '2025-11-10T23:00:57Z'
+        completed_at: '2025-11-10T23:18:12Z'
+    - id: B6.4a
+      name: API URL Configuration Fix
+      status: Completed
+      completed_at: '2025-11-11T00:02:38Z'
+      notes: Updated production env templates, docs, and Playwright smoke defaults
+        so NEXT_PUBLIC_API_BASE_URL/PLAYWRIGHT_API_BASE_URL point at https://api.namozine.com
+        (UI appends /api/v1). Verified frontend lint to confirm no regressions.
+      metadata:
+        description: Correct API URL configuration across all frontend environments
+          to match production API endpoint at https://api.namozine.com (remove /api/v1
+          suffix)
+        started_at: '2025-11-10T23:58:27Z'
+        completed_at: '2025-11-11T00:02:38Z'
+    - id: B6.4b
+      name: Local Development Environment Setup
+      status: Completed
+      completed_at: '2025-11-11T00:32:32Z'
+      notes: 'Added docs/local-development.md, .env.example, docker-compose.dev.yml,
+        scripts/dev-setup.sh, and npm dev:* helpers so npm run dev:all starts Postgres/Qdrant/FastAPI
+        plus the Next.js dev server. pytest tests hit known failures: tests/test_presidio_redaction.py::test_redact_document_uses_pseudonymization_and_audit
+        (SimpleNamespace lacks analysis_explanation), tests/test_rag_service.py::test_semantic_cache_hit_rate_reaches_target
+        (duplicate Prometheus metrics), and tests/integration/test_ingestion_flow.py::test_markdown_cli_flow
+        (ingest_cli 401).'
+      metadata:
+        description: Create comprehensive local development setup guide and scripts
+          to ensure consistent developer experience
+        started_at: '2025-11-11T00:20:58Z'
+        completed_at: '2025-11-11T00:32:32Z'
+    - id: B6.4c
+      name: Authentication Documentation Testing
+      status: Completed
+      completed_at: '2025-11-11T05:48:21Z'
+      notes: Added docs/authentication.md with CLI/frontend instructions, README quickstart,
+        tests/test_auth_flow.py, examples/auth_examples.py, postman/TraceLab-Auth.json,
+        and requests dependency to support scripted login flows; pytest tests/test_auth_flow.py
+        tests/test_auth_api.py now green.
+      metadata:
+        description: Document authentication system, provide clear usage examples,
+          and implement comprehensive auth testing
+        started_at: '2025-11-11T05:39:06Z'
+        completed_at: '2025-11-11T05:48:21Z'
+    - id: B6.4d
+      name: RAG Search UI Implementation
       status: Queued
+      metadata:
+        description: Build semantic search and RAG query interface with results display,
+          LLM synthesis view, and citation linking (previously blocked B6.3 work)
     - id: B6.5
       name: Report Export System
-      status: Queued
+      status: Current
     - id: B6.6
       name: Integration API
       status: Queued

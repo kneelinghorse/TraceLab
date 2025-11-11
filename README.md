@@ -85,6 +85,35 @@ Personal-scale research repository with RAG-powered semantic search, structured 
 - Frontend clients (Next.js in `frontend/`) persist the token locally and automatically attach it to mission and quality API calls. Users must sign in before accessing `/missions` routes.
 - CORS settings are loaded from `CORS_ALLOWED_ORIGINS_DEV` and `CORS_ALLOWED_ORIGINS_PROD`, along with customizable headers/methods. See `docs/auth_and_cors_guidance.md` for deployment examples.
 
+## Authentication Quickstart
+
+1. **Configure credentials**
+   ```bash
+   cp .env.example .env
+   # update AUTH_USERNAME, AUTH_PASSWORD, SECRET_KEY as needed
+   ```
+2. **Obtain a token**
+   ```bash
+   curl -X POST http://localhost:8000/api/v1/auth/login \
+     -H "Content-Type: application/json" \
+     -d '{"username":"tracelab-admin","password":"changeme"}'
+   ```
+3. **Call a protected endpoint**
+   ```bash
+   TOKEN="eyJhbGciOiJIUzI1NiIs..."
+   curl http://localhost:8000/api/v1/missions/ \
+     -H "Authorization: Bearer ${TOKEN}"
+   ```
+4. **Smoke-test with the helper script**
+   ```bash
+   python examples/auth_examples.py --base-url http://localhost:8000
+   ```
+5. **Manual + automated verification**
+   - Import `postman/TraceLab-Auth.json` and update the collection variables for quick demos.
+   - Run `pytest tests/test_auth_flow.py tests/test_auth_api.py` to cover login, refresh, and downstream access.
+
+See `docs/authentication.md` for a deeper walkthrough covering frontend usage, Postman workflows, and troubleshooting tips.
+
 ## Production URLs & Health Checks
 
 - **UI (Cloudflare vanity domain):** `https://namozine.com/missions` points to the Railway Next.js frontend (`frontend-production-43c3.up.railway.app`). Verify availability with `curl -sS -o /dev/null -w "%{http_code}\n" https://namozine.com/missions` (expect `200`).
