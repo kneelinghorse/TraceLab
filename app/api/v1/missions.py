@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -20,10 +20,12 @@ from app.services.mission_protocol_service import (
     MissionProtocolServiceError,
 )
 from app.services.quality_checks import QualityAutomationRunner
+from app.services.report_export import ReportExportError, ReportExportService
 
 router = APIRouter()
 _quality_runner = QualityAutomationRunner(async_enabled=True)
 _service = MissionProtocolService(quality_runner=_quality_runner)
+_report_export_service = ReportExportService()
 
 
 def _mission_read(instance) -> MissionRead:
@@ -98,10 +100,33 @@ def import_mission_yaml(request: MissionImportRequest, db: Session = Depends(get
     return MissionImportResponse(mission=_mission_read(mission), promoted=request.promote_to_complete)
 
 
-@router.get("/{mission_id}/export", response_model=MissionExportResponse)
-def export_mission_yaml(mission_id: UUID, db: Session = Depends(get_db)) -> MissionExportResponse:
+@router.get("/{mission_id}/export")
+def export_mission(
+    mission_id: UUID,
+    format: str = Query("yaml", pattern=r"^(yaml|md|pdf|docx)$"),
+    db: Session = Depends(get_db),
+):
+    normalized_format = format.lower()
+    if normalized_format == "yaml":
+        try:
+            yaml_text = _service.export_mission_yaml(db, mission_id)
+        except MissionProtocolServiceError as exc:
+            _raise_http_error(exc)
+        return MissionExportResponse(mission_id=mission_id, yaml_text=yaml_text)
+
     try:
-        yaml_text = _service.export_mission_yaml(db, mission_id)
+        mission = _service.get_mission(db, mission_id)
     except MissionProtocolServiceError as exc:
         _raise_http_error(exc)
-    return MissionExportResponse(mission_id=mission_id, yaml_text=yaml_text)
+
+    try:
+        result = _report_export_service.export(
+            mission.mission_data,
+            format=normalized_format,
+            completion_percentage=mission.completion_percentage,
+        )
+    except ReportExportError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+    headers = {"Content-Disposition": f'attachment; filename="{result.filename}"'}
+    return Response(content=result.content, media_type=result.media_type, headers=headers)
