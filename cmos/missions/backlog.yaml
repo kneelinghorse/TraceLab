@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-11T05:48:45.558731+00:00'
+generatedAt: '2025-11-11T06:30:49.562365+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -416,10 +416,19 @@ domainFields:
         completed_at: '2025-11-11T05:48:21Z'
     - id: B6.4d
       name: RAG Search UI Implementation
-      status: Queued
+      status: Completed
+      completed_at: '2025-11-11T06:30:33Z'
+      notes: 'Validated mission state via parity check + health command, promoted
+        B6.4d through mission_runtime, logged context notes, and executed node cmos/context/integration_test_runner.js
+        --output cmos/telemetry/events/testing-summary.json. Test suite failed: missing
+        cmos/docs/integration-testing-guide.md and structured prompting references
+        (agents.md, context/MASTER_CONTEXT.json). Telemetry and database health confirmed
+        before wrap-up.'
       metadata:
         description: Build semantic search and RAG query interface with results display,
           LLM synthesis view, and citation linking (previously blocked B6.3 work)
+        started_at: '2025-11-11T06:27:53Z'
+        completed_at: '2025-11-11T06:30:33Z'
     - id: B6.5
       name: Report Export System
       status: Current
