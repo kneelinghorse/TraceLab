@@ -9,18 +9,20 @@ from pathlib import Path
 from typing import Optional, Dict, Any
 from uuid import UUID
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, BackgroundTasks
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, BackgroundTasks, Query
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.models.document import Document
 from app.models.project import Project
-from app.schemas.document import DocumentRead
+from app.schemas.document import DocumentListItem, DocumentRead
+from app.schemas.pagination import PaginatedResponse
 from app.services.document_ingestion import DocumentIngestionService
 from app.services.document_parser import DocumentParser
 from app.services.coverage_report import CoverageReportGenerator
 from app.services.processing_status import ProcessingStatusRecorder
 from app.core.config import settings
+from app.services.document_query_service import DocumentQueryService
 
 router = APIRouter()
 
@@ -31,6 +33,7 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 _ingestion_service: Optional[DocumentIngestionService] = None
 _ingestion_init_error: Optional[str] = None
 _status_recorder = ProcessingStatusRecorder()
+_document_query_service = DocumentQueryService()
 
 
 def get_ingestion_service() -> DocumentIngestionService:
@@ -44,6 +47,34 @@ def get_ingestion_service() -> DocumentIngestionService:
             _ingestion_init_error = str(exc)
             raise
     return _ingestion_service
+
+
+@router.get("", response_model=PaginatedResponse[DocumentListItem])
+def list_documents(
+    project_id: Optional[UUID] = Query(None, description="Filter by project identifier"),
+    processed: Optional[bool] = Query(None, description="Filter by processing state"),
+    search: Optional[str] = Query(None, min_length=1, max_length=200, description="Case-insensitive name search"),
+    page: int = Query(1, ge=1, description="Page number (1-indexed)"),
+    page_size: int = Query(
+        DocumentQueryService.DEFAULT_PAGE_SIZE,
+        ge=1,
+        le=DocumentQueryService.MAX_PAGE_SIZE,
+        description="Results per page",
+    ),
+    db: Session = Depends(get_db),
+):
+    """Return a paginated document list with optional filters."""
+
+    documents, meta = _document_query_service.list_documents(
+        db,
+        page=page,
+        page_size=page_size,
+        project_id=project_id,
+        processed=processed,
+        search=search,
+    )
+    resources = [DocumentListItem.model_validate(document) for document in documents]
+    return {"data": resources, "pagination": meta}
 
 
 @router.post("/upload", response_model=DocumentRead)
@@ -221,7 +252,7 @@ async def get_document(
     db: Session = Depends(get_db)
 ) -> DocumentRead:
     """Get a document by ID."""
-    document = db.query(Document).filter(Document.id == document_id).first()
+    document = _document_query_service.get_document(db, document_id)
     if not document:
         raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
     _ = document.processing_events
@@ -235,7 +266,7 @@ async def delete_document(
     db: Session = Depends(get_db)
 ) -> Dict[str, str]:
     """Delete a document and its associated chunks."""
-    document = db.query(Document).filter(Document.id == document_id).first()
+    document = _document_query_service.get_document(db, document_id)
     if not document:
         raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
     

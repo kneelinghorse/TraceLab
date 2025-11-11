@@ -10,6 +10,8 @@ import { RagSynthesis } from "@/components/RagSynthesis";
 import { ResultCard } from "@/components/ResultCard";
 import { SearchBar, type SearchFiltersState } from "@/components/SearchBar";
 import { documentsApi } from "@/lib/api/documents";
+import { projectsApi } from "@/lib/api/projects";
+import type { PaginatedResponse } from "@/types/pagination";
 import { searchApi } from "@/lib/api/search";
 import { updateMission } from "@/lib/api/missions";
 import { useMissionList } from "@/lib/hooks/useMissions";
@@ -70,11 +72,20 @@ function SearchExperience({ initialSection }: SearchPageProps) {
   const resultsAnchorRef = useRef<HTMLDivElement | null>(null);
 
   const { missions, refresh: refreshMissions } = useMissionList();
-  const { data: projects = [] } = useSWR<Project[]>("search-projects", () => documentsApi.listProjects());
-  const { data: documents = [] } = useSWR<Document[]>(
-    ["search-documents", filters.projectId || "all"],
-    () => documentsApi.listDocuments(filters.projectId || undefined),
+  const { data: projectResponse } = useSWR<PaginatedResponse<Project>>(
+    ["search-projects"],
+    () => projectsApi.listProjects({ pageSize: 200 })
   );
+  const projects = projectResponse?.data ?? [];
+  const { data: documentResponse } = useSWR<PaginatedResponse<Document>>(
+    ["search-documents", filters.projectId || "all"],
+    () =>
+      documentsApi.listDocuments({
+        projectId: filters.projectId || undefined,
+        pageSize: 200,
+      }),
+  );
+  const documents = documentResponse?.data ?? [];
 
   useEffect(() => {
     if (typeof window === "undefined") return;

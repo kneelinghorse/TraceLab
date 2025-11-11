@@ -2,42 +2,32 @@
  * Document API client
  */
 
-import type { Document, DocumentProcessResult, DocumentUploadResponse, Project } from "@/types/document";
+import type { Document, DocumentProcessResult, DocumentUploadResponse } from "@/types/document";
+import type { PaginatedResponse } from "@/types/pagination";
 import { httpClient, API_BASE_URL } from "./http";
 import { getStoredAuth } from "@/lib/auth/storage";
 
+export type ListDocumentsParams = {
+  projectId?: string;
+  processed?: boolean;
+  search?: string;
+  page?: number;
+  pageSize?: number;
+};
+
 export const documentsApi = {
-  /**
-   * List all projects
-   */
-  async listProjects(): Promise<Project[]> {
-    const response = await httpClient.get("/api/v1/projects");
-    return response as Project[];
-  },
-
-  /**
-   * Get project by ID
-   */
-  async getProject(projectId: string): Promise<Project> {
-    const response = await httpClient.get(`/api/v1/projects/${projectId}`);
-    return response as Project;
-  },
-
-  /**
-   * Create a new project
-   */
-  async createProject(data: { name: string; description?: string; research_type?: string }): Promise<Project> {
-    const response = await httpClient.post("/api/v1/projects", data);
-    return response as Project;
-  },
-
   /**
    * List documents in a project
    */
-  async listDocuments(projectId?: string): Promise<Document[]> {
-    const params = projectId ? { project_id: projectId } : {};
-    const response = await httpClient.get("/api/v1/documents", { params });
-    return response as Document[];
+  async listDocuments(params: ListDocumentsParams = {}): Promise<PaginatedResponse<Document>> {
+    const query = {
+      project_id: params.projectId,
+      processed: params.processed,
+      search: params.search,
+      page: params.page,
+      page_size: params.pageSize,
+    };
+    return httpClient.get("/api/v1/documents", { params: query });
   },
 
   /**

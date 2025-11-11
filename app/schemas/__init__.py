@@ -3,6 +3,7 @@ from app.schemas.project import ProjectBase, ProjectCreate, ProjectUpdate, Proje
 from app.schemas.document import (
     DocumentBase,
     DocumentCreate,
+    DocumentListItem,
     DocumentUpdate,
     DocumentRead,
 )
@@ -67,6 +68,10 @@ from app.schemas.rag import (
     RagResponse,
     RagCitation,
 )
+from app.schemas.pagination import (
+    PaginatedResponse,
+    PaginationMeta,
+)
 
 __all__ = [
     "ProjectBase",
@@ -75,6 +80,7 @@ __all__ = [
     "ProjectRead",
     "DocumentBase",
     "DocumentCreate",
+    "DocumentListItem",
     "DocumentUpdate",
     "DocumentRead",
     "DocumentProcessingStatusRead",
@@ -118,4 +124,6 @@ __all__ = [
     "RagQuery",
     "RagResponse",
     "RagCitation",
+    "PaginatedResponse",
+    "PaginationMeta",
 ]

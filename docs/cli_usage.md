@@ -145,8 +145,9 @@ tracelab auth refresh
 ### Projects
 
 ```bash
-# List projects
-tracelab projects list
+# List projects (supports paging & search)
+tracelab projects list --page 1 --page-size 20
+tracelab projects list --search "Discovery"
 tracelab projects list --json
 
 # Get project
@@ -169,9 +170,9 @@ tracelab projects delete <project-id> --confirm
 tracelab documents upload <project-id> <file-path>
 tracelab documents upload <project-id> <file-path> --process --wait
 
-# List documents
-tracelab documents list <project-id>
-tracelab documents list <project-id> --status processed
+# List documents (project filter optional)
+tracelab documents list --project-id <project-id>
+tracelab documents list --status processed --page 2 --page-size 25
 
 # Get document
 tracelab documents get <document-id>
@@ -272,7 +273,7 @@ All commands support:
 
 Example:
 ```bash
-tracelab projects list --json --api-url http://staging.api.com
+tracelab projects list --json --api-url http://staging.api.com --page-size 50
 ```
 
 ## JSON Output Format
@@ -416,4 +417,3 @@ For issues or questions:
 - Documentation: `docs/`
 - CLI Architecture: `docs/cli_architecture.md`
 - API Docs: `http://localhost:8000/docs`
-

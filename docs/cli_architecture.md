@@ -161,8 +161,8 @@ tracelab documents upload <project-id> <file-path> --json
 tracelab documents upload <project-id> ./reports/*.pdf --batch --json
 
 # List documents
-tracelab documents list <project-id>
-tracelab documents list <project-id> --status processed --json
+tracelab documents list --project-id <project-id>
+tracelab documents list --status processed --page 2 --json
 
 # Get document
 tracelab documents get <document-id>
@@ -477,4 +477,3 @@ tracelab version
 - httpx Documentation: https://www.python-httpx.org/
 - Rich Documentation: https://rich.readthedocs.io/
 - JWT Best Practices: https://datatracker.ietf.org/doc/html/rfc8725
-

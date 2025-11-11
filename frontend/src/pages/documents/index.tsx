@@ -4,29 +4,56 @@
 
 import { AuthGate } from "@/components/AuthGate";
 import { documentsApi } from "@/lib/api/documents";
+import { projectsApi } from "@/lib/api/projects";
 import type { Document, Project } from "@/types/document";
+import type { PaginatedResponse } from "@/types/pagination";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
+
+const PAGE_SIZE = 10;
 
 export default function DocumentsPage() {
   const [selectedProject, setSelectedProject] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
 
-  const { data: projects } = useSWR<Project[]>("projects", () => documentsApi.listProjects());
-  const { data: documents, mutate } = useSWR<Document[]>(
-    ["documents", selectedProject],
-    () => documentsApi.listDocuments(selectedProject || undefined)
+  const { data: projectResponse } = useSWR<PaginatedResponse<Project>>(
+    ["projects", "selector"],
+    () => projectsApi.listProjects({ pageSize: 100 })
+  );
+  const projects = projectResponse?.data ?? [];
+
+  const { data: documentsResponse, mutate, isLoading } = useSWR<PaginatedResponse<Document>>(
+    ["documents", selectedProject, statusFilter, searchTerm, page],
+    () =>
+      documentsApi.listDocuments({
+        projectId: selectedProject || undefined,
+        processed: statusFilter === "processed" ? true : statusFilter === "processing" ? false : undefined,
+        search: searchTerm || undefined,
+        page,
+        pageSize: PAGE_SIZE,
+      })
   );
 
-  // Filter documents by status
-  const filteredDocuments = documents?.filter((doc) => {
-    if (statusFilter === "all") return true;
-    if (statusFilter === "processed") return doc.processed;
-    if (statusFilter === "processing") return !doc.processed;
-    return true;
-  });
+  const documents = documentsResponse?.data ?? [];
+  const pagination = documentsResponse?.pagination;
+  const totalPages = pagination?.pages ?? 0;
+  const resolvedPage = pagination?.page ?? page;
+
+  const projectLookup = useMemo(() => {
+    const map = new Map<string, string>();
+    projects.forEach((project) => {
+      map.set(project.id, project.name);
+    });
+    return map;
+  }, [projects]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [selectedProject, statusFilter, searchTerm]);
 
   const handleDelete = async (documentId: string) => {
     if (!confirm("Are you sure you want to delete this document?")) return;
@@ -53,7 +80,7 @@ export default function DocumentsPage() {
           </div>
 
           {/* Actions & Filters */}
-          <div className="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div className="mb-6 flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             <div className="flex gap-4 items-center flex-wrap">
               {/* Project Filter */}
               <select
@@ -79,6 +106,15 @@ export default function DocumentsPage() {
                 <option value="processed">Processed</option>
                 <option value="processing">Processing</option>
               </select>
+
+              {/* Keyword Filter */}
+              <input
+                type="search"
+                placeholder="Search name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              />
             </div>
 
             <Link
@@ -90,11 +126,11 @@ export default function DocumentsPage() {
           </div>
 
           {/* Documents List */}
-          {!filteredDocuments ? (
+          {isLoading && !documentsResponse ? (
             <div className="text-center py-12">
               <p className="text-gray-500">Loading documents...</p>
             </div>
-          ) : filteredDocuments.length === 0 ? (
+          ) : documents.length === 0 ? (
             <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
               <p className="text-gray-500 dark:text-gray-400 mb-4">No documents found</p>
               <Link
@@ -106,7 +142,7 @@ export default function DocumentsPage() {
             </div>
           ) : (
             <div className="grid gap-4">
-              {filteredDocuments.map((document) => (
+              {documents.map((document) => (
                 <div
                   key={document.id}
                   className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow"
@@ -121,6 +157,7 @@ export default function DocumentsPage() {
                       </Link>
 
                       <div className="mt-2 flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
+                        <span>Project: {projectLookup.get(document.project_id) ?? document.project_id}</span>
                         <span>
                           Type: {document.file_type || document.mime_type?.split("/")[1] || "Unknown"}
                         </span>
@@ -170,11 +207,52 @@ export default function DocumentsPage() {
                   </div>
                 </div>
               ))}
+              <PaginationControls
+                page={resolvedPage}
+                pages={totalPages || (documents.length > 0 ? 1 : 0)}
+                onChange={setPage}
+              />
             </div>
           )}
         </div>
       </div>
     </AuthGate>
+  );
+}
+
+type PaginationControlsProps = {
+  page: number;
+  pages: number;
+  onChange: (page: number) => void;
+};
+
+function PaginationControls({ page, pages, onChange }: PaginationControlsProps) {
+  if (!pages || pages <= 1) {
+    return null;
+  }
+
+  return (
+    <div className="flex flex-col sm:flex-row items-center justify-between pt-4">
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-0">
+        Page {page} of {pages}
+      </p>
+      <div className="flex gap-2">
+        <button
+          onClick={() => onChange(Math.max(1, page - 1))}
+          disabled={page === 1}
+          className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <button
+          onClick={() => onChange(Math.min(pages, page + 1))}
+          disabled={page >= pages}
+          className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+    </div>
   );
 }
 

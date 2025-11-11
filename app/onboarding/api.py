@@ -49,13 +49,6 @@ def _idempotency(
     )
 
 
-@router.get("/projects", response_model=List[ProjectRead])
-def list_projects(db: Session = Depends(get_db)) -> List[ProjectRead]:
-    """Return all projects ordered by name."""
-    projects = db.query(Project).order_by(Project.created_at.asc()).all()
-    return [ProjectRead.model_validate(project) for project in projects]
-
-
 @router.post(
     "/projects",
     response_model=ProjectRead,
@@ -88,15 +81,6 @@ def create_project(
     )
     db.commit()
     return JSONResponse(content=response_body, status_code=status.HTTP_201_CREATED)
-
-
-@router.get("/projects/{project_id}", response_model=ProjectRead)
-def get_project(project_id: UUID, db: Session = Depends(get_db)) -> ProjectRead:
-    """Fetch a single project."""
-    project = db.query(Project).filter(Project.id == project_id).first()
-    if not project:
-        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
-    return ProjectRead.model_validate(project)
 
 
 @router.patch("/projects/{project_id}", response_model=ProjectRead)
