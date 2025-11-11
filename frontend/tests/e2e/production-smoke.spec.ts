@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 const isProductionSmoke = Boolean(process.env.PLAYWRIGHT_BASE_URL);
-const apiBase = process.env.PLAYWRIGHT_API_BASE_URL ?? "https://api.namozine.com/api/v1";
+const apiBase = (process.env.PLAYWRIGHT_API_BASE_URL ?? "https://api.namozine.com").replace(/\/$/, "");
 
 test.describe("Production smoke", () => {
   test.skip(!isProductionSmoke, "Set PLAYWRIGHT_BASE_URL to enable production smoke suite.");
@@ -12,7 +12,7 @@ test.describe("Production smoke", () => {
   });
 
   test("API health endpoint stays reachable", async ({ request }) => {
-    const response = await request.get(`${apiBase}/health`);
+    const response = await request.get(`${apiBase}/api/v1/health`);
     expect(response.status()).toBe(200);
     const payload = await response.json();
     expect(payload.status).toBe("healthy");

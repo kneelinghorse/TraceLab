@@ -76,6 +76,8 @@ Personal-scale research repository with RAG-powered semantic search, structured 
    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
    ```
 
+> Need the full local stack (Docker, scripts, frontend) in one place? See `docs/local-development.md`.
+
 ## Authentication & CORS
 
 - The FastAPI backend exposes `/api/v1/auth/login` and `/api/v1/auth/refresh` for JWT issuance. Configure credentials with `AUTH_USERNAME` plus either `AUTH_PASSWORD` (stored securely via passlib) or `AUTH_PASSWORD_HASH`.
@@ -86,16 +88,16 @@ Personal-scale research repository with RAG-powered semantic search, structured 
 ## Production URLs & Health Checks
 
 - **UI (Cloudflare vanity domain):** `https://namozine.com/missions` points to the Railway Next.js frontend (`frontend-production-43c3.up.railway.app`). Verify availability with `curl -sS -o /dev/null -w "%{http_code}\n" https://namozine.com/missions` (expect `200`).
-- **API domain:** `https://api.namozine.com/api/v1` proxies to the FastAPI service on Railway (`tracelab-production.up.railway.app`). Validate with `curl https://api.namozine.com/api/v1/health` (returns `{ "status": "healthy" }`).
+- **API domain:** `https://api.namozine.com` proxies to the FastAPI service on Railway (`tracelab-production.up.railway.app`); keep `NEXT_PUBLIC_API_BASE_URL` and related variables pointed at this root host (the UI appends `/api/v1` paths automatically). Validate the health route with `curl https://api.namozine.com/api/v1/health` (returns `{ "status": "healthy" }`).
 - **CORS origins:** Add both `https://namozine.com` and `https://www.namozine.com` to `CORS_ALLOWED_ORIGINS_PROD` in your `.env` when running the backend in production mode. Keep `Full (Strict)` TLS enabled within Cloudflare to preserve end-to-end encryption.
 - **Playwright smoke:** Run the production smoke suite from `frontend/` whenever DNS or env vars change:
   ```bash
   cd frontend
   PLAYWRIGHT_BASE_URL=https://namozine.com \
-  PLAYWRIGHT_API_BASE_URL=https://api.namozine.com/api/v1 \
-  PLAYWRIGHT_SKIP_SERVER=1 \
-  npx playwright test tests/e2e/production-smoke.spec.ts
-  ```
+PLAYWRIGHT_API_BASE_URL=https://api.namozine.com \
+PLAYWRIGHT_SKIP_SERVER=1 \
+npx playwright test tests/e2e/production-smoke.spec.ts
+```
   The suite loads `/missions` through Cloudflare and pings the `/api/v1/health` endpoint to prove the path is wired correctly.
 
 ## Project Structure
