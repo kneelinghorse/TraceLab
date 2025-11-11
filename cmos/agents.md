@@ -19,6 +19,25 @@
 - Use: `cmos/scripts/` for operations
 - Reference: `cmos/docs/` for procedures
 
+## Security & Quality Guardrails
+
+- CMOS code **must not** import from `app.services` or any other production-only module. Share data through telemetry exports, CLI commands, or mission artifacts instead of cross-imports. Quick audit:
+
+  ```bash
+  rg -n "app\\.services" cmos --type-add 'code:*.py,*.js,*.ts' --type code
+  ```
+
+- Always load the latest instructions in `agents.md`, `cmos/agents.md`, and `cmos/docs/AI-coding-assistant-workflows.md` before editing runtime code.
+- Execute `node cmos/context/integration_test_runner.js --output telemetry/events/testing-summary.json` (see `cmos/docs/integration-testing-guide.md`) to prove guardrails + structured prompting references are in place.
+- Apply OWASP controls listed in `cmos/docs/cmos_Playbook.md` when touching security-sensitive helpers (ContextSecurityValidator, CodeQualityAssurance, mission runtime scripts).
+
+## AI Agent Specific Instructions
+
+- Follow the structured prompting workflow captured in `cmos/docs/AI-coding-assistant-workflows.md` and reference it when updating mission docs or contexts.
+- Update `PROJECT_CONTEXT` + `MASTER_CONTEXT` via `context.db_client.SQLiteClient` helpers—never hand-edit the JSON mirrors. After database writes, regenerate mirrors with `python cmos/scripts/migrate_cmos_memory.py --source cmos --target cmos` if downstream tools require the files.
+- Log every major decision to the SQLite-backed session log using `context.mission_runtime.start/complete/block` so telemetry (`cmos/SESSIONS.jsonl`) stays aligned with mission status.
+- When missions require orchestration changes, document which advanced orchestration patterns (none/rsip/delegation/boomerang) were used and store next hints in `MASTER_CONTEXT` for downstream agents.
+
 ---
 
 ## Data Storage & Telemetry
