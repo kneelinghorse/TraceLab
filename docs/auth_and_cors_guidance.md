@@ -95,11 +95,11 @@ CORS_ALLOWED_HEADERS=["Authorization","Content-Type"]
 # Railway origins documented for incident response
 CORS_ALLOWED_ORIGINS_DEV=["http://localhost:3000"]
 
-# Frontend (Next.js) picks up the vanity domain through NEXT_PUBLIC_API_BASE_URL
-NEXT_PUBLIC_API_BASE_URL=https://api.namozine.com/api/v1
+# Frontend (Next.js) picks up the vanity domain through NEXT_PUBLIC_API_BASE_URL (host only)
+NEXT_PUBLIC_API_BASE_URL=https://api.namozine.com
 ```
 
-After updating the environment variables, restart the FastAPI process and re-run the production Playwright smoke suite to verify that `https://namozine.com/missions` and `https://api.namozine.com/api/v1/health` both succeed with `access-control-allow-origin: https://namozine.com`.
+After updating the environment variables, restart the FastAPI process and re-run the production Playwright smoke suite to verify that `https://namozine.com/missions` and `https://api.namozine.com/api/v1/health` both succeed with `access-control-allow-origin: https://namozine.com`. The frontend automatically appends `/api/v1` paths, so do not include the suffix in `NEXT_PUBLIC_API_BASE_URL`.
 
 ## TraceLab Implementation Notes
 
