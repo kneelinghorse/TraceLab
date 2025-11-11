@@ -72,6 +72,17 @@ def test_create_and_export_mission(client: TestClient, project):
     assert "mission_id: B3.2-api" in export_resp.json()["yaml_text"]
 
 
+def test_export_mission_as_markdown(client: TestClient, project):
+    response = client.post("/api/v1/missions/", json=_api_payload(project.id))
+    assert response.status_code == 201
+    mission_id = response.json()["id"]
+
+    export_resp = client.get(f"/api/v1/missions/{mission_id}/export?format=md")
+    assert export_resp.status_code == 200
+    assert export_resp.headers["content-type"].startswith("text/markdown")
+    assert "Mission ID" in export_resp.text
+
+
 def test_import_yaml_endpoint(client: TestClient, project):
     yaml_body = dedent(
         """

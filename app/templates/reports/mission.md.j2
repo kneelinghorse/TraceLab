@@ -1,0 +1,121 @@
+# {{ meta.title }}
+
+**Mission ID:** {{ meta.mission_id }}  
+**Version:** {{ meta.version }}  
+**Status:** {{ meta.status_label }}  
+**Owner:** {{ meta.owner or "Unassigned" }}  
+**Project ID:** {{ meta.project_id or "n/a" }}  
+**Completion:** {{ meta.completion_percentage }}%  
+**Generated:** {{ meta.generated_at }}
+{% if meta.tags %}
+
+**Tags:** {{ meta.tags | join(", ") }}
+{% endif %}
+
+---
+
+## Research Statement
+{% if research_statement %}
+| Field | Detail |
+| --- | --- |
+| Topic | {{ research_statement.topic | markdown_escape }} |
+| Objective | {{ research_statement.objective | markdown_escape }} |
+| Scope | {{ research_statement.scope | markdown_escape }} |
+| Audience | {{ research_statement.audience | markdown_escape }} |
+| Methodology | {{ research_statement.methodology | markdown_escape }} |
+{% if research_statement.success_metrics %}| Success Metrics | {{ research_statement.success_metrics | markdown_escape }} |
+{% endif %}
+{% if research_statement.risks %}| Risks | {{ research_statement.risks | markdown_escape }} |
+{% endif %}
+{% else %}
+_No research statement recorded._
+{% endif %}
+
+## Key Questions
+{% if key_questions %}
+| # | Question | Status | Answer | Confidence | Owner |
+| --- | --- | --- | --- | --- | --- |
+{% for q in key_questions %}| {{ q.index }} | {{ q.question | markdown_escape }} | {{ q.status }} | {{ q.answer | markdown_escape }} | {{ q.confidence_display }} | {{ q.owner or "—" }} |
+{% endfor %}
+{% else %}
+_No key questions captured._
+{% endif %}
+
+## Evidence Summary
+{% if evidence_rows %}
+| # | Evidence ID | Summary | Source | Citation | Relevance |
+| --- | --- | --- | --- | --- | --- |
+{% for ev in evidence_rows %}| {{ ev.index }} | {{ ev.evidence_id }} | {{ ev.summary | markdown_escape }} | {{ ev.source | markdown_escape }} | {{ ev.citation | markdown_escape }} | {{ ev.relevance_display }} |
+{% endfor %}
+{% else %}
+_No evidence linked to this mission._
+{% endif %}
+
+## Synthesis & Recommendations
+{% if synthesis.sections %}
+{% for section in synthesis.sections %}
+### {{ section.title }}
+{% if section.entries %}
+{% for item in section.entries %}- {{ item | markdown_escape }}
+{% endfor %}
+{% else %}
+_No entries._
+{% endif %}
+
+{% endfor %}
+{% else %}
+_No synthesis captured._
+{% endif %}
+
+## Quality Gates
+{% if quality_checkpoints %}
+| Gate | Status | Notes |
+| --- | --- | --- |
+{% for gate in quality_checkpoints %}| {{ gate.gate }} | {{ gate.status_label }} | {{ gate.notes | markdown_escape }} |
+{% endfor %}
+
+**Summary:** {{ quality_summary.passed }} passed, {{ quality_summary.pending }} pending, {{ quality_summary.failed }} failed.
+{% else %}
+_No quality checkpoints recorded._
+{% endif %}
+
+## Methodology & Discussion
+{% if methodology %}
+- **Participants:** {{ methodology.total_participants }}
+{% if methodology.segments %}- **Segments:** {{ methodology.segments | join("; ") }}
+{% endif %}
+{% if methodology.recruitment_method %}- **Recruitment:** {{ methodology.recruitment_method }}
+{% endif %}
+{% if methodology.validation_steps %}- **Validation Steps:** {{ methodology.validation_steps | join(", ") }}
+{% endif %}
+{% if methodology.artifacts %}- **Verified Artifacts:** {{ methodology.artifacts | join(", ") }}
+{% endif %}
+{% if methodology.notes %}- **Notes:** {{ methodology.notes | markdown_escape }}
+{% endif %}
+{% else %}
+- Methodology details not captured.
+{% endif %}
+
+{% if discussion_guide %}
+### Discussion Guide
+{% for prompt in discussion_guide %}- {{ prompt | markdown_escape }}
+{% endfor %}
+{% endif %}
+
+## Appendix: Evidence Details
+{% if appendix_evidence %}
+{% for ev in appendix_evidence %}
+### {{ ev.label }} — {{ ev.summary | markdown_escape }}
+- **Evidence ID:** {{ ev.evidence_id }}
+- **Source:** {{ ev.source | markdown_escape }}
+- **Citation:** {{ ev.citation | markdown_escape }}
+- **Chunk ID:** {{ ev.chunk_id or "n/a" }}
+- **Relevance:** {{ ev.relevance_display }}
+
+{{ ev.summary_long | markdown_escape }}
+
+---
+{% endfor %}
+{% else %}
+_No additional evidence details available._
+{% endif %}

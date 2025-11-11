@@ -86,6 +86,16 @@ class APIClient:
             response = client.get(url, headers=self.headers, params=params)
             return self._handle_response(response)
 
+    def get_binary(self, path: str, params: Optional[Dict[str, Any]] = None) -> httpx.Response:
+        """Make GET request that returns the raw response (for file downloads)."""
+        url = f"{self.base_url}{path}"
+        headers = dict(self.headers)
+        headers["Accept"] = "*/*"
+        with httpx.Client(timeout=self.timeout) as client:
+            response = client.get(url, headers=headers, params=params)
+            response.raise_for_status()
+            return response
+
     def post(
         self,
         path: str,

@@ -9,6 +9,17 @@ from cli.utils.api import APIClient
 from cli.utils.errors import CLIError, ValidationError, format_error_human, format_error_json
 
 
+def _filename_from_disposition(disposition: str | None) -> str | None:
+    if not disposition:
+        return None
+    parts = [segment.strip() for segment in disposition.split(";")]
+    for part in parts:
+        if part.lower().startswith("filename="):
+            _, _, value = part.partition("=")
+            return value.strip().strip('"\'')
+    return None
+
+
 @click.group()
 def missions():
     """Manage research missions."""
@@ -160,7 +171,13 @@ def import_cmd(ctx, project_id, yaml_file, promote):
 
 @missions.command()
 @click.argument("mission_id")
-@click.option("--format", "fmt", type=click.Choice(["md", "pdf", "docx"]), default="md", help="Export format")
+@click.option(
+    "--format",
+    "fmt",
+    type=click.Choice(["md", "pdf", "docx", "yaml"]),
+    default="md",
+    help="Export format",
+)
 @click.option("--output", "-o", type=click.Path(), help="Output file path")
 @click.pass_obj
 def export(ctx, mission_id, fmt, output):
@@ -169,23 +186,53 @@ def export(ctx, mission_id, fmt, output):
         client = APIClient(base_url=ctx.api_url, token=ctx.token)
 
         with ctx.output.progress_spinner(f"Exporting mission as {fmt}..."):
-            # Get export from API
-            result = client.get(f"/api/v1/missions/{mission_id}/export", params={"format": fmt})
-
-        # Save to file or print
-        content = result.get("content", "")
-
-        if output:
-            Path(output).write_text(content)
-            if ctx.json_mode:
-                ctx.output.success("Export complete", data={"file": output, "format": fmt})
+            if fmt == "yaml":
+                payload = client.get(
+                    f"/api/v1/missions/{mission_id}/export",
+                    params={"format": fmt},
+                )
             else:
-                ctx.output.success(f"Report exported to: {output}")
+                response = client.get_binary(
+                    f"/api/v1/missions/{mission_id}/export",
+                    params={"format": fmt},
+                )
+
+        if fmt == "yaml":
+            yaml_text = payload.get("yaml_text", "")
+            if output:
+                destination = Path(output)
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                destination.write_text(yaml_text)
+                if ctx.json_mode:
+                    ctx.output.success("Export complete", data={"file": str(destination), "format": fmt})
+                else:
+                    ctx.output.success(f"YAML exported to: {destination}")
+            else:
+                if ctx.json_mode:
+                    ctx.output.print_data({"format": fmt, "content": yaml_text})
+                else:
+                    print(yaml_text)
+            return
+
+        suggested_name = _filename_from_disposition(response.headers.get("content-disposition"))
+        default_name = suggested_name or f"{mission_id}.{fmt}"
+
+        if fmt == "md" and not output:
+            markdown = response.content.decode("utf-8")
+            if ctx.json_mode:
+                ctx.output.print_data({"format": fmt, "content": markdown})
+            else:
+                print(markdown)
+            return
+
+        destination = Path(output or default_name)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(response.content)
+
+        if ctx.json_mode:
+            ctx.output.success("Export complete", data={"file": str(destination), "format": fmt})
         else:
-            if ctx.json_mode:
-                ctx.output.print_data({"content": content, "format": fmt})
-            else:
-                print(content)
+            ctx.output.success(f"Report exported to: {destination}")
 
     except CLIError as e:
         if ctx.json_mode:
@@ -288,4 +335,3 @@ def delete(ctx, mission_id, confirm):
         else:
             print(format_error_human(e), file=sys.stderr)
         sys.exit(e.exit_code)
-
