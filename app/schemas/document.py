@@ -75,6 +75,25 @@ class DocumentRead(DocumentBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+class DocumentListItem(BaseModel):
+    """Slimmer document view for paginated listings."""
+
+    id: UUID
+    project_id: UUID
+    name: str
+    file_type: Optional[str] = None
+    file_size: Optional[int] = None
+    mime_type: Optional[str] = None
+    source_type: Optional[str] = None
+    uploaded_at: Optional[datetime] = None
+    processed: bool = False
+    chunked: bool = False
+    embedded: bool = False
+    validation_status: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 from app.schemas.chunk import DocumentChunkRead  # noqa: E402
 from app.schemas.tag import DocumentTagRead  # noqa: E402
 from app.schemas.document_status import DocumentProcessingStatusRead  # noqa: E402

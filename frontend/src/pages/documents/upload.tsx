@@ -4,7 +4,9 @@
 
 import { AuthGate } from "@/components/AuthGate";
 import { documentsApi } from "@/lib/api/documents";
+import { projectsApi } from "@/lib/api/projects";
 import type { Project } from "@/types/document";
+import type { PaginatedResponse } from "@/types/pagination";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import useSWR from "swr";
@@ -17,7 +19,11 @@ export default function DocumentUploadPage() {
   const [progress, setProgress] = useState<string[]>([]);
   const [autoProcess, setAutoProcess] = useState(true);
 
-  const { data: projects } = useSWR<Project[]>("projects", () => documentsApi.listProjects());
+  const { data: projectResponse } = useSWR<PaginatedResponse<Project>>(
+    ["projects", "upload"],
+    () => projectsApi.listProjects({ pageSize: 100 })
+  );
+  const projects = projectResponse?.data ?? [];
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -223,4 +229,3 @@ export default function DocumentUploadPage() {
     </AuthGate>
   );
 }
-

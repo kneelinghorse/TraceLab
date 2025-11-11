@@ -74,31 +74,52 @@ def upload(ctx, project_id, file_path, process, wait):
 
 
 @documents.command()
-@click.argument("project_id")
-@click.option("--status", type=click.Choice(["pending", "processing", "processed", "failed"]), help="Filter by status")
+@click.option("--project-id", help="Filter by project ID")
+@click.option(
+    "--status",
+    type=click.Choice(["all", "processed", "processing"]),
+    default="all",
+    show_default=True,
+    help="Pipeline completion filter",
+)
+@click.option("--page", default=1, show_default=True, type=int, help="Page number")
+@click.option("--page-size", default=20, show_default=True, type=int, help="Results per page")
+@click.option("--search", help="Search by document name")
 @click.pass_obj
-def list(ctx, project_id, status):
-    """List documents in a project."""
+def list(ctx, project_id, status, page, page_size, search):
+    """List documents with optional filters."""
     try:
         client = APIClient(base_url=ctx.api_url, token=ctx.token)
-        params = {"project_id": project_id}
+        params = {"page": page, "page_size": page_size}
+        if project_id:
+            params["project_id"] = project_id
+        if search:
+            params["search"] = search
+        if status == "processed":
+            params["processed"] = True
+        elif status == "processing":
+            params["processed"] = False
 
-        documents = client.get("/api/v1/documents", params=params)
-
-        # Filter by status if specified
-        if status:
-            documents = [d for d in documents if d.get("validation_status") == status]
+        response = client.get("/api/v1/documents", params=params)
 
         if ctx.json_mode:
-            ctx.output.print_data(documents)
-        else:
-            if not documents:
-                ctx.output.info("No documents found")
-            else:
-                ctx.output.success(f"Found {len(documents)} document(s):")
-                for doc in documents:
-                    proc_status = "✓" if doc.get("processed") else "○"
-                    ctx.output.info(f"  {proc_status} {doc['name']} ({doc['id']})")
+            ctx.output.print_data(response)
+            return
+
+        documents = response.get("data", [])
+        meta = response.get("pagination", {})
+        total = meta.get("total", len(documents))
+
+        if not documents:
+            ctx.output.info("No documents found for the requested filters")
+            return
+
+        ctx.output.success(
+            f"Page {meta.get('page', page)} of {meta.get('pages', '?')} (total {total})"
+        )
+        for doc in documents:
+            proc_status = "✓" if doc.get("processed") else "○"
+            ctx.output.info(f"  {proc_status} {doc['name']} ({doc['id']})")
 
     except CLIError as e:
         if ctx.json_mode:

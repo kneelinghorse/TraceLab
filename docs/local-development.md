@@ -81,6 +81,26 @@ curl http://localhost:8000/api/v1/health/db
 http://localhost:3000/missions
 ```
 
+## Project & Document Read APIs
+
+Authenticated endpoints power both the CLI and the Next.js SWR hooks. Each response contains a
+`data` array and `pagination` metadata so you can page through large backlogs.
+
+```bash
+# Requires a bearer token (see docs/authentication.md)
+
+# First page of projects (10 per page)
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:8000/api/v1/projects?page=1&page_size=10"
+
+# Filter documents by project and completion status
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:8000/api/v1/documents?project_id=$PROJECT_ID&processed=true&page=1&page_size=20"
+```
+
+Use these endpoints to capture IDs for `NEXT_PUBLIC_DEFAULT_PROJECT_ID`, populate the document
+library filters, or troubleshoot CLI pagination locally.
+
 ## Troubleshooting
 
 - **Ports already in use** – stop existing Postgres/Qdrant instances or change the forwarded

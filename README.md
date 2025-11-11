@@ -214,6 +214,34 @@ python scripts/upload_corpus.py --destination /secure/presidio/upload
 
 Refer to `data/corpus/README.md` for detailed options (document counts, survey rows, research briefs) and storage guidance.
 
+## Project & Document Read APIs
+
+Authenticated callers now receive paginated envelopes when browsing the research library:
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:8000/api/v1/projects?page=1&page_size=10&search=field"
+
+curl -H "Authorization: Bearer $TOKEN" \
+  "http://localhost:8000/api/v1/documents?project_id=$PROJECT_ID&processed=true&page=1&page_size=20"
+```
+
+Responses share the same shape:
+
+```json
+{
+  "data": [ { "id": "…", "name": "…" } ],
+  "pagination": { "page": 1, "page_size": 10, "total": 27, "pages": 3 }
+}
+```
+
+- `GET /api/v1/projects` supports `page`, `page_size`, and `search`.
+- `GET /api/v1/documents` adds `project_id`, `processed`, and `search` filters.
+
+The CLI (`tracelab projects list`, `tracelab documents list --project-id …`) and the frontend
+SWR hooks consume the same payload, ensuring UI selectors and filters stay in sync with the
+underlying FastAPI service.
+
 ## Development Notes
 
 - The application creates tables automatically in development mode

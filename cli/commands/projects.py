@@ -15,22 +15,37 @@ def projects():
 
 
 @projects.command()
+@click.option("--page", default=1, show_default=True, type=int, help="Page number")
+@click.option("--page-size", default=20, show_default=True, type=int, help="Results per page")
+@click.option("--search", help="Filter by project name")
 @click.pass_obj
-def list(ctx):
-    """List all projects."""
+def list(ctx, page, page_size, search):
+    """List projects with pagination."""
     try:
         client = APIClient(base_url=ctx.api_url, token=ctx.token)
-        projects = client.get("/api/v1/projects")
+        params = {"page": page, "page_size": page_size}
+        if search:
+            params["search"] = search
+
+        response = client.get("/api/v1/projects", params=params)
 
         if ctx.json_mode:
-            ctx.output.print_data(projects)
-        else:
-            if not projects:
-                ctx.output.info("No projects found")
-            else:
-                ctx.output.success(f"Found {len(projects)} project(s):")
-                for proj in projects:
-                    ctx.output.info(f"  - {proj['name']} ({proj['id']})")
+            ctx.output.print_data(response)
+            return
+
+        projects = response.get("data", [])
+        meta = response.get("pagination", {})
+        total = meta.get("total", len(projects))
+
+        if not projects:
+            ctx.output.info("No projects found for the requested page")
+            return
+
+        ctx.output.success(
+            f"Page {meta.get('page', page)} of {meta.get('pages', '?')} (total {total})"
+        )
+        for proj in projects:
+            ctx.output.info(f"  - {proj['name']} ({proj['id']})")
 
     except CLIError as e:
         if ctx.json_mode:
@@ -150,4 +165,3 @@ def delete(ctx, project_id, confirm):
         else:
             print(format_error_human(e), file=sys.stderr)
         sys.exit(e.exit_code)
-
