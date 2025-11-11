@@ -20,6 +20,18 @@ TraceLab secures every API route except `/api/v1/health` with bearer tokens. The
 
 **Local defaults:** Copy `.env.example` to `.env` and edit the values above as needed. Development stacks automatically hash `AUTH_PASSWORD`, so you only need the plain text secret. For production, prefer supplying `AUTH_PASSWORD_HASH` plus a strong `SECRET_KEY`.
 
+### Ingestion CLI Credentials
+
+The ingestion CLI reads credentials in the following order: CLI flags ➜ `INGEST_CLI_*` variables ➜
+`AUTH_*` variables ➜ FastAPI settings defaults. Exporting dedicated ingestion variables lets you keep
+CLI automation isolated from the service account used elsewhere.
+
+| Variable | Purpose | Example |
+| --- | --- | --- |
+| `INGEST_CLI_USERNAME` | Overrides the username for `scripts/ingest_cli.py` | `tracelab-admin` |
+| `INGEST_CLI_PASSWORD` | Overrides the password for the ingestion CLI | `changeme` |
+| `INGEST_CLI_TOKEN` | Supply a pre-issued JWT to skip the login request | `eyJhbGciOiJIUzI1N...` |
+
 ## Token Lifecycle
 
 1. **Login for an access token**
@@ -71,6 +83,29 @@ python examples/auth_examples.py --base-url http://localhost:8000 \
 ```
 
 The script prints each step and exits with non-zero status on failures, making it suitable for smoke-testing new deployments.
+
+### Ingestion CLI Authentication
+
+`scripts/ingest_cli.py` now authenticates automatically before uploading files. Provide credentials
+via env vars or pass them explicitly:
+
+```bash
+export AUTH_USERNAME=tracelab-admin
+export AUTH_PASSWORD=changeme
+# or export INGEST_CLI_USERNAME / INGEST_CLI_PASSWORD for CLI-only overrides
+
+python scripts/ingest_cli.py ./examples/markdown/sample.md $PROJECT_ID \
+  --base-url http://localhost:8000 \
+  --username "$AUTH_USERNAME" --password "$AUTH_PASSWORD"
+
+# Supply an already-issued token instead of logging in
+python scripts/ingest_cli.py ./docs/sample.md $PROJECT_ID \
+  --offline --token "$ACCESS_TOKEN"
+```
+
+The CLI obtains a token from `/api/v1/auth/login`, attaches the `Authorization: Bearer <token>`
+header to every ingestion request, and fails fast if the document never reaches `processed` and
+`chunked` status.
 
 ## Frontend Usage
 

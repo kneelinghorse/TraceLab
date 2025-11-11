@@ -101,6 +101,37 @@ curl -H "Authorization: Bearer $TOKEN" \
 Use these endpoints to capture IDs for `NEXT_PUBLIC_DEFAULT_PROJECT_ID`, populate the document
 library filters, or troubleshoot CLI pagination locally.
 
+## Ingestion CLI Workflow
+
+The Markdown ingestion workflow is exercised via `scripts/ingest_cli.py`, which now authenticates
+against `/api/v1/auth/login` before uploading files. Configure credentials once, then reuse them
+for both offline (`--offline`) and remote (`--base-url`) runs:
+
+```bash
+# Reuse the service account that also powers automated tests
+export AUTH_USERNAME=tracelab-admin
+export AUTH_PASSWORD=changeme
+
+# Optional overrides that only affect the ingestion CLI
+export INGEST_CLI_USERNAME="$AUTH_USERNAME"
+export INGEST_CLI_PASSWORD="$AUTH_PASSWORD"
+
+# Drive the pipeline against the in-process FastAPI app
+python scripts/ingest_cli.py ./examples/markdown/sample.md \
+  11111111-1111-1111-1111-111111111111 \
+  --offline --output tmp/ingest-cli-output.json
+```
+
+Flags:
+
+- `--username` / `--password` override the exported credentials.
+- `--token` skips the login call when you already have a bearer token (e.g., refreshed via `docs/authentication.md`).
+- `--base-url` points to a deployed API host; omit it when using `--offline`.
+
+The CLI waits for ingestion to finish (`processed` + `chunked`) and writes the workflow summary to
+STDOUT or `--output`. Use `docs/ingestion_onboarding_runbook.md` for advanced parity reporting once
+the CLI succeeds.
+
 ## Troubleshooting
 
 - **Ports already in use** – stop existing Postgres/Qdrant instances or change the forwarded
