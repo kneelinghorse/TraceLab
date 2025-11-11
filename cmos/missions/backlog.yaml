@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-11T20:38:19.615547+00:00'
+generatedAt: '2025-11-11T21:05:21.108014+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -524,7 +524,12 @@ domainFields:
         completed_at: '2025-11-11T20:37:13Z'
     - id: B7.3
       name: Ingestion CLI Auth & Workflow Proof
-      status: Current
+      status: Completed
+      completed_at: '2025-11-11T21:05:10Z'
+      notes: scripts/ingest_cli.py now logs in via env/flags, enforces chunked/processed
+        completion, docs/authentication.md + docs/local-development.md describe the
+        flow, telemetry/ingestion-cli-smoke.jsonl captures the pytest run, and parity
+        + foundational refs reran clean.
       metadata:
         description: Teach scripts/ingest_cli.py to authenticate and finish the Markdown
           ingestion workflow
@@ -537,9 +542,11 @@ domainFields:
         - Updated scripts/ingest_cli.py + helper libs
         - Docs + changelog entries
         - Telemetry JSONL summarizing ingest smoke
+        started_at: '2025-11-11T20:53:00Z'
+        completed_at: '2025-11-11T21:05:10Z'
     - id: B7.4
       name: Remove Presidio & Fix Cache Metrics
-      status: Queued
+      status: Current
       metadata:
         description: 'Remove Presidio dependencies (presidio-analyzer, presidio-anonymizer,
           presidio-evaluator) from requirements.txt. Stub or remove presidio_redaction.py
