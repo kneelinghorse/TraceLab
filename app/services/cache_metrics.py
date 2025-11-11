@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import threading
 import time
-from typing import Optional
+from typing import ClassVar, Optional
 
 try:  # pragma: no cover - prometheus optional
     from prometheus_client import Counter, Histogram
@@ -14,6 +14,9 @@ except ModuleNotFoundError:  # pragma: no cover
 class CacheMetrics:
     """Collect and expose semantic cache metrics with in-memory fallbacks."""
 
+    _PROM_METRICS: ClassVar[Optional[dict[str, object]]] = None
+    _PROM_LOCK: ClassVar[threading.Lock] = threading.Lock()
+
     def __init__(self) -> None:
         # In-memory counters for quick assertions and local introspection.
         self._lock = threading.Lock()
@@ -23,16 +26,13 @@ class CacheMetrics:
         self.eviction_count = 0
         self.lookup_latencies: list[float] = []
 
-        # Optional Prometheus instrumentation.
-        if Counter and Histogram:
-            self._hits = Counter("semantic_cache_hits_total", "Semantic cache hits", ["project_id"])
-            self._misses = Counter("semantic_cache_misses_total", "Semantic cache misses", ["project_id"])
-            self._errors = Counter("semantic_cache_errors_total", "Semantic cache errors")
-            self._evictions = Counter("semantic_cache_evictions_total", "Semantic cache evictions")
-            self._lookup_latency = Histogram(
-                "semantic_cache_lookup_latency_seconds",
-                "Semantic cache lookup latency distribution",
-            )
+        metrics = self._get_prometheus_metrics()
+        if metrics:
+            self._hits = metrics["hits"]
+            self._misses = metrics["misses"]
+            self._errors = metrics["errors"]
+            self._evictions = metrics["evictions"]
+            self._lookup_latency = metrics["lookup_latency"]
         else:  # pragma: no cover - instrumentation unavailable
             self._hits = None
             self._misses = None
@@ -100,6 +100,31 @@ class CacheMetrics:
                 "hit_rate": hit_rate,
                 "avg_lookup_seconds": mean_latency,
             }
+
+    @classmethod
+    def _get_prometheus_metrics(cls) -> Optional[dict[str, object]]:
+        """Return shared Prometheus collectors, creating them once per process."""
+        if not (Counter and Histogram):
+            return None
+        with cls._PROM_LOCK:
+            if cls._PROM_METRICS is None:
+                cls._PROM_METRICS = {
+                    "hits": Counter(
+                        "semantic_cache_hits_total", "Semantic cache hits", ["project_id"]
+                    ),
+                    "misses": Counter(
+                        "semantic_cache_misses_total", "Semantic cache misses", ["project_id"]
+                    ),
+                    "errors": Counter("semantic_cache_errors_total", "Semantic cache errors"),
+                    "evictions": Counter(
+                        "semantic_cache_evictions_total", "Semantic cache evictions"
+                    ),
+                    "lookup_latency": Histogram(
+                        "semantic_cache_lookup_latency_seconds",
+                        "Semantic cache lookup latency distribution",
+                    ),
+                }
+            return cls._PROM_METRICS
 
 
 # Global metrics sink used by the semantic cache service.

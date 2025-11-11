@@ -294,10 +294,11 @@ def _merge_sessions(old_entries: List[Dict[str, Any]], new_entries: List[Dict[st
             combined[key] = (entry, order)
             order += 1
 
-    def sort_key(item: Tuple[Dict[str, Any], int]) -> Tuple[datetime, Any, int]:
+    def sort_key(item: Tuple[Dict[str, Any], int]) -> Tuple[datetime, str, int]:
         payload, index = item
         ts = payload.get("timestamp") or payload.get("ts")
-        return (_parse_timestamp(ts), payload.get("session_id"), index)
+        session_id = payload.get("session_id") or ""
+        return (_parse_timestamp(ts), str(session_id), index)
 
     sorted_entries = sorted(combined.values(), key=sort_key)
     merged: List[Dict[str, Any]] = []

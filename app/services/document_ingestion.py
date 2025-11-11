@@ -12,7 +12,6 @@ from sqlalchemy.orm import Session
 
 from app.services.document_parser import DocumentParser
 from app.services.chunking import ChunkingService
-from app.services.presidio_redaction import PresidioRedactionService
 from app.services.processing_status import ProcessingStatusRecorder
 from app.services.coverage_report import CoverageReportGenerator
 from app.models.document import Document
@@ -24,7 +23,6 @@ class DocumentIngestionService:
     
     def __init__(
         self,
-        redaction_service: Optional[PresidioRedactionService] = None,
         chunking_service: Optional[ChunkingService] = None,
         status_recorder: Optional[ProcessingStatusRecorder] = None,
         coverage_report_generator: Optional[CoverageReportGenerator] = None,
@@ -33,13 +31,11 @@ class DocumentIngestionService:
         Initialize ingestion service.
         
         Args:
-            redaction_service: Optional PresidioRedactionService instance
             chunking_service: Optional ChunkingService instance
             status_recorder: Optional recorder for status audit trail
             coverage_report_generator: Optional coverage report generator
         """
         self.parser = DocumentParser()
-        self.redaction_service = redaction_service or PresidioRedactionService()
         self.chunking_service = chunking_service or ChunkingService()
         self.status_recorder = status_recorder or ProcessingStatusRecorder()
         self.coverage_report_generator = coverage_report_generator or CoverageReportGenerator()
@@ -56,9 +52,8 @@ class DocumentIngestionService:
         
         Pipeline stages:
         1. Parse document to extract text
-        2. Redact PII using Presidio
-        3. Chunk redacted text
-        4. Persist document and chunks to database
+        2. Chunk parsed text (PII redaction disabled)
+        3. Persist document and chunks to database
         
         Args:
             db: Database session
@@ -114,22 +109,9 @@ class DocumentIngestionService:
                 "text_length": len(raw_text)
             }
             
-            # Stage 2: Redact PII
+            # Stage 2: (Legacy) Redaction disabled
             current_stage = "redacted"
-            self.status_recorder.record(
-                db,
-                document_id,
-                current_stage,
-                "in_progress",
-                message="Invoking Presidio redaction",
-            )
-
-            redaction_result = self.redaction_service.redact_document(
-                text=raw_text,
-                document_id=str(document_id),
-                use_pseudonymization=True
-            )
-            redacted_text = redaction_result["redacted_text"]
+            redacted_text = raw_text
             document.content = redacted_text
             document.processed = True
             document.validation_status = "validated"
@@ -139,7 +121,7 @@ class DocumentIngestionService:
                 current_stage,
                 "succeeded",
                 details={
-                    "entities_detected": len(redaction_result["entities"]),
+                    "redaction_enabled": False,
                     "redacted_text_length": len(redacted_text)
                 },
                 commit=False,
@@ -148,12 +130,12 @@ class DocumentIngestionService:
             db.refresh(document)
 
             result["stages"]["redacted"] = {
-                "status": "success",
-                "entities_detected": len(redaction_result["entities"]),
+                "status": "skipped",
+                "reason": "Presidio redaction disabled",
                 "redacted_text_length": len(redacted_text)
             }
             
-            # Stage 3: Chunk redacted text
+            # Stage 3: Chunk parsed text
             current_stage = "chunked"
             self.status_recorder.record(
                 db,
