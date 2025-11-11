@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-11T06:30:49.562365+00:00'
+generatedAt: '2025-11-11T20:38:19.615547+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -431,13 +431,131 @@ domainFields:
         completed_at: '2025-11-11T06:30:33Z'
     - id: B6.5
       name: Report Export System
-      status: Current
+      status: Completed
+      completed_at: '2025-11-11T15:51:12Z'
+      notes: 'Implemented report_export service + FastAPI export endpoint, CLI binary
+        downloads, mission UI export selector, and docs/report_export.md. Tests: pytest
+        tests/test_report_export.py tests/integration/test_mission_api.py.'
+      metadata:
+        started_at: '2025-11-11T15:18:35Z'
+        completed_at: '2025-11-11T15:51:12Z'
     - id: B6.6
       name: Integration API
-      status: Queued
+      status: Blocked
+      notes: Deferred - wait until core TraceLab functionality validated before building
+        integration features
     - id: B6.7
       name: Sprint Retrospective
+      status: Completed
+      completed_at: '2025-11-11T17:22:06Z'
+      notes: Created cmos/reports/sprint-06/SPRINT-06-RETROSPECTIVE.md, logged telemetry/events/sprint-06-retrospective.jsonl,
+        added B7.1-B7.4 missions, updated contexts, and documented failing tests (presidio,
+        cache metrics, ingest CLI).
+      metadata:
+        description: Conduct Sprint 06 retrospective evaluating foundational fixes
+          (API URL, local dev, auth), assess CLI and document UI functionality, validate
+          end-to-end workflows, and document findings for Sprint 07 planning
+        successCriteria:
+        - Sprint 06 retrospective report generated with lessons learned, blockers
+          documented, Sprint 07 backlog seeded with fixes
+        deliverables:
+        - cmos/reports/sprint-06/SPRINT-06-RETROSPECTIVE.md
+        started_at: '2025-11-11T17:03:26Z'
+        completed_at: '2025-11-11T17:22:06Z'
+  - sprintId: sprint-07
+    title: Sprint 07 - Reliability & Workflow Unblocking
+    focus: Ship read APIs, restore guardrails, and unblock ingestion workflows
+    status: Planned
+    startDate: '2025-11-21'
+    endDate: '2025-12-05'
+    totalMissions: 4
+    completedMissions: 0
+    missions:
+    - id: B7.1
+      name: Document & Project Read APIs
+      status: Completed
+      completed_at: '2025-11-11T20:22:14Z'
+      notes: Implemented paginated GET /api/v1/projects and /api/v1/documents with
+        new schemas/services, updated CLI + docs, added frontend Projects page & richer
+        document filters, and added pytest + type-check coverage. Validated with pytest
+        tests/test_project_document_read_api.py, npm run type-check, validate_foundational_refs.py,
+        and validate_parity.py.
+      metadata:
+        description: 'Implement GET /api/v1/projects list/detail and GET /api/v1/documents
+          list/filter endpoints with pagination and auth guards. Add UI pages: project
+          creation form, project list/selector, and document list with project filtering.
+          Success: SWR hooks work, CLI commands functional, UI usable for project
+          and document management.'
+        successCriteria:
+        - GET /api/v1/projects and /api/v1/documents return paginated 200 responses
+          with bearer auth
+        - Document Library UI + CLI list commands show real data (SWR retries resolved)
+        - Playwright/pytest coverage added for the new read APIs
+        deliverables:
+        - FastAPI routes + schemas + service wiring
+        - Regression tests + telemetry snippet proving list APIs
+        - README/local-development doc updates for new endpoints
+        started_at: '2025-11-11T19:09:13Z'
+        completed_at: '2025-11-11T20:22:14Z'
+    - id: B7.2
+      name: Integration Test Runbook & Guardrails
+      status: Completed
+      completed_at: '2025-11-11T20:37:13Z'
+      notes: Authored cmos/docs/integration-testing-guide.md, expanded cmos/agents.md
+        + context guardrail sections via SQLite export, reset backlog state for B7.1/B7.2,
+        and reran node cmos/context/integration_test_runner.js --output telemetry/events/testing-summary.json
+        to produce a green telemetry/events/testing-summary.json artifact.
+      metadata:
+        description: 'Find and fix CMOS boundary violation where CMOS code imports
+          from app.services. Author integration-testing-guide.md documenting CMOS-only
+          tests. Make integration_test_runner.js green. Success: No app imports in
+          cmos/, test runner passes, CMOS tests isolated from application code.'
+        successCriteria:
+        - cmos/docs/integration-testing-guide.md created with prerequisites + steps
+        - agents.md and context/MASTER_CONTEXT.json document structured prompting
+          + integration expectations
+        - node cmos/context/integration_test_runner.js --output telemetry/events/testing-summary.json
+          passes
+        deliverables:
+        - Integration testing guide + updated contexts
+        - Telemetry log proving runner success
+        - Mission notes referencing updated guardrails
+        started_at: '2025-11-11T20:28:12Z'
+        completed_at: '2025-11-11T20:37:13Z'
+    - id: B7.3
+      name: Ingestion CLI Auth & Workflow Proof
+      status: Current
+      metadata:
+        description: Teach scripts/ingest_cli.py to authenticate and finish the Markdown
+          ingestion workflow
+        successCriteria:
+        - CLI can log in (env vars or flags) before uploading and processing documents
+        - pytest tests/integration/test_ingestion_flow.py::test_markdown_cli_flow
+          passes
+        - Workflow documented in docs/local-development.md + docs/authentication.md
+        deliverables:
+        - Updated scripts/ingest_cli.py + helper libs
+        - Docs + changelog entries
+        - Telemetry JSONL summarizing ingest smoke
+    - id: B7.4
+      name: Remove Presidio & Fix Cache Metrics
       status: Queued
+      metadata:
+        description: 'Remove Presidio dependencies (presidio-analyzer, presidio-anonymizer,
+          presidio-evaluator) from requirements.txt. Stub or remove presidio_redaction.py
+          service. Update ingestion pipeline to skip PII redaction. Fix cache_metrics.py
+          Prometheus counter duplication. Success: No Presidio imports, ingestion
+          works without redaction, cache metrics test passes.'
+        successCriteria:
+        - pytest tests/test_presidio_redaction.py::test_redact_document_uses_pseudonymization_and_audit
+          passes
+        - pytest tests/test_rag_service.py::test_semantic_cache_hit_rate_reaches_target
+          passes
+        - Quality gate checklist updated to include the repaired tests
+        deliverables:
+        - Code fixes in app/services/presidio_redaction.py and app/services/cache_metrics.py
+        - Test evidence + telemetry entry
+        - Docs/README note covering the new guardrail
   - sprintId: sprint-05
     title: Sprint 05 - Frontend Deployment & Auth Hardening
     focus: Ship hosted Next.js UI, secure API access, and production domain wiring
