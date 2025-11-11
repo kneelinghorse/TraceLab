@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-11T21:05:21.108014+00:00'
+generatedAt: '2025-11-11T22:22:38.135017+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -546,7 +546,12 @@ domainFields:
         completed_at: '2025-11-11T21:05:10Z'
     - id: B7.4
       name: Remove Presidio & Fix Cache Metrics
-      status: Current
+      status: Completed
+      completed_at: '2025-11-11T22:16:20Z'
+      notes: Presidio removed in favor of regex stub; ingestion bypasses redaction;
+        cache metrics reuse shared Prom counters; pytest tests/test_presidio_redaction.py::test_redact_document_uses_pseudonymization_and_audit
+        and tests/test_rag_service.py::test_semantic_cache_hit_rate_reaches_target
+        both pass.
       metadata:
         description: 'Remove Presidio dependencies (presidio-analyzer, presidio-anonymizer,
           presidio-evaluator) from requirements.txt. Stub or remove presidio_redaction.py
@@ -563,6 +568,8 @@ domainFields:
         - Code fixes in app/services/presidio_redaction.py and app/services/cache_metrics.py
         - Test evidence + telemetry entry
         - Docs/README note covering the new guardrail
+        started_at: '2025-11-11T22:03:48Z'
+        completed_at: '2025-11-11T22:16:20Z'
   - sprintId: sprint-05
     title: Sprint 05 - Frontend Deployment & Auth Hardening
     focus: Ship hosted Next.js UI, secure API access, and production domain wiring

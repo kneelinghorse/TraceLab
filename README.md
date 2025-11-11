@@ -191,6 +191,13 @@ curl http://localhost:8000/api/v1/health
 curl http://localhost:8000/api/v1/health/db
 ```
 
+## PII Redaction Guardrail
+
+- Presidio dependencies have been removed. The `PresidioRedactionService` name now refers to a lightweight regex stub that only powers `/api/v1/redaction`.
+- `DocumentIngestionService` skips PII redaction entirely and records `"redaction_enabled": false` in its processing audit trail.
+- Run `pytest tests/test_presidio_redaction.py::test_redact_document_uses_pseudonymization_and_audit` and `pytest tests/test_rag_service.py::test_semantic_cache_hit_rate_reaches_target` whenever touching ingestion, cache metrics, or related guardrails.
+- See `app/services/README_redaction.md` for the full guardrail checklist and migration notes.
+
 ## Synthetic Corpus Pipeline (B1.2)
 
 Regenerate the synthetic UX research corpus (Markdown, TXT, DOCX, PDF, CSV) populated with locale-aware Faker PII:

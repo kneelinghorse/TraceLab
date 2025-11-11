@@ -43,3 +43,12 @@ These events feed Sprint 03 telemetry and the Sprint Efficacy Evaluator mission.
 - Gate logic operates on `MissionProtocolDraft` payloads, so YAML imports and API writes share the same enforcement code path.
 - `QualityGateService` mirrors the gate results into `mission_data.quality_checkpoints`, ensuring progress snapshots and database constraints remain consistent.
 - The evidence-threshold is configurable via `QualityGateService(evidence_threshold=...)` and defaults to 1 chunk per insight.
+
+## Validation Checklist
+
+Run the following regression tests before marking a gate remediation mission complete:
+
+1. `pytest tests/test_presidio_redaction.py::test_redact_document_uses_pseudonymization_and_audit`
+2. `pytest tests/test_rag_service.py::test_semantic_cache_hit_rate_reaches_target`
+
+Record the passing evidence in mission telemetry and link the test output in the mission notes.
