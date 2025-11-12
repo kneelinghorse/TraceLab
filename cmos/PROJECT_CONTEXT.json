@@ -13,7 +13,7 @@
   },
   "working_memory": {
     "active_domain": "starter",
-    "session_count": 78,
+    "session_count": 79,
     "last_session": "2025-11-12T01:38:51Z",
     "agents_md_path": "./agents.md",
     "agents_md_loaded": false,
@@ -390,6 +390,13 @@
         "summary": "Qdrant admin endpoints shipped",
         "action": "complete",
         "ts": "2025-11-12T01:38:51Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "codex",
+        "summary": "Ingestion embedding fix recorded",
+        "action": "update",
+        "ts": "2025-11-12T06:13:21Z"
       }
     ],
     "blocked_missions": [
@@ -419,10 +426,10 @@
   "context_health": {
     "size_kb": 9.63,
     "size_limit_kb": 100,
-    "sessions_since_reset": 58,
+    "sessions_since_reset": 59,
     "last_reset": "",
     "compression_enabled": false,
-    "last_update": "2025-11-12T01:38:51Z"
+    "last_update": "2025-11-12T06:13:21Z"
   },
   "metadata": {
     "migrated_at": "2025-11-11T22:22:26.906669+00:00",
