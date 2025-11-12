@@ -31,6 +31,7 @@ This guide extends the environment provisioning workflow captured in `docs/imple
    - Qdrant connectivity (`status=healthy`).
    - Collection presence (`collection_exists=true`).
    - Actual vs. expected vector dimensions (should be 1536) and distance metric (COSINE) so deviations are easy to spot during ops reviews.
+   - Payload index readiness for `project_id`, `document_id`, and `source_type` via the `payload_indexes` array—every entry must report `present=true` before ingesting content.
 
 4. **Document the run** by appending the command outputs to your deployment journal and ensuring `python cmos/scripts/validate_parity.py --check` still passes. If problems persist, follow the remediation checklist in `docs/implementation_guide.md` (Qdrant section) before escalating.
 
