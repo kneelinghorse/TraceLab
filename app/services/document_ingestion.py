@@ -1,10 +1,12 @@
 """
 Document ingestion service.
 
-Orchestrates the complete ingestion pipeline: parsing, redaction, chunking, and persistence.
+Orchestrates the complete ingestion pipeline: parsing, redaction, chunking, embeddings,
+and persistence.
 """
 
 import logging
+import time
 from pathlib import Path
 from typing import Optional, Dict, Any, List
 from uuid import UUID
@@ -51,6 +53,33 @@ class DocumentIngestionService:
         self.embedding_service = embedding_service
         self.qdrant_service = qdrant_service
         self.redaction_service = redaction_service
+        self._qdrant_collection_ready = False
+
+    def _resolve_embedding_dependencies(self) -> None:
+        """
+        Lazily load embedding and Qdrant services when configuration allows.
+
+        Explicitly injected services (e.g., during tests) always win.
+        """
+        env_allows_auto = settings.environment.lower() != "test"
+        if self.embedding_service is None and env_allows_auto and settings.openai_api_key:
+            self.embedding_service = get_embedding_service()
+        if self.qdrant_service is None and env_allows_auto and settings.qdrant_url:
+            self.qdrant_service = get_qdrant_service()
+
+    def _embedding_skip_reason(self) -> str:
+        """Human-friendly explanation for why the embedding stage is skipped."""
+        if self.embedding_service is None:
+            if settings.environment.lower() == "test":
+                return "Embedding disabled in test environment"
+            if not settings.openai_api_key:
+                return "OPENAI_API_KEY not configured"
+            return "Embedding service unavailable"
+        if self.qdrant_service is None:
+            if not settings.qdrant_url:
+                return "QDRANT_URL not configured"
+            return "Qdrant service unavailable"
+        return "Embedding prerequisites not met"
     
     def process_document(
         self,
@@ -237,15 +266,15 @@ class DocumentIngestionService:
 
             # Stage 5: Generate embeddings and upsert to Qdrant
             current_stage = "embedded"
-            embeddings_configured = (
-                settings.environment.lower() != "test"
-                and bool(
-                    self.embedding_service
-                    or (settings.openai_api_key and settings.qdrant_url)
-                )
+            self._resolve_embedding_dependencies()
+            embedding_service = self.embedding_service
+            qdrant_service = self.qdrant_service
+
+            embedding_conditions_met = (
+                bool(chunk_records) and embedding_service is not None and qdrant_service is not None
             )
 
-            if chunk_records and embeddings_configured:
+            if embedding_conditions_met:
                 self.status_recorder.record(
                     db,
                     document_id,
@@ -255,11 +284,11 @@ class DocumentIngestionService:
                 )
 
                 try:
-                    embedding_service = self.embedding_service or get_embedding_service()
-                    self.embedding_service = embedding_service
-                    qdrant_service = self.qdrant_service or get_qdrant_service()
-                    self.qdrant_service = qdrant_service
+                    if not self._qdrant_collection_ready:
+                        qdrant_service.ensure_collection(write_optimized=False)
+                        self._qdrant_collection_ready = True
 
+                    embedding_started = time.perf_counter()
                     texts = [chunk.content for chunk in chunk_records]
                     embeddings = embedding_service.generate_embeddings_batch(texts)
                     if len(embeddings) != len(chunk_records):
@@ -283,40 +312,62 @@ class DocumentIngestionService:
                         payload.append(payload_item)
 
                     qdrant_service.upsert_chunks(payload)
+                    duration_seconds = round(time.perf_counter() - embedding_started, 4)
                     document.embedded = True
+                    stage_details = {
+                        "chunks_embedded": len(payload),
+                        "duration_seconds": duration_seconds,
+                        "collection": qdrant_service.collection_name,
+                    }
                     self.status_recorder.record(
                         db,
                         document_id,
                         current_stage,
                         "succeeded",
-                        details={
-                            "chunks_embedded": len(payload)
-                        },
+                        details=stage_details,
                         commit=False,
                     )
                     db.commit()
+                    result.setdefault("metrics", {})
+                    result["metrics"]["embedding_duration_seconds"] = duration_seconds
 
                     result["stages"]["embedded"] = {
                         "status": "success",
-                        "chunks_embedded": len(payload)
+                        **stage_details,
                     }
                 except Exception as exc:
                     logger.exception("Failed to embed document %s", document_id)
+                    document.embedded = False
+                    self.status_recorder.record(
+                        db,
+                        document_id,
+                        current_stage,
+                        "failed",
+                        message="Embedding stage failed",
+                        details={"error": str(exc)},
+                        commit=False,
+                    )
+                    db.commit()
+                    result["stages"]["embedded"] = {
+                        "status": "failed",
+                        "error": str(exc)
+                    }
                     raise
             elif chunk_records:
+                reason = self._embedding_skip_reason()
                 self.status_recorder.record(
                     db,
                     document_id,
                     current_stage,
                     "skipped",
-                    message="Embedding service not configured",
+                    message=reason,
                     commit=False,
                 )
                 document.embedded = False
                 db.commit()
                 result["stages"]["embedded"] = {
                     "status": "skipped",
-                    "reason": "Embedding service not configured"
+                    "reason": reason
                 }
             else:
                 result["stages"]["embedded"] = {

@@ -40,6 +40,13 @@ class QdrantService:
                 "The qdrant-client package is required for vector storage interactions. "
                 "Install dependencies from requirements.txt."
             ) from _qdrant_import_error
+        if not settings.qdrant_url:
+            raise ValueError("QDRANT_URL must be configured before using QdrantService")
+        if settings.qdrant_api_key and settings.qdrant_url.startswith("http://"):
+            raise ValueError(
+                "QDRANT_URL must use HTTPS when QDRANT_API_KEY is set. "
+                "See docs/qdrant-railway-setup.md and R7.1 research notes."
+            )
         self.client = QdrantClient(
             url=settings.qdrant_url,
             api_key=settings.qdrant_api_key if settings.qdrant_api_key else None,
