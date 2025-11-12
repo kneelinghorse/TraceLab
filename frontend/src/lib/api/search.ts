@@ -1,8 +1,8 @@
 import { httpClient } from "@/lib/api/http";
 import type { RagResponsePayload, SearchQueryParams, SemanticSearchResponse } from "@/types/search";
 
-const SEMANTIC_PATH = "/api/v1/retrieval/search";
-const RAG_PATH = "/api/v1/search";
+const SEMANTIC_PATH = "/retrieval/search";
+const RAG_PATH = "/search";
 
 export const searchApi = {
   semanticSearch(params: SearchQueryParams) {

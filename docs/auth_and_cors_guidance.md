@@ -99,7 +99,7 @@ CORS_ALLOWED_ORIGINS_DEV=["http://localhost:3000"]
 NEXT_PUBLIC_API_BASE_URL=https://api.namozine.com
 ```
 
-After updating the environment variables, restart the FastAPI process and re-run the production Playwright smoke suite to verify that `https://namozine.com/missions` and `https://api.namozine.com/api/v1/health` both succeed with `access-control-allow-origin: https://namozine.com`. The frontend automatically appends `/api/v1` paths, so do not include the suffix in `NEXT_PUBLIC_API_BASE_URL`.
+After updating the environment variables, restart the FastAPI process and re-run the production Playwright smoke suite to verify that `https://namozine.com/missions` and `https://api.namozine.com/api/v1/health` (or whatever path matches `NEXT_PUBLIC_API_PATH_PREFIX`) both succeed with `access-control-allow-origin: https://namozine.com`. Keep `NEXT_PUBLIC_API_BASE_URL` host-only and adjust `NEXT_PUBLIC_API_PATH_PREFIX` (`/api/v1` by default, set to `""` for root-level APIs) instead of hard-coding suffixes into the base URL.
 
 ## TraceLab Implementation Notes
 

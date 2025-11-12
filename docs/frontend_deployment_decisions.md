@@ -31,8 +31,9 @@ The `.env.production.example` file under `frontend/` is the canonical checklist 
 | --- | --- | --- |
 | `NODE_ENV=production` | Enables production optimisations | Keep synced with build environment |
 | `NEXT_TELEMETRY_DISABLED=1` | Disables Next.js telemetry uploads | Required per security guardrails |
-| `NEXT_PUBLIC_API_BASE_URL` | Points UI calls at the FastAPI backend (`https://<api-domain>`) | Host only; the frontend client appends `/api/v1` |
-| `NEXT_PUBLIC_DEFAULT_PROJECT_ID` | Seeds the Mission Protocol form | Query `GET /api/v1/projects` to capture the UUID |
+| `NEXT_PUBLIC_API_BASE_URL` | Points UI calls at the FastAPI backend (`https://<api-domain>`) | Host only; use `NEXT_PUBLIC_API_PATH_PREFIX` for suffixes |
+| `NEXT_PUBLIC_API_PATH_PREFIX=/api/v1` | Declares the path segment inserted before every API call | Set to `""` when the backend lives at the domain root |
+| `NEXT_PUBLIC_DEFAULT_PROJECT_ID` | Seeds the Mission Protocol form | Query `GET /projects` (respecting the configured prefix) to capture the UUID |
 | `PORT=3000` | Local parity with Railway’s port injection | Set manually for local smoke tests |
 
 ## Deploy & Smoke Test Runbook
@@ -47,7 +48,7 @@ The `.env.production.example` file under `frontend/` is the canonical checklist 
 ## Cloudflare Domain Wiring
 
 - **Root & www:** `namozine.com` and `www.namozine.com` are proxied (orange-cloud) CNAMEs that terminate at `frontend-production-43c3.up.railway.app`. Keep SSL/TLS mode on **Full (Strict)** so Cloudflare validates Railway's managed certificate. Run `dig namozine.com CNAME +short` (should surface the Railway target behind Cloudflare flattening) and `curl -I https://namozine.com/missions` (expect `HTTP/2 200`).
-- **API subdomain:** `api.namozine.com` proxies to `tracelab-production.up.railway.app` without rewriting the path prefix. Validate health with `curl https://api.namozine.com/api/v1/health` and confirm `access-control-allow-origin: https://namozine.com` is present on the CORS pre-flight response.
+- **API subdomain:** `api.namozine.com` proxies to `tracelab-production.up.railway.app` without rewriting the path prefix. Validate health with `curl https://api.namozine.com/api/v1/health` (adjust the `/api/v1` segment to match `NEXT_PUBLIC_API_PATH_PREFIX`) and confirm `access-control-allow-origin: https://namozine.com` is present on the CORS pre-flight response.
 - **Allowed origins:** When promoting a new vanity domain, append both `https://<domain>` and `https://www.<domain>` to `CORS_ALLOWED_ORIGINS_PROD` so the FastAPI middleware mirrors Cloudflare's hostnames. Production smoke tests (`PLAYWRIGHT_BASE_URL=https://namozine.com PLAYWRIGHT_API_BASE_URL=https://api.namozine.com PLAYWRIGHT_SKIP_SERVER=1 npx playwright test tests/e2e/production-smoke.spec.ts`) provide an automated proof that DNS, TLS, and the API are in sync.
 - **Fallback strategy:** Keep the native Railway URLs (`https://frontend-production-43c3.up.railway.app` and `https://tracelab-production.up.railway.app/api/v1`) documented for emergency cutovers. Disable the Cloudflare proxy temporarily if you need to validate origin certificates directly.
 

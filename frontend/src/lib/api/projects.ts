@@ -15,14 +15,14 @@ export const projectsApi = {
       page_size: params.pageSize,
       search: params.search,
     };
-    return httpClient.get("/api/v1/projects", { params: query });
+    return httpClient.get("/projects", { params: query });
   },
 
   getProject(projectId: string): Promise<Project> {
-    return httpClient.get(`/api/v1/projects/${projectId}`);
+    return httpClient.get(`/projects/${projectId}`);
   },
 
   createProject(data: { name: string; description?: string; research_type?: string }): Promise<Project> {
-    return httpClient.post("/api/v1/projects", data);
+    return httpClient.post("/projects", data);
   },
 };

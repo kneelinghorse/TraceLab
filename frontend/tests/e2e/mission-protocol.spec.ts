@@ -4,11 +4,19 @@ import missionDetail from "../fixtures/mission-detail.json";
 import missions from "../fixtures/missions.json";
 import qualityReport from "../fixtures/quality-report.json";
 
-const missionsApi = "http://localhost:8000/api/v1/missions";
+const apiBase = (process.env.PLAYWRIGHT_API_BASE_URL ?? "http://localhost:8000").replace(/\/$/, "");
+const apiPrefix = (process.env.PLAYWRIGHT_API_PATH_PREFIX ?? "/api/v1").replace(/\/$/, "");
+const buildApiUrl = (path: string) => {
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  const prefix = apiPrefix ? apiPrefix : "";
+  return `${apiBase}${prefix}${normalized}`;
+};
+
+const missionsApi = buildApiUrl("/missions");
 const missionId = "11111111-1111-1111-1111-111111111111";
 const endpoints = {
   detail: `${missionsApi}/${missionId}`,
-  quality: `http://localhost:8000/api/v1/quality/missions/${missionId}/quality`,
+  quality: buildApiUrl(`/quality/missions/${missionId}/quality`),
 };
 
 const jsonResponse = (payload: unknown) => ({

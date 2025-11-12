@@ -4,7 +4,7 @@
 
 import type { Document, DocumentProcessResult, DocumentUploadResponse } from "@/types/document";
 import type { PaginatedResponse } from "@/types/pagination";
-import { httpClient, API_BASE_URL } from "./http";
+import { buildApiUrl, httpClient } from "./http";
 import { getStoredAuth } from "@/lib/auth/storage";
 
 export type ListDocumentsParams = {
@@ -27,14 +27,14 @@ export const documentsApi = {
       page: params.page,
       page_size: params.pageSize,
     };
-    return httpClient.get("/api/v1/documents", { params: query });
+    return httpClient.get("/documents", { params: query });
   },
 
   /**
    * Get document by ID
    */
   async getDocument(documentId: string): Promise<Document> {
-    const response = await httpClient.get(`/api/v1/documents/${documentId}`);
+    const response = await httpClient.get(`/documents/${documentId}`);
     return response as Document;
   },
 
@@ -48,7 +48,7 @@ export const documentsApi = {
     const auth = getStoredAuth();
     const token = auth?.token ?? "";
     const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
-    const response = await fetch(`${API_BASE_URL}/api/v1/documents/upload?project_id=${projectId}`, {
+    const response = await fetch(buildApiUrl("/documents/upload", { project_id: projectId }), {
       method: "POST",
       headers,
       body: formData,
@@ -66,7 +66,7 @@ export const documentsApi = {
    * Process a document
    */
   async processDocument(documentId: string): Promise<DocumentProcessResult> {
-    const response = await httpClient.post(`/api/v1/documents/${documentId}/process`, {});
+    const response = await httpClient.post(`/documents/${documentId}/process`, {});
     return response as DocumentProcessResult;
   },
 
@@ -74,6 +74,6 @@ export const documentsApi = {
    * Delete a document
    */
   async deleteDocument(documentId: string): Promise<void> {
-    await httpClient.delete(`/api/v1/documents/${documentId}`);
+    await httpClient.delete(`/documents/${documentId}`);
   },
 };

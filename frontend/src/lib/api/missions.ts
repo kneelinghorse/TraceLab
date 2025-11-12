@@ -6,7 +6,7 @@ import type {
   QualityGateReport,
 } from "@/types/mission";
 
-const MISSIONS_PATH = "/api/v1/missions";
+const MISSIONS_PATH = "/missions";
 
 export async function fetchMissions(): Promise<Mission[]> {
   return apiRequest<Mission[]>(`${MISSIONS_PATH}`);
@@ -31,5 +31,5 @@ export async function updateMission(missionId: string, payload: MissionUpdatePay
 }
 
 export async function fetchQualityReport(missionId: string): Promise<QualityGateReport> {
-  return apiRequest<QualityGateReport>(`/api/v1/quality/missions/${missionId}/quality`);
+  return apiRequest<QualityGateReport>(`/quality/missions/${missionId}/quality`);
 }
