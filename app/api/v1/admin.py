@@ -1,14 +1,44 @@
 """Admin endpoints for Qdrant initialization and health checks."""
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable
+from typing import Any, Dict, Iterable, List, Literal
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
+from pydantic import BaseModel
 
 from app.core.config import settings
 from app.services.qdrant_service import QdrantService, get_qdrant_service
 
 router = APIRouter(tags=["admin"])
+_EXPECTED_PAYLOAD_INDEXES = ("project_id", "document_id", "source_type")
+
+
+class PayloadIndexStatus(BaseModel):
+    """Pydantic representation of payload index readiness."""
+
+    field: str
+    present: bool
+
+
+class QdrantInitResponse(BaseModel):
+    """Response payload returned after initialization attempts."""
+
+    status: Literal["initialized"]
+    collection: str
+    write_optimized: bool
+    qdrant_url: str
+
+
+class QdrantHealthResponse(BaseModel):
+    """Response payload for Qdrant health checks."""
+
+    status: Literal["healthy", "collection_missing"]
+    collection: str
+    collection_exists: bool
+    qdrant_url: str
+    expected: Dict[str, Any]
+    actual: Dict[str, Any]
+    payload_indexes: List[PayloadIndexStatus]
 
 
 def get_admin_qdrant_service() -> QdrantService:
@@ -26,7 +56,17 @@ def _extract_attr(obj: Any, path: Iterable[str]) -> Any:
     return current
 
 
-@router.post("/init-qdrant")
+def _payload_indexes(info: Any) -> List[PayloadIndexStatus]:
+    """Return readiness information for payload indexes we rely on."""
+    payload_schema = getattr(info, "payload_schema", None) if info else None
+    schema_dict = payload_schema if isinstance(payload_schema, dict) else {}
+    statuses: List[PayloadIndexStatus] = []
+    for field in _EXPECTED_PAYLOAD_INDEXES:
+        statuses.append(PayloadIndexStatus(field=field, present=field in schema_dict))
+    return statuses
+
+
+@router.post("/init-qdrant", response_model=QdrantInitResponse)
 def init_qdrant_collection(
     write_optimized: bool = Body(
         False,
@@ -55,7 +95,7 @@ def init_qdrant_collection(
     }
 
 
-@router.get("/health")
+@router.get("/health", response_model=QdrantHealthResponse)
 def qdrant_health(service: QdrantService = Depends(get_admin_qdrant_service)) -> Dict[str, Any]:
     """Report Qdrant connectivity and collection readiness."""
 
@@ -93,4 +133,5 @@ def qdrant_health(service: QdrantService = Depends(get_admin_qdrant_service)) ->
             "status": status_value,
             "vectors_count": vectors_count,
         },
+        "payload_indexes": _payload_indexes(info),
     }

@@ -43,6 +43,11 @@ class _FakeQdrantClient:
                     )
                 )
             ),
+            payload_schema={
+                "project_id": {"data_type": "keyword"},
+                "document_id": {"data_type": "keyword"},
+                "source_type": {"data_type": "keyword"},
+            },
         )
 
 
@@ -149,6 +154,11 @@ def test_health_reports_collection_readiness(client: TestClient):
     assert payload["status"] == "healthy"
     assert payload["collection_exists"] is True
     assert payload["actual"]["vector_size"] == settings.openai_embedding_dimension
+    assert payload["payload_indexes"] == [
+        {"field": "project_id", "present": True},
+        {"field": "document_id", "present": True},
+        {"field": "source_type", "present": True},
+    ]
 
 
 def test_health_returns_service_unavailable_on_errors(client: TestClient):
