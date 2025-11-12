@@ -3,6 +3,7 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1 import (
+    admin,
     auth,
     documents,
     health,
@@ -48,6 +49,12 @@ protected_dependencies = [Depends(require_authenticated_user)]
 
 # Include routers
 app.include_router(health.router, prefix=settings.api_v1_prefix, tags=["health"])
+app.include_router(
+    admin.router,
+    prefix=f"{settings.api_v1_prefix}/admin",
+    tags=["admin"],
+    dependencies=protected_dependencies,
+)
 app.include_router(redaction.router, prefix=f"{settings.api_v1_prefix}/redaction", tags=["redaction"], dependencies=protected_dependencies)
 app.include_router(documents.router, prefix=f"{settings.api_v1_prefix}/documents", tags=["documents"], dependencies=protected_dependencies)
 app.include_router(projects.router, prefix=f"{settings.api_v1_prefix}/projects", tags=["projects"], dependencies=protected_dependencies)

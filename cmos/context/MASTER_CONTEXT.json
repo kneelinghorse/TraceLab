@@ -13,8 +13,8 @@
   },
   "working_memory": {
     "active_domain": "main",
-    "session_count": 55,
-    "last_session": "2025-11-11T21:05:10Z",
+    "session_count": 58,
+    "last_session": "2025-11-12T01:38:51Z",
     "domains": {
       "main": {
         "status": "active",
@@ -103,27 +103,6 @@
       }
     },
     "session_history": [
-      {
-        "mission": "B3.3",
-        "agent": "codex",
-        "summary": "Quality gate backend shipped",
-        "action": "complete",
-        "ts": "2025-11-08T16:50:31Z"
-      },
-      {
-        "mission": "B3.4",
-        "agent": "codex",
-        "summary": "Starting Protocol Engine UI integration alignment",
-        "action": "start",
-        "ts": "2025-11-08T17:59:48Z"
-      },
-      {
-        "mission": "B3.4",
-        "agent": "codex",
-        "summary": "Mission Protocol UI integration delivered",
-        "action": "complete",
-        "ts": "2025-11-08T18:25:52Z"
-      },
       {
         "mission": "B3.5",
         "agent": "",
@@ -452,6 +431,27 @@
         "summary": "CLI auth + ingestion workflow verified",
         "action": "complete",
         "ts": "2025-11-11T21:05:10Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "assistant",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-12T01:32:20Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "assistant",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-12T01:32:26Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "codex",
+        "summary": "Qdrant admin endpoints shipped",
+        "action": "complete",
+        "ts": "2025-11-12T01:38:51Z"
       }
     ],
     "active_mission": null,
@@ -465,7 +465,7 @@
       },
       "B6.3"
     ],
-    "last_completed_mission": "B7.3",
+    "last_completed_mission": "B7.5",
     "last_blocked_mission": "B6.3"
   },
   "technical_context": {
@@ -515,10 +515,10 @@
     "anti_pattern_detection": true,
     "compression_enabled": true,
     "last_reset": "",
-    "sessions_since_reset": 55,
-    "size_kb": 26.66,
+    "sessions_since_reset": 58,
+    "size_kb": 26.64,
     "size_limit_kb": 100,
-    "last_update": "2025-11-11T21:05:10Z"
+    "last_update": "2025-11-12T01:38:51Z"
   },
   "ai_instructions": {
     "preferred_language": "yaml",
@@ -574,7 +574,8 @@
       "Verify frontend can connect to production API",
       "If all fixes complete, B6.6 (RAG Search UI) can proceed",
       "Pick up B6.6",
-      "Pick up B7.4"
+      "Pick up B7.4",
+      "Pick up B7.6"
     ],
     "blockers": [
       {
@@ -630,7 +631,7 @@
         "name": "Markdown Ingestion Service Design",
         "status": "Completed",
         "reference": "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md",
-        "deliverable": "Architecture for chokidar \u2192 queue \u2192 unified/remark ingestion pipeline, Qdrant payload schema, telemetry, and resilience patterns"
+        "deliverable": "Architecture for chokidar → queue → unified/remark ingestion pipeline, Qdrant payload schema, telemetry, and resilience patterns"
       },
       {
         "id": "R2.3",
@@ -651,19 +652,19 @@
         "id": "B2.2",
         "name": "Context Compression Pipeline",
         "status": "Completed",
-        "focus": "Embedding-based filtering to reduce tokens 60-70% (3000\u21921000 tokens)"
+        "focus": "Embedding-based filtering to reduce tokens 60-70% (3000→1000 tokens)"
       },
       {
         "id": "B2.3",
         "name": "Semantic Cache Layer",
         "status": "Blocked",
-        "focus": "Qdrant-based cache with 0.90-0.95 similarity threshold, target 15-20% hit rate; unblocked by sub-missions B2.3a\u2013B2.3d"
+        "focus": "Qdrant-based cache with 0.90-0.95 similarity threshold, target 15-20% hit rate; unblocked by sub-missions B2.3a–B2.3d"
       },
       {
         "id": "B2.3a",
         "name": "Markdown Ingestion Pipeline",
         "status": "In Progress",
-        "focus": "Implement chokidar \u2192 queue \u2192 unified/remark ingestion service per R2.2 research"
+        "focus": "Implement chokidar → queue → unified/remark ingestion service per R2.2 research"
       },
       {
         "id": "B2.3b",
@@ -681,7 +682,7 @@
         "id": "B2.3d",
         "name": "Semantic Cache Implementation",
         "status": "Queued",
-        "focus": "Integrate cache service with RAG pipeline and achieve 15\u201320% hit rate"
+        "focus": "Integrate cache service with RAG pipeline and achieve 15–20% hit rate"
       },
       {
         "id": "B2.4",
@@ -699,7 +700,7 @@
     "sprint_02_success_criteria": [
       "RAG query API successfully retrieves relevant chunks and generates answers with citations",
       "Context compression reduces input tokens by 60-70% (from ~3000 to ~1000 tokens)",
-      "Semantic cache achieves hit rate \u2265 15% (target 15-20%)",
+      "Semantic cache achieves hit rate ≥ 15% (target 15-20%)",
       "Tiered routing escalation rate < 10% (90%+ queries handled by GPT-4o-mini)",
       "Average cost per query < $0.0003 (with all optimizations applied)",
       "Query latency < 5 seconds end-to-end for RAG queries",
@@ -733,9 +734,9 @@
     ],
     "important_for_sprint_02_review": [
       "Telemetry artifacts needed: RAG query performance logs, semantic cache hit/miss statistics, context compression metrics, tiered routing escalation events, cost tracking data",
-      "Key metrics to validate: cache hit rate (target \u226515%), escalation rate (target <10%), token compression ratio (target 60-70%), average cost per query (target <$0.0003)",
+      "Key metrics to validate: cache hit rate (target ≥15%), escalation rate (target <10%), token compression ratio (target 60-70%), average cost per query (target <$0.0003)",
       "R2.1 research provides complete implementation blueprint: pattern libraries, scoring algorithms, escalation decision tree - ready for B2.4 implementation",
-      "All Sprint 02 missions have clear dependencies: B2.1 \u2192 B2.2 \u2192 B2.3 \u2192 B2.4 \u2192 B2.5",
+      "All Sprint 02 missions have clear dependencies: B2.1 → B2.2 → B2.3 → B2.4 → B2.5",
       "Qdrant infrastructure from B1.5 is operational: 12,800 chunks indexed, <10ms latency, ready for RAG queries"
     ],
     "sprint_03_status": "Completed",

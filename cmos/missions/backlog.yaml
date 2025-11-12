@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-11T22:22:38.135017+00:00'
+generatedAt: '2025-11-12T01:39:34.729660+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -445,7 +445,7 @@ domainFields:
       notes: Deferred - wait until core TraceLab functionality validated before building
         integration features
     - id: B6.7
-      name: Sprint Retrospective
+      name: Sprint 07 Retrospective
       status: Completed
       completed_at: '2025-11-11T17:22:06Z'
       notes: Created cmos/reports/sprint-06/SPRINT-06-RETROSPECTIVE.md, logged telemetry/events/sprint-06-retrospective.jsonl,
@@ -570,6 +570,36 @@ domainFields:
         - Docs/README note covering the new guardrail
         started_at: '2025-11-11T22:03:48Z'
         completed_at: '2025-11-11T22:16:20Z'
+    - id: B7.5
+      name: Qdrant Collection Initialization & Health Check
+      status: Completed
+      completed_at: '2025-11-12T01:38:51Z'
+      notes: Admin /api/v1/admin init-qdrant + health endpoints landed with docs/deployment.md
+        guidance and pytest tests/test_admin_endpoints.py -q. CLI health + telemetry
+        review clean.
+      metadata:
+        description: Create admin endpoints for Qdrant collection initialization and
+          health checks to resolve 404 collection errors
+        started_at: '2025-11-12T01:32:26Z'
+        completed_at: '2025-11-12T01:38:51Z'
+    - id: B7.6
+      name: Integrate Embedding Pipeline into Document Ingestion
+      status: Current
+      metadata:
+        description: Add embedding generation to document processing so chunks are
+          automatically embedded to Qdrant and become searchable
+    - id: B7.7
+      name: End-to-End Document Processing Validation
+      status: Queued
+      metadata:
+        description: Validate complete workflow from upload through search, test UI
+          and CLI paths, document gaps
+    - id: B7.8
+      name: Sprint 07 Retrospective
+      status: Queued
+      metadata:
+        description: Complete Sprint 07 retrospective covering foundation fixes and
+          embedding pipeline integration
   - sprintId: sprint-05
     title: Sprint 05 - Frontend Deployment & Auth Hardening
     focus: Ship hosted Next.js UI, secure API access, and production domain wiring
