@@ -42,7 +42,9 @@ class QdrantService:
             ) from _qdrant_import_error
         self.client = QdrantClient(
             url=settings.qdrant_url,
-            api_key=settings.qdrant_api_key if settings.qdrant_api_key else None
+            api_key=settings.qdrant_api_key if settings.qdrant_api_key else None,
+            prefer_grpc=settings.qdrant_prefer_grpc,
+            timeout=settings.qdrant_timeout_seconds,
         )
         self.collection_name = settings.qdrant_collection_name
         self.vector_size = settings.openai_embedding_dimension

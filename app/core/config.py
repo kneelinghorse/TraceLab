@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     qdrant_url: str = "http://localhost:6333"
     qdrant_api_key: Optional[str] = None
     qdrant_collection_name: str = "research_chunks"
+    qdrant_prefer_grpc: bool = False
+    qdrant_timeout_seconds: float = 10.0
     
     # OpenAI
     openai_api_key: Optional[str] = None
