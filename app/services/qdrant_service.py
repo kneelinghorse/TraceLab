@@ -211,12 +211,10 @@ class QdrantService:
             )
             points.append(point)
         
-        # Use upload_points for efficient batch upload
-        self.client.upload_points(
+        # Use upsert for efficient batch upload
+        self.client.upsert(
             collection_name=self.collection_name,
             points=points,
-            batch_size=batch_size,
-            parallel=parallel,
             wait=True
         )
     
