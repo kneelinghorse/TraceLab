@@ -2,12 +2,12 @@
 
 ## Overview
 
-This guide walks through building a personal-scale research repository step-by-step. We'll use Railway for deployment with Qdrant (vector database) as a Railway service, keeping infrastructure simple and cost-effective.
+This guide walks through building a personal-scale research repository step-by-step. We'll deploy FastAPI on Railway, keep PostgreSQL on Railway, and connect to a managed **Qdrant Cloud** cluster for the vector database (you can still spin up a Railway-hosted Qdrant instance for experimentation, but Cloud is the production baseline).
 
 **Tech Stack:**
 - **Backend**: Python 3.11+ with FastAPI
 - **Database**: PostgreSQL (Railway service)
-- **Vector DB**: Qdrant (Railway service)
+- **Vector DB**: Qdrant Cloud (managed) — Railway-hosted container optional for dev
 - **Embeddings**: OpenAI API (`text-embedding-3-small`)
 - **Frontend**: Next.js 14 (deployed on Railway or Vercel)
 - **Hosting**: Railway (backend + services), optional Vercel (frontend)
@@ -30,8 +30,8 @@ This guide walks through building a personal-scale research repository step-by-s
 
 3. **Set Up Services**
    - PostgreSQL: Click "New" → "Database" → "Add PostgreSQL"
-   - Qdrant: Click "New" → "Database" → Search "Qdrant" → Add Qdrant
-   - Note the connection URLs from each service's "Variables" tab
+   - Qdrant: Create a Qdrant Cloud cluster (preferred) and copy the HTTPS endpoint + API key. For all-in-Railway demos you can still add the Qdrant template service, but production should point at Cloud.
+   - Note the connection URLs from each service's "Variables" tab (Railway) plus the Qdrant Cloud dashboard.
 
 ### Step 2: Local Development Environment
 
@@ -106,7 +106,7 @@ psycopg2-binary==2.9.9
 asyncpg==0.29.0
 
 # Vector Database
-qdrant-client==1.7.0
+qdrant-client==1.9.0
 
 # OpenAI
 openai==1.3.5
@@ -152,9 +152,9 @@ SECRET_KEY=your-secret-key-here
 # From Railway PostgreSQL service
 DATABASE_URL=postgresql://postgres:password@containers-us-west-xxx.railway.app:5432/railway
 
-# From Railway Qdrant service
-QDRANT_URL=https://qdrant-production-xxx.up.railway.app
-QDRANT_API_KEY=your-qdrant-api-key
+# From Qdrant Cloud
+QDRANT_URL=https://<cluster>.gcp.cloud.qdrant.io
+QDRANT_API_KEY=your-cloud-api-key
 
 # OpenAI
 OPENAI_API_KEY=sk-...
@@ -1144,7 +1144,7 @@ def test_vector_search():
 **Monthly Costs (Personal Scale):**
 - Railway Hobby Plan: $5/month (500 hours compute)
 - PostgreSQL (Railway): Included or ~$5/month
-- Qdrant (Railway): ~$5/month
+- Qdrant Cloud (starter tier): ~$24/month (or pay-as-you-go)
 - OpenAI Embeddings: ~$1-5/month (depends on usage)
   - 1M tokens = $0.02
   - 50K chunks = ~$1-2/month
@@ -1163,4 +1163,3 @@ def test_vector_search():
 4. **Advanced Features**: Bias detection, traceability validator, rigor checker
 
 See `technical_architecture.md` for detailed specifications of these features.
-
