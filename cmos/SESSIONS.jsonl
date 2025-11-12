@@ -95,3 +95,6 @@
 {"ts": "2025-11-11T20:37:13Z", "agent": "assistant", "mission": "B7.2", "action": "complete", "status": "completed", "summary": "Integration guardrails documented and runner passing", "next_hint": "B7.3 is now Current"}
 {"ts": "2025-11-11T20:53:00Z", "agent": "codex", "mission": "B7.3", "action": "start", "status": "in_progress", "summary": "Starting Protocol Engine"}
 {"ts": "2025-11-11T21:05:10Z", "agent": "codex", "mission": "B7.3", "action": "complete", "status": "completed", "summary": "CLI auth + ingestion workflow verified", "next_hint": "Promote B7.4 (Presidio/cache metrics cleanup) once ready."}
+{"ts": "2025-11-12T01:32:20Z", "agent": "assistant", "mission": "B7.5", "action": "start", "status": "in_progress", "summary": "Starting Protocol Engine"}
+{"ts": "2025-11-12T01:32:26Z", "agent": "assistant", "mission": "B7.5", "action": "start", "status": "in_progress", "summary": "Starting Protocol Engine"}
+{"ts": "2025-11-12T01:38:51Z", "agent": "codex", "mission": "B7.5", "action": "complete", "status": "completed", "summary": "Qdrant admin endpoints shipped", "next_hint": "B7.6 is now Current"}
