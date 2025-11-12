@@ -1,7 +1,7 @@
 import { apiRequest } from "@/lib/api/http";
 import type { LoginPayload, TokenResponse } from "@/types/auth";
 
-const AUTH_PATH = "/api/v1/auth";
+const AUTH_PATH = "/auth";
 
 export async function login(payload: LoginPayload): Promise<TokenResponse> {
   return apiRequest<TokenResponse>(`${AUTH_PATH}/login`, {

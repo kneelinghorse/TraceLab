@@ -98,6 +98,7 @@ if [[ ! -d node_modules ]]; then
 fi
 
 export NEXT_PUBLIC_API_BASE_URL="${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}"
+export NEXT_PUBLIC_API_PATH_PREFIX="${NEXT_PUBLIC_API_PATH_PREFIX:-/api/v1}"
 export NEXT_PUBLIC_DEFAULT_PROJECT_ID="${NEXT_PUBLIC_DEFAULT_PROJECT_ID:-}"
 
 function finish_message() {

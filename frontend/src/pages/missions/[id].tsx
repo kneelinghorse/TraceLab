@@ -7,7 +7,7 @@ import { EvidenceCard } from "@/components/EvidenceCard";
 import { MissionProtocolForm } from "@/components/MissionProtocolForm";
 import { ProgressIndicator } from "@/components/ProgressIndicator";
 import { QualityGatePanel } from "@/components/QualityGatePanel";
-import { API_BASE_URL } from "@/lib/api/http";
+import { API_PATH_PREFIX, buildApiUrl } from "@/lib/api/http";
 import { useMissionDetail, useQualityReport } from "@/lib/hooks/useMissions";
 import { getStoredAuth } from "@/lib/auth/storage";
 
@@ -72,7 +72,7 @@ function MissionDetailContent() {
     setExportError(null);
     try {
       const auth = getStoredAuth();
-      const response = await fetch(`${API_BASE_URL}/api/v1/missions/${missionId}/export?format=${exportFormat}`, {
+      const response = await fetch(buildApiUrl(`/missions/${missionId}/export`, { format: exportFormat }), {
         headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined,
       });
       if (!response.ok) {
@@ -156,7 +156,7 @@ function MissionDetailContent() {
             <QualityGatePanel mission={mission} report={report} />
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
               <p>
-                Real-time gate data fetched from <code>/api/v1/quality/missions/{mission.id}/quality</code>. Compare with heuristics in{" "}
+                Real-time gate data fetched from <code>{`${API_PATH_PREFIX}/quality/missions/${mission.id}/quality`}</code>. Compare with heuristics in{" "}
                 <code>docs/quality_gates.md</code> to see why a gate is blocking.
               </p>
             </div>
