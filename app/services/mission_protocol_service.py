@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.models.mission import Mission
 from app.models.mission_protocol import MissionProtocolDraft
 from app.schemas.mission import MissionCreate, MissionUpdate
+from app.services.cache_manager import get_cache_manager
 from app.services.evidence_linking import EvidenceLinkingService
 from app.services.mission_progress import MissionProgressSnapshot, derive_status, evaluate_progress
 from app.services.quality_gate_service import QualityGateReport, QualityGateService
@@ -38,6 +39,7 @@ class MissionProtocolService:
         self.evidence_service = evidence_service or EvidenceLinkingService()
         self.quality_gate_service = quality_gate_service or QualityGateService()
         self.quality_runner = quality_runner or QualityAutomationRunner(async_enabled=False)
+        self.cache_manager = get_cache_manager()
 
     # ------------------------------------------------------------------
     # CRUD
@@ -73,6 +75,9 @@ class MissionProtocolService:
         db.commit()
         db.refresh(mission)
         self._trigger_quality_automation(mission.id)
+        mission_id_str = str(mission.id)
+        self.cache_manager.invalidate_quality_gates(mission_id_str)
+        self.cache_manager.invalidate_mission_validation(mission_id_str)
         return mission
 
     def update_mission(self, db: Session, mission_id: UUID, payload: MissionUpdate) -> Mission:
@@ -92,12 +97,18 @@ class MissionProtocolService:
         db.commit()
         db.refresh(mission)
         self._trigger_quality_automation(mission.id)
+        mission_id_str = str(mission.id)
+        self.cache_manager.invalidate_quality_gates(mission_id_str)
+        self.cache_manager.invalidate_mission_validation(mission_id_str)
         return mission
 
     def delete_mission(self, db: Session, mission_id: UUID) -> None:
         mission = self.get_mission(db, mission_id)
         db.delete(mission)
         db.commit()
+        mission_id_str = str(mission_id)
+        self.cache_manager.invalidate_quality_gates(mission_id_str)
+        self.cache_manager.invalidate_mission_validation(mission_id_str)
 
     # ------------------------------------------------------------------
     # YAML helpers
@@ -126,7 +137,13 @@ class MissionProtocolService:
         if isinstance(payload, MissionProtocolDraft):
             return payload
         if isinstance(payload, dict):
-            return MissionProtocolDraft.model_validate(payload)
+            cache_key = self.cache_manager.mission_validation_key(payload)
+
+            def _loader() -> MissionProtocolDraft:
+                return MissionProtocolDraft.model_validate(payload)
+
+            draft, _ = self.cache_manager.cached_value("mission_validation", cache_key, _loader)
+            return draft
         raise MissionProtocolServiceError("Mission payload must be a MissionProtocolDraft or dict")
 
     def _merged_quality_gates(

@@ -5,6 +5,7 @@ import time
 from typing import Any, Dict, List, Optional
 
 from app.core.config import settings
+from app.services.cache_manager import get_cache_manager
 from app.services.context_compression import compress_context
 from app.services.embedding_service import EmbeddingService, get_embedding_service
 from app.services.cost_monitor import CostMonitor, get_cost_monitor
@@ -98,6 +99,7 @@ class RagService:
         self.quality_assessor = quality_assessor
         self.routing_metrics = {"total_queries": 0, "escalations": 0}
         self.cost_monitor = get_cost_monitor() if cost_monitor is _UNSET else cost_monitor
+        self.cache_manager = get_cache_manager()
 
     def run_query(
         self,
@@ -113,6 +115,57 @@ class RagService:
         """
         Execute a full RAG workflow: retrieve context and synthesize an answer.
         """
+        cache_key = self.cache_manager.rag_query_key(
+            query=query,
+            project_id=project_id,
+            document_id=document_id,
+            source_type=source_type,
+            top_k=top_k,
+            temperature=temperature,
+            max_tokens=max_tokens,
+        )
+        start = time.perf_counter()
+
+        def _loader() -> Dict[str, Any]:
+            return self._execute_rag_pipeline(
+                query=query,
+                top_k=top_k,
+                project_id=project_id,
+                document_id=document_id,
+                source_type=source_type,
+                hnsw_ef=hnsw_ef,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+
+        result, hit = self.cache_manager.cached_value("rag_query_results", cache_key, _loader)
+        cache_info = result.setdefault("cache", {})
+        cache_info.setdefault("layer", "ttl")
+        cache_info["ttl_seconds"] = self.cache_manager.ttl_seconds("rag_query_results")
+
+        if hit:
+            latency_ms = round((time.perf_counter() - start) * 1000, 2)
+            cache_info["hit"] = True
+            cache_info["source"] = "application_ttl"
+            result["latency_ms"] = latency_ms
+            self._record_cache_hit_event(query=query, project_id=project_id, latency_ms=latency_ms)
+            return result
+
+        cache_info.setdefault("source", "application_ttl")
+        return result
+
+    def _execute_rag_pipeline(
+        self,
+        *,
+        query: str,
+        top_k: int,
+        project_id: Optional[str],
+        document_id: Optional[str],
+        source_type: Optional[str],
+        hnsw_ef: Optional[int],
+        temperature: Optional[float],
+        max_tokens: Optional[int],
+    ) -> Dict[str, Any]:
         start = time.perf_counter()
         query_embedding = self.embedding_service.generate_embedding(query)
         cache_metadata = {
@@ -208,7 +261,6 @@ class RagService:
             cache_hit=False,
         )
         routing_details["estimated_cost_usd"] = round(total_cost, 6)
-
         return result
 
     def _build_messages(self, query: str, chunks: List[Dict[str, Any]]) -> List[Dict[str, str]]:

@@ -22,6 +22,7 @@ from app.services.document_parser import DocumentParser
 from app.services.coverage_report import CoverageReportGenerator
 from app.services.processing_status import ProcessingStatusRecorder
 from app.core.config import settings
+from app.services.cache_manager import get_cache_manager
 from app.services.document_query_service import DocumentQueryService
 
 router = APIRouter()
@@ -34,6 +35,7 @@ _ingestion_service: Optional[DocumentIngestionService] = None
 _ingestion_init_error: Optional[str] = None
 _status_recorder = ProcessingStatusRecorder()
 _document_query_service = DocumentQueryService()
+_cache_manager = get_cache_manager()
 
 
 def get_ingestion_service() -> DocumentIngestionService:
@@ -64,17 +66,28 @@ def list_documents(
     db: Session = Depends(get_db),
 ):
     """Return a paginated document list with optional filters."""
-
-    documents, meta = _document_query_service.list_documents(
-        db,
-        page=page,
-        page_size=page_size,
-        project_id=project_id,
+    cache_key = _cache_manager.document_list_key(
+        project_id=str(project_id) if project_id else None,
         processed=processed,
         search=search,
+        page=page,
+        page_size=page_size,
     )
-    resources = [DocumentListItem.model_validate(document) for document in documents]
-    return {"data": resources, "pagination": meta}
+
+    def _loader() -> Dict[str, Any]:
+        documents, meta = _document_query_service.list_documents(
+            db,
+            page=page,
+            page_size=page_size,
+            project_id=project_id,
+            processed=processed,
+            search=search,
+        )
+        resources = [DocumentListItem.model_validate(document) for document in documents]
+        return {"data": resources, "pagination": meta}
+
+    response, _ = _cache_manager.cached_value("document_lists", cache_key, _loader)
+    return response
 
 
 @router.post("/upload", response_model=DocumentRead)
@@ -182,7 +195,9 @@ async def upload_document(
     # Ensure relationship is loaded for response
     _ = document.processing_events
     
-    return DocumentRead.model_validate(document)
+    response = DocumentRead.model_validate(document)
+    _cache_manager.invalidate_document_lists(str(project_id))
+    return response
 
 
 @router.post("/{document_id}/process")
@@ -243,6 +258,7 @@ async def process_document(
             detail=f"Processing failed: {result.get('error', 'Unknown error')}"
         )
     
+    _cache_manager.invalidate_document_lists(str(document.project_id))
     return result
 
 
@@ -277,9 +293,10 @@ async def delete_document(
             file_path.unlink()
     
     # Delete document (chunks will be cascade deleted)
+    project_id = str(document.project_id) if document.project_id else None
     db.delete(document)
     db.commit()
-    
+    _cache_manager.invalidate_document_lists(project_id)
     return {"message": f"Document {document_id} deleted"}
 
 
