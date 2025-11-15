@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import Column, String, Text, Integer, DateTime, ForeignKey, Index, UniqueConstraint
 from sqlalchemy.orm import relationship
 from app.core.database import Base
-from app.models.types import GUID
+from app.models.types import GUID, TSVector
 
 
 class DocumentChunk(Base):
@@ -15,6 +15,7 @@ class DocumentChunk(Base):
     document_id = Column(GUID(), ForeignKey("documents.id", ondelete="CASCADE"), nullable=False)
     chunk_index = Column(Integer, nullable=False)
     content = Column(Text, nullable=False)
+    content_tsv = Column(TSVector(), nullable=False)
     
     # RAG metadata
     embedding_id = Column(String)  # Reference to vector DB ID

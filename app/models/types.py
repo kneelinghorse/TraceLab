@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import uuid
 
-from sqlalchemy import CHAR, TypeDecorator
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
+from sqlalchemy import CHAR, Text, TypeDecorator
+from sqlalchemy.dialects.postgresql import UUID as PGUUID, TSVECTOR as PGTSVECTOR
 
 
 class GUID(TypeDecorator):
@@ -39,3 +39,15 @@ class GUID(TypeDecorator):
         if isinstance(value, uuid.UUID):
             return value
         return uuid.UUID(str(value))
+
+
+class TSVector(TypeDecorator):
+    """TSVECTOR on PostgreSQL, TEXT everywhere else for schema compatibility."""
+
+    impl = Text
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):  # type: ignore[override]
+        if dialect.name == "postgresql":
+            return dialect.type_descriptor(PGTSVECTOR())
+        return dialect.type_descriptor(Text)

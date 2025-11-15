@@ -9,6 +9,7 @@ from app.services.cache_manager import get_cache_manager
 from app.services.context_compression import compress_context
 from app.services.embedding_service import EmbeddingService, get_embedding_service
 from app.services.cost_monitor import CostMonitor, get_cost_monitor
+from app.services.hybrid_search import HybridSearchService
 from app.services.retrieval_service import RetrievalService, get_retrieval_service
 from app.services.semantic_cache import SemanticCacheService, get_semantic_cache_service
 from app.services.quality_assessment import (
@@ -52,6 +53,7 @@ class RagService:
     def __init__(
         self,
         retrieval_service: Optional[RetrievalService] = None,
+        hybrid_search_service: Optional[HybridSearchService] = None,
         embedding_service: Optional[EmbeddingService] = None,
         cache_service: Optional[SemanticCacheService] = None,
         client: Optional[OpenAI] = None,  # type: ignore[name-defined]
@@ -74,6 +76,9 @@ class RagService:
 
         self.client = client
         self.retrieval_service = retrieval_service or get_retrieval_service()
+        self.hybrid_search_service = hybrid_search_service or HybridSearchService(
+            retrieval_service=self.retrieval_service
+        )
         self.embedding_service = embedding_service or get_embedding_service()
         self.cache_service = (
             cache_service
@@ -111,10 +116,12 @@ class RagService:
         hnsw_ef: Optional[int] = None,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
+        search_mode: str = "semantic",
     ) -> Dict[str, Any]:
         """
         Execute a full RAG workflow: retrieve context and synthesize an answer.
         """
+        normalized_mode = (search_mode or "semantic").strip().lower()
         cache_key = self.cache_manager.rag_query_key(
             query=query,
             project_id=project_id,
@@ -123,6 +130,7 @@ class RagService:
             top_k=top_k,
             temperature=temperature,
             max_tokens=max_tokens,
+            search_mode=normalized_mode,
         )
         start = time.perf_counter()
 
@@ -136,12 +144,14 @@ class RagService:
                 hnsw_ef=hnsw_ef,
                 temperature=temperature,
                 max_tokens=max_tokens,
+                search_mode=normalized_mode,
             )
 
         result, hit = self.cache_manager.cached_value("rag_query_results", cache_key, _loader)
         cache_info = result.setdefault("cache", {})
         cache_info.setdefault("layer", "ttl")
         cache_info["ttl_seconds"] = self.cache_manager.ttl_seconds("rag_query_results")
+        result.setdefault("search_mode", normalized_mode)
 
         if hit:
             latency_ms = round((time.perf_counter() - start) * 1000, 2)
@@ -149,6 +159,8 @@ class RagService:
             cache_info["source"] = "application_ttl"
             result["latency_ms"] = latency_ms
             self._record_cache_hit_event(query=query, project_id=project_id, latency_ms=latency_ms)
+            if self.cache_service is not None:
+                self._record_semantic_cache_hit(project_id)
             return result
 
         cache_info.setdefault("source", "application_ttl")
@@ -165,8 +177,10 @@ class RagService:
         hnsw_ef: Optional[int],
         temperature: Optional[float],
         max_tokens: Optional[int],
+        search_mode: str,
     ) -> Dict[str, Any]:
         start = time.perf_counter()
+        normalized_mode = (search_mode or "semantic").strip().lower()
         query_embedding = self.embedding_service.generate_embedding(query)
         cache_metadata = {
             "query": query,
@@ -176,6 +190,7 @@ class RagService:
             "top_k": top_k,
             "temperature": temperature if temperature is not None else self.default_temperature,
             "max_tokens": max_tokens if max_tokens is not None else self.default_max_tokens,
+            "search_mode": normalized_mode,
         }
 
         if self.cache_service is not None:
@@ -185,6 +200,7 @@ class RagService:
             )
             if cached_result:
                 response = dict(cached_result)
+                response.setdefault("search_mode", normalized_mode)
                 latency_ms = round((time.perf_counter() - start) * 1000, 2)
                 response["latency_ms"] = latency_ms
                 cache_info = response.get("cache") or {}
@@ -197,9 +213,10 @@ class RagService:
                 )
                 return response
 
-        retrieved_chunks = self.retrieval_service.search(
+        retrieved_chunks = self.hybrid_search_service.search(
             query=query,
             top_k=top_k,
+            search_mode=normalized_mode,
             project_id=project_id,
             document_id=document_id,
             source_type=source_type,
@@ -239,6 +256,7 @@ class RagService:
             "cache": {"hit": False},
             "quality": quality_report,
             "routing": routing_details,
+            "search_mode": normalized_mode,
         }
 
         if self.cache_service is not None:
@@ -586,6 +604,15 @@ class RagService:
             total_cost += fallback_cost
 
         return total_cost
+
+    def _record_semantic_cache_hit(self, project_id: Optional[str]) -> None:
+        """Increment semantic cache metrics when TTL cache satisfies a query."""
+        metrics = getattr(self.cache_service, "metrics", None) if self.cache_service else None
+        if metrics and hasattr(metrics, "record_hit"):
+            try:
+                metrics.record_hit(project_id)
+            except Exception:  # pragma: no cover - diagnostics only
+                logger.debug("Semantic cache metrics update failed", exc_info=True)
 
     def _record_cache_hit_event(
         self,

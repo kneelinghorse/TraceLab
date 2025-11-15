@@ -103,6 +103,7 @@ class CacheManager:
         top_k: int,
         temperature: Optional[float],
         max_tokens: Optional[int],
+        search_mode: str,
     ) -> Tuple[Any, ...]:
         return (
             query.strip(),
@@ -112,6 +113,7 @@ class CacheManager:
             int(top_k),
             round(temperature if temperature is not None else 0.0, 3),
             int(max_tokens) if max_tokens is not None else 0,
+            (search_mode or "semantic").strip().lower(),
         )
 
     @staticmethod

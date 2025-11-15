@@ -1,5 +1,5 @@
 """Schemas for RAG query requests and responses."""
-from typing import Dict, List, Optional
+from typing import Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -8,6 +8,10 @@ from app.schemas.retrieval import RetrievalQuery, RetrievedChunk
 
 class RagQuery(RetrievalQuery):
     """Client payload for full RAG query execution."""
+    search_mode: Literal["semantic", "keyword", "hybrid"] = Field(
+        default="semantic",
+        description="Select semantic (vector), keyword (full-text), or hybrid search.",
+    )
     max_tokens: int = Field(
         default=350,
         ge=64,
@@ -102,3 +106,4 @@ class RagResponse(BaseModel):
     cache: CacheInfo
     quality: QualityReport
     routing: RoutingDetails
+    search_mode: Literal["semantic", "keyword", "hybrid"]
