@@ -1,7 +1,7 @@
 """Insight and insight-source models."""
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, Text, Boolean, DateTime, ForeignKey, Numeric
+from sqlalchemy import Column, String, Text, Boolean, DateTime, ForeignKey, Numeric, Index
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 from app.models.types import GUID
@@ -28,6 +28,10 @@ class Insight(Base):
     # Relationships
     sources = relationship("InsightSource", back_populates="insight", cascade="all, delete-orphan")
 
+    __table_args__ = (
+        Index("idx_insights_project_id", "project_id"),
+    )
+
 
 class InsightSource(Base):
     """Junction table for insights and source chunks."""
@@ -39,3 +43,7 @@ class InsightSource(Base):
     
     # Relationships
     insight = relationship("Insight", back_populates="sources")
+
+    __table_args__ = (
+        Index("idx_insight_sources_chunk_id", "chunk_id"),
+    )

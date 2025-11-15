@@ -1,7 +1,7 @@
 """Document chunk model for RAG."""
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, Text, Integer, DateTime, ForeignKey
+from sqlalchemy import Column, String, Text, Integer, DateTime, ForeignKey, Index, UniqueConstraint
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 from app.models.types import GUID
@@ -32,5 +32,8 @@ class DocumentChunk(Base):
     document = relationship("Document", back_populates="chunks")
     
     __table_args__ = (
+        Index("idx_document_chunks_document_id", "document_id"),
+        Index("idx_document_chunks_embedding_id", "embedding_id"),
+        UniqueConstraint("document_id", "chunk_index", name="uq_document_chunks_document_index"),
         {'extend_existing': True},
     )

@@ -1,7 +1,20 @@
 """Document model."""
 import uuid
 from datetime import datetime, date
-from sqlalchemy import Column, String, Text, Integer, Boolean, BigInteger, DateTime, Date, Numeric, ForeignKey, LargeBinary
+from sqlalchemy import (
+    Column,
+    String,
+    Text,
+    Integer,
+    Boolean,
+    BigInteger,
+    DateTime,
+    Date,
+    Numeric,
+    ForeignKey,
+    LargeBinary,
+    Index,
+)
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 from app.models.types import GUID
@@ -46,4 +59,8 @@ class Document(Base):
         back_populates="document",
         cascade="all, delete-orphan",
         order_by="DocumentProcessingStatus.created_at"
+    )
+
+    __table_args__ = (
+        Index("idx_documents_project_id", "project_id"),
     )

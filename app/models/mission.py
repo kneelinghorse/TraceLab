@@ -1,7 +1,7 @@
 """Mission model for Mission Protocol integration."""
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, JSON, CheckConstraint
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, JSON, CheckConstraint, Index
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 from app.core.config import settings
@@ -24,6 +24,7 @@ class Mission(Base):
             _mission_constraint_sql(),
             name="missions_mission_data_check",
         ),
+        Index("idx_missions_project_status", "project_id", "status"),
     )
     
     id = Column(GUID(), primary_key=True, default=uuid.uuid4)
