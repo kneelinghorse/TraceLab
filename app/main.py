@@ -1,6 +1,10 @@
 """FastAPI application entry point."""
-from fastapi import Depends, FastAPI
+from pathlib import Path
+
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 
 from app.api.v1 import (
     admin,
@@ -22,6 +26,7 @@ from app.core.config import settings
 from app.core.database import Base, engine
 from app.core.security import require_authenticated_user
 from app.onboarding import router as onboarding_router
+from app.services.metrics_aggregator import MetricsAggregator, get_metrics_aggregator
 
 # Create tables in development (use migrations in production)
 if settings.environment == "development":
@@ -32,6 +37,8 @@ app = FastAPI(
     description="Personal research repository with RAG-powered search",
     version=settings.app_version,
 )
+
+templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
 
 cors_origins = settings.cors_origins
 if not cors_origins:
@@ -95,3 +102,18 @@ async def root():
         "version": settings.app_version,
         "status": "running"
     }
+
+
+@app.get("/admin/dashboard", response_class=HTMLResponse, dependencies=protected_dependencies)
+def admin_dashboard(
+    request: Request,
+    aggregator: MetricsAggregator = Depends(get_metrics_aggregator),
+) -> HTMLResponse:
+    """Render the admin dashboard at the requested path."""
+
+    metrics = aggregator.collect()
+    auth_header = request.headers.get("authorization", "")
+    return templates.TemplateResponse(
+        "admin/dashboard.html",
+        {"request": request, "metrics": metrics, "auth_header": auth_header},
+    )

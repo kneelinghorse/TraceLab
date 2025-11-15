@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TraceLab Cost Monitoring Dashboard</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        --bg: #0f172a;
+        --panel: rgba(15, 23, 42, 0.8);
+        --border: rgba(148, 163, 184, 0.15);
+        --accent: #38bdf8;
+        --accent-muted: rgba(56, 189, 248, 0.2);
+        --text-muted: #94a3b8;
+      }
+
+      body {
+        margin: 0;
+        background: radial-gradient(circle at top, rgba(56, 189, 248, 0.15), rgba(15, 23, 42, 0.95) 55%);
+        min-height: 100vh;
+        color: #f1f5f9;
+      }
+
+      .page {
+        padding: 2rem clamp(1rem, 5vw, 3.5rem) 3rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: clamp(1.5rem, 3vw, 2.3rem);
+      }
+
+      .timestamp {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+
+      .grid {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .grid-3 {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 1rem;
+        padding: 1.25rem;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35);
+      }
+
+      .metric-value {
+        font-size: 2rem;
+        margin: 0.25rem 0 0;
+        font-weight: 600;
+      }
+
+      .metric-label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+      }
+
+      canvas {
+        width: 100% !important;
+        height: 260px !important;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+
+      th,
+      td {
+        padding: 0.6rem 0.4rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      }
+
+      th {
+        text-align: left;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+
+      .status-badge {
+        padding: 0.15rem 0.65rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        text-transform: capitalize;
+      }
+
+      .status-healthy {
+        background: rgba(34, 197, 94, 0.15);
+        color: #4ade80;
+      }
+
+      .status-unavailable,
+      .status-error {
+        background: rgba(248, 113, 113, 0.15);
+        color: #f87171;
+      }
+
+      .status-collection_missing,
+      .status-degraded {
+        background: rgba(251, 191, 36, 0.15);
+        color: #fbbf24;
+      }
+
+      .list-inline {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 0.5rem 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .list-inline li {
+        font-size: 0.85rem;
+        background: rgba(15, 23, 42, 0.5);
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+      }
+
+      @media (max-width: 720px) {
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        canvas {
+          height: 200px !important;
+        }
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <div>
+          <h1>Cost Monitoring Dashboard</h1>
+          <p class="timestamp">
+            Auto refreshes every 30 seconds · Last updated
+            <span id="last-updated">{{ metrics.generated_at }}</span>
+          </p>
+        </div>
+        <div>
+          <a class="panel" style="text-decoration:none;display:inline-flex;gap:0.5rem;align-items:center;font-size:0.95rem" href="{{ request.url_for('dashboard_export') }}?format=csv">
+            ⬇ Export CSV
+          </a>
+        </div>
+      </header>
+
+      <section class="grid grid-3">
+        <article class="panel">
+          <p class="metric-label">Today's Spend</p>
+          <p class="metric-value" id="metric-today">$0.00</p>
+          <p class="metric-label">Trailing 7 days: <span id="metric-week">$0.00</span></p>
+        </article>
+        <article class="panel">
+          <p class="metric-label">30-Day Spend</p>
+          <p class="metric-value" id="metric-month">$0.00</p>
+          <p class="metric-label">Avg. per query: <span id="metric-avg">$0.00</span></p>
+        </article>
+        <article class="panel">
+          <p class="metric-label">Cost Breakdown</p>
+          <p class="metric-value" id="metric-breakdown">$0.00 · $0.00</p>
+          <p class="metric-label">Embedding · Generation</p>
+        </article>
+      </section>
+
+      <section class="grid grid-3">
+        <article class="panel">
+          <h2>Cost Trend</h2>
+          <canvas id="costTrendChart" aria-label="Cost trend chart"></canvas>
+        </article>
+        <article class="panel">
+          <h2>Latency Trend</h2>
+          <canvas id="latencyTrendChart" aria-label="Latency trend chart"></canvas>
+        </article>
+        <article class="panel">
+          <h2>Cache Overview</h2>
+          <p class="metric-label">Semantic hit rate</p>
+          <p class="metric-value" id="semantic-hit">0.0%</p>
+          <p class="metric-label">TTL average hit rate</p>
+          <p class="metric-value" id="ttl-hit">0.0%</p>
+          <ul class="list-inline" id="cache-tags"></ul>
+        </article>
+      </section>
+
+      <section class="grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));gap:1rem;">
+        <article class="panel">
+          <h2>Query Performance</h2>
+          <div class="grid grid-3" style="gap:0.5rem;">
+            <div>
+              <p class="metric-label">p50</p>
+              <p class="metric-value" id="p50">0 ms</p>
+            </div>
+            <div>
+              <p class="metric-label">p95</p>
+              <p class="metric-value" id="p95">0 ms</p>
+            </div>
+            <div>
+              <p class="metric-label">p99</p>
+              <p class="metric-value" id="p99">0 ms</p>
+            </div>
+          </div>
+          <p class="metric-label" style="margin-top:0.75rem;">Requests last hour: <span id="requests-hour">0</span></p>
+          <h3 style="margin-top:1rem">Slow Queries</h3>
+          <table aria-label="Slow query table">
+            <thead>
+              <tr><th>Time</th><th>Latency</th><th>Route</th></tr>
+            </thead>
+            <tbody id="slow-queries"></tbody>
+          </table>
+        </article>
+        <article class="panel">
+          <h2>Recent Cost Events</h2>
+          <table aria-label="Recent cost events table">
+            <thead>
+              <tr><th>Time</th><th>Model</th><th>Cost</th><th>Cache</th></tr>
+            </thead>
+            <tbody id="recent-events"></tbody>
+          </table>
+        </article>
+      </section>
+
+      <section class="panel">
+        <h2>System Health</h2>
+        <div class="grid grid-3" style="gap:0.75rem;">
+          <div>
+            <p class="metric-label">Database</p>
+            <p><span id="db-status" class="status-badge status-degraded">unknown</span></p>
+            <p class="metric-label">Tables · Indexes</p>
+            <p class="metric-value" id="db-tables">0 · 0</p>
+          </div>
+          <div>
+            <p class="metric-label">Qdrant</p>
+            <p><span id="qdrant-status" class="status-badge status-degraded">unknown</span></p>
+            <p class="metric-label">Vectors</p>
+            <p class="metric-value" id="qdrant-vectors">0</p>
+          </div>
+          <div>
+            <p class="metric-label">Telemetry</p>
+            <p class="metric-value" id="telemetry-events">0 events</p>
+            <p class="metric-label">Latest:
+              <span id="telemetry-last">n/a</span>
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const initialMetrics = {{ metrics | tojson }};
+      const authHeader = {{ auth_header | default('') | tojson }};
+      let costChart;
+      let latencyChart;
+
+      function formatUsd(value, currency) {
+        if (typeof value !== 'number') return '$0.00';
+        return new Intl.NumberFormat(undefined, { style: 'currency', currency: currency || 'USD' }).format(value);
+      }
+
+      function formatPercent(value) {
+        if (typeof value !== 'number') return '0%';
+        return `${(value * 100).toFixed(1)}%`;
+      }
+
+      function updateMetricCards(cost) {
+        document.getElementById('metric-today').textContent = formatUsd(cost.periods.today, cost.currency);
+        document.getElementById('metric-week').textContent = formatUsd(cost.periods.week, cost.currency);
+        document.getElementById('metric-month').textContent = formatUsd(cost.periods.month, cost.currency);
+        document.getElementById('metric-avg').textContent = formatUsd(cost.average_cost_per_query, cost.currency);
+        document.getElementById('metric-breakdown').textContent = `${formatUsd(cost.embedding_cost_usd, cost.currency)} · ${formatUsd(cost.generation_cost_usd, cost.currency)}`;
+        document.getElementById('last-updated').textContent = new Date().toLocaleString();
+      }
+
+      function updateCacheSection(cache) {
+        document.getElementById('semantic-hit').textContent = formatPercent(cache.semantic_cache?.hit_rate || 0);
+        document.getElementById('ttl-hit').textContent = formatPercent(cache.aggregate?.ttl_average_hit_rate || 0);
+        const tagContainer = document.getElementById('cache-tags');
+        tagContainer.innerHTML = '';
+        (cache.ttl_caches || []).forEach((entry) => {
+          const li = document.createElement('li');
+          li.textContent = `${entry.name}: ${(entry.hit_rate * 100).toFixed(1)}%`
+          tagContainer.appendChild(li);
+        });
+      }
+
+      function updatePerformance(perf) {
+        document.getElementById('p50').textContent = `${perf.p50_latency_ms} ms`;
+        document.getElementById('p95').textContent = `${perf.p95_latency_ms} ms`;
+        document.getElementById('p99').textContent = `${perf.p99_latency_ms} ms`;
+        document.getElementById('requests-hour').textContent = perf.requests_last_hour || 0;
+        const body = document.getElementById('slow-queries');
+        body.innerHTML = '';
+        (perf.slow_queries || []).forEach((entry) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `<td>${new Date(entry.ts).toLocaleTimeString()}</td><td>${entry.latency_ms?.toFixed(1)} ms</td><td>${entry.route || 'n/a'}</td>`;
+          body.appendChild(row);
+        });
+      }
+
+      function updateRecentEvents(cost) {
+        const body = document.getElementById('recent-events');
+        body.innerHTML = '';
+        (cost.recent_events || []).forEach((entry) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `<td>${new Date(entry.ts).toLocaleTimeString()}</td><td>${entry.model}</td><td>${formatUsd(entry.cost_usd, cost.currency)}</td><td>${entry.cache_hit ? 'hit' : 'miss'}</td>`;
+          body.appendChild(row);
+        });
+      }
+
+      function updateSystemHealth(system) {
+        const dbStatus = document.getElementById('db-status');
+        dbStatus.textContent = system.database?.status || 'unknown';
+        dbStatus.className = `status-badge status-${system.database?.status || 'degraded'}`;
+        document.getElementById('db-tables').textContent = `${system.database?.tables || 0} · ${system.database?.indexes || 0}`;
+
+        const qStatus = document.getElementById('qdrant-status');
+        qStatus.textContent = system.qdrant?.status || 'unknown';
+        qStatus.className = `status-badge status-${system.qdrant?.status || 'degraded'}`;
+        document.getElementById('qdrant-vectors').textContent = system.qdrant?.vectors_count || 0;
+
+        document.getElementById('telemetry-events').textContent = `${system.telemetry?.events_available || 0} events`;
+        document.getElementById('telemetry-last').textContent = system.telemetry?.last_event || 'n/a';
+      }
+
+      function buildCharts(cost, perf) {
+        const costCtx = document.getElementById('costTrendChart');
+        const latencyCtx = document.getElementById('latencyTrendChart');
+        const costLabels = (cost.daily_trend || []).map((p) => p.label);
+        const costValues = (cost.daily_trend || []).map((p) => p.cost_usd);
+        const latencyLabels = (perf.trend || []).map((p) => p.label);
+        const latencyValues = (perf.trend || []).map((p) => p.latency_ms);
+
+        if (!costChart) {
+          costChart = new Chart(costCtx, {
+            type: 'line',
+            data: { labels: costLabels, datasets: [{ label: 'Daily spend', data: costValues, fill: true, borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,0.2)' }] },
+            options: { responsive: true, plugins: { legend: { display: false } } },
+          });
+        } else {
+          costChart.data.labels = costLabels;
+          costChart.data.datasets[0].data = costValues;
+          costChart.update();
+        }
+
+        if (!latencyChart) {
+          latencyChart = new Chart(latencyCtx, {
+            type: 'line',
+            data: { labels: latencyLabels, datasets: [{ label: 'Avg latency (ms)', data: latencyValues, borderColor: '#c084fc', backgroundColor: 'rgba(192,132,252,0.2)' }] },
+            options: { responsive: true, plugins: { legend: { display: false } } },
+          });
+        } else {
+          latencyChart.data.labels = latencyLabels;
+          latencyChart.data.datasets[0].data = latencyValues;
+          latencyChart.update();
+        }
+      }
+
+      function renderDashboard(data) {
+        updateMetricCards(data.cost_overview);
+        updateCacheSection(data.cache_performance);
+        updatePerformance(data.query_performance);
+        updateRecentEvents(data.cost_overview);
+        updateSystemHealth(data.system_health);
+        buildCharts(data.cost_overview, data.query_performance);
+      }
+
+      async function refreshMetrics() {
+        const headers = {};
+        if (authHeader) headers['Authorization'] = authHeader;
+        try {
+          const response = await fetch('{{ request.url_for("dashboard_data") }}', { headers });
+          if (!response.ok) throw new Error('Refresh failed');
+          const payload = await response.json();
+          renderDashboard(payload);
+        } catch (error) {
+          console.warn('Dashboard refresh failed', error);
+          setTimeout(() => window.location.reload(), 30000);
+          return;
+        }
+        setTimeout(refreshMetrics, 30000);
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        renderDashboard(initialMetrics);
+        refreshMetrics();
+      });
+    </script>
+  </body>
+</html>
