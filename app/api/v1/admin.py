@@ -1,16 +1,23 @@
-"""Admin endpoints for Qdrant initialization and health checks."""
+"""Admin endpoints for Qdrant operations and the cost monitoring dashboard."""
 from __future__ import annotations
 
+import csv
+import io
+from pathlib import Path
 from typing import Any, Dict, Iterable, List, Literal
 
-from fastapi import APIRouter, Body, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, status
+from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
 from app.core.config import settings
+from app.services.metrics_aggregator import MetricsAggregator, get_metrics_aggregator
 from app.services.qdrant_service import QdrantService, get_qdrant_service
 
 router = APIRouter(tags=["admin"])
 _EXPECTED_PAYLOAD_INDEXES = ("project_id", "document_id", "source_type")
+_TEMPLATES = Jinja2Templates(directory=str(Path(__file__).resolve().parents[2] / "templates"))
 
 
 class PayloadIndexStatus(BaseModel):
@@ -44,6 +51,11 @@ class QdrantHealthResponse(BaseModel):
 def get_admin_qdrant_service() -> QdrantService:
     """Dependency that returns the shared Qdrant service instance."""
     return get_qdrant_service()
+
+
+def get_dashboard_aggregator() -> MetricsAggregator:
+    """Dependency for the metrics aggregator singleton."""
+    return get_metrics_aggregator()
 
 
 def _extract_attr(obj: Any, path: Iterable[str]) -> Any:
@@ -135,3 +147,50 @@ def qdrant_health(service: QdrantService = Depends(get_admin_qdrant_service)) ->
         },
         "payload_indexes": _payload_indexes(info),
     }
+
+
+@router.get("/dashboard", response_class=HTMLResponse)
+def dashboard_page(
+    request: Request,
+    aggregator: MetricsAggregator = Depends(get_dashboard_aggregator),
+) -> HTMLResponse:
+    """Render the monitoring dashboard with the latest metrics."""
+
+    metrics = aggregator.collect()
+    auth_header = request.headers.get("authorization", "")
+    return _TEMPLATES.TemplateResponse(
+        "admin/dashboard.html",
+        {"request": request, "metrics": metrics, "auth_header": auth_header},
+    )
+
+
+@router.get("/dashboard/data")
+def dashboard_data(aggregator: MetricsAggregator = Depends(get_dashboard_aggregator)) -> Dict[str, Any]:
+    """Return the dashboard metrics as JSON for auto-refresh."""
+
+    return aggregator.collect()
+
+
+@router.get("/dashboard/export")
+def dashboard_export(
+    format: Literal["json", "csv"] = Query("json", description="Export format"),
+    aggregator: MetricsAggregator = Depends(get_dashboard_aggregator),
+):
+    """Export dashboard metrics for archival or sharing."""
+
+    metrics = aggregator.collect()
+    if format == "json":
+        return metrics
+
+    rows = metrics.get("export_rows", [])
+    buffer = io.StringIO()
+    writer = csv.DictWriter(buffer, fieldnames=["category", "metric", "value", "unit", "notes"])
+    writer.writeheader()
+    for row in rows:
+        writer.writerow(row)
+    buffer.seek(0)
+    return StreamingResponse(
+        io.BytesIO(buffer.read().encode("utf-8")),
+        headers={"Content-Disposition": "attachment; filename=dashboard-metrics.csv"},
+        media_type="text/csv",
+    )
