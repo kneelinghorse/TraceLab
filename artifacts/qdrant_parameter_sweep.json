@@ -1,0 +1,46 @@
+{
+  "generated_at": "2025-11-15T15:50:00Z",
+  "collection": "research_chunks",
+  "points_count": 500000,
+  "vectors_count": 500000,
+  "memory_estimate_gb": 0.78,
+  "trials": 16,
+  "top_k": 10,
+  "ef_values": [64, 96, 128],
+  "target_latency_ms": 10.0,
+  "recall_threshold": 0.99,
+  "results": [
+    {
+      "hnsw_ef": 64,
+      "avg_latency_ms": 7.8,
+      "p95_latency_ms": 9.7,
+      "p99_latency_ms": 10.6,
+      "recall": 0.972,
+      "trials": 16
+    },
+    {
+      "hnsw_ef": 96,
+      "avg_latency_ms": 8.6,
+      "p95_latency_ms": 9.1,
+      "p99_latency_ms": 9.4,
+      "recall": 0.994,
+      "trials": 16
+    },
+    {
+      "hnsw_ef": 128,
+      "avg_latency_ms": 9.8,
+      "p95_latency_ms": 10.5,
+      "p99_latency_ms": 11.2,
+      "recall": 1.0,
+      "trials": 16
+    }
+  ],
+  "recommendation": {
+    "hnsw_ef": 96,
+    "avg_latency_ms": 8.6,
+    "p95_latency_ms": 9.1,
+    "p99_latency_ms": 9.4,
+    "recall": 0.994,
+    "trials": 16
+  }
+}
