@@ -10,6 +10,7 @@ from app.api.v1 import (
     health,
     missions,
     monitoring,
+    qdrant_admin,
     projects,
     quality,
     quality_automated,
@@ -54,6 +55,12 @@ app.include_router(
     admin.router,
     prefix=f"{settings.api_v1_prefix}/admin",
     tags=["admin"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    qdrant_admin.router,
+    prefix=f"{settings.api_v1_prefix}/qdrant-admin",
+    tags=["qdrant-admin"],
     dependencies=protected_dependencies,
 )
 app.include_router(

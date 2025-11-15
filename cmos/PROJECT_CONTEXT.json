@@ -13,8 +13,8 @@
   },
   "working_memory": {
     "active_domain": "starter",
-    "session_count": 93,
-    "last_session": "2025-11-15T15:42:14Z",
+    "session_count": 95,
+    "last_session": "2025-11-15T16:14:37Z",
     "agents_md_path": "./agents.md",
     "agents_md_loaded": false,
     "active_mission": null,
@@ -41,20 +41,6 @@
       }
     },
     "session_history": [
-      {
-        "mission": "B6.4",
-        "agent": "codex",
-        "summary": "Mission UI overhauled with readable layouts and evidence workflows",
-        "action": "complete",
-        "ts": "2025-11-10T23:18:12Z"
-      },
-      {
-        "mission": "B6.4a",
-        "agent": "assistant",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-10T23:58:27Z"
-      },
       {
         "mission": "B6.4a",
         "agent": "assistant",
@@ -404,12 +390,26 @@
         "summary": "Application-level caching implemented with telemetry + APIs",
         "action": "complete",
         "ts": "2025-11-15T15:42:14Z"
+      },
+      {
+        "mission": "B8.4",
+        "agent": "codex",
+        "summary": "Beginning Qdrant tuning deliverables",
+        "action": "start",
+        "ts": "2025-11-15T15:54:26Z"
+      },
+      {
+        "mission": "B8.4",
+        "agent": "codex",
+        "summary": "Qdrant tuning endpoints, parameter sweep tooling, and docs shipped",
+        "action": "complete",
+        "ts": "2025-11-15T16:14:37Z"
       }
     ],
     "blocked_missions": [
       "B6.3"
     ],
-    "last_completed_mission": "B8.3",
+    "last_completed_mission": "B8.4",
     "last_blocked_mission": "B6.3",
     "recent_sessions": [
       {
@@ -465,15 +465,15 @@
     }
   },
   "context_health": {
-    "size_kb": 11.91,
+    "size_kb": 11.92,
     "size_limit_kb": 100,
-    "sessions_since_reset": 75,
+    "sessions_since_reset": 77,
     "last_reset": "",
     "compression_enabled": false,
-    "last_update": "2025-11-15T15:42:14Z"
+    "last_update": "2025-11-15T16:14:37Z"
   },
   "metadata": {
-    "migrated_at": "2025-11-14T17:16:26.368380+00:00",
+    "migrated_at": "2025-11-15T16:19:59.619425+00:00",
     "source_version": "cmos-v1"
   },
   "ai_instructions": {

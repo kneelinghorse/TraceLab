@@ -305,6 +305,126 @@ class QdrantService:
 
         return chunk_results
 
+    def get_collection_diagnostics(self) -> Dict[str, Any]:
+        """Return collection stats plus inferred memory/quantization health."""
+
+        diagnostics: Dict[str, Any] = {
+            "collection": self.collection_name,
+            "collection_exists": False,
+            "points_count": 0,
+            "vectors_count": 0,
+            "payload_indexes": [],
+            "hnsw": {},
+            "quantization": {"enabled": False},
+            "optimizer": {},
+            "vector_size": self.vector_size,
+            "memory_estimate_bytes": 0,
+            "memory_estimate_gb": 0.0,
+            "error": None,
+        }
+
+        try:
+            info = self.client.get_collection(self.collection_name)
+        except Exception as exc:  # pragma: no cover - real Qdrant only
+            diagnostics["error"] = str(exc)
+            return diagnostics
+
+        diagnostics["collection_exists"] = True
+        diagnostics["points_count"] = int(getattr(info, "points_count", 0) or 0)
+        diagnostics["vectors_count"] = int(getattr(info, "vectors_count", diagnostics["points_count"]) or 0)
+
+        payload_schema = getattr(info, "payload_schema", {}) or {}
+        diagnostics["payload_indexes"] = [
+            {"field": field, "present": True}
+            for field in sorted(payload_schema.keys())
+        ]
+
+        config = getattr(info, "config", None)
+        params = getattr(config, "params", None) if config else None
+        vectors = getattr(params, "vectors", None) if params else None
+        hnsw_config = getattr(vectors, "hnsw_config", None) if vectors else None
+        diagnostics["hnsw"] = {
+            "m": getattr(hnsw_config, "m", None),
+            "ef_construct": getattr(hnsw_config, "ef_construct", None),
+            "full_scan_threshold": getattr(hnsw_config, "full_scan_threshold", None),
+            "on_disk": getattr(hnsw_config, "on_disk", None),
+        }
+
+        optimizer_config = getattr(config, "optimizer_config", None) if config else None
+        if optimizer_config is None and config is not None:
+            optimizer_config = getattr(config, "optimizers_config", None)
+        diagnostics["optimizer"] = (
+            {"indexing_threshold": getattr(optimizer_config, "indexing_threshold", None)}
+            if optimizer_config
+            else {}
+        )
+
+        quantization_config = getattr(config, "quantization_config", None) if config else None
+        scalar_config = getattr(quantization_config, "scalar", None) if quantization_config else None
+        quantization_type = None
+        if scalar_config is not None:
+            quantization_type = getattr(scalar_config, "type", None)
+        elif quantization_config is not None:
+            quantization_type = getattr(quantization_config, "type", None)
+
+        diagnostics["quantization"] = {
+            "enabled": quantization_config is not None,
+            "type": str(quantization_type) if quantization_type else None,
+            "always_ram": getattr(scalar_config, "always_ram", None) if scalar_config else None,
+            "quantile": getattr(scalar_config, "quantile", None) if scalar_config else None,
+        }
+
+        quantized = diagnostics["quantization"]["enabled"]
+        vector_bytes = self.vector_size * (1 if quantized else 4)
+        vector_memory_bytes = vector_bytes * diagnostics["vectors_count"]
+        payload_overhead = diagnostics["points_count"] * 256  # heuristic payload footprint
+        total_bytes = vector_memory_bytes + payload_overhead
+        diagnostics["memory_estimate_bytes"] = total_bytes
+        diagnostics["memory_estimate_gb"] = round(total_bytes / (1024 ** 3), 3)
+        return diagnostics
+
+    def apply_hnsw_settings(
+        self,
+        *,
+        m: int,
+        ef_construct: int,
+        full_scan_threshold: int,
+        on_disk: bool = False,
+        optimizer_threshold: Optional[int] = 20000,
+        enable_quantization: bool = True,
+        quantile: float = 0.99,
+        always_ram: bool = True,
+    ) -> None:
+        """Update collection HNSW/quantization parameters in-place."""
+
+        quantization_config = None
+        if enable_quantization:
+            quantization_config = ScalarQuantization(
+                scalar=ScalarQuantizationConfig(
+                    type=ScalarType.INT8,
+                    quantile=quantile,
+                    always_ram=always_ram,
+                )
+            )
+
+        optimizers_config = (
+            OptimizersConfigDiff(indexing_threshold=optimizer_threshold)
+            if optimizer_threshold is not None
+            else None
+        )
+
+        self.client.update_collection(
+            collection_name=self.collection_name,
+            hnsw_config=HnswConfigDiff(
+                m=m,
+                ef_construct=ef_construct,
+                full_scan_threshold=full_scan_threshold,
+                on_disk=on_disk,
+            ),
+            optimizers_config=optimizers_config,
+            quantization_config=quantization_config,
+        )
+
 
 # Singleton instance (lazy initialization)
 _qdrant_service: Optional[QdrantService] = None
