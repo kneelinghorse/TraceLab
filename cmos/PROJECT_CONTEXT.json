@@ -13,11 +13,11 @@
   },
   "working_memory": {
     "active_domain": "starter",
-    "session_count": 82,
-    "last_session": "2025-11-15T00:35:32Z",
+    "session_count": 91,
+    "last_session": "2025-11-15T06:33:15Z",
     "agents_md_path": "./agents.md",
     "agents_md_loaded": false,
-    "active_mission": "B7.7",
+    "active_mission": null,
     "domains": {
       "starter": {
         "status": "planning",
@@ -41,153 +41,6 @@
       }
     },
     "session_history": [
-      {
-        "mission": "B4.2",
-        "agent": "",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-08T21:12:15Z"
-      },
-      {
-        "mission": "B4.2",
-        "agent": "codex",
-        "summary": "Quality automation delivered",
-        "action": "complete",
-        "ts": "2025-11-08T21:27:25Z"
-      },
-      {
-        "mission": "B4.3",
-        "agent": "codex",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-08T22:56:33Z"
-      },
-      {
-        "mission": "B4.3",
-        "agent": "codex",
-        "summary": "Cost telemetry wired into RAG service",
-        "action": "complete",
-        "ts": "2025-11-09T01:01:33Z"
-      },
-      {
-        "mission": "B4.4",
-        "agent": "codex",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-09T02:33:21Z"
-      },
-      {
-        "mission": "B4.4",
-        "agent": "codex",
-        "summary": "Testing & documentation consolidation delivered",
-        "action": "complete",
-        "ts": "2025-11-09T04:01:16Z"
-      },
-      {
-        "mission": "B4.5",
-        "agent": "assistant",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-09T04:45:29Z"
-      },
-      {
-        "mission": "B4.5",
-        "agent": "assistant",
-        "summary": "Sprint 04 efficacy evaluator + telemetry delivered",
-        "action": "complete",
-        "ts": "2025-11-09T04:52:44Z"
-      },
-      {
-        "mission": "B5.1",
-        "agent": "codex",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-09T21:04:12Z"
-      },
-      {
-        "mission": "B5.1",
-        "agent": "codex",
-        "summary": "Standalone Railway frontend is live",
-        "action": "complete",
-        "ts": "2025-11-09T23:48:47Z"
-      },
-      {
-        "mission": "B5.2",
-        "agent": "",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-10T00:00:23Z"
-      },
-      {
-        "mission": "B5.2",
-        "agent": "codex",
-        "summary": "JWT auth + CORS hardening delivered",
-        "action": "complete",
-        "ts": "2025-11-10T00:20:47Z"
-      },
-      {
-        "mission": "B5.3",
-        "agent": "codex",
-        "summary": "Starting Domain Wiring & Telemetry Validation",
-        "action": "start",
-        "ts": "2025-11-10T04:35:54Z"
-      },
-      {
-        "mission": "B5.3",
-        "agent": "codex",
-        "summary": "Cloudflare vanity paths + API wiring validated",
-        "action": "complete",
-        "ts": "2025-11-10T04:57:46Z"
-      },
-      {
-        "mission": "B5.3",
-        "agent": "codex",
-        "summary": "Domain wiring and telemetry validation complete",
-        "action": "complete",
-        "ts": "2025-11-10T05:49:28Z"
-      },
-      {
-        "mission": "B6.1",
-        "agent": "codex",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-10T06:27:29Z"
-      },
-      {
-        "mission": "B6.1",
-        "agent": "codex",
-        "summary": "CLI functionality verified",
-        "action": "complete",
-        "ts": "2025-11-10T06:48:08Z"
-      },
-      {
-        "mission": "B6.2",
-        "agent": "codex",
-        "summary": "Starting Document Library UI scope for Sprint 6.2",
-        "action": "start",
-        "ts": "2025-11-10T15:04:25Z"
-      },
-      {
-        "mission": "B6.2",
-        "agent": "codex",
-        "summary": "Document Library UI verified",
-        "action": "complete",
-        "ts": "2025-11-10T15:06:56Z"
-      },
-      {
-        "mission": "B6.3",
-        "agent": "",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-10T15:52:53Z"
-      },
-      {
-        "mission": "B6.3",
-        "agent": "codex",
-        "summary": "RAG search UI delivered with semantic + synthesis views.",
-        "action": "complete",
-        "ts": "2025-11-10T16:08:06Z"
-      },
       {
         "mission": "B6.3",
         "agent": "codex",
@@ -390,13 +243,208 @@
         "summary": "Starting B7.7 end-to-end workflow validation mission",
         "action": "start",
         "ts": "2025-11-15T00:35:32Z"
+      },
+      {
+        "mission": "B7.7",
+        "agent": "assistant",
+        "summary": "UI + CLI workflows validated; ingestion/search/RAG suites and telemetry prove B7.7 readiness.",
+        "action": "complete",
+        "ts": "2025-11-15T00:52:24Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Started B7.7 validation recap",
+        "action": "start",
+        "ts": "2025-11-15T01:16:25Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured context",
+        "action": "capture",
+        "ts": "2025-11-15T01:16:30Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured next-step",
+        "action": "capture",
+        "ts": "2025-11-15T01:16:33Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Reviewed B7.7 validation evidence, confirmed ingestion/auth stability in prod/local, and noted UI hydration warnings as the only follow-up.",
+        "action": "complete",
+        "ts": "2025-11-15T01:30:06Z"
+      },
+      {
+        "mission": "B7.8",
+        "agent": "assistant",
+        "summary": "Kicking off Sprint 07 retrospective deliverables per mission brief.",
+        "action": "start",
+        "ts": "2025-11-15T01:53:16Z"
+      },
+      {
+        "mission": "B7.8",
+        "agent": "assistant",
+        "summary": "Sprint 07 retrospective + env inventory documented with parity + telemetry evidence readying Sprint 08 planning.",
+        "action": "complete",
+        "ts": "2025-11-15T01:59:03Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Started Sprint 08 & 09 Planning",
+        "action": "start",
+        "ts": "2025-11-15T04:42:42Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-11-15T04:42:49Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-11-15T04:42:51Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-11-15T04:42:53Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-11-15T04:42:55Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-11-15T04:42:58Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured constraint",
+        "action": "capture",
+        "ts": "2025-11-15T04:42:59Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured constraint",
+        "action": "capture",
+        "ts": "2025-11-15T04:43:01Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured context",
+        "action": "capture",
+        "ts": "2025-11-15T04:43:02Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Sprint 08 & 09 fully planned: 12 missions total. Sprint 08 focuses on performance optimization (Week 14). Sprint 09 focuses on advanced search with critical UX fixes (Week 15). All missions created, backlog updated, database seeded, parity validated.",
+        "action": "complete",
+        "ts": "2025-11-15T04:43:10Z"
+      },
+      {
+        "mission": "B8.1",
+        "agent": "assistant",
+        "summary": "Starting telemetry automation mission to automate testing-summary.json from CI test runs",
+        "action": "start",
+        "ts": "2025-11-15T04:57:13Z"
+      },
+      {
+        "mission": "B8.1",
+        "agent": "assistant",
+        "summary": "Telemetry automation pipeline implemented (pytest plugin, Playwright reporter, aggregator, docs, CI).",
+        "action": "complete",
+        "ts": "2025-11-15T05:25:07Z"
+      },
+      {
+        "mission": "B8.2",
+        "agent": "assistant",
+        "summary": "Starting database query optimization work",
+        "action": "start",
+        "ts": "2025-11-15T06:20:01Z"
+      },
+      {
+        "mission": "B8.2",
+        "agent": "assistant",
+        "summary": "Database query optimization changes added (indexes, query loading)",
+        "action": "complete",
+        "ts": "2025-11-15T06:33:15Z"
       }
     ],
     "blocked_missions": [
       "B6.3"
     ],
-    "last_completed_mission": "B7.5",
-    "last_blocked_mission": "B6.3"
+    "last_completed_mission": "B8.2",
+    "last_blocked_mission": "B6.3",
+    "recent_sessions": [
+      {
+        "id": "PS-2025-11-15-001",
+        "session_type": "review",
+        "type": "review",
+        "title": "B7.7 validation recap",
+        "summary": "Reviewed B7.7 validation evidence, confirmed ingestion/auth stability in prod/local, and noted UI hydration warnings as the only follow-up.",
+        "completed_at": "2025-11-15T01:30:06Z",
+        "capture_count": 2,
+        "captures": {
+          "context": 1,
+          "next-step": 1
+        }
+      },
+      {
+        "id": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "type": "planning",
+        "title": "Sprint 08 & 09 Planning",
+        "summary": "Sprint 08 & 09 fully planned: 12 missions total. Sprint 08 focuses on performance optimization (Week 14). Sprint 09 focuses on advanced search with critical UX fixes (Week 15). All missions created, backlog updated, database seeded, parity validated.",
+        "completed_at": "2025-11-15T04:43:10Z",
+        "capture_count": 8,
+        "captures": {
+          "decision": 5,
+          "constraint": 2,
+          "context": 1
+        }
+      }
+    ],
+    "next_steps": [
+      "PS-2025-11-15-001: Draft Sprint 07 retrospective (B7.8) with env var inventory + telemetry references.",
+      "PS-2025-11-15-001: Launch Sprint 08 with B8.1 Telemetry Automation",
+      "PS-2025-11-15-001: After Sprint 08, begin Sprint 09 with B9.1 Hybrid Search"
+    ]
   },
   "technical_context": {
     "dependencies": [
@@ -417,12 +465,12 @@
     }
   },
   "context_health": {
-    "size_kb": 9.66,
+    "size_kb": 11.89,
     "size_limit_kb": 100,
-    "sessions_since_reset": 62,
+    "sessions_since_reset": 73,
     "last_reset": "",
     "compression_enabled": false,
-    "last_update": "2025-11-15T00:35:32Z"
+    "last_update": "2025-11-15T06:33:15Z"
   },
   "metadata": {
     "migrated_at": "2025-11-14T17:16:26.368380+00:00",

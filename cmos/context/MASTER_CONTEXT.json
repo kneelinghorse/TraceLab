@@ -241,14 +241,31 @@
       "decision": "B6.6 (formerly B6.3) remains blocked until fixes complete",
       "source": "Unblocking Sprint 06 development - API URL and auth issues (2025-11-10)",
       "date": "2025-11-10"
-    }
+    },
+    {
+      "date": "2025-11-15",
+      "decision": "Sprint 08 planned with performance optimization focus: telemetry automation, database query optimization, query result caching, Qdrant tuning, and cost monitoring dashboard. No research missions needed - all build missions based on established roadmap Week 14.",
+      "source": "Sprint 08 planning session"
+    },
+    {
+      "date": "2025-11-15",
+      "decision": "Sprint 09 planned with advanced search features focus per roadmap Week 15: hybrid search backend, faceted filters, search page UX fixes (project dropdown, remove RAG Control Room, simplify controls), search history, and saved searches. No research missions needed - all standard implementations. Key UX decision: collapse extra filters until core search workflow is solid.",
+      "source": "Sprint 09 planning session"
+    },
+    "Sprint 08 planned with 6 missions: telemetry automation, database query optimization, query result caching, Qdrant tuning, cost monitoring dashboard, and retrospective. Roadmap Week 14 alignment. (from PS-2025-11-15-001)",
+    "Sprint 08 tech: in-memory caching (cachetools) over Redis for single-user simplicity. Backend-rendered dashboard (FastAPI + Jinja2) over React SPA. Pytest plugin + Playwright reporter for telemetry automation. (from PS-2025-11-15-001)",
+    "Sprint 09 planned with 6 missions: hybrid search backend, faceted filters backend, search page UX fixes, search history, saved searches, and retrospective. Roadmap Week 15 alignment. (from PS-2025-11-15-001)",
+    "Sprint 09 UX fixes priority: project dropdown broken (shows 0), remove RAG Control Room section (missions don't apply), simplify controls to search box + project + results count (max 25), collapse extra filters into advanced panel. (from PS-2025-11-15-001)",
+    "Sprint 09 tech: hybrid search weights 0.7 semantic / 0.3 keyword (configurable). PostgreSQL full-text + Qdrant metadata filters. Search history retention 100 entries or 30 days. Saved search limit 50 per user. (from PS-2025-11-15-001)"
   ],
   "constraints": [
     "All document processing workflows must execute redaction prior to persistence or embedding.",
     "Synthetic data only for evaluation until governance approves real corpus usage.",
     "Local developer environment must function offline except for OpenAI API calls.",
     "Tiered LLM routing escalation rate must stay <10% to meet cost targets.",
-    "Semantic cache hit rate target: 15-20% for cost optimization."
+    "Semantic cache hit rate target: 15-20% for cost optimization.",
+    "CMOS packaging removed from Sprint 08 scope - CMOS is project management tool for TraceLab, not a deliverable itself.",
+    "No research missions needed for Sprint 08 or 09 - all features follow established patterns from roadmap and technical architecture."
   ],
   "quality_standards": {
     "ai_instructions": {
@@ -907,6 +924,50 @@
         "local_backend": "http://localhost:8000",
         "local_frontend": "http://localhost:3000"
       }
+    },
+    "sprint_08_planned": {
+      "date": "2025-11-15",
+      "missions": 6,
+      "focus": "performance_optimization_and_monitoring",
+      "roadmap_alignment": "Week 14 - Performance Optimization",
+      "key_goals": [
+        "Automate telemetry generation",
+        "Optimize database queries with indexes",
+        "Implement application-level caching",
+        "Tune Qdrant parameters for production",
+        "Build cost monitoring dashboard"
+      ],
+      "technology_decisions": {
+        "caching": "in-memory (cachetools) over Redis for single-user simplicity",
+        "dashboard": "backend-rendered (FastAPI + Jinja2) over React SPA",
+        "telemetry": "pytest plugin + Playwright reporter + aggregator"
+      }
+    },
+    "sprint_09_planned": {
+      "date": "2025-11-15",
+      "missions": 6,
+      "focus": "advanced_search_features",
+      "roadmap_alignment": "Week 15 - Advanced Search Features",
+      "key_goals": [
+        "Implement hybrid search (semantic + keyword)",
+        "Add faceted filtering backend",
+        "Fix search page UX (project dropdown, simplified controls)",
+        "Add search history tracking",
+        "Enable saved searches bookmarking"
+      ],
+      "ux_decisions": {
+        "search_controls": "Simplified to search box, project selector, results count (max 25)",
+        "filters": "Collapsed into advanced panel - not prominent until workflow clarity",
+        "rag_control_room": "Removed - missions concept not applicable to search page",
+        "project_dropdown": "Must be wired to GET /api/v1/projects (currently broken)"
+      },
+      "technical_decisions": {
+        "hybrid_weights": "Default 0.7 semantic / 0.3 keyword, configurable",
+        "max_top_k": "Increased from 10 to 25",
+        "filter_backend": "PostgreSQL full-text + Qdrant metadata filters",
+        "history_retention": "100 searches or 30 days",
+        "saved_search_limit": "50 per user"
+      }
     }
   },
   "metadata": {
@@ -923,18 +984,107 @@
         "summary": "Starting B7.7 end-to-end workflow validation mission",
         "action": "start",
         "ts": "2025-11-15T00:35:32Z"
+      },
+      {
+        "mission": "B7.7",
+        "agent": "assistant",
+        "summary": "UI + CLI workflows validated; ingestion/search/RAG suites and telemetry prove B7.7 readiness.",
+        "action": "complete",
+        "ts": "2025-11-15T00:52:24Z"
+      },
+      {
+        "mission": "B7.8",
+        "agent": "assistant",
+        "summary": "Kicking off Sprint 07 retrospective deliverables per mission brief.",
+        "action": "start",
+        "ts": "2025-11-15T01:53:16Z"
+      },
+      {
+        "mission": "B7.8",
+        "agent": "assistant",
+        "summary": "Sprint 07 retrospective + env inventory documented with parity + telemetry evidence readying Sprint 08 planning.",
+        "action": "complete",
+        "ts": "2025-11-15T01:59:03Z"
+      },
+      {
+        "mission": "B8.1",
+        "agent": "assistant",
+        "summary": "Starting telemetry automation mission to automate testing-summary.json from CI test runs",
+        "action": "start",
+        "ts": "2025-11-15T04:57:13Z"
+      },
+      {
+        "mission": "B8.1",
+        "agent": "assistant",
+        "summary": "Telemetry automation pipeline implemented (pytest plugin, Playwright reporter, aggregator, docs, CI).",
+        "action": "complete",
+        "ts": "2025-11-15T05:25:07Z"
+      },
+      {
+        "mission": "B8.2",
+        "agent": "assistant",
+        "summary": "Starting database query optimization work",
+        "action": "start",
+        "ts": "2025-11-15T06:20:01Z"
+      },
+      {
+        "mission": "B8.2",
+        "agent": "assistant",
+        "summary": "Database query optimization changes added (indexes, query loading)",
+        "action": "complete",
+        "ts": "2025-11-15T06:33:15Z"
       }
     ],
-    "last_session": "2025-11-15T00:35:32Z",
-    "session_count": 1,
-    "active_mission": "B7.7",
-    "blocked_missions": []
+    "last_session": "2025-11-15T06:33:15Z",
+    "session_count": 8,
+    "active_mission": null,
+    "blocked_missions": [],
+    "last_completed_mission": "B8.2"
   },
-  "next_session_context": {},
+  "next_session_context": {
+    "when_we_resume": [
+      "PS-2025-11-15-001: After Sprint 08, begin Sprint 09 with B9.1 Hybrid Search",
+      "Pick up B8.3"
+    ]
+  },
   "context_health": {
-    "sessions_since_reset": 1,
-    "last_update": "2025-11-15T00:35:32Z",
-    "size_kb": 30.74,
+    "sessions_since_reset": 12,
+    "last_update": "2025-11-15T06:33:15Z",
+    "size_kb": 37.19,
     "size_limit_kb": 100
-  }
+  },
+  "learnings": [],
+  "context_notes": [
+    "B7.7 validated ingestion flow end-to-end; prod + local confirmed, only residual issue is local hydration warnings but no blocking impact.",
+    "B6.3 not actually blocked - project dropdown shows 0 but actual functionality works. B7.1 resolved the blocker by adding GET endpoints. Database blocker record needs cleanup."
+  ],
+  "recent_sessions": [
+    {
+      "id": "PS-2025-11-15-001",
+      "session_type": "review",
+      "type": "review",
+      "title": "B7.7 validation recap",
+      "summary": "Reviewed B7.7 validation evidence, confirmed ingestion/auth stability in prod/local, and noted UI hydration warnings as the only follow-up.",
+      "completed_at": "2025-11-15T01:30:06Z",
+      "capture_count": 2,
+      "captures": {
+        "context": 1,
+        "next-step": 1
+      }
+    },
+    {
+      "id": "PS-2025-11-15-001",
+      "session_type": "planning",
+      "type": "planning",
+      "title": "Sprint 08 & 09 Planning",
+      "summary": "Sprint 08 & 09 fully planned: 12 missions total. Sprint 08 focuses on performance optimization (Week 14). Sprint 09 focuses on advanced search with critical UX fixes (Week 15). All missions created, backlog updated, database seeded, parity validated.",
+      "completed_at": "2025-11-15T04:43:10Z",
+      "capture_count": 8,
+      "captures": {
+        "decision": 5,
+        "constraint": 2,
+        "context": 1
+      }
+    }
+  ]
 }

@@ -5,7 +5,7 @@ import math
 from typing import List, Optional, Tuple
 from uuid import UUID
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload, load_only
 
 from app.models.document import Document
 from app.schemas.pagination import PaginationMeta
@@ -30,7 +30,22 @@ class DocumentQueryService:
         """Return paginated documents ordered by upload time."""
 
         clamped_page_size = min(max(page_size, 1), self.MAX_PAGE_SIZE)
-        query = db.query(Document)
+        query = db.query(Document).options(
+            load_only(
+                Document.id,
+                Document.project_id,
+                Document.name,
+                Document.file_type,
+                Document.file_size,
+                Document.mime_type,
+                Document.source_type,
+                Document.uploaded_at,
+                Document.processed,
+                Document.chunked,
+                Document.embedded,
+                Document.validation_status,
+            )
+        )
 
         if project_id:
             query = query.filter(Document.project_id == project_id)
@@ -60,4 +75,13 @@ class DocumentQueryService:
     def get_document(self, db: Session, document_id: UUID) -> Optional[Document]:
         """Fetch a single document by identifier."""
 
-        return db.query(Document).filter(Document.id == document_id).first()
+        return (
+            db.query(Document)
+            .options(
+                selectinload(Document.processing_events),
+                selectinload(Document.tags),
+                selectinload(Document.chunks),
+            )
+            .filter(Document.id == document_id)
+            .first()
+        )
