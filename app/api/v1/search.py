@@ -11,6 +11,9 @@ router = APIRouter()
 async def run_rag_search(payload: RagQuery) -> RagResponse:
     """
     Execute a RAG query and return an answer with citations and supporting chunks.
+
+    The search_mode parameter selects semantic (vector-only), keyword (PostgreSQL
+    full-text), or hybrid (weighted combination) retrieval strategies.
     """
     if not payload.query.strip():
         raise HTTPException(status_code=400, detail="Query text must not be empty.")
@@ -25,5 +28,6 @@ async def run_rag_search(payload: RagQuery) -> RagResponse:
         hnsw_ef=payload.hnsw_ef,
         temperature=payload.temperature,
         max_tokens=payload.max_tokens,
+        search_mode=payload.search_mode,
     )
     return RagResponse.model_validate(result)

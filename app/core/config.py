@@ -44,6 +44,12 @@ class Settings(BaseSettings):
     semantic_cache_similarity_threshold: float = 0.92
     semantic_cache_ttl_seconds: int = 86400  # 24 hours
     semantic_cache_max_items: int = 20000
+
+    # Hybrid search
+    hybrid_search_semantic_weight: float = 0.7
+    hybrid_search_keyword_weight: float = 0.3
+    hybrid_search_keyword_language: str = "english"
+    hybrid_search_result_multiplier: int = 2
     
     # API
     api_v1_prefix: str = "/api/v1"

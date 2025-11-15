@@ -1,6 +1,7 @@
 """Tests for the RAG service orchestration and API endpoint."""
 import copy
 import time
+from typing import Any, Dict, List, Optional
 
 import pytest
 from fastapi.testclient import TestClient
@@ -50,6 +51,29 @@ class _FakeRetrievalService:
                 "embedding": [0.61, 0.8, 0.0],
             },
         ]
+
+
+class _FakeHybridSearchService:
+    def __init__(self, results: Optional[List[Dict[str, Any]]] = None):
+        self.calls: List[Dict[str, Any]] = []
+        default_results = results or [
+            {
+                "chunk_id": "chunk-h",
+                "content": "Keyword weighted content about governance hybrids.",
+                "document_id": "doc-h",
+                "project_id": "proj-h",
+                "chunk_index": 0,
+                "source_type": "report",
+                "score": 0.78,
+                "embedding": [0.11, 0.22, 0.33],
+                "search_mode": "keyword",
+            }
+        ]
+        self._results = [dict(item) for item in default_results]
+
+    def search(self, **kwargs):
+        self.calls.append(kwargs)
+        return [dict(item) for item in self._results]
 
 
 class _FakeChatCompletions:
@@ -251,6 +275,41 @@ def test_rag_service_run_query(monkeypatch):
     assert result["routing"]["estimated_cost_usd"] == 0.0
     assert result["routing"]["metrics"]["total_queries"] == 1
     assert result["routing"]["metrics"]["escalations"] == 0
+    assert result["search_mode"] == "semantic"
+
+
+def test_rag_service_respects_search_mode(monkeypatch):
+    fake_retrieval = _FakeRetrievalService()
+    fake_hybrid = _FakeHybridSearchService()
+    fake_embedding = _FakeEmbeddingService()
+    fake_client = _FakeOpenAIClient(
+        "Hybrid search ensures coverage. [Document: doc-h, Chunk: 0]"
+    )
+    cache = _NoOpCacheService()
+    monkeypatch.setattr(rag_module, "_openai_import_error", None, raising=False)
+    monkeypatch.setattr(rag_module, "OpenAI", object, raising=False)
+    service = rag_module.RagService(
+        retrieval_service=fake_retrieval,
+        hybrid_search_service=fake_hybrid,
+        embedding_service=fake_embedding,
+        cache_service=cache,
+        client=fake_client,
+        model="gpt-test",
+        default_temperature=0.0,
+        cost_monitor=None,
+    )
+
+    result = service.run_query(
+        query="Explain hybrid scoring benefits.",
+        top_k=2,
+        search_mode="keyword",
+    )
+
+    assert fake_hybrid.calls[0]["search_mode"] == "keyword"
+    assert result["search_mode"] == "keyword"
+    assert result["sources"][0]["chunk_id"] == "chunk-h"
+    assert cache.checked == 1
+    assert cache.stored == 1
 
 
 def test_rag_service_uses_cache_hit(monkeypatch):
@@ -343,6 +402,7 @@ def test_rag_service_uses_cache_hit(monkeypatch):
     assert result["quality"]["composite_score"] == pytest.approx(0.92)
     assert result["routing"]["selected_model"] == settings.openai_chat_model
     assert result["routing"]["escalated"] is False
+    assert result["search_mode"] == "semantic"
 
 
 def test_tiered_routing_escalates_on_low_quality(monkeypatch):
@@ -389,6 +449,7 @@ def test_tiered_routing_escalates_on_low_quality(monkeypatch):
     )
     assert cache.checked == 1
     assert cache.stored == 1
+    assert result["search_mode"] == "semantic"
 
 
 def test_rag_service_emits_cost_metrics(monkeypatch):
@@ -418,6 +479,7 @@ def test_rag_service_emits_cost_metrics(monkeypatch):
     assert result["routing"]["estimated_cost_usd"] == pytest.approx(0.002)
     assert result["routing"]["attempts"][0]["cost_usd"] == pytest.approx(0.002)
     assert monitor.usage_events[0]["project_id"] == "proj-telemetry"
+    assert result["search_mode"] == "semantic"
 
 
 class _FakeRagService:
@@ -487,6 +549,7 @@ class _FakeRagService:
                 "estimated_cost_usd": 0.00018,
                 "metrics": {"total_queries": 4, "escalations": 0},
             },
+            "search_mode": kwargs.get("search_mode", "semantic"),
         }
 
 
@@ -505,6 +568,7 @@ def test_rag_search_endpoint(monkeypatch, auth_headers):
             "project_id": "44a8f4ba-13c4-4efc-8705-8c620be4e9dd",
             "temperature": 0.25,
             "max_tokens": 256,
+            "search_mode": "hybrid",
         },
         headers=auth_headers,
     )
@@ -518,6 +582,8 @@ def test_rag_search_endpoint(monkeypatch, auth_headers):
     assert fake_service.calls[0]["project_id"] == "44a8f4ba-13c4-4efc-8705-8c620be4e9dd"
     assert fake_service.calls[0]["temperature"] == 0.25
     assert fake_service.calls[0]["max_tokens"] == 256
+    assert fake_service.calls[0]["search_mode"] == "hybrid"
+    assert body["search_mode"] == "hybrid"
     assert body["cache"]["hit"] is False
     assert body["quality"]["composite_score"] == pytest.approx(0.93)
     assert body["routing"]["selected_model"] == settings.openai_chat_model
