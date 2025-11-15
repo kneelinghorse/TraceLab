@@ -1,5 +1,5 @@
 {
-  "project": {
+  "project_identity": {
     "name": "CMOS Starter Template",
     "version": "0.0.0",
     "description": "Blank master context for new CMOS starter projects.",
@@ -9,114 +9,473 @@
       "platform": "FastAPI + PostgreSQL + Qdrant",
       "integration_target": "Internal research teams",
       "environment": "development"
+    },
+    "session_metrics": {
+      "count": 60,
+      "last_session": "2025-11-12T16:09:23Z",
+      "active_domain": "main"
+    },
+    "achievements": [
+      "Completed Sprint 00 strategic research artifacts.",
+      "Completed Sprint 01: all 11 missions delivered (B1.1-B1.9, R1.1-R1.2).",
+      "Achieved all Sprint 01 success criteria: Presidio recall 0.9829, format coverage 5/5, Qdrant latency 9.6ms.",
+      "Established automated sprint evaluation mission (B1.6) and generated Sprint 01 efficacy report.",
+      "Completed Sprint 01 gap-filling missions (B1.7-B1.9) to close all unmet criteria.",
+      "Completed Sprint 02 research (R2.1): comprehensive quality assessment heuristics framework with three-pillar approach.",
+      "Completed Sprint 02 ingestion research (R2.2 Markdown service, R2.3 onboarding workflow) defining architecture for B2.3 sub-missions.",
+      "Planned Sprint 02: all 5 build missions (B2.1-B2.5) defined with success criteria and dependencies.",
+      "Updated B2.3b onboarding mission for single-user deployment and realigned backlog sequencing (B2.3b Current, B2.3d Queued)."
+    ],
+    "files_created": [
+      "cmos/missions/sprint-01/B1.1_Core-Service-Bootstrap.yaml",
+      "cmos/missions/sprint-01/B1.2_Synthetic-Corpus-Pipeline.yaml",
+      "cmos/missions/sprint-01/B1.3_Presidio-Redaction-Service.yaml",
+      "cmos/missions/sprint-01/B1.4_Document-Ingestion-Pipeline.yaml",
+      "cmos/missions/sprint-01/B1.5_Embedding-and-Qdrant-Bootstrap.yaml",
+      "cmos/missions/sprint-01/B1.6_Sprint-Efficacy-Evaluator.yaml",
+      "cmos/missions/sprint-01/B1.7_Presidio-Recall-Tuning.yaml",
+      "cmos/missions/sprint-01/B1.8_Format-Coverage-Completion.yaml",
+      "cmos/missions/sprint-01/B1.9_Qdrant-Latency-Optimization.yaml",
+      "cmos/missions/sprint-02/B2.1_RAG-Query-API.yaml",
+      "cmos/missions/sprint-02/B2.2_Context-Compression-Pipeline.yaml",
+      "cmos/missions/sprint-02/B2.3_Semantic-Cache-Layer.yaml",
+      "cmos/missions/sprint-02/B2.3a_Markdown-Ingestion-Pipeline.yaml",
+      "cmos/missions/sprint-02/B2.3b_Onboarding-API.yaml",
+      "cmos/missions/sprint-02/B2.3c_Ingestion-Integration-Parity.yaml",
+      "cmos/missions/sprint-02/B2.3d_Semantic-Cache-Implementation.yaml",
+      "cmos/missions/sprint-02/B2.4_Tiered-LLM-Routing.yaml",
+      "cmos/missions/sprint-02/B2.5_Sprint-Efficacy-Evaluator.yaml",
+      "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md",
+      "cmos/missions/research/R2.3_Bootstrap-Workflow.md",
+      "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md",
+      "cmos/missions/backlog.yaml",
+      "cmos/docs/sprint-01_metrics_plan.md",
+      "cmos/reports/README.md",
+      "cmos/reports/sprint-01/sprint-01-summary.md",
+      "cmos/reports/sprint-01/SPRINT-01-DELTA-ANALYSIS.md",
+      "cmos/reports/sprint-02/.gitkeep"
+    ],
+    "planning_overview": {
+      "current_sprint": "Sprint 05 - Frontend Deployment & Auth Hardening",
+      "session_summaries": [
+        {
+          "session_date": "2025-11-10",
+          "agent": "Claude",
+          "focus": "Unblocking Sprint 06 development - API URL and auth issues",
+          "key_discoveries": [
+            "Production API is at https://api.namozine.com (root), NOT https://api.namozine.com/api/v1",
+            "All frontend configs and docs have wrong URL with /api/v1 suffix",
+            "Local development blocked due to missing .env setup and auth configuration",
+            "B6.3 (RAG Search UI) blocked by API connectivity issues"
+          ],
+          "decisions_made": [
+            "Renumbered missions to fix linear progression: B6.3-5 are now fix missions, original B6.3-7 moved to B6.6-10",
+            "B6.3: API URL Configuration Fix - remove /api/v1 suffix everywhere",
+            "B6.4: Local Development Environment Setup - create proper dev docs and scripts",
+            "B6.5: Authentication Documentation Testing - document auth flow and credentials",
+            "B6.6 (formerly B6.3) remains blocked until fixes complete"
+          ],
+          "mistakes_made": [
+            "Made unauthorized ad-hoc changes to auth config without understanding impact",
+            "Created frontend/.env.local with wrong API URL",
+            "Failed to recognize production API doesn't use /api/v1 path despite user insisting",
+            "Attempted to fix issues directly instead of creating proper missions"
+          ],
+          "files_modified": [
+            "cmos/missions/sprint-06/* - Renumbered all missions",
+            "cmos/missions/backlog.yaml - Updated mission order and statuses",
+            "app/core/config.py - Reverted unauthorized changes",
+            "app/main.py - Reverted unauthorized changes"
+          ],
+          "blockers_identified": {
+            "api_url_mismatch": {
+              "issue": "Frontend configured for https://api.namozine.com/api/v1 but API serves at root",
+              "impact": "Complete connectivity failure in production and local",
+              "fix": "Mission B6.3 to update all URL references"
+            },
+            "local_dev_setup": {
+              "issue": "No documentation or scripts for local development",
+              "impact": "Developers cannot run application locally",
+              "fix": "Mission B6.4 to create setup guide and automation"
+            },
+            "auth_confusion": {
+              "issue": "No documentation of auth credentials or flow",
+              "impact": "Cannot test authenticated endpoints",
+              "fix": "Mission B6.5 to document authentication"
+            }
+          }
+        }
+      ]
     }
   },
-  "working_memory": {
-    "active_domain": "main",
-    "session_count": 58,
-    "last_session": "2025-11-12T01:38:51Z",
-    "domains": {
-      "main": {
-        "status": "active",
-        "priority": 1,
-        "critical_facts": [
-          "Sprint 01 completed successfully: all 11 missions done, 4/4 success criteria met.",
-          "Presidio recall achieved 0.9829 minimum (exceeding 0.95 target) across all priority entities.",
-          "All 5 priority formats (PDF, DOCX, PPTX, CSV, XLSX) successfully ingested end-to-end.",
-          "Qdrant performance optimized: 9.6ms max latency (under 10ms target) with adaptive hnsw_ef tiers.",
-          "Sprint 02 research (R2.1) completed: comprehensive quality assessment heuristics framework documented.",
-          "Vector storage operational: Qdrant with on-disk storage, scalar quantization, 12,800 chunks indexed.",
-          "Document & project read APIs are still missing; Document Library UI/CLI list flows remain blocked until B7.1 ships.",
-          "scripts/ingest_cli.py currently returns 401 because it never requests JWT tokens; B7.3 owns the fix so ingestion workflows can pass tests/integration/test_ingestion_flow.py.",
-          "Integration testing guardrails (cmos/docs/integration-testing-guide.md + structured prompting refs) are absent, keeping node cmos/context/integration_test_runner.js red; schedule B7.2 to restore telemetry gating."
-        ],
-        "constraints": [
-          "All document processing workflows must execute redaction prior to persistence or embedding.",
-          "Synthetic data only for evaluation until governance approves real corpus usage.",
-          "Local developer environment must function offline except for OpenAI API calls.",
-          "Tiered LLM routing escalation rate must stay <10% to meet cost targets.",
-          "Semantic cache hit rate target: 15-20% for cost optimization."
+  "technical_foundation": {
+    "critical_facts": [
+      "Sprint 01 completed successfully: all 11 missions done, 4/4 success criteria met.",
+      "Presidio recall achieved 0.9829 minimum (exceeding 0.95 target) across all priority entities.",
+      "All 5 priority formats (PDF, DOCX, PPTX, CSV, XLSX) successfully ingested end-to-end.",
+      "Qdrant performance optimized: 9.6ms max latency (under 10ms target) with adaptive hnsw_ef tiers.",
+      "Sprint 02 research (R2.1) completed: comprehensive quality assessment heuristics framework documented.",
+      "Vector storage operational: Qdrant with on-disk storage, scalar quantization, 12,800 chunks indexed.",
+      "Document & project read APIs are still missing; Document Library UI/CLI list flows remain blocked until B7.1 ships.",
+      "scripts/ingest_cli.py currently returns 401 because it never requests JWT tokens; B7.3 owns the fix so ingestion workflows can pass tests/integration/test_ingestion_flow.py.",
+      "Integration testing guardrails (cmos/docs/integration-testing-guide.md + structured prompting refs) are absent, keeping node cmos/context/integration_test_runner.js red; schedule B7.2 to restore telemetry gating."
+    ],
+    "system_components": {
+      "ingestion": "Upload endpoints, format routing (PDF/DOCX/PPTX/CSV/XLSX), redaction, chunking (500-1000 tokens with overlap), and processing state tracking.",
+      "redaction": "Presidio-based pipeline with custom recognizers (PARTICIPANT_ID, PROJECT_ID), pseudonymization operators, recall 0.9829+ on priority entities.",
+      "vector_store": "Qdrant collection with on-disk storage, scalar quantization (int8), HNSW indexing (m=16), adaptive hnsw_ef tiers, 12,800 chunks indexed, <10ms query latency.",
+      "evaluation": "Synthetic corpus generation + presidio-research metrics, sprint efficacy script (B1.6).",
+      "rag_pipeline": "Planned for Sprint 02: query embedding, vector search, GPT-4o-mini generation, context compression, semantic caching, tiered routing."
+    },
+    "dependencies": [
+      "Python 3.11+",
+      "FastAPI",
+      "SQLAlchemy + Alembic",
+      "PostgreSQL 15+",
+      "Qdrant",
+      "OpenAI API (text-embedding-3-small, GPT-4o-mini, GPT-4o)",
+      "Microsoft Presidio (Analyzer & Anonymizer)",
+      "spaCy en_core_web_lg",
+      "Faker",
+      "python-docx",
+      "python-pptx",
+      "pypdf / py-pdf-parser",
+      "pandas",
+      "tiktoken (for token counting in chunking and compression)"
+    ],
+    "integration_points": [
+      "foundational-docs/roadmap_template.md",
+      "foundational-docs/tech_arch_template.md",
+      "foundational-docs/tech_arch_template.md",
+      "foundational-docs/roadmap_template.md",
+      "cmos/missions/backlog.yaml",
+      "cmos/docs/sprint-01_metrics_plan.md",
+      "cmos/reports/sprint-01/sprint-01-summary.md",
+      "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md"
+    ],
+    "enhanced_features": {},
+    "integration_testing": {
+      "guide": "cmos/docs/integration-testing-guide.md",
+      "runner": "node cmos/context/integration_test_runner.js --output telemetry/events/testing-summary.json",
+      "boundary_enforcement": "CMOS helpers must never import from app.services; rely on telemetry exports, CLI commands, or mission evidence when referencing FastAPI state."
+    },
+    "research_findings": {}
+  },
+  "decisions_made": [
+    {
+      "decision": "Adopt FastAPI + PostgreSQL + Alembic for core service bootstrapping.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Leverage Fake PII generation and presidio-research evaluator for regression testing.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Prioritize .pdf (text-based), .docx, .pptx, .csv, .xlsx ingestion in Sprint 01.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Use GPT-4o-mini as default LLM for RAG queries (per TR-03 research).",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Implement rule-based quality assessment heuristics (not ML-based) per R2.1 research.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Adaptive Qdrant hnsw_ef tiers (96/108/120) based on top_k for latency optimization.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Three-pillar quality assessment framework: Linguistic Uncertainty, Answer Integrity, Source Provenance.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Onboarding workflow operates in trusted single-user mode; authentication deferred indefinitely (no device flow or CLI mandate).",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Cloudflare vanity (namozine.com / api.namozine.com) now fronts the Railway UI/API with Full (Strict) TLS; env templates pin NEXT_PUBLIC_API_BASE_URL=https://api.namozine.com/api/v1 and CORS_ALLOWED_ORIGINS_PROD includes https://namozine.com + https://www.namozine.com.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "B6.4c: Documented JWT auth flows end-to-end (docs/authentication.md), added sample script, Postman collection, and pytest coverage for login/refresh to unblock downstream teams.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Sprint 07 focuses on reliability: B7.1 read APIs, B7.2 integration runbook, B7.3 ingest CLI auth, B7.4 Presidio/cache stabilization.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Renumbered missions to fix linear progression: B6.3-5 are now fix missions, original B6.3-7 moved to B6.6-10",
+      "source": "Unblocking Sprint 06 development - API URL and auth issues (2025-11-10)",
+      "date": "2025-11-10"
+    },
+    {
+      "decision": "B6.3: API URL Configuration Fix - remove /api/v1 suffix everywhere",
+      "source": "Unblocking Sprint 06 development - API URL and auth issues (2025-11-10)",
+      "date": "2025-11-10"
+    },
+    {
+      "decision": "B6.4: Local Development Environment Setup - create proper dev docs and scripts",
+      "source": "Unblocking Sprint 06 development - API URL and auth issues (2025-11-10)",
+      "date": "2025-11-10"
+    },
+    {
+      "decision": "B6.5: Authentication Documentation Testing - document auth flow and credentials",
+      "source": "Unblocking Sprint 06 development - API URL and auth issues (2025-11-10)",
+      "date": "2025-11-10"
+    },
+    {
+      "decision": "B6.6 (formerly B6.3) remains blocked until fixes complete",
+      "source": "Unblocking Sprint 06 development - API URL and auth issues (2025-11-10)",
+      "date": "2025-11-10"
+    }
+  ],
+  "constraints": [
+    "All document processing workflows must execute redaction prior to persistence or embedding.",
+    "Synthetic data only for evaluation until governance approves real corpus usage.",
+    "Local developer environment must function offline except for OpenAI API calls.",
+    "Tiered LLM routing escalation rate must stay <10% to meet cost targets.",
+    "Semantic cache hit rate target: 15-20% for cost optimization."
+  ],
+  "quality_standards": {
+    "ai_instructions": {
+      "preferred_language": "yaml",
+      "code_style": "mission_protocol_v2",
+      "testing_required": true,
+      "documentation_level": "comprehensive",
+      "special_instructions": [
+        "Always load agents.md before starting missions.",
+        "Apply OWASP Top 10 security guidelines during implementation.",
+        "Keep PROJECT_CONTEXT.json and missions/backlog.yaml in sync with the SQLite database.",
+        "Follow structured prompting workflows and advanced orchestration patterns (none, rsip, delegation, boomerang) outlined in cmos/docs/AI-coding-assistant-workflows.md before executing CMOS missions."
+      ]
+    },
+    "context_health": {
+      "anti_pattern_detection": true,
+      "compression_enabled": true,
+      "last_reset": "",
+      "sessions_since_reset": 60,
+      "size_kb": 26.67,
+      "size_limit_kb": 100,
+      "last_update": "2025-11-12T16:09:23Z"
+    },
+    "testing_protocols": {
+      "guide": "cmos/docs/integration-testing-guide.md",
+      "runner": "node cmos/context/integration_test_runner.js --output telemetry/events/testing-summary.json",
+      "boundary_enforcement": "CMOS helpers must never import from app.services; rely on telemetry exports, CLI commands, or mission evidence when referencing FastAPI state."
+    },
+    "sprint_evaluation": {
+      "script_path": "scripts/evaluate_sprint.py",
+      "report_directory": "cmos/reports/",
+      "run_protocol": "Execute after each sprint demo; compare mission successCriteria against telemetry and append report reference here.",
+      "sprint_01_report": "cmos/reports/sprint-01/sprint-01-summary.md",
+      "sprint_01_status": "Completed - 4/4 metrics met, 11/11 missions completed",
+      "sprint_02_report": "cmos/reports/sprint-02/sprint-02-summary.md",
+      "sprint_02_status": "Completed - 7/7 metrics met, 9/9 missions completed",
+      "sprint_02_metrics": "cmos/reports/sprint-02/"
+    }
+  },
+  "roadmap": {
+    "status": {
+      "sprint_01": "Completed",
+      "sprint_02": "Planned",
+      "sprint_03": "Completed",
+      "sprint_04": "Planning",
+      "sprint_05": "Planned"
+    },
+    "current_focus": "Sprint 05 - Frontend Deployment & Auth Hardening",
+    "next_checkpoint": "Kick off B5.1 to provision the Railway frontend service and capture deployment telemetry.",
+    "research_completed": [
+      {
+        "id": "R2.1",
+        "name": "Quality Assessment Heuristics",
+        "status": "Completed",
+        "reference": "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md",
+        "deliverable": "Three-pillar framework (Linguistic Uncertainty, Answer Integrity, Source Provenance) with pattern libraries, scoring algorithms, escalation decision tree"
+      },
+      {
+        "id": "R2.2",
+        "name": "Markdown Ingestion Service Design",
+        "status": "Completed",
+        "reference": "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md",
+        "deliverable": "Architecture for chokidar → queue → unified/remark ingestion pipeline, Qdrant payload schema, telemetry, and resilience patterns"
+      },
+      {
+        "id": "R2.3",
+        "name": "Project Bootstrap Workflow",
+        "status": "Completed",
+        "reference": "cmos/missions/research/R2.3_Bootstrap-Workflow.md",
+        "deliverable": "FastAPI onboarding API design with idempotency keys, async ingestion jobs, and optional auth seams (device flow deferred for single-user deployment)"
+      }
+    ],
+    "queued_build_missions": [
+      {
+        "id": "B2.1",
+        "name": "RAG Query API",
+        "status": "Completed",
+        "focus": "Core RAG functionality: query embedding, vector search, GPT-4o-mini generation, citations"
+      },
+      {
+        "id": "B2.2",
+        "name": "Context Compression Pipeline",
+        "status": "Completed",
+        "focus": "Embedding-based filtering to reduce tokens 60-70% (3000→1000 tokens)"
+      },
+      {
+        "id": "B2.3",
+        "name": "Semantic Cache Layer",
+        "status": "Blocked",
+        "focus": "Qdrant-based cache with 0.90-0.95 similarity threshold, target 15-20% hit rate; unblocked by sub-missions B2.3a–B2.3d"
+      },
+      {
+        "id": "B2.3a",
+        "name": "Markdown Ingestion Pipeline",
+        "status": "In Progress",
+        "focus": "Implement chokidar → queue → unified/remark ingestion service per R2.2 research"
+      },
+      {
+        "id": "B2.3b",
+        "name": "Onboarding API",
+        "status": "Current",
+        "focus": "FastAPI onboarding service with idempotent endpoints and async ingestion jobs (trusted single-user, no auth)."
+      },
+      {
+        "id": "B2.3c",
+        "name": "Ingestion Integration & Parity",
+        "status": "Queued",
+        "focus": "End-to-end validation, parity reporting, and observability for ingestion workflow"
+      },
+      {
+        "id": "B2.3d",
+        "name": "Semantic Cache Implementation",
+        "status": "Queued",
+        "focus": "Integrate cache service with RAG pipeline and achieve 15–20% hit rate"
+      },
+      {
+        "id": "B2.4",
+        "name": "Tiered LLM Routing",
+        "status": "Queued",
+        "focus": "R2.1 quality assessment + escalation logic, target <10% escalation rate"
+      },
+      {
+        "id": "B2.5",
+        "name": "Sprint Efficacy Evaluator",
+        "status": "Queued",
+        "focus": "Sprint 02 metrics evaluation: RAG performance, cache hit rate, compression, routing, cost"
+      }
+    ],
+    "success_criteria": [
+      "RAG query API successfully retrieves relevant chunks and generates answers with citations",
+      "Context compression reduces input tokens by 60-70% (from ~3000 to ~1000 tokens)",
+      "Semantic cache achieves hit rate ≥ 15% (target 15-20%)",
+      "Tiered routing escalation rate < 10% (90%+ queries handled by GPT-4o-mini)",
+      "Average cost per query < $0.0003 (with all optimizations applied)",
+      "Query latency < 5 seconds end-to-end for RAG queries",
+      "Sprint evaluation script executes and produces retrospective report"
+    ],
+    "session_summaries": [
+      {
+        "session_date": "2025-11-10",
+        "agent": "Claude",
+        "focus": "Unblocking Sprint 06 development - API URL and auth issues",
+        "key_discoveries": [
+          "Production API is at https://api.namozine.com (root), NOT https://api.namozine.com/api/v1",
+          "All frontend configs and docs have wrong URL with /api/v1 suffix",
+          "Local development blocked due to missing .env setup and auth configuration",
+          "B6.3 (RAG Search UI) blocked by API connectivity issues"
         ],
         "decisions_made": [
-          "Adopt FastAPI + PostgreSQL + Alembic for core service bootstrapping.",
-          "Leverage Fake PII generation and presidio-research evaluator for regression testing.",
-          "Prioritize .pdf (text-based), .docx, .pptx, .csv, .xlsx ingestion in Sprint 01.",
-          "Use GPT-4o-mini as default LLM for RAG queries (per TR-03 research).",
-          "Implement rule-based quality assessment heuristics (not ML-based) per R2.1 research.",
-          "Adaptive Qdrant hnsw_ef tiers (96/108/120) based on top_k for latency optimization.",
-          "Three-pillar quality assessment framework: Linguistic Uncertainty, Answer Integrity, Source Provenance.",
-          "Onboarding workflow operates in trusted single-user mode; authentication deferred indefinitely (no device flow or CLI mandate).",
-          "Cloudflare vanity (namozine.com / api.namozine.com) now fronts the Railway UI/API with Full (Strict) TLS; env templates pin NEXT_PUBLIC_API_BASE_URL=https://api.namozine.com/api/v1 and CORS_ALLOWED_ORIGINS_PROD includes https://namozine.com + https://www.namozine.com.",
-          "B6.4c: Documented JWT auth flows end-to-end (docs/authentication.md), added sample script, Postman collection, and pytest coverage for login/refresh to unblock downstream teams.",
-          "Sprint 07 focuses on reliability: B7.1 read APIs, B7.2 integration runbook, B7.3 ingest CLI auth, B7.4 Presidio/cache stabilization."
+          "Renumbered missions to fix linear progression: B6.3-5 are now fix missions, original B6.3-7 moved to B6.6-10",
+          "B6.3: API URL Configuration Fix - remove /api/v1 suffix everywhere",
+          "B6.4: Local Development Environment Setup - create proper dev docs and scripts",
+          "B6.5: Authentication Documentation Testing - document auth flow and credentials",
+          "B6.6 (formerly B6.3) remains blocked until fixes complete"
         ],
-        "files_created": [
-          "cmos/missions/sprint-01/B1.1_Core-Service-Bootstrap.yaml",
-          "cmos/missions/sprint-01/B1.2_Synthetic-Corpus-Pipeline.yaml",
-          "cmos/missions/sprint-01/B1.3_Presidio-Redaction-Service.yaml",
-          "cmos/missions/sprint-01/B1.4_Document-Ingestion-Pipeline.yaml",
-          "cmos/missions/sprint-01/B1.5_Embedding-and-Qdrant-Bootstrap.yaml",
-          "cmos/missions/sprint-01/B1.6_Sprint-Efficacy-Evaluator.yaml",
-          "cmos/missions/sprint-01/B1.7_Presidio-Recall-Tuning.yaml",
-          "cmos/missions/sprint-01/B1.8_Format-Coverage-Completion.yaml",
-          "cmos/missions/sprint-01/B1.9_Qdrant-Latency-Optimization.yaml",
-          "cmos/missions/sprint-02/B2.1_RAG-Query-API.yaml",
-          "cmos/missions/sprint-02/B2.2_Context-Compression-Pipeline.yaml",
-          "cmos/missions/sprint-02/B2.3_Semantic-Cache-Layer.yaml",
-          "cmos/missions/sprint-02/B2.3a_Markdown-Ingestion-Pipeline.yaml",
-          "cmos/missions/sprint-02/B2.3b_Onboarding-API.yaml",
-          "cmos/missions/sprint-02/B2.3c_Ingestion-Integration-Parity.yaml",
-          "cmos/missions/sprint-02/B2.3d_Semantic-Cache-Implementation.yaml",
-          "cmos/missions/sprint-02/B2.4_Tiered-LLM-Routing.yaml",
-          "cmos/missions/sprint-02/B2.5_Sprint-Efficacy-Evaluator.yaml",
-          "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md",
-          "cmos/missions/research/R2.3_Bootstrap-Workflow.md",
-          "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md",
-          "cmos/missions/backlog.yaml",
-          "cmos/docs/sprint-01_metrics_plan.md",
-          "cmos/reports/README.md",
-          "cmos/reports/sprint-01/sprint-01-summary.md",
-          "cmos/reports/sprint-01/SPRINT-01-DELTA-ANALYSIS.md",
-          "cmos/reports/sprint-02/.gitkeep"
+        "mistakes_made": [
+          "Made unauthorized ad-hoc changes to auth config without understanding impact",
+          "Created frontend/.env.local with wrong API URL",
+          "Failed to recognize production API doesn't use /api/v1 path despite user insisting",
+          "Attempted to fix issues directly instead of creating proper missions"
         ],
-        "achievements": [
-          "Completed Sprint 00 strategic research artifacts.",
-          "Completed Sprint 01: all 11 missions delivered (B1.1-B1.9, R1.1-R1.2).",
-          "Achieved all Sprint 01 success criteria: Presidio recall 0.9829, format coverage 5/5, Qdrant latency 9.6ms.",
-          "Established automated sprint evaluation mission (B1.6) and generated Sprint 01 efficacy report.",
-          "Completed Sprint 01 gap-filling missions (B1.7-B1.9) to close all unmet criteria.",
-          "Completed Sprint 02 research (R2.1): comprehensive quality assessment heuristics framework with three-pillar approach.",
-          "Completed Sprint 02 ingestion research (R2.2 Markdown service, R2.3 onboarding workflow) defining architecture for B2.3 sub-missions.",
-          "Planned Sprint 02: all 5 build missions (B2.1-B2.5) defined with success criteria and dependencies.",
-          "Updated B2.3b onboarding mission for single-user deployment and realigned backlog sequencing (B2.3b Current, B2.3d Queued)."
+        "files_modified": [
+          "cmos/missions/sprint-06/* - Renumbered all missions",
+          "cmos/missions/backlog.yaml - Updated mission order and statuses",
+          "app/core/config.py - Reverted unauthorized changes",
+          "app/main.py - Reverted unauthorized changes"
         ],
-        "sprint_evaluation": {
-          "script_path": "scripts/evaluate_sprint.py",
-          "report_directory": "cmos/reports/",
-          "run_protocol": "Execute after each sprint demo; compare mission successCriteria against telemetry and append report reference here.",
-          "sprint_01_report": "cmos/reports/sprint-01/sprint-01-summary.md",
-          "sprint_01_status": "Completed - 4/4 metrics met, 11/11 missions completed",
-          "sprint_02_report": "cmos/reports/sprint-02/sprint-02-summary.md",
-          "sprint_02_status": "Completed - 7/7 metrics met, 9/9 missions completed",
-          "sprint_02_metrics": "cmos/reports/sprint-02/"
+        "blockers_identified": {
+          "api_url_mismatch": {
+            "issue": "Frontend configured for https://api.namozine.com/api/v1 but API serves at root",
+            "impact": "Complete connectivity failure in production and local",
+            "fix": "Mission B6.3 to update all URL references"
+          },
+          "local_dev_setup": {
+            "issue": "No documentation or scripts for local development",
+            "impact": "Developers cannot run application locally",
+            "fix": "Mission B6.4 to create setup guide and automation"
+          },
+          "auth_confusion": {
+            "issue": "No documentation of auth credentials or flow",
+            "impact": "Cannot test authenticated endpoints",
+            "fix": "Mission B6.5 to document authentication"
+          }
         }
       }
+    ],
+    "research_links": [
+      {
+        "research": "cmos/missions/research/TR-03.RAG-Cost-Optimization.md",
+        "build": "B2.1, B2.2, B2.3, B2.4"
+      },
+      {
+        "research": "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md",
+        "build": "B2.4"
+      },
+      {
+        "research": "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md",
+        "build": "B2.3a, B2.3c, B2.3d"
+      },
+      {
+        "research": "cmos/missions/research/R2.3_Bootstrap-Workflow.md",
+        "build": "B2.3b, B2.3c, B2.3d"
+      }
+    ],
+    "sprint_close_process": [
+      "Run scripts/evaluate_sprint.py with --sprint 2 to generate report in cmos/reports/sprint-02/",
+      "Verify all Sprint 02 success criteria metrics collected (cache hit rate, escalation rate, compression ratio, cost per query)",
+      "Update cmos/missions/backlog.yaml with mission statuses and completion notes",
+      "Capture retrospective highlights in MASTER_CONTEXT.json under working_memory.domains.main.achievements",
+      "Review telemetry artifacts: RAG performance metrics, semantic cache stats, tiered routing logs, cost analysis"
+    ],
+    "important_for_review": [
+      "Telemetry artifacts needed: RAG query performance logs, semantic cache hit/miss statistics, context compression metrics, tiered routing escalation events, cost tracking data",
+      "Key metrics to validate: cache hit rate (target ≥15%), escalation rate (target <10%), token compression ratio (target 60-70%), average cost per query (target <$0.0003)",
+      "R2.1 research provides complete implementation blueprint: pattern libraries, scoring algorithms, escalation decision tree - ready for B2.4 implementation",
+      "All Sprint 02 missions have clear dependencies: B2.1 → B2.2 → B2.3 → B2.4 → B2.5",
+      "Qdrant infrastructure from B1.5 is operational: 12,800 chunks indexed, <10ms latency, ready for RAG queries"
+    ],
+    "sprint_focus": "Hosted Next.js deployment, JWT/CORS hardening, and Cloudflare wiring with telemetry.",
+    "sprint_reports": {
+      "sprint_01": "cmos/reports/sprint-01/sprint-01-summary.md",
+      "sprint_02": "cmos/reports/sprint-02/sprint-02-summary.md"
     },
+    "tracking": {}
+  },
+  "operational_memory": {
     "session_history": [
-      {
-        "mission": "B3.5",
-        "agent": "",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-08T19:13:58Z"
-      },
-      {
-        "mission": "B3.5",
-        "agent": "codex",
-        "summary": "Sprint 03 metrics + telemetry shipped",
-        "action": "complete",
-        "ts": "2025-11-08T19:21:17Z"
-      },
       {
         "mission": "B4.1",
         "agent": "",
@@ -452,9 +811,22 @@
         "summary": "Qdrant admin endpoints shipped",
         "action": "complete",
         "ts": "2025-11-12T01:38:51Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-12T16:06:27Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "codex",
+        "summary": "Protocol Engine controls verified via CLI guardrails",
+        "action": "complete",
+        "ts": "2025-11-12T16:09:23Z"
       }
     ],
-    "active_mission": null,
     "blocked_missions": [
       {
         "item": "Monitoring API telemetry",
@@ -465,338 +837,104 @@
       },
       "B6.3"
     ],
+    "active_mission": null,
     "last_completed_mission": "B7.5",
-    "last_blocked_mission": "B6.3"
-  },
-  "technical_context": {
-    "dependencies": [
-      "Python 3.11+",
-      "FastAPI",
-      "SQLAlchemy + Alembic",
-      "PostgreSQL 15+",
-      "Qdrant",
-      "OpenAI API (text-embedding-3-small, GPT-4o-mini, GPT-4o)",
-      "Microsoft Presidio (Analyzer & Anonymizer)",
-      "spaCy en_core_web_lg",
-      "Faker",
-      "python-docx",
-      "python-pptx",
-      "pypdf / py-pdf-parser",
-      "pandas",
-      "tiktoken (for token counting in chunking and compression)"
-    ],
-    "research_findings": {},
-    "enhanced_features": {},
-    "integration_points": [
-      "foundational-docs/roadmap_template.md",
-      "foundational-docs/tech_arch_template.md",
-      "foundational-docs/tech_arch_template.md",
-      "foundational-docs/roadmap_template.md",
-      "cmos/missions/backlog.yaml",
-      "cmos/docs/sprint-01_metrics_plan.md",
-      "cmos/reports/sprint-01/sprint-01-summary.md",
-      "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md"
-    ],
-    "system_components": {
-      "ingestion": "Upload endpoints, format routing (PDF/DOCX/PPTX/CSV/XLSX), redaction, chunking (500-1000 tokens with overlap), and processing state tracking.",
-      "redaction": "Presidio-based pipeline with custom recognizers (PARTICIPANT_ID, PROJECT_ID), pseudonymization operators, recall 0.9829+ on priority entities.",
-      "vector_store": "Qdrant collection with on-disk storage, scalar quantization (int8), HNSW indexing (m=16), adaptive hnsw_ef tiers, 12,800 chunks indexed, <10ms query latency.",
-      "evaluation": "Synthetic corpus generation + presidio-research metrics, sprint efficacy script (B1.6).",
-      "rag_pipeline": "Planned for Sprint 02: query embedding, vector search, GPT-4o-mini generation, context compression, semantic caching, tiered routing."
-    },
-    "integration_testing": {
-      "guide": "cmos/docs/integration-testing-guide.md",
-      "runner": "node cmos/context/integration_test_runner.js --output telemetry/events/testing-summary.json",
-      "boundary_enforcement": "CMOS helpers must never import from app.services; rely on telemetry exports, CLI commands, or mission evidence when referencing FastAPI state."
-    }
-  },
-  "sprint_tracking": {},
-  "context_health": {
-    "anti_pattern_detection": true,
-    "compression_enabled": true,
-    "last_reset": "",
-    "sessions_since_reset": 58,
-    "size_kb": 26.64,
-    "size_limit_kb": 100,
-    "last_update": "2025-11-12T01:38:51Z"
-  },
-  "ai_instructions": {
-    "preferred_language": "yaml",
-    "code_style": "mission_protocol_v2",
-    "testing_required": true,
-    "documentation_level": "comprehensive",
-    "special_instructions": [
-      "Always load agents.md before starting missions.",
-      "Apply OWASP Top 10 security guidelines during implementation.",
-      "Keep PROJECT_CONTEXT.json and missions/backlog.yaml in sync with the SQLite database.",
-      "Follow structured prompting workflows and advanced orchestration patterns (none, rsip, delegation, boomerang) outlined in cmos/docs/AI-coding-assistant-workflows.md before executing CMOS missions."
-    ]
-  },
-  "next_session_context": {
-    "key_reference_documents": [
-      "foundational-docs/roadmap_template.md",
-      "foundational-docs/tech_arch_template.md",
-      "docs/frontend_deployment_decisions.md",
-      "docs/auth_and_cors_guidance.md",
-      "cmos/missions/sprint-06/B6.3_API-URL-Configuration-Fix.yaml",
-      "cmos/missions/sprint-06/B6.4_Local-Development-Environment-Setup.yaml",
-      "cmos/missions/sprint-06/B6.5_Authentication-Documentation-Testing.yaml"
-    ],
-    "upcoming_missions": [
-      {
-        "id": "B5.1",
-        "summary": "Stand up dedicated Railway Next.js service with build/start commands and env var runbook.",
-        "links": [
-          "cmos/missions/sprint-05/B5.1_Railway-Frontend-Service.yaml"
-        ]
-      },
-      {
-        "id": "B5.2",
-        "summary": "Implement JWT auth + restrictive CORS per docs/auth_and_cors_guidance.md.",
-        "links": [
-          "cmos/missions/sprint-05/B5.2_FastAPI-Auth-CORS-Hardening.yaml"
-        ]
-      },
-      {
-        "id": "B5.3",
-        "summary": "Cloudflare DNS + telemetry validation for hosted UI/API.",
-        "links": [
-          "cmos/missions/sprint-05/B5.3_Domain-Wiring-Telemetry.yaml"
-        ]
+    "last_blocked_mission": "B6.3",
+    "next_session_context": {
+      "key_reference_documents": [
+        "foundational-docs/roadmap_template.md",
+        "foundational-docs/tech_arch_template.md",
+        "docs/frontend_deployment_decisions.md",
+        "docs/auth_and_cors_guidance.md",
+        "cmos/missions/sprint-06/B6.3_API-URL-Configuration-Fix.yaml",
+        "cmos/missions/sprint-06/B6.4_Local-Development-Environment-Setup.yaml",
+        "cmos/missions/sprint-06/B6.5_Authentication-Documentation-Testing.yaml"
+      ],
+      "upcoming_missions": [
+        {
+          "id": "B5.1",
+          "summary": "Stand up dedicated Railway Next.js service with build/start commands and env var runbook.",
+          "links": [
+            "cmos/missions/sprint-05/B5.1_Railway-Frontend-Service.yaml"
+          ]
+        },
+        {
+          "id": "B5.2",
+          "summary": "Implement JWT auth + restrictive CORS per docs/auth_and_cors_guidance.md.",
+          "links": [
+            "cmos/missions/sprint-05/B5.2_FastAPI-Auth-CORS-Hardening.yaml"
+          ]
+        },
+        {
+          "id": "B5.3",
+          "summary": "Cloudflare DNS + telemetry validation for hosted UI/API.",
+          "links": [
+            "cmos/missions/sprint-05/B5.3_Domain-Wiring-Telemetry.yaml"
+          ]
+        }
+      ],
+      "open_questions": [
+        "Confirm whether API will live on api.<domain> or be proxied through the UI.",
+        "Decide on storage for Railway JWT secrets (env panel vs secret manager)."
+      ],
+      "when_we_resume": [
+        "Check if B6.3 (API URL fix) is complete",
+        "Verify frontend can connect to production API",
+        "If all fixes complete, B6.6 (RAG Search UI) can proceed",
+        "Pick up B6.6",
+        "Pick up B7.4",
+        "Pick up B7.6",
+        "Pick up B7.7"
+      ],
+      "blockers": [
+        {
+          "mission": "B6.3",
+          "recorded_at": "2025-11-10T21:47:19Z",
+          "summary": "Unable to validate RAG search UI styling in production",
+          "reason": "Frontend depends on GET /api/v1/documents and /projects, but production API only allows POST (405). UI keeps retrying and appears unstyled because SWR never hydrates. Need backend redeploy or configuration change to enable GET before frontend can be validated.",
+          "needs": [
+            "Deploy backend with GET handlers for /api/v1/documents and /projects matching local FastAPI routes",
+            "Re-run frontend verification against API that supports required endpoints"
+          ]
+        }
+      ],
+      "important_reminders": [
+        "B6.3: Frontend depends on GET /api/v1/documents and /projects, but production API only allows POST (405). UI keeps retrying and appears unstyled because SWR never hydrates. Need backend redeploy or configuration change to enable GET before frontend can be validated."
+      ],
+      "critical_context": {
+        "api_endpoint": "https://api.namozine.com (NO /api/v1 suffix)",
+        "frontend_env_var": "NEXT_PUBLIC_API_BASE_URL=https://api.namozine.com",
+        "local_backend": "http://localhost:8000",
+        "local_frontend": "http://localhost:3000"
       }
-    ],
-    "open_questions": [
-      "Confirm whether API will live on api.<domain> or be proxied through the UI.",
-      "Decide on storage for Railway JWT secrets (env panel vs secret manager)."
-    ],
-    "when_we_resume": [
-      "Check if B6.3 (API URL fix) is complete",
-      "Verify frontend can connect to production API",
-      "If all fixes complete, B6.6 (RAG Search UI) can proceed",
-      "Pick up B6.6",
-      "Pick up B7.4",
-      "Pick up B7.6"
-    ],
-    "blockers": [
-      {
-        "mission": "B6.3",
-        "recorded_at": "2025-11-10T21:47:19Z",
-        "summary": "Unable to validate RAG search UI styling in production",
-        "reason": "Frontend depends on GET /api/v1/documents and /projects, but production API only allows POST (405). UI keeps retrying and appears unstyled because SWR never hydrates. Need backend redeploy or configuration change to enable GET before frontend can be validated.",
-        "needs": [
-          "Deploy backend with GET handlers for /api/v1/documents and /projects matching local FastAPI routes",
-          "Re-run frontend verification against API that supports required endpoints"
-        ]
-      }
-    ],
-    "important_reminders": [
-      "B6.3: Frontend depends on GET /api/v1/documents and /projects, but production API only allows POST (405). UI keeps retrying and appears unstyled because SWR never hydrates. Need backend redeploy or configuration change to enable GET before frontend can be validated."
-    ],
-    "critical_context": {
-      "api_endpoint": "https://api.namozine.com (NO /api/v1 suffix)",
-      "frontend_env_var": "NEXT_PUBLIC_API_BASE_URL=https://api.namozine.com",
-      "local_backend": "http://localhost:8000",
-      "local_frontend": "http://localhost:3000"
     }
   },
   "metadata": {
-    "migrated_at": "2025-11-11T22:22:26.909984+00:00",
-    "source_version": "cmos-v1"
+    "migrated_at": "2025-11-14T17:16:26.369885+00:00",
+    "source_version": "cmos-v1",
+    "upgraded_at": "2025-11-14T17:16:19Z",
+    "upgraded_with": "upgrade_master_context.py"
   },
-  "planning": {
-    "current_sprint": "Sprint 05 - Frontend Deployment & Auth Hardening",
-    "sprint_01_status": "Completed",
-    "sprint_01_summary": {
-      "missions_completed": 11,
-      "success_criteria_met": "4/4",
-      "key_metrics": {
-        "presidio_recall": 0.9829,
-        "format_coverage": "5/5 formats",
-        "qdrant_latency_ms": 9.6,
-        "evaluation_script": "operational"
-      },
-      "report": "cmos/reports/sprint-01/sprint-01-summary.md"
-    },
-    "sprint_02_status": "Planned",
-    "sprint_02_research_completed": [
+  "working_memory": {
+    "session_history": [
       {
-        "id": "R2.1",
-        "name": "Quality Assessment Heuristics",
-        "status": "Completed",
-        "reference": "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md",
-        "deliverable": "Three-pillar framework (Linguistic Uncertainty, Answer Integrity, Source Provenance) with pattern libraries, scoring algorithms, escalation decision tree"
-      },
-      {
-        "id": "R2.2",
-        "name": "Markdown Ingestion Service Design",
-        "status": "Completed",
-        "reference": "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md",
-        "deliverable": "Architecture for chokidar → queue → unified/remark ingestion pipeline, Qdrant payload schema, telemetry, and resilience patterns"
-      },
-      {
-        "id": "R2.3",
-        "name": "Project Bootstrap Workflow",
-        "status": "Completed",
-        "reference": "cmos/missions/research/R2.3_Bootstrap-Workflow.md",
-        "deliverable": "FastAPI onboarding API design with idempotency keys, async ingestion jobs, and optional auth seams (device flow deferred for single-user deployment)"
+        "mission": "B7.7",
+        "agent": "assistant",
+        "summary": "Starting B7.7 end-to-end workflow validation mission",
+        "action": "start",
+        "ts": "2025-11-15T00:35:32Z"
       }
     ],
-    "sprint_02_build_missions": [
-      {
-        "id": "B2.1",
-        "name": "RAG Query API",
-        "status": "Completed",
-        "focus": "Core RAG functionality: query embedding, vector search, GPT-4o-mini generation, citations"
-      },
-      {
-        "id": "B2.2",
-        "name": "Context Compression Pipeline",
-        "status": "Completed",
-        "focus": "Embedding-based filtering to reduce tokens 60-70% (3000→1000 tokens)"
-      },
-      {
-        "id": "B2.3",
-        "name": "Semantic Cache Layer",
-        "status": "Blocked",
-        "focus": "Qdrant-based cache with 0.90-0.95 similarity threshold, target 15-20% hit rate; unblocked by sub-missions B2.3a–B2.3d"
-      },
-      {
-        "id": "B2.3a",
-        "name": "Markdown Ingestion Pipeline",
-        "status": "In Progress",
-        "focus": "Implement chokidar → queue → unified/remark ingestion service per R2.2 research"
-      },
-      {
-        "id": "B2.3b",
-        "name": "Onboarding API",
-        "status": "Current",
-        "focus": "FastAPI onboarding service with idempotent endpoints and async ingestion jobs (trusted single-user, no auth)."
-      },
-      {
-        "id": "B2.3c",
-        "name": "Ingestion Integration & Parity",
-        "status": "Queued",
-        "focus": "End-to-end validation, parity reporting, and observability for ingestion workflow"
-      },
-      {
-        "id": "B2.3d",
-        "name": "Semantic Cache Implementation",
-        "status": "Queued",
-        "focus": "Integrate cache service with RAG pipeline and achieve 15–20% hit rate"
-      },
-      {
-        "id": "B2.4",
-        "name": "Tiered LLM Routing",
-        "status": "Queued",
-        "focus": "R2.1 quality assessment + escalation logic, target <10% escalation rate"
-      },
-      {
-        "id": "B2.5",
-        "name": "Sprint Efficacy Evaluator",
-        "status": "Queued",
-        "focus": "Sprint 02 metrics evaluation: RAG performance, cache hit rate, compression, routing, cost"
-      }
-    ],
-    "sprint_02_success_criteria": [
-      "RAG query API successfully retrieves relevant chunks and generates answers with citations",
-      "Context compression reduces input tokens by 60-70% (from ~3000 to ~1000 tokens)",
-      "Semantic cache achieves hit rate ≥ 15% (target 15-20%)",
-      "Tiered routing escalation rate < 10% (90%+ queries handled by GPT-4o-mini)",
-      "Average cost per query < $0.0003 (with all optimizations applied)",
-      "Query latency < 5 seconds end-to-end for RAG queries",
-      "Sprint evaluation script executes and produces retrospective report"
-    ],
-    "next_checkpoint": "Kick off B5.1 to provision the Railway frontend service and capture deployment telemetry.",
-    "research_to_build_links": [
-      {
-        "research": "cmos/missions/research/TR-03.RAG-Cost-Optimization.md",
-        "build": "B2.1, B2.2, B2.3, B2.4"
-      },
-      {
-        "research": "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md",
-        "build": "B2.4"
-      },
-      {
-        "research": "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md",
-        "build": "B2.3a, B2.3c, B2.3d"
-      },
-      {
-        "research": "cmos/missions/research/R2.3_Bootstrap-Workflow.md",
-        "build": "B2.3b, B2.3c, B2.3d"
-      }
-    ],
-    "sprint_close_process": [
-      "Run scripts/evaluate_sprint.py with --sprint 2 to generate report in cmos/reports/sprint-02/",
-      "Verify all Sprint 02 success criteria metrics collected (cache hit rate, escalation rate, compression ratio, cost per query)",
-      "Update cmos/missions/backlog.yaml with mission statuses and completion notes",
-      "Capture retrospective highlights in MASTER_CONTEXT.json under working_memory.domains.main.achievements",
-      "Review telemetry artifacts: RAG performance metrics, semantic cache stats, tiered routing logs, cost analysis"
-    ],
-    "important_for_sprint_02_review": [
-      "Telemetry artifacts needed: RAG query performance logs, semantic cache hit/miss statistics, context compression metrics, tiered routing escalation events, cost tracking data",
-      "Key metrics to validate: cache hit rate (target ≥15%), escalation rate (target <10%), token compression ratio (target 60-70%), average cost per query (target <$0.0003)",
-      "R2.1 research provides complete implementation blueprint: pattern libraries, scoring algorithms, escalation decision tree - ready for B2.4 implementation",
-      "All Sprint 02 missions have clear dependencies: B2.1 → B2.2 → B2.3 → B2.4 → B2.5",
-      "Qdrant infrastructure from B1.5 is operational: 12,800 chunks indexed, <10ms latency, ready for RAG queries"
-    ],
-    "sprint_03_status": "Completed",
-    "sprint_04_status": "Planning",
-    "sprint_05_status": "Planned",
-    "sprint_05_focus": "Hosted Next.js deployment, JWT/CORS hardening, and Cloudflare wiring with telemetry.",
-    "session_summaries": [
-      {
-        "session_date": "2025-11-10",
-        "agent": "Claude",
-        "focus": "Unblocking Sprint 06 development - API URL and auth issues",
-        "key_discoveries": [
-          "Production API is at https://api.namozine.com (root), NOT https://api.namozine.com/api/v1",
-          "All frontend configs and docs have wrong URL with /api/v1 suffix",
-          "Local development blocked due to missing .env setup and auth configuration",
-          "B6.3 (RAG Search UI) blocked by API connectivity issues"
-        ],
-        "decisions_made": [
-          "Renumbered missions to fix linear progression: B6.3-5 are now fix missions, original B6.3-7 moved to B6.6-10",
-          "B6.3: API URL Configuration Fix - remove /api/v1 suffix everywhere",
-          "B6.4: Local Development Environment Setup - create proper dev docs and scripts",
-          "B6.5: Authentication Documentation Testing - document auth flow and credentials",
-          "B6.6 (formerly B6.3) remains blocked until fixes complete"
-        ],
-        "mistakes_made": [
-          "Made unauthorized ad-hoc changes to auth config without understanding impact",
-          "Created frontend/.env.local with wrong API URL",
-          "Failed to recognize production API doesn't use /api/v1 path despite user insisting",
-          "Attempted to fix issues directly instead of creating proper missions"
-        ],
-        "files_modified": [
-          "cmos/missions/sprint-06/* - Renumbered all missions",
-          "cmos/missions/backlog.yaml - Updated mission order and statuses",
-          "app/core/config.py - Reverted unauthorized changes",
-          "app/main.py - Reverted unauthorized changes"
-        ],
-        "blockers_identified": {
-          "api_url_mismatch": {
-            "issue": "Frontend configured for https://api.namozine.com/api/v1 but API serves at root",
-            "impact": "Complete connectivity failure in production and local",
-            "fix": "Mission B6.3 to update all URL references"
-          },
-          "local_dev_setup": {
-            "issue": "No documentation or scripts for local development",
-            "impact": "Developers cannot run application locally",
-            "fix": "Mission B6.4 to create setup guide and automation"
-          },
-          "auth_confusion": {
-            "issue": "No documentation of auth credentials or flow",
-            "impact": "Cannot test authenticated endpoints",
-            "fix": "Mission B6.5 to document authentication"
-          }
-        }
-      }
-    ],
-    "sprint_06_status": "In Progress - Fixing foundational issues",
-    "sprint_06_critical_fix": {
-      "discovered": "2025-11-10",
-      "issue": "API URL misconfiguration blocking all frontend work",
-      "resolution": "Missions B6.3-B6.5 created to fix before continuing feature work"
-    }
+    "last_session": "2025-11-15T00:35:32Z",
+    "session_count": 1,
+    "active_mission": "B7.7",
+    "blocked_missions": []
+  },
+  "next_session_context": {},
+  "context_health": {
+    "sessions_since_reset": 1,
+    "last_update": "2025-11-15T00:35:32Z",
+    "size_kb": 30.74,
+    "size_limit_kb": 100
   }
 }

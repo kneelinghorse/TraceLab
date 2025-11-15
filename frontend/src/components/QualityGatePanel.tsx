@@ -12,7 +12,7 @@ const GATE_DESCRIPTIONS: Record<string, string> = {
 
 const STATUS_TOKENS: Record<string, { label: string; className: string; icon: string }> = {
   pass: { label: "Pass", className: "border-emerald-200 bg-emerald-50 text-emerald-700", icon: "✓" },
-  fail: { label: "Fail", className: "border-rose-200 bg-rose-50 text-rose-700", icon: "!" },
+  fail: { label: "fail", className: "border-rose-200 bg-rose-50 text-rose-700", icon: "!" },
   pending: { label: "Pending", className: "border-amber-200 bg-amber-50 text-amber-700", icon: "…" },
 };
 
