@@ -18,6 +18,7 @@ from app.models.mission import Mission
 from app.models.mission_protocol import MissionProtocolDraft
 from app.models.quality import QualityCheck
 from app.services.bias_detection import BiasDetector
+from app.services.cache_manager import get_cache_manager
 from app.services.methodology_rigor import MethodologyRigorChecker
 from app.services.quality_automation_models import QualityAutomationCheckResult
 from app.services.synthesis_analyzer import SynthesisAnalyzer
@@ -133,6 +134,7 @@ class QualityAutomationService:
         self.synthesis_analyzer = synthesis_analyzer or SynthesisAnalyzer()
         self.repository = repository or QualityCheckRepository()
         self.telemetry_sink = telemetry_sink or _QualityAutomationTelemetry()
+        self.cache_manager = get_cache_manager()
 
     def evaluate(self, db: Session, *, mission: Mission) -> List[QualityAutomationCheckResult]:
         payload = MissionProtocolDraft.model_validate(mission.mission_data)
@@ -164,6 +166,8 @@ class QualityAutomationService:
         records = self.repository.create_records(db, mission, results, performed_by=performed_by)
         for record, result in zip(records, results):
             self.telemetry_sink(record, result)
+        if mission.id:
+            self.cache_manager.invalidate_quality_gates(str(mission.id))
         return records
 
 

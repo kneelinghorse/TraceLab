@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import (
     admin,
     auth,
+    cache,
     documents,
     health,
     missions,
@@ -53,6 +54,12 @@ app.include_router(
     admin.router,
     prefix=f"{settings.api_v1_prefix}/admin",
     tags=["admin"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    cache.router,
+    prefix=f"{settings.api_v1_prefix}/cache",
+    tags=["cache"],
     dependencies=protected_dependencies,
 )
 app.include_router(redaction.router, prefix=f"{settings.api_v1_prefix}/redaction", tags=["redaction"], dependencies=protected_dependencies)

@@ -28,11 +28,13 @@ from app.onboarding.jobs import create_job, process_job
 from app.onboarding.schemas import JobRead
 from app.schemas.document import DocumentCreate, DocumentRead, DocumentUpdate
 from app.schemas.project import ProjectCreate, ProjectRead, ProjectUpdate
+from app.services.cache_manager import get_cache_manager
 from app.services.processing_status import ProcessingStatusRecorder
 
 router = APIRouter(tags=["onboarding"])
 
 _status_recorder = ProcessingStatusRecorder()
+_cache_manager = get_cache_manager()
 
 
 def _idempotency(
@@ -80,6 +82,7 @@ def create_project(
         status_code=status.HTTP_201_CREATED,
     )
     db.commit()
+    _cache_manager.invalidate_project_metadata(str(project.id))
     return JSONResponse(content=response_body, status_code=status.HTTP_201_CREATED)
 
 
@@ -116,6 +119,7 @@ def update_project(
         status_code=status.HTTP_200_OK,
     )
     db.commit()
+    _cache_manager.invalidate_project_metadata(str(project_id))
     return JSONResponse(content=response_body, status_code=status.HTTP_200_OK)
 
 
@@ -180,6 +184,7 @@ def register_document(
         status_code=status.HTTP_201_CREATED,
     )
     db.commit()
+    _cache_manager.invalidate_document_lists(str(payload.project_id))
     return JSONResponse(content=response_body, status_code=status.HTTP_201_CREATED)
 
 
@@ -216,6 +221,7 @@ def update_document(
         status_code=status.HTTP_200_OK,
     )
     db.commit()
+    _cache_manager.invalidate_document_lists(str(document.project_id))
     return JSONResponse(content=response_body, status_code=status.HTTP_200_OK)
 
 

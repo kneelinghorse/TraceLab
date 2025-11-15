@@ -3,12 +3,14 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
+from app.services.cache_manager import get_cache_manager
 from app.services.cache_metrics import cache_metrics
 from app.services.cost_monitor import get_cost_monitor
 from app.services.rag_service import current_rag_service
 
 
 router = APIRouter()
+_cache_manager = get_cache_manager()
 
 
 @router.get("/costs", summary="Return aggregated OpenAI cost metrics")
@@ -23,6 +25,7 @@ def read_performance() -> dict:
     return {
         "costs": monitor.summary(days=7),
         "cache": cache_metrics.snapshot(),
+        "ttl_caches": _cache_manager.snapshot(),
         "routing": _routing_snapshot(),
     }
 

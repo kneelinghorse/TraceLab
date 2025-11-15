@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-15T06:33:40.364051+00:00'
+generatedAt: '2025-11-15T15:42:34.304921+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -594,7 +594,11 @@ domainFields:
         completed_at: '2025-11-15T06:33:15Z'
     - id: B8.3
       name: Query Result Caching
-      status: Current
+      status: Completed
+      completed_at: '2025-11-15T15:42:14Z'
+      notes: Added TTL cache infrastructure + manager, wired RAG/doc/project/quality/mission
+        flows, exposed cache API & telemetry, documented strategy, exported metrics,
+        and shipped tests/parity checks.
       metadata:
         metadata:
           metadata:
@@ -602,9 +606,11 @@ domainFields:
             priority: medium
             description: Implement in-memory caching for expensive RAG queries and
               document lists
+        started_at: '2025-11-15T15:25:48Z'
+        completed_at: '2025-11-15T15:42:14Z'
     - id: B8.4
       name: Qdrant Performance Tuning
-      status: Queued
+      status: Current
       metadata:
         metadata:
           metadata:

@@ -10,10 +10,12 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.pagination import PaginatedResponse
 from app.schemas.project import ProjectRead
+from app.services.cache_manager import get_cache_manager
 from app.services.project_query_service import ProjectQueryService
 
 router = APIRouter()
 _service = ProjectQueryService()
+_cache_manager = get_cache_manager()
 
 
 @router.get("", response_model=PaginatedResponse[ProjectRead])
@@ -29,17 +31,32 @@ def list_projects(
     db: Session = Depends(get_db),
 ):
     """Return paginated projects ordered by creation time."""
+    cache_key = _cache_manager.project_metadata_key(
+        kind="list",
+        search=search,
+        page=page,
+        page_size=page_size,
+    )
 
-    projects, meta = _service.list_projects(db, page=page, page_size=page_size, search=search)
-    resources = [ProjectRead.model_validate(project) for project in projects]
-    return {"data": resources, "pagination": meta}
+    def _loader() -> Dict[str, Any]:
+        projects, meta = _service.list_projects(db, page=page, page_size=page_size, search=search)
+        resources = [ProjectRead.model_validate(project) for project in projects]
+        return {"data": resources, "pagination": meta}
+
+    response, _ = _cache_manager.cached_value("project_metadata", cache_key, _loader)
+    return response
 
 
 @router.get("/{project_id}", response_model=ProjectRead)
 def get_project(project_id: UUID, db: Session = Depends(get_db)) -> ProjectRead:
     """Return a single project record."""
+    cache_key = _cache_manager.project_metadata_key(kind="detail", identifier=str(project_id))
 
-    project = _service.get_project(db, project_id)
-    if not project:
-        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
-    return ProjectRead.model_validate(project)
+    def _loader() -> ProjectRead:
+        project = _service.get_project(db, project_id)
+        if not project:
+            raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+        return ProjectRead.model_validate(project)
+
+    result, _ = _cache_manager.cached_value("project_metadata", cache_key, _loader)
+    return result
