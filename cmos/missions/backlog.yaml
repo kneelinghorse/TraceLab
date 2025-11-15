@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-15T00:48:44.538843+00:00'
+generatedAt: '2025-11-15T01:59:11.042534+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -648,19 +648,85 @@ domainFields:
             automatically embedded to Qdrant and become searchable
     - id: B7.7
       name: End-to-End Document Processing Validation
-      status: In Progress
+      status: Completed
+      completed_at: '2025-11-15T00:52:24Z'
+      notes: 'Tests: pytest tests/test_document_ingestion.py tests/test_document_embedding_integration.py
+        tests/test_retrieval_service.py tests/test_rag_service.py tests/integration/test_ingestion_flow.py
+        tests/integration/test_rag_pipeline.py + Playwright mission-protocol.spec.ts.
+
+        Fixes: added NEXT_PUBLIC_E2E_AUTH_TOKEN bypass plus Mission Protocol copy/quality-gate
+        tweaks so UI automation can reach backlog + detail views.
+
+        Docs: docs/workflows.md, cmos/reports/sprint-07/validation-report.md, cmos/telemetry/events/sprint-07-validation.jsonl
+        capture workflow steps and evidence.
+
+        Parity: re-exported backlog/context/session mirrors via cmos/cli.py and reran
+        python cmos/scripts/validate_parity.py --check (green).'
       metadata:
         metadata:
           description: Validate complete workflow from upload through search, test
             UI and CLI paths, document gaps
         started_at: '2025-11-15T00:35:32Z'
+        completed_at: '2025-11-15T00:52:24Z'
     - id: B7.8
       name: Sprint 07 Retrospective
-      status: Queued
+      status: Completed
+      completed_at: '2025-11-15T01:59:03Z'
+      notes: 'Docs: cmos/reports/sprint-07/retrospective.md (wins/gaps/readiness)
+        and docs/env/sprint-07-config.md (Railway/backend/frontend/local inventory)
+        reference docs/workflows.md, cmos/reports/sprint-07/validation-report.md,
+        and cmos/telemetry/events/sprint-07-validation.jsonl. Telemetry: cmos/telemetry/events/sprint-07-retro.jsonl
+        captures retro summary + next_hint metadata including parity evidence. Parity:
+        python cmos/scripts/validate_parity.py --check => [OK] after exporting backlog/context
+        mirrors (./cmos/cli.py db export backlog|contexts) and regenerating cmos/SESSIONS.jsonl
+        from the SQLite session_events table.'
       metadata:
-        metadata:
-          description: Complete Sprint 07 retrospective covering foundation fixes
-            and embedding pipeline integration
+        description: Complete the Sprint 07 retrospective covering ingestion validation,
+          resolved environment differences, and Sprint 08 planning inputs.
+        objective: Complete the Sprint 07 retrospective capturing validated ingestion
+          status, resolved environment differences, and telemetry needed to plan Sprint
+          08.
+        constraints:
+        - 'Document-only mission: limit changes to docs/, cmos/reports/, telemetry/,
+          and mission metadata; no runtime code edits.'
+        - Source evidence from B7.7 artifacts (docs/workflows.md, cmos/reports/sprint-07/validation-report.md,
+          telemetry/events/sprint-07-validation.jsonl).
+        - Log parity + telemetry checks via python cmos/scripts/validate_parity.py
+          --check and reference outputs in mission notes.
+        success_criteria:
+        - Retrospective report committed at cmos/reports/sprint-07/retrospective.md
+          summarizing wins, gaps, and readiness.
+        - Environment/configuration inventory created (docs/env/sprint-07-config.md)
+          covering Railway, local backend, and frontend env vars.
+        - Telemetry event log updated (cmos/telemetry/events/sprint-07-retro.jsonl)
+          with validation outcomes and next-hint metadata.
+        - PROJECT_CONTEXT and MASTER_CONTEXT updated via MissionRuntime to reflect
+          Sprint 07 learnings and blockers cleared.
+        - Parity validation rerun (python cmos/scripts/validate_parity.py --check)
+          with result logged in mission notes and telemetry.
+        deliverables:
+        - cmos/reports/sprint-07/retrospective.md
+        - docs/env/sprint-07-config.md
+        - cmos/telemetry/events/sprint-07-retro.jsonl
+        domain_fields:
+          type: build.implementation
+          retrospective_steps:
+          - Ingest B7.7 validation artifacts (docs/workflows.md, cmos/reports/sprint-07/validation-report.md,
+            telemetry/events/sprint-07-validation.jsonl).
+          - Summarize wins, gaps, and readiness in the retrospective report.
+          - Document environment/configuration differences across Railway, backend,
+            and frontend.
+          - Update telemetry + parity evidence and capture MissionRuntime context
+            snapshots.
+          - List Sprint 08 seeds (follow-up missions, bugs) in MASTER_CONTEXT/backlog.
+          validation_protocol:
+          - validator: parity_check
+            focus: Run python cmos/scripts/validate_parity.py --check and log result.
+          - validator: telemetry_review
+            focus: Ensure telemetry/events/sprint-07-retro.jsonl references validation
+              artifacts and next hints.
+        started_at: '2025-11-15T01:53:16Z'
+        completed_at: '2025-11-15T01:59:03Z'
     - id: R7.1
       name: Qdrant Collection Setup Research
       status: Completed
@@ -757,6 +823,144 @@ domainFields:
           - Updated env templates / README pointing to public domains.
           started_at: '2025-11-10T04:35:54Z'
           completed_at: '2025-11-10T05:49:28Z'
+  - sprintId: sprint-08
+    title: Sprint 08 - Performance Optimization & Monitoring
+    focus: Optimize database queries, implement caching, tune Qdrant, automate telemetry, and build monitoring dashboard
+    status: Planned
+    startDate: '2025-11-16'
+    endDate: '2025-11-30'
+    totalMissions: 6
+    completedMissions: 0
+    missions:
+    - id: B8.1
+      name: Telemetry Automation
+      status: Completed
+      completed_at: '2025-11-15T05:25:07Z'
+      notes: Added pytest telemetry plugin + Playwright reporter, built aggregate_test_telemetry.py, wired docs + integration guide, added CI workflow, regenerated testing-summary.json after running pytest tests/test_health.py, Playwright mission-protocol.spec.ts, integration runner, and validate_parity.
+      metadata:
+        metadata:
+          type: Build.Implementation.v1
+          priority: high
+          description: Automate testing-summary.json generation from CI test runs
+    - id: B8.2
+      name: Database Query Optimization
+      status: Current
+      completed_at: null
+      notes: null
+      metadata:
+        metadata:
+          type: Build.Implementation.v1
+          priority: high
+          description: Profile and optimize PostgreSQL queries, add indexes, eliminate N+1 patterns
+    - id: B8.3
+      name: Query Result Caching
+      status: Queued
+      completed_at: null
+      notes: null
+      metadata:
+        metadata:
+          type: Build.Implementation.v1
+          priority: medium
+          description: Implement in-memory caching for expensive RAG queries and document lists
+    - id: B8.4
+      name: Qdrant Performance Tuning
+      status: Queued
+      completed_at: null
+      notes: null
+      metadata:
+        metadata:
+          type: Build.Implementation.v1
+          priority: medium
+          description: Optimize Qdrant HNSW parameters and validate quantization settings
+    - id: B8.5
+      name: Cost Monitoring Dashboard
+      status: Queued
+      completed_at: null
+      notes: null
+      metadata:
+        metadata:
+          type: Build.Implementation.v1
+          priority: medium
+          description: Build dashboard for OpenAI costs, cache rates, and performance metrics
+    - id: B8.6
+      name: Sprint 08 Retrospective
+      status: Queued
+      completed_at: null
+      notes: null
+      metadata:
+        metadata:
+          type: Build.Implementation.v1
+          priority: medium
+          description: Document Sprint 08 outcomes and prepare Sprint 09 backlog
+  - sprintId: sprint-09
+    title: Sprint 09 - Advanced Search Features
+    focus: Hybrid search, faceted filters, search page UX fixes, search history and saved searches
+    status: Planned
+    startDate: '2025-12-01'
+    endDate: '2025-12-15'
+    totalMissions: 6
+    completedMissions: 0
+    missions:
+    - id: B9.1
+      name: Hybrid Search Backend
+      status: Queued
+      completed_at: null
+      notes: null
+      metadata:
+        metadata:
+          type: Build.Implementation.v1
+          priority: high
+          description: Combine semantic and keyword search with weighted scoring
+    - id: B9.2
+      name: Faceted Search Backend
+      status: Queued
+      completed_at: null
+      notes: null
+      metadata:
+        metadata:
+          type: Build.Implementation.v1
+          priority: medium
+          description: Backend support for project, document type, date range filters
+    - id: B9.3
+      name: Search Page Fixes & UI Overhaul
+      status: Queued
+      completed_at: null
+      notes: null
+      metadata:
+        metadata:
+          type: Build.Implementation.v1
+          priority: high
+          description: Fix project dropdown, remove RAG Control Room, simplify controls, collapse filters
+    - id: B9.4
+      name: Search History
+      status: Queued
+      completed_at: null
+      notes: null
+      metadata:
+        metadata:
+          type: Build.Implementation.v1
+          priority: low
+          description: Track and replay previous searches
+    - id: B9.5
+      name: Saved Searches
+      status: Queued
+      completed_at: null
+      notes: null
+      metadata:
+        metadata:
+          type: Build.Implementation.v1
+          priority: low
+          description: Bookmark and organize useful search queries
+    - id: B9.6
+      name: Sprint 09 Retrospective
+      status: Queued
+      completed_at: null
+      notes: null
+      metadata:
+        metadata:
+          type: Build.Implementation.v1
+          priority: medium
+          description: Document Sprint 09 outcomes and prepare Sprint 10
   missionDependencies:
   - from: B1.1
     to: B1.2
@@ -836,5 +1040,62 @@ domainFields:
   - from: B5.2
     to: B5.3
     type: Blocks
+  - from: B8.2
+    to: B8.3
+    type: blocks
+  - from: B8.1
+    to: B8.5
+    type: blocks
+  - from: B8.2
+    to: B8.5
+    type: blocks
+  - from: B8.3
+    to: B8.5
+    type: blocks
+  - from: B8.4
+    to: B8.5
+    type: blocks
+  - from: B8.1
+    to: B8.6
+    type: blocks
+  - from: B8.2
+    to: B8.6
+    type: blocks
+  - from: B8.3
+    to: B8.6
+    type: blocks
+  - from: B8.4
+    to: B8.6
+    type: blocks
+  - from: B8.5
+    to: B8.6
+    type: blocks
+  - from: B9.1
+    to: B9.3
+    type: blocks
+  - from: B9.2
+    to: B9.3
+    type: blocks
+  - from: B9.3
+    to: B9.4
+    type: blocks
+  - from: B9.4
+    to: B9.5
+    type: blocks
+  - from: B9.1
+    to: B9.6
+    type: blocks
+  - from: B9.2
+    to: B9.6
+    type: blocks
+  - from: B9.3
+    to: B9.6
+    type: blocks
+  - from: B9.4
+    to: B9.6
+    type: blocks
+  - from: B9.5
+    to: B9.6
+    type: blocks
   promptMapping:
     prompts: []

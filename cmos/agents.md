@@ -19,25 +19,6 @@
 - Use: `cmos/scripts/` for operations
 - Reference: `cmos/docs/` for procedures
 
-## Security & Quality Guardrails
-
-- CMOS code **must not** import from `app.services` or any other production-only module. Share data through telemetry exports, CLI commands, or mission artifacts instead of cross-imports. Quick audit:
-
-  ```bash
-  rg -n "app\\.services" cmos --type-add 'code:*.py,*.js,*.ts' --type code
-  ```
-
-- Always load the latest instructions in `agents.md`, `cmos/agents.md`, and `cmos/docs/AI-coding-assistant-workflows.md` before editing runtime code.
-- Execute `node cmos/context/integration_test_runner.js --output telemetry/events/testing-summary.json` (see `cmos/docs/integration-testing-guide.md`) to prove guardrails + structured prompting references are in place.
-- Apply OWASP controls listed in `cmos/docs/cmos_Playbook.md` when touching security-sensitive helpers (ContextSecurityValidator, CodeQualityAssurance, mission runtime scripts).
-
-## AI Agent Specific Instructions
-
-- Follow the structured prompting workflow captured in `cmos/docs/AI-coding-assistant-workflows.md` and reference it when updating mission docs or contexts.
-- Update `PROJECT_CONTEXT` + `MASTER_CONTEXT` via `context.db_client.SQLiteClient` helpers—never hand-edit the JSON mirrors. After database writes, regenerate mirrors with `python cmos/scripts/migrate_cmos_memory.py --source cmos --target cmos` if downstream tools require the files.
-- Log every major decision to the SQLite-backed session log using `context.mission_runtime.start/complete/block` so telemetry (`cmos/SESSIONS.jsonl`) stays aligned with mission status.
-- When missions require orchestration changes, document which advanced orchestration patterns (none/rsip/delegation/boomerang) were used and store next hints in `MASTER_CONTEXT` for downstream agents.
-
 ---
 
 ## Data Storage & Telemetry
@@ -119,6 +100,25 @@ block(
 
 ---
 
+### Session Operations
+
+For planning, onboarding, research, or review work (anything that's not a build mission), use the session commands:
+
+```bash
+# Start any session
+./cmos/cli.py session start --type planning --title "Sprint planning"
+
+# Capture insights
+./cmos/cli.py session capture decision "Your decision"
+
+# Complete session
+./cmos/cli.py session complete --summary "What was accomplished"
+```
+
+Sessions automatically write captures to the SQLite store and refresh `project_context`/`master_context` when completed. Run `./cmos/cli.py session onboard` before onboarding or review work to see the latest state.
+
+---
+
 ## Context Management
 
 ### Two Contexts
@@ -128,13 +128,29 @@ block(
 - Session count
 - Working memory (temporary)
 - Context health metrics
+- **Updated frequently** during sessions
 
-**context/MASTER_CONTEXT.json**: Project history
+**context/MASTER_CONTEXT.json**: Project history & strategic memory
 - Project identity
 - Technical foundation
-- Decisions made (permanent record)
-- Constraints
-- Quality standards
+- **Decisions made (permanent record)**
+- **Constraints and quality standards**
+- **Research findings and learnings**
+- **Updated at strategic milestones only**
+
+### Critical: MASTER_CONTEXT is Project Memory
+
+MASTER_CONTEXT is your **historical record** of the project. It should capture:
+- Major architectural decisions
+- Strategic pivots or direction changes
+- Completed sprint summaries (what was learned)
+- New constraints or quality standards
+- Important research findings that inform future work
+
+**DO NOT use MASTER_CONTEXT for**:
+- Session-level updates (use PROJECT_CONTEXT)
+- Mission status tracking (use database)
+- Temporary working notes (use PROJECT_CONTEXT)
 
 ### Operations
 
@@ -152,18 +168,57 @@ client.close()
 
 **Updating contexts**:
 ```python
-# Update and save
+# Update and save (snapshot=True by default)
 master["decisions_made"].append("Chose PostgreSQL for ACID compliance")
 client.set_context(
     "master_context",
     master,
-    source_path="context/MASTER_CONTEXT.json"
+    source_path="context/MASTER_CONTEXT.json",
+    snapshot=True  # Creates historical snapshot
 )
 ```
 
 **When to update**:
-- PROJECT_CONTEXT: Session start/end, mission transitions
-- MASTER_CONTEXT: Major decisions, architecture changes, constraints
+- **PROJECT_CONTEXT**: Session start/end, mission transitions (frequent)
+- **MASTER_CONTEXT**: Major decisions, architecture changes, sprint completions (rare)
+
+### Context Snapshots
+
+The database maintains a **historical timeline** of MASTER_CONTEXT changes.
+
+**Take a snapshot manually** at strategic moments:
+```bash
+# After sprint completion
+./cmos/cli.py context snapshot master --source "Sprint 03 completed - workflow orchestration delivered"
+
+# After major architectural decision
+./cmos/cli.py context snapshot master --source "Decision: switched to PostgreSQL for ACID compliance"
+
+# After research phase
+./cmos/cli.py context snapshot master --source "Research phase complete - 5 protocols analyzed"
+```
+
+**View snapshot history**:
+```bash
+# See timeline of MASTER_CONTEXT changes
+./cmos/cli.py context history master
+
+# View a specific snapshot
+./cmos/cli.py context view <snapshot-id>
+```
+
+**When to snapshot MASTER_CONTEXT**:
+- ✅ Sprint completion (capture what was learned)
+- ✅ Major architectural decisions (PostgreSQL vs MongoDB)
+- ✅ Strategic pivots (changing from X to Y approach)
+- ✅ Research phase completion (before starting build)
+- ✅ New constraints or quality standards established
+- ❌ NOT after every mission (too granular)
+- ❌ NOT for session-level updates (use PROJECT_CONTEXT)
+
+**Automatic vs Manual Snapshots**:
+- Automatic: When you call `set_context(snapshot=True)` - only if content changed
+- Manual: Run `./cmos/cli.py context snapshot master --source "..."` to force a snapshot with descriptive label
 
 ---
 
@@ -302,6 +357,10 @@ DEBUG=false
 - Build sessions: `cmos/docs/build-session-prompt.md`
 - Migration: `cmos/docs/legacy-migration-guide.md`
 - Schema: `cmos/docs/sqlite-schema-reference.md`
+- Security & Quality Guardrails: mirror the project-root guidance from
+  `../agents.md` so telemetry, OWASP, and documentation workflows stay aligned.
+- AI Agent Specific Instructions: when CMOS procedures change, ensure the same
+  section in `../agents.md` stays synchronized to avoid drift between contexts.
 
 **For YOUR project**:
 - Application guidance: `project-root/agents.md` (you create this)

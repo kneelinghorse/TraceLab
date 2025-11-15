@@ -1,0 +1,61 @@
+name: Test & Telemetry
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+
+jobs:
+  telemetry:
+    runs-on: ubuntu-latest
+    env:
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      PYTHONUNBUFFERED: "1"
+      NEXT_PUBLIC_E2E_AUTH_TOKEN: "test-playwright"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pytest telemetry suite
+        run: |
+          python -m pytest tests/test_health.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright telemetry suite
+        working-directory: frontend
+        run: npx playwright test tests/e2e/mission-protocol.spec.ts --project=chromium --workers=1
+
+      - name: Aggregate telemetry
+        run: python cmos/scripts/aggregate_test_telemetry.py
+
+      - name: Upload telemetry artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: testing-summary
+          path: |
+            telemetry/events/testing-summary.json
+            telemetry/events/.artifacts/pytest-latest.json
+            telemetry/events/.artifacts/playwright-latest.json
+            telemetry/events/.artifacts/integration-runner.json

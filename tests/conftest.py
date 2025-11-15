@@ -1,6 +1,7 @@
 """Shared pytest fixtures for ingestion pipeline tests."""
 from __future__ import annotations
 
+import importlib.util
 import os
 import sys
 from pathlib import Path
@@ -19,6 +20,19 @@ os.environ.setdefault("AUTH_PASSWORD", "changeme")
 from app.core.database import Base, engine, SessionLocal
 from app.core.security import get_configured_credentials, issue_token_response
 from app.models.project import Project
+
+pytest_plugins: tuple[str, ...] = ()
+
+_TELEMETRY_PLUGIN_NAME = "cmos_pytest_telemetry_plugin"
+_TELEMETRY_PLUGIN_PATH = REPO_ROOT / "cmos" / "scripts" / "pytest_telemetry_plugin.py"
+
+if _TELEMETRY_PLUGIN_PATH.exists():
+    _spec = importlib.util.spec_from_file_location(_TELEMETRY_PLUGIN_NAME, _TELEMETRY_PLUGIN_PATH)
+    if _spec and _spec.loader:
+        _module = importlib.util.module_from_spec(_spec)
+        sys.modules[_TELEMETRY_PLUGIN_NAME] = _module
+        _spec.loader.exec_module(_module)
+        pytest_plugins = (*pytest_plugins, _TELEMETRY_PLUGIN_NAME)
 
 _COVERAGE_PATH = Path("cmos/reports/sprint-01/ingestion_format_coverage.json")
 

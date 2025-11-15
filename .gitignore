@@ -57,3 +57,6 @@ data/uploads/
 # Local packaging outputs
 artifacts/
 artifacts/**/*
+
+# Telemetry build artifacts
+telemetry/events/.artifacts/
