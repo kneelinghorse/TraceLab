@@ -29,6 +29,9 @@ const initialState: AuthState = {
   isReady: false,
 };
 
+const TEST_AUTH_TOKEN = process.env.NEXT_PUBLIC_E2E_AUTH_TOKEN;
+const TEST_AUTH_USER = process.env.NEXT_PUBLIC_E2E_AUTH_USER ?? "mission-tester";
+
 function persistSession(response: TokenResponse) {
   setStoredAuth({ token: response.access_token, username: response.user.username });
   return {
@@ -43,6 +46,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const stored = getStoredAuth();
     if (stored) {
       return { token: stored.token, user: { username: stored.username }, isReady: true } satisfies AuthState;
+    }
+    if (TEST_AUTH_TOKEN) {
+      return { token: TEST_AUTH_TOKEN, user: { username: TEST_AUTH_USER }, isReady: true } satisfies AuthState;
     }
     return { ...initialState, isReady: true } satisfies AuthState;
   });

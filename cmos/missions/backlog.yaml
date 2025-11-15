@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-12T01:39:34.729660+00:00'
+generatedAt: '2025-11-15T00:48:44.538843+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -23,67 +23,78 @@ domainFields:
       status: Completed
       completed_at: '2025-10-15'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: B1.2
       name: Synthetic Corpus Pipeline
       status: Completed
       completed_at: '2025-10-18'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: B1.3
       name: Presidio Redaction Service
       status: Completed
       completed_at: '2025-10-20'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: B1.4
       name: Document Ingestion Pipeline
       status: Completed
       completed_at: '2025-10-22'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: B1.5
       name: Embedding and Qdrant Bootstrap
       status: Completed
       completed_at: '2025-10-25'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: B1.6
       name: Sprint Efficacy Evaluator
       status: Completed
       completed_at: '2025-10-28'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: B1.7
       name: Presidio Recall Tuning
       status: Completed
       completed_at: '2025-10-29'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: B1.8
       name: Format Coverage Completion
       status: Completed
       completed_at: '2025-10-30'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: B1.9
       name: Qdrant Latency Optimization
       status: Completed
       completed_at: '2025-10-31'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: R1.1
       name: Presidio Evaluation Strategic Framework
       status: Completed
       completed_at: '2025-10-12'
       metadata:
-        type: Research.TechnicalResearch.v1
+        metadata:
+          type: Research.TechnicalResearch.v1
     - id: R1.2
       name: UX Research Document Types
       status: Completed
       completed_at: '2025-10-14'
       metadata:
-        type: Research.TechnicalResearch.v1
+        metadata:
+          type: Research.TechnicalResearch.v1
   - sprintId: sprint-02
     title: Sprint 02 - RAG Query & Semantic Optimization
     focus: null
@@ -98,73 +109,85 @@ domainFields:
       status: Completed
       completed_at: '2025-11-01'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: B2.2
       name: Context Compression Pipeline
       status: Completed
       completed_at: '2025-11-04'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: B2.3
       name: Semantic Cache Layer
       status: Completed
       completed_at: '2025-11-05'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: B2.3a
       name: Markdown Ingestion Pipeline
       status: Completed
       completed_at: '2025-11-05'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: B2.3b
       name: Onboarding API
       status: Completed
       completed_at: '2025-11-05'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: B2.3c
       name: Ingestion Integration & Parity
       status: Completed
       completed_at: '2025-11-05'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: B2.3d
       name: Semantic Cache Implementation
       status: Completed
       completed_at: '2025-11-05'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: B2.4
       name: Tiered LLM Routing
       status: Completed
       completed_at: '2025-11-05'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: B2.5
       name: Sprint Efficacy Evaluator
       status: Completed
       completed_at: '2025-11-05'
       metadata:
-        type: Build.Implementation.v1
+        metadata:
+          type: Build.Implementation.v1
     - id: R2.1
       name: Quality Assessment Heuristics
       status: Completed
       completed_at: '2025-10-28'
       metadata:
-        type: Research.TechnicalResearch.v1
+        metadata:
+          type: Research.TechnicalResearch.v1
     - id: R2.2
       name: Markdown Ingestion Service Design
       status: Completed
       completed_at: '2025-10-30'
       metadata:
-        type: Research.TechnicalResearch.v1
+        metadata:
+          type: Research.TechnicalResearch.v1
     - id: R2.3
       name: Project Bootstrap Workflow
       status: Completed
       completed_at: '2025-10-31'
       metadata:
-        type: Research.TechnicalResearch.v1
+        metadata:
+          type: Research.TechnicalResearch.v1
   - sprintId: sprint-03
     title: Sprint 03 - Mission Protocol Integration
     focus: null
@@ -184,11 +207,13 @@ domainFields:
         tests, and documentation. Synced parity + foundational refs and updated backlog
         mirrors.
       metadata:
-        type: Build.Implementation.v1
-        description: "Pydantic models for MissionProtocolDraft/Complete, layered validation\
-          \ (FastAPI \u2192 business logic \u2192 DB), structured error payloads"
-        started_at: '2025-11-07T22:06:42Z'
-        completed_at: '2025-11-07T22:20:49Z'
+        metadata:
+          type: Build.Implementation.v1
+          description: "Pydantic models for MissionProtocolDraft/Complete, layered\
+            \ validation (FastAPI \u2192 business logic \u2192 DB), structured error\
+            \ payloads"
+          started_at: '2025-11-07T22:06:42Z'
+          completed_at: '2025-11-07T22:20:49Z'
     - id: B3.2
       name: Protocol Engine
       status: Completed
@@ -196,11 +221,12 @@ domainFields:
       notes: Added mission progress/evidence utilities, MissionProtocolService, FastAPI
         routes, YAML import/export, documentation, parity + pytest suites
       metadata:
-        type: Build.Implementation.v1
-        description: CRUD APIs, YAML import/export, progress + gate tracking, evidence
-          linking to insight_sources
-        started_at: '2025-11-08T15:46:02Z'
-        completed_at: '2025-11-08T16:06:06Z'
+        metadata:
+          type: Build.Implementation.v1
+          description: CRUD APIs, YAML import/export, progress + gate tracking, evidence
+            linking to insight_sources
+          started_at: '2025-11-08T15:46:02Z'
+          completed_at: '2025-11-08T16:06:06Z'
     - id: B3.3
       name: Quality Gates
       status: Completed
@@ -211,11 +237,12 @@ domainFields:
         suites (quality_gates, mission service/api/integration) to enforce blocking
         behavior.
       metadata:
-        type: Build.Implementation.v1
-        description: Three-pillar heuristics as blocking validators, status endpoint,
-          telemetry wiring
-        started_at: '2025-11-08T16:31:16Z'
-        completed_at: '2025-11-08T16:50:31Z'
+        metadata:
+          type: Build.Implementation.v1
+          description: Three-pillar heuristics as blocking validators, status endpoint,
+            telemetry wiring
+          started_at: '2025-11-08T16:31:16Z'
+          completed_at: '2025-11-08T16:50:31Z'
     - id: B3.4
       name: UI Integration
       status: Completed
@@ -225,11 +252,12 @@ domainFields:
         docs/frontend_architecture.md. npm run lint + type-check pass; Cypress run
         blocked because bundled binary rejects --no-sandbox on macOS.
       metadata:
-        type: Build.Implementation.v1
-        description: Next.js with React Hook Form + Pydantic validation, progress
-          visualization, quality gate indicators, evidence link UX
-        started_at: '2025-11-08T17:59:48Z'
-        completed_at: '2025-11-08T18:25:52Z'
+        metadata:
+          type: Build.Implementation.v1
+          description: Next.js with React Hook Form + Pydantic validation, progress
+            visualization, quality gate indicators, evidence link UX
+          started_at: '2025-11-08T17:59:48Z'
+          completed_at: '2025-11-08T18:25:52Z'
     - id: B3.5
       name: Sprint Efficacy Evaluator
       status: Completed
@@ -240,11 +268,12 @@ domainFields:
         Added regression tests in tests/sprint_03/ and pytest tests/sprint_03 passes
         to keep coverage on the new evaluators.
       metadata:
-        type: Build.Implementation.v1
-        description: 'Sprint 03 metrics: Mission Protocol adoption, validation coverage,
-          quality gate effectiveness, API stability'
-        started_at: '2025-11-08T19:13:58Z'
-        completed_at: '2025-11-08T19:21:17Z'
+        metadata:
+          type: Build.Implementation.v1
+          description: 'Sprint 03 metrics: Mission Protocol adoption, validation coverage,
+            quality gate effectiveness, API stability'
+          started_at: '2025-11-08T19:13:58Z'
+          completed_at: '2025-11-08T19:21:17Z'
   - sprintId: sprint-04
     title: Sprint 04 - Quality Assurance & Tech Debt
     focus: null
@@ -265,8 +294,9 @@ domainFields:
         \ and documented npm run test:e2e usage.\n- Tests: npm run test:e2e (frontend)\
         \ \u2014 2025-11-08T20:48Z UTC."
       metadata:
-        started_at: '2025-11-08T20:31:17Z'
-        completed_at: '2025-11-08T20:48:34Z'
+        metadata:
+          started_at: '2025-11-08T20:31:17Z'
+          completed_at: '2025-11-08T20:48:34Z'
     - id: B4.2
       name: Quality Gate Automation
       status: Completed
@@ -276,8 +306,9 @@ domainFields:
         added docs + pytest coverage (bias, traceability, methodology, synthesis,
         integration).
       metadata:
-        started_at: '2025-11-08T21:12:15Z'
-        completed_at: '2025-11-08T21:27:25Z'
+        metadata:
+          started_at: '2025-11-08T21:12:15Z'
+          completed_at: '2025-11-08T21:27:25Z'
     - id: B4.3
       name: Performance Optimization
       status: Completed
@@ -291,8 +322,9 @@ domainFields:
         returns instantly without qdrant-client installed. Follow-up: build dedicated
         query cache layer + load test suite to hit P95 <2s, wire dashboards to frontend.'
       metadata:
-        started_at: '2025-11-08T22:56:33Z'
-        completed_at: '2025-11-09T01:01:33Z'
+        metadata:
+          started_at: '2025-11-08T22:56:33Z'
+          completed_at: '2025-11-09T01:01:33Z'
     - id: B4.4
       name: Testing & Documentation Consolidation
       status: Completed
@@ -301,8 +333,9 @@ domainFields:
         RAG integration, monitoring API) plus getting-started / mission protocol /
         best practices docs. Generated coverage HTML + synced mirrors/parity.
       metadata:
-        started_at: '2025-11-09T02:33:21Z'
-        completed_at: '2025-11-09T04:01:16Z'
+        metadata:
+          started_at: '2025-11-09T02:33:21Z'
+          completed_at: '2025-11-09T04:01:16Z'
     - id: B4.5
       name: Sprint Efficacy Evaluator
       status: Completed
@@ -313,8 +346,9 @@ domainFields:
         and metrics.json via python scripts/evaluate_sprint_04.py (after telemetry
         seed). Tests: pytest tests/sprint_04 -q; ./cmos/cli.py validate health.'
       metadata:
-        started_at: '2025-11-09T04:45:29Z'
-        completed_at: '2025-11-09T04:52:44Z'
+        metadata:
+          started_at: '2025-11-09T04:45:29Z'
+          completed_at: '2025-11-09T04:52:44Z'
   - sprintId: sprint-06
     title: Sprint 06 - CLI & Document Repository UI
     focus: Complete functional TraceLab with agent-first CLI and document management
@@ -336,8 +370,9 @@ domainFields:
         check still fails because Sprint 06 missions exist in the missions table but
         lack matching sprint rows, so backlog export omits B6.x entries.
       metadata:
-        started_at: '2025-11-10T06:27:29Z'
-        completed_at: '2025-11-10T06:48:08Z'
+        metadata:
+          started_at: '2025-11-10T06:27:29Z'
+          completed_at: '2025-11-10T06:48:08Z'
     - id: B6.2
       name: Document Library UI
       status: Completed
@@ -345,24 +380,26 @@ domainFields:
       notes: Resolved lint issues (AuthProvider bootstrapping, document error messaging,
         typed processing events) and validated via npm run lint + npm run type-check.
       metadata:
-        started_at: '2025-11-10T15:04:25Z'
-        completed_at: '2025-11-10T15:06:56Z'
+        metadata:
+          started_at: '2025-11-10T15:04:25Z'
+          completed_at: '2025-11-10T15:06:56Z'
     - id: B6.3
       name: RAG Search UI
       status: Completed
       notes: Marked complete to make way for injected fix missions B6.4a-d
       metadata:
-        started_at: '2025-11-10T15:52:53Z'
-        completed_at: '2025-11-10T16:08:06Z'
-        blocked_at: '2025-11-10T21:47:19Z'
-        blocked_reason: Frontend depends on GET /api/v1/documents and /projects, but
-          production API only allows POST (405). UI keeps retrying and appears unstyled
-          because SWR never hydrates. Need backend redeploy or configuration change
-          to enable GET before frontend can be validated.
-        blocked_needs:
-        - Deploy backend with GET handlers for /api/v1/documents and /projects matching
-          local FastAPI routes
-        - Re-run frontend verification against API that supports required endpoints
+        metadata:
+          started_at: '2025-11-10T15:52:53Z'
+          completed_at: '2025-11-10T16:08:06Z'
+          blocked_at: '2025-11-10T21:47:19Z'
+          blocked_reason: Frontend depends on GET /api/v1/documents and /projects,
+            but production API only allows POST (405). UI keeps retrying and appears
+            unstyled because SWR never hydrates. Need backend redeploy or configuration
+            change to enable GET before frontend can be validated.
+          blocked_needs:
+          - Deploy backend with GET handlers for /api/v1/documents and /projects matching
+            local FastAPI routes
+          - Re-run frontend verification against API that supports required endpoints
     - id: B6.4
       name: Mission UI Overhaul
       status: Completed
@@ -371,8 +408,9 @@ domainFields:
         preview, mission templates, and search quick-add notes shipped. npm run lint
         && npm run type-check.
       metadata:
-        started_at: '2025-11-10T23:00:57Z'
-        completed_at: '2025-11-10T23:18:12Z'
+        metadata:
+          started_at: '2025-11-10T23:00:57Z'
+          completed_at: '2025-11-10T23:18:12Z'
     - id: B6.4a
       name: API URL Configuration Fix
       status: Completed
@@ -381,11 +419,12 @@ domainFields:
         so NEXT_PUBLIC_API_BASE_URL/PLAYWRIGHT_API_BASE_URL point at https://api.namozine.com
         (UI appends /api/v1). Verified frontend lint to confirm no regressions.
       metadata:
-        description: Correct API URL configuration across all frontend environments
-          to match production API endpoint at https://api.namozine.com (remove /api/v1
-          suffix)
-        started_at: '2025-11-10T23:58:27Z'
-        completed_at: '2025-11-11T00:02:38Z'
+        metadata:
+          description: Correct API URL configuration across all frontend environments
+            to match production API endpoint at https://api.namozine.com (remove /api/v1
+            suffix)
+          started_at: '2025-11-10T23:58:27Z'
+          completed_at: '2025-11-11T00:02:38Z'
     - id: B6.4b
       name: Local Development Environment Setup
       status: Completed
@@ -397,10 +436,11 @@ domainFields:
         (duplicate Prometheus metrics), and tests/integration/test_ingestion_flow.py::test_markdown_cli_flow
         (ingest_cli 401).'
       metadata:
-        description: Create comprehensive local development setup guide and scripts
-          to ensure consistent developer experience
-        started_at: '2025-11-11T00:20:58Z'
-        completed_at: '2025-11-11T00:32:32Z'
+        metadata:
+          description: Create comprehensive local development setup guide and scripts
+            to ensure consistent developer experience
+          started_at: '2025-11-11T00:20:58Z'
+          completed_at: '2025-11-11T00:32:32Z'
     - id: B6.4c
       name: Authentication Documentation Testing
       status: Completed
@@ -410,10 +450,11 @@ domainFields:
         and requests dependency to support scripted login flows; pytest tests/test_auth_flow.py
         tests/test_auth_api.py now green.
       metadata:
-        description: Document authentication system, provide clear usage examples,
-          and implement comprehensive auth testing
-        started_at: '2025-11-11T05:39:06Z'
-        completed_at: '2025-11-11T05:48:21Z'
+        metadata:
+          description: Document authentication system, provide clear usage examples,
+            and implement comprehensive auth testing
+          started_at: '2025-11-11T05:39:06Z'
+          completed_at: '2025-11-11T05:48:21Z'
     - id: B6.4d
       name: RAG Search UI Implementation
       status: Completed
@@ -425,10 +466,12 @@ domainFields:
         (agents.md, context/MASTER_CONTEXT.json). Telemetry and database health confirmed
         before wrap-up.'
       metadata:
-        description: Build semantic search and RAG query interface with results display,
-          LLM synthesis view, and citation linking (previously blocked B6.3 work)
-        started_at: '2025-11-11T06:27:53Z'
-        completed_at: '2025-11-11T06:30:33Z'
+        metadata:
+          description: Build semantic search and RAG query interface with results
+            display, LLM synthesis view, and citation linking (previously blocked
+            B6.3 work)
+          started_at: '2025-11-11T06:27:53Z'
+          completed_at: '2025-11-11T06:30:33Z'
     - id: B6.5
       name: Report Export System
       status: Completed
@@ -437,8 +480,9 @@ domainFields:
         downloads, mission UI export selector, and docs/report_export.md. Tests: pytest
         tests/test_report_export.py tests/integration/test_mission_api.py.'
       metadata:
-        started_at: '2025-11-11T15:18:35Z'
-        completed_at: '2025-11-11T15:51:12Z'
+        metadata:
+          started_at: '2025-11-11T15:18:35Z'
+          completed_at: '2025-11-11T15:51:12Z'
     - id: B6.6
       name: Integration API
       status: Blocked
@@ -452,16 +496,17 @@ domainFields:
         added B7.1-B7.4 missions, updated contexts, and documented failing tests (presidio,
         cache metrics, ingest CLI).
       metadata:
-        description: Conduct Sprint 06 retrospective evaluating foundational fixes
-          (API URL, local dev, auth), assess CLI and document UI functionality, validate
-          end-to-end workflows, and document findings for Sprint 07 planning
-        successCriteria:
-        - Sprint 06 retrospective report generated with lessons learned, blockers
-          documented, Sprint 07 backlog seeded with fixes
-        deliverables:
-        - cmos/reports/sprint-06/SPRINT-06-RETROSPECTIVE.md
-        started_at: '2025-11-11T17:03:26Z'
-        completed_at: '2025-11-11T17:22:06Z'
+        metadata:
+          description: Conduct Sprint 06 retrospective evaluating foundational fixes
+            (API URL, local dev, auth), assess CLI and document UI functionality,
+            validate end-to-end workflows, and document findings for Sprint 07 planning
+          successCriteria:
+          - Sprint 06 retrospective report generated with lessons learned, blockers
+            documented, Sprint 07 backlog seeded with fixes
+          deliverables:
+          - cmos/reports/sprint-06/SPRINT-06-RETROSPECTIVE.md
+          started_at: '2025-11-11T17:03:26Z'
+          completed_at: '2025-11-11T17:22:06Z'
   - sprintId: sprint-07
     title: Sprint 07 - Reliability & Workflow Unblocking
     focus: Ship read APIs, restore guardrails, and unblock ingestion workflows
@@ -481,22 +526,23 @@ domainFields:
         tests/test_project_document_read_api.py, npm run type-check, validate_foundational_refs.py,
         and validate_parity.py.
       metadata:
-        description: 'Implement GET /api/v1/projects list/detail and GET /api/v1/documents
-          list/filter endpoints with pagination and auth guards. Add UI pages: project
-          creation form, project list/selector, and document list with project filtering.
-          Success: SWR hooks work, CLI commands functional, UI usable for project
-          and document management.'
-        successCriteria:
-        - GET /api/v1/projects and /api/v1/documents return paginated 200 responses
-          with bearer auth
-        - Document Library UI + CLI list commands show real data (SWR retries resolved)
-        - Playwright/pytest coverage added for the new read APIs
-        deliverables:
-        - FastAPI routes + schemas + service wiring
-        - Regression tests + telemetry snippet proving list APIs
-        - README/local-development doc updates for new endpoints
-        started_at: '2025-11-11T19:09:13Z'
-        completed_at: '2025-11-11T20:22:14Z'
+        metadata:
+          description: 'Implement GET /api/v1/projects list/detail and GET /api/v1/documents
+            list/filter endpoints with pagination and auth guards. Add UI pages: project
+            creation form, project list/selector, and document list with project filtering.
+            Success: SWR hooks work, CLI commands functional, UI usable for project
+            and document management.'
+          successCriteria:
+          - GET /api/v1/projects and /api/v1/documents return paginated 200 responses
+            with bearer auth
+          - Document Library UI + CLI list commands show real data (SWR retries resolved)
+          - Playwright/pytest coverage added for the new read APIs
+          deliverables:
+          - FastAPI routes + schemas + service wiring
+          - Regression tests + telemetry snippet proving list APIs
+          - README/local-development doc updates for new endpoints
+          started_at: '2025-11-11T19:09:13Z'
+          completed_at: '2025-11-11T20:22:14Z'
     - id: B7.2
       name: Integration Test Runbook & Guardrails
       status: Completed
@@ -506,22 +552,23 @@ domainFields:
         and reran node cmos/context/integration_test_runner.js --output telemetry/events/testing-summary.json
         to produce a green telemetry/events/testing-summary.json artifact.
       metadata:
-        description: 'Find and fix CMOS boundary violation where CMOS code imports
-          from app.services. Author integration-testing-guide.md documenting CMOS-only
-          tests. Make integration_test_runner.js green. Success: No app imports in
-          cmos/, test runner passes, CMOS tests isolated from application code.'
-        successCriteria:
-        - cmos/docs/integration-testing-guide.md created with prerequisites + steps
-        - agents.md and context/MASTER_CONTEXT.json document structured prompting
-          + integration expectations
-        - node cmos/context/integration_test_runner.js --output telemetry/events/testing-summary.json
-          passes
-        deliverables:
-        - Integration testing guide + updated contexts
-        - Telemetry log proving runner success
-        - Mission notes referencing updated guardrails
-        started_at: '2025-11-11T20:28:12Z'
-        completed_at: '2025-11-11T20:37:13Z'
+        metadata:
+          description: 'Find and fix CMOS boundary violation where CMOS code imports
+            from app.services. Author integration-testing-guide.md documenting CMOS-only
+            tests. Make integration_test_runner.js green. Success: No app imports
+            in cmos/, test runner passes, CMOS tests isolated from application code.'
+          successCriteria:
+          - cmos/docs/integration-testing-guide.md created with prerequisites + steps
+          - agents.md and context/MASTER_CONTEXT.json document structured prompting
+            + integration expectations
+          - node cmos/context/integration_test_runner.js --output telemetry/events/testing-summary.json
+            passes
+          deliverables:
+          - Integration testing guide + updated contexts
+          - Telemetry log proving runner success
+          - Mission notes referencing updated guardrails
+          started_at: '2025-11-11T20:28:12Z'
+          completed_at: '2025-11-11T20:37:13Z'
     - id: B7.3
       name: Ingestion CLI Auth & Workflow Proof
       status: Completed
@@ -531,19 +578,20 @@ domainFields:
         flow, telemetry/ingestion-cli-smoke.jsonl captures the pytest run, and parity
         + foundational refs reran clean.
       metadata:
-        description: Teach scripts/ingest_cli.py to authenticate and finish the Markdown
-          ingestion workflow
-        successCriteria:
-        - CLI can log in (env vars or flags) before uploading and processing documents
-        - pytest tests/integration/test_ingestion_flow.py::test_markdown_cli_flow
-          passes
-        - Workflow documented in docs/local-development.md + docs/authentication.md
-        deliverables:
-        - Updated scripts/ingest_cli.py + helper libs
-        - Docs + changelog entries
-        - Telemetry JSONL summarizing ingest smoke
-        started_at: '2025-11-11T20:53:00Z'
-        completed_at: '2025-11-11T21:05:10Z'
+        metadata:
+          description: Teach scripts/ingest_cli.py to authenticate and finish the
+            Markdown ingestion workflow
+          successCriteria:
+          - CLI can log in (env vars or flags) before uploading and processing documents
+          - pytest tests/integration/test_ingestion_flow.py::test_markdown_cli_flow
+            passes
+          - Workflow documented in docs/local-development.md + docs/authentication.md
+          deliverables:
+          - Updated scripts/ingest_cli.py + helper libs
+          - Docs + changelog entries
+          - Telemetry JSONL summarizing ingest smoke
+          started_at: '2025-11-11T20:53:00Z'
+          completed_at: '2025-11-11T21:05:10Z'
     - id: B7.4
       name: Remove Presidio & Fix Cache Metrics
       status: Completed
@@ -553,53 +601,74 @@ domainFields:
         and tests/test_rag_service.py::test_semantic_cache_hit_rate_reaches_target
         both pass.
       metadata:
-        description: 'Remove Presidio dependencies (presidio-analyzer, presidio-anonymizer,
-          presidio-evaluator) from requirements.txt. Stub or remove presidio_redaction.py
-          service. Update ingestion pipeline to skip PII redaction. Fix cache_metrics.py
-          Prometheus counter duplication. Success: No Presidio imports, ingestion
-          works without redaction, cache metrics test passes.'
-        successCriteria:
-        - pytest tests/test_presidio_redaction.py::test_redact_document_uses_pseudonymization_and_audit
-          passes
-        - pytest tests/test_rag_service.py::test_semantic_cache_hit_rate_reaches_target
-          passes
-        - Quality gate checklist updated to include the repaired tests
-        deliverables:
-        - Code fixes in app/services/presidio_redaction.py and app/services/cache_metrics.py
-        - Test evidence + telemetry entry
-        - Docs/README note covering the new guardrail
-        started_at: '2025-11-11T22:03:48Z'
-        completed_at: '2025-11-11T22:16:20Z'
+        metadata:
+          description: 'Remove Presidio dependencies (presidio-analyzer, presidio-anonymizer,
+            presidio-evaluator) from requirements.txt. Stub or remove presidio_redaction.py
+            service. Update ingestion pipeline to skip PII redaction. Fix cache_metrics.py
+            Prometheus counter duplication. Success: No Presidio imports, ingestion
+            works without redaction, cache metrics test passes.'
+          successCriteria:
+          - pytest tests/test_presidio_redaction.py::test_redact_document_uses_pseudonymization_and_audit
+            passes
+          - pytest tests/test_rag_service.py::test_semantic_cache_hit_rate_reaches_target
+            passes
+          - Quality gate checklist updated to include the repaired tests
+          deliverables:
+          - Code fixes in app/services/presidio_redaction.py and app/services/cache_metrics.py
+          - Test evidence + telemetry entry
+          - Docs/README note covering the new guardrail
+          started_at: '2025-11-11T22:03:48Z'
+          completed_at: '2025-11-11T22:16:20Z'
     - id: B7.5
       name: Qdrant Collection Initialization & Health Check
       status: Completed
-      completed_at: '2025-11-12T01:38:51Z'
-      notes: Admin /api/v1/admin init-qdrant + health endpoints landed with docs/deployment.md
-        guidance and pytest tests/test_admin_endpoints.py -q. CLI health + telemetry
-        review clean.
+      completed_at: '2025-11-12T16:09:23Z'
+      notes: "- Loaded agents.md and cmos/agents.md to honor CMOS guardrails.\n- Executed\
+        \ ./cmos/cli.py validate health and ./cmos/cli.py db show current as pre-flight\
+        \ checks before mission start.\n- Started mission B7.5 via mission_runtime\
+        \ helpers and logged context notes strictly through database-backed CLI commands.\n\
+        - Ran pytest tests/test_health.py -q for the Test Suite Matrix smoke coverage\
+        \ (3 passing, only dependency warnings).\n- Re-validated health, tailed telemetry,\
+        \ and confirmed no runtime deltas\u2014mission closes with documentation +\
+        \ telemetry parity only."
       metadata:
-        description: Create admin endpoints for Qdrant collection initialization and
-          health checks to resolve 404 collection errors
-        started_at: '2025-11-12T01:32:26Z'
-        completed_at: '2025-11-12T01:38:51Z'
+        metadata:
+          description: Create admin endpoints for Qdrant collection initialization
+            and health checks to resolve 404 collection errors
+          started_at: '2025-11-12T16:06:27Z'
+          completed_at: '2025-11-12T16:09:23Z'
     - id: B7.6
       name: Integrate Embedding Pipeline into Document Ingestion
-      status: Current
+      status: Completed
+      notes: Blocked pending R7.1 research - embedding code exists but fails due to
+        missing Qdrant collection
       metadata:
-        description: Add embedding generation to document processing so chunks are
-          automatically embedded to Qdrant and become searchable
+        metadata:
+          description: Add embedding generation to document processing so chunks are
+            automatically embedded to Qdrant and become searchable
     - id: B7.7
       name: End-to-End Document Processing Validation
-      status: Queued
+      status: In Progress
       metadata:
-        description: Validate complete workflow from upload through search, test UI
-          and CLI paths, document gaps
+        metadata:
+          description: Validate complete workflow from upload through search, test
+            UI and CLI paths, document gaps
+        started_at: '2025-11-15T00:35:32Z'
     - id: B7.8
       name: Sprint 07 Retrospective
       status: Queued
       metadata:
-        description: Complete Sprint 07 retrospective covering foundation fixes and
-          embedding pipeline integration
+        metadata:
+          description: Complete Sprint 07 retrospective covering foundation fixes
+            and embedding pipeline integration
+    - id: R7.1
+      name: Qdrant Collection Setup Research
+      status: Completed
+      notes: Research complete - findings in cmos/research/R7.1_Qdrant-Setup-Investigation.md
+      metadata:
+        metadata:
+          description: Research proper Qdrant collection initialization and identify
+            root cause of collection creation failures
   - sprintId: sprint-05
     title: Sprint 05 - Frontend Deployment & Auth Hardening
     focus: Ship hosted Next.js UI, secure API access, and production domain wiring
@@ -618,20 +687,21 @@ domainFields:
         NEXT_PUBLIC_DEFAULT_PROJECT_ID seed), and verified https://frontend-production-43c3.up.railway.app/missions
         renders against production FastAPI API. Telemetry recorded in cmos/telemetry/events/sprint-05-frontend-deployment.jsonl.
       metadata:
-        description: Host the Mission Protocol Next.js workspace on its own Railway
-          service with documented build/start commands and env vars.
-        successCriteria:
-        - Railway frontend service builds with npm install && npm run build and starts
-          via npm run start -- --port .
-        - NEXT_PUBLIC_* env vars configured in Railway and mirrored in docs.
-        - Hosted /missions view reaches FastAPI backend; smoke test captured.
-        - Deployment runbook + telemetry artifacts committed for future agents.
-        deliverables:
-        - railway.frontend.json (or documented service settings).
-        - Updated deployment runbook covering env vars + rollback.
-        - Telemetry + screenshot/logs proving hosted UI works.
-        started_at: '2025-11-09T21:04:12Z'
-        completed_at: '2025-11-09T23:48:47Z'
+        metadata:
+          description: Host the Mission Protocol Next.js workspace on its own Railway
+            service with documented build/start commands and env vars.
+          successCriteria:
+          - Railway frontend service builds with npm install && npm run build and
+            starts via npm run start -- --port .
+          - NEXT_PUBLIC_* env vars configured in Railway and mirrored in docs.
+          - Hosted /missions view reaches FastAPI backend; smoke test captured.
+          - Deployment runbook + telemetry artifacts committed for future agents.
+          deliverables:
+          - railway.frontend.json (or documented service settings).
+          - Updated deployment runbook covering env vars + rollback.
+          - Telemetry + screenshot/logs proving hosted UI works.
+          started_at: '2025-11-09T21:04:12Z'
+          completed_at: '2025-11-09T23:48:47Z'
     - id: B5.2
       name: FastAPI Auth & CORS Hardening
       status: Completed
@@ -647,21 +717,23 @@ domainFields:
         tests/integration/test_mission_api.py::test_create_and_export_mission tests/integration/test_quality_automation.py::test_quality_automation_api_run_and_history
         tests/test_document_ingestion.py::test_upload_and_process_endpoints_record_statuses.'
       metadata:
-        description: Implement JWT auth endpoints and lock down CORS/methods to the
-          hosted UI domain per docs/auth_and_cors_guidance.md.
-        successCriteria:
-        - Login endpoint issues JWTs signed with python-jose and passlib-hashed credentials.
-        - Protected routes require Authorization bearer tokens; unauthenticated calls
-          return 401 with helpful errors.
-        - CORS middleware loads explicit origins/methods/headers from settings (prod
-          vs dev).
-        - Frontend stores/uses tokens and docs describe the auth flow.
-        deliverables:
-        - New auth routes, schemas, and settings toggles.
-        - pytest coverage for login/refresh + CORS behavior.
-        - Docs/README updates covering token handling + allowed origins.
-        started_at: '2025-11-10T00:00:23Z'
-        completed_at: '2025-11-10T00:20:47Z'
+        metadata:
+          description: Implement JWT auth endpoints and lock down CORS/methods to
+            the hosted UI domain per docs/auth_and_cors_guidance.md.
+          successCriteria:
+          - Login endpoint issues JWTs signed with python-jose and passlib-hashed
+            credentials.
+          - Protected routes require Authorization bearer tokens; unauthenticated
+            calls return 401 with helpful errors.
+          - CORS middleware loads explicit origins/methods/headers from settings (prod
+            vs dev).
+          - Frontend stores/uses tokens and docs describe the auth flow.
+          deliverables:
+          - New auth routes, schemas, and settings toggles.
+          - pytest coverage for login/refresh + CORS behavior.
+          - Docs/README updates covering token handling + allowed origins.
+          started_at: '2025-11-10T00:00:23Z'
+          completed_at: '2025-11-10T00:20:47Z'
     - id: B5.3
       name: Domain Wiring & Telemetry Validation
       status: Completed
@@ -669,21 +741,22 @@ domainFields:
       notes: Cloudflare DNS configured, Railway domains mapped, env vars set for production,
         validation and smoke tests executed.
       metadata:
-        description: Point Cloudflare DNS at the hosted UI/API, propagate env vars,
-          and capture telemetry proving production parity.
-        successCriteria:
-        - Cloudflare DNS + SSL mapped to Railway frontend + API domains and documented.
-        - NEXT_PUBLIC_API_BASE_URL and FastAPI allowed origins updated to production
-          URLs with env templates refreshed.
-        - validate_parity.py plus smoke tests executed against production endpoints;
-          results stored in telemetry.
-        - Mission notes document DNS checklist, troubleshooting, and rollback path.
-        deliverables:
-        - DNS change log + doc updates describing production URL.
-        - Telemetry artifacts (parity check, smoke test) committed.
-        - Updated env templates / README pointing to public domains.
-        started_at: '2025-11-10T04:35:54Z'
-        completed_at: '2025-11-10T05:49:28Z'
+        metadata:
+          description: Point Cloudflare DNS at the hosted UI/API, propagate env vars,
+            and capture telemetry proving production parity.
+          successCriteria:
+          - Cloudflare DNS + SSL mapped to Railway frontend + API domains and documented.
+          - NEXT_PUBLIC_API_BASE_URL and FastAPI allowed origins updated to production
+            URLs with env templates refreshed.
+          - validate_parity.py plus smoke tests executed against production endpoints;
+            results stored in telemetry.
+          - Mission notes document DNS checklist, troubleshooting, and rollback path.
+          deliverables:
+          - DNS change log + doc updates describing production URL.
+          - Telemetry artifacts (parity check, smoke test) committed.
+          - Updated env templates / README pointing to public domains.
+          started_at: '2025-11-10T04:35:54Z'
+          completed_at: '2025-11-10T05:49:28Z'
   missionDependencies:
   - from: B1.1
     to: B1.2

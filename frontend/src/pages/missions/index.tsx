@@ -53,7 +53,7 @@ function MissionsContent() {
         <section className="grid gap-6 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm lg:grid-cols-[2fr,1fr]">
           <div className="space-y-4">
             <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-500">Mission Protocol</p>
-            <h1 className="text-4xl font-semibold text-slate-900">Mission workspace + gate readiness</h1>
+            <h1 className="text-4xl font-semibold text-slate-900">UI Integration + Quality Gates</h1>
             <p className="text-base text-slate-600">
               Capture structured research directly inside TraceLab, promote semantic-search evidence, and watch gate status update in
               real time. Layout favors readability with generous spacing and clear hierarchy.
@@ -67,7 +67,7 @@ function MissionsContent() {
                 }`}
                 onClick={() => setMode("create")}
               >
-                Start new mission
+                Start New Mission
               </button>
               <button
                 className={`rounded-full border px-5 py-2 text-sm font-semibold transition ${
@@ -111,7 +111,7 @@ function MissionsContent() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-500">Missions</p>
-              <h2 className="text-2xl font-semibold text-slate-900">Mission Protocol backlog</h2>
+              <h2 className="text-2xl font-semibold text-slate-900">Mission Protocol Backlog</h2>
             </div>
             <button onClick={refresh} className="text-sm font-medium text-slate-600 hover:text-slate-900">
               Refresh
