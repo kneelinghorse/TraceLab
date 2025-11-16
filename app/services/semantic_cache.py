@@ -79,7 +79,7 @@ class SemanticCacheService:
 
     def _create_payload_indexes(self) -> None:
         """Ensure common filter fields are indexed for quick lookups."""
-        for field in ("project_id", "document_id", "source_type"):
+        for field in ("project_id", "document_id", "source_type", "filters_signature"):
             try:
                 self.client.create_payload_index(
                     collection_name=self.collection_name,
@@ -100,6 +100,7 @@ class SemanticCacheService:
         project_id = metadata.get("project_id")
         document_id = metadata.get("document_id")
         source_type = metadata.get("source_type")
+        filters_signature = metadata.get("filters_signature")
 
         filters = []
         if project_id:
@@ -108,6 +109,8 @@ class SemanticCacheService:
             filters.append(FieldCondition(key="document_id", match=MatchValue(value=str(document_id))))
         if source_type:
             filters.append(FieldCondition(key="source_type", match=MatchValue(value=str(source_type))))
+        if filters_signature:
+            filters.append(FieldCondition(key="filters_signature", match=MatchValue(value=str(filters_signature))))
         query_filter = Filter(must=filters) if filters else None
 
         try:
@@ -173,6 +176,12 @@ class SemanticCacheService:
             "project_id": metadata.get("project_id"),
             "document_id": metadata.get("document_id"),
             "source_type": metadata.get("source_type"),
+             "filters_signature": metadata.get("filters_signature"),
+            "document_types": metadata.get("document_types"),
+            "source_types": metadata.get("source_types"),
+            "tags": metadata.get("tags"),
+            "date_from": metadata.get("date_from"),
+            "date_to": metadata.get("date_to"),
             "top_k": metadata.get("top_k"),
             "temperature": metadata.get("temperature"),
             "max_tokens": metadata.get("max_tokens"),

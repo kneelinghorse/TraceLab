@@ -63,4 +63,7 @@ class Document(Base):
 
     __table_args__ = (
         Index("idx_documents_project_id", "project_id"),
+        Index("ix_documents_file_type", "file_type"),
+        Index("ix_documents_source_type", "source_type"),
+        Index("ix_documents_collection_date", "collection_date"),
     )

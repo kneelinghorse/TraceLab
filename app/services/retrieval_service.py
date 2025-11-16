@@ -1,15 +1,19 @@
 """Retrieval service for RAG query functionality."""
+from datetime import date
 from typing import List, Dict, Any, Optional
+
 from app.services.embedding_service import get_embedding_service
+from app.services.faceted_search import FacetFilters, FacetedSearchService
 from app.services.qdrant_service import get_qdrant_service
 
 
 class RetrievalService:
     """Service for retrieving relevant document chunks using semantic search."""
     
-    def __init__(self):
+    def __init__(self, faceted_service: Optional[FacetedSearchService] = None):
         self.embedding_service = get_embedding_service()
         self.qdrant_service = get_qdrant_service()
+        self.faceted_service = faceted_service or FacetedSearchService()
     
     def search(
         self,
@@ -18,6 +22,11 @@ class RetrievalService:
         project_id: Optional[str] = None,
         document_id: Optional[str] = None,
         source_type: Optional[str] = None,
+        document_types: Optional[List[str]] = None,
+        source_types: Optional[List[str]] = None,
+        date_from: Optional[date] = None,
+        date_to: Optional[date] = None,
+        tags: Optional[List[str]] = None,
         hnsw_ef: Optional[int] = None,
         query_embedding: Optional[List[float]] = None,
         include_embeddings: bool = False
@@ -54,7 +63,16 @@ class RetrievalService:
             with_vectors=include_embeddings
         )
 
-        return results
+        filters = FacetFilters.from_kwargs(
+            project_id=project_id,
+            document_types=document_types,
+            source_types=source_types,
+            source_type=source_type,
+            tags=tags,
+            date_from=date_from,
+            date_to=date_to,
+        )
+        return self.faceted_service.filter_chunks(results, filters)
 
     def recommend_hnsw_ef(self, top_k: int) -> int:
         """
