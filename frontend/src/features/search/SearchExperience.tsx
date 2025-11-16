@@ -8,11 +8,14 @@ import useSWR from "swr";
 import { AuthGate } from "@/components/AuthGate";
 import { RagSynthesis } from "@/components/RagSynthesis";
 import { ResultCard } from "@/components/ResultCard";
+import { SaveSearchButton } from "@/components/SaveSearchButton";
+import { SavedSearchesList } from "@/components/SavedSearchesList";
 import { SearchBar, type SearchFiltersState } from "@/components/SearchBar";
 import { documentsApi } from "@/lib/api/documents";
 import { projectsApi } from "@/lib/api/projects";
 import type { PaginatedResponse } from "@/types/pagination";
 import { searchApi } from "@/lib/api/search";
+import { savedSearchesApi } from "@/lib/api/savedSearches";
 import { updateMission } from "@/lib/api/missions";
 import { useMissionList } from "@/lib/hooks/useMissions";
 import type { Document, Project } from "@/types/document";
@@ -23,6 +26,7 @@ import type {
   SearchHistoryEntryPayload,
   SearchResultChunk,
 } from "@/types/search";
+import type { SavedSearch, SaveSearchPreset } from "@/types/saved-searches";
 
 type SearchPageProps = {
   initialSection?: "search" | "results";
@@ -83,6 +87,13 @@ function SearchExperience({ initialSection }: SearchPageProps) {
   const documents = documentResponse?.data ?? [];
   const { data: historyResponse, mutate: mutateHistory } = useSWR(["search-history"], () => searchApi.history());
   const historyEntries = historyResponse?.entries ?? [];
+  const { data: savedSearchResponse, mutate: mutateSavedSearches } = useSWR(["saved-searches"], () =>
+    savedSearchesApi.list(),
+  );
+  const savedSearches = savedSearchResponse?.items ?? [];
+  const savedSearchLimit = savedSearchResponse?.limit_per_user ?? 50;
+  const savedSearchCount = savedSearches.length;
+  const [savePreset, setSavePreset] = useState<SaveSearchPreset | null>(null);
 
   useEffect(() => {
     if (initialSection === "results") {
@@ -111,14 +122,15 @@ function SearchExperience({ initialSection }: SearchPageProps) {
     return Array.from(unique).sort((a, b) => a.localeCompare(b));
   }, [documents]);
 
-  const extractHistoryFilters = useCallback((entry: SearchHistoryEntryPayload): SearchFiltersState => {
-    const source = entry.filters ?? {};
-
+  const normalizeFilters = useCallback((source?: Record<string, unknown>): SearchFiltersState => {
+    const payload = source ?? {};
     const pick = (key: string): string => {
-      const value = source[key];
-      return typeof value === "string" ? value : "";
+      const value = payload[key];
+      if (typeof value === "string") {
+        return value;
+      }
+      return "";
     };
-
     return {
       projectId: pick("project_id"),
       documentType: pick("source_type"),
@@ -126,6 +138,16 @@ function SearchExperience({ initialSection }: SearchPageProps) {
       endDate: pick("date_to"),
     };
   }, []);
+
+  const extractHistoryFilters = useCallback(
+    (entry: SearchHistoryEntryPayload): SearchFiltersState => normalizeFilters(entry.filters ?? {}),
+    [normalizeFilters],
+  );
+
+  const savedSearchFilters = useCallback(
+    (entry: SavedSearch | { filters?: Record<string, unknown> }) => normalizeFilters(entry.filters),
+    [normalizeFilters],
+  );
 
   const filteredResults = useMemo(() => {
     return semanticResults.filter((result) => {
@@ -254,6 +276,56 @@ function SearchExperience({ initialSection }: SearchPageProps) {
       const message = error instanceof Error ? error.message : "Unable to clear history.";
       setSearchError(message);
     }
+  };
+
+  const handleSavedSearchExecute = async (entry: SavedSearch) => {
+    setIsSearching(true);
+    setSearchError(null);
+    setRagError(null);
+    setHighlightedChunkId(null);
+    try {
+      const payload = await savedSearchesApi.execute(entry.id);
+      setQuery(payload.saved_search.query_text);
+      setTopK(payload.saved_search.top_k);
+      setFilters(savedSearchFilters(payload.saved_search));
+      setSemanticResults(payload.semantic.results ?? []);
+      setRagPayload(payload.rag);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Saved search execution failed.";
+      setSearchError(message);
+      setSemanticResults([]);
+      setRagPayload(null);
+    } finally {
+      setIsSearching(false);
+      void mutateHistory();
+      void mutateSavedSearches();
+    }
+  };
+
+  const handleLoadSavedSearch = (entry: SavedSearch) => {
+    setQuery(entry.query_text);
+    setTopK(entry.top_k);
+    setFilters(savedSearchFilters(entry));
+  };
+
+  const handleDeleteSavedSearch = async (entry: SavedSearch) => {
+    try {
+      await savedSearchesApi.remove(entry.id);
+      await mutateSavedSearches();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to delete saved search.";
+      setSearchError(message);
+    }
+  };
+
+  const handleSaveFromHistory = (entry: SearchHistoryEntryPayload) => {
+    const historyFilters = extractHistoryFilters(entry);
+    setSavePreset({
+      query: entry.query_text,
+      filters: historyFilters,
+      topK: entry.top_k,
+      suggestedName: entry.query_text.slice(0, 80),
+    });
   };
 
   const registerCardRef = (chunkId: string | null | undefined) => (element: HTMLDivElement | null) => {
@@ -456,12 +528,20 @@ function SearchExperience({ initialSection }: SearchPageProps) {
                           {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
                         </p>
                       </div>
-                      <button
-                        onClick={() => void handleHistoryRun(entry)}
-                        className="rounded-full border border-white/20 px-3 py-1 text-xs text-slate-200 hover:border-sky-300"
-                      >
-                        Replay
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => void handleHistoryRun(entry)}
+                          className="rounded-full border border-white/20 px-3 py-1 text-xs text-slate-200 hover:border-sky-300"
+                        >
+                          Replay
+                        </button>
+                        <button
+                          onClick={() => handleSaveFromHistory(entry)}
+                          className="rounded-full border border-transparent px-3 py-1 text-xs text-slate-300 hover:text-white"
+                        >
+                          Save
+                        </button>
+                      </div>
                     </div>
                     <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-400">
                       {entryFilters.projectId && <span>Project {entryFilters.projectId}</span>}
@@ -478,19 +558,53 @@ function SearchExperience({ initialSection }: SearchPageProps) {
         </div>
 
         <div className="glass-card rounded-3xl p-6">
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Workflow tips</p>
-          <ol className="mt-4 space-y-3 text-sm text-slate-300">
-            <li className="rounded-2xl border border-white/10 bg-black/20 p-4">
-              <strong className="text-white">Evidence-first:</strong> Promote the highest scoring chunk into a mission with Quick Add before editing summaries.
-            </li>
-            <li className="rounded-2xl border border-white/10 bg-black/20 p-4">
-              <strong className="text-white">Compare wording:</strong> Click a citation to jump back to its chunk, validating tone + context alignment.
-            </li>
-            <li className="rounded-2xl border border-white/10 bg-black/20 p-4">
-              <strong className="text-white">Session hygiene:</strong> Keep query history small; archive validated prompts into Mission Protocol notes.
-            </li>
-          </ol>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Saved searches</p>
+              <h3 className="text-2xl font-semibold text-white">Quick access to proven prompts</h3>
+            </div>
+          </div>
+          <div className="mt-4">
+            <SaveSearchButton
+              currentQuery={query}
+              filters={filters}
+              topK={topK}
+              savedSearchCount={savedSearchCount}
+              limitPerUser={savedSearchLimit}
+              preset={savePreset}
+              onPresetConsumed={() => setSavePreset(null)}
+              onSaved={() => {
+                void mutateSavedSearches();
+              }}
+            />
+          </div>
+          <div className="mt-4">
+            <SavedSearchesList
+              items={savedSearches}
+              limitPerUser={savedSearchLimit}
+              isLoading={!savedSearchResponse}
+              onExecute={(entry) => void handleSavedSearchExecute(entry)}
+              onLoad={(entry) => handleLoadSavedSearch(entry)}
+              onDelete={(entry) => void handleDeleteSavedSearch(entry)}
+              onSelect={(entry) => handleLoadSavedSearch(entry)}
+            />
+          </div>
         </div>
+      </section>
+
+      <section className="glass-card rounded-3xl p-6">
+        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Workflow tips</p>
+        <ol className="mt-4 space-y-3 text-sm text-slate-300">
+          <li className="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <strong className="text-white">Evidence-first:</strong> Promote the highest scoring chunk into a mission with Quick Add before editing summaries.
+          </li>
+          <li className="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <strong className="text-white">Compare wording:</strong> Click a citation to jump back to its chunk, validating tone + context alignment.
+          </li>
+          <li className="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <strong className="text-white">Session hygiene:</strong> Keep query history small; archive validated prompts into Mission Protocol notes.
+          </li>
+        </ol>
       </section>
     </main>
   );

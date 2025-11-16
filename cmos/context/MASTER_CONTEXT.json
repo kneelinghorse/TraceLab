@@ -1149,19 +1149,33 @@
         "summary": "Implementing search history backend + UI logging",
         "action": "start",
         "ts": "2025-11-16T00:51:36Z"
+      },
+      {
+        "mission": "B9.4",
+        "agent": "assistant",
+        "summary": "Search history logging, replay APIs, and UI delivered with parity + tests.",
+        "action": "complete",
+        "ts": "2025-11-16T01:06:40Z"
+      },
+      {
+        "mission": "B9.5",
+        "agent": "codex",
+        "summary": "Starting saved searches mission: scoping requirements and implementation plan.",
+        "action": "start",
+        "ts": "2025-11-16T01:35:45Z"
       }
     ],
-    "last_session": "2025-11-16T00:51:36Z",
-    "session_count": 21,
-    "active_mission": "B9.4",
+    "last_session": "2025-11-16T01:35:45Z",
+    "session_count": 23,
+    "active_mission": "B9.5",
     "blocked_missions": [],
-    "last_completed_mission": "B9.2"
+    "last_completed_mission": "B9.4"
   },
   "next_session_context": {},
   "context_health": {
-    "sessions_since_reset": 25,
-    "last_update": "2025-11-16T00:51:36Z",
-    "size_kb": 40.69,
+    "sessions_since_reset": 27,
+    "last_update": "2025-11-16T01:35:45Z",
+    "size_kb": 41.05,
     "size_limit_kb": 100
   },
   "learnings": [
