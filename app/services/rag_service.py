@@ -2,6 +2,7 @@
 import logging
 import re
 import time
+from datetime import date
 from typing import Any, Dict, List, Optional
 
 from app.core.config import settings
@@ -9,6 +10,7 @@ from app.services.cache_manager import get_cache_manager
 from app.services.context_compression import compress_context
 from app.services.embedding_service import EmbeddingService, get_embedding_service
 from app.services.cost_monitor import CostMonitor, get_cost_monitor
+from app.services.faceted_search import FacetFilters
 from app.services.hybrid_search import HybridSearchService
 from app.services.retrieval_service import RetrievalService, get_retrieval_service
 from app.services.semantic_cache import SemanticCacheService, get_semantic_cache_service
@@ -113,6 +115,11 @@ class RagService:
         project_id: Optional[str] = None,
         document_id: Optional[str] = None,
         source_type: Optional[str] = None,
+        document_types: Optional[List[str]] = None,
+        source_types: Optional[List[str]] = None,
+        date_from: Optional[date] = None,
+        date_to: Optional[date] = None,
+        tags: Optional[List[str]] = None,
         hnsw_ef: Optional[int] = None,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
@@ -122,6 +129,15 @@ class RagService:
         Execute a full RAG workflow: retrieve context and synthesize an answer.
         """
         normalized_mode = (search_mode or "semantic").strip().lower()
+        filters = FacetFilters.from_kwargs(
+            project_id=project_id,
+            document_types=document_types,
+            source_types=source_types,
+            source_type=source_type,
+            tags=tags,
+            date_from=date_from,
+            date_to=date_to,
+        )
         cache_key = self.cache_manager.rag_query_key(
             query=query,
             project_id=project_id,
@@ -131,6 +147,7 @@ class RagService:
             temperature=temperature,
             max_tokens=max_tokens,
             search_mode=normalized_mode,
+            filters_signature=filters.signature(),
         )
         start = time.perf_counter()
 
@@ -141,6 +158,11 @@ class RagService:
                 project_id=project_id,
                 document_id=document_id,
                 source_type=source_type,
+                document_types=document_types,
+                source_types=source_types,
+                date_from=date_from,
+                date_to=date_to,
+                tags=tags,
                 hnsw_ef=hnsw_ef,
                 temperature=temperature,
                 max_tokens=max_tokens,
@@ -174,6 +196,11 @@ class RagService:
         project_id: Optional[str],
         document_id: Optional[str],
         source_type: Optional[str],
+        document_types: Optional[List[str]],
+        source_types: Optional[List[str]],
+        date_from: Optional[date],
+        date_to: Optional[date],
+        tags: Optional[List[str]],
         hnsw_ef: Optional[int],
         temperature: Optional[float],
         max_tokens: Optional[int],
@@ -187,10 +214,24 @@ class RagService:
             "project_id": project_id,
             "document_id": document_id,
             "source_type": source_type,
+            "document_types": list(document_types or []),
+            "source_types": list(source_types or []),
+            "tags": list(tags or []),
+            "date_from": date_from.isoformat() if date_from else None,
+            "date_to": date_to.isoformat() if date_to else None,
             "top_k": top_k,
             "temperature": temperature if temperature is not None else self.default_temperature,
             "max_tokens": max_tokens if max_tokens is not None else self.default_max_tokens,
             "search_mode": normalized_mode,
+            "filters_signature": FacetFilters.from_kwargs(
+                project_id=project_id,
+                document_types=document_types,
+                source_types=source_types,
+                source_type=source_type,
+                tags=tags,
+                date_from=date_from,
+                date_to=date_to,
+            ).signature(),
         }
 
         if self.cache_service is not None:
@@ -220,6 +261,11 @@ class RagService:
             project_id=project_id,
             document_id=document_id,
             source_type=source_type,
+            document_types=document_types,
+            source_types=source_types,
+            date_from=date_from,
+            date_to=date_to,
+            tags=tags,
             hnsw_ef=hnsw_ef,
             query_embedding=query_embedding,
             include_embeddings=True,

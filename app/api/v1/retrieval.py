@@ -24,6 +24,11 @@ async def search_chunks(payload: RetrievalQuery) -> RetrievalResponse:
         project_id=str(payload.project_id) if payload.project_id else None,
         document_id=str(payload.document_id) if payload.document_id else None,
         source_type=payload.source_type,
+        document_types=payload.document_types,
+        source_types=payload.source_types,
+        date_from=payload.date_from,
+        date_to=payload.date_to,
+        tags=payload.tags,
         hnsw_ef=payload.hnsw_ef,
     )
     chunk_models = [RetrievedChunk.model_validate(result) for result in results]

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import uuid
+from datetime import date
 from typing import Any, Callable, Dict, List, Optional
 
 from sqlalchemy import func, select
@@ -11,6 +12,7 @@ from app.core.config import settings
 from app.core.database import SessionLocal
 from app.models.chunk import DocumentChunk
 from app.models.document import Document
+from app.services.faceted_search import FacetFilters, FacetedSearchService
 from app.services.retrieval_service import RetrievalService, get_retrieval_service
 
 
@@ -31,6 +33,7 @@ class HybridSearchService:
         keyword_weight: Optional[float] = None,
         keyword_language: Optional[str] = None,
         keyword_limit_multiplier: Optional[int] = None,
+        faceted_service: Optional[FacetedSearchService] = None,
     ) -> None:
         self.retrieval_service = retrieval_service or get_retrieval_service()
         self.session_factory = session_factory
@@ -44,6 +47,7 @@ class HybridSearchService:
         self.keyword_language = (keyword_language or settings.hybrid_search_keyword_language).lower()
         multiplier = keyword_limit_multiplier or settings.hybrid_search_result_multiplier
         self.keyword_limit_multiplier = multiplier if multiplier and multiplier > 0 else 1
+        self.faceted_service = faceted_service or FacetedSearchService(session_factory=session_factory)
 
     def search(
         self,
@@ -54,6 +58,11 @@ class HybridSearchService:
         project_id: Optional[str] = None,
         document_id: Optional[str] = None,
         source_type: Optional[str] = None,
+        document_types: Optional[List[str]] = None,
+        source_types: Optional[List[str]] = None,
+        date_from: Optional[date] = None,
+        date_to: Optional[date] = None,
+        tags: Optional[List[str]] = None,
         hnsw_ef: Optional[int] = None,
         query_embedding: Optional[List[float]] = None,
         include_embeddings: bool = False,
@@ -65,6 +74,16 @@ class HybridSearchService:
 
         limit = max(1, int(top_k))
 
+        filters = FacetFilters.from_kwargs(
+            project_id=project_id,
+            document_types=document_types,
+            source_types=source_types,
+            source_type=source_type,
+            tags=tags,
+            date_from=date_from,
+            date_to=date_to,
+        )
+
         if normalized_mode == "semantic":
             return self._semantic_only(
                 query=query,
@@ -72,6 +91,11 @@ class HybridSearchService:
                 project_id=project_id,
                 document_id=document_id,
                 source_type=source_type,
+                document_types=document_types,
+                source_types=source_types,
+                date_from=date_from,
+                date_to=date_to,
+                tags=tags,
                 hnsw_ef=hnsw_ef,
                 query_embedding=query_embedding,
                 include_embeddings=include_embeddings,
@@ -83,6 +107,7 @@ class HybridSearchService:
                 project_id=project_id,
                 document_id=document_id,
                 source_type=source_type,
+                filters=filters,
                 limit=limit,
             )
             return self._finalize_keyword_results(keyword_results, limit=limit)
@@ -93,6 +118,11 @@ class HybridSearchService:
             project_id=project_id,
             document_id=document_id,
             source_type=source_type,
+            document_types=document_types,
+            source_types=source_types,
+            date_from=date_from,
+            date_to=date_to,
+            tags=tags,
             hnsw_ef=hnsw_ef,
             query_embedding=query_embedding,
             include_embeddings=include_embeddings,
@@ -102,6 +132,7 @@ class HybridSearchService:
             project_id=project_id,
             document_id=document_id,
             source_type=source_type,
+            filters=filters,
             limit=limit * self.keyword_limit_multiplier,
         )
         return self._merge_results(semantic_results, keyword_results, limit=limit)
@@ -114,6 +145,11 @@ class HybridSearchService:
         project_id: Optional[str],
         document_id: Optional[str],
         source_type: Optional[str],
+        document_types: Optional[List[str]],
+        source_types: Optional[List[str]],
+        date_from: Optional[date],
+        date_to: Optional[date],
+        tags: Optional[List[str]],
         hnsw_ef: Optional[int],
         query_embedding: Optional[List[float]],
         include_embeddings: bool,
@@ -125,6 +161,11 @@ class HybridSearchService:
             project_id=project_id,
             document_id=document_id,
             source_type=source_type,
+            document_types=document_types,
+            source_types=source_types,
+            date_from=date_from,
+            date_to=date_to,
+            tags=tags,
             hnsw_ef=hnsw_ef,
             query_embedding=query_embedding,
             include_embeddings=include_embeddings,
@@ -146,6 +187,7 @@ class HybridSearchService:
         project_id: Optional[str],
         document_id: Optional[str],
         source_type: Optional[str],
+        filters: FacetFilters,
         limit: int,
     ) -> List[Dict[str, Any]]:
         """Execute PostgreSQL full-text search via SQLAlchemy."""
@@ -172,6 +214,7 @@ class HybridSearchService:
                 .limit(limit)
             )
 
+            stmt = self.faceted_service.apply_sql_filters(stmt, filters)
             project_uuid = self._coerce_uuid(project_id)
             document_uuid = self._coerce_uuid(document_id)
             if project_uuid:
@@ -196,7 +239,7 @@ class HybridSearchService:
                         "score": float(mapping["score"] or 0.0),
                     }
                 )
-            return results
+            return self.faceted_service.filter_chunks(results, filters)
         finally:
             session.close()
 

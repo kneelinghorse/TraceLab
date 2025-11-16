@@ -34,6 +34,11 @@ class _FakeQdrantService:
         ]
 
 
+class _StubFacetedService:
+    def filter_chunks(self, chunks, _filters):
+        return list(chunks)
+
+
 def test_retrieval_service_search(monkeypatch):
     fake_embedding = _FakeEmbeddingService()
     fake_qdrant = _FakeQdrantService()
@@ -44,7 +49,7 @@ def test_retrieval_service_search(monkeypatch):
         retrieval_module, "get_qdrant_service", lambda: fake_qdrant
     )
 
-    service = retrieval_module.RetrievalService()
+    service = retrieval_module.RetrievalService(faceted_service=_StubFacetedService())
     results = service.search(
         query="climate policy trends",
         top_k=3,
@@ -72,7 +77,7 @@ def test_retrieval_service_auto_hnsw(monkeypatch):
         retrieval_module, "get_qdrant_service", lambda: fake_qdrant
     )
 
-    service = retrieval_module.RetrievalService()
+    service = retrieval_module.RetrievalService(faceted_service=_StubFacetedService())
     results = service.search(
         query="what is the impact of hnsw tuning?",
         top_k=20,
@@ -90,7 +95,9 @@ def test_retrieval_api_endpoint(monkeypatch, auth_headers):
     fake_embedding = _FakeEmbeddingService()
     fake_qdrant = _FakeQdrantService()
     monkeypatch.setattr(
-        retrieval_router, "get_retrieval_service", lambda: retrieval_module.RetrievalService()
+        retrieval_router,
+        "get_retrieval_service",
+        lambda: retrieval_module.RetrievalService(faceted_service=_StubFacetedService()),
     )
     monkeypatch.setattr(
         retrieval_module, "get_embedding_service", lambda: fake_embedding

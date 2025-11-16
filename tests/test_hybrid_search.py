@@ -29,6 +29,14 @@ class _FakeRetrievalService:
         return [dict(item) for item in self._results]
 
 
+class _StubFacetedService:
+    def apply_sql_filters(self, stmt, _filters):
+        return stmt
+
+    def filter_chunks(self, chunks, _filters):
+        return list(chunks)
+
+
 def _keyword_payload(chunk_id: str, score: float) -> Dict[str, Any]:
     return {
         "chunk_id": chunk_id,
@@ -46,6 +54,7 @@ def test_semantic_mode_delegates_to_retriever(monkeypatch):
     service = hybrid_module.HybridSearchService(
         retrieval_service=fake_retrieval,
         session_factory=lambda: None,
+        faceted_service=_StubFacetedService(),
     )
 
     results = service.search(query="climate goals", top_k=2, search_mode="semantic", include_embeddings=True)
@@ -70,6 +79,7 @@ def test_keyword_mode_normalizes_scores(monkeypatch):
     service = hybrid_module.HybridSearchService(
         retrieval_service=fake_retrieval,
         session_factory=lambda: None,
+        faceted_service=_StubFacetedService(),
     )
 
     results = service.search(query="policy priorities", top_k=1, search_mode="keyword")
@@ -115,6 +125,7 @@ def test_hybrid_mode_merges_weighted_scores(monkeypatch):
     service = hybrid_module.HybridSearchService(
         retrieval_service=fake_retrieval,
         session_factory=lambda: None,
+        faceted_service=_StubFacetedService(),
     )
 
     results = service.search(query="hybrid scoring", top_k=2, search_mode="hybrid")
@@ -130,6 +141,7 @@ def test_invalid_mode_raises_value_error():
     service = hybrid_module.HybridSearchService(
         retrieval_service=fake_retrieval,
         session_factory=lambda: None,
+        faceted_service=_StubFacetedService(),
     )
 
     with pytest.raises(ValueError):
