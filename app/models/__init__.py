@@ -11,6 +11,7 @@ from app.models.processing_status import DocumentProcessingStatus
 from app.models.ingestion_job import IngestionJob
 from app.models.idempotency import IdempotencyRecord
 from app.models.search_history import SearchHistory
+from app.models.saved_search import SavedSearch
 
 __all__ = [
     "Base",
@@ -27,4 +28,5 @@ __all__ = [
     "IngestionJob",
     "IdempotencyRecord",
     "SearchHistory",
+    "SavedSearch",
 ]

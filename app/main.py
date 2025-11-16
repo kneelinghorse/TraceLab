@@ -23,6 +23,7 @@ from app.api.v1 import (
     retrieval,
     search,
     search_history,
+    saved_searches,
 )
 from app.core.config import settings
 from app.core.database import Base, engine
@@ -86,6 +87,12 @@ app.include_router(
     search_history.router,
     prefix=settings.api_v1_prefix,
     tags=["search-history"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    saved_searches.router,
+    prefix=settings.api_v1_prefix,
+    tags=["saved-searches"],
     dependencies=protected_dependencies,
 )
 app.include_router(facets.router, prefix=settings.api_v1_prefix, tags=["facets"], dependencies=protected_dependencies)
