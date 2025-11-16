@@ -99,3 +99,32 @@ export interface SearchQueryParams {
   temperature?: number;
   max_tokens?: number;
 }
+
+export interface SearchHistoryEntryPayload {
+  id: string;
+  query_text: string;
+  search_mode: string;
+  filters: Record<string, unknown>;
+  result_count: number;
+  top_k: number;
+  duration_ms?: number | null;
+  cache_hit: boolean;
+  user_label?: string | null;
+  metadata: Record<string, unknown>;
+  top_chunks: string[];
+  created_at: string;
+}
+
+export interface SearchHistoryResponse {
+  entries: SearchHistoryEntryPayload[];
+  retention: {
+    max_entries: number;
+    max_age_days: number;
+  };
+}
+
+export interface SearchReplayResponse {
+  entry: SearchHistoryEntryPayload;
+  rag: RagResponsePayload;
+  semantic: SemanticSearchResponse;
+}

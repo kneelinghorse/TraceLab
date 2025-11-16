@@ -22,6 +22,7 @@ from app.api.v1 import (
     redaction,
     retrieval,
     search,
+    search_history,
 )
 from app.core.config import settings
 from app.core.database import Base, engine
@@ -81,6 +82,12 @@ app.include_router(redaction.router, prefix=f"{settings.api_v1_prefix}/redaction
 app.include_router(documents.router, prefix=f"{settings.api_v1_prefix}/documents", tags=["documents"], dependencies=protected_dependencies)
 app.include_router(projects.router, prefix=f"{settings.api_v1_prefix}/projects", tags=["projects"], dependencies=protected_dependencies)
 app.include_router(search.router, prefix=settings.api_v1_prefix, tags=["search"], dependencies=protected_dependencies)
+app.include_router(
+    search_history.router,
+    prefix=settings.api_v1_prefix,
+    tags=["search-history"],
+    dependencies=protected_dependencies,
+)
 app.include_router(facets.router, prefix=settings.api_v1_prefix, tags=["facets"], dependencies=protected_dependencies)
 app.include_router(retrieval.router, prefix=f"{settings.api_v1_prefix}/retrieval", tags=["retrieval"], dependencies=protected_dependencies)
 app.include_router(missions.router, prefix=f"{settings.api_v1_prefix}/missions", tags=["missions"], dependencies=protected_dependencies)

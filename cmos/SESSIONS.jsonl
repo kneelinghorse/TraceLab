@@ -1,5 +1,3 @@
-{"ts": "2025-11-01T03:14:16.NZ", "agent": "Codex", "mission": "B1.9", "action": "start", "status": "in_progress", "summary": "Starting Qdrant latency optimization to reach <10ms p99 across query scenarios"}
-{"session_id": "template", "timestamp": "template", "type": "initialization", "summary": "PECMS Project Starter template initialized"}
 {"ts": "2025-10-08T16:20:35.058293+00:00", "mission": "B1.4", "status": "completed", "mission_run_id": "B1.4-20251008-001"}
 {"ts": "2025-10-31T16:45:48.067920Z", "agent": "Auto", "mission": "B1.1", "action": "start", "status": "in_progress", "summary": "Starting Core Service Bootstrap - FastAPI scaffold with PostgreSQL and Alembic"}
 {"ts": "2025-10-31T16:50:56.319057Z", "agent": "Auto", "mission": "B1.1", "action": "complete", "status": "completed", "summary": "Core Service Bootstrap completed - FastAPI scaffold with PostgreSQL schema, Alembic migrations, Docker Compose, and health checks", "next_hint": "B1.2: Synthetic Corpus Pipeline is now Current"}
@@ -18,6 +16,7 @@
 {"ts": "2025-11-01T02:44:11.414640Z", "agent": "Codex", "mission": "B1.8", "action": "start", "status": "in_progress", "summary": "Starting format coverage verification for all 5 priority document types"}
 {"ts": "2025-11-01T02:48:31.062568Z", "agent": "Codex", "mission": "B1.8", "action": "complete", "status": "completed", "summary": "Generated ingestion_format_coverage.json with 5/5 formats chunked and validated via sprint evaluator", "next_hint": "B1.9: Qdrant Latency Optimization promoted to Current"}
 {"ts": "2025-11-01T03:14:16.000000Z", "agent": "Codex", "mission": "B1.9", "action": "start", "status": "in_progress", "summary": "Re-logged mission start with corrected ISO timestamp"}
+{"ts": "2025-11-01T03:14:16.NZ", "agent": "Codex", "mission": "B1.9", "action": "start", "status": "in_progress", "summary": "Starting Qdrant latency optimization to reach <10ms p99 across query scenarios"}
 {"ts": "2025-11-01T03:16:51.039933Z", "agent": "Codex", "mission": "B1.9", "action": "complete", "status": "completed", "summary": "Adaptive hnsw_ef tiers cut Qdrant p99 latency below 10ms across top_k targets", "next_hint": "Queue Sprint 02 mission B2.1 when ready to begin RAG build-out"}
 {"ts": "2025-11-01T15:07:11.898620Z", "agent": "Codex", "mission": "B2.1", "action": "start", "status": "in_progress", "summary": "Beginning RAG query API implementation and validation"}
 {"ts": "2025-11-01T15:12:07.554158Z", "agent": "Codex", "mission": "B2.1", "action": "complete", "status": "completed", "summary": "Delivered RAG query API with GPT-4o-mini answers, citation parsing, and tests", "next_hint": "B2.2 promoted to Current for context compression pipeline work"}
@@ -114,3 +113,13 @@
 {"ts": "2025-11-15T06:33:15Z", "agent": "assistant", "mission": "B8.2", "action": "complete", "status": "completed", "summary": "Database query optimization changes added (indexes, query loading)", "next_hint": "B8.3 is now Current"}
 {"ts": "2025-11-15T15:25:48Z", "agent": "assistant", "mission": "B8.3", "action": "start", "status": "in_progress", "summary": "Starting B8.3 query caching work"}
 {"ts": "2025-11-15T15:42:14Z", "agent": "assistant", "mission": "B8.3", "action": "complete", "status": "completed", "summary": "Application-level caching implemented with telemetry + APIs", "next_hint": "B8.4 is now Current"}
+{"ts": "2025-11-15T16:32:12Z", "agent": "codex", "mission": "B8.5", "action": "start", "status": "in_progress", "summary": "Kick off cost monitoring dashboard implementation"}
+{"ts": "2025-11-15T16:45:47Z", "agent": "codex", "mission": "B8.5", "action": "complete", "status": "completed", "summary": "Delivered /admin/dashboard experience with live metrics and exports", "next_hint": "Consider wiring frontend link once sprint 09 search UI ships."}
+{"ts": "2025-11-15T20:25:53Z", "agent": "codex", "mission": "B8.6", "action": "start", "status": "in_progress", "summary": "Starting Sprint 08 retrospective documentation"}
+{"ts": "2025-11-15T20:41:00Z", "agent": "assistant", "mission": "B8.6", "action": "complete", "status": "completed", "summary": "Sprint 08 retrospective + metrics docs delivered with telemetry + dashboard evidence", "next_hint": "B9.1 Hybrid Search Backend is ready to start."}
+{"ts": "2025-11-15T22:49:31Z", "agent": "codex", "mission": "B9.1", "action": "start", "status": "in_progress", "summary": "Kicking off hybrid search backend work"}
+{"ts": "2025-11-15T23:28:43Z", "agent": "codex", "mission": "B9.1", "action": "complete", "status": "completed", "summary": "Hybrid search backend shipped with weighted semantic+keyword retrieval", "next_hint": "B9.2 is now Current"}
+{"ts": "2025-11-16T00:00:51Z", "agent": "assistant", "mission": "B9.2", "action": "start", "status": "in_progress", "summary": "Starting faceted search backend implementation"}
+{"ts": "2025-11-16T00:21:53Z", "agent": "assistant", "mission": "B9.2", "action": "complete", "status": "completed", "summary": "Faceted search backend, facets API, and filter-aware caching delivered", "next_hint": "B9.4 is now Current"}
+{"ts": "2025-11-16T00:51:36Z", "agent": "assistant", "mission": "B9.4", "action": "start", "status": "in_progress", "summary": "Implementing search history backend + UI logging"}
+{"session_id": "template", "timestamp": "template", "type": "initialization", "summary": "PECMS Project Starter template initialized"}
