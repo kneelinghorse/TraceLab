@@ -13,11 +13,11 @@
   },
   "working_memory": {
     "active_domain": "starter",
-    "session_count": 95,
-    "last_session": "2025-11-15T16:14:37Z",
+    "session_count": 104,
+    "last_session": "2025-11-16T00:51:36Z",
     "agents_md_path": "./agents.md",
     "agents_md_loaded": false,
-    "active_mission": null,
+    "active_mission": "B9.4",
     "domains": {
       "starter": {
         "status": "planning",
@@ -41,69 +41,6 @@
       }
     },
     "session_history": [
-      {
-        "mission": "B6.4a",
-        "agent": "assistant",
-        "summary": "Frontend API base URL corrected",
-        "action": "complete",
-        "ts": "2025-11-11T00:02:38Z"
-      },
-      {
-        "mission": "B6.4b",
-        "agent": "assistant",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-11T00:20:58Z"
-      },
-      {
-        "mission": "B6.4b",
-        "agent": "codex",
-        "summary": "Local dev environment documented and scripted",
-        "action": "complete",
-        "ts": "2025-11-11T00:32:32Z"
-      },
-      {
-        "mission": "B6.4c",
-        "agent": "codex",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-11T05:39:06Z"
-      },
-      {
-        "mission": "B6.4c",
-        "agent": "codex",
-        "summary": "Auth docs + coverage delivered",
-        "action": "complete",
-        "ts": "2025-11-11T05:48:21Z"
-      },
-      {
-        "mission": "B6.4d",
-        "agent": "codex",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-11T06:27:53Z"
-      },
-      {
-        "mission": "B6.4d",
-        "agent": "codex",
-        "summary": "Pre-flight guardrails + telemetry review for Protocol Engine session",
-        "action": "complete",
-        "ts": "2025-11-11T06:30:33Z"
-      },
-      {
-        "mission": "B6.5",
-        "agent": "assistant",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-11T15:18:35Z"
-      },
-      {
-        "mission": "B6.5",
-        "agent": "assistant",
-        "summary": "Multi-format report exports delivered",
-        "action": "complete",
-        "ts": "2025-11-11T15:51:12Z"
-      },
       {
         "mission": "B6.7",
         "agent": "assistant",
@@ -404,12 +341,75 @@
         "summary": "Qdrant tuning endpoints, parameter sweep tooling, and docs shipped",
         "action": "complete",
         "ts": "2025-11-15T16:14:37Z"
+      },
+      {
+        "mission": "B8.5",
+        "agent": "codex",
+        "summary": "Kick off cost monitoring dashboard implementation",
+        "action": "start",
+        "ts": "2025-11-15T16:32:12Z"
+      },
+      {
+        "mission": "B8.5",
+        "agent": "codex",
+        "summary": "Delivered /admin/dashboard experience with live metrics and exports",
+        "action": "complete",
+        "ts": "2025-11-15T16:45:47Z"
+      },
+      {
+        "mission": "B8.6",
+        "agent": "codex",
+        "summary": "Starting Sprint 08 retrospective documentation",
+        "action": "start",
+        "ts": "2025-11-15T20:25:53Z"
+      },
+      {
+        "mission": "B8.6",
+        "agent": "assistant",
+        "summary": "Sprint 08 retrospective + metrics docs delivered with telemetry + dashboard evidence",
+        "action": "complete",
+        "ts": "2025-11-15T20:41:00Z"
+      },
+      {
+        "mission": "B9.1",
+        "agent": "codex",
+        "summary": "Kicking off hybrid search backend work",
+        "action": "start",
+        "ts": "2025-11-15T22:49:31Z"
+      },
+      {
+        "mission": "B9.1",
+        "agent": "codex",
+        "summary": "Hybrid search backend shipped with weighted semantic+keyword retrieval",
+        "action": "complete",
+        "ts": "2025-11-15T23:28:43Z"
+      },
+      {
+        "mission": "B9.2",
+        "agent": "assistant",
+        "summary": "Starting faceted search backend implementation",
+        "action": "start",
+        "ts": "2025-11-16T00:00:51Z"
+      },
+      {
+        "mission": "B9.2",
+        "agent": "assistant",
+        "summary": "Faceted search backend, facets API, and filter-aware caching delivered",
+        "action": "complete",
+        "ts": "2025-11-16T00:21:53Z"
+      },
+      {
+        "mission": "B9.4",
+        "agent": "assistant",
+        "summary": "Implementing search history backend + UI logging",
+        "action": "start",
+        "ts": "2025-11-16T00:51:36Z"
       }
     ],
     "blocked_missions": [
       "B6.3"
     ],
-    "last_completed_mission": "B8.4",
+    "last_completed_mission": "B9.2",
     "last_blocked_mission": "B6.3",
     "recent_sessions": [
       {
@@ -465,12 +465,12 @@
     }
   },
   "context_health": {
-    "size_kb": 11.92,
+    "size_kb": 12.12,
     "size_limit_kb": 100,
-    "sessions_since_reset": 77,
+    "sessions_since_reset": 86,
     "last_reset": "",
     "compression_enabled": false,
-    "last_update": "2025-11-15T16:14:37Z"
+    "last_update": "2025-11-16T00:51:36Z"
   },
   "metadata": {
     "migrated_at": "2025-11-15T16:19:59.619425+00:00",

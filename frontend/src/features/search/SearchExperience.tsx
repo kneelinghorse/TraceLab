@@ -17,16 +17,12 @@ import { updateMission } from "@/lib/api/missions";
 import { useMissionList } from "@/lib/hooks/useMissions";
 import type { Document, Project } from "@/types/document";
 import type { Mission } from "@/types/mission";
-import type { RagCitation, RagResponsePayload, SearchResultChunk } from "@/types/search";
-
-const HISTORY_KEY = "tracelab.search.history";
-
-type SearchHistoryEntry = SearchFiltersState & {
-  id: string;
-  query: string;
-  timestamp: string;
-  topK: number;
-};
+import type {
+  RagCitation,
+  RagResponsePayload,
+  SearchHistoryEntryPayload,
+  SearchResultChunk,
+} from "@/types/search";
 
 type SearchPageProps = {
   initialSection?: "search" | "results";
@@ -65,7 +61,6 @@ function SearchExperience({ initialSection }: SearchPageProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [ragError, setRagError] = useState<string | null>(null);
-  const [history, setHistory] = useState<SearchHistoryEntry[]>([]);
   const [highlightedChunkId, setHighlightedChunkId] = useState<string | null>(null);
 
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -86,19 +81,8 @@ function SearchExperience({ initialSection }: SearchPageProps) {
       }),
   );
   const documents = documentResponse?.data ?? [];
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const stored = window.localStorage.getItem(HISTORY_KEY);
-      if (stored) {
-        const parsed: SearchHistoryEntry[] = JSON.parse(stored);
-        setHistory(parsed);
-      }
-    } catch {
-      // ignore history parse issues
-    }
-  }, []);
+  const { data: historyResponse, mutate: mutateHistory } = useSWR(["search-history"], () => searchApi.history());
+  const historyEntries = historyResponse?.entries ?? [];
 
   useEffect(() => {
     if (initialSection === "results") {
@@ -127,6 +111,22 @@ function SearchExperience({ initialSection }: SearchPageProps) {
     return Array.from(unique).sort((a, b) => a.localeCompare(b));
   }, [documents]);
 
+  const extractHistoryFilters = useCallback((entry: SearchHistoryEntryPayload): SearchFiltersState => {
+    const source = entry.filters ?? {};
+
+    const pick = (key: string): string => {
+      const value = source[key];
+      return typeof value === "string" ? value : "";
+    };
+
+    return {
+      projectId: pick("project_id"),
+      documentType: pick("source_type"),
+      startDate: pick("date_from"),
+      endDate: pick("date_to"),
+    };
+  }, []);
+
   const filteredResults = useMemo(() => {
     return semanticResults.filter((result) => {
       const doc = result.document_id ? documentIndex.get(result.document_id) : undefined;
@@ -154,19 +154,6 @@ function SearchExperience({ initialSection }: SearchPageProps) {
     });
   }, [semanticResults, documentIndex, filters.documentType, filters.startDate, filters.endDate]);
 
-  const persistHistoryEntry = useCallback((entry: Omit<SearchHistoryEntry, "id">) => {
-    setHistory((previous) => {
-      const identifier = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
-      const resolved = { ...entry, id: identifier } satisfies SearchHistoryEntry;
-      const filtered = previous.filter((item) => !(item.query === entry.query && item.projectId === entry.projectId && item.documentType === entry.documentType && item.startDate === entry.startDate && item.endDate === entry.endDate));
-      const next = [resolved, ...filtered].slice(0, 10);
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
-      }
-      return next;
-    });
-  }, []);
-
   const handleFiltersChange = (update: Partial<SearchFiltersState>) => {
     setFilters((current) => {
       const next = { ...current, ...update };
@@ -178,7 +165,7 @@ function SearchExperience({ initialSection }: SearchPageProps) {
   };
 
   const executeSearch = useCallback(
-    async (override?: Partial<SearchHistoryEntry>) => {
+    async (override?: Partial<SearchFiltersState & { query: string; topK: number }>) => {
       const queryText = (override?.query ?? query).trim();
       if (!queryText) {
         setSearchError("Enter a query to run search.");
@@ -225,38 +212,47 @@ function SearchExperience({ initialSection }: SearchPageProps) {
           setRagPayload(null);
         }
 
-        persistHistoryEntry({
-          query: queryText,
-          projectId,
-          documentType,
-          startDate: fromDate,
-          endDate: toDate,
-          timestamp: new Date().toISOString(),
-          topK: limit,
-        });
+        void mutateHistory();
       } finally {
         setIsSearching(false);
       }
     },
-    [filters.documentType, filters.endDate, filters.projectId, filters.startDate, persistHistoryEntry, query, topK],
+    [filters.documentType, filters.endDate, filters.projectId, filters.startDate, mutateHistory, query, topK],
   );
 
-  const handleHistoryRun = (entry: SearchHistoryEntry) => {
-    setQuery(entry.query);
-    setTopK(entry.topK);
-    setFilters({
-      projectId: entry.projectId,
-      documentType: entry.documentType,
-      startDate: entry.startDate,
-      endDate: entry.endDate,
-    });
-    executeSearch(entry);
+  const handleHistoryRun = async (entry: SearchHistoryEntryPayload) => {
+    const nextFilters = extractHistoryFilters(entry);
+    setQuery(entry.query_text);
+    setTopK(entry.top_k);
+    setFilters(nextFilters);
+    setIsSearching(true);
+    setSearchError(null);
+    setRagError(null);
+    setHighlightedChunkId(null);
+
+    try {
+      const payload = await searchApi.replay(entry.id);
+      setSemanticResults(payload.semantic.results ?? []);
+      setRagPayload(payload.rag);
+      setRagError(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Replay failed.";
+      setSearchError(message);
+      setSemanticResults([]);
+      setRagPayload(null);
+    } finally {
+      setIsSearching(false);
+      void mutateHistory();
+    }
   };
 
-  const clearHistory = () => {
-    setHistory([]);
-    if (typeof window !== "undefined") {
-      window.localStorage.removeItem(HISTORY_KEY);
+  const clearHistory = async () => {
+    try {
+      await searchApi.clearHistory();
+      await mutateHistory();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to clear history.";
+      setSearchError(message);
     }
   };
 
@@ -318,7 +314,7 @@ function SearchExperience({ initialSection }: SearchPageProps) {
   const searchStats = [
     { label: "Projects", value: projects.length },
     { label: "Documents", value: documents.length },
-    { label: "Queries this session", value: history.length },
+    { label: "Queries this session", value: historyEntries.length },
   ];
 
   return (
@@ -437,43 +433,46 @@ function SearchExperience({ initialSection }: SearchPageProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Query history</p>
-              <h3 className="text-2xl font-semibold text-white">Local session</h3>
+              <h3 className="text-2xl font-semibold text-white">Recent searches</h3>
             </div>
-            {history.length > 0 && (
-              <button onClick={clearHistory} className="text-sm text-slate-300 hover:text-white">
+            {historyEntries.length > 0 && (
+              <button onClick={() => void clearHistory()} className="text-sm text-slate-300 hover:text-white">
                 Clear history
               </button>
             )}
           </div>
-          {history.length === 0 ? (
+          {historyEntries.length === 0 ? (
             <p className="mt-4 text-sm text-slate-400">No previous queries stored.</p>
           ) : (
             <ul className="mt-4 space-y-3">
-              {history.map((entry) => (
-                <li key={entry.id} className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                      <p className="text-sm text-white">{entry.query}</p>
-                      <p className="text-xs text-slate-400">
-                        {formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true })}
-                      </p>
+              {historyEntries.map((entry) => {
+                const entryFilters = extractHistoryFilters(entry);
+                return (
+                  <li key={entry.id} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <p className="text-sm text-white">{entry.query_text}</p>
+                        <p className="text-xs text-slate-400">
+                          {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => void handleHistoryRun(entry)}
+                        className="rounded-full border border-white/20 px-3 py-1 text-xs text-slate-200 hover:border-sky-300"
+                      >
+                        Replay
+                      </button>
                     </div>
-                    <button
-                      onClick={() => handleHistoryRun(entry)}
-                      className="rounded-full border border-white/20 px-3 py-1 text-xs text-slate-200 hover:border-sky-300"
-                    >
-                      Run again
-                    </button>
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-400">
-                    {entry.projectId && <span>Project {entry.projectId}</span>}
-                    {entry.documentType && <span>Type {entry.documentType}</span>}
-                    {entry.startDate && <span>From {entry.startDate}</span>}
-                    {entry.endDate && <span>To {entry.endDate}</span>}
-                    <span>Top K {entry.topK}</span>
-                  </div>
-                </li>
-              ))}
+                    <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-400">
+                      {entryFilters.projectId && <span>Project {entryFilters.projectId}</span>}
+                      {entryFilters.documentType && <span>Type {entryFilters.documentType}</span>}
+                      {entryFilters.startDate && <span>From {entryFilters.startDate}</span>}
+                      {entryFilters.endDate && <span>To {entryFilters.endDate}</span>}
+                      <span>Top K {entry.top_k}</span>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
