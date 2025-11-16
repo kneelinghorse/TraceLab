@@ -60,7 +60,8 @@ export function SaveSearchButton({
       topK: topKValue,
       suggestedName: source?.suggestedName,
     });
-    setName(source?.suggestedName ?? query.slice(0, 80) || "Saved search");
+    const defaultName = query.slice(0, 80) || "Saved search";
+    setName(source?.suggestedName ?? defaultName);
     setDescription("");
     setError(null);
     setIsOpen(true);
