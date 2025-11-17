@@ -1,0 +1,198 @@
+"""Tests for PEDR quality-aware search scoring."""
+from __future__ import annotations
+
+from typing import Any, Dict, List
+
+import pytest
+
+from app.services.pedr import QualityFilters, QualityScoringService
+
+
+class _RecordingLoader:
+    def __init__(self, mapping: Dict[str, Dict[str, Any]]):
+        self.mapping = mapping
+        self.calls: List[List[str]] = []
+
+    def __call__(self, document_ids):
+        normalized = [str(doc_id) for doc_id in document_ids]
+        self.calls.append(normalized)
+        return {doc_id: self.mapping[doc_id] for doc_id in normalized if doc_id in self.mapping}
+
+
+def _metadata(*, status: str, passed_gates: int, validated: bool = False, pii: bool = False) -> Dict[str, Any]:
+    gates: Dict[str, Dict[str, Any]] = {}
+    for index, gate in enumerate(QualityScoringService.EXPECTED_GATES):
+        gates[gate] = {
+            "status": "pass" if index < passed_gates else "pending",
+            "validated": validated if index < passed_gates else False,
+        }
+    mission_data = {"tags": ["pii"]} if pii else {}
+    if pii:
+        mission_data["governance"] = {"piiHandling": True}
+    return {
+        "mission_id": f"{status}-mission",
+        "status": status,
+        "quality_gates": gates,
+        "mission_data": mission_data,
+    }
+
+
+def test_complete_mission_scores_higher_than_draft():
+    loader = _RecordingLoader(
+        {
+            "doc-complete": _metadata(status="complete", passed_gates=5, validated=True),
+            "doc-draft": _metadata(status="draft", passed_gates=2),
+        }
+    )
+    service = QualityScoringService(metadata_loader=loader)
+
+    results = service.apply(
+        [
+            {"document_id": "doc-complete", "combined_score": 0.8},
+            {"document_id": "doc-draft", "combined_score": 0.8},
+        ],
+        filters=QualityFilters(),
+    )
+
+    complete = next(item for item in results if item["document_id"] == "doc-complete")
+    draft = next(item for item in results if item["document_id"] == "doc-draft")
+    assert complete["quality_score"] > draft["quality_score"]
+
+
+def test_validation_boost_adds_to_final_score():
+    loader = _RecordingLoader(
+        {"doc-review": _metadata(status="review", passed_gates=5, validated=True)}
+    )
+    service = QualityScoringService(metadata_loader=loader)
+
+    result = service.apply(
+        [{"document_id": "doc-review", "combined_score": 0.5}],
+        filters=QualityFilters(),
+    )[0]
+
+    assert result["quality_boost"] == pytest.approx(0.15, rel=1e-3)
+    assert result["quality_score"] == pytest.approx(1.15, rel=1e-3)
+
+
+def test_default_score_used_when_metadata_missing():
+    loader = _RecordingLoader({})
+    service = QualityScoringService(metadata_loader=loader)
+
+    result = service.apply(
+        [{"document_id": "doc-missing", "combined_score": 1.0}],
+        filters=QualityFilters(),
+    )[0]
+
+    assert result["quality_score"] == pytest.approx(QualityScoringService.DEFAULT_BASE_SCORE, rel=1e-3)
+
+
+def test_min_quality_gates_filter():
+    loader = _RecordingLoader(
+        {
+            "doc-strong": _metadata(status="complete", passed_gates=5, validated=True),
+            "doc-weak": _metadata(status="review", passed_gates=2),
+        }
+    )
+    service = QualityScoringService(metadata_loader=loader)
+
+    results = service.apply(
+        [
+            {"document_id": "doc-strong", "combined_score": 0.5},
+            {"document_id": "doc-weak", "combined_score": 0.5},
+        ],
+        filters=QualityFilters(min_quality_gates=4),
+    )
+
+    assert len(results) == 1
+    assert results[0]["document_id"] == "doc-strong"
+
+
+def test_status_filter():
+    loader = _RecordingLoader(
+        {
+            "doc-complete": _metadata(status="complete", passed_gates=5),
+            "doc-draft": _metadata(status="draft", passed_gates=5),
+        }
+    )
+    service = QualityScoringService(metadata_loader=loader)
+
+    results = service.apply(
+        [
+            {"document_id": "doc-complete", "combined_score": 0.5},
+            {"document_id": "doc-draft", "combined_score": 0.5},
+        ],
+        filters=QualityFilters(statuses=("complete",)),
+    )
+
+    assert len(results) == 1
+    assert results[0]["document_id"] == "doc-complete"
+
+
+def test_allow_pii_filter():
+    loader = _RecordingLoader(
+        {
+            "doc-safe": _metadata(status="complete", passed_gates=5),
+            "doc-pii": _metadata(status="complete", passed_gates=5, pii=True),
+        }
+    )
+    service = QualityScoringService(metadata_loader=loader)
+
+    results = service.apply(
+        [
+            {"document_id": "doc-safe", "combined_score": 0.5},
+            {"document_id": "doc-pii", "combined_score": 0.5},
+        ],
+        filters=QualityFilters(allow_pii=False),
+    )
+
+    assert len(results) == 1
+    assert results[0]["document_id"] == "doc-safe"
+
+
+def test_combined_score_scaled_by_quality():
+    loader = _RecordingLoader({"doc-scale": _metadata(status="complete", passed_gates=5)})
+    service = QualityScoringService(metadata_loader=loader)
+
+    result = service.apply(
+        [{"document_id": "doc-scale", "combined_score": 0.4}],
+        filters=QualityFilters(),
+    )[0]
+
+    assert result["combined_score"] > 0.4
+    assert result["score"] == result["combined_score"]
+
+
+def test_documents_without_id_preserve_default_quality():
+    loader = _RecordingLoader({})
+    service = QualityScoringService(metadata_loader=loader)
+
+    result = service.apply(
+        [{"document_id": None, "combined_score": 0.3}],
+        filters=QualityFilters(),
+    )[0]
+
+    assert result["quality_score"] == pytest.approx(QualityScoringService.DEFAULT_BASE_SCORE, rel=1e-3)
+
+
+def test_metadata_loader_receives_document_ids():
+    loader = _RecordingLoader({"doc-one": _metadata(status="draft", passed_gates=1)})
+    service = QualityScoringService(metadata_loader=loader)
+
+    service.apply(
+        [{"document_id": "doc-one", "combined_score": 0.2}],
+        filters=QualityFilters(),
+    )
+
+    assert loader.calls == [["doc-one"]]
+
+
+def test_in_progress_status_receives_small_boost():
+    loader = _RecordingLoader({"doc-progress": _metadata(status="in_progress", passed_gates=3)})
+    service = QualityScoringService(metadata_loader=loader)
+
+    result = service.apply(
+        [{"document_id": "doc-progress", "combined_score": 0.2}],
+        filters=QualityFilters(),
+    )[0]
+
+    assert result["quality_boost"] == pytest.approx(0.05, rel=1e-3)

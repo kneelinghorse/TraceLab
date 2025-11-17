@@ -44,6 +44,9 @@ async def run_rag_search(
         temperature=payload.temperature,
         max_tokens=payload.max_tokens,
         search_mode=payload.search_mode,
+        min_quality_gates=payload.min_quality_gates,
+        status_filters=payload.status,
+        allow_pii=payload.allow_pii,
     )
     response = RagResponse.model_validate(result)
     _log_search_history(
@@ -72,6 +75,9 @@ def _log_search_history(
         "tags": payload.tags or [],
         "date_from": payload.date_from.isoformat() if payload.date_from else None,
         "date_to": payload.date_to.isoformat() if payload.date_to else None,
+        "min_quality_gates": payload.min_quality_gates,
+        "status": payload.status or [],
+        "allow_pii": payload.allow_pii,
     }
     cache = (
         response.cache.model_dump()

@@ -38,6 +38,20 @@ class RetrievalQuery(BaseModel):
         le=512,
         description="Optional HNSW ef override; defaults to tuned mission latency tiers."
     )
+    min_quality_gates: Optional[int] = Field(
+        default=None,
+        ge=0,
+        le=5,
+        description="Minimum number of passing quality gates required for a mission.",
+    )
+    status: Optional[List[str]] = Field(
+        default=None,
+        description="Allowed mission statuses (draft, in_progress, review, complete).",
+    )
+    allow_pii: Optional[bool] = Field(
+        default=True,
+        description="When False, exclude missions flagged for PII handling.",
+    )
 
 
 class RetrievedChunk(BaseModel):
@@ -52,6 +66,15 @@ class RetrievedChunk(BaseModel):
     collection_date: Optional[date] = None
     tags: Optional[List[str]] = None
     score: float
+    quality_score: Optional[float] = None
+    quality_base_score: Optional[float] = None
+    quality_boost: Optional[float] = None
+    quality_status: Optional[str] = None
+    quality_gates_passed: Optional[int] = None
+    quality_gates_total: Optional[int] = None
+    quality_validated: Optional[bool] = None
+    quality_mission_id: Optional[str] = None
+    quality_pii_flagged: Optional[bool] = None
 
 
 class RetrievalResponse(BaseModel):
