@@ -37,6 +37,24 @@ class _StubFacetedService:
         return list(chunks)
 
 
+class _IdentityQualityService:
+    def apply(self, results, *, filters=None):
+        annotated = []
+        for entry in results:
+            payload = dict(entry)
+            payload.setdefault("quality_score", 1.0)
+            payload.setdefault("quality_base_score", 1.0)
+            payload.setdefault("quality_boost", 0.0)
+            payload.setdefault("quality_status", "unknown")
+            payload.setdefault("quality_gates_passed", 0)
+            payload.setdefault("quality_gates_total", 0)
+            payload.setdefault("quality_validated", False)
+            payload.setdefault("quality_mission_id", None)
+            payload.setdefault("quality_pii_flagged", False)
+            annotated.append(payload)
+        return annotated
+
+
 def _keyword_payload(chunk_id: str, score: float) -> Dict[str, Any]:
     return {
         "chunk_id": chunk_id,
@@ -55,6 +73,7 @@ def test_semantic_mode_delegates_to_retriever(monkeypatch):
         retrieval_service=fake_retrieval,
         session_factory=lambda: None,
         faceted_service=_StubFacetedService(),
+        quality_service=_IdentityQualityService(),
     )
 
     results = service.search(query="climate goals", top_k=2, search_mode="semantic", include_embeddings=True)
@@ -80,6 +99,7 @@ def test_keyword_mode_normalizes_scores(monkeypatch):
         retrieval_service=fake_retrieval,
         session_factory=lambda: None,
         faceted_service=_StubFacetedService(),
+        quality_service=_IdentityQualityService(),
     )
 
     results = service.search(query="policy priorities", top_k=1, search_mode="keyword")
@@ -126,6 +146,7 @@ def test_hybrid_mode_merges_weighted_scores(monkeypatch):
         retrieval_service=fake_retrieval,
         session_factory=lambda: None,
         faceted_service=_StubFacetedService(),
+        quality_service=_IdentityQualityService(),
     )
 
     results = service.search(query="hybrid scoring", top_k=2, search_mode="hybrid")
@@ -142,6 +163,7 @@ def test_invalid_mode_raises_value_error():
         retrieval_service=fake_retrieval,
         session_factory=lambda: None,
         faceted_service=_StubFacetedService(),
+        quality_service=_IdentityQualityService(),
     )
 
     with pytest.raises(ValueError):

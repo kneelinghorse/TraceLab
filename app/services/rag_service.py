@@ -124,6 +124,9 @@ class RagService:
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
         search_mode: str = "semantic",
+        min_quality_gates: Optional[int] = None,
+        status_filters: Optional[List[str]] = None,
+        allow_pii: Optional[bool] = True,
     ) -> Dict[str, Any]:
         """
         Execute a full RAG workflow: retrieve context and synthesize an answer.
@@ -148,6 +151,11 @@ class RagService:
             max_tokens=max_tokens,
             search_mode=normalized_mode,
             filters_signature=filters.signature(),
+            quality_signature=self._quality_filter_signature(
+                min_quality_gates=min_quality_gates,
+                statuses=status_filters,
+                allow_pii=allow_pii,
+            ),
         )
         start = time.perf_counter()
 
@@ -167,6 +175,9 @@ class RagService:
                 temperature=temperature,
                 max_tokens=max_tokens,
                 search_mode=normalized_mode,
+                min_quality_gates=min_quality_gates,
+                status_filters=status_filters,
+                allow_pii=allow_pii,
             )
 
         result, hit = self.cache_manager.cached_value("rag_query_results", cache_key, _loader)
@@ -205,6 +216,9 @@ class RagService:
         temperature: Optional[float],
         max_tokens: Optional[int],
         search_mode: str,
+        min_quality_gates: Optional[int],
+        status_filters: Optional[List[str]],
+        allow_pii: Optional[bool],
     ) -> Dict[str, Any]:
         start = time.perf_counter()
         normalized_mode = (search_mode or "semantic").strip().lower()
@@ -232,6 +246,9 @@ class RagService:
                 date_from=date_from,
                 date_to=date_to,
             ).signature(),
+            "min_quality_gates": min_quality_gates,
+            "status_filters": list(status_filters or []),
+            "allow_pii": allow_pii if allow_pii is not None else True,
         }
 
         if self.cache_service is not None:
@@ -269,6 +286,9 @@ class RagService:
             hnsw_ef=hnsw_ef,
             query_embedding=query_embedding,
             include_embeddings=True,
+            min_quality_gates=min_quality_gates,
+            status_filters=status_filters,
+            allow_pii=allow_pii,
         )
 
         compressed_chunks, compression_metrics = compress_context(
@@ -326,6 +346,38 @@ class RagService:
         )
         routing_details["estimated_cost_usd"] = round(total_cost, 6)
         return result
+
+    @staticmethod
+    def _quality_filter_signature(
+        *,
+        min_quality_gates: Optional[int],
+        statuses: Optional[List[str]],
+        allow_pii: Optional[bool],
+    ) -> str:
+        """Generate a cache-friendly signature for governance filters."""
+        if min_quality_gates is None:
+            gates_token = "*"
+        else:
+            try:
+                value = int(min_quality_gates)
+            except (TypeError, ValueError):
+                value = 0
+            gates_token = str(max(0, min(5, value)))
+
+        if statuses:
+            normalized = sorted(
+                {
+                    str(status).strip().lower()
+                    for status in statuses
+                    if isinstance(status, str) and status.strip()
+                }
+            )
+            status_token = ",".join(normalized) if normalized else "*"
+        else:
+            status_token = "*"
+
+        pii_token = "no_pii" if allow_pii is False else "any"
+        return "|".join([gates_token, status_token, pii_token])
 
     def _build_messages(self, query: str, chunks: List[Dict[str, Any]]) -> List[Dict[str, str]]:
         """Compose chat messages incorporating retrieved context."""

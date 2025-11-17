@@ -13,6 +13,7 @@ from app.core.database import SessionLocal
 from app.models.chunk import DocumentChunk
 from app.models.document import Document
 from app.services.faceted_search import FacetFilters, FacetedSearchService
+from app.services.pedr import QualityFilters, QualityScoringService, get_quality_scoring_service
 from app.services.retrieval_service import RetrievalService, get_retrieval_service
 
 
@@ -34,6 +35,7 @@ class HybridSearchService:
         keyword_language: Optional[str] = None,
         keyword_limit_multiplier: Optional[int] = None,
         faceted_service: Optional[FacetedSearchService] = None,
+        quality_service: Optional[QualityScoringService] = None,
     ) -> None:
         self.retrieval_service = retrieval_service or get_retrieval_service()
         self.session_factory = session_factory
@@ -48,6 +50,7 @@ class HybridSearchService:
         multiplier = keyword_limit_multiplier or settings.hybrid_search_result_multiplier
         self.keyword_limit_multiplier = multiplier if multiplier and multiplier > 0 else 1
         self.faceted_service = faceted_service or FacetedSearchService(session_factory=session_factory)
+        self.quality_service = quality_service or get_quality_scoring_service()
 
     def search(
         self,
@@ -66,6 +69,9 @@ class HybridSearchService:
         hnsw_ef: Optional[int] = None,
         query_embedding: Optional[List[float]] = None,
         include_embeddings: bool = False,
+        min_quality_gates: Optional[int] = None,
+        status_filters: Optional[List[str]] = None,
+        allow_pii: Optional[bool] = None,
     ) -> List[Dict[str, Any]]:
         """Execute the requested search mode and return ranked chunks."""
         normalized_mode = (search_mode or "semantic").strip().lower()
@@ -74,7 +80,7 @@ class HybridSearchService:
 
         limit = max(1, int(top_k))
 
-        filters = FacetFilters.from_kwargs(
+        facet_filters = FacetFilters.from_kwargs(
             project_id=project_id,
             document_types=document_types,
             source_types=source_types,
@@ -83,9 +89,14 @@ class HybridSearchService:
             date_from=date_from,
             date_to=date_to,
         )
+        quality_filters = QualityFilters(
+            min_quality_gates=min_quality_gates,
+            statuses=tuple(status_filters or ()),
+            allow_pii=allow_pii,
+        )
 
         if normalized_mode == "semantic":
-            return self._semantic_only(
+            semantic_only = self._semantic_only(
                 query=query,
                 top_k=limit,
                 project_id=project_id,
@@ -100,6 +111,7 @@ class HybridSearchService:
                 query_embedding=query_embedding,
                 include_embeddings=include_embeddings,
             )
+            return self._apply_quality_scoring(semantic_only, limit=limit, quality_filters=quality_filters)
 
         if normalized_mode == "keyword":
             keyword_results = self._keyword_search(
@@ -107,10 +119,11 @@ class HybridSearchService:
                 project_id=project_id,
                 document_id=document_id,
                 source_type=source_type,
-                filters=filters,
+                filters=facet_filters,
                 limit=limit,
             )
-            return self._finalize_keyword_results(keyword_results, limit=limit)
+            finalized = self._finalize_keyword_results(keyword_results, limit=limit)
+            return self._apply_quality_scoring(finalized, limit=limit, quality_filters=quality_filters)
 
         semantic_results = self.retrieval_service.search(
             query=query,
@@ -132,10 +145,11 @@ class HybridSearchService:
             project_id=project_id,
             document_id=document_id,
             source_type=source_type,
-            filters=filters,
+            filters=facet_filters,
             limit=limit * self.keyword_limit_multiplier,
         )
-        return self._merge_results(semantic_results, keyword_results, limit=limit)
+        merged = self._merge_results(semantic_results, keyword_results, limit=limit)
+        return self._apply_quality_scoring(merged, limit=limit, quality_filters=quality_filters)
 
     def _semantic_only(
         self,
@@ -299,8 +313,25 @@ class HybridSearchService:
             entry["search_mode"] = "keyword"
             combined[chunk_id] = entry
 
-        ranked = sorted(
+        return sorted(
             combined.values(),
+            key=lambda item: float(item.get("combined_score") or 0.0),
+            reverse=True,
+        )
+
+    def _apply_quality_scoring(
+        self,
+        results: List[Dict[str, Any]],
+        *,
+        limit: int,
+        quality_filters: QualityFilters,
+    ) -> List[Dict[str, Any]]:
+        """Annotate and re-rank results with PEDR quality metadata."""
+        if not results or self.quality_service is None:
+            return results[:limit]
+        annotated = self.quality_service.apply(results, filters=quality_filters)
+        ranked = sorted(
+            annotated,
             key=lambda item: float(item.get("combined_score") or 0.0),
             reverse=True,
         )

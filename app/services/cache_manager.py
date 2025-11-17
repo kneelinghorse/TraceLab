@@ -105,6 +105,7 @@ class CacheManager:
         max_tokens: Optional[int],
         search_mode: str,
         filters_signature: Optional[str] = None,
+        quality_signature: Optional[str] = None,
     ) -> Tuple[Any, ...]:
         return (
             query.strip(),
@@ -116,6 +117,7 @@ class CacheManager:
             int(max_tokens) if max_tokens is not None else 0,
             (search_mode or "semantic").strip().lower(),
             filters_signature or "*",
+            quality_signature or "*",
         )
 
     @staticmethod
