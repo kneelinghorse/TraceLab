@@ -16,6 +16,7 @@ class MissionBase(BaseModel):
     project_id: Optional[UUID] = None
     mission_data: MissionProtocolDraft
     quality_gates: Optional[Dict[str, Any]] = None
+    evidence_linking_metadata: Optional[Dict[str, Any]] = None
     status: Optional[str] = None
     completion_percentage: Optional[int] = None
 
@@ -31,6 +32,7 @@ class MissionUpdate(BaseModel):
 
     mission_data: Optional[MissionProtocolDraft] = None
     quality_gates: Optional[Dict[str, Any]] = None
+    evidence_linking_metadata: Optional[Dict[str, Any]] = None
     status: Optional[str] = None
     completion_percentage: Optional[int] = None
 
