@@ -1,0 +1,114 @@
+{
+  "mission_id": "DSR-INT-002",
+  "version": "1.0.0",
+  "title": "Security Incident Coordination",
+  "status": "complete",
+  "owner": "DeepSearch Autonomous Agent",
+  "research_statement": {
+    "topic": "Coordinating security incident communications",
+    "objective": "Document best practices for 7-day response windows",
+    "scope": "Incident coordination for multi-product SaaS vendors",
+    "audience": "Security + communications leadership",
+    "methodology": "Post-incident review synthesis",
+    "success_metrics": [
+      "Publish incident FAQ within 36 hours",
+      "Reduce duplicate updates sent to enterprise customers",
+      "Achieve >90% stakeholder satisfaction"
+    ],
+    "risks": [
+      "Legal review could delay timelines",
+      "Regional privacy requirements vary"
+    ]
+  },
+  "key_questions": [
+    {
+      "question": "How do high-performing teams structure day-0 to day-7 communications?",
+      "status": "answered",
+      "answer": "They pre-stage templates, run twice-daily control tower syncs, and keep shared FAQ + timeline docs updated.",
+      "confidence": 0.79
+    },
+    {
+      "question": "What slows incident approvals the most?",
+      "status": "answered",
+      "answer": "Legal review cycles and lack of pre-approved severities add 18-24 hour delays.",
+      "confidence": 0.71
+    }
+  ],
+  "synthesis": {
+    "key_insights": [
+      "Control tower rituals shorten approval loops and remove ambiguity across teams.",
+      "Joint comms + legal slack channels keep reviewers aligned on latest drafts.",
+      "Enterprise customers prefer timeline-focused updates to RCA-first docs."
+    ],
+    "surprising_findings": [
+      "Teams that published the FAQ early reduced inbound tickets by 43%."
+    ],
+    "contradictory_information": [],
+    "contradiction_resolutions": [],
+    "recommendations": [
+      "Pre-stage FAQ templates with scenario placeholders.",
+      "Stand up incident control tower channel with two-a-day cadences.",
+      "Record approvals inside shared timeline doc."
+    ],
+    "next_steps": [
+      "Finalize severity ladder",
+      "Draft shared FAQ",
+      "Schedule dry-run"
+    ]
+  },
+  "tags": [
+    "security",
+    "incident",
+    "week-7"
+  ],
+  "methodology_details": {
+    "participant_segments": [
+      {"segment": "Security leads", "count": 4},
+      {"segment": "Comms", "count": 3},
+      {"segment": "Legal", "count": 2}
+    ],
+    "total_participants": 9,
+    "recruitment_method": "Incident debrief archive",
+    "consent_documented": true,
+    "validation_steps_completed": [
+      "Aligned with legal",
+      "Audited past RCAs"
+    ],
+    "artifacts_verified": [
+      "Incident runbooks",
+      "Executive updates"
+    ]
+  },
+  "evidence": [
+    {
+      "evidence_id": "EV-SI-1",
+      "source": "DeepSearch",
+      "summary": "Control tower syncs twice per day shortened approval loops by 36%.",
+      "source_type": "postmortem"
+    },
+    {
+      "evidence_id": "EV-SI-2",
+      "source": "DeepSearch",
+      "summary": "Publishing FAQ drafts within 36 hours cut inbound tickets nearly in half.",
+      "source_type": "support"
+    },
+    {
+      "evidence_id": "EV-SI-3",
+      "source": "DeepSearch",
+      "summary": "Pre-approved severities saved 18-24 hours of legal review time.",
+      "source_type": "analysis"
+    }
+  ],
+  "quality_checkpoints": [
+    {"gate": "research_statement", "status": "pass"},
+    {"gate": "evidence_links", "status": "pass"},
+    {"gate": "synthesis_quality", "status": "pass"},
+    {"gate": "traceability", "status": "pass"},
+    {"gate": "contradictions_resolved", "status": "pass"}
+  ],
+  "discussion_guide": [
+    "Timeline review",
+    "Stakeholder updates",
+    "Approval mapping"
+  ]
+}

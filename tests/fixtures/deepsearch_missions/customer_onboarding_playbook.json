@@ -1,0 +1,123 @@
+{
+  "mission_id": "DSR-INT-001",
+  "version": "1.0.0",
+  "title": "Customer Onboarding Playbook",
+  "status": "complete",
+  "owner": "DeepSearch Autonomous Agent",
+  "research_statement": {
+    "topic": "Frictionless customer onboarding",
+    "objective": "Document the most reliable activation levers for SaaS onboarding",
+    "scope": "North American B2B SaaS products",
+    "audience": "Product growth team",
+    "methodology": "Mixed-method evaluation of funnel recordings + interviews",
+    "success_metrics": [
+      "Increase day-7 activation by 12%",
+      "Reduce onboarding drop-off to <20%",
+      "Ship pre-flight checklist for CS"
+    ],
+    "risks": [
+      "Sample skewed toward venture-backed SaaS",
+      "Requires CS instrumentation buy-in"
+    ]
+  },
+  "key_questions": [
+    {
+      "question": "Which onboarding surfaces correlate with activation spikes?",
+      "status": "answered",
+      "answer": "Contextual product tours + checklist email pairing drive a 1.18x activation delta.",
+      "confidence": 0.82,
+      "owner": "growth"
+    },
+    {
+      "question": "Where do teams lose the most new accounts?",
+      "status": "answered",
+      "answer": "Payment configuration and permissions mapping cause 47% of drop-offs across five tools.",
+      "confidence": 0.74,
+      "owner": "ops"
+    }
+  ],
+  "synthesis": {
+    "key_insights": [
+      "Trigger-based onboarding nudges outperform time-based sequences for complex SaaS tools.",
+      "Teams that surface admin + end-user tasks together cut activation time from 12 days to 5.",
+      "A shared health score with CS during onboarding reduces churn risk flags by 33%."
+    ],
+    "surprising_findings": [
+      "Video walkthroughs underperform when analytics instrumentation already powers personalized tours.",
+      "Over half of accounts prefer Slack-based coaching to webinar office hours."
+    ],
+    "contradictory_information": [
+      "Some teams reported success with hands-on white-glove onboarding despite automation focus."
+    ],
+    "contradiction_resolutions": [
+      "Blend automation with a kickoff concierge for the first week to capture both benefits."
+    ],
+    "recommendations": [
+      "Launch checklist inside app + automated email reinforcement.",
+      "Provide live Slack office hours during week 1.",
+      "Expose shared health score dashboard with CS."
+    ],
+    "next_steps": [
+      "Ship product-tour triggered checklist",
+      "Publish CS readiness briefing",
+      "Measure conversion after rollout"
+    ]
+  },
+  "tags": [
+    "onboarding",
+    "product",
+    "week-7"
+  ],
+  "methodology_details": {
+    "participant_segments": [
+      {"segment": "Growth PMs", "count": 6, "percentage": 0.35},
+      {"segment": "Customer Success", "count": 5, "percentage": 0.29},
+      {"segment": "Implementation Leads", "count": 4, "percentage": 0.24}
+    ],
+    "total_participants": 15,
+    "recruitment_method": "Productboard community + activation slack",
+    "consent_documented": true,
+    "validation_steps_completed": [
+      "Cross-checked funnel analytics",
+      "Validated with CS playbooks"
+    ],
+    "artifacts_verified": [
+      "Activation dashboards",
+      "Customer interviews",
+      "Implementation runbooks"
+    ],
+    "notes": "Research covers B2B SaaS, Series A-D stage."
+  },
+  "evidence": [
+    {
+      "evidence_id": "EV-CO-1",
+      "source": "DeepSearch",
+      "summary": "Activation runs 1.18x faster when product tours + CS checklists fire together.",
+      "source_type": "playbook"
+    },
+    {
+      "evidence_id": "EV-CO-2",
+      "source": "DeepSearch",
+      "summary": "Permissions mapping is the #1 blocker for enterprise onboarding and causes 47% drop-off.",
+      "source_type": "interview"
+    },
+    {
+      "evidence_id": "EV-CO-3",
+      "source": "DeepSearch",
+      "summary": "Shared onboarding health score reduces churn risk flags by a third across pilots.",
+      "source_type": "analysis"
+    }
+  ],
+  "quality_checkpoints": [
+    {"gate": "research_statement", "status": "pass", "notes": "Objectives validated"},
+    {"gate": "evidence_links", "status": "pass", "notes": "Auto-linked to activation chunks"},
+    {"gate": "synthesis_quality", "status": "pass", "notes": "Insights tie to evidence"},
+    {"gate": "traceability", "status": "pass", "notes": "Chunks + documents logged"},
+    {"gate": "contradictions_resolved", "status": "pass", "notes": "Trade-offs documented"}
+  ],
+  "discussion_guide": [
+    "Walk through activation funnel",
+    "Map admin vs end-user tasks",
+    "Scoreboard review"
+  ]
+}
