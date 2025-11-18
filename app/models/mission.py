@@ -39,6 +39,7 @@ class Mission(Base):
     #   "evidence_links": {"status": "complete", "validated": false},
     #   "contradictions_resolved": {"status": "pending"}
     # }
+    evidence_linking_metadata = Column(JSON, nullable=True)
     
     # Progress tracking
     status = Column(String, default='draft')  # 'draft' | 'in_progress' | 'review' | 'complete'
