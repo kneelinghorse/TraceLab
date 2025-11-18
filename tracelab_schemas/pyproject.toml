@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tracelab-schemas"
+version = "1.0.0"
+description = "TraceLab Mission Protocol Pydantic schemas for DeepSearch validation."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "TraceLab Platform Team" }
+]
+keywords = ["mission-protocol", "schemas", "pydantic", "tracelab"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Framework :: Pydantic",
+  "Intended Audience :: Developers"
+]
+dependencies = [
+  "pydantic>=2.5,<3.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/systemsystems/TraceLab"
+Documentation = "https://github.com/systemsystems/TraceLab/tree/main/docs"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tracelab_schemas*"]
+
+[tool.setuptools.package-data]
+"tracelab_schemas" = ["py.typed"]
+"tracelab_schemas.tracelab_schemas" = ["py.typed"]
