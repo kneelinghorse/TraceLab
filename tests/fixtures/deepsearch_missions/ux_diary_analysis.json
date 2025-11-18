@@ -1,0 +1,113 @@
+{
+  "mission_id": "DSR-INT-004",
+  "version": "1.0.0",
+  "title": "UX Diary Study Analysis",
+  "status": "complete",
+  "owner": "DeepSearch Autonomous Agent",
+  "research_statement": {
+    "topic": "Multi-device diary study for mobile researchers",
+    "objective": "Identify friction in week-long diary submissions",
+    "scope": "North American research teams running diary studies",
+    "audience": "Design research operations",
+    "methodology": "Diary study synthesis + survey follow-up",
+    "success_metrics": [
+      "Boost submission completeness to 95%",
+      "Reduce moderator reminders by 30%",
+      "Document top 3 retention tactics"
+    ],
+    "risks": [
+      "Participants may over-report adherence",
+      "Mobile OS updates skew results"
+    ]
+  },
+  "key_questions": [
+    {
+      "question": "What causes participants to abandon diary entries?",
+      "status": "answered",
+      "answer": "Notification fatigue and fragmented prompts cause 61% of drop-offs.",
+      "confidence": 0.78
+    },
+    {
+      "question": "Which retention tactics keep compliance high?",
+      "status": "answered",
+      "answer": "Auto-summaries + weekend catch-up blocks maintain 94% completion.",
+      "confidence": 0.81
+    }
+  ],
+  "synthesis": {
+    "key_insights": [
+      "Bundled evening prompts outperform hourly pings for mobile-heavy participants.",
+      "Moderators who provide AI-generated summaries reduce participant confusion.",
+      "Weekend catch-up windows rescue 22% of near-missed entries."
+    ],
+    "surprising_findings": [
+      "Participants prefer Slack reminders over SMS for multi-device diaries."
+    ],
+    "contradictory_information": [],
+    "contradiction_resolutions": [],
+    "recommendations": [
+      "Consolidate prompts",
+      "Offer AI-generated recaps",
+      "Schedule weekend catch-ups"
+    ],
+    "next_steps": [
+      "Ship prompt scheduler",
+      "Publish moderator guidelines",
+      "Pilot Slack-first reminders"
+    ]
+  },
+  "tags": [
+    "ux",
+    "diary-study",
+    "week-7"
+  ],
+  "methodology_details": {
+    "participant_segments": [
+      {"segment": "Mobile primary", "count": 12},
+      {"segment": "Desktop primary", "count": 6}
+    ],
+    "total_participants": 18,
+    "recruitment_method": "Diary platform data",
+    "consent_documented": true,
+    "validation_steps_completed": [
+      "Moderator QA",
+      "Data sanity checks"
+    ],
+    "artifacts_verified": [
+      "Diary exports",
+      "Moderator logs"
+    ]
+  },
+  "evidence": [
+    {
+      "evidence_id": "EV-UX-1",
+      "source": "DeepSearch",
+      "summary": "Notification fatigue causes 61% of diary drop-offs across six studies.",
+      "source_type": "diary"
+    },
+    {
+      "evidence_id": "EV-UX-2",
+      "source": "DeepSearch",
+      "summary": "Weekend catch-up windows rescue 22% of near-missed diary entries.",
+      "source_type": "survey"
+    },
+    {
+      "evidence_id": "EV-UX-3",
+      "source": "DeepSearch",
+      "summary": "AI-generated diary recaps keep completion at 94% when paired with bundled prompts.",
+      "source_type": "analysis"
+    }
+  ],
+  "quality_checkpoints": [
+    {"gate": "research_statement", "status": "pass"},
+    {"gate": "evidence_links", "status": "pass"},
+    {"gate": "synthesis_quality", "status": "pass"},
+    {"gate": "traceability", "status": "pass"},
+    {"gate": "contradictions_resolved", "status": "pass"}
+  ],
+  "discussion_guide": [
+    "Reminder cadence",
+    "Moderator tooling",
+    "Retention tactics"
+  ]
+}

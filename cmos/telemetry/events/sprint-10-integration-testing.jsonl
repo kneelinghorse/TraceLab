@@ -1,0 +1,1 @@
+{"ts":"2025-11-18T05:44:28Z","suite":"tests/integration/test_deepsearch_integration.py","command":"pytest tests/integration/test_deepsearch_integration.py","cases":10,"passed":10,"failed":0,"duration_s":6.5,"context":{"mission":"B10.5","notes":"Week 7 DeepSearch integration suite + docs + fixtures."}}

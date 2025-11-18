@@ -1,0 +1,114 @@
+{
+  "mission_id": "DSR-INT-003",
+  "version": "1.0.0",
+  "title": "Operations Resilience Report",
+  "status": "complete",
+  "owner": "DeepSearch Autonomous Agent",
+  "research_statement": {
+    "topic": "Operational resilience and incident runbooks",
+    "objective": "Benchmark resilience rituals for hybrid cloud data platforms",
+    "scope": "Incident response + capacity planning teams",
+    "audience": "SRE leadership",
+    "methodology": "Benchmarking survey with follow-up interviews",
+    "success_metrics": [
+      "Document top 5 resilience rituals",
+      "Share staffing/coverage patterns",
+      "Quantify rollback speed improvements"
+    ],
+    "risks": [
+      "Respondents may overstate maturity",
+      "Regional outage data limited"
+    ]
+  },
+  "key_questions": [
+    {
+      "question": "Which rituals correlate with shorter rollback windows?",
+      "status": "answered",
+      "answer": "Playbook dry-runs every 30 days plus joint pager reviews lead to 28% faster rollback.",
+      "confidence": 0.76
+    },
+    {
+      "question": "How do high-performing teams staff incident commanders?",
+      "status": "answered",
+      "answer": "They rotate staff weekly and pair senior ICs with apprentice coordinators.",
+      "confidence": 0.72
+    }
+  ],
+  "synthesis": {
+    "key_insights": [
+      "Runbook dry-runs and failure injection keep rollback muscle-memory fresh.",
+      "Incident commanders with buddy system reduce fatigue and knowledge loss.",
+      "Capacity planning rituals tied to customer impact metrics outperform infra-only approaches."
+    ],
+    "surprising_findings": [
+      "Teams with customer-facing SLIs surfaced rollback success metrics faster than infra-only orgs."
+    ],
+    "contradictory_information": [],
+    "contradiction_resolutions": [],
+    "recommendations": [
+      "Schedule monthly dry-runs",
+      "Pair ICs with apprentices",
+      "Link capacity planning with product metrics"
+    ],
+    "next_steps": [
+      "Publish resilience toolkit",
+      "Define shared SLIs",
+      "Enable pager buddy rotation"
+    ]
+  },
+  "tags": [
+    "sre",
+    "resilience",
+    "week-7"
+  ],
+  "methodology_details": {
+    "participant_segments": [
+      {"segment": "SRE", "count": 7},
+      {"segment": "Platform PM", "count": 3},
+      {"segment": "Incident commander", "count": 4}
+    ],
+    "total_participants": 14,
+    "recruitment_method": "Hybrid cloud community",
+    "consent_documented": true,
+    "validation_steps_completed": [
+      "Incident timeline verification",
+      "Resilience metric cross-check"
+    ],
+    "artifacts_verified": [
+      "Pager rotations",
+      "Runbook change logs"
+    ]
+  },
+  "evidence": [
+    {
+      "evidence_id": "EV-OR-1",
+      "source": "DeepSearch",
+      "summary": "Monthly runbook dry-runs cut rollback windows by 28% across 11 teams.",
+      "source_type": "benchmark"
+    },
+    {
+      "evidence_id": "EV-OR-2",
+      "source": "DeepSearch",
+      "summary": "Buddy system for ICs reduces fatigue and knowledge loss while keeping MTTR steady.",
+      "source_type": "interview"
+    },
+    {
+      "evidence_id": "EV-OR-3",
+      "source": "DeepSearch",
+      "summary": "Capacity planning rituals tied to customer SLIs reduce surprise incidents by 22%.",
+      "source_type": "analysis"
+    }
+  ],
+  "quality_checkpoints": [
+    {"gate": "research_statement", "status": "pass"},
+    {"gate": "evidence_links", "status": "pass"},
+    {"gate": "synthesis_quality", "status": "pass"},
+    {"gate": "traceability", "status": "pass"},
+    {"gate": "contradictions_resolved", "status": "pass"}
+  ],
+  "discussion_guide": [
+    "Runbook cadence",
+    "Pager coverage",
+    "Failure injection"
+  ]
+}

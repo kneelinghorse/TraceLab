@@ -1,0 +1,114 @@
+{
+  "mission_id": "DSR-INT-005",
+  "version": "1.0.0",
+  "title": "AI Infrastructure Benchmark",
+  "status": "complete",
+  "owner": "DeepSearch Autonomous Agent",
+  "research_statement": {
+    "topic": "AI infrastructure cost + observability patterns",
+    "objective": "Benchmark GPU utilization guardrails for GenAI deployments",
+    "scope": "North American and EU platform teams",
+    "audience": "AI infra leadership",
+    "methodology": "Benchmark survey + cost telemetry review",
+    "success_metrics": [
+      "Surface three guardrails that keep GPU utilization >70%",
+      "Define observability SLA for latency",
+      "Publish playbook for capacity alerts"
+    ],
+    "risks": [
+      "Vendors may not share precise GPU metrics",
+      "Currency fluctuations impact cost baseline"
+    ]
+  },
+  "key_questions": [
+    {
+      "question": "What guardrails keep GPU utilization high without starving workloads?",
+      "status": "answered",
+      "answer": "Dynamic batch sizing + autoscaling tied to job priority keeps utilization above 72% for 80% of teams.",
+      "confidence": 0.8
+    },
+    {
+      "question": "How do top teams observe inference latency + cost together?",
+      "status": "answered",
+      "answer": "They stream GPU telemetry + API latency into a shared dashboard with per-model SLOs.",
+      "confidence": 0.77
+    }
+  ],
+  "synthesis": {
+    "key_insights": [
+      "Budget guardrails tied to priority tiers cut surprise overruns by 31%.",
+      "Realtime GPU + latency dashboards guide when to pre-warm or shed load.",
+      "FinOps integrations that tag jobs maintain 96% of chargebacks within forecast."
+    ],
+    "surprising_findings": [
+      "Teams running multi-tenant endpoints regained 22% utilization after enabling per-tenant queueing."
+    ],
+    "contradictory_information": [],
+    "contradiction_resolutions": [],
+    "recommendations": [
+      "Implement batch-size autotuning",
+      "Expose shared GPU/latency dashboard",
+      "Integrate job tagging with FinOps"
+    ],
+    "next_steps": [
+      "Pilot autotuning",
+      "Publish latency guardrails",
+      "Wire tagging to billing"
+    ]
+  },
+  "tags": [
+    "ai-infra",
+    "benchmark",
+    "week-7"
+  ],
+  "methodology_details": {
+    "participant_segments": [
+      {"segment": "ML platform", "count": 5},
+      {"segment": "FinOps", "count": 3},
+      {"segment": "Data infra", "count": 4}
+    ],
+    "total_participants": 12,
+    "recruitment_method": "Community benchmark",
+    "consent_documented": true,
+    "validation_steps_completed": [
+      "Telemetry audit",
+      "Interview triangulation"
+    ],
+    "artifacts_verified": [
+      "GPU dashboards",
+      "FinOps exports"
+    ]
+  },
+  "evidence": [
+    {
+      "evidence_id": "EV-AI-1",
+      "source": "DeepSearch",
+      "summary": "Dynamic batch sizing + priority queues keep GPU utilization above 72% across 80% of teams.",
+      "source_type": "benchmark"
+    },
+    {
+      "evidence_id": "EV-AI-2",
+      "source": "DeepSearch",
+      "summary": "GPU + latency dashboards feed per-model guardrails for scaling decisions.",
+      "source_type": "telemetry"
+    },
+    {
+      "evidence_id": "EV-AI-3",
+      "source": "DeepSearch",
+      "summary": "FinOps integrations keep 96% of chargebacks within target forecast ranges.",
+      "source_type": "analysis"
+    }
+  ],
+  "quality_checkpoints": [
+    {"gate": "research_statement", "status": "pass"},
+    {"gate": "evidence_links", "status": "pass"},
+    {"gate": "synthesis_quality", "status": "pass"},
+    {"gate": "traceability", "status": "pass"},
+    {"gate": "contradictions_resolved", "status": "pass"}
+  ],
+  "discussion_guide": [
+    "Telemetry review",
+    "Guardrail scoring",
+    "FinOps integration"
+  ]
+}
