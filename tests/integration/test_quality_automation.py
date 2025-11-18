@@ -103,6 +103,7 @@ def _seed_supporting_documents(db_session, project):
         document_id=document.id,
         chunk_index=0,
         content="Automation chunk",
+        content_tsv="Automation chunk",
     )
     db_session.add(chunk)
     db_session.flush()

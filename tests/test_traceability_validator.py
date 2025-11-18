@@ -16,7 +16,13 @@ def test_traceability_validator_detects_missing_chunks_and_low_relevance(db_sess
     db_session.flush()
 
     chunk_id = uuid4()
-    chunk = DocumentChunk(id=chunk_id, document_id=document.id, chunk_index=0, content="chunk body")
+    chunk = DocumentChunk(
+        id=chunk_id,
+        document_id=document.id,
+        chunk_index=0,
+        content="chunk body",
+        content_tsv="chunk body",
+    )
     db_session.add(chunk)
     db_session.flush()
 

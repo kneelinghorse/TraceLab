@@ -257,7 +257,13 @@
     "Sprint 09 planned with 6 missions: hybrid search backend, faceted filters backend, search page UX fixes, search history, saved searches, and retrospective. Roadmap Week 15 alignment. (from PS-2025-11-15-001)",
     "Sprint 09 UX fixes priority: project dropdown broken (shows 0), remove RAG Control Room section (missions don't apply), simplify controls to search box + project + results count (max 25), collapse extra filters into advanced panel. (from PS-2025-11-15-001)",
     "Sprint 09 tech: hybrid search weights 0.7 semantic / 0.3 keyword (configurable). PostgreSQL full-text + Qdrant metadata filters. Search history retention 100 entries or 30 days. Saved search limit 50 per user. (from PS-2025-11-15-001)",
-    "Sprint 08 closed with telemetry automation, TTL cache evidence (75% RAG hits / 80% doc hits), and Qdrant tuned to 9.4 ms p99; ready to start B9.1 Hybrid Search next."
+    "Sprint 08 closed with telemetry automation, TTL cache evidence (75% RAG hits / 80% doc hits), and Qdrant tuned to 9.4 ms p99; ready to start B9.1 Hybrid Search next.",
+    {
+      "date": "2025-11-16",
+      "decision": "Sprint 09 closed with hybrid search, faceted filters, search history, and saved searches. Sprint 10 now focuses on DeepSearch ingestion, PEDR connector, Mission Protocol UI, and the agent correction loop.",
+      "source": "B9.6 retrospective"
+    },
+    "Sprint 09 evidence: precision@5 +19% vs semantic-only (cmos/telemetry/events/sprint-09-hybrid-search.jsonl) and saved-search replay rate 25% (cmos/reports/sprint-09/search-metrics.json)."
   ],
   "constraints": [
     "All document processing workflows must execute redaction prior to persistence or embedding.",
@@ -314,10 +320,11 @@
       "sprint_04": "Planning",
       "sprint_05": "Planned",
       "sprint_08": "Planned - 6 missions",
-      "sprint_09": "Planned - 5 missions (removed B9.3 UI fixes)"
+      "sprint_09": "Completed - hybrid search, faceted filters, search history, saved searches shipped",
+      "sprint_10": "Planned - 6 missions"
     },
-    "current_focus": "Sprint 08 - Performance Optimization (Week 14)",
-    "next_checkpoint": "Sprint 09 retrospective will finalize DeepSearch integration architecture",
+    "current_focus": "Sprint 10 - DeepSearch Integration & PEDR Phase 1",
+    "next_checkpoint": "Sprint 10 integration missions: quality search, ingestion endpoint, schema package, relationship API, integration testing",
     "research_completed": [
       {
         "id": "R2.1",
@@ -514,6 +521,31 @@
         "Agent correction loop (422 validation errors trigger refinement)"
       ],
       "details": "Architecture details to be finalized during Sprint 09 retrospective"
+    },
+    "deepsearch_integration": {
+      "status": "100% aligned",
+      "timeline": {
+        "week_4": "DeepSearch provides sample JSON payloads",
+        "week_5": "TraceLab delivers Pydantic schema package",
+        "week_6": "Manual upload testing",
+        "week_7": "Automated integration testing (coordinated)",
+        "week_8": "Production validation"
+      },
+      "key_decisions": {
+        "output_format": "Markdown (Sprint 1-2) → JSON (Sprint 3+)",
+        "evidence_linking": "Post-processing auto-linking via similarity (TraceLab responsibility)",
+        "schema_sharing": "Pydantic package for DeepSearch pre-validation",
+        "authentication": "24-hour JWT with retry-on-401",
+        "project_management": "Config-based mapping with auto-create fallback"
+      },
+      "integration_flow": "DeepSearch generates JSON → TraceLab validates/stores → PEDR indexes → agents query"
+    },
+    "pedr_integration": {
+      "approach": "Phased - Start as TraceLab module, extract later if needed",
+      "phase_1": "Sprint 10 - Quality-aware search (complete missions rank 2x higher, governance filters)",
+      "phase_2": "Sprint 11 - Relationship context API",
+      "phase_3": "Future - Enhanced protocol features if valuable (intent classification, graph analytics)",
+      "technology": "Pure Python, reuses PostgreSQL FTS + Qdrant, no JavaScript Protocol Suite for MVP"
     }
   },
   "operational_memory": {
@@ -880,7 +912,7 @@
       "B6.3"
     ],
     "active_mission": null,
-    "last_completed_mission": "B7.5",
+    "last_completed_mission": "B9.5",
     "last_blocked_mission": "B6.3",
     "next_session_context": {
       "key_reference_documents": [
@@ -1163,23 +1195,80 @@
         "summary": "Starting saved searches mission: scoping requirements and implementation plan.",
         "action": "start",
         "ts": "2025-11-16T01:35:45Z"
+      },
+      {
+        "mission": "B9.5",
+        "agent": "codex",
+        "summary": "Shipped saved searches across backend, API, and UI.",
+        "action": "complete",
+        "ts": "2025-11-16T02:03:55Z"
+      },
+      {
+        "mission": "B9.6",
+        "agent": "assistant",
+        "summary": "Kicking off Sprint 09 retrospective deliverables",
+        "action": "start",
+        "ts": "2025-11-16T02:22:51Z"
+      },
+      {
+        "mission": "B9.6",
+        "agent": "assistant",
+        "summary": "Sprint 09 retrospective, search metrics, telemetry, and Sprint 10 backlog delivered",
+        "action": "complete",
+        "ts": "2025-11-16T02:35:30Z"
+      },
+      {
+        "mission": "B10.1",
+        "agent": "assistant",
+        "summary": "Starting quality-aware search service enhancements",
+        "action": "start",
+        "ts": "2025-11-17T22:49:04Z"
+      },
+      {
+        "mission": "B10.1",
+        "agent": "assistant",
+        "summary": "Quality-aware hybrid search shipped with PEDR filters + docs",
+        "action": "complete",
+        "ts": "2025-11-17T23:08:14Z"
+      },
+      {
+        "mission": "B10.2",
+        "agent": "codex",
+        "summary": "Starting DeepSearch ingestion endpoint implementation",
+        "action": "start",
+        "ts": "2025-11-17T23:38:57Z"
+      },
+      {
+        "mission": "B10.2",
+        "agent": "codex",
+        "summary": "Delivered DeepSearch ingestion endpoint with auto-linking + telemetry",
+        "action": "complete",
+        "ts": "2025-11-18T00:31:01Z"
+      },
+      {
+        "mission": "B10.3",
+        "agent": "codex",
+        "summary": "Packaging Pydantic schema library for DeepSearch",
+        "action": "start",
+        "ts": "2025-11-18T03:41:01Z"
       }
     ],
-    "last_session": "2025-11-16T01:35:45Z",
-    "session_count": 23,
-    "active_mission": "B9.5",
+    "last_session": "2025-11-18T03:41:01Z",
+    "session_count": 31,
+    "active_mission": "B10.3",
     "blocked_missions": [],
-    "last_completed_mission": "B9.4"
+    "last_completed_mission": "B10.2"
   },
   "next_session_context": {},
   "context_health": {
-    "sessions_since_reset": 27,
-    "last_update": "2025-11-16T01:35:45Z",
-    "size_kb": 41.05,
+    "sessions_since_reset": 35,
+    "last_update": "2025-11-18T03:41:01Z",
+    "size_kb": 44.29,
     "size_limit_kb": 100
   },
   "learnings": [
-    "TTL caches cut repeated RAG latency from 22.23 ms to 0.008 ms and drop repeated OpenAI cost to ~$0.000071; monitoring dashboard now surfaces these metrics alongside cost telemetry."
+    "TTL caches cut repeated RAG latency from 22.23 ms to 0.008 ms and drop repeated OpenAI cost to ~$0.000071; monitoring dashboard now surfaces these metrics alongside cost telemetry.",
+    "Sprint 09 metrics: hybrid precision +0.12 vs semantic-only, avg search durations 419 ms, saved-search replay 25% (see cmos/reports/sprint-09/search-metrics-report.md)."
   ],
   "context_notes": [
     "B7.7 validated ingestion flow end-to-end; prod + local confirmed, only residual issue is local hydration warnings but no blocking impact.",
