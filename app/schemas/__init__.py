@@ -72,6 +72,16 @@ from app.schemas.pagination import (
     PaginatedResponse,
     PaginationMeta,
 )
+from app.schemas.relationships import (
+    RelationshipContextResponse,
+    RelationshipEdgeInfo,
+    RelationshipFilters,
+    RelationshipTotals,
+    RelatedChunk,
+    RelatedDocument,
+    RelatedInsight,
+    RelatedMission,
+)
 
 __all__ = [
     "ProjectBase",
@@ -126,4 +136,12 @@ __all__ = [
     "RagCitation",
     "PaginatedResponse",
     "PaginationMeta",
+    "RelationshipContextResponse",
+    "RelationshipEdgeInfo",
+    "RelationshipFilters",
+    "RelationshipTotals",
+    "RelatedChunk",
+    "RelatedDocument",
+    "RelatedInsight",
+    "RelatedMission",
 ]

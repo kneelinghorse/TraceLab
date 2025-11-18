@@ -17,6 +17,7 @@ from app.api.v1 import (
     missions,
     monitoring,
     qdrant_admin,
+    relationships,
     projects,
     quality,
     quality_automated,
@@ -99,6 +100,12 @@ app.include_router(
 app.include_router(facets.router, prefix=settings.api_v1_prefix, tags=["facets"], dependencies=protected_dependencies)
 app.include_router(retrieval.router, prefix=f"{settings.api_v1_prefix}/retrieval", tags=["retrieval"], dependencies=protected_dependencies)
 app.include_router(missions.router, prefix=f"{settings.api_v1_prefix}/missions", tags=["missions"], dependencies=protected_dependencies)
+app.include_router(
+    relationships.router,
+    prefix=f"{settings.api_v1_prefix}/missions",
+    tags=["relationships"],
+    dependencies=protected_dependencies,
+)
 app.include_router(
     deepsearch.router,
     prefix=f"{settings.api_v1_prefix}/deepsearch",

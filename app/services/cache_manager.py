@@ -40,6 +40,7 @@ _BUCKETS: Dict[str, _Bucket] = {
     "project_metadata": _Bucket("project_metadata", CacheConfig("project_metadata", ttl_seconds=300, maxsize=256)),
     "quality_gates": _Bucket("quality_gates", CacheConfig("quality_gates", ttl_seconds=60, maxsize=256)),
     "mission_validation": _Bucket("mission_validation", CacheConfig("mission_validation", ttl_seconds=30, maxsize=256)),
+    "relationship_context": _Bucket("relationship_context", CacheConfig("relationship_context", ttl_seconds=300, maxsize=512)),
 }
 
 
@@ -170,6 +171,22 @@ class CacheManager:
     def quality_gate_key(mission_id: str) -> Tuple[str]:
         return (mission_id,)
 
+    @staticmethod
+    def relationship_context_key(
+        *,
+        mission_id: str,
+        depth: int,
+        entity_types: Optional[Sequence[str]],
+        min_relevance: Optional[float],
+    ) -> Tuple[Any, ...]:
+        normalized_types: Tuple[str, ...]
+        if entity_types:
+            normalized_types = tuple(sorted(entity_types))
+        else:
+            normalized_types = tuple()
+        normalized_relevance = None if min_relevance is None else round(float(min_relevance), 3)
+        return (str(mission_id), int(depth), normalized_types, normalized_relevance)
+
     # ------------------------------------------------------------------
     # Domain-specific invalidation adapters
     # ------------------------------------------------------------------
@@ -201,6 +218,11 @@ class CacheManager:
         if not mission_id:
             return self.invalidate("mission_validation")
         return self.invalidate("mission_validation", predicate=lambda key: key[0] == mission_id)
+
+    def invalidate_relationship_context(self, mission_id: Optional[str] = None) -> int:
+        if not mission_id:
+            return self.invalidate("relationship_context")
+        return self.invalidate("relationship_context", predicate=lambda key: key[0] == str(mission_id))
 
     # ------------------------------------------------------------------
     # Metrics + telemetry
