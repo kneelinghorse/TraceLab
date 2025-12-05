@@ -145,3 +145,55 @@ pytest tests/test_auth_flow.py tests/test_auth_api.py
 - **Token immediately expires** – Set `ACCESS_TOKEN_EXPIRE_MINUTES` to a positive integer and confirm the container clock is synchronized (UTC recommended).
 
 Refer to `docs/auth_and_cors_guidance.md` for production hardening and additional deployment examples once the basics here are verified.
+
+## Service Accounts & DeepSearch Integration
+
+### Architecture
+
+TraceLab uses **single-user auth via environment variables** - not a database of users. The `AUTH_USERNAME` and `AUTH_PASSWORD` env vars define the ONE account that can authenticate.
+
+This is intentional for an internal single-builder tool. Both human operators and DeepSearch agents share the same credentials.
+
+### Production Credentials
+
+```bash
+# Railway environment variables (current production)
+AUTH_USERNAME=kneelinghorse
+AUTH_PASSWORD=Bigpuma
+```
+
+### Usage (from DeepSearch)
+
+```python
+import requests
+
+# Login with shared credentials
+resp = requests.post(
+    "https://api.namozine.com/api/v1/auth/login",
+    json={"username": "kneelinghorse", "password": "Bigpuma"}
+)
+token = resp.json()["access_token"]
+
+# Use token for API calls
+headers = {"Authorization": f"Bearer {token}"}
+preflight = requests.post(
+    "https://api.namozine.com/api/v1/pedr/preflight",
+    headers=headers,
+    json={"query": "passwordless authentication", "top_k": 5}
+)
+```
+
+**Token Expiry:** Configured via `ACCESS_TOKEN_EXPIRE_MINUTES` (default 60 min, production uses 1440 = 24 hours)
+
+### Future Multi-User Support
+
+If separate service accounts are needed later:
+1. Modify `app/core/security.py` to support credential list or DB lookup
+2. Add user management endpoints
+3. Update Railway with multiple accounts
+
+For now, shared credentials are appropriate.
+
+**Cross-Reference:**
+- DeepSearch integration: `DeepSearch.alpha/cmos/planning/Answers-from-tracelab-sprint12.md`
+- Sprint 12 mission: `cmos/missions/sprint-12/B12.3_Create-Service-Account-Production.yaml`

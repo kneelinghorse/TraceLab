@@ -1,0 +1,51 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B12.6
+  name: Sprint 12 Retrospective
+  sprint: Sprint 12
+  type: Build.Review.v1
+  priority: normal
+  created: 2025-12-05
+  owner: assistant
+
+missionId: "B12.6"
+
+spec:
+  objective: |
+    Conduct Sprint 12 retrospective capturing outcomes from making TraceLab
+    actually usable, and draft Sprint 13 backlog for continued improvements.
+
+  context: |
+    Sprint 12 REVISED focus - making system usable:
+    - B12.1: Fix missions endpoint 500 error
+    - B12.2: Fix HTTPS redirects dropping auth headers
+    - B12.3: Create service account in production
+    - B12.4: Standardize API response structure
+    - B12.5: End-to-end integration verification
+
+    This retrospective should:
+    1. Document what was fixed and working
+    2. Capture any remaining issues from E2E testing
+    3. Note DeepSearch integration status
+    4. Draft Sprint 13 backlog for additional fixes/features
+    5. Update MASTER_CONTEXT with strategic outcomes
+
+  success_criteria:
+    - Retrospective report created
+    - All mission outcomes documented
+    - Sprint 13 backlog drafted based on E2E findings
+    - MASTER_CONTEXT updated
+    - Telemetry captured
+
+  deliverables:
+    - cmos/reports/sprint-12/retrospective.md
+    - cmos/reports/sprint-12/sprint-13-backlog-draft.md
+    - Updated MASTER_CONTEXT via database
+    - Telemetry at cmos/telemetry/events/sprint-12-retro.jsonl
+
+  dependencies:
+    - B12.1 through B12.5 complete
+
+  estimated_effort: 1 hour

@@ -1,0 +1,65 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B12.2
+  name: Fix HTTPS Redirects Dropping Auth Headers
+  sprint: Sprint 12
+  type: Build.Fix.v1
+  priority: critical
+  created: 2025-12-05
+  owner: assistant
+
+missionId: "B12.2"
+
+spec:
+  objective: |
+    Fix FastAPI trailing slash redirects that use HTTP instead of HTTPS, causing
+    Authorization headers to be dropped and authentication to fail.
+
+  context: |
+    **Current State:**
+    - Requests to /missions redirect to http://api.namozine.com/api/v1/missions/ (HTTP not HTTPS)
+    - When browser/client follows redirect, Authorization header is stripped (security feature)
+    - Results in "Missing Authorization bearer token" error after redirect
+    - Affects multiple endpoints: /missions, potentially /documents/, /projects/
+
+    **Example:**
+    ```
+    GET /api/v1/missions (with Auth header)
+    -> 307 Redirect to http://api.namozine.com/api/v1/missions/
+    -> GET http://... (Auth header DROPPED by client)
+    -> 401 Missing Authorization bearer token
+    ```
+
+    **Root Cause:**
+    - FastAPI's redirect_slashes behavior generates HTTP URLs by default
+    - Behind Cloudflare/Railway proxy, the app sees HTTP even though client used HTTPS
+    - Need to either:
+      1. Configure FastAPI to use HTTPS in redirects (via root_path or forwarded headers)
+      2. Disable redirect_slashes and handle both with/without slash
+      3. Configure trusted proxy headers properly
+
+    **Files to Investigate:**
+    - app/main.py - FastAPI app configuration
+    - app/core/config.py - settings including root_path
+    - Railway/Cloudflare proxy configuration
+
+  success_criteria:
+    - All redirects use HTTPS, not HTTP
+    - Auth headers preserved across redirects
+    - /missions, /documents, /projects all work with or without trailing slash
+    - Verified in production at https://api.namozine.com
+
+  deliverables:
+    - Fix applied to FastAPI configuration
+    - Test showing redirects maintain HTTPS
+    - Documentation of proxy header configuration if needed
+
+  test_plan:
+    - curl -v with auth header, check redirect Location header uses HTTPS
+    - Verify endpoints work both with and without trailing slash
+    - Test in production after deployment
+
+  estimated_effort: 1-2 hours
+  dependencies: []

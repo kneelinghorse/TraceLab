@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-12-05T01:32:59.974952+00:00'
+generatedAt: '2025-12-05T16:23:26.073268+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -1247,10 +1247,46 @@ domainFields:
     missions:
     - id: B11.1
       name: Auto-Link Correction Loop & Observability
-      status: Queued
-      notes: 'Full specification: cmos/missions/sprint-11/B11.1_Auto-Link-Correction-Loop.yaml
-        - Async correction loop with webhook notifications, error taxonomy, retry
-        queue, Grafana-ready telemetry.'
+      status: Completed
+      completed_at: '2025-12-05T02:00:28Z'
+      notes: 'Deliverables completed:
+
+        - AutoLinkErrorType enum with 7 error types (NO_EMBEDDING, LOW_SIMILARITY,
+        NO_CHUNKS, TIMEOUT, VALIDATION_ERROR, EMPTY_CONTENT, DATABASE_ERROR)
+
+        - CorrectionQueueService with exponential backoff (5s, 30s per contract)
+
+        - WebhookClient with retry logic and dead letter queue
+
+        - /api/v1/deepsearch/corrections endpoints (GET status, POST trigger, GET
+        telemetry, POST process, DELETE completed, GET/DELETE dead-letter)
+
+        - Correction schemas (CorrectionItem, CorrectionQueueStats, WebhookPayload,
+        TelemetryRecord)
+
+        - Integration with deepsearch/ingest endpoint to queue failed items
+
+        - Grafana-ready JSONL telemetry at cmos/telemetry/events/sprint-11-corrections.jsonl
+
+        - Documentation at docs/correction-loop.md
+
+        - 22 passing tests covering retry logic, webhooks, error classification
+
+
+        Success criteria met:
+
+        - Error taxonomy with 7 error types (exceeds 5+ requirement)
+
+        - Retry queue with max 2 attempts and exponential backoff
+
+        - Webhook notifications on success/failure
+
+        - /api/v1/deepsearch/corrections returns status counts
+
+        - Telemetry exports Grafana-ready JSONL with timestamps, error types, retry
+        counts
+
+        '
       metadata:
         description: Turn auto-link telemetry into actionable retries and dashboards
           so DeepSearch payloads self-heal. Async with webhook notifications.
@@ -1265,11 +1301,46 @@ domainFields:
         - Corrections API endpoint
         - Updated telemetry format for dashboards
         spec_file: cmos/missions/sprint-11/B11.1_Auto-Link-Correction-Loop.yaml
+        started_at: '2025-12-05T01:34:36Z'
+        completed_at: '2025-12-05T02:00:28Z'
     - id: B11.2
       name: PEDR Delta Sync Service
-      status: Queued
-      notes: 'Full specification: cmos/missions/sprint-11/B11.2_PEDR-Delta-Sync-Service.yaml
-        - Event-driven delta sync, manifest transformation, CLI commands, parity checks.'
+      status: Completed
+      completed_at: '2025-12-05T02:13:36Z'
+      notes: 'Deliverables completed:
+
+        - app/models/sync_state.py: SyncState model for tracking sync state per entity
+        type
+
+        - app/services/pedr/manifest_transformer.py: Mission to PEDR manifest conversion
+        with governance scoring
+
+        - app/services/pedr/delta_sync.py: Delta detection and sync orchestration
+        service
+
+        - app/services/pedr/sync_events.py: Event emitter for sync triggers (mission
+        completion)
+
+        - app/cli/pedr.py: CLI commands (sync, status, parity, pending)
+
+        - tests/test_pedr_delta_sync.py: 22 tests all passing
+
+        - docs/pedr-sync.md: Comprehensive sync architecture documentation
+
+
+        Quality gates met:
+
+        - Delta detector queries by updated_at > last_sync
+
+        - Event-driven sync via SyncEventEmitter with priority ordering
+
+        - PEDR manifest includes urn, governance_pii (1-10), governance_impact, bindings
+
+        - CLI: python -m app.cli.pedr sync --delta/--full/--dry-run
+
+        - Parity check validates sync completeness
+
+        - Telemetry: cmos/telemetry/events/sprint-11-pedr-sync.jsonl'
       metadata:
         description: Stream validated missions and relationship context into PEDR
           with governance metadata. Event-driven sync.
@@ -1283,12 +1354,14 @@ domainFields:
         - Scheduler configuration
         - Documentation for index rebuilds
         spec_file: cmos/missions/sprint-11/B11.2_PEDR-Delta-Sync-Service.yaml
+        started_at: '2025-12-05T02:04:11Z'
+        completed_at: '2025-12-05T02:13:36Z'
     - id: B11.3
       name: Mission Protocol Console (Read-Only UI)
-      status: Queued
-      notes: 'Full specification: cmos/missions/sprint-11/B11.3_Mission-Protocol-Console.yaml
-        - Next.js operator dashboard, relationship tree, correction status, export
-        buttons.'
+      status: Completed
+      completed_at: '2025-12-05T02:46:18Z'
+      notes: All success criteria met. Created 11 new files for console pages, components,
+        API client, types, tests, and documentation.
       metadata:
         description: Ship an operator console that consumes the Relationship Context
           API + telemetry. Extend existing Next.js bundle.
@@ -1301,11 +1374,33 @@ domainFields:
         - API client integration
         - Export functionality
         spec_file: cmos/missions/sprint-11/B11.3_Mission-Protocol-Console.yaml
+        started_at: '2025-12-05T02:33:10Z'
+        completed_at: '2025-12-05T02:46:18Z'
     - id: B11.4
       name: Schema Distribution & Contract Hardening
-      status: Queued
-      notes: 'Full specification: cmos/missions/sprint-11/B11.4_Schema-Distribution.yaml
-        - GitHub Packages publishing, semantic versioning, CI version checks.'
+      status: Completed
+      completed_at: '2025-12-05T03:37:54Z'
+      notes: 'Deliverables:
+
+        - pyproject.toml: Updated with dynamic versioning, GitHub Packages URLs, optional
+        deps
+
+        - .github/workflows/publish-schemas.yml: Publishes to GitHub Packages on schemas-v*
+        tag
+
+        - .github/workflows/version-check.yml: CI validates semver, changelog, and
+        schema parity
+
+        - tracelab_schemas/CHANGELOG.md: Versioning policy and 1.0.0 release notes
+
+        - scripts/bump-version.sh: Version bumping helper with semver enforcement
+
+        - docs/schema-versioning.md: Complete versioning and release process documentation
+
+        - README.md: Updated with GitHub Packages installation and usage
+
+
+        Schema package at v1.0.0. Tests pass (2/2). Ready for first release tag.'
       metadata:
         description: Publish tracelab_schemas to GitHub Packages and lock the ingestion
           contract with semantic versioning.
@@ -1318,11 +1413,39 @@ domainFields:
         - Contract documentation updates
         - CI version check
         spec_file: cmos/missions/sprint-11/B11.4_Schema-Distribution.yaml
+        started_at: '2025-12-05T03:26:56Z'
+        completed_at: '2025-12-05T03:37:54Z'
     - id: B11.5
       name: PEDR Pre-Flight Query Service
-      status: Queued
-      notes: 'Full specification: cmos/missions/sprint-11/B11.5_PEDR-PreFlight-Query.yaml
-        - Pre-flight endpoint, reuse/proceed recommendations, decision criteria.'
+      status: Completed
+      completed_at: '2025-12-05T03:55:49Z'
+      notes: 'Deliverables completed:
+
+        - app/schemas/pedr_preflight.py: Request/response schemas (PreflightQuery,
+        PreflightMatch, PreflightRecommendation)
+
+        - app/services/pedr/preflight.py: PreflightService with recommendation logic
+        (reuse/review/proceed)
+
+        - app/api/v1/pedr_preflight.py: POST /api/v1/pedr/preflight endpoint
+
+        - scripts/preflight_example.py: CLI example for DeepSearch integration
+
+        - docs/preflight-queries.md: Integration guide with examples
+
+        - tests/test_pedr_preflight.py: 19 tests for recommendation logic
+
+
+        Decision criteria implemented:
+
+        - reuse: similarity >= 85% AND quality_gates >= 4 AND status = complete
+
+        - review: similarity >= 70% AND status = complete
+
+        - proceed: No qualifying matches
+
+
+        Telemetry enabled at cmos/telemetry/events/sprint-11-preflight.jsonl'
       metadata:
         description: Prevent duplicate research by letting DeepSearch query PEDR before
           launching new missions. min_quality_gates=4, status=complete filter.
@@ -1335,12 +1458,40 @@ domainFields:
         - CLI example for DeepSearch agent
         - Telemetry logging
         spec_file: cmos/missions/sprint-11/B11.5_PEDR-PreFlight-Query.yaml
+        started_at: '2025-12-05T03:44:00Z'
+        completed_at: '2025-12-05T03:55:49Z'
     - id: B11.6
       name: Sprint 11 Retrospective
-      status: Queued
-      notes: 'Full specification: cmos/missions/sprint-11/B11.6_Sprint-Retrospective.yaml
-        - Standard retrospective with correction metrics, PEDR sync stats, Sprint
-        12 draft.'
+      status: Completed
+      completed_at: '2025-12-05T14:19:07Z'
+      notes: 'Deliverables completed:
+
+        - cmos/reports/sprint-11/retrospective.md: Sprint 11 retrospective report
+        with metrics
+
+        - cmos/reports/sprint-11/sprint-12-backlog-draft.md: Phase 3 backlog proposal
+
+        - cmos/telemetry/events/sprint-11-retro.jsonl: Sprint telemetry events
+
+        - MASTER_CONTEXT updated with Sprint 11 outcomes and decisions
+
+        - Backlog and contexts exported for parity
+
+
+        Metrics captured:
+
+        - 5/5 missions completed (B11.1-B11.5)
+
+        - 63 tests passing (correction loop: 22, PEDR sync: 22, pre-flight: 19)
+
+        - 7 error types in correction taxonomy
+
+        - Schema package at v1.0.0
+
+        - Pre-flight thresholds: 85%/4-gates for reuse, 70% for review
+
+
+        Sprint 12 ready with 6 missions focused on production hardening.'
       metadata:
         description: Standard closure mission documenting correction-loop outcomes,
           PEDR sync metrics, and backlog updates.
@@ -1354,6 +1505,48 @@ domainFields:
         - Telemetry JSONL
         - Sprint 12 backlog draft
         spec_file: cmos/missions/sprint-11/B11.6_Sprint-Retrospective.yaml
+        started_at: '2025-12-05T03:58:41Z'
+        completed_at: '2025-12-05T14:19:07Z'
+  - sprintId: sprint-12
+    title: Sprint 12 - Make TraceLab Actually Usable
+    focus: 'Fix critical bugs blocking DeepSearch integration: missions endpoint 500,
+      HTTPS redirects, service account, API consistency'
+    status: Planned
+    startDate: '2025-12-08'
+    endDate: '2025-12-22'
+    totalMissions: 6
+    completedMissions: 0
+    missions:
+    - id: B12.1
+      name: Fix Missions Endpoint 500 Error
+      status: Queued
+      notes: 'CRITICAL: /api/v1/missions/ returns 500 error. Blocks all mission creation.
+        Full spec: cmos/missions/sprint-12/B12.1_Fix-Missions-Endpoint.yaml'
+    - id: B12.2
+      name: Fix HTTPS Redirects Dropping Auth Headers
+      status: Queued
+      notes: 'CRITICAL: FastAPI redirects to http:// not https://, auth headers dropped.
+        Full spec: cmos/missions/sprint-12/B12.2_Fix-HTTPS-Redirects.yaml'
+    - id: B12.3
+      name: Create Service Account in Production
+      status: Queued
+      notes: 'CRITICAL: deepsearch-service account documented but not created in production
+        DB. Full spec: cmos/missions/sprint-12/B12.3_Create-Service-Account-Production.yaml'
+    - id: B12.4
+      name: Standardize API Response Structure
+      status: Queued
+      notes: 'HIGH: API responses inconsistent (data vs results vs items). Full spec:
+        cmos/missions/sprint-12/B12.4_Standardize-API-Responses.yaml'
+    - id: B12.5
+      name: End-to-End Integration Verification
+      status: Queued
+      notes: 'HIGH: Verify complete DeepSearch -> TraceLab flow works after fixes.
+        Full spec: cmos/missions/sprint-12/B12.5_End-to-End-Integration-Verification.yaml'
+    - id: B12.6
+      name: Sprint 12 Retrospective
+      status: Queued
+      notes: 'Document fixes delivered, capture additional issues from E2E testing,
+        draft Sprint 13. Full spec: cmos/missions/sprint-12/B12.6_Sprint-Retrospective.yaml'
   - sprintId: sprint-10
     title: Sprint 10 - DeepSearch Integration & PEDR Phase 1
     focus: Quality-aware search, DeepSearch ingestion endpoint, post-processing auto-linking,

@@ -3,7 +3,7 @@
     "name": "CMOS Starter Template",
     "version": "0.0.0",
     "description": "Blank master context for new CMOS starter projects.",
-    "status": "uninitialised",
+    "status": "sprint-12-needs-revision",
     "start_date": "2025-01-01",
     "deployment": {
       "platform": "FastAPI + PostgreSQL + Qdrant",
@@ -11,8 +11,8 @@
       "environment": "development"
     },
     "session_metrics": {
-      "count": 60,
-      "last_session": "2025-11-12T16:09:23Z",
+      "count": 135,
+      "last_session": "2025-12-05T15:02:20.218158Z",
       "active_domain": "main"
     },
     "achievements": [
@@ -26,7 +26,10 @@
       "Planned Sprint 02: all 5 build missions (B2.1-B2.5) defined with success criteria and dependencies.",
       "Updated B2.3b onboarding mission for single-user deployment and realigned backlog sequencing (B2.3b Current, B2.3d Queued).",
       "Completed Sprint 10: PEDR quality-aware ranking, DeepSearch ingestion + auto-linking, schema package, relationship API, and integration telemetry all shipped with retrospective + backlog updates.",
-      "Sprint 10 completed: PEDR quality-aware ranking (212% boost for validated research), DeepSearch ingestion with 100% auto-linking, schema package, relationship API, and 24-test integration suite."
+      "Sprint 10 completed: PEDR quality-aware ranking (212% boost for validated research), DeepSearch ingestion with 100% auto-linking, schema package, relationship API, and 24-test integration suite.",
+      "Sprint 11 completed: correction loops, PEDR delta sync, console UI, schema distribution (v1.0.0), pre-flight queries",
+      "Sprint 12 planned with 6 missions and B12.4 (DeepSearch credentials) completed during planning",
+      "DeepSearch integration unblocked - service account created and documented"
     ],
     "files_created": [
       "cmos/missions/sprint-01/B1.1_Core-Service-Bootstrap.yaml",
@@ -58,7 +61,7 @@
       "cmos/reports/sprint-02/.gitkeep"
     ],
     "planning_overview": {
-      "current_sprint": "Sprint 11 - Correction Loop & PEDR Delta",
+      "current_sprint": "Sprint 12 - Production Hardening & Integration Polish",
       "session_summaries": [
         {
           "session_date": "2025-11-10",
@@ -131,6 +134,72 @@
             "cmos/missions/backlog.yaml - Sprint 11 backlog synced"
           ],
           "blockers_identified": {}
+        },
+        {
+          "session_date": "2025-12-05",
+          "agent": "Claude Opus 4.5",
+          "focus": "Sprint 12 planning and DeepSearch integration unblocking",
+          "key_discoveries": [
+            "Sprint 11 completed all 6 missions (B11.1-B11.6) with 63 tests passing",
+            "DeepSearch blocked on P0 credentials - resolved by creating deepsearch-service account",
+            "Auth architecture is simple (single shared service account) which is appropriate for internal project",
+            "Sprint 11 retrospective identified 4 follow-up areas: load testing, telemetry rotation, console auth, schema evolution"
+          ],
+          "decisions_made": [
+            "B12.4 (DeepSearch Service Account) completed during planning to unblock DeepSearch Sprint 05",
+            "Auth risk assessed as LOW - single shared account, JWT with 24h expiry, no user management",
+            "Sprint 12 scope: 6 missions (B12.1-B12.6) focused on production hardening",
+            "Full mission YAML files created for each Sprint 12 mission for agent execution clarity"
+          ],
+          "mistakes_made": [],
+          "files_modified": [
+            "TraceLab/.env - Updated with deepsearch-service credentials",
+            "DeepSearch.alpha/cmos/planning/Answers-from-tracelab-sprint12.md - Full integration answers",
+            "cmos/missions/sprint-12/*.yaml - 6 mission protocol files",
+            "cmos/reports/sprint-11/sprint-12-backlog-draft.md - Sprint 12 backlog",
+            "cmos/db/cmos.sqlite - Sprint 12 missions seeded"
+          ],
+          "blockers_identified": {}
+        },
+        {
+          "session_date": "2025-12-05",
+          "agent": "Claude Opus 4.5",
+          "focus": "CRITICAL: Sprint 12 backlog review - fundamentally misaligned with project needs",
+          "key_discoveries": [
+            "Sprint 12 backlog was built from 'retrospective follow-ups' - infrastructure work for scale problems that don't exist",
+            "TraceLab is a SINGLE BUILDER, SINGLE USER internal tool - not a production system with users",
+            "B12.1 (Load Testing): Tests for traffic volume that doesn't exist",
+            "B12.2 (Telemetry Rotation): Solves storage problem that can be fixed with 'rm'",
+            "B12.3 (Console Auth): Protects against users that don't exist",
+            "B12.5 (Schema Evolution): Process documentation for a team that doesn't exist",
+            "Only B12.4 (DeepSearch credentials) was valuable - and it's already done",
+            "DeepSearch integration uses JWT login flow when simple API key would reduce friction for the ONE real integration"
+          ],
+          "decisions_made": [
+            "SPRINT 12 BACKLOG IS WRONG - must be revised by next agent",
+            "B12.1, B12.2, B12.3, B12.5 should be scrapped - infrastructure theater for nonexistent scale",
+            "B12.4 is the only salvageable mission (already completed)",
+            "Next sprint should focus on: API key support for DeepSearch, actual features that help real workflows",
+            "Stop building for imaginary production load - build for actual single-user internal tool use case"
+          ],
+          "mistakes_made": [
+            "Proposed infrastructure/hardening work because retrospective mentioned it as 'follow-ups'",
+            "Failed to question whether follow-ups for production system apply to single-builder tool",
+            "Prioritized 'sensible defaults' and 'hardening' over actual user value",
+            "Made DeepSearch use JWT login dance instead of simple API key - added friction to key integration",
+            "Created 6 detailed mission YAML files for work that shouldn't be done"
+          ],
+          "files_modified": [
+            "cmos/missions/sprint-12/*.yaml - 6 mission files created (most should be deleted)",
+            "cmos/db/cmos.sqlite - Sprint 12 missions seeded (need revision)"
+          ],
+          "blockers_identified": {
+            "sprint_12_misalignment": {
+              "issue": "Entire sprint backlog optimizes for nonexistent scale instead of actual use case",
+              "impact": "Would waste effort on infrastructure theater instead of real value",
+              "fix": "Next agent must: 1) Scrap B12.1/B12.2/B12.3/B12.5, 2) Add API key support, 3) Focus on actual needs"
+            }
+          }
         }
       ]
     }
@@ -145,7 +214,9 @@
       "Vector storage operational: Qdrant with on-disk storage, scalar quantization, 12,800 chunks indexed.",
       "Document & project read APIs are still missing; Document Library UI/CLI list flows remain blocked until B7.1 ships.",
       "scripts/ingest_cli.py currently returns 401 because it never requests JWT tokens; B7.3 owns the fix so ingestion workflows can pass tests/integration/test_ingestion_flow.py.",
-      "Integration testing guardrails (cmos/docs/integration-testing-guide.md + structured prompting refs) are absent, keeping node cmos/context/integration_test_runner.js red; schedule B7.2 to restore telemetry gating."
+      "Integration testing guardrails (cmos/docs/integration-testing-guide.md + structured prompting refs) are absent, keeping node cmos/context/integration_test_runner.js red; schedule B7.2 to restore telemetry gating.",
+      "Sprint 12 missions have full YAML protocol files in cmos/missions/sprint-12/ for unambiguous agent execution",
+      "SPRINT 12 MISALIGNED: B12.1 (load testing), B12.2 (telemetry rotation), B12.3 (console auth), B12.5 (schema evolution) are infrastructure work for scale problems that don't exist. TraceLab is single-builder, single-user. Next agent must revise sprint to focus on real value: API key for DeepSearch, actual workflow features."
     ],
     "system_components": {
       "ingestion": "Upload endpoints, format routing (PDF/DOCX/PPTX/CSV/XLSX), redaction, chunking (500-1000 tokens with overlap), and processing state tracking.",
@@ -327,7 +398,42 @@
     "Console UI: extend existing Next.js bundle (from PS-2025-12-05-001)",
     "Package index: GitHub Packages for tracelab_schemas distribution (from PS-2025-12-05-001)",
     "B11.1 kept combined (not split into sub-missions) (from PS-2025-12-05-001)",
-    "B6.6 Integration API archived as superseded (from PS-2025-12-05-001)"
+    "B6.6 Integration API archived as superseded (from PS-2025-12-05-001)",
+    "Correction loop uses async webhooks with exponential backoff (5s, 30s)",
+    "PEDR sync is event-driven via SyncEventEmitter with priority ordering",
+    "Pre-flight thresholds: 85%+4 gates for reuse, 70% for review",
+    "Schema package published to GitHub Packages with semver validation",
+    "Console extends existing Next.js bundle",
+    "Sprint 12 Theme: Production Hardening & Integration Polish - focus on load testing, telemetry rotation, console auth, and DeepSearch integration support (from PS-2025-12-05-002)",
+    "B12.4 (DeepSearch Service Account) completed early - credentials created and documented in DeepSearch.alpha/cmos/planning/Answers-from-tracelab-sprint12.md. TraceLab .env updated with deepsearch-service account. (from PS-2025-12-05-002)",
+    "Auth risk is LOW: single shared service account via env vars, JWT with 24h expiry, no user management complexity. DeepSearch unblocked immediately. (from PS-2025-12-05-002)",
+    {
+      "decision": "Sprint 12 uses production hardening theme: load testing, telemetry rotation, console auth, schema evolution",
+      "source": "PS-2025-12-05-002",
+      "date": "2025-12-05"
+    },
+    {
+      "decision": "Auth architecture: single shared service account (deepsearch-service) for internal project simplicity",
+      "source": "PS-2025-12-05-002",
+      "date": "2025-12-05"
+    },
+    {
+      "decision": "Full mission YAML protocol files required for all Sprint 12 missions to ensure agent execution clarity",
+      "source": "PS-2025-12-05-002",
+      "date": "2025-12-05"
+    },
+    {
+      "decision": "DeepSearch credentials: deepsearch-service with 24h JWT expiry, documented in DeepSearch.alpha planning repo",
+      "source": "PS-2025-12-05-002",
+      "date": "2025-12-05"
+    },
+    {
+      "decision": "SPRINT 12 REQUIRES REVISION: Backlog was infrastructure theater for nonexistent scale. Only B12.4 (credentials) was valuable. Next agent must rebuild sprint around actual single-user use case needs, starting with API key support for DeepSearch.",
+      "source": "PS-2025-12-05-002 review",
+      "date": "2025-12-05",
+      "priority": "CRITICAL"
+    },
+    "Sprint 12 priority order confirmed: B12.1 (Load Testing) -> B12.2 (Telemetry) -> B12.3 (Console Auth) -> B12.5 (Schema Evolution) -> B12.6 (Retro) (from PS-2025-12-05-003)"
   ],
   "constraints": [
     "All document processing workflows must execute redaction prior to persistence or embedding.",
@@ -386,7 +492,8 @@
       "sprint_08": "Planned - 6 missions",
       "sprint_09": "Completed - hybrid search, faceted filters, search history, saved searches shipped",
       "sprint_10": "Completed - DeepSearch ingestion + PEDR Phase 1 delivered",
-      "sprint_11": "Planned - correction loop & PEDR delta"
+      "sprint_11": "Completed - correction loop, PEDR sync, console, schema distribution, pre-flight delivered",
+      "sprint_12": "Planned - production hardening & load testing"
     },
     "current_focus": "Sprint 11 - Correction Loop & PEDR Delta",
     "next_checkpoint": "Sprint 11 missions: correction loop, PEDR delta sync, Mission Protocol Console",
@@ -1366,37 +1473,128 @@
         "summary": "Sprint 10 retro delivered metrics, telemetry, and Sprint 11 backlog.",
         "action": "complete",
         "ts": "2025-11-18T13:54:42Z"
+      },
+      {
+        "mission": "B11.1",
+        "agent": "assistant",
+        "summary": "Starting auto-link correction loop implementation",
+        "action": "start",
+        "ts": "2025-12-05T01:34:36Z"
+      },
+      {
+        "mission": "B11.1",
+        "agent": "assistant",
+        "summary": "Auto-link correction loop with webhooks and telemetry implemented",
+        "action": "complete",
+        "ts": "2025-12-05T02:00:28Z"
+      },
+      {
+        "mission": "B11.2",
+        "agent": "assistant",
+        "summary": "Starting PEDR Delta Sync Service implementation",
+        "action": "start",
+        "ts": "2025-12-05T02:04:11Z"
+      },
+      {
+        "mission": "B11.2",
+        "agent": "assistant",
+        "summary": "PEDR Delta Sync Service implemented with event-driven architecture",
+        "action": "complete",
+        "ts": "2025-12-05T02:13:36Z"
+      },
+      {
+        "mission": "B11.3",
+        "agent": "claude-opus-4-5",
+        "summary": "Building Mission Protocol Console read-only UI with dashboard, relationships, corrections, and export",
+        "action": "start",
+        "ts": "2025-12-05T02:33:10Z"
+      },
+      {
+        "mission": "B11.3",
+        "agent": "claude-opus-4-5",
+        "summary": "Delivered Mission Protocol Console with dashboard, mission list, detail view, corrections queue, and export functionality",
+        "action": "complete",
+        "ts": "2025-12-05T02:46:18Z"
+      },
+      {
+        "mission": "B11.4",
+        "agent": "assistant",
+        "summary": "Starting schema distribution and contract hardening",
+        "action": "start",
+        "ts": "2025-12-05T03:26:56Z"
+      },
+      {
+        "mission": "B11.4",
+        "agent": "assistant",
+        "summary": "Schema distribution and contract hardening complete",
+        "action": "complete",
+        "ts": "2025-12-05T03:37:54Z"
+      },
+      {
+        "mission": "B11.5",
+        "agent": "assistant",
+        "summary": "Implementing PEDR pre-flight query service",
+        "action": "start",
+        "ts": "2025-12-05T03:44:00Z"
+      },
+      {
+        "mission": "B11.5",
+        "agent": "assistant",
+        "summary": "Implemented PEDR pre-flight query service for duplicate research prevention",
+        "action": "complete",
+        "ts": "2025-12-05T03:55:49Z"
+      },
+      {
+        "mission": "B11.6",
+        "agent": "claude-opus",
+        "summary": "Starting Sprint 11 retrospective",
+        "action": "start",
+        "ts": "2025-12-05T03:58:41Z"
+      },
+      {
+        "mission": "B11.6",
+        "agent": "claude-opus",
+        "summary": "Sprint 11 retrospective completed",
+        "action": "complete",
+        "ts": "2025-12-05T14:19:07Z"
       }
     ],
-    "last_session": "2025-11-18T13:54:42Z",
-    "session_count": 38,
+    "last_session": "2025-12-05T14:19:07Z",
+    "session_count": 50,
     "active_mission": null,
     "blocked_missions": [],
-    "last_completed_mission": "B10.6"
+    "last_completed_mission": "B11.6"
   },
   "next_session_context": {
     "when_we_resume": [
-      "PS-2025-12-05-001: Start B11.1 Auto-Link Correction Loop & Observability",
-      "PS-2025-12-05-001: Review cmos/planning/DeepSearch-TraceLab-Integration-Contract.md Phase 2 section before implementing"
+      "PS-2025-12-05-001: Review cmos/planning/DeepSearch-TraceLab-Integration-Contract.md Phase 2 section before implementing",
+      "PS-2025-12-05-002: Start B12.1 Production Load Testing - benchmark correction loop, PEDR sync, and preflight queries",
+      "PS-2025-12-05-003: Start B12.1 Production Load Testing",
+      "PS-2025-12-05-003: Benchmark correction loop at 100+ concurrent items",
+      "PS-2025-12-05-003: Validate PEDR sync handles 500+ mission delta in <60s"
     ]
   },
   "context_health": {
-    "sessions_since_reset": 44,
-    "last_update": "2025-12-05T01:21:15Z",
-    "size_kb": 49.96,
+    "sessions_since_reset": 60,
+    "last_update": "2025-12-05T15:15:11Z",
+    "size_kb": 60.48,
     "size_limit_kb": 100
   },
   "learnings": [
     "TTL caches cut repeated RAG latency from 22.23 ms to 0.008 ms and drop repeated OpenAI cost to ~$0.000071; monitoring dashboard now surfaces these metrics alongside cost telemetry.",
     "Sprint 09 metrics: hybrid precision +0.12 vs semantic-only, avg search durations 419 ms, saved-search replay 25% (see cmos/reports/sprint-09/search-metrics-report.md).",
     "Auto-link telemetry hit 100% success on the customer onboarding payload; treat telemetry deltas as the trigger for correction-loop retries.",
-    "Sprint 10 delivered all 6 missions: PEDR quality scoring (212% boost for complete vs draft), DeepSearch ingestion with 100% auto-linking success, schema package, relationship API, and integration test suite (24 tests passing) (from PS-2025-12-05-001)"
+    "Sprint 10 delivered all 6 missions: PEDR quality scoring (212% boost for complete vs draft), DeepSearch ingestion with 100% auto-linking success, schema package, relationship API, and integration test suite (24 tests passing) (from PS-2025-12-05-001)",
+    "DeepSearch team has questions ready for integration - answered in DeepSearch.alpha/cmos/planning/Answers-from-tracelab-sprint12.md. Key items: API URLs, auth flow, PEDR preflight endpoint, ingest endpoint status. (from PS-2025-12-05-002)",
+    "Sprint 11 achieved 100% mission completion (6/6) with 63 tests passing across correction loop, PEDR sync, and pre-flight modules (from PS-2025-12-05-003)",
+    "B12.4 (DeepSearch Service Account) completed early during planning, enabling DeepSearch Sprint 05 to proceed immediately (from PS-2025-12-05-003)"
   ],
   "context_notes": [
     "B7.7 validated ingestion flow end-to-end; prod + local confirmed, only residual issue is local hydration warnings but no blocking impact.",
     "B6.3 not actually blocked - project dropdown shows 0 but actual functionality works. B7.1 resolved the blocker by adding GET endpoints. Database blocker record needs cleanup.",
     "Publish tracelab_schemas to the internal index and wire CI guards so DeepSearch + TraceLab pin the same schema version before Sprint 11 starts.",
-    "Current branch: sprint-10-quality-aware-search. No active missions in backlog. Sprint 11 draft exists with 6 missions covering correction loops, PEDR sync, operator console, schema publishing, and pre-flight queries."
+    "Current branch: sprint-10-quality-aware-search. No active missions in backlog. Sprint 11 draft exists with 6 missions covering correction loops, PEDR sync, operator console, schema publishing, and pre-flight queries.",
+    "Sprint 11 completed all 6 missions: B11.1 (Correction Loop), B11.2 (PEDR Delta Sync), B11.3 (Console UI), B11.4 (Schema Distribution), B11.5 (Pre-Flight Query), B11.6 (Retrospective). 63 tests passing, schema at v1.0.0."
   ],
   "recent_sessions": [
     {
@@ -1440,6 +1638,35 @@
         "decision": 7,
         "next-step": 2
       }
+    },
+    {
+      "id": "PS-2025-12-05-002",
+      "session_type": "planning",
+      "type": "planning",
+      "title": "Sprint 12 Planning",
+      "summary": "Sprint 12 planned: 6 missions (B12.1-B12.6) focused on production hardening. B12.4 (DeepSearch Service Account) completed early - credentials created and documented. Auth risk assessed as LOW. DeepSearch unblocked for their Sprint 05.",
+      "completed_at": "2025-12-05T14:50:48Z",
+      "capture_count": 6,
+      "captures": {
+        "context": 1,
+        "learning": 1,
+        "decision": 3,
+        "next-step": 1
+      }
+    },
+    {
+      "id": "PS-2025-12-05-003",
+      "session_type": "review",
+      "type": "review",
+      "title": "Sprint 11 Review & Sprint 12 Planning Finalization",
+      "summary": "Sprint 11 review confirmed: 6/6 missions complete (100%), 63 tests passing, DeepSearch integration fully documented. Sprint 12 ready with B12.4 already complete. Priority: B12.1 (Load Testing) is next up.",
+      "completed_at": "2025-12-05T15:15:11Z",
+      "capture_count": 3,
+      "captures": {
+        "learning": 2,
+        "decision": 1
+      }
     }
-  ]
+  ],
+  "current_focus": "Sprint 12 - Phase 3: Production hardening, load testing, telemetry aggregation"
 }

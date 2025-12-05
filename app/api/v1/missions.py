@@ -1,10 +1,13 @@
 """Mission Protocol API endpoints."""
 from __future__ import annotations
 
+import logging
 from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from pydantic import ValidationError
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -21,6 +24,8 @@ from app.services.mission_protocol_service import (
 )
 from app.services.quality_checks import QualityAutomationRunner
 from app.services.report_export import ReportExportError, ReportExportService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 _quality_runner = QualityAutomationRunner(async_enabled=True)
@@ -42,17 +47,56 @@ def list_missions(
     project_id: Optional[UUID] = None,
     db: Session = Depends(get_db),
 ) -> List[MissionRead]:
-    missions = _service.list_missions(db, project_id=project_id)
-    return [_mission_read(mission) for mission in missions]
+    try:
+        missions = _service.list_missions(db, project_id=project_id)
+        return [_mission_read(mission) for mission in missions]
+    except SQLAlchemyError as exc:
+        logger.exception("Database error listing missions")
+        error_str = str(exc)
+        if "evidence_linking_metadata" in error_str:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Database schema mismatch: missing 'evidence_linking_metadata' column. Run 'alembic upgrade head' to apply migrations.",
+            ) from exc
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error: {error_str[:200]}",
+        ) from exc
+    except ValidationError as exc:
+        logger.exception("Validation error serializing missions")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Data validation error: {str(exc)[:200]}",
+        ) from exc
 
 
 @router.post("/", response_model=MissionRead, status_code=status.HTTP_201_CREATED)
 def create_mission(payload: MissionCreate, db: Session = Depends(get_db)) -> MissionRead:
     try:
         mission = _service.create_mission(db, payload)
+        return _mission_read(mission)
     except MissionProtocolServiceError as exc:
         _raise_http_error(exc)
-    return _mission_read(mission)
+    except SQLAlchemyError as exc:
+        logger.exception("Database error creating mission")
+        error_str = str(exc)
+        if "evidence_linking_metadata" in error_str:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Database schema mismatch: missing 'evidence_linking_metadata' column. Run 'alembic upgrade head' to apply migrations.",
+            ) from exc
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error: {error_str[:200]}",
+        ) from exc
+    except ValidationError as exc:
+        logger.exception("Validation error serializing mission")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Data validation error: {str(exc)[:200]}",
+        ) from exc
+    # This return is here to satisfy type checker - the try block returns or raises
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error")
 
 
 @router.get("/{mission_id}", response_model=MissionRead)

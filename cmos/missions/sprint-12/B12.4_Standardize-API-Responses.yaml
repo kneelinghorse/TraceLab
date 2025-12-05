@@ -1,0 +1,61 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B12.4
+  name: Standardize API Response Structure
+  sprint: Sprint 12
+  type: Build.Improvement.v1
+  priority: high
+  created: 2025-12-05
+  owner: assistant
+
+missionId: "B12.4"
+
+spec:
+  objective: |
+    Standardize all API list endpoints to use consistent response structure so
+    frontend and integrations don't need special handling per endpoint.
+
+  context: |
+    **Current Inconsistency:**
+    | Endpoint | Response Key | Structure |
+    |----------|-------------|-----------|
+    | /projects | `data` | `{"data": [...], "pagination": {...}}` |
+    | /documents | `data` | `{"data": [...], "pagination": {...}}` |
+    | /retrieval/search | `results` | `{"results": [...]}` |
+    | /search | direct | `{"answer": ..., "sources": [...]}` |
+    | /facets | direct | `{"projects": [...], "document_types": [...]}` |
+    | /missions | unknown | Currently 500 error |
+
+    **Proposed Standard:**
+    - List endpoints return: `{"data": [...], "pagination": {...}}` or `{"data": [...]}`
+    - Search endpoints return: `{"results": [...], "metadata": {...}}`
+    - Action endpoints return: `{"success": bool, "data": {...}}`
+    - Keep specialized responses (like /search RAG answer) as-is but document
+
+    **Frontend Impact:**
+    - Search page may be expecting different keys
+    - Need to update frontend API client if we change backend
+    - Or update backend to match what frontend expects
+
+  success_criteria:
+    - All list endpoints use consistent `data` key for arrays
+    - Pagination structure is consistent where applicable
+    - Frontend search page works with correct response structure
+    - API documentation updated with response schemas
+
+  deliverables:
+    - Audit of all endpoints and their current response structure
+    - Standardized response schemas in app/schemas/
+    - Updated endpoints to use consistent structure
+    - Frontend fixes if needed
+
+  test_plan:
+    - Call each list endpoint and verify response structure
+    - Verify frontend pages still work after changes
+    - Run existing tests to catch regressions
+
+  estimated_effort: 2-3 hours
+  dependencies:
+    - B12.1 (missions endpoint must work first)
