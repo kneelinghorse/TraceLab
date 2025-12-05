@@ -1,5 +1,5 @@
 missionId: "TR-Mission-Protocol-Validation-001"
-objective: "Research validation frameworks and schema enforcement strategies for Mission Protocol YAML structure, ensuring quality gates can be automatically enforced and validated against the schema."
+objective: "Resarch validation frameworks and schema enforcement strategies for Mission Protocol YAML structure, ensuring quality gates can be automatically enforced and validated against the schema."
 
 context: |
   Mission Protocol stored as JSONB in PostgreSQL.
