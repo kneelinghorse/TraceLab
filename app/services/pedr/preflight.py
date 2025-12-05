@@ -12,7 +12,7 @@ import uuid
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple
 
 from sqlalchemy.orm import Session
 
@@ -27,8 +27,10 @@ from app.schemas.pedr_preflight import (
     PreflightRecommendation,
     PreflightTelemetry,
 )
-from app.services.hybrid_search import HybridSearchService, get_hybrid_search_service
-from app.services.pedr import QualityFilters
+from app.services.pedr.quality_scoring import QualityFilters
+
+if TYPE_CHECKING:
+    from app.services.hybrid_search import HybridSearchService
 
 logger = logging.getLogger(__name__)
 
@@ -52,12 +54,16 @@ class PreflightService:
     def __init__(
         self,
         *,
-        search_service: Optional[HybridSearchService] = None,
+        search_service: Optional["HybridSearchService"] = None,
         session_factory: Callable[[], Session] = SessionLocal,
         thresholds: Optional[PreflightThresholds] = None,
         telemetry_enabled: bool = True,
     ) -> None:
-        self.search_service = search_service or get_hybrid_search_service()
+        if search_service is None:
+            # Lazy import to avoid circular dependency
+            from app.services.hybrid_search import get_hybrid_search_service
+            search_service = get_hybrid_search_service()
+        self.search_service = search_service
         self.session_factory = session_factory
         self.thresholds = thresholds or self.DEFAULT_THRESHOLDS
         self.telemetry_enabled = telemetry_enabled
