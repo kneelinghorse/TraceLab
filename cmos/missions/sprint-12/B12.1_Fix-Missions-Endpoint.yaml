@@ -1,0 +1,56 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B12.1
+  name: Fix Missions Endpoint 500 Error
+  sprint: Sprint 12
+  type: Build.Fix.v1
+  priority: critical
+  created: 2025-12-05
+  owner: assistant
+
+missionId: "B12.1"
+
+spec:
+  objective: |
+    Fix the /api/v1/missions/ endpoint which currently returns 500 Internal Server Error.
+    This is blocking all mission creation and listing - the core functionality DeepSearch needs.
+
+  context: |
+    **Current State:**
+    - GET /api/v1/missions/ returns 500 Internal Server Error
+    - POST /api/v1/missions/ also returns 500
+    - The endpoint redirects from /missions to /missions/ (307) then fails
+    - No missions can be created or listed in production
+
+    **Root Cause Investigation Needed:**
+    - The MissionRead schema requires `mission_data: MissionProtocolDraft` which is complex
+    - Likely a serialization/validation error when querying the database
+    - Could be a database schema mismatch with the Pydantic models
+    - Check if the missions table exists and has correct schema in production
+
+    **Files to Investigate:**
+    - app/api/v1/missions.py - endpoint handlers
+    - app/schemas/mission.py - MissionRead, MissionCreate schemas
+    - app/models/mission.py - SQLAlchemy model
+    - app/services/mission_protocol_service.py - list_missions, create_mission
+
+  success_criteria:
+    - GET /api/v1/missions/ returns 200 with list of missions (even if empty)
+    - POST /api/v1/missions/ successfully creates a mission
+    - GET /api/v1/missions/{id} returns a specific mission
+    - All endpoints work in production at https://api.namozine.com
+
+  deliverables:
+    - Fix applied to missions endpoint
+    - Verification script or curl commands proving endpoints work
+    - Root cause documented in mission notes
+
+  test_plan:
+    - Run locally: curl -X GET http://localhost:8000/api/v1/missions/
+    - Create test mission: POST with minimal MissionProtocolDraft payload
+    - Verify in production after deployment
+
+  estimated_effort: 2-4 hours
+  dependencies: []

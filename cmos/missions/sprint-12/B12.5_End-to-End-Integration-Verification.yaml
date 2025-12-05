@@ -1,0 +1,62 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B12.5
+  name: End-to-End Integration Verification
+  sprint: Sprint 12
+  type: Build.Testing.v1
+  priority: high
+  created: 2025-12-05
+  owner: assistant
+
+missionId: "B12.5"
+
+spec:
+  objective: |
+    Verify the complete DeepSearch → TraceLab integration flow works end-to-end
+    in production, documenting any issues found for follow-up.
+
+  context: |
+    **The Integration Flow:**
+    1. DeepSearch authenticates via /api/v1/auth/login
+    2. DeepSearch calls /api/v1/pedr/preflight to check for existing research
+    3. If "proceed", DeepSearch does web research
+    4. DeepSearch calls /api/v1/deepsearch/ingest with MissionProtocolComplete
+    5. TraceLab validates, auto-links evidence, stores mission
+    6. Future preflight queries can find this mission
+
+    **Current State:**
+    - Step 1: BLOCKED (service account doesn't exist) - B12.3 fixes this
+    - Step 2: Should work (preflight endpoint is functional)
+    - Step 4: Unknown (missions endpoint is broken) - B12.1 fixes this
+    - Step 5: Unknown (depends on missions working)
+
+    **What This Mission Does:**
+    After B12.1-B12.3 are complete, run the full integration flow and verify
+    each step works. Document any issues for additional fixes.
+
+  success_criteria:
+    - Service account can authenticate
+    - Preflight query returns valid response (proceed, review, or reuse)
+    - Ingest endpoint accepts a test MissionProtocolComplete payload
+    - Mission is persisted and visible via GET /missions
+    - Subsequent preflight query finds the ingested mission
+
+  deliverables:
+    - Integration test script (Python) that runs full flow
+    - Documentation of test results
+    - List of any additional issues found
+    - Telemetry captured for the test run
+
+  test_plan:
+    - Create test_integration.py script
+    - Run against production with deepsearch-service account
+    - Use a clearly marked test mission (e.g., mission_id: "TEST-E2E-001")
+    - Verify each step and log results
+
+  estimated_effort: 2 hours
+  dependencies:
+    - B12.1 (missions endpoint must work)
+    - B12.2 (redirects must be fixed)
+    - B12.3 (service account must exist)
