@@ -1,0 +1,151 @@
+name: Publish Schema Package
+
+on:
+  push:
+    tags:
+      - 'schemas-v*'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  validate:
+    name: Validate version tag
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: extract
+        run: |
+          TAG_VERSION="${GITHUB_REF#refs/tags/schemas-v}"
+          echo "version=$TAG_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Tag version: $TAG_VERSION"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify version matches package
+        run: |
+          cd tracelab_schemas
+          PACKAGE_VERSION=$(python -c "from tracelab_schemas.version import __version__; print(__version__)")
+          TAG_VERSION="${{ steps.extract.outputs.version }}"
+
+          if [ "$PACKAGE_VERSION" != "$TAG_VERSION" ]; then
+            echo "ERROR: Tag version ($TAG_VERSION) does not match package version ($PACKAGE_VERSION)"
+            echo "Please update tracelab_schemas/tracelab_schemas/version.py to match the tag"
+            exit 1
+          fi
+
+          echo "Version check passed: $PACKAGE_VERSION"
+
+  build:
+    name: Build package
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install build tools
+        run: pip install build
+
+      - name: Build wheel and sdist
+        run: |
+          cd tracelab_schemas
+          python -m build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: tracelab_schemas/dist/
+
+  publish-github:
+    name: Publish to GitHub Packages
+    needs: [validate, build]
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install twine
+        run: pip install twine
+
+      - name: Publish to GitHub Packages
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python -m twine upload \
+            --repository-url https://upload.pypi.pkg.github.com/systemsystems/ \
+            dist/*
+
+  create-release:
+    name: Create GitHub Release
+    needs: [validate, publish-github]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Extract changelog section
+        id: changelog
+        run: |
+          VERSION="${{ needs.validate.outputs.version }}"
+          # Extract the section for this version from CHANGELOG.md
+          NOTES=$(awk "/^## \[$VERSION\]/{found=1; next} /^## \[/{if(found) exit} found" tracelab_schemas/CHANGELOG.md)
+
+          if [ -z "$NOTES" ]; then
+            NOTES="Release v$VERSION of tracelab-schemas package."
+          fi
+
+          echo "notes<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$NOTES" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: tracelab-schemas v${{ needs.validate.outputs.version }}
+          body: |
+            ## tracelab-schemas v${{ needs.validate.outputs.version }}
+
+            ${{ steps.changelog.outputs.notes }}
+
+            ### Installation
+
+            ```bash
+            pip install tracelab-schemas==${{ needs.validate.outputs.version }} \
+              --index-url https://pypi.pkg.github.com/systemsystems
+            ```
+          files: dist/*
+          draft: false
+          prerelease: ${{ contains(needs.validate.outputs.version, '-') }}
