@@ -1,0 +1,155 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B10.4
+  name: Relationship Context API
+  sprint: Sprint 10
+  type: Build.Implementation.v1
+  priority: medium
+  created: 2025-11-17
+  owner: assistant
+
+missionId: "B10.4"
+
+spec:
+  objective: |
+    Implement API endpoint to retrieve related entities (documents, insights, chunks) for 
+    a given mission, providing full research context through SQL joins without separate graph database.
+  
+  context: |
+    Per PEDR integration plan Phase 1, relationship context is valuable for understanding 
+    research connections. Per alignment with DeepSearch, implement via simple SQL joins 
+    (no separate graph database for MVP).
+    
+    When viewing a mission, users and agents want to see:
+    - All documents that contributed evidence
+    - All insights derived from mission research
+    - All chunks referenced in evidence
+    - Related missions in same project
+    
+    This provides "full story" context beyond isolated chunks.
+  
+  researchStatement:
+    topic: Relationship traversal for research artifacts
+    scope: SQL-based graph queries, related entity retrieval
+    centralHypothesis: Relationship context improves research comprehension and reusability
+  
+  keyQuestions:
+    - What relationships should be exposed?
+    - How deep should traversal go (1 hop, 2 hops)?
+    - Should related entities be filtered by relevance?
+    - What's acceptable query performance?
+  
+  technicalApproach:
+    architecture:
+      - RESTful endpoint for relationship queries
+      - SQL JOIN-based traversal (no graph DB)
+      - Configurable depth and filters
+      - Response includes relationship metadata
+    
+    implementation:
+      - Create GET /api/v1/missions/{mission_id}/related endpoint
+      - Implement app/services/relationship_service.py
+      - SQL queries using JOINs (documents via evidence chunks, insights via insight_sources, related missions via project+tags)
+      - Add relationship metadata (relationship_type, relevance_score)
+      - Support depth parameter (default 1, max 2)
+      - Add filtering (entity_types, min_relevance)
+      - Cache relationship queries (TTL 5min)
+      - Add tests for relationship traversal
+      - Document relationship API
+    
+    relationshipQueries: |
+      Get related documents:
+      SELECT DISTINCT d.* 
+      FROM documents d
+      JOIN document_chunks dc ON dc.document_id = d.id
+      JOIN missions m ON m.mission_data->>'evidence' LIKE '%' || dc.id || '%'
+      WHERE m.id = :mission_id;
+      
+      Get related insights:
+      SELECT DISTINCT i.*
+      FROM insights i
+      JOIN insight_sources isrc ON isrc.insight_id = i.id
+      JOIN document_chunks dc ON dc.id = isrc.chunk_id
+      JOIN missions m ON m.mission_data->>'evidence' LIKE '%' || dc.id || '%'
+      WHERE m.id = :mission_id;
+      
+      Get related missions (same project):
+      SELECT m2.*
+      FROM missions m1
+      JOIN missions m2 ON m2.project_id = m1.project_id
+      WHERE m1.id = :mission_id AND m2.id != :mission_id;
+  
+  successCriteria:
+    - GET /api/v1/missions/{mission_id}/related endpoint works
+    - Returns related documents, insights, chunks
+    - Relationship metadata included (type, relevance)
+    - Depth parameter controls traversal (1-2 hops)
+    - Query performance <500ms for typical mission
+    - Response cached to reduce load
+    - Tests verify relationship queries
+    - Documentation explains API usage
+  
+  deliverables:
+    - file: app/api/v1/relationships.py
+      description: Relationship context endpoints
+    
+    - file: app/services/relationship_service.py
+      description: Relationship traversal service using SQL
+    
+    - file: app/schemas/relationships.py
+      description: Relationship response schemas
+    
+    - file: tests/test_relationship_api.py
+      description: Relationship traversal tests
+    
+    - file: docs/relationship-api.md
+      description: Relationship context API documentation
+  
+  qualityGates:
+    - gate: relationships_accurate
+      description: Queries return correct related entities
+      validation: Test cases verify relationship logic
+    
+    - gate: performance_acceptable
+      description: Query latency acceptable
+      validation: Queries complete in <500ms
+    
+    - gate: caching_working
+      description: Results cached to reduce load
+      validation: Cache tests verify TTL behavior
+  
+  dependencies:
+    upstream:
+      - B10.2  # Missions must be stored before relationships queryable
+    downstream:
+      - B10.5  # Integration testing
+  
+  risks:
+    - risk: Complex JOINs slow with large datasets
+      mitigation: Add indexes, limit depth, cache results
+    
+    - risk: JSON queries inefficient
+      mitigation: Consider materialized views if performance issues
+  
+  acceptanceCriteria:
+    - Related documents query works
+    - Related insights query works
+    - Related missions query works
+    - Depth parameter limits traversal
+    - Relationship metadata accurate
+    - Query performance <500ms p95
+    - Results cached (5min TTL)
+    - Tests verify all relationship types
+    - Documentation with usage examples
+  
+  estimatedEffort: small-medium
+  orchestrationPattern: none
+  
+domainFields:
+  sprint_10_integration: true
+  pedr_phase: 2
+  performance_impact: low
+  integration_category: graph_context
+

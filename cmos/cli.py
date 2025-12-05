@@ -20,6 +20,11 @@ try:
 except ModuleNotFoundError:  # pragma: no cover - optional dependency
     yaml = None
 
+try:  # pragma: no cover - optional dependency
+    import click  # type: ignore
+except ModuleNotFoundError:  # pragma: no cover - optional dependency
+    click = None
+
 
 def _find_cmos_root() -> Path:
     """Locate the cmos/ directory so the CLI can run from any path."""
@@ -51,6 +56,23 @@ from context.mission_runtime import (  # noqa: E402
     block as block_mission,
     complete as complete_mission,
     start as start_mission,
+)
+from context.session_runtime import (  # noqa: E402
+    ActiveSessionError,
+    NoActiveSessionError,
+    SessionError,
+    SessionRuntimeError,
+    ValidationError,
+    capture as capture_session,
+    complete as complete_session,
+    start as start_session,
+)
+from context.view_helpers import (  # noqa: E402
+    ContextViewError,
+    export_context as export_context_view,
+    get_context_at_point,
+    get_domain_view,
+    get_master_context_view,
 )
 
 
@@ -103,6 +125,65 @@ VALID_MISSION_STATUSES = (
 )
 
 _STATUS_LOOKUP = {status.lower(): status for status in VALID_MISSION_STATUSES}
+
+ANSI_RESET = "\033[0m"
+ANSI_COLORS = {
+    "red": "\033[31m",
+    "yellow": "\033[33m",
+}
+
+NO_ACTIVE_SESSION_MESSAGE = (
+    "No active session. Start one with: ./cmos/cli.py session start --type planning --title \"Sprint planning\" "
+    "or pass --session PS-YYYY-MM-DD-### to target an existing one."
+)
+
+
+def _isatty(stream: Any) -> bool:
+    probe = getattr(stream, "isatty", None)
+    if callable(probe):  # pragma: no branch - thin wrapper
+        try:
+            return bool(probe())
+        except OSError:  # pragma: no cover - platform specific
+            return False
+    return False
+
+
+def _emit_text(text: str, *, color: str | None = None, err: bool = False) -> None:
+    stream = sys.stderr if err else sys.stdout
+    if click is not None:
+        styled = click.style(text, fg=color) if color else text
+        click.echo(styled, err=err)
+        return
+    if color and _isatty(stream):
+        prefix = ANSI_COLORS.get(color)
+        if prefix:
+            text = f"{prefix}{text}{ANSI_RESET}"
+    print(text, file=stream)
+
+
+def _session_error_label(error: SessionError) -> str:
+    if isinstance(error, ValidationError):
+        return "Validation error"
+    if isinstance(error, ActiveSessionError):
+        return "Active session conflict"
+    if isinstance(error, NoActiveSessionError):
+        return "Session lookup error"
+    if isinstance(error, SessionRuntimeError):
+        return "Session runtime error"
+    return "Session error"
+
+
+def _print_session_error(error: SessionError) -> None:
+    label = _session_error_label(error)
+    _emit_text(f"{label}: {error}", color="red", err=True)
+    if getattr(error, "hint", None):
+        _emit_text(f"Hint: {error.hint}", color="yellow", err=True)
+    if getattr(error, "suggestion", None):
+        _emit_text(f"Try: {error.suggestion}", color="yellow", err=True)
+
+
+def _print_generic_error(error: Exception) -> None:
+    _emit_text(f"Error: {error}", color="red", err=True)
 
 
 def _normalize_status(value: str) -> str:
@@ -198,6 +279,103 @@ def _extract_string_items(value: Any) -> List[str]:
                 if candidate:
                     results.append(candidate)
         return results
+
+
+def _load_json_array(raw: Any) -> List[Any]:
+    """Best-effort conversion of JSON-encoded list columns into Python lists."""
+    if raw is None:
+        return []
+    if isinstance(raw, list):
+        return raw
+    try:
+        parsed = json.loads(raw)
+    except (json.JSONDecodeError, TypeError):
+        return []
+    return parsed if isinstance(parsed, list) else []
+
+
+def _parse_iso_timestamp(value: Optional[str]) -> Optional[datetime]:
+    if not value:
+        return None
+    cleaned = value.strip()
+    if not cleaned:
+        return None
+    if cleaned.endswith("Z"):
+        cleaned = cleaned[:-1] + "+00:00"
+    try:
+        return datetime.fromisoformat(cleaned)
+    except ValueError:
+        return None
+
+
+def _format_relative_timestamp(value: Optional[str]) -> str:
+    dt = _parse_iso_timestamp(value)
+    if not dt:
+        return "unknown"
+    now = datetime.now(tz=timezone.utc)
+    delta = now - dt.astimezone(timezone.utc)
+    seconds = int(delta.total_seconds())
+    if seconds < 60:
+        return "just now"
+    if seconds < 3600:
+        minutes = seconds // 60
+        return f"{minutes}m ago"
+    if seconds < 86_400:
+        hours = seconds // 3600
+        return f"{hours}h ago"
+    if seconds < 604_800:
+        days = seconds // 86_400
+        return f"{days}d ago"
+    return dt.strftime("%Y-%m-%d")
+
+
+def _format_full_timestamp(value: Optional[str]) -> str:
+    dt = _parse_iso_timestamp(value)
+    if not dt:
+        return "unknown"
+    return dt.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
+
+def _format_duration(start: Optional[str], end: Optional[str]) -> str:
+    start_dt = _parse_iso_timestamp(start)
+    end_dt = _parse_iso_timestamp(end) or datetime.now(tz=timezone.utc)
+    if not start_dt:
+        return "unknown"
+    total_seconds = int((end_dt - start_dt).total_seconds())
+    if total_seconds < 0:
+        total_seconds = 0
+    minutes = total_seconds // 60
+    if minutes < 1:
+        return "<1 min"
+    if minutes < 60:
+        return f"{minutes} min"
+    hours = minutes // 60
+    mins = minutes % 60
+    return f"{hours}h {mins}m" if mins else f"{hours}h"
+
+
+def _active_session_info(env: Environment) -> Optional[Dict[str, Any]]:
+    """Return the active session record from project_context if available."""
+    client = _open_client(env)
+    try:
+        project_context = client.get_context("project_context") or {}
+    finally:
+        client.close()
+    working = project_context.get("working_memory") or {}
+    active = working.get("active_session")
+    if isinstance(active, dict) and active.get("id"):
+        return active
+    return None
+
+
+def _require_session_id(env: Environment, override: Optional[str]) -> str:
+    """Resolve the session ID to operate on, enforcing active session when needed."""
+    if override:
+        return override
+    active = _active_session_info(env)
+    if not active:
+        raise SystemExit(NO_ACTIVE_SESSION_MESSAGE)
+    return str(active["id"])
     return []
 
 
@@ -343,6 +521,7 @@ def _mission_start(env: Environment, args: argparse.Namespace) -> None:
         db_path=env.db_path,
     )
     _print_json(f"Mission {args.mission_id} started.", result.event)
+    _sync_backlog(env)
 
 
 def _mission_complete(env: Environment, args: argparse.Namespace) -> None:
@@ -359,6 +538,7 @@ def _mission_complete(env: Environment, args: argparse.Namespace) -> None:
         db_path=env.db_path,
     )
     _print_json(f"Mission {args.mission_id} completed.", result.event)
+    _sync_backlog(env)
     if result.next_mission:
         status = "In Progress" if args.immediate else "Current"
         print(f"Promoted {result.next_mission} -> {status}.")
@@ -377,6 +557,7 @@ def _mission_block(env: Environment, args: argparse.Namespace) -> None:
         db_path=env.db_path,
     )
     _print_json(f"Mission {args.mission_id} blocked.", result.event)
+    _sync_backlog(env)
 
 
 def _mission_add(env: Environment, args: argparse.Namespace) -> None:
@@ -544,6 +725,452 @@ def _mission_status_cmd(env: Environment, args: argparse.Namespace) -> None:
         _mission_status(runtime, args.limit)
     finally:
         runtime.close()
+
+
+def _mission_show_cmd(env: Environment, args: argparse.Namespace) -> None:
+    """Display full mission specification."""
+    if yaml is None:
+        raise SystemExit("PyYAML is required for mission display. Install pyyaml first.")
+    
+    client = _open_client(env)
+    try:
+        row = client.fetchone(
+            """
+            SELECT m.id, m.name, m.status, m.completed_at, m.notes,
+                   s.id as sprint_id, s.title as sprint_title,
+                   m.objective, m.context, m.success_criteria, 
+                   m.deliverables, m.reference_docs, m.domain_fields
+            FROM missions m
+            LEFT JOIN sprints s ON s.id = m.sprint_id
+            WHERE m.id = :id
+            """,
+            {"id": args.mission_id}
+        )
+        
+        if not row:
+            raise SystemExit(f"Mission {args.mission_id} not found.")
+        
+        if args.format == "compact":
+            # Compact format - key info only
+            print(f"\nMission: {row['id']}")
+            print(f"Name: {row['name']}")
+            print(f"Status: {row['status']}")
+            print(f"Sprint: {row['sprint_id']} - {row['sprint_title'] or 'N/A'}")
+            if row['completed_at']:
+                print(f"Completed: {row['completed_at']}")
+            if row['objective']:
+                print(f"\nObjective:\n{row['objective']}")
+            if row['notes']:
+                print(f"\nNotes:\n{row['notes']}")
+        else:
+            # Full format - everything
+            print(f"\n{'='*80}")
+            print(f"Mission: {row['id']} - {row['name']}")
+            print(f"{'='*80}\n")
+            
+            print(f"Status: {row['status']}")
+            print(f"Sprint: {row['sprint_id']} - {row['sprint_title'] or 'N/A'}")
+            if row['completed_at']:
+                print(f"Completed: {row['completed_at']}")
+            
+            if row['objective']:
+                print(f"\n## Objective\n{row['objective']}")
+            
+            if row['context']:
+                print(f"\n## Context\n{row['context']}")
+            
+            if row['success_criteria']:
+                criteria = json.loads(row['success_criteria'])
+                print(f"\n## Success Criteria")
+                for i, criterion in enumerate(criteria, 1):
+                    print(f"  {i}. {criterion}")
+            
+            if row['deliverables']:
+                deliverables = json.loads(row['deliverables'])
+                print(f"\n## Deliverables")
+                for i, item in enumerate(deliverables, 1):
+                    print(f"  {i}. {item}")
+            
+            if row['reference_docs']:
+                refs = json.loads(row['reference_docs'])
+                print(f"\n## References")
+                for ref in refs:
+                    print(f"  - {ref}")
+            
+            if row['domain_fields']:
+                domain = json.loads(row['domain_fields'])
+                print(f"\n## Domain Fields")
+                print(f"Type: {domain.get('type', 'N/A')}")
+                if domain.get('researchFoundation'):
+                    print(f"\nResearch Foundation:")
+                    for finding in domain['researchFoundation']:
+                        print(f"  - {finding.get('finding', 'N/A')} (from {finding.get('sourceMission', 'N/A')})")
+            
+            if row['notes']:
+                print(f"\n## Mission Notes\n{row['notes']}")
+            
+            print(f"\n{'='*80}\n")
+    finally:
+        client.close()
+
+
+def _session_start(env: Environment, args: argparse.Namespace) -> None:
+    session_id = start_session(
+        session_type=args.session_type,
+        title=args.title,
+        agent=args.agent,
+        sprint_id=args.sprint,
+        repo_root=env.root,
+        db_path=env.db_path,
+    )
+    print(f"Session {session_id} started ({args.session_type}): {args.title}")
+
+
+def _session_capture(env: Environment, args: argparse.Namespace) -> None:
+    session_id = _require_session_id(env, args.session)
+    capture_session(
+        session_id=session_id,
+        category=args.category,
+        content=args.content,
+        context=args.context,
+        agent=args.agent,
+        repo_root=env.root,
+        db_path=env.db_path,
+    )
+    print(f"[{session_id}] Recorded {args.category} insight.")
+
+
+def _session_complete(env: Environment, args: argparse.Namespace) -> None:
+    session_id = _require_session_id(env, args.session)
+    next_steps = _extract_string_items(args.next_steps)
+    complete_session(
+        session_id=session_id,
+        summary=args.summary,
+        next_steps=next_steps or None,
+        agent=args.agent,
+        repo_root=env.root,
+        db_path=env.db_path,
+    )
+    note = f"Session {session_id} completed."
+    if next_steps:
+        note = f"{note} Next steps recorded: {len(next_steps)}."
+    print(note)
+
+
+def _session_onboard(env: Environment, _args: argparse.Namespace) -> None:
+    client = _open_client(env)
+    try:
+        project_context = client.get_context("project_context") or {}
+        master_context = client.get_context("master_context") or {}
+        session_stats = client.fetchone(
+            """
+            SELECT COUNT(*) AS total_sessions,
+                   MAX(COALESCE(completed_at, started_at)) AS last_activity
+              FROM sessions
+            """
+        ) or {}
+        recent_sessions = client.fetchall(
+            """
+            SELECT id, type, title, summary, completed_at, started_at, captures, next_steps
+              FROM sessions
+             ORDER BY COALESCE(completed_at, started_at) DESC
+             LIMIT 5
+            """
+        )
+        active_missions = client.fetchall(
+            """
+            SELECT id, name, status
+              FROM missions
+             WHERE status IN ('In Progress', 'Current')
+             ORDER BY CASE status WHEN 'In Progress' THEN 0 ELSE 1 END, rowid
+             LIMIT 3
+            """
+        )
+        blocked_missions = client.fetchall(
+            """
+            SELECT id, name, notes
+              FROM missions
+             WHERE status = 'Blocked'
+             ORDER BY rowid
+             LIMIT 3
+            """
+        )
+        queued_missions = client.fetchall(
+            """
+            SELECT id, name
+              FROM missions
+             WHERE status = 'Queued'
+             ORDER BY rowid
+             LIMIT 3
+            """
+        )
+        decisions = client.fetchall(
+            """
+            SELECT decision_text, project_domain, created_at
+              FROM strategic_decisions
+             ORDER BY created_at DESC
+             LIMIT 10
+            """
+        )
+        sprint = client.fetchone(
+            """
+            SELECT id, title, status
+              FROM sprints
+             ORDER BY CASE status WHEN 'In Progress' THEN 0 WHEN 'Current' THEN 1 ELSE 2 END,
+                      rowid
+             LIMIT 1
+            """
+        )
+    finally:
+        client.close()
+
+    working_memory = project_context.get("working_memory") or {}
+    project_identity = master_context.get("project_identity") or {}
+    project_name = project_identity.get("name") or "CMOS Project"
+    project_desc = project_identity.get("description") or "Session management initiative"
+    total_sessions = working_memory.get("session_count") or session_stats.get("total_sessions") or 0
+    last_activity = working_memory.get("last_session") or session_stats.get("last_activity")
+
+    lines: List[str] = []
+    lines.append("=== Project Overview ===")
+    lines.append(f"Project: {project_name}")
+    if project_desc:
+        lines.append(f"Description: {project_desc}")
+    if sprint:
+        lines.append(f"Sprint: {sprint['id']} - {sprint['title']} ({sprint['status']})")
+    lines.append(f"Sessions: {total_sessions} total, last activity { _format_relative_timestamp(last_activity) }")
+    lines.append("")
+
+    lines.append("=== Recent Sessions ===")
+    if not recent_sessions:
+        lines.append("No sessions recorded yet. Start one with `./cmos/cli.py session start ...`")
+    else:
+        for row in recent_sessions:
+            ts = row.get("completed_at") or row.get("started_at")
+            title = row.get("title") or row.get("id")
+            lines.append(f"• [{(row.get('type') or 'session').title()}] {title} ({_format_relative_timestamp(ts)})")
+            summary = row.get("summary") or "No summary captured."
+            lines.append(f"  Summary: {summary}")
+            captures = _load_json_array(row.get("captures"))
+            decision = next((c.get("content") for c in captures if c.get("category") == "decision"), None)
+            learning = next((c.get("content") for c in captures if c.get("category") == "learning"), None)
+            next_capture = next((c.get("content") for c in captures if c.get("category") == "next-step"), None)
+            if decision:
+                lines.append(f"  Decision: {decision}")
+            if learning:
+                lines.append(f"  Learning: {learning}")
+            next_steps = _load_json_array(row.get("next_steps"))
+            highlight = next_capture or (next_steps[0] if next_steps else None)
+            if highlight:
+                lines.append(f"  Next: {highlight}")
+    lines.append("")
+
+    lines.append("=== Active Work ===")
+    if active_missions:
+        for mission in active_missions:
+            lines.append(f"• {mission['id']} ({mission['status']}): {mission['name']}")
+    else:
+        lines.append("No missions currently marked Current/In Progress.")
+    if blocked_missions:
+        lines.append("Blocked:")
+        for mission in blocked_missions:
+            reason = mission.get("notes") or "reason not captured"
+            lines.append(f"  • {mission['id']}: {mission['name']} — {reason}")
+    if queued_missions:
+        lines.append("Next Up:")
+        for mission in queued_missions:
+            lines.append(f"  • {mission['id']}: {mission['name']}")
+    lines.append("")
+
+    lines.append("=== Recent Decisions ===")
+    if decisions:
+        for decision in decisions:
+            domain = decision.get("project_domain") or "general"
+            ts = decision.get("created_at")
+            lines.append(f"• {decision['decision_text']} [{domain}] ({_format_relative_timestamp(ts)})")
+    else:
+        lines.append("No strategic decisions recorded yet.")
+    lines.append("")
+
+    lines.append("=== Quick Start ===")
+    lines.append("1. Review backlog: ./cmos/cli.py mission status")
+    lines.append("2. Start build work: ./cmos/cli.py mission start <id> --summary \"Your summary\"")
+    lines.append("3. Capture planning: ./cmos/cli.py session start --type planning --title \"Sprint planning\"")
+    lines.append("4. Log insights: ./cmos/cli.py session capture decision \"Key decision\"")
+    lines.append("5. Finish sessions: ./cmos/cli.py session complete --summary \"Wrap-up\"")
+
+    print("\n".join(lines))
+
+
+def _session_list(env: Environment, args: argparse.Namespace) -> None:
+    client = _open_client(env)
+    try:
+        clauses = []
+        params: Dict[str, Any] = {"limit": args.limit}
+        if args.type:
+            clauses.append("type = :type")
+            params["type"] = args.type.strip().lower()
+        if args.status:
+            clauses.append("status = :status")
+            params["status"] = args.status.strip().lower()
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        rows = client.fetchall(
+            f"""
+            SELECT id, type, title, status, agent, started_at, completed_at, summary, captures
+              FROM sessions
+              {where}
+             ORDER BY COALESCE(completed_at, started_at) DESC
+             LIMIT :limit
+            """,
+            params,
+        )
+    finally:
+        client.close()
+
+    print("=== Recent Sessions ===")
+    if not rows:
+        print("No sessions match the provided filters.")
+        return
+
+    for row in rows:
+        session_id = row.get("id")
+        session_type = (row.get("type") or "session").title()
+        status = row.get("status") or "unknown"
+        title = row.get("title") or session_id
+        started = row.get("started_at")
+        completed = row.get("completed_at")
+        summary = row.get("summary") or "No summary captured."
+        duration = _format_duration(started, completed if status == "completed" else None)
+        captures = _load_json_array(row.get("captures"))
+        counts: Dict[str, int] = {}
+        for capture in captures:
+            category = (capture.get("category") or "").lower()
+            if category:
+                counts[category] = counts.get(category, 0) + 1
+
+        capture_bits = ", ".join(f"{value} {key}" for key, value in counts.items()) or "no captures logged"
+        print(f"{session_id} [{session_type}] {title} ({status})")
+        print(f"  Started: {_format_full_timestamp(started)}, Duration: {duration}")
+        print(f"  Summary: {summary}")
+        print(f"  Captures: {capture_bits}")
+        print("")
+
+
+def _session_show(env: Environment, args: argparse.Namespace) -> None:
+    client = _open_client(env)
+    try:
+        row = client.fetchone(
+            """
+            SELECT id, type, title, status, agent, sprint_id,
+                   started_at, completed_at, summary, captures, next_steps
+              FROM sessions
+             WHERE id = :id
+            """,
+            {"id": args.session_id},
+        )
+    finally:
+        client.close()
+
+    if not row:
+        raise SystemExit(f"Session {args.session_id} not found.")
+
+    session_id = row["id"]
+    session_type = (row.get("type") or "session").title()
+    print(f"=== Session Details: {session_id} ===")
+    print(f"Type: {session_type}")
+    print(f"Title: {row.get('title') or 'Untitled session'}")
+    print(f"Status: {row.get('status') or 'unknown'}")
+    print(f"Agent: {row.get('agent') or 'unknown'}")
+    if row.get("sprint_id"):
+        print(f"Sprint: {row['sprint_id']}")
+    print(f"Started: {_format_full_timestamp(row.get('started_at'))}")
+    print(f"Completed: {_format_full_timestamp(row.get('completed_at'))}")
+    print(f"Summary: {row.get('summary') or 'No summary recorded.'}")
+    print("")
+
+    captures = _load_json_array(row.get("captures"))
+    print("=== Captures ===")
+    if not captures:
+        print("No captures recorded.")
+    else:
+        for capture in captures:
+            ts = capture.get("timestamp")
+            category = capture.get("category", "entry").title()
+            print(f"[{category}] {_format_full_timestamp(ts)}")
+            print(f"  {capture.get('content', 'No content provided.')}")
+            if capture.get("context"):
+                print(f"  Context: {capture['context']}")
+            print("")
+
+    next_steps = _load_json_array(row.get("next_steps"))
+    print("=== Next Steps ===")
+    if next_steps:
+        for step in next_steps:
+            print(f"• {step}")
+    else:
+        print("No next steps recorded.")
+
+
+def _session_search(env: Environment, args: argparse.Namespace) -> None:
+    client = _open_client(env)
+    try:
+        params: Dict[str, Any] = {
+            "pattern": f"%{args.query.lower()}%",
+            "limit": args.limit,
+        }
+        rows = client.fetchall(
+            """
+            SELECT id, type, title, summary, captures, started_at, completed_at
+              FROM sessions
+             WHERE LOWER(COALESCE(title, '')) LIKE :pattern
+                OR LOWER(COALESCE(summary, '')) LIKE :pattern
+                OR LOWER(COALESCE(captures, '')) LIKE :pattern
+                OR LOWER(COALESCE(next_steps, '')) LIKE :pattern
+             ORDER BY COALESCE(completed_at, started_at) DESC
+             LIMIT :limit
+            """,
+            params,
+        )
+    finally:
+        client.close()
+
+    category = (args.category or "").lower()
+    print(f"=== Search Results for \"{args.query}\" ===")
+    if not rows:
+        print("No sessions matched the search query.")
+        return
+
+    matches = 0
+    for row in rows:
+        captures = _load_json_array(row.get("captures"))
+        title = row.get("title") or row.get("id")
+        snippet = row.get("summary") or ""
+        capture_match = None
+        for capture in captures:
+            cat = (capture.get("category") or "").lower()
+            content = capture.get("content") or ""
+            text = f"{content} {capture.get('context') or ''}".lower()
+            if category and cat != category:
+                continue
+            if args.query.lower() in text or args.query.lower() in (title or "").lower() or args.query.lower() in snippet.lower():
+                capture_match = capture
+                break
+        if category and capture_match is None:
+            continue
+
+        matches += 1
+        session_id = row.get("id")
+        session_type = (row.get("type") or "session").title()
+        print(f"{session_id} [{session_type}] {title}")
+        if capture_match:
+            print(f"  [{capture_match.get('category', 'entry').title()}] {capture_match.get('content')}")
+        else:
+            print(f"  Summary: {snippet or 'No summary available.'}")
+        print(f"  When: {_format_relative_timestamp(row.get('completed_at') or row.get('started_at'))}")
+        print("")
+
+    if matches == 0:
+        print("No sessions matched the category filter.")
 
 
 def _load_backlog(client: SQLiteClient) -> Dict[str, Any]:
@@ -729,6 +1356,304 @@ def _sync_backlog(env: Environment) -> Path:
     return path
 
 
+def _export_mission_yaml(env: Environment, mission_id: str, output_dir: Optional[Path] = None) -> Path:
+    """Export a single mission's full YAML specification from database."""
+    if yaml is None:
+        raise SystemExit("PyYAML is required for mission export. Install pyyaml first.")
+    
+    client = _open_client(env)
+    try:
+        row = client.fetchone(
+            """
+            SELECT id, sprint_id, name, objective, context, 
+                   success_criteria, deliverables, reference_docs, domain_fields
+            FROM missions WHERE id = :id
+            """,
+            {"id": mission_id}
+        )
+        if not row:
+            raise SystemExit(f"Mission {mission_id} not found in database.")
+    finally:
+        client.close()
+    
+    # Build mission YAML structure
+    mission_doc = {
+        "missionId": row["id"],
+        "objective": row["objective"] or "",
+        "context": row["context"] or "",
+    }
+    
+    # Parse JSON fields
+    if row["success_criteria"]:
+        mission_doc["successCriteria"] = json.loads(row["success_criteria"])
+    if row["deliverables"]:
+        mission_doc["deliverables"] = json.loads(row["deliverables"])
+    if row["reference_docs"]:
+        mission_doc["references"] = json.loads(row["reference_docs"])
+    if row["domain_fields"]:
+        mission_doc["domainFields"] = json.loads(row["domain_fields"])
+    
+    # Determine output path
+    base_dir = output_dir or (env.root / "missions" / row["sprint_id"])
+    base_dir = base_dir.resolve()
+    base_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Generate filename from mission name
+    safe_name = row["name"].replace(":", "_").replace(" ", "_").replace("/", "-")
+    output_path = base_dir / f"{row['id']}_{safe_name}.yaml"
+    
+    # Write YAML file with comment header
+    with output_path.open("w", encoding="utf-8") as f:
+        f.write(f"# Mission File: {output_path.name}\n\n")
+        yaml.safe_dump(mission_doc, f, sort_keys=False, allow_unicode=True)
+    
+    return output_path
+
+
+def _export_all_missions(env: Environment, output_root: Optional[Path] = None) -> int:
+    """Export all missions as YAML files organized by sprint."""
+    if yaml is None:
+        raise SystemExit("PyYAML is required for mission export. Install pyyaml first.")
+    
+    base_dir = (output_root or (env.root / "missions")).resolve()
+    client = _open_client(env)
+    try:
+        rows = client.fetchall(
+            """
+            SELECT id, sprint_id FROM missions 
+            WHERE objective IS NOT NULL
+            ORDER BY sprint_id, id
+            """
+        )
+    finally:
+        client.close()
+    
+    count = 0
+    for row in rows:
+        sprint_dir = base_dir / row["sprint_id"]
+        _export_mission_yaml(env, row["id"], sprint_dir)
+        count += 1
+    
+    return count
+
+
+def _context_snapshot(env: Environment, context_id: str, session_id: Optional[str] = None, source: Optional[str] = None) -> None:
+    """Take a snapshot of the specified context."""
+    full_context_id = f"{context_id}_context"
+    client = _open_client(env)
+    try:
+        context = client.get_context(full_context_id)
+        if not context:
+            raise SystemExit(f"Context '{context_id}' not found in database.")
+        
+        was_added = client.add_context_snapshot(
+            full_context_id,
+            context,
+            session_id=session_id,
+            source=source
+        )
+        
+        if was_added:
+            print(f"Snapshot created for {context_id}_context")
+            if source:
+                print(f"Source: {source}")
+        else:
+            print(f"No changes detected in {context_id}_context (snapshot not created)")
+    finally:
+        client.close()
+
+
+def _context_history(env: Environment, context_id: str, limit: int = 10) -> None:
+    """View snapshot history for a context."""
+    full_context_id = f"{context_id}_context"
+    client = _open_client(env)
+    try:
+        snapshots = client.fetchall(
+            """
+            SELECT id, session_id, source, created_at, content_hash
+            FROM context_snapshots
+            WHERE context_id = :context_id
+            ORDER BY created_at DESC
+            LIMIT :limit
+            """,
+            {"context_id": full_context_id, "limit": limit}
+        )
+        
+        if not snapshots:
+            print(f"No snapshots found for {context_id}_context")
+            return
+        
+        print(f"\nSnapshot History for {context_id}_context ({len(snapshots)} shown):\n")
+        for snap in snapshots:
+            print(f"ID: {snap['id']}")
+            print(f"  Created: {snap['created_at']}")
+            if snap['session_id']:
+                print(f"  Session: {snap['session_id']}")
+            if snap['source']:
+                print(f"  Source: {snap['source']}")
+            print(f"  Hash: {snap['content_hash'][:16]}...")
+            print()
+    finally:
+        client.close()
+
+
+def _context_view_snapshot(env: Environment, snapshot_id: int) -> None:
+    """View a specific snapshot."""
+    client = _open_client(env)
+    try:
+        snapshot = client.fetchone(
+            """
+            SELECT id, context_id, session_id, source, content, created_at
+            FROM context_snapshots
+            WHERE id = :id
+            """,
+            {"id": snapshot_id}
+        )
+        
+        if not snapshot:
+            raise SystemExit(f"Snapshot {snapshot_id} not found.")
+        
+        print(f"\nSnapshot ID: {snapshot['id']}")
+        print(f"Context: {snapshot['context_id']}")
+        print(f"Created: {snapshot['created_at']}")
+        if snapshot['session_id']:
+            print(f"Session: {snapshot['session_id']}")
+        if snapshot['source']:
+            print(f"Source: {snapshot['source']}")
+        print("\n--- Content ---\n")
+        print(snapshot['content'])
+    finally:
+        client.close()
+
+
+def _context_render_view(env: Environment, args: argparse.Namespace) -> None:
+    """Render an aggregated context view with optional filters."""
+
+    client = _open_client(env)
+    try:
+        if args.domain:
+            view = get_domain_view(
+                client,
+                args.domain,
+                as_of=args.as_of,
+                recent_limit=args.recent_limit,
+            )
+        elif args.as_of:
+            view = get_context_at_point(
+                client,
+                as_of=args.as_of,
+                recent_limit=args.recent_limit,
+            )
+        else:
+            view = get_master_context_view(
+                client,
+                recent_limit=args.recent_limit,
+            )
+        rendered = export_context_view(view, args.format)
+    except ContextViewError as exc:
+        raise SystemExit(str(exc)) from exc
+    finally:
+        client.close()
+
+    print(rendered)
+
+
+def _decisions_list(env: Environment, limit: int, domain: Optional[str] = None) -> None:
+    """List strategic decisions."""
+    client = _open_client(env)
+    try:
+        query = "SELECT id, decision_text, created_at, project_domain, sprint_id FROM strategic_decisions"
+        params: Dict[str, Any] = {"limit": limit}
+        
+        if domain:
+            query += " WHERE project_domain = :domain"
+            params["domain"] = domain
+        
+        query += " ORDER BY created_at DESC LIMIT :limit"
+        
+        decisions = client.fetchall(query, params)
+        
+        if not decisions:
+            print("No strategic decisions found.")
+            return
+        
+        print(f"\nStrategic Decisions ({len(decisions)} shown):\n")
+        for dec in decisions:
+            print(f"ID: {dec['id']}")
+            print(f"  Date: {dec['created_at']}")
+            if dec['project_domain']:
+                print(f"  Domain: {dec['project_domain']}")
+            if dec['sprint_id']:
+                print(f"  Sprint: {dec['sprint_id']}")
+            print(f"  Decision: {dec['decision_text'][:100]}{'...' if len(dec['decision_text']) > 100 else ''}")
+            print()
+    finally:
+        client.close()
+
+
+def _decisions_search(env: Environment, keyword: str, domain: Optional[str] = None) -> None:
+    """Search decisions by keyword."""
+    client = _open_client(env)
+    try:
+        query = """
+            SELECT id, decision_text, created_at, project_domain, sprint_id 
+            FROM strategic_decisions 
+            WHERE decision_text LIKE :keyword
+        """
+        params: Dict[str, Any] = {"keyword": f"%{keyword}%"}
+        
+        if domain:
+            query += " AND project_domain = :domain"
+            params["domain"] = domain
+        
+        query += " ORDER BY created_at DESC"
+        
+        decisions = client.fetchall(query, params)
+        
+        if not decisions:
+            print(f"No decisions found matching '{keyword}'.")
+            return
+        
+        print(f"\nFound {len(decisions)} decision(s) matching '{keyword}':\n")
+        for dec in decisions:
+            print(f"ID: {dec['id']} | {dec['created_at']}")
+            if dec['project_domain']:
+                print(f"  Domain: {dec['project_domain']}")
+            print(f"  {dec['decision_text']}")
+            print()
+    finally:
+        client.close()
+
+
+def _decisions_by_sprint(env: Environment, sprint_id: str) -> None:
+    """Show decisions linked to a sprint."""
+    client = _open_client(env)
+    try:
+        decisions = client.fetchall(
+            """
+            SELECT id, decision_text, created_at, project_domain 
+            FROM strategic_decisions 
+            WHERE sprint_id = :sprint_id
+            ORDER BY created_at
+            """,
+            {"sprint_id": sprint_id}
+        )
+        
+        if not decisions:
+            print(f"No decisions found for sprint '{sprint_id}'.")
+            return
+        
+        print(f"\nStrategic Decisions for {sprint_id} ({len(decisions)} total):\n")
+        for dec in decisions:
+            print(f"ID: {dec['id']} | {dec['created_at']}")
+            if dec['project_domain']:
+                print(f"  Domain: {dec['project_domain']}")
+            print(f"  {dec['decision_text']}")
+            print()
+    finally:
+        client.close()
+
+
 def _validate_foundational_refs(env: Environment) -> None:
     failures: List[str] = []
     for relative_path, rules in FOUNDATIONAL_CHECKS.items():
@@ -782,6 +1707,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     mission_status = mission_sub.add_parser("status", help="Show queued and active missions")
     mission_status.add_argument("--limit", type=int, default=5, help="Maximum missions to display")
+
+    mission_show = mission_sub.add_parser("show", help="Display full mission specification")
+    mission_show.add_argument("mission_id", help="Mission identifier (e.g. B3.3)")
+    mission_show.add_argument("--format", choices=["full", "compact"], default="full", help="Output format")
 
     mission_start = mission_sub.add_parser("start", help="Mark a mission as In Progress")
     mission_start.add_argument("mission_id", help="Mission identifier (e.g. B3.3)")
@@ -870,6 +1799,148 @@ def build_parser() -> argparse.ArgumentParser:
         help="Root directory for context exports (default: cmos root)",
     )
 
+    db_export_missions = db_sub.add_parser("export-missions", help="Export mission YAML files from database")
+    db_export_missions.add_argument("mission_id", nargs="?", help="Specific mission ID to export (exports all if omitted)")
+    db_export_missions.add_argument("--output-dir", type=Path, help="Output directory for mission YAML files")
+
+    context_parser = subparsers.add_parser("context", help="Context management commands")
+    context_sub = context_parser.add_subparsers(dest="context_command", required=True)
+    
+    context_snapshot = context_sub.add_parser("snapshot", help="Take a snapshot of a context")
+    context_snapshot.add_argument("context_id", choices=["project", "master"], help="Context to snapshot")
+    context_snapshot.add_argument("--session", help="Session ID for this snapshot")
+    context_snapshot.add_argument("--source", help="Source description for this snapshot")
+    
+    context_history = context_sub.add_parser("history", help="View snapshot history for a context")
+    context_history.add_argument("context_id", choices=["project", "master"], help="Context to view history for")
+    context_history.add_argument("--limit", type=int, default=10, help="Number of snapshots to show (default: 10)")
+    
+    context_view = context_sub.add_parser("view", help="Render aggregated context or snapshot views")
+    context_view.add_argument(
+        "--snapshot",
+        type=int,
+        help="Snapshot ID to display instead of building a live view",
+    )
+    context_view.add_argument(
+        "--as-of",
+        help="ISO timestamp or session ID for historical views",
+    )
+    context_view.add_argument(
+        "--domain",
+        help="Project domain filter (requires session metadata domain)",
+    )
+    context_view.add_argument(
+        "--format",
+        choices=["json", "yaml", "markdown"],
+        default="json",
+        help="Output format for aggregated views (default: json)",
+    )
+    context_view.add_argument(
+        "--recent-limit",
+        type=int,
+        default=10,
+        dest="recent_limit",
+        help="Number of recent sessions to include (default: 10)",
+    )
+
+    decisions_parser = subparsers.add_parser("decisions", help="Query strategic decisions from MASTER_CONTEXT")
+    decisions_sub = decisions_parser.add_subparsers(dest="decisions_command", required=True)
+    
+    decisions_list = decisions_sub.add_parser("list", help="List all strategic decisions")
+    decisions_list.add_argument("--limit", type=int, default=20, help="Number of decisions to show (default: 20)")
+    decisions_list.add_argument("--domain", help="Filter by project domain (e.g., 'ai-studio')")
+    
+    decisions_search = decisions_sub.add_parser("search", help="Search decisions by keyword")
+    decisions_search.add_argument("keyword", help="Keyword to search for in decision text")
+    decisions_search.add_argument("--domain", help="Filter by project domain")
+    
+    decisions_by_sprint = decisions_sub.add_parser("by-sprint", help="Show decisions linked to a sprint")
+    decisions_by_sprint.add_argument("sprint_id", help="Sprint ID (e.g., 'Sprint 03', 'sprint-03')")
+
+    session_parser = subparsers.add_parser(
+        "session",
+        help="Manage planning/onboarding/review sessions",
+        description=(
+            "Capture non-build work such as planning, onboarding, reviews, and research. "
+            "Each command writes to the session timeline and updates project/master context. "
+            "See docs/session-management-guide.md for walkthroughs and templates."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    session_sub = session_parser.add_subparsers(dest="session_command", required=True)
+
+    session_start = session_sub.add_parser(
+        "start",
+        help="Start a planning/onboarding session",
+        description=(
+            "Begin a new session for planning, onboarding, review, research, check-ins, or custom work. "
+            "Sessions are mutually exclusive—complete or resume an active session before starting another."
+        ),
+    )
+    session_start.add_argument(
+        "--type",
+        dest="session_type",
+        required=True,
+        choices=["onboarding", "planning", "review", "research", "check-in", "custom"],
+        help="Session type",
+    )
+    session_start.add_argument("--title", required=True, help="Descriptive session title")
+    session_start.add_argument("--sprint", help="Optional sprint identifier")
+    session_start.add_argument("--agent", default="assistant", help="Agent identifier for session logging")
+
+    session_capture = session_sub.add_parser(
+        "capture",
+        help="Capture an insight for the active session",
+        description=(
+            "Log a decision, learning, constraint, context note, or next-step while a session is active. "
+            "Categories must be one of: decision, learning, constraint, context, next-step."
+        ),
+    )
+    session_capture.add_argument(
+        "category",
+        choices=["decision", "learning", "constraint", "context", "next-step"],
+        help="Capture category",
+    )
+    session_capture.add_argument("content", help="Insight content to record")
+    session_capture.add_argument("--context", help="Additional context for this capture")
+    session_capture.add_argument("--session", help="Override session ID (default: active session)")
+    session_capture.add_argument("--agent", default="assistant", help="Agent identifier for session logging")
+
+    session_complete = session_sub.add_parser(
+        "complete",
+        help="Complete the active session",
+        description=(
+            "Close the active session, summarize outcomes, and optionally record next steps that feed "
+            "project/master context. All captures are aggregated when you complete the session."
+        ),
+    )
+    session_complete.add_argument("--summary", required=True, help="Session summary")
+    session_complete.add_argument(
+        "--next-steps",
+        action="append",
+        default=None,
+        help="Next-step entry (repeatable)",
+    )
+    session_complete.add_argument("--session", help="Override session ID (default: active session)")
+    session_complete.add_argument("--agent", default="assistant", help="Agent identifier for session logging")
+    session_onboard = session_sub.add_parser("onboard", help="Show a consolidated onboarding report")
+    session_list = session_sub.add_parser("list", help="List recent sessions with optional filters")
+    session_list.add_argument("--limit", type=int, default=10, help="Number of sessions to display (default: 10)")
+    session_list.add_argument("--type", help="Filter by session type (e.g., planning)")
+    session_list.add_argument("--status", choices=["active", "completed"], help="Filter by session status")
+
+    session_show = session_sub.add_parser("show", help="Display detailed information for a session")
+    session_show.add_argument("session_id", help="Session identifier (e.g., PS-2024-11-13-001)")
+
+    session_search = session_sub.add_parser("search", help="Search session history")
+    session_search.add_argument("query", help="Search term or phrase")
+    session_search.add_argument(
+        "--category",
+        choices=["decision", "learning", "constraint", "context", "next-step"],
+        help="Limit results to captures in the specified category",
+    )
+    session_search.add_argument("--limit", type=int, default=20, help="Maximum results to inspect (default: 20)")
+
     validate_parser = subparsers.add_parser("validate", help="Project validation commands")
     validate_sub = validate_parser.add_subparsers(dest="validate_command", required=True)
     validate_sub.add_parser("health", help="Run a database health check")
@@ -881,6 +1952,8 @@ def build_parser() -> argparse.ArgumentParser:
 def _handle_mission(env: Environment, args: argparse.Namespace) -> None:
     if args.mission_command == "status":
         _mission_status_cmd(env, args)
+    elif args.mission_command == "show":
+        _mission_show_cmd(env, args)
     elif args.mission_command == "start":
         _mission_start(env, args)
     elif args.mission_command == "complete":
@@ -920,8 +1993,59 @@ def _handle_db(env: Environment, args: argparse.Namespace) -> None:
             _export_contexts(env, args)
         else:
             _export_backlog(env, args.output)
+    elif args.db_command == "export-missions":
+        if args.mission_id:
+            output_path = _export_mission_yaml(env, args.mission_id, args.output_dir)
+            print(f"Exported mission {args.mission_id} to {output_path}")
+        else:
+            count = _export_all_missions(env, args.output_dir)
+            print(f"Exported {count} mission(s) to {args.output_dir or (env.root / 'missions')}")
     else:  # pragma: no cover - argparse guards this
         raise SystemExit("Unknown db subcommand")
+
+
+def _handle_context(env: Environment, args: argparse.Namespace) -> None:
+    if args.context_command == "snapshot":
+        _context_snapshot(env, args.context_id, args.session, args.source)
+    elif args.context_command == "history":
+        _context_history(env, args.context_id, args.limit)
+    elif args.context_command == "view":
+        if args.snapshot is not None:
+            _context_view_snapshot(env, args.snapshot)
+        else:
+            _context_render_view(env, args)
+    else:  # pragma: no cover - argparse guards this
+        raise SystemExit("Unknown context subcommand")
+
+
+def _handle_decisions(env: Environment, args: argparse.Namespace) -> None:
+    if args.decisions_command == "list":
+        _decisions_list(env, args.limit, args.domain)
+    elif args.decisions_command == "search":
+        _decisions_search(env, args.keyword, args.domain)
+    elif args.decisions_command == "by-sprint":
+        _decisions_by_sprint(env, args.sprint_id)
+    else:  # pragma: no cover - argparse guards this
+        raise SystemExit("Unknown decisions subcommand")
+
+
+def _handle_session(env: Environment, args: argparse.Namespace) -> None:
+    if args.session_command == "start":
+        _session_start(env, args)
+    elif args.session_command == "capture":
+        _session_capture(env, args)
+    elif args.session_command == "complete":
+        _session_complete(env, args)
+    elif args.session_command == "onboard":
+        _session_onboard(env, args)
+    elif args.session_command == "list":
+        _session_list(env, args)
+    elif args.session_command == "show":
+        _session_show(env, args)
+    elif args.session_command == "search":
+        _session_search(env, args)
+    else:  # pragma: no cover - argparse guards this
+        raise SystemExit("Unknown session subcommand")
 
 
 def _handle_validate(env: Environment, args: argparse.Namespace) -> None:
@@ -945,12 +2069,21 @@ def main(argv: Optional[List[str]] = None) -> int:
             _handle_research(env, args)
         elif args.command == "db":
             _handle_db(env, args)
+        elif args.command == "context":
+            _handle_context(env, args)
+        elif args.command == "decisions":
+            _handle_decisions(env, args)
+        elif args.command == "session":
+            _handle_session(env, args)
         elif args.command == "validate":
             _handle_validate(env, args)
         else:  # pragma: no cover - argparse guards this
             parser.error("Unknown command")
+    except SessionError as error:
+        _print_session_error(error)
+        return 1
     except (MissionRuntimeError, SQLiteClientError) as error:
-        print(f"Error: {error}", file=sys.stderr)
+        _print_generic_error(error)
         return 1
     return 0
 

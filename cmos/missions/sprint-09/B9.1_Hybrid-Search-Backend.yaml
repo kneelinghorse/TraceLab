@@ -1,0 +1,206 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B9.1
+  name: Hybrid Search Backend
+  sprint: Sprint 09
+  type: Build.Implementation.v1
+  priority: high
+  created: 2025-11-15
+  owner: assistant
+
+missionId: "B9.1"
+
+spec:
+  objective: |
+    Implement hybrid search combining semantic (Qdrant) and keyword (PostgreSQL full-text) 
+    search with weighted scoring to improve result relevance and precision.
+  
+  context: |
+    Per roadmap Week 15, hybrid search combines strengths of both approaches:
+    - Semantic search finds conceptually similar content
+    - Keyword search ensures important terms aren't missed
+    - Weighted combination ranks by both relevance AND term matching
+    
+    Current state: Pure semantic search via Qdrant
+    Target: Hybrid search with configurable semantic/keyword weights
+  
+  researchStatement:
+    topic: Hybrid search implementation combining vector and full-text search
+    scope: Backend search service, PostgreSQL full-text indexes, result merging
+    centralHypothesis: Hybrid search improves precision by 20%+ vs semantic-only
+  
+  keyQuestions:
+    - How do we add PostgreSQL full-text search to existing schema?
+    - What weight distribution is optimal (default 70/30 semantic/keyword)?
+    - How do we merge and rank results from two sources?
+    - Should weights be user-configurable or fixed?
+    - What's the performance impact of dual searches?
+  
+  technicalApproach:
+    architecture:
+      - Add tsvector column to document_chunks table
+      - Create GIN index for full-text search
+      - Implement hybrid search service
+      - Weighted scoring algorithm
+      - Configurable search mode (semantic-only, keyword-only, hybrid)
+    
+    implementation:
+      - Create Alembic migration to add content_tsv tsvector column
+      - Add GIN index on content_tsv
+      - Create app/services/hybrid_search.py with weighted scoring
+      - Update app/services/retrieval_service.py to support hybrid mode
+      - Add search_mode parameter to API (semantic, keyword, hybrid)
+      - Add weight configuration (default 0.7 semantic, 0.3 keyword)
+      - Create performance benchmarks for hybrid vs semantic-only
+      - Document hybrid search algorithm and weight tuning
+    
+    scoringAlgorithm: |
+      For each query:
+      1. Execute semantic search (Qdrant) - get top_k*2 results with similarity scores
+      2. Execute keyword search (PostgreSQL) - get top_k*2 results with ts_rank scores
+      3. Normalize scores to 0-1 range
+      4. Combine: combined_score = (semantic_score * weight_s) + (keyword_score * weight_k)
+      5. Sort by combined_score descending
+      6. Return top_k results
+      
+      Default weights: weight_s=0.7, weight_k=0.3
+      Rationale: Semantic understanding more important than exact term matching
+    
+    implementationExample: |
+      # PostgreSQL Migration - Add full-text search column
+      ALTER TABLE document_chunks ADD COLUMN content_tsv tsvector 
+        GENERATED ALWAYS AS (to_tsvector('english', content)) STORED;
+      CREATE INDEX idx_chunks_fts ON document_chunks USING GIN(content_tsv);
+      
+      # Keyword Search Query
+      SELECT chunk_id, content, 
+             ts_rank(content_tsv, websearch_to_tsquery('english', :query)) as keyword_score
+      FROM document_chunks
+      WHERE project_id = :project_id
+        AND content_tsv @@ websearch_to_tsquery('english', :query)
+      ORDER BY keyword_score DESC
+      LIMIT :limit;
+      
+      # Score Normalization (min-max scaling to 0-1 range)
+      def normalize_scores(results):
+          if not results:
+              return []
+          scores = [r.score for r in results]
+          min_score, max_score = min(scores), max(scores)
+          if max_score == min_score:
+              return [{**r, 'normalized': 1.0} for r in results]
+          return [{
+              **r, 
+              'normalized': (r.score - min_score) / (max_score - min_score)
+          } for r in results]
+      
+      # Hybrid Merge with Weighted Scoring
+      def merge_results(semantic_results, keyword_results, weight_s=0.7, weight_k=0.3):
+          semantic_norm = normalize_scores(semantic_results)
+          keyword_norm = normalize_scores(keyword_results)
+          
+          combined = {}
+          for result in semantic_norm:
+              combined[result.chunk_id] = {
+                  'chunk': result,
+                  'semantic': result.normalized,
+                  'keyword': 0,
+                  'combined': result.normalized * weight_s
+              }
+          
+          for result in keyword_norm:
+              if result.chunk_id in combined:
+                  combined[result.chunk_id]['keyword'] = result.normalized
+                  combined[result.chunk_id]['combined'] += result.normalized * weight_k
+              else:
+                  combined[result.chunk_id] = {
+                      'chunk': result,
+                      'semantic': 0,
+                      'keyword': result.normalized,
+                      'combined': result.normalized * weight_k
+                  }
+          
+          return sorted(combined.values(), key=lambda x: x['combined'], reverse=True)
+  
+  successCriteria:
+    - PostgreSQL full-text search indexes added
+    - Hybrid search service implemented with weighted scoring
+    - API supports search_mode parameter (semantic, keyword, hybrid)
+    - Hybrid mode returns combined results sorted by weighted score
+    - Performance benchmarks show hybrid adds <200ms latency
+    - Precision improved by ≥15% vs semantic-only on test queries
+    - Documentation explains scoring algorithm
+  
+  deliverables:
+    - file: alembic/versions/XXX_add_fulltext_search.py
+      description: Migration adding tsvector column and GIN index
+    
+    - file: app/services/hybrid_search.py
+      description: Hybrid search service with weighted scoring
+    
+    - file: app/api/v1/search.py
+      description: Updated search endpoints with mode parameter
+    
+    - file: tests/test_hybrid_search.py
+      description: Hybrid search tests and precision benchmarks
+    
+    - file: docs/hybrid-search.md
+      description: Hybrid search algorithm and configuration guide
+    
+    - telemetry: Hybrid search performance metrics
+      path: cmos/telemetry/events/sprint-09-hybrid-search.jsonl
+  
+  qualityGates:
+    - gate: fulltext_indexes_working
+      description: PostgreSQL full-text search operational
+      validation: Keyword-only queries return results
+    
+    - gate: scoring_algorithm_correct
+      description: Weighted scoring combines results properly
+      validation: Test queries verify score calculation
+    
+    - gate: performance_acceptable
+      description: Hybrid search latency acceptable
+      validation: Adds <200ms vs semantic-only
+    
+    - gate: precision_improved
+      description: Hybrid improves result relevance
+      validation: Benchmark shows ≥15% precision improvement
+  
+  dependencies:
+    upstream: []
+    downstream:
+      - B9.3  # UI will expose hybrid search mode
+  
+  risks:
+    - risk: Performance degradation from dual searches
+      mitigation: Run searches in parallel, cache results
+    
+    - risk: Score normalization issues
+      mitigation: Test with diverse score ranges, add scaling logic
+  
+  acceptanceCriteria:
+    - Migration adds tsvector column with GIN index
+    - Hybrid search service combines semantic + keyword results
+    - API accepts search_mode parameter (semantic, keyword, hybrid)
+    - Default weights (0.7/0.3) configurable via settings
+    - Hybrid mode tested with 10+ diverse queries
+    - Performance benchmarks document latency impact
+    - Precision metrics show improvement
+    - Documentation explains algorithm and usage
+  
+  estimatedEffort: medium
+  orchestrationPattern: none
+  
+domainFields:
+  sprint_09_advanced_search: true
+  roadmap_phase: 4
+  roadmap_week: 15
+  performance_impact: medium
+  search_category: hybrid
+  default_weights:
+    semantic: 0.7
+    keyword: 0.3
+

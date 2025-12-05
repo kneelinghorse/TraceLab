@@ -1,0 +1,132 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B8.1
+  name: Telemetry Automation
+  sprint: Sprint 08
+  type: Build.Implementation.v1
+  priority: high
+  created: 2025-11-15
+  owner: assistant
+
+missionId: "B8.1"
+
+spec:
+  objective: |
+    Automate the generation of testing-summary.json from CI test runs to eliminate manual 
+    JSONL editing and ensure telemetry stays current with every test execution.
+  
+  context: |
+    Currently, testing-summary.json is manually updated, leading to:
+    - Stale test evidence
+    - Manual overhead
+    - Potential drift between actual test results and recorded telemetry
+    
+    Sprint 07 retrospective identified this as the top priority gap. The integration test 
+    runner (node cmos/context/integration_test_runner.js) already exists but needs to be 
+    wired into pytest and Playwright workflows to auto-refresh the summary file.
+  
+  researchStatement:
+    topic: Telemetry automation for continuous test evidence
+    scope: Pytest, Playwright, and integration test runner outputs
+    centralHypothesis: Automating telemetry generation eliminates manual editing and keeps test evidence synchronized
+  
+  keyQuestions:
+    - How do we wire pytest to auto-update testing-summary.json?
+    - How do we integrate Playwright test results?
+    - Should telemetry update happen in CI only or also in local dev?
+    - What format changes are needed to support automated updates?
+  
+  technicalApproach:
+    architecture:
+      - Pytest plugin or post-test hook to capture results
+      - Playwright reporter integration
+      - Unified telemetry aggregator script
+      - CI workflow integration (GitHub Actions or similar)
+    
+    implementation:
+      - Create pytest plugin: cmos/scripts/pytest_telemetry_plugin.py
+      - Create Playwright reporter: cmos/scripts/playwright_telemetry_reporter.js
+      - Create aggregator: cmos/scripts/aggregate_test_telemetry.py
+      - Update CI config to run aggregator after tests
+      - Wire into cmos/context/integration_test_runner.js
+    
+    dataFlow: |
+      pytest → pytest_telemetry_plugin → temp results
+      Playwright → playwright_reporter → temp results
+      integration_test_runner → temp results
+      aggregate_test_telemetry → testing-summary.json (final)
+  
+  successCriteria:
+    - pytest automatically updates telemetry after test runs
+    - Playwright automatically updates telemetry after e2e tests
+    - testing-summary.json reflects latest test results without manual editing
+    - CI pipeline runs telemetry aggregation on every commit
+    - Local dev can optionally trigger telemetry update
+    - Zero manual JSONL edits required for mission completion
+  
+  deliverables:
+    - file: cmos/scripts/pytest_telemetry_plugin.py
+      description: Pytest plugin to capture test results in telemetry format
+    
+    - file: cmos/scripts/playwright_telemetry_reporter.js
+      description: Playwright custom reporter for telemetry integration
+    
+    - file: cmos/scripts/aggregate_test_telemetry.py
+      description: Aggregates all test results into testing-summary.json
+    
+    - file: .github/workflows/test-telemetry.yml
+      description: CI workflow to run tests and update telemetry
+    
+    - file: docs/telemetry-automation.md
+      description: Documentation for automated telemetry system
+    
+    - artifact: Updated testing-summary.json
+      description: Auto-generated from latest test run
+  
+  qualityGates:
+    - gate: automated_telemetry
+      description: Telemetry updates without manual intervention
+      validation: Run pytest + Playwright, verify testing-summary.json updates
+    
+    - gate: ci_integration
+      description: CI pipeline includes telemetry generation
+      validation: Check CI workflow includes aggregation step
+    
+    - gate: documentation
+      description: Process documented for future reference
+      validation: docs/telemetry-automation.md exists and is complete
+  
+  dependencies:
+    upstream: []
+    downstream: 
+      - B8.6  # Sprint retrospective will validate telemetry automation
+  
+  risks:
+    - risk: Pytest plugin conflicts with existing plugins
+      mitigation: Use pytest hooks carefully, test with existing setup
+    
+    - risk: Playwright reporter breaks existing test runs
+      mitigation: Make reporter optional, test locally first
+    
+    - risk: CI performance impact
+      mitigation: Aggregation script should be <5 seconds overhead
+  
+  acceptanceCriteria:
+    - Run pytest suite → testing-summary.json updates automatically
+    - Run Playwright suite → testing-summary.json updates automatically
+    - CI commit triggers automatic telemetry refresh
+    - No manual JSONL editing in mission notes
+    - Telemetry timestamp matches test run timestamp
+  
+  estimatedEffort: medium
+  orchestrationPattern: none
+  
+domainFields:
+  sprint_08_optimization: true
+  roadmap_phase: 5
+  roadmap_week: 19
+  performance_impact: low
+  monitoring_category: observability
+

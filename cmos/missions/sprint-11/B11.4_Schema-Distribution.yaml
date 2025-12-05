@@ -1,0 +1,147 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B11.4
+  name: Schema Distribution & Contract Hardening
+  sprint: Sprint 11
+  type: Build.Implementation.v1
+  priority: medium
+  created: 2025-12-05
+  owner: assistant
+
+missionId: "B11.4"
+
+spec:
+  objective: |
+    Publish tracelab_schemas to GitHub Packages and lock the ingestion contract
+    with semantic versioning and CI guardrails.
+
+  context: |
+    Sprint 10 created the tracelab_schemas package (B10.3) with Mission Protocol
+    Pydantic models. Currently it's local-only. For DeepSearch integration:
+
+    1. Publish to GitHub Packages (decision from planning session)
+    2. Semantic versioning with breaking change protection
+    3. CI check ensures DeepSearch and TraceLab pin same version
+    4. Contract documentation locked to version
+
+    Architecture decision: GitHub Packages (not Artifactory).
+    Reference: cmos/planning/DeepSearch-TraceLab-Integration-Contract.md
+
+  researchStatement:
+    topic: Schema package distribution and version management
+    scope: GitHub Packages publishing, semantic versioning, CI integration
+    centralHypothesis: Shared schema package eliminates version drift between systems
+
+  keyQuestions:
+    - What's the GitHub Packages publishing workflow?
+    - How do we enforce semantic versioning (major for breaking)?
+    - What CI check validates version alignment?
+    - How do we document version-to-contract mapping?
+    - Should we auto-publish on tag or manual release?
+
+  technicalApproach:
+    architecture:
+      - GitHub Packages for PyPI-compatible hosting
+      - pyproject.toml with version metadata
+      - GitHub Actions for publish workflow
+      - CI job to verify version alignment
+      - CHANGELOG.md for version history
+
+    implementation:
+      - Update tracelab_schemas/pyproject.toml for GitHub Packages
+      - Create .github/workflows/publish-schemas.yml
+      - Add version bumping script (bump-version.sh)
+      - Create CHANGELOG.md with semantic versioning notes
+      - Add CI job: compare TraceLab + DeepSearch pinned versions
+      - Update contract docs with version requirements
+      - Add README with installation instructions
+      - Create release process documentation
+      - Test publish workflow in dry-run mode
+
+    versioningStrategy: |
+      Semantic Versioning (semver):
+        - MAJOR: Breaking changes to MissionProtocolComplete schema
+        - MINOR: New optional fields, new schemas
+        - PATCH: Bug fixes, documentation updates
+
+      Breaking changes require:
+        1. MAJOR version bump
+        2. Migration guide in CHANGELOG.md
+        3. Deprecation notice 1 version prior
+        4. Both teams acknowledge before release
+
+  successCriteria:
+    - Package published to GitHub Packages
+    - pip install tracelab-schemas works from GitHub Packages
+    - Semantic version enforced (CI blocks invalid bumps)
+    - CI check verifies TraceLab + DeepSearch version match
+    - Contract documentation links to specific version
+
+  deliverables:
+    - file: tracelab_schemas/pyproject.toml
+      description: Updated with GitHub Packages config
+
+    - file: .github/workflows/publish-schemas.yml
+      description: Publish workflow on release tag
+
+    - file: .github/workflows/version-check.yml
+      description: CI job for version alignment
+
+    - file: tracelab_schemas/CHANGELOG.md
+      description: Version history with breaking change notes
+
+    - file: scripts/bump-version.sh
+      description: Version bumping helper script
+
+    - file: docs/schema-versioning.md
+      description: Versioning policy and release process
+
+  qualityGates:
+    - gate: package_published
+      description: Package available on GitHub Packages
+      validation: pip install succeeds from registry
+
+    - gate: semver_enforced
+      description: Version follows semantic versioning
+      validation: CI blocks invalid version strings
+
+    - gate: version_alignment_checked
+      description: CI verifies cross-system version match
+      validation: PR check runs and reports status
+
+    - gate: docs_versioned
+      description: Contract docs reference specific version
+      validation: Documentation includes version requirements
+
+  dependencies:
+    upstream:
+      - B10.3  # Schema package scaffolding
+    downstream:
+      - B11.6  # Retrospective captures distribution metrics
+
+  risks:
+    - risk: GitHub Packages authentication complexity
+      mitigation: Document token setup, provide setup script
+
+    - risk: Version drift during active development
+      mitigation: CI blocks PRs with version mismatch
+
+  acceptanceCriteria:
+    - tracelab-schemas on GitHub Packages registry
+    - pip install tracelab-schemas --index-url=... succeeds
+    - GitHub Actions workflow publishes on version tag
+    - CI job compares versions across repos
+    - CHANGELOG.md documents all versions
+    - Contract docs specify minimum version requirement
+    - README includes installation instructions
+
+  estimatedEffort: small-medium
+  orchestrationPattern: none
+
+domainFields:
+  sprint_11_correction: true
+  packaging: true
+  ci_cd: true
+  integration_category: distribution

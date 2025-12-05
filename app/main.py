@@ -10,6 +10,7 @@ from app.api.v1 import (
     admin,
     auth,
     cache,
+    corrections,
     deepsearch,
     documents,
     facets,
@@ -110,6 +111,12 @@ app.include_router(
     deepsearch.router,
     prefix=f"{settings.api_v1_prefix}/deepsearch",
     tags=["deepsearch"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    corrections.router,
+    prefix=f"{settings.api_v1_prefix}/deepsearch",
+    tags=["corrections"],
     dependencies=protected_dependencies,
 )
 app.include_router(quality.router, prefix=settings.api_v1_prefix, tags=["quality"], dependencies=protected_dependencies)

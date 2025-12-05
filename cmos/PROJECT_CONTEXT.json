@@ -13,8 +13,8 @@
   },
   "working_memory": {
     "active_domain": "starter",
-    "session_count": 119,
-    "last_session": "2025-11-18T05:45:07Z",
+    "session_count": 122,
+    "last_session": "2025-12-05T01:21:15Z",
     "agents_md_path": "./agents.md",
     "agents_md_loaded": false,
     "active_mission": null,
@@ -41,122 +41,6 @@
       }
     },
     "session_history": [
-      {
-        "mission": "B7.7",
-        "agent": "assistant",
-        "summary": "Starting B7.7 end-to-end workflow validation mission",
-        "action": "start",
-        "ts": "2025-11-15T00:35:32Z"
-      },
-      {
-        "mission": "B7.7",
-        "agent": "assistant",
-        "summary": "UI + CLI workflows validated; ingestion/search/RAG suites and telemetry prove B7.7 readiness.",
-        "action": "complete",
-        "ts": "2025-11-15T00:52:24Z"
-      },
-      {
-        "session": "PS-2025-11-15-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Started B7.7 validation recap",
-        "action": "start",
-        "ts": "2025-11-15T01:16:25Z"
-      },
-      {
-        "session": "PS-2025-11-15-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Captured context",
-        "action": "capture",
-        "ts": "2025-11-15T01:16:30Z"
-      },
-      {
-        "session": "PS-2025-11-15-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Captured next-step",
-        "action": "capture",
-        "ts": "2025-11-15T01:16:33Z"
-      },
-      {
-        "session": "PS-2025-11-15-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Reviewed B7.7 validation evidence, confirmed ingestion/auth stability in prod/local, and noted UI hydration warnings as the only follow-up.",
-        "action": "complete",
-        "ts": "2025-11-15T01:30:06Z"
-      },
-      {
-        "mission": "B7.8",
-        "agent": "assistant",
-        "summary": "Kicking off Sprint 07 retrospective deliverables per mission brief.",
-        "action": "start",
-        "ts": "2025-11-15T01:53:16Z"
-      },
-      {
-        "mission": "B7.8",
-        "agent": "assistant",
-        "summary": "Sprint 07 retrospective + env inventory documented with parity + telemetry evidence readying Sprint 08 planning.",
-        "action": "complete",
-        "ts": "2025-11-15T01:59:03Z"
-      },
-      {
-        "session": "PS-2025-11-15-001",
-        "session_type": "planning",
-        "agent": "assistant",
-        "summary": "Started Sprint 08 & 09 Planning",
-        "action": "start",
-        "ts": "2025-11-15T04:42:42Z"
-      },
-      {
-        "session": "PS-2025-11-15-001",
-        "session_type": "planning",
-        "agent": "assistant",
-        "summary": "Captured decision",
-        "action": "capture",
-        "ts": "2025-11-15T04:42:49Z"
-      },
-      {
-        "session": "PS-2025-11-15-001",
-        "session_type": "planning",
-        "agent": "assistant",
-        "summary": "Captured decision",
-        "action": "capture",
-        "ts": "2025-11-15T04:42:51Z"
-      },
-      {
-        "session": "PS-2025-11-15-001",
-        "session_type": "planning",
-        "agent": "assistant",
-        "summary": "Captured decision",
-        "action": "capture",
-        "ts": "2025-11-15T04:42:53Z"
-      },
-      {
-        "session": "PS-2025-11-15-001",
-        "session_type": "planning",
-        "agent": "assistant",
-        "summary": "Captured decision",
-        "action": "capture",
-        "ts": "2025-11-15T04:42:55Z"
-      },
-      {
-        "session": "PS-2025-11-15-001",
-        "session_type": "planning",
-        "agent": "assistant",
-        "summary": "Captured decision",
-        "action": "capture",
-        "ts": "2025-11-15T04:42:58Z"
-      },
-      {
-        "session": "PS-2025-11-15-001",
-        "session_type": "planning",
-        "agent": "assistant",
-        "summary": "Captured constraint",
-        "action": "capture",
-        "ts": "2025-11-15T04:42:59Z"
-      },
       {
         "session": "PS-2025-11-15-001",
         "session_type": "planning",
@@ -404,12 +288,130 @@
         "summary": "DeepSearch integration fixtures, tests, docs, and telemetry delivered",
         "action": "complete",
         "ts": "2025-11-18T05:45:07Z"
+      },
+      {
+        "mission": "B10.6",
+        "agent": "assistant",
+        "summary": "Kicking off Sprint 10 retrospective + planning deliverables",
+        "action": "start",
+        "ts": "2025-11-18T13:39:09Z"
+      },
+      {
+        "mission": "B10.6",
+        "agent": "assistant",
+        "summary": "Sprint 10 retro delivered metrics, telemetry, and Sprint 11 backlog.",
+        "action": "complete",
+        "ts": "2025-11-18T13:54:42Z"
+      },
+      {
+        "session": "PS-2025-12-05-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Started Sprint 10 Review & Sprint 11 Planning",
+        "action": "start",
+        "ts": "2025-12-05T00:37:05Z"
+      },
+      {
+        "session": "PS-2025-12-05-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured learning",
+        "action": "capture",
+        "ts": "2025-12-05T00:37:31Z"
+      },
+      {
+        "session": "PS-2025-12-05-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured context",
+        "action": "capture",
+        "ts": "2025-12-05T00:37:33Z"
+      },
+      {
+        "session": "PS-2025-12-05-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-12-05T01:15:57Z"
+      },
+      {
+        "session": "PS-2025-12-05-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-12-05T01:15:59Z"
+      },
+      {
+        "session": "PS-2025-12-05-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-12-05T01:16:02Z"
+      },
+      {
+        "session": "PS-2025-12-05-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-12-05T01:16:04Z"
+      },
+      {
+        "session": "PS-2025-12-05-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-12-05T01:16:07Z"
+      },
+      {
+        "session": "PS-2025-12-05-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-12-05T01:16:09Z"
+      },
+      {
+        "session": "PS-2025-12-05-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-12-05T01:16:11Z"
+      },
+      {
+        "session": "PS-2025-12-05-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured next-step",
+        "action": "capture",
+        "ts": "2025-12-05T01:21:09Z"
+      },
+      {
+        "session": "PS-2025-12-05-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured next-step",
+        "action": "capture",
+        "ts": "2025-12-05T01:21:12Z"
+      },
+      {
+        "session": "PS-2025-12-05-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Sprint 10 review completed (6/6 missions, 100% auto-linking, 212% quality boost). Sprint 11 planned with 6 missions focused on correction loops, PEDR delta sync, and operator tooling. Key architecture decisions captured: async webhooks for corrections, event-driven PEDR sync, Next.js for console, GitHub Packages for schema distribution.",
+        "action": "complete",
+        "ts": "2025-12-05T01:21:15Z"
       }
     ],
     "blocked_missions": [
       "B6.3"
     ],
-    "last_completed_mission": "B10.5",
+    "last_completed_mission": "B10.6",
     "last_blocked_mission": "B6.3",
     "recent_sessions": [
       {
@@ -438,6 +440,21 @@
           "constraint": 2,
           "context": 1
         }
+      },
+      {
+        "id": "PS-2025-12-05-001",
+        "session_type": "review",
+        "type": "review",
+        "title": "Sprint 10 Review & Sprint 11 Planning",
+        "summary": "Sprint 10 review completed (6/6 missions, 100% auto-linking, 212% quality boost). Sprint 11 planned with 6 missions focused on correction loops, PEDR delta sync, and operator tooling. Key architecture decisions captured: async webhooks for corrections, event-driven PEDR sync, Next.js for console, GitHub Packages for schema distribution.",
+        "completed_at": "2025-12-05T01:21:15Z",
+        "capture_count": 11,
+        "captures": {
+          "learning": 1,
+          "context": 1,
+          "decision": 7,
+          "next-step": 2
+        }
       }
     ],
     "next_steps": [
@@ -465,12 +482,12 @@
     }
   },
   "context_health": {
-    "size_kb": 12.55,
+    "size_kb": 13.25,
     "size_limit_kb": 100,
-    "sessions_since_reset": 101,
+    "sessions_since_reset": 105,
     "last_reset": "",
     "compression_enabled": false,
-    "last_update": "2025-11-18T05:45:07Z"
+    "last_update": "2025-12-05T01:21:15Z"
   },
   "metadata": {
     "migrated_at": "2025-11-15T16:19:59.619425+00:00",

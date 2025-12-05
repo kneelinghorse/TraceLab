@@ -1,0 +1,155 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B11.2
+  name: PEDR Delta Sync Service
+  sprint: Sprint 11
+  type: Build.Implementation.v1
+  priority: high
+  created: 2025-12-05
+  owner: assistant
+
+missionId: "B11.2"
+
+spec:
+  objective: |
+    Stream validated missions and relationship context into PEDR with governance
+    metadata using event-driven sync architecture.
+
+  context: |
+    Sprint 10 delivered quality-aware search (B10.1) and relationship API (B10.4).
+    Now we need to push this data into PEDR for:
+
+    1. Delta detection - identify new/updated missions since last sync
+    2. Export job - stream missions with quality + relationship metadata
+    3. Governance - include PII flags, business impact scores
+    4. Event-driven - trigger on mission completion, not hourly batch
+
+    Architecture decision: Event-driven sync (not hourly batch).
+    Reference: cmos/planning/PEDR-docs/tracelab-to-pedr-mapping.md
+
+  researchStatement:
+    topic: Event-driven research artifact sync to PEDR search index
+    scope: Delta detection, export service, governance metadata propagation
+    centralHypothesis: Event-driven sync reduces stale search results from hours to seconds
+
+  keyQuestions:
+    - What triggers a sync event (mission complete, status change)?
+    - How do we track last_sync per entity type?
+    - What's the PEDR ingestion endpoint format?
+    - How do we handle sync failures (retry, dead letter)?
+    - Should deletions/updates reconcile bidirectionally?
+
+  technicalApproach:
+    architecture:
+      - Delta detector using updated_at timestamps
+      - Event emitter on mission status changes
+      - PEDR export service with semantic manifest transformation
+      - CLI command for manual sync triggers
+      - Scheduler for catch-up syncs (fallback)
+
+    implementation:
+      - Create app/services/pedr/delta_sync.py
+      - Track sync_state table (entity_type, last_sync_at, sync_count)
+      - Emit sync event on mission status=complete
+      - Transform mission to PEDR manifest (per mapping doc)
+      - Include quality_score, governance_pii, governance_impact
+      - Add relationship bindings (project, evidence chunks)
+      - POST to PEDR ingestion endpoint
+      - Add CLI: tracelab pedr sync [--full|--delta]
+      - Create scheduler job for hourly catch-up
+      - Implement parity check (count comparison)
+      - Add tests for delta detection and transformation
+      - Document sync architecture and rebuild process
+
+    manifestTransformation: |
+      Mission -> PEDR Manifest:
+        urn: urn:research:mission:{mission_id}
+        purpose: research_statement.objective
+        description: title
+        element_type: mission
+        element_intent: Read
+        governance_pii: detect from synthesis
+        governance_impact: calculate from quality_gates (5-8 range)
+        bindings: {project_id, evidence_chunks[], related_missions[]}
+
+  successCriteria:
+    - Delta detector identifies missions updated since last sync
+    - Event-driven sync triggers on mission completion
+    - PEDR export includes governance metadata
+    - CLI sync command works for manual triggers
+    - Parity check validates sync completeness
+    - <30 second latency from mission complete to PEDR availability
+
+  deliverables:
+    - file: app/services/pedr/delta_sync.py
+      description: Delta detection and sync orchestration
+
+    - file: app/services/pedr/manifest_transformer.py
+      description: Mission to PEDR manifest conversion
+
+    - file: app/services/pedr/sync_events.py
+      description: Event emitter for sync triggers
+
+    - file: app/cli/pedr.py
+      description: CLI commands for manual sync
+
+    - file: docs/pedr-sync.md
+      description: Sync architecture and rebuild documentation
+
+    - file: tests/test_pedr_delta_sync.py
+      description: Delta detection and transformation tests
+
+    - telemetry: Sync metrics
+      path: cmos/telemetry/events/sprint-11-pedr-sync.jsonl
+
+  qualityGates:
+    - gate: delta_detection_accurate
+      description: Only changed entities selected for sync
+      validation: Test shows unchanged missions excluded
+
+    - gate: event_driven_working
+      description: Sync triggers on mission completion
+      validation: End-to-end test from ingest to PEDR
+
+    - gate: governance_propagated
+      description: PII and impact scores in PEDR manifest
+      validation: Manifest inspection shows governance fields
+
+    - gate: parity_validated
+      description: Mission counts match between systems
+      validation: Parity check script passes
+
+  dependencies:
+    upstream:
+      - B10.1  # Quality metadata for governance scores
+      - B10.4  # Relationship API for bindings
+    downstream:
+      - B11.5  # Pre-flight queries need synced data
+      - B11.6  # Retrospective captures sync metrics
+
+  risks:
+    - risk: PEDR endpoint unavailable during sync
+      mitigation: Retry with backoff, dead letter queue
+
+    - risk: High sync volume overwhelms PEDR
+      mitigation: Batch mode for bulk syncs, rate limiting
+
+  acceptanceCriteria:
+    - Delta detector queries by updated_at > last_sync
+    - Event published on mission status transition to complete
+    - PEDR manifest includes urn, governance_*, bindings
+    - CLI: tracelab pedr sync --delta succeeds
+    - Parity check: count(missions) == count(PEDR manifests)
+    - Sync latency <30s measured via telemetry
+    - Tests cover delta, full sync, and failure recovery
+
+  estimatedEffort: medium
+  orchestrationPattern: event-driven
+
+domainFields:
+  sprint_11_correction: true
+  pedr_integration: true
+  sync_architecture: event-driven
+  integration_category: data_sync

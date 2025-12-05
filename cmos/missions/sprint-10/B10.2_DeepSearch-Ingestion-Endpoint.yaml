@@ -1,0 +1,181 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B10.2
+  name: DeepSearch Ingestion Endpoint + Post-Processing
+  sprint: Sprint 10
+  type: Build.Implementation.v1
+  priority: high
+  created: 2025-11-17
+  owner: assistant
+
+missionId: "B10.2"
+
+spec:
+  objective: |
+    Build API endpoint to receive Mission Protocol JSON from DeepSearch agent, validate 
+    via Pydantic and quality gates, store in database, and implement post-processing 
+    auto-linking to match evidence to document chunks via similarity.
+  
+  context: |
+    Per DeepSearch integration alignment, TraceLab receives structured research outputs 
+    from autonomous agents and validates them before storage.
+    
+    Key requirements from alignment:
+    - Accept Mission Protocol JSON (MissionProtocolComplete schema)
+    - Validate structure via Pydantic
+    - Run quality gate checks
+    - Store mission in PostgreSQL
+    - Auto-link evidence to chunks via similarity matching (post-processing)
+    - Return validation results or errors
+    
+    DeepSearch submits URL-based evidence only (no chunk_ids). TraceLab background job 
+    matches evidence text to chunks using semantic similarity.
+  
+  researchStatement:
+    topic: Agent-to-API ingestion with automated evidence linking
+    scope: API endpoint, validation, storage, post-processing auto-linking
+    centralHypothesis: Automated evidence linking eliminates manual chunk reference management
+  
+  keyQuestions:
+    - What validation happens at API layer vs background job?
+    - How do we match evidence text to chunks (similarity threshold)?
+    - Should auto-linking be synchronous or async background job?
+    - How do we handle linking failures?
+    - What metadata should be returned to DeepSearch?
+  
+  technicalApproach:
+    architecture:
+      - New API endpoint for DeepSearch
+      - Pydantic validation at request layer
+      - Quality gate validation
+      - Mission storage in PostgreSQL
+      - Background job for evidence auto-linking
+      - Similarity-based chunk matching
+    
+    implementation:
+      - Create POST /api/v1/deepsearch/ingest endpoint
+      - Accept request body with project_id, mission JSON, auto_create_project flag
+      - Validate mission via MissionProtocolComplete
+      - Run quality gate validators
+      - Store mission in database
+      - Queue background job for evidence linking
+      - Create app/services/evidence_auto_linking.py
+      - Use sentence-transformers or OpenAI embeddings for evidence matching
+      - Match evidence.content to document chunks via cosine similarity
+      - Update insight_sources table with matched chunks
+      - Return mission UUID and validation status
+      - Add tests for ingestion and auto-linking
+      - Document auto-linking algorithm
+    
+    autoLinkingAlgorithm: |
+      For each evidence item without chunk_id:
+      1. Generate embedding for evidence.content (use same model as chunks)
+      2. Query Qdrant for top-5 most similar chunks in same project
+      3. Apply similarity threshold (0.7 default)
+      4. If match found:
+         - Update evidence with chunk_id
+         - Create insight_sources entry (if insight_id present)
+         - Log linking telemetry
+      5. If no match:
+         - Log warning
+         - Evidence remains without chunk_id (URL-only reference)
+      
+      Confidence scoring:
+      - score ≥0.9: high confidence, auto-link
+      - 0.7 ≤ score <0.9: medium confidence, auto-link with flag
+      - score <0.7: low confidence, skip linking
+  
+  successCriteria:
+    - POST /api/v1/deepsearch/ingest endpoint accepts Mission Protocol JSON
+    - Pydantic validation returns 422 on schema errors
+    - Quality gate validation returns 400 on gate failures
+    - Missions stored in PostgreSQL with all metadata
+    - Background job matches evidence to chunks (≥80% success rate)
+    - Similarity threshold configurable (default 0.7)
+    - Auto-linking telemetry logged
+    - Returns mission UUID and quality gate status
+    - Tests cover validation, storage, and auto-linking
+  
+  deliverables:
+    - file: app/api/v1/deepsearch.py
+      description: DeepSearch ingestion endpoints
+    
+    - file: app/services/evidence_auto_linking.py
+      description: Evidence-to-chunk similarity matching service
+    
+    - file: app/schemas/deepsearch.py
+      description: DeepSearch ingestion request/response schemas
+    
+    - file: alembic/versions/XXX_add_evidence_linking_metadata.py
+      description: Migration for auto-linking metadata fields
+    
+    - file: tests/test_deepsearch_ingestion.py
+      description: Ingestion endpoint and validation tests
+    
+    - file: tests/test_evidence_auto_linking.py
+      description: Auto-linking algorithm and matching tests
+    
+    - file: docs/deepsearch-integration.md
+      description: DeepSearch ingestion guide and auto-linking algorithm
+    
+    - telemetry: Ingestion and linking metrics
+      path: cmos/telemetry/events/sprint-10-deepsearch-ingestion.jsonl
+  
+  qualityGates:
+    - gate: ingestion_endpoint_working
+      description: Endpoint accepts and validates missions
+      validation: POST requests succeed with valid JSON
+    
+    - gate: validation_enforced
+      description: Pydantic and quality gates block invalid missions
+      validation: Test 422 and 400 error cases
+    
+    - gate: auto_linking_functional
+      description: Evidence matched to chunks automatically
+      validation: 80% success rate on test missions
+    
+    - gate: telemetry_complete
+      description: All ingestion events logged
+      validation: Telemetry captures success/error cases
+  
+  dependencies:
+    upstream:
+      - B10.1  # Quality scoring used in validation
+    downstream:
+      - B10.5  # Integration testing validates endpoint
+  
+  risks:
+    - risk: Auto-linking matches wrong chunks
+      mitigation: Conservative similarity threshold (0.7), log confidence scores
+    
+    - risk: Background job delays chunk availability
+      mitigation: Async processing acceptable, add status endpoint
+    
+    - risk: Evidence text too short for good matching
+      mitigation: Minimum length threshold, fallback to URL-only
+  
+  acceptanceCriteria:
+    - /api/v1/deepsearch/ingest endpoint created
+    - Accepts MissionProtocolComplete JSON
+    - Validates and returns 422 on schema errors
+    - Quality gates checked, returns 400 on failures
+    - Mission stored with all fields
+    - Background job created for auto-linking
+    - Evidence matched to chunks with ≥0.7 similarity
+    - Auto-linking success rate ≥80%
+    - Telemetry logs ingestion attempts
+    - Tests cover all validation paths
+    - Documentation explains auto-linking algorithm
+  
+  estimatedEffort: medium-large
+  orchestrationPattern: none
+  
+domainFields:
+  sprint_10_integration: true
+  pedr_phase: 1
+  performance_impact: medium
+  integration_category: agent_ingestion
+  deepsearch_coordination: true
+

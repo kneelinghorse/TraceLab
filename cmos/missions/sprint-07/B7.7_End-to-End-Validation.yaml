@@ -1,0 +1,61 @@
+# Mission File: B7.7_End-to-End-Validation.yaml
+
+missionId: "B7.7"
+
+objective: "Validate complete document workflow from upload through search, generate validation report, and document any remaining gaps."
+
+context: |
+  After fixing Qdrant initialization (B7.5) and embedding integration (B7.6), need to prove the
+  complete workflow works: upload document → process with embedding → search and find results →
+  RAG query generates answers. Test both UI and CLI workflows. Document success/failure of each
+  step to identify any remaining blockers before declaring Sprint 07 complete.
+
+successCriteria:
+  - "UI workflow validated: login → create project → upload document → process → search → view results."
+  - "CLI workflow validated: login → create project → upload → process → search → export."
+  - "Document processing completes all stages: parsed → chunked → embedded."
+  - "Search returns relevant chunks from uploaded documents."
+  - "RAG queries generate answers with proper citations."
+  - "Validation report documents success/failure with evidence (screenshots, API responses, logs)."
+  - "Any remaining gaps documented with severity and recommendations."
+
+deliverables:
+  - "cmos/reports/sprint-07/validation-report.md - Complete workflow validation."
+  - "cmos/telemetry/events/sprint-07-validation.jsonl - Test execution telemetry."
+  - "docs/workflows.md - Documented end-to-end workflows for users."
+  - "Any blocker tickets for Sprint 08 if gaps found."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  implementationScope:
+    coreDeliverable: "End-to-end workflow validation with gap analysis."
+    outOfScope:
+      - "Fixing gaps discovered (that's next sprint)."
+      - "Performance testing or load testing."
+      - "Edge case coverage."
+
+  validationProtocol:
+    - validator: "UI workflow test"
+      focus: "Complete workflow in browser, document each step with screenshots."
+    - validator: "CLI workflow test"
+      focus: "Complete workflow via CLI, capture command outputs."
+    - validator: "Database verification"
+      focus: "Check PostgreSQL for chunks, Qdrant for vectors, verify counts match."
+    - validator: "Search quality check"
+      focus: "Upload known document, search for key concepts, verify relevant results returned."
+
+  handoffContext:
+    completed:
+      - "End-to-end workflows validated."
+      - "Gaps documented with severity."
+      - "System readiness assessed."
+    interfaces: []
+    assumptions:
+      - "B7.1-B7.6 complete and deployed."
+      - "Qdrant collection initialized."
+      - "Embedding pipeline functional."
+      - "All services running (PostgreSQL, Qdrant, FastAPI, Next.js)."
+    nextMission: "B7.8: Sprint 07 Retrospective"
+    blockers: []
+

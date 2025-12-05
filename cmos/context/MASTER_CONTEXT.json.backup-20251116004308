@@ -1,0 +1,1200 @@
+{
+  "project_identity": {
+    "name": "CMOS Starter Template",
+    "version": "0.0.0",
+    "description": "Blank master context for new CMOS starter projects.",
+    "status": "uninitialised",
+    "start_date": "2025-01-01",
+    "deployment": {
+      "platform": "FastAPI + PostgreSQL + Qdrant",
+      "integration_target": "Internal research teams",
+      "environment": "development"
+    },
+    "session_metrics": {
+      "count": 60,
+      "last_session": "2025-11-12T16:09:23Z",
+      "active_domain": "main"
+    },
+    "achievements": [
+      "Completed Sprint 00 strategic research artifacts.",
+      "Completed Sprint 01: all 11 missions delivered (B1.1-B1.9, R1.1-R1.2).",
+      "Achieved all Sprint 01 success criteria: Presidio recall 0.9829, format coverage 5/5, Qdrant latency 9.6ms.",
+      "Established automated sprint evaluation mission (B1.6) and generated Sprint 01 efficacy report.",
+      "Completed Sprint 01 gap-filling missions (B1.7-B1.9) to close all unmet criteria.",
+      "Completed Sprint 02 research (R2.1): comprehensive quality assessment heuristics framework with three-pillar approach.",
+      "Completed Sprint 02 ingestion research (R2.2 Markdown service, R2.3 onboarding workflow) defining architecture for B2.3 sub-missions.",
+      "Planned Sprint 02: all 5 build missions (B2.1-B2.5) defined with success criteria and dependencies.",
+      "Updated B2.3b onboarding mission for single-user deployment and realigned backlog sequencing (B2.3b Current, B2.3d Queued)."
+    ],
+    "files_created": [
+      "cmos/missions/sprint-01/B1.1_Core-Service-Bootstrap.yaml",
+      "cmos/missions/sprint-01/B1.2_Synthetic-Corpus-Pipeline.yaml",
+      "cmos/missions/sprint-01/B1.3_Presidio-Redaction-Service.yaml",
+      "cmos/missions/sprint-01/B1.4_Document-Ingestion-Pipeline.yaml",
+      "cmos/missions/sprint-01/B1.5_Embedding-and-Qdrant-Bootstrap.yaml",
+      "cmos/missions/sprint-01/B1.6_Sprint-Efficacy-Evaluator.yaml",
+      "cmos/missions/sprint-01/B1.7_Presidio-Recall-Tuning.yaml",
+      "cmos/missions/sprint-01/B1.8_Format-Coverage-Completion.yaml",
+      "cmos/missions/sprint-01/B1.9_Qdrant-Latency-Optimization.yaml",
+      "cmos/missions/sprint-02/B2.1_RAG-Query-API.yaml",
+      "cmos/missions/sprint-02/B2.2_Context-Compression-Pipeline.yaml",
+      "cmos/missions/sprint-02/B2.3_Semantic-Cache-Layer.yaml",
+      "cmos/missions/sprint-02/B2.3a_Markdown-Ingestion-Pipeline.yaml",
+      "cmos/missions/sprint-02/B2.3b_Onboarding-API.yaml",
+      "cmos/missions/sprint-02/B2.3c_Ingestion-Integration-Parity.yaml",
+      "cmos/missions/sprint-02/B2.3d_Semantic-Cache-Implementation.yaml",
+      "cmos/missions/sprint-02/B2.4_Tiered-LLM-Routing.yaml",
+      "cmos/missions/sprint-02/B2.5_Sprint-Efficacy-Evaluator.yaml",
+      "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md",
+      "cmos/missions/research/R2.3_Bootstrap-Workflow.md",
+      "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md",
+      "cmos/missions/backlog.yaml",
+      "cmos/docs/sprint-01_metrics_plan.md",
+      "cmos/reports/README.md",
+      "cmos/reports/sprint-01/sprint-01-summary.md",
+      "cmos/reports/sprint-01/SPRINT-01-DELTA-ANALYSIS.md",
+      "cmos/reports/sprint-02/.gitkeep"
+    ],
+    "planning_overview": {
+      "current_sprint": "Sprint 05 - Frontend Deployment & Auth Hardening",
+      "session_summaries": [
+        {
+          "session_date": "2025-11-10",
+          "agent": "Claude",
+          "focus": "Unblocking Sprint 06 development - API URL and auth issues",
+          "key_discoveries": [
+            "Production API is at https://api.namozine.com (root), NOT https://api.namozine.com/api/v1",
+            "All frontend configs and docs have wrong URL with /api/v1 suffix",
+            "Local development blocked due to missing .env setup and auth configuration",
+            "B6.3 (RAG Search UI) blocked by API connectivity issues"
+          ],
+          "decisions_made": [
+            "Renumbered missions to fix linear progression: B6.3-5 are now fix missions, original B6.3-7 moved to B6.6-10",
+            "B6.3: API URL Configuration Fix - remove /api/v1 suffix everywhere",
+            "B6.4: Local Development Environment Setup - create proper dev docs and scripts",
+            "B6.5: Authentication Documentation Testing - document auth flow and credentials",
+            "B6.6 (formerly B6.3) remains blocked until fixes complete"
+          ],
+          "mistakes_made": [
+            "Made unauthorized ad-hoc changes to auth config without understanding impact",
+            "Created frontend/.env.local with wrong API URL",
+            "Failed to recognize production API doesn't use /api/v1 path despite user insisting",
+            "Attempted to fix issues directly instead of creating proper missions"
+          ],
+          "files_modified": [
+            "cmos/missions/sprint-06/* - Renumbered all missions",
+            "cmos/missions/backlog.yaml - Updated mission order and statuses",
+            "app/core/config.py - Reverted unauthorized changes",
+            "app/main.py - Reverted unauthorized changes"
+          ],
+          "blockers_identified": {
+            "api_url_mismatch": {
+              "issue": "Frontend configured for https://api.namozine.com/api/v1 but API serves at root",
+              "impact": "Complete connectivity failure in production and local",
+              "fix": "Mission B6.3 to update all URL references"
+            },
+            "local_dev_setup": {
+              "issue": "No documentation or scripts for local development",
+              "impact": "Developers cannot run application locally",
+              "fix": "Mission B6.4 to create setup guide and automation"
+            },
+            "auth_confusion": {
+              "issue": "No documentation of auth credentials or flow",
+              "impact": "Cannot test authenticated endpoints",
+              "fix": "Mission B6.5 to document authentication"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "technical_foundation": {
+    "critical_facts": [
+      "Sprint 01 completed successfully: all 11 missions done, 4/4 success criteria met.",
+      "Presidio recall achieved 0.9829 minimum (exceeding 0.95 target) across all priority entities.",
+      "All 5 priority formats (PDF, DOCX, PPTX, CSV, XLSX) successfully ingested end-to-end.",
+      "Qdrant performance optimized: 9.6ms max latency (under 10ms target) with adaptive hnsw_ef tiers.",
+      "Sprint 02 research (R2.1) completed: comprehensive quality assessment heuristics framework documented.",
+      "Vector storage operational: Qdrant with on-disk storage, scalar quantization, 12,800 chunks indexed.",
+      "Document & project read APIs are still missing; Document Library UI/CLI list flows remain blocked until B7.1 ships.",
+      "scripts/ingest_cli.py currently returns 401 because it never requests JWT tokens; B7.3 owns the fix so ingestion workflows can pass tests/integration/test_ingestion_flow.py.",
+      "Integration testing guardrails (cmos/docs/integration-testing-guide.md + structured prompting refs) are absent, keeping node cmos/context/integration_test_runner.js red; schedule B7.2 to restore telemetry gating."
+    ],
+    "system_components": {
+      "ingestion": "Upload endpoints, format routing (PDF/DOCX/PPTX/CSV/XLSX), redaction, chunking (500-1000 tokens with overlap), and processing state tracking.",
+      "redaction": "Presidio-based pipeline with custom recognizers (PARTICIPANT_ID, PROJECT_ID), pseudonymization operators, recall 0.9829+ on priority entities.",
+      "vector_store": "Qdrant collection with on-disk storage, scalar quantization (int8), HNSW indexing (m=16), adaptive hnsw_ef tiers, 12,800 chunks indexed, <10ms query latency.",
+      "evaluation": "Synthetic corpus generation + presidio-research metrics, sprint efficacy script (B1.6).",
+      "rag_pipeline": "Planned for Sprint 02: query embedding, vector search, GPT-4o-mini generation, context compression, semantic caching, tiered routing."
+    },
+    "dependencies": [
+      "Python 3.11+",
+      "FastAPI",
+      "SQLAlchemy + Alembic",
+      "PostgreSQL 15+",
+      "Qdrant",
+      "OpenAI API (text-embedding-3-small, GPT-4o-mini, GPT-4o)",
+      "Microsoft Presidio (Analyzer & Anonymizer)",
+      "spaCy en_core_web_lg",
+      "Faker",
+      "python-docx",
+      "python-pptx",
+      "pypdf / py-pdf-parser",
+      "pandas",
+      "tiktoken (for token counting in chunking and compression)"
+    ],
+    "integration_points": [
+      "foundational-docs/roadmap_template.md",
+      "foundational-docs/tech_arch_template.md",
+      "foundational-docs/tech_arch_template.md",
+      "foundational-docs/roadmap_template.md",
+      "cmos/missions/backlog.yaml",
+      "cmos/docs/sprint-01_metrics_plan.md",
+      "cmos/reports/sprint-01/sprint-01-summary.md",
+      "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md"
+    ],
+    "enhanced_features": {},
+    "integration_testing": {
+      "guide": "cmos/docs/integration-testing-guide.md",
+      "runner": "node cmos/context/integration_test_runner.js --output telemetry/events/testing-summary.json",
+      "boundary_enforcement": "CMOS helpers must never import from app.services; rely on telemetry exports, CLI commands, or mission evidence when referencing FastAPI state."
+    },
+    "research_findings": {}
+  },
+  "decisions_made": [
+    {
+      "decision": "Adopt FastAPI + PostgreSQL + Alembic for core service bootstrapping.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Leverage Fake PII generation and presidio-research evaluator for regression testing.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Prioritize .pdf (text-based), .docx, .pptx, .csv, .xlsx ingestion in Sprint 01.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Use GPT-4o-mini as default LLM for RAG queries (per TR-03 research).",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Implement rule-based quality assessment heuristics (not ML-based) per R2.1 research.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Adaptive Qdrant hnsw_ef tiers (96/108/120) based on top_k for latency optimization.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Three-pillar quality assessment framework: Linguistic Uncertainty, Answer Integrity, Source Provenance.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Onboarding workflow operates in trusted single-user mode; authentication deferred indefinitely (no device flow or CLI mandate).",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Cloudflare vanity (namozine.com / api.namozine.com) now fronts the Railway UI/API with Full (Strict) TLS; env templates pin NEXT_PUBLIC_API_BASE_URL=https://api.namozine.com/api/v1 and CORS_ALLOWED_ORIGINS_PROD includes https://namozine.com + https://www.namozine.com.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "B6.4c: Documented JWT auth flows end-to-end (docs/authentication.md), added sample script, Postman collection, and pytest coverage for login/refresh to unblock downstream teams.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Sprint 07 focuses on reliability: B7.1 read APIs, B7.2 integration runbook, B7.3 ingest CLI auth, B7.4 Presidio/cache stabilization.",
+      "source": "working_memory",
+      "date": null
+    },
+    {
+      "decision": "Renumbered missions to fix linear progression: B6.3-5 are now fix missions, original B6.3-7 moved to B6.6-10",
+      "source": "Unblocking Sprint 06 development - API URL and auth issues (2025-11-10)",
+      "date": "2025-11-10"
+    },
+    {
+      "decision": "B6.3: API URL Configuration Fix - remove /api/v1 suffix everywhere",
+      "source": "Unblocking Sprint 06 development - API URL and auth issues (2025-11-10)",
+      "date": "2025-11-10"
+    },
+    {
+      "decision": "B6.4: Local Development Environment Setup - create proper dev docs and scripts",
+      "source": "Unblocking Sprint 06 development - API URL and auth issues (2025-11-10)",
+      "date": "2025-11-10"
+    },
+    {
+      "decision": "B6.5: Authentication Documentation Testing - document auth flow and credentials",
+      "source": "Unblocking Sprint 06 development - API URL and auth issues (2025-11-10)",
+      "date": "2025-11-10"
+    },
+    {
+      "decision": "B6.6 (formerly B6.3) remains blocked until fixes complete",
+      "source": "Unblocking Sprint 06 development - API URL and auth issues (2025-11-10)",
+      "date": "2025-11-10"
+    },
+    {
+      "date": "2025-11-15",
+      "decision": "Sprint 08 planned with performance optimization focus: telemetry automation, database query optimization, query result caching, Qdrant tuning, and cost monitoring dashboard. No research missions needed - all build missions based on established roadmap Week 14.",
+      "source": "Sprint 08 planning session"
+    },
+    {
+      "date": "2025-11-15",
+      "decision": "Sprint 09 planned with advanced search features focus per roadmap Week 15: hybrid search backend, faceted filters, search page UX fixes (project dropdown, remove RAG Control Room, simplify controls), search history, and saved searches. No research missions needed - all standard implementations. Key UX decision: collapse extra filters until core search workflow is solid.",
+      "source": "Sprint 09 planning session"
+    },
+    "Sprint 08 planned with 6 missions: telemetry automation, database query optimization, query result caching, Qdrant tuning, cost monitoring dashboard, and retrospective. Roadmap Week 14 alignment. (from PS-2025-11-15-001)",
+    "Sprint 08 tech: in-memory caching (cachetools) over Redis for single-user simplicity. Backend-rendered dashboard (FastAPI + Jinja2) over React SPA. Pytest plugin + Playwright reporter for telemetry automation. (from PS-2025-11-15-001)",
+    "Sprint 09 planned with 6 missions: hybrid search backend, faceted filters backend, search page UX fixes, search history, saved searches, and retrospective. Roadmap Week 15 alignment. (from PS-2025-11-15-001)",
+    "Sprint 09 UX fixes priority: project dropdown broken (shows 0), remove RAG Control Room section (missions don't apply), simplify controls to search box + project + results count (max 25), collapse extra filters into advanced panel. (from PS-2025-11-15-001)",
+    "Sprint 09 tech: hybrid search weights 0.7 semantic / 0.3 keyword (configurable). PostgreSQL full-text + Qdrant metadata filters. Search history retention 100 entries or 30 days. Saved search limit 50 per user. (from PS-2025-11-15-001)",
+    "Sprint 08 closed with telemetry automation, TTL cache evidence (75% RAG hits / 80% doc hits), and Qdrant tuned to 9.4 ms p99; ready to start B9.1 Hybrid Search next."
+  ],
+  "constraints": [
+    "All document processing workflows must execute redaction prior to persistence or embedding.",
+    "Synthetic data only for evaluation until governance approves real corpus usage.",
+    "Local developer environment must function offline except for OpenAI API calls.",
+    "Tiered LLM routing escalation rate must stay <10% to meet cost targets.",
+    "Semantic cache hit rate target: 15-20% for cost optimization.",
+    "CMOS packaging removed from Sprint 08 scope - CMOS is project management tool for TraceLab, not a deliverable itself.",
+    "No research missions needed for Sprint 08 or 09 - all features follow established patterns from roadmap and technical architecture."
+  ],
+  "quality_standards": {
+    "ai_instructions": {
+      "preferred_language": "yaml",
+      "code_style": "mission_protocol_v2",
+      "testing_required": true,
+      "documentation_level": "comprehensive",
+      "special_instructions": [
+        "Always load agents.md before starting missions.",
+        "Apply OWASP Top 10 security guidelines during implementation.",
+        "Keep PROJECT_CONTEXT.json and missions/backlog.yaml in sync with the SQLite database.",
+        "Follow structured prompting workflows and advanced orchestration patterns (none, rsip, delegation, boomerang) outlined in cmos/docs/AI-coding-assistant-workflows.md before executing CMOS missions."
+      ]
+    },
+    "context_health": {
+      "anti_pattern_detection": true,
+      "compression_enabled": true,
+      "last_reset": "",
+      "sessions_since_reset": 60,
+      "size_kb": 26.67,
+      "size_limit_kb": 100,
+      "last_update": "2025-11-12T16:09:23Z"
+    },
+    "testing_protocols": {
+      "guide": "cmos/docs/integration-testing-guide.md",
+      "runner": "node cmos/context/integration_test_runner.js --output telemetry/events/testing-summary.json",
+      "boundary_enforcement": "CMOS helpers must never import from app.services; rely on telemetry exports, CLI commands, or mission evidence when referencing FastAPI state."
+    },
+    "sprint_evaluation": {
+      "script_path": "scripts/evaluate_sprint.py",
+      "report_directory": "cmos/reports/",
+      "run_protocol": "Execute after each sprint demo; compare mission successCriteria against telemetry and append report reference here.",
+      "sprint_01_report": "cmos/reports/sprint-01/sprint-01-summary.md",
+      "sprint_01_status": "Completed - 4/4 metrics met, 11/11 missions completed",
+      "sprint_02_report": "cmos/reports/sprint-02/sprint-02-summary.md",
+      "sprint_02_status": "Completed - 7/7 metrics met, 9/9 missions completed",
+      "sprint_02_metrics": "cmos/reports/sprint-02/"
+    }
+  },
+  "roadmap": {
+    "status": {
+      "sprint_01": "Completed",
+      "sprint_02": "Planned",
+      "sprint_03": "Completed",
+      "sprint_04": "Planning",
+      "sprint_05": "Planned",
+      "sprint_08": "Planned - 6 missions",
+      "sprint_09": "Planned - 5 missions (removed B9.3 UI fixes)"
+    },
+    "current_focus": "Sprint 08 - Performance Optimization (Week 14)",
+    "next_checkpoint": "Sprint 09 retrospective will finalize DeepSearch integration architecture",
+    "research_completed": [
+      {
+        "id": "R2.1",
+        "name": "Quality Assessment Heuristics",
+        "status": "Completed",
+        "reference": "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md",
+        "deliverable": "Three-pillar framework (Linguistic Uncertainty, Answer Integrity, Source Provenance) with pattern libraries, scoring algorithms, escalation decision tree"
+      },
+      {
+        "id": "R2.2",
+        "name": "Markdown Ingestion Service Design",
+        "status": "Completed",
+        "reference": "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md",
+        "deliverable": "Architecture for chokidar → queue → unified/remark ingestion pipeline, Qdrant payload schema, telemetry, and resilience patterns"
+      },
+      {
+        "id": "R2.3",
+        "name": "Project Bootstrap Workflow",
+        "status": "Completed",
+        "reference": "cmos/missions/research/R2.3_Bootstrap-Workflow.md",
+        "deliverable": "FastAPI onboarding API design with idempotency keys, async ingestion jobs, and optional auth seams (device flow deferred for single-user deployment)"
+      }
+    ],
+    "queued_build_missions": [
+      {
+        "id": "B2.1",
+        "name": "RAG Query API",
+        "status": "Completed",
+        "focus": "Core RAG functionality: query embedding, vector search, GPT-4o-mini generation, citations"
+      },
+      {
+        "id": "B2.2",
+        "name": "Context Compression Pipeline",
+        "status": "Completed",
+        "focus": "Embedding-based filtering to reduce tokens 60-70% (3000→1000 tokens)"
+      },
+      {
+        "id": "B2.3",
+        "name": "Semantic Cache Layer",
+        "status": "Blocked",
+        "focus": "Qdrant-based cache with 0.90-0.95 similarity threshold, target 15-20% hit rate; unblocked by sub-missions B2.3a–B2.3d"
+      },
+      {
+        "id": "B2.3a",
+        "name": "Markdown Ingestion Pipeline",
+        "status": "In Progress",
+        "focus": "Implement chokidar → queue → unified/remark ingestion service per R2.2 research"
+      },
+      {
+        "id": "B2.3b",
+        "name": "Onboarding API",
+        "status": "Current",
+        "focus": "FastAPI onboarding service with idempotent endpoints and async ingestion jobs (trusted single-user, no auth)."
+      },
+      {
+        "id": "B2.3c",
+        "name": "Ingestion Integration & Parity",
+        "status": "Queued",
+        "focus": "End-to-end validation, parity reporting, and observability for ingestion workflow"
+      },
+      {
+        "id": "B2.3d",
+        "name": "Semantic Cache Implementation",
+        "status": "Queued",
+        "focus": "Integrate cache service with RAG pipeline and achieve 15–20% hit rate"
+      },
+      {
+        "id": "B2.4",
+        "name": "Tiered LLM Routing",
+        "status": "Queued",
+        "focus": "R2.1 quality assessment + escalation logic, target <10% escalation rate"
+      },
+      {
+        "id": "B2.5",
+        "name": "Sprint Efficacy Evaluator",
+        "status": "Queued",
+        "focus": "Sprint 02 metrics evaluation: RAG performance, cache hit rate, compression, routing, cost"
+      }
+    ],
+    "success_criteria": [
+      "RAG query API successfully retrieves relevant chunks and generates answers with citations",
+      "Context compression reduces input tokens by 60-70% (from ~3000 to ~1000 tokens)",
+      "Semantic cache achieves hit rate ≥ 15% (target 15-20%)",
+      "Tiered routing escalation rate < 10% (90%+ queries handled by GPT-4o-mini)",
+      "Average cost per query < $0.0003 (with all optimizations applied)",
+      "Query latency < 5 seconds end-to-end for RAG queries",
+      "Sprint evaluation script executes and produces retrospective report"
+    ],
+    "session_summaries": [
+      {
+        "session_date": "2025-11-10",
+        "agent": "Claude",
+        "focus": "Unblocking Sprint 06 development - API URL and auth issues",
+        "key_discoveries": [
+          "Production API is at https://api.namozine.com (root), NOT https://api.namozine.com/api/v1",
+          "All frontend configs and docs have wrong URL with /api/v1 suffix",
+          "Local development blocked due to missing .env setup and auth configuration",
+          "B6.3 (RAG Search UI) blocked by API connectivity issues"
+        ],
+        "decisions_made": [
+          "Renumbered missions to fix linear progression: B6.3-5 are now fix missions, original B6.3-7 moved to B6.6-10",
+          "B6.3: API URL Configuration Fix - remove /api/v1 suffix everywhere",
+          "B6.4: Local Development Environment Setup - create proper dev docs and scripts",
+          "B6.5: Authentication Documentation Testing - document auth flow and credentials",
+          "B6.6 (formerly B6.3) remains blocked until fixes complete"
+        ],
+        "mistakes_made": [
+          "Made unauthorized ad-hoc changes to auth config without understanding impact",
+          "Created frontend/.env.local with wrong API URL",
+          "Failed to recognize production API doesn't use /api/v1 path despite user insisting",
+          "Attempted to fix issues directly instead of creating proper missions"
+        ],
+        "files_modified": [
+          "cmos/missions/sprint-06/* - Renumbered all missions",
+          "cmos/missions/backlog.yaml - Updated mission order and statuses",
+          "app/core/config.py - Reverted unauthorized changes",
+          "app/main.py - Reverted unauthorized changes"
+        ],
+        "blockers_identified": {
+          "api_url_mismatch": {
+            "issue": "Frontend configured for https://api.namozine.com/api/v1 but API serves at root",
+            "impact": "Complete connectivity failure in production and local",
+            "fix": "Mission B6.3 to update all URL references"
+          },
+          "local_dev_setup": {
+            "issue": "No documentation or scripts for local development",
+            "impact": "Developers cannot run application locally",
+            "fix": "Mission B6.4 to create setup guide and automation"
+          },
+          "auth_confusion": {
+            "issue": "No documentation of auth credentials or flow",
+            "impact": "Cannot test authenticated endpoints",
+            "fix": "Mission B6.5 to document authentication"
+          }
+        }
+      }
+    ],
+    "research_links": [
+      {
+        "research": "cmos/missions/research/TR-03.RAG-Cost-Optimization.md",
+        "build": "B2.1, B2.2, B2.3, B2.4"
+      },
+      {
+        "research": "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md",
+        "build": "B2.4"
+      },
+      {
+        "research": "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md",
+        "build": "B2.3a, B2.3c, B2.3d"
+      },
+      {
+        "research": "cmos/missions/research/R2.3_Bootstrap-Workflow.md",
+        "build": "B2.3b, B2.3c, B2.3d"
+      }
+    ],
+    "sprint_close_process": [
+      "Run scripts/evaluate_sprint.py with --sprint 2 to generate report in cmos/reports/sprint-02/",
+      "Verify all Sprint 02 success criteria metrics collected (cache hit rate, escalation rate, compression ratio, cost per query)",
+      "Update cmos/missions/backlog.yaml with mission statuses and completion notes",
+      "Capture retrospective highlights in MASTER_CONTEXT.json under working_memory.domains.main.achievements",
+      "Review telemetry artifacts: RAG performance metrics, semantic cache stats, tiered routing logs, cost analysis"
+    ],
+    "important_for_review": [
+      "Telemetry artifacts needed: RAG query performance logs, semantic cache hit/miss statistics, context compression metrics, tiered routing escalation events, cost tracking data",
+      "Key metrics to validate: cache hit rate (target ≥15%), escalation rate (target <10%), token compression ratio (target 60-70%), average cost per query (target <$0.0003)",
+      "R2.1 research provides complete implementation blueprint: pattern libraries, scoring algorithms, escalation decision tree - ready for B2.4 implementation",
+      "All Sprint 02 missions have clear dependencies: B2.1 → B2.2 → B2.3 → B2.4 → B2.5",
+      "Qdrant infrastructure from B1.5 is operational: 12,800 chunks indexed, <10ms latency, ready for RAG queries"
+    ],
+    "sprint_focus": "Hosted Next.js deployment, JWT/CORS hardening, and Cloudflare wiring with telemetry.",
+    "sprint_reports": {
+      "sprint_01": "cmos/reports/sprint-01/sprint-01-summary.md",
+      "sprint_02": "cmos/reports/sprint-02/sprint-02-summary.md"
+    },
+    "tracking": {},
+    "architectural_pivot": {
+      "date": "2025-11-15",
+      "summary": "Autonomous Knowledge System architecture: DeepSearch (agent researcher) → TraceLab (validation API + repository) → PEDR (governance search)",
+      "key_insight": "Mission Protocol repurposed from human forms to agent output validation. Quality gates enforce structure on autonomous research outputs.",
+      "integration_flow": "DeepSearch generates structured JSON → TraceLab validates via Pydantic → stores in PostgreSQL/Qdrant → PEDR indexes for internal search → agents query PEDR before external research",
+      "traceLab_role": [
+        "Validation API for agent outputs",
+        "Knowledge repository (validated research storage)",
+        "RAG synthesis engine (meta-analysis across corpus)",
+        "Data source for agents (via PEDR)"
+      ]
+    },
+    "sprint_10_plus_direction": {
+      "focus": "DeepSearch → TraceLab → PEDR integration",
+      "key_missions": [
+        "DeepSearch JSON ingestion endpoint",
+        "PEDR connector to index TraceLab database",
+        "Mission Protocol UI redesign (read-only agent output dashboard)",
+        "Agent correction loop (422 validation errors trigger refinement)"
+      ],
+      "details": "Architecture details to be finalized during Sprint 09 retrospective"
+    }
+  },
+  "operational_memory": {
+    "session_history": [
+      {
+        "mission": "B4.1",
+        "agent": "",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-08T20:31:17Z"
+      },
+      {
+        "mission": "B4.1",
+        "agent": "codex",
+        "summary": "Playwright suite replaces Cypress for Mission Protocol UI",
+        "action": "complete",
+        "ts": "2025-11-08T20:48:34Z"
+      },
+      {
+        "mission": "B4.2",
+        "agent": "",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-08T21:12:15Z"
+      },
+      {
+        "mission": "B4.2",
+        "agent": "codex",
+        "summary": "Quality automation delivered",
+        "action": "complete",
+        "ts": "2025-11-08T21:27:25Z"
+      },
+      {
+        "mission": "B4.3",
+        "agent": "codex",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-08T22:56:33Z"
+      },
+      {
+        "mission": "B4.3",
+        "agent": "codex",
+        "summary": "Cost telemetry wired into RAG service",
+        "action": "complete",
+        "ts": "2025-11-09T01:01:33Z"
+      },
+      {
+        "mission": "B4.4",
+        "agent": "codex",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-09T02:33:21Z"
+      },
+      {
+        "mission": "B4.4",
+        "agent": "codex",
+        "summary": "Testing & documentation consolidation delivered",
+        "action": "complete",
+        "ts": "2025-11-09T04:01:16Z"
+      },
+      {
+        "mission": "B4.5",
+        "agent": "assistant",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-09T04:45:29Z"
+      },
+      {
+        "mission": "B4.5",
+        "agent": "assistant",
+        "summary": "Sprint 04 efficacy evaluator + telemetry delivered",
+        "action": "complete",
+        "ts": "2025-11-09T04:52:44Z"
+      },
+      {
+        "mission": "B5.1",
+        "agent": "codex",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-09T21:04:12Z"
+      },
+      {
+        "mission": "B5.1",
+        "agent": "codex",
+        "summary": "Standalone Railway frontend is live",
+        "action": "complete",
+        "ts": "2025-11-09T23:48:47Z"
+      },
+      {
+        "mission": "B5.2",
+        "agent": "",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-10T00:00:23Z"
+      },
+      {
+        "mission": "B5.2",
+        "agent": "codex",
+        "summary": "JWT auth + CORS hardening delivered",
+        "action": "complete",
+        "ts": "2025-11-10T00:20:47Z"
+      },
+      {
+        "mission": "B5.3",
+        "agent": "codex",
+        "summary": "Starting Domain Wiring & Telemetry Validation",
+        "action": "start",
+        "ts": "2025-11-10T04:35:54Z"
+      },
+      {
+        "mission": "B5.3",
+        "agent": "codex",
+        "summary": "Cloudflare vanity paths + API wiring validated",
+        "action": "complete",
+        "ts": "2025-11-10T04:57:46Z"
+      },
+      {
+        "mission": "B5.3",
+        "agent": "codex",
+        "summary": "Domain wiring and telemetry validation complete",
+        "action": "complete",
+        "ts": "2025-11-10T05:49:28Z"
+      },
+      {
+        "mission": "B6.1",
+        "agent": "codex",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-10T06:27:29Z"
+      },
+      {
+        "mission": "B6.1",
+        "agent": "codex",
+        "summary": "CLI functionality verified",
+        "action": "complete",
+        "ts": "2025-11-10T06:48:08Z"
+      },
+      {
+        "mission": "B6.2",
+        "agent": "codex",
+        "summary": "Starting Document Library UI scope for Sprint 6.2",
+        "action": "start",
+        "ts": "2025-11-10T15:04:25Z"
+      },
+      {
+        "mission": "B6.2",
+        "agent": "codex",
+        "summary": "Document Library UI verified",
+        "action": "complete",
+        "ts": "2025-11-10T15:06:56Z"
+      },
+      {
+        "mission": "B6.3",
+        "agent": "",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-10T15:52:53Z"
+      },
+      {
+        "mission": "B6.3",
+        "agent": "codex",
+        "summary": "RAG search UI delivered with semantic + synthesis views.",
+        "action": "complete",
+        "ts": "2025-11-10T16:08:06Z"
+      },
+      {
+        "mission": "B6.3",
+        "agent": "codex",
+        "summary": "Unable to validate RAG search UI styling in production",
+        "action": "blocked",
+        "ts": "2025-11-10T21:47:19Z"
+      },
+      {
+        "mission": "B6.4",
+        "agent": "",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-10T23:00:57Z"
+      },
+      {
+        "mission": "B6.4",
+        "agent": "codex",
+        "summary": "Mission UI overhauled with readable layouts and evidence workflows",
+        "action": "complete",
+        "ts": "2025-11-10T23:18:12Z"
+      },
+      {
+        "mission": "B6.4a",
+        "agent": "assistant",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-10T23:58:27Z"
+      },
+      {
+        "mission": "B6.4a",
+        "agent": "assistant",
+        "summary": "Frontend API base URL corrected",
+        "action": "complete",
+        "ts": "2025-11-11T00:02:38Z"
+      },
+      {
+        "mission": "B6.4b",
+        "agent": "assistant",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-11T00:20:58Z"
+      },
+      {
+        "mission": "B6.4b",
+        "agent": "codex",
+        "summary": "Local dev environment documented and scripted",
+        "action": "complete",
+        "ts": "2025-11-11T00:32:32Z"
+      },
+      {
+        "mission": "B6.4c",
+        "agent": "codex",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-11T05:39:06Z"
+      },
+      {
+        "mission": "B6.4c",
+        "agent": "codex",
+        "summary": "Auth docs + coverage delivered",
+        "action": "complete",
+        "ts": "2025-11-11T05:48:21Z"
+      },
+      {
+        "mission": "B6.4d",
+        "agent": "codex",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-11T06:27:53Z"
+      },
+      {
+        "mission": "B6.4d",
+        "agent": "codex",
+        "summary": "Pre-flight guardrails + telemetry review for Protocol Engine session",
+        "action": "complete",
+        "ts": "2025-11-11T06:30:33Z"
+      },
+      {
+        "mission": "B6.5",
+        "agent": "assistant",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-11T15:18:35Z"
+      },
+      {
+        "mission": "B6.5",
+        "agent": "assistant",
+        "summary": "Multi-format report exports delivered",
+        "action": "complete",
+        "ts": "2025-11-11T15:51:12Z"
+      },
+      {
+        "mission": "B6.7",
+        "agent": "assistant",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-11T17:03:26Z"
+      },
+      {
+        "mission": "B6.7",
+        "agent": "assistant",
+        "summary": "Sprint 06 retrospective + telemetry delivered; Sprint 07 backlog seeded",
+        "action": "complete",
+        "ts": "2025-11-11T17:22:06Z"
+      },
+      {
+        "mission": "B7.1",
+        "agent": "assistant",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-11T19:09:13Z"
+      },
+      {
+        "mission": "B7.1",
+        "agent": "assistant",
+        "summary": "Document & Project read APIs + CLI/UI shipped",
+        "action": "complete",
+        "ts": "2025-11-11T20:22:14Z"
+      },
+      {
+        "mission": "B7.1",
+        "agent": "assistant",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-11T20:24:28Z"
+      },
+      {
+        "mission": "B7.2",
+        "agent": "assistant",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-11T20:28:12Z"
+      },
+      {
+        "mission": "B7.2",
+        "agent": "assistant",
+        "summary": "Integration guardrails documented and runner passing",
+        "action": "complete",
+        "ts": "2025-11-11T20:37:13Z"
+      },
+      {
+        "mission": "B7.3",
+        "agent": "codex",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-11T20:53:00Z"
+      },
+      {
+        "mission": "B7.3",
+        "agent": "codex",
+        "summary": "CLI auth + ingestion workflow verified",
+        "action": "complete",
+        "ts": "2025-11-11T21:05:10Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "assistant",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-12T01:32:20Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "assistant",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-12T01:32:26Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "codex",
+        "summary": "Qdrant admin endpoints shipped",
+        "action": "complete",
+        "ts": "2025-11-12T01:38:51Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-12T16:06:27Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "codex",
+        "summary": "Protocol Engine controls verified via CLI guardrails",
+        "action": "complete",
+        "ts": "2025-11-12T16:09:23Z"
+      }
+    ],
+    "blocked_missions": [
+      {
+        "item": "Monitoring API telemetry",
+        "reason": "Direct imports of app.services.rag_service still initialise Qdrant, so standalone monitoring.read_performance() calls hang when qdrant-client isn't installed.",
+        "impact": "Blocks offline diagnostics for sprint-04 monitoring dashboard until init path is stubbed or dependency added.",
+        "status": "tracking",
+        "ts": "2025-11-09T01:54:56.075694Z"
+      },
+      "B6.3"
+    ],
+    "active_mission": null,
+    "last_completed_mission": "B7.5",
+    "last_blocked_mission": "B6.3",
+    "next_session_context": {
+      "key_reference_documents": [
+        "foundational-docs/roadmap_template.md",
+        "foundational-docs/tech_arch_template.md",
+        "docs/frontend_deployment_decisions.md",
+        "docs/auth_and_cors_guidance.md",
+        "cmos/missions/sprint-06/B6.3_API-URL-Configuration-Fix.yaml",
+        "cmos/missions/sprint-06/B6.4_Local-Development-Environment-Setup.yaml",
+        "cmos/missions/sprint-06/B6.5_Authentication-Documentation-Testing.yaml"
+      ],
+      "upcoming_missions": [
+        {
+          "id": "B5.1",
+          "summary": "Stand up dedicated Railway Next.js service with build/start commands and env var runbook.",
+          "links": [
+            "cmos/missions/sprint-05/B5.1_Railway-Frontend-Service.yaml"
+          ]
+        },
+        {
+          "id": "B5.2",
+          "summary": "Implement JWT auth + restrictive CORS per docs/auth_and_cors_guidance.md.",
+          "links": [
+            "cmos/missions/sprint-05/B5.2_FastAPI-Auth-CORS-Hardening.yaml"
+          ]
+        },
+        {
+          "id": "B5.3",
+          "summary": "Cloudflare DNS + telemetry validation for hosted UI/API.",
+          "links": [
+            "cmos/missions/sprint-05/B5.3_Domain-Wiring-Telemetry.yaml"
+          ]
+        }
+      ],
+      "open_questions": [
+        "Confirm whether API will live on api.<domain> or be proxied through the UI.",
+        "Decide on storage for Railway JWT secrets (env panel vs secret manager)."
+      ],
+      "when_we_resume": [
+        "Check if B6.3 (API URL fix) is complete",
+        "Verify frontend can connect to production API",
+        "If all fixes complete, B6.6 (RAG Search UI) can proceed",
+        "Pick up B6.6",
+        "Pick up B7.4",
+        "Pick up B7.6",
+        "Pick up B7.7"
+      ],
+      "blockers": [
+        {
+          "mission": "B6.3",
+          "recorded_at": "2025-11-10T21:47:19Z",
+          "summary": "Unable to validate RAG search UI styling in production",
+          "reason": "Frontend depends on GET /api/v1/documents and /projects, but production API only allows POST (405). UI keeps retrying and appears unstyled because SWR never hydrates. Need backend redeploy or configuration change to enable GET before frontend can be validated.",
+          "needs": [
+            "Deploy backend with GET handlers for /api/v1/documents and /projects matching local FastAPI routes",
+            "Re-run frontend verification against API that supports required endpoints"
+          ]
+        }
+      ],
+      "important_reminders": [
+        "B6.3: Frontend depends on GET /api/v1/documents and /projects, but production API only allows POST (405). UI keeps retrying and appears unstyled because SWR never hydrates. Need backend redeploy or configuration change to enable GET before frontend can be validated."
+      ],
+      "critical_context": {
+        "api_endpoint": "https://api.namozine.com (NO /api/v1 suffix)",
+        "frontend_env_var": "NEXT_PUBLIC_API_BASE_URL=https://api.namozine.com",
+        "local_backend": "http://localhost:8000",
+        "local_frontend": "http://localhost:3000"
+      }
+    },
+    "sprint_08_planned": {
+      "date": "2025-11-15",
+      "missions": 6,
+      "focus": "performance_optimization_and_monitoring",
+      "roadmap_alignment": "Week 14 - Performance Optimization",
+      "key_goals": [
+        "Automate telemetry generation",
+        "Optimize database queries with indexes",
+        "Implement application-level caching",
+        "Tune Qdrant parameters for production",
+        "Build cost monitoring dashboard"
+      ],
+      "technology_decisions": {
+        "caching": "in-memory (cachetools) over Redis for single-user simplicity",
+        "dashboard": "backend-rendered (FastAPI + Jinja2) over React SPA",
+        "telemetry": "pytest plugin + Playwright reporter + aggregator"
+      }
+    },
+    "sprint_09_planned": {
+      "date": "2025-11-15",
+      "missions": 6,
+      "focus": "advanced_search_features",
+      "roadmap_alignment": "Week 15 - Advanced Search Features",
+      "key_goals": [
+        "Implement hybrid search (semantic + keyword)",
+        "Add faceted filtering backend",
+        "Fix search page UX (project dropdown, simplified controls)",
+        "Add search history tracking",
+        "Enable saved searches bookmarking"
+      ],
+      "ux_decisions": {
+        "search_controls": "Simplified to search box, project selector, results count (max 25)",
+        "filters": "Collapsed into advanced panel - not prominent until workflow clarity",
+        "rag_control_room": "Removed - missions concept not applicable to search page",
+        "project_dropdown": "Must be wired to GET /api/v1/projects (currently broken)"
+      },
+      "technical_decisions": {
+        "hybrid_weights": "Default 0.7 semantic / 0.3 keyword, configurable",
+        "max_top_k": "Increased from 10 to 25",
+        "filter_backend": "PostgreSQL full-text + Qdrant metadata filters",
+        "history_retention": "100 searches or 30 days",
+        "saved_search_limit": "50 per user"
+      }
+    }
+  },
+  "metadata": {
+    "migrated_at": "2025-11-15T16:19:59.621008+00:00",
+    "source_version": "cmos-v1",
+    "upgraded_at": "2025-11-14T17:16:19Z",
+    "upgraded_with": "upgrade_master_context.py"
+  },
+  "working_memory": {
+    "session_history": [
+      {
+        "mission": "B7.7",
+        "agent": "assistant",
+        "summary": "Starting B7.7 end-to-end workflow validation mission",
+        "action": "start",
+        "ts": "2025-11-15T00:35:32Z"
+      },
+      {
+        "mission": "B7.7",
+        "agent": "assistant",
+        "summary": "UI + CLI workflows validated; ingestion/search/RAG suites and telemetry prove B7.7 readiness.",
+        "action": "complete",
+        "ts": "2025-11-15T00:52:24Z"
+      },
+      {
+        "mission": "B7.8",
+        "agent": "assistant",
+        "summary": "Kicking off Sprint 07 retrospective deliverables per mission brief.",
+        "action": "start",
+        "ts": "2025-11-15T01:53:16Z"
+      },
+      {
+        "mission": "B7.8",
+        "agent": "assistant",
+        "summary": "Sprint 07 retrospective + env inventory documented with parity + telemetry evidence readying Sprint 08 planning.",
+        "action": "complete",
+        "ts": "2025-11-15T01:59:03Z"
+      },
+      {
+        "mission": "B8.1",
+        "agent": "assistant",
+        "summary": "Starting telemetry automation mission to automate testing-summary.json from CI test runs",
+        "action": "start",
+        "ts": "2025-11-15T04:57:13Z"
+      },
+      {
+        "mission": "B8.1",
+        "agent": "assistant",
+        "summary": "Telemetry automation pipeline implemented (pytest plugin, Playwright reporter, aggregator, docs, CI).",
+        "action": "complete",
+        "ts": "2025-11-15T05:25:07Z"
+      },
+      {
+        "mission": "B8.2",
+        "agent": "assistant",
+        "summary": "Starting database query optimization work",
+        "action": "start",
+        "ts": "2025-11-15T06:20:01Z"
+      },
+      {
+        "mission": "B8.2",
+        "agent": "assistant",
+        "summary": "Database query optimization changes added (indexes, query loading)",
+        "action": "complete",
+        "ts": "2025-11-15T06:33:15Z"
+      },
+      {
+        "mission": "B8.3",
+        "agent": "assistant",
+        "summary": "Starting B8.3 query caching work",
+        "action": "start",
+        "ts": "2025-11-15T15:25:48Z"
+      },
+      {
+        "mission": "B8.3",
+        "agent": "assistant",
+        "summary": "Application-level caching implemented with telemetry + APIs",
+        "action": "complete",
+        "ts": "2025-11-15T15:42:14Z"
+      },
+      {
+        "mission": "B8.4",
+        "agent": "codex",
+        "summary": "Beginning Qdrant tuning deliverables",
+        "action": "start",
+        "ts": "2025-11-15T15:54:26Z"
+      },
+      {
+        "mission": "B8.4",
+        "agent": "codex",
+        "summary": "Qdrant tuning endpoints, parameter sweep tooling, and docs shipped",
+        "action": "complete",
+        "ts": "2025-11-15T16:14:37Z"
+      },
+      {
+        "mission": "B8.5",
+        "agent": "codex",
+        "summary": "Kick off cost monitoring dashboard implementation",
+        "action": "start",
+        "ts": "2025-11-15T16:32:12Z"
+      },
+      {
+        "mission": "B8.5",
+        "agent": "codex",
+        "summary": "Delivered /admin/dashboard experience with live metrics and exports",
+        "action": "complete",
+        "ts": "2025-11-15T16:45:47Z"
+      },
+      {
+        "mission": "B8.6",
+        "agent": "codex",
+        "summary": "Starting Sprint 08 retrospective documentation",
+        "action": "start",
+        "ts": "2025-11-15T20:25:53Z"
+      },
+      {
+        "mission": "B8.6",
+        "agent": "assistant",
+        "summary": "Sprint 08 retrospective + metrics docs delivered with telemetry + dashboard evidence",
+        "action": "complete",
+        "ts": "2025-11-15T20:41:00Z"
+      },
+      {
+        "mission": "B9.1",
+        "agent": "codex",
+        "summary": "Kicking off hybrid search backend work",
+        "action": "start",
+        "ts": "2025-11-15T22:49:31Z"
+      },
+      {
+        "mission": "B9.1",
+        "agent": "codex",
+        "summary": "Hybrid search backend shipped with weighted semantic+keyword retrieval",
+        "action": "complete",
+        "ts": "2025-11-15T23:28:43Z"
+      },
+      {
+        "mission": "B9.2",
+        "agent": "assistant",
+        "summary": "Starting faceted search backend implementation",
+        "action": "start",
+        "ts": "2025-11-16T00:00:51Z"
+      },
+      {
+        "mission": "B9.2",
+        "agent": "assistant",
+        "summary": "Faceted search backend, facets API, and filter-aware caching delivered",
+        "action": "complete",
+        "ts": "2025-11-16T00:21:53Z"
+      }
+    ],
+    "last_session": "2025-11-16T00:21:53Z",
+    "session_count": 20,
+    "active_mission": null,
+    "blocked_missions": [],
+    "last_completed_mission": "B9.2"
+  },
+  "next_session_context": {
+    "when_we_resume": [
+      "Pick up B9.4"
+    ]
+  },
+  "context_health": {
+    "sessions_since_reset": 24,
+    "last_update": "2025-11-16T00:21:53Z",
+    "size_kb": 40.57,
+    "size_limit_kb": 100
+  },
+  "learnings": [
+    "TTL caches cut repeated RAG latency from 22.23 ms to 0.008 ms and drop repeated OpenAI cost to ~$0.000071; monitoring dashboard now surfaces these metrics alongside cost telemetry."
+  ],
+  "context_notes": [
+    "B7.7 validated ingestion flow end-to-end; prod + local confirmed, only residual issue is local hydration warnings but no blocking impact.",
+    "B6.3 not actually blocked - project dropdown shows 0 but actual functionality works. B7.1 resolved the blocker by adding GET endpoints. Database blocker record needs cleanup."
+  ],
+  "recent_sessions": [
+    {
+      "id": "PS-2025-11-15-001",
+      "session_type": "review",
+      "type": "review",
+      "title": "B7.7 validation recap",
+      "summary": "Reviewed B7.7 validation evidence, confirmed ingestion/auth stability in prod/local, and noted UI hydration warnings as the only follow-up.",
+      "completed_at": "2025-11-15T01:30:06Z",
+      "capture_count": 2,
+      "captures": {
+        "context": 1,
+        "next-step": 1
+      }
+    },
+    {
+      "id": "PS-2025-11-15-001",
+      "session_type": "planning",
+      "type": "planning",
+      "title": "Sprint 08 & 09 Planning",
+      "summary": "Sprint 08 & 09 fully planned: 12 missions total. Sprint 08 focuses on performance optimization (Week 14). Sprint 09 focuses on advanced search with critical UX fixes (Week 15). All missions created, backlog updated, database seeded, parity validated.",
+      "completed_at": "2025-11-15T04:43:10Z",
+      "capture_count": 8,
+      "captures": {
+        "decision": 5,
+        "constraint": 2,
+        "context": 1
+      }
+    }
+  ]
+}

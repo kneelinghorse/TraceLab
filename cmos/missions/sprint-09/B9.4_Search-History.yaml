@@ -1,0 +1,147 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B9.4
+  name: Search History
+  sprint: Sprint 09
+  type: Build.Implementation.v1
+  priority: low
+  created: 2025-11-15
+  owner: assistant
+
+missionId: "B9.4"
+
+spec:
+  objective: |
+    Implement search history tracking to allow users to review, replay, and learn from 
+    previous searches, improving research workflow efficiency.
+  
+  context: |
+    Per roadmap Week 15, search history provides:
+    - Audit trail of research queries
+    - Ability to replay previous searches
+    - Pattern recognition in search behavior
+    - Quick access to frequent queries
+    
+    Single-user application, so history per user (no multi-user complexity).
+  
+  researchStatement:
+    topic: Search history tracking and replay functionality
+    scope: Query logging, result caching, UI history panel
+    centralHypothesis: Search history reduces redundant queries by 30%+
+  
+  keyQuestions:
+    - What metadata should we store per search?
+    - How long should history be retained?
+    - Should we cache results with history entries?
+    - How do users replay historical searches?
+  
+  technicalApproach:
+    architecture:
+      - New search_history table
+      - Store query, filters, result count, timestamp
+      - Optional: cache results for instant replay
+      - History API endpoints
+      - Frontend history sidebar
+    
+    implementation:
+      - Create search_history table (query, filters, result_count, user_id, created_at)
+      - Add search history logging to search service
+      - Create GET /api/v1/search/history endpoint
+      - Create POST /api/v1/search/replay/:id endpoint
+      - Add history sidebar to search page
+      - Show recent searches with metadata
+      - Click to replay search (pre-fill query and filters)
+      - Add clear history button
+      - Retention policy (keep last 100 searches, or 30 days)
+    
+    historyMetadata: |
+      Per history entry:
+      - query_text (the search query)
+      - search_mode (semantic, keyword, hybrid)
+      - filters_applied (JSON of filter values)
+      - result_count (number of results)
+      - top_chunks (optional, store top 5 chunk IDs)
+      - created_at (timestamp)
+      - execution_time (ms)
+  
+  successCriteria:
+    - All searches logged to search_history table
+    - History endpoint returns recent searches
+    - UI displays last 20 searches
+    - Click to replay works (pre-fills controls)
+    - History retention policy enforced (100 entries or 30 days)
+    - Replay searches return consistent results (if docs unchanged)
+  
+  deliverables:
+    - file: alembic/versions/XXX_add_search_history.py
+      description: Migration for search_history table
+    
+    - file: app/models/search_history.py
+      description: SearchHistory model
+    
+    - file: app/services/search_history.py
+      description: Search history logging and retrieval service
+    
+    - file: app/api/v1/search_history.py
+      description: Search history endpoints
+    
+    - file: frontend/src/components/SearchHistory.tsx
+      description: History sidebar component
+    
+    - file: tests/test_search_history.py
+      description: Search history tests
+    
+    - file: docs/search-history.md
+      description: Search history feature documentation
+  
+  qualityGates:
+    - gate: logging_working
+      description: Searches logged automatically
+      validation: Verify entries created in database
+    
+    - gate: replay_functional
+      description: Replay accurately reproduces searches
+      validation: Replay test searches, verify results match
+    
+    - gate: retention_enforced
+      description: Old history cleaned up
+      validation: Verify retention policy runs
+  
+  dependencies:
+    upstream:
+      - B9.3  # Search page UI must be functional first
+    downstream:
+      - B9.5  # Saved searches builds on history
+  
+  risks:
+    - risk: History table grows large
+      mitigation: Aggressive retention policy, add indexes
+    
+    - risk: Replay results differ if docs changed
+      mitigation: Show warning if docs modified since search
+  
+  acceptanceCriteria:
+    - search_history table created and indexed
+    - All searches logged with metadata
+    - History endpoint returns last 100 searches
+    - Frontend history sidebar displays searches
+    - Click to replay pre-fills query and filters
+    - Retention policy removes old entries (100 max or 30 days)
+    - Tests verify logging and replay functionality
+    - Documentation covers usage and retention
+  
+  estimatedEffort: small-medium
+  orchestrationPattern: none
+  
+domainFields:
+  sprint_09_advanced_search: true
+  roadmap_phase: 4
+  roadmap_week: 15
+  performance_impact: low
+  search_category: history
+  retention_policy:
+    max_entries: 100
+    max_age_days: 30
+

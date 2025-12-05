@@ -1,0 +1,17 @@
+{
+  "generated_at": "2025-11-12T19:39:37.334498Z",
+  "formats": {
+    "MD": {
+      "extension": ".md",
+      "total_uploaded": 3,
+      "successfully_processed": 2,
+      "failed": 1,
+      "processed": 3,
+      "chunked": 3,
+      "embedded": 2,
+      "success_rate_percent": 66.67,
+      "processed_rate_percent": 100.0,
+      "chunked_rate_percent": 100.0
+    }
+  }
+}

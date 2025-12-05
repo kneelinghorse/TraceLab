@@ -1,0 +1,80 @@
+# Mission File: R7.1_Qdrant-Collection-Setup-Research.yaml
+
+missionId: "R7.1"
+
+objective: "Research proper Qdrant collection initialization, Railway hosting integration, and identify root cause of collection creation failures."
+
+context: |
+  Document processing fails with "Collection 'research_chunks' doesn't exist" despite having 
+  ensure_collection() code and admin endpoint. Need to understand:
+  - Why ensure_collection() isn't creating the collection when called
+  - Proper Qdrant collection setup for hosted instances
+  - Railway + Qdrant integration requirements
+  - Differences between local and hosted Qdrant setup
+  - Whether collection should be created at startup vs on-demand
+  
+  Current symptoms:
+  - Admin endpoint exists but collection not created when called
+  - Local Qdrant (localhost:6333) same issue
+  - Hosted Qdrant (qdrant-production-1e32.up.railway.app) same issue
+  - upsert_chunks() fails with 404 on missing collection
+  - Warning: "Api key is used with unsecure connection" in logs
+
+successCriteria:
+  - "Qdrant documentation reviewed for collection creation best practices."
+  - "Railway Qdrant integration patterns documented."
+  - "Root cause identified: Why ensure_collection() not working."
+  - "Recommended approach documented: startup init vs admin endpoint vs manual."
+  - "Working proof-of-concept that creates collection successfully."
+  - "Environment variable requirements documented (URL format, API keys, etc)."
+  - "Local setup steps documented and verified."
+
+deliverables:
+  - "cmos/missions/research/R7.1_Qdrant-Setup-Investigation.md - Research findings."
+  - "Proof-of-concept script or curl commands that work."
+  - "Updated B7.5 and B7.6 mission specs based on findings."
+  - "docs/qdrant-setup.md - Setup guide for future reference."
+
+domainFields:
+  type: "Research.Technical.v1"
+
+  researchQuestions:
+    - "What is the correct way to create Qdrant collections programmatically?"
+    - "Why would ensure_collection() fail silently or not create collection?"
+    - "What are the differences between local Qdrant and hosted Qdrant Cloud?"
+    - "Does Railway require special configuration for Qdrant integration?"
+    - "Should collection be created during app startup or via admin endpoint?"
+    - "What permissions/credentials are needed to create collections?"
+    - "Is the connection URL format correct (http vs https, ports, etc)?"
+
+  informationSources:
+    - "Qdrant official documentation (qdrant.tech/documentation)"
+    - "Qdrant Cloud setup guides"
+    - "Railway integration documentation"
+    - "qdrant-client Python library documentation"
+    - "app/services/qdrant_service.py implementation"
+    - "app/api/v1/admin.py current implementation"
+    - "Railway logs showing actual errors"
+    - "Qdrant dashboard/console (if accessible)"
+
+  validationProtocol:
+    - validator: "Working proof-of-concept"
+      focus: "Can create collection using documented method."
+    - validator: "Root cause confirmed"
+      focus: "Explain why current implementation doesn't work."
+    - validator: "Solution documented"
+      focus: "Clear steps to fix the issue."
+
+  handoffContext:
+    completed:
+      - "Root cause identified and documented."
+      - "Working solution verified."
+      - "Setup guide created."
+    nextMission: "Update B7.5 based on research findings"
+    blockers: []
+
+  researchScope:
+    depth: "Deep - investigate Qdrant client library, Railway integration, error logs"
+    breadth: "Focused - specifically collection creation and hosting"
+    methodology: "Technical investigation with proof-of-concept validation"
+

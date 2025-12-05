@@ -1,0 +1,343 @@
+{
+  "generated_at": "2025-11-15T20:36:37Z",
+  "cost_overview": {
+    "currency": "USD",
+    "retention_days": 45,
+    "totals": {
+      "queries": 2,
+      "cost_usd": 0.000567,
+      "prompt_tokens": 1744,
+      "completion_tokens": 508,
+      "avg_latency_ms": 9338.02,
+      "cache_hit_rate": 0.0
+    },
+    "periods": {
+      "today": 0.0,
+      "week": 0.000567,
+      "month": 0.000567
+    },
+    "average_cost_per_query": 0.000284,
+    "embedding_cost_usd": 0.0,
+    "generation_cost_usd": 0.000567,
+    "model_breakdown": [
+      {
+        "model": "gpt-4o-mini",
+        "cost_usd": 0.000567,
+        "share": 1.0
+      }
+    ],
+    "route_breakdown": [
+      {
+        "route": "primary",
+        "cost_usd": 0.000567,
+        "share": 1.0
+      }
+    ],
+    "daily_trend": [
+      {
+        "label": "2025-11-12",
+        "cost_usd": 0.000567
+      }
+    ],
+    "recent_events": [
+      {
+        "ts": "2025-11-12T19:40:14.157416Z",
+        "model": "gpt-4o-mini",
+        "route": "primary",
+        "latency_ms": 8891.81,
+        "cost_usd": 0.000252,
+        "cache_hit": false,
+        "project_id": null
+      },
+      {
+        "ts": "2025-11-12T17:16:52.728208Z",
+        "model": "gpt-4o-mini",
+        "route": "primary",
+        "latency_ms": 9784.23,
+        "cost_usd": 0.000315,
+        "cache_hit": false,
+        "project_id": null
+      }
+    ]
+  },
+  "cache_performance": {
+    "ttl_caches": [
+      {
+        "name": "document_lists",
+        "ttl_seconds": 120,
+        "maxsize": 512,
+        "size": 12,
+        "hits": 48.0,
+        "misses": 12.0,
+        "sets": 12.0,
+        "invalidations": 0.0,
+        "hit_rate": 0.8,
+        "last_event_ts": "2025-11-15T20:36:37.812803Z"
+      },
+      {
+        "name": "mission_validation",
+        "ttl_seconds": 30,
+        "maxsize": 256,
+        "size": 0,
+        "hits": 0.0,
+        "misses": 0.0,
+        "sets": 0.0,
+        "invalidations": 0.0,
+        "hit_rate": 0.0,
+        "last_event_ts": "2025-11-15T20:36:37.082748Z"
+      },
+      {
+        "name": "project_metadata",
+        "ttl_seconds": 300,
+        "maxsize": 256,
+        "size": 8,
+        "hits": 32.0,
+        "misses": 8.0,
+        "sets": 8.0,
+        "invalidations": 0.0,
+        "hit_rate": 0.8,
+        "last_event_ts": "2025-11-15T20:36:37.842123Z"
+      },
+      {
+        "name": "quality_gates",
+        "ttl_seconds": 60,
+        "maxsize": 256,
+        "size": 0,
+        "hits": 0.0,
+        "misses": 0.0,
+        "sets": 0.0,
+        "invalidations": 0.0,
+        "hit_rate": 0.0,
+        "last_event_ts": "2025-11-15T20:36:37.082731Z"
+      },
+      {
+        "name": "rag_query_results",
+        "ttl_seconds": 300,
+        "maxsize": 128,
+        "size": 30,
+        "hits": 90.0,
+        "misses": 30.0,
+        "sets": 30.0,
+        "invalidations": 0.0,
+        "hit_rate": 0.75,
+        "last_event_ts": "2025-11-15T20:36:37.738136Z"
+      }
+    ],
+    "semantic_cache": {
+      "hits": 0.0,
+      "misses": 0.0,
+      "errors": 0.0,
+      "evictions": 0.0,
+      "hit_rate": 0.0,
+      "avg_lookup_seconds": 0.0
+    },
+    "aggregate": {
+      "ttl_cache_count": 5,
+      "ttl_average_hit_rate": 0.47,
+      "semantic_hit_rate": 0.0,
+      "semantic_evictions": 0.0
+    }
+  },
+  "query_performance": {
+    "p50_latency_ms": 9338.02,
+    "p95_latency_ms": 9739.609,
+    "p99_latency_ms": 9775.306,
+    "average_latency_ms": 9338.02,
+    "requests_last_hour": 0,
+    "semantic_cache_hit_rate": 0.0,
+    "application_cache_hit_rate": 0.47,
+    "slow_queries": [
+      {
+        "ts": "2025-11-12T17:16:52.728208Z",
+        "model": "gpt-4o-mini",
+        "route": "primary",
+        "latency_ms": 9784.23,
+        "cost_usd": 0.000315,
+        "cache_hit": false,
+        "project_id": null
+      },
+      {
+        "ts": "2025-11-12T19:40:14.157416Z",
+        "model": "gpt-4o-mini",
+        "route": "primary",
+        "latency_ms": 8891.81,
+        "cost_usd": 0.000252,
+        "cache_hit": false,
+        "project_id": null
+      }
+    ],
+    "trend": [
+      {
+        "label": "2025-11-12",
+        "latency_ms": 9338.02
+      }
+    ]
+  },
+  "system_health": {
+    "database": {
+      "engine": "sqlite:////Users/systemsystems/portfolio/TraceLab/cmos/db/cmos.sqlite",
+      "pool_status": "Pool size: 5  Connections in pool: 0 Current Overflow: -5 Current Checked out connections: 0",
+      "dialect": "sqlite",
+      "tables": 12,
+      "indexes": 14,
+      "status": "healthy"
+    },
+    "qdrant": {
+      "status": "healthy",
+      "collection": "research_chunks",
+      "vector_size": 1536,
+      "vectors_count": 500000,
+      "payload_indexes": [
+        {
+          "field": "project_id",
+          "present": true
+        },
+        {
+          "field": "document_id",
+          "present": true
+        },
+        {
+          "field": "source_type",
+          "present": true
+        }
+      ]
+    },
+    "cache": {
+      "ttl_cache_count": 5,
+      "semantic_cache_hit_rate": 0.0
+    },
+    "telemetry": {
+      "events_available": 2,
+      "source": "telemetry/events/sprint-04-performance.jsonl",
+      "last_event": "2025-11-12T19:40:14.157416Z"
+    }
+  },
+  "export_rows": [
+    {
+      "category": "costs",
+      "metric": "today_cost_usd",
+      "value": 0.0,
+      "unit": "USD",
+      "notes": null
+    },
+    {
+      "category": "costs",
+      "metric": "week_cost_usd",
+      "value": 0.000567,
+      "unit": "USD",
+      "notes": null
+    },
+    {
+      "category": "costs",
+      "metric": "month_cost_usd",
+      "value": 0.000567,
+      "unit": "USD",
+      "notes": null
+    },
+    {
+      "category": "costs",
+      "metric": "average_cost_per_query",
+      "value": 0.000284,
+      "unit": "USD",
+      "notes": null
+    },
+    {
+      "category": "costs",
+      "metric": "embedding_cost_usd",
+      "value": 0.0,
+      "unit": "USD",
+      "notes": null
+    },
+    {
+      "category": "costs",
+      "metric": "generation_cost_usd",
+      "value": 0.000567,
+      "unit": "USD",
+      "notes": null
+    },
+    {
+      "category": "cache",
+      "metric": "semantic_cache_hit_rate",
+      "value": 0.0,
+      "unit": null,
+      "notes": null
+    },
+    {
+      "category": "cache",
+      "metric": "ttl_average_hit_rate",
+      "value": 0.47,
+      "unit": null,
+      "notes": null
+    },
+    {
+      "category": "performance",
+      "metric": "p50_latency_ms",
+      "value": 9338.02,
+      "unit": "ms",
+      "notes": null
+    },
+    {
+      "category": "performance",
+      "metric": "p95_latency_ms",
+      "value": 9739.609,
+      "unit": "ms",
+      "notes": null
+    },
+    {
+      "category": "performance",
+      "metric": "p99_latency_ms",
+      "value": 9775.306,
+      "unit": "ms",
+      "notes": null
+    },
+    {
+      "category": "performance",
+      "metric": "requests_last_hour",
+      "value": 0,
+      "unit": null,
+      "notes": null
+    },
+    {
+      "category": "system",
+      "metric": "database_status",
+      "value": "healthy",
+      "unit": null,
+      "notes": null
+    },
+    {
+      "category": "system",
+      "metric": "database_tables",
+      "value": 12,
+      "unit": null,
+      "notes": null
+    },
+    {
+      "category": "system",
+      "metric": "database_indexes",
+      "value": 14,
+      "unit": null,
+      "notes": null
+    },
+    {
+      "category": "system",
+      "metric": "qdrant_status",
+      "value": "healthy",
+      "unit": null,
+      "notes": null
+    },
+    {
+      "category": "system",
+      "metric": "qdrant_vectors",
+      "value": 500000,
+      "unit": null,
+      "notes": null
+    },
+    {
+      "category": "system",
+      "metric": "telemetry_events",
+      "value": 2,
+      "unit": null,
+      "notes": null
+    }
+  ]
+}

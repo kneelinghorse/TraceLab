@@ -1,0 +1,157 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B11.5
+  name: PEDR Pre-Flight Query Service
+  sprint: Sprint 11
+  type: Build.Implementation.v1
+  priority: medium
+  created: 2025-12-05
+  owner: assistant
+
+missionId: "B11.5"
+
+spec:
+  objective: |
+    Prevent duplicate research by letting DeepSearch query PEDR before launching
+    new missions, with clear reuse vs proceed guidance.
+
+  context: |
+    Per integration contract, DeepSearch should check TraceLab before researching:
+
+    "Query TraceLab: Does this research already exist?"
+
+    Pre-flight query returns existing research so DeepSearch can:
+    - Reuse: Existing complete mission with high quality (skip web search)
+    - Proceed: No match or only drafts (launch new research)
+
+    Filters: min_quality_gates=4, status=complete (per contract).
+    Reference: cmos/planning/DeepSearch-TraceLab-Integration-Contract.md Section 1
+
+  researchStatement:
+    topic: Pre-research existence check for autonomous agents
+    scope: Pre-flight endpoint, summarizer, reuse telemetry
+    centralHypothesis: Pre-flight queries reduce duplicate research by 30%
+
+  keyQuestions:
+    - What similarity threshold triggers "reuse" recommendation?
+    - How do we summarize existing research for DeepSearch consumption?
+    - What telemetry captures reuse vs proceed decisions?
+    - Should pre-flight be synchronous or async?
+    - How do we handle partial matches (related but not duplicate)?
+
+  technicalApproach:
+    architecture:
+      - New endpoint: /api/v1/pedr/preflight
+      - Query via existing quality-aware search (B10.1)
+      - Summarizer for mission digest
+      - Telemetry for reuse metrics
+      - CLI example for DeepSearch integration
+
+    implementation:
+      - Create POST /api/v1/pedr/preflight endpoint
+      - Accept query string and optional filters
+      - Call HybridSearchService with min_quality_gates=4, status=['complete']
+      - Score top results for "reuse" recommendation
+      - Generate mission summaries (title, objective, key insights)
+      - Return recommendation: {action: 'reuse'|'proceed', matches: [...], summary: '...'}
+      - Add telemetry: preflight_query, decision, latency, match_count
+      - Create CLI example for DeepSearch agent
+      - Add tests for recommendation logic
+      - Document decision criteria
+
+    decisionCriteria: |
+      Pre-flight response logic:
+        - If top match score >= 0.85 AND status=complete AND quality_gates>=4:
+            action: 'reuse', provide mission summary
+        - If top match score >= 0.70 AND status=complete:
+            action: 'review', suggest checking existing research
+        - Else:
+            action: 'proceed', no relevant existing research
+
+      Summary format:
+        - Mission ID and title
+        - Objective (truncated to 200 chars)
+        - Key insights (first 3)
+        - Quality score and gate count
+        - Created date
+
+  successCriteria:
+    - /api/v1/pedr/preflight returns reuse/proceed recommendation
+    - Summary includes mission digest for DeepSearch consumption
+    - Telemetry tracks reuse vs proceed decisions
+    - CLI example demonstrates agent integration
+    - Response latency <500ms
+
+  deliverables:
+    - file: app/api/v1/pedr_preflight.py
+      description: Pre-flight query endpoint
+
+    - file: app/services/pedr/preflight.py
+      description: Pre-flight logic and summarizer
+
+    - file: app/schemas/pedr_preflight.py
+      description: Pre-flight request/response schemas
+
+    - file: scripts/preflight_example.py
+      description: CLI example for DeepSearch agent
+
+    - file: docs/preflight-queries.md
+      description: Pre-flight integration guide
+
+    - file: tests/test_pedr_preflight.py
+      description: Pre-flight recommendation tests
+
+    - telemetry: Pre-flight metrics
+      path: cmos/telemetry/events/sprint-11-preflight.jsonl
+
+  qualityGates:
+    - gate: endpoint_functional
+      description: Pre-flight returns recommendations
+      validation: API tests pass with various queries
+
+    - gate: recommendations_accurate
+      description: High-quality matches recommend reuse
+      validation: Test cases verify decision logic
+
+    - gate: summaries_useful
+      description: Summaries help DeepSearch decide
+      validation: Summary includes required fields
+
+    - gate: telemetry_complete
+      description: Reuse/proceed decisions logged
+      validation: Telemetry captures all decisions
+
+  dependencies:
+    upstream:
+      - B10.1  # Quality-aware search service
+      - B11.2  # PEDR sync ensures data is current
+    downstream:
+      - B11.6  # Retrospective captures reuse metrics
+
+  risks:
+    - risk: False positives recommend reuse for unrelated research
+      mitigation: Conservative threshold (0.85), include relevance score
+
+    - risk: High latency blocks DeepSearch workflow
+      mitigation: Cached search results, async option
+
+  acceptanceCriteria:
+    - POST /api/v1/pedr/preflight accepts query string
+    - Returns {action, matches, summary} JSON
+    - action is 'reuse' when score>=0.85 AND quality>=4 AND complete
+    - action is 'proceed' when no relevant matches
+    - Summary includes mission_id, title, objective, key_insights
+    - Telemetry logs query, decision, latency, match_count
+    - CLI example runs and produces output
+    - Response latency <500ms (p95)
+
+  estimatedEffort: small-medium
+  orchestrationPattern: none
+
+domainFields:
+  sprint_11_correction: true
+  pedr_integration: true
+  deepsearch_coordination: true
+  integration_category: duplicate_prevention

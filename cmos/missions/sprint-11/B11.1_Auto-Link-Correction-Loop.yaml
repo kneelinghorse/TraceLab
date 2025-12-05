@@ -1,0 +1,155 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B11.1
+  name: Auto-Link Correction Loop & Observability
+  sprint: Sprint 11
+  type: Build.Implementation.v1
+  priority: high
+  created: 2025-12-05
+  owner: assistant
+
+missionId: "B11.1"
+
+spec:
+  objective: |
+    Turn auto-link telemetry into actionable retries and dashboards so DeepSearch
+    payloads self-heal without manual intervention.
+
+  context: |
+    Sprint 10 delivered evidence auto-linking with 100% success rate on test payloads.
+    However, production will encounter failures (embedding mismatch, missing chunks,
+    threshold misses). We need:
+
+    1. Error taxonomy - classify why auto-linking fails
+    2. Retry queue - async retries with exponential backoff
+    3. Webhook notifications - notify DeepSearch of success/failure
+    4. Observability - Grafana-ready telemetry for dashboards
+
+    Architecture decision: Async with webhook notifications (not blocking endpoint).
+    Reference: cmos/planning/DeepSearch-TraceLab-Integration-Contract.md Phase 2
+
+  researchStatement:
+    topic: Automated error correction for evidence auto-linking
+    scope: Retry infrastructure, webhook integration, telemetry dashboards
+    centralHypothesis: Async correction loops with webhooks reduce manual intervention to <5%
+
+  keyQuestions:
+    - What error categories exist for auto-linking failures?
+    - How many retries before giving up (max 2 per contract)?
+    - What webhook payload format does DeepSearch expect?
+    - What telemetry format is Grafana-ready (JSONL with timestamps)?
+    - Should failed corrections block mission status updates?
+
+  technicalApproach:
+    architecture:
+      - Error taxonomy enum in app/services/evidence_auto_linking.py
+      - Retry queue using background tasks (or Celery if needed)
+      - Webhook client for DeepSearch callbacks
+      - /api/v1/deepsearch/corrections endpoint for status/retry triggers
+      - Telemetry aggregator for dashboard exports
+
+    implementation:
+      - Define AutoLinkErrorType enum (NO_EMBEDDING, LOW_SIMILARITY, NO_CHUNKS, TIMEOUT)
+      - Add retry_count, last_error, error_type to evidence metadata
+      - Create CorrectionQueueService with exponential backoff
+      - Implement webhook POST to DeepSearch callback URL
+      - Add /api/v1/deepsearch/corrections GET (status) and POST (trigger retry)
+      - Create telemetry aggregator for JSONL summaries
+      - Export Grafana-compatible metrics (success rate, retry count, error distribution)
+      - Add tests for retry logic and webhook delivery
+      - Document correction flow and dashboard setup
+
+    errorTaxonomy: |
+      AutoLinkErrorType:
+        - NO_EMBEDDING: Evidence text couldn't generate embedding
+        - LOW_SIMILARITY: Best match below threshold (configurable, default 0.7)
+        - NO_CHUNKS: No chunks exist in project for matching
+        - TIMEOUT: Qdrant/embedding service timeout
+        - VALIDATION_ERROR: Evidence structure invalid
+
+    retryStrategy: |
+      - Max retries: 2 (per integration contract)
+      - Backoff: exponential (5s, 30s)
+      - On final failure: mark evidence as unlinked, webhook failure notification
+      - On success: update chunk_id, webhook success notification
+
+  successCriteria:
+    - Error taxonomy defined with 5+ error types
+    - Retry queue processes failed auto-links automatically
+    - Webhook notifications sent on success/failure (async)
+    - /api/v1/deepsearch/corrections endpoint returns correction status
+    - Telemetry exports Grafana-ready JSONL (timestamps, counts, rates)
+    - <5% of auto-link failures require manual intervention after retries
+
+  deliverables:
+    - file: app/services/correction_queue.py
+      description: Async retry queue with exponential backoff
+
+    - file: app/services/webhook_client.py
+      description: DeepSearch callback webhook sender
+
+    - file: app/api/v1/corrections.py
+      description: Corrections status and trigger endpoint
+
+    - file: app/schemas/corrections.py
+      description: Correction status and webhook payload schemas
+
+    - file: docs/correction-loop.md
+      description: Correction flow documentation and dashboard setup
+
+    - file: tests/test_correction_loop.py
+      description: Retry logic and webhook delivery tests
+
+    - telemetry: Correction metrics
+      path: cmos/telemetry/events/sprint-11-corrections.jsonl
+
+  qualityGates:
+    - gate: error_taxonomy_complete
+      description: All error types documented and handled
+      validation: Enum covers observed failure modes
+
+    - gate: retry_queue_functional
+      description: Failed items automatically retried
+      validation: Integration test shows retry behavior
+
+    - gate: webhooks_delivered
+      description: DeepSearch receives notifications
+      validation: Mock webhook server receives callbacks
+
+    - gate: telemetry_grafana_ready
+      description: JSONL format suitable for dashboards
+      validation: Sample import into Grafana succeeds
+
+  dependencies:
+    upstream:
+      - B10.2  # DeepSearch ingestion endpoint
+      - B10.5  # Integration testing foundation
+    downstream:
+      - B11.3  # Console displays correction status
+      - B11.6  # Retrospective captures correction metrics
+
+  risks:
+    - risk: Webhook delivery failures create infinite loops
+      mitigation: Dead letter queue, max notification attempts
+
+    - risk: Retry storm under high load
+      mitigation: Rate limiting, circuit breaker pattern
+
+  acceptanceCriteria:
+    - Error taxonomy enum with 5+ types
+    - Retry queue with max 2 attempts and exponential backoff
+    - Webhook client sends JSON to callback URL
+    - /api/v1/deepsearch/corrections returns {pending, completed, failed} counts
+    - Telemetry JSONL includes timestamp, error_type, retry_count, success_rate
+    - Tests cover retry exhaustion and webhook failure scenarios
+
+  estimatedEffort: medium
+  orchestrationPattern: async-queue
+
+domainFields:
+  sprint_11_correction: true
+  deepsearch_coordination: true
+  observability: true
+  integration_category: error_handling

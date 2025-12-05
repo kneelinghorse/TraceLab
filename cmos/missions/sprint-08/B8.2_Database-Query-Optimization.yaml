@@ -1,0 +1,146 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B8.2
+  name: Database Query Optimization
+  sprint: Sprint 08
+  type: Build.Implementation.v1
+  priority: high
+  created: 2025-11-15
+  owner: assistant
+
+missionId: "B8.2"
+
+spec:
+  objective: |
+    Profile and optimize PostgreSQL queries to improve application performance, 
+    reduce query latency, and eliminate N+1 query problems across the application.
+  
+  context: |
+    Per roadmap Week 14, database query optimization is critical for production readiness.
+    Current state:
+    - No comprehensive indexing strategy
+    - Potential N+1 queries in document/chunk retrieval
+    - No query performance monitoring
+    - Unknown baseline performance metrics
+    
+    This mission will establish baseline metrics, identify bottlenecks, add necessary 
+    indexes, and optimize slow queries.
+  
+  researchStatement:
+    topic: PostgreSQL query performance optimization
+    scope: All FastAPI endpoints, especially document ingestion and RAG retrieval
+    centralHypothesis: Proper indexing and query optimization will reduce p95 latency by 50%+
+  
+  keyQuestions:
+    - What are the current slowest queries?
+    - Which tables lack critical indexes?
+    - Where are N+1 query patterns occurring?
+    - What is baseline query performance before optimization?
+    - What performance targets should we set?
+  
+  technicalApproach:
+    architecture:
+      - Enable pg_stat_statements for query profiling
+      - SQLAlchemy query logging for N+1 detection
+      - Database index strategy
+      - Query optimization patterns
+    
+    implementation:
+      - Enable and configure pg_stat_statements
+      - Add SQLAlchemy query logging to identify N+1 problems
+      - Profile top 10 slowest queries
+      - Add missing indexes (projects, documents, document_chunks, missions)
+      - Optimize ORM queries (use joinedload/selectinload where needed)
+      - Create database performance test suite
+      - Document indexing strategy
+    
+    indexStrategy: |
+      Priority indexes to add:
+      1. documents(project_id) - frequently filtered
+      2. document_chunks(document_id) - join performance
+      3. document_chunks(embedding_id) - lookup performance
+      4. insights(project_id) - filtered queries
+      5. insight_sources(insight_id, chunk_id) - join performance
+      6. missions(project_id, status) - composite for filtered queries
+      7. quality_checks(entity_type, entity_id) - lookup performance
+  
+  successCriteria:
+    - pg_stat_statements enabled and collecting query metrics
+    - All critical indexes added (minimum 7 indexes from strategy)
+    - N+1 query problems identified and fixed
+    - p95 query latency <100ms for document retrieval
+    - p95 query latency <200ms for RAG context assembly
+    - Query performance test suite passes
+    - Indexing strategy documented
+  
+  deliverables:
+    - file: alembic/versions/XXX_add_performance_indexes.py
+      description: Migration adding all performance indexes
+    
+    - file: app/db/indexes.sql
+      description: Complete index definitions with rationale
+    
+    - file: tests/performance/test_query_performance.py
+      description: Performance test suite for critical queries
+    
+    - file: docs/database-optimization.md
+      description: Indexing strategy and query optimization guide
+    
+    - artifact: Query performance baseline report
+      description: Before/after metrics showing improvement
+    
+    - telemetry: Query performance metrics logged
+      path: cmos/telemetry/events/sprint-08-db-optimization.jsonl
+  
+  qualityGates:
+    - gate: baseline_established
+      description: Baseline query performance metrics captured
+      validation: Query report exists with before metrics
+    
+    - gate: indexes_added
+      description: All critical indexes deployed
+      validation: Check pg_indexes for new indexes
+    
+    - gate: n1_eliminated
+      description: N+1 query patterns fixed
+      validation: SQLAlchemy query logs show no N+1 patterns
+    
+    - gate: performance_improved
+      description: Measurable performance improvement
+      validation: After metrics show ≥50% latency reduction
+  
+  dependencies:
+    upstream: []
+    downstream:
+      - B8.5  # Dashboard will display optimized query metrics
+  
+  risks:
+    - risk: Index overhead on write performance
+      mitigation: Test write performance, use partial indexes if needed
+    
+    - risk: Large index size
+      mitigation: Monitor index size, consider BRIN for large tables
+    
+    - risk: Query optimizer not using indexes
+      mitigation: Use EXPLAIN ANALYZE to verify index usage
+  
+  acceptanceCriteria:
+    - pg_stat_statements shows top 10 queries with execution stats
+    - All 7+ critical indexes created and in use
+    - Zero N+1 queries in document retrieval paths
+    - Query performance tests pass with p95 <100ms target
+    - Documentation includes index rationale and maintenance guide
+    - Telemetry shows before/after comparison
+  
+  estimatedEffort: medium-large
+  orchestrationPattern: none
+  
+domainFields:
+  sprint_08_optimization: true
+  roadmap_phase: 4
+  roadmap_week: 14
+  performance_impact: high
+  monitoring_category: database
+

@@ -1,0 +1,161 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B10.5
+  name: Integration Testing & Documentation
+  sprint: Sprint 10
+  type: Build.Implementation.v1
+  priority: high
+  created: 2025-11-17
+  owner: assistant
+
+missionId: "B10.5"
+
+spec:
+  objective: |
+    Create comprehensive integration test suite validating DeepSearch → TraceLab flow, 
+    document all integration patterns, and prepare for Week 7 joint testing with DeepSearch team.
+  
+  context: |
+    Per DeepSearch alignment, integration testing happens in phases:
+    - Week 4: TraceLab validates sample JSON from DeepSearch
+    - Week 6: Manual upload testing
+    - Week 7: Automated integration testing (this mission supports)
+    - Week 8: Production validation
+    
+    This mission creates the test infrastructure and documentation needed for successful 
+    integration across all phases.
+  
+  researchStatement:
+    topic: End-to-end integration validation for autonomous knowledge system
+    scope: Test suite, mock data, integration patterns, coordination docs
+    centralHypothesis: Comprehensive testing infrastructure enables smooth Week 7 integration
+  
+  keyQuestions:
+    - What test scenarios cover critical integration paths?
+    - How do we mock DeepSearch outputs for testing?
+    - What validation should happen at each phase (Week 4, 6, 7, 8)?
+    - How do we coordinate async testing with external team?
+  
+  technicalApproach:
+    architecture:
+      - Integration test suite with mock DeepSearch outputs
+      - Sample Mission Protocol JSON (5+ scenarios)
+      - Test all validation paths (success + errors)
+      - Integration testing guide for coordination
+      - Phased testing checklist
+    
+    implementation:
+      - Create tests/integration/test_deepsearch_integration.py
+      - Generate 5+ sample Mission Protocol JSON payloads (valid complete, invalid schema, quality gate failures, auto-linking scenarios, multi-entity)
+      - Test ingestion endpoint with all samples
+      - Test quality-aware search with mock missions
+      - Test relationship context API
+      - Test auto-linking algorithm with diverse evidence
+      - Create docs/deepsearch-integration-testing.md
+      - Add coordination checklist for Week 4, 6, 7, 8
+      - Document common error patterns and fixes
+    
+    testScenarios: |
+      Scenario 1: Valid Complete Mission
+      - All required fields populated
+      - All 5 quality gates passing
+      - Evidence with URLs and content
+      - Expected: 201 Created
+      
+      Scenario 2: Schema Validation Failure
+      - Missing synthesis.key_insights
+      - Expected: 422 with detailed error
+      
+      Scenario 3: Quality Gate Failure
+      - Evidence array empty
+      - Expected: 400 with failing gate names
+      
+      Scenario 4: Auto-Linking Success
+      - Evidence content matches existing chunk
+      - Expected: chunk_id populated post-process
+      
+      Scenario 5: Auto-Linking Failure
+      - Evidence content has no similar chunks
+      - Expected: Evidence remains URL-only
+  
+  successCriteria:
+    - Integration test suite with 10+ test cases
+    - All critical paths tested (success + error cases)
+    - 5+ sample JSON payloads created
+    - Mock data represents diverse research types
+    - Tests verify ingestion, validation, auto-linking, search
+    - Integration testing guide documented
+    - Phased testing checklist (Week 4, 6, 7, 8)
+    - Common errors and fixes documented
+  
+  deliverables:
+    - file: tests/integration/test_deepsearch_integration.py
+      description: End-to-end integration test suite
+    
+    - file: tests/fixtures/deepsearch_missions/
+      description: Sample Mission Protocol JSON files (5+ scenarios)
+    
+    - file: docs/deepsearch-integration-testing.md
+      description: Integration testing guide and coordination checklist
+    
+    - file: docs/deepsearch-common-errors.md
+      description: Error patterns, causes, and fixes
+    
+    - artifact: Integration test results
+      description: Test run output proving all scenarios pass
+    
+    - telemetry: Integration testing metrics
+      path: cmos/telemetry/events/sprint-10-integration-testing.jsonl
+  
+  qualityGates:
+    - gate: all_scenarios_covered
+      description: Test suite covers critical integration paths
+      validation: 10+ test cases for success and error paths
+    
+    - gate: mock_data_realistic
+      description: Sample JSONs represent real research
+      validation: DeepSearch team reviews and approves samples
+    
+    - gate: documentation_complete
+      description: Integration guide ready for coordination
+      validation: Guide includes all phases and checklists
+  
+  dependencies:
+    upstream:
+      - B10.1  # Quality search to test
+      - B10.2  # Ingestion endpoint to test
+      - B10.3  # Shared schemas for validation
+      - B10.4  # Relationship API to test
+    downstream:
+      - B10.6  # Retrospective reviews testing results
+  
+  risks:
+    - risk: Mock data doesn't match real DeepSearch outputs
+      mitigation: Coordinate with DeepSearch team on samples
+    
+    - risk: Integration testing reveals design gaps
+      mitigation: Flexible Sprint 11 for iteration
+  
+  acceptanceCriteria:
+    - 10+ integration test cases implemented
+    - All test scenarios pass
+    - Sample JSON files created and validated
+    - Integration guide documents phased testing
+    - Common errors documented with fixes
+    - Tests run in CI pipeline
+    - DeepSearch team reviews and approves test approach
+    - Telemetry captured for retrospective
+  
+  estimatedEffort: medium
+  orchestrationPattern: none
+  
+domainFields:
+  sprint_10_integration: true
+  pedr_phase: 1
+  performance_impact: none
+  integration_category: testing
+  deepsearch_coordination: true
+  week_7_critical: true
+

@@ -1,0 +1,57 @@
+# Mission File: B7.5_Qdrant-Initialization.yaml
+
+missionId: "B7.5"
+
+objective: "Create Qdrant collection initialization system with admin endpoint and health check to resolve 404 collection errors."
+
+context: |
+  Production searches and document processing fail with "Collection 'research_chunks' doesn't exist" 
+  errors. The QdrantService has ensure_collection() method but it's never called during normal operations.
+  Backend assumes collection exists but provides no way to initialize it. Need admin endpoint to create
+  collection on-demand and health check to verify Qdrant connectivity.
+
+successCriteria:
+  - "Admin endpoint POST /api/v1/admin/init-qdrant creates research_chunks collection if missing."
+  - "Health endpoint GET /api/v1/admin/health checks Qdrant connectivity and collection status."
+  - "Collection created with proper vector config (1536 dimensions, COSINE distance, payload indexes)."
+  - "Admin endpoints protected with authentication."
+  - "Deployment docs updated with initialization requirement."
+
+deliverables:
+  - "app/api/v1/admin.py - Admin endpoints for initialization and health."
+  - "Updated app/main.py to register admin router."
+  - "docs/deployment.md section on Qdrant initialization."
+  - "pytest tests/test_admin_endpoints.py for initialization logic."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  implementationScope:
+    coreDeliverable: "Admin initialization endpoint for Qdrant setup."
+    outOfScope:
+      - "Qdrant configuration changes."
+      - "Migration to different vector database."
+      - "Collection schema changes."
+
+  validationProtocol:
+    - validator: "curl test"
+      focus: "Call /api/v1/admin/init-qdrant, verify 200 response and collection created."
+    - validator: "pytest tests/test_admin_endpoints.py"
+      focus: "Initialization logic, error handling, idempotency."
+    - validator: "Qdrant verification"
+      focus: "Confirm research_chunks collection exists with correct config."
+
+  handoffContext:
+    completed:
+      - "Admin endpoints functional."
+      - "Qdrant collection can be initialized."
+      - "Health check reports Qdrant status."
+    interfaces:
+      - "POST /api/v1/admin/init-qdrant"
+      - "GET /api/v1/admin/health"
+    assumptions:
+      - "QDRANT_URL and QDRANT_API_KEY configured in Railway."
+      - "QdrantService.ensure_collection() method works correctly."
+    nextMission: "B7.6: Integrate Embedding Pipeline"
+    blockers: []
+

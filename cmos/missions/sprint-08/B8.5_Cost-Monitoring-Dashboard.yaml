@@ -1,0 +1,179 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B8.5
+  name: Cost Monitoring Dashboard
+  sprint: Sprint 08
+  type: Build.Implementation.v1
+  priority: medium
+  created: 2025-11-15
+  owner: assistant
+
+missionId: "B8.5"
+
+spec:
+  objective: |
+    Build comprehensive monitoring dashboard to track OpenAI API costs, cache hit rates, 
+    query performance, and system health metrics in real-time.
+  
+  context: |
+    Per roadmap Week 14, monitoring dashboard is critical for cost optimization.
+    Current state:
+    - Cost telemetry service exists (app/services/cost_monitor.py from Sprint 04)
+    - Metrics collected but not visualized
+    - No unified dashboard for system health
+    
+    This mission creates a dashboard to visualize:
+    - OpenAI embedding costs
+    - OpenAI RAG generation costs
+    - Cache hit rates (semantic + application-level)
+    - Query performance metrics
+    - Database query stats
+    - Qdrant performance
+    
+    Target: Single-page dashboard accessible at /admin/dashboard
+  
+  researchStatement:
+    topic: System observability and cost visualization
+    scope: All performance and cost metrics from Sprint 08 optimizations
+    centralHypothesis: Unified dashboard enables data-driven optimization decisions
+  
+  keyQuestions:
+    - What metrics are most important for daily monitoring?
+    - Should dashboard be frontend (React) or backend (simple HTML)?
+    - How do we aggregate metrics from different sources?
+    - What time ranges should be supported (hour/day/week/month)?
+    - Should we support metric exports (CSV/JSON)?
+  
+  technicalApproach:
+    architecture:
+      - Simple backend-rendered dashboard (no React complexity)
+      - FastAPI endpoint with Jinja2 templates
+      - Aggregate metrics from telemetry files
+      - Real-time metrics from monitoring services
+      - Chart.js for visualizations
+    
+    implementation:
+      - Create /admin/dashboard endpoint
+      - Aggregate telemetry from JSONL files
+      - Query live metrics from services (cost_monitor, cache_manager, monitoring)
+      - Create dashboard template with sections (cost overview, cache performance, query latency, database health, Qdrant stats)
+      - Add metric export endpoints (JSON/CSV)
+      - Create dashboard documentation
+    
+    metricsToDisplay: |
+      Cost Metrics:
+      - Total OpenAI spend (today/week/month)
+      - Embedding cost breakdown
+      - RAG generation cost breakdown
+      - Cost per query average
+      - Cost trend chart
+      
+      Performance Metrics:
+      - Query latency (p50/p95/p99)
+      - RAG query latency
+      - Database query latency
+      - Performance trend charts
+      
+      Cache Metrics:
+      - Application cache hit rate
+      - Semantic cache hit rate
+      - Cache memory usage
+      - Cache invalidation rate
+      
+      System Health:
+      - Database connection pool stats
+      - Qdrant collection stats (vector count, memory)
+      - Slow query log (top 10)
+      - Error rate
+  
+  successCriteria:
+    - Dashboard accessible at /admin/dashboard
+    - Displays current OpenAI costs (today/week/month)
+    - Shows cache hit rates for all caches
+    - Displays query performance metrics
+    - Renders performance trend charts
+    - Auto-refreshes metrics every 30 seconds
+    - Metric export endpoints work (JSON/CSV)
+    - Dashboard loads in <2 seconds
+    - Mobile-responsive design
+  
+  deliverables:
+    - file: app/api/v1/admin.py
+      description: Admin dashboard endpoints
+    
+    - file: app/templates/admin/dashboard.html
+      description: Dashboard HTML template with Chart.js
+    
+    - file: app/services/metrics_aggregator.py
+      description: Service to aggregate metrics from multiple sources
+    
+    - file: tests/test_admin_dashboard.py
+      description: Dashboard endpoint tests
+    
+    - file: docs/monitoring-dashboard.md
+      description: Dashboard user guide and metric definitions
+    
+    - artifact: Live dashboard screenshot
+      description: Visual confirmation of working dashboard
+  
+  qualityGates:
+    - gate: metrics_displayed
+      description: All key metrics visible on dashboard
+      validation: Dashboard shows cost, performance, cache, and health metrics
+    
+    - gate: realtime_updates
+      description: Dashboard auto-refreshes with latest data
+      validation: Metrics update without page reload
+    
+    - gate: export_working
+      description: Metric export endpoints functional
+      validation: Can export metrics as JSON and CSV
+    
+    - gate: documentation_complete
+      description: Dashboard usage documented
+      validation: docs/monitoring-dashboard.md explains all metrics
+  
+  dependencies:
+    upstream:
+      - B8.1  # Telemetry automation provides fresh data
+      - B8.2  # Database optimization metrics to display
+      - B8.3  # Cache metrics to display
+      - B8.4  # Qdrant metrics to display
+    downstream:
+      - B8.6  # Sprint retrospective will reference dashboard
+  
+  risks:
+    - risk: Dashboard performance with large telemetry files
+      mitigation: Limit time range queries, add pagination
+    
+    - risk: Chart rendering performance
+      mitigation: Use efficient Chart.js options, limit data points
+    
+    - risk: Authentication/security for admin dashboard
+      mitigation: Reuse existing JWT auth, require admin role
+  
+  acceptanceCriteria:
+    - Dashboard displays all 4 metric categories (cost, performance, cache, health)
+    - OpenAI costs calculated accurately from telemetry
+    - Cache hit rates match actual cache metrics
+    - Query latency charts show recent trends
+    - Dashboard auto-refreshes every 30 seconds
+    - Export endpoints return valid JSON/CSV
+    - Dashboard is mobile-responsive
+    - Documentation explains each metric and its significance
+    - Dashboard loads in <2 seconds
+  
+  estimatedEffort: medium
+  orchestrationPattern: none
+  
+domainFields:
+  sprint_08_optimization: true
+  roadmap_phase: 4
+  roadmap_week: 14
+  performance_impact: low
+  monitoring_category: observability
+  ui_type: backend_rendered
+  framework: FastAPI + Jinja2 + Chart.js
+

@@ -1,0 +1,158 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B10.6
+  name: Sprint 10 Retrospective
+  sprint: Sprint 10
+  type: Build.Implementation.v1
+  priority: medium
+  created: 2025-11-17
+  owner: assistant
+
+missionId: "B10.6"
+
+spec:
+  objective: |
+    Document Sprint 10 integration outcomes, validate PEDR Phase 1 delivery, assess 
+    DeepSearch readiness, and plan Sprint 11 scope based on integration learnings.
+  
+  context: |
+    Standard sprint closure following Sprint 01-09 pattern.
+    Sprint 10 focused on DeepSearch integration foundation and PEDR Phase 1.
+    
+    This retrospective will:
+    - Validate quality-aware search implementation
+    - Assess ingestion endpoint and auto-linking effectiveness
+    - Review schema package delivery
+    - Evaluate integration testing coverage
+    - Coordinate with DeepSearch for Week 7 testing
+    - Plan Sprint 11 (advanced integration or next roadmap phase)
+  
+  researchStatement:
+    topic: Sprint 10 integration efficacy and system readiness
+    scope: All Sprint 10 missions (B10.1-B10.5)
+    centralHypothesis: PEDR Phase 1 and ingestion foundation enable autonomous knowledge loop
+  
+  keyQuestions:
+    - Does quality-aware search rank complete missions higher?
+    - Is ingestion endpoint ready for DeepSearch Sprint 4?
+    - Does auto-linking match evidence to chunks accurately?
+    - Are shared schemas sufficient for pre-validation?
+    - What gaps exist for Week 7 integration testing?
+  
+  technicalApproach:
+    architecture:
+      - Retrospective document with integration metrics
+      - Quality search effectiveness analysis
+      - Auto-linking accuracy report
+      - Integration readiness assessment
+      - Sprint 11 recommendations
+    
+    implementation:
+      - Create cmos/reports/sprint-10/retrospective.md
+      - Aggregate Sprint 10 telemetry
+      - Test quality search with sample missions
+      - Measure auto-linking success rate
+      - Review schema package with DeepSearch feedback
+      - Document integration testing results (if Week 4 samples available)
+      - Update MASTER_CONTEXT with Sprint 10 outcomes
+      - Draft Sprint 11 backlog (advanced integration or roadmap continuation)
+      - Log retrospective telemetry
+  
+  successCriteria:
+    - Retrospective document created
+    - Quality search ranking validated (complete > draft)
+    - Auto-linking accuracy measured (target ≥80%)
+    - Integration testing coverage assessed
+    - DeepSearch coordination status documented
+    - Sprint 11 backlog drafted
+    - MASTER_CONTEXT updated
+    - Parity validation passed
+  
+  deliverables:
+    - file: cmos/reports/sprint-10/retrospective.md
+      description: Sprint 10 retrospective with integration assessment
+    
+    - file: cmos/reports/sprint-10/integration-readiness-report.md
+      description: DeepSearch integration readiness analysis
+    
+    - artifact: Sprint 11 backlog draft
+      description: Next sprint missions based on integration learnings
+    
+    - telemetry: Retrospective summary
+      path: cmos/telemetry/events/sprint-10-retro.jsonl
+    
+    - update: MASTER_CONTEXT
+      description: Add Sprint 10 integration outcomes to history
+  
+  metricsToCapture: |
+    PEDR Metrics:
+    - Quality search ranking effectiveness
+    - Complete vs draft ranking differential
+    - Governance filter usage
+    - Search latency with quality boost
+    
+    Integration Metrics:
+    - Ingestion endpoint success rate
+    - Auto-linking accuracy (evidence → chunks)
+    - Auto-linking confidence distribution
+    - Validation error types (422 vs 400)
+    
+    Coordination Metrics:
+    - Schema package delivery status
+    - DeepSearch sample JSON received (Week 4)
+    - Integration testing readiness (Week 7)
+  
+  qualityGates:
+    - gate: metrics_compiled
+      description: All Sprint 10 metrics aggregated
+      validation: Retrospective includes quantified results
+    
+    - gate: retrospective_complete
+      description: Retrospective document comprehensive
+      validation: All sections filled with analysis
+    
+    - gate: integration_readiness_assessed
+      description: Week 7 testing readiness evaluated
+      validation: Readiness report identifies gaps/blockers
+    
+    - gate: sprint_11_planned
+      description: Next sprint scope defined
+      validation: Sprint 11 missions drafted
+  
+  dependencies:
+    upstream:
+      - B10.1  # Quality search
+      - B10.2  # Ingestion endpoint
+      - B10.3  # Schema package
+      - B10.4  # Relationship API
+      - B10.5  # Integration testing
+    downstream: []
+  
+  risks:
+    - risk: Week 7 testing reveals integration gaps
+      mitigation: Flexible Sprint 11 for iteration
+  
+  acceptanceCriteria:
+    - Retrospective includes all required sections
+    - Quality search effectiveness quantified
+    - Auto-linking accuracy measured with evidence
+    - Integration readiness documented
+    - DeepSearch coordination status current
+    - Sprint 11 backlog includes 4-6 missions
+    - MASTER_CONTEXT updated via database client
+    - Parity validation passed
+    - Retrospective telemetry logged
+  
+  estimatedEffort: small
+  orchestrationPattern: none
+  
+domainFields:
+  sprint_10_integration: true
+  pedr_phase: 1
+  performance_impact: none
+  integration_category: meta
+  retrospective_type: standard
+  coordination_focus: deepsearch_week_7_testing
+

@@ -1,0 +1,23 @@
+{
+  "generated_at": "2025-11-15T20:32:19Z",
+  "summary": {
+    "rag_query_results": {
+      "hit_rate": 0.75,
+      "hit_latency_ms": 0.008145334302551217,
+      "miss_latency_ms": 22.23244591926535,
+      "samples": 120
+    },
+    "document_lists": {
+      "hit_rate": 0.8,
+      "hit_latency_ms": 0.011606821014235416,
+      "miss_latency_ms": 5.93623606255278,
+      "samples": 60
+    },
+    "project_metadata": {
+      "hit_rate": 0.8,
+      "hit_latency_ms": 0.006618407496716827,
+      "miss_latency_ms": 3.603958204621449,
+      "samples": 40
+    }
+  }
+}

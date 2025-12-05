@@ -1,0 +1,147 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B10.1
+  name: Quality-Aware Search (PEDR Phase 1)
+  sprint: Sprint 10
+  type: Build.Implementation.v1
+  priority: high
+  created: 2025-11-17
+  owner: assistant
+
+missionId: "B10.1"
+
+spec:
+  objective: |
+    Extend HybridSearchService with quality-aware ranking so complete, validated missions 
+    rank higher than drafts, enabling agents and users to find high-quality research first.
+  
+  context: |
+    Per PEDR integration plan Phase 1, quality-aware search is the core value proposition.
+    
+    Current state: Hybrid search (Sprint 09) ranks by keyword + semantic similarity only.
+    No awareness of mission status, quality gates, or validation state.
+    
+    Target: Complete missions with passing quality gates rank 2× higher than drafts.
+    This implements simplified PEDR as TraceLab module (app/services/pedr/).
+  
+  researchStatement:
+    topic: Quality-aware search ranking for research artifacts
+    scope: Hybrid search enhancement, mission status boosting, governance filtering
+    centralHypothesis: Quality boosting improves research findability by surfacing validated work first
+  
+  keyQuestions:
+    - How do we calculate quality score from quality_gates JSON?
+    - What boost factor for complete missions (2×)?
+    - Should we filter out drafts entirely or just rank lower?
+    - How do we add governance filters (PII, business impact)?
+  
+  technicalApproach:
+    architecture:
+      - Create app/services/pedr/ module
+      - Quality scoring service
+      - Extend HybridSearchService with quality boost
+      - Add governance filter parameters
+      - Reuse existing PostgreSQL + Qdrant
+    
+    implementation:
+      - Create app/services/pedr/quality_scoring.py
+      - Calculate quality score from quality_gates (count passing gates / total gates)
+      - Add status-based boost (complete = +0.20, review = +0.10, draft = +0.00)
+      - Extend HybridSearchService.search() to apply quality boost
+      - Add governance filters to search API (min_quality_gates, status, allow_pii)
+      - Update search response to include quality metadata
+      - Add tests for quality ranking
+      - Document quality scoring algorithm
+    
+    qualityScoring: |
+      Quality score calculation:
+      1. Base score: count of passing gates / 5 (research_statement, evidence_links, synthesis_quality, traceability, contradictions_resolved)
+      2. Status boost: complete = +0.20, review = +0.10, in_progress = +0.05, draft = +0.00
+      3. Validation boost: if mission.validated = +0.05
+      4. Final quality multiplier: combined_score * (1 + quality_boost)
+      
+      Example:
+      - Draft mission (3/5 gates, draft): base=0.60, boost=0.00 → 0.60
+      - Complete mission (5/5 gates, complete): base=1.00, boost=0.20 → 1.20
+      - Result: Complete mission ranks 2× higher
+    
+    governanceFilters: |
+      New search parameters:
+      - min_quality_gates (int, 0-5): Filter missions with fewer passing gates
+      - status (list): Filter by mission status ['complete', 'review', 'in_progress', 'draft']
+      - allow_pii (bool): If false, exclude missions flagged for PII (future field)
+  
+  successCriteria:
+    - Quality scoring service calculates score from quality_gates
+    - Complete missions rank 2× higher than drafts in search results
+    - Governance filters work (min_quality_gates, status)
+    - Search API accepts new filter parameters
+    - Quality metadata included in search responses
+    - Tests verify ranking logic
+    - Documentation explains scoring algorithm
+  
+  deliverables:
+    - file: app/services/pedr/__init__.py
+      description: PEDR module initialization
+    
+    - file: app/services/pedr/quality_scoring.py
+      description: Quality score calculation from quality gates
+    
+    - file: app/services/hybrid_search.py
+      description: Updated with quality boost integration
+    
+    - file: app/schemas/search.py
+      description: Updated with governance filter parameters
+    
+    - file: tests/test_quality_aware_search.py
+      description: Quality ranking and filtering tests
+    
+    - file: docs/quality-aware-search.md
+      description: PEDR Phase 1 documentation and scoring algorithm
+  
+  qualityGates:
+    - gate: quality_scoring_working
+      description: Quality scores calculated correctly
+      validation: Unit tests verify score calculation
+    
+    - gate: ranking_improved
+      description: Complete missions rank higher than drafts
+      validation: Search tests show 2× ranking boost
+    
+    - gate: filters_functional
+      description: Governance filters work correctly
+      validation: Tests verify filtering logic
+  
+  dependencies:
+    upstream: []
+    downstream:
+      - B10.2  # Ingestion endpoint uses quality scoring
+  
+  risks:
+    - risk: Quality boost too aggressive
+      mitigation: Make boost factor configurable, test with diverse queries
+    
+    - risk: Performance impact from quality calculation
+      mitigation: Cache quality scores, add indexes
+  
+  acceptanceCriteria:
+    - app/services/pedr/ module created
+    - Quality score calculated from quality_gates JSON
+    - Complete missions rank ≥2× higher than drafts
+    - Search API accepts min_quality_gates, status, allow_pii filters
+    - Filters correctly narrow results
+    - Quality metadata in responses (quality_score, quality_gates_passed)
+    - Tests verify ranking and filtering (10+ test cases)
+    - Documentation explains algorithm with examples
+  
+  estimatedEffort: medium
+  orchestrationPattern: none
+  
+domainFields:
+  sprint_10_integration: true
+  pedr_phase: 1
+  performance_impact: low
+  integration_category: quality_ranking
+

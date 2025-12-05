@@ -68,6 +68,16 @@ export function Navigation() {
               >
                 Search
               </Link>
+              <Link
+                href="/console"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive("/console")
+                    ? "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
+                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                }`}
+              >
+                Console
+              </Link>
             </div>
           </div>
           

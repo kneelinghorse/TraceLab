@@ -1,0 +1,155 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B9.5
+  name: Saved Searches
+  sprint: Sprint 09
+  type: Build.Implementation.v1
+  priority: low
+  created: 2025-11-15
+  owner: assistant
+
+missionId: "B9.5"
+
+spec:
+  objective: |
+    Enable users to bookmark and name useful search queries for quick access, supporting 
+    iterative research workflows and common query patterns.
+  
+  context: |
+    Per roadmap Week 15, saved searches let users:
+    - Bookmark useful queries with custom names
+    - Quickly re-run common searches
+    - Share search patterns (future: if multi-user)
+    - Organize research workflows
+    
+    Built on top of search history (B9.4), adds user-initiated bookmarking.
+  
+  researchStatement:
+    topic: Saved search bookmarking for research workflows
+    scope: Search persistence, quick access UI, search organization
+    centralHypothesis: Saved searches reduce time to run frequent queries by 80%+
+  
+  keyQuestions:
+    - How do users save searches (from history or from current search)?
+    - Should saved searches have folders/categories?
+    - What metadata should be editable (name, description)?
+    - How many saved searches is reasonable (10? 50?)?
+  
+  technicalApproach:
+    architecture:
+      - New saved_searches table
+      - CRUD API for saved searches
+      - UI for saving, managing, running saved searches
+      - Quick access sidebar or dropdown
+    
+    implementation:
+      - Create saved_searches table (name, description, query, filters, user_id)
+      - Add "Save search" button to search page
+      - Create saved search management page
+      - Add GET/POST/PUT/DELETE /api/v1/saved-searches endpoints
+      - Add quick access to saved searches (dropdown or sidebar)
+      - Click saved search to execute immediately
+      - Allow editing name/description
+      - Add delete saved search
+      - Optional: add categories/folders for organization
+    
+    savedSearchMetadata: |
+      Per saved search:
+      - name (user-provided, e.g., "Checkout issues")
+      - description (optional, user-provided)
+      - query_text
+      - search_mode (semantic, keyword, hybrid)
+      - filters (JSON of filter values)
+      - top_k value
+      - created_at
+      - last_used_at (updated on execution)
+      - use_count (tracking)
+  
+  successCriteria:
+    - Users can save searches from search page or history
+    - Saved searches have custom names and descriptions
+    - Quick access UI shows all saved searches
+    - Click to execute saved search
+    - Can edit/delete saved searches
+    - Limit of 50 saved searches per user
+    - Usage tracking shows most-used searches
+  
+  deliverables:
+    - file: alembic/versions/XXX_add_saved_searches.py
+      description: Migration for saved_searches table
+    
+    - file: app/models/saved_search.py
+      description: SavedSearch model
+    
+    - file: app/services/saved_search.py
+      description: Saved search CRUD service
+    
+    - file: app/api/v1/saved_searches.py
+      description: Saved search endpoints
+    
+    - file: frontend/src/components/SaveSearchButton.tsx
+      description: Button to save current search
+    
+    - file: frontend/src/components/SavedSearchesList.tsx
+      description: Quick access to saved searches
+    
+    - file: frontend/src/pages/saved-searches.tsx
+      description: Saved search management page
+    
+    - file: tests/test_saved_searches.py
+      description: Saved search tests
+    
+    - file: docs/saved-searches.md
+      description: Saved searches user guide
+  
+  qualityGates:
+    - gate: save_working
+      description: Users can save searches successfully
+      validation: Save button creates database entry
+    
+    - gate: execution_working
+      description: Saved searches execute correctly
+      validation: Replay saved search returns expected results
+    
+    - gate: management_functional
+      description: Can edit and delete saved searches
+      validation: CRUD operations all work
+  
+  dependencies:
+    upstream:
+      - B9.4  # Search history provides foundation
+    downstream:
+      - B9.6  # Sprint retrospective
+  
+  risks:
+    - risk: Users create too many saved searches
+      mitigation: Enforce 50 search limit
+    
+    - risk: Saved searches become stale if corpus changes
+      mitigation: Show last_used_at timestamp as freshness indicator
+  
+  acceptanceCriteria:
+    - saved_searches table created
+    - Save button on search page works
+    - Saved searches page lists all saved searches
+    - Quick access dropdown/sidebar shows saved searches
+    - Click to execute saved search
+    - Edit name/description works
+    - Delete saved search works
+    - Limit of 50 saved searches enforced
+    - Tests verify all CRUD operations
+    - Documentation covers saving and managing searches
+  
+  estimatedEffort: small-medium
+  orchestrationPattern: none
+  
+domainFields:
+  sprint_09_advanced_search: true
+  roadmap_phase: 4
+  roadmap_week: 15
+  performance_impact: none
+  search_category: bookmarks
+  max_saved_searches: 50
+
