@@ -2,58 +2,114 @@
 
 missionId: "B6.7"
 
-objective: "Conduct end-to-end validation of agent workflows, generate Sprint 06 telemetry report, and document findings for Sprint 07 planning."
+objective: "Conduct Sprint 06 retrospective evaluating foundational fixes, assess system functionality, and document findings for Sprint 07 planning."
 
 context: |
-  Sprint 06 delivers complete functional TraceLab with CLI, document UI, search UI, mission tracking,
-  and report export. Need to validate the full workflow works: agent uploads documents via CLI,
-  searches via RAG, collects evidence, synthesizes findings, exports report. Capture telemetry on
-  what works, what breaks, where agents struggle, and what features are missing. Sprint 06 success
-  means agents and humans can both use TraceLab for real research workflows.
+  Sprint 06 began with B6.3 (RAG Search UI) blocked due to API connectivity issues. Investigation revealed
+  fundamental API URL misconfiguration (api.namozine.com vs api.namozine.com/api/v1), missing local dev
+  documentation, and undocumented authentication. Injected fix missions B6.4a-d to address these blockers:
+  - B6.4a: API URL Configuration Fix
+  - B6.4b: Local Development Environment Setup  
+  - B6.4c: Authentication Documentation and Testing
+  - B6.4d: RAG Search UI Implementation
+  
+  Completed missions: B6.1 (CLI), B6.2 (Document UI), B6.4 (Mission UI Overhaul).
+  In progress: B6.5 (Report Export).
+  Deferred: B6.6 (Integration API) - premature for current system maturity.
+  
+  This retrospective evaluates whether foundational issues are resolved and the system is usable.
 
 successCriteria:
-  - "End-to-end agent workflow tested: CLI login -> project create -> document upload -> RAG query -> mission create -> add evidence -> export report."
-  - "End-to-end human workflow tested: UI login -> upload documents -> search -> create mission -> link evidence -> export report."
-  - "Issues documented with severity (blocker, major, minor) and recommendations for Sprint 07."
-  - "Telemetry collected: CLI usage logs, UI interaction patterns, API performance, error rates."
-  - "Sprint 06 retrospective report generated in cmos/reports/sprint-06/SPRINT-06-RETROSPECTIVE.md."
-  - "Sprint 07 backlog seeded with fixes and enhancements from validation."
+  - "Retrospective report documents what worked, what didn't, and why."
+  - "API connectivity issues assessed - can frontend connect to backend?"
+  - "Local development workflow validated - can developers run system locally?"
+  - "Authentication assessed - are credentials documented and working?"
+  - "CLI and Document UI functionality evaluated against real use cases."
+  - "Gaps and blockers documented with severity levels (blocker, major, minor)."
+  - "Sprint 07 backlog seeded with prioritized fixes and enhancements."
+  - "MASTER_CONTEXT updated with Sprint 06 lessons learned."
 
 deliverables:
-  - "cmos/reports/sprint-06/sprint-06-summary.md - Sprint metrics report."
-  - "cmos/reports/sprint-06/SPRINT-06-RETROSPECTIVE.md - Retrospective with lessons learned."
-  - "cmos/telemetry/events/sprint-06-validation.jsonl - End-to-end test telemetry."
-  - "Sprint 07 mission stubs based on identified gaps."
-  - "Updated MASTER_CONTEXT with Sprint 06 achievements."
+  - "cmos/reports/sprint-06/SPRINT-06-RETROSPECTIVE.md - Full retrospective report."
+  - "cmos/telemetry/events/sprint-06-retrospective.jsonl - Findings and metrics."
+  - "Sprint 07 mission stubs for identified gaps."
+  - "Updated MASTER_CONTEXT with achievements and lessons learned."
 
 domainFields:
   type: "Build.Implementation.v1"
 
   researchFoundation:
-    - finding: "Sprint evaluation framework established in Sprint 01 (B1.6)."
-      sourceMission: "scripts/evaluate_sprint.py"
+    - finding: "Sprint 04 retrospective established evaluation framework."
+      sourceMission: "cmos/reports/sprint-04/SPRINT-04-RETROSPECTIVE.md"
+    - finding: "API URL misconfiguration discovered during B6.3 work."
+      sourceMission: "Session events 2025-11-10"
 
   implementationScope:
-    coreDeliverable: "Sprint 06 validation and retrospective with Sprint 07 backlog."
+    coreDeliverable: "Sprint 06 retrospective with actionable Sprint 07 backlog."
     outOfScope:
-      - "Sprint 07 mission implementation (next sprint)."
+      - "Sprint 07 mission implementation."
+      - "Fixing identified issues (that's Sprint 07 work)."
+
+  evaluationAreas:
+    infrastructure:
+      - "API connectivity (production and local)"
+      - "Environment configuration"
+      - "Local development setup"
+      - "Authentication system usability"
+    functionality:
+      - "CLI commands (login, upload, search, missions)"
+      - "Document UI (upload, list, detail, processing)"
+      - "Mission UI (create, evidence, quality gates)"
+      - "Search functionality (if B6.4d complete)"
+    workflows:
+      - "Agent workflow: CLI-based document upload and search"
+      - "Human workflow: UI-based document management"
+      - "Evidence collection and mission tracking"
+    gaps:
+      - "Missing features blocking real usage"
+      - "Documentation gaps"
+      - "Testing gaps"
+      - "User experience issues"
 
   validationProtocol:
-    - validator: "Agent workflow test"
-      focus: "Full CLI workflow completes successfully."
-    - validator: "Human workflow test"
-      focus: "Full UI workflow completes successfully."
-    - validator: "Documentation review"
-      focus: "All mission deliverables documented."
+    - validator: "Infrastructure validation"
+      focus: "Test API connectivity, local dev setup, auth login."
+    - validator: "Functionality validation"
+      focus: "Test CLI commands, document upload/search, mission CRUD."
+    - validator: "Workflow validation"
+      focus: "Complete end-to-end workflow (upload → search → evidence → report)."
+    - validator: "Gap analysis"
+      focus: "Document what's missing or broken with severity."
 
   handoffContext:
     completed:
-      - "Sprint 06 validated end-to-end."
-      - "Retrospective complete."
+      - "Sprint 06 fully evaluated."
+      - "Lessons learned documented."
       - "Sprint 07 backlog ready."
     interfaces: []
     assumptions:
-      - "All B6.1-B6.6 missions complete."
-    nextMission: "Sprint 07 missions (TBD based on findings)"
+      - "B6.1, B6.2, B6.4 completed."
+      - "B6.4a-d fix missions executed."
+      - "Frontend and backend running for testing."
+    nextMission: "Sprint 07 missions (based on findings)"
     blockers: []
+
+  retrospectiveGuidance: |
+    Key questions to answer:
+    1. Did the API URL fix (B6.4a) resolve connectivity issues?
+    2. Can developers now run the system locally (B6.4b)?
+    3. Is authentication documented and working (B6.4c)?
+    4. Is the RAG Search UI functional (B6.4d)?
+    5. What works well that we should keep doing?
+    6. What major gaps remain that block real usage?
+    7. What should be prioritized in Sprint 07?
+    
+    Structure:
+    - Executive Summary (3-5 key findings)
+    - Achievements (what was completed successfully)
+    - Challenges (what blocked progress and why)
+    - Infrastructure Assessment (API, local dev, auth)
+    - Functionality Assessment (CLI, UI, workflows)
+    - Lessons Learned (process improvements)
+    - Sprint 07 Recommendations (prioritized backlog)
 

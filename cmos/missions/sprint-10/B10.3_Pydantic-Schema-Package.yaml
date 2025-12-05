@@ -1,0 +1,148 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B10.3
+  name: Pydantic Schema Package for DeepSearch
+  sprint: Sprint 10
+  type: Build.Implementation.v1
+  priority: medium
+  created: 2025-11-17
+  owner: assistant
+
+missionId: "B10.3"
+
+spec:
+  objective: |
+    Package TraceLab's Mission Protocol Pydantic schemas as importable Python library 
+    for DeepSearch to use for pre-validation before API submission.
+  
+  context: |
+    Per DeepSearch integration alignment, DeepSearch wants to pre-validate Mission Protocol 
+    JSON locally before submitting to TraceLab API. This reduces 422 validation errors and 
+    enables faster iteration.
+    
+    TraceLab's schemas live in app/models/mission_protocol.py. Need to expose these as 
+    importable package that DeepSearch can install and use.
+    
+    Deadline: Week 5 (DeepSearch Sprint 3 start)
+  
+  researchStatement:
+    topic: Schema sharing between TraceLab and DeepSearch
+    scope: Python package creation, distribution, version management
+    centralHypothesis: Shared schemas enable pre-validation and reduce API errors
+  
+  keyQuestions:
+    - How to package schemas (PyPI, git submodule, shared repo)?
+    - What schemas to expose (just MissionProtocol or all)?
+    - How to handle version sync (schema changes)?
+    - Should we include validators or just models?
+  
+  technicalApproach:
+    architecture:
+      - Extract schemas to standalone package
+      - Minimal dependencies (pydantic only)
+      - Version synchronization strategy
+      - Distribution method (git, PyPI, or shared folder)
+    
+    implementation:
+      - Create tracelab_schemas/ package directory
+      - Copy mission_protocol.py models (MissionProtocolDraft, Complete, nested models)
+      - Add setup.py or pyproject.toml
+      - Add README with usage examples
+      - Version package (start at 1.0.0, sync with TraceLab versions)
+      - Publish or make available to DeepSearch
+      - Update TraceLab to import from package (ensure single source of truth)
+      - Document schema package usage
+      - Add versioning guide
+    
+    packageStructure: |
+      tracelab_schemas/
+      ├── pyproject.toml
+      ├── README.md
+      ├── tracelab_schemas/
+      │   ├── __init__.py
+      │   ├── mission_protocol.py     # Exported models
+      │   ├── version.py              # Version info
+      │   └── py.typed                # PEP 561 marker
+      └── tests/
+          └── test_schemas.py
+      
+      Usage (DeepSearch side):
+      pip install -e /path/to/tracelab_schemas
+      
+      from tracelab_schemas import MissionProtocolComplete
+      mission = MissionProtocolComplete(**data)  # Pre-validate
+  
+  successCriteria:
+    - Schemas packaged as standalone Python package
+    - Package installable via pip (editable mode acceptable)
+    - DeepSearch can import and use for validation
+    - Version synchronization documented
+    - TraceLab and DeepSearch use same schema definitions
+    - README includes usage examples
+    - Tests verify schemas work outside TraceLab
+  
+  deliverables:
+    - directory: tracelab_schemas/
+      description: Standalone schema package
+    
+    - file: tracelab_schemas/pyproject.toml
+      description: Package configuration
+    
+    - file: tracelab_schemas/README.md
+      description: Usage guide for DeepSearch team
+    
+    - file: tracelab_schemas/tracelab_schemas/mission_protocol.py
+      description: Exported Pydantic models
+    
+    - file: docs/schema-package.md
+      description: Schema versioning and distribution guide
+  
+  qualityGates:
+    - gate: package_installable
+      description: Package installs successfully
+      validation: pip install works from DeepSearch environment
+    
+    - gate: schemas_importable
+      description: Schemas can be imported and used
+      validation: DeepSearch test script validates mission
+    
+    - gate: version_sync
+      description: Version management documented
+      validation: README explains versioning strategy
+  
+  dependencies:
+    upstream: []
+    downstream:
+      - B10.5  # Integration testing uses shared schemas
+  
+  risks:
+    - risk: Schema drift if TraceLab changes without updating package
+      mitigation: Document versioning policy, add change detection tests
+    
+    - risk: Circular dependencies
+      mitigation: Keep package minimal (models only, no TraceLab imports)
+  
+  acceptanceCriteria:
+    - tracelab_schemas package created
+    - Package installable via pip -e
+    - MissionProtocolComplete, MissionProtocolDraft exportable
+    - All nested models included (ResearchStatement, Synthesis, Evidence, etc)
+    - DeepSearch can validate missions locally
+    - Version documented (1.0.0)
+    - README with usage examples
+    - Tests verify imports work
+    - Versioning guide explains update process
+  
+  estimatedEffort: small
+  orchestrationPattern: none
+  
+domainFields:
+  sprint_10_integration: true
+  pedr_phase: 1
+  performance_impact: none
+  integration_category: schema_sharing
+  deepsearch_coordination: true
+  deadline: week_5
+

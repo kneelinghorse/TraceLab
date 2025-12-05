@@ -4,12 +4,38 @@ CMOS (Context + Mission Orchestration System) is a lightweight starter kit for t
 
 ---
 
+## What's New in v2.1
+
+**🎯 Mission Memory System**
+- Full mission specs stored in database (objective, context, successCriteria, deliverables, domainFields)
+- Query missions with `./cmos/cli.py mission show <id>` - no file exports needed
+- `mission_details` view for easy inspection in your DB app
+
+**📜 Strategic Decision Timeline**
+- `strategic_decisions` table indexes decisions from MASTER_CONTEXT for powerful querying
+- Search decisions: `./cmos/cli.py decisions search "PostgreSQL"`
+- List by domain: `./cmos/cli.py decisions list --domain ai-studio`
+- Hybrid approach: JSON blob stays simple for agents, SQL queries for analysis
+
+**📸 Context Snapshot System**
+- Historical timeline of MASTER_CONTEXT changes at strategic milestones
+- Take snapshots: `./cmos/cli.py context snapshot master --source "Sprint 03 completed"`
+- View history: `./cmos/cli.py context history master`
+- View any past state: `./cmos/cli.py context view <snapshot-id>`
+
+**📊 Sprint Retrospectives**
+- `sprint_summary` view aggregates missions, decisions, completion rates per sprint
+- Query: `SELECT * FROM sprint_summary WHERE sprint_id='sprint-03'`
+
+---
+
 ## What You Get
 
 - **Mission Protocol alignment** – Build/Research mission templates, domain packs, and worker manifests wired for RSIP, delegation, and boomerang orchestration patterns.
 - **Agent-ready guidance** – A comprehensive `agents.md` contract plus empty context files that teams can populate with their own history.
 - **Guardrails & validation** – Security, quality, and integration harnesses (JavaScript + Python) that enforce OWASP guidance and regression testing.
-- **Optional SQLite canonical store** – Schema, seed script, and health validation commands for teams that want transactional mission state in addition to file mirrors.
+- **SQLite canonical store** – Schema, seed script, and health validation commands. SQLite is the canonical source of truth; export file mirrors on-demand.
+- **Queryable project memory** – Strategic decisions, mission specs, and context snapshots fully searchable via SQL or CLI.
 - **Packaging workflow** – Automation to produce distributable starter archives without leaking local tooling artefacts.
 
 ---
@@ -105,14 +131,19 @@ Use mission commands to edit backlog data without hand-editing YAML. Each comman
 ---
 
 ## Optional SQLite Runtime
-
-The file system remains the source of truth, but some teams prefer transactional mission storage.
+ 
+SQLite is the canonical source of truth. Generate file mirrors on-demand when you need human-friendly views.
 
 - **Generate a database**  
   ```bash
   python cmos/scripts/seed_sqlite.py
   ```
-  This applies `cmos/db/schema.sql`, writes an empty `cmos/db/cmos.sqlite`, and stores copies of `cmos/PROJECT_CONTEXT.json` and `cmos/context/MASTER_CONTEXT.json` in the `contexts` table.
+  This applies `cmos/db/schema.sql`, creates `cmos/db/cmos.sqlite`, and imports:
+  - Mission YAML files from `missions/sprint-XX/` folders (full specs)
+  - Contexts from `PROJECT_CONTEXT.json` and `MASTER_CONTEXT.json`
+  - Strategic decisions extracted from MASTER_CONTEXT
+  - Session history from `SESSIONS.jsonl`
+  - Backlog data from `missions/backlog.yaml`
 
 - **Validate database health**  
   ```bash
@@ -149,22 +180,55 @@ The file system remains the source of truth, but some teams prefer transactional
 
 ## Automation & Tooling
 
+### Unified CLI (`cmos/cli.py`)
+
+The CLI provides comprehensive commands for mission lifecycle, context management, and project memory queries:
+
+**Mission Commands:**
+- `mission status` - Show active missions queue
+- `mission show <id>` - Display full mission specification
+- `mission start/complete/block <id>` - Lifecycle operations
+- `mission add/update/depends` - Backlog management
+
+**Context & Memory Commands:**
+- `context snapshot master` - Take strategic snapshot
+- `context history master` - View snapshot timeline
+- `decisions list/search/by-sprint` - Query strategic decisions
+
+**Database Commands:**
+- `db show backlog/current` - View mission state
+- `db export backlog/contexts/missions` - Generate file exports
+
+**Validation Commands:**
+- `validate health` - Database connectivity check
+- `validate docs` - Documentation reference validation
+
+### Scripts
+
 | Script | Description |
 | ------ | ----------- |
-| `cmos/cli.py` | Unified CLI for mission, db, and validation commands. |
-| `cmos/scripts/mission_runtime.py` | Legacy mission lifecycle helper (still available for automation). |
-| `cmos/scripts/db_tools.py` | Legacy database utilities (automation helpers for exports). |
-| `cmos/scripts/seed_sqlite.py` | Imports backlog and contexts into `cmos/db/cmos.sqlite` from external sources. |
-| `cmos/scripts/migrate_cmos_memory.py` | Migrates data from legacy CMOS systems. |
+| `cmos/scripts/seed_sqlite.py` | Imports mission YAMLs, backlog, and contexts into database. Auto-scans `sprint-XX/` folders. |
+| `cmos/scripts/migrate_sprint_yaml_to_db.py` | Migrates mission YAML files from sprint folders into database when agents write to files instead of DB. |
+| `cmos/scripts/migrate_cmos_memory.py` | Migrates data from legacy CMOS systems (flat files or old databases). |
 | `cmos/scripts/validate_foundational_refs.py` | Ensures documentation references target `foundational-docs/`. |
 | `cmos/scripts/package_starter.sh` | Produces distributable `cmos-starter-<UTC>.tar.gz` bundle. |
 | `cmos/scripts/reset_starter.sh` | Resets CMOS to clean state for distribution. |
+| `cmos/scripts/mission_runtime.py` | Legacy mission lifecycle helper (still available for automation). |
+| `cmos/scripts/db_tools.py` | Legacy database utilities (automation helpers for exports). |
 
 ---
 
 ## Testing & Guardrails
 
-- **JavaScript test suites** – Run `npm run test:unit`, `npm run test:integration`, or `npm run test:e2e` for focused coverage. Use `npm run test:coverage` to generate reports.
+- **JavaScript test suites** – Run via Node directly (no npm install required):
+  - Integration runner:
+    ```bash
+    node cmos/context/integration_test_runner.js --manifest cmos/tests/integration/test_manifest.json
+    ```
+  - Show help:
+    ```bash
+    node cmos/context/integration_test_runner.js --help
+    ```
 - **Security validation** – `context/security_validation.js` scans mission outputs and fixtures against OWASP-aligned rules.
 - **Quality assurance** – `context/quality_assurance.js` reviews generated code for common pitfalls.
 - **Integration harness** – `context/integration_test_runner.js` orchestrates the full guardrail suite.
@@ -204,11 +268,13 @@ The script normalises from cmos root, strips transient artefacts, and produces a
 
 ## Key Principles
 
-1. **Database Only** - `cmos/db/cmos.sqlite` is single source of truth, export files on-demand
-2. **Minimal Backlog** - Keep `backlog.yaml` small (current work only), DB has full history
-3. **Two agents.md Files** - One for your code (`project-root/agents.md`), one for CMOS operations (`cmos/agents.md`)
-4. **Clear Boundaries** - Never write application code in cmos/
-5. **Export When Needed** - Generate file views via `./cmos/cli.py db export [backlog|contexts]`
+1. **Database First** - `cmos/db/cmos.sqlite` is single source of truth, export files on-demand
+2. **Queryable Memory** - Mission specs, strategic decisions, and context history fully searchable
+3. **Minimal Backlog** - Keep `backlog.yaml` small (current work only), DB has full history
+4. **Strategic Snapshots** - Capture MASTER_CONTEXT at milestones, maintain decision timeline
+5. **Two agents.md Files** - One for your code (`project-root/agents.md`), one for CMOS operations (`cmos/agents.md`)
+6. **Clear Boundaries** - Never write application code in cmos/
+7. **Export When Needed** - Generate file views via `./cmos/cli.py db export [backlog|contexts|missions]`
 
 ---
 

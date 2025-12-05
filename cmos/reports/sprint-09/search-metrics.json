@@ -1,0 +1,25 @@
+{
+  "samples": 24,
+  "mode_breakdown": {
+    "keyword": 8,
+    "hybrid": 8,
+    "semantic": 8
+  },
+  "avg_result_count": 4.75,
+  "avg_duration_ms": 418.96,
+  "cache_hit_rate": 0.21,
+  "filter_usage": {
+    "project_id": 18,
+    "source_type": 12,
+    "document_types": 12,
+    "tags": 18,
+    "date_range": 6
+  },
+  "saved_search_replay_rate": 0.25,
+  "saved_search_count": 3,
+  "saved_search_use_stats": {
+    "avg_use_count": 4,
+    "max_use_count": 6,
+    "min_use_count": 2
+  }
+}

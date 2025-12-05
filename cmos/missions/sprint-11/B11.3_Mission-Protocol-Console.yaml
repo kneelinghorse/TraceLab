@@ -1,0 +1,164 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B11.3
+  name: Mission Protocol Console (Read-Only UI)
+  sprint: Sprint 11
+  type: Build.Implementation.v1
+  priority: medium
+  created: 2025-12-05
+  owner: assistant
+
+missionId: "B11.3"
+
+spec:
+  objective: |
+    Ship an operator console that consumes the Relationship Context API and
+    telemetry, providing visibility into missions, evidence, and correction status.
+
+  context: |
+    Sprint 10 delivered the Relationship Context API (B10.4) with cached responses.
+    Operators need a UI to:
+
+    1. Browse missions with status, quality scores
+    2. View evidence and linked chunks
+    3. Monitor correction queue status
+    4. Export mission data (JSON/YAML)
+
+    Architecture decision: Extend existing Next.js bundle (not separate FastAPI SSR).
+    Reference: cmos/reports/sprint-10/sprint-11-backlog-draft.md
+
+  researchStatement:
+    topic: Operator dashboard for Mission Protocol visibility
+    scope: Next.js pages, API client, telemetry display, export functionality
+    centralHypothesis: Centralized visibility reduces operator investigation time by 50%
+
+  keyQuestions:
+    - What's the existing Next.js app structure?
+    - How do we display relationship graph (tree vs network)?
+    - What export formats are needed (JSON, YAML, Markdown)?
+    - Should telemetry show real-time or last-refresh?
+    - What authentication model for operator access?
+
+  technicalApproach:
+    architecture:
+      - Next.js pages under /console route
+      - API client for TraceLab backend
+      - Server-side rendering for initial load
+      - Client-side updates for telemetry
+      - Export buttons with file download
+
+    implementation:
+      - Create pages/console/index.tsx (dashboard)
+      - Create pages/console/missions/[id].tsx (detail view)
+      - Create pages/console/corrections.tsx (queue status)
+      - Build API client (lib/tracelab-client.ts)
+      - Add relationship tree component
+      - Add evidence table with chunk links
+      - Add correction status cards
+      - Implement export buttons (JSON, YAML)
+      - Add telemetry summary component
+      - Create basic auth middleware for /console routes
+      - Add tests for page rendering
+      - Document console usage for operators
+
+    pageStructure: |
+      /console
+        - Dashboard with mission counts by status
+        - Recent corrections summary
+        - Quality gate distribution chart
+
+      /console/missions
+        - Mission list with filters (status, sprint, quality)
+        - Search by title/ID
+
+      /console/missions/[id]
+        - Mission details
+        - Relationship tree (documents, evidence, chunks)
+        - Quality gates status
+        - Export buttons
+
+      /console/corrections
+        - Pending corrections queue
+        - Failed corrections with error details
+        - Retry trigger buttons (admin only)
+
+  successCriteria:
+    - Dashboard displays mission counts and quality distribution
+    - Mission detail shows relationships and evidence
+    - Correction status visible with error details
+    - Export buttons generate JSON/YAML downloads
+    - Basic auth protects console routes
+    - Page load <2 seconds
+
+  deliverables:
+    - file: pages/console/index.tsx
+      description: Main dashboard page
+
+    - file: pages/console/missions/[id].tsx
+      description: Mission detail with relationships
+
+    - file: pages/console/corrections.tsx
+      description: Correction queue status page
+
+    - file: lib/tracelab-client.ts
+      description: TypeScript API client
+
+    - file: components/RelationshipTree.tsx
+      description: Hierarchical relationship display
+
+    - file: docs/console-guide.md
+      description: Operator console usage guide
+
+    - file: tests/console.test.tsx
+      description: Page rendering tests
+
+  qualityGates:
+    - gate: dashboard_functional
+      description: Dashboard loads with mission data
+      validation: Cypress test passes
+
+    - gate: relationships_displayed
+      description: Evidence and chunks visible
+      validation: Detail page shows linked items
+
+    - gate: exports_working
+      description: JSON/YAML downloads succeed
+      validation: Export produces valid files
+
+    - gate: auth_enforced
+      description: Console routes protected
+      validation: Unauthenticated access blocked
+
+  dependencies:
+    upstream:
+      - B10.4  # Relationship Context API
+      - B11.1  # Correction status data
+    downstream:
+      - B11.6  # Retrospective captures UI feedback
+
+  risks:
+    - risk: Next.js version conflicts with existing setup
+      mitigation: Check compatibility, use isolated route group
+
+    - risk: API client complexity for relationship data
+      mitigation: Use React Query for caching
+
+  acceptanceCriteria:
+    - /console route renders dashboard
+    - Mission list with status/quality filters
+    - Mission detail shows evidence->chunk relationships
+    - Correction queue page shows pending/failed counts
+    - Export buttons download valid JSON/YAML
+    - Basic auth on all /console/* routes
+    - Tests verify page rendering
+
+  estimatedEffort: medium
+  orchestrationPattern: none
+
+domainFields:
+  sprint_11_correction: true
+  frontend: true
+  operator_tooling: true
+  integration_category: ui

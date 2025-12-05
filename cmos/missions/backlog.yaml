@@ -4,7 +4,7 @@ displayName: CMOS Backlog Export
 description: Backlog export generated from the CMOS SQLite database.
 author: CMOS
 schema: ./schemas/SprintPlan.v1.json
-generatedAt: '2025-11-18T06:11:13.902740+00:00'
+generatedAt: '2025-12-05T01:32:59.974952+00:00'
 ---
 domainFields:
   type: Planning.SprintPlan.v1
@@ -612,7 +612,7 @@ domainFields:
                 completed_at: '2025-11-11T15:51:12Z'
     - id: B6.6
       name: Integration API
-      status: Blocked
+      status: Superceeded
       notes: Deferred - wait until core TraceLab functionality validated before building
         integration features
     - id: B6.7
@@ -1235,6 +1235,125 @@ domainFields:
                   architecture for Sprint 10
           started_at: '2025-11-16T02:22:51Z'
           completed_at: '2025-11-16T02:35:30Z'
+  - sprintId: sprint-11
+    title: Sprint 11 - Correction Loop & PEDR Delta
+    focus: Automated correction loops, PEDR delta exports, and operator tooling for
+      DeepSearch self-correction
+    status: Planned
+    startDate: '2025-12-05'
+    endDate: '2025-12-19'
+    totalMissions: 6
+    completedMissions: 0
+    missions:
+    - id: B11.1
+      name: Auto-Link Correction Loop & Observability
+      status: Queued
+      notes: 'Full specification: cmos/missions/sprint-11/B11.1_Auto-Link-Correction-Loop.yaml
+        - Async correction loop with webhook notifications, error taxonomy, retry
+        queue, Grafana-ready telemetry.'
+      metadata:
+        description: Turn auto-link telemetry into actionable retries and dashboards
+          so DeepSearch payloads self-heal. Async with webhook notifications.
+        successCriteria:
+        - Error taxonomy defined and documented
+        - Retry queue implemented with async webhook notifications
+        - /api/v1/deepsearch/corrections endpoint functional
+        - Grafana-ready JSONL summaries exported
+        deliverables:
+        - Error taxonomy documentation
+        - Retry queue service with webhook support
+        - Corrections API endpoint
+        - Updated telemetry format for dashboards
+        spec_file: cmos/missions/sprint-11/B11.1_Auto-Link-Correction-Loop.yaml
+    - id: B11.2
+      name: PEDR Delta Sync Service
+      status: Queued
+      notes: 'Full specification: cmos/missions/sprint-11/B11.2_PEDR-Delta-Sync-Service.yaml
+        - Event-driven delta sync, manifest transformation, CLI commands, parity checks.'
+      metadata:
+        description: Stream validated missions and relationship context into PEDR
+          with governance metadata. Event-driven sync.
+        successCriteria:
+        - Delta detector identifies new/updated missions
+        - PEDR export job runs via CLI and scheduler
+        - Parity checks validate sync completeness
+        deliverables:
+        - Delta sync service with event-driven architecture
+        - PEDR export CLI command
+        - Scheduler configuration
+        - Documentation for index rebuilds
+        spec_file: cmos/missions/sprint-11/B11.2_PEDR-Delta-Sync-Service.yaml
+    - id: B11.3
+      name: Mission Protocol Console (Read-Only UI)
+      status: Queued
+      notes: 'Full specification: cmos/missions/sprint-11/B11.3_Mission-Protocol-Console.yaml
+        - Next.js operator dashboard, relationship tree, correction status, export
+        buttons.'
+      metadata:
+        description: Ship an operator console that consumes the Relationship Context
+          API + telemetry. Extend existing Next.js bundle.
+        successCriteria:
+        - Dashboard displays missions, evidence, and telemetry summaries
+        - Correction status visible in UI
+        - Download/export buttons functional
+        deliverables:
+        - Next.js dashboard pages
+        - API client integration
+        - Export functionality
+        spec_file: cmos/missions/sprint-11/B11.3_Mission-Protocol-Console.yaml
+    - id: B11.4
+      name: Schema Distribution & Contract Hardening
+      status: Queued
+      notes: 'Full specification: cmos/missions/sprint-11/B11.4_Schema-Distribution.yaml
+        - GitHub Packages publishing, semantic versioning, CI version checks.'
+      metadata:
+        description: Publish tracelab_schemas to GitHub Packages and lock the ingestion
+          contract with semantic versioning.
+        successCriteria:
+        - Package published to GitHub Packages
+        - Semantic version guardrails enforced
+        - CI check ensures DeepSearch + TraceLab pin same version
+        deliverables:
+        - GitHub Packages publishing workflow
+        - Contract documentation updates
+        - CI version check
+        spec_file: cmos/missions/sprint-11/B11.4_Schema-Distribution.yaml
+    - id: B11.5
+      name: PEDR Pre-Flight Query Service
+      status: Queued
+      notes: 'Full specification: cmos/missions/sprint-11/B11.5_PEDR-PreFlight-Query.yaml
+        - Pre-flight endpoint, reuse/proceed recommendations, decision criteria.'
+      metadata:
+        description: Prevent duplicate research by letting DeepSearch query PEDR before
+          launching new missions. min_quality_gates=4, status=complete filter.
+        successCriteria:
+        - /api/v1/pedr/preflight endpoint returns existing research
+        - Mission Protocol summarizer generates reuse recommendations
+        - Telemetry tracks reuse vs new research decisions
+        deliverables:
+        - Pre-flight API endpoint
+        - CLI example for DeepSearch agent
+        - Telemetry logging
+        spec_file: cmos/missions/sprint-11/B11.5_PEDR-PreFlight-Query.yaml
+    - id: B11.6
+      name: Sprint 11 Retrospective
+      status: Queued
+      notes: 'Full specification: cmos/missions/sprint-11/B11.6_Sprint-Retrospective.yaml
+        - Standard retrospective with correction metrics, PEDR sync stats, Sprint
+        12 draft.'
+      metadata:
+        description: Standard closure mission documenting correction-loop outcomes,
+          PEDR sync metrics, and backlog updates.
+        successCriteria:
+        - Retrospective report committed
+        - Telemetry captured
+        - MASTER_CONTEXT updated
+        - Parity validation passed
+        deliverables:
+        - cmos/reports/sprint-11/retrospective.md
+        - Telemetry JSONL
+        - Sprint 12 backlog draft
+        spec_file: cmos/missions/sprint-11/B11.6_Sprint-Retrospective.yaml
   - sprintId: sprint-10
     title: Sprint 10 - DeepSearch Integration & PEDR Phase 1
     focus: Quality-aware search, DeepSearch ingestion endpoint, post-processing auto-linking,
@@ -1263,6 +1382,7 @@ domainFields:
               rank 2x higher
         started_at: '2025-11-17T22:49:04Z'
         completed_at: '2025-11-17T23:08:14Z'
+        spec_file: cmos/missions/sprint-10/B10.1_Quality-Aware-Search.yaml
     - id: B10.2
       name: DeepSearch Ingestion Endpoint + Post-Processing
       status: Completed
@@ -1279,6 +1399,7 @@ domainFields:
               similarity
         started_at: '2025-11-17T23:38:57Z'
         completed_at: '2025-11-18T00:31:01Z'
+        spec_file: cmos/missions/sprint-10/B10.2_DeepSearch-Ingestion-Endpoint.yaml
     - id: B10.3
       name: Pydantic Schema Package for DeepSearch
       status: Completed
@@ -1296,6 +1417,7 @@ domainFields:
             description: Package Mission Protocol schemas for DeepSearch pre-validation
         started_at: '2025-11-18T03:41:01Z'
         completed_at: '2025-11-18T03:59:47Z'
+        spec_file: cmos/missions/sprint-10/B10.3_Pydantic-Schema-Package.yaml
     - id: B10.4
       name: Relationship Context API
       status: Completed
@@ -1315,6 +1437,7 @@ domainFields:
             description: SQL-based relationship traversal for related missions/docs/insights
         started_at: '2025-11-18T04:17:49Z'
         completed_at: '2025-11-18T04:30:02Z'
+        spec_file: cmos/missions/sprint-10/B10.4_Relationship-Context-API.yaml
     - id: B10.5
       name: Integration Testing & Documentation
       status: Completed
@@ -1340,15 +1463,24 @@ domainFields:
             description: End-to-end tests and Week 7 coordination preparation
         started_at: '2025-11-18T05:16:12Z'
         completed_at: '2025-11-18T05:45:07Z'
+        spec_file: cmos/missions/sprint-10/B10.5_Integration-Testing.yaml
     - id: B10.6
       name: Sprint 10 Retrospective
-      status: Current
+      status: Completed
+      completed_at: '2025-11-18T13:54:42Z'
+      notes: Authored sprint-10 retrospective + integration readiness report, measured
+        PEDR quality multipliers, captured auto-link telemetry, logged Sprint 10 retro
+        event, synced MASTER_CONTEXT via SQLiteClient, exported backlog-ready Sprint
+        11 draft, and ran DeepSearch ingestion/quality pytest suites.
       metadata:
         metadata:
           metadata:
             type: Build.Implementation.v1
             priority: medium
             description: Document integration outcomes and plan Sprint 11
+        started_at: '2025-11-18T13:39:09Z'
+        completed_at: '2025-11-18T13:54:42Z'
+        spec_file: cmos/missions/sprint-10/B10.6_Sprint-Retrospective.yaml
   missionDependencies:
   - from: B1.1
     to: B1.2
@@ -1374,6 +1506,12 @@ domainFields:
   - from: B10.1
     to: B10.6
     type: blocks
+  - from: B10.1
+    to: B11.2
+    type: blocks
+  - from: B10.1
+    to: B11.5
+    type: blocks
   - from: B10.2
     to: B10.4
     type: blocks
@@ -1383,20 +1521,56 @@ domainFields:
   - from: B10.2
     to: B10.6
     type: blocks
+  - from: B10.2
+    to: B11.1
+    type: blocks
   - from: B10.3
     to: B10.5
     type: blocks
   - from: B10.3
     to: B10.6
     type: blocks
+  - from: B10.3
+    to: B11.4
+    type: blocks
   - from: B10.4
     to: B10.5
     type: blocks
   - from: B10.4
     to: B10.6
+    type: blocks
+  - from: B10.4
+    to: B11.2
+    type: blocks
+  - from: B10.4
+    to: B11.3
     type: blocks
   - from: B10.5
     to: B10.6
+    type: blocks
+  - from: B10.5
+    to: B11.1
+    type: blocks
+  - from: B11.1
+    to: B11.3
+    type: blocks
+  - from: B11.1
+    to: B11.6
+    type: blocks
+  - from: B11.2
+    to: B11.5
+    type: blocks
+  - from: B11.2
+    to: B11.6
+    type: blocks
+  - from: B11.3
+    to: B11.6
+    type: blocks
+  - from: B11.4
+    to: B11.6
+    type: blocks
+  - from: B11.5
+    to: B11.6
     type: blocks
   - from: B2.1
     to: B2.2

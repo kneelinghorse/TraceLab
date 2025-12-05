@@ -1,0 +1,488 @@
+{
+  "project": {
+    "name": "CMOS Starter",
+    "version": "2.0.0",
+    "description": "Mission orchestration starter kit with SQLite runtime helpers, security guardrails, and Mission Protocol templates.",
+    "status": "starter-template",
+    "start_date": "",
+    "deployment": {
+      "platform": "Local/Node.js",
+      "integration_target": "Mission Protocol v2 projects",
+      "environment": "development"
+    }
+  },
+  "working_memory": {
+    "active_domain": "starter",
+    "session_count": 107,
+    "last_session": "2025-11-16T02:03:55Z",
+    "agents_md_path": "./agents.md",
+    "agents_md_loaded": false,
+    "active_mission": null,
+    "domains": {
+      "starter": {
+        "status": "planning",
+        "priority": 1,
+        "current_mission": null,
+        "missions": {},
+        "critical_facts": [
+          "Populate this list with the most important truths about your project before starting missions.",
+          "foundational-docs/roadmap_template.md and foundational-docs/tech_arch_template.md are the default templates for roadmap and architecture hand-offs."
+        ],
+        "constraints": [
+          "Keep the distributed starter free of seeded mission or sprint data.",
+          "Maintain parity between the SQLite database and whichever file mirrors your team elects to manage.",
+          "Document updates to foundational references or runtime helpers in MASTER_CONTEXT.json."
+        ],
+        "decisions_made": [
+          "B5.3 codifies hosted domain wiring: deploy frontend at https://namozine.com, backend at https://api.namozine.com/api/v1, and run the production Playwright smoke before each DNS/env change.",
+          "Sprint 07 backlog seeded with B7.1-B7.4 to deliver read APIs, guardrail docs, ingest CLI auth, and Presidio/cache fixes."
+        ],
+        "files_created": []
+      }
+    },
+    "session_history": [
+      {
+        "mission": "B7.1",
+        "agent": "assistant",
+        "summary": "Document & Project read APIs + CLI/UI shipped",
+        "action": "complete",
+        "ts": "2025-11-11T20:22:14Z"
+      },
+      {
+        "mission": "B7.1",
+        "agent": "assistant",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-11T20:24:28Z"
+      },
+      {
+        "mission": "B7.2",
+        "agent": "assistant",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-11T20:28:12Z"
+      },
+      {
+        "mission": "B7.2",
+        "agent": "assistant",
+        "summary": "Integration guardrails documented and runner passing",
+        "action": "complete",
+        "ts": "2025-11-11T20:37:13Z"
+      },
+      {
+        "mission": "B7.3",
+        "agent": "codex",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-11T20:53:00Z"
+      },
+      {
+        "mission": "B7.3",
+        "agent": "codex",
+        "summary": "CLI auth + ingestion workflow verified",
+        "action": "complete",
+        "ts": "2025-11-11T21:05:10Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "assistant",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-12T01:32:20Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "assistant",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-12T01:32:26Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "codex",
+        "summary": "Qdrant admin endpoints shipped",
+        "action": "complete",
+        "ts": "2025-11-12T01:38:51Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "codex",
+        "summary": "Ingestion embedding fix recorded",
+        "action": "update",
+        "ts": "2025-11-12T06:13:21Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "",
+        "summary": "Starting Protocol Engine",
+        "action": "start",
+        "ts": "2025-11-12T16:06:27Z"
+      },
+      {
+        "mission": "B7.5",
+        "agent": "codex",
+        "summary": "Protocol Engine controls verified via CLI guardrails",
+        "action": "complete",
+        "ts": "2025-11-12T16:09:23Z"
+      },
+      {
+        "mission": "B7.7",
+        "agent": "assistant",
+        "summary": "Starting B7.7 end-to-end workflow validation mission",
+        "action": "start",
+        "ts": "2025-11-15T00:35:32Z"
+      },
+      {
+        "mission": "B7.7",
+        "agent": "assistant",
+        "summary": "UI + CLI workflows validated; ingestion/search/RAG suites and telemetry prove B7.7 readiness.",
+        "action": "complete",
+        "ts": "2025-11-15T00:52:24Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Started B7.7 validation recap",
+        "action": "start",
+        "ts": "2025-11-15T01:16:25Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured context",
+        "action": "capture",
+        "ts": "2025-11-15T01:16:30Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured next-step",
+        "action": "capture",
+        "ts": "2025-11-15T01:16:33Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Reviewed B7.7 validation evidence, confirmed ingestion/auth stability in prod/local, and noted UI hydration warnings as the only follow-up.",
+        "action": "complete",
+        "ts": "2025-11-15T01:30:06Z"
+      },
+      {
+        "mission": "B7.8",
+        "agent": "assistant",
+        "summary": "Kicking off Sprint 07 retrospective deliverables per mission brief.",
+        "action": "start",
+        "ts": "2025-11-15T01:53:16Z"
+      },
+      {
+        "mission": "B7.8",
+        "agent": "assistant",
+        "summary": "Sprint 07 retrospective + env inventory documented with parity + telemetry evidence readying Sprint 08 planning.",
+        "action": "complete",
+        "ts": "2025-11-15T01:59:03Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Started Sprint 08 & 09 Planning",
+        "action": "start",
+        "ts": "2025-11-15T04:42:42Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-11-15T04:42:49Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-11-15T04:42:51Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-11-15T04:42:53Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-11-15T04:42:55Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-11-15T04:42:58Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured constraint",
+        "action": "capture",
+        "ts": "2025-11-15T04:42:59Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured constraint",
+        "action": "capture",
+        "ts": "2025-11-15T04:43:01Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured context",
+        "action": "capture",
+        "ts": "2025-11-15T04:43:02Z"
+      },
+      {
+        "session": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Sprint 08 & 09 fully planned: 12 missions total. Sprint 08 focuses on performance optimization (Week 14). Sprint 09 focuses on advanced search with critical UX fixes (Week 15). All missions created, backlog updated, database seeded, parity validated.",
+        "action": "complete",
+        "ts": "2025-11-15T04:43:10Z"
+      },
+      {
+        "mission": "B8.1",
+        "agent": "assistant",
+        "summary": "Starting telemetry automation mission to automate testing-summary.json from CI test runs",
+        "action": "start",
+        "ts": "2025-11-15T04:57:13Z"
+      },
+      {
+        "mission": "B8.1",
+        "agent": "assistant",
+        "summary": "Telemetry automation pipeline implemented (pytest plugin, Playwright reporter, aggregator, docs, CI).",
+        "action": "complete",
+        "ts": "2025-11-15T05:25:07Z"
+      },
+      {
+        "mission": "B8.2",
+        "agent": "assistant",
+        "summary": "Starting database query optimization work",
+        "action": "start",
+        "ts": "2025-11-15T06:20:01Z"
+      },
+      {
+        "mission": "B8.2",
+        "agent": "assistant",
+        "summary": "Database query optimization changes added (indexes, query loading)",
+        "action": "complete",
+        "ts": "2025-11-15T06:33:15Z"
+      },
+      {
+        "mission": "B8.3",
+        "agent": "assistant",
+        "summary": "Starting B8.3 query caching work",
+        "action": "start",
+        "ts": "2025-11-15T15:25:48Z"
+      },
+      {
+        "mission": "B8.3",
+        "agent": "assistant",
+        "summary": "Application-level caching implemented with telemetry + APIs",
+        "action": "complete",
+        "ts": "2025-11-15T15:42:14Z"
+      },
+      {
+        "mission": "B8.4",
+        "agent": "codex",
+        "summary": "Beginning Qdrant tuning deliverables",
+        "action": "start",
+        "ts": "2025-11-15T15:54:26Z"
+      },
+      {
+        "mission": "B8.4",
+        "agent": "codex",
+        "summary": "Qdrant tuning endpoints, parameter sweep tooling, and docs shipped",
+        "action": "complete",
+        "ts": "2025-11-15T16:14:37Z"
+      },
+      {
+        "mission": "B8.5",
+        "agent": "codex",
+        "summary": "Kick off cost monitoring dashboard implementation",
+        "action": "start",
+        "ts": "2025-11-15T16:32:12Z"
+      },
+      {
+        "mission": "B8.5",
+        "agent": "codex",
+        "summary": "Delivered /admin/dashboard experience with live metrics and exports",
+        "action": "complete",
+        "ts": "2025-11-15T16:45:47Z"
+      },
+      {
+        "mission": "B8.6",
+        "agent": "codex",
+        "summary": "Starting Sprint 08 retrospective documentation",
+        "action": "start",
+        "ts": "2025-11-15T20:25:53Z"
+      },
+      {
+        "mission": "B8.6",
+        "agent": "assistant",
+        "summary": "Sprint 08 retrospective + metrics docs delivered with telemetry + dashboard evidence",
+        "action": "complete",
+        "ts": "2025-11-15T20:41:00Z"
+      },
+      {
+        "mission": "B9.1",
+        "agent": "codex",
+        "summary": "Kicking off hybrid search backend work",
+        "action": "start",
+        "ts": "2025-11-15T22:49:31Z"
+      },
+      {
+        "mission": "B9.1",
+        "agent": "codex",
+        "summary": "Hybrid search backend shipped with weighted semantic+keyword retrieval",
+        "action": "complete",
+        "ts": "2025-11-15T23:28:43Z"
+      },
+      {
+        "mission": "B9.2",
+        "agent": "assistant",
+        "summary": "Starting faceted search backend implementation",
+        "action": "start",
+        "ts": "2025-11-16T00:00:51Z"
+      },
+      {
+        "mission": "B9.2",
+        "agent": "assistant",
+        "summary": "Faceted search backend, facets API, and filter-aware caching delivered",
+        "action": "complete",
+        "ts": "2025-11-16T00:21:53Z"
+      },
+      {
+        "mission": "B9.4",
+        "agent": "assistant",
+        "summary": "Implementing search history backend + UI logging",
+        "action": "start",
+        "ts": "2025-11-16T00:51:36Z"
+      },
+      {
+        "mission": "B9.4",
+        "agent": "assistant",
+        "summary": "Search history logging, replay APIs, and UI delivered with parity + tests.",
+        "action": "complete",
+        "ts": "2025-11-16T01:06:40Z"
+      },
+      {
+        "mission": "B9.5",
+        "agent": "codex",
+        "summary": "Starting saved searches mission: scoping requirements and implementation plan.",
+        "action": "start",
+        "ts": "2025-11-16T01:35:45Z"
+      },
+      {
+        "mission": "B9.5",
+        "agent": "codex",
+        "summary": "Shipped saved searches across backend, API, and UI.",
+        "action": "complete",
+        "ts": "2025-11-16T02:03:55Z"
+      }
+    ],
+    "blocked_missions": [
+      "B6.3"
+    ],
+    "last_completed_mission": "B9.5",
+    "last_blocked_mission": "B6.3",
+    "recent_sessions": [
+      {
+        "id": "PS-2025-11-15-001",
+        "session_type": "review",
+        "type": "review",
+        "title": "B7.7 validation recap",
+        "summary": "Reviewed B7.7 validation evidence, confirmed ingestion/auth stability in prod/local, and noted UI hydration warnings as the only follow-up.",
+        "completed_at": "2025-11-15T01:30:06Z",
+        "capture_count": 2,
+        "captures": {
+          "context": 1,
+          "next-step": 1
+        }
+      },
+      {
+        "id": "PS-2025-11-15-001",
+        "session_type": "planning",
+        "type": "planning",
+        "title": "Sprint 08 & 09 Planning",
+        "summary": "Sprint 08 & 09 fully planned: 12 missions total. Sprint 08 focuses on performance optimization (Week 14). Sprint 09 focuses on advanced search with critical UX fixes (Week 15). All missions created, backlog updated, database seeded, parity validated.",
+        "completed_at": "2025-11-15T04:43:10Z",
+        "capture_count": 8,
+        "captures": {
+          "decision": 5,
+          "constraint": 2,
+          "context": 1
+        }
+      }
+    ],
+    "next_steps": [
+      "PS-2025-11-15-001: Draft Sprint 07 retrospective (B7.8) with env var inventory + telemetry references.",
+      "PS-2025-11-15-001: Launch Sprint 08 with B8.1 Telemetry Automation",
+      "PS-2025-11-15-001: After Sprint 08, begin Sprint 09 with B9.1 Hybrid Search"
+    ]
+  },
+  "technical_context": {
+    "dependencies": [
+      "Python 3.11+",
+      "Node.js 20+ (for optional tooling and tests)"
+    ],
+    "tooling": {
+      "seed_database": "python scripts/seed_sqlite.py --data-root <path-to-planning-repo>",
+      "validate_parity": "python scripts/validate_parity.py --data-root <path-to-planning-repo>",
+      "mission_runtime": "python scripts/mission_runtime.py --help"
+    },
+    "reference_docs": [
+      "foundational-docs/roadmap_template.md",
+      "foundational-docs/tech_arch_template.md"
+    ],
+    "integration": {
+      "last_validated": "Pending - run integration_test_runner before completion."
+    }
+  },
+  "context_health": {
+    "size_kb": 12.19,
+    "size_limit_kb": 100,
+    "sessions_since_reset": 89,
+    "last_reset": "",
+    "compression_enabled": false,
+    "last_update": "2025-11-16T02:03:55Z"
+  },
+  "metadata": {
+    "migrated_at": "2025-11-15T16:19:59.619425+00:00",
+    "source_version": "cmos-v1"
+  },
+  "ai_instructions": {
+    "preferred_language": "javascript",
+    "code_style": "modular_zero_dependency",
+    "testing_required": true,
+    "documentation_level": "concise",
+    "special_instructions": [
+      "Log integration test outcomes (telemetry/events/testing-summary.json) in mission notes and keep structured prompting cues in sync with master context."
+    ]
+  }
+}

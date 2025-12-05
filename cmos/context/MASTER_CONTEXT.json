@@ -24,7 +24,9 @@
       "Completed Sprint 02 research (R2.1): comprehensive quality assessment heuristics framework with three-pillar approach.",
       "Completed Sprint 02 ingestion research (R2.2 Markdown service, R2.3 onboarding workflow) defining architecture for B2.3 sub-missions.",
       "Planned Sprint 02: all 5 build missions (B2.1-B2.5) defined with success criteria and dependencies.",
-      "Updated B2.3b onboarding mission for single-user deployment and realigned backlog sequencing (B2.3b Current, B2.3d Queued)."
+      "Updated B2.3b onboarding mission for single-user deployment and realigned backlog sequencing (B2.3b Current, B2.3d Queued).",
+      "Completed Sprint 10: PEDR quality-aware ranking, DeepSearch ingestion + auto-linking, schema package, relationship API, and integration telemetry all shipped with retrospective + backlog updates.",
+      "Sprint 10 completed: PEDR quality-aware ranking (212% boost for validated research), DeepSearch ingestion with 100% auto-linking, schema package, relationship API, and 24-test integration suite."
     ],
     "files_created": [
       "cmos/missions/sprint-01/B1.1_Core-Service-Bootstrap.yaml",
@@ -56,7 +58,7 @@
       "cmos/reports/sprint-02/.gitkeep"
     ],
     "planning_overview": {
-      "current_sprint": "Sprint 05 - Frontend Deployment & Auth Hardening",
+      "current_sprint": "Sprint 11 - Correction Loop & PEDR Delta",
       "session_summaries": [
         {
           "session_date": "2025-11-10",
@@ -104,6 +106,31 @@
               "fix": "Mission B6.5 to document authentication"
             }
           }
+        },
+        {
+          "session_date": "2025-12-04",
+          "agent": "Claude",
+          "focus": "Sprint 10 Review & Sprint 11 Planning",
+          "key_discoveries": [
+            "Sprint 10 delivered all 6 missions with 100% auto-linking success and 212% quality boost for validated vs draft research",
+            "Comprehensive PEDR documentation exists - no research missions needed for Sprint 11",
+            "Correction loop architecture decided: async with webhook notifications"
+          ],
+          "decisions_made": [
+            "Sprint 11 order approved as drafted: B11.1-B11.6",
+            "Correction loop: async with webhook notifications (not blocking endpoint)",
+            "PEDR sync: event-driven (not hourly batch)",
+            "Console UI: extend existing Next.js bundle",
+            "Package index: GitHub Packages for tracelab_schemas distribution",
+            "B11.1 kept combined (not split into sub-missions)",
+            "B6.6 Integration API archived as superseded"
+          ],
+          "mistakes_made": [],
+          "files_modified": [
+            "cmos/db/cmos.sqlite - Sprint 11 missions seeded",
+            "cmos/missions/backlog.yaml - Sprint 11 backlog synced"
+          ],
+          "blockers_identified": {}
         }
       ]
     }
@@ -263,7 +290,44 @@
       "decision": "Sprint 09 closed with hybrid search, faceted filters, search history, and saved searches. Sprint 10 now focuses on DeepSearch ingestion, PEDR connector, Mission Protocol UI, and the agent correction loop.",
       "source": "B9.6 retrospective"
     },
-    "Sprint 09 evidence: precision@5 +19% vs semantic-only (cmos/telemetry/events/sprint-09-hybrid-search.jsonl) and saved-search replay rate 25% (cmos/reports/sprint-09/search-metrics.json)."
+    "Sprint 09 evidence: precision@5 +19% vs semantic-only (cmos/telemetry/events/sprint-09-hybrid-search.jsonl) and saved-search replay rate 25% (cmos/reports/sprint-09/search-metrics.json).",
+    {
+      "decision": "Sprint 11 will focus on the correction loop, PEDR delta sync, and Mission Protocol Console per B10.6 retro.",
+      "source": "mission_B10.6",
+      "date": "2025-11-18"
+    },
+    {
+      "decision": "Relationship Context API is the single data source for the Mission Protocol Console and PEDR exports; no bespoke queries.",
+      "source": "mission_B10.6",
+      "date": "2025-11-18"
+    },
+    {
+      "date": "2025-12-04",
+      "decision": "Sprint 11 correction loop: async with webhook notifications for retry queue",
+      "source": "Sprint 11 planning session"
+    },
+    {
+      "date": "2025-12-04",
+      "decision": "PEDR sync cadence: event-driven (not hourly batch)",
+      "source": "Sprint 11 planning session"
+    },
+    {
+      "date": "2025-12-04",
+      "decision": "Mission Protocol Console extends Next.js (not separate FastAPI SSR)",
+      "source": "Sprint 11 planning session"
+    },
+    {
+      "date": "2025-12-04",
+      "decision": "tracelab_schemas distributed via GitHub Packages",
+      "source": "Sprint 11 planning session"
+    },
+    "Sprint 11 order approved as drafted: B11.1-B11.6 (from PS-2025-12-05-001)",
+    "Correction loop: async with webhook notifications (not blocking endpoint) (from PS-2025-12-05-001)",
+    "PEDR sync: event-driven (not hourly batch) (from PS-2025-12-05-001)",
+    "Console UI: extend existing Next.js bundle (from PS-2025-12-05-001)",
+    "Package index: GitHub Packages for tracelab_schemas distribution (from PS-2025-12-05-001)",
+    "B11.1 kept combined (not split into sub-missions) (from PS-2025-12-05-001)",
+    "B6.6 Integration API archived as superseded (from PS-2025-12-05-001)"
   ],
   "constraints": [
     "All document processing workflows must execute redaction prior to persistence or embedding.",
@@ -321,10 +385,11 @@
       "sprint_05": "Planned",
       "sprint_08": "Planned - 6 missions",
       "sprint_09": "Completed - hybrid search, faceted filters, search history, saved searches shipped",
-      "sprint_10": "Planned - 6 missions"
+      "sprint_10": "Completed - DeepSearch ingestion + PEDR Phase 1 delivered",
+      "sprint_11": "Planned - correction loop & PEDR delta"
     },
-    "current_focus": "Sprint 10 - DeepSearch Integration & PEDR Phase 1",
-    "next_checkpoint": "Sprint 10 integration missions: quality search, ingestion endpoint, schema package, relationship API, integration testing",
+    "current_focus": "Sprint 11 - Correction Loop & PEDR Delta",
+    "next_checkpoint": "Sprint 11 missions: correction loop, PEDR delta sync, Mission Protocol Console",
     "research_completed": [
       {
         "id": "R2.1",
@@ -515,12 +580,13 @@
     "sprint_10_plus_direction": {
       "focus": "DeepSearch → TraceLab → PEDR integration",
       "key_missions": [
-        "DeepSearch JSON ingestion endpoint",
-        "PEDR connector to index TraceLab database",
-        "Mission Protocol UI redesign (read-only agent output dashboard)",
-        "Agent correction loop (422 validation errors trigger refinement)"
+        "Auto-link correction loop & telemetry observability",
+        "PEDR delta sync + catalog export",
+        "Mission Protocol Console (read-only operator UI)",
+        "Schema distribution + contract hardening",
+        "PEDR pre-flight query service"
       ],
-      "details": "Architecture details to be finalized during Sprint 09 retrospective"
+      "details": "Phase 2 (Sprint 11) locks in correction loop, PEDR sync, and operator console deliverables captured in cmos/reports/sprint-10/sprint-11-backlog-draft.md."
     },
     "deepsearch_integration": {
       "status": "100% aligned",
@@ -543,7 +609,7 @@
     "pedr_integration": {
       "approach": "Phased - Start as TraceLab module, extract later if needed",
       "phase_1": "Sprint 10 - Quality-aware search (complete missions rank 2x higher, governance filters)",
-      "phase_2": "Sprint 11 - Relationship context API",
+      "phase_2": "Sprint 11 - Correction loop + PEDR delta sync",
       "phase_3": "Future - Enhanced protocol features if valuable (intent classification, graph analytics)",
       "technology": "Pure Python, reuses PostgreSQL FTS + Qdrant, no JavaScript Protocol Suite for MVP"
     }
@@ -1286,32 +1352,51 @@
         "summary": "DeepSearch integration fixtures, tests, docs, and telemetry delivered",
         "action": "complete",
         "ts": "2025-11-18T05:45:07Z"
+      },
+      {
+        "mission": "B10.6",
+        "agent": "assistant",
+        "summary": "Kicking off Sprint 10 retrospective + planning deliverables",
+        "action": "start",
+        "ts": "2025-11-18T13:39:09Z"
+      },
+      {
+        "mission": "B10.6",
+        "agent": "assistant",
+        "summary": "Sprint 10 retro delivered metrics, telemetry, and Sprint 11 backlog.",
+        "action": "complete",
+        "ts": "2025-11-18T13:54:42Z"
       }
     ],
-    "last_session": "2025-11-18T05:45:07Z",
-    "session_count": 36,
+    "last_session": "2025-11-18T13:54:42Z",
+    "session_count": 38,
     "active_mission": null,
     "blocked_missions": [],
-    "last_completed_mission": "B10.5"
+    "last_completed_mission": "B10.6"
   },
   "next_session_context": {
     "when_we_resume": [
-      "Pick up B10.6"
+      "PS-2025-12-05-001: Start B11.1 Auto-Link Correction Loop & Observability",
+      "PS-2025-12-05-001: Review cmos/planning/DeepSearch-TraceLab-Integration-Contract.md Phase 2 section before implementing"
     ]
   },
   "context_health": {
-    "sessions_since_reset": 40,
-    "last_update": "2025-11-18T05:45:07Z",
-    "size_kb": 45.17,
+    "sessions_since_reset": 44,
+    "last_update": "2025-12-05T01:21:15Z",
+    "size_kb": 49.96,
     "size_limit_kb": 100
   },
   "learnings": [
     "TTL caches cut repeated RAG latency from 22.23 ms to 0.008 ms and drop repeated OpenAI cost to ~$0.000071; monitoring dashboard now surfaces these metrics alongside cost telemetry.",
-    "Sprint 09 metrics: hybrid precision +0.12 vs semantic-only, avg search durations 419 ms, saved-search replay 25% (see cmos/reports/sprint-09/search-metrics-report.md)."
+    "Sprint 09 metrics: hybrid precision +0.12 vs semantic-only, avg search durations 419 ms, saved-search replay 25% (see cmos/reports/sprint-09/search-metrics-report.md).",
+    "Auto-link telemetry hit 100% success on the customer onboarding payload; treat telemetry deltas as the trigger for correction-loop retries.",
+    "Sprint 10 delivered all 6 missions: PEDR quality scoring (212% boost for complete vs draft), DeepSearch ingestion with 100% auto-linking success, schema package, relationship API, and integration test suite (24 tests passing) (from PS-2025-12-05-001)"
   ],
   "context_notes": [
     "B7.7 validated ingestion flow end-to-end; prod + local confirmed, only residual issue is local hydration warnings but no blocking impact.",
-    "B6.3 not actually blocked - project dropdown shows 0 but actual functionality works. B7.1 resolved the blocker by adding GET endpoints. Database blocker record needs cleanup."
+    "B6.3 not actually blocked - project dropdown shows 0 but actual functionality works. B7.1 resolved the blocker by adding GET endpoints. Database blocker record needs cleanup.",
+    "Publish tracelab_schemas to the internal index and wire CI guards so DeepSearch + TraceLab pin the same schema version before Sprint 11 starts.",
+    "Current branch: sprint-10-quality-aware-search. No active missions in backlog. Sprint 11 draft exists with 6 missions covering correction loops, PEDR sync, operator console, schema publishing, and pre-flight queries."
   ],
   "recent_sessions": [
     {
@@ -1339,6 +1424,21 @@
         "decision": 5,
         "constraint": 2,
         "context": 1
+      }
+    },
+    {
+      "id": "PS-2025-12-05-001",
+      "session_type": "review",
+      "type": "review",
+      "title": "Sprint 10 Review & Sprint 11 Planning",
+      "summary": "Sprint 10 review completed (6/6 missions, 100% auto-linking, 212% quality boost). Sprint 11 planned with 6 missions focused on correction loops, PEDR delta sync, and operator tooling. Key architecture decisions captured: async webhooks for corrections, event-driven PEDR sync, Next.js for console, GitHub Packages for schema distribution.",
+      "completed_at": "2025-12-05T01:21:15Z",
+      "capture_count": 11,
+      "captures": {
+        "learning": 1,
+        "context": 1,
+        "decision": 7,
+        "next-step": 2
       }
     }
   ]

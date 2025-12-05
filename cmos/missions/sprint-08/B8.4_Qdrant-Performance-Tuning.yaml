@@ -1,0 +1,169 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B8.4
+  name: Qdrant Performance Tuning
+  sprint: Sprint 08
+  type: Build.Implementation.v1
+  priority: medium
+  created: 2025-11-15
+  owner: assistant
+
+missionId: "B8.4"
+
+spec:
+  objective: |
+    Optimize Qdrant vector database configuration for production workload, validate 
+    quantization settings, tune HNSW parameters, and benchmark query performance at scale.
+  
+  context: |
+    Per roadmap Week 8 and technical architecture, Qdrant needs production tuning.
+    Current state:
+    - Basic Qdrant setup complete from Sprint 01
+    - Configuration follows tech arch recommendations
+    - No production load testing performed
+    - Unknown actual performance under real workload
+    
+    Technical architecture specifies:
+    - Scalar quantization (int8) with always_ram: true
+    - HNSW: m=16, ef_construct=100
+    - hnsw_ef=128 (query-time, tunable 64-256)
+    - Target: <10ms p99 latency for 500K vectors
+    
+    This mission validates these settings and tunes for actual workload.
+  
+  researchStatement:
+    topic: Qdrant performance optimization for production scale
+    scope: Query latency, memory usage, indexing parameters
+    centralHypothesis: Tuned HNSW parameters reduce query latency while maintaining >99% recall
+  
+  keyQuestions:
+    - What is current query latency at production vector count?
+    - Are quantization settings optimal?
+    - Should hnsw_ef be adjusted for our workload?
+    - What is actual memory usage vs predicted?
+    - How does batch size affect ingestion performance?
+  
+  technicalApproach:
+    architecture:
+      - Load testing with realistic query patterns
+      - Parameter sweep for hnsw_ef (64, 96, 128, 160, 256)
+      - Validation of quantization effectiveness
+      - Memory usage profiling
+      - Ingestion performance testing
+    
+    implementation:
+      - Create Qdrant performance test suite
+      - Implement parameter sweep script
+      - Add query latency monitoring
+      - Test quantization accuracy (compare int8 vs full precision)
+      - Benchmark different batch sizes for ingestion
+      - Create Qdrant admin dashboard endpoint
+      - Document optimal configuration
+    
+    testingStrategy: |
+      1. Baseline measurement:
+         - Current vector count and memory usage
+         - Query latency p50/p95/p99 at current hnsw_ef
+         - Recall@10 accuracy
+      
+      2. Parameter sweep:
+         - Test hnsw_ef: 64, 96, 128, 160, 256
+         - Measure latency vs recall tradeoff
+         - Identify optimal value for workload
+      
+      3. Quantization validation:
+         - Compare quantized vs full precision results
+         - Verify >99% recall maintained
+         - Confirm memory savings (4x reduction)
+      
+      4. Ingestion optimization:
+         - Test batch_size: 500, 1000, 2000, 5000
+         - Measure throughput and memory impact
+  
+  successCriteria:
+    - Query latency p99 <10ms for unfiltered search
+    - Quantization maintains >99% recall vs full precision
+    - Memory usage ≤2.5GB for 500K vectors
+    - Optimal hnsw_ef value identified and configured
+    - Ingestion throughput ≥1000 vectors/second
+    - Performance test suite passes
+    - Configuration documented with rationale
+  
+  deliverables:
+    - file: tests/performance/test_qdrant_performance.py
+      description: Qdrant performance test suite
+    
+    - file: scripts/qdrant_parameter_sweep.py
+      description: Script to test different HNSW parameters
+    
+    - file: app/api/v1/qdrant_admin.py
+      description: Qdrant admin endpoints (stats, health, config)
+    
+    - file: docs/qdrant-optimization.md
+      description: Qdrant configuration guide with benchmark results
+    
+    - artifact: Performance benchmark report
+      description: Before/after metrics with parameter recommendations
+    
+    - telemetry: Qdrant performance metrics
+      path: cmos/telemetry/events/sprint-08-qdrant-benchmarks.jsonl
+  
+  qualityGates:
+    - gate: baseline_established
+      description: Current performance metrics captured
+      validation: Benchmark report includes baseline measurements
+    
+    - gate: parameters_optimized
+      description: Optimal hnsw_ef identified through testing
+      validation: Parameter sweep results documented
+    
+    - gate: quantization_validated
+      description: Quantization accuracy verified
+      validation: Recall >99% vs full precision
+    
+    - gate: latency_target_met
+      description: Query latency meets production target
+      validation: p99 latency <10ms achieved
+  
+  dependencies:
+    upstream: []
+    downstream:
+      - B8.5  # Dashboard will display Qdrant metrics
+  
+  risks:
+    - risk: Parameter changes degrade accuracy
+      mitigation: Validate recall after every parameter change
+    
+    - risk: Railway memory limits exceeded
+      mitigation: Monitor memory usage, adjust collection config if needed
+    
+    - risk: Performance varies by query type
+      mitigation: Test with diverse query patterns (filtered, unfiltered)
+  
+  acceptanceCriteria:
+    - Performance test suite runs successfully
+    - Parameter sweep identifies optimal hnsw_ef value
+    - Quantization verified to maintain >99% recall
+    - Query latency p99 <10ms for target workload
+    - Memory usage within 2.5GB limit for 500K vectors
+    - Qdrant admin endpoints provide stats and health checks
+    - Documentation includes benchmark results and recommendations
+  
+  estimatedEffort: small-medium
+  orchestrationPattern: none
+  
+domainFields:
+  sprint_08_optimization: true
+  roadmap_phase: 2
+  roadmap_week: 8
+  performance_impact: medium
+  monitoring_category: vector_database
+  current_config:
+    m: 16
+    ef_construct: 100
+    hnsw_ef: 128
+    quantization: int8
+    always_ram: true
+

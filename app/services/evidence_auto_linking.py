@@ -6,6 +6,7 @@ import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from difflib import SequenceMatcher
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 from uuid import UUID
@@ -19,6 +20,49 @@ from app.models.mission_protocol import MissionProtocolComplete
 _WHITESPACE = re.compile(r"\s+")
 
 
+class AutoLinkErrorType(str, Enum):
+    """Error taxonomy for evidence auto-linking failures.
+
+    Classifies why auto-linking failed to enable targeted retry strategies
+    and observability dashboards.
+    """
+
+    NO_EMBEDDING = "no_embedding"
+    """Evidence text couldn't generate embedding (empty/invalid content)."""
+
+    LOW_SIMILARITY = "low_similarity"
+    """Best match below similarity threshold (configurable, default 0.7)."""
+
+    NO_CHUNKS = "no_chunks"
+    """No chunks exist in project for matching."""
+
+    TIMEOUT = "timeout"
+    """Qdrant/embedding service timeout."""
+
+    VALIDATION_ERROR = "validation_error"
+    """Evidence structure invalid or missing required fields."""
+
+    EMPTY_CONTENT = "empty_content"
+    """Evidence summary/content is empty or whitespace-only."""
+
+    DATABASE_ERROR = "database_error"
+    """Database query failed during candidate loading."""
+
+
+@dataclass(slots=True)
+class EvidenceMatchResult:
+    """Individual evidence matching outcome with error tracking."""
+
+    evidence_id: str
+    chunk_id: Optional[str] = None
+    similarity: float = 0.0
+    summary_preview: str = ""
+    success: bool = False
+    error_type: Optional[AutoLinkErrorType] = None
+    retry_count: int = 0
+    last_error: Optional[str] = None
+
+
 @dataclass(slots=True)
 class EvidenceAutoLinkingResult:
     """Summary returned after attempting evidence-to-chunk matching."""
@@ -26,8 +70,10 @@ class EvidenceAutoLinkingResult:
     attempted: int = 0
     linked: int = 0
     skipped: int = 0
+    failed: int = 0
     threshold: float = 0.7
     matches: List[Dict[str, Any]] = field(default_factory=list)
+    errors: List[Dict[str, Any]] = field(default_factory=list)
 
     @property
     def success_rate(self) -> float:
@@ -36,14 +82,24 @@ class EvidenceAutoLinkingResult:
             return 0.0
         return round(self.linked / self.attempted, 3)
 
+    @property
+    def failure_rate(self) -> float:
+        """Return the ratio of failed items relative to attempted ones."""
+        if self.attempted <= 0:
+            return 0.0
+        return round(self.failed / self.attempted, 3)
+
     def as_dict(self) -> Dict[str, Any]:
         return {
             "attempted": self.attempted,
             "linked": self.linked,
             "skipped": self.skipped,
+            "failed": self.failed,
             "threshold": self.threshold,
             "success_rate": self.success_rate,
+            "failure_rate": self.failure_rate,
             "matches": list(self.matches),
+            "errors": list(self.errors),
         }
 
 
@@ -79,8 +135,7 @@ class EvidenceAutoLinkingService:
             return result
 
         candidates = self._load_candidates(db, project_id)
-        if not candidates:
-            return result
+        no_chunks = len(candidates) == 0
 
         threshold = max(min(result.threshold, 1.0), 0.0)
         for item in evidence_items:
@@ -90,14 +145,40 @@ class EvidenceAutoLinkingService:
 
             result.attempted += 1
             summary = self._normalize_text(item.summary)
-            best = self._best_candidate(summary, candidates)
             match_payload = {
                 "evidence_id": item.evidence_id,
                 "chunk_id": None,
                 "similarity": 0.0,
                 "summary_preview": self._preview(item.summary),
+                "success": False,
+                "error_type": None,
             }
 
+            # Check for empty content
+            if not summary:
+                result.failed += 1
+                match_payload["error_type"] = AutoLinkErrorType.EMPTY_CONTENT.value
+                result.errors.append({
+                    "evidence_id": item.evidence_id,
+                    "error_type": AutoLinkErrorType.EMPTY_CONTENT.value,
+                    "message": "Evidence summary is empty or whitespace-only",
+                })
+                result.matches.append(match_payload)
+                continue
+
+            # Check for no chunks in project
+            if no_chunks:
+                result.failed += 1
+                match_payload["error_type"] = AutoLinkErrorType.NO_CHUNKS.value
+                result.errors.append({
+                    "evidence_id": item.evidence_id,
+                    "error_type": AutoLinkErrorType.NO_CHUNKS.value,
+                    "message": "No chunks exist in project for matching",
+                })
+                result.matches.append(match_payload)
+                continue
+
+            best = self._best_candidate(summary, candidates)
             if best:
                 chunk_id, score = best
                 match_payload["similarity"] = round(score, 3)
@@ -106,7 +187,27 @@ class EvidenceAutoLinkingService:
                     item.chunk_id = chunk_str
                     item.relevance_score = round(score, 3)
                     match_payload["chunk_id"] = chunk_str
+                    match_payload["success"] = True
                     result.linked += 1
+                else:
+                    # Below threshold - classify as LOW_SIMILARITY
+                    result.failed += 1
+                    match_payload["error_type"] = AutoLinkErrorType.LOW_SIMILARITY.value
+                    result.errors.append({
+                        "evidence_id": item.evidence_id,
+                        "error_type": AutoLinkErrorType.LOW_SIMILARITY.value,
+                        "message": f"Best match ({score:.3f}) below threshold ({threshold})",
+                        "best_similarity": round(score, 3),
+                        "threshold": threshold,
+                    })
+            else:
+                result.failed += 1
+                match_payload["error_type"] = AutoLinkErrorType.NO_EMBEDDING.value
+                result.errors.append({
+                    "evidence_id": item.evidence_id,
+                    "error_type": AutoLinkErrorType.NO_EMBEDDING.value,
+                    "message": "Could not find any matching candidate",
+                })
 
             result.matches.append(match_payload)
 

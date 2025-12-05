@@ -12,6 +12,7 @@ from app.models.ingestion_job import IngestionJob
 from app.models.idempotency import IdempotencyRecord
 from app.models.search_history import SearchHistory
 from app.models.saved_search import SavedSearch
+from app.models.sync_state import SyncState
 
 __all__ = [
     "Base",
@@ -29,4 +30,5 @@ __all__ = [
     "IdempotencyRecord",
     "SearchHistory",
     "SavedSearch",
+    "SyncState",
 ]

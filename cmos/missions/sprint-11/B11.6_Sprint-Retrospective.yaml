@@ -1,0 +1,140 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B11.6
+  name: Sprint 11 Retrospective
+  sprint: Sprint 11
+  type: Build.Retrospective.v1
+  priority: standard
+  created: 2025-12-05
+  owner: assistant
+
+missionId: "B11.6"
+
+spec:
+  objective: |
+    Standard closure mission documenting correction-loop outcomes, PEDR sync
+    metrics, operator console feedback, and Sprint 12 backlog draft.
+
+  context: |
+    Sprint 11 focuses on Phase 2 integration: correction loops, PEDR delta sync,
+    and operator tooling. The retrospective captures:
+
+    1. Correction loop effectiveness (retry success rate, manual intervention %)
+    2. PEDR sync metrics (latency, parity validation)
+    3. Console usability feedback
+    4. Schema distribution adoption
+    5. Pre-flight query reuse rate
+
+    Reference: cmos/reports/sprint-10/retrospective.md (template)
+
+  researchStatement:
+    topic: Sprint 11 outcomes and Phase 3 planning
+    scope: Metrics collection, retrospective analysis, backlog drafting
+    centralHypothesis: Correction loops reduce manual intervention to <5%
+
+  keyQuestions:
+    - What % of auto-link failures self-healed via retry?
+    - Did PEDR sync latency meet <30s target?
+    - Is operator console reducing investigation time?
+    - Any schema version drift incidents?
+    - What % of DeepSearch queries used pre-flight?
+
+  technicalApproach:
+    deliverables:
+      - Retrospective report with metrics tables
+      - Telemetry JSONL compilation
+      - MASTER_CONTEXT updates
+      - Sprint 12 backlog draft
+      - Parity validation
+
+    retrospectiveTemplate: |
+      ## Executive Summary
+      [Sprint outcomes in 2-3 sentences]
+
+      ## Sprint Outcomes
+      - B11.1: [Correction loop results]
+      - B11.2: [PEDR sync metrics]
+      - B11.3: [Console feedback]
+      - B11.4: [Schema distribution status]
+      - B11.5: [Pre-flight reuse rate]
+
+      ## Metrics & Evidence
+      [Tables with quantitative results]
+
+      ## DeepSearch Coordination
+      [Integration status, issues resolved]
+
+      ## Risks & Follow-Ups
+      [Identified risks, items for Sprint 12]
+
+      ## Sprint 12 Readiness
+      [Backlog draft summary]
+
+  successCriteria:
+    - Retrospective report committed
+    - Telemetry JSONL exported
+    - MASTER_CONTEXT updated with Sprint 11 outcomes
+    - Parity validation passes
+    - Sprint 12 backlog drafted
+
+  deliverables:
+    - file: cmos/reports/sprint-11/retrospective.md
+      description: Sprint 11 retrospective report
+
+    - file: cmos/reports/sprint-11/sprint-12-backlog-draft.md
+      description: Phase 3 backlog proposal
+
+    - telemetry: Sprint 11 summary
+      path: cmos/telemetry/events/sprint-11-retro.jsonl
+
+    - context: MASTER_CONTEXT updates
+      description: Sprint 11 achievements and decisions
+
+  qualityGates:
+    - gate: metrics_captured
+      description: Quantitative outcomes documented
+      validation: Tables include success rates, latencies
+
+    - gate: telemetry_exported
+      description: All sprint telemetry compiled
+      validation: JSONL file contains sprint events
+
+    - gate: context_updated
+      description: MASTER_CONTEXT reflects Sprint 11
+      validation: Context export includes sprint outcomes
+
+    - gate: parity_valid
+      description: Database and file exports match
+      validation: validate_parity.py passes
+
+  dependencies:
+    upstream:
+      - B11.1  # Correction loop metrics
+      - B11.2  # PEDR sync metrics
+      - B11.3  # Console feedback
+      - B11.4  # Schema distribution status
+      - B11.5  # Pre-flight metrics
+    downstream: []
+
+  risks:
+    - risk: Metrics collection incomplete
+      mitigation: Standardized telemetry format, early collection
+
+  acceptanceCriteria:
+    - cmos/reports/sprint-11/retrospective.md committed
+    - Metrics tables for all 5 missions
+    - Telemetry JSONL with sprint events
+    - MASTER_CONTEXT snapshot with Sprint 11 summary
+    - Parity validation: validate_parity.py --check passes
+    - Sprint 12 backlog draft with 4-6 missions
+
+  estimatedEffort: small
+  orchestrationPattern: none
+
+domainFields:
+  sprint_11_correction: true
+  retrospective: true
+  planning: true
+  integration_category: closure

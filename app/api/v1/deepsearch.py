@@ -1,7 +1,7 @@
 """DeepSearch ingestion endpoints."""
 from __future__ import annotations
 
-from typing import Dict
+from typing import Dict, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -13,10 +13,12 @@ from app.models.mission_protocol import MissionProtocolDraft
 from app.models.project import Project
 from app.schemas.deepsearch import (
     AutoLinkingSummary,
+    CorrectionQueueInfo,
     DeepSearchIngestRequest,
     DeepSearchIngestResponse,
 )
 from app.schemas.mission import MissionCreate
+from app.services.correction_queue import get_correction_queue
 from app.services.evidence_auto_linking import EvidenceAutoLinkingService
 from app.services.mission_protocol_service import (
     MissionProtocolService,
@@ -71,6 +73,29 @@ def ingest_deepsearch_payload(
     db.commit()
     db.refresh(mission)
 
+    # Queue failed auto-link items for async correction
+    correction_info: Optional[CorrectionQueueInfo] = None
+    if auto_link_result.failed > 0:
+        correction_queue = get_correction_queue()
+        evidence_summaries = {
+            ev.evidence_id: ev.summary or ""
+            for ev in (mission_payload.evidence or [])
+        }
+        queued_ids = correction_queue.queue_failed_items(
+            mission_uuid=mission.id,
+            mission_id=mission_payload.mission_id,
+            project_id=mission.project_id,
+            result=auto_link_result,
+            callback_url=payload.callback_url,
+            evidence_summaries=evidence_summaries,
+        )
+        if queued_ids:
+            correction_info = CorrectionQueueInfo(
+                queued_count=len(queued_ids),
+                correction_ids=queued_ids,
+                callback_url=payload.callback_url,
+            )
+
     quality_summary = mission.quality_gates or report.as_dict()
     response = DeepSearchIngestResponse(
         mission_uuid=mission.id,
@@ -80,6 +105,7 @@ def ingest_deepsearch_payload(
         quality_gates_passed=True,
         quality_gates=quality_summary,
         auto_linking=AutoLinkingSummary(**auto_link_result.as_dict()),
+        corrections=correction_info,
     )
     return response
 

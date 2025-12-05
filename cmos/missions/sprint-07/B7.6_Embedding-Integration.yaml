@@ -1,0 +1,85 @@
+# Mission File: B7.6_Embedding-Integration.yaml
+
+missionId: "B7.6"
+
+objective: "Complete and verify embedding integration in document processing pipeline based on R7.1 research findings."
+
+context: |
+  Embedding integration code was added to document_ingestion.py (commit ded6527) but document 
+  processing fails with "Collection 'research_chunks' doesn't exist" errors. The code generates 
+  embeddings and calls upsert_chunks(), but Qdrant returns 404. R7.1 research will identify why 
+  collection creation fails and provide the correct setup approach.
+  
+  Current state: Embedding code exists locally (uncommitted) but doesn't work.
+
+agentNotes: |
+  ⚠️ EXISTING WORK: Embedding integration already implemented in local branch.
+  
+  Code location: app/services/document_ingestion.py lines 237-328
+  - Generates embeddings via EmbeddingService.generate_embeddings_batch()
+  - Stores via QdrantService.upsert_chunks()
+  - Sets document.embedded = True
+  - Tracks "embedded" stage in processing status
+  
+  Your task:
+  1. REVIEW code against R7.1 research findings
+  2. FIX issues identified in research (collection setup, connection config, etc)
+  3. ADD missing deliverables:
+     - tests/test_document_embedding_integration.py
+     - docs/document-processing.md
+  4. TEST locally: upload → process → verify embedded=True AND Qdrant has vectors
+  5. VERIFY error handling works (OpenAI failures, Qdrant failures)
+  
+  DO NOT rebuild from scratch. Fix and complete existing work.
+
+successCriteria:
+  - "POST /api/v1/documents/{id}/process generates embeddings for all chunks using EmbeddingService."
+  - "Embeddings stored in Qdrant via QdrantService.upsert_chunks() before process completes."
+  - "Document.embedded flag set to True after successful embedding."
+  - "Process endpoint response includes embedding status (count, duration)."
+  - "Handles OpenAI rate limits with retries and exponential backoff."
+  - "Handles Qdrant errors gracefully without corrupting document state."
+  - "Processing status events track embedding stage."
+  - "pytest coverage for embedding integration and error cases."
+  - "ACTUALLY WORKS: Documents become searchable after processing (not just code exists)."
+
+deliverables:
+  - "app/services/document_ingestion.py - Verified and fixed based on R7.1 findings."
+  - "tests/test_document_embedding_integration.py - Integration tests."
+  - "docs/document-processing.md - Complete pipeline documentation."
+  - "Validation evidence: Screenshots or logs showing successful embedding."
+
+domainFields:
+  type: "Build.Implementation.v1"
+
+  implementationScope:
+    coreDeliverable: "Working automatic embedding generation during document processing."
+    outOfScope:
+      - "Background workers or async processing (stay synchronous)."
+      - "Batch embedding optimization (use existing batch methods)."
+      - "Alternative embedding providers."
+
+  validationProtocol:
+    - validator: "Local integration test"
+      focus: "Upload document, process, verify embedded=True and Qdrant has vectors."
+    - validator: "pytest tests/test_document_embedding_integration.py"
+      focus: "Embedding generation, Qdrant storage, error handling."
+    - validator: "Search verification"
+      focus: "Processed document appears in search results."
+    - validator: "Error log review"
+      focus: "No 404 collection errors, proper error messages if failures occur."
+
+  handoffContext:
+    completed:
+      - "Document processing includes embedding step and it works."
+      - "Documents become searchable after processing."
+      - "Error handling prevents partial failures."
+      - "Tests prove reliability."
+    interfaces:
+      - "POST /api/v1/documents/{id}/process - Updated with working embedding"
+    assumptions:
+      - "R7.1 research complete with solution."
+      - "Qdrant collection can be initialized per R7.1 findings."
+      - "OpenAI API key configured."
+    nextMission: "B7.7: End-to-End Validation"
+    blockers: []

@@ -1,0 +1,145 @@
+---
+apiVersion: mission.protocol.v2
+kind: Mission
+metadata:
+  id: B9.2
+  name: Faceted Search Backend
+  sprint: Sprint 09
+  type: Build.Implementation.v1
+  priority: medium
+  created: 2025-11-15
+  owner: assistant
+
+missionId: "B9.2"
+
+spec:
+  objective: |
+    Implement backend support for faceted search filters enabling users to narrow 
+    search results by project, document type, source type, date range, and tags.
+  
+  context: |
+    Per roadmap Week 15, faceted search adds filtering capabilities to semantic/hybrid search.
+    
+    Current UI already has filter controls (project, document type, date range) but they 
+    aren't wired to backend. This mission creates the backend API to support these filters.
+    
+    Filters will be collapsed in UI initially (per B9.3 plan) but backend must support them.
+  
+  researchStatement:
+    topic: Faceted filtering for vector and keyword search results
+    scope: Qdrant metadata filters, PostgreSQL WHERE clauses, combined filtering
+    centralHypothesis: Faceted filters improve search precision by allowing corpus narrowing
+  
+  keyQuestions:
+    - How do we apply filters to both Qdrant and PostgreSQL searches?
+    - What filters are most useful for research workflows?
+    - Should filters be AND or OR logic?
+    - How do we handle filter combinations efficiently?
+  
+  technicalApproach:
+    architecture:
+      - Extend search API to accept filter parameters
+      - Apply filters to Qdrant metadata
+      - Apply filters to PostgreSQL WHERE clauses
+      - Return available facet values (for UI dropdowns)
+      - Optimize filter queries with indexes
+    
+    implementation:
+      - Add filter parameters to search endpoints (project_id, document_type, source_type, date_from, date_to, tags)
+      - Implement filter application in retrieval_service.py
+      - Add Qdrant metadata filters for project_id, document_id
+      - Add PostgreSQL WHERE clauses for document types, dates
+      - Create /api/v1/search/facets endpoint to get available filter values
+      - Add database indexes for filtered columns
+      - Update hybrid_search.py to apply filters to both sources
+      - Document filter API and usage
+    
+    filterSupport: |
+      Supported filters:
+      - project_id (exact match, single or multiple)
+      - document_type (transcript, survey, notes, report, etc)
+      - source_type (interview, survey, observation, analysis)
+      - date_from / date_to (document collection_date range)
+      - tags (if implemented, array of tag IDs)
+      
+      Filter logic: AND (all filters must match)
+      Multiple values within a filter: OR (any value matches)
+  
+  successCriteria:
+    - Search API accepts all filter parameters
+    - Filters applied to both Qdrant and PostgreSQL queries
+    - Facets endpoint returns available filter values with counts
+    - Filtered searches return only matching results
+    - Filter performance acceptable (adds <100ms)
+    - Indexes support efficient filtering
+  
+  deliverables:
+    - file: app/api/v1/search.py
+      description: Updated search endpoints with filter parameters
+    
+    - file: app/services/faceted_search.py
+      description: Faceted filtering service
+    
+    - file: app/api/v1/facets.py
+      description: Facets endpoint returning available filter values
+    
+    - file: alembic/versions/XXX_add_filter_indexes.py
+      description: Migration adding indexes for filtered columns
+    
+    - file: tests/test_faceted_search.py
+      description: Faceted filtering tests
+    
+    - file: docs/search-filters.md
+      description: Filter API documentation
+  
+  qualityGates:
+    - gate: filters_applied
+      description: All filters correctly narrow results
+      validation: Test queries with each filter type
+    
+    - gate: facets_accurate
+      description: Facets endpoint returns correct counts
+      validation: Verify counts match actual data
+    
+    - gate: performance_maintained
+      description: Filtering doesn't degrade performance
+      validation: Filtered queries add <100ms latency
+  
+  dependencies:
+    upstream:
+      - B9.1  # Hybrid search service to extend
+    downstream:
+      - B9.3  # UI will use facets endpoint
+  
+  risks:
+    - risk: Complex filter combinations slow queries
+      mitigation: Add compound indexes for common filter combos
+    
+    - risk: Qdrant metadata filters limited
+      mitigation: Pre-filter in PostgreSQL if needed
+  
+  acceptanceCriteria:
+    - All 5 filter types implemented and working
+    - Facets endpoint returns filter options with counts
+    - Filtered searches return correct results
+    - Performance tests show <100ms filter overhead
+    - Filter indexes added to database
+    - Documentation covers all filter parameters
+    - Tests verify filter logic for all combinations
+  
+  estimatedEffort: medium
+  orchestrationPattern: none
+  
+domainFields:
+  sprint_09_advanced_search: true
+  roadmap_phase: 4
+  roadmap_week: 15
+  performance_impact: low
+  search_category: faceted_filtering
+  supported_filters:
+    - project_id
+    - document_type
+    - source_type
+    - date_range
+    - tags
+
