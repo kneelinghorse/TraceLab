@@ -30,6 +30,11 @@ from .sync_events import (
     emit_batch_sync_requested,
     get_sync_event_emitter,
 )
+from .preflight import (
+    PreflightThresholds,
+    PreflightService,
+    get_preflight_service,
+)
 
 __all__ = [
     # Quality scoring
@@ -58,4 +63,8 @@ __all__ = [
     "emit_document_processed",
     "emit_batch_sync_requested",
     "get_sync_event_emitter",
+    # Pre-flight queries
+    "PreflightThresholds",
+    "PreflightService",
+    "get_preflight_service",
 ]
