@@ -5,6 +5,8 @@ from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.api.v1 import (
     admin,
@@ -35,6 +37,38 @@ from app.core.security import require_authenticated_user
 from app.onboarding import router as onboarding_router
 from app.services.metrics_aggregator import MetricsAggregator, get_metrics_aggregator
 
+class ProxyHeadersMiddleware:
+    """Middleware to trust X-Forwarded-Proto header from reverse proxies.
+
+    When running behind Cloudflare/Railway, this ensures FastAPI uses HTTPS
+    in redirect URLs instead of HTTP, preventing auth header stripping.
+    """
+
+    def __init__(self, app: ASGIApp, trusted_hosts: list[str] | None = None):
+        self.app = app
+        self.trusted_hosts = trusted_hosts or ["*"]
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send):
+        if scope["type"] in ("http", "websocket"):
+            headers = dict(scope.get("headers", []))
+
+            # Trust X-Forwarded-Proto header to set correct scheme
+            forwarded_proto = headers.get(b"x-forwarded-proto", b"").decode("latin-1")
+            if forwarded_proto:
+                scope["scheme"] = forwarded_proto
+
+            # Trust X-Forwarded-Host if present
+            forwarded_host = headers.get(b"x-forwarded-host", b"").decode("latin-1")
+            if forwarded_host:
+                # Update host header in scope
+                scope["headers"] = [
+                    (k, v) if k != b"host" else (k, forwarded_host.encode("latin-1"))
+                    for k, v in scope.get("headers", [])
+                ]
+
+        await self.app(scope, receive, send)
+
+
 # Create tables in development (use migrations in production)
 if settings.environment == "development":
     Base.metadata.create_all(bind=engine)
@@ -60,6 +94,10 @@ app.add_middleware(
     allow_methods=settings.cors_allowed_methods,
     allow_headers=settings.cors_allowed_headers,
 )
+
+# Add proxy headers middleware to trust X-Forwarded-* headers from Cloudflare/Railway
+# This ensures redirects use HTTPS instead of HTTP, preserving auth headers
+app.add_middleware(ProxyHeadersMiddleware)
 
 protected_dependencies = [Depends(require_authenticated_user)]
 
