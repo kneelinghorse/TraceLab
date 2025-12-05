@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.schemas.mission import MissionCreate, MissionRead, MissionUpdate
+from app.schemas.pagination import ListResponse
 from app.schemas.mission_protocol import (
     MissionExportResponse,
     MissionImportRequest,
@@ -42,14 +43,14 @@ def _raise_http_error(error: MissionProtocolServiceError) -> None:
     raise HTTPException(status_code=status_code, detail=str(error)) from error
 
 
-@router.get("/", response_model=List[MissionRead])
+@router.get("/", response_model=ListResponse[MissionRead])
 def list_missions(
     project_id: Optional[UUID] = None,
     db: Session = Depends(get_db),
-) -> List[MissionRead]:
+) -> ListResponse[MissionRead]:
     try:
         missions = _service.list_missions(db, project_id=project_id)
-        return [_mission_read(mission) for mission in missions]
+        return ListResponse(data=[_mission_read(mission) for mission in missions])
     except SQLAlchemyError as exc:
         logger.exception("Database error listing missions")
         error_str = str(exc)

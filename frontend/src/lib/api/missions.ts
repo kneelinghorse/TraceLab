@@ -8,8 +8,13 @@ import type {
 
 const MISSIONS_PATH = "/missions";
 
+interface ListResponse<T> {
+  data: T[];
+}
+
 export async function fetchMissions(): Promise<Mission[]> {
-  return apiRequest<Mission[]>(`${MISSIONS_PATH}`);
+  const response = await apiRequest<ListResponse<Mission>>(`${MISSIONS_PATH}`);
+  return response.data;
 }
 
 export async function fetchMission(missionId: string): Promise<Mission> {

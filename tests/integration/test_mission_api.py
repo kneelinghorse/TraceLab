@@ -136,7 +136,9 @@ def test_import_yaml_endpoint(client: TestClient, project):
 
     list_resp = client.get(f"/api/v1/missions/?project_id={project.id}")
     assert list_resp.status_code == 200
-    missions = list_resp.json()
+    response_data = list_resp.json()
+    assert "data" in response_data, "Response should have 'data' key for consistency"
+    missions = response_data["data"]
     assert any(item["mission_data"]["mission_id"] == "B3.2-import" for item in missions)
 
 
