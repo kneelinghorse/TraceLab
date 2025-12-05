@@ -1,0 +1,181 @@
+name: Schema Version Check
+
+on:
+  pull_request:
+    paths:
+      - 'tracelab_schemas/**'
+      - 'requirements*.txt'
+      - 'pyproject.toml'
+
+jobs:
+  validate-version:
+    name: Validate schema version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pydantic packaging
+
+      - name: Check version format (semver)
+        run: |
+          cd tracelab_schemas
+          VERSION=$(python -c "from tracelab_schemas.version import __version__; print(__version__)")
+
+          # Validate semver format: MAJOR.MINOR.PATCH or MAJOR.MINOR.PATCH-prerelease
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$'; then
+            echo "ERROR: Version '$VERSION' does not follow semantic versioning"
+            echo "Expected format: MAJOR.MINOR.PATCH or MAJOR.MINOR.PATCH-prerelease"
+            exit 1
+          fi
+
+          echo "Version format valid: $VERSION"
+
+      - name: Check CHANGELOG has version entry
+        run: |
+          cd tracelab_schemas
+          VERSION=$(python -c "from tracelab_schemas.version import __version__; print(__version__)")
+
+          if ! grep -q "## \[$VERSION\]" CHANGELOG.md 2>/dev/null; then
+            echo "WARNING: No CHANGELOG entry found for version $VERSION"
+            echo "Please add a changelog entry before releasing"
+          else
+            echo "CHANGELOG entry found for version $VERSION"
+          fi
+
+      - name: Check for breaking changes
+        run: |
+          cd tracelab_schemas
+          VERSION=$(python -c "from tracelab_schemas.version import __version__; print(__version__)")
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+
+          # If bumping major version, ensure breaking changes are documented
+          if [ "$MAJOR" != "1" ]; then
+            if ! grep -q "BREAKING" CHANGELOG.md 2>/dev/null; then
+              echo "WARNING: Major version bump detected but no BREAKING changes in CHANGELOG"
+            fi
+          fi
+
+          echo "Breaking change check complete"
+
+  schema-parity:
+    name: Verify schema parity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pydantic
+
+      - name: Check TraceLab imports schema package
+        run: |
+          # Verify app/models/mission_protocol.py uses the schema package
+          if grep -q "from tracelab_schemas" app/models/mission_protocol.py 2>/dev/null; then
+            echo "TraceLab correctly imports from tracelab_schemas package"
+          else
+            echo "INFO: TraceLab may have local mission_protocol definitions"
+            echo "Consider migrating to use tracelab_schemas package for parity"
+          fi
+
+      - name: Validate schema models
+        run: |
+          cd tracelab_schemas
+          python -c "
+          from tracelab_schemas import MissionProtocolComplete, MissionProtocolDraft
+          from tracelab_schemas.version import __version__
+
+          print(f'Schema package version: {__version__}')
+          print(f'MissionProtocolComplete fields: {len(MissionProtocolComplete.model_fields)}')
+          print(f'MissionProtocolDraft fields: {len(MissionProtocolDraft.model_fields)}')
+          print('Schema validation successful')
+          "
+
+  notify-version-change:
+    name: Notify on version change
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check for version change
+        id: version_check
+        run: |
+          # Get current version
+          CURRENT=$(python -c "
+          import sys
+          sys.path.insert(0, 'tracelab_schemas')
+          from tracelab_schemas.version import __version__
+          print(__version__)
+          ")
+
+          # Get base branch version
+          git fetch origin ${{ github.base_ref }} --depth=1
+          git checkout origin/${{ github.base_ref }} -- tracelab_schemas/tracelab_schemas/version.py 2>/dev/null || true
+
+          BASE=$(python -c "
+          import sys
+          sys.path.insert(0, 'tracelab_schemas')
+          try:
+              from tracelab_schemas.version import __version__
+              print(__version__)
+          except:
+              print('0.0.0')
+          " 2>/dev/null || echo "0.0.0")
+
+          # Restore current version
+          git checkout HEAD -- tracelab_schemas/tracelab_schemas/version.py 2>/dev/null || true
+
+          echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
+          echo "base=$BASE" >> "$GITHUB_OUTPUT"
+
+          if [ "$CURRENT" != "$BASE" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Version changed: $BASE -> $CURRENT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Version unchanged: $CURRENT"
+          fi
+
+      - name: Add version change comment
+        if: steps.version_check.outputs.changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## Schema Version Update
+
+            **Version changed:** \`${{ steps.version_check.outputs.base }}\` → \`${{ steps.version_check.outputs.current }}\`
+
+            ### Checklist
+            - [ ] CHANGELOG.md updated with version entry
+            - [ ] Breaking changes documented (if major bump)
+            - [ ] DeepSearch team notified (if integration-breaking)
+
+            After merging, create a release tag:
+            \`\`\`bash
+            git tag schemas-v${{ steps.version_check.outputs.current }}
+            git push origin schemas-v${{ steps.version_check.outputs.current }}
+            \`\`\``
+            })
