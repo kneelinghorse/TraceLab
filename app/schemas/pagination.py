@@ -25,3 +25,9 @@ class PaginatedResponse(GenericModel, Generic[T]):
     data: List[T]
     pagination: PaginationMeta
 
+
+class ListResponse(GenericModel, Generic[T]):
+    """Standard envelope for non-paginated list endpoints."""
+
+    data: List[T]
+
