@@ -449,6 +449,76 @@ Exported from TraceLab`;
   });
 });
 
+describe('uploadDocument', () => {
+  let client: TraceLabClient;
+
+  beforeEach(() => {
+    client = new TraceLabClient({
+      baseUrl: 'http://localhost:8000',
+      token: 'test-token',
+    });
+    mockFetch.mockReset();
+  });
+
+  it('should upload a document with base64 content', async () => {
+    const mockResponse = {
+      id: 'doc-new',
+      name: 'research.md',
+      project_id: 'proj-1',
+      file_type: 'notes',
+      file_size: 1024,
+      mime_type: 'text/markdown',
+      processed: false,
+      validation_status: 'pending',
+      created_at: '2024-01-01T00:00:00Z',
+    };
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: () => Promise.resolve(mockResponse),
+    });
+
+    const result = await client.uploadDocument({
+      name: 'research.md',
+      content: 'IyBSZXNlYXJjaCBGaW5kaW5ncw==', // base64 for "# Research Findings"
+      content_type: 'text/markdown',
+      project_id: 'proj-1',
+    });
+
+    expect(result.id).toBe('doc-new');
+    expect(result.name).toBe('research.md');
+    expect(result.processed).toBe(false);
+    expect(mockFetch).toHaveBeenCalledWith(
+      'http://localhost:8000/api/v1/documents/upload?project_id=proj-1',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({
+          Authorization: 'Bearer test-token',
+        }),
+      })
+    );
+  });
+
+  it('should handle upload errors', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 400,
+      statusText: 'Bad Request',
+      json: () => Promise.resolve({ detail: 'Unsupported file format' }),
+    });
+
+    await expect(
+      client.uploadDocument({
+        name: 'file.exe',
+        content: 'YmFkY29udGVudA==',
+        content_type: 'application/pdf', // lying about content type
+        project_id: 'proj-1',
+      })
+    ).rejects.toThrow(TraceLabAPIError);
+  });
+});
+
 describe('Authentication', () => {
   it('should use JWT token when provided', async () => {
     const client = new TraceLabClient({

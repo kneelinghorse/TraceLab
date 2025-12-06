@@ -2,7 +2,7 @@
 /**
  * TraceLab MCP Server
  *
- * Provides 12 tools for AI agents to perform complete research-to-output loops
+ * Provides 13 tools for AI agents to perform complete research-to-output loops
  * against TraceLab's knowledge base.
  *
  * Tools:
@@ -18,6 +18,7 @@
  * 10. list_reports - Browse existing reports
  * 11. get_report - Get full report details
  * 12. export_report - Export report as markdown
+ * 13. upload_document - Upload a new document to TraceLab
  */
 export {};
 //# sourceMappingURL=index.d.ts.map
