@@ -12,6 +12,7 @@ from app.api.v1 import (
     admin,
     auth,
     cache,
+    collections,
     corrections,
     deepsearch,
     documents,
@@ -135,6 +136,12 @@ app.include_router(
     saved_searches.router,
     prefix=settings.api_v1_prefix,
     tags=["saved-searches"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    collections.router,
+    prefix=f"{settings.api_v1_prefix}/collections",
+    tags=["collections"],
     dependencies=protected_dependencies,
 )
 app.include_router(facets.router, prefix=settings.api_v1_prefix, tags=["facets"], dependencies=protected_dependencies)
