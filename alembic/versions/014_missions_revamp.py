@@ -40,7 +40,9 @@ def upgrade() -> None:
         existing_columns = {col["name"] for col in inspector.get_columns("missions")}
 
         # Check if this is the old schema (has mission_data column)
-        if "mission_data" in existing_columns:
+        has_old_schema = "mission_data" in existing_columns
+
+        if has_old_schema:
             # We need to drop old columns and add new ones
             # First, drop old constraints
             try:
@@ -52,11 +54,6 @@ def upgrade() -> None:
                 op.drop_index("idx_missions_project_status", table_name="missions")
             except Exception:
                 pass
-
-            # Drop old columns that we're replacing
-            for old_col in ["mission_data", "quality_gates", "evidence_linking_metadata", "completion_percentage"]:
-                if old_col in existing_columns:
-                    op.drop_column("missions", old_col)
 
         # Add new columns if they don't exist
         new_columns = {
@@ -129,6 +126,74 @@ def upgrade() -> None:
         for col_name, col_def in new_columns.items():
             if col_name not in current_columns:
                 op.add_column("missions", col_def)
+
+        # Migrate data from old mission_data column to new columns
+        if has_old_schema and is_pg:
+            # Extract data from mission_data JSON blob
+            op.execute("""
+                UPDATE missions SET
+                    mission_id = COALESCE(
+                        mission_data->>'mission_id',
+                        'MIGRATED-' || LEFT(id::text, 8)
+                    ),
+                    title = COALESCE(
+                        mission_data->>'title',
+                        'Migrated Mission'
+                    ),
+                    objective = COALESCE(
+                        mission_data->'research_statement'->>'objective',
+                        mission_data->>'objective',
+                        'Objective to be defined'
+                    ),
+                    success_criteria = COALESCE(
+                        mission_data->'success_criteria',
+                        '["TBD"]'::jsonb
+                    )
+                WHERE mission_data IS NOT NULL
+            """)
+            # Set defaults for rows without mission_data
+            op.execute("""
+                UPDATE missions SET
+                    mission_id = 'MIGRATED-' || LEFT(id::text, 8),
+                    title = 'Migrated Mission',
+                    objective = 'Objective to be defined',
+                    success_criteria = '["TBD"]'::jsonb
+                WHERE mission_id IS NULL
+            """)
+
+        # Drop old columns AFTER data migration
+        if has_old_schema:
+            for old_col in ["mission_data", "quality_gates", "evidence_linking_metadata", "completion_percentage"]:
+                if old_col in existing_columns:
+                    op.drop_column("missions", old_col)
+
+        # Deduplicate mission_ids by appending row number for duplicates
+        if is_pg:
+            op.execute("""
+                WITH duplicates AS (
+                    SELECT id, mission_id,
+                           ROW_NUMBER() OVER (PARTITION BY mission_id ORDER BY created_at) as rn
+                    FROM missions
+                    WHERE mission_id IS NOT NULL
+                )
+                UPDATE missions m
+                SET mission_id = d.mission_id || '-DUP' || d.rn
+                FROM duplicates d
+                WHERE m.id = d.id AND d.rn > 1
+            """)
+
+        # Make required columns NOT NULL after data migration
+        if is_pg:
+            op.alter_column("missions", "mission_id", nullable=False)
+            op.alter_column("missions", "title", nullable=False)
+            op.alter_column("missions", "objective", nullable=False)
+            op.alter_column("missions", "success_criteria", nullable=False)
+
+        # Add unique constraint on mission_id
+        try:
+            op.create_unique_constraint("uq_missions_mission_id", "missions", ["mission_id"])
+        except Exception:
+            pass
 
         # Add indexes
         try:
@@ -242,16 +307,43 @@ def upgrade() -> None:
         op.create_index("idx_missions_deepsearch_job_id", "missions", ["deepsearch_job_id"])
         op.create_index("idx_missions_project_status", "missions", ["project_id", "status"])
 
+    # Migrate existing status values to new schema before adding constraints
+    # Old schema: 'draft', 'in_progress', 'review', 'complete'
+    # New schema: 'draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled'
+    op.execute("""
+        UPDATE missions SET status = 'completed' WHERE status = 'complete'
+    """)
+    op.execute("""
+        UPDATE missions SET status = 'in_progress' WHERE status = 'review'
+    """)
+    # Set any other unexpected values to 'draft'
+    op.execute("""
+        UPDATE missions SET status = 'draft'
+        WHERE status IS NULL
+           OR status NOT IN ('draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled')
+    """)
+
     # Add constraints (PostgreSQL only for now due to JSON function differences)
     if is_pg:
-        # Success criteria must be non-empty array
+        # Success criteria must be non-empty array - only if success_criteria column has data
+        # Skip this constraint if there are rows with NULL or empty success_criteria
+        op.execute("""
+            UPDATE missions SET success_criteria = '["TBD"]'::jsonb
+            WHERE success_criteria IS NULL
+               OR jsonb_typeof(success_criteria) != 'array'
+               OR jsonb_array_length(success_criteria) = 0
+        """)
         op.execute("""
             ALTER TABLE missions
             ADD CONSTRAINT success_criteria_not_empty
             CHECK (jsonb_array_length(success_criteria) > 0)
         """)
 
-        # Title length constraint
+        # Title length constraint - ensure titles meet requirements
+        op.execute("""
+            UPDATE missions SET title = CONCAT(COALESCE(title, ''), ' (migrated)')
+            WHERE title IS NULL OR char_length(title) < 3
+        """)
         op.execute("""
             ALTER TABLE missions
             ADD CONSTRAINT title_length
@@ -286,6 +378,12 @@ def downgrade() -> None:
                 op.drop_constraint("valid_mission_status", "missions", type_="check")
             except Exception:
                 pass
+
+        # Drop unique constraint
+        try:
+            op.drop_constraint("uq_missions_mission_id", "missions", type_="unique")
+        except Exception:
+            pass
 
         # Drop new indexes
         for idx in [
