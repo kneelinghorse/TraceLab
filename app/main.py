@@ -27,6 +27,7 @@ from app.api.v1 import (
     quality,
     quality_automated,
     redaction,
+    reports,
     retrieval,
     search,
     search_history,
@@ -181,6 +182,12 @@ app.include_router(
 )
 app.include_router(monitoring.router, prefix=f"{settings.api_v1_prefix}/monitoring", tags=["monitoring"], dependencies=protected_dependencies)
 app.include_router(synthesize.router, prefix=settings.api_v1_prefix, tags=["synthesize"], dependencies=protected_dependencies)
+app.include_router(
+    reports.router,
+    prefix=f"{settings.api_v1_prefix}/reports",
+    tags=["reports"],
+    dependencies=protected_dependencies,
+)
 app.include_router(onboarding_router, prefix=settings.api_v1_prefix, dependencies=protected_dependencies)
 app.include_router(auth.router, prefix=f"{settings.api_v1_prefix}/auth", tags=["auth"])
 
