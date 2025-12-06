@@ -26,9 +26,9 @@ class SynthesizeRequest(BaseModel):
         max_length=2000,
         description="Custom instruction for synthesis (default: 'Summarize the following documents')",
     )
-    format: Literal["summary", "report", "bullets"] = Field(
-        default="summary",
-        description="Output format: summary (prose), report (structured), bullets (list)",
+    format: Literal["markdown", "summary", "report", "bullets"] = Field(
+        default="markdown",
+        description="Output format: markdown (default prose), summary (prose), report (structured), bullets (list)",
     )
 
     @model_validator(mode="after")
@@ -49,9 +49,9 @@ class CitationInfo(BaseModel):
     """Citation reference back to source chunk."""
 
     chunk_id: UUID = Field(description="UUID of the source chunk")
-    document_name: Optional[str] = Field(
+    document_id: Optional[UUID] = Field(
         default=None,
-        description="Name of the source document",
+        description="UUID of the source document",
     )
     excerpt: str = Field(
         description="First ~100 characters of the chunk content",

@@ -64,7 +64,7 @@ def synthesize(
     citations = [
         CitationInfo(
             chunk_id=c["chunk_id"],
-            document_name=c.get("document_name"),
+            document_id=c.get("document_id"),
             excerpt=c.get("excerpt", ""),
         )
         for c in result.get("citations", [])
