@@ -2,7 +2,7 @@
 /**
  * TraceLab MCP Server
  *
- * Provides 12 tools for AI agents to perform complete research-to-output loops
+ * Provides 13 tools for AI agents to perform complete research-to-output loops
  * against TraceLab's knowledge base.
  *
  * Tools:
@@ -18,6 +18,7 @@
  * 10. list_reports - Browse existing reports
  * 11. get_report - Get full report details
  * 12. export_report - Export report as markdown
+ * 13. upload_document - Upload a new document to TraceLab
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -308,6 +309,52 @@ const TOOLS: Tool[] = [
       required: ['report_id'],
     },
   },
+  {
+    name: 'upload_document',
+    description:
+      'Upload a new document to TraceLab for ingestion. Supports PDF, DOCX, PPTX, CSV, XLSX, Markdown, TXT, JSON, XML, and YAML files. The document will be processed through the ingestion pipeline (parsing, PII redaction, chunking, embedding).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Filename or document name (e.g., "research-paper.pdf")',
+        },
+        content: {
+          type: 'string',
+          description: 'Base64 encoded file content',
+        },
+        content_type: {
+          type: 'string',
+          description:
+            'MIME type of the file (e.g., "application/pdf", "text/markdown", "text/plain")',
+          enum: [
+            'application/pdf',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'text/csv',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'text/markdown',
+            'text/plain',
+            'application/json',
+            'application/xml',
+            'text/xml',
+            'application/x-yaml',
+            'text/yaml',
+          ],
+        },
+        project_id: {
+          type: 'string',
+          description: 'UUID of the project to add the document to',
+        },
+        description: {
+          type: 'string',
+          description: 'Optional description of the document',
+        },
+      },
+      required: ['name', 'content', 'content_type', 'project_id'],
+    },
+  },
 ];
 
 // Input validation schemas
@@ -371,6 +418,27 @@ const GetReportInput = z.object({
 
 const ExportReportInput = z.object({
   report_id: z.string().uuid(),
+});
+
+const UploadDocumentInput = z.object({
+  name: z.string().min(1),
+  content: z.string().min(1), // base64 encoded
+  content_type: z.enum([
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'text/csv',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/markdown',
+    'text/plain',
+    'application/json',
+    'application/xml',
+    'text/xml',
+    'application/x-yaml',
+    'text/yaml',
+  ]),
+  project_id: z.string().uuid(),
+  description: z.string().optional(),
 });
 
 // Tool handlers
@@ -769,6 +837,90 @@ async function handleExportReport(args: unknown) {
   };
 }
 
+async function handleUploadDocument(args: unknown) {
+  const input = UploadDocumentInput.parse(args);
+
+  // Validate base64 content (basic check)
+  try {
+    const decoded = Buffer.from(input.content, 'base64');
+    if (decoded.length === 0) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                error: 'Invalid content',
+                message: 'Base64 content decodes to empty data',
+              },
+              null,
+              2
+            ),
+          },
+        ],
+        isError: true,
+      };
+    }
+  } catch {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(
+            {
+              error: 'Invalid base64',
+              message: 'Content must be valid base64 encoded data',
+            },
+            null,
+            2
+          ),
+        },
+      ],
+      isError: true,
+    };
+  }
+
+  const result = await client.uploadDocument({
+    name: input.name,
+    content: input.content,
+    content_type: input.content_type,
+    project_id: input.project_id,
+    description: input.description,
+  });
+
+  return {
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(
+          {
+            message: `Document "${result.name}" uploaded successfully`,
+            document: {
+              id: result.id,
+              name: result.name,
+              project_id: result.project_id,
+              file_type: result.file_type,
+              file_size: result.file_size,
+              mime_type: result.mime_type,
+              processed: result.processed,
+              validation_status: result.validation_status,
+              created_at: result.created_at,
+            },
+            next_steps: [
+              `Document ID: ${result.id}`,
+              'The document is now queued for processing (parsing, PII redaction, chunking, embedding).',
+              `To process immediately, call POST /api/v1/documents/${result.id}/process`,
+              'Once processed, the document will be searchable via search_knowledge.',
+            ],
+          },
+          null,
+          2
+        ),
+      },
+    ],
+  };
+}
+
 // Create and run the server
 async function main() {
   const server = new Server(
@@ -818,6 +970,8 @@ async function main() {
           return await handleGetReport(args);
         case 'export_report':
           return await handleExportReport(args);
+        case 'upload_document':
+          return await handleUploadDocument(args);
         default:
           return {
             content: [

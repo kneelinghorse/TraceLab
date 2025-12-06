@@ -158,6 +158,24 @@ export interface ReportListResponse {
     page: number;
     page_size: number;
 }
+export interface DocumentUploadRequest {
+    name: string;
+    content: string;
+    content_type: string;
+    project_id: string;
+    description?: string;
+}
+export interface DocumentUploadResponse {
+    id: string;
+    name: string;
+    project_id: string;
+    file_type: string;
+    file_size: number;
+    mime_type: string;
+    processed: boolean;
+    validation_status: string;
+    created_at: string;
+}
 export declare class TraceLabAPIError extends Error {
     statusCode: number;
     response?: unknown | undefined;
@@ -218,5 +236,10 @@ export declare class TraceLabClient {
      * For MVP, returns the content field directly
      */
     exportReport(reportId: string): Promise<string>;
+    /**
+     * Upload a document to TraceLab
+     * Accepts base64 encoded content and sends as multipart/form-data
+     */
+    uploadDocument(data: DocumentUploadRequest): Promise<DocumentUploadResponse>;
 }
 //# sourceMappingURL=api-client.d.ts.map

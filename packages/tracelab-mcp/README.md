@@ -4,7 +4,7 @@ MCP (Model Context Protocol) server that enables AI agents to perform complete r
 
 ## Features
 
-- **12 research tools** for semantic search, collection management, synthesis, and report generation
+- **13 research tools** for semantic search, collection management, synthesis, report generation, and document upload
 - **Full research workflow** - search, collect, synthesize, persist
 - **Persistent reports** - save synthesis results as named artifacts that survive across sessions
 - **Multiple auth methods** - JWT tokens or API keys
@@ -260,6 +260,31 @@ Parameters:
 - report_id (required): UUID of the report
 ```
 
+### 13. upload_document
+
+Upload a new document to TraceLab for ingestion. The document will be processed through the ingestion pipeline (parsing, PII redaction, chunking, embedding).
+
+```
+Parameters:
+- name (required): Filename or document name (e.g., "research-paper.pdf")
+- content (required): Base64 encoded file content
+- content_type (required): MIME type of the file
+- project_id (required): UUID of the project to add the document to
+- description: Optional description of the document
+
+Supported content types:
+- application/pdf (.pdf)
+- application/vnd.openxmlformats-officedocument.wordprocessingml.document (.docx)
+- application/vnd.openxmlformats-officedocument.presentationml.presentation (.pptx)
+- text/csv (.csv)
+- application/vnd.openxmlformats-officedocument.spreadsheetml.sheet (.xlsx)
+- text/markdown (.md)
+- text/plain (.txt)
+- application/json (.json)
+- application/xml, text/xml (.xml)
+- application/x-yaml, text/yaml (.yaml, .yml)
+```
+
 ## Example Research Workflow
 
 Here's how an AI agent might use these tools to complete a research task:
@@ -308,6 +333,49 @@ Or export raw collection:
 
 ```
 export_collection(collection_id="...")
+```
+
+## Example Document Upload Workflow
+
+AI agents can upload documents they discover or generate for later search:
+
+1. **Upload a document** (from base64 content)
+   ```
+   upload_document(
+     name="research-findings.md",
+     content="IyBSZXNlYXJjaCBGaW5kaW5ncwoK...",  // base64 encoded
+     content_type="text/markdown",
+     project_id="uuid-of-project"
+   )
+   ```
+
+2. **Wait for processing** (optional)
+   The document is queued for processing. You can immediately continue working,
+   or poll the document status via the API.
+
+3. **Search the new content**
+   ```
+   search_knowledge(query="findings from uploaded research", project_id="...")
+   ```
+
+### Converting files to base64
+
+**In JavaScript/TypeScript:**
+```javascript
+const content = fs.readFileSync('document.pdf');
+const base64 = content.toString('base64');
+```
+
+**In Python:**
+```python
+import base64
+with open('document.pdf', 'rb') as f:
+    base64_content = base64.b64encode(f.read()).decode('utf-8')
+```
+
+**In shell:**
+```bash
+base64 < document.pdf
 ```
 
 ## Development

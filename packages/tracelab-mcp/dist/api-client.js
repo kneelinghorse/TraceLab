@@ -150,5 +150,43 @@ export class TraceLabClient {
         const report = await this.getReport(reportId);
         return report.content;
     }
+    /**
+     * Upload a document to TraceLab
+     * Accepts base64 encoded content and sends as multipart/form-data
+     */
+    async uploadDocument(data) {
+        const url = `${this.baseUrl}/api/v1/documents/upload?project_id=${encodeURIComponent(data.project_id)}`;
+        // Decode base64 content to binary
+        const binaryContent = Buffer.from(data.content, 'base64');
+        // Create a Blob from the binary content
+        const blob = new Blob([binaryContent], { type: data.content_type });
+        // Create FormData with the file
+        const formData = new FormData();
+        formData.append('file', blob, data.name);
+        // Build headers without Content-Type (browser sets it with boundary)
+        const headers = {};
+        if (this.headers['Authorization']) {
+            headers['Authorization'] = this.headers['Authorization'];
+        }
+        if (this.headers['X-API-Key']) {
+            headers['X-API-Key'] = this.headers['X-API-Key'];
+        }
+        const response = await fetch(url, {
+            method: 'POST',
+            headers,
+            body: formData,
+        });
+        if (!response.ok) {
+            let errorBody;
+            try {
+                errorBody = await response.json();
+            }
+            catch {
+                errorBody = await response.text();
+            }
+            throw new TraceLabAPIError(`Upload failed: ${response.status} ${response.statusText}`, response.status, errorBody);
+        }
+        return (await response.json());
+    }
 }
 //# sourceMappingURL=api-client.js.map

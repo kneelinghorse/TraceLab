@@ -181,6 +181,27 @@ export interface ReportListResponse {
   page_size: number;
 }
 
+// Document upload types
+export interface DocumentUploadRequest {
+  name: string;
+  content: string; // base64 encoded file content
+  content_type: string; // MIME type
+  project_id: string;
+  description?: string;
+}
+
+export interface DocumentUploadResponse {
+  id: string;
+  name: string;
+  project_id: string;
+  file_type: string;
+  file_size: number;
+  mime_type: string;
+  processed: boolean;
+  validation_status: string;
+  created_at: string;
+}
+
 export class TraceLabAPIError extends Error {
   constructor(
     message: string,
@@ -387,5 +408,55 @@ export class TraceLabClient {
   async exportReport(reportId: string): Promise<string> {
     const report = await this.getReport(reportId);
     return report.content;
+  }
+
+  /**
+   * Upload a document to TraceLab
+   * Accepts base64 encoded content and sends as multipart/form-data
+   */
+  async uploadDocument(data: DocumentUploadRequest): Promise<DocumentUploadResponse> {
+    const url = `${this.baseUrl}/api/v1/documents/upload?project_id=${encodeURIComponent(data.project_id)}`;
+
+    // Decode base64 content to binary
+    const binaryContent = Buffer.from(data.content, 'base64');
+
+    // Create a Blob from the binary content
+    const blob = new Blob([binaryContent], { type: data.content_type });
+
+    // Create FormData with the file
+    const formData = new FormData();
+    formData.append('file', blob, data.name);
+
+    // Build headers without Content-Type (browser sets it with boundary)
+    const headers: Record<string, string> = {};
+    if (this.headers['Authorization']) {
+      headers['Authorization'] = this.headers['Authorization'];
+    }
+    if (this.headers['X-API-Key']) {
+      headers['X-API-Key'] = this.headers['X-API-Key'];
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      let errorBody: unknown;
+      try {
+        errorBody = await response.json();
+      } catch {
+        errorBody = await response.text();
+      }
+
+      throw new TraceLabAPIError(
+        `Upload failed: ${response.status} ${response.statusText}`,
+        response.status,
+        errorBody
+      );
+    }
+
+    return (await response.json()) as DocumentUploadResponse;
   }
 }
