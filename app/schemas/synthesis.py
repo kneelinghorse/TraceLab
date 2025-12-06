@@ -11,6 +11,9 @@ class SynthesizeRequest(BaseModel):
     """Request payload for /api/v1/synthesize endpoint.
 
     Either collection_id OR chunk_ids must be provided (not both).
+
+    Optional: Set save_as_report=true with a report_title to persist
+    the synthesis result as a report in a single API call.
     """
 
     collection_id: Optional[UUID] = Field(
@@ -30,6 +33,19 @@ class SynthesizeRequest(BaseModel):
         default="markdown",
         description="Output format: markdown (default prose), summary (prose), report (structured), bullets (list)",
     )
+    save_as_report: bool = Field(
+        default=False,
+        description="If true, persist the synthesis result as a report",
+    )
+    report_title: Optional[str] = Field(
+        default=None,
+        max_length=255,
+        description="Title for the report (required if save_as_report=true)",
+    )
+    project_id: Optional[UUID] = Field(
+        default=None,
+        description="Project UUID to associate the report with (optional, only used if save_as_report=true)",
+    )
 
     @model_validator(mode="after")
     def validate_source_input(self) -> "SynthesizeRequest":
@@ -42,6 +58,13 @@ class SynthesizeRequest(BaseModel):
         if has_collection and has_chunks:
             raise ValueError("Provide either collection_id or chunk_ids, not both.")
 
+        return self
+
+    @model_validator(mode="after")
+    def validate_report_params(self) -> "SynthesizeRequest":
+        """Ensure report_title is provided when save_as_report is true."""
+        if self.save_as_report and not self.report_title:
+            raise ValueError("report_title is required when save_as_report is true.")
         return self
 
 
@@ -82,6 +105,10 @@ class SynthesizeResponse(BaseModel):
     cache_id: Optional[str] = Field(
         default=None,
         description="Cache entry UUID if cached",
+    )
+    report_id: Optional[UUID] = Field(
+        default=None,
+        description="UUID of the created report (only present if save_as_report=true)",
     )
 
 
