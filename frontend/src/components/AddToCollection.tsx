@@ -4,7 +4,7 @@
  */
 
 import { collectionsApi, type Collection } from "@/lib/api/collections";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import useSWR from "swr";
 
@@ -26,7 +26,8 @@ export function AddToCollection({
   const [newName, setNewName] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const { data: response, mutate } = useSWR(
@@ -35,42 +36,59 @@ export function AddToCollection({
   );
   const collections = response?.data ?? [];
 
-  // Calculate menu position when opening
-  // Uses fixed positioning, so we use viewport-relative coordinates from getBoundingClientRect
+  // Track client-side mount for SSR hydration safety
   useEffect(() => {
-    if (isOpen && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      const menuWidth = 256; // w-64 (16rem)
-      const menuHeight = 300; // approximate max height
+    setIsMounted(true);
+  }, []);
 
-      // Calculate left position, ensuring menu stays on screen
-      let leftPos = rect.right - menuWidth;
-      // If menu would go off left edge, align to left edge of button instead
-      if (leftPos < 8) {
-        leftPos = rect.left;
-      }
-      // If menu would go off right edge, pull it back
-      if (leftPos + menuWidth > window.innerWidth - 8) {
-        leftPos = window.innerWidth - menuWidth - 8;
-      }
+  // Calculate menu position
+  const updatePosition = useCallback(() => {
+    if (!buttonRef.current) return;
 
-      // Calculate top position - prefer below button, but flip above if not enough space
-      let topPos = rect.bottom + 4;
-      if (topPos + menuHeight > window.innerHeight - 8) {
-        // Not enough space below, try above
-        topPos = rect.top - menuHeight - 4;
-        if (topPos < 8) {
-          // Not enough space above either, just position below and let it scroll
-          topPos = rect.bottom + 4;
-        }
-      }
+    const rect = buttonRef.current.getBoundingClientRect();
+    const menuWidth = 256; // w-64 (16rem)
+    const menuHeight = 300; // approximate max height
 
-      setMenuPosition({
-        top: topPos,
-        left: leftPos,
-      });
+    // Calculate left position, ensuring menu stays on screen
+    let leftPos = rect.right - menuWidth;
+    if (leftPos < 8) {
+      leftPos = rect.left;
     }
-  }, [isOpen]);
+    if (leftPos + menuWidth > window.innerWidth - 8) {
+      leftPos = window.innerWidth - menuWidth - 8;
+    }
+
+    // Calculate top position - prefer below button, but flip above if not enough space
+    let topPos = rect.bottom + 4;
+    if (topPos + menuHeight > window.innerHeight - 8) {
+      topPos = rect.top - menuHeight - 4;
+      if (topPos < 8) {
+        topPos = rect.bottom + 4;
+      }
+    }
+
+    setMenuPosition({ top: topPos, left: leftPos });
+  }, []);
+
+  // Update position when opening and on scroll/resize
+  useEffect(() => {
+    if (!isOpen) {
+      setMenuPosition(null);
+      return;
+    }
+
+    // Calculate initial position
+    updatePosition();
+
+    // Recalculate on scroll or resize
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
+
+    return () => {
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+    };
+  }, [isOpen, updatePosition]);
 
   // Clear feedback after 3 seconds
   useEffect(() => {
@@ -128,7 +146,8 @@ export function AddToCollection({
     ? "text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
     : "px-3 py-1.5 text-sm border border-white/20 rounded-lg text-slate-200 hover:border-sky-300 hover:text-sky-200";
 
-  const dropdownMenu = isOpen && typeof document !== "undefined" ? createPortal(
+  // Only render portal after mount (SSR safety) and when position is calculated
+  const dropdownMenu = isMounted && isOpen && menuPosition ? createPortal(
     <>
       {/* Backdrop */}
       <div

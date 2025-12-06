@@ -2,7 +2,8 @@
  * Collections API client
  */
 
-import { httpClient } from "./http";
+import { buildApiUrl, httpClient } from "./http";
+import { getStoredAuth } from "@/lib/auth/storage";
 
 export type Collection = {
   id: string;
@@ -102,14 +103,13 @@ export const collectionsApi = {
    * Triggers a file download.
    */
   async exportMarkdown(collectionId: string): Promise<void> {
-    const token = localStorage.getItem("access_token");
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-    const url = `${baseUrl}/collections/${collectionId}/export`;
+    const auth = getStoredAuth();
+    const url = buildApiUrl(`/collections/${collectionId}/export`);
 
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        Authorization: token ? `Bearer ${token}` : "",
+        Authorization: auth?.token ? `Bearer ${auth.token}` : "",
       },
     });
 
