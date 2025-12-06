@@ -1,177 +1,243 @@
-"""Mission Protocol API endpoints."""
+"""Missions CRUD API endpoints.
+
+Provides full CRUD operations for missions with:
+- Status and project filtering on list endpoint
+- Pagination support
+- Proper Pydantic schema validation
+"""
 from __future__ import annotations
 
 import logging
-from typing import List, Optional
+from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
-from pydantic import ValidationError
-from sqlalchemy.exc import SQLAlchemyError
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi import status as http_status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas.mission import MissionCreate, MissionRead, MissionUpdate
-from app.schemas.pagination import ListResponse
-from app.schemas.mission_protocol import (
-    MissionExportResponse,
-    MissionImportRequest,
-    MissionImportResponse,
-)
-from app.services.mission_protocol_service import (
+from app.schemas.mission import MissionCreate, MissionResponse, MissionUpdate
+from app.schemas.pagination import PaginatedResponse
+from app.services.mission_service import (
     MissionNotFoundError,
-    MissionProtocolService,
-    MissionProtocolServiceError,
+    MissionService,
+    MissionValidationError,
 )
-from app.services.quality_checks import QualityAutomationRunner
-from app.services.report_export import ReportExportError, ReportExportService
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
-_quality_runner = QualityAutomationRunner(async_enabled=True)
-_service = MissionProtocolService(quality_runner=_quality_runner)
-_report_export_service = ReportExportService()
+_service = MissionService()
 
 
-def _mission_read(instance) -> MissionRead:
-    return MissionRead.model_validate(instance)
+def _to_response(mission) -> MissionResponse:
+    """Convert Mission ORM instance to MissionResponse schema.
+
+    Handles the field mapping between model and schema.
+    """
+    return MissionResponse(
+        id=mission.id,
+        project_id=mission.project_id,
+        mission_id=mission.mission_id,
+        title=mission.title,
+        objective=mission.objective,
+        success_criteria=mission.success_criteria or [],
+        context=mission.context or {},
+        deliverables=mission.deliverables or [],
+        research_phases=mission.research_phases or {},
+        tags=mission.tags or [],
+        metadata=mission.mission_metadata or {},  # Map mission_metadata -> metadata
+        status=mission.status,
+        queued_at=mission.queued_at,
+        started_at=mission.started_at,
+        completed_at=mission.completed_at,
+        deepsearch_job_id=mission.deepsearch_job_id,
+        execution_metadata=mission.execution_metadata or {},
+        result_document_ids=mission.result_document_ids or [],
+        result_report_id=mission.result_report_id,
+        result_markdown=mission.result_markdown,
+        result_protocol=mission.result_protocol,
+        error_message=mission.error_message,
+        created_at=mission.created_at,
+        updated_at=mission.updated_at,
+        created_by=mission.created_by,
+    )
 
 
-def _raise_http_error(error: MissionProtocolServiceError) -> None:
-    status_code = status.HTTP_404_NOT_FOUND if isinstance(error, MissionNotFoundError) else status.HTTP_400_BAD_REQUEST
-    raise HTTPException(status_code=status_code, detail=str(error)) from error
-
-
-@router.get("/", response_model=ListResponse[MissionRead])
+@router.get("", response_model=PaginatedResponse[MissionResponse])
 def list_missions(
-    project_id: Optional[UUID] = None,
+    page: int = Query(1, ge=1, description="Page number (1-indexed)"),
+    page_size: int = Query(
+        MissionService.DEFAULT_PAGE_SIZE,
+        ge=1,
+        le=MissionService.MAX_PAGE_SIZE,
+        description="Results per page",
+    ),
+    status: Optional[str] = Query(
+        None,
+        description="Filter by mission status (draft, queued, in_progress, completed, blocked, cancelled)",
+    ),
+    project_id: Optional[UUID] = Query(
+        None,
+        description="Filter by project UUID",
+    ),
     db: Session = Depends(get_db),
-) -> ListResponse[MissionRead]:
+) -> PaginatedResponse[MissionResponse]:
+    """List missions with optional filtering and pagination.
+
+    - **page**: Page number (1-indexed, default 1)
+    - **page_size**: Results per page (1-100, default 20)
+    - **status**: Filter by mission status
+    - **project_id**: Filter by project UUID
+    """
     try:
-        missions = _service.list_missions(db, project_id=project_id)
-        return ListResponse(data=[_mission_read(mission) for mission in missions])
-    except SQLAlchemyError as exc:
-        logger.exception("Database error listing missions")
-        error_str = str(exc)
-        if "evidence_linking_metadata" in error_str:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Database schema mismatch: missing 'evidence_linking_metadata' column. Run 'alembic upgrade head' to apply migrations.",
-            ) from exc
+        missions, meta = _service.list_missions(
+            db,
+            page=page,
+            page_size=page_size,
+            status=status,
+            project_id=project_id,
+        )
+        return PaginatedResponse(
+            data=[_to_response(m) for m in missions],
+            pagination=meta,
+        )
+    except MissionValidationError as exc:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database error: {error_str[:200]}",
+            status_code=http_status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
         ) from exc
-    except ValidationError as exc:
-        logger.exception("Validation error serializing missions")
+    except Exception as exc:
+        logger.exception("Error listing missions")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Data validation error: {str(exc)[:200]}",
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error listing missions: {str(exc)[:200]}",
         ) from exc
 
 
-@router.post("/", response_model=MissionRead, status_code=status.HTTP_201_CREATED)
-def create_mission(payload: MissionCreate, db: Session = Depends(get_db)) -> MissionRead:
-    try:
-        mission = _service.create_mission(db, payload)
-        return _mission_read(mission)
-    except MissionProtocolServiceError as exc:
-        _raise_http_error(exc)
-    except SQLAlchemyError as exc:
-        logger.exception("Database error creating mission")
-        error_str = str(exc)
-        if "evidence_linking_metadata" in error_str:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Database schema mismatch: missing 'evidence_linking_metadata' column. Run 'alembic upgrade head' to apply migrations.",
-            ) from exc
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database error: {error_str[:200]}",
-        ) from exc
-    except ValidationError as exc:
-        logger.exception("Validation error serializing mission")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Data validation error: {str(exc)[:200]}",
-        ) from exc
-    # This return is here to satisfy type checker - the try block returns or raises
-    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error")
+@router.get("/{mission_id}", response_model=MissionResponse)
+def get_mission(
+    mission_id: UUID,
+    db: Session = Depends(get_db),
+) -> MissionResponse:
+    """Get a mission by its UUID.
 
-
-@router.get("/{mission_id}", response_model=MissionRead)
-def get_mission(mission_id: UUID, db: Session = Depends(get_db)) -> MissionRead:
+    - **mission_id**: The mission's UUID (not the human-readable mission_id)
+    """
     try:
         mission = _service.get_mission(db, mission_id)
-    except MissionProtocolServiceError as exc:
-        _raise_http_error(exc)
-    return _mission_read(mission)
+        return _to_response(mission)
+    except MissionNotFoundError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
+    except Exception as exc:
+        logger.exception("Error getting mission")
+        raise HTTPException(
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error getting mission: {str(exc)[:200]}",
+        ) from exc
 
 
-@router.put("/{mission_id}", response_model=MissionRead)
+@router.post("", response_model=MissionResponse, status_code=http_status.HTTP_201_CREATED)
+def create_mission(
+    data: MissionCreate,
+    db: Session = Depends(get_db),
+) -> MissionResponse:
+    """Create a new mission.
+
+    Required fields:
+    - **mission_id**: Human-readable identifier (e.g., "B16.1")
+    - **title**: Mission title (3-255 characters)
+    - **objective**: What the mission aims to achieve
+    - **success_criteria**: Array of measurable success conditions (at least 1)
+
+    Optional fields:
+    - **project_id**: UUID of project to associate with
+    - **context**: Additional context object
+    - **deliverables**: Array of expected deliverables
+    - **research_phases**: Research phase configuration
+    - **tags**: Array of tags for categorization
+    - **metadata**: Arbitrary metadata object
+    - **status**: Initial status (default: "draft")
+    - **created_by**: Agent or user creating the mission
+    """
+    try:
+        mission = _service.create_mission(db, data)
+        return _to_response(mission)
+    except MissionValidationError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+    except Exception as exc:
+        logger.exception("Error creating mission")
+        # Check for unique constraint violation
+        if "UNIQUE constraint failed" in str(exc) or "duplicate key" in str(exc).lower():
+            raise HTTPException(
+                status_code=http_status.HTTP_409_CONFLICT,
+                detail=f"Mission with mission_id '{data.mission_id}' already exists",
+            ) from exc
+        raise HTTPException(
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error creating mission: {str(exc)[:200]}",
+        ) from exc
+
+
+@router.put("/{mission_id}", response_model=MissionResponse)
 def update_mission(
     mission_id: UUID,
-    payload: MissionUpdate,
+    data: MissionUpdate,
     db: Session = Depends(get_db),
-) -> MissionRead:
+) -> MissionResponse:
+    """Update an existing mission.
+
+    All fields are optional - only provided fields will be updated.
+
+    - **mission_id**: The mission's UUID (not the human-readable mission_id)
+    """
     try:
-        mission = _service.update_mission(db, mission_id, payload)
-    except MissionProtocolServiceError as exc:
-        _raise_http_error(exc)
-    return _mission_read(mission)
+        mission = _service.update_mission(db, mission_id, data)
+        return _to_response(mission)
+    except MissionNotFoundError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
+    except MissionValidationError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+    except Exception as exc:
+        logger.exception("Error updating mission")
+        raise HTTPException(
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error updating mission: {str(exc)[:200]}",
+        ) from exc
 
 
-@router.delete("/{mission_id}", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
-def delete_mission(mission_id: UUID, db: Session = Depends(get_db)) -> Response:
+@router.delete("/{mission_id}", status_code=http_status.HTTP_204_NO_CONTENT)
+def delete_mission(
+    mission_id: UUID,
+    db: Session = Depends(get_db),
+) -> Response:
+    """Delete a mission.
+
+    - **mission_id**: The mission's UUID (not the human-readable mission_id)
+    """
     try:
         _service.delete_mission(db, mission_id)
-    except MissionProtocolServiceError as exc:
-        _raise_http_error(exc)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-@router.post("/import", response_model=MissionImportResponse, status_code=status.HTTP_201_CREATED)
-def import_mission_yaml(request: MissionImportRequest, db: Session = Depends(get_db)) -> MissionImportResponse:
-    try:
-        mission = _service.import_mission_yaml(
-            db,
-            project_id=request.project_id,
-            yaml_text=request.yaml_text,
-            promote_to_complete=request.promote_to_complete,
-        )
-    except MissionProtocolServiceError as exc:
-        _raise_http_error(exc)
-    return MissionImportResponse(mission=_mission_read(mission), promoted=request.promote_to_complete)
-
-
-@router.get("/{mission_id}/export")
-def export_mission(
-    mission_id: UUID,
-    format: str = Query("yaml", pattern=r"^(yaml|md|pdf|docx)$"),
-    db: Session = Depends(get_db),
-):
-    normalized_format = format.lower()
-    if normalized_format == "yaml":
-        try:
-            yaml_text = _service.export_mission_yaml(db, mission_id)
-        except MissionProtocolServiceError as exc:
-            _raise_http_error(exc)
-        return MissionExportResponse(mission_id=mission_id, yaml_text=yaml_text)
-
-    try:
-        mission = _service.get_mission(db, mission_id)
-    except MissionProtocolServiceError as exc:
-        _raise_http_error(exc)
-
-    try:
-        result = _report_export_service.export(
-            mission.mission_data,
-            format=normalized_format,
-            completion_percentage=mission.completion_percentage,
-        )
-    except ReportExportError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
-
-    headers = {"Content-Disposition": f'attachment; filename="{result.filename}"'}
-    return Response(content=result.content, media_type=result.media_type, headers=headers)
+        return Response(status_code=http_status.HTTP_204_NO_CONTENT)
+    except MissionNotFoundError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
+    except Exception as exc:
+        logger.exception("Error deleting mission")
+        raise HTTPException(
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error deleting mission: {str(exc)[:200]}",
+        ) from exc
