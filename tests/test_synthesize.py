@@ -327,12 +327,11 @@ class TestSynthesizeEndpoint:
         for citation in citations:
             assert "chunk_id" in citation
             assert "excerpt" in citation
-        # Verify document name is included
-        assert any(c.get("document_name") == "Multi-Source Doc" for c in citations)
+            assert "document_id" in citation
 
     @patch("app.services.synthesis.OpenAI")
     def test_synthesize_format_options(self, mock_openai_class, auth_headers, db_session):
-        """Test all three format options work correctly."""
+        """Test all four format options work correctly."""
         client = TestClient(app)
 
         mock_client = MagicMock()
@@ -346,7 +345,7 @@ class TestSynthesizeEndpoint:
         collection = _create_test_collection(db_session)
         _add_chunk_to_collection(db_session, str(collection.id), str(chunk.id))
 
-        for format_type in ["summary", "report", "bullets"]:
+        for format_type in ["markdown", "summary", "report", "bullets"]:
             response = client.post(
                 "/api/v1/synthesize",
                 json={"collection_id": str(collection.id), "format": format_type},
@@ -487,7 +486,7 @@ class TestSynthesizeSchemas:
             citations=[
                 CitationInfo(
                     chunk_id=uuid.uuid4(),
-                    document_name="Test Doc",
+                    document_id=uuid.uuid4(),
                     excerpt="First 100 chars...",
                 )
             ],

@@ -35,6 +35,10 @@ MAX_CONTEXT_CHARS = 100_000  # Approximate ~25k tokens
 
 
 FORMAT_INSTRUCTIONS = {
+    "markdown": (
+        "Write a cohesive prose summary that synthesizes the key information from the provided sources. "
+        "Organize the content logically by topic rather than by source. Use markdown formatting."
+    ),
     "summary": (
         "Write a cohesive prose summary that synthesizes the key information from the provided sources. "
         "Organize the content logically by topic rather than by source."
@@ -87,7 +91,7 @@ class SynthesisService:
         collection_id: Optional[UUID] = None,
         chunk_ids: Optional[List[UUID]] = None,
         prompt: Optional[str] = None,
-        output_format: Literal["summary", "report", "bullets"] = "summary",
+        output_format: Literal["markdown", "summary", "report", "bullets"] = "markdown",
     ) -> Dict[str, Any]:
         """Generate a synthesis from collection or chunk IDs.
 
@@ -271,7 +275,7 @@ class SynthesisService:
             # Store citation info
             citation_map[idx] = {
                 "chunk_id": chunk["chunk_id"],
-                "document_name": chunk.get("document_name"),
+                "document_id": chunk.get("document_id"),
                 "excerpt": content[:100] if content else "",
             }
 
@@ -371,7 +375,7 @@ class SynthesisService:
                 info = citation_map[marker]
                 citations.append({
                     "chunk_id": info["chunk_id"],
-                    "document_name": info.get("document_name"),
+                    "document_id": info.get("document_id"),
                     "excerpt": info.get("excerpt", ""),
                 })
 
