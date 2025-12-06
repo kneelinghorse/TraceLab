@@ -2,6 +2,7 @@
  * Document detail page
  */
 
+import { AddToCollection } from "@/components/AddToCollection";
 import { AuthGate } from "@/components/AuthGate";
 import { documentsApi } from "@/lib/api/documents";
 import type { Document, DocumentChunk } from "@/types/document";
@@ -307,11 +308,11 @@ export default function DocumentDetailPage() {
                         key={chunk.id}
                         className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden"
                       >
-                        <button
-                          onClick={() => toggleChunk(chunk.id)}
-                          className="w-full px-4 py-3 flex items-center justify-between bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-                        >
-                          <div className="flex items-center gap-4">
+                        <div className="px-4 py-3 flex items-center justify-between bg-gray-50 dark:bg-gray-700">
+                          <button
+                            onClick={() => toggleChunk(chunk.id)}
+                            className="flex items-center gap-4 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                          >
                             <span className="font-mono text-sm text-blue-600 dark:text-blue-400">
                               #{chunk.chunk_index}
                             </span>
@@ -320,11 +321,12 @@ export default function DocumentDetailPage() {
                                 {chunk.token_count} tokens
                               </span>
                             )}
-                          </div>
-                          <span className="text-gray-400">
-                            {expandedChunks.has(chunk.id) ? "−" : "+"}
-                          </span>
-                        </button>
+                            <span className="text-gray-400">
+                              {expandedChunks.has(chunk.id) ? "−" : "+"}
+                            </span>
+                          </button>
+                          <AddToCollection chunkId={chunk.id} variant="compact" />
+                        </div>
                         {expandedChunks.has(chunk.id) && (
                           <div className="px-4 py-3 bg-white dark:bg-gray-800">
                             <pre className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-mono overflow-x-auto">

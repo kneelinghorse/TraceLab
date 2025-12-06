@@ -1,62 +1,25 @@
 import clsx from "clsx";
 import Link from "next/link";
-import { forwardRef, useState } from "react";
+import { forwardRef } from "react";
 
+import { AddToCollection } from "@/components/AddToCollection";
 import type { Document } from "@/types/document";
-import type { Mission } from "@/types/mission";
 import type { SearchResultChunk } from "@/types/search";
 
 type ResultCardProps = {
   result: SearchResultChunk;
   document?: Document;
-  missions: Mission[];
-  onQuickAddEvidence: (missionId: string, result: SearchResultChunk, note?: string) => Promise<void>;
   isHighlighted?: boolean;
 };
 
-type Feedback = {
-  type: "success" | "error";
-  message: string;
-} | null;
-
 export const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCard(
-  { result, document, missions, onQuickAddEvidence, isHighlighted = false },
+  { result, document, isHighlighted = false },
   ref,
 ) {
-  const [selectedMission, setSelectedMission] = useState<string>("");
-  const [isLinking, setIsLinking] = useState(false);
-  const [feedback, setFeedback] = useState<Feedback>(null);
-  const [note, setNote] = useState("");
 
   const documentLabel = document?.name ?? document?.file_path ?? result.document_id ?? "Unlinked document";
   const chunkPreview = result.content.length > 360 ? `${result.content.slice(0, 357)}…` : result.content;
   const scoreLabel = typeof result.score === "number" ? result.score.toFixed(3) : "–";
-
-  const handleQuickAdd = async () => {
-    if (!selectedMission) {
-      setFeedback({ type: "error", message: "Select a mission before adding evidence." });
-      return;
-    }
-
-    setFeedback(null);
-    setIsLinking(true);
-    try {
-      await onQuickAddEvidence(selectedMission, result, note.trim() || undefined);
-      const mission = missions.find((item) => item.id === selectedMission);
-      setFeedback({
-        type: "success",
-        message: mission
-          ? `Linked to ${mission.mission_data.title ?? mission.mission_data.mission_id}`
-          : "Evidence added",
-      });
-      setNote("");
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to add evidence";
-      setFeedback({ type: "error", message });
-    } finally {
-      setIsLinking(false);
-    }
-  };
 
   return (
     <div
@@ -94,47 +57,18 @@ export const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function R
 
       <p className="mt-4 text-slate-100 leading-relaxed whitespace-pre-line">{chunkPreview}</p>
 
-      <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-sky-300">
-        {document?.id && (
-          <Link href={`/documents/${document.id}`} className="hover:underline">
-            View document ↗
-          </Link>
-        )}
-        {result.project_id && <span className="text-slate-400">Project: {result.project_id}</span>}
-      </div>
-
-      <div className="mt-5 space-y-2 rounded-2xl border border-white/10 bg-slate-900/30 p-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <select
-            value={selectedMission}
-            onChange={(event) => setSelectedMission(event.target.value)}
-            className="flex-1 rounded-xl border border-white/15 bg-black/20 px-3 py-2 text-sm text-white focus:outline-none"
-          >
-            <option value="">Select mission…</option>
-            {missions.map((mission) => (
-              <option key={mission.id} value={mission.id} className="bg-slate-900 text-white">
-                {mission.mission_data.title ?? mission.mission_data.mission_id}
-              </option>
-            ))}
-          </select>
-          <button
-            type="button"
-            disabled={!selectedMission || isLinking}
-            onClick={handleQuickAdd}
-            className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow shadow-emerald-500/30 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isLinking ? "Linking…" : "Quick add"}
-          </button>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-4 text-sm text-sky-300">
+          {document?.id && (
+            <Link href={`/documents/${document.id}`} className="hover:underline">
+              View document &rarr;
+            </Link>
+          )}
+          {result.project_id && <span className="text-slate-400">Project: {result.project_id}</span>}
         </div>
-        <textarea
-          value={note}
-          onChange={(event) => setNote(event.target.value)}
-          className="w-full rounded-xl border border-white/15 bg-black/20 px-3 py-2 text-sm text-slate-100 focus:outline-none"
-          placeholder="Optional note captured with the evidence"
-          rows={2}
-        />
-        {feedback && (
-          <p className={clsx("text-sm", feedback.type === "success" ? "text-emerald-300" : "text-rose-300")}>{feedback.message}</p>
+
+        {result.chunk_id && (
+          <AddToCollection chunkId={result.chunk_id} />
         )}
       </div>
     </div>
