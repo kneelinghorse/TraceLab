@@ -1,0 +1,111 @@
+id: B14.1
+title: "TraceLab MCP Server"
+type: Build.Integration
+status: Queued
+priority: High
+sprint: Sprint 14
+
+objective: |
+  Build an MCP (Model Context Protocol) server with 8 tools enabling AI agents
+  to perform complete research-to-output loops autonomously against TraceLab.
+
+context: |
+  MCP is the standard protocol for connecting AI agents to external tools.
+  TraceLab already has all the APIs needed - this mission wraps them in an
+  MCP server so Claude Code and other MCP-compatible agents can use TraceLab
+  as a knowledge backend without manual intervention.
+
+  Collections backend (B13.4) already has CRUD. The MCP server wraps existing
+  endpoints plus the new synthesize endpoint (B14.2).
+
+success_criteria:
+  - All 8 MCP tools implemented and functional
+  - MCP server connects to TraceLab API via configured base URL
+  - Authentication via API key (B14.3) or JWT token
+  - Agent can complete full research loop - search, collect, synthesize
+  - MCP server installable via npx or as standalone package
+  - Works with Claude Code out of the box
+
+deliverables:
+  - MCP server package (TypeScript, following MCP SDK patterns)
+  - 8 tool implementations wrapping TraceLab API
+  - MCP configuration documentation (claude_desktop_config.json example)
+  - README with installation and usage instructions
+  - Integration tests for each tool
+
+mcp_tools:
+  search_knowledge:
+    purpose: Find relevant chunks via semantic search
+    endpoint: POST /api/v1/retrieval/search
+    params:
+      - query
+      - project_id
+      - limit
+    returns: Array of chunks with scores
+
+  list_projects:
+    purpose: Browse available projects
+    endpoint: GET /api/v1/projects
+    params: []
+    returns: Array of projects
+
+  list_collections:
+    purpose: See existing collections
+    endpoint: GET /api/v1/collections
+    params: []
+    returns: Array of collections
+
+  get_collection:
+    purpose: Get chunks in a collection
+    endpoint: GET /api/v1/collections/{id}
+    params:
+      - collection_id
+    returns: Collection with chunks array
+
+  export_collection:
+    purpose: Export collection as markdown bundle
+    endpoint: GET /api/v1/collections/{id}/export
+    params:
+      - collection_id
+    returns: Markdown string
+
+  create_collection:
+    purpose: Create new collection for organizing research
+    endpoint: POST /api/v1/collections
+    params:
+      - name
+      - description
+    returns: Created collection
+
+  add_to_collection:
+    purpose: Add chunk to collection
+    endpoint: POST /api/v1/collections/{id}/chunks
+    params:
+      - collection_id
+      - chunk_id
+      - notes
+    returns: Updated collection
+
+  synthesize:
+    purpose: Generate summary/report from collected chunks
+    endpoint: POST /api/v1/synthesize
+    params:
+      - collection_id
+      - prompt
+      - format
+    returns: Markdown with citations
+
+implementation_notes:
+  - Use official MCP TypeScript SDK (@modelcontextprotocol/sdk)
+  - Store API URL and key in environment variables
+  - Handle auth errors gracefully with helpful messages
+  - Consider stdio transport for Claude Desktop integration
+  - "Package name suggestion: @tracelab/mcp-server or tracelab-mcp"
+
+dependencies:
+  - "B14.2 (Synthesize Endpoint) - required for synthesize tool"
+  - "B14.3 (API Key Auth) - recommended for simpler config"
+
+references:
+  - https://modelcontextprotocol.io/
+  - https://github.com/modelcontextprotocol/typescript-sdk

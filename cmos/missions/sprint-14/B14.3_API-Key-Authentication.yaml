@@ -1,0 +1,98 @@
+id: B14.3
+title: "API Key Authentication"
+type: Build.Feature
+status: Queued
+priority: High
+sprint: Sprint 14
+
+objective: |
+  Add X-API-Key header authentication as an alternative to JWT tokens,
+  enabling simpler configuration for MCP servers and automated scripts.
+
+context: |
+  Current auth requires JWT tokens from /auth/login with periodic refresh.
+  For MCP servers and automated pipelines, API keys are simpler:
+  - Configure once in environment variable
+  - No token refresh logic needed
+  - Easy to revoke if compromised
+
+  This is the recommended auth method for the MCP server (B14.1).
+
+success_criteria:
+  - X-API-Key header accepted on all authenticated endpoints
+  - API keys work alongside existing JWT auth (not replacing it)
+  - Keys can be created, listed, and revoked via API
+  - Keys stored securely (hashed, like passwords)
+  - Full key shown only once at creation time
+  - Audit logging of key usage (last_used_at timestamp)
+
+deliverables:
+  - APIKey SQLAlchemy model
+  - Alembic migration for api_keys table
+  - API key middleware (checks X-API-Key before JWT)
+  - Key management endpoints
+  - Key generation utilities
+  - Tests for auth flow
+  - Documentation for MCP configuration
+
+api_spec:
+  header: X-API-Key
+  format: "tl_ prefix plus 32 random alphanumeric chars"
+  example: tl_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
+
+  endpoints:
+    create_key:
+      method: POST
+      path: /api/v1/auth/api-keys
+      request:
+        name: string
+        expires_in_days: number or null
+      response:
+        id: string
+        name: string
+        key: string (only returned on creation)
+        created_at: timestamp
+        expires_at: timestamp or null
+
+    list_keys:
+      method: GET
+      path: /api/v1/auth/api-keys
+      response: array of key objects (without key values)
+
+    delete_key:
+      method: DELETE
+      path: /api/v1/auth/api-keys/{key_id}
+      response:
+        success: boolean
+
+database_schema:
+  table: api_keys
+  columns:
+    - "id: UUID primary key"
+    - "user_id: FK to users (for multi-user future)"
+    - "name: string (human label like MCP Server)"
+    - "key_hash: string (bcrypt or similar)"
+    - "key_prefix: string (first 8 chars for identification)"
+    - "created_at: timestamp"
+    - "last_used_at: timestamp nullable"
+    - "expires_at: timestamp nullable"
+
+implementation_notes:
+  - Check X-API-Key header in middleware before JWT check
+  - If API key present and valid, set request.user same as JWT would
+  - Hash keys with bcrypt or passlib (same as passwords)
+  - Store key_prefix (tl_a1b2c3d4) for display in list endpoint
+  - Update last_used_at on each successful auth (debounce to avoid write spam)
+  - Single-user system now, but schema supports multi-user
+
+security_notes:
+  - Never log full API keys
+  - Rate limit key creation (max 10 per user)
+  - Consider IP allowlist per key (future enhancement)
+  - Keys inherit user permissions (no scopes for v1)
+
+dependencies: []
+
+references:
+  - app/api/v1/auth.py (existing JWT auth)
+  - app/core/security.py (password hashing utilities)
