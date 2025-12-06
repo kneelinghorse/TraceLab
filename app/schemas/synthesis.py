@@ -75,3 +75,34 @@ class SynthesizeResponse(BaseModel):
         default=0,
         description="Number of chunks included in synthesis",
     )
+    cache_hit: bool = Field(
+        default=False,
+        description="True if result was served from cache",
+    )
+    cache_id: Optional[str] = Field(
+        default=None,
+        description="Cache entry UUID if cached",
+    )
+
+
+class SynthesisCacheStatsResponse(BaseModel):
+    """Response payload for /api/v1/synthesis/cache/stats endpoint."""
+
+    total_entries: int = Field(description="Total number of cached syntheses")
+    total_hits: int = Field(description="Total cache hits across all entries")
+    total_tokens_cached: int = Field(description="Total tokens in cached entries")
+    total_tokens_saved: int = Field(
+        description="Estimated tokens saved by cache hits (hits * tokens per entry)"
+    )
+    last_hit_at: Optional[str] = Field(
+        default=None,
+        description="ISO timestamp of most recent cache hit",
+    )
+    oldest_entry: Optional[str] = Field(
+        default=None,
+        description="ISO timestamp of oldest cache entry",
+    )
+    top_entries: List[dict] = Field(
+        default_factory=list,
+        description="Top cache entries by hit count",
+    )

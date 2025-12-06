@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -14,6 +14,9 @@ from app.models.chunk import DocumentChunk
 from app.models.collection import Collection, CollectionItem
 from app.models.document import Document
 from app.services.cost_monitor import CostMonitor, get_cost_monitor
+
+if TYPE_CHECKING:
+    from app.services.synthesis_cache import SynthesisCacheService
 
 try:
     from openai import OpenAI
@@ -66,6 +69,8 @@ class SynthesisService:
         temperature: float = 0.3,
         max_tokens: int = 2000,
         cost_monitor: Optional[CostMonitor] = None,
+        cache_service: Optional["SynthesisCacheService"] = None,
+        enable_cache: bool = True,
     ) -> None:
         if _openai_import_error is not None:
             raise RuntimeError(
@@ -84,6 +89,21 @@ class SynthesisService:
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.cost_monitor = cost_monitor if cost_monitor is not None else get_cost_monitor()
+        self.enable_cache = enable_cache
+
+        # Lazy-load cache service to avoid circular imports
+        self._cache_service = cache_service
+
+    @property
+    def cache_service(self) -> Optional["SynthesisCacheService"]:
+        """Get cache service, initializing lazily if needed."""
+        if self._cache_service is None and self.enable_cache:
+            try:
+                from app.services.synthesis_cache import get_synthesis_cache_service
+                self._cache_service = get_synthesis_cache_service()
+            except Exception:
+                logger.debug("Cache service unavailable", exc_info=True)
+        return self._cache_service
 
     def synthesize(
         self,
@@ -92,6 +112,7 @@ class SynthesisService:
         chunk_ids: Optional[List[UUID]] = None,
         prompt: Optional[str] = None,
         output_format: Literal["markdown", "summary", "report", "bullets"] = "markdown",
+        skip_cache: bool = False,
     ) -> Dict[str, Any]:
         """Generate a synthesis from collection or chunk IDs.
 
@@ -100,17 +121,21 @@ class SynthesisService:
             chunk_ids: List of chunk UUIDs to synthesize (mutually exclusive with collection_id)
             prompt: Custom instruction (default: format-specific instruction)
             output_format: Output format - summary, report, or bullets
+            skip_cache: If True, bypass cache lookup (still stores result)
 
         Returns:
-            Dict with content, citations, tokens_used, truncated, chunk_count
+            Dict with content, citations, tokens_used, truncated, chunk_count, cache_hit
         """
         start_time = time.perf_counter()
 
-        # Fetch chunks
+        # Fetch chunks - needed both for cache key and synthesis
         if collection_id is not None:
             chunks, truncated = self._fetch_collection_chunks(collection_id)
+            # Extract chunk IDs for cache key
+            effective_chunk_ids = [UUID(c["chunk_id"]) for c in chunks]
         elif chunk_ids:
             chunks, truncated = self._fetch_chunks_by_ids(chunk_ids)
+            effective_chunk_ids = chunk_ids[:MAX_CHUNKS_PER_REQUEST]
         else:
             raise ValueError("Either collection_id or chunk_ids must be provided.")
 
@@ -121,8 +146,37 @@ class SynthesisService:
                 "tokens_used": 0,
                 "truncated": False,
                 "chunk_count": 0,
+                "cache_hit": False,
             }
 
+        # Check cache before calling LLM
+        cache_result = None
+        if not skip_cache and self.cache_service and effective_chunk_ids:
+            try:
+                cache_result = self.cache_service.get(
+                    chunk_ids=effective_chunk_ids,
+                    prompt=prompt,
+                    output_format=output_format,
+                )
+            except Exception:
+                logger.debug("Cache lookup failed", exc_info=True)
+
+        if cache_result:
+            # Cache hit - return cached result with timing
+            latency_ms = (time.perf_counter() - start_time) * 1000
+            self._track_cache_hit(latency_ms=latency_ms)
+
+            return {
+                "content": cache_result["content"],
+                "citations": cache_result["citations"],
+                "tokens_used": cache_result["tokens_used"],
+                "truncated": truncated,
+                "chunk_count": len(chunks),
+                "cache_hit": True,
+                "cache_id": cache_result.get("cache_id"),
+            }
+
+        # Cache miss - generate synthesis via LLM
         # Build context with source markers
         context_text, citation_map, was_truncated = self._build_context(chunks)
         truncated = truncated or was_truncated
@@ -140,15 +194,55 @@ class SynthesisService:
 
         # Track cost
         latency_ms = (time.perf_counter() - start_time) * 1000
-        self._track_cost(usage=usage, latency_ms=latency_ms)
+        self._track_cost(usage=usage, latency_ms=latency_ms, cache_hit=False)
+
+        tokens_used = (usage or {}).get("total_tokens", 0)
+
+        # Store in cache for future requests
+        cache_id = None
+        if self.cache_service and effective_chunk_ids:
+            try:
+                cache_id = self.cache_service.set(
+                    chunk_ids=effective_chunk_ids,
+                    prompt=prompt,
+                    output_format=output_format,
+                    content=final_content,
+                    citations=used_citations,
+                    tokens_used=tokens_used,
+                    model_used=self.model,
+                )
+            except Exception:
+                logger.debug("Cache store failed", exc_info=True)
 
         return {
             "content": final_content,
             "citations": used_citations,
-            "tokens_used": (usage or {}).get("total_tokens", 0),
+            "tokens_used": tokens_used,
             "truncated": truncated,
             "chunk_count": len(chunks),
+            "cache_hit": False,
+            "cache_id": cache_id,
         }
+
+    def _track_cache_hit(self, *, latency_ms: float) -> None:
+        """Track a cache hit for cost monitoring."""
+        if self.cost_monitor is None:
+            return
+
+        try:
+            self.cost_monitor.track_usage(
+                model="synthesis-cache",
+                prompt_tokens=0,
+                completion_tokens=0,
+                total_tokens=0,
+                latency_ms=latency_ms,
+                cache_hit=True,
+                route="synthesis",
+                metadata={"endpoint": "/api/v1/synthesize"},
+                estimated_cost=0.0,
+            )
+        except Exception:
+            logger.debug("Cache hit tracking failed", exc_info=True)
 
     def _fetch_collection_chunks(
         self, collection_id: UUID
@@ -386,6 +480,7 @@ class SynthesisService:
         *,
         usage: Optional[Dict[str, int]],
         latency_ms: float,
+        cache_hit: bool = False,
     ) -> None:
         """Track token usage for cost monitoring."""
         if self.cost_monitor is None or usage is None:
@@ -398,7 +493,7 @@ class SynthesisService:
                 completion_tokens=usage.get("completion_tokens"),
                 total_tokens=usage.get("total_tokens"),
                 latency_ms=latency_ms,
-                cache_hit=False,
+                cache_hit=cache_hit,
                 route="synthesis",
                 metadata={"endpoint": "/api/v1/synthesize"},
             )
