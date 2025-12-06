@@ -36,22 +36,37 @@ export function AddToCollection({
   const collections = response?.data ?? [];
 
   // Calculate menu position when opening
+  // Uses fixed positioning, so we use viewport-relative coordinates from getBoundingClientRect
   useEffect(() => {
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       const menuWidth = 256; // w-64 (16rem)
+      const menuHeight = 300; // approximate max height
+
       // Calculate left position, ensuring menu stays on screen
-      let leftPos = rect.right + window.scrollX - menuWidth;
+      let leftPos = rect.right - menuWidth;
       // If menu would go off left edge, align to left edge of button instead
       if (leftPos < 8) {
-        leftPos = rect.left + window.scrollX;
+        leftPos = rect.left;
       }
       // If menu would go off right edge, pull it back
       if (leftPos + menuWidth > window.innerWidth - 8) {
         leftPos = window.innerWidth - menuWidth - 8;
       }
+
+      // Calculate top position - prefer below button, but flip above if not enough space
+      let topPos = rect.bottom + 4;
+      if (topPos + menuHeight > window.innerHeight - 8) {
+        // Not enough space below, try above
+        topPos = rect.top - menuHeight - 4;
+        if (topPos < 8) {
+          // Not enough space above either, just position below and let it scroll
+          topPos = rect.bottom + 4;
+        }
+      }
+
       setMenuPosition({
-        top: rect.bottom + window.scrollY + 4,
+        top: topPos,
         left: leftPos,
       });
     }
