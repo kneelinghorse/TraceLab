@@ -268,13 +268,59 @@ async def get_document(
     document_id: UUID,
     db: Session = Depends(get_db)
 ) -> DocumentRead:
-    """Get a document by ID."""
+    """Get a document by ID with stats and content preview."""
     document = _document_query_service.get_document(db, document_id)
     if not document:
         raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
     _ = document.processing_events
 
-    return DocumentRead.model_validate(document)
+    # Compute stats from chunks
+    chunk_count = len(document.chunks) if document.chunks else 0
+    total_tokens = sum(c.token_count or 0 for c in document.chunks) if document.chunks else 0
+
+    # Compute word count from chunk content
+    word_count = 0
+    if document.chunks:
+        for chunk in document.chunks:
+            if chunk.content:
+                word_count += len(chunk.content.split())
+
+    # Generate content preview from first chunks (up to ~500 chars)
+    preview = None
+    if document.chunks:
+        sorted_chunks = sorted(document.chunks, key=lambda c: c.chunk_index)
+        preview_parts = []
+        current_length = 0
+        max_preview_length = 500
+
+        for chunk in sorted_chunks:
+            if not chunk.content:
+                continue
+            if current_length >= max_preview_length:
+                break
+            remaining = max_preview_length - current_length
+            if len(chunk.content) <= remaining:
+                preview_parts.append(chunk.content)
+                current_length += len(chunk.content)
+            else:
+                # Truncate at word boundary if possible
+                truncated = chunk.content[:remaining]
+                last_space = truncated.rfind(' ')
+                if last_space > remaining * 0.6:  # Only truncate at space if reasonable
+                    truncated = truncated[:last_space]
+                preview_parts.append(truncated + "...")
+                break
+
+        preview = " ".join(preview_parts) if preview_parts else None
+
+    # Build response with stats
+    response = DocumentRead.model_validate(document)
+    response.chunk_count = chunk_count
+    response.total_tokens = total_tokens
+    response.word_count = word_count
+    response.preview = preview
+
+    return response
 
 
 @router.get("/{document_id}/chunks", response_model=PaginatedResponse[DocumentChunkRead])

@@ -72,6 +72,12 @@ class DocumentRead(DocumentBase):
     tags: Optional[List["DocumentTagRead"]] = None
     processing_events: Optional[List["DocumentProcessingStatusRead"]] = None
 
+    # Stats computed from chunks
+    chunk_count: Optional[int] = None
+    total_tokens: Optional[int] = None
+    word_count: Optional[int] = None
+    preview: Optional[str] = None
+
     model_config = ConfigDict(from_attributes=True)
 
 
