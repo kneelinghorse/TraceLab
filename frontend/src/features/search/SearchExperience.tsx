@@ -67,12 +67,12 @@ function SearchExperience({ initialSection }: SearchPageProps) {
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const resultsAnchorRef = useRef<HTMLDivElement | null>(null);
 
-  const { data: projectResponse } = useSWR<PaginatedResponse<Project>>(
+  const { data: projectResponse, error: projectError } = useSWR<PaginatedResponse<Project>>(
     ["search-projects"],
     () => projectsApi.listProjects({ pageSize: 200 })
   );
   const projects = projectResponse?.data ?? [];
-  const { data: documentResponse } = useSWR<PaginatedResponse<Document>>(
+  const { data: documentResponse, error: documentError } = useSWR<PaginatedResponse<Document>>(
     ["search-documents", filters.projectId || "all"],
     () =>
       documentsApi.listDocuments({
@@ -81,6 +81,16 @@ function SearchExperience({ initialSection }: SearchPageProps) {
       }),
   );
   const documents = documentResponse?.data ?? [];
+
+  // Debug logging for API errors
+  useEffect(() => {
+    if (projectError) {
+      console.error("[SearchExperience] Failed to load projects:", projectError);
+    }
+    if (documentError) {
+      console.error("[SearchExperience] Failed to load documents:", documentError);
+    }
+  }, [projectError, documentError]);
   const { data: historyResponse, mutate: mutateHistory } = useSWR(["search-history"], () => searchApi.history());
   const historyEntries = historyResponse?.entries ?? [];
   const { data: savedSearchResponse, mutate: mutateSavedSearches } = useSWR(["saved-searches"], () =>
@@ -521,10 +531,16 @@ function SearchExperience({ initialSection }: SearchPageProps) {
               <div>
                 <p className="text-3xl font-semibold text-white">{projects.length}</p>
                 <p className="text-sm text-slate-400">Projects</p>
+                {projectError && (
+                  <p className="text-xs text-rose-400 mt-1">Failed to load</p>
+                )}
               </div>
               <div>
                 <p className="text-3xl font-semibold text-white">{documents.length}</p>
                 <p className="text-sm text-slate-400">Documents</p>
+                {documentError && (
+                  <p className="text-xs text-rose-400 mt-1">Failed to load</p>
+                )}
               </div>
               <div>
                 <p className="text-3xl font-semibold text-white">{historyEntries.length}</p>

@@ -39,9 +39,20 @@ export function AddToCollection({
   useEffect(() => {
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
+      const menuWidth = 256; // w-64 (16rem)
+      // Calculate left position, ensuring menu stays on screen
+      let leftPos = rect.right + window.scrollX - menuWidth;
+      // If menu would go off left edge, align to left edge of button instead
+      if (leftPos < 8) {
+        leftPos = rect.left + window.scrollX;
+      }
+      // If menu would go off right edge, pull it back
+      if (leftPos + menuWidth > window.innerWidth - 8) {
+        leftPos = window.innerWidth - menuWidth - 8;
+      }
       setMenuPosition({
         top: rect.bottom + window.scrollY + 4,
-        left: rect.right + window.scrollX - 256, // 256 = w-64 (16rem)
+        left: leftPos,
       });
     }
   }, [isOpen]);
