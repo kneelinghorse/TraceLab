@@ -97,6 +97,48 @@ export default function DocumentDetailPage() {
               {document.name}
             </h1>
 
+            {/* Document Stats - Prominently displayed */}
+            {document.chunked && (document.chunk_count || document.word_count || document.total_tokens) && (
+              <div className="mb-6 flex flex-wrap gap-4">
+                {document.chunk_count !== undefined && document.chunk_count > 0 && (
+                  <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-3">
+                    <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                      {document.chunk_count}
+                    </div>
+                    <div className="text-sm text-blue-600 dark:text-blue-400">Chunks</div>
+                  </div>
+                )}
+                {document.word_count !== undefined && document.word_count > 0 && (
+                  <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg px-4 py-3">
+                    <div className="text-2xl font-bold text-green-700 dark:text-green-300">
+                      {document.word_count.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-green-600 dark:text-green-400">Words</div>
+                  </div>
+                )}
+                {document.total_tokens !== undefined && document.total_tokens > 0 && (
+                  <div className="bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800 rounded-lg px-4 py-3">
+                    <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
+                      {document.total_tokens.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-purple-600 dark:text-purple-400">Tokens</div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Content Preview */}
+            {document.preview && (
+              <div className="mb-6 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+                  Content Preview
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">
+                  {document.preview}
+                </p>
+              </div>
+            )}
+
             {/* Metadata */}
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>

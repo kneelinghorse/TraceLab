@@ -19,6 +19,12 @@ export interface Document {
   embedded: boolean;
   validation_status?: string;
   processing_events?: ProcessingEvent[];
+
+  // Stats computed from chunks
+  chunk_count?: number;
+  total_tokens?: number;
+  word_count?: number;
+  preview?: string;
 }
 
 export interface ProcessingEvent {
