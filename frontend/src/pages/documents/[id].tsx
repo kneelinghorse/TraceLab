@@ -16,6 +16,7 @@ export default function DocumentDetailPage() {
   const router = useRouter();
   const { id } = router.query;
   const [processing, setProcessing] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [chunksPage, setChunksPage] = useState(1);
   const [expandedChunks, setExpandedChunks] = useState<Set<string>>(new Set());
 
@@ -66,6 +67,28 @@ export default function DocumentDetailPage() {
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to delete document";
       alert(message);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!id || !document) return;
+
+    setDownloading(true);
+    try {
+      const blob = await documentsApi.downloadDocument(id as string);
+      const url = window.URL.createObjectURL(blob);
+      const link = window.document.createElement("a");
+      link.href = url;
+      link.download = document.name;
+      window.document.body.appendChild(link);
+      link.click();
+      window.document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to download document";
+      alert(message);
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -197,6 +220,13 @@ export default function DocumentDetailPage() {
 
             {/* Actions */}
             <div className="mt-6 flex gap-4">
+              <button
+                onClick={handleDownload}
+                disabled={downloading}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              >
+                {downloading ? "Downloading..." : "Download Original"}
+              </button>
               {!document.processed && (
                 <button
                   onClick={handleProcess}

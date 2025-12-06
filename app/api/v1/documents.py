@@ -10,6 +10,7 @@ from typing import Optional, Dict, Any
 from uuid import UUID
 
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, BackgroundTasks, Query
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -321,6 +322,40 @@ async def get_document(
     response.preview = preview
 
     return response
+
+
+@router.get("/{document_id}/download")
+async def download_document(
+    document_id: UUID,
+    db: Session = Depends(get_db)
+) -> FileResponse:
+    """
+    Download the original uploaded document file.
+
+    Returns the file with its original filename and MIME type.
+    """
+    document = db.query(Document).filter(Document.id == document_id).first()
+    if not document:
+        raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+
+    if not document.file_path:
+        raise HTTPException(
+            status_code=400,
+            detail="Document has no associated file"
+        )
+
+    file_path = Path(document.file_path)
+    if not file_path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="File not found on disk"
+        )
+
+    return FileResponse(
+        path=file_path,
+        filename=document.name,
+        media_type=document.mime_type or "application/octet-stream"
+    )
 
 
 @router.get("/{document_id}/chunks", response_model=PaginatedResponse[DocumentChunkRead])
