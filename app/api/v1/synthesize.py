@@ -6,10 +6,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.schemas.synthesis import (
     CitationInfo,
+    SynthesisCacheStatsResponse,
     SynthesizeRequest,
     SynthesizeResponse,
 )
 from app.services.synthesis import SynthesisService, get_synthesis_service
+from app.services.synthesis_cache import SynthesisCacheService, get_synthesis_cache_service
 
 router = APIRouter()
 
@@ -35,6 +37,9 @@ def synthesize(
 
     Returns markdown content with inline citations [1], [2], etc., plus a
     citations list mapping numbers to source chunks.
+
+    **Caching**: Results are cached by content hash. Identical requests return
+    instantly from cache, saving API costs and time.
     """
     try:
         result = service.synthesize(
@@ -76,4 +81,40 @@ def synthesize(
         tokens_used=result.get("tokens_used", 0),
         truncated=result.get("truncated", False),
         chunk_count=result.get("chunk_count", 0),
+        cache_hit=result.get("cache_hit", False),
+        cache_id=result.get("cache_id"),
+    )
+
+
+@router.get("/synthesis/cache/stats", response_model=SynthesisCacheStatsResponse)
+def get_synthesis_cache_stats(
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    cache_service: SynthesisCacheService = Depends(get_synthesis_cache_service),
+) -> SynthesisCacheStatsResponse:
+    """Get synthesis cache statistics.
+
+    Returns aggregated stats about the synthesis cache including:
+    - Total cached entries
+    - Total cache hits
+    - Tokens saved by caching
+    - Top hit entries
+
+    Useful for monitoring cache efficiency and cost savings.
+    """
+    try:
+        stats = cache_service.get_stats()
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve cache stats: {exc}",
+        ) from exc
+
+    return SynthesisCacheStatsResponse(
+        total_entries=stats.get("total_entries", 0),
+        total_hits=stats.get("total_hits", 0),
+        total_tokens_cached=stats.get("total_tokens_cached", 0),
+        total_tokens_saved=stats.get("total_tokens_saved", 0),
+        last_hit_at=stats.get("last_hit_at"),
+        oldest_entry=stats.get("oldest_entry"),
+        top_entries=stats.get("top_entries", []),
     )
