@@ -1,0 +1,68 @@
+id: B15.3
+title: "Synthesis Caching"
+type: Build.Feature
+status: Queued
+priority: High
+sprint: Sprint 15
+
+objective: |
+  Add content-addressable caching to the synthesis pipeline. Before calling
+  the LLM, check if we've already synthesized the same chunks with the same
+  prompt. Cache hits return instantly and save API costs.
+
+context: |
+  Each synthesis call costs tokens. If an agent or user requests the same
+  synthesis multiple times (common during iterative research), we're wasting
+  money. The cache uses a hash of (sorted chunk_ids + prompt + format) as the
+  key - identical inputs get cached results.
+
+success_criteria:
+  - SynthesisCacheService with get/set/record_hit operations
+  - Input hash computed consistently (sorted IDs, normalized prompt)
+  - Cache checked before LLM call in SynthesisService
+  - Cache populated after successful synthesis
+  - hit_count and last_hit_at updated on cache hits
+  - Cache integrated into /api/v1/synthesize endpoint
+  - Cache stats visible (optional: /api/v1/synthesis/cache/stats)
+  - 10+ tests for caching behavior
+
+deliverables:
+  - app/services/synthesis_cache.py
+  - Updated app/services/synthesis.py (cache integration)
+  - tests/test_synthesis_cache.py
+  - Optional: cache stats endpoint
+
+cache_algorithm:
+  compute_hash:
+    inputs:
+      - chunk_ids (sorted, stringified)
+      - prompt (stripped, lowercased)
+      - format (lowercase)
+    method: "SHA-256 of JSON string: {chunk_ids: [...], prompt: '...', format: '...'}"
+
+  synthesize_with_cache:
+    steps:
+      - "1. Compute input_hash from request params"
+      - "2. Query synthesis_cache WHERE input_hash = ?"
+      - "3. If found: increment hit_count, update last_hit_at, return cached"
+      - "4. If not found: call LLM, save to cache, return result"
+
+implementation_notes:
+  - Hash must be deterministic - sort chunk_ids, normalize strings
+  - Store full citations in cache (JSONB column)
+  - Consider cache TTL in future (for now, cache forever)
+  - Use SELECT FOR UPDATE or upsert pattern for concurrent requests
+  - Track cache_hit in cost_monitor for metrics
+
+cache_benefits:
+  - Identical requests return in <50ms vs 2-5s for LLM
+  - Saves $0.01-0.10 per cache hit (depending on model)
+  - Enables "warm cache" for common queries
+  - hit_count identifies valuable syntheses
+
+dependencies:
+  - "B15.1 (Reports Data Model - synthesis_cache table)"
+
+references:
+  - app/services/synthesis.py (integration point)
+  - app/services/cost_monitor.py (metrics pattern)

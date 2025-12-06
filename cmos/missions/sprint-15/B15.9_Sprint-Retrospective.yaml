@@ -1,0 +1,62 @@
+id: B15.9
+title: "Sprint 15 Retrospective"
+type: Build.Meta
+status: Queued
+priority: Low
+sprint: Sprint 15
+
+objective: |
+  Conduct sprint retrospective, document outcomes, update MASTER_CONTEXT,
+  and draft Sprint 16 backlog if needed.
+
+context: |
+  Sprint 15 introduces Reports as a major feature - the "output" side of
+  TraceLab. This retrospective captures what was delivered, lessons learned,
+  and identifies any follow-up work for future sprints.
+
+success_criteria:
+  - Sprint 15 retrospective document created
+  - All mission outcomes documented with metrics
+  - MASTER_CONTEXT updated with sprint outcomes
+  - Sprint 16 backlog drafted (if needed)
+  - Telemetry captured for sprint metrics
+  - Database and contexts exported/validated
+
+deliverables:
+  - cmos/reports/sprint-15/retrospective.md
+  - Updated MASTER_CONTEXT (via session capture)
+  - cmos/telemetry/events/sprint-15-retro.jsonl
+  - Sprint 16 backlog draft (if applicable)
+
+retrospective_template:
+  sections:
+    - Executive Summary
+    - Mission Outcomes (B15.1-B15.8)
+    - Metrics (missions completed, tests added, API endpoints)
+    - What Went Well
+    - What Could Be Improved
+    - Technical Debt Identified
+    - Sprint 16 Recommendations
+
+metrics_to_capture:
+  - Total missions planned vs completed
+  - New tests added
+  - New API endpoints added
+  - New MCP tools added
+  - Report table row count (if any reports created during testing)
+  - Cache hit rate (if synthesis caching live)
+
+sprint_16_considerations:
+  - Report versioning (v1 -> v2 -> v3 chains)
+  - Report export formats (PDF, DOCX)
+  - Report sharing/publishing
+  - Bulk operations on reports
+  - Report templates
+  - Advanced synthesis (multi-step, iterative)
+
+dependencies:
+  - All other Sprint 15 missions
+
+references:
+  - cmos/reports/sprint-14/retrospective.md (template)
+  - cmos/docs/session-management-guide.md (session capture)

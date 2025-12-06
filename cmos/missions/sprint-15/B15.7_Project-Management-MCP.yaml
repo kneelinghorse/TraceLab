@@ -1,0 +1,113 @@
+id: B15.7
+title: "Project Management MCP Tools"
+type: Build.Feature
+status: Queued
+priority: Medium
+sprint: Sprint 15
+
+objective: |
+  Add project management tools to the MCP server, enabling AI agents to create
+  projects, update metadata, and get project statistics. This gives agents
+  organizational control over the knowledge base.
+
+context: |
+  Agents currently can list_projects but cannot create or modify them. For
+  autonomous workflows where an agent is researching a new topic, it should
+  be able to:
+  - Create a project for organizing documents
+  - Update project metadata as research evolves
+  - Get statistics to understand project scope
+
+success_criteria:
+  - create_project MCP tool implemented
+  - update_project MCP tool implemented
+  - get_project_stats MCP tool implemented
+  - All tools tested and documented
+  - README updated with new tools
+
+deliverables:
+  - Updated packages/tracelab-mcp/src/tools/projects.ts
+  - Updated packages/tracelab-mcp/src/index.ts
+  - Updated packages/tracelab-mcp/README.md
+  - Tests for project tools
+
+mcp_tools:
+  create_project:
+    purpose: Create a new project for organizing documents
+    endpoint: POST /api/v1/projects
+    params:
+      - "name: string (required) - project name"
+      - "description: string (optional) - project description"
+    returns:
+      id: string
+      name: string
+      description: string
+      created_at: timestamp
+    example: |
+      create_project({
+        name: "Agent Architecture Research",
+        description: "Research on multi-agent systems and orchestration patterns"
+      })
+
+  update_project:
+    purpose: Update project metadata
+    endpoint: PUT /api/v1/projects/{id}
+    params:
+      - "project_id: string (required)"
+      - "name: string (optional) - new name"
+      - "description: string (optional) - new description"
+    returns: Updated project object
+    example: |
+      update_project({
+        project_id: "proj-123",
+        description: "Updated: Now includes LangGraph and CrewAI patterns"
+      })
+
+  get_project_stats:
+    purpose: Get statistics about a project
+    endpoint: GET /api/v1/projects/{id}/stats
+    params:
+      - "project_id: string (required)"
+    returns:
+      project_id: string
+      name: string
+      document_count: number
+      chunk_count: number
+      report_count: number
+      total_tokens: number
+      last_updated: timestamp
+    example: |
+      get_project_stats({ project_id: "proj-123" })
+    notes: "May need new backend endpoint for aggregated stats"
+
+backend_requirements:
+  existing_endpoints:
+    - "GET /api/v1/projects - list (exists)"
+    - "POST /api/v1/projects - create (verify exists)"
+    - "PUT /api/v1/projects/{id} - update (verify exists)"
+
+  new_endpoint_needed:
+    - "GET /api/v1/projects/{id}/stats - aggregated statistics"
+    - Returns: document_count, chunk_count, report_count, total_tokens
+    - Requires joining documents, chunks, reports tables
+
+implementation_notes:
+  - Check existing project endpoints in app/api/v1/projects.py
+  - May need to add stats endpoint if not present
+  - Stats query should be efficient (use COUNT, SUM aggregations)
+  - report_count only available after B15.2 ships
+
+agent_workflow:
+  description: "Agent sets up research project"
+  steps:
+    - "1. create_project({ name: 'New Research Topic' })"
+    - "2. upload_document({ project_id, ... }) [multiple]"
+    - "3. get_project_stats({ project_id }) -> see scope"
+    - "4. search_knowledge({ project_id }) -> search within project"
+    - "5. create_report({ project_id, collection_id }) -> generate output"
+
+dependencies: []
+
+references:
+  - app/api/v1/projects.py (existing endpoints)
+  - packages/tracelab-mcp/src/tools/ (tool patterns)

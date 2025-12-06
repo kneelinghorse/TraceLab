@@ -1,0 +1,84 @@
+id: B15.4
+title: "Reports UI"
+type: Build.Feature
+status: Queued
+priority: High
+sprint: Sprint 15
+
+objective: |
+  Build the frontend interface for browsing, viewing, and creating reports.
+  Users should be able to see their generated reports, view content with
+  citations, and create new reports from collections.
+
+context: |
+  The Reports API (B15.2) provides the backend. This mission adds the UI
+  so users can interact with reports through the web interface. Key flows:
+  1. Browse all reports (list view)
+  2. View a single report (detail view with citations)
+  3. Create report from collection (button on collection detail)
+
+success_criteria:
+  - /reports page listing all reports
+  - /reports/[id] page showing report detail
+  - Create Report button on collection detail page
+  - Report creation modal/form with title input
+  - Status badge (draft/final) display
+  - Citations rendered with links to source chunks
+  - Copy to clipboard button for report content
+  - Delete report functionality
+  - Loading and error states handled
+
+deliverables:
+  - frontend/src/pages/reports/index.tsx (list page)
+  - frontend/src/pages/reports/[id].tsx (detail page)
+  - frontend/src/lib/api/reports.ts (API client)
+  - frontend/src/components/CreateReportModal.tsx
+  - Updated frontend/src/pages/collections/[id].tsx (add create button)
+  - Updated frontend/src/components/Navigation.tsx (add Reports link)
+
+ui_spec:
+  reports_list:
+    route: /reports
+    features:
+      - Table/card list of reports
+      - Columns: title, status, created_at, chunk_count
+      - Click row to view detail
+      - Filter by status (All, Draft, Final)
+      - Sort by created_at (newest first)
+
+  report_detail:
+    route: /reports/[id]
+    features:
+      - Title (editable inline or via button)
+      - Status badge with toggle (draft <-> final)
+      - Report content (markdown rendered)
+      - Citations section (list of sources with links)
+      - Metadata: created_at, tokens_used, chunk_count
+      - Actions: Copy content, Delete report
+      - Back to reports list link
+
+  create_report_modal:
+    trigger: Button on collection detail page
+    fields:
+      - title (text input, required)
+      - format (dropdown: summary, report, bullets)
+      - prompt (optional textarea)
+    behavior:
+      - On submit: POST /api/v1/reports with collection_id
+      - Show loading state during synthesis
+      - On success: redirect to new report detail
+      - On error: show error message
+
+implementation_notes:
+  - Use existing shadcn/ui components where available
+  - Markdown rendering: use existing ReactMarkdown setup
+  - Citations can link to /documents/[doc_id] or show chunk preview
+  - Consider skeleton loading for better UX during synthesis
+  - Copy button copies raw markdown content
+
+dependencies:
+  - "B15.2 (Reports Service & API)"
+
+references:
+  - frontend/src/pages/collections/[id].tsx (similar detail pattern)
+  - frontend/src/pages/documents/[id].tsx (markdown rendering)
