@@ -38,6 +38,10 @@ try:
 except ImportError:
     PANDAS_AVAILABLE = False
 
+import json
+import xml.etree.ElementTree as ET
+import yaml
+
 
 class DocumentParser:
     """Parser for extracting text from various document formats."""
@@ -76,6 +80,12 @@ class DocumentParser:
             return DocumentParser._parse_xlsx(file_content)
         elif suffix in {".md", ".markdown", ".txt"}:
             return DocumentParser._parse_markdown(file_content)
+        elif suffix == ".json":
+            return DocumentParser._parse_json(file_content)
+        elif suffix == ".xml":
+            return DocumentParser._parse_xml(file_content)
+        elif suffix in {".yaml", ".yml"}:
+            return DocumentParser._parse_yaml(file_content)
         else:
             raise ValueError(f"Unsupported file format: {suffix}")
 
@@ -202,7 +212,11 @@ class DocumentParser:
         if file_path is None:
             return False
         suffix = file_path.suffix.lower()
-        return suffix in {".pdf", ".docx", ".pptx", ".csv", ".xlsx", ".md", ".markdown", ".txt"}
+        return suffix in {
+            ".pdf", ".docx", ".pptx", ".csv", ".xlsx",
+            ".md", ".markdown", ".txt",
+            ".json", ".xml", ".yaml", ".yml"
+        }
 
     @staticmethod
     def _parse_markdown(content: bytes) -> str:
@@ -226,3 +240,94 @@ class DocumentParser:
                 text = candidate
 
         return text.strip()
+
+    @staticmethod
+    def _parse_json(content: bytes) -> str:
+        """Extract text from JSON file.
+
+        Parses the JSON and pretty-prints it for readability.
+        For arrays of objects, extracts text values recursively.
+        """
+        try:
+            text = content.decode("utf-8")
+        except UnicodeDecodeError:
+            text = content.decode("utf-8", errors="ignore")
+
+        try:
+            data = json.loads(text)
+            # Pretty print for structured viewing
+            return json.dumps(data, indent=2, ensure_ascii=False)
+        except json.JSONDecodeError as e:
+            # Return raw content if parsing fails
+            return f"[JSON Parse Error: {e}]\n\n{text}"
+
+    @staticmethod
+    def _parse_xml(content: bytes) -> str:
+        """Extract text from XML file.
+
+        Parses XML and extracts all text content, preserving structure
+        through indentation.
+        """
+        try:
+            text = content.decode("utf-8")
+        except UnicodeDecodeError:
+            text = content.decode("utf-8", errors="ignore")
+
+        def extract_text(element: ET.Element, depth: int = 0) -> list[str]:
+            """Recursively extract text from XML element."""
+            result = []
+            indent = "  " * depth
+            tag = element.tag.split("}")[-1] if "}" in element.tag else element.tag
+
+            # Handle element text
+            if element.text and element.text.strip():
+                result.append(f"{indent}<{tag}> {element.text.strip()}")
+            elif len(element) == 0:  # Leaf element
+                result.append(f"{indent}<{tag}>")
+            else:
+                result.append(f"{indent}<{tag}>")
+
+            # Process children
+            for child in element:
+                result.extend(extract_text(child, depth + 1))
+
+            # Handle tail text
+            if element.tail and element.tail.strip():
+                result.append(f"{indent}{element.tail.strip()}")
+
+            return result
+
+        try:
+            root = ET.fromstring(text)
+            lines = extract_text(root)
+            return "\n".join(lines)
+        except ET.ParseError as e:
+            # Return raw content if parsing fails
+            return f"[XML Parse Error: {e}]\n\n{text}"
+
+    @staticmethod
+    def _parse_yaml(content: bytes) -> str:
+        """Extract text from YAML file.
+
+        Parses YAML and pretty-prints it. Handles multi-document YAML files.
+        """
+        try:
+            text = content.decode("utf-8")
+        except UnicodeDecodeError:
+            text = content.decode("utf-8", errors="ignore")
+
+        try:
+            # Handle multi-document YAML
+            documents = list(yaml.safe_load_all(text))
+            if len(documents) == 1:
+                return yaml.dump(documents[0], default_flow_style=False, allow_unicode=True)
+            else:
+                parts = []
+                for i, doc in enumerate(documents):
+                    if doc is not None:
+                        parts.append(f"--- Document {i + 1} ---")
+                        parts.append(yaml.dump(doc, default_flow_style=False, allow_unicode=True))
+                return "\n".join(parts)
+        except yaml.YAMLError as e:
+            # Return raw content if parsing fails
+            return f"[YAML Parse Error: {e}]\n\n{text}"

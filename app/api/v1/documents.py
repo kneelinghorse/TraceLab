@@ -145,6 +145,10 @@ async def upload_document(
         ".md": "text/markdown",
         ".markdown": "text/markdown",
         ".txt": "text/plain",
+        ".json": "application/json",
+        ".xml": "application/xml",
+        ".yaml": "application/x-yaml",
+        ".yml": "application/x-yaml",
     }
     mime_type = mime_types.get(file_path.suffix.lower())
     
@@ -159,6 +163,10 @@ async def upload_document(
             ".md": "notes",
             ".markdown": "notes",
             ".txt": "notes",
+            ".json": "config",
+            ".xml": "config",
+            ".yaml": "config",
+            ".yml": "config",
         }
         file_type = file_type_map.get(file_path.suffix.lower(), "report")
     
