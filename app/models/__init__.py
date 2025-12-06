@@ -15,6 +15,8 @@ from app.models.saved_search import SavedSearch
 from app.models.sync_state import SyncState
 from app.models.collection import Collection, CollectionItem
 from app.models.api_key import APIKey
+from app.models.report import Report, ReportSource
+from app.models.synthesis_cache import SynthesisCache
 
 __all__ = [
     "Base",
@@ -36,4 +38,7 @@ __all__ = [
     "Collection",
     "CollectionItem",
     "APIKey",
+    "Report",
+    "ReportSource",
+    "SynthesisCache",
 ]

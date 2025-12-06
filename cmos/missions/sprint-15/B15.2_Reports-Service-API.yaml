@@ -1,0 +1,114 @@
+id: B15.2
+title: "Reports Service & API"
+type: Build.Feature
+status: Queued
+priority: High
+sprint: Sprint 15
+
+objective: |
+  Build the Reports service layer and REST API endpoints for creating, reading,
+  updating, and listing reports. Integrate with existing SynthesisService to
+  generate report content.
+
+context: |
+  With the data model in place (B15.1), this mission adds the business logic
+  and API layer. The key integration point is the existing SynthesisService -
+  Reports wrap synthesis results with persistence, naming, and metadata.
+
+success_criteria:
+  - ReportService with CRUD operations
+  - POST /api/v1/reports - create report (triggers synthesis)
+  - GET /api/v1/reports - list reports (filterable by project, status)
+  - GET /api/v1/reports/{id} - get single report with sources
+  - PUT /api/v1/reports/{id} - update title/status
+  - DELETE /api/v1/reports/{id} - delete report
+  - Pydantic request/response schemas
+  - Integration with SynthesisService
+  - 15+ tests covering all endpoints
+
+deliverables:
+  - app/services/report_service.py
+  - app/schemas/report.py
+  - app/api/v1/reports.py
+  - tests/test_reports_api.py
+  - Router registered in app/main.py
+
+api_spec:
+  create_report:
+    method: POST
+    path: /api/v1/reports
+    request:
+      title: string (required)
+      collection_id: UUID | null
+      chunk_ids: UUID[] | null
+      project_id: UUID | null
+      prompt: string | null
+      format: "summary" | "report" | "bullets" | "markdown"
+    response:
+      id: UUID
+      title: string
+      content: string
+      citations: Citation[]
+      tokens_used: number
+      status: "draft"
+      created_at: timestamp
+    notes: "Either collection_id OR chunk_ids required"
+
+  list_reports:
+    method: GET
+    path: /api/v1/reports
+    params:
+      project_id: UUID (optional filter)
+      status: string (optional filter)
+      page: int (default 1)
+      page_size: int (default 20)
+    response:
+      items: Report[]
+      total: number
+      page: number
+      page_size: number
+
+  get_report:
+    method: GET
+    path: /api/v1/reports/{id}
+    response:
+      id: UUID
+      title: string
+      content: string
+      citations: Citation[]
+      sources: ReportSource[]
+      tokens_used: number
+      chunk_count: number
+      status: string
+      created_at: timestamp
+      updated_at: timestamp
+
+  update_report:
+    method: PUT
+    path: /api/v1/reports/{id}
+    request:
+      title: string | null
+      status: "draft" | "final" | null
+    response: Report
+
+  delete_report:
+    method: DELETE
+    path: /api/v1/reports/{id}
+    response:
+      success: boolean
+
+implementation_notes:
+  - ReportService wraps SynthesisService for content generation
+  - On create: synthesize -> save report -> save sources -> return
+  - Store source_type='collection' or 'chunk' in report_sources
+  - If collection_id provided, also snapshot chunk_ids at creation time
+  - content_hash = SHA-256(content) for future dedup
+  - Pagination follows existing ListResponse pattern
+
+dependencies:
+  - "B15.1 (Reports Data Model)"
+
+references:
+  - app/services/synthesis.py (integration point)
+  - app/api/v1/collections.py (API pattern)
+  - app/schemas/collection.py (schema pattern)

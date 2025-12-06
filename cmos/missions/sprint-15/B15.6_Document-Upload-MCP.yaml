@@ -1,0 +1,93 @@
+id: B15.6
+title: "Document Upload MCP Tool"
+type: Build.Feature
+status: Queued
+priority: Medium
+sprint: Sprint 15
+
+objective: |
+  Add an upload_document tool to the MCP server, enabling AI agents to ingest
+  new documents into TraceLab without human intervention. This closes the loop
+  for fully autonomous research workflows.
+
+context: |
+  Currently, documents must be uploaded via the web UI or CLI. For autonomous
+  agent workflows, agents need to be able to add documents they discover or
+  generate. This enables patterns like:
+  - Agent finds relevant PDF -> uploads to TraceLab -> searches it
+  - Agent generates a document -> uploads for future reference
+
+success_criteria:
+  - upload_document MCP tool implemented
+  - Supports file content as base64 or URL
+  - Handles metadata (name, project_id, description)
+  - Returns document ID and processing status
+  - Integrates with existing ingestion pipeline
+  - Tool tested and documented
+
+deliverables:
+  - Updated packages/tracelab-mcp/src/tools/upload.ts
+  - Updated packages/tracelab-mcp/src/index.ts
+  - Updated packages/tracelab-mcp/README.md
+  - Tests for upload tool
+
+mcp_tool:
+  upload_document:
+    purpose: Ingest a new document into TraceLab
+    endpoint: POST /api/v1/documents/upload
+    params:
+      - "name: string (required) - filename or document name"
+      - "content: string (required) - base64 encoded file content"
+      - "content_type: string (required) - MIME type (application/pdf, text/markdown, etc)"
+      - "project_id: string (optional) - project to add document to"
+      - "description: string (optional) - document description"
+    returns:
+      document_id: string
+      status: string (processing, completed, failed)
+      message: string
+    example: |
+      upload_document({
+        name: "research-paper.pdf",
+        content: "JVBERi0xLjQK...",  // base64
+        content_type: "application/pdf",
+        project_id: "proj-123"
+      })
+
+supported_formats:
+  - "application/pdf (.pdf)"
+  - "application/vnd.openxmlformats-officedocument.wordprocessingml.document (.docx)"
+  - "application/vnd.openxmlformats-officedocument.presentationml.presentation (.pptx)"
+  - "text/csv (.csv)"
+  - "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet (.xlsx)"
+  - "text/markdown (.md)"
+  - "text/plain (.txt)"
+  - "application/json (.json)"
+  - "application/xml, text/xml (.xml)"
+  - "application/x-yaml, text/yaml (.yaml, .yml)"
+
+implementation_notes:
+  - MCP tool sends base64 content to TraceLab API
+  - API decodes and processes through existing ingestion pipeline
+  - Consider file size limits (e.g., 10MB max)
+  - Return early with document_id, processing happens async
+  - Agent can poll /api/v1/documents/{id} for status
+
+agent_workflow:
+  description: "Agent uploads and searches new document"
+  steps:
+    - "1. Agent has document content (from web fetch, generation, etc)"
+    - "2. upload_document({ name, content, content_type })"
+    - "3. Wait for processing (poll or just proceed)"
+    - "4. search_knowledge('query', project_id) -> includes new doc"
+
+future_enhancements:
+  - URL-based upload (agent provides URL, TraceLab fetches)
+  - Batch upload for multiple documents
+  - Upload progress/webhook notifications
+
+dependencies: []
+
+references:
+  - app/api/v1/documents.py (upload endpoint)
+  - app/services/document_service.py (ingestion logic)
+  - packages/tracelab-mcp/src/tools/ (tool patterns)

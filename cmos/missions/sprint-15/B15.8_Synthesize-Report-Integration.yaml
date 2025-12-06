@@ -1,0 +1,108 @@
+id: B15.8
+title: "Synthesize-to-Report Integration"
+type: Build.Feature
+status: Queued
+priority: Medium
+sprint: Sprint 15
+
+objective: |
+  Add a save_as_report parameter to the existing /api/v1/synthesize endpoint,
+  allowing callers to persist synthesis results as reports in a single call.
+  This simplifies the agent workflow and ensures no synthesis is lost.
+
+context: |
+  Currently, to save a synthesis as a report, you must:
+  1. POST /api/v1/synthesize -> get content
+  2. POST /api/v1/reports -> save with title
+
+  With this integration:
+  1. POST /api/v1/synthesize with save_as_report=true, title="..." -> done
+
+  This is especially valuable for MCP tools where the synthesize tool can
+  optionally persist results without a separate create_report call.
+
+success_criteria:
+  - save_as_report boolean param added to SynthesizeRequest
+  - report_title string param added (required if save_as_report=true)
+  - When save_as_report=true, synthesis result saved as report
+  - Response includes report_id when saved
+  - MCP synthesize tool updated to support save_as_report
+  - Backward compatible (existing calls unchanged)
+  - Tests for new functionality
+
+deliverables:
+  - Updated app/schemas/synthesis.py (new params)
+  - Updated app/api/v1/synthesize.py (integration logic)
+  - Updated app/services/synthesis.py (or call ReportService)
+  - Updated packages/tracelab-mcp/src/tools/synthesize.ts
+  - tests/test_synthesize_report_integration.py
+
+api_changes:
+  synthesize_request:
+    existing_params:
+      - collection_id
+      - chunk_ids
+      - prompt
+      - format
+    new_params:
+      - "save_as_report: boolean (default false)"
+      - "report_title: string (required if save_as_report=true)"
+      - "project_id: UUID (optional, for report organization)"
+
+  synthesize_response:
+    existing_fields:
+      - content
+      - citations
+      - tokens_used
+      - truncated
+      - chunk_count
+    new_fields:
+      - "report_id: UUID | null (present if saved as report)"
+
+example_usage:
+  without_save:
+    request:
+      collection_id: "abc-123"
+      prompt: "Summarize key findings"
+    response:
+      content: "..."
+      report_id: null
+
+  with_save:
+    request:
+      collection_id: "abc-123"
+      prompt: "Summarize key findings"
+      save_as_report: true
+      report_title: "Key Findings Summary"
+    response:
+      content: "..."
+      report_id: "rpt-456"
+
+mcp_tool_update:
+  synthesize:
+    new_params:
+      - "save_as_report: boolean (optional)"
+      - "report_title: string (optional, required if save_as_report)"
+    example: |
+      synthesize({
+        collection_id: "abc-123",
+        prompt: "Summarize the research",
+        save_as_report: true,
+        report_title: "Research Summary Q4"
+      })
+
+implementation_notes:
+  - Use ReportService.create() internally when save_as_report=true
+  - Reuse the same synthesis result (don't call LLM twice)
+  - Validate report_title present when save_as_report=true
+  - Pass through project_id to report if provided
+  - Consider: should synthesize tool replace create_report? (No, keep both)
+
+dependencies:
+  - "B15.2 (Reports Service & API)"
+  - "B15.3 (Synthesis Caching) - optional but recommended"
+
+references:
+  - app/api/v1/synthesize.py (current endpoint)
+  - app/schemas/synthesis.py (current schemas)
+  - packages/tracelab-mcp/src/tools/synthesize.ts

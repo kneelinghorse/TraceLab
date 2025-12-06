@@ -1,0 +1,101 @@
+id: B15.5
+title: "Reports MCP Tools"
+type: Build.Feature
+status: Queued
+priority: High
+sprint: Sprint 15
+
+objective: |
+  Add Reports tools to the TraceLab MCP server, enabling AI agents to create,
+  list, retrieve, and export reports autonomously. This completes the
+  research-to-output loop with persistent artifacts.
+
+context: |
+  The MCP server (B14.1) has 8 tools for search/collect/synthesize. With
+  Reports, agents can now persist their synthesis outputs as named artifacts
+  that survive across sessions. The flow becomes:
+
+  search -> collect -> create_report (synthesize + persist)
+
+success_criteria:
+  - create_report tool implemented
+  - list_reports tool implemented
+  - get_report tool implemented
+  - export_report tool implemented
+  - All tools tested and documented
+  - README updated with new tools
+
+deliverables:
+  - Updated packages/tracelab-mcp/src/tools/*.ts
+  - Updated packages/tracelab-mcp/src/index.ts (tool registration)
+  - Updated packages/tracelab-mcp/README.md
+  - Tests for new tools
+
+mcp_tools:
+  create_report:
+    purpose: Create a new report from collection or chunks
+    endpoint: POST /api/v1/reports
+    params:
+      - "title: string (required) - name for the report"
+      - "collection_id: string (optional) - synthesize entire collection"
+      - "chunk_ids: string[] (optional) - synthesize specific chunks"
+      - "prompt: string (optional) - custom synthesis instruction"
+      - "format: string (optional) - summary|report|bullets|markdown"
+    returns: Report object with id, title, content, citations
+    example: |
+      create_report({
+        title: "LangGraph Architecture Summary",
+        collection_id: "abc-123",
+        prompt: "Focus on the agent orchestration patterns"
+      })
+
+  list_reports:
+    purpose: Browse existing reports
+    endpoint: GET /api/v1/reports
+    params:
+      - "project_id: string (optional) - filter by project"
+      - "status: string (optional) - filter by draft|final"
+      - "limit: number (optional) - max results"
+    returns: Array of report summaries
+    example: |
+      list_reports({ status: "final", limit: 10 })
+
+  get_report:
+    purpose: Get full report content and metadata
+    endpoint: GET /api/v1/reports/{id}
+    params:
+      - "report_id: string (required)"
+    returns: Full report with content, citations, sources
+    example: |
+      get_report({ report_id: "xyz-789" })
+
+  export_report:
+    purpose: Export report as markdown text
+    endpoint: GET /api/v1/reports/{id}
+    params:
+      - "report_id: string (required)"
+    returns: Markdown string (report content)
+    notes: "For MVP, returns content field directly. Future: format options"
+    example: |
+      export_report({ report_id: "xyz-789" })
+
+agent_workflow:
+  description: "Complete research-to-report loop"
+  steps:
+    - "1. search_knowledge('LangGraph patterns') -> chunks"
+    - "2. create_collection({ name: 'LangGraph Research' })"
+    - "3. add_to_collection(collection_id, chunk_id) [repeat]"
+    - "4. create_report({ title: 'LangGraph Summary', collection_id })"
+    - "5. get_report(report_id) -> read the generated report"
+
+implementation_notes:
+  - Follow existing tool patterns in tracelab-mcp
+  - export_report can just return content field (MD is native)
+  - Consider adding update_report in future for status changes
+
+dependencies:
+  - "B15.2 (Reports Service & API)"
+
+references:
+  - packages/tracelab-mcp/src/tools/ (existing tools)
+  - packages/tracelab-mcp/README.md (documentation pattern)

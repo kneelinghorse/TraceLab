@@ -1,0 +1,93 @@
+id: B15.1
+title: "Reports Data Model"
+type: Build.Feature
+status: Queued
+priority: High
+sprint: Sprint 15
+
+objective: |
+  Create the database schema for Reports - the persisted output artifacts of TraceLab.
+  Documents flow IN, Reports flow OUT. Reports are synthesized from collections/chunks
+  and represent the system's generated knowledge artifacts.
+
+context: |
+  TraceLab now has a complete input pipeline (documents, chunks, collections) and
+  synthesis capability (B14.2). This mission adds persistence for synthesis outputs
+  as "Reports" - named, versioned artifacts that can be retrieved and exported.
+
+  Design for future version chains (v1 -> v2 -> v3) but MVP only needs single
+  version with ability to regenerate.
+
+success_criteria:
+  - reports table created with all required columns
+  - report_sources table for polymorphic source tracking
+  - synthesis_cache table for content-hash caching
+  - Alembic migration runs cleanly (upgrade and downgrade)
+  - SQLAlchemy models with proper relationships
+  - Indexes on frequently queried columns
+
+deliverables:
+  - app/models/report.py (Report, ReportSource models)
+  - app/models/synthesis_cache.py (SynthesisCache model)
+  - alembic/versions/013_add_reports.py migration
+  - Updated app/models/__init__.py exports
+
+database_schema:
+  reports:
+    columns:
+      - "id: UUID PRIMARY KEY"
+      - "project_id: UUID FK projects(id) nullable"
+      - "title: VARCHAR(255) NOT NULL"
+      - "report_type: VARCHAR(50) DEFAULT 'summary'"
+      - "prompt: TEXT (synthesis prompt used)"
+      - "content: TEXT NOT NULL"
+      - "content_hash: VARCHAR(64) (SHA-256)"
+      - "version: INTEGER DEFAULT 1"
+      - "parent_id: UUID FK reports(id) nullable (for future versioning)"
+      - "status: VARCHAR(20) DEFAULT 'draft' (draft, final)"
+      - "tokens_used: INTEGER DEFAULT 0"
+      - "chunk_count: INTEGER DEFAULT 0"
+      - "created_at: TIMESTAMP"
+      - "updated_at: TIMESTAMP"
+    indexes:
+      - "ix_reports_project_id"
+      - "ix_reports_status"
+      - "ix_reports_created_at"
+
+  report_sources:
+    columns:
+      - "id: UUID PRIMARY KEY"
+      - "report_id: UUID FK reports(id) ON DELETE CASCADE"
+      - "source_type: VARCHAR(20) NOT NULL (collection, chunk)"
+      - "source_id: UUID NOT NULL"
+      - "added_at: TIMESTAMP"
+    indexes:
+      - "ix_report_sources_report_id"
+      - "ix_report_sources_source_type_source_id"
+
+  synthesis_cache:
+    columns:
+      - "id: UUID PRIMARY KEY"
+      - "input_hash: VARCHAR(64) UNIQUE NOT NULL"
+      - "content: TEXT NOT NULL"
+      - "citations: JSONB"
+      - "model_used: VARCHAR(50)"
+      - "tokens_used: INTEGER DEFAULT 0"
+      - "created_at: TIMESTAMP"
+      - "hit_count: INTEGER DEFAULT 0"
+      - "last_hit_at: TIMESTAMP nullable"
+    indexes:
+      - "ix_synthesis_cache_input_hash"
+
+implementation_notes:
+  - Use gen_random_uuid() or Python uuid4 for IDs
+  - parent_id enables future version chains but leave null for MVP
+  - content_hash computed as SHA-256 of content for dedup detection
+  - Keep report_sources simple - source_type is enum-like string
+  - synthesis_cache.input_hash = SHA-256(sorted(chunk_ids) + prompt + format)
+
+dependencies: []
+
+references:
+  - app/models/collection.py (similar pattern)
+  - alembic/versions/011_add_collections.py (migration pattern)
