@@ -17,6 +17,7 @@ export default function CollectionDetailPage() {
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editError, setEditError] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   const { data: collection, mutate, isLoading } = useSWR<CollectionDetail>(
     id ? `collection-${id}` : null,
@@ -75,6 +76,19 @@ export default function CollectionDetailPage() {
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to remove chunk";
       alert(message);
+    }
+  };
+
+  const handleExport = async () => {
+    if (!collection) return;
+    setIsExporting(true);
+    try {
+      await collectionsApi.exportMarkdown(collection.id);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to export collection";
+      alert(message);
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -162,6 +176,13 @@ export default function CollectionDetailPage() {
                     )}
                   </div>
                   <div className="flex gap-2">
+                    <button
+                      onClick={handleExport}
+                      disabled={isExporting || collection.item_count === 0}
+                      className="px-4 py-2 text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isExporting ? "Exporting..." : "Export"}
+                    </button>
                     <button
                       onClick={handleStartEdit}
                       className="px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded"

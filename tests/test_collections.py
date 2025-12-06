@@ -315,3 +315,84 @@ def test_collection_cascade_delete_items(auth_headers, db_session):
         assert remaining_chunk is not None, "Chunk should still exist after collection deletion"
     finally:
         session.close()
+
+
+def test_collection_export_markdown(auth_headers, db_session):
+    """Test exporting a collection as markdown."""
+    client = TestClient(app)
+
+    # Create test data
+    project = _create_test_project(db_session)
+    document = _create_test_document(db_session, project.id)
+    chunk1 = _create_test_chunk(db_session, document.id, 0, "This is the first chunk content for export testing.")
+    chunk2 = _create_test_chunk(db_session, document.id, 1, "This is the second chunk content for export testing.")
+
+    # Create collection
+    create_resp = client.post(
+        "/api/v1/collections",
+        json={"name": "Export Test Collection", "description": "Testing markdown export"},
+        headers=auth_headers,
+    )
+    assert create_resp.status_code == 201
+    collection_id = create_resp.json()["id"]
+
+    # Add chunks
+    client.post(
+        f"/api/v1/collections/{collection_id}/chunks",
+        json={"chunk_id": str(chunk1.id), "notes": "First important note"},
+        headers=auth_headers,
+    )
+    client.post(
+        f"/api/v1/collections/{collection_id}/chunks",
+        json={"chunk_id": str(chunk2.id)},
+        headers=auth_headers,
+    )
+
+    # Export collection
+    export_resp = client.get(f"/api/v1/collections/{collection_id}/export", headers=auth_headers)
+    assert export_resp.status_code == 200
+    assert export_resp.headers["content-type"] == "text/markdown; charset=utf-8"
+    assert "attachment" in export_resp.headers.get("content-disposition", "")
+    assert "export-test-collection-export.md" in export_resp.headers.get("content-disposition", "")
+
+    # Verify markdown content
+    content = export_resp.text
+    assert "# Export Test Collection" in content
+    assert "> Testing markdown export" in content
+    assert "## Metadata" in content
+    assert "## Collected Chunks" in content
+    assert "### Chunk 1" in content
+    assert "### Chunk 2" in content
+    assert "This is the first chunk content" in content
+    assert "This is the second chunk content" in content
+    assert "**Notes:** First important note" in content
+    assert "**Source:** Test Document" in content
+
+
+def test_collection_export_empty(auth_headers):
+    """Test exporting an empty collection returns valid markdown."""
+    client = TestClient(app)
+
+    # Create collection without chunks
+    create_resp = client.post(
+        "/api/v1/collections",
+        json={"name": "Empty Export"},
+        headers=auth_headers,
+    )
+    collection_id = create_resp.json()["id"]
+
+    # Export empty collection
+    export_resp = client.get(f"/api/v1/collections/{collection_id}/export", headers=auth_headers)
+    assert export_resp.status_code == 200
+    content = export_resp.text
+    assert "# Empty Export" in content
+    assert "**Total Chunks:** 0" in content
+
+
+def test_collection_export_not_found(auth_headers):
+    """Test export returns 404 for non-existent collection."""
+    client = TestClient(app)
+    fake_id = str(uuid.uuid4())
+
+    export_resp = client.get(f"/api/v1/collections/{fake_id}/export", headers=auth_headers)
+    assert export_resp.status_code == 404
