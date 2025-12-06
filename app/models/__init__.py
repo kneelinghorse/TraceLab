@@ -13,6 +13,7 @@ from app.models.idempotency import IdempotencyRecord
 from app.models.search_history import SearchHistory
 from app.models.saved_search import SavedSearch
 from app.models.sync_state import SyncState
+from app.models.collection import Collection, CollectionItem
 
 __all__ = [
     "Base",
@@ -31,4 +32,6 @@ __all__ = [
     "SearchHistory",
     "SavedSearch",
     "SyncState",
+    "Collection",
+    "CollectionItem",
 ]
