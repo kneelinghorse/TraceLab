@@ -59,6 +59,16 @@ export function Navigation() {
                 Missions
               </Link>
               <Link
+                href="/collections"
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive("/collections")
+                    ? "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
+                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                }`}
+              >
+                Collections
+              </Link>
+              <Link
                 href="/search"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive("/search")

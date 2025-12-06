@@ -16,10 +16,7 @@ import { projectsApi } from "@/lib/api/projects";
 import type { PaginatedResponse } from "@/types/pagination";
 import { searchApi } from "@/lib/api/search";
 import { savedSearchesApi } from "@/lib/api/savedSearches";
-import { updateMission } from "@/lib/api/missions";
-import { useMissionList } from "@/lib/hooks/useMissions";
 import type { Document, Project } from "@/types/document";
-import type { Mission } from "@/types/mission";
 import type {
   RagCitation,
   RagResponsePayload,
@@ -70,7 +67,6 @@ function SearchExperience({ initialSection }: SearchPageProps) {
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const resultsAnchorRef = useRef<HTMLDivElement | null>(null);
 
-  const { missions, refresh: refreshMissions } = useMissionList();
   const { data: projectResponse } = useSWR<PaginatedResponse<Project>>(
     ["search-projects"],
     () => projectsApi.listProjects({ pageSize: 200 })
@@ -344,38 +340,6 @@ function SearchExperience({ initialSection }: SearchPageProps) {
     target?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
-  const handleQuickAddEvidence = async (missionId: string, chunk: SearchResultChunk, note?: string) => {
-    const mission = missions.find((item) => item.id === missionId);
-    if (!mission) {
-      throw new Error("Mission not found.");
-    }
-
-    const doc = chunk.document_id ? documentIndex.get(chunk.document_id) : undefined;
-    const evidenceId = chunk.chunk_id ? `EV-${chunk.chunk_id}` : `EV-${Date.now()}`;
-    const baseSummary = chunk.content.length > 280 ? `${chunk.content.slice(0, 277)}…` : chunk.content;
-    const trimmedNote = note?.trim();
-    const summary = trimmedNote ? `${baseSummary}\n\nResearcher note: ${trimmedNote}` : baseSummary;
-    const evidence = {
-      evidence_id: evidenceId,
-      source: doc?.name ?? "Semantic Search Result",
-      summary: summary || "Semantic search chunk",
-      chunk_id: chunk.chunk_id ?? "",
-      insight_id: undefined,
-      source_type: chunk.source_type ?? doc?.source_type ?? "semantic-search",
-      relevance_score: Number(chunk.score.toFixed(4)),
-      tags: ["search-ui"],
-    } satisfies Mission["mission_data"]["evidence"][number];
-
-    const nextEvidence = [...(mission.mission_data.evidence ?? []), evidence];
-    await updateMission(mission.id, {
-      mission_data: {
-        ...mission.mission_data,
-        evidence: nextEvidence,
-      },
-    });
-    refreshMissions();
-  };
-
   const filterChips = [
     filters.projectId && { label: "Project", value: filters.projectId },
     filters.documentType && { label: "Type", value: filters.documentType },
@@ -488,8 +452,6 @@ function SearchExperience({ initialSection }: SearchPageProps) {
                   ref={registerCardRef(result.chunk_id)}
                   result={result}
                   document={result.document_id ? documentIndex.get(result.document_id) : undefined}
-                  missions={missions}
-                  onQuickAddEvidence={handleQuickAddEvidence}
                   isHighlighted={highlightedChunkId === result.chunk_id}
                 />
               ))}
