@@ -1,9 +1,11 @@
 """Collection CRUD and item management endpoints."""
 from __future__ import annotations
 
+import re
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi.responses import PlainTextResponse
 
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.schemas.collection import (
@@ -101,6 +103,38 @@ def get_collection(
         updated_at=entry.updated_at,
         item_count=len(item_responses),
         items=item_responses,
+    )
+
+
+@router.get("/{collection_id}/export")
+def export_collection(
+    collection_id: UUID,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    service: CollectionService = Depends(get_collection_service),
+) -> Response:
+    """Export collection as markdown bundle for agent synthesis.
+
+    Returns a markdown file containing all chunks with metadata,
+    suitable for feeding to AI agents for report generation.
+    """
+    markdown = service.export_markdown(collection_id)
+    if markdown is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found.")
+
+    # Fetch collection name for filename
+    entry = service.get(collection_id)
+    filename = "collection-export.md"
+    if entry:
+        # Sanitize name for filename
+        safe_name = re.sub(r"[^\w\s-]", "", entry.name).strip().replace(" ", "-").lower()
+        filename = f"{safe_name}-export.md" if safe_name else "collection-export.md"
+
+    return Response(
+        content=markdown,
+        media_type="text/markdown",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+        },
     )
 
 

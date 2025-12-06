@@ -1,6 +1,7 @@
 """Service for managing chunk collections."""
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional
 from uuid import UUID
 
@@ -10,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
 from app.models.collection import Collection, CollectionItem
 from app.models.chunk import DocumentChunk
+from app.models.document import Document
 
 SessionFactory = Callable[[], Session]
 
@@ -245,6 +247,115 @@ class CollectionService:
                 .filter(CollectionItem.collection_id == str(collection_id))
                 .count()
             )
+        finally:
+            session.close()
+
+    # ------------------------------------------------------------------
+    # Export
+    # ------------------------------------------------------------------
+    def export_markdown(self, collection_id: UUID | str) -> Optional[str]:
+        """Export collection as markdown bundle for agent synthesis.
+
+        Returns None if collection not found, otherwise a markdown string.
+        """
+        session = self.session_factory()
+        try:
+            collection = (
+                session.query(Collection)
+                .filter(Collection.id == str(collection_id))
+                .one_or_none()
+            )
+            if collection is None:
+                return None
+
+            # Get items with chunks eagerly loaded
+            items = (
+                session.query(CollectionItem)
+                .filter(CollectionItem.collection_id == str(collection_id))
+                .order_by(CollectionItem.added_at.asc())
+                .all()
+            )
+
+            # Gather document info for chunks
+            doc_ids = set()
+            for item in items:
+                if item.chunk and item.chunk.document_id:
+                    doc_ids.add(str(item.chunk.document_id))
+
+            documents: Dict[str, Document] = {}
+            if doc_ids:
+                docs = (
+                    session.query(Document)
+                    .filter(Document.id.in_(doc_ids))
+                    .all()
+                )
+                documents = {str(d.id): d for d in docs}
+
+            # Build markdown
+            lines: List[str] = []
+            lines.append(f"# {collection.name}")
+            lines.append("")
+            if collection.description:
+                lines.append(f"> {collection.description}")
+                lines.append("")
+            lines.append("---")
+            lines.append("")
+            lines.append("## Metadata")
+            lines.append("")
+            lines.append(f"- **Collection ID:** `{collection.id}`")
+            lines.append(f"- **Created:** {collection.created_at.strftime('%Y-%m-%d %H:%M UTC')}")
+            lines.append(f"- **Updated:** {collection.updated_at.strftime('%Y-%m-%d %H:%M UTC')}")
+            lines.append(f"- **Total Chunks:** {len(items)}")
+            lines.append("")
+            lines.append("---")
+            lines.append("")
+            lines.append("## Collected Chunks")
+            lines.append("")
+
+            for idx, item in enumerate(items, start=1):
+                chunk = item.chunk
+                doc = documents.get(str(chunk.document_id)) if chunk else None
+
+                lines.append(f"### Chunk {idx}")
+                lines.append("")
+
+                # Source info
+                if doc:
+                    lines.append(f"**Source:** {doc.name}")
+                    if doc.file_type:
+                        lines.append(f"**Type:** {doc.file_type}")
+                    if doc.source_type:
+                        lines.append(f"**Source Type:** {doc.source_type}")
+                elif chunk:
+                    lines.append(f"**Document ID:** `{chunk.document_id}`")
+
+                if chunk:
+                    lines.append(f"**Chunk Index:** {chunk.chunk_index}")
+
+                lines.append(f"**Added to Collection:** {item.added_at.strftime('%Y-%m-%d %H:%M UTC')}")
+
+                if item.notes:
+                    lines.append("")
+                    lines.append(f"**Notes:** {item.notes}")
+
+                lines.append("")
+                lines.append("```")
+                if chunk and chunk.content:
+                    lines.append(chunk.content)
+                else:
+                    lines.append("(Content unavailable)")
+                lines.append("```")
+                lines.append("")
+                lines.append("---")
+                lines.append("")
+
+            # Footer for agent context
+            lines.append("## Export Info")
+            lines.append("")
+            lines.append(f"*Exported at {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')} for agent synthesis.*")
+            lines.append("")
+
+            return "\n".join(lines)
         finally:
             session.close()
 

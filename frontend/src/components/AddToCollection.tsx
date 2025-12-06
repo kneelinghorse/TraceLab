@@ -1,9 +1,11 @@
 /**
  * AddToCollection - Dropdown component for adding chunks to collections
+ * Uses portal to escape backdrop-blur stacking contexts
  */
 
 import { collectionsApi, type Collection } from "@/lib/api/collections";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import useSWR from "swr";
 
 type AddToCollectionProps = {
@@ -24,12 +26,25 @@ export function AddToCollection({
   const [newName, setNewName] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const { data: response, mutate } = useSWR(
     isOpen ? "collections-dropdown" : null,
     () => collectionsApi.list()
   );
   const collections = response?.data ?? [];
+
+  // Calculate menu position when opening
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.right + window.scrollX - 256, // 256 = w-64 (16rem)
+      });
+    }
+  }, [isOpen]);
 
   // Clear feedback after 3 seconds
   useEffect(() => {
@@ -78,13 +93,108 @@ export function AddToCollection({
     }
   };
 
+  const closeMenu = () => {
+    setIsOpen(false);
+    setIsCreating(false);
+  };
+
   const buttonClass = variant === "compact"
     ? "text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
     : "px-3 py-1.5 text-sm border border-white/20 rounded-lg text-slate-200 hover:border-sky-300 hover:text-sky-200";
 
+  const dropdownMenu = isOpen && typeof document !== "undefined" ? createPortal(
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 z-[9998]"
+        onClick={closeMenu}
+      />
+
+      {/* Menu */}
+      <div
+        className="fixed w-64 z-[9999] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl"
+        style={{ top: menuPosition.top, left: menuPosition.left }}
+      >
+        <div className="p-2">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 px-2 py-1">
+            Add to collection
+          </p>
+
+          {/* Existing collections */}
+          <div className="max-h-48 overflow-y-auto">
+            {collections.length === 0 ? (
+              <p className="px-2 py-2 text-sm text-gray-500 dark:text-gray-400">
+                No collections yet
+              </p>
+            ) : (
+              collections.map((collection) => (
+                <button
+                  key={collection.id}
+                  onClick={() => handleAddToCollection(collection)}
+                  disabled={isAdding}
+                  className="w-full text-left px-2 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-50"
+                >
+                  <span className="block truncate">{collection.name}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {collection.item_count} {collection.item_count === 1 ? "chunk" : "chunks"}
+                  </span>
+                </button>
+              ))
+            )}
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-gray-200 dark:border-gray-700 my-2" />
+
+          {/* Create new */}
+          {isCreating ? (
+            <form onSubmit={handleCreateAndAdd} className="p-2">
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="Collection name..."
+                className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                autoFocus
+              />
+              <div className="flex gap-2 mt-2">
+                <button
+                  type="submit"
+                  disabled={!newName.trim() || isAdding}
+                  className="flex-1 px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                >
+                  Create & Add
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCreating(false);
+                    setNewName("");
+                  }}
+                  className="px-2 py-1 text-xs text-gray-600 dark:text-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            <button
+              onClick={() => setIsCreating(true)}
+              className="w-full text-left px-2 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+            >
+              + New Collection
+            </button>
+          )}
+        </div>
+      </div>
+    </>,
+    document.body
+  ) : null;
+
   return (
-    <div className={`relative ${isOpen ? "z-50" : ""} ${className}`}>
+    <div className={`relative ${className}`}>
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={buttonClass}
@@ -93,94 +203,7 @@ export function AddToCollection({
         {isAdding ? "Adding..." : "+ Collection"}
       </button>
 
-      {/* Dropdown */}
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => {
-              setIsOpen(false);
-              setIsCreating(false);
-            }}
-          />
-
-          {/* Menu */}
-          <div className="absolute right-0 mt-1 w-64 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-            <div className="p-2">
-              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 px-2 py-1">
-                Add to collection
-              </p>
-
-              {/* Existing collections */}
-              <div className="max-h-48 overflow-y-auto">
-                {collections.length === 0 ? (
-                  <p className="px-2 py-2 text-sm text-gray-500 dark:text-gray-400">
-                    No collections yet
-                  </p>
-                ) : (
-                  collections.map((collection) => (
-                    <button
-                      key={collection.id}
-                      onClick={() => handleAddToCollection(collection)}
-                      disabled={isAdding}
-                      className="w-full text-left px-2 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-50"
-                    >
-                      <span className="block truncate">{collection.name}</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {collection.item_count} {collection.item_count === 1 ? "chunk" : "chunks"}
-                      </span>
-                    </button>
-                  ))
-                )}
-              </div>
-
-              {/* Divider */}
-              <div className="border-t border-gray-200 dark:border-gray-700 my-2" />
-
-              {/* Create new */}
-              {isCreating ? (
-                <form onSubmit={handleCreateAndAdd} className="p-2">
-                  <input
-                    type="text"
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                    placeholder="Collection name..."
-                    className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    autoFocus
-                  />
-                  <div className="flex gap-2 mt-2">
-                    <button
-                      type="submit"
-                      disabled={!newName.trim() || isAdding}
-                      className="flex-1 px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-                    >
-                      Create & Add
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsCreating(false);
-                        setNewName("");
-                      }}
-                      className="px-2 py-1 text-xs text-gray-600 dark:text-gray-400"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <button
-                  onClick={() => setIsCreating(true)}
-                  className="w-full text-left px-2 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                >
-                  + New Collection
-                </button>
-              )}
-            </div>
-          </div>
-        </>
-      )}
+      {dropdownMenu}
 
       {/* Feedback */}
       {feedback && (
