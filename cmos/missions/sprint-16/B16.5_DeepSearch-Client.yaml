@@ -1,0 +1,60 @@
+mission_id: B16.5
+title: DeepSearch Client
+sprint: Sprint 16
+status: Queued
+track: DeepSearch Integration
+
+objective: |
+  Create HTTP client for DeepSearch API to submit missions and
+  check execution status.
+
+success_criteria:
+  - DeepSearchClient class with typed methods
+  - POST /missions/execute support
+  - GET /missions/{job_id}/status support
+  - Proper error handling and retries
+  - Configuration via environment variables
+  - Timeout handling
+  - Tests with mocked responses
+
+deliverables:
+  - app/services/deepsearch_client.py
+  - app/schemas/deepsearch.py (request/response schemas)
+  - Configuration in app/core/config.py
+  - tests/test_deepsearch_client.py
+
+client_interface: |
+  class DeepSearchClient:
+      async def execute_mission(
+          self,
+          mission_id: str,
+          title: str,
+          objective: str,
+          success_criteria: list[str],
+          callback_url: str,
+          context: dict = None,
+          deliverables: list[str] = None,
+          research_phases: dict = None,
+          metadata: dict = None
+      ) -> ExecuteResponse:
+          """POST to DeepSearch /missions/execute"""
+
+      async def get_status(
+          self,
+          job_id: str
+      ) -> StatusResponse:
+          """GET from DeepSearch /missions/{job_id}/status"""
+
+config:
+  - DEEPSEARCH_API_URL (required)
+  - DEEPSEARCH_API_KEY (required)
+  - DEEPSEARCH_TIMEOUT (default: 30)
+  - DEEPSEARCH_RETRIES (default: 3)
+
+cross_project_dependency: |
+  This mission depends on DeepSearch DS.6.3 (Execute Endpoint).
+  DeepSearch must have /missions/execute endpoint available.
+
+estimated_tests: 10-15
+dependencies:
+  - B16.4

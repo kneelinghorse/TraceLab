@@ -1,0 +1,73 @@
+mission_id: B16.4
+title: Missions MCP Tools
+sprint: Sprint 16
+status: Queued
+track: Missions Revamp
+
+objective: |
+  Add MCP tools for mission management: create, list, get, submit,
+  and get status.
+
+success_criteria:
+  - create_mission tool creates mission in TraceLab
+  - list_missions tool with project/status filters
+  - get_mission tool returns full mission details
+  - submit_mission tool queues mission for DeepSearch execution
+  - get_mission_status tool returns current status
+  - All tools documented with examples
+  - Tests for each tool
+
+deliverables:
+  - MCP tools in app/mcp/tools/missions.py
+  - Tool documentation in docs/mcp-tools.md
+  - tests/test_mcp_missions.py
+
+mcp_tools:
+  - name: create_mission
+    params:
+      - mission_id (required)
+      - title (required)
+      - objective (required)
+      - success_criteria (required, list)
+      - project_id (optional)
+      - context (optional, dict)
+      - deliverables (optional, list)
+      - research_phases (optional, dict)
+      - tags (optional, list)
+      - priority (optional, default: normal)
+      - max_loops (optional, default: 3)
+    returns: mission object
+
+  - name: list_missions
+    params:
+      - project_id (optional)
+      - status (optional)
+      - page (optional)
+      - page_size (optional)
+    returns: paginated mission list
+
+  - name: get_mission
+    params:
+      - mission_id (required)
+    returns: full mission with results
+
+  - name: submit_mission
+    params:
+      - mission_id (required)
+    returns: job_id, status, eta
+    notes: |
+      1. Fetch mission from TraceLab
+      2. Validate success_criteria not empty
+      3. POST to DeepSearch /missions/execute
+      4. Update mission status to queued
+      5. Store deepsearch_job_id
+
+  - name: get_mission_status
+    params:
+      - mission_id (required)
+    returns: status, progress, results if complete
+
+estimated_tests: 20-25
+dependencies:
+  - B16.2
+  - B16.3

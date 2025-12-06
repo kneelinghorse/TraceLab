@@ -1,0 +1,40 @@
+mission_id: B16.12
+title: Mission Queue View
+sprint: Sprint 16
+status: Queued
+track: UI
+
+objective: |
+  Create view showing running and queued missions with progress
+  indicators and real-time status updates.
+
+success_criteria:
+  - /missions/queue page showing active missions
+  - Queued missions shown in order
+  - Running mission highlighted with progress
+  - Auto-refresh every 30 seconds
+  - Progress indicator based on execution_metadata
+  - ETA display for queued missions
+  - Cancel button for queued missions (if supported)
+  - Link to full detail view
+
+deliverables:
+  - frontend/src/pages/missions/queue.tsx
+  - QueueCard component
+  - ProgressIndicator component
+  - Auto-refresh hook
+
+ui_components:
+  - RunningMission: Large card with progress bar, current loop, elapsed time
+  - QueuedMission: Smaller card with position, ETA
+  - RefreshIndicator: Shows last refresh time
+  - EmptyState: Message when queue is empty
+
+auto_refresh:
+  interval: 30000  # 30 seconds
+  hook: useInterval or SWR revalidation
+
+estimated_tests: 5-10 (type checks, lint)
+dependencies:
+  - B16.9
+  - B16.10

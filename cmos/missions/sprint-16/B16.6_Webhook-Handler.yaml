@@ -1,0 +1,64 @@
+mission_id: B16.6
+title: Webhook Handler
+sprint: Sprint 16
+status: Queued
+track: DeepSearch Integration
+
+objective: |
+  Implement POST /api/v1/webhooks/deepsearch endpoint to receive
+  execution results from DeepSearch and update mission records.
+
+success_criteria:
+  - POST /api/v1/webhooks/deepsearch endpoint
+  - Validate incoming payload signature/auth
+  - Update mission status based on result
+  - Store execution_metadata, result_markdown, result_protocol
+  - Handle success and failure cases
+  - Idempotent (safe to receive same webhook twice)
+  - Tests for all scenarios
+
+deliverables:
+  - app/api/v1/webhooks.py
+  - app/schemas/webhook.py (DeepSearchResult schema)
+  - app/services/webhook_handler.py
+  - tests/test_webhook_handler.py
+
+webhook_payload: |
+  {
+    "job_id": "ds-job-abc123",
+    "mission_id": "DRM.0.7",
+    "status": "complete",
+    "execution_metadata": {
+      "loops_executed": 3,
+      "sources_found": 12,
+      "duration_seconds": 187,
+      "model_used": "gemini-1.5-flash",
+      "pedr_checked": true,
+      "pedr_reused": false
+    },
+    "result_markdown": "# Research Results\n...",
+    "result_protocol": { ... },
+    "error": null
+  }
+
+handler_logic: |
+  1. Validate webhook signature/auth
+  2. Find mission by mission_id
+  3. If status == "complete":
+     - Update mission status to "complete"
+     - Store execution_metadata
+     - Store result_markdown
+     - Store result_protocol
+     - Trigger B16.7 (auto-ingest) and B16.8 (auto-report)
+  4. If status == "failed":
+     - Update mission status to "failed"
+     - Store error_message
+  5. Return {"received": true}
+
+cross_project_dependency: |
+  This mission depends on DeepSearch DS.6.6 (Webhook Callback).
+  DeepSearch must POST results to this endpoint.
+
+estimated_tests: 15-20
+dependencies:
+  - B16.5

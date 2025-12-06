@@ -1,0 +1,35 @@
+mission_id: B16.9
+title: Missions List View
+sprint: Sprint 16
+status: Queued
+track: UI
+
+objective: |
+  Create frontend page to browse missions by project and status,
+  showing queue state and basic mission info.
+
+success_criteria:
+  - /missions page listing all missions
+  - Filter by project dropdown
+  - Filter by status (draft, queued, running, complete, failed)
+  - Status badges with appropriate colors
+  - Queue position shown for queued missions
+  - Click through to mission detail
+  - Pagination
+  - "Create Mission" button linking to create form
+
+deliverables:
+  - frontend/src/pages/missions/index.tsx
+  - frontend/src/lib/api/missions.ts
+  - frontend/src/types/mission.ts
+  - Navigation link to Missions
+
+ui_components:
+  - MissionCard: Shows title, status badge, project, created date
+  - StatusFilter: Dropdown for status filtering
+  - ProjectFilter: Dropdown for project filtering
+  - QueuePosition: Shows position in queue for queued missions
+
+estimated_tests: 5-10 (type checks, lint)
+dependencies:
+  - B16.2

@@ -1,0 +1,39 @@
+mission_id: B16.10
+title: Mission Detail View
+sprint: Sprint 16
+status: Queued
+track: UI
+
+objective: |
+  Create frontend page showing full mission details including
+  objective, phases, execution history, and linked documents/reports.
+
+success_criteria:
+  - /missions/[id] detail page
+  - Shows objective, success_criteria, deliverables
+  - Shows research_phases with tasks
+  - Shows execution metadata (loops, duration, model)
+  - Links to result documents
+  - Links to result report
+  - Status history/timeline
+  - "Submit to DeepSearch" button (if draft)
+  - Error message display (if failed)
+
+deliverables:
+  - frontend/src/pages/missions/[id].tsx
+  - MissionDetail component
+  - ExecutionTimeline component
+  - ResultLinks component
+
+ui_sections:
+  - Header: title, status badge, mission_id
+  - Objective: objective text
+  - Success Criteria: bulleted list
+  - Research Phases: collapsible sections with tasks
+  - Execution: metadata cards (loops, duration, sources, model)
+  - Results: links to documents and report
+  - Actions: Submit, Edit, Delete buttons
+
+estimated_tests: 5-10 (type checks, lint)
+dependencies:
+  - B16.9

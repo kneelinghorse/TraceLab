@@ -1,0 +1,48 @@
+mission_id: B16.2
+title: Missions CRUD API
+sprint: Sprint 16
+status: Queued
+track: Missions Revamp
+
+objective: |
+  Implement full CRUD API for missions with status filtering and
+  proper Pydantic schemas.
+
+success_criteria:
+  - POST /api/v1/missions - create mission
+  - GET /api/v1/missions - list with status/project filters
+  - GET /api/v1/missions/{id} - get mission details
+  - PUT /api/v1/missions/{id} - update mission
+  - DELETE /api/v1/missions/{id} - delete mission
+  - Pydantic schemas for request/response
+  - MissionService with business logic
+  - Pagination on list endpoint
+  - Tests for all endpoints
+
+deliverables:
+  - app/schemas/mission.py (MissionCreate, MissionUpdate, MissionResponse)
+  - app/services/mission_service.py
+  - app/api/v1/missions.py
+  - tests/test_missions_api.py
+
+api_endpoints:
+  - method: POST
+    path: /api/v1/missions
+    description: Create new mission
+  - method: GET
+    path: /api/v1/missions
+    description: List missions with filters
+    params: [status, project_id, page, page_size]
+  - method: GET
+    path: /api/v1/missions/{mission_id}
+    description: Get mission by mission_id
+  - method: PUT
+    path: /api/v1/missions/{mission_id}
+    description: Update mission
+  - method: DELETE
+    path: /api/v1/missions/{mission_id}
+    description: Delete mission
+
+estimated_tests: 15-20
+dependencies:
+  - B16.1

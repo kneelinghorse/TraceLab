@@ -1,0 +1,47 @@
+mission_id: B16.7
+title: Auto-Ingest Results
+sprint: Sprint 16
+status: Queued
+track: DeepSearch Integration
+
+objective: |
+  Automatically ingest result_markdown as a document when mission
+  completes, linking it back to the mission.
+
+success_criteria:
+  - result_markdown ingested as document on webhook complete
+  - Document filename: {mission_id}_report.md
+  - Document linked to mission's project_id
+  - Document source_type: "deepsearch"
+  - Document metadata includes mission_id
+  - mission.result_document_ids updated with new doc ID
+  - Chunking and embedding performed
+  - Tests for auto-ingest flow
+
+deliverables:
+  - Integration in webhook_handler.py
+  - Document ingestion with proper metadata
+  - tests/test_auto_ingest.py
+
+ingest_logic: |
+  async def auto_ingest_result(mission: Mission, result_markdown: str):
+      doc = await ingest_document(
+          content=result_markdown,
+          filename=f"{mission.mission_id}_report.md",
+          project_id=mission.project_id,
+          source_type="deepsearch",
+          metadata={
+              "mission_id": mission.mission_id,
+              "deepsearch_job_id": mission.deepsearch_job_id,
+              "auto_generated": True
+          }
+      )
+
+      mission.result_document_ids = [str(doc.id)]
+      await save_mission(mission)
+
+      return doc
+
+estimated_tests: 10-15
+dependencies:
+  - B16.6

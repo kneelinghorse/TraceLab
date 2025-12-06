@@ -1,0 +1,43 @@
+mission_id: B16.11
+title: Mission Create Form
+sprint: Sprint 16
+status: Queued
+track: UI
+
+objective: |
+  Create form to define new mission with validation matching
+  the backend schema requirements.
+
+success_criteria:
+  - /missions/new page with form
+  - Required fields: mission_id, title, objective, success_criteria
+  - Optional fields: project, context, deliverables, research_phases, tags
+  - Dynamic success_criteria list (add/remove items)
+  - Client-side validation matching backend rules
+  - Error display for validation failures
+  - Redirect to detail page on success
+  - "Save as Draft" and "Submit Immediately" options
+
+deliverables:
+  - frontend/src/pages/missions/new.tsx
+  - MissionForm component
+  - SuccessCriteriaInput component (dynamic list)
+  - ResearchPhasesEditor component (optional)
+
+form_fields:
+  - mission_id: text input, required, pattern validation
+  - title: text input, required, 3-255 chars
+  - objective: textarea, required, min 10 chars
+  - success_criteria: dynamic list, at least 1 item
+  - project_id: dropdown selector
+  - context.background: textarea
+  - context.constraints: dynamic list
+  - deliverables: dynamic list
+  - tags: tag input
+  - priority: select (low, normal, high)
+  - max_loops: number input (1-10)
+
+estimated_tests: 5-10 (type checks, lint)
+dependencies:
+  - B16.3
+  - B16.9

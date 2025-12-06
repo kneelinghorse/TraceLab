@@ -1,0 +1,53 @@
+mission_id: B16.3
+title: Missions Validation
+sprint: Sprint 16
+status: Queued
+track: Missions Revamp
+
+objective: |
+  Implement comprehensive validation for missions including schema
+  validation, business rules, and DeepSearch compatibility checks.
+
+success_criteria:
+  - success_criteria must be non-empty array
+  - title length 3-255 characters
+  - mission_id format validation (alphanumeric with dots/dashes)
+  - objective cannot be empty
+  - Pydantic validators on schemas
+  - Database constraints as backup
+  - Validation error messages are clear and actionable
+  - Tests for all validation rules
+
+deliverables:
+  - Pydantic validators in app/schemas/mission.py
+  - MissionValidator service class
+  - Clear error responses (422 with field-level errors)
+  - tests/test_mission_validation.py
+
+validation_rules:
+  - field: mission_id
+    rules:
+      - required
+      - unique
+      - pattern: ^[A-Za-z0-9][A-Za-z0-9._-]*$
+      - max_length: 50
+  - field: title
+    rules:
+      - required
+      - min_length: 3
+      - max_length: 255
+  - field: objective
+    rules:
+      - required
+      - min_length: 10
+  - field: success_criteria
+    rules:
+      - required
+      - type: array
+      - min_items: 1
+      - each item: non-empty string
+
+estimated_tests: 15-20
+dependencies:
+  - B16.1
+  - B16.2

@@ -1,0 +1,71 @@
+mission_id: B16.1
+title: Missions Schema Migration
+sprint: Sprint 16
+status: Queued
+track: Missions Revamp
+
+objective: |
+  Create new missions table with DeepSearch-compatible schema including
+  execution tracking, result fields, and proper constraints.
+
+success_criteria:
+  - Alembic migration 014_missions_revamp.py created
+  - Missions table has all required fields (mission_id, title, objective, success_criteria)
+  - Execution tracking fields (status, queued_at, started_at, completed_at, deepsearch_job_id)
+  - Result fields (execution_metadata, result_document_ids, result_report_id, result_markdown, result_protocol)
+  - Constraints enforced (success_criteria_not_empty, title_length)
+  - Indexes on project_id, status, mission_id
+  - SQLAlchemy model in app/models/mission.py
+  - Migration tested for upgrade/downgrade
+
+deliverables:
+  - app/models/mission.py with Mission SQLAlchemy model
+  - alembic/versions/014_missions_revamp.py
+  - Tests for model constraints
+
+schema: |
+  CREATE TABLE missions (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    project_id          UUID REFERENCES projects(id),
+
+    -- DeepSearch Required Fields
+    mission_id          VARCHAR(50) NOT NULL UNIQUE,
+    title               VARCHAR(255) NOT NULL,
+    objective           TEXT NOT NULL,
+    success_criteria    JSONB NOT NULL,
+
+    -- DeepSearch Optional Fields
+    context             JSONB DEFAULT '{}',
+    deliverables        JSONB DEFAULT '[]',
+    research_phases     JSONB DEFAULT '{}',
+    tags                JSONB DEFAULT '[]',
+    metadata            JSONB DEFAULT '{}',
+
+    -- Execution Tracking
+    status              VARCHAR(20) DEFAULT 'draft',
+    queued_at           TIMESTAMP,
+    started_at          TIMESTAMP,
+    completed_at        TIMESTAMP,
+    deepsearch_job_id   VARCHAR(100),
+
+    -- Results
+    execution_metadata  JSONB DEFAULT '{}',
+    result_document_ids JSONB DEFAULT '[]',
+    result_report_id    UUID REFERENCES reports(id),
+    result_markdown     TEXT,
+    result_protocol     JSONB,
+    error_message       TEXT,
+
+    -- Housekeeping
+    created_at          TIMESTAMP DEFAULT NOW(),
+    updated_at          TIMESTAMP DEFAULT NOW(),
+    created_by          VARCHAR(100),
+
+    CONSTRAINT success_criteria_not_empty
+      CHECK (jsonb_array_length(success_criteria) > 0),
+    CONSTRAINT title_length
+      CHECK (char_length(title) >= 3 AND char_length(title) <= 255)
+  );
+
+estimated_tests: 10-15
+dependencies: []
