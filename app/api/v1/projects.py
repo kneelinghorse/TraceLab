@@ -1,7 +1,7 @@
 """Project read endpoints (list/detail)."""
 from __future__ import annotations
 
-from typing import Optional
+from typing import Any, Dict, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
