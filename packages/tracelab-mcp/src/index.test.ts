@@ -302,6 +302,151 @@ Exported from TraceLab`;
       ).rejects.toThrow(TraceLabAPIError);
     });
   });
+
+  describe('createReport', () => {
+    it('should create a new report from collection', async () => {
+      const mockResponse = {
+        id: 'report-1',
+        title: 'ML Best Practices Summary',
+        content: '## Summary\n\nKey findings...',
+        citations: [
+          {
+            chunk_id: 'chunk-1',
+            document_id: 'doc-1',
+            excerpt: 'Supporting evidence...',
+          },
+        ],
+        tokens_used: 1500,
+        status: 'draft',
+        created_at: '2024-01-01T00:00:00Z',
+      };
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: () => Promise.resolve(mockResponse),
+      });
+
+      const result = await client.createReport({
+        title: 'ML Best Practices Summary',
+        collection_id: 'coll-1',
+        prompt: 'Summarize best practices',
+        format: 'summary',
+      });
+
+      expect(result.id).toBe('report-1');
+      expect(result.title).toBe('ML Best Practices Summary');
+      expect(result.citations).toHaveLength(1);
+      expect(result.tokens_used).toBe(1500);
+    });
+  });
+
+  describe('listReports', () => {
+    it('should list reports with pagination', async () => {
+      const mockResponse = {
+        items: [
+          {
+            id: 'report-1',
+            title: 'ML Summary',
+            status: 'final',
+            report_type: 'summary',
+            tokens_used: 1500,
+            chunk_count: 5,
+            project_id: 'proj-1',
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z',
+          },
+        ],
+        total: 1,
+        page: 1,
+        page_size: 20,
+      };
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: () => Promise.resolve(mockResponse),
+      });
+
+      const result = await client.listReports(1, 20, undefined, 'final');
+
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0].title).toBe('ML Summary');
+      expect(result.total).toBe(1);
+    });
+  });
+
+  describe('getReport', () => {
+    it('should get full report details', async () => {
+      const mockResponse = {
+        id: 'report-1',
+        title: 'ML Summary',
+        content: '## Full Report Content\n\nDetailed findings...',
+        citations: [],
+        tokens_used: 1500,
+        status: 'final',
+        created_at: '2024-01-01T00:00:00Z',
+        project_id: 'proj-1',
+        report_type: 'summary',
+        prompt: 'Summarize findings',
+        chunk_count: 5,
+        sources: [
+          {
+            id: 'src-1',
+            report_id: 'report-1',
+            source_type: 'collection',
+            source_id: 'coll-1',
+            added_at: '2024-01-01T00:00:00Z',
+          },
+        ],
+        updated_at: '2024-01-01T00:00:00Z',
+      };
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: () => Promise.resolve(mockResponse),
+      });
+
+      const result = await client.getReport('report-1');
+
+      expect(result.id).toBe('report-1');
+      expect(result.content).toContain('Full Report Content');
+      expect(result.sources).toHaveLength(1);
+      expect(result.chunk_count).toBe(5);
+    });
+  });
+
+  describe('exportReport', () => {
+    it('should export report as markdown', async () => {
+      const mockResponse = {
+        id: 'report-1',
+        title: 'ML Summary',
+        content: '## ML Best Practices\n\n1. Use cross-validation\n2. Feature engineering matters',
+        citations: [],
+        tokens_used: 1500,
+        status: 'final',
+        created_at: '2024-01-01T00:00:00Z',
+        project_id: null,
+        report_type: 'summary',
+        prompt: null,
+        chunk_count: 5,
+        sources: [],
+        updated_at: '2024-01-01T00:00:00Z',
+      };
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        headers: new Headers({ 'content-type': 'application/json' }),
+        json: () => Promise.resolve(mockResponse),
+      });
+
+      const result = await client.exportReport('report-1');
+
+      expect(result).toContain('ML Best Practices');
+      expect(result).toContain('cross-validation');
+    });
+  });
 });
 
 describe('Authentication', () => {

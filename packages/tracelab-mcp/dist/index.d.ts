@@ -2,7 +2,7 @@
 /**
  * TraceLab MCP Server
  *
- * Provides 8 tools for AI agents to perform complete research-to-output loops
+ * Provides 12 tools for AI agents to perform complete research-to-output loops
  * against TraceLab's knowledge base.
  *
  * Tools:
@@ -14,6 +14,10 @@
  * 6. create_collection - Create new collection for research
  * 7. add_to_collection - Add chunk to collection
  * 8. synthesize - Generate summary/report from collected chunks
+ * 9. create_report - Create a persistent report from collection/chunks
+ * 10. list_reports - Browse existing reports
+ * 11. get_report - Get full report details
+ * 12. export_report - Export report as markdown
  */
 export {};
 //# sourceMappingURL=index.d.ts.map

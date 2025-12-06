@@ -2,7 +2,7 @@
 /**
  * TraceLab MCP Server
  *
- * Provides 8 tools for AI agents to perform complete research-to-output loops
+ * Provides 12 tools for AI agents to perform complete research-to-output loops
  * against TraceLab's knowledge base.
  *
  * Tools:
@@ -14,6 +14,10 @@
  * 6. create_collection - Create new collection for research
  * 7. add_to_collection - Add chunk to collection
  * 8. synthesize - Generate summary/report from collected chunks
+ * 9. create_report - Create a persistent report from collection/chunks
+ * 10. list_reports - Browse existing reports
+ * 11. get_report - Get full report details
+ * 12. export_report - Export report as markdown
  */
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
@@ -184,6 +188,101 @@ const TOOLS = [
             required: ['collection_id'],
         },
     },
+    {
+        name: 'create_report',
+        description: 'Create a new report by synthesizing content from a collection or specific chunks. Reports are persistent artifacts that survive across sessions.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                title: {
+                    type: 'string',
+                    description: 'Title for the report (max 255 chars)',
+                    maxLength: 255,
+                },
+                collection_id: {
+                    type: 'string',
+                    description: 'UUID of collection to synthesize (mutually exclusive with chunk_ids)',
+                },
+                chunk_ids: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'UUIDs of specific chunks to synthesize (mutually exclusive with collection_id)',
+                },
+                project_id: {
+                    type: 'string',
+                    description: 'Optional: UUID of project to associate report with',
+                },
+                prompt: {
+                    type: 'string',
+                    description: 'Optional: Custom synthesis prompt (max 2000 chars)',
+                    maxLength: 2000,
+                },
+                format: {
+                    type: 'string',
+                    enum: ['summary', 'report', 'bullets', 'markdown'],
+                    description: 'Output format (default: summary)',
+                },
+            },
+            required: ['title'],
+        },
+    },
+    {
+        name: 'list_reports',
+        description: 'Browse existing reports with optional filtering by project or status.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                project_id: {
+                    type: 'string',
+                    description: 'Optional: Filter by project UUID',
+                },
+                status: {
+                    type: 'string',
+                    enum: ['draft', 'final'],
+                    description: 'Optional: Filter by status',
+                },
+                page: {
+                    type: 'number',
+                    description: 'Page number (1-indexed, default: 1)',
+                    minimum: 1,
+                },
+                page_size: {
+                    type: 'number',
+                    description: 'Results per page (1-100, default: 20)',
+                    minimum: 1,
+                    maximum: 100,
+                },
+            },
+        },
+    },
+    {
+        name: 'get_report',
+        description: 'Get full report details including content, citations, and source references.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                report_id: {
+                    type: 'string',
+                    description: 'UUID of the report',
+                },
+            },
+            required: ['report_id'],
+        },
+    },
+    {
+        name: 'export_report',
+        description: 'Export a report as markdown text. Returns the synthesized content directly.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                report_id: {
+                    type: 'string',
+                    description: 'UUID of the report to export',
+                },
+            },
+            required: ['report_id'],
+        },
+    },
 ];
 // Input validation schemas
 const SearchKnowledgeInput = z.object({
@@ -216,6 +315,26 @@ const SynthesizeInput = z.object({
     collection_id: z.string().uuid(),
     prompt: z.string().optional(),
     format: z.enum(['markdown', 'summary', 'report']).optional().default('markdown'),
+});
+const CreateReportInput = z.object({
+    title: z.string().min(1).max(255),
+    collection_id: z.string().uuid().optional(),
+    chunk_ids: z.array(z.string().uuid()).optional(),
+    project_id: z.string().uuid().optional(),
+    prompt: z.string().max(2000).optional(),
+    format: z.enum(['summary', 'report', 'bullets', 'markdown']).optional().default('summary'),
+});
+const ListReportsInput = z.object({
+    project_id: z.string().uuid().optional(),
+    status: z.enum(['draft', 'final']).optional(),
+    page: z.number().min(1).optional().default(1),
+    page_size: z.number().min(1).max(100).optional().default(20),
+});
+const GetReportInput = z.object({
+    report_id: z.string().uuid(),
+});
+const ExportReportInput = z.object({
+    report_id: z.string().uuid(),
 });
 // Tool handlers
 async function handleSearchKnowledge(args) {
@@ -412,6 +531,121 @@ async function handleSynthesize(args) {
         throw error;
     }
 }
+async function handleCreateReport(args) {
+    const input = CreateReportInput.parse(args);
+    if (!input.collection_id && !input.chunk_ids) {
+        return {
+            content: [
+                {
+                    type: 'text',
+                    text: JSON.stringify({
+                        error: 'Invalid input',
+                        message: 'Either collection_id or chunk_ids must be provided.',
+                    }, null, 2),
+                },
+            ],
+            isError: true,
+        };
+    }
+    const result = await client.createReport({
+        title: input.title,
+        collection_id: input.collection_id,
+        chunk_ids: input.chunk_ids,
+        project_id: input.project_id,
+        prompt: input.prompt,
+        format: input.format,
+    });
+    return {
+        content: [
+            {
+                type: 'text',
+                text: JSON.stringify({
+                    message: `Report "${result.title}" created successfully`,
+                    report: {
+                        id: result.id,
+                        title: result.title,
+                        status: result.status,
+                        tokens_used: result.tokens_used,
+                        created_at: result.created_at,
+                        content_preview: result.content.substring(0, 500) + (result.content.length > 500 ? '...' : ''),
+                        citations: result.citations,
+                    },
+                }, null, 2),
+            },
+        ],
+    };
+}
+async function handleListReports(args) {
+    const input = ListReportsInput.parse(args);
+    const result = await client.listReports(input.page, input.page_size, input.project_id, input.status);
+    return {
+        content: [
+            {
+                type: 'text',
+                text: JSON.stringify({
+                    reports: result.items.map((r) => ({
+                        id: r.id,
+                        title: r.title,
+                        status: r.status,
+                        report_type: r.report_type,
+                        tokens_used: r.tokens_used,
+                        chunk_count: r.chunk_count,
+                        project_id: r.project_id,
+                        created_at: r.created_at,
+                    })),
+                    pagination: {
+                        page: result.page,
+                        page_size: result.page_size,
+                        total: result.total,
+                    },
+                }, null, 2),
+            },
+        ],
+    };
+}
+async function handleGetReport(args) {
+    const input = GetReportInput.parse(args);
+    const result = await client.getReport(input.report_id);
+    return {
+        content: [
+            {
+                type: 'text',
+                text: JSON.stringify({
+                    id: result.id,
+                    title: result.title,
+                    content: result.content,
+                    status: result.status,
+                    report_type: result.report_type,
+                    tokens_used: result.tokens_used,
+                    chunk_count: result.chunk_count,
+                    project_id: result.project_id,
+                    prompt: result.prompt,
+                    citations: result.citations,
+                    sources: result.sources.map((s) => ({
+                        id: s.id,
+                        source_type: s.source_type,
+                        source_id: s.source_id,
+                        added_at: s.added_at,
+                    })),
+                    created_at: result.created_at,
+                    updated_at: result.updated_at,
+                }, null, 2),
+            },
+        ],
+    };
+}
+async function handleExportReport(args) {
+    const input = ExportReportInput.parse(args);
+    const markdown = await client.exportReport(input.report_id);
+    return {
+        content: [
+            {
+                type: 'text',
+                text: markdown,
+            },
+        ],
+    };
+}
 // Create and run the server
 async function main() {
     const server = new Server({
@@ -447,6 +681,14 @@ async function main() {
                     return await handleAddToCollection(args);
                 case 'synthesize':
                     return await handleSynthesize(args);
+                case 'create_report':
+                    return await handleCreateReport(args);
+                case 'list_reports':
+                    return await handleListReports(args);
+                case 'get_report':
+                    return await handleGetReport(args);
+                case 'export_report':
+                    return await handleExportReport(args);
                 default:
                     return {
                         content: [
