@@ -1,0 +1,64 @@
+mission_id: B16.8
+title: Auto-Create Report
+sprint: Sprint 16
+status: Queued
+track: DeepSearch Integration
+
+objective: |
+  Automatically create a Report from result_protocol when mission
+  completes with a full protocol, linking it to the mission.
+
+success_criteria:
+  - Report created from result_protocol on webhook complete
+  - Report title derived from mission title
+  - Report content from protocol synthesis
+  - Report sources linked to ingested document chunks
+  - mission.result_report_id updated
+  - Report status: draft (user can finalize)
+  - Tests for auto-report flow
+
+deliverables:
+  - create_report_from_protocol function
+  - Integration in webhook_handler.py
+  - tests/test_auto_report.py
+
+report_creation_logic: |
+  async def create_report_from_protocol(
+      mission: Mission,
+      protocol: dict
+  ) -> Report:
+      # Extract content from protocol
+      synthesis = protocol.get("synthesis", {})
+      content = format_protocol_to_markdown(protocol)
+
+      # Create report
+      report = await report_service.create(
+          title=f"Research: {mission.title}",
+          content=content,
+          format="markdown",
+          status="draft",
+          project_id=mission.project_id,
+          metadata={
+              "mission_id": mission.mission_id,
+              "auto_generated": True,
+              "quality_checkpoints": protocol.get("quality_checkpoints", [])
+          }
+      )
+
+      # Link sources (chunks from auto-ingested document)
+      if mission.result_document_ids:
+          doc_id = mission.result_document_ids[0]
+          chunks = await get_document_chunks(doc_id)
+          for chunk in chunks[:10]:  # Top 10 chunks as sources
+              await report_service.add_source(report.id, chunk.id)
+
+      # Update mission
+      mission.result_report_id = report.id
+      await save_mission(mission)
+
+      return report
+
+estimated_tests: 10-15
+dependencies:
+  - B16.6
+  - B16.7

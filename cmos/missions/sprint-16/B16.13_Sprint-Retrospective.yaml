@@ -1,0 +1,37 @@
+mission_id: B16.13
+title: Sprint 16 Retrospective
+sprint: Sprint 16
+status: Queued
+track: Wrap-up
+
+objective: |
+  Sprint wrap-up including retrospective report, telemetry capture,
+  MASTER_CONTEXT update, and Sprint 17 planning notes.
+
+success_criteria:
+  - cmos/reports/sprint-16/retrospective.md created
+  - Telemetry logged to cmos/telemetry/events/sprint-16-retro.jsonl
+  - MASTER_CONTEXT updated with Sprint 16 outcomes
+  - Sprint 17 draft proposal created
+  - All Sprint 16 missions marked complete in database
+  - Backlog exported and validated
+
+deliverables:
+  - cmos/reports/sprint-16/retrospective.md
+  - cmos/reports/sprint-16/sprint-17-backlog-draft.md
+  - cmos/telemetry/events/sprint-16-retro.jsonl
+  - Updated MASTER_CONTEXT
+
+retrospective_sections:
+  - Executive Summary
+  - Mission Outcomes (all 13 missions)
+  - Metrics (tests added, endpoints, MCP tools)
+  - What Went Well
+  - What Could Be Improved
+  - Technical Debt Identified
+  - DeepSearch Integration Status
+  - Strategic Outcomes for MASTER_CONTEXT
+  - Sprint 17 Recommendations
+
+dependencies:
+  - B16.1 through B16.12 (all prior missions)
