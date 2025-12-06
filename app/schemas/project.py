@@ -50,3 +50,15 @@ class ProjectRead(ProjectBase):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ProjectStats(BaseModel):
+    """Statistics for a project."""
+
+    project_id: UUID
+    name: str
+    document_count: int
+    chunk_count: int
+    report_count: int
+    total_tokens: int
+    last_updated: Optional[datetime] = None

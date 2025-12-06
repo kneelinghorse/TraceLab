@@ -56,6 +56,32 @@ export interface Project {
   updated_at: string;
 }
 
+export interface ProjectCreate {
+  name: string;
+  description?: string;
+  research_type?: string;
+  methodology?: string;
+  status?: string;
+}
+
+export interface ProjectUpdate {
+  name?: string;
+  description?: string;
+  research_type?: string;
+  methodology?: string;
+  status?: string;
+}
+
+export interface ProjectStats {
+  project_id: string;
+  name: string;
+  document_count: number;
+  chunk_count: number;
+  report_count: number;
+  total_tokens: number;
+  last_updated?: string;
+}
+
 export interface PaginatedResponse<T> {
   data: T[];
   pagination: {
@@ -458,5 +484,26 @@ export class TraceLabClient {
     }
 
     return (await response.json()) as DocumentUploadResponse;
+  }
+
+  /**
+   * Create a new project
+   */
+  async createProject(data: ProjectCreate): Promise<Project> {
+    return this.request<Project>('POST', '/api/v1/projects', data);
+  }
+
+  /**
+   * Update an existing project
+   */
+  async updateProject(projectId: string, data: ProjectUpdate): Promise<Project> {
+    return this.request<Project>('PUT', `/api/v1/projects/${projectId}`, data);
+  }
+
+  /**
+   * Get aggregated statistics for a project
+   */
+  async getProjectStats(projectId: string): Promise<ProjectStats> {
+    return this.request<ProjectStats>('GET', `/api/v1/projects/${projectId}/stats`);
   }
 }

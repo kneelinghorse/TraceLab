@@ -2,23 +2,26 @@
 /**
  * TraceLab MCP Server
  *
- * Provides 13 tools for AI agents to perform complete research-to-output loops
+ * Provides 16 tools for AI agents to perform complete research-to-output loops
  * against TraceLab's knowledge base.
  *
  * Tools:
  * 1. search_knowledge - Semantic search across the knowledge base
  * 2. list_projects - Browse available projects
- * 3. list_collections - View existing collections
- * 4. get_collection - Get chunks in a collection
- * 5. export_collection - Export collection as markdown
- * 6. create_collection - Create new collection for research
- * 7. add_to_collection - Add chunk to collection
- * 8. synthesize - Generate summary/report from collected chunks
- * 9. create_report - Create a persistent report from collection/chunks
- * 10. list_reports - Browse existing reports
- * 11. get_report - Get full report details
- * 12. export_report - Export report as markdown
- * 13. upload_document - Upload a new document to TraceLab
+ * 3. create_project - Create a new project
+ * 4. update_project - Update project metadata
+ * 5. get_project_stats - Get project statistics
+ * 6. list_collections - View existing collections
+ * 7. get_collection - Get chunks in a collection
+ * 8. export_collection - Export collection as markdown
+ * 9. create_collection - Create new collection for research
+ * 10. add_to_collection - Add chunk to collection
+ * 11. synthesize - Generate summary/report from collected chunks
+ * 12. create_report - Create a persistent report from collection/chunks
+ * 13. list_reports - Browse existing reports
+ * 14. get_report - Get full report details
+ * 15. export_report - Export report as markdown
+ * 16. upload_document - Upload a new document to TraceLab
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -99,6 +102,88 @@ const TOOLS: Tool[] = [
           description: 'Optional: Search by project name',
         },
       },
+    },
+  },
+  {
+    name: 'create_project',
+    description:
+      'Create a new project to organize documents and research.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Name for the project (required)',
+        },
+        description: {
+          type: 'string',
+          description: 'Optional: Description of the project',
+        },
+        research_type: {
+          type: 'string',
+          enum: ['strategic', 'tactical', 'generative', 'evaluative'],
+          description: 'Optional: Type of research',
+        },
+        methodology: {
+          type: 'string',
+          enum: ['qualitative', 'quantitative', 'mixed'],
+          description: 'Optional: Research methodology',
+        },
+      },
+      required: ['name'],
+    },
+  },
+  {
+    name: 'update_project',
+    description:
+      'Update an existing project\'s metadata.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        project_id: {
+          type: 'string',
+          description: 'UUID of the project to update',
+        },
+        name: {
+          type: 'string',
+          description: 'Optional: New name for the project',
+        },
+        description: {
+          type: 'string',
+          description: 'Optional: New description',
+        },
+        research_type: {
+          type: 'string',
+          enum: ['strategic', 'tactical', 'generative', 'evaluative'],
+          description: 'Optional: Type of research',
+        },
+        methodology: {
+          type: 'string',
+          enum: ['qualitative', 'quantitative', 'mixed'],
+          description: 'Optional: Research methodology',
+        },
+        status: {
+          type: 'string',
+          enum: ['active', 'archived', 'completed'],
+          description: 'Optional: Project status',
+        },
+      },
+      required: ['project_id'],
+    },
+  },
+  {
+    name: 'get_project_stats',
+    description:
+      'Get aggregated statistics for a project, including document count, chunk count, report count, and total tokens.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        project_id: {
+          type: 'string',
+          description: 'UUID of the project',
+        },
+      },
+      required: ['project_id'],
     },
   },
   {
@@ -371,6 +456,26 @@ const ListProjectsInput = z.object({
   search: z.string().optional(),
 });
 
+const CreateProjectInput = z.object({
+  name: z.string().min(1),
+  description: z.string().optional(),
+  research_type: z.enum(['strategic', 'tactical', 'generative', 'evaluative']).optional(),
+  methodology: z.enum(['qualitative', 'quantitative', 'mixed']).optional(),
+});
+
+const UpdateProjectInput = z.object({
+  project_id: z.string().uuid(),
+  name: z.string().min(1).optional(),
+  description: z.string().optional(),
+  research_type: z.enum(['strategic', 'tactical', 'generative', 'evaluative']).optional(),
+  methodology: z.enum(['qualitative', 'quantitative', 'mixed']).optional(),
+  status: z.enum(['active', 'archived', 'completed']).optional(),
+});
+
+const GetProjectStatsInput = z.object({
+  project_id: z.string().uuid(),
+});
+
 const GetCollectionInput = z.object({
   collection_id: z.string().uuid(),
 });
@@ -501,6 +606,99 @@ async function handleListProjects(args: unknown) {
               research_type: p.research_type,
             })),
             pagination: result.pagination,
+          },
+          null,
+          2
+        ),
+      },
+    ],
+  };
+}
+
+async function handleCreateProject(args: unknown) {
+  const input = CreateProjectInput.parse(args);
+  const result = await client.createProject({
+    name: input.name,
+    description: input.description,
+    research_type: input.research_type,
+    methodology: input.methodology,
+  });
+
+  return {
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(
+          {
+            message: `Project "${result.name}" created successfully`,
+            project: {
+              id: result.id,
+              name: result.name,
+              description: result.description,
+              status: result.status,
+              research_type: result.research_type,
+              created_at: result.created_at,
+            },
+          },
+          null,
+          2
+        ),
+      },
+    ],
+  };
+}
+
+async function handleUpdateProject(args: unknown) {
+  const input = UpdateProjectInput.parse(args);
+  const result = await client.updateProject(input.project_id, {
+    name: input.name,
+    description: input.description,
+    research_type: input.research_type,
+    methodology: input.methodology,
+    status: input.status,
+  });
+
+  return {
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(
+          {
+            message: `Project "${result.name}" updated successfully`,
+            project: {
+              id: result.id,
+              name: result.name,
+              description: result.description,
+              status: result.status,
+              research_type: result.research_type,
+              updated_at: result.updated_at,
+            },
+          },
+          null,
+          2
+        ),
+      },
+    ],
+  };
+}
+
+async function handleGetProjectStats(args: unknown) {
+  const input = GetProjectStatsInput.parse(args);
+  const result = await client.getProjectStats(input.project_id);
+
+  return {
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(
+          {
+            project_id: result.project_id,
+            name: result.name,
+            document_count: result.document_count,
+            chunk_count: result.chunk_count,
+            report_count: result.report_count,
+            total_tokens: result.total_tokens,
+            last_updated: result.last_updated,
           },
           null,
           2
@@ -950,6 +1148,12 @@ async function main() {
           return await handleSearchKnowledge(args);
         case 'list_projects':
           return await handleListProjects(args);
+        case 'create_project':
+          return await handleCreateProject(args);
+        case 'update_project':
+          return await handleUpdateProject(args);
+        case 'get_project_stats':
+          return await handleGetProjectStats(args);
         case 'list_collections':
           return await handleListCollections();
         case 'get_collection':

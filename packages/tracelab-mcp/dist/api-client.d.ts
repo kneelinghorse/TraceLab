@@ -50,6 +50,29 @@ export interface Project {
     created_at: string;
     updated_at: string;
 }
+export interface ProjectCreate {
+    name: string;
+    description?: string;
+    research_type?: string;
+    methodology?: string;
+    status?: string;
+}
+export interface ProjectUpdate {
+    name?: string;
+    description?: string;
+    research_type?: string;
+    methodology?: string;
+    status?: string;
+}
+export interface ProjectStats {
+    project_id: string;
+    name: string;
+    document_count: number;
+    chunk_count: number;
+    report_count: number;
+    total_tokens: number;
+    last_updated?: string;
+}
 export interface PaginatedResponse<T> {
     data: T[];
     pagination: {
@@ -241,5 +264,17 @@ export declare class TraceLabClient {
      * Accepts base64 encoded content and sends as multipart/form-data
      */
     uploadDocument(data: DocumentUploadRequest): Promise<DocumentUploadResponse>;
+    /**
+     * Create a new project
+     */
+    createProject(data: ProjectCreate): Promise<Project>;
+    /**
+     * Update an existing project
+     */
+    updateProject(projectId: string, data: ProjectUpdate): Promise<Project>;
+    /**
+     * Get aggregated statistics for a project
+     */
+    getProjectStats(projectId: string): Promise<ProjectStats>;
 }
 //# sourceMappingURL=api-client.d.ts.map
