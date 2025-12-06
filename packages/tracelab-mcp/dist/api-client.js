@@ -188,5 +188,23 @@ export class TraceLabClient {
         }
         return (await response.json());
     }
+    /**
+     * Create a new project
+     */
+    async createProject(data) {
+        return this.request('POST', '/api/v1/projects', data);
+    }
+    /**
+     * Update an existing project
+     */
+    async updateProject(projectId, data) {
+        return this.request('PUT', `/api/v1/projects/${projectId}`, data);
+    }
+    /**
+     * Get aggregated statistics for a project
+     */
+    async getProjectStats(projectId) {
+        return this.request('GET', `/api/v1/projects/${projectId}/stats`);
+    }
 }
 //# sourceMappingURL=api-client.js.map

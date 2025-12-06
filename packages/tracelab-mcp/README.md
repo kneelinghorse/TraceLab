@@ -4,7 +4,7 @@ MCP (Model Context Protocol) server that enables AI agents to perform complete r
 
 ## Features
 
-- **13 research tools** for semantic search, collection management, synthesis, report generation, and document upload
+- **16 research tools** for semantic search, project management, collection management, synthesis, report generation, and document upload
 - **Full research workflow** - search, collect, synthesize, persist
 - **Persistent reports** - save synthesis results as named artifacts that survive across sessions
 - **Multiple auth methods** - JWT tokens or API keys
@@ -158,7 +158,51 @@ Parameters:
 - search: Search by project name
 ```
 
-### 3. list_collections
+### 3. create_project
+
+Create a new project to organize documents and research.
+
+```
+Parameters:
+- name (required): Name for the project
+- description: Optional project description
+- research_type: Type of research (strategic, tactical, generative, evaluative)
+- methodology: Research methodology (qualitative, quantitative, mixed)
+```
+
+### 4. update_project
+
+Update an existing project's metadata.
+
+```
+Parameters:
+- project_id (required): UUID of the project to update
+- name: New name for the project
+- description: New description
+- research_type: Type of research (strategic, tactical, generative, evaluative)
+- methodology: Research methodology (qualitative, quantitative, mixed)
+- status: Project status (active, archived, completed)
+```
+
+### 5. get_project_stats
+
+Get aggregated statistics for a project.
+
+```
+Parameters:
+- project_id (required): UUID of the project
+
+Returns:
+- project_id: UUID
+- name: Project name
+- document_count: Number of documents
+- chunk_count: Number of chunks
+- report_count: Number of reports
+- total_tokens: Total token count across all chunks
+- last_updated: Timestamp of last update
+```
+
+### 6. list_collections
 
 List all research collections.
 
@@ -166,7 +210,7 @@ List all research collections.
 Parameters: none
 ```
 
-### 4. get_collection
+### 7. get_collection
 
 Get detailed information about a collection including all its chunks.
 
@@ -175,7 +219,7 @@ Parameters:
 - collection_id (required): UUID of the collection
 ```
 
-### 5. export_collection
+### 8. export_collection
 
 Export a collection as a markdown document.
 
@@ -184,7 +228,7 @@ Parameters:
 - collection_id (required): UUID of the collection
 ```
 
-### 6. create_collection
+### 9. create_collection
 
 Create a new collection to organize research chunks.
 
@@ -194,7 +238,7 @@ Parameters:
 - description: Optional description (max 2000 chars)
 ```
 
-### 7. add_to_collection
+### 10. add_to_collection
 
 Add a knowledge chunk to a collection.
 
@@ -205,7 +249,7 @@ Parameters:
 - notes: Optional notes about relevance
 ```
 
-### 8. synthesize
+### 11. synthesize
 
 Generate a summary or report from collected chunks.
 
@@ -216,7 +260,7 @@ Parameters:
 - format: Output format (markdown, summary, report)
 ```
 
-### 9. create_report
+### 12. create_report
 
 Create a new persistent report by synthesizing content from a collection or specific chunks. Reports are named artifacts that survive across sessions.
 
@@ -230,7 +274,7 @@ Parameters:
 - format: Output format (summary, report, bullets, markdown)
 ```
 
-### 10. list_reports
+### 13. list_reports
 
 Browse existing reports with optional filtering.
 
@@ -242,7 +286,7 @@ Parameters:
 - page_size: Results per page (1-100, default: 20)
 ```
 
-### 11. get_report
+### 14. get_report
 
 Get full report details including content, citations, and source references.
 
@@ -251,7 +295,7 @@ Parameters:
 - report_id (required): UUID of the report
 ```
 
-### 12. export_report
+### 15. export_report
 
 Export a report as markdown text.
 
@@ -260,7 +304,7 @@ Parameters:
 - report_id (required): UUID of the report
 ```
 
-### 13. upload_document
+### 16. upload_document
 
 Upload a new document to TraceLab for ingestion. The document will be processed through the ingestion pipeline (parsing, PII redaction, chunking, embedding).
 
@@ -284,6 +328,43 @@ Supported content types:
 - application/xml, text/xml (.xml)
 - application/x-yaml, text/yaml (.yaml, .yml)
 ```
+
+## Example Project Setup Workflow
+
+Here's how an AI agent might set up and manage a research project:
+
+1. **Create a project for organizing research**
+   ```
+   create_project(
+     name="Agent Architecture Research",
+     description="Research on multi-agent systems and orchestration patterns",
+     research_type="strategic"
+   )
+   ```
+
+2. **Upload relevant documents**
+   ```
+   upload_document(
+     name="agent-patterns.pdf",
+     content="base64...",
+     content_type="application/pdf",
+     project_id="uuid-from-step-1"
+   )
+   ```
+
+3. **Check project scope**
+   ```
+   get_project_stats(project_id="...")
+   // Returns: document_count, chunk_count, total_tokens
+   ```
+
+4. **Update project as research evolves**
+   ```
+   update_project(
+     project_id="...",
+     description="Updated: Now includes LangGraph and CrewAI patterns"
+   )
+   ```
 
 ## Example Research Workflow
 
