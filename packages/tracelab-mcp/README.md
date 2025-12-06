@@ -36,13 +36,46 @@ npm start
 
 ## Configuration
 
+### Generating an API Key (Recommended)
+
+API keys are the recommended authentication method for MCP servers - they don't expire like JWT tokens and don't require periodic refresh.
+
+**Step 1: Get a JWT token**
+```bash
+curl -X POST https://your-tracelab-instance.com/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "your-username", "password": "your-password"}'
+```
+
+**Step 2: Create an API key**
+```bash
+curl -X POST https://your-tracelab-instance.com/api/v1/auth/api-keys \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "MCP Server"}'
+```
+
+The response contains your API key - **save it immediately**, as it's only shown once:
+```json
+{
+  "id": "uuid",
+  "name": "MCP Server",
+  "key": "tl_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",  // Save this!
+  "key_prefix": "tl_a1b2c3d4",
+  "created_at": "2025-12-06T00:00:00Z",
+  "expires_at": null
+}
+```
+
+**API Key Format**: `tl_` prefix followed by 32 alphanumeric characters.
+
 ### Environment Variables
 
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `TRACELAB_API_URL` | TraceLab API base URL | Yes (default: `http://localhost:8000`) |
-| `TRACELAB_TOKEN` | JWT authentication token | One of token/apiKey |
-| `TRACELAB_API_KEY` | API key for authentication | One of token/apiKey |
+| `TRACELAB_API_KEY` | API key for authentication (recommended) | One of apiKey/token |
+| `TRACELAB_TOKEN` | JWT authentication token | One of apiKey/token |
 
 ### Claude Desktop Configuration
 

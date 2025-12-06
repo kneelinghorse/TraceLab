@@ -14,6 +14,7 @@ from app.models.search_history import SearchHistory
 from app.models.saved_search import SavedSearch
 from app.models.sync_state import SyncState
 from app.models.collection import Collection, CollectionItem
+from app.models.api_key import APIKey
 
 __all__ = [
     "Base",
@@ -34,4 +35,5 @@ __all__ = [
     "SyncState",
     "Collection",
     "CollectionItem",
+    "APIKey",
 ]
