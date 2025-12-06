@@ -130,6 +130,7 @@ def upgrade() -> None:
         # Migrate data from old mission_data column to new columns
         if has_old_schema and is_pg:
             # Extract data from mission_data JSON blob
+            # Note: Cast mission_data to jsonb first to ensure consistent types in COALESCE
             op.execute("""
                 UPDATE missions SET
                     mission_id = COALESCE(
@@ -146,7 +147,7 @@ def upgrade() -> None:
                         'Objective to be defined'
                     ),
                     success_criteria = COALESCE(
-                        mission_data->'success_criteria',
+                        (mission_data::jsonb)->'success_criteria',
                         '["TBD"]'::jsonb
                     )
                 WHERE mission_data IS NOT NULL
