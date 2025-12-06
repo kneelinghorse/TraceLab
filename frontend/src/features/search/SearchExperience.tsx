@@ -55,7 +55,7 @@ export function SearchPage({ initialSection = "search" }: SearchPageProps) {
 
 function SearchExperience({ initialSection }: SearchPageProps) {
   const [query, setQuery] = useState("");
-  const [topK, setTopK] = useState(6);
+  const [topK, setTopK] = useState(10);
   const [filters, setFilters] = useState<SearchFiltersState>({ projectId: "", documentType: "", startDate: "", endDate: "" });
   const [semanticResults, setSemanticResults] = useState<SearchResultChunk[]>([]);
   const [ragPayload, setRagPayload] = useState<RagResponsePayload | null>(null);
@@ -192,8 +192,6 @@ function SearchExperience({ initialSection }: SearchPageProps) {
 
       const projectId = override?.projectId ?? filters.projectId;
       const documentType = override?.documentType ?? filters.documentType;
-      const fromDate = override?.startDate ?? filters.startDate;
-      const toDate = override?.endDate ?? filters.endDate;
       const limit = override?.topK ?? topK;
 
       setIsSearching(true);
@@ -235,7 +233,7 @@ function SearchExperience({ initialSection }: SearchPageProps) {
         setIsSearching(false);
       }
     },
-    [filters.documentType, filters.endDate, filters.projectId, filters.startDate, mutateHistory, query, topK],
+    [filters.documentType, filters.projectId, mutateHistory, query, topK],
   );
 
   const handleHistoryRun = async (entry: SearchHistoryEntryPayload) => {
@@ -340,234 +338,224 @@ function SearchExperience({ initialSection }: SearchPageProps) {
     target?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
-  const filterChips = [
-    filters.projectId && { label: "Project", value: filters.projectId },
-    filters.documentType && { label: "Type", value: filters.documentType },
-    filters.startDate && { label: "From", value: filters.startDate },
-    filters.endDate && { label: "To", value: filters.endDate },
-  ].filter(Boolean) as { label: string; value: string }[];
-
-  const searchStats = [
-    { label: "Projects", value: projects.length },
-    { label: "Documents", value: documents.length },
-    { label: "Queries this session", value: historyEntries.length },
-  ];
-
   return (
-    <main className="relative mx-auto max-w-7xl space-y-10 px-4 py-12 sm:px-6 lg:px-10" ref={resultsAnchorRef}>
-      <header className="grid gap-6 lg:grid-cols-[2fr,1fr]">
-        <div className="glass-card grid gap-6 rounded-3xl p-8 text-white">
-          <div className="flex items-center gap-3 text-slate-200">
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-500/20 text-sky-200">
-              <SparklesIcon className="h-5 w-5" />
-            </span>
-            <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-slate-400">RAG control room</p>
-              <p className="text-lg font-semibold text-white">Blend semantic search with evidence-ready answers</p>
-            </div>
-          </div>
-          <div className="space-y-3">
-            <h1 className="text-4xl font-semibold">Search TraceLab intelligence in one pass</h1>
-            <p className="text-lg text-slate-300">
-              Narrow the retrieval corpus with projects, document types, or time windows, then capture synthesized answers with
-              traceable citations.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {searchStats.map((stat) => (
-              <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">{stat.label}</p>
-                <p className="text-2xl font-semibold text-white">{stat.value}</p>
-              </div>
-            ))}
+    <main className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-10" ref={resultsAnchorRef}>
+      {/* Search bar at top - prominent and full width */}
+      <div className="mb-8">
+        <div className="mb-4 flex items-center gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500/20 text-sky-200">
+            <SparklesIcon className="h-5 w-5" />
+          </span>
+          <div>
+            <h1 className="text-2xl font-semibold text-white">Search TraceLab</h1>
+            <p className="text-sm text-slate-400">Semantic search with RAG synthesis</p>
           </div>
         </div>
-        <div className="glass-card rounded-3xl p-6">
-          <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Session health</p>
-          <div className="mt-4 space-y-4">
-            <div className="flex items-baseline justify-between">
-              <p className="text-4xl font-semibold text-white">{filteredResults.length.toString().padStart(2, "0")}</p>
-              <p className="text-sm text-slate-400">semantic matches</p>
-            </div>
-            <div className="flex items-baseline justify-between">
-              <p className="text-3xl font-semibold text-emerald-300">{ragPayload ? "Ready" : "Pending"}</p>
-              <p className="text-sm text-slate-400">RAG synthesis</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-slate-900/40 p-4 text-sm text-slate-300">
-              <p className="font-semibold text-white">Workflow</p>
-              <p>1. Craft filters • 2. Inspect ranked chunks • 3. Log evidence / citations.</p>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <SearchBar
-        query={query}
-        onQueryChange={setQuery}
-        filters={filters}
-        onFiltersChange={handleFiltersChange}
-        onSubmit={() => executeSearch()}
-        isSearching={isSearching}
-        projects={projects}
-        documentTypes={documentTypes}
-        topK={topK}
-        onTopKChange={setTopK}
-      />
-
-      <section className="glass-card rounded-3xl p-6">
-        <div className="flex flex-wrap items-center gap-3">
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Active filters</p>
-          {filterChips.length === 0 && <span className="text-sm text-slate-500">Corpus wide</span>}
-          <div className="flex flex-wrap gap-2">
-            {filterChips.map((chip) => (
-              <span key={`${chip.label}-${chip.value}`} className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs text-white/90">
-                <strong className="mr-1 text-slate-400">{chip.label}:</strong> {chip.value}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <div className="grid gap-6 xl:grid-cols-[7fr,5fr]">
-        <section className="space-y-4">
-          <div className="glass-card flex flex-wrap items-center justify-between gap-3 rounded-3xl p-5">
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Semantic results</p>
-              <p className="text-xl font-semibold text-white">{filteredResults.length} supporting chunk{filteredResults.length === 1 ? "" : "s"}</p>
-            </div>
-            {searchError && <p className="text-sm text-rose-300">{searchError}</p>}
-            {isSearching && !searchError && <p className="text-sm text-slate-400">Refreshing context…</p>}
-          </div>
-
-          {filteredResults.length === 0 && !isSearching ? (
-            <div className="glass-card rounded-3xl p-8 text-center text-slate-300">
-              <p className="text-lg font-semibold text-white">No semantic matches yet</p>
-              <p className="mt-2 text-sm text-slate-400">Adjust filters or run a new query to populate this panel.</p>
-            </div>
-          ) : (
-            <div className="grid gap-4">
-              {filteredResults.map((result) => (
-                <ResultCard
-                  key={result.chunk_id}
-                  ref={registerCardRef(result.chunk_id)}
-                  result={result}
-                  document={result.document_id ? documentIndex.get(result.document_id) : undefined}
-                  isHighlighted={highlightedChunkId === result.chunk_id}
-                />
-              ))}
-            </div>
-          )}
-        </section>
-
-        <RagSynthesis payload={ragPayload} isLoading={isSearching && !ragPayload} error={ragError} onCitationClick={handleCitationClick} />
+        <SearchBar
+          query={query}
+          onQueryChange={setQuery}
+          filters={filters}
+          onFiltersChange={handleFiltersChange}
+          onSubmit={() => executeSearch()}
+          isSearching={isSearching}
+          projects={projects}
+          documentTypes={documentTypes}
+          topK={topK}
+          onTopKChange={setTopK}
+        />
       </div>
 
-      <section className="grid gap-6 lg:grid-cols-2">
-        <div className="glass-card rounded-3xl p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Query history</p>
-              <h3 className="text-2xl font-semibold text-white">Recent searches</h3>
+      {/* Main content with sidebar */}
+      <div className="grid gap-6 lg:grid-cols-[1fr,280px]">
+        {/* Main content area */}
+        <div className="space-y-6">
+          {/* Results section */}
+          <section className="space-y-4">
+            <div className="glass-card flex flex-wrap items-center justify-between gap-3 rounded-2xl p-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Results</p>
+                <p className="text-lg font-semibold text-white">
+                  {filteredResults.length} chunk{filteredResults.length === 1 ? "" : "s"}
+                </p>
+              </div>
+              {searchError && <p className="text-sm text-rose-300">{searchError}</p>}
+              {isSearching && !searchError && (
+                <p className="text-sm text-slate-400">Searching…</p>
+              )}
             </div>
-            {historyEntries.length > 0 && (
-              <button onClick={() => void clearHistory()} className="text-sm text-slate-300 hover:text-white">
-                Clear history
-              </button>
+
+            {filteredResults.length === 0 && !isSearching ? (
+              <div className="glass-card rounded-2xl p-8 text-center text-slate-300">
+                <p className="text-lg font-semibold text-white">No results yet</p>
+                <p className="mt-2 text-sm text-slate-400">
+                  Enter a query and search to find relevant content.
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {filteredResults.map((result) => (
+                  <ResultCard
+                    key={result.chunk_id}
+                    ref={registerCardRef(result.chunk_id)}
+                    result={result}
+                    document={result.document_id ? documentIndex.get(result.document_id) : undefined}
+                    isHighlighted={highlightedChunkId === result.chunk_id}
+                  />
+                ))}
+              </div>
             )}
-          </div>
-          {historyEntries.length === 0 ? (
-            <p className="mt-4 text-sm text-slate-400">No previous queries stored.</p>
-          ) : (
-            <ul className="mt-4 space-y-3">
-              {historyEntries.map((entry) => {
-                const entryFilters = extractHistoryFilters(entry);
-                return (
-                  <li key={entry.id} className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div>
-                        <p className="text-sm text-white">{entry.query_text}</p>
-                        <p className="text-xs text-slate-400">
-                          {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => void handleHistoryRun(entry)}
-                          className="rounded-full border border-white/20 px-3 py-1 text-xs text-slate-200 hover:border-sky-300"
-                        >
-                          Replay
-                        </button>
-                        <button
-                          onClick={() => handleSaveFromHistory(entry)}
-                          className="rounded-full border border-transparent px-3 py-1 text-xs text-slate-300 hover:text-white"
-                        >
-                          Save
-                        </button>
-                      </div>
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-400">
-                      {entryFilters.projectId && <span>Project {entryFilters.projectId}</span>}
-                      {entryFilters.documentType && <span>Type {entryFilters.documentType}</span>}
-                      {entryFilters.startDate && <span>From {entryFilters.startDate}</span>}
-                      {entryFilters.endDate && <span>To {entryFilters.endDate}</span>}
-                      <span>Top K {entry.top_k}</span>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
+          </section>
+
+          {/* RAG Synthesis */}
+          <RagSynthesis
+            payload={ragPayload}
+            isLoading={isSearching && !ragPayload}
+            error={ragError}
+            onCitationClick={handleCitationClick}
+          />
+
+          {/* History and Saved Searches */}
+          <section className="grid gap-6 lg:grid-cols-2">
+            <div className="glass-card rounded-2xl p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">History</p>
+                  <h3 className="text-lg font-semibold text-white">Recent searches</h3>
+                </div>
+                {historyEntries.length > 0 && (
+                  <button
+                    onClick={() => void clearHistory()}
+                    className="text-sm text-slate-400 hover:text-white"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+              {historyEntries.length === 0 ? (
+                <p className="mt-4 text-sm text-slate-400">No previous queries.</p>
+              ) : (
+                <ul className="mt-4 space-y-2">
+                  {historyEntries.slice(0, 5).map((entry) => {
+                    const entryFilters = extractHistoryFilters(entry);
+                    return (
+                      <li
+                        key={entry.id}
+                        className="rounded-xl border border-white/10 bg-black/20 p-3"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm text-white">{entry.query_text}</p>
+                            <p className="text-xs text-slate-400">
+                              {formatDistanceToNow(new Date(entry.created_at), {
+                                addSuffix: true,
+                              })}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => void handleHistoryRun(entry)}
+                              className="rounded-lg border border-white/20 px-2 py-1 text-xs text-slate-200 hover:border-sky-300"
+                            >
+                              Run
+                            </button>
+                            <button
+                              onClick={() => handleSaveFromHistory(entry)}
+                              className="px-2 py-1 text-xs text-slate-400 hover:text-white"
+                            >
+                              Save
+                            </button>
+                          </div>
+                        </div>
+                        {(entryFilters.projectId || entry.top_k !== 10) && (
+                          <div className="mt-1 flex flex-wrap gap-1 text-xs text-slate-500">
+                            {entryFilters.projectId && <span>Project: {entryFilters.projectId}</span>}
+                            <span>Chunks: {entry.top_k}</span>
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+
+            <div className="glass-card rounded-2xl p-5">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Saved</p>
+                <h3 className="text-lg font-semibold text-white">Quick access</h3>
+              </div>
+              <div className="mt-4">
+                <SaveSearchButton
+                  currentQuery={query}
+                  filters={filters}
+                  topK={topK}
+                  savedSearchCount={savedSearchCount}
+                  limitPerUser={savedSearchLimit}
+                  preset={savePreset}
+                  onPresetConsumed={() => setSavePreset(null)}
+                  onSaved={() => {
+                    void mutateSavedSearches();
+                  }}
+                />
+              </div>
+              <div className="mt-4">
+                <SavedSearchesList
+                  items={savedSearches}
+                  limitPerUser={savedSearchLimit}
+                  isLoading={!savedSearchResponse}
+                  onExecute={(entry) => void handleSavedSearchExecute(entry)}
+                  onLoad={(entry) => handleLoadSavedSearch(entry)}
+                  onDelete={(entry) => void handleDeleteSavedSearch(entry)}
+                  onSelect={(entry) => handleLoadSavedSearch(entry)}
+                />
+              </div>
+            </div>
+          </section>
         </div>
 
-        <div className="glass-card rounded-3xl p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Saved searches</p>
-              <h3 className="text-2xl font-semibold text-white">Quick access to proven prompts</h3>
+        {/* Right sidebar - Stats */}
+        <aside className="space-y-4 lg:sticky lg:top-8 lg:self-start">
+          <div className="glass-card rounded-2xl p-5">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Corpus Stats</p>
+            <div className="mt-4 space-y-4">
+              <div>
+                <p className="text-3xl font-semibold text-white">{projects.length}</p>
+                <p className="text-sm text-slate-400">Projects</p>
+              </div>
+              <div>
+                <p className="text-3xl font-semibold text-white">{documents.length}</p>
+                <p className="text-sm text-slate-400">Documents</p>
+              </div>
+              <div>
+                <p className="text-3xl font-semibold text-white">{historyEntries.length}</p>
+                <p className="text-sm text-slate-400">Queries this session</p>
+              </div>
             </div>
           </div>
-          <div className="mt-4">
-            <SaveSearchButton
-              currentQuery={query}
-              filters={filters}
-              topK={topK}
-              savedSearchCount={savedSearchCount}
-              limitPerUser={savedSearchLimit}
-              preset={savePreset}
-              onPresetConsumed={() => setSavePreset(null)}
-              onSaved={() => {
-                void mutateSavedSearches();
-              }}
-            />
-          </div>
-          <div className="mt-4">
-            <SavedSearchesList
-              items={savedSearches}
-              limitPerUser={savedSearchLimit}
-              isLoading={!savedSearchResponse}
-              onExecute={(entry) => void handleSavedSearchExecute(entry)}
-              onLoad={(entry) => handleLoadSavedSearch(entry)}
-              onDelete={(entry) => void handleDeleteSavedSearch(entry)}
-              onSelect={(entry) => handleLoadSavedSearch(entry)}
-            />
-          </div>
-        </div>
-      </section>
 
-      <section className="glass-card rounded-3xl p-6">
-        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Workflow tips</p>
-        <ol className="mt-4 space-y-3 text-sm text-slate-300">
-          <li className="rounded-2xl border border-white/10 bg-black/20 p-4">
-            <strong className="text-white">Evidence-first:</strong> Promote the highest scoring chunk into a mission with Quick Add before editing summaries.
-          </li>
-          <li className="rounded-2xl border border-white/10 bg-black/20 p-4">
-            <strong className="text-white">Compare wording:</strong> Click a citation to jump back to its chunk, validating tone + context alignment.
-          </li>
-          <li className="rounded-2xl border border-white/10 bg-black/20 p-4">
-            <strong className="text-white">Session hygiene:</strong> Keep query history small; archive validated prompts into Mission Protocol notes.
-          </li>
-        </ol>
-      </section>
+          <div className="glass-card rounded-2xl p-5">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Session Status</p>
+            <div className="mt-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-400">Matches</span>
+                <span className="text-lg font-semibold text-white">{filteredResults.length}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-400">RAG</span>
+                <span className={`text-sm font-medium ${ragPayload ? "text-emerald-400" : "text-slate-500"}`}>
+                  {ragPayload ? "Ready" : "Pending"}
+                </span>
+              </div>
+              {filters.projectId && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-slate-400">Filter</span>
+                  <span className="text-sm text-sky-400">Project active</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </aside>
+      </div>
     </main>
   );
 }
