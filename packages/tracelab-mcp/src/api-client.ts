@@ -119,6 +119,68 @@ export interface SynthesizeResponse {
   }>;
 }
 
+// Report types
+export interface ReportCreate {
+  title: string;
+  collection_id?: string;
+  chunk_ids?: string[];
+  project_id?: string;
+  prompt?: string;
+  format?: 'summary' | 'report' | 'bullets' | 'markdown';
+}
+
+export interface ReportCitation {
+  chunk_id: string;
+  document_id?: string;
+  excerpt: string;
+}
+
+export interface Report {
+  id: string;
+  title: string;
+  content: string;
+  citations: ReportCitation[];
+  tokens_used: number;
+  status: string;
+  created_at: string;
+}
+
+export interface ReportSource {
+  id: string;
+  report_id: string;
+  source_type: string;
+  source_id: string;
+  added_at: string;
+}
+
+export interface ReportDetail extends Report {
+  project_id?: string;
+  report_type: string;
+  prompt?: string;
+  chunk_count: number;
+  sources: ReportSource[];
+  updated_at: string;
+}
+
+export interface ReportListItem {
+  id: string;
+  title: string;
+  status: string;
+  report_type: string;
+  tokens_used: number;
+  chunk_count: number;
+  project_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ReportListResponse {
+  items: ReportListItem[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
 export class TraceLabAPIError extends Error {
   constructor(
     message: string,
@@ -277,5 +339,53 @@ export class TraceLabClient {
    */
   async synthesize(data: SynthesizeRequest): Promise<SynthesizeResponse> {
     return this.request<SynthesizeResponse>('POST', '/api/v1/synthesize', data);
+  }
+
+  /**
+   * Create a new report by synthesizing from collection or chunks
+   */
+  async createReport(data: ReportCreate): Promise<Report> {
+    return this.request<Report>('POST', '/api/v1/reports', data);
+  }
+
+  /**
+   * List reports with optional filtering
+   */
+  async listReports(
+    page = 1,
+    pageSize = 20,
+    projectId?: string,
+    status?: string
+  ): Promise<ReportListResponse> {
+    const params = new URLSearchParams({
+      page: String(page),
+      page_size: String(pageSize),
+    });
+    if (projectId) {
+      params.set('project_id', projectId);
+    }
+    if (status) {
+      params.set('status', status);
+    }
+    return this.request<ReportListResponse>(
+      'GET',
+      `/api/v1/reports?${params}`
+    );
+  }
+
+  /**
+   * Get a single report with full details
+   */
+  async getReport(reportId: string): Promise<ReportDetail> {
+    return this.request<ReportDetail>('GET', `/api/v1/reports/${reportId}`);
+  }
+
+  /**
+   * Export a report as markdown text
+   * For MVP, returns the content field directly
+   */
+  async exportReport(reportId: string): Promise<string> {
+    const report = await this.getReport(reportId);
+    return report.content;
   }
 }

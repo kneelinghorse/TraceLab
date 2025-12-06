@@ -104,6 +104,60 @@ export interface SynthesizeResponse {
         excerpt: string;
     }>;
 }
+export interface ReportCreate {
+    title: string;
+    collection_id?: string;
+    chunk_ids?: string[];
+    project_id?: string;
+    prompt?: string;
+    format?: 'summary' | 'report' | 'bullets' | 'markdown';
+}
+export interface ReportCitation {
+    chunk_id: string;
+    document_id?: string;
+    excerpt: string;
+}
+export interface Report {
+    id: string;
+    title: string;
+    content: string;
+    citations: ReportCitation[];
+    tokens_used: number;
+    status: string;
+    created_at: string;
+}
+export interface ReportSource {
+    id: string;
+    report_id: string;
+    source_type: string;
+    source_id: string;
+    added_at: string;
+}
+export interface ReportDetail extends Report {
+    project_id?: string;
+    report_type: string;
+    prompt?: string;
+    chunk_count: number;
+    sources: ReportSource[];
+    updated_at: string;
+}
+export interface ReportListItem {
+    id: string;
+    title: string;
+    status: string;
+    report_type: string;
+    tokens_used: number;
+    chunk_count: number;
+    project_id?: string;
+    created_at: string;
+    updated_at: string;
+}
+export interface ReportListResponse {
+    items: ReportListItem[];
+    total: number;
+    page: number;
+    page_size: number;
+}
 export declare class TraceLabAPIError extends Error {
     statusCode: number;
     response?: unknown | undefined;
@@ -147,5 +201,22 @@ export declare class TraceLabClient {
      * Note: This endpoint may not be available until B14.2 is implemented
      */
     synthesize(data: SynthesizeRequest): Promise<SynthesizeResponse>;
+    /**
+     * Create a new report by synthesizing from collection or chunks
+     */
+    createReport(data: ReportCreate): Promise<Report>;
+    /**
+     * List reports with optional filtering
+     */
+    listReports(page?: number, pageSize?: number, projectId?: string, status?: string): Promise<ReportListResponse>;
+    /**
+     * Get a single report with full details
+     */
+    getReport(reportId: string): Promise<ReportDetail>;
+    /**
+     * Export a report as markdown text
+     * For MVP, returns the content field directly
+     */
+    exportReport(reportId: string): Promise<string>;
 }
 //# sourceMappingURL=api-client.d.ts.map

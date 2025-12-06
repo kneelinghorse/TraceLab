@@ -114,5 +114,41 @@ export class TraceLabClient {
     async synthesize(data) {
         return this.request('POST', '/api/v1/synthesize', data);
     }
+    /**
+     * Create a new report by synthesizing from collection or chunks
+     */
+    async createReport(data) {
+        return this.request('POST', '/api/v1/reports', data);
+    }
+    /**
+     * List reports with optional filtering
+     */
+    async listReports(page = 1, pageSize = 20, projectId, status) {
+        const params = new URLSearchParams({
+            page: String(page),
+            page_size: String(pageSize),
+        });
+        if (projectId) {
+            params.set('project_id', projectId);
+        }
+        if (status) {
+            params.set('status', status);
+        }
+        return this.request('GET', `/api/v1/reports?${params}`);
+    }
+    /**
+     * Get a single report with full details
+     */
+    async getReport(reportId) {
+        return this.request('GET', `/api/v1/reports/${reportId}`);
+    }
+    /**
+     * Export a report as markdown text
+     * For MVP, returns the content field directly
+     */
+    async exportReport(reportId) {
+        const report = await this.getReport(reportId);
+        return report.content;
+    }
 }
 //# sourceMappingURL=api-client.js.map

@@ -4,8 +4,9 @@ MCP (Model Context Protocol) server that enables AI agents to perform complete r
 
 ## Features
 
-- **8 research tools** for semantic search, collection management, and synthesis
-- **Full research workflow** - search, collect, synthesize
+- **12 research tools** for semantic search, collection management, synthesis, and report generation
+- **Full research workflow** - search, collect, synthesize, persist
+- **Persistent reports** - save synthesis results as named artifacts that survive across sessions
 - **Multiple auth methods** - JWT tokens or API keys
 - **Claude Code compatible** - works out of the box with Claude Desktop
 
@@ -215,6 +216,50 @@ Parameters:
 - format: Output format (markdown, summary, report)
 ```
 
+### 9. create_report
+
+Create a new persistent report by synthesizing content from a collection or specific chunks. Reports are named artifacts that survive across sessions.
+
+```
+Parameters:
+- title (required): Title for the report (max 255 chars)
+- collection_id: UUID of collection to synthesize (mutually exclusive with chunk_ids)
+- chunk_ids: Array of chunk UUIDs to synthesize (mutually exclusive with collection_id)
+- project_id: UUID of project to associate report with
+- prompt: Custom synthesis prompt (max 2000 chars)
+- format: Output format (summary, report, bullets, markdown)
+```
+
+### 10. list_reports
+
+Browse existing reports with optional filtering.
+
+```
+Parameters:
+- project_id: Filter by project UUID
+- status: Filter by status (draft, final)
+- page: Page number (1-indexed, default: 1)
+- page_size: Results per page (1-100, default: 20)
+```
+
+### 11. get_report
+
+Get full report details including content, citations, and source references.
+
+```
+Parameters:
+- report_id (required): UUID of the report
+```
+
+### 12. export_report
+
+Export a report as markdown text.
+
+```
+Parameters:
+- report_id (required): UUID of the report
+```
+
 ## Example Research Workflow
 
 Here's how an AI agent might use these tools to complete a research task:
@@ -234,15 +279,36 @@ Here's how an AI agent might use these tools to complete a research task:
    add_to_collection(collection_id="...", chunk_id="...", notes="Key insight about model validation")
    ```
 
-4. **Synthesize the findings**
+4. **Create a persistent report** (recommended)
    ```
-   synthesize(collection_id="...", prompt="Summarize the top 5 ML best practices", format="markdown")
+   create_report(
+     title="ML Best Practices Summary",
+     collection_id="...",
+     prompt="Summarize the top 5 ML best practices",
+     format="report"
+   )
    ```
 
-5. **Export for reference**
+5. **Retrieve the report later**
    ```
-   export_collection(collection_id="...")
+   list_reports(status="final")
+   get_report(report_id="...")
+   export_report(report_id="...")
    ```
+
+### Alternative: Quick Synthesis (non-persistent)
+
+For ephemeral analysis without saving:
+
+```
+synthesize(collection_id="...", prompt="Summarize findings", format="markdown")
+```
+
+Or export raw collection:
+
+```
+export_collection(collection_id="...")
+```
 
 ## Development
 
