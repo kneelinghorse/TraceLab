@@ -1,0 +1,37 @@
+id: B13.7
+title: "Search Layout Overhaul"
+type: Build.Enhancement
+status: Queued
+priority: High
+sprint: Sprint 13
+
+objective: |
+  Redesign search page layout: search bar prominent at top, stats in sidebar,
+  simplified filters.
+
+context: |
+  Current search page has cluttered filters and poor hierarchy. User feedback:
+  - Search should be primary, at top
+  - Stats moved to side column
+  - Only 2 filters visible: Project (dropdown), Chunks (dropdown)
+  - Chunks dropdown: preset values 10, 15, 20, 25, 35
+  - Remove other filters for now (can add back later)
+
+success_criteria:
+  - Search bar at top of page, full width, prominent
+  - Stats (doc count, project count, etc.) in right sidebar
+  - Two filter dropdowns only: Project, Number of chunks
+  - Chunks dropdown has preset options: 10, 15, 20, 25, 35
+  - Clean, uncluttered layout
+  - Mobile responsive
+
+implementation_notes:
+  - Modify frontend/src/features/search/SearchExperience.tsx
+  - May need to refactor SearchBar component
+  - Remove filter chips/advanced filters for now
+  - Use CSS grid or flexbox for sidebar layout
+  - Preserve search functionality, just reorganize UI
+
+dependencies: []
+
+estimated_effort: "2-3 hours"

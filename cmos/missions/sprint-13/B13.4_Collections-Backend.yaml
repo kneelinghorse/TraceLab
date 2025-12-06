@@ -1,0 +1,38 @@
+id: B13.4
+title: "Collections Backend"
+type: Build.Feature
+status: Queued
+priority: High
+sprint: Sprint 13
+
+objective: |
+  Create a new Collection entity that allows users to group chunks from
+  different documents for later export or analysis.
+
+context: |
+  Users want a "shopping cart" for chunks - the ability to collect chunks
+  across multiple searches and documents, then export them as a bundle
+  for agent synthesis. This replaces the dead "add to mission" workflow.
+
+success_criteria:
+  - Collection model with id, name, description, created_at, updated_at
+  - CollectionItem join table: collection_id, chunk_id, added_at, notes
+  - Alembic migration for new tables
+  - CRUD endpoints:
+    - POST /api/v1/collections (create)
+    - GET /api/v1/collections (list)
+    - GET /api/v1/collections/{id} (detail with chunks)
+    - PUT /api/v1/collections/{id} (update name/description)
+    - DELETE /api/v1/collections/{id}
+    - POST /api/v1/collections/{id}/chunks (add chunk)
+    - DELETE /api/v1/collections/{id}/chunks/{chunk_id} (remove chunk)
+
+implementation_notes:
+  - New files: app/models/collection.py, app/schemas/collection.py, app/api/v1/collections.py
+  - Register router in app/main.py
+  - Collection belongs to no project (global to user, but single-user system)
+  - Consider max chunks per collection limit (soft limit ~100?)
+
+dependencies: []
+
+estimated_effort: "3-4 hours"

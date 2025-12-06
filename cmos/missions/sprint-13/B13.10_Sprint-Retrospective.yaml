@@ -1,0 +1,34 @@
+id: B13.10
+title: "Sprint 13 Retrospective"
+type: Build.Review
+status: Queued
+priority: Normal
+sprint: Sprint 13
+
+objective: |
+  Document Sprint 13 outcomes, update MASTER_CONTEXT, and assess
+  whether further UI work is needed or system is "done enough."
+
+context: |
+  Sprint 13 focused on making TraceLab data accessible through the UI:
+  documents, collections, search fixes. This retrospective captures
+  what was delivered and informs next steps.
+
+success_criteria:
+  - cmos/reports/sprint-13/retrospective.md created
+  - MASTER_CONTEXT updated with Sprint 13 outcomes
+  - Telemetry logged
+  - Assessment: is TraceLab UI "good enough" for current needs?
+  - If more work needed, draft Sprint 14 backlog
+
+implementation_notes:
+  - Follow standard retrospective pattern
+  - Capture: what worked, what didn't, metrics
+  - Key question: does the UI now support the core workflows?
+    - Upload docs -> see content -> search -> collect -> export
+  - Document any remaining gaps
+
+dependencies:
+  - All other B13.x missions
+
+estimated_effort: "1 hour"

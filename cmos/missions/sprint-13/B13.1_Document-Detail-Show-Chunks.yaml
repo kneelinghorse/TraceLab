@@ -1,0 +1,32 @@
+id: B13.1
+title: "Document Detail: Show Chunks"
+type: Build.Enhancement
+status: Queued
+priority: High
+sprint: Sprint 13
+
+objective: |
+  Display all chunks belonging to a document on the document detail page,
+  allowing users to see the actual content that was extracted and indexed.
+
+context: |
+  Currently the document detail page only shows metadata (name, type, size,
+  processing status). Users cannot see what content was extracted from their
+  documents. The DocumentChunk model exists with document_id FK but there's
+  no API endpoint to fetch chunks by document.
+
+success_criteria:
+  - GET /api/v1/documents/{id}/chunks endpoint returns paginated chunks
+  - Document detail page displays chunks with content text
+  - Chunks show index number and token count
+  - Pagination for documents with many chunks
+
+implementation_notes:
+  - Add endpoint to app/api/v1/documents.py
+  - Use DocumentChunkRead schema from app/schemas/chunk.py
+  - Frontend: Add chunks section to frontend/src/pages/documents/[id].tsx
+  - Consider collapsible chunks for long content
+
+dependencies: []
+
+estimated_effort: "2-3 hours"

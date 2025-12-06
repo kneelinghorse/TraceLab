@@ -1,0 +1,31 @@
+id: B13.3
+title: "Document: Download Original"
+type: Build.Enhancement
+status: Queued
+priority: Medium
+sprint: Sprint 13
+
+objective: |
+  Allow users to download the original uploaded file from the document
+  detail page.
+
+context: |
+  Files are stored at data/uploads/{id}_{filename} and the path is saved
+  in Document.file_path. Currently there's no way to retrieve the original
+  file through the UI.
+
+success_criteria:
+  - GET /api/v1/documents/{id}/download returns original file
+  - Correct Content-Type and Content-Disposition headers
+  - Download button on document detail page
+  - Graceful error if file no longer exists on disk
+
+implementation_notes:
+  - Use FileResponse from fastapi.responses
+  - Read Document.file_path from database
+  - Set filename from Document.name or original filename
+  - Handle missing file case (file deleted from disk but record exists)
+
+dependencies: []
+
+estimated_effort: "1 hour"

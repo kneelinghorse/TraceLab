@@ -2,7 +2,7 @@
  * Document API client
  */
 
-import type { Document, DocumentProcessResult, DocumentUploadResponse } from "@/types/document";
+import type { Document, DocumentChunk, DocumentProcessResult, DocumentUploadResponse } from "@/types/document";
 import type { PaginatedResponse } from "@/types/pagination";
 import { buildApiUrl, httpClient } from "./http";
 import { getStoredAuth } from "@/lib/auth/storage";
@@ -75,5 +75,19 @@ export const documentsApi = {
    */
   async deleteDocument(documentId: string): Promise<void> {
     await httpClient.delete(`/documents/${documentId}`);
+  },
+
+  /**
+   * List chunks for a document
+   */
+  async listChunks(
+    documentId: string,
+    params: { page?: number; pageSize?: number } = {}
+  ): Promise<PaginatedResponse<DocumentChunk>> {
+    const query = {
+      page: params.page,
+      page_size: params.pageSize,
+    };
+    return httpClient.get(`/documents/${documentId}/chunks`, { params: query });
   },
 };

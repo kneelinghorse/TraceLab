@@ -1,0 +1,36 @@
+id: B13.9
+title: "Format Support: JSON, XML, YAML"
+type: Build.Enhancement
+status: Queued
+priority: Medium
+sprint: Sprint 13
+
+objective: |
+  Add support for uploading and ingesting JSON, XML, and YAML files.
+
+context: |
+  Currently supported: .pdf, .docx, .pptx, .csv, .xlsx, .md, .markdown, .txt
+
+  User wants to ingest structured data files (design artifacts, configs,
+  data exports). These are text-based and straightforward to parse.
+
+success_criteria:
+  - .json files can be uploaded and chunked
+  - .xml files can be uploaded and chunked
+  - .yaml/.yml files can be uploaded and chunked
+  - Appropriate mime types detected
+  - Content extracted as text for chunking
+
+implementation_notes:
+  - Extend DocumentParser.is_format_supported() in app/services/document_parser.py
+  - Add parsers for each format:
+    - JSON: json.loads() -> pretty print or extract text values
+    - XML: xml.etree or lxml -> extract text content
+    - YAML: yaml.safe_load() -> pretty print or extract
+  - Update mime_types dict in app/api/v1/documents.py
+  - Update file_type_map for default categorization
+  - Consider: should structured data be chunked differently? (probably not for MVP)
+
+dependencies: []
+
+estimated_effort: "2 hours"

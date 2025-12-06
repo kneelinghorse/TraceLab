@@ -62,3 +62,17 @@ export interface DocumentProcessResult {
   };
   error?: string;
 }
+
+export interface DocumentChunk {
+  id: string;
+  document_id: string;
+  chunk_index: number;
+  content: string;
+  embedding_id?: string;
+  token_count?: number;
+  start_char?: number;
+  end_char?: number;
+  prev_chunk_id?: string;
+  next_chunk_id?: string;
+  created_at: string;
+}
