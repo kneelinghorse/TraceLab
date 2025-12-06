@@ -83,7 +83,7 @@ export function AddToCollection({
     : "px-3 py-1.5 text-sm border border-white/20 rounded-lg text-slate-200 hover:border-sky-300 hover:text-sky-200";
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative ${isOpen ? "z-50" : ""} ${className}`}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -98,7 +98,7 @@ export function AddToCollection({
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-10"
+            className="fixed inset-0 z-40"
             onClick={() => {
               setIsOpen(false);
               setIsCreating(false);
@@ -106,7 +106,7 @@ export function AddToCollection({
           />
 
           {/* Menu */}
-          <div className="absolute right-0 mt-1 w-64 z-20 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+          <div className="absolute right-0 mt-1 w-64 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
             <div className="p-2">
               <p className="text-xs font-medium text-gray-500 dark:text-gray-400 px-2 py-1">
                 Add to collection
@@ -185,7 +185,7 @@ export function AddToCollection({
       {/* Feedback */}
       {feedback && (
         <div
-          className={`absolute right-0 mt-1 px-3 py-1.5 text-xs rounded-lg whitespace-nowrap z-30 ${
+          className={`absolute right-0 mt-1 px-3 py-1.5 text-xs rounded-lg whitespace-nowrap z-50 ${
             feedback.type === "success"
               ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
               : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
