@@ -3,6 +3,7 @@
  */
 
 import { AuthGate } from "@/components/AuthGate";
+import { CreateReportModal } from "@/components/CreateReportModal";
 import { collectionsApi, type CollectionDetail, type CollectionItem } from "@/lib/api/collections";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
@@ -18,6 +19,7 @@ export default function CollectionDetailPage() {
   const [editDescription, setEditDescription] = useState("");
   const [editError, setEditError] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   const { data: collection, mutate, isLoading } = useSWR<CollectionDetail>(
     id ? `collection-${id}` : null,
@@ -177,6 +179,13 @@ export default function CollectionDetailPage() {
                   </div>
                   <div className="flex gap-2">
                     <button
+                      onClick={() => setIsReportModalOpen(true)}
+                      disabled={collection.item_count === 0}
+                      className="px-4 py-2 text-sm bg-purple-600 text-white hover:bg-purple-700 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Create Report
+                    </button>
+                    <button
                       onClick={handleExport}
                       disabled={isExporting || collection.item_count === 0}
                       className="px-4 py-2 text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
@@ -281,6 +290,14 @@ export default function CollectionDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Create Report Modal */}
+      <CreateReportModal
+        collectionId={collection.id}
+        collectionName={collection.name}
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+      />
     </AuthGate>
   );
 }
