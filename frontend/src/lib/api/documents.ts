@@ -78,6 +78,27 @@ export const documentsApi = {
   },
 
   /**
+   * Download the original document file
+   */
+  async downloadDocument(documentId: string): Promise<Blob> {
+    const auth = getStoredAuth();
+    const token = auth?.token ?? "";
+    const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
+    const response = await fetch(buildApiUrl(`/documents/${documentId}/download`), {
+      method: "GET",
+      headers,
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: "Download failed" }));
+      throw new Error(error.detail || "Download failed");
+    }
+
+    return response.blob();
+  },
+
+  /**
    * List chunks for a document
    */
   async listChunks(
