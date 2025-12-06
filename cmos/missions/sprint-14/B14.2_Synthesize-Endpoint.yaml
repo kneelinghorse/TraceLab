@@ -1,0 +1,71 @@
+id: B14.2
+title: "Synthesize Endpoint"
+type: Build.Feature
+status: Queued
+priority: High
+sprint: Sprint 14
+
+objective: |
+  Create POST /api/v1/synthesize endpoint that generates LLM-powered summaries
+  with citations from a collection or set of chunks.
+
+context: |
+  This powers the 'synthesize' MCP tool. Agents collect relevant chunks into
+  a collection during research, then call synthesize to generate a summary
+  report with proper citations back to the original sources.
+
+  This is the "output" step in the research-to-output loop:
+  search → collect → synthesize
+
+success_criteria:
+  - Endpoint accepts collection_id OR chunk_ids (not both)
+  - Returns well-formatted markdown with inline citations
+  - Citations reference original chunk IDs and document sources
+  - Handles large collections gracefully (truncation with warning)
+  - Error handling for empty collections, invalid IDs
+  - Token usage tracked for cost monitoring
+
+deliverables:
+  - FastAPI endpoint at POST /api/v1/synthesize
+  - SynthesisService with LLM integration
+  - Pydantic request/response schemas
+  - Citation formatting utilities
+  - Tests for various input scenarios
+  - API documentation
+
+api_spec:
+  endpoint: POST /api/v1/synthesize
+
+  request_schema:
+    collection_id: string | null  # Synthesize entire collection
+    chunk_ids: string[] | null    # Synthesize specific chunks
+    prompt: string | null         # Custom instruction (default: "Summarize")
+    format: string                # "summary" | "report" | "bullets"
+
+  response_schema:
+    content: string               # Markdown output
+    citations:                    # Source references
+      - chunk_id: string
+        document_name: string
+        excerpt: string           # First 100 chars of chunk
+    tokens_used: number           # LLM token consumption
+    truncated: boolean            # True if input was truncated
+
+  constraints:
+    - Either collection_id OR chunk_ids required
+    - Max 50 chunks per request (truncate with warning if exceeded)
+    - Max ~100k tokens input context
+
+implementation_notes:
+  - Use existing OpenAI client from app/services/llm.py or rag_service.py
+  - Build context string from chunks with source markers [1], [2], etc.
+  - System prompt instructs LLM to cite sources using markers
+  - Post-process to map markers to actual chunk metadata
+  - Consider caching synthesis results by content hash
+  - Track token usage via cost_monitor.py
+
+dependencies: []
+
+references:
+  - app/services/rag_service.py (existing LLM integration)
+  - app/services/cost_monitor.py (token tracking)

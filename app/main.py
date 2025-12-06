@@ -31,6 +31,7 @@ from app.api.v1 import (
     search,
     search_history,
     saved_searches,
+    synthesize,
 )
 from app.core.config import settings
 from app.core.database import Base, engine
@@ -179,6 +180,7 @@ app.include_router(
     dependencies=protected_dependencies,
 )
 app.include_router(monitoring.router, prefix=f"{settings.api_v1_prefix}/monitoring", tags=["monitoring"], dependencies=protected_dependencies)
+app.include_router(synthesize.router, prefix=settings.api_v1_prefix, tags=["synthesize"], dependencies=protected_dependencies)
 app.include_router(onboarding_router, prefix=settings.api_v1_prefix, dependencies=protected_dependencies)
 app.include_router(auth.router, prefix=f"{settings.api_v1_prefix}/auth", tags=["auth"])
 

@@ -1,0 +1,16 @@
+{"ts": "2025-12-05T20:00:00Z", "event": "retrospective_start", "mission": "B13.10", "sprint": "sprint-13"}
+{"ts": "2025-12-05T20:01:00Z", "event": "missions_reviewed", "count": 9, "all_completed": true}
+{"ts": "2025-12-05T20:02:00Z", "event": "mission_summary", "id": "B13.1", "name": "Document Detail: Show Chunks", "tests": 5}
+{"ts": "2025-12-05T20:02:01Z", "event": "mission_summary", "id": "B13.2", "name": "Document Detail: Preview & Stats", "deliverables": ["stats_cards", "preview"]}
+{"ts": "2025-12-05T20:02:02Z", "event": "mission_summary", "id": "B13.3", "name": "Document Download Original", "tests": 6}
+{"ts": "2025-12-05T20:02:03Z", "event": "mission_summary", "id": "B13.4", "name": "Collections Backend", "tests": 8, "endpoints": 7}
+{"ts": "2025-12-05T20:02:04Z", "event": "mission_summary", "id": "B13.5", "name": "Collections UI", "pages": 2, "components": 1}
+{"ts": "2025-12-05T20:02:05Z", "event": "mission_summary", "id": "B13.6", "name": "Collection Export", "tests": 11}
+{"ts": "2025-12-05T20:02:06Z", "event": "mission_summary", "id": "B13.7", "name": "Search Layout Overhaul", "deliverables": ["search_bar_top", "stats_sidebar", "simplified_filters"]}
+{"ts": "2025-12-05T20:02:07Z", "event": "mission_summary", "id": "B13.8", "name": "Search Endpoint Wiring", "tests": 8}
+{"ts": "2025-12-05T20:02:08Z", "event": "mission_summary", "id": "B13.9", "name": "Format Support JSON XML YAML", "tests": 26, "formats_added": 3}
+{"ts": "2025-12-05T20:03:00Z", "event": "workflow_assessment", "complete": true, "steps": ["upload", "view", "search", "collect", "export"]}
+{"ts": "2025-12-05T20:04:00Z", "event": "sprint_metrics", "missions_planned": 9, "missions_completed": 9, "completion_rate": "100%", "tests_added": 56, "formats_supported": 11}
+{"ts": "2025-12-05T20:05:00Z", "event": "ui_assessment", "result": "good_enough", "core_workflows_complete": 5}
+{"ts": "2025-12-05T20:06:00Z", "event": "master_context_updated", "decisions_added": 6, "sprint_summary_added": true}
+{"ts": "2025-12-05T20:07:00Z", "event": "retrospective_complete", "mission": "B13.10", "sprint": "sprint-13", "outcome": "UI workflow complete - no Sprint 14 immediately required"}
