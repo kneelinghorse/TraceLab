@@ -1,0 +1,37 @@
+id: B13.5
+title: "Collections UI"
+type: Build.Feature
+status: Queued
+priority: High
+sprint: Sprint 13
+
+objective: |
+  Build the frontend for collections - ability to add chunks to collections
+  from search results and document views, plus a collections management page.
+
+context: |
+  With B13.4 providing the backend, users need UI to:
+  1. Add chunks to collections (from search, from document detail)
+  2. View and manage their collections
+  3. See what's in each collection
+
+success_criteria:
+  - "Add to Collection" button/dropdown on search result chunks
+  - "Add to Collection" button on document chunk list (from B13.1)
+  - /collections page listing all collections with chunk counts
+  - /collections/[id] page showing collection contents
+  - Ability to remove chunks from collection
+  - Create new collection inline or from modal
+
+implementation_notes:
+  - New pages: frontend/src/pages/collections/index.tsx, [id].tsx
+  - New API client: frontend/src/lib/api/collections.ts
+  - Add to nav menu
+  - "Add to Collection" could be dropdown showing existing collections + "New Collection"
+  - Remove "Add to Mission" from search results (dead workflow)
+
+dependencies:
+  - B13.4
+  - B13.1 (for chunk display on doc detail)
+
+estimated_effort: "3-4 hours"

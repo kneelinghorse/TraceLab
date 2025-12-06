@@ -13,11 +13,11 @@
   },
   "working_memory": {
     "active_domain": "starter",
-    "session_count": 136,
-    "last_session": "2025-12-05T15:15:11Z",
+    "session_count": 152,
+    "last_session": "2025-12-06T00:44:34Z",
     "agents_md_path": "./agents.md",
     "agents_md_loaded": false,
-    "active_mission": null,
+    "active_mission": "B13.1",
     "domains": {
       "starter": {
         "status": "planning",
@@ -41,236 +41,6 @@
       }
     },
     "session_history": [
-      {
-        "mission": "B10.1",
-        "agent": "assistant",
-        "summary": "Starting quality-aware search service enhancements",
-        "action": "start",
-        "ts": "2025-11-17T22:49:04Z"
-      },
-      {
-        "mission": "B10.1",
-        "agent": "assistant",
-        "summary": "Quality-aware hybrid search shipped with PEDR filters + docs",
-        "action": "complete",
-        "ts": "2025-11-17T23:08:14Z"
-      },
-      {
-        "mission": "B10.2",
-        "agent": "codex",
-        "summary": "Starting DeepSearch ingestion endpoint implementation",
-        "action": "start",
-        "ts": "2025-11-17T23:38:57Z"
-      },
-      {
-        "mission": "B10.2",
-        "agent": "codex",
-        "summary": "Delivered DeepSearch ingestion endpoint with auto-linking + telemetry",
-        "action": "complete",
-        "ts": "2025-11-18T00:31:01Z"
-      },
-      {
-        "mission": "B10.3",
-        "agent": "codex",
-        "summary": "Packaging Pydantic schema library for DeepSearch",
-        "action": "start",
-        "ts": "2025-11-18T03:41:01Z"
-      },
-      {
-        "mission": "B10.3",
-        "agent": "codex",
-        "summary": "Mission Protocol schemas packaged for DeepSearch and TraceLab now imports them from the shared library.",
-        "action": "complete",
-        "ts": "2025-11-18T03:59:47Z"
-      },
-      {
-        "mission": "B10.4",
-        "agent": "assistant",
-        "summary": "Kicking off Relationship Context API build",
-        "action": "start",
-        "ts": "2025-11-18T04:17:49Z"
-      },
-      {
-        "mission": "B10.4",
-        "agent": "assistant",
-        "summary": "Relationship context API implemented with caching + docs",
-        "action": "complete",
-        "ts": "2025-11-18T04:30:02Z"
-      },
-      {
-        "mission": "B10.5",
-        "agent": "assistant",
-        "summary": "Kicking off DeepSearch integration testing suite build",
-        "action": "start",
-        "ts": "2025-11-18T05:16:12Z"
-      },
-      {
-        "mission": "B10.5",
-        "agent": "assistant",
-        "summary": "DeepSearch integration fixtures, tests, docs, and telemetry delivered",
-        "action": "complete",
-        "ts": "2025-11-18T05:45:07Z"
-      },
-      {
-        "mission": "B10.6",
-        "agent": "assistant",
-        "summary": "Kicking off Sprint 10 retrospective + planning deliverables",
-        "action": "start",
-        "ts": "2025-11-18T13:39:09Z"
-      },
-      {
-        "mission": "B10.6",
-        "agent": "assistant",
-        "summary": "Sprint 10 retro delivered metrics, telemetry, and Sprint 11 backlog.",
-        "action": "complete",
-        "ts": "2025-11-18T13:54:42Z"
-      },
-      {
-        "session": "PS-2025-12-05-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Started Sprint 10 Review & Sprint 11 Planning",
-        "action": "start",
-        "ts": "2025-12-05T00:37:05Z"
-      },
-      {
-        "session": "PS-2025-12-05-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Captured learning",
-        "action": "capture",
-        "ts": "2025-12-05T00:37:31Z"
-      },
-      {
-        "session": "PS-2025-12-05-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Captured context",
-        "action": "capture",
-        "ts": "2025-12-05T00:37:33Z"
-      },
-      {
-        "session": "PS-2025-12-05-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Captured decision",
-        "action": "capture",
-        "ts": "2025-12-05T01:15:57Z"
-      },
-      {
-        "session": "PS-2025-12-05-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Captured decision",
-        "action": "capture",
-        "ts": "2025-12-05T01:15:59Z"
-      },
-      {
-        "session": "PS-2025-12-05-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Captured decision",
-        "action": "capture",
-        "ts": "2025-12-05T01:16:02Z"
-      },
-      {
-        "session": "PS-2025-12-05-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Captured decision",
-        "action": "capture",
-        "ts": "2025-12-05T01:16:04Z"
-      },
-      {
-        "session": "PS-2025-12-05-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Captured decision",
-        "action": "capture",
-        "ts": "2025-12-05T01:16:07Z"
-      },
-      {
-        "session": "PS-2025-12-05-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Captured decision",
-        "action": "capture",
-        "ts": "2025-12-05T01:16:09Z"
-      },
-      {
-        "session": "PS-2025-12-05-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Captured decision",
-        "action": "capture",
-        "ts": "2025-12-05T01:16:11Z"
-      },
-      {
-        "session": "PS-2025-12-05-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Captured next-step",
-        "action": "capture",
-        "ts": "2025-12-05T01:21:09Z"
-      },
-      {
-        "session": "PS-2025-12-05-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Captured next-step",
-        "action": "capture",
-        "ts": "2025-12-05T01:21:12Z"
-      },
-      {
-        "session": "PS-2025-12-05-001",
-        "session_type": "review",
-        "agent": "assistant",
-        "summary": "Sprint 10 review completed (6/6 missions, 100% auto-linking, 212% quality boost). Sprint 11 planned with 6 missions focused on correction loops, PEDR delta sync, and operator tooling. Key architecture decisions captured: async webhooks for corrections, event-driven PEDR sync, Next.js for console, GitHub Packages for schema distribution.",
-        "action": "complete",
-        "ts": "2025-12-05T01:21:15Z"
-      },
-      {
-        "mission": "B11.1",
-        "agent": "assistant",
-        "summary": "Starting auto-link correction loop implementation",
-        "action": "start",
-        "ts": "2025-12-05T01:34:36Z"
-      },
-      {
-        "mission": "B11.1",
-        "agent": "assistant",
-        "summary": "Auto-link correction loop with webhooks and telemetry implemented",
-        "action": "complete",
-        "ts": "2025-12-05T02:00:28Z"
-      },
-      {
-        "mission": "B11.2",
-        "agent": "assistant",
-        "summary": "Starting PEDR Delta Sync Service implementation",
-        "action": "start",
-        "ts": "2025-12-05T02:04:11Z"
-      },
-      {
-        "mission": "B11.2",
-        "agent": "assistant",
-        "summary": "PEDR Delta Sync Service implemented with event-driven architecture",
-        "action": "complete",
-        "ts": "2025-12-05T02:13:36Z"
-      },
-      {
-        "mission": "B11.3",
-        "agent": "claude-opus-4-5",
-        "summary": "Building Mission Protocol Console read-only UI with dashboard, relationships, corrections, and export",
-        "action": "start",
-        "ts": "2025-12-05T02:33:10Z"
-      },
-      {
-        "mission": "B11.3",
-        "agent": "claude-opus-4-5",
-        "summary": "Delivered Mission Protocol Console with dashboard, mission list, detail view, corrections queue, and export functionality",
-        "action": "complete",
-        "ts": "2025-12-05T02:46:18Z"
-      },
       {
         "mission": "B11.4",
         "agent": "assistant",
@@ -416,12 +186,247 @@
         "summary": "Sprint 11 review confirmed: 6/6 missions complete (100%), 63 tests passing, DeepSearch integration fully documented. Sprint 12 ready with B12.4 already complete. Priority: B12.1 (Load Testing) is next up.",
         "action": "complete",
         "ts": "2025-12-05T15:15:11Z"
+      },
+      {
+        "session": "PS-2025-12-05-004",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Started Critical System Assessment - What Actually Works",
+        "action": "start",
+        "ts": "2025-12-05T15:25:12Z"
+      },
+      {
+        "session": "PS-2025-12-05-004",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-12-05T15:25:30Z"
+      },
+      {
+        "session": "PS-2025-12-05-004",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured learning",
+        "action": "capture",
+        "ts": "2025-12-05T15:25:30Z"
+      },
+      {
+        "session": "PS-2025-12-05-004",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured learning",
+        "action": "capture",
+        "ts": "2025-12-05T15:26:19Z"
+      },
+      {
+        "session": "PS-2025-12-05-004",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-12-05T15:38:33Z"
+      },
+      {
+        "session": "PS-2025-12-05-004",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-12-05T15:51:45Z"
+      },
+      {
+        "session": "PS-2025-12-05-004",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "CRITICAL: Sprint 12 backlog completely revised. Previous backlog was infrastructure theater. Actual issues found: 1) Missions endpoint 500 error, 2) HTTPS redirects drop auth headers, 3) Service account not in production, 4) API response inconsistency. Created 6 new mission YAMLs focused on making system actually work.",
+        "action": "complete",
+        "ts": "2025-12-05T16:01:30Z"
+      },
+      {
+        "session": "PS-2025-12-05-005",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Started Sprint 12 Database Update",
+        "action": "start",
+        "ts": "2025-12-05T16:17:03Z"
+      },
+      {
+        "session": "PS-2025-12-05-005",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-12-05T16:17:07Z"
+      },
+      {
+        "session": "PS-2025-12-05-005",
+        "session_type": "planning",
+        "agent": "assistant",
+        "summary": "Sprint 12 database fully updated. Removed old infrastructure theater missions. Added 6 missions focused on making TraceLab actually usable. Mission YAML files created with full specs. Agents can now pick up queued missions.",
+        "action": "complete",
+        "ts": "2025-12-05T16:17:13Z"
+      },
+      {
+        "mission": "B12.1",
+        "agent": "opus-4.5",
+        "summary": "Starting investigation of /api/v1/missions/ 500 error",
+        "action": "start",
+        "ts": "2025-12-05T16:39:49Z"
+      },
+      {
+        "mission": "B12.1",
+        "agent": "opus-4.5",
+        "summary": "Fixed missions endpoint 500 error with improved error handling",
+        "action": "complete",
+        "ts": "2025-12-05T16:58:47Z"
+      },
+      {
+        "mission": "B12.2",
+        "agent": "assistant",
+        "summary": "Starting fix for HTTPS redirect issue",
+        "action": "start",
+        "ts": "2025-12-05T17:26:34Z"
+      },
+      {
+        "mission": "B12.2",
+        "agent": "assistant",
+        "summary": "Fixed HTTPS redirects by adding ProxyHeadersMiddleware",
+        "action": "complete",
+        "ts": "2025-12-05T17:31:23Z"
+      },
+      {
+        "mission": "B12.3",
+        "agent": "assistant",
+        "summary": "Starting service account production setup - using shared credentials approach",
+        "action": "start",
+        "ts": "2025-12-05T17:38:52Z"
+      },
+      {
+        "mission": "B12.3",
+        "agent": "assistant",
+        "summary": "Configured DeepSearch with shared TraceLab credentials",
+        "action": "complete",
+        "ts": "2025-12-05T17:45:04Z"
+      },
+      {
+        "mission": "B12.4",
+        "agent": "assistant",
+        "summary": "Standardizing API response structures for consistency",
+        "action": "start",
+        "ts": "2025-12-05T17:48:02Z"
+      },
+      {
+        "mission": "B12.4",
+        "agent": "assistant",
+        "summary": "Standardized API response structures for consistency",
+        "action": "complete",
+        "ts": "2025-12-05T17:53:02Z"
+      },
+      {
+        "mission": "B12.5",
+        "agent": "assistant",
+        "summary": "Starting End-to-End Integration Verification",
+        "action": "start",
+        "ts": "2025-12-05T18:10:27Z"
+      },
+      {
+        "mission": "B12.5",
+        "agent": "assistant",
+        "summary": "E2E integration verified - all critical tests pass",
+        "action": "complete",
+        "ts": "2025-12-05T18:31:04Z"
+      },
+      {
+        "mission": "B12.6",
+        "agent": "assistant",
+        "summary": "Sprint 12 Retrospective - documenting outcomes and drafting Sprint 13",
+        "action": "start",
+        "ts": "2025-12-05T18:41:50Z"
+      },
+      {
+        "mission": "B12.6",
+        "agent": "assistant",
+        "summary": "Sprint 12 Retrospective completed",
+        "action": "complete",
+        "ts": "2025-12-05T19:30:11Z"
+      },
+      {
+        "session": "PS-2025-12-05-006",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Started Sprint 12 Review & Sprint 13 Planning",
+        "action": "start",
+        "ts": "2025-12-05T19:31:17Z"
+      },
+      {
+        "session": "PS-2025-12-05-006",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured learning",
+        "action": "capture",
+        "ts": "2025-12-05T19:31:36Z"
+      },
+      {
+        "session": "PS-2025-12-05-006",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured learning",
+        "action": "capture",
+        "ts": "2025-12-05T19:31:36Z"
+      },
+      {
+        "session": "PS-2025-12-05-006",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-12-05T19:31:53Z"
+      },
+      {
+        "session": "PS-2025-12-05-006",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-12-05T20:35:37Z"
+      },
+      {
+        "session": "PS-2025-12-05-006",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured decision",
+        "action": "capture",
+        "ts": "2025-12-06T00:12:52Z"
+      },
+      {
+        "session": "PS-2025-12-05-006",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Captured next-step",
+        "action": "capture",
+        "ts": "2025-12-06T00:18:57Z"
+      },
+      {
+        "session": "PS-2025-12-05-006",
+        "session_type": "review",
+        "agent": "assistant",
+        "summary": "Sprint 12 review complete. Sprint 13 planned with 10 missions: Documents (show chunks, preview, download), Collections (backend, UI, export), Search (layout, wiring), Format support. YAML files created, database updated, MASTER_CONTEXT updated.",
+        "action": "complete",
+        "ts": "2025-12-06T00:18:57Z"
+      },
+      {
+        "mission": "B13.1",
+        "agent": "assistant",
+        "summary": "Starting Document Detail: Show Chunks - adding endpoint and UI for chunk display",
+        "action": "start",
+        "ts": "2025-12-06T00:44:34Z"
       }
     ],
     "blocked_missions": [
       "B6.3"
     ],
-    "last_completed_mission": "B11.6",
+    "last_completed_mission": "B12.6",
     "last_blocked_mission": "B6.3",
     "recent_sessions": [
       {
@@ -493,6 +498,45 @@
           "learning": 2,
           "decision": 1
         }
+      },
+      {
+        "id": "PS-2025-12-05-004",
+        "session_type": "review",
+        "type": "review",
+        "title": "Critical System Assessment - What Actually Works",
+        "summary": "CRITICAL: Sprint 12 backlog completely revised. Previous backlog was infrastructure theater. Actual issues found: 1) Missions endpoint 500 error, 2) HTTPS redirects drop auth headers, 3) Service account not in production, 4) API response inconsistency. Created 6 new mission YAMLs focused on making system actually work.",
+        "completed_at": "2025-12-05T16:01:30Z",
+        "capture_count": 5,
+        "captures": {
+          "decision": 3,
+          "learning": 2
+        }
+      },
+      {
+        "id": "PS-2025-12-05-005",
+        "session_type": "planning",
+        "type": "planning",
+        "title": "Sprint 12 Database Update",
+        "summary": "Sprint 12 database fully updated. Removed old infrastructure theater missions. Added 6 missions focused on making TraceLab actually usable. Mission YAML files created with full specs. Agents can now pick up queued missions.",
+        "completed_at": "2025-12-05T16:17:13Z",
+        "capture_count": 1,
+        "captures": {
+          "decision": 1
+        }
+      },
+      {
+        "id": "PS-2025-12-05-006",
+        "session_type": "review",
+        "type": "review",
+        "title": "Sprint 12 Review & Sprint 13 Planning",
+        "summary": "Sprint 12 review complete. Sprint 13 planned with 10 missions: Documents (show chunks, preview, download), Collections (backend, UI, export), Search (layout, wiring), Format support. YAML files created, database updated, MASTER_CONTEXT updated.",
+        "completed_at": "2025-12-06T00:18:57Z",
+        "capture_count": 6,
+        "captures": {
+          "learning": 2,
+          "decision": 3,
+          "next-step": 1
+        }
       }
     ],
     "next_steps": [
@@ -501,7 +545,10 @@
       "PS-2025-11-15-001: After Sprint 08, begin Sprint 09 with B9.1 Hybrid Search",
       "PS-2025-12-05-003: Start B12.1 Production Load Testing",
       "PS-2025-12-05-003: Benchmark correction loop at 100+ concurrent items",
-      "PS-2025-12-05-003: Validate PEDR sync handles 500+ mission delta in <60s"
+      "PS-2025-12-05-003: Validate PEDR sync handles 500+ mission delta in <60s",
+      "PS-2025-12-05-004: Execute B12.1 - Fix missions endpoint 500 error",
+      "PS-2025-12-05-004: Execute B12.2 - Fix HTTPS redirect issue",
+      "PS-2025-12-05-004: Execute B12.3 - Create service account in production"
     ]
   },
   "technical_context": {
@@ -523,12 +570,12 @@
     }
   },
   "context_health": {
-    "size_kb": 14.63,
+    "size_kb": 16.6,
     "size_limit_kb": 100,
-    "sessions_since_reset": 121,
+    "sessions_since_reset": 140,
     "last_reset": "",
     "compression_enabled": false,
-    "last_update": "2025-12-05T15:15:11Z"
+    "last_update": "2025-12-06T00:44:34Z"
   },
   "metadata": {
     "migrated_at": "2025-11-15T16:19:59.619425+00:00",

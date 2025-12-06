@@ -1,0 +1,31 @@
+id: B13.2
+title: "Document Detail: Preview & Stats"
+type: Build.Enhancement
+status: Queued
+priority: High
+sprint: Sprint 13
+
+objective: |
+  Add content preview and statistics to document detail page so users can
+  quickly understand what a document contains without reading all chunks.
+
+context: |
+  After B13.1 adds chunk display, users need a quick summary view. Show
+  aggregate stats and a preview of the document content.
+
+success_criteria:
+  - Document detail shows chunk count
+  - Document detail shows total word/token count
+  - Content preview shows first ~500 chars of combined chunks
+  - Stats displayed prominently near document header
+
+implementation_notes:
+  - Chunk count can come from chunks endpoint or add to document response
+  - Word count: sum token_count from chunks or calculate from content
+  - Preview: concatenate first N chunks, truncate to ~500 chars
+  - Could add this to GET /api/v1/documents/{id} response or separate endpoint
+
+dependencies:
+  - B13.1
+
+estimated_effort: "1-2 hours"

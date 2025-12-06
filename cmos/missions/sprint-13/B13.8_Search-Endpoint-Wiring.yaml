@@ -1,0 +1,38 @@
+id: B13.8
+title: "Search Endpoint Wiring"
+type: Build.Fix
+status: Queued
+priority: High
+sprint: Sprint 13
+
+objective: |
+  Fix search page to correctly fetch and display projects, document counts,
+  and remove dead "add to mission" functionality.
+
+context: |
+  Search page has broken/missing functionality:
+  - Projects list not loading correctly
+  - Document count not showing
+  - "Add to mission" button exists but workflow is dead
+
+  This was partially identified in B6.3 blocked report - backend issues
+  may now be fixed (Sprint 12), but frontend wiring needs verification.
+
+success_criteria:
+  - Project dropdown populated from GET /api/v1/projects
+  - Document count displays correctly
+  - Search hits correct endpoints (verify /api/v1/search or /api/v1/retrieval)
+  - Remove "Add to Mission" button from search results
+  - Replace with "Add to Collection" (from B13.5) or remove entirely
+
+implementation_notes:
+  - Audit frontend/src/features/search/SearchExperience.tsx
+  - Check API client calls in frontend/src/lib/api/
+  - Verify endpoints match what backend provides
+  - Test against production API
+  - Remove mission-related code from search components
+
+dependencies:
+  - B13.5 (if adding "Add to Collection" replacement)
+
+estimated_effort: "2 hours"

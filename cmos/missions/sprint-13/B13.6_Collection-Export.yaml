@@ -1,0 +1,51 @@
+id: B13.6
+title: "Collection Export"
+type: Build.Feature
+status: Queued
+priority: High
+sprint: Sprint 13
+
+objective: |
+  Export a collection as a markdown bundle containing all chunk content,
+  ready to be passed to an agent for synthesis into a report.
+
+context: |
+  The end goal of collections is to gather research material and then
+  produce a report. This mission enables export; report generation
+  (calling an LLM) could be a future enhancement.
+
+success_criteria:
+  - GET /api/v1/collections/{id}/export?format=md returns markdown file
+  - Markdown includes:
+    - Collection name and description
+    - For each chunk: source document name, chunk content
+    - Metadata footer (export date, chunk count)
+  - Download triggers from collection detail page
+  - Optional: JSON export format for programmatic use
+
+implementation_notes:
+  - Add export endpoint to collections router
+  - Use FileResponse with Content-Disposition for download
+  - Markdown format:
+    ```
+    # Collection: {name}
+    {description}
+
+    ---
+    ## Source: {document_name}
+    {chunk_content}
+
+    ---
+    ## Source: {document_name}
+    {chunk_content}
+
+    ---
+    Exported: {date} | {n} chunks
+    ```
+  - Consider adding chunk notes if user added any
+
+dependencies:
+  - B13.4
+  - B13.5
+
+estimated_effort: "1-2 hours"

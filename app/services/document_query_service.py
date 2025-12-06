@@ -7,6 +7,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session, selectinload, load_only
 
+from app.models.chunk import DocumentChunk
 from app.models.document import Document
 from app.schemas.pagination import PaginationMeta
 
@@ -85,3 +86,33 @@ class DocumentQueryService:
             .filter(Document.id == document_id)
             .first()
         )
+
+    def list_chunks_by_document(
+        self,
+        db: Session,
+        document_id: UUID,
+        *,
+        page: int,
+        page_size: int,
+    ) -> Tuple[List[DocumentChunk], PaginationMeta]:
+        """Return paginated chunks for a document, ordered by chunk_index."""
+
+        clamped_page_size = min(max(page_size, 1), self.MAX_PAGE_SIZE)
+        query = db.query(DocumentChunk).filter(DocumentChunk.document_id == document_id)
+
+        query = query.order_by(DocumentChunk.chunk_index.asc())
+        total = query.count()
+        items = (
+            query.offset((page - 1) * clamped_page_size)
+            .limit(clamped_page_size)
+            .all()
+        )
+
+        total_pages = math.ceil(total / clamped_page_size) if total else 0
+        meta = PaginationMeta(
+            page=page,
+            page_size=clamped_page_size,
+            total=total,
+            pages=total_pages,
+        )
+        return items, meta

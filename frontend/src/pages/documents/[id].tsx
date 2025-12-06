@@ -4,7 +4,8 @@
 
 import { AuthGate } from "@/components/AuthGate";
 import { documentsApi } from "@/lib/api/documents";
-import type { Document } from "@/types/document";
+import type { Document, DocumentChunk } from "@/types/document";
+import type { PaginatedResponse } from "@/types/pagination";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -15,11 +16,30 @@ export default function DocumentDetailPage() {
   const router = useRouter();
   const { id } = router.query;
   const [processing, setProcessing] = useState(false);
+  const [chunksPage, setChunksPage] = useState(1);
+  const [expandedChunks, setExpandedChunks] = useState<Set<string>>(new Set());
 
   const { data: document, mutate } = useSWR<Document>(
     id ? `document-${id}` : null,
     () => documentsApi.getDocument(id as string)
   );
+
+  const { data: chunksResponse, isLoading: chunksLoading } = useSWR<PaginatedResponse<DocumentChunk>>(
+    document?.chunked && id ? `chunks-${id}-${chunksPage}` : null,
+    () => documentsApi.listChunks(id as string, { page: chunksPage, pageSize: 10 })
+  );
+
+  const toggleChunk = (chunkId: string) => {
+    setExpandedChunks((prev) => {
+      const next = new Set(prev);
+      if (next.has(chunkId)) {
+        next.delete(chunkId);
+      } else {
+        next.add(chunkId);
+      }
+      return next;
+    });
+  };
 
   const handleProcess = async () => {
     if (!id) return;
@@ -155,7 +175,7 @@ export default function DocumentDetailPage() {
 
           {/* Processing Events */}
           {document.processing_events && document.processing_events.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 mb-6">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 Processing History
               </h2>
@@ -188,6 +208,90 @@ export default function DocumentDetailPage() {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Document Chunks */}
+          {document.chunked && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Document Chunks
+                {chunksResponse && (
+                  <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
+                    ({chunksResponse.pagination.total} total)
+                  </span>
+                )}
+              </h2>
+
+              {chunksLoading && (
+                <p className="text-gray-500 dark:text-gray-400">Loading chunks...</p>
+              )}
+
+              {chunksResponse && chunksResponse.data.length > 0 && (
+                <>
+                  <div className="space-y-3">
+                    {chunksResponse.data.map((chunk) => (
+                      <div
+                        key={chunk.id}
+                        className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden"
+                      >
+                        <button
+                          onClick={() => toggleChunk(chunk.id)}
+                          className="w-full px-4 py-3 flex items-center justify-between bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                        >
+                          <div className="flex items-center gap-4">
+                            <span className="font-mono text-sm text-blue-600 dark:text-blue-400">
+                              #{chunk.chunk_index}
+                            </span>
+                            {chunk.token_count && (
+                              <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-2 py-0.5 rounded">
+                                {chunk.token_count} tokens
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-gray-400">
+                            {expandedChunks.has(chunk.id) ? "−" : "+"}
+                          </span>
+                        </button>
+                        {expandedChunks.has(chunk.id) && (
+                          <div className="px-4 py-3 bg-white dark:bg-gray-800">
+                            <pre className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-mono overflow-x-auto">
+                              {chunk.content}
+                            </pre>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Pagination */}
+                  {chunksResponse.pagination.pages > 1 && (
+                    <div className="mt-4 flex items-center justify-between">
+                      <button
+                        onClick={() => setChunksPage((p) => Math.max(1, p - 1))}
+                        disabled={chunksPage === 1}
+                        className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        Previous
+                      </button>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        Page {chunksResponse.pagination.page} of {chunksResponse.pagination.pages}
+                      </span>
+                      <button
+                        onClick={() => setChunksPage((p) => Math.min(chunksResponse.pagination.pages, p + 1))}
+                        disabled={chunksPage >= chunksResponse.pagination.pages}
+                        className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {chunksResponse && chunksResponse.data.length === 0 && (
+                <p className="text-gray-500 dark:text-gray-400">No chunks available.</p>
+              )}
             </div>
           )}
         </div>

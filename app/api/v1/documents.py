@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.document import Document
 from app.models.project import Project
+from app.schemas.chunk import DocumentChunkRead
 from app.schemas.document import DocumentListItem, DocumentRead
 from app.schemas.pagination import PaginatedResponse
 from app.services.document_ingestion import DocumentIngestionService
@@ -272,8 +273,35 @@ async def get_document(
     if not document:
         raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
     _ = document.processing_events
-    
+
     return DocumentRead.model_validate(document)
+
+
+@router.get("/{document_id}/chunks", response_model=PaginatedResponse[DocumentChunkRead])
+async def list_document_chunks(
+    document_id: UUID,
+    page: int = Query(1, ge=1, description="Page number (1-indexed)"),
+    page_size: int = Query(
+        20,
+        ge=1,
+        le=100,
+        description="Results per page",
+    ),
+    db: Session = Depends(get_db),
+):
+    """Return paginated chunks for a document, ordered by chunk index."""
+    document = _document_query_service.get_document(db, document_id)
+    if not document:
+        raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+
+    chunks, meta = _document_query_service.list_chunks_by_document(
+        db,
+        document_id,
+        page=page,
+        page_size=page_size,
+    )
+    resources = [DocumentChunkRead.model_validate(chunk) for chunk in chunks]
+    return {"data": resources, "pagination": meta}
 
 
 @router.delete("/{document_id}")
