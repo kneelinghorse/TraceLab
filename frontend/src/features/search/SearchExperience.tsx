@@ -69,7 +69,7 @@ function SearchExperience({ initialSection }: SearchPageProps) {
 
   const { data: projectResponse, error: projectError } = useSWR<PaginatedResponse<Project>>(
     ["search-projects"],
-    () => projectsApi.listProjects({ pageSize: 200 })
+    () => projectsApi.listProjects({ pageSize: 100 })
   );
   const projects = projectResponse?.data ?? [];
   const { data: documentResponse, error: documentError } = useSWR<PaginatedResponse<Document>>(
@@ -77,7 +77,7 @@ function SearchExperience({ initialSection }: SearchPageProps) {
     () =>
       documentsApi.listDocuments({
         projectId: filters.projectId || undefined,
-        pageSize: 200,
+        pageSize: 100,
       }),
   );
   const documents = documentResponse?.data ?? [];
