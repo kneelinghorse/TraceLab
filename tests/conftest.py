@@ -43,8 +43,9 @@ def reset_database_and_reports(request):
 
     This fixture is skipped for tests in tests/mcp/ since those don't need DB.
     """
-    # Skip for MCP tests that don't need database
-    if 'mcp' in str(request.fspath):
+    # Skip for MCP tests and unit tests that don't need database
+    test_path = str(request.fspath)
+    if 'mcp' in test_path or 'test_deepsearch_client' in test_path:
         yield
         return
 
