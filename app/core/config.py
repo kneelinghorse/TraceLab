@@ -76,6 +76,7 @@ class Settings(BaseSettings):
     deepsearch_retries: int = 3
     deepsearch_backoff_multiplier: float = 2.0
     deepsearch_initial_backoff: float = 1.0
+    deepsearch_webhook_secret: Optional[str] = None
 
     class Config:
         env_file = ".env"
