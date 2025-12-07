@@ -1,9 +1,11 @@
 """Pydantic schemas for mission entities.
 
 Aligned with the Mission model from B16.1 with explicit DeepSearch-compatible fields.
+Implements comprehensive validation per B16.3 spec.
 """
 from __future__ import annotations
 
+import re
 from datetime import datetime
 from typing import Any, Dict, List, Literal, Optional
 from uuid import UUID
@@ -13,6 +15,9 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 # Valid mission statuses
 MissionStatus = Literal["draft", "queued", "in_progress", "completed", "blocked", "cancelled"]
+
+# Mission ID pattern: starts with alphanumeric, can contain dots, dashes, underscores
+MISSION_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
 
 class MissionBase(BaseModel):
@@ -32,8 +37,8 @@ class MissionBase(BaseModel):
     )
     objective: str = Field(
         ...,
-        min_length=1,
-        description="What this mission aims to achieve",
+        min_length=10,
+        description="What this mission aims to achieve (minimum 10 characters)",
     )
     success_criteria: List[str] = Field(
         ...,
@@ -41,11 +46,28 @@ class MissionBase(BaseModel):
         description="Array of measurable success conditions",
     )
 
+    @field_validator("mission_id")
+    @classmethod
+    def validate_mission_id_format(cls, v: str) -> str:
+        """Validate mission_id matches required pattern."""
+        if not MISSION_ID_PATTERN.match(v):
+            raise ValueError(
+                "mission_id must start with alphanumeric and contain only "
+                "letters, numbers, dots, dashes, or underscores"
+            )
+        return v
+
     @field_validator("success_criteria")
     @classmethod
     def validate_success_criteria(cls, v: List[str]) -> List[str]:
+        """Validate success_criteria is non-empty and each item is a non-empty string."""
         if not v:
             raise ValueError("success_criteria must contain at least one item")
+        for i, item in enumerate(v):
+            if not isinstance(item, str):
+                raise ValueError(f"success_criteria[{i}] must be a string")
+            if not item.strip():
+                raise ValueError(f"success_criteria[{i}] cannot be empty or whitespace")
         return v
 
 
@@ -101,11 +123,12 @@ class MissionUpdate(BaseModel):
     )
     objective: Optional[str] = Field(
         None,
-        min_length=1,
-        description="What this mission aims to achieve",
+        min_length=10,
+        description="What this mission aims to achieve (minimum 10 characters)",
     )
     success_criteria: Optional[List[str]] = Field(
         None,
+        min_length=1,
         description="Array of measurable success conditions",
     )
     context: Optional[Dict[str, Any]] = Field(
@@ -165,8 +188,16 @@ class MissionUpdate(BaseModel):
     @field_validator("success_criteria")
     @classmethod
     def validate_success_criteria(cls, v: Optional[List[str]]) -> Optional[List[str]]:
-        if v is not None and len(v) == 0:
+        """Validate success_criteria when provided."""
+        if v is None:
+            return v
+        if len(v) == 0:
             raise ValueError("success_criteria must contain at least one item if provided")
+        for i, item in enumerate(v):
+            if not isinstance(item, str):
+                raise ValueError(f"success_criteria[{i}] must be a string")
+            if not item.strip():
+                raise ValueError(f"success_criteria[{i}] cannot be empty or whitespace")
         return v
 
 
