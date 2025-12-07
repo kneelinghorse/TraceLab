@@ -70,7 +70,7 @@ def create_project(
     """Create a new project."""
     project = _service.create_project(db, data)
     # Invalidate list cache
-    _cache_manager.invalidate_by_prefix("project_metadata:list")
+    _cache_manager.invalidate_project_metadata()
     return ProjectRead.model_validate(project)
 
 
@@ -85,8 +85,7 @@ def update_project(
     if not project:
         raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
     # Invalidate caches
-    _cache_manager.invalidate_by_prefix("project_metadata:list")
-    _cache_manager.invalidate_by_prefix(f"project_metadata:detail:{project_id}")
+    _cache_manager.invalidate_project_metadata(str(project_id))
     return ProjectRead.model_validate(project)
 
 
