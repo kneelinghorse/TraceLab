@@ -183,7 +183,7 @@ function MissionsContent() {
             </p>
           </div>
           <Link
-            href="/console/missions"
+            href="/missions/new"
             className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
           >
             Create Mission
@@ -257,7 +257,7 @@ function MissionsContent() {
                 No missions found. Create one to get started.
               </p>
               <Link
-                href="/console/missions"
+                href="/missions/new"
                 className="mt-4 inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700"
               >
                 Create your first mission
