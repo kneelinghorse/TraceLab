@@ -1,5 +1,5 @@
 /**
- * Documents list page
+ * Documents list page - cross-project document browser
  */
 
 import { AuthGate } from "@/components/AuthGate";
@@ -22,11 +22,12 @@ export default function DocumentsPage() {
 
   const { data: projectResponse } = useSWR<PaginatedResponse<Project>>(
     ["projects", "selector"],
-    () => projectsApi.listProjects({ pageSize: 100 })
+    () => projectsApi.listProjects({ pageSize: 100 }),
+    { revalidateOnMount: true }
   );
   const projects = projectResponse?.data ?? [];
 
-  const { data: documentsResponse, mutate, isLoading } = useSWR<PaginatedResponse<Document>>(
+  const { data: documentsResponse, mutate, isLoading, isValidating } = useSWR<PaginatedResponse<Document>>(
     ["documents", selectedProject, statusFilter, searchTerm, page],
     () =>
       documentsApi.listDocuments({
@@ -35,7 +36,8 @@ export default function DocumentsPage() {
         search: searchTerm || undefined,
         page,
         pageSize: PAGE_SIZE,
-      })
+      }),
+    { revalidateOnMount: true }
   );
 
   const documents = documentsResponse?.data ?? [];
@@ -67,6 +69,10 @@ export default function DocumentsPage() {
     }
   };
 
+  const handleRefresh = () => {
+    mutate();
+  };
+
   return (
     <AuthGate>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -75,7 +81,7 @@ export default function DocumentsPage() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Documents</h1>
             <p className="mt-2 text-gray-600 dark:text-gray-400">
-              Upload and manage your research documents
+              Browse and manage documents across all projects. For project-specific management, use the project detail page.
             </p>
           </div>
 
@@ -87,6 +93,7 @@ export default function DocumentsPage() {
                 value={selectedProject}
                 onChange={(e) => setSelectedProject(e.target.value)}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                aria-label="Filter by project"
               >
                 <option value="">All Projects</option>
                 {projects?.map((project) => (
@@ -101,6 +108,7 @@ export default function DocumentsPage() {
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                aria-label="Filter by status"
               >
                 <option value="all">All Status</option>
                 <option value="processed">Processed</option>
@@ -114,7 +122,25 @@ export default function DocumentsPage() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                aria-label="Search documents"
               />
+
+              {/* Refresh Button */}
+              <button
+                type="button"
+                onClick={handleRefresh}
+                disabled={isValidating}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+                title="Refresh documents"
+              >
+                {isValidating ? (
+                  <span className="inline-block w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                )}
+              </button>
             </div>
 
             <Link
@@ -137,7 +163,7 @@ export default function DocumentsPage() {
                 href="/documents/upload"
                 className="text-blue-600 hover:text-blue-700 dark:text-blue-400"
               >
-                Upload your first document →
+                Upload your first document
               </Link>
             </div>
           ) : (
@@ -157,7 +183,12 @@ export default function DocumentsPage() {
                       </Link>
 
                       <div className="mt-2 flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
-                        <span>Project: {projectLookup.get(document.project_id) ?? document.project_id}</span>
+                        <Link
+                          href={`/projects/${document.project_id}`}
+                          className="hover:text-blue-600 dark:hover:text-blue-400"
+                        >
+                          Project: {projectLookup.get(document.project_id) ?? "Unknown"}
+                        </Link>
                         <span>
                           Type: {document.file_type || document.mime_type?.split("/")[1] || "Unknown"}
                         </span>
@@ -198,6 +229,7 @@ export default function DocumentsPage() {
                         View
                       </Link>
                       <button
+                        type="button"
                         onClick={() => handleDelete(document.id)}
                         className="px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-gray-700 rounded"
                       >
@@ -238,6 +270,7 @@ function PaginationControls({ page, pages, onChange }: PaginationControlsProps) 
       </p>
       <div className="flex gap-2">
         <button
+          type="button"
           onClick={() => onChange(Math.max(1, page - 1))}
           disabled={page === 1}
           className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg disabled:opacity-50"
@@ -245,6 +278,7 @@ function PaginationControls({ page, pages, onChange }: PaginationControlsProps) 
           Previous
         </button>
         <button
+          type="button"
           onClick={() => onChange(Math.min(pages, page + 1))}
           disabled={page >= pages}
           className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg disabled:opacity-50"
