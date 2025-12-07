@@ -18,10 +18,10 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Index,
-    JSON,
     String,
     Text,
 )
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -78,34 +78,34 @@ class Mission(Base):
         comment="What this mission aims to achieve",
     )
     success_criteria = Column(
-        JSON,
+        JSONB,
         nullable=False,
         comment="Array of measurable success conditions",
     )
 
     # DeepSearch Optional Fields
     context = Column(
-        JSON,
+        JSONB,
         default=dict,
         comment="Additional context object for the mission",
     )
     deliverables = Column(
-        JSON,
+        JSONB,
         default=list,
         comment="Array of expected deliverables",
     )
     research_phases = Column(
-        JSON,
+        JSONB,
         default=dict,
         comment="Research phase configuration",
     )
     tags = Column(
-        JSON,
+        JSONB,
         default=list,
         comment="Array of tags for categorization",
     )
     mission_metadata = Column(
-        JSON,
+        JSONB,
         default=dict,
         comment="Arbitrary metadata object",
     )
@@ -142,12 +142,12 @@ class Mission(Base):
 
     # Results
     execution_metadata = Column(
-        JSON,
+        JSONB,
         default=dict,
         comment="Execution metrics and debugging info",
     )
     result_document_ids = Column(
-        JSON,
+        JSONB,
         default=list,
         comment="Array of document UUIDs produced by this mission",
     )
@@ -163,7 +163,7 @@ class Mission(Base):
         comment="Raw markdown output from mission execution",
     )
     result_protocol = Column(
-        JSON,
+        JSONB,
         nullable=True,
         comment="Mission Protocol compliant result object",
     )
