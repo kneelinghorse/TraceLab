@@ -1,6 +1,6 @@
 # TraceLab Research Repository
 
-Personal-scale research repository with RAG-powered semantic search, structured data organization, and quality-enforced workflows.
+Personal-scale research repository with RAG-powered semantic search, structured data organization, and quality-enforced workflows.+ mcp
 
 ## Tech Stack
 
