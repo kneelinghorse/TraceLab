@@ -1,190 +1,271 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { formatDistanceToNow } from "date-fns";
 
 import { AuthGate } from "@/components/AuthGate";
-import { EvidenceCard } from "@/components/EvidenceCard";
-import { MissionProtocolForm } from "@/components/MissionProtocolForm";
-import { ProgressIndicator } from "@/components/ProgressIndicator";
-import { QualityGatePanel } from "@/components/QualityGatePanel";
-import { API_PATH_PREFIX, buildApiUrl } from "@/lib/api/http";
-import { useMissionDetail, useQualityReport } from "@/lib/hooks/useMissions";
-import { getStoredAuth } from "@/lib/auth/storage";
+import { useApiMission } from "@/lib/hooks/useMissions";
+import type { MissionStatus } from "@/types/mission";
+
+const STATUS_COLORS: Record<MissionStatus, { bg: string; text: string; dot: string }> = {
+  draft: { bg: "bg-gray-100 dark:bg-gray-700", text: "text-gray-700 dark:text-gray-300", dot: "bg-gray-400" },
+  queued: { bg: "bg-amber-100 dark:bg-amber-900/30", text: "text-amber-700 dark:text-amber-300", dot: "bg-amber-400" },
+  in_progress: { bg: "bg-blue-100 dark:bg-blue-900/30", text: "text-blue-700 dark:text-blue-300", dot: "bg-blue-400" },
+  completed: { bg: "bg-emerald-100 dark:bg-emerald-900/30", text: "text-emerald-700 dark:text-emerald-300", dot: "bg-emerald-400" },
+  blocked: { bg: "bg-red-100 dark:bg-red-900/30", text: "text-red-700 dark:text-red-300", dot: "bg-red-400" },
+  cancelled: { bg: "bg-gray-100 dark:bg-gray-700", text: "text-gray-500 dark:text-gray-400", dot: "bg-gray-300" },
+};
+
+function StatusBadge({ status }: { status: MissionStatus }) {
+  const colors = STATUS_COLORS[status] ?? STATUS_COLORS.draft;
+  const label = status.replace("_", " ");
+
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium ${colors.bg} ${colors.text}`}>
+      <span className={`w-2 h-2 rounded-full ${colors.dot}`} />
+      {label.charAt(0).toUpperCase() + label.slice(1)}
+    </span>
+  );
+}
 
 function MissionDetailContent() {
   const router = useRouter();
   const missionId = typeof router.query.id === "string" ? router.query.id : undefined;
 
-  const { mission, isLoading, error, refresh } = useMissionDetail(missionId);
-  const { report, refresh: refreshQuality } = useQualityReport(missionId);
-  const [exportFormat, setExportFormat] = useState<"md" | "pdf" | "docx">("md");
-  const [isExporting, setIsExporting] = useState(false);
-  const [exportError, setExportError] = useState<string | null>(null);
+  const { mission, isLoading, error, refresh } = useApiMission(missionId);
 
   if (!missionId) {
-    return <p className="p-8 text-slate-600">Select a mission from the backlog to view details.</p>;
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <p className="text-gray-600 dark:text-gray-400">Select a mission to view details.</p>
+        </div>
+      </div>
+    );
   }
 
   if (isLoading) {
-    return <p className="p-8 text-slate-600">Loading mission…</p>;
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <p className="text-gray-600 dark:text-gray-400">Loading mission...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="rounded-3xl border border-rose-200 bg-rose-50 p-8 text-rose-700">
-        Unable to load mission.
-        <button onClick={refresh} className="ml-2 font-semibold text-rose-900 underline">
-          Retry
-        </button>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
+            <p className="text-red-600 dark:text-red-400">
+              Failed to load mission: {error.message}
+            </p>
+            <button
+              onClick={refresh}
+              className="mt-2 text-sm font-medium text-red-700 dark:text-red-300 underline"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!mission) {
-    return <p className="p-8 text-rose-700">Mission not found.</p>;
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <p className="text-gray-600 dark:text-gray-400">Mission not found.</p>
+        </div>
+      </div>
+    );
   }
 
-  const handleCompleted = () => {
-    refresh();
-    refreshQuality();
-  };
-
-  const resolveFilename = (disposition: string | null | undefined, fallback: string) => {
-    if (!disposition) {
-      return fallback;
-    }
-    const match = disposition
-      .split(";")
-      .map((part) => part.trim())
-      .find((part) => part.toLowerCase().startsWith("filename="));
-    if (!match) {
-      return fallback;
-    }
-    const value = match.split("=", 2)[1];
-    return value ? value.replace(/^"|"$/g, "") : fallback;
-  };
-
-  const handleExport = async () => {
-    if (!missionId || !mission) {
-      return;
-    }
-    setIsExporting(true);
-    setExportError(null);
-    try {
-      const auth = getStoredAuth();
-      const response = await fetch(buildApiUrl(`/missions/${missionId}/export`, { format: exportFormat }), {
-        headers: auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined,
-      });
-      if (!response.ok) {
-        const detail = await response.text();
-        throw new Error(detail || "Failed to export report");
-      }
-
-      const blob = await response.blob();
-      const fallbackName = `${mission.mission_data.mission_id}.${exportFormat}`;
-      const filename = resolveFilename(response.headers.get("content-disposition"), fallbackName);
-      const url = window.URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = filename;
-      document.body.appendChild(anchor);
-      anchor.click();
-      document.body.removeChild(anchor);
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      setExportError(err instanceof Error ? err.message : "Unable to export report");
-    } finally {
-      setIsExporting(false);
-    }
-  };
+  const createdAt = mission.created_at
+    ? formatDistanceToNow(new Date(mission.created_at), { addSuffix: true })
+    : null;
+  const updatedAt = mission.updated_at
+    ? formatDistanceToNow(new Date(mission.updated_at), { addSuffix: true })
+    : null;
+  const startedAt = mission.started_at
+    ? formatDistanceToNow(new Date(mission.started_at), { addSuffix: true })
+    : null;
+  const completedAt = mission.completed_at
+    ? formatDistanceToNow(new Date(mission.completed_at), { addSuffix: true })
+    : null;
 
   return (
-    <main className="min-h-screen bg-slate-50 py-10">
-      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 text-slate-900 sm:px-6 lg:px-8">
-        <section className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-          <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500">
-            <Link href="/missions" className="font-medium text-sky-700">
-              ← Back to backlog
-            </Link>
-            <span>·</span>
-            <span>Mission ID: {mission.mission_data.mission_id}</span>
-          </div>
-          <h1 className="mt-3 text-4xl font-semibold text-slate-900">{mission.mission_data.title ?? mission.mission_data.mission_id}</h1>
-          <p className="mt-3 max-w-4xl text-base leading-relaxed text-slate-600">{mission.mission_data.summary}</p>
-          <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-600">
-            <span>Status: {mission.mission_data.status}</span>
-            <span>Owner: {mission.mission_data.owner ?? "Unassigned"}</span>
-            <span>Completion: {mission.completion_percentage ?? 0}%</span>
-          </div>
-          <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Report Export</p>
-              <p className="text-sm text-slate-600">Download Markdown, PDF, or DOCX summaries with citations.</p>
-              {exportError && <p className="mt-2 text-xs text-rose-600">{exportError}</p>}
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <label className="text-sm font-medium text-slate-600" htmlFor="export-format">
-                Format
-              </label>
-              <select
-                id="export-format"
-                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-800 shadow-sm"
-                value={exportFormat}
-                onChange={(event) => setExportFormat(event.target.value as "md" | "pdf" | "docx")}
-                disabled={isExporting}
-              >
-                <option value="md">Markdown (.md)</option>
-                <option value="pdf">PDF (.pdf)</option>
-                <option value="docx">Word (.docx)</option>
-              </select>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-6">
+          <Link
+            href="/missions"
+            className="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700"
+          >
+            &larr; Back to missions
+          </Link>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-2">
+                  <StatusBadge status={mission.status} />
+                  <span className="text-sm font-mono text-gray-500 dark:text-gray-400">
+                    {mission.mission_id}
+                  </span>
+                </div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {mission.title}
+                </h1>
+                <p className="mt-2 text-gray-600 dark:text-gray-300">
+                  {mission.objective}
+                </p>
+              </div>
               <button
-                type="button"
-                onClick={handleExport}
-                disabled={isExporting}
-                className="rounded-xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:bg-slate-400"
+                onClick={refresh}
+                className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-gray-600 rounded-lg"
               >
-                {isExporting ? "Exporting…" : "Export"}
+                Refresh
               </button>
             </div>
-          </div>
-        </section>
 
-        <section className="grid gap-6 lg:grid-cols-[2fr,1fr]">
-          <MissionProtocolForm mission={mission} onCompleted={handleCompleted} />
-          <div className="space-y-6">
-            <ProgressIndicator value={mission.completion_percentage ?? 0} mission={mission} />
-            <QualityGatePanel mission={mission} report={report} />
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-              <p>
-                Real-time gate data fetched from <code>{`${API_PATH_PREFIX}/quality/missions/${mission.id}/quality`}</code>. Compare with heuristics in{" "}
-                <code>docs/quality_gates.md</code> to see why a gate is blocking.
-              </p>
+            {mission.tags.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {mission.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+              {createdAt && (
+                <div>
+                  <p className="text-gray-500 dark:text-gray-400">Created</p>
+                  <p className="text-gray-900 dark:text-white">{createdAt}</p>
+                </div>
+              )}
+              {startedAt && (
+                <div>
+                  <p className="text-gray-500 dark:text-gray-400">Started</p>
+                  <p className="text-gray-900 dark:text-white">{startedAt}</p>
+                </div>
+              )}
+              {completedAt && (
+                <div>
+                  <p className="text-gray-500 dark:text-gray-400">Completed</p>
+                  <p className="text-gray-900 dark:text-white">{completedAt}</p>
+                </div>
+              )}
+              {updatedAt && (
+                <div>
+                  <p className="text-gray-500 dark:text-gray-400">Updated</p>
+                  <p className="text-gray-900 dark:text-white">{updatedAt}</p>
+                </div>
+              )}
             </div>
           </div>
-        </section>
 
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Evidence</p>
-              <h2 className="text-2xl font-semibold text-slate-900">Linked sources</h2>
-            </div>
-            <span className="text-sm font-medium text-slate-500">{mission.mission_data.evidence.length} record(s)</span>
-          </div>
-          {mission.mission_data.evidence.length === 0 ? (
-            <p className="mt-4 text-sm text-slate-600">
-              No evidence linked yet. Use the search workspace → quick add action to capture supporting chunks.
-            </p>
-          ) : (
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              {mission.mission_data.evidence.map((item, index) => (
-                <EvidenceCard key={item.evidence_id || index} evidence={item} index={index} />
-              ))}
+          {mission.success_criteria.length > 0 && (
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                Success Criteria
+              </h2>
+              <ul className="space-y-2">
+                {mission.success_criteria.map((criterion, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="mt-1 w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0" />
+                    <span className="text-gray-600 dark:text-gray-300">{criterion}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
-        </section>
+
+          {mission.deliverables.length > 0 && (
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                Deliverables
+              </h2>
+              <ul className="space-y-2">
+                {mission.deliverables.map((deliverable, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="mt-1 w-1.5 h-1.5 rounded-full bg-blue-400 flex-shrink-0" />
+                    <span className="text-gray-600 dark:text-gray-300">{deliverable}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {mission.error_message && (
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-3">
+                Error
+              </h2>
+              <p className="text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+                {mission.error_message}
+              </p>
+            </div>
+          )}
+
+          {mission.result_markdown && (
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                Results
+              </h2>
+              <div className="prose prose-sm dark:prose-invert max-w-none bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+                <pre className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300 font-mono">
+                  {mission.result_markdown}
+                </pre>
+              </div>
+            </div>
+          )}
+
+          {mission.result_report_id && (
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                Generated Report
+              </h2>
+              <Link
+                href={`/reports/${mission.result_report_id}`}
+                className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium"
+              >
+                View Report &rarr;
+              </Link>
+            </div>
+          )}
+
+          {mission.deepsearch_job_id && (
+            <div className="p-6">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                Execution Details
+              </h2>
+              <div className="grid gap-4 sm:grid-cols-2 text-sm">
+                <div>
+                  <p className="text-gray-500 dark:text-gray-400">DeepSearch Job ID</p>
+                  <p className="font-mono text-gray-900 dark:text-white">{mission.deepsearch_job_id}</p>
+                </div>
+                {mission.created_by && (
+                  <div>
+                    <p className="text-gray-500 dark:text-gray-400">Created By</p>
+                    <p className="text-gray-900 dark:text-white">{mission.created_by}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </main>
+    </div>
   );
 }
 

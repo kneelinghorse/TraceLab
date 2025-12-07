@@ -1,174 +1,285 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
 
 import { AuthGate } from "@/components/AuthGate";
-import { MissionProtocolForm } from "@/components/MissionProtocolForm";
-import { ProgressIndicator } from "@/components/ProgressIndicator";
-import { QualityGatePanel } from "@/components/QualityGatePanel";
-import { useMissionList } from "@/lib/hooks/useMissions";
-import type { Mission } from "@/types/mission";
+import { projectsApi } from "@/lib/api/projects";
+import { calculateQueuePosition, useApiMissions } from "@/lib/hooks/useMissions";
+import type { ApiMission, MissionStatus } from "@/types/mission";
+import type { Project } from "@/types/document";
+import type { PaginatedResponse } from "@/types/pagination";
+import useSWR from "swr";
 
-type FormMode = "create" | "edit";
+const PAGE_SIZE = 20;
 
-const gateSummary = (mission?: Mission) => {
-  const gates = mission?.mission_data.quality_checkpoints ?? [];
-  const failing = gates.filter((gate) => gate.status === "fail").length;
-  const passing = gates.filter((gate) => gate.status === "pass").length;
-  return { failing, passing };
+const MISSION_STATUSES: { value: MissionStatus | "all"; label: string }[] = [
+  { value: "all", label: "All Statuses" },
+  { value: "draft", label: "Draft" },
+  { value: "queued", label: "Queued" },
+  { value: "in_progress", label: "In Progress" },
+  { value: "completed", label: "Completed" },
+  { value: "blocked", label: "Blocked" },
+  { value: "cancelled", label: "Cancelled" },
+];
+
+const STATUS_COLORS: Record<MissionStatus, { bg: string; text: string; dot: string }> = {
+  draft: { bg: "bg-gray-100 dark:bg-gray-700", text: "text-gray-700 dark:text-gray-300", dot: "bg-gray-400" },
+  queued: { bg: "bg-amber-100 dark:bg-amber-900/30", text: "text-amber-700 dark:text-amber-300", dot: "bg-amber-400" },
+  in_progress: { bg: "bg-blue-100 dark:bg-blue-900/30", text: "text-blue-700 dark:text-blue-300", dot: "bg-blue-400" },
+  completed: { bg: "bg-emerald-100 dark:bg-emerald-900/30", text: "text-emerald-700 dark:text-emerald-300", dot: "bg-emerald-400" },
+  blocked: { bg: "bg-red-100 dark:bg-red-900/30", text: "text-red-700 dark:text-red-300", dot: "bg-red-400" },
+  cancelled: { bg: "bg-gray-100 dark:bg-gray-700", text: "text-gray-500 dark:text-gray-400", dot: "bg-gray-300" },
 };
 
-function MissionsContent() {
-  const { missions, isLoading, error, refresh } = useMissionList();
-  const [mode, setMode] = useState<FormMode>("edit");
-  const [selectedMissionId, setSelectedMissionId] = useState<string | undefined>(undefined);
-
-  const activeMission = useMemo(() => {
-    if (!missions.length) {
-      return undefined;
-    }
-    if (!selectedMissionId) {
-      return missions[0];
-    }
-    return missions.find((mission) => mission.id === selectedMissionId) ?? missions[0];
-  }, [missions, selectedMissionId]);
-
-  const handleSelectMission = (mission: Mission) => {
-    setSelectedMissionId(mission.id);
-    setMode("edit");
-  };
-
-  const handleFormCompleted = (mission: Mission) => {
-    setSelectedMissionId(mission.id);
-    setMode("edit");
-    refresh();
-  };
-
-  const formMission = mode === "edit" ? activeMission : undefined;
-  const highlightedMissionId = selectedMissionId ?? activeMission?.id;
-  const { failing, passing } = gateSummary(formMission);
+function StatusBadge({ status }: { status: MissionStatus }) {
+  const colors = STATUS_COLORS[status] ?? STATUS_COLORS.draft;
+  const label = status.replace("_", " ");
 
   return (
-    <main className="min-h-screen bg-slate-50 py-10">
-      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 text-slate-900 sm:px-6 lg:px-8">
-        <section className="grid gap-6 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm lg:grid-cols-[2fr,1fr]">
-          <div className="space-y-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-500">Mission Protocol</p>
-            <h1 className="text-4xl font-semibold text-slate-900">UI Integration + Quality Gates</h1>
-            <p className="text-base text-slate-600">
-              Capture structured research directly inside TraceLab, promote semantic-search evidence, and watch gate status update in
-              real time. Layout favors readability with generous spacing and clear hierarchy.
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${colors.bg} ${colors.text}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${colors.dot}`} />
+      {label.charAt(0).toUpperCase() + label.slice(1)}
+    </span>
+  );
+}
+
+function QueuePosition({ position }: { position: number | null }) {
+  if (position === null) return null;
+
+  return (
+    <span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-medium">
+      <span className="text-amber-500">#</span>
+      {position} in queue
+    </span>
+  );
+}
+
+interface MissionCardProps {
+  mission: ApiMission;
+  queuePosition: number | null;
+}
+
+function MissionCard({ mission, queuePosition }: MissionCardProps) {
+  const createdAt = mission.created_at
+    ? formatDistanceToNow(new Date(mission.created_at), { addSuffix: true })
+    : "recently";
+
+  return (
+    <Link
+      href={`/missions/${mission.id}`}
+      className="block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-sm transition-all"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <StatusBadge status={mission.status} />
+            <QueuePosition position={queuePosition} />
+          </div>
+          <h3 className="mt-2 text-lg font-semibold text-gray-900 dark:text-white truncate">
+            {mission.title}
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
+            {mission.mission_id}
+          </p>
+        </div>
+      </div>
+
+      <p className="mt-3 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+        {mission.objective}
+      </p>
+
+      <div className="mt-4 flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+        <span>Created {createdAt}</span>
+        {mission.tags.length > 0 && (
+          <span className="flex items-center gap-1">
+            {mission.tags.slice(0, 3).map((tag) => (
+              <span key={tag} className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-gray-600 dark:text-gray-300">
+                {tag}
+              </span>
+            ))}
+            {mission.tags.length > 3 && <span>+{mission.tags.length - 3}</span>}
+          </span>
+        )}
+      </div>
+
+      {mission.error_message && (
+        <p className="mt-2 text-xs text-red-600 dark:text-red-400 line-clamp-1">
+          Error: {mission.error_message}
+        </p>
+      )}
+    </Link>
+  );
+}
+
+interface PaginationProps {
+  page: number;
+  totalPages: number;
+  onChange: (page: number) => void;
+}
+
+function Pagination({ page, totalPages, onChange }: PaginationProps) {
+  if (totalPages <= 1) return null;
+
+  return (
+    <div className="flex items-center justify-between pt-4 text-sm text-gray-600 dark:text-gray-400">
+      <span>
+        Page {page} of {totalPages}
+      </span>
+      <div className="flex gap-2">
+        <button
+          onClick={() => onChange(Math.max(1, page - 1))}
+          disabled={page === 1}
+          className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        >
+          Previous
+        </button>
+        <button
+          onClick={() => onChange(Math.min(totalPages, page + 1))}
+          disabled={page >= totalPages}
+          className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function MissionsContent() {
+  const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<MissionStatus | "all">("all");
+  const [projectFilter, setProjectFilter] = useState<string>("all");
+
+  // Fetch projects for filter dropdown
+  const { data: projectsData } = useSWR<PaginatedResponse<Project>>(
+    ["projects-filter"],
+    () => projectsApi.listProjects({ page: 1, pageSize: 100 }),
+  );
+  const projects = projectsData?.data ?? [];
+
+  // Fetch missions with filters
+  const { missions, pagination, isLoading, error, refresh } = useApiMissions({
+    page,
+    pageSize: PAGE_SIZE,
+    status: statusFilter === "all" ? undefined : statusFilter,
+    projectId: projectFilter === "all" ? undefined : projectFilter,
+  });
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [statusFilter, projectFilter]);
+
+  const totalPages = pagination?.pages ?? 0;
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Missions</h1>
+            <p className="mt-1 text-gray-600 dark:text-gray-400">
+              Browse and manage research missions
             </p>
+          </div>
+          <Link
+            href="/console/missions"
+            className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+          >
+            Create Mission
+          </Link>
+        </header>
+
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
             <div className="flex flex-wrap gap-3">
-              <button
-                className={`rounded-full border px-5 py-2 text-sm font-semibold transition ${
-                  mode === "create"
-                    ? "border-slate-900 bg-slate-900 text-white"
-                    : "border-slate-300 bg-white text-slate-900 hover:border-slate-500"
-                }`}
-                onClick={() => setMode("create")}
-              >
-                Start New Mission
-              </button>
-              <button
-                className={`rounded-full border px-5 py-2 text-sm font-semibold transition ${
-                  mode === "edit"
-                    ? "border-slate-900 bg-slate-900 text-white"
-                    : "border-slate-300 bg-white text-slate-900 hover:border-slate-500"
-                }`}
-                onClick={() => setMode("edit")}
-                disabled={!activeMission}
-              >
-                Edit selected mission
-              </button>
-            </div>
-            {formMission && (
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                <p className="font-medium text-slate-900">{formMission.mission_data.title ?? formMission.mission_data.mission_id}</p>
-                <p>
-                  {formMission.completion_percentage ?? 0}% complete · {failing} failing gate(s) · {passing} passing gate(s)
-                </p>
+              <div>
+                <label htmlFor="status-filter" className="sr-only">
+                  Filter by status
+                </label>
+                <select
+                  id="status-filter"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as MissionStatus | "all")}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm"
+                >
+                  {MISSION_STATUSES.map((s) => (
+                    <option key={s.value} value={s.value}>
+                      {s.label}
+                    </option>
+                  ))}
+                </select>
               </div>
-            )}
-          </div>
-          <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
-            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-500">Quality reference</p>
-            <p className="mt-3 leading-relaxed">
-              Widgets map to Pydantic validators shipped in Sprint 03. Keep docs/quality_gates.md handy—every field in the form is
-              annotated so you know which gate it unlocks.
-            </p>
-          </div>
-        </section>
 
-        <section className="grid gap-6 lg:grid-cols-[2fr,1fr]">
-          <MissionProtocolForm mission={formMission} onCompleted={handleFormCompleted} />
-          <div className="space-y-6">
-            <ProgressIndicator value={formMission?.completion_percentage ?? 0} mission={formMission} />
-            <QualityGatePanel mission={formMission} />
-          </div>
-        </section>
-
-        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-500">Missions</p>
-              <h2 className="text-2xl font-semibold text-slate-900">Mission Protocol Backlog</h2>
+              <div>
+                <label htmlFor="project-filter" className="sr-only">
+                  Filter by project
+                </label>
+                <select
+                  id="project-filter"
+                  value={projectFilter}
+                  onChange={(e) => setProjectFilter(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm"
+                >
+                  <option value="all">All Projects</option>
+                  {projects.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <button onClick={refresh} className="text-sm font-medium text-slate-600 hover:text-slate-900">
+
+            <button
+              onClick={refresh}
+              className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
               Refresh
             </button>
           </div>
-          {error && <p className="mt-3 text-sm text-rose-600">Unable to load missions: {error.message}</p>}
-          {isLoading ? (
-            <p className="mt-3 text-sm text-slate-600">Loading missions…</p>
-          ) : (
-            <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {missions.map((mission) => {
-                const isActive = mission.id === highlightedMissionId;
-                const failingGates = mission.mission_data.quality_checkpoints.filter((gate) => gate.status === "fail").length;
-                const completion = mission.completion_percentage ?? 0;
-                return (
-                  <button
-                    key={mission.id}
-                    onClick={() => handleSelectMission(mission)}
-                    className={`text-left rounded-2xl border p-5 transition ${
-                      isActive
-                        ? "border-slate-900 bg-slate-900 text-white shadow-lg shadow-slate-900/15"
-                        : "border-slate-200 bg-white text-slate-900 hover:border-slate-400"
-                    }`}
-                  >
-                    <p className={`text-xs font-semibold uppercase tracking-[0.3em] ${isActive ? "text-white/70" : "text-slate-500"}`}>
-                      {mission.mission_data.status}
-                    </p>
-                    <h3 className={`mt-1 text-xl font-semibold ${isActive ? "text-white" : "text-slate-900"}`}>
-                      {mission.mission_data.title ?? mission.mission_data.mission_id}
-                    </h3>
-                    <p className={`text-sm ${isActive ? "text-white/80" : "text-slate-600"}`}>
-                      {mission.mission_data.summary ?? "Summary pending"}
-                    </p>
-                    <div className={`mt-4 flex items-center justify-between text-sm ${isActive ? "text-white/80" : "text-slate-600"}`}>
-                      <span>{completion}% complete</span>
-                      <span className={failingGates ? "text-rose-500" : "text-emerald-600"}>
-                        {failingGates ? `${failingGates} failing gate(s)` : "All gates passing"}
-                      </span>
-                    </div>
-                    <Link
-                      href={`/missions/${mission.id}`}
-                      className={`mt-3 inline-flex items-center gap-1 text-sm font-semibold ${isActive ? "text-white" : "text-sky-700"}`}
-                      onClick={(event) => event.stopPropagation()}
-                    >
-                      View details →
-                    </Link>
-                  </button>
-                );
-              })}
-              {missions.length === 0 && (
-                <p className="text-sm text-slate-600">No missions found. Create one to get started.</p>
-              )}
+
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-sm text-red-600 dark:text-red-400">
+                Failed to load missions: {error.message}
+              </p>
             </div>
           )}
-        </section>
+
+          {isLoading && !missions.length ? (
+            <div className="py-12 text-center">
+              <p className="text-gray-500 dark:text-gray-400">Loading missions...</p>
+            </div>
+          ) : missions.length === 0 ? (
+            <div className="py-12 text-center">
+              <p className="text-gray-500 dark:text-gray-400">
+                No missions found. Create one to get started.
+              </p>
+              <Link
+                href="/console/missions"
+                className="mt-4 inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700"
+              >
+                Create your first mission
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {missions.map((mission) => (
+                  <MissionCard
+                    key={mission.id}
+                    mission={mission}
+                    queuePosition={calculateQueuePosition(mission, missions)}
+                  />
+                ))}
+              </div>
+              <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+            </>
+          )}
+        </div>
       </div>
-    </main>
+    </div>
   );
 }
 

@@ -1,4 +1,8 @@
-export type MissionStatus = "draft" | "in_progress" | "review" | "complete";
+// Legacy Mission Protocol status (for MissionProtocolDraft)
+export type MissionProtocolStatus = "draft" | "in_progress" | "review" | "complete";
+
+// New mission status aligned with backend API
+export type MissionStatus = "draft" | "queued" | "in_progress" | "completed" | "blocked" | "cancelled";
 
 export type QualityGateName =
   | "research_statement"
@@ -61,7 +65,7 @@ export interface MissionProtocolDraft {
   title?: string | null;
   summary?: string | null;
   project_id?: string | null;
-  status: MissionStatus;
+  status: MissionProtocolStatus;
   owner?: string | null;
   research_statement?: ResearchStatement | null;
   key_questions: KeyQuestion[];
@@ -78,7 +82,7 @@ export interface Mission {
   project_id: string | null;
   mission_data: MissionProtocolDraft;
   quality_gates?: Record<string, Record<string, unknown>> | null;
-  status?: MissionStatus | null;
+  status?: MissionProtocolStatus | null;
   completion_percentage?: number | null;
   created_at: string;
   updated_at: string;
@@ -88,7 +92,7 @@ export interface MissionCreatePayload {
   project_id: string;
   mission_data: MissionProtocolDraft;
   quality_gates?: Record<string, Record<string, unknown>>;
-  status?: MissionStatus;
+  status?: MissionProtocolStatus;
 }
 
 export type MissionUpdatePayload = Partial<MissionCreatePayload>;
@@ -116,4 +120,80 @@ export interface EvidenceLinkPayload {
   evidence_id: string;
   chunk_id: string;
   insight_id?: string;
+}
+
+// ============================================
+// API Mission types (aligned with backend)
+// ============================================
+
+/**
+ * Mission entity from the API (B16.1+ schema)
+ */
+export interface ApiMission {
+  id: string;
+  project_id: string | null;
+  mission_id: string;
+  title: string;
+  objective: string;
+  success_criteria: string[];
+  context: Record<string, unknown>;
+  deliverables: string[];
+  research_phases: Record<string, unknown>;
+  tags: string[];
+  metadata: Record<string, unknown>;
+  status: MissionStatus;
+  queued_at: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+  deepsearch_job_id: string | null;
+  execution_metadata: Record<string, unknown>;
+  result_document_ids: string[];
+  result_report_id: string | null;
+  result_markdown: string | null;
+  result_protocol: Record<string, unknown> | null;
+  error_message: string | null;
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+}
+
+export interface ApiMissionCreate {
+  mission_id: string;
+  title: string;
+  objective: string;
+  success_criteria: string[];
+  project_id?: string;
+  context?: Record<string, unknown>;
+  deliverables?: string[];
+  research_phases?: Record<string, unknown>;
+  tags?: string[];
+  metadata?: Record<string, unknown>;
+  status?: MissionStatus;
+  created_by?: string;
+}
+
+export interface ApiMissionUpdate {
+  title?: string;
+  objective?: string;
+  success_criteria?: string[];
+  context?: Record<string, unknown>;
+  deliverables?: string[];
+  research_phases?: Record<string, unknown>;
+  tags?: string[];
+  metadata?: Record<string, unknown>;
+  status?: MissionStatus;
+  deepsearch_job_id?: string;
+  result_document_ids?: string[];
+  result_report_id?: string;
+  result_markdown?: string;
+  result_protocol?: Record<string, unknown>;
+  error_message?: string;
+  execution_metadata?: Record<string, unknown>;
+}
+
+export interface MissionListParams {
+  page?: number;
+  page_size?: number;
+  status?: MissionStatus;
+  project_id?: string;
 }

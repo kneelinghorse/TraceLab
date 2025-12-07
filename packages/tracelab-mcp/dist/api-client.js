@@ -40,12 +40,13 @@ export class TraceLabClient {
         }
         const response = await fetch(url, options);
         if (!response.ok) {
+            const text = await response.text();
             let errorBody;
             try {
-                errorBody = await response.json();
+                errorBody = JSON.parse(text);
             }
             catch {
-                errorBody = await response.text();
+                errorBody = text;
             }
             throw new TraceLabAPIError(`API request failed: ${response.status} ${response.statusText}`, response.status, errorBody);
         }
