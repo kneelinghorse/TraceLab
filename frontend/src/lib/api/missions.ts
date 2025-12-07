@@ -59,6 +59,16 @@ export const missionsApi = {
   delete(missionId: string): Promise<void> {
     return httpClient.delete<void>(`${MISSIONS_PATH}/${missionId}`);
   },
+
+  /**
+   * Submit a draft mission to DeepSearch (sets status to queued).
+   */
+  submitToDeepSearch(missionId: string): Promise<ApiMission> {
+    return httpClient.put<ApiMission>(`${MISSIONS_PATH}/${missionId}`, {
+      status: "queued",
+      queued_at: new Date().toISOString(),
+    });
+  },
 };
 
 // ============================================
