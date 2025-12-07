@@ -1,7 +1,7 @@
 """Webhook handler service for processing DeepSearch callbacks.
 
 Handles incoming webhook payloads from DeepSearch and updates mission records.
-Includes signature validation and idempotent processing.
+Includes signature validation, idempotent processing, and auto-ingestion of results.
 """
 from __future__ import annotations
 
@@ -14,9 +14,11 @@ from typing import Optional, Tuple
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
+from app.models.document import Document
 from app.models.mission import Mission
 from app.schemas.mission import MissionUpdate
 from app.schemas.webhook import DeepSearchWebhookPayload, DeepSearchWebhookStatus
+from app.services.auto_ingest import AutoIngestError, AutoIngestService
 from app.services.mission_service import MissionNotFoundError, MissionService
 
 logger = logging.getLogger(__name__)
@@ -33,8 +35,13 @@ class WebhookProcessingError(RuntimeError):
 class WebhookHandler:
     """Handles DeepSearch webhook callbacks with validation and idempotency."""
 
-    def __init__(self, mission_service: Optional[MissionService] = None):
+    def __init__(
+        self,
+        mission_service: Optional[MissionService] = None,
+        auto_ingest_service: Optional[AutoIngestService] = None,
+    ):
         self._mission_service = mission_service or MissionService()
+        self._auto_ingest_service = auto_ingest_service
 
     def validate_signature(
         self,
@@ -147,6 +154,12 @@ class WebhookHandler:
         else:
             raise WebhookProcessingError(f"Unhandled webhook status: {payload.status}")
 
+    def _get_auto_ingest_service(self) -> AutoIngestService:
+        """Lazily initialize auto-ingest service."""
+        if self._auto_ingest_service is None:
+            self._auto_ingest_service = AutoIngestService()
+        return self._auto_ingest_service
+
     def _handle_success(
         self,
         db: Session,
@@ -155,7 +168,8 @@ class WebhookHandler:
     ) -> Tuple[Mission, str]:
         """Handle successful job completion.
 
-        Updates mission with results and marks as completed.
+        Updates mission with results, marks as completed, and auto-ingests
+        result_markdown as a document if available.
         """
         update_data = MissionUpdate(
             status="completed",
@@ -173,6 +187,40 @@ class WebhookHandler:
             payload.mission_id,
             payload.job_id,
         )
+
+        # Auto-ingest result_markdown as document (B16.7)
+        if payload.result_markdown and updated_mission.project_id:
+            try:
+                auto_ingest_service = self._get_auto_ingest_service()
+                document = auto_ingest_service.auto_ingest_result(
+                    db=db,
+                    mission=updated_mission,
+                    result_markdown=payload.result_markdown,
+                )
+                logger.info(
+                    "Auto-ingested result for mission %s as document %s",
+                    payload.mission_id,
+                    document.id,
+                )
+            except AutoIngestError as exc:
+                # Log but don't fail the webhook - mission is already completed
+                logger.warning(
+                    "Auto-ingest failed for mission %s: %s",
+                    payload.mission_id,
+                    str(exc),
+                )
+            except Exception as exc:
+                logger.exception(
+                    "Unexpected error during auto-ingest for mission %s",
+                    payload.mission_id,
+                )
+        elif not payload.result_markdown:
+            logger.debug("No result_markdown to ingest for mission %s", payload.mission_id)
+        elif not updated_mission.project_id:
+            logger.debug(
+                "Mission %s has no project_id, skipping auto-ingest",
+                payload.mission_id,
+            )
 
         return updated_mission, "completed"
 
