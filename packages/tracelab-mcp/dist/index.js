@@ -250,7 +250,7 @@ const TOOLS = [
     },
     {
         name: 'synthesize',
-        description: 'Generate a summary or report from a collection of chunks. Includes citations.',
+        description: 'Generate a summary or report from a collection of chunks. Includes citations. Optionally save the result as a persistent report.',
         inputSchema: {
             type: 'object',
             properties: {
@@ -266,6 +266,19 @@ const TOOLS = [
                     type: 'string',
                     enum: ['markdown', 'summary', 'report'],
                     description: 'Output format (default: markdown)',
+                },
+                save_as_report: {
+                    type: 'boolean',
+                    description: 'Optional: If true, persist the synthesis result as a report (default: false)',
+                },
+                report_title: {
+                    type: 'string',
+                    description: 'Optional: Title for the report (required if save_as_report is true)',
+                    maxLength: 255,
+                },
+                project_id: {
+                    type: 'string',
+                    description: 'Optional: UUID of project to associate the report with',
                 },
             },
             required: ['collection_id'],
@@ -459,6 +472,12 @@ const SynthesizeInput = z.object({
     collection_id: z.string().uuid(),
     prompt: z.string().optional(),
     format: z.enum(['markdown', 'summary', 'report']).optional().default('markdown'),
+    save_as_report: z.boolean().optional().default(false),
+    report_title: z.string().max(255).optional(),
+    project_id: z.string().uuid().optional(),
+}).refine((data) => !data.save_as_report || data.report_title, {
+    message: 'report_title is required when save_as_report is true',
+    path: ['report_title'],
 });
 const CreateReportInput = z.object({
     title: z.string().min(1).max(255),
@@ -738,15 +757,24 @@ async function handleSynthesize(args) {
             collection_id: input.collection_id,
             prompt: input.prompt,
             format: input.format,
+            save_as_report: input.save_as_report,
+            report_title: input.report_title,
+            project_id: input.project_id,
         });
+        const response = {
+            synthesis: result.content,
+            citations: result.citations,
+        };
+        // Include report_id if saved as report
+        if (result.report_id) {
+            response.report_id = result.report_id;
+            response.message = `Synthesis saved as report "${input.report_title}"`;
+        }
         return {
             content: [
                 {
                     type: 'text',
-                    text: JSON.stringify({
-                        synthesis: result.content,
-                        citations: result.citations,
-                    }, null, 2),
+                    text: JSON.stringify(response, null, 2),
                 },
             ],
         };

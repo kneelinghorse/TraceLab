@@ -118,6 +118,9 @@ export interface SynthesizeRequest {
     collection_id: string;
     prompt?: string;
     format?: 'markdown' | 'summary' | 'report';
+    save_as_report?: boolean;
+    report_title?: string;
+    project_id?: string;
 }
 export interface SynthesizeResponse {
     content: string;
@@ -126,6 +129,7 @@ export interface SynthesizeResponse {
         document_id?: string;
         excerpt: string;
     }>;
+    report_id?: string;
 }
 export interface ReportCreate {
     title: string;

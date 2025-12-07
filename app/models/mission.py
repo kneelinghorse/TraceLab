@@ -193,18 +193,9 @@ class Mission(Base):
 
     __table_args__ = (
         # Ensure success_criteria is a non-empty array
-        # PostgreSQL: Check JSONB array length
-        # SQLite: Check JSON array via json_array_length
+        # PostgreSQL uses jsonb_array_length (success_criteria is stored as JSONB)
         CheckConstraint(
-            """
-            (
-                CASE
-                    WHEN json_type(success_criteria) = 'array'
-                    THEN json_array_length(success_criteria) > 0
-                    ELSE jsonb_array_length(success_criteria) > 0
-                END
-            )
-            """,
+            "jsonb_array_length(success_criteria) > 0",
             name="success_criteria_not_empty",
         ),
         # Title length constraint
