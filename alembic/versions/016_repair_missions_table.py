@@ -3,6 +3,8 @@
 This migration ensures the missions table exists, even if migration 014 failed.
 It's idempotent and safe to run multiple times.
 
+If core tables (projects, reports) don't exist, this resets alembic to run from scratch.
+
 Revision ID: 016_repair_missions
 Revises: 015_add_document_metadata
 Create Date: 2025-12-07
@@ -28,6 +30,20 @@ def upgrade() -> None:
     inspector = inspect(bind)
     is_pg = is_postgresql(bind)
 
+    # Check if core tables exist - if not, we need to reset alembic
+    if not inspector.has_table("projects"):
+        print("CRITICAL: projects table missing - database schema is corrupt")
+        print("Resetting alembic_version to force full migration...")
+
+        # Delete the alembic_version entry to force re-run from scratch
+        op.execute("DELETE FROM alembic_version")
+
+        # Alembic will error out, but on next deploy it will start fresh
+        raise Exception(
+            "Database schema incomplete. alembic_version has been reset. "
+            "Please redeploy to run all migrations from scratch."
+        )
+
     # Check if missions table exists
     if inspector.has_table("missions"):
         print("missions table already exists, skipping creation")
@@ -35,9 +51,11 @@ def upgrade() -> None:
 
     print("missions table does not exist, creating it now...")
 
-    # Create the missions table
-    op.create_table(
-        "missions",
+    # Check if reports table exists for the foreign key
+    has_reports = inspector.has_table("reports")
+
+    # Build columns list
+    columns = [
         sa.Column(
             "id",
             postgresql.UUID(as_uuid=True) if is_pg else sa.String(36),
@@ -102,12 +120,6 @@ def upgrade() -> None:
             postgresql.JSONB() if is_pg else sa.JSON(),
             server_default="[]",
         ),
-        sa.Column(
-            "result_report_id",
-            postgresql.UUID(as_uuid=True) if is_pg else sa.String(36),
-            sa.ForeignKey("reports.id", ondelete="SET NULL"),
-            nullable=True,
-        ),
         sa.Column("result_markdown", sa.Text(), nullable=True),
         sa.Column(
             "result_protocol",
@@ -119,7 +131,29 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
         sa.Column("created_by", sa.String(100), nullable=True),
-    )
+    ]
+
+    # Add result_report_id column - with or without FK depending on reports table
+    if has_reports:
+        columns.append(
+            sa.Column(
+                "result_report_id",
+                postgresql.UUID(as_uuid=True) if is_pg else sa.String(36),
+                sa.ForeignKey("reports.id", ondelete="SET NULL"),
+                nullable=True,
+            )
+        )
+    else:
+        columns.append(
+            sa.Column(
+                "result_report_id",
+                postgresql.UUID(as_uuid=True) if is_pg else sa.String(36),
+                nullable=True,
+            )
+        )
+
+    # Create the missions table
+    op.create_table("missions", *columns)
 
     # Add indexes
     op.create_index("idx_missions_project_id", "missions", ["project_id"])
