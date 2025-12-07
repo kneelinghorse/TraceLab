@@ -95,6 +95,16 @@ class ProjectQueryService:
         db.refresh(project)
         return project
 
+    def delete_project(self, db: Session, project_id: UUID) -> bool:
+        """Delete a project and all associated data (cascading via FK constraints)."""
+        project = db.query(Project).filter(Project.id == project_id).first()
+        if not project:
+            return False
+
+        db.delete(project)
+        db.commit()
+        return True
+
     def get_project_stats(self, db: Session, project_id: UUID) -> Optional[ProjectStats]:
         """Get aggregated statistics for a project."""
         project = db.query(Project).filter(Project.id == project_id).first()

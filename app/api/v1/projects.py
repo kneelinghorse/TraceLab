@@ -89,6 +89,19 @@ def update_project(
     return ProjectRead.model_validate(project)
 
 
+@router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_project(
+    project_id: UUID,
+    db: Session = Depends(get_db),
+) -> None:
+    """Delete a project and all associated data."""
+    deleted = _service.delete_project(db, project_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+    # Invalidate caches
+    _cache_manager.invalidate_project_metadata(str(project_id))
+
+
 @router.get("/{project_id}/stats", response_model=ProjectStats)
 def get_project_stats(
     project_id: UUID,
