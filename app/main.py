@@ -33,6 +33,7 @@ from app.api.v1 import (
     search_history,
     saved_searches,
     synthesize,
+    webhooks,
 )
 from app.core.config import settings
 from app.core.database import Base, engine
@@ -190,6 +191,12 @@ app.include_router(
 )
 app.include_router(onboarding_router, prefix=settings.api_v1_prefix, dependencies=protected_dependencies)
 app.include_router(auth.router, prefix=f"{settings.api_v1_prefix}/auth", tags=["auth"])
+# Webhooks use signature-based auth, not JWT
+app.include_router(
+    webhooks.router,
+    prefix=f"{settings.api_v1_prefix}/webhooks",
+    tags=["webhooks"],
+)
 
 
 @app.get("/")
