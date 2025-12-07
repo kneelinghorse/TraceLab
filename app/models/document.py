@@ -10,6 +10,7 @@ from sqlalchemy import (
     BigInteger,
     DateTime,
     Date,
+    JSON,
     Numeric,
     ForeignKey,
     LargeBinary,
@@ -50,6 +51,9 @@ class Document(Base):
     # Quality metadata
     transcription_accuracy = Column(Numeric(3, 2))  # If AI-transcribed
     validation_status = Column(String, default='pending')  # 'pending' | 'validated' | 'flagged'
+
+    # Provenance metadata (for auto-ingested documents)
+    document_metadata = Column(JSON, default=dict, comment="Arbitrary metadata for document provenance")
     
     # Relationships
     chunks = relationship("DocumentChunk", back_populates="document", cascade="all, delete-orphan")

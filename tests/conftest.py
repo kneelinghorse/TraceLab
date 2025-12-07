@@ -43,9 +43,11 @@ def reset_database_and_reports(request):
 
     This fixture is skipped for tests in tests/mcp/ since those don't need DB.
     """
-    # Skip for MCP tests and unit tests that don't need database
+    # Skip for MCP tests and unit tests that don't need database reset
+    # Also skip for tests that rely on existing schema (created via Alembic)
     test_path = str(request.fspath)
-    if 'mcp' in test_path or 'test_deepsearch_client' in test_path:
+    skip_patterns = ['mcp', 'test_deepsearch_client', 'test_auto_ingest']
+    if any(pattern in test_path for pattern in skip_patterns):
         yield
         return
 
