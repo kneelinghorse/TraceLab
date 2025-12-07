@@ -179,8 +179,8 @@ class QualityScoringService:
                     Document.id.label("document_id"),
                     Project.mission_protocol_id.label("mission_id"),
                     Mission.status.label("mission_status"),
-                    Mission.quality_gates,
-                    Mission.mission_data,
+                    Mission.mission_metadata,
+                    Mission.execution_metadata,
                 )
                 .join(Project, Document.project_id == Project.id)
                 .outerjoin(Mission, Project.mission_protocol_id == Mission.id)
@@ -191,11 +191,13 @@ class QualityScoringService:
             mapping: Dict[str, Dict[str, Any]] = {}
             for row in rows:
                 payload = row._mapping
+                # Extract quality gates from mission_metadata if present
+                mission_meta = payload.get("mission_metadata") or {}
                 mapping[str(payload["document_id"])] = {
                     "mission_id": str(payload["mission_id"]) if payload["mission_id"] else None,
                     "status": payload["mission_status"],
-                    "quality_gates": payload["quality_gates"],
-                    "mission_data": payload["mission_data"],
+                    "quality_gates": mission_meta.get("quality_gates"),
+                    "mission_data": payload.get("execution_metadata"),
                 }
             return mapping
         finally:
