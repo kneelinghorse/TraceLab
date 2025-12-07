@@ -1,12 +1,106 @@
-"""Schemas for DeepSearch ingestion endpoints."""
+"""Schemas for DeepSearch integration (client and ingestion endpoints)."""
 from __future__ import annotations
 
+from datetime import datetime
+from enum import Enum
 from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field, conint, confloat
 
 from app.models.mission_protocol import MissionProtocolComplete
+
+
+# =============================================================================
+# DeepSearch Client Schemas (TraceLab → DeepSearch)
+# =============================================================================
+
+
+class DeepSearchJobStatus(str, Enum):
+    """Status values for DeepSearch job execution."""
+
+    PENDING = "pending"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+
+
+class DeepSearchExecuteRequest(BaseModel):
+    """Request payload for POST /missions/execute on DeepSearch."""
+
+    mission_id: str = Field(..., description="Unique mission identifier")
+    title: str = Field(..., description="Mission title")
+    objective: str = Field(..., description="Primary mission objective")
+    success_criteria: List[str] = Field(
+        ..., min_length=1, description="Measurable success criteria"
+    )
+    callback_url: str = Field(..., description="Webhook URL for status updates")
+    context: Optional[Dict[str, Any]] = Field(
+        default=None, description="Additional context for mission execution"
+    )
+    deliverables: Optional[List[str]] = Field(
+        default=None, description="Expected deliverables"
+    )
+    research_phases: Optional[Dict[str, Any]] = Field(
+        default=None, description="Research phase configuration"
+    )
+    metadata: Optional[Dict[str, Any]] = Field(
+        default=None, description="Additional metadata"
+    )
+
+
+class DeepSearchExecuteResponse(BaseModel):
+    """Response from POST /missions/execute on DeepSearch."""
+
+    job_id: str = Field(..., description="Unique job identifier for tracking")
+    mission_id: str = Field(..., description="Mission ID that was submitted")
+    status: DeepSearchJobStatus = Field(
+        default=DeepSearchJobStatus.PENDING, description="Initial job status"
+    )
+    estimated_duration_seconds: Optional[int] = Field(
+        default=None, description="Estimated execution time"
+    )
+    created_at: datetime = Field(..., description="Job creation timestamp")
+
+
+class DeepSearchStatusResponse(BaseModel):
+    """Response from GET /missions/{job_id}/status on DeepSearch."""
+
+    job_id: str = Field(..., description="Job identifier")
+    mission_id: str = Field(..., description="Mission ID")
+    status: DeepSearchJobStatus = Field(..., description="Current job status")
+    progress_percent: Optional[int] = Field(
+        default=None, ge=0, le=100, description="Execution progress percentage"
+    )
+    current_phase: Optional[str] = Field(
+        default=None, description="Current execution phase"
+    )
+    started_at: Optional[datetime] = Field(
+        default=None, description="Execution start time"
+    )
+    completed_at: Optional[datetime] = Field(
+        default=None, description="Execution completion time"
+    )
+    result: Optional[Dict[str, Any]] = Field(
+        default=None, description="Execution result (when completed)"
+    )
+    error: Optional[str] = Field(
+        default=None, description="Error message (when failed)"
+    )
+    error_code: Optional[str] = Field(
+        default=None, description="Error code (when failed)"
+    )
+
+
+class DeepSearchErrorResponse(BaseModel):
+    """Error response from DeepSearch API."""
+
+    error: str = Field(..., description="Error message")
+    error_code: Optional[str] = Field(default=None, description="Error code")
+    details: Optional[Dict[str, Any]] = Field(
+        default=None, description="Additional error details"
+    )
 
 
 class DeepSearchIngestRequest(BaseModel):

@@ -69,6 +69,14 @@ class Settings(BaseSettings):
     cors_allowed_headers: List[str] = Field(default_factory=lambda: ["Authorization", "Content-Type"])
     cors_allow_credentials: bool = True
 
+    # DeepSearch integration
+    deepsearch_api_url: Optional[str] = None
+    deepsearch_api_key: Optional[str] = None
+    deepsearch_timeout: float = 30.0
+    deepsearch_retries: int = 3
+    deepsearch_backoff_multiplier: float = 2.0
+    deepsearch_initial_backoff: float = 1.0
+
     class Config:
         env_file = ".env"
         case_sensitive = False
