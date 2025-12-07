@@ -16,9 +16,11 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.models.document import Document
 from app.models.mission import Mission
+from app.models.report import Report
 from app.schemas.mission import MissionUpdate
 from app.schemas.webhook import DeepSearchWebhookPayload, DeepSearchWebhookStatus
 from app.services.auto_ingest import AutoIngestError, AutoIngestService
+from app.services.auto_report import AutoReportError, AutoReportService
 from app.services.mission_service import MissionNotFoundError, MissionService
 
 logger = logging.getLogger(__name__)
@@ -39,9 +41,11 @@ class WebhookHandler:
         self,
         mission_service: Optional[MissionService] = None,
         auto_ingest_service: Optional[AutoIngestService] = None,
+        auto_report_service: Optional[AutoReportService] = None,
     ):
         self._mission_service = mission_service or MissionService()
         self._auto_ingest_service = auto_ingest_service
+        self._auto_report_service = auto_report_service
 
     def validate_signature(
         self,
@@ -160,6 +164,12 @@ class WebhookHandler:
             self._auto_ingest_service = AutoIngestService()
         return self._auto_ingest_service
 
+    def _get_auto_report_service(self) -> AutoReportService:
+        """Lazily initialize auto-report service."""
+        if self._auto_report_service is None:
+            self._auto_report_service = AutoReportService()
+        return self._auto_report_service
+
     def _handle_success(
         self,
         db: Session,
@@ -219,6 +229,42 @@ class WebhookHandler:
         elif not updated_mission.project_id:
             logger.debug(
                 "Mission %s has no project_id, skipping auto-ingest",
+                payload.mission_id,
+            )
+
+        # Auto-create report from result_protocol (B16.8)
+        if payload.result_protocol and updated_mission.project_id:
+            try:
+                auto_report_service = self._get_auto_report_service()
+                # Refresh mission to get updated result_document_ids from auto-ingest
+                db.refresh(updated_mission)
+                report = auto_report_service.create_report_from_protocol(
+                    db=db,
+                    mission=updated_mission,
+                    protocol=payload.result_protocol,
+                )
+                logger.info(
+                    "Auto-created report %s for mission %s",
+                    report.id,
+                    payload.mission_id,
+                )
+            except AutoReportError as exc:
+                # Log but don't fail the webhook - mission is already completed
+                logger.warning(
+                    "Auto-report creation failed for mission %s: %s",
+                    payload.mission_id,
+                    str(exc),
+                )
+            except Exception as exc:
+                logger.exception(
+                    "Unexpected error during auto-report creation for mission %s",
+                    payload.mission_id,
+                )
+        elif not payload.result_protocol:
+            logger.debug("No result_protocol for auto-report for mission %s", payload.mission_id)
+        elif not updated_mission.project_id:
+            logger.debug(
+                "Mission %s has no project_id, skipping auto-report",
                 payload.mission_id,
             )
 
