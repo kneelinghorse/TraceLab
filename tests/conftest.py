@@ -38,8 +38,16 @@ _COVERAGE_PATH = Path("cmos/reports/sprint-01/ingestion_format_coverage.json")
 
 
 @pytest.fixture(autouse=True)
-def reset_database_and_reports():
-    """Reset the SQLite database and coverage artifact before each test."""
+def reset_database_and_reports(request):
+    """Reset the SQLite database and coverage artifact before each test.
+
+    This fixture is skipped for tests in tests/mcp/ since those don't need DB.
+    """
+    # Skip for MCP tests that don't need database
+    if 'mcp' in str(request.fspath):
+        yield
+        return
+
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     original_bytes = None
