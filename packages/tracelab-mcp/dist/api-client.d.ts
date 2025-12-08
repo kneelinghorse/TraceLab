@@ -203,6 +203,74 @@ export interface DocumentUploadResponse {
     validation_status: string;
     created_at: string;
 }
+export interface Mission {
+    id: string;
+    mission_id: string;
+    title: string;
+    objective: string;
+    success_criteria: string[];
+    project_id?: string;
+    context?: Record<string, unknown>;
+    deliverables?: string[];
+    research_phases?: Record<string, unknown>;
+    tags?: string[];
+    metadata?: Record<string, unknown>;
+    status: 'draft' | 'queued' | 'in_progress' | 'completed' | 'blocked' | 'cancelled';
+    queued_at?: string;
+    started_at?: string;
+    completed_at?: string;
+    deepsearch_job_id?: string;
+    execution_metadata?: Record<string, unknown>;
+    result_document_ids?: string[];
+    result_report_id?: string;
+    result_markdown?: string;
+    result_protocol?: Record<string, unknown>;
+    error_message?: string;
+    created_at: string;
+    updated_at: string;
+    created_by?: string;
+}
+export interface MissionCreate {
+    mission_id: string;
+    title: string;
+    objective: string;
+    success_criteria: string[];
+    project_id?: string;
+    context?: Record<string, unknown>;
+    deliverables?: string[];
+    research_phases?: Record<string, unknown>;
+    tags?: string[];
+    metadata?: Record<string, unknown>;
+    status?: string;
+}
+export interface MissionUpdate {
+    title?: string;
+    objective?: string;
+    success_criteria?: string[];
+    context?: Record<string, unknown>;
+    deliverables?: string[];
+    research_phases?: Record<string, unknown>;
+    tags?: string[];
+    metadata?: Record<string, unknown>;
+    status?: string;
+}
+export interface MissionListResponse {
+    data: Mission[];
+    pagination: {
+        page: number;
+        page_size: number;
+        total: number;
+        pages: number;
+    };
+}
+export interface MissionSubmitResponse {
+    status: string;
+    mode: string;
+    mission_id: string;
+    uuid: string;
+    message: string;
+    job_id?: string;
+}
 export declare class TraceLabAPIError extends Error {
     statusCode: number;
     response?: unknown | undefined;
@@ -280,5 +348,33 @@ export declare class TraceLabClient {
      * Get aggregated statistics for a project
      */
     getProjectStats(projectId: string): Promise<ProjectStats>;
+    /**
+     * List missions with optional filtering
+     */
+    listMissions(page?: number, pageSize?: number, status?: string, projectId?: string): Promise<MissionListResponse>;
+    /**
+     * Get a single mission by ID
+     */
+    getMission(missionId: string): Promise<Mission>;
+    /**
+     * Create a new mission
+     */
+    createMission(data: MissionCreate): Promise<Mission>;
+    /**
+     * Update an existing mission
+     */
+    updateMission(missionId: string, data: MissionUpdate): Promise<Mission>;
+    /**
+     * Submit a mission for execution (sets status to queued)
+     * In worker mode, the DeepSearch worker will poll and pick it up
+     */
+    submitMission(missionId: string): Promise<MissionSubmitResponse>;
+    /**
+     * Get the current status of a mission
+     */
+    getMissionStatus(missionId: string): Promise<{
+        status: string;
+        progress?: number;
+    }>;
 }
 //# sourceMappingURL=api-client.d.ts.map

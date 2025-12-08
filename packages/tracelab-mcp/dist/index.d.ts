@@ -2,7 +2,7 @@
 /**
  * TraceLab MCP Server
  *
- * Provides 16 tools for AI agents to perform complete research-to-output loops
+ * Provides 21 tools for AI agents to perform complete research-to-output loops
  * against TraceLab's knowledge base.
  *
  * Tools:
@@ -22,6 +22,11 @@
  * 14. get_report - Get full report details
  * 15. export_report - Export report as markdown
  * 16. upload_document - Upload a new document to TraceLab
+ * 17. create_mission - Create a new research mission
+ * 18. list_missions - Browse existing missions
+ * 19. get_mission - Get mission details
+ * 20. submit_mission - Submit mission for DeepSearch execution
+ * 21. get_mission_status - Get current mission status
  */
 export {};
 //# sourceMappingURL=index.d.ts.map
