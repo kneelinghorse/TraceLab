@@ -70,6 +70,8 @@ class Settings(BaseSettings):
     cors_allow_credentials: bool = True
 
     # DeepSearch integration
+    # Mode: "worker" (DB polling, Railway prod) or "http" (API calls, local dev)
+    deepsearch_mode: str = "worker"
     deepsearch_api_url: Optional[str] = None
     deepsearch_api_key: Optional[str] = None
     deepsearch_timeout: float = 30.0

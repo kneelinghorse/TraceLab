@@ -14,8 +14,14 @@ from uuid import UUID
 from mcp.server import Server
 from mcp.types import TextContent, Tool
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.schemas.mission import MissionCreate, MissionUpdate
+from app.services.deepsearch_client import (
+    DeepSearchClient,
+    DeepSearchClientError,
+    DeepSearchConfigurationError,
+)
 from app.services.mission_service import (
     MissionNotFoundError,
     MissionService,
@@ -338,14 +344,17 @@ async def handle_get_mission(arguments: Dict[str, Any]) -> List[TextContent]:
 async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
     """Handle the submit_mission tool call.
 
+    Supports two modes (controlled by DEEPSEARCH_MODE env var):
+    - "worker": Just sets status='queued', DeepSearch worker polls DB (Railway prod)
+    - "http": POSTs to DeepSearch API with callback URL (local dev)
+
     This tool:
     1. Fetches the mission from TraceLab
     2. Validates success_criteria is not empty
-    3. Would POST to DeepSearch /missions/execute (stubbed for now)
-    4. Updates mission status to 'queued'
-    5. Stores the deepsearch_job_id
-
-    Note: DeepSearch integration requires B16.5 (DeepSearch Client) to be completed.
+    3. Checks mission isn't already queued/in_progress
+    4. Worker mode: Sets status='queued' for worker to pick up
+       HTTP mode: POSTs to DeepSearch /missions/execute
+    5. Returns job info
     """
     import json
 
@@ -378,25 +387,82 @@ async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
                     })
                 )]
 
-            # 4. Generate a placeholder job_id (actual DeepSearch integration in B16.5)
-            # In production, this would POST to DeepSearch /missions/execute
-            job_id = f"ds-{mission.mission_id}-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
+            # 4. Check mode: worker (DB polling) or http (API calls)
+            deepsearch_mode = getattr(settings, 'deepsearch_mode', 'worker').lower()
 
-            # 5. Update mission status to queued
-            update_data = MissionUpdate(
-                status="queued",
-                deepsearch_job_id=job_id,
-            )
+            if deepsearch_mode == "http":
+                # HTTP mode: POST to DeepSearch API (for local dev)
+                base_url = getattr(settings, 'api_base_url', None) or "http://localhost:8000"
+                callback_url = f"{base_url}/api/v1/webhooks/deepsearch"
+
+                try:
+                    client = DeepSearchClient()
+                    response = await client.execute_mission(
+                        mission_id=mission.mission_id,
+                        title=mission.title,
+                        objective=mission.objective,
+                        success_criteria=mission.success_criteria,
+                        callback_url=callback_url,
+                        context=mission.context or {},
+                        deliverables=mission.deliverables or [],
+                        research_phases=mission.research_phases or {},
+                        metadata=mission.mission_metadata or {},
+                    )
+                    job_id = response.job_id
+                    logger.info(
+                        "Mission %s submitted to DeepSearch via HTTP, job_id=%s",
+                        mission.mission_id,
+                        job_id,
+                    )
+                except DeepSearchConfigurationError as e:
+                    return [TextContent(
+                        type="text",
+                        text=json.dumps({
+                            "error": f"DeepSearch not configured: {e}",
+                            "mission_id": mission.mission_id,
+                            "hint": "Set DEEPSEARCH_API_URL and DEEPSEARCH_API_KEY, or use DEEPSEARCH_MODE=worker",
+                        })
+                    )]
+                except DeepSearchClientError as e:
+                    logger.error("DeepSearch HTTP submission failed: %s", e)
+                    return [TextContent(
+                        type="text",
+                        text=json.dumps({
+                            "error": f"DeepSearch submission failed: {e}",
+                            "mission_id": mission.mission_id,
+                            "error_code": getattr(e, 'error_code', None),
+                            "status_code": getattr(e, 'status_code', None),
+                        })
+                    )]
+
+                # Update with job_id from HTTP response
+                update_data = MissionUpdate(
+                    status="queued",
+                    deepsearch_job_id=job_id,
+                )
+                message = "Mission submitted to DeepSearch via HTTP."
+            else:
+                # Worker mode: Just set status to queued, worker will pick it up
+                job_id = None  # Worker will set its own job_id
+                update_data = MissionUpdate(status="queued")
+                message = "Mission queued for DeepSearch worker."
+                logger.info(
+                    "Mission %s queued for DeepSearch worker pickup",
+                    mission.mission_id,
+                )
+
+            # 5. Update mission status
             updated_mission = _mission_service.update_mission(db, mission.id, update_data)
 
             result = {
-                "job_id": job_id,
                 "status": "queued",
+                "mode": deepsearch_mode,
                 "mission_id": updated_mission.mission_id,
                 "uuid": str(updated_mission.id),
-                "eta": "Pending DeepSearch client integration (B16.5)",
-                "message": "Mission queued for execution. DeepSearch client integration pending.",
+                "message": message,
             }
+            if job_id:
+                result["job_id"] = job_id
             return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
         finally:
