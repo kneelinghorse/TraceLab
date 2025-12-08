@@ -2,7 +2,7 @@
 
 Personal-scale research repository with RAG-powered semantic search, structured data organization, and quality-enforced workflows.+ mcp
 
-## Tech Stack
+## Tech Stack -dn
 
 - **Backend**: Python 3.11+ with FastAPI
 - **Database**: PostgreSQL 15
