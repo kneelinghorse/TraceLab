@@ -2,7 +2,7 @@
 /**
  * TraceLab MCP Server
  *
- * Provides 16 tools for AI agents to perform complete research-to-output loops
+ * Provides 21 tools for AI agents to perform complete research-to-output loops
  * against TraceLab's knowledge base.
  *
  * Tools:
@@ -22,6 +22,11 @@
  * 14. get_report - Get full report details
  * 15. export_report - Export report as markdown
  * 16. upload_document - Upload a new document to TraceLab
+ * 17. create_mission - Create a new research mission
+ * 18. list_missions - Browse existing missions
+ * 19. get_mission - Get mission details
+ * 20. submit_mission - Submit mission for DeepSearch execution
+ * 21. get_mission_status - Get current mission status
  */
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
@@ -423,6 +428,119 @@ const TOOLS = [
             required: ['name', 'content', 'content_type', 'project_id'],
         },
     },
+    // Mission tools
+    {
+        name: 'create_mission',
+        description: 'Create a new research mission. Missions define research objectives that can be executed by DeepSearch.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                mission_id: {
+                    type: 'string',
+                    description: 'Unique mission identifier (e.g., "B17.1")',
+                },
+                title: {
+                    type: 'string',
+                    description: 'Short title for the mission',
+                },
+                objective: {
+                    type: 'string',
+                    description: 'Primary research objective',
+                },
+                success_criteria: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Measurable criteria for success',
+                },
+                project_id: {
+                    type: 'string',
+                    description: 'Optional: UUID of project to associate with',
+                },
+                deliverables: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Optional: Expected deliverables',
+                },
+                tags: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Optional: Tags for categorization',
+                },
+            },
+            required: ['mission_id', 'title', 'objective', 'success_criteria'],
+        },
+    },
+    {
+        name: 'list_missions',
+        description: 'List missions with optional filtering by status or project.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                status: {
+                    type: 'string',
+                    enum: ['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled'],
+                    description: 'Optional: Filter by status',
+                },
+                project_id: {
+                    type: 'string',
+                    description: 'Optional: Filter by project UUID',
+                },
+                page: {
+                    type: 'number',
+                    description: 'Page number (1-indexed, default: 1)',
+                    minimum: 1,
+                },
+                page_size: {
+                    type: 'number',
+                    description: 'Results per page (1-100, default: 20)',
+                    minimum: 1,
+                    maximum: 100,
+                },
+            },
+        },
+    },
+    {
+        name: 'get_mission',
+        description: 'Get detailed information about a mission including execution status and results.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                mission_id: {
+                    type: 'string',
+                    description: 'UUID of the mission',
+                },
+            },
+            required: ['mission_id'],
+        },
+    },
+    {
+        name: 'submit_mission',
+        description: 'Submit a mission for execution. In worker mode, sets status to queued for DeepSearch worker to pick up. In HTTP mode, submits directly to DeepSearch API.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                mission_id: {
+                    type: 'string',
+                    description: 'UUID of the mission to submit',
+                },
+            },
+            required: ['mission_id'],
+        },
+    },
+    {
+        name: 'get_mission_status',
+        description: 'Get the current execution status of a mission.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                mission_id: {
+                    type: 'string',
+                    description: 'UUID of the mission',
+                },
+            },
+            required: ['mission_id'],
+        },
+    },
 ];
 // Input validation schemas
 const SearchKnowledgeInput = z.object({
@@ -518,6 +636,31 @@ const UploadDocumentInput = z.object({
     ]),
     project_id: z.string().uuid(),
     description: z.string().optional(),
+});
+// Mission input schemas
+const CreateMissionInput = z.object({
+    mission_id: z.string().min(1),
+    title: z.string().min(1),
+    objective: z.string().min(1),
+    success_criteria: z.array(z.string()).min(1),
+    project_id: z.string().uuid().optional(),
+    deliverables: z.array(z.string()).optional(),
+    tags: z.array(z.string()).optional(),
+});
+const ListMissionsInput = z.object({
+    status: z.enum(['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled']).optional(),
+    project_id: z.string().uuid().optional(),
+    page: z.number().min(1).optional().default(1),
+    page_size: z.number().min(1).max(100).optional().default(20),
+});
+const GetMissionInput = z.object({
+    mission_id: z.string().uuid(),
+});
+const SubmitMissionInput = z.object({
+    mission_id: z.string().uuid(),
+});
+const GetMissionStatusInput = z.object({
+    mission_id: z.string().uuid(),
 });
 // Tool handlers
 async function handleSearchKnowledge(args) {
@@ -982,6 +1125,126 @@ async function handleUploadDocument(args) {
         ],
     };
 }
+// Mission handlers
+async function handleCreateMission(args) {
+    const input = CreateMissionInput.parse(args);
+    const result = await client.createMission({
+        mission_id: input.mission_id,
+        title: input.title,
+        objective: input.objective,
+        success_criteria: input.success_criteria,
+        project_id: input.project_id,
+        deliverables: input.deliverables,
+        tags: input.tags,
+    });
+    return {
+        content: [
+            {
+                type: 'text',
+                text: JSON.stringify({
+                    message: `Mission "${result.mission_id}" created successfully`,
+                    mission: {
+                        id: result.id,
+                        mission_id: result.mission_id,
+                        title: result.title,
+                        objective: result.objective,
+                        status: result.status,
+                        created_at: result.created_at,
+                    },
+                }, null, 2),
+            },
+        ],
+    };
+}
+async function handleListMissions(args) {
+    const input = ListMissionsInput.parse(args);
+    const result = await client.listMissions(input.page, input.page_size, input.status, input.project_id);
+    return {
+        content: [
+            {
+                type: 'text',
+                text: JSON.stringify({
+                    missions: result.data.map((m) => ({
+                        id: m.id,
+                        mission_id: m.mission_id,
+                        title: m.title,
+                        status: m.status,
+                        project_id: m.project_id,
+                        created_at: m.created_at,
+                    })),
+                    pagination: result.pagination,
+                }, null, 2),
+            },
+        ],
+    };
+}
+async function handleGetMission(args) {
+    const input = GetMissionInput.parse(args);
+    const result = await client.getMission(input.mission_id);
+    return {
+        content: [
+            {
+                type: 'text',
+                text: JSON.stringify({
+                    id: result.id,
+                    mission_id: result.mission_id,
+                    title: result.title,
+                    objective: result.objective,
+                    success_criteria: result.success_criteria,
+                    status: result.status,
+                    project_id: result.project_id,
+                    deliverables: result.deliverables,
+                    tags: result.tags,
+                    queued_at: result.queued_at,
+                    started_at: result.started_at,
+                    completed_at: result.completed_at,
+                    deepsearch_job_id: result.deepsearch_job_id,
+                    execution_metadata: result.execution_metadata,
+                    result_document_ids: result.result_document_ids,
+                    result_report_id: result.result_report_id,
+                    error_message: result.error_message,
+                    created_at: result.created_at,
+                    updated_at: result.updated_at,
+                }, null, 2),
+            },
+        ],
+    };
+}
+async function handleSubmitMission(args) {
+    const input = SubmitMissionInput.parse(args);
+    const result = await client.submitMission(input.mission_id);
+    return {
+        content: [
+            {
+                type: 'text',
+                text: JSON.stringify({
+                    message: `Mission ${result.mission_id} submitted for execution`,
+                    status: result.status,
+                    mode: result.mode,
+                    mission_id: result.mission_id,
+                    uuid: result.uuid,
+                    job_id: result.job_id,
+                }, null, 2),
+            },
+        ],
+    };
+}
+async function handleGetMissionStatus(args) {
+    const input = GetMissionStatusInput.parse(args);
+    const result = await client.getMissionStatus(input.mission_id);
+    return {
+        content: [
+            {
+                type: 'text',
+                text: JSON.stringify({
+                    mission_id: input.mission_id,
+                    status: result.status,
+                    progress: result.progress,
+                }, null, 2),
+            },
+        ],
+    };
+}
 // Create and run the server
 async function main() {
     const server = new Server({
@@ -1033,6 +1296,16 @@ async function main() {
                     return await handleExportReport(args);
                 case 'upload_document':
                     return await handleUploadDocument(args);
+                case 'create_mission':
+                    return await handleCreateMission(args);
+                case 'list_missions':
+                    return await handleListMissions(args);
+                case 'get_mission':
+                    return await handleGetMission(args);
+                case 'submit_mission':
+                    return await handleSubmitMission(args);
+                case 'get_mission_status':
+                    return await handleGetMissionStatus(args);
                 default:
                     return {
                         content: [

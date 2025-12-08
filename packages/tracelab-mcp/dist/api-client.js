@@ -207,5 +207,59 @@ export class TraceLabClient {
     async getProjectStats(projectId) {
         return this.request('GET', `/api/v1/projects/${projectId}/stats`);
     }
+    // ============================================
+    // Mission Methods
+    // ============================================
+    /**
+     * List missions with optional filtering
+     */
+    async listMissions(page = 1, pageSize = 20, status, projectId) {
+        const params = new URLSearchParams({
+            page: String(page),
+            page_size: String(pageSize),
+        });
+        if (status) {
+            params.set('status', status);
+        }
+        if (projectId) {
+            params.set('project_id', projectId);
+        }
+        return this.request('GET', `/api/v1/missions?${params}`);
+    }
+    /**
+     * Get a single mission by ID
+     */
+    async getMission(missionId) {
+        return this.request('GET', `/api/v1/missions/${missionId}`);
+    }
+    /**
+     * Create a new mission
+     */
+    async createMission(data) {
+        return this.request('POST', '/api/v1/missions', data);
+    }
+    /**
+     * Update an existing mission
+     */
+    async updateMission(missionId, data) {
+        return this.request('PATCH', `/api/v1/missions/${missionId}`, data);
+    }
+    /**
+     * Submit a mission for execution (sets status to queued)
+     * In worker mode, the DeepSearch worker will poll and pick it up
+     */
+    async submitMission(missionId) {
+        return this.request('POST', `/api/v1/missions/${missionId}/submit`);
+    }
+    /**
+     * Get the current status of a mission
+     */
+    async getMissionStatus(missionId) {
+        const mission = await this.getMission(missionId);
+        return {
+            status: mission.status,
+            progress: mission.execution_metadata?.progress_percent,
+        };
+    }
 }
 //# sourceMappingURL=api-client.js.map

@@ -232,6 +232,80 @@ export interface DocumentUploadResponse {
   created_at: string;
 }
 
+// Mission types
+export interface Mission {
+  id: string;
+  mission_id: string;
+  title: string;
+  objective: string;
+  success_criteria: string[];
+  project_id?: string;
+  context?: Record<string, unknown>;
+  deliverables?: string[];
+  research_phases?: Record<string, unknown>;
+  tags?: string[];
+  metadata?: Record<string, unknown>;
+  status: 'draft' | 'queued' | 'in_progress' | 'completed' | 'blocked' | 'cancelled';
+  queued_at?: string;
+  started_at?: string;
+  completed_at?: string;
+  deepsearch_job_id?: string;
+  execution_metadata?: Record<string, unknown>;
+  result_document_ids?: string[];
+  result_report_id?: string;
+  result_markdown?: string;
+  result_protocol?: Record<string, unknown>;
+  error_message?: string;
+  created_at: string;
+  updated_at: string;
+  created_by?: string;
+}
+
+export interface MissionCreate {
+  mission_id: string;
+  title: string;
+  objective: string;
+  success_criteria: string[];
+  project_id?: string;
+  context?: Record<string, unknown>;
+  deliverables?: string[];
+  research_phases?: Record<string, unknown>;
+  tags?: string[];
+  metadata?: Record<string, unknown>;
+  status?: string;
+}
+
+export interface MissionUpdate {
+  title?: string;
+  objective?: string;
+  success_criteria?: string[];
+  context?: Record<string, unknown>;
+  deliverables?: string[];
+  research_phases?: Record<string, unknown>;
+  tags?: string[];
+  metadata?: Record<string, unknown>;
+  status?: string;
+}
+
+export interface MissionListResponse {
+  data: Mission[];
+  pagination: {
+    page: number;
+    page_size: number;
+    total: number;
+    pages: number;
+  };
+}
+
+export interface MissionSubmitResponse {
+  status: string;
+  mode: string;
+  mission_id: string;
+  uuid: string;
+  message: string;
+  job_id?: string;
+}
+
 export class TraceLabAPIError extends Error {
   constructor(
     message: string,
@@ -510,5 +584,77 @@ export class TraceLabClient {
    */
   async getProjectStats(projectId: string): Promise<ProjectStats> {
     return this.request<ProjectStats>('GET', `/api/v1/projects/${projectId}/stats`);
+  }
+
+  // ============================================
+  // Mission Methods
+  // ============================================
+
+  /**
+   * List missions with optional filtering
+   */
+  async listMissions(
+    page = 1,
+    pageSize = 20,
+    status?: string,
+    projectId?: string
+  ): Promise<MissionListResponse> {
+    const params = new URLSearchParams({
+      page: String(page),
+      page_size: String(pageSize),
+    });
+    if (status) {
+      params.set('status', status);
+    }
+    if (projectId) {
+      params.set('project_id', projectId);
+    }
+    return this.request<MissionListResponse>(
+      'GET',
+      `/api/v1/missions?${params}`
+    );
+  }
+
+  /**
+   * Get a single mission by ID
+   */
+  async getMission(missionId: string): Promise<Mission> {
+    return this.request<Mission>('GET', `/api/v1/missions/${missionId}`);
+  }
+
+  /**
+   * Create a new mission
+   */
+  async createMission(data: MissionCreate): Promise<Mission> {
+    return this.request<Mission>('POST', '/api/v1/missions', data);
+  }
+
+  /**
+   * Update an existing mission
+   */
+  async updateMission(missionId: string, data: MissionUpdate): Promise<Mission> {
+    return this.request<Mission>('PATCH', `/api/v1/missions/${missionId}`, data);
+  }
+
+  /**
+   * Submit a mission for execution (sets status to queued)
+   * In worker mode, the DeepSearch worker will poll and pick it up
+   */
+  async submitMission(missionId: string): Promise<MissionSubmitResponse> {
+    return this.request<MissionSubmitResponse>(
+      'POST',
+      `/api/v1/missions/${missionId}/submit`
+    );
+  }
+
+  /**
+   * Get the current status of a mission
+   */
+  async getMissionStatus(missionId: string): Promise<{ status: string; progress?: number }> {
+    const mission = await this.getMission(missionId);
+    return {
+      status: mission.status,
+      progress: mission.execution_metadata?.progress_percent as number | undefined,
+    };
   }
 }
