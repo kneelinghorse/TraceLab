@@ -8,6 +8,7 @@ import type {
   MissionListParams,
   MissionUpdatePayload,
   QualityGateReport,
+  ReportPromotionResponse,
 } from "@/types/mission";
 import type { PaginatedResponse } from "@/types/pagination";
 
@@ -68,6 +69,17 @@ export const missionsApi = {
       status: "queued",
       queued_at: new Date().toISOString(),
     });
+  },
+
+  /**
+   * Promote a mission's report to a searchable document.
+   * This creates a new document from the report's content and runs it
+   * through the chunking/embedding pipeline for future searches.
+   */
+  promoteReport(missionId: string): Promise<ReportPromotionResponse> {
+    return httpClient.post<ReportPromotionResponse>(
+      `${MISSIONS_PATH}/${missionId}/promote-report`
+    );
   },
 };
 

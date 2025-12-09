@@ -263,3 +263,13 @@ class MissionSubmitResponse(BaseModel):
     uuid: UUID = Field(..., description="Mission UUID")
     message: str = Field(..., description="Status message")
     job_id: Optional[str] = Field(None, description="DeepSearch job ID (http mode only)")
+
+
+class ReportPromotionResponse(BaseModel):
+    """Response from promoting a mission report to a document."""
+
+    document_id: UUID = Field(..., description="UUID of the created document")
+    document_name: str = Field(..., description="Name of the created document")
+    status: str = Field(..., description="Processing status (processing or completed)")
+    message: str = Field(..., description="Status message")
+    chunk_count: Optional[int] = Field(None, description="Number of chunks created")

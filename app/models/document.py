@@ -60,6 +60,25 @@ class Document(Base, SoftDeleteMixin):
 
     # Provenance metadata (for auto-ingested documents)
     document_metadata = Column(JSON, default=dict, comment="Arbitrary metadata for document provenance")
+
+    # Report promotion provenance
+    source_report_id = Column(
+        GUID(),
+        ForeignKey("reports.id", ondelete="SET NULL"),
+        nullable=True,
+        comment="ID of source report if promoted from synthesis",
+    )
+    source_mission_id = Column(
+        GUID(),
+        ForeignKey("missions.id", ondelete="SET NULL"),
+        nullable=True,
+        comment="ID of source mission if promoted from mission report",
+    )
+    source_origin = Column(
+        String(20),
+        default="upload",
+        comment="Origin type: upload, synthesized, imported",
+    )
     
     # Relationships
     chunks = relationship("DocumentChunk", back_populates="document", cascade="all, delete-orphan")
@@ -76,4 +95,5 @@ class Document(Base, SoftDeleteMixin):
         Index("ix_documents_file_type", "file_type"),
         Index("ix_documents_source_type", "source_type"),
         Index("ix_documents_collection_date", "collection_date"),
+        Index("idx_documents_source_origin", "source_origin"),
     )
