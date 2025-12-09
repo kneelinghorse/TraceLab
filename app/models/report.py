@@ -30,6 +30,7 @@ class Report(Base):
     chunk_count = Column(Integer, nullable=False, default=0)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_by = Column(String(100), nullable=True, comment="Agent or user who created this report")
 
     # Relationships
     project = relationship("Project", lazy="joined")
