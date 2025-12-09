@@ -1,6 +1,7 @@
 """Tag and taxonomy models."""
 import uuid
-from sqlalchemy import Column, String, ForeignKey, UniqueConstraint, Index
+from datetime import datetime
+from sqlalchemy import Column, String, ForeignKey, UniqueConstraint, Index, DateTime
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 from app.models.types import GUID
@@ -9,13 +10,17 @@ from app.models.types import GUID
 class Tag(Base):
     """Tag entity for categorizing documents."""
     __tablename__ = "tags"
-    
+
     id = Column(GUID(), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
     user_id = Column(GUID())  # Placeholder for auth
     category = Column(String)  # 'method' | 'theme' | 'persona' | 'custom'
     color = Column(String)  # Hex color for UI
     parent_id = Column(GUID(), ForeignKey("tags.id"))
+
+    # Audit timestamps
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
     
     # Relationships
     parent = relationship("Tag", remote_side=[id], backref="children")

@@ -41,6 +41,7 @@ class Document(Base, SoftDeleteMixin):
     
     # Metadata
     uploaded_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
     file_size = Column(BigInteger)
     mime_type = Column(String)
     
