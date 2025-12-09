@@ -529,14 +529,18 @@ function SearchExperience({ initialSection }: SearchPageProps) {
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Corpus Stats</p>
             <div className="mt-4 space-y-4">
               <div>
-                <p className="text-3xl font-semibold text-white">{projects.length}</p>
+                <p className="text-3xl font-semibold text-white">
+                  {projectResponse?.pagination?.total ?? projects.length}
+                </p>
                 <p className="text-sm text-slate-400">Projects</p>
                 {projectError && (
                   <p className="text-xs text-rose-400 mt-1">Failed to load</p>
                 )}
               </div>
               <div>
-                <p className="text-3xl font-semibold text-white">{documents.length}</p>
+                <p className="text-3xl font-semibold text-white">
+                  {documentResponse?.pagination?.total ?? documents.length}
+                </p>
                 <p className="text-sm text-slate-400">Documents</p>
                 {documentError && (
                   <p className="text-xs text-rose-400 mt-1">Failed to load</p>
