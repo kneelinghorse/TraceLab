@@ -202,10 +202,51 @@ def update_mission(
 
     All fields are optional - only provided fields will be updated.
 
+    When status transitions to 'completed' with result_protocol, auto-creates a Report.
+
     - **mission_id**: The mission's UUID (not the human-readable mission_id)
     """
     try:
+        # Get current mission state before update
+        old_mission = _service.get_mission(db, mission_id)
+        old_status = old_mission.status
+        old_has_report = old_mission.result_report_id is not None
+
         mission = _service.update_mission(db, mission_id, data)
+
+        # Auto-create report if transitioning to completed with result_protocol
+        # and no report exists yet
+        if (
+            data.status == "completed"
+            and old_status != "completed"
+            and mission.result_protocol
+            and mission.project_id
+            and not old_has_report
+            and not mission.result_report_id
+        ):
+            try:
+                from app.services.auto_report import AutoReportService
+                auto_report_service = AutoReportService()
+                report = auto_report_service.create_report_from_protocol(
+                    db=db,
+                    mission=mission,
+                    protocol=mission.result_protocol,
+                )
+                logger.info(
+                    "Auto-created report %s for mission %s on completion",
+                    report.id,
+                    mission.mission_id,
+                )
+                # Refresh to get the updated result_report_id
+                db.refresh(mission)
+            except Exception as report_exc:
+                # Log but don't fail the update - mission is already completed
+                logger.warning(
+                    "Auto-report creation failed for mission %s: %s",
+                    mission.mission_id,
+                    str(report_exc),
+                )
+
         return _to_response(mission)
     except MissionNotFoundError as exc:
         raise HTTPException(
