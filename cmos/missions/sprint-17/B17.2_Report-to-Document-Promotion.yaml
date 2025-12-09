@@ -1,0 +1,92 @@
+mission_id: B17.2
+title: Report to Document Promotion
+sprint: Sprint 17
+status: Queued
+track: Knowledge Loop
+priority: High
+
+objective: |
+  Enable one-click promotion of a mission's final report to become a searchable
+  document in the project. This closes the knowledge loop so synthesized research
+  feeds back into future searches and missions.
+
+success_criteria:
+  - Document model has new fields: source_report_id, source_mission_id, source_origin
+  - Alembic migration adds new columns to documents table
+  - API endpoint POST /api/v1/missions/{id}/promote-report
+  - Endpoint creates Document from Report.content (markdown)
+  - Document automatically processed through chunking → embedding pipeline
+  - source_origin set to 'synthesized' for promoted reports
+  - Report becomes read-only after promotion (or at least linked document is immutable snapshot)
+  - UI button on mission detail page for completed missions with reports
+  - Button shows disabled/complete state after promotion
+  - Link to created document visible on mission page
+
+deliverables:
+  - alembic/versions/018_document_provenance.py
+  - Updated app/models/document.py with new fields
+  - app/api/v1/missions.py - new promote_report endpoint
+  - app/services/report_promotion.py - service for promotion logic
+  - frontend/src/pages/missions/[id].tsx - Add promote button
+  - Tests for promotion flow
+
+implementation_notes: |
+  Pattern to follow: app/services/auto_ingest.py
+
+  AutoIngestService does nearly identical work:
+  - Creates Document from markdown content
+  - Sets metadata (mission_id, source info)
+  - Calls DocumentIngestionService.process_document() for chunking/embedding
+  - Updates mission.result_document_ids
+
+  ReportPromotionService should follow same structure but:
+  - Source content from Report.content instead of result_markdown
+  - Add new source_report_id, source_mission_id, source_origin fields
+  - Check for existing promotion (409 Conflict via source_report_id lookup)
+
+schema_changes: |
+  ALTER TABLE documents ADD COLUMN source_report_id UUID REFERENCES reports(id) ON DELETE SET NULL;
+  ALTER TABLE documents ADD COLUMN source_mission_id UUID REFERENCES missions(id) ON DELETE SET NULL;
+  ALTER TABLE documents ADD COLUMN source_origin VARCHAR(20) DEFAULT 'upload';
+  -- source_origin values: 'upload' | 'synthesized' | 'imported'
+  
+  CREATE INDEX idx_documents_source_origin ON documents(source_origin);
+  CREATE INDEX idx_documents_source_report ON documents(source_report_id) WHERE source_report_id IS NOT NULL;
+
+api_design: |
+  POST /api/v1/missions/{mission_id}/promote-report
+  
+  Request: (no body needed, uses mission's result_report)
+  
+  Response:
+  {
+    "document_id": "uuid",
+    "document_name": "Mission B16.5 Report - DeepSearch Client",
+    "status": "processing",  // or "completed" if sync processing
+    "message": "Report promoted to document. Processing started."
+  }
+  
+  Errors:
+  - 404: Mission not found
+  - 400: Mission has no report (result_report_id is null)
+  - 400: Mission not completed
+  - 409: Report already promoted (document with source_report_id exists)
+
+promotion_behavior: |
+  1. Validate mission exists, is completed, has result_report_id
+  2. Check no document already exists with this source_report_id
+  3. Create Document record:
+     - project_id: from mission
+     - name: "{Mission title} - Report" or similar
+     - content: report.content (markdown)
+     - file_type: 'report' or 'synthesis'
+     - source_type: 'analysis'
+     - source_origin: 'synthesized'
+     - source_report_id: report.id
+     - source_mission_id: mission.id
+  4. Trigger document processing (async or sync based on preference)
+  5. Return document_id to caller
+
+estimated_tests: 15-20
+dependencies:
+  - B17.1 (nice to have, not blocking)

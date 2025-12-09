@@ -1,0 +1,39 @@
+mission_id: B17.1
+title: Document Count Display Bug Fix
+sprint: Sprint 17
+status: Queued
+track: Bug Fix
+priority: High
+
+objective: |
+  Fix the search page sidebar to display the actual total document count from
+  pagination metadata instead of the length of the fetched array (capped at 100).
+
+success_criteria:
+  - Search page displays correct total document count (not capped at pageSize)
+  - Uses documentResponse.pagination.total instead of documents.length
+  - Handles loading/error states gracefully
+  - Same fix applied to any other stats using array length instead of pagination.total
+
+deliverables:
+  - Updated frontend/src/features/search/SearchExperience.tsx
+
+technical_details: |
+  Current bug location: SearchExperience.tsx
+  
+  Current (wrong):
+  ```tsx
+  <p className="text-3xl font-semibold text-white">{documents.length}</p>
+  ```
+  
+  Fix:
+  ```tsx
+  <p className="text-3xl font-semibold text-white">
+    {documentResponse?.pagination?.total ?? documents.length}
+  </p>
+  ```
+  
+  Also verify projects count uses same pattern.
+
+estimated_effort: 30 minutes
+dependencies: []

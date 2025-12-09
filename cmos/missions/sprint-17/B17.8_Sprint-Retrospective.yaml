@@ -1,0 +1,54 @@
+mission_id: B17.8
+title: Sprint 17 Retrospective
+sprint: Sprint 17
+status: Queued
+track: Retrospective
+priority: Required
+
+objective: |
+  Close Sprint 17 with a retrospective documenting outcomes, learnings,
+  and planning for Sprint 18.
+
+success_criteria:
+  - Sprint 17 retrospective document created
+  - All mission outcomes documented
+  - Research findings summarized with actionable items
+  - Sprint 18 backlog draft created
+  - MASTER_CONTEXT updated with strategic decisions
+  - Context snapshot taken
+
+deliverables:
+  - cmos/reports/sprint-17/retrospective.md
+  - cmos/reports/sprint-17/sprint-18-backlog-draft.md
+  - cmos/telemetry/events/sprint-17-retro.jsonl
+  - MASTER_CONTEXT snapshot
+
+sprint_18_candidates: |
+  Items to consider for Sprint 18 based on current roadmap:
+
+  1. DeepSearch Observability Dashboard (deferred from S17)
+     - Requires: DeepSearch to send execution metadata in webhooks
+     - Shows: job status distribution, duration charts, success rates
+
+  2. PEDR Search Integration
+     - Build on R17.5 findings about PEDR readiness
+     - Enable relationship-aware search across entities
+
+  3. Test Infrastructure (if R17.1-R17.5 identify gaps)
+     - Add tests based on research findings
+     - Focus on areas with identified brittleness
+
+  4. Any remediation from research missions
+     - Data protection fixes (from R17.1)
+     - Qdrant resilience improvements (from R17.2)
+     - Schema evolution procedures (from R17.4)
+
+estimated_effort: 1-2 hours
+dependencies:
+  - B17.1
+  - B17.2
+  - R17.1
+  - R17.2
+  - R17.3
+  - R17.4
+  - R17.5

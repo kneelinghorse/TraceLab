@@ -1,0 +1,132 @@
+mission_id: B17.4
+title: Create Embedding Reprocessing Script
+sprint: Sprint 17
+status: Queued
+track: Infrastructure
+priority: High
+
+objective: |
+  Create a production-ready script to rebuild the entire Qdrant vector store
+  from PostgreSQL source of truth. This enables recovery from Qdrant data loss
+  and supports embedding model upgrades.
+
+context: |
+  Research mission R17.2 (Qdrant Resilience) confirmed:
+  - PostgreSQL stores all data needed to regenerate embeddings
+  - Embeddings are NOT stored in PostgreSQL (by design - regeneratable)
+  - Current GAP: No bulk reprocess script exists
+  - Single document reprocess requires manual SQL + API calls
+
+  Qdrant Cloud (free tier) has no user-initiated backups.
+  PostgreSQL is our source of truth - Qdrant must be rebuildable.
+
+  Estimated rebuild time at current scale (~200 docs): 10-30 minutes
+  Estimated OpenAI API cost: $2-5
+
+success_criteria:
+  - scripts/reprocess_embeddings.py exists and works
+  - Batch processing with progress output
+  - Resume capability (track last processed document ID)
+  - Dry-run mode shows what would be processed without API calls
+  - Cost estimation output before actual run
+  - Can rebuild entire Qdrant collection from scratch
+  - Idempotent - safe to run multiple times
+
+deliverables:
+  - scripts/reprocess_embeddings.py
+  - Update docs/qdrant-resilience.md with usage instructions
+
+implementation_notes: |
+  Working example from R17.2 report:
+
+  ```python
+  # scripts/reprocess_embeddings.py
+  import sys
+  sys.path.insert(0, '.')
+
+  from sqlalchemy.orm import Session
+  from app.core.database import get_db
+  from app.models.document import Document
+  from app.models.chunk import DocumentChunk
+  from app.services.embedding_service import get_embedding_service
+  from app.services.qdrant_service import get_qdrant_service
+
+  def reprocess_all_embeddings(dry_run=False, resume_from=None):
+      """Regenerate all embeddings from PostgreSQL chunks."""
+      db = next(get_db())
+      embedding_service = get_embedding_service()
+      qdrant_service = get_qdrant_service()
+
+      # Ensure collection exists
+      if not dry_run:
+          qdrant_service.ensure_collection(write_optimized=True)
+
+      # Query documents
+      query = db.query(Document).filter(Document.chunked == True)
+      if resume_from:
+          query = query.filter(Document.id > resume_from)
+      documents = query.order_by(Document.id).all()
+
+      total_chunks = 0
+      for doc in documents:
+          chunks = db.query(DocumentChunk).filter(
+              DocumentChunk.document_id == doc.id
+          ).order_by(DocumentChunk.chunk_index).all()
+
+          if not chunks:
+              continue
+
+          total_chunks += len(chunks)
+
+          if dry_run:
+              print(f"[DRY RUN] {doc.name}: {len(chunks)} chunks")
+              continue
+
+          # Generate embeddings
+          texts = [c.content for c in chunks]
+          embeddings = embedding_service.generate_embeddings_batch(texts)
+
+          # Prepare and upsert to Qdrant
+          payload = []
+          for chunk, embedding in zip(chunks, embeddings):
+              chunk.embedding_id = str(chunk.id)
+              payload.append({
+                  "chunk_id": chunk.id,
+                  "embedding": embedding,
+                  "content": chunk.content,
+                  "document_id": doc.id,
+                  "project_id": doc.project_id,
+                  "chunk_index": chunk.chunk_index,
+                  "source_type": doc.source_type,
+              })
+
+          qdrant_service.upsert_chunks(payload)
+          doc.embedded = True
+          db.commit()
+          print(f"Processed {doc.name}: {len(chunks)} chunks")
+
+      if dry_run:
+          # Cost estimate: ~$0.02/1K tokens, avg 750 tokens/chunk
+          est_tokens = total_chunks * 750
+          est_cost = (est_tokens / 1000) * 0.02
+          print(f"\\nDry run complete:")
+          print(f"  Documents: {len(documents)}")
+          print(f"  Chunks: {total_chunks}")
+          print(f"  Est. tokens: {est_tokens:,}")
+          print(f"  Est. cost: ${est_cost:.2f}")
+      else:
+          qdrant_service.enable_indexing_and_quantization()
+          print("Rebuild complete!")
+
+  if __name__ == "__main__":
+      import argparse
+      parser = argparse.ArgumentParser()
+      parser.add_argument("--dry-run", action="store_true")
+      parser.add_argument("--resume-from", type=str, help="Document UUID to resume from")
+      args = parser.parse_args()
+      reprocess_all_embeddings(dry_run=args.dry_run, resume_from=args.resume_from)
+  ```
+
+estimated_effort: 4 hours
+estimated_tests: 5-8
+dependencies: []
