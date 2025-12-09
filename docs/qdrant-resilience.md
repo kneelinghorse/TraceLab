@@ -48,7 +48,7 @@ Document Upload → Parse → Redact → Chunk → Generate Embeddings → Store
 
 ## Reprocessing Capabilities
 
-### Current State: Partial Support
+### Current State: Full Support
 
 | Capability | Status | Notes |
 |------------|--------|-------|
@@ -56,7 +56,7 @@ Document Upload → Parse → Redact → Chunk → Generate Embeddings → Store
 | Re-embed chunks | ✅ Available | `EmbeddingService.generate_embeddings_batch()` |
 | Upsert to Qdrant | ✅ Available | `QdrantService.upsert_chunks()` |
 | Single document reprocess | ⚠️ Manual | Must delete chunks, call `/process` endpoint |
-| Bulk reprocess all docs | ❌ No script | **GAP**: Need `scripts/reprocess_embeddings.py` |
+| Bulk reprocess all docs | ✅ Available | `scripts/reprocess_embeddings.py` |
 | Idempotent reindex | ✅ Safe | Upsert uses chunk UUID as point ID |
 
 ### Idempotency Guarantee
@@ -88,72 +88,55 @@ curl -X POST "http://localhost:8000/api/v1/documents/$DOCUMENT_ID/process" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
-### Full Collection Rebuild (Manual Steps)
+### Full Collection Rebuild
 
-Until `scripts/reprocess_embeddings.py` exists, follow this procedure:
+Use the production-ready reprocessing script:
 
-```python
-# reprocess_all.py (one-time script)
-import sys
-sys.path.insert(0, '.')
+```bash
+# Preview what would be processed (no API calls)
+python scripts/reprocess_embeddings.py --dry-run
 
-from sqlalchemy.orm import Session
-from app.core.database import get_db
-from app.models.document import Document
-from app.models.chunk import DocumentChunk
-from app.services.embedding_service import get_embedding_service
-from app.services.qdrant_service import get_qdrant_service
+# Full rebuild
+python scripts/reprocess_embeddings.py
 
-def reprocess_all_embeddings():
-    """Regenerate all embeddings from PostgreSQL chunks."""
-    db = next(get_db())
-    embedding_service = get_embedding_service()
-    qdrant_service = get_qdrant_service()
+# Resume from specific document (if interrupted)
+python scripts/reprocess_embeddings.py --resume-from <document-uuid>
 
-    # Ensure collection exists
-    qdrant_service.ensure_collection(write_optimized=True)
+# Process only a specific project
+python scripts/reprocess_embeddings.py --project-id <project-uuid>
 
-    # Process documents in batches
-    documents = db.query(Document).filter(Document.chunked == True).all()
+# Drop collection and start fresh
+python scripts/reprocess_embeddings.py --drop-collection
+```
 
-    for doc in documents:
-        chunks = db.query(DocumentChunk).filter(
-            DocumentChunk.document_id == doc.id
-        ).order_by(DocumentChunk.chunk_index).all()
+**Script Features:**
+- **Batch processing** with real-time progress output and ETA
+- **Resume capability** - tracks last processed document for resuming interrupted runs
+- **Dry-run mode** - shows what would be processed with cost estimation
+- **Cost estimation** - calculates estimated OpenAI API cost before running
+- **Project filtering** - process only documents from a specific project
+- **Drop collection** - option to start fresh by deleting existing Qdrant collection
+- **Idempotent** - safe to run multiple times (uses upsert semantics)
+- **Error handling** - continues processing on individual document failures
 
-        if not chunks:
-            continue
+**Example dry-run output:**
+```
+============================================================
+DRY RUN - No API calls will be made
+============================================================
 
-        # Generate embeddings
-        texts = [c.content for c in chunks]
-        embeddings = embedding_service.generate_embeddings_batch(texts)
+[DRY RUN] interview_001.pdf: 12 chunks
+[DRY RUN] survey_results.csv: 8 chunks
+[DRY RUN] research_notes.md: 5 chunks
 
-        # Prepare Qdrant payload
-        payload = []
-        for chunk, embedding in zip(chunks, embeddings):
-            chunk.embedding_id = str(chunk.id)
-            payload.append({
-                "chunk_id": chunk.id,
-                "embedding": embedding,
-                "content": chunk.content,
-                "document_id": doc.id,
-                "project_id": doc.project_id,
-                "chunk_index": chunk.chunk_index,
-                "source_type": doc.source_type,
-            })
-
-        # Upsert to Qdrant
-        qdrant_service.upsert_chunks(payload)
-        doc.embedded = True
-        db.commit()
-        print(f"Reprocessed {doc.name}: {len(chunks)} chunks")
-
-    # Enable indexing after bulk import
-    qdrant_service.enable_indexing_and_quantization()
-    print("Rebuild complete!")
-
-if __name__ == "__main__":
-    reprocess_all_embeddings()
+------------------------------------------------------------
+SUMMARY
+------------------------------------------------------------
+Documents to process: 3
+Total chunks: 25
+Estimated tokens: 18,750
+Estimated cost: $0.0004
+Estimated time: 0.5 seconds
 ```
 
 ---
@@ -186,11 +169,16 @@ if __name__ == "__main__":
 
 ## Gap Analysis
 
-### Missing Capabilities
+### Resolved Gaps
+
+| Gap | Status | Resolution |
+|-----|--------|------------|
+| No bulk reprocess script | ✅ **RESOLVED** | `scripts/reprocess_embeddings.py` implemented (B17.4) |
+
+### Remaining Gaps
 
 | Gap | Priority | Recommendation |
 |-----|----------|----------------|
-| No bulk reprocess script | **HIGH** | Create `scripts/reprocess_embeddings.py` |
 | No Qdrant collection export | MEDIUM | Qdrant Cloud doesn't support user backups on free tier |
 | No embedding backup in PG | LOW | See cost/benefit analysis below |
 
@@ -228,18 +216,35 @@ Current tier (free/starter) limitations:
 
 ### Scenario 1: Qdrant Collection Corrupted/Lost
 
-1. Drop the collection (if exists): `qdrant_service.client.delete_collection(collection_name)`
-2. Run full rebuild script (above)
-3. Verify with diagnostics endpoint: `GET /api/v1/qdrant-admin/stats`
+```bash
+# 1. Preview the rebuild (recommended first)
+python scripts/reprocess_embeddings.py --dry-run
+
+# 2. Drop collection and rebuild from scratch
+python scripts/reprocess_embeddings.py --drop-collection
+
+# 3. Verify with diagnostics endpoint
+curl -X GET "http://localhost:8000/api/v1/qdrant-admin/stats" \
+  -H "Authorization: Bearer $TOKEN"
+```
 
 ### Scenario 2: Embedding Model Change
 
 When upgrading embedding models (e.g., text-embedding-3-small → text-embedding-3-large):
 
-1. Update `OPENAI_EMBEDDING_MODEL` and `OPENAI_EMBEDDING_DIMENSION` in config
-2. Drop existing collection (vector dimensions changed)
-3. Run full rebuild script
-4. Update benchmark baselines
+```bash
+# 1. Update environment config
+export OPENAI_EMBEDDING_MODEL="text-embedding-3-large"
+export OPENAI_EMBEDDING_DIMENSION="3072"
+
+# 2. Preview the rebuild
+python scripts/reprocess_embeddings.py --dry-run
+
+# 3. Drop collection and rebuild (dimensions changed)
+python scripts/reprocess_embeddings.py --drop-collection
+
+# 4. Update benchmark baselines
+```
 
 ### Scenario 3: Single Document Needs Re-embedding
 
@@ -275,14 +280,16 @@ python scripts/verify_ingestion_parity.py
 
 ## Recommendations
 
-### Immediate (Sprint 17)
+### Completed (Sprint 17)
 
 1. ✅ Document current architecture (this file)
-2. ⚠️ **Create `scripts/reprocess_embeddings.py`** with:
+2. ✅ **Created `scripts/reprocess_embeddings.py`** with:
    - Batch processing with progress
    - Resume capability (track last processed doc)
    - Dry-run mode
    - Cost estimation output
+   - Project filtering
+   - Drop collection option
 
 ### Near-term (Sprint 18-19)
 
@@ -308,3 +315,4 @@ python scripts/verify_ingestion_parity.py
 
 *Last Updated: 2025-12-09*
 *Mission: R17.2 - Qdrant Resilience & Reprocessing Strategy*
+*Updated: B17.4 - Embedding Reprocessing Script Implementation*
