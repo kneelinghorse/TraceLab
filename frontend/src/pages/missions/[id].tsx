@@ -7,7 +7,7 @@ import { AuthGate } from "@/components/AuthGate";
 import { ExecutionTimeline, ResearchPhases, ResultLinks } from "@/components/missions";
 import { missionsApi } from "@/lib/api/missions";
 import { useApiMission } from "@/lib/hooks/useMissions";
-import type { MissionStatus } from "@/types/mission";
+import type { MissionStatus, ReportPromotionResponse } from "@/types/mission";
 
 const STATUS_COLORS: Record<MissionStatus, { bg: string; text: string; dot: string }> = {
   draft: { bg: "bg-gray-100 dark:bg-gray-700", text: "text-gray-700 dark:text-gray-300", dot: "bg-gray-400" },
@@ -44,6 +44,9 @@ function MissionDetailContent() {
   const missionId = typeof router.query.id === "string" ? router.query.id : undefined;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isPromoting, setIsPromoting] = useState(false);
+  const [promotionResult, setPromotionResult] = useState<ReportPromotionResponse | null>(null);
+  const [promotionError, setPromotionError] = useState<string | null>(null);
 
   const { mission, isLoading, error, refresh } = useApiMission(missionId);
 
@@ -72,6 +75,30 @@ function MissionDetailContent() {
       router.push("/missions");
     } catch (err) {
       alert(err instanceof Error ? err.message : "Failed to delete mission");
+    }
+  };
+
+  const handlePromoteReport = async () => {
+    if (!missionId) return;
+
+    setIsPromoting(true);
+    setPromotionError(null);
+    setPromotionResult(null);
+
+    try {
+      const result = await missionsApi.promoteReport(missionId);
+      setPromotionResult(result);
+      refresh();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to promote report";
+      // Check for already promoted error (409)
+      if (message.includes("already been promoted")) {
+        setPromotionError("Report has already been promoted to a document.");
+      } else {
+        setPromotionError(message);
+      }
+    } finally {
+      setIsPromoting(false);
     }
   };
 
@@ -197,6 +224,23 @@ function MissionDetailContent() {
                   {isSubmitting ? "Submitting..." : "Submit to DeepSearch"}
                 </button>
               )}
+              {mission.status === "completed" && mission.result_report_id && !promotionResult && (
+                <button
+                  onClick={handlePromoteReport}
+                  disabled={isPromoting}
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
+                >
+                  {isPromoting ? "Promoting..." : "Promote Report to Document"}
+                </button>
+              )}
+              {promotionResult && (
+                <Link
+                  href={`/documents/${promotionResult.document_id}`}
+                  className="px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors font-medium text-sm"
+                >
+                  View Promoted Document
+                </Link>
+              )}
               <Link
                 href={`/console/missions?edit=${missionId}`}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-sm"
@@ -213,6 +257,15 @@ function MissionDetailContent() {
 
             {submitError && (
               <p className="mt-3 text-sm text-red-600 dark:text-red-400">{submitError}</p>
+            )}
+            {promotionError && (
+              <p className="mt-3 text-sm text-red-600 dark:text-red-400">{promotionError}</p>
+            )}
+            {promotionResult && (
+              <p className="mt-3 text-sm text-emerald-600 dark:text-emerald-400">
+                {promotionResult.message}
+                {promotionResult.chunk_count !== null && ` (${promotionResult.chunk_count} chunks created)`}
+              </p>
             )}
           </div>
 

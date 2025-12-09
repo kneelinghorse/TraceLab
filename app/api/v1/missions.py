@@ -17,7 +17,13 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.database import get_db
-from app.schemas.mission import MissionCreate, MissionResponse, MissionSubmitResponse, MissionUpdate
+from app.schemas.mission import (
+    MissionCreate,
+    MissionResponse,
+    MissionSubmitResponse,
+    MissionUpdate,
+    ReportPromotionResponse,
+)
 from app.schemas.pagination import PaginatedResponse
 from app.services.mission_service import (
     MissionNotFoundError,
@@ -319,4 +325,104 @@ def submit_mission(
         raise HTTPException(
             status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error submitting mission: {str(exc)[:200]}",
+        ) from exc
+
+
+@router.post("/{mission_id}/promote-report", response_model=ReportPromotionResponse)
+def promote_mission_report(
+    mission_id: UUID,
+    db: Session = Depends(get_db),
+) -> ReportPromotionResponse:
+    """Promote a mission's report to a searchable document.
+
+    Takes the mission's result_report and creates a new document from its content,
+    running it through the chunking and embedding pipeline so synthesized research
+    feeds back into future searches.
+
+    Validates:
+    - Mission exists
+    - Mission status is 'completed'
+    - Mission has a result_report_id
+    - Report has not already been promoted
+
+    - **mission_id**: The mission's UUID
+    """
+    from app.models.report import Report
+    from app.services.report_promotion import (
+        ReportAlreadyPromotedError,
+        ReportPromotionError,
+        get_report_promotion_service,
+    )
+
+    try:
+        # Get mission
+        mission = _service.get_mission(db, mission_id)
+
+        # Validate mission is completed
+        if mission.status != "completed":
+            raise HTTPException(
+                status_code=http_status.HTTP_400_BAD_REQUEST,
+                detail=f"Mission must be completed to promote report (current status: {mission.status})",
+            )
+
+        # Validate mission has a report
+        if not mission.result_report_id:
+            raise HTTPException(
+                status_code=http_status.HTTP_400_BAD_REQUEST,
+                detail="Mission has no result report to promote",
+            )
+
+        # Get the report
+        report = db.query(Report).filter(Report.id == mission.result_report_id).first()
+        if not report:
+            raise HTTPException(
+                status_code=http_status.HTTP_404_NOT_FOUND,
+                detail=f"Report {mission.result_report_id} not found",
+            )
+
+        # Promote the report
+        promotion_service = get_report_promotion_service()
+        document = promotion_service.promote_report(db, mission, report)
+
+        chunk_count = len(document.chunks) if document.chunks else 0
+        status = "completed" if document.embedded else "processing"
+
+        logger.info(
+            "Promoted report %s from mission %s to document %s (%d chunks)",
+            report.id,
+            mission.mission_id,
+            document.id,
+            chunk_count,
+        )
+
+        return ReportPromotionResponse(
+            document_id=document.id,
+            document_name=document.name,
+            status=status,
+            message="Report promoted to document. Processing complete." if status == "completed" else "Report promoted to document. Processing started.",
+            chunk_count=chunk_count,
+        )
+
+    except MissionNotFoundError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
+    except ReportAlreadyPromotedError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        ) from exc
+    except ReportPromotionError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("Error promoting mission report")
+        raise HTTPException(
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error promoting report: {str(exc)[:200]}",
         ) from exc
