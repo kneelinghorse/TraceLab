@@ -1,0 +1,57 @@
+mission_id: R17.5
+title: Future-Proofing for Scale & Enhanced Search
+sprint: Sprint 17
+status: Queued
+track: Research - Architecture
+priority: Medium
+
+objective: |
+  Identify schema and architecture patterns that support growth without
+  brittleness. Ensure we're capturing the right metadata and have proper
+  indexes for our query patterns.
+
+context: |
+  This is an IN-REPO investigation mission. PEDR integration is deferred
+  until our core system is stable, but we want to ensure current decisions
+  don't create technical debt or block future capabilities.
+  
+  Goal: Set up well for scale and future features, not implement PEDR now.
+
+questions_to_answer:
+  - What indexes exist? What queries are missing indexes?
+  - Are we using PostgreSQL features optimally? (JSONB queries, full-text, etc.)
+  - What metadata should every entity have that we might be missing?
+  - Are there any N+1 query patterns or performance concerns?
+  - What would PEDR integration require that we don't have?
+  - Should we move toward explicit relationships (graph-like) vs implicit (vector)?
+  - What cross-system sync considerations exist? (TraceLab ↔ DeepSearch)
+  - Are there any brittleness risks in current schema?
+
+investigation_areas:
+  - All app/models/*.py - Current indexes and constraints
+  - app/api/v1/*.py - Query patterns, potential N+1s
+  - PostgreSQL EXPLAIN ANALYZE on common queries (if accessible)
+  - JSONB column usage and query patterns
+  - Full-text search configuration
+  - Existing PEDR code (app/services/pedr/) - what's there?
+
+deliverables:
+  - docs/architecture-health-check.md containing:
+    - Index audit: existing vs recommended
+    - Query pattern analysis
+    - Metadata completeness assessment
+    - PEDR readiness checklist (what we have, what we'd need)
+    - Brittleness risks identified
+    - Recommendations prioritized by impact
+
+success_criteria:
+  - Complete index audit
+  - Query patterns documented with any performance concerns
+  - Clear list of metadata we should add
+  - PEDR readiness understood (not implemented, just assessed)
+  - No critical brittleness risks unaddressed
+
+estimated_effort: 3-4 hours
+dependencies:
+  - R17.1 (some overlap on FK analysis)
+  - R17.4 (schema understanding)

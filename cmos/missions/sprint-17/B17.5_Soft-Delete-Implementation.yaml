@@ -1,0 +1,115 @@
+mission_id: B17.5
+title: Implement Soft Delete for Projects and Documents
+sprint: Sprint 17
+status: Queued
+track: Data Protection
+priority: High
+
+objective: |
+  Replace hard deletes with soft deletes on high-value tables (projects, documents).
+  Enable "undo" functionality and prevent permanent, unrecoverable data loss.
+
+context: |
+  Research mission R17.1 (Data Protection Audit) recommended soft deletes because:
+  - CASCADE DELETEs are too aggressive for a research platform
+  - User data (research documents, insights) is irreplaceable
+  - Recovery from backup is slow and risky (1-4 hours)
+  - Soft delete enables "undo" functionality
+
+  Tables requiring soft delete (per R17.1):
+  - projects (HIGH priority) - deletion cascades to everything
+  - documents (HIGH priority) - deletion cascades to chunks, collections
+
+  Current behavior: DELETE is immediate and permanent with full CASCADE chain.
+
+success_criteria:
+  - projects table has deleted_at (DateTime, nullable) and deleted_by (String, nullable)
+  - documents table has deleted_at and deleted_by columns
+  - All list/get queries filter WHERE deleted_at IS NULL
+  - DELETE endpoints set deleted_at instead of hard delete
+  - New POST /api/v1/projects/{id}/restore endpoint
+  - New POST /api/v1/documents/{id}/restore endpoint
+  - Soft-deleted items hidden from normal queries
+  - Admin can query deleted items with ?include_deleted=true
+  - Tests cover soft delete, restore, and query filtering
+
+deliverables:
+  - alembic/versions/019_soft_delete.py
+  - Updated app/models/project.py with soft delete mixin
+  - Updated app/models/document.py with soft delete mixin
+  - app/models/mixins.py - SoftDeleteMixin class
+  - Updated app/api/v1/projects.py - soft delete + restore
+  - Updated app/api/v1/documents.py - soft delete + restore
+  - Updated app/services/ queries to filter deleted
+  - tests/test_soft_delete.py
+
+schema_changes: |
+  ALTER TABLE projects ADD COLUMN deleted_at TIMESTAMP;
+  ALTER TABLE projects ADD COLUMN deleted_by VARCHAR(100);
+  CREATE INDEX idx_projects_deleted_at ON projects(deleted_at) WHERE deleted_at IS NOT NULL;
+
+  ALTER TABLE documents ADD COLUMN deleted_at TIMESTAMP;
+  ALTER TABLE documents ADD COLUMN deleted_by VARCHAR(100);
+  CREATE INDEX idx_documents_deleted_at ON documents(deleted_at) WHERE deleted_at IS NOT NULL;
+
+implementation_notes: |
+  Soft Delete Mixin pattern:
+
+  ```python
+  # app/models/mixins.py
+  from datetime import datetime
+  from sqlalchemy import Column, DateTime, String
+
+  class SoftDeleteMixin:
+      deleted_at = Column(DateTime, nullable=True, index=True)
+      deleted_by = Column(String(100), nullable=True)
+
+      def soft_delete(self, deleted_by: str = None):
+          self.deleted_at = datetime.utcnow()
+          self.deleted_by = deleted_by
+
+      def restore(self):
+          self.deleted_at = None
+          self.deleted_by = None
+
+      @property
+      def is_deleted(self) -> bool:
+          return self.deleted_at is not None
+  ```
+
+  Query filter pattern:
+
+  ```python
+  # In service layer
+  def list_projects(include_deleted: bool = False):
+      query = db.query(Project)
+      if not include_deleted:
+          query = query.filter(Project.deleted_at.is_(None))
+      return query.all()
+  ```
+
+  Restore endpoint:
+
+  ```python
+  @router.post("/{project_id}/restore")
+  async def restore_project(
+      project_id: UUID,
+      db: Session = Depends(get_db),
+      api_key: APIKey = Depends(require_api_key),
+  ):
+      project = db.query(Project).filter(Project.id == project_id).first()
+      if not project:
+          raise HTTPException(404, "Project not found")
+      if not project.is_deleted:
+          raise HTTPException(400, "Project is not deleted")
+      project.restore()
+      db.commit()
+      return {"status": "restored", "id": str(project_id)}
+  ```
+
+  Future consideration: Add scheduled purge job to hard-delete after 30 days.
+
+estimated_effort: 8 hours
+estimated_tests: 20-25
+dependencies:
+  - B17.3 (auth must exist before soft delete endpoints)

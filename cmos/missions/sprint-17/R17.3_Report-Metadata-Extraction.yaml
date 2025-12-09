@@ -1,0 +1,58 @@
+mission_id: R17.3
+title: Report Metadata Extraction Analysis
+sprint: Sprint 17
+status: Queued
+track: Research - Architecture
+priority: Medium
+
+objective: |
+  Analyze what structured metadata exists in synthesized reports and determine
+  if we should extract and store it for enhanced searchability.
+
+context: |
+  This is an IN-REPO investigation mission. Currently, reports are chunked as
+  plain text. Links, citations, and references become just text in vectors.
+  
+  Question: Should we extract structure from reports to enable richer search
+  and future knowledge graph capabilities?
+
+questions_to_answer:
+  - What metadata exists in typical reports? (examine actual report content)
+  - What formats do citations/references take?
+  - Are there consistent patterns we can parse?
+  - What would we do with extracted metadata?
+  - How does this feed into enhanced search?
+  - What's the ROI of extraction vs. just vector search?
+  - Would this require schema changes?
+
+investigation_areas:
+  - Sample reports in database (examine actual content patterns)
+  - app/services/synthesis_service.py - How reports are generated
+  - app/services/chunking.py - Current chunking approach
+  - ReportSource model - Current citation tracking
+  - Research on markdown parsing patterns
+
+potential_extractions:
+  - External URLs mentioned
+  - Internal chunk/document references (citations like [Source 1])
+  - Key entities (people, companies, concepts)
+  - Topic/theme tags
+  - Source document IDs referenced
+
+deliverables:
+  - docs/report-metadata-analysis.md containing:
+    - Sample analysis of 5-10 actual reports
+    - Metadata patterns identified
+    - Extraction feasibility assessment
+    - Schema additions if recommended
+    - Implementation approach if worth doing
+    - Decision: extract now, later, or not at all
+
+success_criteria:
+  - Clear analysis of what's in our reports
+  - Extraction recommendation with rationale
+  - If yes: schema design and implementation approach
+  - If no: documented reasoning
+
+estimated_effort: 2-3 hours
+dependencies: []

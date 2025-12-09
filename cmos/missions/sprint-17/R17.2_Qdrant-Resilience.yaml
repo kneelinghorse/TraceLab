@@ -1,0 +1,53 @@
+mission_id: R17.2
+title: Qdrant Resilience & Reprocessing Strategy
+sprint: Sprint 17
+status: Queued
+track: Research - Architecture
+priority: Medium
+
+objective: |
+  Ensure we can fully rebuild the Qdrant vector store from PostgreSQL source
+  of truth if needed. Document reprocessing capabilities and identify gaps.
+
+context: |
+  This is an IN-REPO investigation mission. The agent should examine our
+  embedding and Qdrant integration code to understand recovery capabilities.
+  
+  Key concern: Qdrant Cloud doesn't support user-initiated backups on our tier.
+  PostgreSQL is our source of truth, but can we actually rebuild vectors from it?
+
+questions_to_answer:
+  - Can we fully rebuild Qdrant from PostgreSQL data today?
+  - What data is needed? (document content, chunk boundaries, embeddings?)
+  - Are embeddings stored in PostgreSQL or only in Qdrant?
+  - What's the reprocessing pipeline? Is it idempotent?
+  - How long would a full reindex take at current scale (~100-200 docs)?
+  - What about at 10x scale?
+  - Should we store embeddings in PostgreSQL as backup?
+  - What CLI/scripts exist for reprocessing?
+
+investigation_areas:
+  - app/services/embedding_service.py - Embedding generation
+  - app/services/qdrant_service.py - Vector storage
+  - app/services/document_ingestion.py - Processing pipeline
+  - app/models/chunk.py - What's stored about embeddings
+  - scripts/*.py - Any existing reprocessing tools
+  - Current Qdrant collection configuration
+
+deliverables:
+  - docs/qdrant-resilience.md containing:
+    - Current embedding storage architecture
+    - Step-by-step reprocessing procedure
+    - Gap analysis (what's missing for full rebuild)
+    - Time/cost estimates for reprocessing
+    - Recommendation on embedding backup strategy
+  - scripts/reprocess_embeddings.py (if doesn't exist) or documentation of existing capability
+
+success_criteria:
+  - Clear documentation of rebuild capability (or lack thereof)
+  - Reprocessing procedure documented and tested
+  - Decision on embedding storage redundancy
+  - Time estimate for full rebuild at current scale
+
+estimated_effort: 2-3 hours
+dependencies: []

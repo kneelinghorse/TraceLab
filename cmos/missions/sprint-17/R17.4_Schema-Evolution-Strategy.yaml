@@ -1,0 +1,52 @@
+mission_id: R17.4
+title: Schema Evolution & Migration Strategy
+sprint: Sprint 17
+status: Queued
+track: Research - Architecture
+priority: Medium
+
+objective: |
+  Document our schema evolution practices and establish clear procedures for
+  handling breaking changes, rollbacks, and coordinated updates.
+
+context: |
+  This is an IN-REPO investigation mission. As TraceLab evolves, we need
+  confidence that schema changes won't cause data loss or extended downtime.
+  
+  Current state: We use Alembic for migrations, but practices may not be
+  consistently documented or followed.
+
+questions_to_answer:
+  - What's our current Alembic migration discipline?
+  - Are migrations reversible? Do we test downgrade?
+  - How do we handle breaking changes? (column renames, type changes)
+  - What's the rollback strategy if a migration fails in production?
+  - How do we coordinate PostgreSQL migrations with Qdrant schema changes?
+  - Should we version our API alongside schema?
+  - What's our testing approach for migrations?
+
+investigation_areas:
+  - alembic/versions/*.py - Review all migrations
+  - alembic/env.py - Configuration
+  - Any existing migration documentation
+  - Railway deployment process
+  - CI/CD pipeline (if any migration testing)
+
+deliverables:
+  - docs/schema-evolution-guide.md containing:
+    - Current migration inventory and patterns
+    - Migration best practices checklist
+    - Breaking change handling procedure
+    - Rollback procedures
+    - Testing requirements for migrations
+    - Coordination checklist (Postgres + Qdrant + API)
+  - Template for future migrations (if useful)
+
+success_criteria:
+  - All existing migrations reviewed
+  - Clear procedures documented for common scenarios
+  - Rollback capability verified or gaps identified
+  - Breaking change checklist created
+
+estimated_effort: 2-3 hours
+dependencies: []

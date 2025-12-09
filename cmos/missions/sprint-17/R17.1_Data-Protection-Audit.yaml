@@ -1,0 +1,54 @@
+mission_id: R17.1
+title: Data Protection & Recovery Patterns Audit
+sprint: Sprint 17
+status: Queued
+track: Research - Architecture
+priority: Medium
+
+objective: |
+  Audit current data protection mechanisms and establish best practices for
+  protecting TraceLab data from accidental loss. Document recovery procedures
+  and recommend improvements.
+
+context: |
+  This is an IN-REPO investigation mission, not a DeepSearch web research mission.
+  The agent should examine our actual codebase, database schema, and deployment
+  configuration to assess current state and make recommendations.
+  
+  Recent incident context: Accidental data deletion highlighted need for
+  better safeguards. PostgreSQL backups are now in place, but we need to
+  document and verify our protection strategy.
+
+questions_to_answer:
+  - What CASCADE DELETE behaviors exist across all foreign keys?
+  - Which tables have ON DELETE CASCADE vs SET NULL vs RESTRICT?
+  - Should we implement soft deletes? On which tables?
+  - What's our current PostgreSQL backup configuration on Railway?
+  - How would we recover from various failure scenarios?
+  - Are there any orphan record risks?
+  - What safeguards prevent accidental bulk deletes via API?
+
+investigation_areas:
+  - app/models/*.py - All SQLAlchemy models and their FK relationships
+  - alembic/versions/*.py - Migration history for constraint changes
+  - app/api/v1/*.py - DELETE endpoints and their protections
+  - Railway configuration - Backup settings
+  - Current indexes and constraints
+
+deliverables:
+  - docs/data-protection-audit.md containing:
+    - Table of all FK relationships and their ON DELETE behavior
+    - Risk assessment for each cascade path
+    - Soft delete recommendation (yes/no with rationale)
+    - Current backup configuration documentation
+    - Recovery runbook for common scenarios
+    - Recommended safeguards for API delete operations
+
+success_criteria:
+  - Complete FK cascade audit documented
+  - Soft delete decision made with rationale
+  - Recovery runbook written and tested (at least read-through)
+  - Any critical gaps identified with remediation plan
+
+estimated_effort: 2-3 hours
+dependencies: []
