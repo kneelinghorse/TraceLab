@@ -7,7 +7,7 @@ import { AuthGate } from "@/components/AuthGate";
 import { ExecutionTimeline, ResearchPhases, ResultLinks } from "@/components/missions";
 import { missionsApi } from "@/lib/api/missions";
 import { useApiMission } from "@/lib/hooks/useMissions";
-import type { MissionStatus, ReportPromoteResponse } from "@/types/mission";
+import type { MissionStatus } from "@/types/mission";
 
 const STATUS_COLORS: Record<MissionStatus, { bg: string; text: string; dot: string }> = {
   draft: { bg: "bg-gray-100 dark:bg-gray-700", text: "text-gray-700 dark:text-gray-300", dot: "bg-gray-400" },
@@ -44,9 +44,6 @@ function MissionDetailContent() {
   const missionId = typeof router.query.id === "string" ? router.query.id : undefined;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [isPromoting, setIsPromoting] = useState(false);
-  const [promoteError, setPromoteError] = useState<string | null>(null);
-  const [promoteResult, setPromoteResult] = useState<ReportPromoteResponse | null>(null);
 
   const { mission, isLoading, error, refresh } = useApiMission(missionId);
 
@@ -75,30 +72,6 @@ function MissionDetailContent() {
       router.push("/missions");
     } catch (err) {
       alert(err instanceof Error ? err.message : "Failed to delete mission");
-    }
-  };
-
-  const handlePromoteReport = async () => {
-    if (!missionId) return;
-
-    setIsPromoting(true);
-    setPromoteError(null);
-    setPromoteResult(null);
-
-    try {
-      const result = await missionsApi.promoteReport(missionId);
-      setPromoteResult(result);
-      refresh();
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to promote report";
-      // Check for 409 conflict (already promoted)
-      if (errorMessage.includes("already promoted")) {
-        setPromoteError("Report has already been promoted to a document");
-      } else {
-        setPromoteError(errorMessage);
-      }
-    } finally {
-      setIsPromoting(false);
     }
   };
 
@@ -156,9 +129,6 @@ function MissionDetailContent() {
     ? formatDistanceToNow(new Date(mission.created_at), { addSuffix: true })
     : null;
   const isDraft = mission.status === "draft";
-  const isCompleted = mission.status === "completed";
-  const hasReport = !!mission.result_report_id;
-  const canPromote = isCompleted && hasReport && !promoteResult;
   const hasResearchPhases = Object.keys(mission.research_phases).length > 0;
 
   return (
@@ -227,26 +197,6 @@ function MissionDetailContent() {
                   {isSubmitting ? "Submitting..." : "Submit to DeepSearch"}
                 </button>
               )}
-              {canPromote && (
-                <button
-                  onClick={handlePromoteReport}
-                  disabled={isPromoting}
-                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
-                >
-                  {isPromoting ? "Promoting..." : "Promote Report to Document"}
-                </button>
-              )}
-              {promoteResult && (
-                <Link
-                  href={`/documents/${promoteResult.document_id}`}
-                  className="px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors font-medium text-sm inline-flex items-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  View Promoted Document
-                </Link>
-              )}
               <Link
                 href={`/console/missions?edit=${missionId}`}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-sm"
@@ -263,14 +213,6 @@ function MissionDetailContent() {
 
             {submitError && (
               <p className="mt-3 text-sm text-red-600 dark:text-red-400">{submitError}</p>
-            )}
-            {promoteError && (
-              <p className="mt-3 text-sm text-red-600 dark:text-red-400">{promoteError}</p>
-            )}
-            {promoteResult && (
-              <p className="mt-3 text-sm text-emerald-600 dark:text-emerald-400">
-                Report promoted to document &quot;{promoteResult.document_name}&quot;. Status: {promoteResult.status}
-              </p>
             )}
           </div>
 
