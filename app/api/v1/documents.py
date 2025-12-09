@@ -27,8 +27,10 @@ from app.services.processing_status import ProcessingStatusRecorder
 from app.core.config import settings
 from app.services.cache_manager import get_cache_manager
 from app.services.document_query_service import DocumentQueryService
+from app.services.soft_delete_service import DocumentSoftDeleteService
 
 router = APIRouter()
+_soft_delete_service = DocumentSoftDeleteService()
 
 # Storage directory for uploaded files
 UPLOAD_DIR = Path("data/uploads")
@@ -59,6 +61,7 @@ def list_documents(
     project_id: Optional[UUID] = Query(None, description="Filter by project identifier"),
     processed: Optional[bool] = Query(None, description="Filter by processing state"),
     search: Optional[str] = Query(None, min_length=1, max_length=200, description="Case-insensitive name search"),
+    include_deleted: bool = Query(False, description="Include soft-deleted documents in results"),
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
     page_size: int = Query(
         DocumentQueryService.DEFAULT_PAGE_SIZE,
@@ -68,13 +71,17 @@ def list_documents(
     ),
     db: Session = Depends(get_db),
 ):
-    """Return a paginated document list with optional filters."""
+    """Return a paginated document list with optional filters.
+
+    By default, soft-deleted documents are excluded. Use include_deleted=true to see all documents.
+    """
     cache_key = _cache_manager.document_list_key(
         project_id=str(project_id) if project_id else None,
         processed=processed,
         search=search,
         page=page,
         page_size=page_size,
+        include_deleted=include_deleted,
     )
 
     def _loader() -> Dict[str, Any]:
@@ -85,6 +92,7 @@ def list_documents(
             project_id=project_id,
             processed=processed,
             search=search,
+            include_deleted=include_deleted,
         )
         resources = [DocumentListItem.model_validate(document) for document in documents]
         return {"data": resources, "pagination": meta}
@@ -399,43 +407,65 @@ async def delete_document(
     document_id: UUID,
     confirm: bool = Query(
         False,
-        description="Must be true to confirm deletion. WARNING: This deletes all "
-        "associated chunks and embeddings.",
+        description="Must be true to confirm deletion. This soft-deletes the document "
+        "(can be restored later).",
     ),
     db: Session = Depends(get_db),
     user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> Dict[str, str]:
-    """Delete a document and its associated chunks.
+    """Soft-delete a document.
 
     Requires authentication and explicit confirmation via confirm=true query parameter.
-    This is a destructive operation that CASCADE deletes:
-    - All chunks from the document
-    - All embeddings associated with those chunks
-    - The original uploaded file from disk
+    This is a SOFT delete - the document and its data are hidden but can be restored
+    using POST /documents/{id}/restore.
+
+    The original file on disk is NOT deleted during soft delete.
     """
     if not confirm:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Document deletion requires confirm=true query parameter. "
-            "WARNING: This will delete ALL chunks and embeddings for this document.",
+            "This will soft-delete the document (can be restored later).",
+        )
+
+    result = _soft_delete_service.soft_delete_document(db, document_id, deleted_by=user.username)
+    if result is None:
+        raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+    if result is False:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Document is already deleted",
+        )
+
+    document = _document_query_service.get_document(db, document_id, include_deleted=True)
+    project_id = str(document.project_id) if document and document.project_id else None
+    _cache_manager.invalidate_document_lists(project_id)
+    return {"status": "deleted", "id": str(document_id), "message": "Document soft-deleted. Use POST /documents/{id}/restore to recover."}
+
+
+@router.post("/{document_id}/restore", response_model=Dict[str, Any])
+async def restore_document(
+    document_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
+) -> Dict[str, Any]:
+    """Restore a soft-deleted document.
+
+    Requires authentication. Only works on documents that have been soft-deleted.
+    """
+    result = _soft_delete_service.restore_document(db, document_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+    if result is False:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Document is not deleted",
         )
 
     document = _document_query_service.get_document(db, document_id)
-    if not document:
-        raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
-
-    # Delete file if it exists
-    if document.file_path:
-        file_path = Path(document.file_path)
-        if file_path.exists():
-            file_path.unlink()
-
-    # Delete document (chunks will be cascade deleted)
-    project_id = str(document.project_id) if document.project_id else None
-    db.delete(document)
-    db.commit()
+    project_id = str(document.project_id) if document and document.project_id else None
     _cache_manager.invalidate_document_lists(project_id)
-    return {"message": f"Document {document_id} deleted"}
+    return {"status": "restored", "id": str(document_id)}
 
 
 @router.get("/coverage/report")

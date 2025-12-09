@@ -4,10 +4,16 @@ from datetime import datetime
 from sqlalchemy import Column, String, Text, Integer, DateTime, CheckConstraint
 from app.core.database import Base
 from app.models.types import GUID
+from app.models.mixins import SoftDeleteMixin
 
 
-class Project(Base):
-    """Project entity representing a research project."""
+class Project(Base, SoftDeleteMixin):
+    """Project entity representing a research project.
+
+    Supports soft delete via SoftDeleteMixin - records are not permanently
+    deleted but marked with deleted_at timestamp. Use project.soft_delete()
+    and project.restore() methods.
+    """
     __tablename__ = "projects"
     
     id = Column(GUID(), primary_key=True, default=uuid.uuid4)

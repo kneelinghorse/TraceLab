@@ -29,11 +29,24 @@ class ProjectQueryService:
         page: int,
         page_size: int,
         search: Optional[str] = None,
+        include_deleted: bool = False,
     ) -> Tuple[List[Project], PaginationMeta]:
-        """Return paginated projects ordered by recency."""
+        """Return paginated projects ordered by recency.
+
+        Args:
+            db: Database session
+            page: Page number (1-indexed)
+            page_size: Results per page
+            search: Optional name filter
+            include_deleted: If True, include soft-deleted projects
+        """
 
         clamped_page_size = min(max(page_size, 1), self.MAX_PAGE_SIZE)
         query = db.query(Project)
+
+        # Filter out soft-deleted projects by default
+        if not include_deleted:
+            query = query.filter(Project.deleted_at.is_(None))
 
         if search:
             like_term = f"%{search.strip()}%"
@@ -56,10 +69,23 @@ class ProjectQueryService:
         )
         return items, meta
 
-    def get_project(self, db: Session, project_id: UUID) -> Optional[Project]:
-        """Fetch a single project."""
+    def get_project(
+        self,
+        db: Session,
+        project_id: UUID,
+        include_deleted: bool = False,
+    ) -> Optional[Project]:
+        """Fetch a single project.
 
-        return db.query(Project).filter(Project.id == project_id).first()
+        Args:
+            db: Database session
+            project_id: Project UUID
+            include_deleted: If True, return even if soft-deleted
+        """
+        query = db.query(Project).filter(Project.id == project_id)
+        if not include_deleted:
+            query = query.filter(Project.deleted_at.is_(None))
+        return query.first()
 
     def create_project(self, db: Session, data: ProjectCreate) -> Project:
         """Create a new project."""
@@ -96,7 +122,11 @@ class ProjectQueryService:
         return project
 
     def delete_project(self, db: Session, project_id: UUID) -> bool:
-        """Delete a project and all associated data (cascading via FK constraints)."""
+        """Hard delete a project and all associated data (cascading via FK constraints).
+
+        WARNING: This permanently deletes the project. Use soft_delete_project for
+        recoverable deletion.
+        """
         project = db.query(Project).filter(Project.id == project_id).first()
         if not project:
             return False
@@ -105,21 +135,79 @@ class ProjectQueryService:
         db.commit()
         return True
 
+    def soft_delete_project(
+        self,
+        db: Session,
+        project_id: UUID,
+        deleted_by: str = None,
+    ) -> Optional[bool]:
+        """Soft delete a project.
+
+        Args:
+            db: Database session
+            project_id: UUID of project to delete
+            deleted_by: Identifier of who performed the deletion
+
+        Returns:
+            None if project not found
+            False if project already deleted
+            True if successfully soft deleted
+        """
+        project = db.query(Project).filter(Project.id == project_id).first()
+        if not project:
+            return None
+        if project.is_deleted:
+            return False
+
+        project.soft_delete(deleted_by=deleted_by)
+        db.commit()
+        return True
+
+    def restore_project(
+        self,
+        db: Session,
+        project_id: UUID,
+    ) -> Optional[bool]:
+        """Restore a soft-deleted project.
+
+        Args:
+            db: Database session
+            project_id: UUID of project to restore
+
+        Returns:
+            None if project not found
+            False if project is not deleted
+            True if successfully restored
+        """
+        project = db.query(Project).filter(Project.id == project_id).first()
+        if not project:
+            return None
+        if not project.is_deleted:
+            return False
+
+        project.restore()
+        db.commit()
+        return True
+
     def get_project_stats(self, db: Session, project_id: UUID) -> Optional[ProjectStats]:
-        """Get aggregated statistics for a project."""
+        """Get aggregated statistics for a project.
+
+        Only counts non-deleted documents in the statistics.
+        """
         project = db.query(Project).filter(Project.id == project_id).first()
         if not project:
             return None
 
-        # Count documents
+        # Count documents (exclude soft-deleted)
         document_count = (
             db.query(func.count(Document.id))
             .filter(Document.project_id == project_id)
+            .filter(Document.deleted_at.is_(None))
             .scalar()
             or 0
         )
 
-        # Count chunks and sum tokens (via documents)
+        # Count chunks and sum tokens (via non-deleted documents)
         chunk_stats = (
             db.query(
                 func.count(Chunk.id).label("chunk_count"),
@@ -127,6 +215,7 @@ class ProjectQueryService:
             )
             .join(Document, Chunk.document_id == Document.id)
             .filter(Document.project_id == project_id)
+            .filter(Document.deleted_at.is_(None))
             .first()
         )
         chunk_count = chunk_stats.chunk_count if chunk_stats else 0
@@ -140,10 +229,11 @@ class ProjectQueryService:
             or 0
         )
 
-        # Get last updated timestamp (most recent document or report)
+        # Get last updated timestamp (most recent non-deleted document or report)
         last_doc_update = (
             db.query(func.max(Document.updated_at))
             .filter(Document.project_id == project_id)
+            .filter(Document.deleted_at.is_(None))
             .scalar()
         )
         last_report_update = (
