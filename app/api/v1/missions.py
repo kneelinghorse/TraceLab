@@ -17,12 +17,23 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.database import get_db
-from app.schemas.mission import MissionCreate, MissionResponse, MissionSubmitResponse, MissionUpdate
+from app.schemas.mission import (
+    MissionCreate,
+    MissionResponse,
+    MissionSubmitResponse,
+    MissionUpdate,
+    ReportPromoteResponse,
+)
 from app.schemas.pagination import PaginatedResponse
 from app.services.mission_service import (
     MissionNotFoundError,
     MissionService,
     MissionValidationError,
+)
+from app.services.report_promotion import (
+    ReportAlreadyPromotedError,
+    ReportPromotionError,
+    get_report_promotion_service,
 )
 
 logger = logging.getLogger(__name__)
@@ -319,4 +330,105 @@ def submit_mission(
         raise HTTPException(
             status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error submitting mission: {str(exc)[:200]}",
+        ) from exc
+
+
+@router.post("/{mission_id}/promote-report", response_model=ReportPromoteResponse)
+def promote_mission_report(
+    mission_id: UUID,
+    db: Session = Depends(get_db),
+) -> ReportPromoteResponse:
+    """Promote a mission's report to a searchable document.
+
+    Creates a new Document from the mission's associated report and processes it
+    through the chunking/embedding pipeline, making it searchable.
+
+    The promoted document includes provenance tracking:
+    - source_report_id: Links back to the original report
+    - source_mission_id: Links to the mission
+    - source_origin: Set to 'synthesized'
+
+    - **mission_id**: The mission's UUID
+
+    Returns:
+    - **document_id**: UUID of the created document
+    - **document_name**: Name of the created document
+    - **status**: Processing status ('processing' or 'completed')
+    - **message**: Status message
+
+    Errors:
+    - 404: Mission not found
+    - 400: Mission has no report (result_report_id is null)
+    - 400: Mission not completed
+    - 409: Report already promoted (document with source_report_id exists)
+    """
+    try:
+        # Get mission
+        mission = _service.get_mission(db, mission_id)
+
+        # Validate mission is completed
+        if mission.status != "completed":
+            raise HTTPException(
+                status_code=http_status.HTTP_400_BAD_REQUEST,
+                detail=f"Mission must be completed to promote report. Current status: {mission.status}",
+            )
+
+        # Validate mission has a report
+        if not mission.result_report_id:
+            raise HTTPException(
+                status_code=http_status.HTTP_400_BAD_REQUEST,
+                detail="Mission has no associated report to promote",
+            )
+
+        # Load the report
+        report = mission.result_report
+        if not report:
+            raise HTTPException(
+                status_code=http_status.HTTP_400_BAD_REQUEST,
+                detail="Mission's report could not be loaded",
+            )
+
+        # Promote the report
+        promotion_service = get_report_promotion_service()
+        document = promotion_service.promote_report(db, mission, report)
+
+        # Determine status based on processing state
+        status = "completed" if document.embedded else "processing"
+
+        logger.info(
+            "Promoted report %s from mission %s to document %s",
+            report.id,
+            mission.mission_id,
+            document.id,
+        )
+
+        return ReportPromoteResponse(
+            document_id=document.id,
+            document_name=document.name,
+            status=status,
+            message=f"Report promoted to document. Status: {status}.",
+        )
+
+    except MissionNotFoundError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
+    except ReportAlreadyPromotedError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_409_CONFLICT,
+            detail=f"Report already promoted to document {exc.document_id}",
+        ) from exc
+    except ReportPromotionError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("Error promoting mission report")
+        raise HTTPException(
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error promoting report: {str(exc)[:200]}",
         ) from exc
