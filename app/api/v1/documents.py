@@ -9,11 +9,12 @@ from pathlib import Path
 from typing import Optional, Dict, Any
 from uuid import UUID
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, BackgroundTasks, Query
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, BackgroundTasks, Query, status
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.document import Document
 from app.models.project import Project
 from app.schemas.chunk import DocumentChunkRead
@@ -393,22 +394,42 @@ async def list_document_chunks(
     return {"data": resources, "pagination": meta}
 
 
-@router.delete("/{document_id}")
+@router.delete("/{document_id}", status_code=status.HTTP_200_OK)
 async def delete_document(
     document_id: UUID,
-    db: Session = Depends(get_db)
+    confirm: bool = Query(
+        False,
+        description="Must be true to confirm deletion. WARNING: This deletes all "
+        "associated chunks and embeddings.",
+    ),
+    db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> Dict[str, str]:
-    """Delete a document and its associated chunks."""
+    """Delete a document and its associated chunks.
+
+    Requires authentication and explicit confirmation via confirm=true query parameter.
+    This is a destructive operation that CASCADE deletes:
+    - All chunks from the document
+    - All embeddings associated with those chunks
+    - The original uploaded file from disk
+    """
+    if not confirm:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Document deletion requires confirm=true query parameter. "
+            "WARNING: This will delete ALL chunks and embeddings for this document.",
+        )
+
     document = _document_query_service.get_document(db, document_id)
     if not document:
         raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
-    
+
     # Delete file if it exists
     if document.file_path:
         file_path = Path(document.file_path)
         if file_path.exists():
             file_path.unlink()
-    
+
     # Delete document (chunks will be cascade deleted)
     project_id = str(document.project_id) if document.project_id else None
     db.delete(document)
