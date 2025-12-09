@@ -19,6 +19,34 @@ _service = ProjectQueryService()
 _cache_manager = get_cache_manager()
 
 
+# -----------------------------------------------------------------------------
+# Restore endpoint (soft delete recovery)
+# -----------------------------------------------------------------------------
+
+
+@router.post("/{project_id}/restore", response_model=Dict[str, Any])
+def restore_project(
+    project_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
+) -> Dict[str, Any]:
+    """Restore a soft-deleted project.
+
+    Requires authentication. Only works on projects that have been soft-deleted.
+    """
+    result = _service.restore_project(db, project_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+    if result is False:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Project is not deleted",
+        )
+    # Invalidate caches
+    _cache_manager.invalidate_project_metadata(str(project_id))
+    return {"status": "restored", "id": str(project_id)}
+
+
 @router.get("", response_model=PaginatedResponse[ProjectRead])
 def list_projects(
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
@@ -29,18 +57,25 @@ def list_projects(
         description="Results per page",
     ),
     search: Optional[str] = Query(None, min_length=1, max_length=200, description="Case-insensitive substring match"),
+    include_deleted: bool = Query(False, description="Include soft-deleted projects in results"),
     db: Session = Depends(get_db),
 ):
-    """Return paginated projects ordered by creation time."""
+    """Return paginated projects ordered by creation time.
+
+    By default, soft-deleted projects are excluded. Use include_deleted=true to see all projects.
+    """
     cache_key = _cache_manager.project_metadata_key(
         kind="list",
         search=search,
         page=page,
         page_size=page_size,
+        include_deleted=include_deleted,
     )
 
     def _loader() -> Dict[str, Any]:
-        projects, meta = _service.list_projects(db, page=page, page_size=page_size, search=search)
+        projects, meta = _service.list_projects(
+            db, page=page, page_size=page_size, search=search, include_deleted=include_deleted
+        )
         resources = [ProjectRead.model_validate(project) for project in projects]
         return {"data": resources, "pagination": meta}
 
@@ -90,37 +125,42 @@ def update_project(
     return ProjectRead.model_validate(project)
 
 
-@router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{project_id}", status_code=status.HTTP_200_OK, response_model=Dict[str, Any])
 def delete_project(
     project_id: UUID,
     confirm: bool = Query(
         False,
-        description="Must be true to confirm deletion. WARNING: This deletes all "
-        "associated documents, chunks, insights, and missions.",
+        description="Must be true to confirm deletion. This soft-deletes the project "
+        "(can be restored later).",
     ),
     db: Session = Depends(get_db),
     user: AuthenticatedUser = Depends(require_authenticated_user),
-) -> None:
-    """Delete a project and all associated data.
+) -> Dict[str, Any]:
+    """Soft-delete a project.
 
     Requires authentication and explicit confirmation via confirm=true query parameter.
-    This is a destructive operation that CASCADE deletes:
-    - All documents in the project
-    - All chunks from those documents
-    - All insights derived from the project
-    - All missions associated with the project
+    This is a SOFT delete - the project and its data are hidden but can be restored
+    using POST /projects/{id}/restore.
+
+    To permanently delete, use a separate purge operation (not yet implemented).
     """
     if not confirm:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Project deletion requires confirm=true query parameter. "
-            "WARNING: This will delete ALL documents, chunks, insights, and missions in this project.",
+            "This will soft-delete the project (can be restored later).",
         )
-    deleted = _service.delete_project(db, project_id)
-    if not deleted:
+    result = _service.soft_delete_project(db, project_id, deleted_by=user.username)
+    if result is None:
         raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+    if result is False:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Project is already deleted",
+        )
     # Invalidate caches
     _cache_manager.invalidate_project_metadata(str(project_id))
+    return {"status": "deleted", "id": str(project_id), "message": "Project soft-deleted. Use POST /projects/{id}/restore to recover."}
 
 
 @router.get("/{project_id}/stats", response_model=ProjectStats)

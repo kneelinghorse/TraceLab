@@ -19,10 +19,16 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 from app.models.types import GUID
+from app.models.mixins import SoftDeleteMixin
 
 
-class Document(Base):
-    """Document entity representing uploaded research documents."""
+class Document(Base, SoftDeleteMixin):
+    """Document entity representing uploaded research documents.
+
+    Supports soft delete via SoftDeleteMixin - records are not permanently
+    deleted but marked with deleted_at timestamp. Use document.soft_delete()
+    and document.restore() methods.
+    """
     __tablename__ = "documents"
     
     id = Column(GUID(), primary_key=True, default=uuid.uuid4)

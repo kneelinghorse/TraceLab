@@ -27,8 +27,19 @@ class DocumentQueryService:
         project_id: Optional[UUID] = None,
         processed: Optional[bool] = None,
         search: Optional[str] = None,
+        include_deleted: bool = False,
     ) -> Tuple[List[Document], PaginationMeta]:
-        """Return paginated documents ordered by upload time."""
+        """Return paginated documents ordered by upload time.
+
+        Args:
+            db: Database session
+            page: Page number (1-indexed)
+            page_size: Results per page
+            project_id: Optional project filter
+            processed: Optional processing state filter
+            search: Optional name filter
+            include_deleted: If True, include soft-deleted documents
+        """
 
         clamped_page_size = min(max(page_size, 1), self.MAX_PAGE_SIZE)
         query = db.query(Document).options(
@@ -45,8 +56,14 @@ class DocumentQueryService:
                 Document.chunked,
                 Document.embedded,
                 Document.validation_status,
+                Document.deleted_at,
+                Document.deleted_by,
             )
         )
+
+        # Filter out soft-deleted documents by default
+        if not include_deleted:
+            query = query.filter(Document.deleted_at.is_(None))
 
         if project_id:
             query = query.filter(Document.project_id == project_id)
@@ -73,10 +90,20 @@ class DocumentQueryService:
         )
         return items, meta
 
-    def get_document(self, db: Session, document_id: UUID) -> Optional[Document]:
-        """Fetch a single document by identifier."""
+    def get_document(
+        self,
+        db: Session,
+        document_id: UUID,
+        include_deleted: bool = False,
+    ) -> Optional[Document]:
+        """Fetch a single document by identifier.
 
-        return (
+        Args:
+            db: Database session
+            document_id: Document UUID
+            include_deleted: If True, return even if soft-deleted
+        """
+        query = (
             db.query(Document)
             .options(
                 selectinload(Document.processing_events),
@@ -84,8 +111,10 @@ class DocumentQueryService:
                 selectinload(Document.chunks),
             )
             .filter(Document.id == document_id)
-            .first()
         )
+        if not include_deleted:
+            query = query.filter(Document.deleted_at.is_(None))
+        return query.first()
 
     def list_chunks_by_document(
         self,
