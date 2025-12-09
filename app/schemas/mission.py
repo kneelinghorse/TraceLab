@@ -252,3 +252,14 @@ class MissionResponse(MissionBase):
 
 # Alias for backwards compatibility
 MissionRead = MissionResponse
+
+
+class MissionSubmitResponse(BaseModel):
+    """Response from submitting a mission for execution."""
+
+    status: str = Field(..., description="Current mission status (queued)")
+    mode: str = Field(..., description="Execution mode (worker or http)")
+    mission_id: str = Field(..., description="Human-readable mission ID")
+    uuid: UUID = Field(..., description="Mission UUID")
+    message: str = Field(..., description="Status message")
+    job_id: Optional[str] = Field(None, description="DeepSearch job ID (http mode only)")

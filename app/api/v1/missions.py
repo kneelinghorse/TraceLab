@@ -15,8 +15,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi import status as http_status
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.database import get_db
-from app.schemas.mission import MissionCreate, MissionResponse, MissionUpdate
+from app.schemas.mission import MissionCreate, MissionResponse, MissionSubmitResponse, MissionUpdate
 from app.schemas.pagination import PaginatedResponse
 from app.services.mission_service import (
     MissionNotFoundError,
@@ -240,4 +241,82 @@ def delete_mission(
         raise HTTPException(
             status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error deleting mission: {str(exc)[:200]}",
+        ) from exc
+
+
+@router.post("/{mission_id}/submit", response_model=MissionSubmitResponse)
+def submit_mission(
+    mission_id: UUID,
+    db: Session = Depends(get_db),
+) -> MissionSubmitResponse:
+    """Submit a mission for DeepSearch execution.
+
+    Sets the mission status to 'queued' so the DeepSearch worker can pick it up.
+
+    Validates:
+    - Mission exists
+    - Mission has at least one success criterion
+    - Mission is not already queued or in progress
+
+    - **mission_id**: The mission's UUID
+    """
+    try:
+        # Get mission
+        mission = _service.get_mission(db, mission_id)
+
+        # Validate success_criteria
+        if not mission.success_criteria or len(mission.success_criteria) == 0:
+            raise HTTPException(
+                status_code=http_status.HTTP_400_BAD_REQUEST,
+                detail="Mission must have at least one success criterion to be submitted",
+            )
+
+        # Check if already submitted
+        if mission.status in ("queued", "in_progress"):
+            raise HTTPException(
+                status_code=http_status.HTTP_400_BAD_REQUEST,
+                detail=f"Mission is already {mission.status}",
+            )
+
+        # Get execution mode from settings
+        deepsearch_mode = getattr(settings, "deepsearch_mode", "worker").lower()
+
+        # Update mission status to queued
+        update_data = MissionUpdate(status="queued")
+        updated_mission = _service.update_mission(db, mission_id, update_data)
+
+        # Build response
+        message = (
+            "Mission queued for DeepSearch worker."
+            if deepsearch_mode == "worker"
+            else "Mission submitted to DeepSearch via HTTP."
+        )
+
+        logger.info(
+            "Mission %s submitted (mode=%s)",
+            updated_mission.mission_id,
+            deepsearch_mode,
+        )
+
+        return MissionSubmitResponse(
+            status="queued",
+            mode=deepsearch_mode,
+            mission_id=updated_mission.mission_id,
+            uuid=updated_mission.id,
+            message=message,
+            job_id=updated_mission.deepsearch_job_id,
+        )
+
+    except MissionNotFoundError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("Error submitting mission")
+        raise HTTPException(
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error submitting mission: {str(exc)[:200]}",
         ) from exc

@@ -713,3 +713,93 @@ class TestMissionStatusTransitions:
             )
             assert response.status_code == 201, f"Failed for status: {status}"
             assert response.json()["status"] == status
+
+
+class TestMissionSubmit:
+    """Tests for the POST /missions/{id}/submit endpoint."""
+
+    def test_submit_mission_success(self, auth_headers, db_session):
+        """Successfully submit a draft mission."""
+        client = TestClient(app)
+        mission = _create_test_mission(db_session, mission_id="SUBMIT-001", status="draft")
+
+        response = client.post(
+            f"/api/v1/missions/{mission.id}/submit",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200, response.text
+        data = response.json()
+        assert data["status"] == "queued"
+        assert data["mission_id"] == "SUBMIT-001"
+        assert data["uuid"] == str(mission.id)
+        assert "message" in data
+        assert data["mode"] in ("worker", "http")
+
+    def test_submit_mission_not_found(self, auth_headers):
+        """Submit non-existent mission returns 404."""
+        client = TestClient(app)
+        fake_id = uuid.uuid4()
+
+        response = client.post(
+            f"/api/v1/missions/{fake_id}/submit",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 404
+
+    def test_submit_mission_already_queued(self, auth_headers, db_session):
+        """Cannot submit a mission that is already queued."""
+        client = TestClient(app)
+        mission = _create_test_mission(db_session, mission_id="SUBMIT-002", status="queued")
+
+        response = client.post(
+            f"/api/v1/missions/{mission.id}/submit",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 400
+        assert "already queued" in response.json()["detail"]
+
+    def test_submit_mission_in_progress(self, auth_headers, db_session):
+        """Cannot submit a mission that is in progress."""
+        client = TestClient(app)
+        mission = _create_test_mission(db_session, mission_id="SUBMIT-003", status="in_progress")
+
+        response = client.post(
+            f"/api/v1/missions/{mission.id}/submit",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 400
+        assert "already in_progress" in response.json()["detail"]
+
+    def test_submit_completed_mission(self, auth_headers, db_session):
+        """Can resubmit a completed mission."""
+        client = TestClient(app)
+        mission = _create_test_mission(db_session, mission_id="SUBMIT-004", status="completed")
+
+        response = client.post(
+            f"/api/v1/missions/{mission.id}/submit",
+            headers=auth_headers,
+        )
+
+        # Completed missions can be resubmitted
+        assert response.status_code == 200
+        assert response.json()["status"] == "queued"
+
+    def test_submit_mission_updates_status_in_db(self, auth_headers, db_session):
+        """Submit should update the mission status in the database."""
+        client = TestClient(app)
+        mission = _create_test_mission(db_session, mission_id="SUBMIT-005", status="draft")
+
+        response = client.post(
+            f"/api/v1/missions/{mission.id}/submit",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+
+        # Verify in database
+        db_session.refresh(mission)
+        assert mission.status == "queued"
