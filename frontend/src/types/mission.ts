@@ -197,3 +197,10 @@ export interface MissionListParams {
   status?: MissionStatus;
   project_id?: string;
 }
+
+export interface ReportPromoteResponse {
+  document_id: string;
+  document_name: string;
+  status: "processing" | "completed";
+  message: string;
+}
