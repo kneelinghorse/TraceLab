@@ -420,5 +420,3 @@
 {"ts": "2025-12-09T19:01:56Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
 {"ts": "2025-12-09T19:04:06Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
 {"ts": "2025-12-09T19:13:33Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
-{"ts": "2025-12-09T19:21:49Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
-{"ts": "2025-12-09T19:31:31Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
