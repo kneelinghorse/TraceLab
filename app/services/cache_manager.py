@@ -129,6 +129,7 @@ class CacheManager:
         search: Optional[str],
         page: int,
         page_size: int,
+        include_deleted: bool = False,
     ) -> Tuple[Any, ...]:
         normalized_search = (search or "").strip().lower()
         processed_state = (
@@ -140,6 +141,7 @@ class CacheManager:
             normalized_search,
             int(page),
             int(page_size),
+            include_deleted,
         )
 
     @staticmethod
@@ -150,6 +152,7 @@ class CacheManager:
         search: Optional[str] = None,
         page: Optional[int] = None,
         page_size: Optional[int] = None,
+        include_deleted: bool = False,
     ) -> Tuple[Any, ...]:
         if kind == "detail" and identifier:
             return ("detail", identifier)
@@ -159,6 +162,7 @@ class CacheManager:
             normalized_search,
             int(page or 1),
             int(page_size or 20),
+            include_deleted,
         )
 
     @staticmethod
