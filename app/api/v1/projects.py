@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.schemas.pagination import PaginatedResponse
 from app.schemas.project import ProjectCreate, ProjectRead, ProjectStats, ProjectUpdate
 from app.services.cache_manager import get_cache_manager
@@ -92,9 +93,29 @@ def update_project(
 @router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_project(
     project_id: UUID,
+    confirm: bool = Query(
+        False,
+        description="Must be true to confirm deletion. WARNING: This deletes all "
+        "associated documents, chunks, insights, and missions.",
+    ),
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> None:
-    """Delete a project and all associated data."""
+    """Delete a project and all associated data.
+
+    Requires authentication and explicit confirmation via confirm=true query parameter.
+    This is a destructive operation that CASCADE deletes:
+    - All documents in the project
+    - All chunks from those documents
+    - All insights derived from the project
+    - All missions associated with the project
+    """
+    if not confirm:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Project deletion requires confirm=true query parameter. "
+            "WARNING: This will delete ALL documents, chunks, insights, and missions in this project.",
+        )
     deleted = _service.delete_project(db, project_id)
     if not deleted:
         raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
