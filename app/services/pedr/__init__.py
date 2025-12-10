@@ -42,6 +42,13 @@ from .syntactic import (
     SyntacticService,
     get_syntactic_service,
 )
+from .pragmatic import (
+    QueryIntent,
+    IntentDetectionResult,
+    PragmaticFilters,
+    PragmaticService,
+    get_pragmatic_service,
+)
 
 __all__ = [
     # Quality scoring
@@ -80,4 +87,10 @@ __all__ = [
     "SyntacticFilters",
     "SyntacticService",
     "get_syntactic_service",
+    # Pragmatic layer (intent classification)
+    "QueryIntent",
+    "IntentDetectionResult",
+    "PragmaticFilters",
+    "PragmaticService",
+    "get_pragmatic_service",
 ]
