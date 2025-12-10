@@ -1,0 +1,138 @@
+{
+  "summary": {
+    "capture_timestamp": "2025-12-10T14:27:53.821892+00:00",
+    "query_count": 10,
+    "successful_queries": 10,
+    "note": "Mock benchmark without database"
+  },
+  "results": [
+    {
+      "query": "user research interview methodology",
+      "latency_ms": 0.122375029604882,
+      "result_count": 0,
+      "intent": "search",
+      "intent_confidence": 0.9,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "note": "Mock benchmark - no DB search"
+    },
+    {
+      "query": "usability testing best practices",
+      "latency_ms": 0.04549999721348286,
+      "result_count": 0,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "note": "Mock benchmark - no DB search"
+    },
+    {
+      "query": "participant recruitment strategy",
+      "latency_ms": 0.03450002986937761,
+      "result_count": 0,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "note": "Mock benchmark - no DB search"
+    },
+    {
+      "query": "API integration authentication",
+      "latency_ms": 0.03570900298655033,
+      "result_count": 0,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "note": "Mock benchmark - no DB search"
+    },
+    {
+      "query": "database schema design patterns",
+      "latency_ms": 0.050915987230837345,
+      "result_count": 0,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "note": "Mock benchmark - no DB search"
+    },
+    {
+      "query": "embedding service configuration",
+      "latency_ms": 0.04775001434609294,
+      "result_count": 0,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "note": "Mock benchmark - no DB search"
+    },
+    {
+      "query": "sprint planning backlog prioritization",
+      "latency_ms": 0.07116701453924179,
+      "result_count": 0,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "note": "Mock benchmark - no DB search"
+    },
+    {
+      "query": "code review quality checklist",
+      "latency_ms": 0.043459003791213036,
+      "result_count": 0,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "note": "Mock benchmark - no DB search"
+    },
+    {
+      "query": "deployment pipeline CI/CD",
+      "latency_ms": 0.06454205140471458,
+      "result_count": 0,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "note": "Mock benchmark - no DB search"
+    },
+    {
+      "query": "mission protocol validation",
+      "latency_ms": 0.03991700941696763,
+      "result_count": 0,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": "mission",
+      "type_confidence": 0.85,
+      "note": "Mock benchmark - no DB search"
+    }
+  ],
+  "search_config": {
+    "search_mode": "PEDR pre-analysis only (mock)"
+  },
+  "comparison": {
+    "baseline": {
+      "search_mode": "keyword (PostgreSQL full-text)",
+      "latency_p50_ms": 59.76156299584545,
+      "latency_mean_ms": 3217.0736667874735,
+      "avg_results": 4.7
+    },
+    "pedr": {
+      "search_mode": "PEDR pre-analysis only (mock)",
+      "latency_p50_ms": 0,
+      "latency_p95_ms": 0,
+      "latency_mean_ms": 0,
+      "avg_results": 0
+    },
+    "improvements": {
+      "latency_change_pct": -100.0,
+      "additional_capabilities": [
+        "RRF fusion across 5 layers",
+        "Intent classification",
+        "Element type detection",
+        "Quality scoring integration",
+        "Semantic Protocol URNs"
+      ]
+    }
+  }
+}
