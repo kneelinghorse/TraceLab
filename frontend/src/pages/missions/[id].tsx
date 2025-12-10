@@ -7,7 +7,7 @@ import { AuthGate } from "@/components/AuthGate";
 import { ExecutionTimeline, ResearchPhases, ResultLinks } from "@/components/missions";
 import { missionsApi } from "@/lib/api/missions";
 import { useApiMission } from "@/lib/hooks/useMissions";
-import type { MissionStatus, ReportPromotionResponse } from "@/types/mission";
+import type { MissionStatus, ReportPromotionResponse, ApiMissionUpdate } from "@/types/mission";
 
 const STATUS_COLORS: Record<MissionStatus, { bg: string; text: string; dot: string }> = {
   draft: { bg: "bg-gray-100 dark:bg-gray-700", text: "text-gray-700 dark:text-gray-300", dot: "bg-gray-400" },
@@ -47,6 +47,16 @@ function MissionDetailContent() {
   const [isPromoting, setIsPromoting] = useState(false);
   const [promotionResult, setPromotionResult] = useState<ReportPromotionResponse | null>(null);
   const [promotionError, setPromotionError] = useState<string | null>(null);
+
+  // Edit mode state
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editObjective, setEditObjective] = useState("");
+  const [editSuccessCriteria, setEditSuccessCriteria] = useState<string[]>([]);
+  const [editDeliverables, setEditDeliverables] = useState<string[]>([]);
+  const [editTags, setEditTags] = useState<string[]>([]);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const { mission, isLoading, error, refresh } = useApiMission(missionId);
 
@@ -100,6 +110,84 @@ function MissionDetailContent() {
     } finally {
       setIsPromoting(false);
     }
+  };
+
+  // Edit mode handlers
+  const handleStartEdit = () => {
+    if (!mission) return;
+    setEditTitle(mission.title);
+    setEditObjective(mission.objective);
+    setEditSuccessCriteria([...mission.success_criteria]);
+    setEditDeliverables([...mission.deliverables]);
+    setEditTags([...mission.tags]);
+    setEditError(null);
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditError(null);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!missionId || !mission) return;
+
+    if (!editTitle.trim()) {
+      setEditError("Title is required");
+      return;
+    }
+    if (!editObjective.trim()) {
+      setEditError("Objective is required");
+      return;
+    }
+
+    setEditError(null);
+    setIsSaving(true);
+
+    try {
+      const updateData: ApiMissionUpdate = {
+        title: editTitle.trim(),
+        objective: editObjective.trim(),
+        success_criteria: editSuccessCriteria.filter(c => c.trim() !== ""),
+        deliverables: editDeliverables.filter(d => d.trim() !== ""),
+        tags: editTags.filter(t => t.trim() !== ""),
+      };
+
+      await missionsApi.update(missionId, updateData);
+      setIsEditing(false);
+      refresh();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to update mission";
+      setEditError(message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // List editing helpers
+  const handleAddListItem = (
+    setter: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    setter(prev => [...prev, ""]);
+  };
+
+  const handleUpdateListItem = (
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
+    index: number,
+    value: string
+  ) => {
+    setter(prev => {
+      const updated = [...prev];
+      updated[index] = value;
+      return updated;
+    });
+  };
+
+  const handleRemoveListItem = (
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
+    index: number
+  ) => {
+    setter(prev => prev.filter((_, i) => i !== index));
   };
 
   if (!missionId) {
@@ -181,79 +269,249 @@ function MissionDetailContent() {
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
           {/* Header Section */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-2">
+            {isEditing ? (
+              /* Edit Mode Form */
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 mb-4">
                   <StatusBadge status={mission.status} />
                   <span className="text-sm font-mono text-gray-500 dark:text-gray-400">
                     {mission.mission_id}
                   </span>
-                </div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {mission.title}
-                </h1>
-                {createdAt && (
-                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Created {createdAt}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {mission.tags.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {mission.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded"
-                  >
-                    {tag}
+                  <span className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded">
+                    Editing
                   </span>
-                ))}
-              </div>
-            )}
+                </div>
 
-            {/* Action Buttons */}
-            <div className="mt-6 flex flex-wrap gap-3">
-              {isDraft && (
-                <button
-                  onClick={handleSubmitToDeepSearch}
-                  disabled={isSubmitting}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
-                >
-                  {isSubmitting ? "Submitting..." : "Submit to DeepSearch"}
-                </button>
-              )}
-              {mission.status === "completed" && mission.result_report_id && !promotionResult && (
-                <button
-                  onClick={handlePromoteReport}
-                  disabled={isPromoting}
-                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
-                >
-                  {isPromoting ? "Promoting..." : "Promote Report to Document"}
-                </button>
-              )}
-              {promotionResult && (
-                <Link
-                  href={`/documents/${promotionResult.document_id}`}
-                  className="px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors font-medium text-sm"
-                >
-                  View Promoted Document
-                </Link>
-              )}
-              <Link
-                href={`/console/missions?edit=${missionId}`}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-sm"
-              >
-                Edit Mission
-              </Link>
-              <button
-                onClick={handleDelete}
-                className="px-4 py-2 border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium text-sm"
-              >
-                Delete
-              </button>
-            </div>
+                {/* Title */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Title *
+                  </label>
+                  <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    autoFocus
+                  />
+                </div>
+
+                {/* Objective */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Objective *
+                  </label>
+                  <textarea
+                    value={editObjective}
+                    onChange={(e) => setEditObjective(e.target.value)}
+                    rows={3}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Success Criteria */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Success Criteria
+                  </label>
+                  <div className="space-y-2">
+                    {editSuccessCriteria.map((criterion, index) => (
+                      <div key={index} className="flex gap-2">
+                        <input
+                          type="text"
+                          value={criterion}
+                          onChange={(e) => handleUpdateListItem(setEditSuccessCriteria, index, e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                          placeholder="Enter success criterion"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveListItem(setEditSuccessCriteria, index)}
+                          className="px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => handleAddListItem(setEditSuccessCriteria)}
+                      className="px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg"
+                    >
+                      + Add Criterion
+                    </button>
+                  </div>
+                </div>
+
+                {/* Deliverables */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Deliverables
+                  </label>
+                  <div className="space-y-2">
+                    {editDeliverables.map((deliverable, index) => (
+                      <div key={index} className="flex gap-2">
+                        <input
+                          type="text"
+                          value={deliverable}
+                          onChange={(e) => handleUpdateListItem(setEditDeliverables, index, e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                          placeholder="Enter deliverable"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveListItem(setEditDeliverables, index)}
+                          className="px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => handleAddListItem(setEditDeliverables)}
+                      className="px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg"
+                    >
+                      + Add Deliverable
+                    </button>
+                  </div>
+                </div>
+
+                {/* Tags */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Tags
+                  </label>
+                  <div className="space-y-2">
+                    {editTags.map((tag, index) => (
+                      <div key={index} className="flex gap-2">
+                        <input
+                          type="text"
+                          value={tag}
+                          onChange={(e) => handleUpdateListItem(setEditTags, index, e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                          placeholder="Enter tag"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveListItem(setEditTags, index)}
+                          className="px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => handleAddListItem(setEditTags)}
+                      className="px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg"
+                    >
+                      + Add Tag
+                    </button>
+                  </div>
+                </div>
+
+                {/* Error Display */}
+                {editError && (
+                  <p className="text-sm text-red-600 dark:text-red-400">{editError}</p>
+                )}
+
+                {/* Save/Cancel Buttons */}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={handleSaveEdit}
+                    disabled={isSaving}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                  >
+                    {isSaving ? "Saving..." : "Save Changes"}
+                  </button>
+                  <button
+                    onClick={handleCancelEdit}
+                    disabled={isSaving}
+                    className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* View Mode */
+              <>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-2">
+                      <StatusBadge status={mission.status} />
+                      <span className="text-sm font-mono text-gray-500 dark:text-gray-400">
+                        {mission.mission_id}
+                      </span>
+                    </div>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      {mission.title}
+                    </h1>
+                    {createdAt && (
+                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Created {createdAt}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {mission.tags.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {mission.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="mt-6 flex flex-wrap gap-3">
+                  {isDraft && (
+                    <button
+                      onClick={handleSubmitToDeepSearch}
+                      disabled={isSubmitting}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
+                    >
+                      {isSubmitting ? "Submitting..." : "Submit to DeepSearch"}
+                    </button>
+                  )}
+                  {mission.status === "completed" && mission.result_report_id && !promotionResult && (
+                    <button
+                      onClick={handlePromoteReport}
+                      disabled={isPromoting}
+                      className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
+                    >
+                      {isPromoting ? "Promoting..." : "Promote Report to Document"}
+                    </button>
+                  )}
+                  {promotionResult && (
+                    <Link
+                      href={`/documents/${promotionResult.document_id}`}
+                      className="px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors font-medium text-sm"
+                    >
+                      View Promoted Document
+                    </Link>
+                  )}
+                  <button
+                    onClick={handleStartEdit}
+                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium text-sm"
+                  >
+                    Edit Mission
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="px-4 py-2 border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium text-sm"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </>
+            )}
 
             {submitError && (
               <p className="mt-3 text-sm text-red-600 dark:text-red-400">{submitError}</p>
