@@ -1,0 +1,28 @@
+mission_id: R18.0
+title: PEDR Baseline Capture
+status: Queued
+sprint_id: sprint-18
+track: Research
+
+objective: |
+  Capture baseline search quality metrics before PEDR enhancements.
+  Run 5-10 representative queries through current hybrid search, note results.
+  This is a quick sanity check, not an elaborate framework.
+
+success_criteria:
+  - Run 5-10 queries covering different research topics
+  - Note precision (are top results relevant?)
+  - Note quality awareness (do complete missions outrank drafts?)
+  - Note latency (rough p50)
+  - Record findings in session capture or telemetry
+
+deliverables:
+  - Baseline metrics captured (can be session notes or simple jsonl)
+  - Clear "before" picture for comparison after B18.4
+
+context: |
+  Keep this lightweight. The goal is having something to compare against,
+  not building elaborate test infrastructure. A few manual queries with
+  notes is sufficient.
+
+estimated_hours: 1-2

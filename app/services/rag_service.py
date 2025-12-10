@@ -127,6 +127,10 @@ class RagService:
         min_quality_gates: Optional[int] = None,
         status_filters: Optional[List[str]] = None,
         allow_pii: Optional[bool] = True,
+        element_type: Optional[str] = None,
+        element_types: Optional[List[str]] = None,
+        auto_detect_type: bool = True,
+        type_boost_enabled: bool = True,
     ) -> Dict[str, Any]:
         """
         Execute a full RAG workflow: retrieve context and synthesize an answer.
@@ -178,6 +182,10 @@ class RagService:
                 min_quality_gates=min_quality_gates,
                 status_filters=status_filters,
                 allow_pii=allow_pii,
+                element_type=element_type,
+                element_types=element_types,
+                auto_detect_type=auto_detect_type,
+                type_boost_enabled=type_boost_enabled,
             )
 
         result, hit = self.cache_manager.cached_value("rag_query_results", cache_key, _loader)
@@ -219,6 +227,10 @@ class RagService:
         min_quality_gates: Optional[int],
         status_filters: Optional[List[str]],
         allow_pii: Optional[bool],
+        element_type: Optional[str] = None,
+        element_types: Optional[List[str]] = None,
+        auto_detect_type: bool = True,
+        type_boost_enabled: bool = True,
     ) -> Dict[str, Any]:
         start = time.perf_counter()
         normalized_mode = (search_mode or "semantic").strip().lower()
@@ -289,6 +301,10 @@ class RagService:
             min_quality_gates=min_quality_gates,
             status_filters=status_filters,
             allow_pii=allow_pii,
+            element_type=element_type,
+            element_types=element_types,
+            auto_detect_type=auto_detect_type,
+            type_boost_enabled=type_boost_enabled,
         )
 
         compressed_chunks, compression_metrics = compress_context(

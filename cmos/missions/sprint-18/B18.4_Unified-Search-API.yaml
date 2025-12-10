@@ -1,0 +1,36 @@
+mission_id: B18.4
+title: Unified PEDR Search API
+status: Queued
+sprint_id: sprint-18
+track: PEDR
+depends_on: [B18.3]
+
+objective: |
+  Create single POST /api/v1/pedr/search endpoint that orchestrates all
+  5 layers (lexical, semantic, syntactic, pragmatic, governance) with
+  RRF fusion. This becomes the candidate for primary search interface.
+
+success_criteria:
+  - POST /api/v1/pedr/search endpoint working
+  - All 5 layers integrated (lexical, semantic already exist)
+  - RRF (Reciprocal Rank Fusion) combining layer results
+  - Configurable layer weights
+  - Response includes quality metadata (URN, confidence, etc)
+  - Latency <200ms p95
+
+deliverables:
+  - app/services/pedr/search_orchestrator.py - layer coordination
+  - app/services/pedr/fusion.py - RRF implementation
+  - app/api/v1/pedr_search.py - unified endpoint
+  - app/schemas/pedr_search.py - request/response models
+  - Benchmark comparison vs baseline (R18.0)
+
+context: |
+  This is the key validation point. After B18.4, we can measure whether
+  PEDR delivers better results than current hybrid search. If not,
+  we reconsider the relational layer investment.
+
+  RRF formula: score = sum(1 / (k + rank_in_layer)) across layers
+  where k=60 is standard constant
+
+estimated_hours: 4-5

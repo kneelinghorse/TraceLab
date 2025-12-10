@@ -1,8 +1,12 @@
 """Schemas for retrieval queries and responses."""
 from datetime import date
-from typing import List, Optional
+from typing import List, Literal, Optional
 from uuid import UUID
 from pydantic import BaseModel, Field
+
+
+# Valid element types for PEDR syntactic layer
+ElementTypeValue = Literal["mission", "document", "insight", "chunk"]
 
 
 class RetrievalQuery(BaseModel):
@@ -52,6 +56,23 @@ class RetrievalQuery(BaseModel):
         default=True,
         description="When False, exclude missions flagged for PII handling.",
     )
+    # PEDR syntactic layer parameters
+    element_type: Optional[ElementTypeValue] = Field(
+        default=None,
+        description="Filter by entity type (mission, document, insight, chunk). Auto-detected from query if not specified.",
+    )
+    element_types: Optional[List[ElementTypeValue]] = Field(
+        default=None,
+        description="Filter by multiple entity types (OR semantics).",
+    )
+    auto_detect_type: bool = Field(
+        default=True,
+        description="Auto-detect element type from query phrasing when not explicitly specified.",
+    )
+    type_boost_enabled: bool = Field(
+        default=True,
+        description="Apply score boost to results matching detected/specified element type.",
+    )
 
 
 class RetrievedChunk(BaseModel):
@@ -75,6 +96,10 @@ class RetrievedChunk(BaseModel):
     quality_validated: Optional[bool] = None
     quality_mission_id: Optional[str] = None
     quality_pii_flagged: Optional[bool] = None
+    # PEDR syntactic layer fields
+    element_type: Optional[str] = None
+    element_type_match: Optional[bool] = None
+    type_boost: Optional[float] = None
 
 
 class RetrievalResponse(BaseModel):

@@ -1,0 +1,34 @@
+mission_id: B18.6
+title: PEDR Decision Gate
+status: Queued
+sprint_id: sprint-18
+track: PEDR
+depends_on: [B18.5]
+
+objective: |
+  Final evaluation of PEDR vs current search. Document findings and
+  make go/no-go decision on PEDR as primary search interface.
+
+success_criteria:
+  - Side-by-side comparison documented
+  - Precision improvement (or not) quantified
+  - Latency comparison
+  - Recommendation: PEDR primary, PEDR scoped, or PEDR deprecated
+  - Roadmap updated based on decision
+
+deliverables:
+  - cmos/reports/sprint-18/pedr-evaluation.md
+  - Decision captured in MASTER_CONTEXT
+  - Updated roadmap (if PEDR proceeds: DeepSearch integration next)
+
+context: |
+  This is the "prove it or kill it" gate. Be honest about results.
+
+  Decision criteria:
+  - PEDR PRIMARY: >=15% precision improvement AND <200ms latency
+  - PEDR SCOPED: Some improvement but not enough for primary
+  - PEDR DEPRECATED: No meaningful improvement, focus elsewhere
+
+  If PEDR proves out, Sprint 19 would focus on DeepSearch integration.
+
+estimated_hours: 2-3

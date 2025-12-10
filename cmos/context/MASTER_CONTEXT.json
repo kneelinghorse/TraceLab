@@ -3,7 +3,7 @@
     "name": "CMOS Starter Template",
     "version": "0.0.0",
     "description": "Blank master context for new CMOS starter projects.",
-    "status": "sprint-12-completed",
+    "status": "sprint-17-completed",
     "start_date": "2025-01-01",
     "deployment": {
       "platform": "FastAPI + PostgreSQL + Qdrant",
@@ -31,7 +31,9 @@
       "Sprint 12 planned with 6 missions and B12.4 (DeepSearch credentials) completed during planning",
       "DeepSearch integration unblocked - service account created and documented",
       "Sprint 12 backlog finalized: 6 missions to make system usable (fix 500 errors, auth issues, service account)",
-      "Sprint 12 completed: Made TraceLab actually usable. Fixed missions 500 error, HTTPS redirect auth drop, service account creation, API response standardization. DeepSearch integration verified E2E."
+      "Sprint 12 completed: Made TraceLab actually usable. Fixed missions 500 error, HTTPS redirect auth drop, service account creation, API response standardization. DeepSearch integration verified E2E.",
+      "Sprint 17 completed: Data Protection & Stability. Soft delete, auth on DELETE, Qdrant recovery scripts, report promotion, audit metadata.",
+      "Sprint 18 planned: PEDR Validation Sprint - prove 6-layer search delivers measurably better results."
     ],
     "files_created": [
       "cmos/missions/sprint-01/B1.1_Core-Service-Bootstrap.yaml",
@@ -623,7 +625,7 @@
         "name": "Markdown Ingestion Service Design",
         "status": "Completed",
         "reference": "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md",
-        "deliverable": "Architecture for chokidar → queue → unified/remark ingestion pipeline, Qdrant payload schema, telemetry, and resilience patterns"
+        "deliverable": "Architecture for chokidar \u2192 queue \u2192 unified/remark ingestion pipeline, Qdrant payload schema, telemetry, and resilience patterns"
       },
       {
         "id": "R2.3",
@@ -644,19 +646,19 @@
         "id": "B2.2",
         "name": "Context Compression Pipeline",
         "status": "Completed",
-        "focus": "Embedding-based filtering to reduce tokens 60-70% (3000→1000 tokens)"
+        "focus": "Embedding-based filtering to reduce tokens 60-70% (3000\u21921000 tokens)"
       },
       {
         "id": "B2.3",
         "name": "Semantic Cache Layer",
         "status": "Blocked",
-        "focus": "Qdrant-based cache with 0.90-0.95 similarity threshold, target 15-20% hit rate; unblocked by sub-missions B2.3a–B2.3d"
+        "focus": "Qdrant-based cache with 0.90-0.95 similarity threshold, target 15-20% hit rate; unblocked by sub-missions B2.3a\u2013B2.3d"
       },
       {
         "id": "B2.3a",
         "name": "Markdown Ingestion Pipeline",
         "status": "In Progress",
-        "focus": "Implement chokidar → queue → unified/remark ingestion service per R2.2 research"
+        "focus": "Implement chokidar \u2192 queue \u2192 unified/remark ingestion service per R2.2 research"
       },
       {
         "id": "B2.3b",
@@ -674,7 +676,7 @@
         "id": "B2.3d",
         "name": "Semantic Cache Implementation",
         "status": "Queued",
-        "focus": "Integrate cache service with RAG pipeline and achieve 15–20% hit rate"
+        "focus": "Integrate cache service with RAG pipeline and achieve 15\u201320% hit rate"
       },
       {
         "id": "B2.4",
@@ -692,7 +694,7 @@
     "success_criteria": [
       "RAG query API successfully retrieves relevant chunks and generates answers with citations",
       "Context compression reduces input tokens by 60-70% (from ~3000 to ~1000 tokens)",
-      "Semantic cache achieves hit rate ≥ 15% (target 15-20%)",
+      "Semantic cache achieves hit rate \u2265 15% (target 15-20%)",
       "Tiered routing escalation rate < 10% (90%+ queries handled by GPT-4o-mini)",
       "Average cost per query < $0.0003 (with all optimizations applied)",
       "Query latency < 5 seconds end-to-end for RAG queries",
@@ -774,9 +776,9 @@
     ],
     "important_for_review": [
       "Telemetry artifacts needed: RAG query performance logs, semantic cache hit/miss statistics, context compression metrics, tiered routing escalation events, cost tracking data",
-      "Key metrics to validate: cache hit rate (target ≥15%), escalation rate (target <10%), token compression ratio (target 60-70%), average cost per query (target <$0.0003)",
+      "Key metrics to validate: cache hit rate (target \u226515%), escalation rate (target <10%), token compression ratio (target 60-70%), average cost per query (target <$0.0003)",
       "R2.1 research provides complete implementation blueprint: pattern libraries, scoring algorithms, escalation decision tree - ready for B2.4 implementation",
-      "All Sprint 02 missions have clear dependencies: B2.1 → B2.2 → B2.3 → B2.4 → B2.5",
+      "All Sprint 02 missions have clear dependencies: B2.1 \u2192 B2.2 \u2192 B2.3 \u2192 B2.4 \u2192 B2.5",
       "Qdrant infrastructure from B1.5 is operational: 12,800 chunks indexed, <10ms latency, ready for RAG queries"
     ],
     "sprint_focus": "Hosted Next.js deployment, JWT/CORS hardening, and Cloudflare wiring with telemetry.",
@@ -787,9 +789,9 @@
     "tracking": {},
     "architectural_pivot": {
       "date": "2025-11-15",
-      "summary": "Autonomous Knowledge System architecture: DeepSearch (agent researcher) → TraceLab (validation API + repository) → PEDR (governance search)",
+      "summary": "Autonomous Knowledge System architecture: DeepSearch (agent researcher) \u2192 TraceLab (validation API + repository) \u2192 PEDR (governance search)",
       "key_insight": "Mission Protocol repurposed from human forms to agent output validation. Quality gates enforce structure on autonomous research outputs.",
-      "integration_flow": "DeepSearch generates structured JSON → TraceLab validates via Pydantic → stores in PostgreSQL/Qdrant → PEDR indexes for internal search → agents query PEDR before external research",
+      "integration_flow": "DeepSearch generates structured JSON \u2192 TraceLab validates via Pydantic \u2192 stores in PostgreSQL/Qdrant \u2192 PEDR indexes for internal search \u2192 agents query PEDR before external research",
       "traceLab_role": [
         "Validation API for agent outputs",
         "Knowledge repository (validated research storage)",
@@ -798,7 +800,7 @@
       ]
     },
     "sprint_10_plus_direction": {
-      "focus": "DeepSearch → TraceLab → PEDR integration",
+      "focus": "DeepSearch \u2192 TraceLab \u2192 PEDR integration",
       "key_missions": [
         "Auto-link correction loop & telemetry observability",
         "PEDR delta sync + catalog export",
@@ -818,13 +820,13 @@
         "week_8": "Production validation"
       },
       "key_decisions": {
-        "output_format": "Markdown (Sprint 1-2) → JSON (Sprint 3+)",
+        "output_format": "Markdown (Sprint 1-2) \u2192 JSON (Sprint 3+)",
         "evidence_linking": "Post-processing auto-linking via similarity (TraceLab responsibility)",
         "schema_sharing": "Pydantic package for DeepSearch pre-validation",
         "authentication": "24-hour JWT with retry-on-401",
         "project_management": "Config-based mapping with auto-create fallback"
       },
-      "integration_flow": "DeepSearch generates JSON → TraceLab validates/stores → PEDR indexes → agents query"
+      "integration_flow": "DeepSearch generates JSON \u2192 TraceLab validates/stores \u2192 PEDR indexes \u2192 agents query"
     },
     "pedr_integration": {
       "approach": "Phased - Start as TraceLab module, extract later if needed",
@@ -1837,15 +1839,29 @@
         "Verified E2E DeepSearch integration (5/6 steps pass)",
         "Documented pre-flight discovery limitation"
       ]
+    },
+    {
+      "sprint": "Sprint 17",
+      "theme": "Data Protection, Stability & Architecture Research",
+      "completed": "2025-12-09",
+      "missions_completed": 11,
+      "key_outcomes": [
+        "DELETE endpoints require auth + confirm=true",
+        "Soft delete for projects/documents (recoverable)",
+        "Qdrant recovery script (reprocess_embeddings.py)",
+        "Report promotion to document for knowledge loop",
+        "Audit metadata: updated_at, created_by, timestamps",
+        "Architecture health: 8/10, N+1 risks identified"
+      ]
     }
   ],
   "current_sprint": {
-    "id": "sprint-13",
-    "name": "Sprint 13",
-    "theme": "UI Usability & Collections",
+    "id": "sprint-18",
+    "name": "Sprint 18",
+    "theme": "PEDR Validation Sprint",
     "status": "Planned",
-    "missions": 10,
-    "planned_date": "2025-12-05"
+    "missions": 8,
+    "planned_date": "2025-12-10"
   },
   "strategic_context": {
     "sprint_13": {
@@ -1906,6 +1922,33 @@
         "B13.8": [
           "B13.5"
         ]
+      }
+    },
+    "sprint_18": {
+      "theme": "PEDR Validation Sprint",
+      "planned": "2025-12-10",
+      "mission_count": 8,
+      "approach": "prove-it-first",
+      "missions": {
+        "R18.0": "PEDR Baseline Capture",
+        "B18.1": "Syntactic Layer - Type Filtering",
+        "B18.2": "Pragmatic Layer - Intent Classification",
+        "B18.3": "Full Semantic Protocol Integration",
+        "B18.4": "Unified PEDR Search API",
+        "B18.5": "Relational Layer - Graph Context",
+        "B18.6": "PEDR Decision Gate",
+        "B18.7": "Sprint 18 Retrospective"
+      },
+      "key_decisions": [
+        "PEDR becomes THE search interface ONLY IF it proves >=15% precision improvement",
+        "Build 5 layers first, Relational layer last",
+        "B18.6 is decision gate: Primary, Scoped, or Deprecated",
+        "DeepSearch integration deferred until PEDR proves value"
+      ],
+      "validation_criteria": {
+        "primary": ">=15% precision improvement AND <200ms latency",
+        "scoped": "Some improvement but not enough for primary interface",
+        "deprecated": "No meaningful improvement, focus elsewhere"
       }
     }
   },
