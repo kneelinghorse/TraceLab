@@ -16,6 +16,9 @@ PEDRElementType = Literal["mission", "document", "insight", "chunk"]
 # Query intents from PEDR pragmatic layer
 PEDRQueryIntent = Literal["search", "create", "update", "delete", "execute"]
 
+# Rerank mode for hybrid search optimization
+PEDRRerankMode = Literal["full", "hybrid"]
+
 
 class PEDRLayerWeights(BaseModel):
     """Configurable weights for each PEDR layer in RRF fusion."""
@@ -105,6 +108,21 @@ class PEDRSearchRequest(BaseModel):
         description="HNSW ef override for semantic search",
     )
 
+    # Hybrid rerank options (B19.4)
+    rerank_mode: PEDRRerankMode = Field(
+        default="full",
+        description=(
+            "Search rerank mode: 'full' for standard semantic search across entire corpus, "
+            "'hybrid' for FTS-first with semantic reranking (faster, <300ms target)"
+        ),
+    )
+    candidate_pool: int = Field(
+        default=50,
+        ge=10,
+        le=200,
+        description="Number of FTS candidates to retrieve for hybrid reranking (only used when rerank_mode='hybrid')",
+    )
+
     # Graph expansion options (Relational Layer)
     include_related: bool = Field(
         default=False,
@@ -144,6 +162,14 @@ class PEDRSearchMetadata(BaseModel):
     timings: PEDRLayerTimings = Field(description="Per-layer timing information")
     total_candidates: int = Field(ge=0, description="Total unique candidates before final ranking")
     result_count: int = Field(ge=0, description="Number of results returned")
+    rerank_mode: Optional[PEDRRerankMode] = Field(
+        default=None,
+        description="Rerank mode used for this search (full or hybrid)",
+    )
+    hybrid_fallback_used: bool = Field(
+        default=False,
+        description="True if hybrid mode fell back to full semantic (FTS returned no candidates)",
+    )
 
 
 class PEDRSearchResult(BaseModel):
@@ -214,6 +240,7 @@ PEDRSearchQuery = PEDRSearchRequest  # Alias
 __all__ = [
     "PEDRElementType",
     "PEDRQueryIntent",
+    "PEDRRerankMode",
     "PEDRLayerWeights",
     "PEDRSearchRequest",
     "PEDRLayerTimings",
