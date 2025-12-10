@@ -6,6 +6,7 @@ import type { SVGProps } from "react";
 import useSWR from "swr";
 
 import { AuthGate } from "@/components/AuthGate";
+import { PEDRMetadataPanel } from "@/components/PEDRMetadataPanel";
 import { RagSynthesis } from "@/components/RagSynthesis";
 import { ResultCard } from "@/components/ResultCard";
 import { SaveSearchButton } from "@/components/SaveSearchButton";
@@ -18,6 +19,8 @@ import { searchApi } from "@/lib/api/search";
 import { savedSearchesApi } from "@/lib/api/savedSearches";
 import type { Document, Project } from "@/types/document";
 import type {
+  PEDRSearchMetadata,
+  PEDRSearchResult,
   RagCitation,
   RagResponsePayload,
   SearchHistoryEntryPayload,
@@ -58,11 +61,14 @@ function SearchExperience({ initialSection }: SearchPageProps) {
   const [topK, setTopK] = useState(10);
   const [filters, setFilters] = useState<SearchFiltersState>({ projectId: "", documentType: "", startDate: "", endDate: "" });
   const [semanticResults, setSemanticResults] = useState<SearchResultChunk[]>([]);
+  const [pedrResults, setPedrResults] = useState<PEDRSearchResult[]>([]);
+  const [pedrMetadata, setPedrMetadata] = useState<PEDRSearchMetadata | null>(null);
   const [ragPayload, setRagPayload] = useState<RagResponsePayload | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [ragError, setRagError] = useState<string | null>(null);
   const [highlightedChunkId, setHighlightedChunkId] = useState<string | null>(null);
+  const [usePedr, setUsePedr] = useState(true); // Default to PEDR for main search
 
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const resultsAnchorRef = useRef<HTMLDivElement | null>(null);
@@ -155,8 +161,28 @@ function SearchExperience({ initialSection }: SearchPageProps) {
     [normalizeFilters],
   );
 
+  // Convert PEDR results to SearchResultChunk format for compatibility
+  const normalizedResults: SearchResultChunk[] = useMemo(() => {
+    if (usePedr && pedrResults.length > 0) {
+      return pedrResults.map((r) => ({
+        chunk_id: r.chunk_id,
+        content: r.content,
+        document_id: r.document_id,
+        project_id: r.project_id,
+        chunk_index: r.chunk_index,
+        source_type: r.source_type,
+        score: r.rrf_score,
+        // Keep PEDR-specific fields for extended display
+        element_type: r.element_type,
+        quality_score: r.quality_score,
+        contributing_layers: r.contributing_layers,
+      })) as SearchResultChunk[];
+    }
+    return semanticResults;
+  }, [usePedr, pedrResults, semanticResults]);
+
   const filteredResults = useMemo(() => {
-    return semanticResults.filter((result) => {
+    return normalizedResults.filter((result) => {
       const doc = result.document_id ? documentIndex.get(result.document_id) : undefined;
 
       if (filters.documentType) {
@@ -180,7 +206,7 @@ function SearchExperience({ initialSection }: SearchPageProps) {
 
       return true;
     });
-  }, [semanticResults, documentIndex, filters.documentType, filters.startDate, filters.endDate]);
+  }, [normalizedResults, documentIndex, filters.documentType, filters.startDate, filters.endDate]);
 
   const handleFiltersChange = (update: Partial<SearchFiltersState>) => {
     setFilters((current) => {
@@ -209,6 +235,47 @@ function SearchExperience({ initialSection }: SearchPageProps) {
       setRagError(null);
       setHighlightedChunkId(null);
 
+      // Try PEDR first, fall back to semantic search if it fails
+      if (usePedr) {
+        try {
+          const pedrResponse = await searchApi.pedrSearch({
+            query: queryText,
+            top_k: limit,
+            project_id: projectId || undefined,
+            source_type: documentType || undefined,
+          });
+
+          setPedrResults(pedrResponse.results);
+          setPedrMetadata(pedrResponse.metadata);
+          setSemanticResults([]); // Clear semantic results when using PEDR
+
+          // Still run RAG query with PEDR results as context
+          try {
+            const ragResponse = await searchApi.ragQuery({
+              query: queryText,
+              top_k: limit,
+              project_id: projectId || undefined,
+              source_type: documentType || undefined,
+            });
+            setRagPayload(ragResponse);
+          } catch (ragErr) {
+            const reason = ragErr instanceof Error ? ragErr.message : "RAG query failed.";
+            setRagError(reason);
+            setRagPayload(null);
+          }
+
+          void mutateHistory();
+          setIsSearching(false);
+          return;
+        } catch (pedrError) {
+          // PEDR failed, fall back to semantic search
+          console.warn("PEDR search failed, falling back to semantic:", pedrError);
+          setPedrResults([]);
+          setPedrMetadata(null);
+        }
+      }
+
+      // Fallback to semantic search
       const payload = {
         query: queryText,
         top_k: limit,
@@ -243,7 +310,7 @@ function SearchExperience({ initialSection }: SearchPageProps) {
         setIsSearching(false);
       }
     },
-    [filters.documentType, filters.projectId, mutateHistory, query, topK],
+    [filters.documentType, filters.projectId, mutateHistory, query, topK, usePedr],
   );
 
   const handleHistoryRun = async (entry: SearchHistoryEntryPayload) => {
@@ -383,7 +450,14 @@ function SearchExperience({ initialSection }: SearchPageProps) {
           <section className="space-y-4">
             <div className="glass-card flex flex-wrap items-center justify-between gap-3 rounded-2xl p-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Results</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Results</p>
+                  {pedrMetadata && (
+                    <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-300">
+                      PEDR
+                    </span>
+                  )}
+                </div>
                 <p className="text-lg font-semibold text-white">
                   {filteredResults.length} chunk{filteredResults.length === 1 ? "" : "s"}
                 </p>
@@ -393,6 +467,9 @@ function SearchExperience({ initialSection }: SearchPageProps) {
                 <p className="text-sm text-slate-400">Searching…</p>
               )}
             </div>
+
+            {/* PEDR metadata panel */}
+            <PEDRMetadataPanel metadata={pedrMetadata} />
 
             {filteredResults.length === 0 && !isSearching ? (
               <div className="glass-card rounded-2xl p-8 text-center text-slate-300">

@@ -2,6 +2,15 @@
  * Types supporting the semantic search + RAG experience.
  */
 
+// PEDR element types
+export type PEDRElementType = "mission" | "document" | "insight" | "chunk";
+
+// PEDR query intents
+export type PEDRQueryIntent = "search" | "create" | "update" | "delete" | "execute";
+
+// PEDR rerank modes
+export type PEDRRerankMode = "full" | "hybrid";
+
 export interface SearchResultChunk {
   chunk_id: string;
   content: string;
@@ -10,6 +19,10 @@ export interface SearchResultChunk {
   chunk_index?: number;
   source_type?: string;
   score: number;
+  // PEDR-specific fields (optional, populated when using PEDR search)
+  element_type?: string;
+  quality_score?: number;
+  contributing_layers?: string[];
 }
 
 export interface SemanticSearchResponse {
@@ -127,4 +140,94 @@ export interface SearchReplayResponse {
   entry: SearchHistoryEntryPayload;
   rag: RagResponsePayload;
   semantic: SemanticSearchResponse;
+}
+
+// PEDR Search Types
+
+export interface PEDRSearchParams {
+  query: string;
+  top_k?: number;
+  project_id?: string;
+  document_id?: string;
+  source_type?: string;
+  element_type?: PEDRElementType;
+  element_types?: PEDRElementType[];
+  auto_detect_type?: boolean;
+  type_boost_enabled?: boolean;
+  intent_boost_enabled?: boolean;
+  min_quality_gates?: number;
+  rerank_mode?: PEDRRerankMode;
+  include_related?: boolean;
+  max_related_per_result?: number;
+}
+
+export interface PEDRLayerTimings {
+  lexical_ms: number;
+  semantic_ms: number;
+  syntactic_ms: number;
+  pragmatic_ms: number;
+  governance_ms: number;
+  fusion_ms: number;
+  relational_ms: number;
+  total_ms: number;
+}
+
+export interface PEDRSearchMetadata {
+  query: string;
+  intent: PEDRQueryIntent;
+  intent_confidence: number;
+  detected_type: PEDRElementType | null;
+  type_confidence: number;
+  layers_used: string[];
+  layer_weights: Record<string, number>;
+  timings: PEDRLayerTimings;
+  total_candidates: number;
+  result_count: number;
+  rerank_mode?: PEDRRerankMode;
+  hybrid_fallback_used: boolean;
+}
+
+export interface PEDRSearchResult {
+  // Core identification
+  chunk_id: string;
+  content: string;
+  document_id?: string;
+  project_id?: string;
+
+  // PEDR scores
+  rrf_score: number;
+  rrf_rank: number;
+  layer_ranks: Record<string, number>;
+  layer_scores: Record<string, number>;
+
+  // Semantic Protocol metadata
+  urn?: string;
+  confidence: number;
+  criticality: number;
+
+  // Layer annotations
+  element_type?: string;
+  query_intent?: string;
+  quality_score: number;
+  quality_status?: string;
+  quality_gates_passed: number;
+
+  // Provenance
+  contributing_layers: string[];
+
+  // Chunk metadata
+  chunk_index?: number;
+  source_type?: string;
+
+  // Compatibility
+  score: number;
+  combined_score: number;
+
+  // Graph expansion
+  related_entities?: Array<Record<string, unknown>>;
+}
+
+export interface PEDRSearchResponse {
+  results: PEDRSearchResult[];
+  metadata: PEDRSearchMetadata;
 }

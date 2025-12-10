@@ -45,14 +45,25 @@ export const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function R
 
       <div className="mt-4 space-y-2">
         <p className="text-sm text-slate-300">{documentLabel}</p>
-        <p className="text-sm text-slate-400">
-          {result.source_type ? result.source_type : "Unknown type"}
+        <div className="flex flex-wrap items-center gap-2 text-sm text-slate-400">
+          <span>{result.source_type ? result.source_type : "Unknown type"}</span>
           {document?.uploaded_at && (
-            <span className="ml-2 text-xs text-slate-500">
+            <span className="text-xs text-slate-500">
               Uploaded {new Date(document.uploaded_at).toLocaleDateString()}
             </span>
           )}
-        </p>
+          {/* PEDR metadata badges */}
+          {result.element_type && (
+            <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-300">
+              {result.element_type}
+            </span>
+          )}
+          {result.quality_score !== undefined && result.quality_score < 1 && (
+            <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs text-amber-300">
+              Quality: {(result.quality_score * 100).toFixed(0)}%
+            </span>
+          )}
+        </div>
       </div>
 
       <p className="mt-4 text-slate-100 leading-relaxed whitespace-pre-line">{chunkPreview}</p>

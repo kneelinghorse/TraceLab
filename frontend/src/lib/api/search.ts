@@ -1,5 +1,7 @@
 import { httpClient } from "@/lib/api/http";
 import type {
+  PEDRSearchParams,
+  PEDRSearchResponse,
   RagResponsePayload,
   SearchHistoryResponse,
   SearchQueryParams,
@@ -10,6 +12,7 @@ import type {
 const SEMANTIC_PATH = "/retrieval/search";
 const RAG_PATH = "/search";
 const HISTORY_PATH = "/search/history";
+const PEDR_PATH = "/pedr/search";
 
 export const searchApi = {
   semanticSearch(params: SearchQueryParams) {
@@ -30,5 +33,13 @@ export const searchApi = {
 
   replay(historyId: string) {
     return httpClient.post<SearchReplayResponse>(`/search/replay/${historyId}`);
+  },
+
+  /**
+   * PEDR unified search - 5-layer fusion search with RRF ranking.
+   * Uses lexical, semantic, syntactic, pragmatic, and governance layers.
+   */
+  pedrSearch(params: PEDRSearchParams) {
+    return httpClient.post<PEDRSearchResponse>(PEDR_PATH, params);
   },
 };
