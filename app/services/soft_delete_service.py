@@ -1,12 +1,19 @@
-"""Soft delete service for documents."""
+"""Soft delete service for documents.
+
+Includes PEDR cache invalidation on document state changes (B19.2).
+"""
 from __future__ import annotations
 
+import logging
 from typing import Optional, Union
 from uuid import UUID
 
 from sqlalchemy.orm import Session
 
 from app.models.document import Document
+from app.services.pedr.cache import invalidate_pedr_cache
+
+logger = logging.getLogger(__name__)
 
 
 class DocumentSoftDeleteService:
@@ -38,6 +45,16 @@ class DocumentSoftDeleteService:
 
         document.soft_delete(deleted_by=deleted_by)
         db.commit()
+
+        # Invalidate PEDR cache to remove deleted document from search results
+        invalidated_count = invalidate_pedr_cache()
+        if invalidated_count > 0:
+            logger.info(
+                "PEDR cache invalidated after document %s soft-delete (%d entries cleared)",
+                document_id,
+                invalidated_count,
+            )
+
         return True
 
     def restore_document(
@@ -64,4 +81,14 @@ class DocumentSoftDeleteService:
 
         document.restore()
         db.commit()
+
+        # Invalidate PEDR cache to include restored document in search results
+        invalidated_count = invalidate_pedr_cache()
+        if invalidated_count > 0:
+            logger.info(
+                "PEDR cache invalidated after document %s restore (%d entries cleared)",
+                document_id,
+                invalidated_count,
+            )
+
         return True
