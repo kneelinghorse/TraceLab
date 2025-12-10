@@ -374,17 +374,17 @@ def promote_mission_report(
     mission_id: UUID,
     db: Session = Depends(get_db),
 ) -> ReportPromotionResponse:
-    """Promote a mission's report to a searchable document.
+    """Promote a mission's report/markdown to a searchable document.
 
-    Takes the mission's result_report and creates a new document from its content,
-    running it through the chunking and embedding pipeline so synthesized research
-    feeds back into future searches.
+    Takes the mission's result_report OR result_markdown and creates a new document
+    from its content, running it through the chunking and embedding pipeline so
+    synthesized research feeds back into future searches.
 
     Validates:
     - Mission exists
     - Mission status is 'completed'
-    - Mission has a result_report_id
-    - Report has not already been promoted
+    - Mission has result_report_id OR result_markdown
+    - Content has not already been promoted
 
     - **mission_id**: The mission's UUID
     """
@@ -406,35 +406,57 @@ def promote_mission_report(
                 detail=f"Mission must be completed to promote report (current status: {mission.status})",
             )
 
-        # Validate mission has a report
-        if not mission.result_report_id:
+        # Validate mission has promotable content (report OR markdown)
+        if not mission.result_report_id and not mission.result_markdown:
             raise HTTPException(
                 status_code=http_status.HTTP_400_BAD_REQUEST,
-                detail="Mission has no result report to promote",
+                detail="Mission has no result report or markdown to promote",
             )
 
-        # Get the report
-        report = db.query(Report).filter(Report.id == mission.result_report_id).first()
-        if not report:
-            raise HTTPException(
-                status_code=http_status.HTTP_404_NOT_FOUND,
-                detail=f"Report {mission.result_report_id} not found",
-            )
-
-        # Promote the report
         promotion_service = get_report_promotion_service()
-        document = promotion_service.promote_report(db, mission, report)
+
+        # Check if already promoted (either via report or markdown)
+        from app.models.document import Document
+        existing_doc = (
+            db.query(Document)
+            .filter(Document.source_mission_id == mission.id)
+            .first()
+        )
+        if existing_doc:
+            raise ReportAlreadyPromotedError(
+                f"Mission {mission.mission_id} has already been promoted to document {existing_doc.id}"
+            )
+
+        # Try to promote from report first, fall back to markdown
+        if mission.result_report_id:
+            report = db.query(Report).filter(Report.id == mission.result_report_id).first()
+            if report:
+                document = promotion_service.promote_report(db, mission, report)
+                logger.info(
+                    "Promoted report %s from mission %s to document %s",
+                    report.id,
+                    mission.mission_id,
+                    document.id,
+                )
+            else:
+                # Report ID set but report not found - fall through to markdown
+                logger.warning(
+                    "Report %s not found for mission %s, falling back to result_markdown",
+                    mission.result_report_id,
+                    mission.mission_id,
+                )
+                document = promotion_service.promote_markdown(db, mission)
+        else:
+            # No report, promote directly from markdown
+            document = promotion_service.promote_markdown(db, mission)
+            logger.info(
+                "Promoted result_markdown from mission %s to document %s",
+                mission.mission_id,
+                document.id,
+            )
 
         chunk_count = len(document.chunks) if document.chunks else 0
         status = "completed" if document.embedded else "processing"
-
-        logger.info(
-            "Promoted report %s from mission %s to document %s (%d chunks)",
-            report.id,
-            mission.mission_id,
-            document.id,
-            chunk_count,
-        )
 
         return ReportPromotionResponse(
             document_id=document.id,

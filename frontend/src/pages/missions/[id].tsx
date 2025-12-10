@@ -480,18 +480,26 @@ function MissionDetailContent() {
                       {isSubmitting ? "Submitting..." : "Submit to DeepSearch"}
                     </button>
                   )}
-                  {mission.status === "completed" && mission.result_report_id && !promotionResult && (
+                  {mission.status === "completed" && (mission.result_report_id || mission.result_markdown) && !promotionResult && mission.result_document_ids.length === 0 && (
                     <button
                       onClick={handlePromoteReport}
                       disabled={isPromoting}
                       className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
                     >
-                      {isPromoting ? "Promoting..." : "Promote Report to Document"}
+                      {isPromoting ? "Promoting..." : "Promote to Document"}
                     </button>
                   )}
                   {promotionResult && (
                     <Link
                       href={`/documents/${promotionResult.document_id}`}
+                      className="px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors font-medium text-sm"
+                    >
+                      View Promoted Document
+                    </Link>
+                  )}
+                  {!promotionResult && mission.result_document_ids.length > 0 && (
+                    <Link
+                      href={`/documents/${mission.result_document_ids[0]}`}
                       className="px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors font-medium text-sm"
                     >
                       View Promoted Document

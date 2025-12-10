@@ -162,6 +162,13 @@ class ReportPromotionService:
 
             db.refresh(document)
 
+            # Update mission with promoted document ID
+            current_doc_ids = mission.result_document_ids or []
+            if str(document.id) not in current_doc_ids:
+                current_doc_ids.append(str(document.id))
+                mission.result_document_ids = current_doc_ids
+                db.commit()
+
             logger.info(
                 "Successfully promoted report %s to document %s with %d chunks",
                 report.id,
@@ -173,6 +180,142 @@ class ReportPromotionService:
             raise
         except Exception as exc:
             logger.exception("Unexpected error during report promotion")
+            raise ReportPromotionError(
+                f"Promotion error: {str(exc)}"
+            ) from exc
+
+        return document
+
+    def promote_markdown(
+        self,
+        db: Session,
+        mission: Mission,
+    ) -> Document:
+        """Promote a mission's result_markdown directly to a searchable document.
+
+        Creates a new document from the mission's result_markdown and runs it through
+        the chunking and embedding pipeline.
+
+        Args:
+            db: Database session
+            mission: The completed mission with result_markdown
+
+        Returns:
+            The created Document with chunks
+
+        Raises:
+            ReportPromotionError: If promotion fails
+            ReportAlreadyPromotedError: If markdown was already promoted
+        """
+        if not mission.result_markdown:
+            raise ReportPromotionError("Mission has no result_markdown to promote")
+
+        if not mission.project_id:
+            raise ReportPromotionError(
+                f"Mission {mission.mission_id} has no project_id"
+            )
+
+        # Check if mission markdown has already been promoted
+        existing_doc = (
+            db.query(Document)
+            .filter(Document.source_mission_id == mission.id)
+            .first()
+        )
+        if existing_doc:
+            raise ReportAlreadyPromotedError(
+                f"Mission {mission.mission_id} has already been promoted to document {existing_doc.id}"
+            )
+
+        # Create document name from mission title
+        document_name = f"{mission.title} - DeepSearch Results"
+
+        logger.info(
+            "Promoting result_markdown from mission %s as document '%s'",
+            mission.mission_id,
+            document_name,
+        )
+
+        # Create document record with provenance fields
+        document = Document(
+            project_id=mission.project_id,
+            name=document_name,
+            file_type="markdown",
+            content=mission.result_markdown,
+            file_size=len(mission.result_markdown.encode("utf-8")),
+            mime_type="text/markdown",
+            source_type="analysis",
+            source_origin="synthesized",
+            source_mission_id=mission.id,
+            document_metadata={
+                "mission_id": mission.mission_id,
+                "promoted_from": "result_markdown",
+                "promoted": True,
+            },
+            processed=False,
+            chunked=False,
+            embedded=False,
+            validation_status="pending",
+        )
+        db.add(document)
+        db.commit()
+        db.refresh(document)
+
+        # Record document creation
+        self._status_recorder.record(
+            db,
+            document.id,
+            stage="uploaded",
+            status="succeeded",
+            details={
+                "file_name": document_name,
+                "file_size_bytes": document.file_size,
+                "mime_type": "text/markdown",
+                "source_type": "analysis",
+                "source_origin": "synthesized",
+                "promoted_from": "result_markdown",
+                "mission_id": mission.mission_id,
+            },
+        )
+
+        # Process through ingestion pipeline
+        try:
+            ingestion_service = self._get_ingestion_service()
+
+            result = ingestion_service.process_document(
+                db=db,
+                document_id=document.id,
+                file_content=mission.result_markdown.encode("utf-8"),
+            )
+
+            if result.get("status") == "failed":
+                error = result.get("error", "Unknown ingestion error")
+                logger.error(
+                    "Ingestion failed for promoted document %s: %s",
+                    document.id,
+                    error,
+                )
+                raise ReportPromotionError(f"Ingestion failed: {error}")
+
+            db.refresh(document)
+
+            # Update mission with promoted document ID
+            current_doc_ids = mission.result_document_ids or []
+            if str(document.id) not in current_doc_ids:
+                current_doc_ids.append(str(document.id))
+                mission.result_document_ids = current_doc_ids
+                db.commit()
+
+            logger.info(
+                "Successfully promoted result_markdown from mission %s to document %s with %d chunks",
+                mission.mission_id,
+                document.id,
+                len(document.chunks) if document.chunks else 0,
+            )
+
+        except ReportPromotionError:
+            raise
+        except Exception as exc:
+            logger.exception("Unexpected error during markdown promotion")
             raise ReportPromotionError(
                 f"Promotion error: {str(exc)}"
             ) from exc
