@@ -69,6 +69,11 @@ class Settings(BaseSettings):
     cors_allowed_headers: List[str] = Field(default_factory=lambda: ["Authorization", "Content-Type"])
     cors_allow_credentials: bool = True
 
+    # PEDR cache settings
+    pedr_cache_max_size: int = 1000  # Max cached queries
+    pedr_cache_ttl_seconds: int = 300  # 5 minutes TTL
+    pedr_cache_enabled: bool = True
+
     # DeepSearch integration
     # Mode: "worker" (DB polling, Railway prod) or "http" (API calls, local dev)
     deepsearch_mode: str = "worker"

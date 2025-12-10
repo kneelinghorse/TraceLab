@@ -10,6 +10,11 @@ This module implements the unified PEDR search orchestration, combining:
 Results are fused using Reciprocal Rank Fusion (RRF) for robust ranking
 across heterogeneous retrieval methods.
 
+Includes query result caching for latency optimization (B19.2):
+- Cache hit: <100ms response time
+- Cache miss: Full search pipeline executed
+- Auto-invalidation on document changes
+
 Reference: PEDR Protocol Architecture Guide
 """
 from __future__ import annotations
@@ -47,6 +52,10 @@ from app.services.pedr.syntactic import (
     SyntacticFilters,
     SyntacticService,
     get_syntactic_service,
+)
+from app.services.pedr.cache import (
+    CacheStats,
+    get_pedr_cache,
 )
 
 logger = logging.getLogger(__name__)
@@ -126,6 +135,8 @@ class PEDRMetadata:
     timings: LayerTimings
     total_candidates: int
     result_count: int
+    cache_hit: bool = False
+    cache_stats: Optional[Dict[str, Any]] = None
 
 
 @dataclass
@@ -205,29 +216,33 @@ class PEDRSearchResponse:
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API response."""
+        metadata_dict = {
+            "query": self.metadata.query,
+            "intent": self.metadata.intent,
+            "intent_confidence": self.metadata.intent_confidence,
+            "detected_type": self.metadata.detected_type,
+            "type_confidence": self.metadata.type_confidence,
+            "layers_used": self.metadata.layers_used,
+            "layer_weights": self.metadata.layer_weights,
+            "timings": {
+                "lexical_ms": self.metadata.timings.lexical_ms,
+                "semantic_ms": self.metadata.timings.semantic_ms,
+                "syntactic_ms": self.metadata.timings.syntactic_ms,
+                "pragmatic_ms": self.metadata.timings.pragmatic_ms,
+                "governance_ms": self.metadata.timings.governance_ms,
+                "fusion_ms": self.metadata.timings.fusion_ms,
+                "relational_ms": self.metadata.timings.relational_ms,
+                "total_ms": self.metadata.timings.total_ms,
+            },
+            "total_candidates": self.metadata.total_candidates,
+            "result_count": self.metadata.result_count,
+            "cache_hit": self.metadata.cache_hit,
+        }
+        if self.metadata.cache_stats is not None:
+            metadata_dict["cache_stats"] = self.metadata.cache_stats
         return {
             "results": [r.to_dict() for r in self.results],
-            "metadata": {
-                "query": self.metadata.query,
-                "intent": self.metadata.intent,
-                "intent_confidence": self.metadata.intent_confidence,
-                "detected_type": self.metadata.detected_type,
-                "type_confidence": self.metadata.type_confidence,
-                "layers_used": self.metadata.layers_used,
-                "layer_weights": self.metadata.layer_weights,
-                "timings": {
-                    "lexical_ms": self.metadata.timings.lexical_ms,
-                    "semantic_ms": self.metadata.timings.semantic_ms,
-                    "syntactic_ms": self.metadata.timings.syntactic_ms,
-                    "pragmatic_ms": self.metadata.timings.pragmatic_ms,
-                    "governance_ms": self.metadata.timings.governance_ms,
-                    "fusion_ms": self.metadata.timings.fusion_ms,
-                    "relational_ms": self.metadata.timings.relational_ms,
-                    "total_ms": self.metadata.timings.total_ms,
-                },
-                "total_candidates": self.metadata.total_candidates,
-                "result_count": self.metadata.result_count,
-            },
+            "metadata": metadata_dict,
         }
 
 
@@ -342,6 +357,45 @@ class PEDRSearchOrchestrator:
         start_time = time.perf_counter()
         timings = LayerTimings()
 
+        # Build cache filter key from all search parameters
+        from app.core.config import settings as app_settings
+
+        cache_filters = {
+            "project_id": project_id,
+            "document_id": document_id,
+            "source_type": source_type,
+            "document_types": tuple(document_types) if document_types else None,
+            "source_types": tuple(source_types) if source_types else None,
+            "date_from": str(date_from) if date_from else None,
+            "date_to": str(date_to) if date_to else None,
+            "tags": tuple(tags) if tags else None,
+            "element_type": element_type,
+            "element_types": tuple(element_types) if element_types else None,
+        }
+
+        # Check cache first (if enabled)
+        cache = get_pedr_cache()
+        cache_enabled = getattr(app_settings, "pedr_cache_enabled", True)
+
+        if cache_enabled:
+            cached_response = cache.get(query, top_k, cache_filters)
+            if cached_response is not None:
+                # Cache hit - return cached response with updated timing
+                timings.total_ms = (time.perf_counter() - start_time) * 1000
+                cache_stats = cache.get_stats().to_dict()
+                logger.debug(
+                    "PEDR cache hit for query '%s' in %.2fms",
+                    query[:50],
+                    timings.total_ms,
+                )
+                return self._build_cached_response(
+                    cached_response,
+                    query=query,
+                    timings=timings,
+                    cache_stats=cache_stats,
+                )
+
+        # Cache miss - execute full search pipeline
         # Merge config with runtime overrides
         config = self._merge_config(
             element_type=element_type,
@@ -481,6 +535,7 @@ class PEDRSearchOrchestrator:
         timings.total_ms = (time.perf_counter() - start_time) * 1000
 
         # Build response
+        cache_stats = cache.get_stats().to_dict() if cache_enabled else None
         metadata = PEDRMetadata(
             query=query,
             intent=pragmatic_filters.intent.value,
@@ -496,9 +551,24 @@ class PEDRSearchOrchestrator:
             timings=timings,
             total_candidates=len(fused_results),
             result_count=len(final_results),
+            cache_hit=False,
+            cache_stats=cache_stats,
         )
 
-        return PEDRSearchResponse(results=final_results, metadata=metadata)
+        response = PEDRSearchResponse(results=final_results, metadata=metadata)
+
+        # Store results in cache for future requests
+        if cache_enabled and final_results:
+            # Convert results to cacheable format (list of dicts)
+            cacheable_results = [r.to_dict() for r in final_results]
+            cache.set(query, top_k, cache_filters, cacheable_results)
+            logger.debug(
+                "PEDR cache stored for query '%s' (%d results)",
+                query[:50],
+                len(final_results),
+            )
+
+        return response
 
     def _merge_config(self, **overrides: Any) -> PEDRConfig:
         """Merge runtime overrides with base config."""
@@ -646,6 +716,72 @@ class PEDRSearchOrchestrator:
             )
 
         return final
+
+    def _build_cached_response(
+        self,
+        cached_results: List[Dict[str, Any]],
+        *,
+        query: str,
+        timings: LayerTimings,
+        cache_stats: Dict[str, Any],
+    ) -> PEDRSearchResponse:
+        """Build a PEDRSearchResponse from cached result dictionaries.
+
+        Args:
+            cached_results: List of result dictionaries from cache.
+            query: Original query string.
+            timings: Timing information (mostly just total_ms for cache hits).
+            cache_stats: Current cache statistics.
+
+        Returns:
+            PEDRSearchResponse built from cached data.
+        """
+        # Reconstruct PEDRSearchResult objects from cached dicts
+        results: List[PEDRSearchResult] = []
+        for r in cached_results:
+            results.append(
+                PEDRSearchResult(
+                    chunk_id=r.get("chunk_id", ""),
+                    content=r.get("content", ""),
+                    document_id=r.get("document_id"),
+                    project_id=r.get("project_id"),
+                    rrf_score=float(r.get("rrf_score") or r.get("score") or 0.0),
+                    rrf_rank=int(r.get("rrf_rank") or 0),
+                    layer_ranks=r.get("layer_ranks", {}),
+                    layer_scores=r.get("layer_scores", {}),
+                    urn=r.get("urn"),
+                    confidence=float(r.get("confidence") or 0.5),
+                    criticality=float(r.get("criticality") or 0.5),
+                    element_type=r.get("element_type"),
+                    query_intent=r.get("query_intent"),
+                    quality_score=float(r.get("quality_score") or 1.0),
+                    quality_status=r.get("quality_status"),
+                    quality_gates_passed=int(r.get("quality_gates_passed") or 0),
+                    contributing_layers=r.get("contributing_layers", []),
+                    chunk_index=r.get("chunk_index"),
+                    source_type=r.get("source_type"),
+                )
+            )
+
+        # Build metadata for cache hit
+        # Use cached values for intent/type detection if available
+        first_result = cached_results[0] if cached_results else {}
+        metadata = PEDRMetadata(
+            query=query,
+            intent=first_result.get("query_intent", "unknown"),
+            intent_confidence=0.0,  # Not re-computed on cache hit
+            detected_type=first_result.get("element_type"),
+            type_confidence=0.0,  # Not re-computed on cache hit
+            layers_used=[],  # Not applicable for cache hits
+            layer_weights={},
+            timings=timings,
+            total_candidates=len(results),
+            result_count=len(results),
+            cache_hit=True,
+            cache_stats=cache_stats,
+        )
+
+        return PEDRSearchResponse(results=results, metadata=metadata)
 
 
 # Singleton instance

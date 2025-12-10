@@ -3,6 +3,8 @@ Document ingestion service.
 
 Orchestrates the complete ingestion pipeline: parsing, redaction, chunking, embeddings,
 and persistence.
+
+Includes PEDR cache invalidation on document changes (B19.2).
 """
 
 import logging
@@ -20,6 +22,7 @@ from app.services.processing_status import ProcessingStatusRecorder
 from app.services.coverage_report import CoverageReportGenerator
 from app.services.embedding_service import EmbeddingService, get_embedding_service
 from app.services.qdrant_service import QdrantService, get_qdrant_service
+from app.services.pedr.cache import invalidate_pedr_cache
 from app.models.document import Document
 from app.models.chunk import DocumentChunk
 
@@ -381,7 +384,16 @@ class DocumentIngestionService:
 
             # Update ingestion coverage metrics
             self.coverage_report_generator.generate_report(db)
-            
+
+            # Invalidate PEDR cache to reflect new document content
+            invalidated_count = invalidate_pedr_cache()
+            if invalidated_count > 0:
+                logger.info(
+                    "PEDR cache invalidated after document %s ingestion (%d entries cleared)",
+                    document_id,
+                    invalidated_count,
+                )
+
             return result
             
         except Exception as e:
