@@ -1,0 +1,192 @@
+mission_id: B19.2
+title: Semantic Search Result Caching
+sprint: sprint-19
+status: Queued
+track: Build
+priority: 3
+estimated_hours: 3-4
+
+objective: |
+  Implement query result caching to reduce latency for repeated or similar queries.
+  Target 20%+ cache hit rate for common query patterns with <100ms response for cached results.
+
+context: |
+  From R19.0 research (cmos/reports/sprint-19/qdrant-optimization-research.md):
+
+  Three-Tier Cache Architecture:
+  1. Query Cache - Full query → results mapping (5 min TTL)
+  2. Embedding Cache - Text → embedding vector (1 hour TTL)
+  3. Result Cache - Top-K results for query hash (10 min TTL)
+
+  For this mission, implement Query Result Cache (tier 1) which has the
+  highest immediate impact. Embedding cache already exists partially in
+  the semantic_cache Qdrant collection.
+
+success_criteria:
+  - Cache hit rate >= 20% for common query patterns
+  - Cache invalidation on document upload/delete
+  - P50 latency <100ms for cached queries
+  - TTL configurable (default: 5 minutes)
+  - Cache metrics exposed in response metadata
+
+deliverables:
+  - app/services/pedr/cache.py - PEDR result cache implementation
+  - Cache integration in search_orchestrator.py
+  - Cache invalidation hooks in document service
+  - Cache metrics in API response
+  - Tests for cache behavior
+
+implementation_details:
+  files_to_create:
+    - path: app/services/pedr/cache.py
+      description: |
+        LRU cache with TTL for PEDR search results.
+
+        ```python
+        import hashlib
+        import time
+        from functools import lru_cache
+        from typing import Any
+        from dataclasses import dataclass
+        from app.core.config import settings
+
+        @dataclass
+        class CacheEntry:
+            results: list
+            timestamp: float
+            query_hash: str
+
+        class PEDRCache:
+            def __init__(self, max_size: int = 1000, ttl_seconds: int = 300):
+                self.max_size = max_size
+                self.ttl_seconds = ttl_seconds
+                self._cache: dict[str, CacheEntry] = {}
+                self._hits = 0
+                self._misses = 0
+
+            def _generate_key(self, query: str, top_k: int, filters: dict) -> str:
+                """Deterministic cache key from query parameters."""
+                payload = f"{query.lower().strip()}:{top_k}:{sorted(filters.items())}"
+                return hashlib.sha256(payload.encode()).hexdigest()[:16]
+
+            def get(self, query: str, top_k: int, filters: dict) -> list | None:
+                key = self._generate_key(query, top_k, filters)
+                entry = self._cache.get(key)
+
+                if entry is None:
+                    self._misses += 1
+                    return None
+
+                if time.time() - entry.timestamp > self.ttl_seconds:
+                    del self._cache[key]
+                    self._misses += 1
+                    return None
+
+                self._hits += 1
+                return entry.results
+
+            def set(self, query: str, top_k: int, filters: dict, results: list):
+                key = self._generate_key(query, top_k, filters)
+                self._cache[key] = CacheEntry(
+                    results=results,
+                    timestamp=time.time(),
+                    query_hash=key
+                )
+                # Evict oldest if over max_size
+                if len(self._cache) > self.max_size:
+                    oldest_key = min(self._cache, key=lambda k: self._cache[k].timestamp)
+                    del self._cache[oldest_key]
+
+            def invalidate_all(self):
+                """Clear entire cache - call on document changes."""
+                self._cache.clear()
+
+            def get_stats(self) -> dict:
+                total = self._hits + self._misses
+                return {
+                    "cache_hits": self._hits,
+                    "cache_misses": self._misses,
+                    "hit_rate": self._hits / total if total > 0 else 0,
+                    "cache_size": len(self._cache)
+                }
+
+        # Global singleton
+        pedr_cache = PEDRCache(
+            max_size=settings.PEDR_CACHE_MAX_SIZE or 1000,
+            ttl_seconds=settings.PEDR_CACHE_TTL or 300
+        )
+        ```
+
+  files_to_modify:
+    - path: app/services/pedr/search_orchestrator.py
+      changes: |
+        Integrate cache lookup before search, cache store after:
+        ```python
+        from app.services.pedr.cache import pedr_cache
+
+        async def search(self, query: str, top_k: int, filters: dict) -> PEDRSearchResponse:
+            # Check cache first
+            cached = pedr_cache.get(query, top_k, filters)
+            if cached is not None:
+                return PEDRSearchResponse(
+                    results=cached,
+                    metadata={"cache_hit": True, **pedr_cache.get_stats()}
+                )
+
+            # Execute search
+            results = await self._execute_search(query, top_k, filters)
+
+            # Store in cache
+            pedr_cache.set(query, top_k, filters, results)
+
+            return PEDRSearchResponse(
+                results=results,
+                metadata={"cache_hit": False, **pedr_cache.get_stats()}
+            )
+        ```
+
+    - path: app/services/document_service.py
+      changes: |
+        Add cache invalidation on document changes:
+        ```python
+        from app.services.pedr.cache import pedr_cache
+
+        async def create_document(...):
+            # ... existing code ...
+            pedr_cache.invalidate_all()
+
+        async def delete_document(...):
+            # ... existing code ...
+            pedr_cache.invalidate_all()
+        ```
+
+    - path: app/core/config.py
+      changes: |
+        Add cache configuration:
+        ```python
+        PEDR_CACHE_MAX_SIZE: int = 1000
+        PEDR_CACHE_TTL: int = 300  # 5 minutes
+        ```
+
+testing:
+  unit_tests:
+    - Test cache hit returns cached results
+    - Test cache miss triggers search
+    - Test TTL expiration invalidates entry
+    - Test max_size eviction works
+    - Test invalidate_all clears cache
+    - Test cache key generation is deterministic
+
+  integration_tests:
+    - Test repeated query hits cache (verify via response metadata)
+    - Test document upload invalidates cache
+    - Test cache stats in API response
+
+reference_docs:
+  - cmos/reports/sprint-19/qdrant-optimization-research.md
+  - app/services/pedr/search_orchestrator.py
+
+notes: |
+  Consider Redis for production if multi-instance deployment needed.
+  In-memory cache is fine for single-instance Railway deployment.
+  20% hit rate is conservative - may see higher with common queries.

@@ -6,6 +6,7 @@ import uuid
 from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple
 
 from app.core.config import settings
+from app.core.qdrant_client import get_qdrant_client
 from app.services.cache_metrics import cache_metrics
 
 try:  # pragma: no cover - allow import without qdrant dependency
@@ -28,9 +29,20 @@ else:
 
 
 class SemanticCacheService:
-    """Qdrant-backed semantic cache for RAG responses."""
+    """Qdrant-backed semantic cache for RAG responses.
+
+    Uses the shared pre-warmed Qdrant client from app.core.qdrant_client
+    to eliminate cold-start latency on first cache lookup.
+    """
 
     def __init__(self, client: Optional[QdrantClient] = None, enabled: Optional[bool] = None) -> None:
+        """Initialize SemanticCacheService.
+
+        Args:
+            client: Optional QdrantClient instance. If not provided, uses the
+                    shared pre-warmed client from app.core.qdrant_client.
+            enabled: Override for cache enabled setting. If None, uses settings.
+        """
         if _qdrant_import_error is not None:  # pragma: no cover
             raise RuntimeError(
                 "The qdrant-client package is required for semantic cache support. "
@@ -44,10 +56,8 @@ class SemanticCacheService:
         self.collection_name = settings.semantic_cache_collection_name
         self.metrics = cache_metrics
 
-        self._client = client or QdrantClient(
-            url=settings.qdrant_url,
-            api_key=settings.qdrant_api_key if settings.qdrant_api_key else None,
-        )
+        # Use provided client or fall back to shared singleton
+        self._client = client if client is not None else get_qdrant_client()
 
         if self.enabled:
             self._ensure_collection()

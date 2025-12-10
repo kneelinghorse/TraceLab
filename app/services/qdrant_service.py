@@ -29,30 +29,31 @@ else:
     _qdrant_import_error = None
 
 from app.core.config import settings
+from app.core.qdrant_client import get_qdrant_client
 
 
 class QdrantService:
-    """Service for managing Qdrant vector database collections and operations."""
-    
-    def __init__(self):
+    """Service for managing Qdrant vector database collections and operations.
+
+    Uses the shared pre-warmed Qdrant client from app.core.qdrant_client
+    to eliminate cold-start latency on first query.
+    """
+
+    def __init__(self, client: Optional[QdrantClient] = None):
+        """Initialize QdrantService.
+
+        Args:
+            client: Optional QdrantClient instance. If not provided, uses the
+                    shared pre-warmed client from app.core.qdrant_client.
+        """
         if _qdrant_import_error is not None:
             raise RuntimeError(
                 "The qdrant-client package is required for vector storage interactions. "
                 "Install dependencies from requirements.txt."
             ) from _qdrant_import_error
-        if not settings.qdrant_url:
-            raise ValueError("QDRANT_URL must be configured before using QdrantService")
-        if settings.qdrant_api_key and settings.qdrant_url.startswith("http://"):
-            raise ValueError(
-                "QDRANT_URL must use HTTPS when QDRANT_API_KEY is set. "
-                "See docs/qdrant-railway-setup.md and R7.1 research notes."
-            )
-        self.client = QdrantClient(
-            url=settings.qdrant_url,
-            api_key=settings.qdrant_api_key if settings.qdrant_api_key else None,
-            prefer_grpc=settings.qdrant_prefer_grpc,
-            timeout=settings.qdrant_timeout_seconds,
-        )
+
+        # Use provided client or fall back to shared singleton
+        self.client = client if client is not None else get_qdrant_client()
         self.collection_name = settings.qdrant_collection_name
         self.vector_size = settings.openai_embedding_dimension
         

@@ -1,0 +1,233 @@
+mission_id: B19.4
+title: Hybrid Rerank Architecture
+sprint: sprint-19
+status: Queued
+track: Build
+priority: 4
+estimated_hours: 4-5
+
+objective: |
+  Implement "FTS first, semantic rerank" pattern as a fallback strategy
+  if HNSW tuning alone doesn't achieve latency targets. This provides
+  faster results with semantic enhancement by limiting vector search scope.
+
+context: |
+  From R19.0 research (cmos/reports/sprint-19/qdrant-optimization-research.md):
+
+  Architecture:
+  ```
+  Query → PostgreSQL FTS (top 50, <100ms)
+             ↓
+      Semantic Rerank (top 50 → top 10, <200ms)
+             ↓
+        Final Results (<300ms total)
+  ```
+
+  Benefits:
+  - FTS provides fast initial filtering (leverages existing PostgreSQL GIN index)
+  - Semantic only runs on 50 candidates vs full corpus
+  - Combined latency <300ms achievable
+
+  Trade-offs:
+  - Results depend on FTS candidate quality
+  - Slightly lower recall than full semantic search
+  - More complex orchestration
+
+success_criteria:
+  - FTS returns top-50 candidates in <100ms
+  - Semantic rerank of top-50 in <200ms
+  - Combined P50 latency <300ms
+  - Precision comparable to full PEDR (>90% overlap)
+  - API parameter to select rerank mode
+
+deliverables:
+  - app/services/pedr/hybrid_rerank.py - Rerank implementation
+  - API parameter: rerank_mode (full | hybrid)
+  - Benchmark comparison vs full semantic search
+  - Tests for rerank behavior
+
+implementation_details:
+  files_to_create:
+    - path: app/services/pedr/hybrid_rerank.py
+      description: |
+        Two-stage search: FTS candidates → semantic rerank.
+
+        ```python
+        from typing import Literal
+        from sqlalchemy.ext.asyncio import AsyncSession
+        from sqlalchemy import text
+        from app.services.embedding_service import EmbeddingService
+        from app.core.qdrant_client import get_qdrant_client
+        import numpy as np
+
+        RerankMode = Literal["full", "hybrid"]
+
+        class HybridReranker:
+            def __init__(self, embedding_service: EmbeddingService):
+                self.embedding_service = embedding_service
+                self.qdrant = get_qdrant_client()
+
+            async def search(
+                self,
+                db: AsyncSession,
+                query: str,
+                top_k: int = 10,
+                candidate_pool: int = 50,
+                mode: RerankMode = "hybrid"
+            ) -> list[dict]:
+                if mode == "full":
+                    return await self._full_semantic_search(query, top_k)
+
+                # Stage 1: FTS candidates
+                candidates = await self._fts_candidates(db, query, candidate_pool)
+
+                if not candidates:
+                    # Fallback to full semantic if FTS returns nothing
+                    return await self._full_semantic_search(query, top_k)
+
+                # Stage 2: Semantic rerank
+                reranked = await self._semantic_rerank(query, candidates, top_k)
+
+                return reranked
+
+            async def _fts_candidates(
+                self,
+                db: AsyncSession,
+                query: str,
+                limit: int
+            ) -> list[dict]:
+                """PostgreSQL full-text search for candidate retrieval."""
+                # Use existing content_tsv column
+                sql = text("""
+                    SELECT
+                        id,
+                        content,
+                        document_id,
+                        chunk_index,
+                        ts_rank(content_tsv, websearch_to_tsquery('english', :query)) as score
+                    FROM document_chunks
+                    WHERE content_tsv @@ websearch_to_tsquery('english', :query)
+                    ORDER BY score DESC
+                    LIMIT :limit
+                """)
+
+                result = await db.execute(sql, {"query": query, "limit": limit})
+                rows = result.fetchall()
+
+                return [
+                    {
+                        "chunk_id": str(row.id),
+                        "content": row.content,
+                        "document_id": str(row.document_id),
+                        "chunk_index": row.chunk_index,
+                        "fts_score": float(row.score)
+                    }
+                    for row in rows
+                ]
+
+            async def _semantic_rerank(
+                self,
+                query: str,
+                candidates: list[dict],
+                top_k: int
+            ) -> list[dict]:
+                """Rerank candidates using semantic similarity."""
+                # Get query embedding
+                query_embedding = self.embedding_service.embed_text(query)
+
+                # Get embeddings for candidates from Qdrant
+                chunk_ids = [c["chunk_id"] for c in candidates]
+
+                # Retrieve vectors from Qdrant
+                points = self.qdrant.retrieve(
+                    collection_name="document_chunks",
+                    ids=chunk_ids,
+                    with_vectors=True
+                )
+
+                # Calculate cosine similarity
+                scores = []
+                for point in points:
+                    if point.vector:
+                        similarity = self._cosine_similarity(
+                            query_embedding, point.vector
+                        )
+                        scores.append((point.id, similarity))
+
+                # Sort by semantic score
+                scores.sort(key=lambda x: x[1], reverse=True)
+
+                # Map back to candidates and return top_k
+                id_to_candidate = {c["chunk_id"]: c for c in candidates}
+                reranked = []
+                for chunk_id, score in scores[:top_k]:
+                    if chunk_id in id_to_candidate:
+                        candidate = id_to_candidate[chunk_id].copy()
+                        candidate["semantic_score"] = score
+                        candidate["score"] = score  # Use semantic as final score
+                        reranked.append(candidate)
+
+                return reranked
+
+            def _cosine_similarity(self, a: list[float], b: list[float]) -> float:
+                a_np = np.array(a)
+                b_np = np.array(b)
+                return float(np.dot(a_np, b_np) / (np.linalg.norm(a_np) * np.linalg.norm(b_np)))
+
+            async def _full_semantic_search(self, query: str, top_k: int) -> list[dict]:
+                """Fallback to full semantic search."""
+                embedding = self.embedding_service.embed_text(query)
+                results = self.qdrant.search(
+                    collection_name="document_chunks",
+                    query_vector=embedding,
+                    limit=top_k
+                )
+                return [
+                    {
+                        "chunk_id": str(r.id),
+                        "content": r.payload.get("content", ""),
+                        "document_id": r.payload.get("document_id"),
+                        "score": r.score
+                    }
+                    for r in results
+                ]
+        ```
+
+  files_to_modify:
+    - path: app/schemas/pedr_search.py
+      changes: |
+        Add rerank_mode parameter:
+        ```python
+        class PEDRSearchRequest(BaseModel):
+            query: str
+            top_k: int = 10
+            rerank_mode: Literal["full", "hybrid"] = "full"
+            candidate_pool: int = 50  # Only used in hybrid mode
+        ```
+
+    - path: app/api/v1/pedr_search.py
+      changes: |
+        Pass rerank_mode to orchestrator.
+
+testing:
+  unit_tests:
+    - Test FTS candidates returns results
+    - Test semantic rerank orders by similarity
+    - Test fallback to full semantic when FTS empty
+    - Test mode parameter switches behavior
+
+  benchmarks:
+    - Compare hybrid vs full latency (target: hybrid <300ms)
+    - Compare precision (target: >90% overlap with full)
+
+reference_docs:
+  - cmos/reports/sprint-19/qdrant-optimization-research.md
+  - app/services/hybrid_search.py
+  - app/models/document_chunk.py (content_tsv column)
+
+notes: |
+  This is a FALLBACK strategy if B19.1 + B19.3 don't achieve targets.
+  The existing content_tsv GIN index enables fast FTS.
+
+  Only implement if HNSW tuning alone doesn't get us to <500ms.
+  Hybrid adds complexity and slightly reduces recall.

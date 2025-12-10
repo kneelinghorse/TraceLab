@@ -1,0 +1,230 @@
+mission_id: B19.5
+title: Wire PEDR to Main Search Page
+sprint: sprint-19
+status: Queued
+track: Build
+priority: 5
+estimated_hours: 3-4
+depends_on:
+  - B19.1  # Pre-warming must be done
+  - B19.3  # HNSW tuning must achieve targets
+
+objective: |
+  Connect optimized PEDR to the main search page UI as the primary search method.
+  Only execute this mission AFTER latency targets are met (<500ms P50).
+
+context: |
+  From session planning (2025-12-10):
+  - PEDR for main search page once latency optimized
+  - Keep fast FTS methods for project/document browsing
+  - PEDR for all agent/MCP searches
+
+  Current UI architecture:
+  - SearchExperience.tsx orchestrates search
+  - Uses /retrieval/search (semantic) and /search (RAG)
+  - PEDR endpoint exists at POST /api/v1/pedr/search but not wired
+
+  PEDR provides:
+  - 5-layer fusion (lexical, semantic, syntactic, pragmatic, governance)
+  - Intent classification
+  - Element type detection
+  - Quality-aware ranking
+
+success_criteria:
+  - Main search page uses PEDR endpoint
+  - Search results show PEDR metadata (intent, type, confidence)
+  - Latency acceptable (<500ms P50)
+  - Fallback to FTS if PEDR unavailable
+  - RAG synthesis continues to work with PEDR results
+
+deliverables:
+  - Updated frontend/src/lib/api/search.ts
+  - Updated frontend/src/features/search/SearchExperience.tsx
+  - PEDR-specific result display components
+  - Fallback logic for PEDR failures
+
+implementation_details:
+  prerequisite_check:
+    description: |
+      BEFORE starting this mission, verify latency targets met:
+      ```bash
+      python scripts/pedr_latency_benchmark.py
+      # Should show P50 < 500ms
+      ```
+      If not met, do NOT proceed. Focus on B19.1-B19.4 first.
+
+  files_to_modify:
+    - path: frontend/src/lib/api/search.ts
+      changes: |
+        Add PEDR search method:
+        ```typescript
+        export interface PEDRSearchParams {
+          query: string;
+          top_k?: number;
+          project_id?: string;
+          element_type?: 'mission' | 'document' | 'insight' | 'chunk';
+          include_related?: boolean;
+        }
+
+        export interface PEDRSearchResult {
+          chunk_id: string;
+          content: string;
+          document_id: string;
+          score: number;
+          element_type: string;
+          element_type_confidence: number;
+          quality_score?: number;
+          urn?: string;
+        }
+
+        export interface PEDRSearchResponse {
+          results: PEDRSearchResult[];
+          metadata: {
+            query_intent: string;
+            intent_confidence: number;
+            detected_type: string;
+            type_confidence: number;
+            layer_timings: Record<string, number>;
+            total_time_ms: number;
+            cache_hit: boolean;
+          };
+        }
+
+        export const searchApi = {
+          // ... existing methods ...
+
+          pedrSearch: async (params: PEDRSearchParams): Promise<PEDRSearchResponse> => {
+            const response = await apiClient.post('/pedr/search', params);
+            return response.data;
+          },
+        };
+        ```
+
+    - path: frontend/src/features/search/SearchExperience.tsx
+      changes: |
+        Replace semanticSearch with pedrSearch:
+        ```typescript
+        import { searchApi, PEDRSearchResponse } from '@/lib/api/search';
+
+        // State for PEDR metadata
+        const [pedrMetadata, setPedrMetadata] = useState<PEDRSearchResponse['metadata'] | null>(null);
+
+        const executeSearch = async () => {
+          setIsSearching(true);
+          try {
+            // Use PEDR for main search
+            const pedrResponse = await searchApi.pedrSearch({
+              query,
+              top_k: topK,
+              project_id: filters.projectId || undefined,
+            });
+
+            setSemanticResults(pedrResponse.results.map(r => ({
+              chunk_id: r.chunk_id,
+              content: r.content,
+              document_id: r.document_id,
+              score: r.score,
+              // Include PEDR-specific fields
+              element_type: r.element_type,
+              quality_score: r.quality_score,
+            })));
+
+            setPedrMetadata(pedrResponse.metadata);
+
+            // RAG still uses semantic results
+            const ragResponse = await searchApi.ragQuery({
+              query,
+              top_k: topK,
+              ...
+            });
+            setRagPayload(ragResponse);
+
+          } catch (error) {
+            console.error('PEDR search failed, falling back to FTS:', error);
+            // Fallback to existing semantic search
+            const fallbackResults = await searchApi.semanticSearch({ query, top_k: topK });
+            setSemanticResults(fallbackResults.results);
+            setPedrMetadata(null);
+          } finally {
+            setIsSearching(false);
+          }
+        };
+        ```
+
+    - path: frontend/src/components/ResultCard.tsx
+      changes: |
+        Display PEDR metadata:
+        ```typescript
+        interface ResultCardProps {
+          // ... existing props ...
+          elementType?: string;
+          qualityScore?: number;
+        }
+
+        // In render:
+        {elementType && (
+          <Badge variant="outline" className="text-xs">
+            {elementType}
+          </Badge>
+        )}
+        {qualityScore && (
+          <span className="text-xs text-muted-foreground">
+            Quality: {(qualityScore * 100).toFixed(0)}%
+          </span>
+        )}
+        ```
+
+  files_to_create:
+    - path: frontend/src/components/PEDRMetadataPanel.tsx
+      description: |
+        Display PEDR search metadata (intent, timing, etc.):
+        ```typescript
+        interface PEDRMetadataPanelProps {
+          metadata: {
+            query_intent: string;
+            intent_confidence: number;
+            detected_type: string;
+            total_time_ms: number;
+            cache_hit: boolean;
+          } | null;
+        }
+
+        export function PEDRMetadataPanel({ metadata }: PEDRMetadataPanelProps) {
+          if (!metadata) return null;
+
+          return (
+            <div className="text-xs text-muted-foreground flex gap-4 mt-2">
+              <span>Intent: {metadata.query_intent} ({(metadata.intent_confidence * 100).toFixed(0)}%)</span>
+              <span>Type: {metadata.detected_type}</span>
+              <span>Time: {metadata.total_time_ms}ms</span>
+              {metadata.cache_hit && <Badge variant="secondary">Cached</Badge>}
+            </div>
+          );
+        }
+        ```
+
+testing:
+  manual_testing:
+    - Perform search on main page
+    - Verify PEDR metadata displays
+    - Verify results show element types
+    - Test fallback by stopping PEDR service
+    - Verify RAG synthesis still works
+
+  latency_verification:
+    - Search should complete in <500ms (visible in metadata)
+    - Cache hits should show <100ms
+
+reference_docs:
+  - cmos/reports/sprint-19/qdrant-optimization-research.md
+  - frontend/src/features/search/SearchExperience.tsx
+  - app/api/v1/pedr_search.py
+
+notes: |
+  GATE: Do not execute until B19.1 + B19.3 achieve <500ms P50.
+
+  The RAG synthesis endpoint continues to use semantic results.
+  PEDR replaces the initial retrieval step only.
+
+  Keep project/document browsing on fast FTS - PEDR is for
+  main search page only per session decisions.
