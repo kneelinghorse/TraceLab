@@ -1,0 +1,34 @@
+mission_id: B18.2
+title: Pragmatic Layer - Intent Classification
+status: Queued
+sprint_id: sprint-18
+track: PEDR
+depends_on: [B18.1]
+
+objective: |
+  Classify query intent (Search/Read, Create, Update, Delete, Execute)
+  and use intent to improve result ranking and routing.
+
+success_criteria:
+  - Intent classifier for queries (keyword-based is fine for MVP)
+  - Search queries route to search, action queries flagged differently
+  - Intent-aware result boosting (Read intent -> boost research artifacts)
+  - 80%+ accuracy on test queries
+
+deliverables:
+  - app/services/pedr/pragmatic.py - intent classification
+  - Integration with search scoring
+  - Tests for intent detection
+
+context: |
+  Layer 4 of PEDR. Pragmatic layer understands what the user wants to DO
+  with the search results, not just what they're searching for.
+
+  Intent mapping:
+  - Search/Read: "find", "show", "what is", "research on"
+  - Create: "create", "new", "add"
+  - Update: "update", "edit", "modify"
+  - Delete: "delete", "remove"
+  - Execute: "run", "execute", "trigger"
+
+estimated_hours: 3-4

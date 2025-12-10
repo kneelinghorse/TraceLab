@@ -1,0 +1,380 @@
+{
+  "summary": {
+    "capture_timestamp": "2025-12-10T05:57:43.209405+00:00",
+    "query_count": 10,
+    "successful_queries": 10,
+    "latency_p50_ms": 59.76156299584545,
+    "latency_p90_ms": 31608.228583005257,
+    "latency_mean_ms": 3217.0736667874735,
+    "avg_results_per_query": 4.7
+  },
+  "results": [
+    {
+      "query": "user research interview methodology",
+      "latency_ms": 31608.228583005257,
+      "result_count": 5,
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.030882353,
+          "semantic_score": 0.0,
+          "keyword_score": 0.030882353,
+          "search_mode": "keyword",
+          "document_id": "f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+          "document_name": "R00.1_UX-Research-Methods-State-of-the-Art.md",
+          "content_preview": "Advanced frameworks like Jobs-to-be-Done represent a paradigm shift, moving the focus from user pers"
+        },
+        {
+          "rank": 2,
+          "score": 0.030882353,
+          "semantic_score": 0.0,
+          "keyword_score": 0.030882353,
+          "search_mode": "keyword",
+          "document_id": "6c47ffba-af76-4159-ba66-d7c764683361",
+          "document_name": "R1.1_UX-Research-Methods-State-of-the-Art.md",
+          "content_preview": "Advanced frameworks like Jobs-to-be-Done represent a paradigm shift, moving the focus from user pers"
+        },
+        {
+          "rank": 3,
+          "score": 0.01658179,
+          "semantic_score": 0.0,
+          "keyword_score": 0.01658179,
+          "search_mode": "keyword",
+          "document_id": "6c47ffba-af76-4159-ba66-d7c764683361",
+          "document_name": "R1.1_UX-Research-Methods-State-of-the-Art.md",
+          "content_preview": "Thus, the state-of-the-art practitioner must be not only a methodological expert but also a skilled "
+        }
+      ]
+    },
+    {
+      "query": "usability testing best practices",
+      "latency_ms": 56.98820896213874,
+      "result_count": 5,
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.03373984,
+          "semantic_score": 0.0,
+          "keyword_score": 0.03373984,
+          "search_mode": "keyword",
+          "document_id": "9dc4d05e-be91-4540-95bd-c25316d49759",
+          "document_name": "RDV.3_Architectural Evaluation of Trait Engine Specification v0.1- Composability Stress Test.md",
+          "content_preview": "Solution (The PHP Model): The v0.2 spec should adopt the proven operators from PHP's trait system : "
+        },
+        {
+          "rank": 2,
+          "score": 0.0015625,
+          "semantic_score": 0.0,
+          "keyword_score": 0.0015625,
+          "search_mode": "keyword",
+          "document_id": "6b06254a-85f8-4636-adfd-064b8a4736c9",
+          "document_name": "R18.1_Technical-Research-Report-Component-Set-IV.md",
+          "content_preview": "The canonical intents are:  Success: Indicates the successful completion of an action. Universally s"
+        },
+        {
+          "rank": 3,
+          "score": 0.0014492754,
+          "semantic_score": 0.0,
+          "keyword_score": 0.0014492754,
+          "search_mode": "keyword",
+          "document_id": "d06ee195-e5c0-465f-9318-141a49ec5056",
+          "document_name": "CR5.4_The 2025 State of the Junior Software Engineer- Onboarding, AI Integration, and Career Trajectories in a Transformed Industry.md",
+          "content_preview": "Placement Struggles: Placement rates for traditional web dev bootcamps have softened, with reports o"
+        }
+      ]
+    },
+    {
+      "query": "participant recruitment strategy",
+      "latency_ms": 59.976166987325996,
+      "result_count": 5,
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.0125,
+          "semantic_score": 0.0,
+          "keyword_score": 0.0125,
+          "search_mode": "keyword",
+          "document_id": "e6c5722f-abde-4990-8069-434baada9989",
+          "document_name": "r0.1_The_Universal_Mission_Framework.md",
+          "content_preview": "[9] stakeholders:   - role: \"Product Manager\"     contact: \"@username\"   - role: \"Lead Engineer\"    "
+        },
+        {
+          "rank": 2,
+          "score": 0.0035714286,
+          "semantic_score": 0.0,
+          "keyword_score": 0.0035714286,
+          "search_mode": "keyword",
+          "document_id": "e4f32d07-e596-4c8b-9712-5717a13595ce",
+          "document_name": "R00.6_A-Framework-for-Augmenting-UX-Research-with-Artificial-Intelligence.md",
+          "content_preview": "Primary Role of AI\t Pattern detection in complex data (e.g., medical imaging), rapid evidence synthe"
+        },
+        {
+          "rank": 3,
+          "score": 0.0035714286,
+          "semantic_score": 0.0,
+          "keyword_score": 0.0035714286,
+          "search_mode": "keyword",
+          "document_id": "4654ed43-2c19-40c4-b318-28f575ba560f",
+          "document_name": "R1.6_A-Framework-for-Augmenting-UX-Research-with-Artificial-Intelligence.md",
+          "content_preview": "Primary Role of AI\t Pattern detection in complex data (e.g., medical imaging), rapid evidence synthe"
+        }
+      ]
+    },
+    {
+      "query": "API integration authentication",
+      "latency_ms": 56.97916599456221,
+      "result_count": 5,
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.0085847955,
+          "semantic_score": 0.0,
+          "keyword_score": 0.0085847955,
+          "search_mode": "keyword",
+          "document_id": "092dae90-3715-4ac0-9b69-52957b4ee86f",
+          "document_name": "Semantic Design System Research Synthesis - Final Review Document.md",
+          "content_preview": "Semantic Design System Research Synthesis - Final Review Document Mission: API Support Landscape for"
+        },
+        {
+          "rank": 2,
+          "score": 0.0078867655,
+          "semantic_score": 0.0,
+          "keyword_score": 0.0078867655,
+          "search_mode": "keyword",
+          "document_id": "8ea60d91-d221-4df7-a4e5-eca9b7292d4c",
+          "document_name": "mission-drm-0.1-gemini-deep-search_gemini-2-x-grounded-search-cli-research.md",
+          "content_preview": "Streaming allows for real-time data processing and immediate feedback, while the App Builder assista"
+        },
+        {
+          "rank": 3,
+          "score": 0.005263158,
+          "semantic_score": 0.0,
+          "keyword_score": 0.005263158,
+          "search_mode": "keyword",
+          "document_id": "a28eab37-03f3-492e-83fe-f48e502fc223",
+          "document_name": "R2.2_markdown-ingestion-service-design-spec.md",
+          "content_preview": "This relational link will be managed within a single Qdrant collection, using a doc_type payload fie"
+        }
+      ]
+    },
+    {
+      "query": "database schema design patterns",
+      "latency_ms": 64.16945799719542,
+      "result_count": 5,
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.048875052,
+          "semantic_score": 0.0,
+          "keyword_score": 0.048875052,
+          "search_mode": "keyword",
+          "document_id": "c3289d7a-0f7c-447b-bbc6-62506c69f24f",
+          "document_name": "R28.1_Separation-of-Duty-Constraint-Patterns.md",
+          "content_preview": "# R28.1 Separation of Duty (SoD) Constraint Patterns  ## 1.0 Introduction  This report provides a co"
+        },
+        {
+          "rank": 2,
+          "score": 0.019993413,
+          "semantic_score": 0.0,
+          "keyword_score": 0.019993413,
+          "search_mode": "keyword",
+          "document_id": "6a8fa4d7-a767-4d50-90cb-7cfe377410b5",
+          "document_name": "Cross-Schema Pattern Analysis A Study of Production Databases(72.2%).md",
+          "content_preview": "**Temporal Intelligence** patterns (68% adoption) become critical for scheduling, reporting, and tim"
+        },
+        {
+          "rank": 3,
+          "score": 0.017870087,
+          "semantic_score": 0.0,
+          "keyword_score": 0.017870087,
+          "search_mode": "keyword",
+          "document_id": "f7ec8a6b-32be-42ab-a7d7-af6a52d9f542",
+          "document_name": "R1.4_Graph-Based-Memory-Systems.md",
+          "content_preview": "This mitigates the issue of having too little context in small, isolated chunks. Community Detection"
+        }
+      ]
+    },
+    {
+      "query": "embedding service configuration",
+      "latency_ms": 86.32529200986028,
+      "result_count": 5,
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.020360649,
+          "semantic_score": 0.0,
+          "keyword_score": 0.020360649,
+          "search_mode": "keyword",
+          "document_id": "809c0bd0-be1b-406a-93ea-14c2b2440ba5",
+          "document_name": "DRM.0.6_A Strategic Analysis of RAGAs for DeepSearch Validation.md",
+          "content_preview": "Infrastructure: RAGAs is a software library, not a standalone service. It is imported directly into "
+        },
+        {
+          "rank": 2,
+          "score": 0.019385155,
+          "semantic_score": 0.0,
+          "keyword_score": 0.019385155,
+          "search_mode": "keyword",
+          "document_id": "96218326-cbdd-48ec-8c17-060df16a45ad",
+          "document_name": "roadmap.md",
+          "content_preview": "**Key Technical Foundations:** - Pydantic-based Mission Protocol validation - Microsoft Presidio for"
+        },
+        {
+          "rank": 3,
+          "score": 0.019385155,
+          "semantic_score": 0.0,
+          "keyword_score": 0.019385155,
+          "search_mode": "keyword",
+          "document_id": "96218326-cbdd-48ec-8c17-060df16a45ad",
+          "document_name": "roadmap.md",
+          "content_preview": "# Research Repository: Development Roadmap  ## Executive Summary  This roadmap outlines the developm"
+        }
+      ]
+    },
+    {
+      "query": "sprint planning backlog prioritization",
+      "latency_ms": 59.54695900436491,
+      "result_count": 2,
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.0025974025,
+          "semantic_score": 0.0,
+          "keyword_score": 0.0025974025,
+          "search_mode": "keyword",
+          "document_id": "9d5b6e69-32a5-44f5-8935-7aaf7e804162",
+          "document_name": "R1.3_Inverting Software Metrics for Insight.md",
+          "content_preview": "6.3. Integrating Metrics into Team Rituals and Culture Metrics are only valuable if they are used to"
+        },
+        {
+          "rank": 2,
+          "score": 0.0003773585,
+          "semantic_score": 0.0,
+          "keyword_score": 0.0003773585,
+          "search_mode": "keyword",
+          "document_id": "6da84ddb-626c-4e41-ad13-83943714753a",
+          "document_name": "CR2.1_Modern SDLC Frameworks - Agile, DevOps, Platform Engineering Approaches.md",
+          "content_preview": "The 2024 Puppet State of DevOps Report highlights that 43% of organizations now have dedicated platf"
+        }
+      ]
+    },
+    {
+      "query": "code review quality checklist",
+      "latency_ms": 64.84562496189028,
+      "result_count": 5,
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.014354067,
+          "semantic_score": 0.0,
+          "keyword_score": 0.014354067,
+          "search_mode": "keyword",
+          "document_id": "a1475b2c-eeae-4a67-b555-11506ef83975",
+          "document_name": "Advanced AI Orchestration Patterns in CMOS-#2.md",
+          "content_preview": "scalability, security, simplicity) and known requirements from technical_architecture.md. The missio"
+        },
+        {
+          "rank": 2,
+          "score": 0.005566845,
+          "semantic_score": 0.0,
+          "keyword_score": 0.005566845,
+          "search_mode": "keyword",
+          "document_id": "cf581d3c-cc9a-49f9-9e22-29601692b68b",
+          "document_name": "M007_Governing the Pixel- Advanced Frameworks for Enterprise Design System Integrity.md",
+          "content_preview": "They track \"Design Adoption\" specifically in Figma, distinguishing it from code adoption. They analy"
+        },
+        {
+          "rank": 3,
+          "score": 0.005263158,
+          "semantic_score": 0.0,
+          "keyword_score": 0.005263158,
+          "search_mode": "keyword",
+          "document_id": "82d47105-8c1d-4e31-98bf-df891131d9ce",
+          "document_name": "The Design\u2194Code Contract- A Technical Framework for Enterprise-Scale Integration and Automation.md",
+          "content_preview": "A robust token pipeline that programmatically distributes values to both design tools and codebases "
+        }
+      ]
+    },
+    {
+      "query": "deployment pipeline CI/CD",
+      "latency_ms": 56.194417004007846,
+      "result_count": 5,
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.10526316,
+          "semantic_score": 0.0,
+          "keyword_score": 0.10526316,
+          "search_mode": "keyword",
+          "document_id": "df653bca-7571-40c9-ab02-82488ffb6715",
+          "document_name": "CR2.3_The Decoupling of Deployment and Release- An Exhaustive Analysis of Enterprise Release Management in 2025.md",
+          "content_preview": "The Decoupling of Deployment and Release: An Exhaustive Analysis of Enterprise Release Management in"
+        },
+        {
+          "rank": 2,
+          "score": 0.10294118,
+          "semantic_score": 0.0,
+          "keyword_score": 0.10294118,
+          "search_mode": "keyword",
+          "document_id": "cf581d3c-cc9a-49f9-9e22-29601692b68b",
+          "document_name": "M007_Governing the Pixel- Advanced Frameworks for Enterprise Design System Integrity.md",
+          "content_preview": "Governing the Pixel: Advanced Frameworks for Enterprise Design System Integrity Executive Summary In"
+        },
+        {
+          "rank": 3,
+          "score": 0.101960786,
+          "semantic_score": 0.0,
+          "keyword_score": 0.101960786,
+          "search_mode": "keyword",
+          "document_id": "cf581d3c-cc9a-49f9-9e22-29601692b68b",
+          "document_name": "M007_Governing the Pixel- Advanced Frameworks for Enterprise Design System Integrity.md",
+          "content_preview": "Custom Linters: Organizations with sufficient engineering resources often build custom plugins using"
+        }
+      ]
+    },
+    {
+      "query": "mission protocol validation",
+      "latency_ms": 57.48279194813222,
+      "result_count": 5,
+      "top_results": [
+        {
+          "rank": 1,
+          "score": 0.6046149,
+          "semantic_score": 0.0,
+          "keyword_score": 0.6046149,
+          "search_mode": "keyword",
+          "document_id": "96218326-cbdd-48ec-8c17-060df16a45ad",
+          "document_name": "roadmap.md",
+          "content_preview": "**Key Technical Foundations:** - Pydantic-based Mission Protocol validation - Microsoft Presidio for"
+        },
+        {
+          "rank": 2,
+          "score": 0.60405934,
+          "semantic_score": 0.0,
+          "keyword_score": 0.60405934,
+          "search_mode": "keyword",
+          "document_id": "96218326-cbdd-48ec-8c17-060df16a45ad",
+          "document_name": "roadmap.md",
+          "content_preview": "# Research Repository: Development Roadmap  ## Executive Summary  This roadmap outlines the developm"
+        },
+        {
+          "rank": 3,
+          "score": 0.3711811,
+          "semantic_score": 0.0,
+          "keyword_score": 0.3711811,
+          "search_mode": "keyword",
+          "document_id": "0ea03410-2cd5-481e-ade9-dddbf6dee4da",
+          "document_name": "mission_protocol_validation.md",
+          "content_preview": "# Mission Protocol Validation Framework  The Mission Protocol validation stack enforces research rig"
+        }
+      ]
+    }
+  ],
+  "search_config": {
+    "search_mode": "keyword (PostgreSQL full-text)",
+    "top_k": 5,
+    "semantic_weight": 0.0,
+    "keyword_weight": 1.0,
+    "note": "Baseline using keyword-only search; hybrid/semantic available in production"
+  }
+}

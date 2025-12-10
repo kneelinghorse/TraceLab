@@ -35,6 +35,13 @@ from .preflight import (
     PreflightService,
     get_preflight_service,
 )
+from .syntactic import (
+    ElementType as SyntacticElementType,
+    TypeDetectionResult,
+    SyntacticFilters,
+    SyntacticService,
+    get_syntactic_service,
+)
 
 __all__ = [
     # Quality scoring
@@ -67,4 +74,10 @@ __all__ = [
     "PreflightThresholds",
     "PreflightService",
     "get_preflight_service",
+    # Syntactic layer (type detection + filtering)
+    "SyntacticElementType",
+    "TypeDetectionResult",
+    "SyntacticFilters",
+    "SyntacticService",
+    "get_syntactic_service",
 ]

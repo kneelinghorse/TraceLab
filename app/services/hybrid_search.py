@@ -14,6 +14,7 @@ from app.models.chunk import DocumentChunk
 from app.models.document import Document
 from app.services.faceted_search import FacetFilters, FacetedSearchService
 from app.services.pedr import QualityFilters, QualityScoringService, get_quality_scoring_service
+from app.services.pedr.syntactic import SyntacticFilters, SyntacticService, get_syntactic_service
 from app.services.retrieval_service import RetrievalService, get_retrieval_service
 
 
@@ -36,6 +37,7 @@ class HybridSearchService:
         keyword_limit_multiplier: Optional[int] = None,
         faceted_service: Optional[FacetedSearchService] = None,
         quality_service: Optional[QualityScoringService] = None,
+        syntactic_service: Optional[SyntacticService] = None,
     ) -> None:
         self.retrieval_service = retrieval_service or get_retrieval_service()
         self.session_factory = session_factory
@@ -51,6 +53,7 @@ class HybridSearchService:
         self.keyword_limit_multiplier = multiplier if multiplier and multiplier > 0 else 1
         self.faceted_service = faceted_service or FacetedSearchService(session_factory=session_factory)
         self.quality_service = quality_service or get_quality_scoring_service()
+        self.syntactic_service = syntactic_service or get_syntactic_service()
 
     def search(
         self,
@@ -72,6 +75,10 @@ class HybridSearchService:
         min_quality_gates: Optional[int] = None,
         status_filters: Optional[List[str]] = None,
         allow_pii: Optional[bool] = None,
+        element_type: Optional[str] = None,
+        element_types: Optional[List[str]] = None,
+        auto_detect_type: bool = True,
+        type_boost_enabled: bool = True,
     ) -> List[Dict[str, Any]]:
         """Execute the requested search mode and return ranked chunks."""
         normalized_mode = (search_mode or "semantic").strip().lower()
@@ -94,6 +101,13 @@ class HybridSearchService:
             statuses=tuple(status_filters or ()),
             allow_pii=allow_pii,
         )
+        syntactic_filters = self.syntactic_service.create_filters(
+            element_type=element_type,
+            element_types=element_types,
+            query=query,
+            auto_detect=auto_detect_type,
+            type_boost_enabled=type_boost_enabled,
+        )
 
         if normalized_mode == "semantic":
             semantic_only = self._semantic_only(
@@ -111,7 +125,8 @@ class HybridSearchService:
                 query_embedding=query_embedding,
                 include_embeddings=include_embeddings,
             )
-            return self._apply_quality_scoring(semantic_only, limit=limit, quality_filters=quality_filters)
+            quality_scored = self._apply_quality_scoring(semantic_only, limit=limit, quality_filters=quality_filters)
+            return self._apply_syntactic_processing(quality_scored, limit=limit, syntactic_filters=syntactic_filters)
 
         if normalized_mode == "keyword":
             keyword_results = self._keyword_search(
@@ -123,7 +138,8 @@ class HybridSearchService:
                 limit=limit,
             )
             finalized = self._finalize_keyword_results(keyword_results, limit=limit)
-            return self._apply_quality_scoring(finalized, limit=limit, quality_filters=quality_filters)
+            quality_scored = self._apply_quality_scoring(finalized, limit=limit, quality_filters=quality_filters)
+            return self._apply_syntactic_processing(quality_scored, limit=limit, syntactic_filters=syntactic_filters)
 
         semantic_results = self.retrieval_service.search(
             query=query,
@@ -149,7 +165,8 @@ class HybridSearchService:
             limit=limit * self.keyword_limit_multiplier,
         )
         merged = self._merge_results(semantic_results, keyword_results, limit=limit)
-        return self._apply_quality_scoring(merged, limit=limit, quality_filters=quality_filters)
+        quality_scored = self._apply_quality_scoring(merged, limit=limit, quality_filters=quality_filters)
+        return self._apply_syntactic_processing(quality_scored, limit=limit, syntactic_filters=syntactic_filters)
 
     def _semantic_only(
         self,
@@ -332,6 +349,32 @@ class HybridSearchService:
         annotated = self.quality_service.apply(results, filters=quality_filters)
         ranked = sorted(
             annotated,
+            key=lambda item: float(item.get("combined_score") or 0.0),
+            reverse=True,
+        )
+        return ranked[:limit]
+
+    def _apply_syntactic_processing(
+        self,
+        results: List[Dict[str, Any]],
+        *,
+        limit: int,
+        syntactic_filters: SyntacticFilters,
+    ) -> List[Dict[str, Any]]:
+        """Apply PEDR syntactic layer: type detection, filtering, and boosting."""
+        if not results or self.syntactic_service is None:
+            return results[:limit]
+
+        # Apply type boost (re-ranks based on element type match)
+        processed = self.syntactic_service.apply(
+            results,
+            filters=syntactic_filters,
+            filter_mode=False,  # Boost only, don't filter out results
+        )
+
+        # Re-sort by combined_score after type boost
+        ranked = sorted(
+            processed,
             key=lambda item: float(item.get("combined_score") or 0.0),
             reverse=True,
         )

@@ -47,6 +47,10 @@ async def run_rag_search(
         min_quality_gates=payload.min_quality_gates,
         status_filters=payload.status,
         allow_pii=payload.allow_pii,
+        element_type=payload.element_type,
+        element_types=payload.element_types,
+        auto_detect_type=payload.auto_detect_type,
+        type_boost_enabled=payload.type_boost_enabled,
     )
     response = RagResponse.model_validate(result)
     _log_search_history(
@@ -78,6 +82,10 @@ def _log_search_history(
         "min_quality_gates": payload.min_quality_gates,
         "status": payload.status or [],
         "allow_pii": payload.allow_pii,
+        "element_type": payload.element_type,
+        "element_types": payload.element_types or [],
+        "auto_detect_type": payload.auto_detect_type,
+        "type_boost_enabled": payload.type_boost_enabled,
     }
     cache = (
         response.cache.model_dump()

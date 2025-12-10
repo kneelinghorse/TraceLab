@@ -1,0 +1,35 @@
+mission_id: B18.3
+title: Full Semantic Protocol Integration
+status: Queued
+sprint_id: sprint-18
+track: PEDR
+depends_on: [B18.2]
+
+objective: |
+  Implement the Semantic Protocol from PEDR docs: URN-based identification,
+  confidence scoring, criticality calculation. Transform entities into
+  protocol manifests.
+
+success_criteria:
+  - URN generation: urn:research:{type}:{id} format
+  - Confidence scoring using Bayesian approach (evidence-based)
+  - Criticality calculation (impact * visibility * PII factor)
+  - Manifests stored/cached for search use
+
+deliverables:
+  - app/services/pedr/semantic_protocol.py - full protocol implementation
+  - URN generation utilities
+  - Confidence and criticality calculators
+  - Integration with manifest_transformer.py (already exists)
+  - Tests
+
+context: |
+  This formalizes the Semantic Protocol from cmos/planning/PEDR-docs/.
+  The existing quality_scoring.py has some of these concepts but not
+  the full protocol structure (URNs, confidence scoring, etc).
+
+  Key formulas from docs:
+  - Criticality: (impact * 0.4) + (visibility * 0.2) + (pii * 0.3) + (blast_radius * 0.1)
+  - Confidence: Bayesian update from evidence presence
+
+estimated_hours: 4-5

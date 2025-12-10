@@ -1,0 +1,38 @@
+mission_id: B18.5
+title: Relational Layer - Graph Context
+status: Queued
+sprint_id: sprint-18
+track: PEDR
+depends_on: [B18.4]
+
+objective: |
+  Build relationship graph for research entities and add graph expansion
+  to search. Enable "show me everything related to this mission" queries.
+
+success_criteria:
+  - Relationship graph built (mission -> documents -> insights -> chunks)
+  - GET /api/v1/pedr/related/{urn} endpoint
+  - Graph expansion option in search (include_related=true)
+  - Related results are actually relevant (manual verification)
+
+deliverables:
+  - app/services/pedr/relational.py - graph building and traversal
+  - Database queries for relationship extraction
+  - app/api/v1/pedr_related.py - related entities endpoint
+  - Integration with search orchestrator
+  - Tests
+
+context: |
+  Layer 6 of PEDR. This is last because it's the most complex and
+  its value depends on B18.4 showing promise.
+
+  Relationships to model:
+  - mission BELONGS_TO project
+  - mission REFERENCES chunk (via evidence)
+  - document BELONGS_TO project
+  - document CONTAINS chunk
+  - insight DERIVED_FROM chunk
+
+  Can use SQL joins for MVP (no separate graph DB needed).
+
+estimated_hours: 5-6

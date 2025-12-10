@@ -1,0 +1,24 @@
+mission_id: B18.7
+title: Sprint 18 Retrospective
+status: Queued
+sprint_id: sprint-18
+track: Retrospective
+
+objective: |
+  Close Sprint 18 with retrospective documenting PEDR outcomes and
+  planning Sprint 19 based on decision gate results.
+
+success_criteria:
+  - Sprint 18 retrospective document created
+  - All mission outcomes documented
+  - PEDR decision documented and justified
+  - Sprint 19 backlog draft created (content depends on B18.6 outcome)
+  - MASTER_CONTEXT updated
+  - Context snapshot taken
+
+deliverables:
+  - cmos/reports/sprint-18/retrospective.md
+  - cmos/reports/sprint-18/sprint-19-backlog-draft.md
+  - Telemetry captured
+
+estimated_hours: 1-2

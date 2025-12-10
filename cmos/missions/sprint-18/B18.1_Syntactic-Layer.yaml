@@ -1,0 +1,28 @@
+mission_id: B18.1
+title: Syntactic Layer - Type Filtering
+status: Queued
+sprint_id: sprint-18
+track: PEDR
+depends_on: [R18.0]
+
+objective: |
+  Add element_type filtering to PEDR search. Enable queries to target
+  specific entity types (mission, document, insight, chunk) and auto-detect
+  expected type from query phrasing.
+
+success_criteria:
+  - element_type parameter added to search API
+  - Auto-detection from query ("find missions about..." -> filters to missions)
+  - Type boost in scoring (matching type ranks higher)
+  - Tests for type detection logic
+
+deliverables:
+  - app/services/pedr/syntactic.py - type detection logic
+  - Updated hybrid_search.py or new pedr search service
+  - Brief validation: run baseline queries with type filtering
+
+context: |
+  This is Layer 3 of the 6-layer PEDR architecture. Syntactic layer
+  provides structural/type awareness to search results.
+
+estimated_hours: 2-3
