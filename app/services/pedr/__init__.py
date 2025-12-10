@@ -97,6 +97,13 @@ from .relational import (
     RelationalService,
     get_relational_service,
 )
+from .hybrid_rerank import (
+    RerankMode,
+    HybridRerankTimings,
+    HybridRerankResult,
+    HybridReranker,
+    get_hybrid_reranker,
+)
 
 __all__ = [
     # Quality scoring
@@ -185,4 +192,10 @@ __all__ = [
     "GraphExpansionResult",
     "RelationalService",
     "get_relational_service",
+    # Hybrid Rerank (B19.4)
+    "RerankMode",
+    "HybridRerankTimings",
+    "HybridRerankResult",
+    "HybridReranker",
+    "get_hybrid_reranker",
 ]
