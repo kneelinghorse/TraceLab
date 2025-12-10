@@ -21,6 +21,7 @@ from app.api.v1 import (
     missions,
     monitoring,
     pedr_preflight,
+    pedr_related,
     pedr_search,
     qdrant_admin,
     relationships,
@@ -179,6 +180,12 @@ app.include_router(
     pedr_search.router,
     prefix=settings.api_v1_prefix,
     tags=["pedr-search"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    pedr_related.router,
+    prefix=settings.api_v1_prefix,
+    tags=["pedr-related"],
     dependencies=protected_dependencies,
 )
 app.include_router(quality.router, prefix=settings.api_v1_prefix, tags=["quality"], dependencies=protected_dependencies)

@@ -108,6 +108,7 @@ class LayerTimings:
     pragmatic_ms: float = 0.0
     governance_ms: float = 0.0
     fusion_ms: float = 0.0
+    relational_ms: float = 0.0
     total_ms: float = 0.0
 
 
@@ -162,9 +163,12 @@ class PEDRSearchResult:
     chunk_index: Optional[int] = None
     source_type: Optional[str] = None
 
+    # Graph expansion (populated by API layer when include_related=True)
+    related_entities: Optional[List[Dict[str, Any]]] = None
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for API response."""
-        return {
+        result = {
             "chunk_id": self.chunk_id,
             "content": self.content,
             "document_id": self.document_id,
@@ -187,6 +191,9 @@ class PEDRSearchResult:
             "score": self.rrf_score,  # Alias for compatibility
             "combined_score": self.rrf_score,
         }
+        if self.related_entities is not None:
+            result["related_entities"] = self.related_entities
+        return result
 
 
 @dataclass
@@ -215,6 +222,7 @@ class PEDRSearchResponse:
                     "pragmatic_ms": self.metadata.timings.pragmatic_ms,
                     "governance_ms": self.metadata.timings.governance_ms,
                     "fusion_ms": self.metadata.timings.fusion_ms,
+                    "relational_ms": self.metadata.timings.relational_ms,
                     "total_ms": self.metadata.timings.total_ms,
                 },
                 "total_candidates": self.metadata.total_candidates,

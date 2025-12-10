@@ -89,6 +89,14 @@ from .search_orchestrator import (
     create_pedr_orchestrator,
     DEFAULT_LAYER_WEIGHTS,
 )
+from .relational import (
+    RelationType,
+    EntityType as RelationalEntityType,
+    RelatedEntity,
+    GraphExpansionResult,
+    RelationalService,
+    get_relational_service,
+)
 
 __all__ = [
     # Quality scoring
@@ -170,4 +178,11 @@ __all__ = [
     "get_pedr_orchestrator",
     "create_pedr_orchestrator",
     "DEFAULT_LAYER_WEIGHTS",
+    # Relational Layer (Graph Context)
+    "RelationType",
+    "RelationalEntityType",
+    "RelatedEntity",
+    "GraphExpansionResult",
+    "RelationalService",
+    "get_relational_service",
 ]
