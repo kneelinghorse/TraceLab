@@ -1,0 +1,590 @@
+{
+  "summary": {
+    "capture_timestamp": "2025-12-10T15:24:16.745138+00:00",
+    "query_count": 10,
+    "successful_queries": 10,
+    "latency_p50_ms": 1501.2147499946877,
+    "latency_p90_ms": 63568.864582979586,
+    "latency_p95_ms": 63568.864582979586,
+    "latency_mean_ms": 7608.725904102903,
+    "avg_results_per_query": 5.0,
+    "total_candidates": 600
+  },
+  "results": [
+    {
+      "query": "user research interview methodology",
+      "latency_ms": 63568.864582979586,
+      "result_count": 5,
+      "intent": "search",
+      "intent_confidence": 0.9,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "layers_used": [
+        "lexical",
+        "semantic"
+      ],
+      "layer_timings": {
+        "lexical_ms": 61671.295499952976,
+        "semantic_ms": 1775.3682500333525,
+        "syntactic_ms": 0.03195903263986111,
+        "pragmatic_ms": 0.038207974284887314,
+        "governance_ms": 120.85391697473824,
+        "fusion_ms": 0.7288340129889548
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "rrf_score": 0.009644,
+          "contributing_layers": [
+            "lexical",
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "6c47ffba-af76-4159-ba66-d7c764683361",
+          "content_preview": "Thus, the state-of-the-art practitioner must be not only a methodological expert but also a skilled "
+        },
+        {
+          "rank": 2,
+          "rrf_score": 0.009613,
+          "contributing_layers": [
+            "lexical",
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+          "content_preview": "Thus, the state-of-the-art practitioner must be not only a methodological expert but also a skilled "
+        },
+        {
+          "rank": 3,
+          "rrf_score": 0.005556,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+          "content_preview": "When prioritizing which research projects to undertake, frameworks like the **RICE model**\u2014which sco"
+        }
+      ]
+    },
+    {
+      "query": "usability testing best practices",
+      "latency_ms": 960.6577919912525,
+      "result_count": 5,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "layers_used": [
+        "lexical",
+        "semantic"
+      ],
+      "layer_timings": {
+        "lexical_ms": 372.44949996238574,
+        "semantic_ms": 472.03683300176635,
+        "syntactic_ms": 0.14916603686288,
+        "pragmatic_ms": 0.10370905511081219,
+        "governance_ms": 112.66195902135223,
+        "fusion_ms": 2.9060000088065863
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "rrf_score": 0.005738,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "6c47ffba-af76-4159-ba66-d7c764683361",
+          "content_preview": "Most importantly, it is **not a substitute for user testing**, as experts cannot fully replicate the"
+        },
+        {
+          "rank": 2,
+          "rrf_score": 0.005645,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+          "content_preview": "Most importantly, it is **not a substitute for user testing**, as experts cannot fully replicate the"
+        },
+        {
+          "rank": 3,
+          "rrf_score": 0.005556,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "6c47ffba-af76-4159-ba66-d7c764683361",
+          "content_preview": "They are then given a series of tasks, such as \"Find where you would go to track a recent order.\" Th"
+        }
+      ]
+    },
+    {
+      "query": "participant recruitment strategy",
+      "latency_ms": 1501.2147499946877,
+      "result_count": 5,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "layers_used": [
+        "lexical",
+        "semantic"
+      ],
+      "layer_timings": {
+        "lexical_ms": 295.48779100878164,
+        "semantic_ms": 1093.4650410199538,
+        "syntactic_ms": 0.07429200923070312,
+        "pragmatic_ms": 0.10691600618883967,
+        "governance_ms": 111.3826660439372,
+        "fusion_ms": 0.4529579891823232
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "rrf_score": 0.009706,
+          "contributing_layers": [
+            "lexical",
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "e4f32d07-e596-4c8b-9712-5717a13595ce",
+          "content_preview": "Primary Role of AI\t\nPattern detection in complex data (e.g., medical imaging), rapid evidence synthe"
+        },
+        {
+          "rank": 2,
+          "rrf_score": 0.005556,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+          "content_preview": "Based on inputs like Jira tickets or design mockups, AI can help formulate research goals, draft key"
+        },
+        {
+          "rank": 3,
+          "rrf_score": 0.005469,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "08a9b00d-f15b-4629-a0bd-dc52b114132d",
+          "content_preview": "Based on inputs like Jira tickets or design mockups, AI can help formulate research goals, draft key"
+        }
+      ]
+    },
+    {
+      "query": "API integration authentication",
+      "latency_ms": 1579.1244170395657,
+      "result_count": 5,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "layers_used": [
+        "lexical",
+        "semantic"
+      ],
+      "layer_timings": {
+        "lexical_ms": 419.01237500132993,
+        "semantic_ms": 1045.5844160169363,
+        "syntactic_ms": 0.031124975066632032,
+        "pragmatic_ms": 0.04249997437000275,
+        "governance_ms": 113.21641597896814,
+        "fusion_ms": 0.8821249939501286
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "rrf_score": 0.005738,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "ed1c4297-f9e2-43e9-a28d-ad92015b302d",
+          "content_preview": "Data Inaccuracy: The broker's data may be outdated or inaccurate, leading to incorrect decisions or "
+        },
+        {
+          "rank": 2,
+          "rrf_score": 0.008892,
+          "contributing_layers": [
+            "lexical",
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "ed1c4297-f9e2-43e9-a28d-ad92015b302d",
+          "content_preview": "The specific actions an API can perform are defined by HTTP methods (also known as verbs), such as G"
+        },
+        {
+          "rank": 3,
+          "rrf_score": 0.005556,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "c62e6ec9-23ca-450b-b520-a9faefbd3ce6",
+          "content_preview": "This aligns with OWASP recommendations to enforce strong authorization on all state-changing API end"
+        }
+      ]
+    },
+    {
+      "query": "database schema design patterns",
+      "latency_ms": 1864.6490829996765,
+      "result_count": 5,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "layers_used": [
+        "lexical",
+        "semantic"
+      ],
+      "layer_timings": {
+        "lexical_ms": 327.5231669540517,
+        "semantic_ms": 1424.165666976478,
+        "syntactic_ms": 0.08170801447704434,
+        "pragmatic_ms": 0.09225000394508243,
+        "governance_ms": 111.85933399247006,
+        "fusion_ms": 0.6783329881727695
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "rrf_score": 0.005738,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "2ad0a482-02b5-4e84-95fd-d4a90fe9dba0",
+          "content_preview": "System-versioned temporal tables, popularized by SQL:2011 standard, provide automatic history tracki"
+        },
+        {
+          "rank": 2,
+          "rrf_score": 0.009377,
+          "contributing_layers": [
+            "lexical",
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "6a8fa4d7-a767-4d50-90cb-7cfe377410b5",
+          "content_preview": "### Financial services emphasize immutability and precision\n\nFinancial schemas demonstrate distincti"
+        },
+        {
+          "rank": 3,
+          "rrf_score": 0.005556,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "2ad0a482-02b5-4e84-95fd-d4a90fe9dba0",
+          "content_preview": "The shared database, shared schema approach adds tenant\\_id columns to every table, requiring carefu"
+        }
+      ]
+    },
+    {
+      "query": "embedding service configuration",
+      "latency_ms": 930.9086250141263,
+      "result_count": 5,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "layers_used": [
+        "lexical",
+        "semantic"
+      ],
+      "layer_timings": {
+        "lexical_ms": 385.7107500080019,
+        "semantic_ms": 427.979875006713,
+        "syntactic_ms": 0.06962497718632221,
+        "pragmatic_ms": 0.07816700963303447,
+        "governance_ms": 115.92408298747614,
+        "fusion_ms": 0.5432080361060798
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "rrf_score": 0.005738,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "754bc51d-3b29-453a-8d6e-b61a99dab39b",
+          "content_preview": "This simplifies scaling and operations. Serverless Functions: For servers with intermittent traffic,"
+        },
+        {
+          "rank": 2,
+          "rrf_score": 0.005645,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "c3243ad4-e1b3-4f2d-8abf-7811c53a4cbe",
+          "content_preview": "It stores user-specific, overridable settings. The data represents the explicit choices of an indivi"
+        },
+        {
+          "rank": 3,
+          "rrf_score": 0.005556,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "d002ccc2-738b-400e-b790-879d58240f76",
+          "content_preview": "The MCP's registry.yaml serves the exact same function: it allows the core MCP service to discover a"
+        }
+      ]
+    },
+    {
+      "query": "sprint planning backlog prioritization",
+      "latency_ms": 1192.2050419962034,
+      "result_count": 5,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "layers_used": [
+        "lexical",
+        "semantic"
+      ],
+      "layer_timings": {
+        "lexical_ms": 293.95779204787686,
+        "semantic_ms": 784.0905409539118,
+        "syntactic_ms": 0.10612502228468657,
+        "pragmatic_ms": 0.1218329998664558,
+        "governance_ms": 113.2121670525521,
+        "fusion_ms": 0.427457969635725
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "rrf_score": 0.005738,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "content_preview": "Strategic Recommendations and Roadmap Beyond Sprint 1\nThe successful execution of Sprint 1 will esta"
+        },
+        {
+          "rank": 2,
+          "rrf_score": 0.005645,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "3d34451c-fa47-4d1e-834f-86de4c63a628",
+          "content_preview": "### Design Sprint methodology solves the wrong problem for rapid MVP needs\n\nGoogle Design Sprint's e"
+        },
+        {
+          "rank": 3,
+          "rrf_score": 0.005556,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "da8c5e2f-62c0-4169-ba91-b05392298577",
+          "content_preview": "# Sprint 19 Changelog\n\n**Sprint:** 19 - Design System Hardening & Packaging Readiness\n**Status:** \u2705 "
+        }
+      ]
+    },
+    {
+      "query": "code review quality checklist",
+      "latency_ms": 1968.5595410410315,
+      "result_count": 5,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "layers_used": [
+        "lexical",
+        "semantic"
+      ],
+      "layer_timings": {
+        "lexical_ms": 356.88908299198374,
+        "semantic_ms": 1493.5209999675862,
+        "syntactic_ms": 0.06795796798542142,
+        "pragmatic_ms": 0.0772500061430037,
+        "governance_ms": 116.8232909985818,
+        "fusion_ms": 0.6187499966472387
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "rrf_score": 0.005738,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "2a7cc5f8-a52b-4ed5-9df9-f3e3beffc4ac",
+          "content_preview": "Junior Reviewers: High-performing teams explicitly assign junior engineers to review senior code. Th"
+        },
+        {
+          "rank": 2,
+          "rrf_score": 0.005645,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "2a7cc5f8-a52b-4ed5-9df9-f3e3beffc4ac",
+          "content_preview": "Analysis based on data and insights from 239 industry sources, engineering blogs, and research paper"
+        },
+        {
+          "rank": 3,
+          "rrf_score": 0.005556,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "2a7cc5f8-a52b-4ed5-9df9-f3e3beffc4ac",
+          "content_preview": "- Reddit\nOpens in a new window\n\ngitkraken.com\nCode Review Best Practices for Developers in 2024 - Gi"
+        }
+      ]
+    },
+    {
+      "query": "deployment pipeline CI/CD",
+      "latency_ms": 1493.2449579937384,
+      "result_count": 5,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": null,
+      "type_confidence": 0.0,
+      "layers_used": [
+        "lexical",
+        "semantic"
+      ],
+      "layer_timings": {
+        "lexical_ms": 297.82087495550513,
+        "semantic_ms": 1078.4137910231948,
+        "syntactic_ms": 0.17854099860414863,
+        "pragmatic_ms": 0.14166696928441525,
+        "governance_ms": 115.38575001759455,
+        "fusion_ms": 1.0216669761575758
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "rrf_score": 0.008342,
+          "contributing_layers": [
+            "lexical",
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "df653bca-7571-40c9-ab02-82488ffb6715",
+          "content_preview": "The pipeline itself acts as the compliance officer. 9.3. Target: The DevOps Dojo\nTarget implemented "
+        },
+        {
+          "rank": 2,
+          "rrf_score": 0.005645,
+          "contributing_layers": [
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "df653bca-7571-40c9-ab02-82488ffb6715",
+          "content_preview": "By pre-scaling infrastructure based on predictive models, organizations prevent deployment-related c"
+        },
+        {
+          "rank": 3,
+          "rrf_score": 0.008568,
+          "contributing_layers": [
+            "lexical",
+            "semantic"
+          ],
+          "element_type": null,
+          "document_id": "df653bca-7571-40c9-ab02-82488ffb6715",
+          "content_preview": "Opens in a new window\n\nfeatbit.co\nAdvantages and Disadvantages of Blue-Green Deployment in 2025 - Fe"
+        }
+      ]
+    },
+    {
+      "query": "mission protocol validation",
+      "latency_ms": 1027.8302499791607,
+      "result_count": 5,
+      "intent": "search",
+      "intent_confidence": 0.5,
+      "detected_type": "mission",
+      "type_confidence": 0.85,
+      "layers_used": [
+        "lexical",
+        "semantic"
+      ],
+      "layer_timings": {
+        "lexical_ms": 404.743957973551,
+        "semantic_ms": 499.22762502683327,
+        "syntactic_ms": 0.05320803029462695,
+        "pragmatic_ms": 0.043832988012582064,
+        "governance_ms": 122.86974996095523,
+        "fusion_ms": 0.40424999315291643
+      },
+      "top_results": [
+        {
+          "rank": 1,
+          "rrf_score": 0.004098,
+          "contributing_layers": [
+            "lexical"
+          ],
+          "element_type": "chunk",
+          "document_id": "96218326-cbdd-48ec-8c17-060df16a45ad",
+          "content_preview": "**Key Technical Foundations:**\n- Pydantic-based Mission Protocol validation\n- Microsoft Presidio for"
+        },
+        {
+          "rank": 2,
+          "rrf_score": 0.004032,
+          "contributing_layers": [
+            "lexical"
+          ],
+          "element_type": "chunk",
+          "document_id": "96218326-cbdd-48ec-8c17-060df16a45ad",
+          "content_preview": "# Research Repository: Development Roadmap\n\n## Executive Summary\n\nThis roadmap outlines the developm"
+        },
+        {
+          "rank": 3,
+          "rrf_score": 0.008824,
+          "contributing_layers": [
+            "lexical",
+            "semantic"
+          ],
+          "element_type": "chunk",
+          "document_id": "65ee718f-6161-4df7-a4b6-b2fd3e8cac9b",
+          "content_preview": "Therefore, establishing a robust, automated, and comprehensive validation framework is not merely a "
+        }
+      ]
+    }
+  ],
+  "search_config": {
+    "search_mode": "PEDR unified (5-layer RRF fusion)",
+    "top_k": 5,
+    "layers": [
+      "lexical",
+      "semantic",
+      "syntactic",
+      "pragmatic",
+      "governance"
+    ],
+    "rrf_k": 60
+  },
+  "comparison": {
+    "baseline": {
+      "search_mode": "keyword (PostgreSQL full-text)",
+      "latency_p50_ms": 59.76156299584545,
+      "latency_mean_ms": 3217.0736667874735,
+      "avg_results": 4.7
+    },
+    "pedr": {
+      "search_mode": "PEDR unified (5-layer RRF fusion)",
+      "latency_p50_ms": 1501.2147499946877,
+      "latency_p95_ms": 63568.864582979586,
+      "latency_mean_ms": 7608.725904102903,
+      "avg_results": 5.0
+    },
+    "improvements": {
+      "latency_change_pct": 2412.00717440916,
+      "additional_capabilities": [
+        "RRF fusion across 5 layers",
+        "Intent classification",
+        "Element type detection",
+        "Quality scoring integration",
+        "Semantic Protocol URNs"
+      ]
+    }
+  }
+}

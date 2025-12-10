@@ -3,7 +3,7 @@
     "name": "CMOS Starter Template",
     "version": "0.0.0",
     "description": "Blank master context for new CMOS starter projects.",
-    "status": "sprint-17-completed",
+    "status": "sprint-18-completed",
     "start_date": "2025-01-01",
     "deployment": {
       "platform": "FastAPI + PostgreSQL + Qdrant",
@@ -33,7 +33,8 @@
       "Sprint 12 backlog finalized: 6 missions to make system usable (fix 500 errors, auth issues, service account)",
       "Sprint 12 completed: Made TraceLab actually usable. Fixed missions 500 error, HTTPS redirect auth drop, service account creation, API response standardization. DeepSearch integration verified E2E.",
       "Sprint 17 completed: Data Protection & Stability. Soft delete, auth on DELETE, Qdrant recovery scripts, report promotion, audit metadata.",
-      "Sprint 18 planned: PEDR Validation Sprint - prove 6-layer search delivers measurably better results."
+      "Sprint 18 planned: PEDR Validation Sprint - prove 6-layer search delivers measurably better results.",
+      "Sprint 18 completed: PEDR Validation Sprint - 6 missions delivered (R18.0, B18.1-B18.6). PEDR SCOPED decision: Not for interactive search (1.5s P50 vs 200ms target), approved for deep research, MCP, and batch processing."
     ],
     "files_created": [
       "cmos/missions/sprint-01/B1.1_Core-Service-Bootstrap.yaml",
@@ -262,6 +263,33 @@
             "cmos/reports/sprint-12/sprint-13-backlog-draft.md"
           ],
           "blockers_identified": {}
+        },
+        {
+          "session_date": "2025-12-10",
+          "agent": "Claude Opus 4.5",
+          "focus": "Sprint 18 Retrospective - PEDR Validation Results",
+          "key_discoveries": [
+            "PEDR delivers 25x latency cost (1,501ms P50 vs 60ms baseline)",
+            "Semantic layer (Qdrant) accounts for 60-80% of query latency",
+            "Precision improvements significant for conceptual queries, marginal for exact-match",
+            "Cold start penalty severe (~60s for first query)",
+            "RRF fusion algorithm works correctly for combining heterogeneous rankers"
+          ],
+          "decisions_made": [
+            "PEDR SCOPED - Not for primary interactive search",
+            "PEDR approved for: deep research, MCP integration, batch processing, quality-aware queries",
+            "Recommended dual-path architecture: FTS (fast) + PEDR (deep)",
+            "Sprint 19 should focus on latency optimization or alternative PEDR use cases"
+          ],
+          "mistakes_made": [],
+          "files_modified": [
+            "app/services/pedr/*.py - 5-layer PEDR implementation",
+            "tests/test_pedr_*.py - Comprehensive test coverage",
+            "cmos/reports/sprint-18/retrospective.md",
+            "cmos/reports/sprint-18/pedr-evaluation.md",
+            "cmos/reports/sprint-18/sprint-19-backlog-draft.md"
+          ],
+          "blockers_identified": {}
         }
       ]
     }
@@ -281,7 +309,11 @@
       "Sprint 12 READY: Database updated with 6 missions to fix core functionality. Mission notes point to full YAML specs in cmos/missions/sprint-12/",
       "Production API issues: missions endpoint 500, HTTPS redirects drop auth, service account missing. All addressed in Sprint 12.",
       "Sprint 12 fixed: missions endpoint 500 (schema fix), HTTPS redirects dropping auth (ProxyHeadersMiddleware), service account (shared credentials). All critical paths verified working.",
-      "Pre-flight discovery limitation: ingested missions not immediately discoverable. Root cause: pre-flight searches via chunks, not missions table. Sprint 13 candidate for enhancement."
+      "Pre-flight discovery limitation: ingested missions not immediately discoverable. Root cause: pre-flight searches via chunks, not missions table. Sprint 13 candidate for enhancement.",
+      "PEDR 5-layer architecture implemented: lexical, semantic, syntactic, pragmatic, governance with RRF fusion",
+      "PEDR latency: 1,501ms P50 (vs 60ms baseline FTS) - semantic layer is bottleneck",
+      "PEDR precision: Significant improvement for conceptual queries, marginal for exact-match",
+      "PEDR decision (B18.6): SCOPED - approved for deep research, MCP, batch; not for interactive search"
     ],
     "system_components": {
       "ingestion": "Upload endpoints, format routing (PDF/DOCX/PPTX/CSV/XLSX), redaction, chunking (500-1000 tokens with overlap), and processing state tracking.",
@@ -548,7 +580,27 @@
     "2025-12-05: Project-Mission relationship is loose: Project contains Documents and Missions, but linkage is weak",
     "2025-12-05: Search UI priorities: search bar top, stats sidebar, only 2 filters (project dropdown, chunks 10/15/20/25/35)",
     "2025-12-05: Format support expansion: add JSON, XML, YAML to existing pdf/docx/md/txt support",
-    "2025-12-05: Sprint 13 theme is making TraceLab data *accessible* through UI, not just stored"
+    "2025-12-05: Sprint 13 theme is making TraceLab data *accessible* through UI, not just stored",
+    {
+      "decision": "PEDR SCOPED: Not for interactive search (1.5s P50 vs 200ms target), approved for deep research, MCP, batch processing",
+      "source": "B18.6 Decision Gate",
+      "date": "2025-12-10"
+    },
+    {
+      "decision": "Recommended dual-path architecture: Fast FTS path (60ms) for interactive, Slow PEDR path (1.5s) for deep research",
+      "source": "B18.6 Decision Gate",
+      "date": "2025-12-10"
+    },
+    {
+      "decision": "Semantic layer (Qdrant) is latency bottleneck at 60-80% of query time - optimization focus for Sprint 19",
+      "source": "B18.6 Benchmark Analysis",
+      "date": "2025-12-10"
+    },
+    {
+      "decision": "Sprint 18 completed 8/8 missions: R18.0 baseline, B18.1-B18.6 PEDR layers + decision gate, B18.7 retrospective",
+      "source": "B18.7 Retrospective",
+      "date": "2025-12-10"
+    }
   ],
   "constraints": [
     "All document processing workflows must execute redaction prior to persistence or embedding.",
@@ -608,10 +660,11 @@
       "sprint_09": "Completed - hybrid search, faceted filters, search history, saved searches shipped",
       "sprint_10": "Completed - DeepSearch ingestion + PEDR Phase 1 delivered",
       "sprint_11": "Completed - correction loop, PEDR sync, console, schema distribution, pre-flight delivered",
-      "sprint_12": "Planned - production hardening & load testing"
+      "sprint_12": "Planned - production hardening & load testing",
+      "sprint_18": "Completed - PEDR validation, decision: SCOPED"
     },
-    "current_focus": "Sprint 11 - Correction Loop & PEDR Delta",
-    "next_checkpoint": "Sprint 11 missions: correction loop, PEDR delta sync, Mission Protocol Console",
+    "current_focus": "Sprint 18 Complete - Sprint 19 Planning",
+    "next_checkpoint": "Sprint 19: PEDR latency optimization or alternative use cases",
     "research_completed": [
       {
         "id": "R2.1",
