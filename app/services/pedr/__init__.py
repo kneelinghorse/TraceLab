@@ -49,6 +49,25 @@ from .pragmatic import (
     PragmaticService,
     get_pragmatic_service,
 )
+from .semantic_protocol import (
+    URN,
+    URNGenerator,
+    GovernanceMetadata,
+    SemanticFeatures,
+    ElementMetadata,
+    ProtocolManifest,
+    ConfidenceScorer,
+    CriticalityCalculator,
+    IntentResolver,
+    SemanticVectorGenerator,
+    SemanticProtocol,
+    get_semantic_protocol,
+    EntityType as SemanticEntityType,
+    SemanticIntent,
+    PROTOCOL_VERSION,
+    CRITICALITY_WEIGHTS,
+    CONFIDENCE_PRIOR,
+)
 
 __all__ = [
     # Quality scoring
@@ -93,4 +112,22 @@ __all__ = [
     "PragmaticFilters",
     "PragmaticService",
     "get_pragmatic_service",
+    # Semantic Protocol (The Namer)
+    "URN",
+    "URNGenerator",
+    "GovernanceMetadata",
+    "SemanticFeatures",
+    "ElementMetadata",
+    "ProtocolManifest",
+    "ConfidenceScorer",
+    "CriticalityCalculator",
+    "IntentResolver",
+    "SemanticVectorGenerator",
+    "SemanticProtocol",
+    "get_semantic_protocol",
+    "SemanticEntityType",
+    "SemanticIntent",
+    "PROTOCOL_VERSION",
+    "CRITICALITY_WEIGHTS",
+    "CONFIDENCE_PRIOR",
 ]
