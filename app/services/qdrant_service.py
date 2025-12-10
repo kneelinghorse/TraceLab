@@ -235,20 +235,21 @@ class QdrantService:
         project_id: Optional[str] = None,
         document_id: Optional[str] = None,
         source_type: Optional[str] = None,
-        hnsw_ef: int = 128,
+        hnsw_ef: Optional[int] = None,
         with_vectors: bool = False
     ) -> List[Dict[str, Any]]:
         """
         Search for similar chunks using vector similarity.
-        
+
         Args:
             query_vector: Query embedding vector
             top_k: Number of results to return
             project_id: Optional filter by project
             document_id: Optional filter by document
             source_type: Optional filter by source type
-            hnsw_ef: HNSW search parameter (higher = better recall, slower)
-            
+            hnsw_ef: HNSW search parameter (higher = better recall, slower).
+                     Defaults to settings.qdrant_hnsw_ef_default (64).
+
         Returns:
             List of search result dicts with keys:
                 - chunk_id: Chunk UUID
@@ -258,6 +259,9 @@ class QdrantService:
                 - chunk_index: Index within document
                 - score: Similarity score
         """
+        # Use configured default if not specified
+        effective_hnsw_ef = hnsw_ef if hnsw_ef is not None else settings.qdrant_hnsw_ef_default
+
         # Build filter
         filter_conditions = []
         if project_id:
@@ -281,7 +285,7 @@ class QdrantService:
             limit=top_k,
             query_filter=query_filter,
             with_payload=True,
-            search_params={"hnsw_ef": hnsw_ef} if hnsw_ef else None,
+            search_params={"hnsw_ef": effective_hnsw_ef},
             with_vectors=with_vectors
         )
 

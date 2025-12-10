@@ -460,3 +460,6 @@
 {"ts": "2025-12-10T17:33:24Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
 {"ts": "2025-12-10T17:35:18Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
 {"ts": "2025-12-10T17:47:07Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
+{"ts": "2025-12-10T17:54:35Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
+{"ts": "2025-12-10T17:54:54Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
+{"ts": "2025-12-10T18:00:01Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}

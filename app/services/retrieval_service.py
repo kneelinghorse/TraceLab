@@ -2,6 +2,7 @@
 from datetime import date
 from typing import List, Dict, Any, Optional
 
+from app.core.config import settings
 from app.services.embedding_service import get_embedding_service
 from app.services.faceted_search import FacetFilters, FacetedSearchService
 from app.services.qdrant_service import get_qdrant_service
@@ -78,17 +79,26 @@ class RetrievalService:
         """
         Recommend an HNSW ef value that balances recall and latency.
 
-        Uses empirically tuned tiers to keep p99 latency under 10ms for larger
-        result sets while keeping recall high for small fan-outs.
+        Tuned based on B19.3 benchmarks (2025-12-10):
+        - ef=32-64: ~40ms avg latency, 100% recall at 7K corpus
+        - ef=128: ~47ms avg latency (baseline)
+
+        Uses lower ef values for latency-sensitive interactive queries,
+        scaling up only for large result sets to maintain recall.
         """
+        base_ef = settings.qdrant_hnsw_ef_default  # 64 by default
+
         if top_k <= 5:
-            return 96
+            # Small result sets: use base ef, very fast
+            return base_ef
         if top_k <= 10:
-            return 108
+            # Medium result sets: slight increase for recall margin
+            return max(base_ef, 72)
         if top_k <= 20:
-            return 120
-        # Guardrails for unusually large fan-outs while avoiding runaway values.
-        return min(160, max(96, int(top_k * 5.5)))
+            # Larger result sets: increase for better recall
+            return max(base_ef, 96)
+        # Very large fan-outs: scale conservatively
+        return min(128, max(base_ef, int(top_k * 4)))
 
 
 # Singleton instance (lazy initialization)

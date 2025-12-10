@@ -23,6 +23,11 @@ class Settings(BaseSettings):
     qdrant_collection_name: str = "research_chunks"
     qdrant_prefer_grpc: bool = False
     qdrant_timeout_seconds: float = 10.0
+    # HNSW tuning: ef_search controls recall/latency trade-off (B19.3)
+    # Lower values = faster but potentially lower recall
+    # Benchmarks (7K points): ef=32-64 gives ~40ms avg, ef=128 gives ~47ms avg
+    # All values tested showed 100% recall at current corpus size
+    qdrant_hnsw_ef_default: int = 64  # Optimized default (was 128)
     
     # OpenAI
     openai_api_key: Optional[str] = None
