@@ -71,10 +71,10 @@ export const documentsApi = {
   },
 
   /**
-   * Delete a document
+   * Delete a document (soft delete with confirmation)
    */
   async deleteDocument(documentId: string): Promise<void> {
-    await httpClient.delete(`/documents/${documentId}`);
+    await httpClient.delete(`/documents/${documentId}`, { params: { confirm: true } });
   },
 
   /**
