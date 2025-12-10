@@ -39,6 +39,7 @@ from app.api.v1 import (
 )
 from app.core.config import settings
 from app.core.database import Base, engine
+from app.core.qdrant_client import prewarm_qdrant
 from app.core.security import require_authenticated_user
 from app.onboarding import router as onboarding_router
 from app.services.metrics_aggregator import MetricsAggregator, get_metrics_aggregator
@@ -104,6 +105,29 @@ app.add_middleware(
 # Add proxy headers middleware to trust X-Forwarded-* headers from Cloudflare/Railway
 # This ensures redirects use HTTPS instead of HTTP, preserving auth headers
 app.add_middleware(ProxyHeadersMiddleware)
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Pre-warm Qdrant connection on application startup.
+
+    This eliminates the 60+ second cold-start penalty on the first query
+    by initializing the connection pool and running a dummy search.
+    """
+    logger.info("Pre-warming Qdrant connection...")
+    success = await prewarm_qdrant()
+    if success:
+        logger.info("Qdrant pre-warm complete - ready for queries")
+    else:
+        logger.warning(
+            "Qdrant pre-warm failed - first query may experience cold-start latency. "
+            "Check QDRANT_URL configuration and Qdrant service availability."
+        )
+
 
 protected_dependencies = [Depends(require_authenticated_user)]
 

@@ -1,0 +1,269 @@
+mission_id: B19.6
+title: PEDR Latency Benchmark Suite
+sprint: sprint-19
+status: Queued
+track: Build
+priority: 6
+estimated_hours: 2-3
+
+objective: |
+  Create automated benchmark suite to track PEDR latency improvements
+  across Sprint 19 optimizations. This enables data-driven decisions
+  and prevents regressions.
+
+context: |
+  From R19.0 research (cmos/reports/sprint-19/qdrant-optimization-research.md):
+
+  Test Queries (10 query baseline):
+  1. "usability testing best practices"
+  2. "mission protocol validation"
+  3. "participant recruitment strategy"
+  4. "sprint planning backlog"
+  5. "deployment pipeline CI/CD"
+  6. "authentication security"
+  7. "document ingestion"
+  8. "semantic search optimization"
+  9. "quality gates research"
+  10. "API endpoint design"
+
+  Metrics to capture:
+  - P50, P95, P99 latency
+  - Layer timing breakdown
+  - Cache hit rate
+  - Comparison to Sprint 18 baseline
+
+success_criteria:
+  - Reproducible benchmark with 10+ queries
+  - P50, P95, mean latency metrics captured
+  - Layer timing breakdown per query
+  - Comparison to R18.0 baseline data
+  - JSON output for telemetry tracking
+  - Can run manually or in CI
+
+deliverables:
+  - scripts/pedr_latency_benchmark.py
+  - Benchmark results in cmos/telemetry/events/
+  - Threshold alerts for regression detection
+  - Documentation in scripts/README.md
+
+implementation_details:
+  files_to_create:
+    - path: scripts/pedr_latency_benchmark.py
+      description: |
+        Comprehensive PEDR benchmark suite.
+
+        ```python
+        #!/usr/bin/env python3
+        """
+        PEDR Latency Benchmark Suite
+
+        Runs standardized queries against PEDR search and captures metrics.
+        Outputs JSON for telemetry and comparison.
+
+        Usage:
+            python scripts/pedr_latency_benchmark.py
+            python scripts/pedr_latency_benchmark.py --output cmos/telemetry/events/pedr-benchmark.jsonl
+            python scripts/pedr_latency_benchmark.py --compare cmos/reports/sprint-18/pedr-baseline-capture.json
+        """
+
+        import argparse
+        import json
+        import statistics
+        import time
+        from datetime import datetime, timezone
+        from pathlib import Path
+
+        import httpx
+
+        # Standard test queries from R19.0 research
+        TEST_QUERIES = [
+            "usability testing best practices",
+            "mission protocol validation",
+            "participant recruitment strategy",
+            "sprint planning backlog",
+            "deployment pipeline CI/CD",
+            "authentication security",
+            "document ingestion",
+            "semantic search optimization",
+            "quality gates research",
+            "API endpoint design",
+        ]
+
+        API_BASE = "http://localhost:8000/api/v1"
+
+        def run_benchmark(queries: list[str], runs_per_query: int = 3) -> dict:
+            """Run benchmark and collect metrics."""
+            results = []
+            all_latencies = []
+
+            with httpx.Client(timeout=60.0) as client:
+                for query in queries:
+                    query_latencies = []
+                    layer_timings = []
+
+                    for run in range(runs_per_query):
+                        start = time.perf_counter()
+                        try:
+                            response = client.post(
+                                f"{API_BASE}/pedr/search",
+                                json={"query": query, "top_k": 10}
+                            )
+                            elapsed_ms = (time.perf_counter() - start) * 1000
+                            response.raise_for_status()
+
+                            data = response.json()
+                            query_latencies.append(elapsed_ms)
+                            all_latencies.append(elapsed_ms)
+
+                            if "metadata" in data and "layer_timings" in data["metadata"]:
+                                layer_timings.append(data["metadata"]["layer_timings"])
+
+                        except Exception as e:
+                            print(f"  Error on query '{query}': {e}")
+                            continue
+
+                    if query_latencies:
+                        results.append({
+                            "query": query,
+                            "runs": len(query_latencies),
+                            "p50_ms": statistics.median(query_latencies),
+                            "mean_ms": statistics.mean(query_latencies),
+                            "min_ms": min(query_latencies),
+                            "max_ms": max(query_latencies),
+                            "layer_timings": layer_timings[-1] if layer_timings else {}
+                        })
+                        print(f"  {query[:40]}: P50={statistics.median(query_latencies):.0f}ms")
+
+            # Aggregate metrics
+            if all_latencies:
+                sorted_latencies = sorted(all_latencies)
+                p50_idx = len(sorted_latencies) // 2
+                p95_idx = int(len(sorted_latencies) * 0.95)
+                p99_idx = int(len(sorted_latencies) * 0.99)
+
+                aggregate = {
+                    "p50_ms": sorted_latencies[p50_idx],
+                    "p95_ms": sorted_latencies[p95_idx] if p95_idx < len(sorted_latencies) else sorted_latencies[-1],
+                    "p99_ms": sorted_latencies[p99_idx] if p99_idx < len(sorted_latencies) else sorted_latencies[-1],
+                    "mean_ms": statistics.mean(all_latencies),
+                    "total_queries": len(all_latencies)
+                }
+            else:
+                aggregate = {}
+
+            return {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "sprint": "sprint-19",
+                "benchmark_type": "pedr_latency",
+                "queries": results,
+                "aggregate": aggregate
+            }
+
+        def compare_to_baseline(current: dict, baseline_path: str) -> dict:
+            """Compare current results to baseline."""
+            with open(baseline_path) as f:
+                baseline = json.load(f)
+
+            current_p50 = current["aggregate"].get("p50_ms", 0)
+            baseline_p50 = baseline.get("aggregate", {}).get("p50_ms", baseline.get("p50_latency_ms", 0))
+
+            if baseline_p50 > 0:
+                improvement_pct = ((baseline_p50 - current_p50) / baseline_p50) * 100
+            else:
+                improvement_pct = 0
+
+            return {
+                "baseline_p50_ms": baseline_p50,
+                "current_p50_ms": current_p50,
+                "improvement_pct": improvement_pct,
+                "target_met": current_p50 < 500  # Sprint 19 target
+            }
+
+        def main():
+            parser = argparse.ArgumentParser(description="PEDR Latency Benchmark")
+            parser.add_argument("--output", "-o", help="Output JSON file path")
+            parser.add_argument("--compare", "-c", help="Baseline JSON to compare against")
+            parser.add_argument("--runs", "-r", type=int, default=3, help="Runs per query")
+            args = parser.parse_args()
+
+            print("PEDR Latency Benchmark Suite")
+            print("=" * 50)
+            print(f"Queries: {len(TEST_QUERIES)}")
+            print(f"Runs per query: {args.runs}")
+            print()
+
+            results = run_benchmark(TEST_QUERIES, args.runs)
+
+            print()
+            print("=" * 50)
+            print("Aggregate Results:")
+            agg = results["aggregate"]
+            print(f"  P50:  {agg.get('p50_ms', 0):.0f}ms")
+            print(f"  P95:  {agg.get('p95_ms', 0):.0f}ms")
+            print(f"  Mean: {agg.get('mean_ms', 0):.0f}ms")
+
+            if args.compare:
+                print()
+                comparison = compare_to_baseline(results, args.compare)
+                results["comparison"] = comparison
+                print(f"Baseline P50: {comparison['baseline_p50_ms']:.0f}ms")
+                print(f"Current P50:  {comparison['current_p50_ms']:.0f}ms")
+                print(f"Improvement:  {comparison['improvement_pct']:+.1f}%")
+                print(f"Target Met (<500ms): {'YES' if comparison['target_met'] else 'NO'}")
+
+            if args.output:
+                output_path = Path(args.output)
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(output_path, "w") as f:
+                    json.dump(results, f, indent=2)
+                print(f"\nResults saved to: {output_path}")
+
+        if __name__ == "__main__":
+            main()
+        ```
+
+    - path: scripts/README.md
+      description: |
+        Add benchmark documentation:
+        ```markdown
+        ## PEDR Latency Benchmark
+
+        Run the PEDR benchmark suite to measure search latency:
+
+        ```bash
+        # Basic run
+        python scripts/pedr_latency_benchmark.py
+
+        # Save results
+        python scripts/pedr_latency_benchmark.py -o cmos/telemetry/events/pedr-benchmark-$(date +%Y%m%d).json
+
+        # Compare to Sprint 18 baseline
+        python scripts/pedr_latency_benchmark.py -c cmos/reports/sprint-18/pedr-baseline-capture.json
+        ```
+
+        ### Targets (Sprint 19)
+        - P50 < 500ms (for interactive use)
+        - P95 < 1000ms
+        - Improvement > 50% from Sprint 18 baseline
+        ```
+
+testing:
+  manual_testing:
+    - Run benchmark script locally
+    - Verify JSON output is valid
+    - Verify comparison works with baseline
+    - Check layer timings are captured
+
+reference_docs:
+  - cmos/reports/sprint-19/qdrant-optimization-research.md
+  - cmos/reports/sprint-18/pedr-baseline-capture.json
+  - scripts/pedr_baseline_capture.py (Sprint 18 version)
+
+notes: |
+  This script should be run:
+  1. Before any optimization (capture pre-state)
+  2. After each optimization mission (B19.1, B19.2, B19.3)
+  3. At sprint retrospective (final comparison)
+
+  The --compare flag enables regression detection.
+  Consider adding to CI/CD to catch performance regressions.

@@ -1,0 +1,201 @@
+mission_id: B19.3
+title: HNSW Parameter Tuning
+sprint: sprint-19
+status: Queued
+track: Build
+priority: 2
+estimated_hours: 3-4
+
+objective: |
+  Tune Qdrant HNSW parameters to optimize for lower latency while maintaining
+  acceptable recall. Target 30-50% latency reduction with <5% recall degradation.
+
+context: |
+  From R19.0 research (cmos/reports/sprint-19/qdrant-optimization-research.md):
+
+  HNSW Parameters:
+  - ef_search: Candidates checked during search (PRIMARY LATENCY LEVER)
+  - ef_construction: Candidates during index build (affects graph quality)
+  - m: Connections per node (affects recall and RAM)
+
+  Current observed behavior:
+  - ef_search=128 → ~1,500ms P50
+  - Target: ef_search=48-64 → ~300-500ms P50
+  - Trade-off: ~5% recall reduction acceptable for interactive use
+
+  Test Matrix from Research:
+  | Test | ef_search | Expected P50 |
+  |------|-----------|--------------|
+  | Baseline | 128 | 1,500ms |
+  | T1 | 64 | ~900ms (40% faster) |
+  | T2 | 48 | ~600ms (60% faster) |
+  | T3 | 32 | ~400ms (70% faster, may impact recall) |
+
+success_criteria:
+  - ef_search optimized for latency/recall trade-off
+  - Semantic layer latency reduced by >= 30%
+  - Recall degradation < 5% from baseline
+  - Parameter changes documented with benchmark evidence
+  - Rollback procedure documented
+
+deliverables:
+  - Updated Qdrant collection configuration
+  - Benchmark comparison report (before/after)
+  - Parameter selection documented with rationale
+  - scripts/tune_hnsw.py - Parameter testing script
+
+implementation_details:
+  investigation_first:
+    description: |
+      Before changing production, investigate current settings:
+      ```python
+      from qdrant_client import QdrantClient
+
+      client = QdrantClient(host="localhost", port=6333)
+      collection_info = client.get_collection("document_chunks")
+      print(f"Current HNSW config: {collection_info.config.hnsw_config}")
+      print(f"Current ef_search: {collection_info.config.hnsw_config.ef_construct}")
+      ```
+
+  files_to_create:
+    - path: scripts/tune_hnsw.py
+      description: |
+        Script to test different ef_search values and measure impact.
+
+        ```python
+        #!/usr/bin/env python3
+        """
+        HNSW Parameter Tuning Script
+        Tests different ef_search values and measures latency/recall.
+        """
+        import time
+        import statistics
+        from qdrant_client import QdrantClient, models
+        from app.services.embedding_service import EmbeddingService
+
+        # Test queries from R19.0 research
+        TEST_QUERIES = [
+            "usability testing best practices",
+            "mission protocol validation",
+            "participant recruitment strategy",
+            "sprint planning backlog",
+            "deployment pipeline CI/CD",
+            "authentication security",
+            "document ingestion",
+            "semantic search optimization",
+            "quality gates research",
+            "API endpoint design",
+        ]
+
+        EF_SEARCH_VALUES = [128, 96, 64, 48, 32]
+
+        def benchmark_ef_search(client: QdrantClient, ef_search: int, embedding_service: EmbeddingService):
+            latencies = []
+
+            for query in TEST_QUERIES:
+                # Get embedding
+                embedding = embedding_service.embed_text(query)
+
+                # Time the search
+                start = time.perf_counter()
+                results = client.search(
+                    collection_name="document_chunks",
+                    query_vector=embedding,
+                    limit=10,
+                    search_params=models.SearchParams(
+                        hnsw_ef=ef_search,  # Query-time override
+                        exact=False
+                    )
+                )
+                elapsed = (time.perf_counter() - start) * 1000
+                latencies.append(elapsed)
+
+            return {
+                "ef_search": ef_search,
+                "p50": statistics.median(latencies),
+                "p95": statistics.quantiles(latencies, n=20)[18] if len(latencies) >= 20 else max(latencies),
+                "mean": statistics.mean(latencies),
+                "queries": len(latencies)
+            }
+
+        def main():
+            client = QdrantClient(host="localhost", port=6333)
+            embedding_service = EmbeddingService()
+
+            print("HNSW Parameter Tuning Benchmark")
+            print("=" * 50)
+
+            results = []
+            for ef in EF_SEARCH_VALUES:
+                print(f"\nTesting ef_search={ef}...")
+                result = benchmark_ef_search(client, ef, embedding_service)
+                results.append(result)
+                print(f"  P50: {result['p50']:.1f}ms, P95: {result['p95']:.1f}ms")
+
+            # Print comparison
+            print("\n" + "=" * 50)
+            print("Results Summary:")
+            baseline = results[0]["p50"]
+            for r in results:
+                improvement = ((baseline - r["p50"]) / baseline) * 100
+                print(f"  ef_search={r['ef_search']:3d}: P50={r['p50']:7.1f}ms ({improvement:+.1f}%)")
+
+        if __name__ == "__main__":
+            main()
+        ```
+
+  files_to_modify:
+    - path: app/services/hybrid_search.py
+      changes: |
+        Add configurable hnsw_ef parameter:
+        ```python
+        from app.core.config import settings
+
+        async def semantic_search(self, query: str, top_k: int, ...):
+            results = self.qdrant_client.search(
+                collection_name="document_chunks",
+                query_vector=embedding,
+                limit=top_k,
+                search_params=models.SearchParams(
+                    hnsw_ef=settings.QDRANT_HNSW_EF,  # Configurable
+                    exact=False
+                )
+            )
+        ```
+
+    - path: app/core/config.py
+      changes: |
+        Add HNSW configuration:
+        ```python
+        # Qdrant HNSW tuning
+        QDRANT_HNSW_EF: int = 64  # Default after tuning (was 128)
+        ```
+
+    - path: app/services/pedr/search_orchestrator.py
+      changes: |
+        Pass hnsw_ef to semantic layer search.
+
+testing:
+  benchmarks:
+    - Run scripts/tune_hnsw.py to find optimal ef_search
+    - Compare P50 latency before/after
+    - Verify recall stays >95% with sample queries
+
+  recall_validation:
+    description: |
+      Compare results at ef_search=128 (baseline) vs optimized value.
+      Calculate overlap percentage - should be >95%.
+
+reference_docs:
+  - cmos/reports/sprint-19/qdrant-optimization-research.md
+  - app/services/hybrid_search.py
+  - app/services/embedding_service.py
+
+notes: |
+  IMPORTANT: ef_search is a query-time parameter, so changes take effect
+  immediately without rebuilding the index. This makes tuning safe to test.
+
+  The hnsw_ef parameter in SearchParams overrides collection default.
+  Start with ef_search=64, measure, then try 48 if more reduction needed.
+
+  If recall drops >5%, stick with ef_search=64 as the safe choice.

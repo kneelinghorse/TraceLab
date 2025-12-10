@@ -1,0 +1,127 @@
+mission_id: B19.1
+title: Qdrant Connection Pre-warming
+sprint: sprint-19
+status: Queued
+track: Build
+priority: 1
+estimated_hours: 2-3
+
+objective: |
+  Eliminate the 60+ second cold-start penalty by pre-warming Qdrant connections
+  on application startup. This is the highest-ROI optimization with lowest risk.
+
+context: |
+  From R19.0 research (cmos/reports/sprint-19/qdrant-optimization-research.md):
+
+  Current Problem:
+  - First query after startup takes 60+ seconds
+  - Caused by: cold Qdrant client connection, uninitialized pool, no data in memory
+
+  The fix involves:
+  1. Initializing connection pool at startup
+  2. Running a dummy query to warm the connection
+  3. Adding health check to verify Qdrant is ready before accepting requests
+
+success_criteria:
+  - First query latency reduced from 60s to <2s
+  - Connection pool initialized at FastAPI startup event
+  - Health check endpoint verifies Qdrant connectivity
+  - Application doesn't accept requests until Qdrant is warm
+  - Graceful degradation if Qdrant unavailable at startup
+
+deliverables:
+  - app/core/qdrant_client.py - Connection pool singleton with pre-warming
+  - app/api/health.py - Updated health check including Qdrant status
+  - Startup event handler in app/main.py
+  - Tests verifying pre-warm behavior
+
+implementation_details:
+  files_to_create:
+    - path: app/core/qdrant_client.py
+      description: |
+        Singleton QdrantClient with connection pooling.
+
+        Key implementation:
+        ```python
+        from qdrant_client import QdrantClient
+        from app.core.config import settings
+
+        _client: QdrantClient | None = None
+
+        def get_qdrant_client() -> QdrantClient:
+            global _client
+            if _client is None:
+                _client = QdrantClient(
+                    host=settings.QDRANT_HOST,
+                    port=settings.QDRANT_PORT,
+                    prefer_grpc=True,  # gRPC is faster than REST
+                    timeout=30,
+                )
+            return _client
+
+        async def prewarm_qdrant() -> bool:
+            """Pre-warm connection by running dummy query. Call at startup."""
+            try:
+                client = get_qdrant_client()
+                # Dummy search to initialize connection
+                client.search(
+                    collection_name="document_chunks",
+                    query_vector=[0.0] * 1536,  # Match embedding dimension
+                    limit=1
+                )
+                return True
+            except Exception as e:
+                logger.error(f"Qdrant pre-warm failed: {e}")
+                return False
+        ```
+
+  files_to_modify:
+    - path: app/main.py
+      changes: |
+        Add startup event handler:
+        ```python
+        from app.core.qdrant_client import prewarm_qdrant
+
+        @app.on_event("startup")
+        async def startup_event():
+            logger.info("Pre-warming Qdrant connection...")
+            success = await prewarm_qdrant()
+            if success:
+                logger.info("Qdrant pre-warm complete")
+            else:
+                logger.warning("Qdrant pre-warm failed - service may be slow on first query")
+        ```
+
+    - path: app/api/health.py
+      changes: |
+        Add Qdrant health check:
+        ```python
+        @router.get("/health/qdrant")
+        async def qdrant_health():
+            try:
+                client = get_qdrant_client()
+                collections = client.get_collections()
+                return {"status": "healthy", "collections": len(collections.collections)}
+            except Exception as e:
+                return {"status": "unhealthy", "error": str(e)}
+        ```
+
+testing:
+  unit_tests:
+    - Test prewarm_qdrant returns True on success
+    - Test prewarm_qdrant returns False and logs on failure
+    - Test get_qdrant_client returns singleton
+
+  integration_tests:
+    - Test startup completes pre-warm before accepting requests
+    - Test /health/qdrant returns healthy status
+    - Measure first query latency after startup (<2s target)
+
+reference_docs:
+  - cmos/reports/sprint-19/qdrant-optimization-research.md
+  - app/services/embedding_service.py (current Qdrant usage)
+
+notes: |
+  This is the quickest win - implement first before HNSW tuning.
+  The existing embedding_service.py creates QdrantClient on each call.
+  After this mission, refactor embedding_service to use the singleton.
