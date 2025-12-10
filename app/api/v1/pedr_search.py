@@ -6,6 +6,7 @@ This is the primary search interface for TraceLab, replacing/complementing the
 legacy RAG search endpoint with full Protocol-Enhanced Deep Research capabilities.
 """
 import logging
+import time
 from typing import Any, Dict
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -18,6 +19,7 @@ from app.schemas.pedr_search import (
     PEDRSearchMetadata,
     PEDRLayerTimings,
 )
+from app.services.pedr.relational import get_relational_service
 from app.services.pedr.search_orchestrator import create_pedr_orchestrator
 
 router = APIRouter()
@@ -93,14 +95,44 @@ async def pedr_search(
             layer_weights=layer_weights,
         )
 
+        # Apply graph expansion if requested
+        relational_ms = 0.0
+        if payload.include_related:
+            t0 = time.perf_counter()
+            relational_service = get_relational_service()
+            for search_result in result.results:
+                if search_result.urn:
+                    try:
+                        expansion = relational_service.get_related(
+                            search_result.urn,
+                            max_depth=1,
+                            limit=payload.max_related_per_result,
+                        )
+                        # Store as dict for serialization
+                        search_result.related_entities = [
+                            e.to_dict() for e in expansion.related_entities
+                        ]
+                    except Exception as e:
+                        logger.warning(
+                            "Failed to expand relations for %s: %s",
+                            search_result.urn,
+                            e,
+                        )
+                        search_result.related_entities = []
+                else:
+                    search_result.related_entities = []
+            relational_ms = (time.perf_counter() - t0) * 1000
+            result.metadata.timings.relational_ms = relational_ms
+
         # Convert internal response to Pydantic models
-        response = _convert_to_response(result)
+        response = _convert_to_response(result, include_related=payload.include_related)
 
         logger.info(
-            "PEDR search completed: query=%r, results=%d, latency=%.1fms, user=%s",
+            "PEDR search completed: query=%r, results=%d, latency=%.1fms, relational=%.1fms, user=%s",
             payload.query[:50],
             len(response.results),
             response.metadata.timings.total_ms,
+            relational_ms,
             current_user.username,
         )
 
@@ -119,37 +151,39 @@ async def pedr_search(
 
 def _convert_to_response(
     internal_result: Any,
+    *,
+    include_related: bool = False,
 ) -> PEDRSearchResponse:
     """Convert internal PEDRSearchResponse to Pydantic schema."""
     # The internal result is already well-structured, just need to map to Pydantic
 
     results = []
     for r in internal_result.results:
-        results.append(
-            PEDRSearchResult(
-                chunk_id=r.chunk_id,
-                content=r.content,
-                document_id=r.document_id,
-                project_id=r.project_id,
-                rrf_score=r.rrf_score,
-                rrf_rank=r.rrf_rank,
-                layer_ranks=r.layer_ranks,
-                layer_scores=r.layer_scores,
-                urn=r.urn,
-                confidence=r.confidence,
-                criticality=r.criticality,
-                element_type=r.element_type,
-                query_intent=r.query_intent,
-                quality_score=r.quality_score,
-                quality_status=r.quality_status,
-                quality_gates_passed=r.quality_gates_passed,
-                contributing_layers=r.contributing_layers,
-                chunk_index=r.chunk_index,
-                source_type=r.source_type,
-                score=r.rrf_score,
-                combined_score=r.rrf_score,
-            )
+        result = PEDRSearchResult(
+            chunk_id=r.chunk_id,
+            content=r.content,
+            document_id=r.document_id,
+            project_id=r.project_id,
+            rrf_score=r.rrf_score,
+            rrf_rank=r.rrf_rank,
+            layer_ranks=r.layer_ranks,
+            layer_scores=r.layer_scores,
+            urn=r.urn,
+            confidence=r.confidence,
+            criticality=r.criticality,
+            element_type=r.element_type,
+            query_intent=r.query_intent,
+            quality_score=r.quality_score,
+            quality_status=r.quality_status,
+            quality_gates_passed=r.quality_gates_passed,
+            contributing_layers=r.contributing_layers,
+            chunk_index=r.chunk_index,
+            source_type=r.source_type,
+            score=r.rrf_score,
+            combined_score=r.rrf_score,
+            related_entities=r.related_entities if include_related else None,
         )
+        results.append(result)
 
     metadata = internal_result.metadata
     timings = PEDRLayerTimings(
@@ -159,6 +193,7 @@ def _convert_to_response(
         pragmatic_ms=metadata.timings.pragmatic_ms,
         governance_ms=metadata.timings.governance_ms,
         fusion_ms=metadata.timings.fusion_ms,
+        relational_ms=metadata.timings.relational_ms,
         total_ms=metadata.timings.total_ms,
     )
 

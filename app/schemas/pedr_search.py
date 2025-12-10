@@ -105,6 +105,18 @@ class PEDRSearchRequest(BaseModel):
         description="HNSW ef override for semantic search",
     )
 
+    # Graph expansion options (Relational Layer)
+    include_related: bool = Field(
+        default=False,
+        description="Include related entities for each result (graph expansion)",
+    )
+    max_related_per_result: int = Field(
+        default=5,
+        ge=0,
+        le=20,
+        description="Maximum related entities to include per result",
+    )
+
 
 class PEDRLayerTimings(BaseModel):
     """Timing information for each PEDR search layer."""
@@ -115,6 +127,7 @@ class PEDRLayerTimings(BaseModel):
     pragmatic_ms: float = Field(description="Pragmatic processing latency in milliseconds")
     governance_ms: float = Field(description="Governance scoring latency in milliseconds")
     fusion_ms: float = Field(description="RRF fusion latency in milliseconds")
+    relational_ms: float = Field(default=0.0, description="Graph expansion latency in milliseconds")
     total_ms: float = Field(description="Total search latency in milliseconds")
 
 
@@ -179,6 +192,12 @@ class PEDRSearchResult(BaseModel):
     # Compatibility aliases
     score: float = Field(default=0.0, description="Alias for rrf_score (backward compatibility)")
     combined_score: float = Field(default=0.0, description="Alias for rrf_score (backward compatibility)")
+
+    # Graph expansion (populated when include_related=true)
+    related_entities: Optional[List[Dict[str, Any]]] = Field(
+        default=None,
+        description="Related entities from graph expansion (when include_related=true)",
+    )
 
 
 class PEDRSearchResponse(BaseModel):
