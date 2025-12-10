@@ -68,6 +68,27 @@ from .semantic_protocol import (
     CRITICALITY_WEIGHTS,
     CONFIDENCE_PRIOR,
 )
+from .fusion import (
+    RRFConfig,
+    LayerResult,
+    FusedResult,
+    FusionOutput,
+    RRFFusion,
+    get_rrf_fusion,
+    rrf_score,
+    RRF_K,
+)
+from .search_orchestrator import (
+    PEDRConfig,
+    LayerTimings,
+    PEDRMetadata,
+    PEDRSearchResult,
+    PEDRSearchResponse,
+    PEDRSearchOrchestrator,
+    get_pedr_orchestrator,
+    create_pedr_orchestrator,
+    DEFAULT_LAYER_WEIGHTS,
+)
 
 __all__ = [
     # Quality scoring
@@ -130,4 +151,23 @@ __all__ = [
     "PROTOCOL_VERSION",
     "CRITICALITY_WEIGHTS",
     "CONFIDENCE_PRIOR",
+    # RRF Fusion
+    "RRFConfig",
+    "LayerResult",
+    "FusedResult",
+    "FusionOutput",
+    "RRFFusion",
+    "get_rrf_fusion",
+    "rrf_score",
+    "RRF_K",
+    # Search Orchestrator
+    "PEDRConfig",
+    "LayerTimings",
+    "PEDRMetadata",
+    "PEDRSearchResult",
+    "PEDRSearchResponse",
+    "PEDRSearchOrchestrator",
+    "get_pedr_orchestrator",
+    "create_pedr_orchestrator",
+    "DEFAULT_LAYER_WEIGHTS",
 ]
