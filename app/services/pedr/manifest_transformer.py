@@ -1,6 +1,9 @@
 """Transform Tracelab missions to PEDR manifest format.
 
 Reference: cmos/planning/PEDR-docs/tracelab-to-pedr-mapping.md
+
+This module provides backward-compatible manifest transformation while
+integrating with the new Semantic Protocol for full protocol features.
 """
 from __future__ import annotations
 
@@ -8,6 +11,13 @@ import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Sequence
+
+from app.services.pedr.semantic_protocol import (
+    EntityType,
+    ProtocolManifest,
+    SemanticProtocol,
+    get_semantic_protocol,
+)
 
 # PII detection patterns (simple heuristics)
 PII_PATTERNS = [
@@ -20,7 +30,11 @@ PII_PATTERNS = [
 
 @dataclass(frozen=True)
 class PEDRManifest:
-    """PEDR protocol catalog entry format."""
+    """PEDR protocol catalog entry format.
+
+    This is the legacy manifest format maintained for backward compatibility.
+    New code should use ProtocolManifest from semantic_protocol.py.
+    """
 
     urn: str
     manifest: Dict[str, Any]
@@ -32,6 +46,10 @@ class PEDRManifest:
     governance_pii: bool
     governance_impact: int
     bindings: Dict[str, Any]
+    # New fields from Semantic Protocol
+    confidence: float = 0.5
+    criticality: float = 0.5
+    semantic_vector: List[Dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
@@ -46,7 +64,36 @@ class PEDRManifest:
             "governance_pii": self.governance_pii,
             "governance_impact": self.governance_impact,
             "bindings": self.bindings,
+            "confidence": self.confidence,
+            "criticality": self.criticality,
+            "semantic_vector": self.semantic_vector,
         }
+
+    @classmethod
+    def from_protocol_manifest(cls, protocol_manifest: ProtocolManifest) -> "PEDRManifest":
+        """Create PEDRManifest from a ProtocolManifest.
+
+        Args:
+            protocol_manifest: Full Semantic Protocol manifest
+
+        Returns:
+            Legacy PEDRManifest format
+        """
+        return cls(
+            urn=str(protocol_manifest.urn),
+            manifest=protocol_manifest.to_dict(),
+            purpose=protocol_manifest.semantics.purpose,
+            description=protocol_manifest.semantics.description,
+            context_domain=protocol_manifest.context.get("domain", "research"),
+            element_type=protocol_manifest.element.element_type.replace("research.", ""),
+            element_intent=protocol_manifest.element.intent.value,
+            governance_pii=protocol_manifest.governance.pii_handling,
+            governance_impact=protocol_manifest.governance.business_impact,
+            bindings=protocol_manifest.relationships,
+            confidence=protocol_manifest.confidence,
+            criticality=protocol_manifest.criticality,
+            semantic_vector=protocol_manifest.semantics.vector,
+        )
 
 
 @dataclass
@@ -405,6 +452,192 @@ class ManifestTransformer:
         if len(text) <= max_length:
             return text
         return text[:max_length - 3] + "..."
+
+    # ------------------------------------------------------------------
+    # Semantic Protocol Integration
+    # ------------------------------------------------------------------
+
+    def transform_with_protocol(
+        self,
+        mission_id: str,
+        mission_data: Dict[str, Any],
+        quality_gates: Optional[Dict[str, Any]] = None,
+        project_id: Optional[str] = None,
+        status: str = "unknown",
+    ) -> TransformationResult:
+        """Transform mission using full Semantic Protocol.
+
+        This method creates a ProtocolManifest with all semantic features:
+        - URN-based identification
+        - Bayesian confidence scoring
+        - Criticality calculation
+        - Semantic vectors
+
+        Args:
+            mission_id: Mission protocol ID
+            mission_data: Full mission data
+            quality_gates: Quality gate validation results
+            project_id: Associated project ID
+            status: Mission status
+
+        Returns:
+            TransformationResult with enhanced PEDRManifest
+        """
+        warnings: List[str] = []
+
+        if not mission_data:
+            return TransformationResult(
+                success=False,
+                error="Mission data is empty",
+            )
+
+        try:
+            # Get semantic protocol service
+            protocol = get_semantic_protocol()
+
+            # Create full protocol manifest
+            protocol_manifest = protocol.create_mission_manifest(
+                mission_id=mission_id,
+                mission_data=mission_data,
+                quality_gates=quality_gates,
+                project_id=project_id,
+                status=status,
+            )
+
+            # Convert to legacy PEDRManifest format
+            legacy_manifest = PEDRManifest.from_protocol_manifest(protocol_manifest)
+
+            return TransformationResult(
+                success=True,
+                manifest=legacy_manifest,
+                warnings=warnings,
+            )
+
+        except Exception as e:
+            # Fall back to legacy transformation
+            warnings.append(f"Semantic Protocol failed, using legacy: {e}")
+            return self.transform_mission(
+                mission_id=mission_id,
+                mission_data=mission_data,
+                quality_gates=quality_gates,
+                project_id=project_id,
+                status=status,
+            )
+
+    def transform_document_with_protocol(
+        self,
+        document_id: str,
+        name: str,
+        content: Optional[str] = None,
+        file_type: Optional[str] = None,
+        source_type: Optional[str] = None,
+        project_id: Optional[str] = None,
+        chunk_count: int = 0,
+    ) -> TransformationResult:
+        """Transform document using full Semantic Protocol.
+
+        Args:
+            document_id: Document ID
+            name: Document name
+            content: Document content
+            file_type: File type
+            source_type: Source type
+            project_id: Associated project ID
+            chunk_count: Number of chunks
+
+        Returns:
+            TransformationResult with enhanced PEDRManifest
+        """
+        try:
+            protocol = get_semantic_protocol()
+
+            protocol_manifest = protocol.create_document_manifest(
+                document_id=document_id,
+                name=name,
+                content=content,
+                file_type=file_type,
+                source_type=source_type,
+                project_id=project_id,
+                chunk_count=chunk_count,
+            )
+
+            legacy_manifest = PEDRManifest.from_protocol_manifest(protocol_manifest)
+
+            return TransformationResult(
+                success=True,
+                manifest=legacy_manifest,
+            )
+
+        except Exception as e:
+            # Fall back to legacy transformation
+            return self.transform_document(
+                document_id=document_id,
+                name=name,
+                content=content,
+                file_type=file_type,
+                source_type=source_type,
+                project_id=project_id,
+                chunk_count=chunk_count,
+            )
+
+    def transform_insight_with_protocol(
+        self,
+        insight_id: str,
+        title: str,
+        content: str,
+        insight_type: Optional[str] = None,
+        created_by: Optional[str] = None,
+        validated: bool = False,
+        project_id: Optional[str] = None,
+        source_chunk_ids: Optional[List[str]] = None,
+    ) -> TransformationResult:
+        """Transform insight using full Semantic Protocol.
+
+        Args:
+            insight_id: Insight ID
+            title: Insight title
+            content: Insight content
+            insight_type: Type of insight
+            created_by: Creator identifier
+            validated: Validation status
+            project_id: Associated project ID
+            source_chunk_ids: Source chunk IDs
+
+        Returns:
+            TransformationResult with enhanced PEDRManifest
+        """
+        try:
+            protocol = get_semantic_protocol()
+
+            protocol_manifest = protocol.create_insight_manifest(
+                insight_id=insight_id,
+                title=title,
+                content=content,
+                insight_type=insight_type,
+                validated=validated,
+                project_id=project_id,
+                source_chunk_ids=source_chunk_ids,
+            )
+
+            legacy_manifest = PEDRManifest.from_protocol_manifest(protocol_manifest)
+
+            return TransformationResult(
+                success=True,
+                manifest=legacy_manifest,
+            )
+
+        except Exception as e:
+            # Fall back to legacy transformation
+            return self.transform_insight(
+                insight_id=insight_id,
+                title=title,
+                content=content,
+                insight_type=insight_type,
+                created_by=created_by,
+                validated=validated,
+                project_id=project_id,
+                source_chunk_ids=source_chunk_ids,
+            )
 
 
 # Singleton instance
