@@ -309,6 +309,7 @@ def submit_mission(
 
     Validates:
     - Mission exists
+    - Mission is associated with a project
     - Mission has at least one success criterion
     - Mission is not already queued or in progress
 
@@ -317,6 +318,17 @@ def submit_mission(
     try:
         # Get mission
         mission = _service.get_mission(db, mission_id)
+
+        # Validate project_id is set
+        if not mission.project_id:
+            raise HTTPException(
+                status_code=http_status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "message": "Mission must be associated with a project before submission",
+                    "mission_id": str(mission_id),
+                    "suggestion": "Use PUT /missions/{id} to set project_id first",
+                },
+            )
 
         # Validate success_criteria
         if not mission.success_criteria or len(mission.success_criteria) == 0:
