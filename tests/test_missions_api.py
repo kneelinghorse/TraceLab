@@ -719,9 +719,12 @@ class TestMissionSubmit:
     """Tests for the POST /missions/{id}/submit endpoint."""
 
     def test_submit_mission_success(self, auth_headers, db_session):
-        """Successfully submit a draft mission."""
+        """Successfully submit a draft mission with project."""
         client = TestClient(app)
-        mission = _create_test_mission(db_session, mission_id="SUBMIT-001", status="draft")
+        project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session, mission_id="SUBMIT-001", status="draft", project_id=project.id
+        )
 
         response = client.post(
             f"/api/v1/missions/{mission.id}/submit",
@@ -735,6 +738,24 @@ class TestMissionSubmit:
         assert data["uuid"] == str(mission.id)
         assert "message" in data
         assert data["mode"] in ("worker", "http")
+
+    def test_submit_mission_without_project_fails(self, auth_headers, db_session):
+        """Cannot submit a mission without a project."""
+        client = TestClient(app)
+        mission = _create_test_mission(
+            db_session, mission_id="SUBMIT-NOPROJECT", status="draft", project_id=None
+        )
+
+        response = client.post(
+            f"/api/v1/missions/{mission.id}/submit",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 400
+        data = response.json()
+        assert "project" in data["detail"]["message"].lower()
+        assert data["detail"]["mission_id"] == str(mission.id)
+        assert "suggestion" in data["detail"]
 
     def test_submit_mission_not_found(self, auth_headers):
         """Submit non-existent mission returns 404."""
@@ -751,7 +772,10 @@ class TestMissionSubmit:
     def test_submit_mission_already_queued(self, auth_headers, db_session):
         """Cannot submit a mission that is already queued."""
         client = TestClient(app)
-        mission = _create_test_mission(db_session, mission_id="SUBMIT-002", status="queued")
+        project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session, mission_id="SUBMIT-002", status="queued", project_id=project.id
+        )
 
         response = client.post(
             f"/api/v1/missions/{mission.id}/submit",
@@ -764,7 +788,10 @@ class TestMissionSubmit:
     def test_submit_mission_in_progress(self, auth_headers, db_session):
         """Cannot submit a mission that is in progress."""
         client = TestClient(app)
-        mission = _create_test_mission(db_session, mission_id="SUBMIT-003", status="in_progress")
+        project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session, mission_id="SUBMIT-003", status="in_progress", project_id=project.id
+        )
 
         response = client.post(
             f"/api/v1/missions/{mission.id}/submit",
@@ -777,7 +804,10 @@ class TestMissionSubmit:
     def test_submit_completed_mission(self, auth_headers, db_session):
         """Can resubmit a completed mission."""
         client = TestClient(app)
-        mission = _create_test_mission(db_session, mission_id="SUBMIT-004", status="completed")
+        project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session, mission_id="SUBMIT-004", status="completed", project_id=project.id
+        )
 
         response = client.post(
             f"/api/v1/missions/{mission.id}/submit",
@@ -791,7 +821,10 @@ class TestMissionSubmit:
     def test_submit_mission_updates_status_in_db(self, auth_headers, db_session):
         """Submit should update the mission status in the database."""
         client = TestClient(app)
-        mission = _create_test_mission(db_session, mission_id="SUBMIT-005", status="draft")
+        project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session, mission_id="SUBMIT-005", status="draft", project_id=project.id
+        )
 
         response = client.post(
             f"/api/v1/missions/{mission.id}/submit",

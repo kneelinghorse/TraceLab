@@ -363,11 +363,12 @@ async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
 
     This tool:
     1. Fetches the mission from TraceLab
-    2. Validates success_criteria is not empty
-    3. Checks mission isn't already queued/in_progress
-    4. Worker mode: Sets status='queued' for worker to pick up
+    2. Validates project_id is set (missions must be associated with a project)
+    3. Validates success_criteria is not empty
+    4. Checks mission isn't already queued/in_progress
+    5. Worker mode: Sets status='queued' for worker to pick up
        HTTP mode: POSTs to DeepSearch /missions/execute
-    5. Returns job info
+    6. Returns job info
     """
     import json
 
@@ -379,7 +380,18 @@ async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
             # 1. Fetch the mission
             mission = _get_mission_by_id_or_mission_id(db, mission_id)
 
-            # 2. Validate success_criteria
+            # 2. Validate project_id is set
+            if not mission.project_id:
+                return [TextContent(
+                    type="text",
+                    text=json.dumps({
+                        "error": "Mission must be associated with a project before submission",
+                        "mission_id": mission.mission_id,
+                        "suggestion": "Use PUT /missions/{id} to set project_id first",
+                    })
+                )]
+
+            # 3. Validate success_criteria
             if not mission.success_criteria or len(mission.success_criteria) == 0:
                 return [TextContent(
                     type="text",
@@ -389,7 +401,7 @@ async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
                     })
                 )]
 
-            # 3. Check if already submitted
+            # 4. Check if already submitted
             if mission.status in ("queued", "in_progress"):
                 return [TextContent(
                     type="text",
@@ -400,7 +412,7 @@ async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
                     })
                 )]
 
-            # 4. Check mode: worker (DB polling) or http (API calls)
+            # 5. Check mode: worker (DB polling) or http (API calls)
             deepsearch_mode = getattr(settings, 'deepsearch_mode', 'worker').lower()
 
             if deepsearch_mode == "http":
@@ -468,7 +480,7 @@ async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
                     mission.mission_id,
                 )
 
-            # 5. Update mission status
+            # 6. Update mission status
             updated_mission = _mission_service.update_mission(db, mission.id, update_data)
 
             result = {
