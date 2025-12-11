@@ -124,6 +124,14 @@ function SearchExperience({ initialSection }: SearchPageProps) {
     return map;
   }, [documents]);
 
+  const projectIndex = useMemo(() => {
+    const map = new Map<string, Project>();
+    for (const proj of projects) {
+      map.set(proj.id, proj);
+    }
+    return map;
+  }, [projects]);
+
   const documentTypes = useMemo(() => {
     const unique = new Set<string>();
     documents.forEach((doc) => {
@@ -472,11 +480,32 @@ function SearchExperience({ initialSection }: SearchPageProps) {
             <PEDRMetadataPanel metadata={pedrMetadata} />
 
             {filteredResults.length === 0 && !isSearching ? (
-              <div className="glass-card rounded-2xl p-8 text-center text-slate-300">
-                <p className="text-lg font-semibold text-white">No results yet</p>
-                <p className="mt-2 text-sm text-slate-400">
-                  Enter a query and search to find relevant content.
-                </p>
+              <div className="glass-card rounded-2xl p-8 text-slate-300">
+                <div className="text-center">
+                  <p className="text-lg font-semibold text-white">No results yet</p>
+                  <p className="mt-2 text-sm text-slate-400">
+                    Enter a query and search to find relevant content.
+                  </p>
+                </div>
+                {!query && historyEntries.length > 0 && (
+                  <div className="mt-6 border-t border-white/10 pt-6">
+                    <p className="text-sm font-medium text-slate-400 mb-3">Recent searches</p>
+                    <div className="flex flex-wrap gap-2">
+                      {historyEntries.slice(0, 5).map((entry) => (
+                        <button
+                          key={entry.id}
+                          onClick={() => void handleHistoryRun(entry)}
+                          className="group flex items-center gap-2 rounded-full border border-white/15 bg-black/20 px-3 py-1.5 text-sm text-slate-200 hover:border-sky-400 hover:bg-sky-500/10 transition-colors"
+                        >
+                          <span className="truncate max-w-[200px]">{entry.query_text}</span>
+                          <span className="text-xs text-slate-500 group-hover:text-sky-400">
+                            {entry.result_count} results
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="grid gap-4">
@@ -486,6 +515,7 @@ function SearchExperience({ initialSection }: SearchPageProps) {
                     ref={registerCardRef(result.chunk_id)}
                     result={result}
                     document={result.document_id ? documentIndex.get(result.document_id) : undefined}
+                    project={result.project_id ? projectIndex.get(result.project_id) : undefined}
                     isHighlighted={highlightedChunkId === result.chunk_id}
                   />
                 ))}
@@ -555,7 +585,9 @@ function SearchExperience({ initialSection }: SearchPageProps) {
                         </div>
                         {(entryFilters.projectId || entry.top_k !== 10) && (
                           <div className="mt-1 flex flex-wrap gap-1 text-xs text-slate-500">
-                            {entryFilters.projectId && <span>Project: {entryFilters.projectId}</span>}
+                            {entryFilters.projectId && (
+                              <span>Project: {projectIndex.get(entryFilters.projectId)?.name ?? entryFilters.projectId}</span>
+                            )}
                             <span>Chunks: {entry.top_k}</span>
                           </div>
                         )}
