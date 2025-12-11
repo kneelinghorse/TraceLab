@@ -87,8 +87,8 @@ class ReportPromotionService:
                 f"Report {report.id} has already been promoted to document {existing_doc.id}"
             )
 
-        # Create document name from mission title and report
-        document_name = f"{mission.title} - Report"
+        # Create document name from mission title and report (must end in .md for parser)
+        document_name = f"{mission.title} - Report.md"
 
         logger.info(
             "Promoting report %s from mission %s as document '%s'",
@@ -226,8 +226,8 @@ class ReportPromotionService:
                 f"Mission {mission.mission_id} has already been promoted to document {existing_doc.id}"
             )
 
-        # Create document name from mission title
-        document_name = f"{mission.title} - DeepSearch Results"
+        # Create document name from mission title (must end in .md for parser)
+        document_name = f"{mission.title} - DeepSearch Results.md"
 
         logger.info(
             "Promoting result_markdown from mission %s as document '%s'",
