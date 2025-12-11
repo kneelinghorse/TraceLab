@@ -35,6 +35,7 @@ export const apiMissionFormSchema = z.object({
   status: z.enum(["draft", "queued"]).optional(),
   priority: z.enum(["low", "normal", "high"]).optional(),
   max_loops: z.number().min(1).max(10).optional(),
+  research_depth: z.enum(["baseline", "deep", "alpha"]).optional(),
 });
 
 export type ApiMissionFormValues = z.infer<typeof apiMissionFormSchema>;
@@ -58,4 +59,5 @@ export const defaultApiMissionFormValues: ApiMissionFormValues = {
   status: "draft",
   priority: "normal",
   max_loops: 3,
+  research_depth: "baseline",
 };

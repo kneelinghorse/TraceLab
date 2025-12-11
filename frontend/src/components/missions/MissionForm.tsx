@@ -72,6 +72,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
           max_loops: values.max_loops,
           ...values.metadata,
         },
+        research_depth: values.research_depth || "baseline",
         status: submitStatus,
       };
 
@@ -169,7 +170,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
           </h2>
         </header>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="form-label">Project</label>
             <select {...register("project_id")} className="form-input">
@@ -185,6 +186,20 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
             )}
           </div>
 
+          <div>
+            <label className="form-label">Research Depth</label>
+            <select {...register("research_depth")} className="form-input">
+              <option value="baseline">Baseline - Quick (2-4 min)</option>
+              <option value="deep">Deep - Thorough (5-10 min)</option>
+              <option value="alpha">Alpha - Comprehensive (8-15 min)</option>
+            </select>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Controls research thoroughness and source depth
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="form-label">Priority</label>
             <select {...register("priority")} className="form-input">

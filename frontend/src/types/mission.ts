@@ -129,6 +129,8 @@ export interface EvidenceLinkPayload {
 /**
  * Mission entity from the API (B16.1+ schema)
  */
+export type ResearchDepth = "baseline" | "deep" | "alpha";
+
 export interface ApiMission {
   id: string;
   project_id: string | null;
@@ -142,6 +144,7 @@ export interface ApiMission {
   research_phases: Record<string, unknown>;
   tags: string[];
   metadata: Record<string, unknown>;
+  research_depth: ResearchDepth;
   status: MissionStatus;
   queued_at: string | null;
   started_at: string | null;
@@ -169,6 +172,7 @@ export interface ApiMissionCreate {
   research_phases?: Record<string, unknown>;
   tags?: string[];
   metadata?: Record<string, unknown>;
+  research_depth?: ResearchDepth;
   status?: MissionStatus;
   created_by?: string;
 }
