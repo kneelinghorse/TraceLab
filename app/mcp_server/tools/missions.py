@@ -51,6 +51,7 @@ def _serialize_mission(mission) -> Dict[str, Any]:
         "research_phases": mission.research_phases or {},
         "tags": mission.tags or [],
         "metadata": mission.mission_metadata or {},
+        "research_depth": mission.research_depth or "baseline",
         "status": mission.status,
         "queued_at": mission.queued_at.isoformat() if mission.queued_at else None,
         "started_at": mission.started_at.isoformat() if mission.started_at else None,
@@ -133,6 +134,12 @@ MISSION_TOOLS: List[Tool] = [
                     "minimum": 1,
                     "maximum": 10,
                     "description": "Maximum DeepSearch iteration loops (optional)",
+                },
+                "research_depth": {
+                    "type": "string",
+                    "enum": ["baseline", "deep", "alpha"],
+                    "default": "baseline",
+                    "description": "Research depth tier: baseline (quick verification), deep (comprehensive analysis), alpha (novel domain exploration)",
                 },
             },
             "required": ["mission_id", "title", "objective", "success_criteria"],
@@ -256,6 +263,7 @@ async def handle_create_mission(arguments: Dict[str, Any]) -> List[TextContent]:
             research_phases=arguments.get("research_phases", {}),
             tags=arguments.get("tags", []),
             metadata=metadata,
+            research_depth=arguments.get("research_depth", "baseline"),
             status="draft",
             created_by="mcp-tool",
         )
@@ -407,6 +415,7 @@ async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
                         deliverables=mission.deliverables or [],
                         research_phases=mission.research_phases or {},
                         metadata=mission.mission_metadata or {},
+                        research_depth=mission.research_depth or "baseline",
                     )
                     job_id = response.job_id
                     logger.info(

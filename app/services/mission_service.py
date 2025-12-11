@@ -155,6 +155,7 @@ class MissionService:
             research_phases=data.research_phases or {},
             tags=data.tags or [],
             mission_metadata=data.metadata or {},  # Schema uses 'metadata', model uses 'mission_metadata'
+            research_depth=data.research_depth or "baseline",
             status=data.status or "draft",
             created_by=data.created_by,
         )

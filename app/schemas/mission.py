@@ -16,6 +16,9 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 # Valid mission statuses
 MissionStatus = Literal["draft", "queued", "in_progress", "completed", "blocked", "cancelled"]
 
+# Valid research depth tiers
+ResearchDepth = Literal["baseline", "deep", "alpha"]
+
 # Mission ID pattern: starts with alphanumeric, can contain dots, dashes, underscores
 MISSION_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
@@ -98,6 +101,10 @@ class MissionCreate(MissionBase):
         default_factory=dict,
         description="Arbitrary metadata object",
     )
+    research_depth: Optional[ResearchDepth] = Field(
+        "baseline",
+        description="Research depth tier: baseline (default), deep, or alpha",
+    )
     status: Optional[MissionStatus] = Field(
         "draft",
         description="Initial mission status",
@@ -150,6 +157,10 @@ class MissionUpdate(BaseModel):
     metadata: Optional[Dict[str, Any]] = Field(
         None,
         description="Arbitrary metadata object",
+    )
+    research_depth: Optional[ResearchDepth] = Field(
+        None,
+        description="Research depth tier: baseline, deep, or alpha",
     )
     status: Optional[MissionStatus] = Field(
         None,
@@ -212,6 +223,9 @@ class MissionResponse(MissionBase):
     research_phases: Dict[str, Any] = Field(default_factory=dict)
     tags: List[str] = Field(default_factory=list)
     metadata: Dict[str, Any] = Field(default_factory=dict)
+    research_depth: Optional[ResearchDepth] = Field(
+        "baseline", description="Research depth tier: baseline, deep, or alpha"
+    )
     status: MissionStatus
     queued_at: Optional[datetime] = None
     started_at: Optional[datetime] = None

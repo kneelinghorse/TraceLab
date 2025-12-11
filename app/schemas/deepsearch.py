@@ -48,6 +48,10 @@ class DeepSearchExecuteRequest(BaseModel):
     metadata: Optional[Dict[str, Any]] = Field(
         default=None, description="Additional metadata"
     )
+    research_depth: Optional[str] = Field(
+        default="baseline",
+        description="Research depth tier: baseline (default), deep, or alpha",
+    )
 
 
 class DeepSearchExecuteResponse(BaseModel):
