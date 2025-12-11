@@ -3,21 +3,23 @@ import Link from "next/link";
 import { forwardRef } from "react";
 
 import { AddToCollection } from "@/components/AddToCollection";
-import type { Document } from "@/types/document";
+import type { Document, Project } from "@/types/document";
 import type { SearchResultChunk } from "@/types/search";
 
 type ResultCardProps = {
   result: SearchResultChunk;
   document?: Document;
+  project?: Project;
   isHighlighted?: boolean;
 };
 
 export const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function ResultCard(
-  { result, document, isHighlighted = false },
+  { result, document, project, isHighlighted = false },
   ref,
 ) {
 
   const documentLabel = document?.name ?? document?.file_path ?? result.document_id ?? "Unlinked document";
+  const projectLabel = project?.name ?? result.project_id;
   const chunkPreview = result.content.length > 360 ? `${result.content.slice(0, 357)}…` : result.content;
   const scoreLabel = typeof result.score === "number" ? result.score.toFixed(3) : "–";
 
@@ -44,7 +46,29 @@ export const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function R
       </div>
 
       <div className="mt-4 space-y-2">
-        <p className="text-sm text-slate-300">{documentLabel}</p>
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          {result.project_id && (
+            <Link
+              href={`/projects/${result.project_id}`}
+              className="text-sky-300 hover:text-sky-200 hover:underline"
+            >
+              {projectLabel}
+            </Link>
+          )}
+          {result.project_id && result.document_id && (
+            <span className="text-slate-500">/</span>
+          )}
+          {result.document_id ? (
+            <Link
+              href={`/documents/${result.document_id}`}
+              className="text-slate-300 hover:text-white hover:underline"
+            >
+              {documentLabel}
+            </Link>
+          ) : (
+            <span className="text-slate-300">{documentLabel}</span>
+          )}
+        </div>
         <div className="flex flex-wrap items-center gap-2 text-sm text-slate-400">
           <span>{result.source_type ? result.source_type : "Unknown type"}</span>
           {document?.uploaded_at && (
@@ -68,16 +92,7 @@ export const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function R
 
       <p className="mt-4 text-slate-100 leading-relaxed whitespace-pre-line">{chunkPreview}</p>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-4 text-sm text-sky-300">
-          {document?.id && (
-            <Link href={`/documents/${document.id}`} className="hover:underline">
-              View document &rarr;
-            </Link>
-          )}
-          {result.project_id && <span className="text-slate-400">Project: {result.project_id}</span>}
-        </div>
-
+      <div className="mt-4 flex flex-wrap items-center justify-end gap-4">
         {result.chunk_id && (
           <AddToCollection chunkId={result.chunk_id} />
         )}
