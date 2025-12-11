@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import List, Optional, Tuple
 from uuid import UUID
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.mission import MISSION_STATUSES, Mission
 from app.schemas.mission import MissionCreate, MissionUpdate
@@ -57,7 +57,7 @@ class MissionService:
             Tuple of (missions list, pagination metadata)
         """
         clamped_page_size = min(max(page_size, 1), self.MAX_PAGE_SIZE)
-        query = db.query(Mission)
+        query = db.query(Mission).options(joinedload(Mission.project))
 
         # Apply filters
         if status:
@@ -105,7 +105,12 @@ class MissionService:
         Raises:
             MissionNotFoundError: If mission doesn't exist
         """
-        mission = db.query(Mission).filter(Mission.id == mission_id).first()
+        mission = (
+            db.query(Mission)
+            .options(joinedload(Mission.project))
+            .filter(Mission.id == mission_id)
+            .first()
+        )
         if not mission:
             raise MissionNotFoundError(f"Mission {mission_id} not found")
         return mission
