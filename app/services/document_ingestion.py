@@ -129,8 +129,10 @@ class DocumentIngestionService:
         
         try:
             # Stage 1: Parse document
-            if not DocumentParser.is_format_supported(file_path or Path(document.name)):
-                raise ValueError(f"Unsupported file format: {file_path.suffix if file_path else 'unknown'}")
+            # Use document.name as fallback path for format detection when file_path is None
+            parse_path = file_path or Path(document.name)
+            if not DocumentParser.is_format_supported(parse_path):
+                raise ValueError(f"Unsupported file format: {parse_path.suffix if parse_path else 'unknown'}")
             current_stage = "extracted"
             self.status_recorder.record(
                 db,
@@ -140,7 +142,7 @@ class DocumentIngestionService:
                 message="Parsing document content",
             )
 
-            raw_text = self.parser.parse(file_path, file_content)
+            raw_text = self.parser.parse(parse_path, file_content)
             self.status_recorder.record(
                 db,
                 document_id,
