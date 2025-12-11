@@ -60,6 +60,7 @@ def _to_response(mission) -> MissionResponse:
         research_phases=mission.research_phases or {},
         tags=mission.tags or [],
         metadata=mission.mission_metadata or {},  # Map mission_metadata -> metadata
+        research_depth=mission.research_depth or "baseline",
         status=mission.status,
         queued_at=mission.queued_at,
         started_at=mission.started_at,

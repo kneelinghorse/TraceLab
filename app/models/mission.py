@@ -109,6 +109,12 @@ class Mission(Base):
         default=dict,
         comment="Arbitrary metadata object",
     )
+    research_depth = Column(
+        String(20),
+        nullable=True,
+        default="baseline",
+        comment="Research depth tier: baseline, deep, or alpha",
+    )
 
     # Execution Tracking
     status = Column(
@@ -208,6 +214,11 @@ class Mission(Base):
             "status IN ('draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled')",
             name="valid_mission_status",
         ),
+        # Valid research_depth values (nullable allowed)
+        CheckConstraint(
+            "research_depth IS NULL OR research_depth IN ('baseline', 'deep', 'alpha')",
+            name="valid_research_depth",
+        ),
         # Composite index for project + status queries
         Index("idx_missions_project_status", "project_id", "status"),
         # Index for mission_id lookups
@@ -229,6 +240,7 @@ class Mission(Base):
             "research_phases": self.research_phases or {},
             "tags": self.tags or [],
             "metadata": self.mission_metadata or {},
+            "research_depth": self.research_depth,
             "status": self.status,
             "queued_at": self.queued_at.isoformat() if self.queued_at else None,
             "started_at": self.started_at.isoformat() if self.started_at else None,
@@ -257,6 +269,7 @@ class Mission(Base):
             "research_phases": self.research_phases or {},
             "tags": self.tags or [],
             "metadata": self.mission_metadata or {},
+            "research_depth": self.research_depth or "baseline",
         }
 
     @classmethod
@@ -278,5 +291,6 @@ class Mission(Base):
             research_phases=protocol.get("research_phases", {}),
             tags=protocol.get("tags", []),
             mission_metadata=protocol.get("metadata", {}),
+            research_depth=protocol.get("research_depth", "baseline"),
             created_by=created_by,
         )
