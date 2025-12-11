@@ -1,13 +1,16 @@
-"""DeepSearch ingestion endpoints."""
+"""DeepSearch ingestion and worker health endpoints."""
 from __future__ import annotations
 
-from typing import Dict, Optional
+import logging
+from typing import Any, Dict, Optional
 from uuid import UUID
 
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.models.mission_protocol import MissionProtocolDraft
 from app.models.project import Project
@@ -16,6 +19,7 @@ from app.schemas.deepsearch import (
     CorrectionQueueInfo,
     DeepSearchIngestRequest,
     DeepSearchIngestResponse,
+    WorkerHealthResponse,
 )
 from app.schemas.mission import MissionCreate
 from app.services.correction_queue import get_correction_queue
@@ -25,6 +29,8 @@ from app.services.mission_protocol_service import (
     MissionProtocolServiceError,
 )
 from app.services.quality_gate_service import QualityGateReport, QualityGateService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -161,3 +167,57 @@ def _quality_failure_payload(
             },
         },
     }
+
+
+@router.get(
+    "/worker/health",
+    response_model=WorkerHealthResponse,
+    summary="Get DeepSearch worker health",
+    description="Proxy endpoint to fetch health status from the DeepSearch worker service.",
+)
+async def get_worker_health() -> WorkerHealthResponse:
+    """Fetch health status from the DeepSearch worker.
+
+    Proxies to the worker's /health endpoint to avoid CORS issues.
+    Returns offline status with error message if the worker is unreachable.
+    """
+    health_url = settings.deepsearch_worker_health_url
+
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            response = await client.get(health_url)
+
+            if response.is_success:
+                data = response.json()
+                return WorkerHealthResponse(
+                    status=data.get("status", "unknown"),
+                    uptime_seconds=data.get("uptime_seconds"),
+                    missions_processed=data.get("missions_processed", 0),
+                    missions_completed=data.get("missions_completed", 0),
+                    missions_failed=data.get("missions_failed", 0),
+                    current_mission_id=data.get("current_mission_id"),
+                    poll_interval=data.get("poll_interval"),
+                )
+            else:
+                logger.warning(
+                    "DeepSearch worker health check failed: HTTP %d",
+                    response.status_code,
+                )
+                return WorkerHealthResponse(
+                    status="offline",
+                    error=f"Worker returned HTTP {response.status_code}",
+                )
+
+    except httpx.TimeoutException:
+        logger.warning("DeepSearch worker health check timed out")
+        return WorkerHealthResponse(
+            status="offline",
+            error="Connection timed out",
+        )
+
+    except httpx.RequestError as e:
+        logger.warning("DeepSearch worker health check failed: %s", str(e))
+        return WorkerHealthResponse(
+            status="offline",
+            error=f"Connection error: {str(e)}",
+        )

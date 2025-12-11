@@ -8,6 +8,7 @@ import type {
   CorrectionStatusResponse,
   CorrectionTelemetry,
   RelationshipContextResponse,
+  WorkerHealthResponse,
 } from "@/types/console";
 import type { ApiMission } from "@/types/mission";
 import type { PaginatedResponse } from "@/types/pagination";
@@ -52,6 +53,12 @@ export async function getCorrectionStatus(
 
 export async function getCorrectionTelemetry(): Promise<CorrectionTelemetry> {
   return httpClient.get<CorrectionTelemetry>("/deepsearch/corrections/telemetry");
+}
+
+// ==================== Worker Health API ====================
+
+export async function getWorkerHealth(): Promise<WorkerHealthResponse> {
+  return httpClient.get<WorkerHealthResponse>("/deepsearch/worker/health");
 }
 
 export interface TriggerCorrectionParams {

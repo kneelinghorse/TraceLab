@@ -183,3 +183,16 @@ export interface ExportOptions {
   includeEvidence?: boolean;
   includeQualityGates?: boolean;
 }
+
+// ==================== Worker Health Types ====================
+
+export interface WorkerHealthResponse {
+  status: string; // "healthy", "degraded", or "offline"
+  uptime_seconds?: number | null;
+  missions_processed: number;
+  missions_completed: number;
+  missions_failed: number;
+  current_mission_id?: string | null;
+  poll_interval?: number | null;
+  error?: string | null;
+}

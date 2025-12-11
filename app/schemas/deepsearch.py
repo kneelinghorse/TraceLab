@@ -187,3 +187,33 @@ class DeepSearchIngestResponse(BaseModel):
         default=None,
         description="Info about corrections queued for async retry (if any failures)",
     )
+
+
+# =============================================================================
+# DeepSearch Worker Health Schemas
+# =============================================================================
+
+
+class WorkerHealthResponse(BaseModel):
+    """Health status from the DeepSearch worker service."""
+
+    status: str = Field(..., description="Worker status: healthy, degraded, or offline")
+    uptime_seconds: Optional[float] = Field(
+        default=None, description="Worker uptime in seconds"
+    )
+    missions_processed: int = Field(
+        default=0, description="Total missions processed since startup"
+    )
+    missions_completed: int = Field(
+        default=0, description="Missions completed successfully"
+    )
+    missions_failed: int = Field(default=0, description="Missions that failed")
+    current_mission_id: Optional[str] = Field(
+        default=None, description="Currently executing mission ID"
+    )
+    poll_interval: Optional[int] = Field(
+        default=None, description="Worker poll interval in seconds"
+    )
+    error: Optional[str] = Field(
+        default=None, description="Error message if worker is offline"
+    )

@@ -9,6 +9,7 @@ import Link from "next/link";
 import { AuthGate } from "@/components/AuthGate";
 import { StatCard, StatGrid } from "@/components/console/StatCard";
 import { CorrectionStatusCard } from "@/components/console/CorrectionStatusCard";
+import { WorkerHealthCard } from "@/components/console/WorkerHealthCard";
 import {
   getConsoleMissions,
   getCorrectionStatus,
@@ -182,6 +183,14 @@ function ConsoleDashboard() {
                   color="red"
                 />
               </StatGrid>
+            </section>
+
+            {/* DeepSearch Worker Health */}
+            <section className="mb-8">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                DeepSearch Worker Status
+              </h2>
+              <WorkerHealthCard refreshInterval={30000} />
             </section>
 
             {/* Quick Links */}

@@ -89,6 +89,8 @@ class Settings(BaseSettings):
     deepsearch_backoff_multiplier: float = 2.0
     deepsearch_initial_backoff: float = 1.0
     deepsearch_webhook_secret: Optional[str] = None
+    # DeepSearch worker health endpoint (for console monitoring)
+    deepsearch_worker_health_url: str = "http://localhost:8080/health"
 
     class Config:
         env_file = ".env"
