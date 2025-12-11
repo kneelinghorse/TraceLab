@@ -206,6 +206,7 @@ class MissionResponse(MissionBase):
 
     id: UUID
     project_id: Optional[UUID] = None
+    project_name: Optional[str] = Field(None, description="Name of the associated project")
     context: Dict[str, Any] = Field(default_factory=dict)
     deliverables: List[str] = Field(default_factory=list)
     research_phases: Dict[str, Any] = Field(default_factory=dict)

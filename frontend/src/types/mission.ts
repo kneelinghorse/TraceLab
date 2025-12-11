@@ -132,6 +132,7 @@ export interface EvidenceLinkPayload {
 export interface ApiMission {
   id: string;
   project_id: string | null;
+  project_name: string | null;
   mission_id: string;
   title: string;
   objective: string;

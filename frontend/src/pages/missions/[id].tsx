@@ -448,11 +448,31 @@ function MissionDetailContent() {
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                       {mission.title}
                     </h1>
-                    {createdAt && (
-                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        Created {createdAt}
-                      </p>
-                    )}
+                    <div className="mt-1 flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+                      {mission.project_id && mission.project_name ? (
+                        <Link
+                          href={`/projects/${mission.project_id}`}
+                          className="text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          {mission.project_name}
+                        </Link>
+                      ) : mission.project_id ? (
+                        <Link
+                          href={`/projects/${mission.project_id}`}
+                          className="text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          View Project
+                        </Link>
+                      ) : (
+                        <span className="text-gray-400 dark:text-gray-500">No project</span>
+                      )}
+                      {createdAt && (
+                        <>
+                          <span className="text-gray-300 dark:text-gray-600">&bull;</span>
+                          <span>Created {createdAt}</span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
 

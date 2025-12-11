@@ -42,9 +42,15 @@ def _to_response(mission) -> MissionResponse:
 
     Handles the field mapping between model and schema.
     """
+    # Get project name if project relationship is loaded
+    project_name = None
+    if mission.project_id and mission.project:
+        project_name = mission.project.name
+
     return MissionResponse(
         id=mission.id,
         project_id=mission.project_id,
+        project_name=project_name,
         mission_id=mission.mission_id,
         title=mission.title,
         objective=mission.objective,
