@@ -58,7 +58,7 @@ def reset_database_and_reports(request):
     # Skip for MCP tests and unit tests that don't need database reset
     # Also skip for tests that rely on existing schema (created via Alembic)
     test_path = str(request.fspath)
-    skip_patterns = ['mcp', 'tests/unit', 'test_deepsearch_client', 'test_auto_ingest', 'test_auto_report', 'test_reprocess_embeddings', 'test_pedr_relational', 'test_qdrant_prewarm', 'test_pedr_enhancements']
+    skip_patterns = ['mcp', 'tests/unit', 'test_deepsearch_client', 'test_auto_ingest', 'test_auto_report', 'test_reprocess_embeddings', 'test_pedr_relational', 'test_qdrant_prewarm', 'test_pedr_enhancements', 'test_rag_service']
     if any(pattern in test_path for pattern in skip_patterns):
         yield
         return
