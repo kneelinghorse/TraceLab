@@ -16,11 +16,11 @@ import {
   triggerCorrections,
   clearCompletedCorrections,
 } from "@/lib/api/console";
-import type { Mission } from "@/types/mission";
+import type { ApiMission } from "@/types/mission";
 import type { CorrectionStatusResponse } from "@/types/console";
 
 interface DashboardData {
-  missions: Mission[];
+  missions: ApiMission[];
   corrections: CorrectionStatusResponse | null;
   stats: {
     missionsByStatus: Record<string, number>;
@@ -227,8 +227,7 @@ function ConsoleDashboard() {
               </div>
               <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
                 {recentMissions.map((mission) => {
-                  const gates = mission.mission_data?.quality_checkpoints ?? [];
-                  const failingGates = gates.filter((g) => g.status === "fail").length;
+                  const hasError = !!mission.error_message;
                   return (
                     <Link
                       key={mission.id}
@@ -237,27 +236,32 @@ function ConsoleDashboard() {
                     >
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-gray-900 dark:text-white truncate">
-                          {mission.mission_data?.title ?? mission.mission_data?.mission_id ?? "Untitled"}
+                          {mission.title ?? mission.mission_id ?? "Untitled"}
                         </h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {mission.completion_percentage ?? 0}% complete
+                          {mission.objective?.slice(0, 80) ?? "No objective"}
+                          {(mission.objective?.length ?? 0) > 80 ? "..." : ""}
                         </p>
                       </div>
                       <div className="flex items-center gap-3 ml-4">
                         <span
                           className={`text-xs px-2 py-1 rounded-full ${
-                            mission.mission_data?.status === "complete"
+                            mission.status === "completed"
                               ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                              : mission.mission_data?.status === "in_progress"
+                              : mission.status === "in_progress"
                               ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                              : mission.status === "queued"
+                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                              : mission.status === "blocked"
+                              ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
                               : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
                           }`}
                         >
-                          {mission.mission_data?.status ?? "draft"}
+                          {mission.status ?? "draft"}
                         </span>
-                        {failingGates > 0 && (
+                        {hasError && (
                           <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                            {failingGates} failing
+                            error
                           </span>
                         )}
                       </div>

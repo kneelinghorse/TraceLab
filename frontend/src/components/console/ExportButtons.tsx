@@ -3,12 +3,12 @@
  */
 
 import { useState } from "react";
-import type { Mission } from "@/types/mission";
+import type { ApiMission } from "@/types/mission";
 import type { RelationshipContextResponse, ExportFormat } from "@/types/console";
 import { exportMissionAsJson, exportMissionAsYaml, downloadFile } from "@/lib/api/console";
 
 interface ExportButtonsProps {
-  mission: Mission;
+  mission: ApiMission;
   relationships?: RelationshipContextResponse | null;
   className?: string;
 }
@@ -19,7 +19,7 @@ export function ExportButtons({ mission, relationships, className = "" }: Export
   const handleExport = async (format: ExportFormat) => {
     setIsExporting(true);
     try {
-      const missionId = mission.mission_data?.mission_id ?? mission.id;
+      const missionId = mission.mission_id ?? mission.id;
       const filename = `mission-${missionId}-${new Date().toISOString().split("T")[0]}`;
 
       if (format === "json") {
