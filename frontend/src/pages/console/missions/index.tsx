@@ -7,25 +7,23 @@ import Link from "next/link";
 
 import { AuthGate } from "@/components/AuthGate";
 import { getConsoleMissions } from "@/lib/api/console";
-import type { Mission, MissionStatus } from "@/types/mission";
+import type { ApiMission, MissionStatus } from "@/types/mission";
 
-type SortField = "updated_at" | "created_at" | "completion_percentage" | "title";
+type SortField = "updated_at" | "created_at" | "title";
 type SortDirection = "asc" | "desc";
 
 interface FilterState {
   status: MissionStatus | "all";
   search: string;
-  qualityRange: "all" | "excellent" | "good" | "fair" | "poor";
 }
 
 function MissionListContent() {
-  const [missions, setMissions] = useState<Mission[]>([]);
+  const [missions, setMissions] = useState<ApiMission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>({
     status: "all",
     search: "",
-    qualityRange: "all",
   });
   const [sort, setSort] = useState<{ field: SortField; direction: SortDirection }>({
     field: "updated_at",
@@ -52,37 +50,19 @@ function MissionListContent() {
   const filteredMissions = useMemo(() => {
     return missions
       .filter((m) => {
-        // Status filter
-        if (filters.status !== "all" && m.mission_data?.status !== filters.status) {
+        // Status filter - status is directly on ApiMission
+        if (filters.status !== "all" && m.status !== filters.status) {
           return false;
         }
 
         // Search filter
         if (filters.search) {
           const searchLower = filters.search.toLowerCase();
-          const title = m.mission_data?.title?.toLowerCase() ?? "";
-          const missionId = m.mission_data?.mission_id?.toLowerCase() ?? "";
-          if (!title.includes(searchLower) && !missionId.includes(searchLower)) {
+          const title = m.title?.toLowerCase() ?? "";
+          const missionId = m.mission_id?.toLowerCase() ?? "";
+          const objective = m.objective?.toLowerCase() ?? "";
+          if (!title.includes(searchLower) && !missionId.includes(searchLower) && !objective.includes(searchLower)) {
             return false;
-          }
-        }
-
-        // Quality range filter
-        if (filters.qualityRange !== "all") {
-          const completion = m.completion_percentage ?? 0;
-          switch (filters.qualityRange) {
-            case "excellent":
-              if (completion < 80) return false;
-              break;
-            case "good":
-              if (completion < 60 || completion >= 80) return false;
-              break;
-            case "fair":
-              if (completion < 40 || completion >= 60) return false;
-              break;
-            case "poor":
-              if (completion >= 40) return false;
-              break;
           }
         }
 
@@ -94,12 +74,8 @@ function MissionListContent() {
 
         switch (sort.field) {
           case "title":
-            aVal = a.mission_data?.title ?? "";
-            bVal = b.mission_data?.title ?? "";
-            break;
-          case "completion_percentage":
-            aVal = a.completion_percentage ?? 0;
-            bVal = b.completion_percentage ?? 0;
+            aVal = a.title ?? "";
+            bVal = b.title ?? "";
             break;
           case "created_at":
             aVal = new Date(a.created_at).getTime();
@@ -127,7 +103,7 @@ function MissionListContent() {
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = { all: missions.length };
     for (const m of missions) {
-      const status = m.mission_data?.status ?? "unknown";
+      const status = m.status ?? "draft";
       counts[status] = (counts[status] ?? 0) + 1;
     }
     return counts;
@@ -195,27 +171,10 @@ function MissionListContent() {
               >
                 <option value="all">All ({statusCounts.all})</option>
                 <option value="draft">Draft ({statusCounts.draft ?? 0})</option>
+                <option value="queued">Queued ({statusCounts.queued ?? 0})</option>
                 <option value="in_progress">In Progress ({statusCounts.in_progress ?? 0})</option>
-                <option value="review">Review ({statusCounts.review ?? 0})</option>
-                <option value="complete">Complete ({statusCounts.complete ?? 0})</option>
-              </select>
-            </div>
-
-            {/* Quality Filter */}
-            <div className="w-48">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Quality
-              </label>
-              <select
-                value={filters.qualityRange}
-                onChange={(e) => setFilters((f) => ({ ...f, qualityRange: e.target.value as FilterState["qualityRange"] }))}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="all">All</option>
-                <option value="excellent">Excellent (80-100%)</option>
-                <option value="good">Good (60-79%)</option>
-                <option value="fair">Fair (40-59%)</option>
-                <option value="poor">Poor (0-39%)</option>
+                <option value="completed">Completed ({statusCounts.completed ?? 0})</option>
+                <option value="blocked">Blocked ({statusCounts.blocked ?? 0})</option>
               </select>
             </div>
           </div>
@@ -246,14 +205,11 @@ function MissionListContent() {
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Status
                     </th>
-                    <th
-                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
-                      onClick={() => handleSort("completion_percentage")}
-                    >
-                      Completion {sort.field === "completion_percentage" && (sort.direction === "asc" ? "↑" : "↓")}
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Objective
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Quality Gates
+                      Tags
                     </th>
                     <th
                       className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
@@ -265,9 +221,7 @@ function MissionListContent() {
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                   {filteredMissions.map((mission) => {
-                    const gates = mission.mission_data?.quality_checkpoints ?? [];
-                    const passingGates = gates.filter((g) => g.status === "pass").length;
-                    const failingGates = gates.filter((g) => g.status === "fail").length;
+                    const hasError = !!mission.error_message;
                     return (
                       <tr
                         key={mission.id}
@@ -278,63 +232,57 @@ function MissionListContent() {
                             href={`/console/missions/${mission.id}`}
                             className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
                           >
-                            {mission.mission_data?.title ?? mission.mission_data?.mission_id ?? "Untitled"}
+                            {mission.title ?? mission.mission_id ?? "Untitled"}
                           </Link>
                           <div className="text-sm text-gray-500 dark:text-gray-400">
-                            {mission.mission_data?.mission_id}
+                            {mission.mission_id}
                           </div>
                         </td>
                         <td className="px-4 py-4">
                           <span
                             className={`text-xs px-2 py-1 rounded-full ${
-                              mission.mission_data?.status === "complete"
+                              mission.status === "completed"
                                 ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                                : mission.mission_data?.status === "in_progress"
+                                : mission.status === "in_progress"
                                 ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                                : mission.mission_data?.status === "review"
-                                ? "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+                                : mission.status === "queued"
+                                ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                                : mission.status === "blocked"
+                                ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
                                 : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
                             }`}
                           >
-                            {mission.mission_data?.status ?? "draft"}
+                            {mission.status ?? "draft"}
                           </span>
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-2">
-                            <div className="w-24 h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full rounded-full ${
-                                  (mission.completion_percentage ?? 0) >= 80
-                                    ? "bg-green-500"
-                                    : (mission.completion_percentage ?? 0) >= 60
-                                    ? "bg-blue-500"
-                                    : (mission.completion_percentage ?? 0) >= 40
-                                    ? "bg-yellow-500"
-                                    : "bg-red-500"
-                                }`}
-                                style={{ width: `${mission.completion_percentage ?? 0}%` }}
-                              />
-                            </div>
-                            <span className="text-sm text-gray-600 dark:text-gray-300">
-                              {mission.completion_percentage ?? 0}%
+                          {hasError && (
+                            <span className="ml-2 text-xs px-2 py-1 rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                              error
                             </span>
-                          </div>
+                          )}
                         </td>
                         <td className="px-4 py-4">
-                          <div className="flex items-center gap-2">
-                            {passingGates > 0 && (
-                              <span className="text-xs px-2 py-0.5 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded">
-                                {passingGates} pass
+                          <p className="text-sm text-gray-600 dark:text-gray-300 max-w-xs truncate">
+                            {mission.objective ?? "No objective"}
+                          </p>
+                        </td>
+                        <td className="px-4 py-4">
+                          <div className="flex flex-wrap gap-1">
+                            {(mission.tags ?? []).slice(0, 3).map((tag) => (
+                              <span
+                                key={tag}
+                                className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded"
+                              >
+                                {tag}
                               </span>
-                            )}
-                            {failingGates > 0 && (
-                              <span className="text-xs px-2 py-0.5 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded">
-                                {failingGates} fail
-                              </span>
-                            )}
-                            {gates.length === 0 && (
+                            ))}
+                            {(mission.tags?.length ?? 0) > 3 && (
                               <span className="text-xs text-gray-400 dark:text-gray-500">
-                                No gates
+                                +{mission.tags!.length - 3}
+                              </span>
+                            )}
+                            {(mission.tags?.length ?? 0) === 0 && (
+                              <span className="text-xs text-gray-400 dark:text-gray-500">
+                                No tags
                               </span>
                             )}
                           </div>

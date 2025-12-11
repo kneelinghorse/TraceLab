@@ -9,7 +9,8 @@ import type {
   CorrectionTelemetry,
   RelationshipContextResponse,
 } from "@/types/console";
-import type { Mission } from "@/types/mission";
+import type { ApiMission } from "@/types/mission";
+import type { PaginatedResponse } from "@/types/pagination";
 
 // ==================== Relationships API ====================
 
@@ -114,17 +115,21 @@ export async function getDeadLetterQueue(
 
 /**
  * Fetch missions with computed console metrics.
- * Uses existing mission API but enriches with quality/linking stats.
+ * Uses existing mission API (paginated response).
  */
-export async function getConsoleMissions(): Promise<Mission[]> {
-  return httpClient.get<Mission[]>("/missions");
+export async function getConsoleMissions(): Promise<ApiMission[]> {
+  const response = await httpClient.get<PaginatedResponse<ApiMission>>("/missions", {
+    params: { page_size: 100 },
+  });
+  return response.data;
 }
 
 /**
  * Compute dashboard stats from missions and corrections data.
+ * Uses ApiMission schema where status is directly on the mission object.
  */
 export function computeDashboardStats(
-  missions: Mission[],
+  missions: ApiMission[],
   corrections: CorrectionStatusResponse
 ): {
   missionsByStatus: Record<string, number>;
@@ -135,17 +140,17 @@ export function computeDashboardStats(
   const qualityDistribution = { excellent: 0, good: 0, fair: 0, poor: 0 };
 
   for (const mission of missions) {
-    // Count by status
-    const status = mission.mission_data?.status ?? "unknown";
+    // Count by status - status is directly on ApiMission
+    const status = mission.status ?? "draft";
     missionsByStatus[status] = (missionsByStatus[status] ?? 0) + 1;
 
-    // Quality distribution based on completion percentage
-    const completion = mission.completion_percentage ?? 0;
-    if (completion >= 80) {
+    // Quality distribution based on success criteria completion
+    // Since we don't have completion_percentage, use whether mission is completed
+    if (mission.status === "completed") {
       qualityDistribution.excellent++;
-    } else if (completion >= 60) {
+    } else if (mission.status === "in_progress") {
       qualityDistribution.good++;
-    } else if (completion >= 40) {
+    } else if (mission.status === "queued") {
       qualityDistribution.fair++;
     } else {
       qualityDistribution.poor++;
@@ -165,15 +170,19 @@ export function computeDashboardStats(
  * Generate export content for a mission in JSON format.
  */
 export function exportMissionAsJson(
-  mission: Mission,
+  mission: ApiMission,
   relationships?: RelationshipContextResponse
 ): string {
   const exportData = {
     mission: {
       id: mission.id,
-      mission_data: mission.mission_data,
-      quality_gates: mission.quality_gates,
-      completion_percentage: mission.completion_percentage,
+      mission_id: mission.mission_id,
+      title: mission.title,
+      objective: mission.objective,
+      status: mission.status,
+      success_criteria: mission.success_criteria,
+      deliverables: mission.deliverables,
+      tags: mission.tags,
       created_at: mission.created_at,
       updated_at: mission.updated_at,
     },
@@ -196,42 +205,42 @@ export function exportMissionAsJson(
  * Generate export content for a mission in YAML format.
  */
 export function exportMissionAsYaml(
-  mission: Mission,
+  mission: ApiMission,
   relationships?: RelationshipContextResponse
 ): string {
   // Simple YAML generation without external dependencies
   const lines: string[] = [];
 
-  lines.push("# Mission Protocol Export");
+  lines.push("# Mission Export");
   lines.push(`# Exported: ${new Date().toISOString()}`);
   lines.push("");
   lines.push("mission:");
   lines.push(`  id: "${mission.id}"`);
-  lines.push(`  mission_id: "${mission.mission_data?.mission_id ?? ""}"`);
-  lines.push(`  title: "${mission.mission_data?.title ?? "Untitled"}"`);
-  lines.push(`  status: "${mission.mission_data?.status ?? "draft"}"`);
-  lines.push(`  completion_percentage: ${mission.completion_percentage ?? 0}`);
+  lines.push(`  mission_id: "${mission.mission_id ?? ""}"`);
+  lines.push(`  title: "${mission.title ?? "Untitled"}"`);
+  lines.push(`  status: "${mission.status ?? "draft"}"`);
   lines.push(`  created_at: "${mission.created_at}"`);
   lines.push(`  updated_at: "${mission.updated_at}"`);
 
-  if (mission.mission_data?.research_statement) {
+  if (mission.objective) {
     lines.push("");
-    lines.push("  research_statement:");
-    lines.push(`    topic: "${mission.mission_data.research_statement.topic}"`);
-    lines.push(`    objective: "${mission.mission_data.research_statement.objective}"`);
-    lines.push(`    scope: "${mission.mission_data.research_statement.scope}"`);
+    lines.push("  objective: |");
+    lines.push(`    ${mission.objective.replace(/\n/g, "\n    ")}`);
   }
 
-  if (mission.mission_data?.evidence?.length) {
+  if (mission.success_criteria?.length) {
     lines.push("");
-    lines.push("  evidence:");
-    for (const ev of mission.mission_data.evidence) {
-      lines.push(`    - evidence_id: "${ev.evidence_id}"`);
-      lines.push(`      source: "${ev.source}"`);
-      lines.push(`      summary: "${ev.summary.replace(/"/g, '\\"')}"`);
-      if (ev.chunk_id) {
-        lines.push(`      chunk_id: "${ev.chunk_id}"`);
-      }
+    lines.push("  success_criteria:");
+    for (const criterion of mission.success_criteria) {
+      lines.push(`    - "${criterion.replace(/"/g, '\\"')}"`);
+    }
+  }
+
+  if (mission.deliverables?.length) {
+    lines.push("");
+    lines.push("  deliverables:");
+    for (const deliverable of mission.deliverables) {
+      lines.push(`    - "${deliverable.replace(/"/g, '\\"')}"`);
     }
   }
 
