@@ -200,6 +200,11 @@ MISSION_TOOLS: List[Tool] = [
                     "type": "string",
                     "description": "The mission's human-readable ID (e.g., 'B16.1') or UUID",
                 },
+                "research_depth": {
+                    "type": "string",
+                    "enum": ["baseline", "deep", "alpha"],
+                    "description": "Override research depth at submission time. If not provided, uses the depth set at creation (default: baseline)",
+                },
             },
             "required": ["mission_id"],
         },
@@ -403,6 +408,9 @@ async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
                 base_url = getattr(settings, 'api_base_url', None) or "http://localhost:8000"
                 callback_url = f"{base_url}/api/v1/webhooks/deepsearch"
 
+                # Use override research_depth if provided, else mission's depth
+                effective_depth = arguments.get("research_depth") or mission.research_depth or "baseline"
+
                 try:
                     client = DeepSearchClient()
                     response = await client.execute_mission(
@@ -415,7 +423,7 @@ async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
                         deliverables=mission.deliverables or [],
                         research_phases=mission.research_phases or {},
                         metadata=mission.mission_metadata or {},
-                        research_depth=mission.research_depth or "baseline",
+                        research_depth=effective_depth,
                     )
                     job_id = response.job_id
                     logger.info(
