@@ -173,6 +173,10 @@ class PEDRSearchResult:
     # Original chunk metadata
     chunk_index: Optional[int] = None
     source_type: Optional[str] = None
+    source_origin: Optional[str] = None
+
+    # Embedding vector (populated when include_embeddings=True)
+    embedding: Optional[List[float]] = None
 
     # Graph expansion (populated by API layer when include_related=True)
     related_entities: Optional[List[Dict[str, Any]]] = None
@@ -199,9 +203,12 @@ class PEDRSearchResult:
             "contributing_layers": self.contributing_layers,
             "chunk_index": self.chunk_index,
             "source_type": self.source_type,
+            "source_origin": self.source_origin,
             "score": self.rrf_score,  # Alias for compatibility
             "combined_score": self.rrf_score,
         }
+        if self.embedding is not None:
+            result["embedding"] = self.embedding
         if self.related_entities is not None:
             result["related_entities"] = self.related_entities
         return result
@@ -303,12 +310,14 @@ class PEDRSearchOrchestrator:
         project_id: Optional[str] = None,
         document_id: Optional[str] = None,
         source_type: Optional[str] = None,
+        source_origin: Optional[str] = None,
         document_types: Optional[List[str]] = None,
         source_types: Optional[List[str]] = None,
         date_from: Optional[date] = None,
         date_to: Optional[date] = None,
         tags: Optional[List[str]] = None,
         hnsw_ef: Optional[int] = None,
+        include_embeddings: bool = False,
         # PEDR-specific parameters
         element_type: Optional[str] = None,
         element_types: Optional[List[str]] = None,
@@ -334,12 +343,14 @@ class PEDRSearchOrchestrator:
             project_id: Filter by project UUID.
             document_id: Filter by document UUID.
             source_type: Filter by source type.
+            source_origin: Filter by source origin (upload, synthesized, imported).
             document_types: Filter by document types.
             source_types: Filter by source types.
             date_from: Filter documents from this date.
             date_to: Filter documents up to this date.
             tags: Filter by tags (OR semantics).
             hnsw_ef: HNSW ef override for semantic search.
+            include_embeddings: Include embedding vectors in results (for RAG context compression).
             element_type: Single element type filter.
             element_types: Multiple element type filters.
             auto_detect_type: Auto-detect element type from query.
@@ -364,6 +375,7 @@ class PEDRSearchOrchestrator:
             "project_id": project_id,
             "document_id": document_id,
             "source_type": source_type,
+            "source_origin": source_origin,
             "document_types": tuple(document_types) if document_types else None,
             "source_types": tuple(source_types) if source_types else None,
             "date_from": str(date_from) if date_from else None,
@@ -371,6 +383,7 @@ class PEDRSearchOrchestrator:
             "tags": tuple(tags) if tags else None,
             "element_type": element_type,
             "element_types": tuple(element_types) if element_types else None,
+            "include_embeddings": include_embeddings,
         }
 
         # Check cache first (if enabled)
@@ -433,12 +446,14 @@ class PEDRSearchOrchestrator:
             "project_id": project_id,
             "document_id": document_id,
             "source_type": source_type,
+            "source_origin": source_origin,
             "document_types": document_types,
             "source_types": source_types,
             "date_from": date_from,
             "date_to": date_to,
             "tags": tags,
             "hnsw_ef": hnsw_ef,
+            "include_embeddings": include_embeddings,
         }
 
         # Lexical layer
@@ -712,6 +727,8 @@ class PEDRSearchOrchestrator:
                     contributing_layers=r.get("contributing_layers", []),
                     chunk_index=r.get("chunk_index"),
                     source_type=r.get("source_type"),
+                    source_origin=r.get("source_origin"),
+                    embedding=r.get("embedding"),
                 )
             )
 
@@ -760,6 +777,8 @@ class PEDRSearchOrchestrator:
                     contributing_layers=r.get("contributing_layers", []),
                     chunk_index=r.get("chunk_index"),
                     source_type=r.get("source_type"),
+                    source_origin=r.get("source_origin"),
+                    embedding=r.get("embedding"),
                 )
             )
 
@@ -858,12 +877,14 @@ def create_pedr_orchestrator(
         project_id: Optional[str] = None,
         document_id: Optional[str] = None,
         source_type: Optional[str] = None,
+        source_origin: Optional[str] = None,
         document_types: Optional[List[str]] = None,
         source_types: Optional[List[str]] = None,
         date_from: Optional[date] = None,
         date_to: Optional[date] = None,
         tags: Optional[List[str]] = None,
         hnsw_ef: Optional[int] = None,
+        include_embeddings: bool = False,
         **kwargs: Any,
     ) -> List[Dict[str, Any]]:
         return retrieval_service.search(
@@ -872,12 +893,14 @@ def create_pedr_orchestrator(
             project_id=project_id,
             document_id=document_id,
             source_type=source_type,
+            source_origin=source_origin,
             document_types=document_types,
             source_types=source_types,
             date_from=date_from,
             date_to=date_to,
             tags=tags,
             hnsw_ef=hnsw_ef,
+            include_embeddings=include_embeddings,
         )
 
     return PEDRSearchOrchestrator(

@@ -314,6 +314,8 @@ class DocumentIngestionService:
                         }
                         if document.source_type:
                             payload_item["source_type"] = document.source_type
+                        if document.source_origin:
+                            payload_item["source_origin"] = document.source_origin
                         payload.append(payload_item)
 
                     qdrant_service.upsert_chunks(payload)
