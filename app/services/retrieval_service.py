@@ -23,6 +23,7 @@ class RetrievalService:
         project_id: Optional[str] = None,
         document_id: Optional[str] = None,
         source_type: Optional[str] = None,
+        source_origin: Optional[str] = None,
         document_types: Optional[List[str]] = None,
         source_types: Optional[List[str]] = None,
         date_from: Optional[date] = None,
@@ -34,14 +35,16 @@ class RetrievalService:
     ) -> List[Dict[str, Any]]:
         """
         Search for relevant chunks using semantic similarity.
-        
+
         Args:
             query: Natural language query string
             top_k: Number of results to return
             project_id: Optional filter by project UUID
             document_id: Optional filter by document UUID
             source_type: Optional filter by source type
+            source_origin: Optional filter by source origin (upload, synthesized, imported)
             hnsw_ef: Explicit HNSW search parameter override
+            include_embeddings: Include embedding vectors in results
 
         Returns:
             List of search result dicts with chunk information and scores
@@ -60,6 +63,7 @@ class RetrievalService:
             project_id=project_id,
             document_id=document_id,
             source_type=source_type,
+            source_origin=source_origin,
             hnsw_ef=resolved_hnsw_ef,
             with_vectors=include_embeddings
         )

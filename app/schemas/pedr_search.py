@@ -41,6 +41,10 @@ class PEDRSearchRequest(BaseModel):
     project_id: Optional[UUID] = Field(default=None, description="Filter by project UUID")
     document_id: Optional[UUID] = Field(default=None, description="Filter by document UUID")
     source_type: Optional[str] = Field(default=None, description="Filter by document source type")
+    source_origin: Optional[str] = Field(
+        default=None,
+        description="Filter by document origin: 'upload' (user uploaded), 'synthesized' (from mission/report), 'imported' (external)",
+    )
     document_types: Optional[List[str]] = Field(default=None, description="Filter by document types (OR semantics)")
     source_types: Optional[List[str]] = Field(default=None, description="Filter by source types (OR semantics)")
     date_from: Optional[date] = Field(default=None, description="Filter documents from this date")
@@ -135,6 +139,12 @@ class PEDRSearchRequest(BaseModel):
         description="Maximum related entities to include per result",
     )
 
+    # Embedding passthrough options (B21.7)
+    include_embeddings: bool = Field(
+        default=False,
+        description="Include embedding vectors in results (for RAG context compression)",
+    )
+
 
 class PEDRLayerTimings(BaseModel):
     """Timing information for each PEDR search layer."""
@@ -214,10 +224,20 @@ class PEDRSearchResult(BaseModel):
     # Chunk metadata
     chunk_index: Optional[int] = Field(default=None, ge=0, description="Position in parent document")
     source_type: Optional[str] = Field(default=None, description="Document source type")
+    source_origin: Optional[str] = Field(
+        default=None,
+        description="Document origin: 'upload', 'synthesized', or 'imported'",
+    )
 
     # Compatibility aliases
     score: float = Field(default=0.0, description="Alias for rrf_score (backward compatibility)")
     combined_score: float = Field(default=0.0, description="Alias for rrf_score (backward compatibility)")
+
+    # Embedding vector (populated when include_embeddings=true)
+    embedding: Optional[List[float]] = Field(
+        default=None,
+        description="Embedding vector for this chunk (when include_embeddings=true)",
+    )
 
     # Graph expansion (populated when include_related=true)
     related_entities: Optional[List[Dict[str, Any]]] = Field(

@@ -35,8 +35,14 @@ body {
 }
 
 ::selection {
-  background-color: hsla(var(--accent), 0.25);
+  background-color: hsl(var(--accent) / 0.25);
   color: hsl(var(--foreground));
+}
+
+/* Form inputs have white background - need darker selection */
+.form-input::selection {
+  background-color: hsl(var(--accent) / 0.4);
+  color: #0f172a;
 }
 
 .glass-card {

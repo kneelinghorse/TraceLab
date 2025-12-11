@@ -129,7 +129,7 @@ class QdrantService:
                 )
     
     def _create_payload_indexes(self) -> None:
-        """Create payload indexes for project_id, document_id, and source_type."""
+        """Create payload indexes for project_id, document_id, source_type, and source_origin."""
         try:
             self.client.create_payload_index(
                 collection_name=self.collection_name,
@@ -138,7 +138,7 @@ class QdrantService:
             )
         except Exception:
             pass  # Index may already exist
-        
+
         try:
             self.client.create_payload_index(
                 collection_name=self.collection_name,
@@ -147,11 +147,20 @@ class QdrantService:
             )
         except Exception:
             pass
-        
+
         try:
             self.client.create_payload_index(
                 collection_name=self.collection_name,
                 field_name="source_type",
+                field_schema=PayloadSchemaType.KEYWORD
+            )
+        except Exception:
+            pass
+
+        try:
+            self.client.create_payload_index(
+                collection_name=self.collection_name,
+                field_name="source_origin",
                 field_schema=PayloadSchemaType.KEYWORD
             )
         except Exception:
@@ -189,7 +198,7 @@ class QdrantService:
     ) -> None:
         """
         Store document chunks as vectors in Qdrant.
-        
+
         Args:
             chunks: List of chunk dicts with keys:
                 - chunk_id (UUID): Chunk ID
@@ -199,6 +208,7 @@ class QdrantService:
                 - project_id (str): UUID of project
                 - chunk_index (int): Index within document
                 - source_type (str, optional): Type of source document
+                - source_origin (str, optional): Origin type (upload, synthesized, imported)
             batch_size: Batch size for upload_points
             parallel: Number of parallel upload workers
         """
@@ -213,14 +223,16 @@ class QdrantService:
             }
             if "source_type" in chunk:
                 payload["source_type"] = chunk["source_type"]
-            
+            if "source_origin" in chunk:
+                payload["source_origin"] = chunk["source_origin"]
+
             point = PointStruct(
                 id=point_id,
                 vector=chunk["embedding"],
                 payload=payload
             )
             points.append(point)
-        
+
         # Use upsert for efficient batch upload
         self.client.upsert(
             collection_name=self.collection_name,
@@ -235,6 +247,7 @@ class QdrantService:
         project_id: Optional[str] = None,
         document_id: Optional[str] = None,
         source_type: Optional[str] = None,
+        source_origin: Optional[str] = None,
         hnsw_ef: Optional[int] = None,
         with_vectors: bool = False
     ) -> List[Dict[str, Any]]:
@@ -247,6 +260,7 @@ class QdrantService:
             project_id: Optional filter by project
             document_id: Optional filter by document
             source_type: Optional filter by source type
+            source_origin: Optional filter by source origin (upload, synthesized, imported)
             hnsw_ef: HNSW search parameter (higher = better recall, slower).
                      Defaults to settings.qdrant_hnsw_ef_default (64).
 
@@ -258,6 +272,7 @@ class QdrantService:
                 - project_id: Project UUID
                 - chunk_index: Index within document
                 - score: Similarity score
+                - source_origin: Document origin type
         """
         # Use configured default if not specified
         effective_hnsw_ef = hnsw_ef if hnsw_ef is not None else settings.qdrant_hnsw_ef_default
@@ -275,6 +290,10 @@ class QdrantService:
         if source_type:
             filter_conditions.append(
                 FieldCondition(key="source_type", match=MatchValue(value=str(source_type)))
+            )
+        if source_origin:
+            filter_conditions.append(
+                FieldCondition(key="source_origin", match=MatchValue(value=str(source_origin)))
             )
         
         query_filter = Filter(must=filter_conditions) if filter_conditions else None
@@ -298,6 +317,7 @@ class QdrantService:
                 "project_id": result.payload.get("project_id"),
                 "chunk_index": result.payload.get("chunk_index"),
                 "source_type": result.payload.get("source_type"),
+                "source_origin": result.payload.get("source_origin"),
                 "score": result.score
             }
             if with_vectors:
