@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import useSWR from "swr";
@@ -29,6 +29,8 @@ interface MissionFormProps {
  */
 export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [showProjectRequiredTooltip, setShowProjectRequiredTooltip] = useState(false);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   // Fetch projects for dropdown
   const { data: projectsData } = useSWR<PaginatedResponse<Project>>(
@@ -41,12 +43,33 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
     control,
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<ApiMissionFormValues>({
     defaultValues: defaultApiMissionFormValues,
     resolver: zodResolver(apiMissionFormSchema),
     mode: "onBlur",
   });
+
+  // Watch project_id to enable/disable Submit button
+  const projectId = watch("project_id");
+  const isProjectSelected = Boolean(projectId && projectId.trim() !== "");
+
+  // Hide tooltip when clicking outside the submit button
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (submitButtonRef.current && !submitButtonRef.current.contains(event.target as Node)) {
+        setShowProjectRequiredTooltip(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleDisabledSubmitClick = () => {
+    setShowProjectRequiredTooltip(true);
+    setSubmitError("A project must be selected to submit to DeepSearch. Select a project above or save as draft.");
+  };
 
   const handleFormSubmit = async (
     values: ApiMissionFormValues,
@@ -172,15 +195,22 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
 
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <label className="form-label">Project</label>
+            <label className="form-label">
+              Project {!isProjectSelected && <span className="text-red-500">*</span>}
+            </label>
             <select {...register("project_id")} className="form-input">
-              <option value="">No project</option>
+              <option value="">Select a project</option>
               {projects.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
                 </option>
               ))}
             </select>
+            {!isProjectSelected && (
+              <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+                Required for DeepSearch submission
+              </p>
+            )}
             {errors.project_id && (
               <p className="form-error">{errors.project_id.message}</p>
             )}
@@ -330,14 +360,28 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
               {isSubmitting ? "Saving..." : "Save as Draft"}
             </button>
 
-            <button
-              type="button"
-              onClick={onSubmitQueued}
-              disabled={isSubmitting}
-              className="px-4 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50"
-            >
-              {isSubmitting ? "Submitting..." : "Submit to DeepSearch"}
-            </button>
+            <div className="relative">
+              <button
+                ref={submitButtonRef}
+                type="button"
+                onClick={isProjectSelected ? onSubmitQueued : handleDisabledSubmitClick}
+                disabled={isSubmitting}
+                className={`px-4 py-2.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 ${
+                  isProjectSelected
+                    ? "text-white bg-blue-600 hover:bg-blue-700"
+                    : "text-gray-400 bg-gray-300 dark:bg-gray-600 cursor-not-allowed"
+                }`}
+                title={isProjectSelected ? undefined : "Select a project to submit to DeepSearch"}
+              >
+                {isSubmitting ? "Submitting..." : "Submit to DeepSearch"}
+              </button>
+              {showProjectRequiredTooltip && !isProjectSelected && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg whitespace-nowrap shadow-lg z-10">
+                  Select a project to submit to DeepSearch
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700" />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>
