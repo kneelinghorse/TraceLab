@@ -11,7 +11,11 @@ from app.services.context_compression import compress_context
 from app.services.embedding_service import EmbeddingService, get_embedding_service
 from app.services.cost_monitor import CostMonitor, get_cost_monitor
 from app.services.faceted_search import FacetFilters
-from app.services.hybrid_search import HybridSearchService
+from app.services.pedr.search_orchestrator import (
+    PEDRSearchOrchestrator,
+    PEDRSearchResponse,
+    create_pedr_orchestrator,
+)
 from app.services.retrieval_service import RetrievalService, get_retrieval_service
 from app.services.semantic_cache import SemanticCacheService, get_semantic_cache_service
 from app.services.quality_assessment import (
@@ -55,7 +59,7 @@ class RagService:
     def __init__(
         self,
         retrieval_service: Optional[RetrievalService] = None,
-        hybrid_search_service: Optional[HybridSearchService] = None,
+        pedr_orchestrator: Optional[PEDRSearchOrchestrator] = None,
         embedding_service: Optional[EmbeddingService] = None,
         cache_service: Optional[SemanticCacheService] = None,
         client: Optional[OpenAI] = None,  # type: ignore[name-defined]
@@ -77,10 +81,14 @@ class RagService:
             client = OpenAI(api_key=settings.openai_api_key)
 
         self.client = client
-        self.retrieval_service = retrieval_service or get_retrieval_service()
-        self.hybrid_search_service = hybrid_search_service or HybridSearchService(
-            retrieval_service=self.retrieval_service
-        )
+        # retrieval_service is only needed if PEDR orchestrator needs to be created
+        self.retrieval_service = retrieval_service
+        if pedr_orchestrator is not None:
+            self.pedr_orchestrator = pedr_orchestrator
+        else:
+            # Only create retrieval_service if needed by PEDR factory
+            self.retrieval_service = retrieval_service or get_retrieval_service()
+            self.pedr_orchestrator = create_pedr_orchestrator()
         self.embedding_service = embedding_service or get_embedding_service()
         self.cache_service = (
             cache_service
@@ -283,10 +291,10 @@ class RagService:
                 )
                 return response
 
-        retrieved_chunks = self.hybrid_search_service.search(
+        # Use PEDR orchestrator for retrieval with proper RRF fusion
+        pedr_response = self.pedr_orchestrator.search(
             query=query,
             top_k=top_k,
-            search_mode=normalized_mode,
             project_id=project_id,
             document_id=document_id,
             source_type=source_type,
@@ -296,16 +304,30 @@ class RagService:
             date_to=date_to,
             tags=tags,
             hnsw_ef=hnsw_ef,
-            query_embedding=query_embedding,
             include_embeddings=True,
-            min_quality_gates=min_quality_gates,
-            status_filters=status_filters,
-            allow_pii=allow_pii,
             element_type=element_type,
             element_types=element_types,
             auto_detect_type=auto_detect_type,
             type_boost_enabled=type_boost_enabled,
+            min_quality_gates=min_quality_gates,
+            status_filters=status_filters,
+            allow_pii=allow_pii,
         )
+
+        # Convert PEDR results to dict format for context compression
+        retrieved_chunks = [
+            {
+                "chunk_id": r.chunk_id,
+                "content": r.content,
+                "document_id": r.document_id,
+                "project_id": r.project_id,
+                "chunk_index": r.chunk_index,
+                "source_type": r.source_type,
+                "score": r.rrf_score,
+                "embedding": r.embedding,
+            }
+            for r in pedr_response.results
+        ]
 
         compressed_chunks, compression_metrics = compress_context(
             chunks=retrieved_chunks,

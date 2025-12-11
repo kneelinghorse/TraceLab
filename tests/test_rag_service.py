@@ -11,6 +11,12 @@ from app.main import app
 from app.core.config import settings
 from app.services import rag_service as rag_module
 from app.services.cache_metrics import CacheMetrics
+from app.services.pedr.search_orchestrator import (
+    PEDRSearchResponse,
+    PEDRSearchResult,
+    PEDRMetadata,
+    LayerTimings,
+)
 
 
 class _FakeEmbeddingService:
@@ -53,27 +59,65 @@ class _FakeRetrievalService:
         ]
 
 
-class _FakeHybridSearchService:
+class _FakePEDROrchestrator:
+    """Fake PEDR orchestrator that returns PEDRSearchResponse objects."""
+
     def __init__(self, results: Optional[List[Dict[str, Any]]] = None):
         self.calls: List[Dict[str, Any]] = []
         default_results = results or [
             {
-                "chunk_id": "chunk-h",
-                "content": "Keyword weighted content about governance hybrids.",
-                "document_id": "doc-h",
-                "project_id": "proj-h",
+                "chunk_id": "chunk-1",
+                "content": "Policy frameworks emphasize iterative experimentation and measurement.",
+                "document_id": "doc-1",
+                "project_id": "proj-1",
                 "chunk_index": 0,
                 "source_type": "report",
-                "score": 0.78,
-                "embedding": [0.11, 0.22, 0.33],
-                "search_mode": "keyword",
-            }
+                "rrf_score": 0.93,
+                "embedding": [0.92, 0.2, 0.0],
+            },
+            {
+                "chunk_id": "chunk-2",
+                "content": "Programs pair semantic search with lightweight LLM orchestration.",
+                "document_id": "doc-1",
+                "project_id": "proj-1",
+                "chunk_index": 1,
+                "source_type": "report",
+                "rrf_score": 0.61,
+                "embedding": [0.61, 0.8, 0.0],
+            },
         ]
-        self._results = [dict(item) for item in default_results]
+        self._results = default_results
 
-    def search(self, **kwargs):
+    def search(self, **kwargs) -> PEDRSearchResponse:
         self.calls.append(kwargs)
-        return [dict(item) for item in self._results]
+        # Build PEDRSearchResult objects from our test data
+        results = [
+            PEDRSearchResult(
+                chunk_id=r["chunk_id"],
+                content=r["content"],
+                document_id=r.get("document_id"),
+                project_id=r.get("project_id"),
+                chunk_index=r.get("chunk_index"),
+                source_type=r.get("source_type"),
+                rrf_score=r.get("rrf_score", r.get("score", 0.0)),
+                embedding=r.get("embedding"),
+            )
+            for r in self._results
+        ]
+        metadata = PEDRMetadata(
+            query=kwargs.get("query", ""),
+            intent="factual",
+            intent_confidence=0.9,
+            detected_type=None,
+            type_confidence=0.0,
+            layers_used=["lexical", "semantic"],
+            layer_weights={"lexical": 0.25, "semantic": 0.35},
+            timings=LayerTimings(total_ms=50.0),
+            total_candidates=len(results),
+            result_count=len(results),
+            cache_hit=False,
+        )
+        return PEDRSearchResponse(results=results, metadata=metadata)
 
 
 class _FakeChatCompletions:
@@ -228,7 +272,7 @@ class _FakeCostMonitor:
 
 
 def test_rag_service_run_query(monkeypatch):
-    fake_retrieval = _FakeRetrievalService()
+    fake_pedr = _FakePEDROrchestrator()
     fake_embedding = _FakeEmbeddingService()
     fake_client = _FakeOpenAIClient(
         "The repository embraces iterative delivery. [Document: doc-1, Chunk: 0]"
@@ -238,7 +282,7 @@ def test_rag_service_run_query(monkeypatch):
     monkeypatch.setattr(rag_module, "_openai_import_error", None, raising=False)
     monkeypatch.setattr(rag_module, "OpenAI", object, raising=False)
     service = rag_module.RagService(
-        retrieval_service=fake_retrieval,
+        pedr_orchestrator=fake_pedr,
         embedding_service=fake_embedding,
         cache_service=cache,
         client=fake_client,
@@ -264,7 +308,7 @@ def test_rag_service_run_query(monkeypatch):
     assert fake_embedding.requests == [
         "How does the repository describe experiment-driven delivery?"
     ]
-    assert fake_retrieval.calls[0]["project_id"] == "proj-1"
+    assert fake_pedr.calls[0]["project_id"] == "proj-1"
     assert result["latency_ms"] >= 0.0
     assert result["cache"]["hit"] is False
     assert cache.checked == 1
@@ -279,8 +323,20 @@ def test_rag_service_run_query(monkeypatch):
 
 
 def test_rag_service_respects_search_mode(monkeypatch):
-    fake_retrieval = _FakeRetrievalService()
-    fake_hybrid = _FakeHybridSearchService()
+    # PEDR doesn't use search_mode directly - it uses RRF fusion across layers
+    # This test verifies search_mode is passed through to the response
+    fake_pedr = _FakePEDROrchestrator(results=[
+        {
+            "chunk_id": "chunk-h",
+            "content": "Keyword weighted content about governance hybrids.",
+            "document_id": "doc-h",
+            "project_id": "proj-h",
+            "chunk_index": 0,
+            "source_type": "report",
+            "rrf_score": 0.78,
+            "embedding": [0.11, 0.22, 0.33],
+        }
+    ])
     fake_embedding = _FakeEmbeddingService()
     fake_client = _FakeOpenAIClient(
         "Hybrid search ensures coverage. [Document: doc-h, Chunk: 0]"
@@ -289,8 +345,7 @@ def test_rag_service_respects_search_mode(monkeypatch):
     monkeypatch.setattr(rag_module, "_openai_import_error", None, raising=False)
     monkeypatch.setattr(rag_module, "OpenAI", object, raising=False)
     service = rag_module.RagService(
-        retrieval_service=fake_retrieval,
-        hybrid_search_service=fake_hybrid,
+        pedr_orchestrator=fake_pedr,
         embedding_service=fake_embedding,
         cache_service=cache,
         client=fake_client,
@@ -305,7 +360,8 @@ def test_rag_service_respects_search_mode(monkeypatch):
         search_mode="keyword",
     )
 
-    assert fake_hybrid.calls[0]["search_mode"] == "keyword"
+    # PEDR is called (search_mode not passed to PEDR - it uses RRF)
+    assert len(fake_pedr.calls) == 1
     assert result["search_mode"] == "keyword"
     assert result["sources"][0]["chunk_id"] == "chunk-h"
     assert cache.checked == 1
@@ -313,7 +369,7 @@ def test_rag_service_respects_search_mode(monkeypatch):
 
 
 def test_rag_service_uses_cache_hit(monkeypatch):
-    fake_retrieval = _FakeRetrievalService()
+    fake_pedr = _FakePEDROrchestrator()
     fake_embedding = _FakeEmbeddingService()
     fake_client = _FakeOpenAIClient("Cache should satisfy this query.")
 
@@ -380,7 +436,7 @@ def test_rag_service_uses_cache_hit(monkeypatch):
     monkeypatch.setattr(rag_module, "_openai_import_error", None, raising=False)
     monkeypatch.setattr(rag_module, "OpenAI", object, raising=False)
     service = rag_module.RagService(
-        retrieval_service=fake_retrieval,
+        pedr_orchestrator=fake_pedr,
         embedding_service=fake_embedding,
         cache_service=cache,
         client=fake_client,
@@ -397,7 +453,7 @@ def test_rag_service_uses_cache_hit(monkeypatch):
 
     assert result["answer"].startswith("Cached results already contain the answer")
     assert result["cache"]["hit"] is True
-    assert fake_retrieval.calls == []
+    assert fake_pedr.calls == []  # PEDR should not be called on cache hit
     assert cache.checked == 1
     assert result["quality"]["composite_score"] == pytest.approx(0.92)
     assert result["routing"]["selected_model"] == settings.openai_chat_model
@@ -406,7 +462,7 @@ def test_rag_service_uses_cache_hit(monkeypatch):
 
 
 def test_tiered_routing_escalates_on_low_quality(monkeypatch):
-    fake_retrieval = _FakeRetrievalService()
+    fake_pedr = _FakePEDROrchestrator()
     fake_embedding = _FakeEmbeddingService()
     responses = {
         settings.openai_chat_model: "I'm sorry, I cannot help with that request.",
@@ -422,7 +478,7 @@ def test_tiered_routing_escalates_on_low_quality(monkeypatch):
     monkeypatch.setattr(rag_module, "OpenAI", object, raising=False)
 
     service = rag_module.RagService(
-        retrieval_service=fake_retrieval,
+        pedr_orchestrator=fake_pedr,
         embedding_service=fake_embedding,
         cache_service=cache,
         client=fake_client,
@@ -453,7 +509,7 @@ def test_tiered_routing_escalates_on_low_quality(monkeypatch):
 
 
 def test_rag_service_emits_cost_metrics(monkeypatch):
-    fake_retrieval = _FakeRetrievalService()
+    fake_pedr = _FakePEDROrchestrator()
     fake_embedding = _FakeEmbeddingService()
     fake_client = _FakeOpenAIClient(
         "Performance metrics with telemetry. [Document: doc-1, Chunk: 0]"
@@ -465,7 +521,7 @@ def test_rag_service_emits_cost_metrics(monkeypatch):
     monkeypatch.setattr(rag_module, "OpenAI", object, raising=False)
 
     service = rag_module.RagService(
-        retrieval_service=fake_retrieval,
+        pedr_orchestrator=fake_pedr,
         embedding_service=fake_embedding,
         cache_service=cache,
         client=fake_client,
@@ -591,7 +647,7 @@ def test_rag_search_endpoint(monkeypatch, auth_headers):
 
 
 def test_semantic_cache_hit_rate_reaches_target(monkeypatch):
-    fake_retrieval = _FakeRetrievalService()
+    fake_pedr = _FakePEDROrchestrator()
     fake_embedding = _FakeEmbeddingService()
     fake_client = _FakeOpenAIClient(
         "Markdown corpus insights. [Document: doc-9, Chunk: 1]"
@@ -601,7 +657,7 @@ def test_semantic_cache_hit_rate_reaches_target(monkeypatch):
     monkeypatch.setattr(rag_module, "_openai_import_error", None, raising=False)
     monkeypatch.setattr(rag_module, "OpenAI", object, raising=False)
     service = rag_module.RagService(
-        retrieval_service=fake_retrieval,
+        pedr_orchestrator=fake_pedr,
         embedding_service=fake_embedding,
         cache_service=workload_cache,
         client=fake_client,
@@ -628,4 +684,4 @@ def test_semantic_cache_hit_rate_reaches_target(monkeypatch):
 
     hit_rate = workload_cache.metrics.hit_rate()
     assert 0.15 <= hit_rate <= 0.25
-    assert len(fake_retrieval.calls) == 8
+    assert len(fake_pedr.calls) == 8  # 8 cache misses = 8 PEDR calls
