@@ -232,6 +232,49 @@ export interface DocumentUploadResponse {
   created_at: string;
 }
 
+// Document retrieval types
+export interface DocumentChunk {
+  id: string;
+  document_id: string;
+  chunk_index: number;
+  content: string;
+  embedding_id?: string;
+  token_count?: number;
+  start_char?: number;
+  end_char?: number;
+  created_at: string;
+}
+
+export interface Document {
+  id: string;
+  project_id: string;
+  name: string;
+  file_type?: string;
+  file_size?: number;
+  mime_type?: string;
+  source_type?: string;
+  uploaded_at: string;
+  processed: boolean;
+  chunked: boolean;
+  embedded: boolean;
+  validation_status: string;
+  chunk_count?: number;
+  total_tokens?: number;
+  word_count?: number;
+  preview?: string;
+  chunks?: DocumentChunk[];
+}
+
+export interface DocumentChunksResponse {
+  data: DocumentChunk[];
+  pagination: {
+    page: number;
+    page_size: number;
+    total: number;
+    pages: number;
+  };
+}
+
 // Mission types
 export interface Mission {
   id: string;
@@ -245,6 +288,7 @@ export interface Mission {
   research_phases?: Record<string, unknown>;
   tags?: string[];
   metadata?: Record<string, unknown>;
+  research_depth?: 'baseline' | 'deep' | 'alpha';
   status: 'draft' | 'queued' | 'in_progress' | 'completed' | 'blocked' | 'cancelled';
   queued_at?: string;
   started_at?: string;
@@ -272,6 +316,7 @@ export interface MissionCreate {
   research_phases?: Record<string, unknown>;
   tags?: string[];
   metadata?: Record<string, unknown>;
+  research_depth?: 'baseline' | 'deep' | 'alpha';
   status?: string;
 }
 
@@ -284,6 +329,7 @@ export interface MissionUpdate {
   research_phases?: Record<string, unknown>;
   tags?: string[];
   metadata?: Record<string, unknown>;
+  research_depth?: 'baseline' | 'deep' | 'alpha';
   status?: string;
 }
 
@@ -584,6 +630,35 @@ export class TraceLabClient {
    */
   async getProjectStats(projectId: string): Promise<ProjectStats> {
     return this.request<ProjectStats>('GET', `/api/v1/projects/${projectId}/stats`);
+  }
+
+  // ============================================
+  // Document Methods
+  // ============================================
+
+  /**
+   * Get a document by ID with metadata and optional chunks
+   */
+  async getDocument(documentId: string): Promise<Document> {
+    return this.request<Document>('GET', `/api/v1/documents/${documentId}`);
+  }
+
+  /**
+   * Get paginated chunks for a document
+   */
+  async getDocumentChunks(
+    documentId: string,
+    page = 1,
+    pageSize = 20
+  ): Promise<DocumentChunksResponse> {
+    const params = new URLSearchParams({
+      page: String(page),
+      page_size: String(pageSize),
+    });
+    return this.request<DocumentChunksResponse>(
+      'GET',
+      `/api/v1/documents/${documentId}/chunks?${params}`
+    );
   }
 
   // ============================================

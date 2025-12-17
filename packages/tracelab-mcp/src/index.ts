@@ -2,7 +2,7 @@
 /**
  * TraceLab MCP Server
  *
- * Provides 21 tools for AI agents to perform complete research-to-output loops
+ * Provides 23 tools for AI agents to perform complete research-to-output loops
  * against TraceLab's knowledge base.
  *
  * Tools:
@@ -22,11 +22,13 @@
  * 14. get_report - Get full report details
  * 15. export_report - Export report as markdown
  * 16. upload_document - Upload a new document to TraceLab
- * 17. create_mission - Create a new research mission
- * 18. list_missions - Browse existing missions
- * 19. get_mission - Get mission details
- * 20. submit_mission - Submit mission for DeepSearch execution
- * 21. get_mission_status - Get current mission status
+ * 17. get_document_content - Retrieve full document content with pagination
+ * 18. create_mission - Create a new research mission
+ * 19. list_missions - Browse existing missions
+ * 20. get_mission - Get mission details
+ * 21. update_mission - Update mission details (title, objective, research_depth, etc.)
+ * 22. submit_mission - Submit mission for DeepSearch execution
+ * 23. get_mission_status - Get current mission status
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -57,28 +59,28 @@ const TOOLS: Tool[] = [
   {
     name: 'search_knowledge',
     description:
-      'Search for relevant knowledge chunks using semantic search. Returns scored results with content excerpts.',
+      'Find relevant information in the TraceLab knowledge base using semantic search. Returns ranked chunks with content excerpts and document references. Use get_document_content to read full documents. Related tools: get_document_content, add_to_collection.',
     inputSchema: {
       type: 'object',
       properties: {
         query: {
           type: 'string',
-          description: 'The search query - can be a question or topic',
+          description: 'Natural language search query. Example: "user onboarding best practices", "competitive analysis methods", "interview synthesis techniques"',
         },
         project_id: {
           type: 'string',
-          description: 'Optional: Filter by project UUID',
+          description: 'Scope search to a specific project UUID. Get project IDs from list_projects.',
         },
         limit: {
           type: 'number',
-          description: 'Maximum results to return (1-50, default: 10)',
+          description: 'Maximum results to return (1-50, default: 10). Increase for broader exploration, decrease for focused lookups.',
           minimum: 1,
           maximum: 50,
         },
         tags: {
           type: 'array',
           items: { type: 'string' },
-          description: 'Optional: Filter by tags (OR semantics)',
+          description: 'Filter results to chunks with any of these tags (OR logic). Example: ["interview", "synthesis"]',
         },
       },
       required: ['query'],
@@ -461,44 +463,80 @@ const TOOLS: Tool[] = [
       required: ['name', 'content', 'content_type', 'project_id'],
     },
   },
+  {
+    name: 'get_document_content',
+    description:
+      'Read the full text content of a document. Returns assembled text from document chunks with optional metadata. Use pagination for large documents (continuation hints provided). Get document_id from search_knowledge results or list documents by project. Related tools: search_knowledge, upload_document.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        document_id: {
+          type: 'string',
+          description: 'UUID of the document. Get from search_knowledge results (document_id field) or from document upload response.',
+        },
+        page: {
+          type: 'number',
+          description: 'Page number for large documents (1-indexed, default: 1). Response includes has_more flag and next_page hint for continuation.',
+          minimum: 1,
+        },
+        page_size: {
+          type: 'number',
+          description: 'Chunks per page (1-100, default: 20). Reduce for very long documents or to stay within context limits.',
+          minimum: 1,
+          maximum: 100,
+        },
+        include_metadata: {
+          type: 'boolean',
+          description: 'Include document metadata (name, file_type, word_count, chunk_count) in response. Default: true. Set false for content-only retrieval.',
+        },
+      },
+      required: ['document_id'],
+    },
+  },
   // Mission tools
   {
     name: 'create_mission',
     description:
-      'Create a new research mission. Missions define research objectives that can be executed by DeepSearch.',
+      'Create a new research mission for DeepSearch execution. After creation, use update_mission to modify details or submit_mission to queue for execution. Related tools: update_mission, submit_mission, get_mission, list_missions.',
     inputSchema: {
       type: 'object',
       properties: {
         mission_id: {
           type: 'string',
-          description: 'Unique mission identifier (e.g., "B17.1")',
+          description: 'Unique mission identifier. Example: "R001", "B17.1", "market-analysis-q4"',
         },
         title: {
           type: 'string',
-          description: 'Short title for the mission',
+          description: 'Short descriptive title. Example: "Q4 Market Analysis", "User Interview Synthesis"',
         },
         objective: {
           type: 'string',
-          description: 'Primary research objective',
+          description: 'Clear research objective describing what to find or analyze. Example: "Identify key market trends and competitive positioning in enterprise SaaS"',
         },
         success_criteria: {
           type: 'array',
           items: { type: 'string' },
-          description: 'Measurable criteria for success',
+          description: 'Measurable outcomes that define success. Example: ["Identify 5+ market trends", "Analyze 3+ competitors", "Produce executive summary"]',
         },
         project_id: {
           type: 'string',
-          description: 'Optional: UUID of project to associate with',
+          description: 'UUID of project to associate with. Links mission results to project knowledge base.',
         },
         deliverables: {
           type: 'array',
           items: { type: 'string' },
-          description: 'Optional: Expected deliverables',
+          description: 'Expected output artifacts. Example: ["Market analysis report", "Competitor matrix", "Trend forecast"]',
         },
         tags: {
           type: 'array',
           items: { type: 'string' },
-          description: 'Optional: Tags for categorization',
+          description: 'Categorization tags. Example: ["market-research", "competitive", "q4-2024"]',
+        },
+        research_depth: {
+          type: 'string',
+          enum: ['baseline', 'deep', 'alpha'],
+          description: 'Controls research thoroughness and duration. BASELINE (~5 min): Quick scan of top sources, good for simple lookups or validation. DEEP (~15-30 min): Comprehensive multi-source analysis, recommended for most research tasks. ALPHA (~1+ hour): Exhaustive research with cross-validation and synthesis, use for critical strategic decisions. Default: baseline. Can be changed later via update_mission or at submission via submit_mission.',
+          default: 'baseline',
         },
       },
       required: ['mission_id', 'title', 'objective', 'success_criteria'],
@@ -507,27 +545,27 @@ const TOOLS: Tool[] = [
   {
     name: 'list_missions',
     description:
-      'List missions with optional filtering by status or project.',
+      'Browse existing research missions with optional filtering. Returns mission summaries including status and research_depth. Use get_mission for full details. Related tools: get_mission, create_mission.',
     inputSchema: {
       type: 'object',
       properties: {
         status: {
           type: 'string',
           enum: ['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled'],
-          description: 'Optional: Filter by status',
+          description: 'Filter by execution status. draft: Not yet submitted. queued: Waiting for execution. in_progress: Currently executing. completed: Finished successfully. blocked: Awaiting resolution. cancelled: Terminated.',
         },
         project_id: {
           type: 'string',
-          description: 'Optional: Filter by project UUID',
+          description: 'Filter to missions associated with this project UUID.',
         },
         page: {
           type: 'number',
-          description: 'Page number (1-indexed, default: 1)',
+          description: 'Page number for pagination (1-indexed, default: 1)',
           minimum: 1,
         },
         page_size: {
           type: 'number',
-          description: 'Results per page (1-100, default: 20)',
+          description: 'Number of missions per page (1-100, default: 20)',
           minimum: 1,
           maximum: 100,
         },
@@ -537,13 +575,60 @@ const TOOLS: Tool[] = [
   {
     name: 'get_mission',
     description:
-      'Get detailed information about a mission including execution status and results.',
+      'Retrieve full mission details including objective, success criteria, research_depth, execution status, and results. Use this to check mission progress or access completed research outputs. Related tools: list_missions, update_mission, submit_mission.',
     inputSchema: {
       type: 'object',
       properties: {
         mission_id: {
           type: 'string',
-          description: 'UUID of the mission',
+          description: 'UUID of the mission to retrieve. Get mission UUIDs from list_missions or create_mission response.',
+        },
+      },
+      required: ['mission_id'],
+    },
+  },
+  {
+    name: 'update_mission',
+    description:
+      'Modify an existing mission before submission. Change research_depth to control thoroughness, refine objectives, or update success criteria. Only draft missions can be modified. Related tools: create_mission, get_mission, submit_mission.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        mission_id: {
+          type: 'string',
+          description: 'UUID of the mission to update. Get from list_missions or create_mission response.',
+        },
+        title: {
+          type: 'string',
+          description: 'New mission title. Example: "Updated Market Analysis"',
+        },
+        objective: {
+          type: 'string',
+          description: 'Revised research objective. Be specific about what to find or analyze.',
+        },
+        success_criteria: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'New measurable success criteria. Example: ["Identify 10+ data points", "Compare 5 competitors"]',
+        },
+        research_depth: {
+          type: 'string',
+          enum: ['baseline', 'deep', 'alpha'],
+          description: 'Change research thoroughness. BASELINE (~5 min): Quick scan, good for simple lookups. DEEP (~15-30 min): Comprehensive analysis, recommended default. ALPHA (~1+ hour): Exhaustive research, use for critical decisions.',
+        },
+        deliverables: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Updated expected outputs. Example: ["Executive summary", "Data appendix"]',
+        },
+        tags: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'New categorization tags. Example: ["priority", "q4-research"]',
+        },
+        context: {
+          type: 'object',
+          description: 'Additional context metadata as key-value pairs.',
         },
       },
       required: ['mission_id'],
@@ -552,13 +637,18 @@ const TOOLS: Tool[] = [
   {
     name: 'submit_mission',
     description:
-      'Submit a mission for execution. In worker mode, sets status to queued for DeepSearch worker to pick up. In HTTP mode, submits directly to DeepSearch API.',
+      'Queue a mission for DeepSearch execution. The mission transitions from draft to queued status. Optionally override research_depth at submission time. Monitor progress with get_mission. Related tools: create_mission, update_mission, get_mission, get_mission_status.',
     inputSchema: {
       type: 'object',
       properties: {
         mission_id: {
           type: 'string',
-          description: 'UUID of the mission to submit',
+          description: 'UUID of the mission to submit for execution. Must be in draft status.',
+        },
+        research_depth: {
+          type: 'string',
+          enum: ['baseline', 'deep', 'alpha'],
+          description: 'Override mission research_depth at submission. BASELINE (~5 min): Quick scan for simple lookups. DEEP (~15-30 min): Comprehensive multi-source analysis (recommended). ALPHA (~1+ hour): Exhaustive research with synthesis for critical decisions. If not provided, uses the depth set on the mission.',
         },
       },
       required: ['mission_id'],
@@ -567,13 +657,13 @@ const TOOLS: Tool[] = [
   {
     name: 'get_mission_status',
     description:
-      'Get the current execution status of a mission.',
+      'Check execution progress of a submitted mission. Returns current status (queued/in_progress/completed/blocked) and progress percentage. Lightweight alternative to get_mission for status polling. Related tools: submit_mission, get_mission.',
     inputSchema: {
       type: 'object',
       properties: {
         mission_id: {
           type: 'string',
-          description: 'UUID of the mission',
+          description: 'UUID of the mission to check. Get from submit_mission response or list_missions.',
         },
       },
       required: ['mission_id'],
@@ -694,6 +784,13 @@ const UploadDocumentInput = z.object({
   description: z.string().optional(),
 });
 
+const GetDocumentContentInput = z.object({
+  document_id: z.string().uuid(),
+  page: z.number().min(1).optional().default(1),
+  page_size: z.number().min(1).max(100).optional().default(20),
+  include_metadata: z.boolean().optional().default(true),
+});
+
 // Mission input schemas
 const CreateMissionInput = z.object({
   mission_id: z.string().min(1),
@@ -703,6 +800,7 @@ const CreateMissionInput = z.object({
   project_id: z.string().uuid().optional(),
   deliverables: z.array(z.string()).optional(),
   tags: z.array(z.string()).optional(),
+  research_depth: z.enum(['baseline', 'deep', 'alpha']).optional().default('baseline'),
 });
 
 const ListMissionsInput = z.object({
@@ -716,8 +814,20 @@ const GetMissionInput = z.object({
   mission_id: z.string().uuid(),
 });
 
+const UpdateMissionInput = z.object({
+  mission_id: z.string().uuid(),
+  title: z.string().min(1).optional(),
+  objective: z.string().min(1).optional(),
+  success_criteria: z.array(z.string()).optional(),
+  research_depth: z.enum(['baseline', 'deep', 'alpha']).optional(),
+  deliverables: z.array(z.string()).optional(),
+  tags: z.array(z.string()).optional(),
+  context: z.record(z.unknown()).optional(),
+});
+
 const SubmitMissionInput = z.object({
   mission_id: z.string().uuid(),
+  research_depth: z.enum(['baseline', 'deep', 'alpha']).optional(),
 });
 
 const GetMissionStatusInput = z.object({
@@ -1304,6 +1414,68 @@ async function handleUploadDocument(args: unknown) {
   };
 }
 
+async function handleGetDocumentContent(args: unknown) {
+  const input = GetDocumentContentInput.parse(args);
+
+  // Fetch document metadata if requested
+  let documentMeta: { name: string; file_type?: string; word_count?: number; chunk_count?: number } | undefined;
+  if (input.include_metadata) {
+    const doc = await client.getDocument(input.document_id);
+    documentMeta = {
+      name: doc.name,
+      file_type: doc.file_type,
+      word_count: doc.word_count,
+      chunk_count: doc.chunk_count,
+    };
+  }
+
+  // Fetch chunks with pagination
+  const chunksResponse = await client.getDocumentChunks(
+    input.document_id,
+    input.page,
+    input.page_size
+  );
+
+  // Assemble content from chunks
+  const content = chunksResponse.data
+    .sort((a, b) => a.chunk_index - b.chunk_index)
+    .map((chunk) => chunk.content)
+    .join('\n\n');
+
+  const response: Record<string, unknown> = {
+    document_id: input.document_id,
+    content,
+    pagination: {
+      page: chunksResponse.pagination.page,
+      page_size: chunksResponse.pagination.page_size,
+      total_chunks: chunksResponse.pagination.total,
+      total_pages: chunksResponse.pagination.pages,
+      has_more: chunksResponse.pagination.page < chunksResponse.pagination.pages,
+    },
+  };
+
+  if (documentMeta) {
+    response.metadata = documentMeta;
+  }
+
+  // Provide continuation hint for large documents
+  if (chunksResponse.pagination.page < chunksResponse.pagination.pages) {
+    response.continuation = {
+      message: `Document has more content. Call get_document_content with page=${chunksResponse.pagination.page + 1} to continue.`,
+      next_page: chunksResponse.pagination.page + 1,
+    };
+  }
+
+  return {
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(response, null, 2),
+      },
+    ],
+  };
+}
+
 // Mission handlers
 async function handleCreateMission(args: unknown) {
   const input = CreateMissionInput.parse(args);
@@ -1315,6 +1487,7 @@ async function handleCreateMission(args: unknown) {
     project_id: input.project_id,
     deliverables: input.deliverables,
     tags: input.tags,
+    research_depth: input.research_depth,
   });
 
   return {
@@ -1330,6 +1503,7 @@ async function handleCreateMission(args: unknown) {
               title: result.title,
               objective: result.objective,
               status: result.status,
+              research_depth: result.research_depth,
               created_at: result.created_at,
             },
           },
@@ -1390,6 +1564,7 @@ async function handleGetMission(args: unknown) {
             objective: result.objective,
             success_criteria: result.success_criteria,
             status: result.status,
+            research_depth: result.research_depth,
             project_id: result.project_id,
             deliverables: result.deliverables,
             tags: result.tags,
@@ -1412,8 +1587,60 @@ async function handleGetMission(args: unknown) {
   };
 }
 
+async function handleUpdateMission(args: unknown) {
+  const input = UpdateMissionInput.parse(args);
+
+  // Build update payload with only provided fields
+  const updateData: Record<string, unknown> = {};
+  if (input.title !== undefined) updateData.title = input.title;
+  if (input.objective !== undefined) updateData.objective = input.objective;
+  if (input.success_criteria !== undefined) updateData.success_criteria = input.success_criteria;
+  if (input.research_depth !== undefined) updateData.research_depth = input.research_depth;
+  if (input.deliverables !== undefined) updateData.deliverables = input.deliverables;
+  if (input.tags !== undefined) updateData.tags = input.tags;
+  if (input.context !== undefined) updateData.context = input.context;
+
+  const result = await client.updateMission(input.mission_id, updateData);
+
+  return {
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(
+          {
+            message: `Mission "${result.mission_id}" updated successfully`,
+            mission: {
+              id: result.id,
+              mission_id: result.mission_id,
+              title: result.title,
+              objective: result.objective,
+              success_criteria: result.success_criteria,
+              status: result.status,
+              research_depth: result.research_depth,
+              project_id: result.project_id,
+              deliverables: result.deliverables,
+              tags: result.tags,
+              updated_at: result.updated_at,
+            },
+          },
+          null,
+          2
+        ),
+      },
+    ],
+  };
+}
+
 async function handleSubmitMission(args: unknown) {
   const input = SubmitMissionInput.parse(args);
+
+  // If research_depth override is provided, update the mission first
+  if (input.research_depth) {
+    await client.updateMission(input.mission_id, {
+      research_depth: input.research_depth,
+    });
+  }
+
   const result = await client.submitMission(input.mission_id);
 
   return {
@@ -1428,6 +1655,7 @@ async function handleSubmitMission(args: unknown) {
             mission_id: result.mission_id,
             uuid: result.uuid,
             job_id: result.job_id,
+            research_depth: input.research_depth || 'unchanged',
           },
           null,
           2
@@ -1516,12 +1744,16 @@ async function main() {
           return await handleExportReport(args);
         case 'upload_document':
           return await handleUploadDocument(args);
+        case 'get_document_content':
+          return await handleGetDocumentContent(args);
         case 'create_mission':
           return await handleCreateMission(args);
         case 'list_missions':
           return await handleListMissions(args);
         case 'get_mission':
           return await handleGetMission(args);
+        case 'update_mission':
+          return await handleUpdateMission(args);
         case 'submit_mission':
           return await handleSubmitMission(args);
         case 'get_mission_status':

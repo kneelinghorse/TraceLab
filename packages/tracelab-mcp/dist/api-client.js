@@ -208,6 +208,25 @@ export class TraceLabClient {
         return this.request('GET', `/api/v1/projects/${projectId}/stats`);
     }
     // ============================================
+    // Document Methods
+    // ============================================
+    /**
+     * Get a document by ID with metadata and optional chunks
+     */
+    async getDocument(documentId) {
+        return this.request('GET', `/api/v1/documents/${documentId}`);
+    }
+    /**
+     * Get paginated chunks for a document
+     */
+    async getDocumentChunks(documentId, page = 1, pageSize = 20) {
+        const params = new URLSearchParams({
+            page: String(page),
+            page_size: String(pageSize),
+        });
+        return this.request('GET', `/api/v1/documents/${documentId}/chunks?${params}`);
+    }
+    // ============================================
     // Mission Methods
     // ============================================
     /**
