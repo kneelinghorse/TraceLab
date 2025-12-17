@@ -203,6 +203,45 @@ export interface DocumentUploadResponse {
     validation_status: string;
     created_at: string;
 }
+export interface DocumentChunk {
+    id: string;
+    document_id: string;
+    chunk_index: number;
+    content: string;
+    embedding_id?: string;
+    token_count?: number;
+    start_char?: number;
+    end_char?: number;
+    created_at: string;
+}
+export interface Document {
+    id: string;
+    project_id: string;
+    name: string;
+    file_type?: string;
+    file_size?: number;
+    mime_type?: string;
+    source_type?: string;
+    uploaded_at: string;
+    processed: boolean;
+    chunked: boolean;
+    embedded: boolean;
+    validation_status: string;
+    chunk_count?: number;
+    total_tokens?: number;
+    word_count?: number;
+    preview?: string;
+    chunks?: DocumentChunk[];
+}
+export interface DocumentChunksResponse {
+    data: DocumentChunk[];
+    pagination: {
+        page: number;
+        page_size: number;
+        total: number;
+        pages: number;
+    };
+}
 export interface Mission {
     id: string;
     mission_id: string;
@@ -215,6 +254,7 @@ export interface Mission {
     research_phases?: Record<string, unknown>;
     tags?: string[];
     metadata?: Record<string, unknown>;
+    research_depth?: 'baseline' | 'deep' | 'alpha';
     status: 'draft' | 'queued' | 'in_progress' | 'completed' | 'blocked' | 'cancelled';
     queued_at?: string;
     started_at?: string;
@@ -241,6 +281,7 @@ export interface MissionCreate {
     research_phases?: Record<string, unknown>;
     tags?: string[];
     metadata?: Record<string, unknown>;
+    research_depth?: 'baseline' | 'deep' | 'alpha';
     status?: string;
 }
 export interface MissionUpdate {
@@ -252,6 +293,7 @@ export interface MissionUpdate {
     research_phases?: Record<string, unknown>;
     tags?: string[];
     metadata?: Record<string, unknown>;
+    research_depth?: 'baseline' | 'deep' | 'alpha';
     status?: string;
 }
 export interface MissionListResponse {
@@ -348,6 +390,14 @@ export declare class TraceLabClient {
      * Get aggregated statistics for a project
      */
     getProjectStats(projectId: string): Promise<ProjectStats>;
+    /**
+     * Get a document by ID with metadata and optional chunks
+     */
+    getDocument(documentId: string): Promise<Document>;
+    /**
+     * Get paginated chunks for a document
+     */
+    getDocumentChunks(documentId: string, page?: number, pageSize?: number): Promise<DocumentChunksResponse>;
     /**
      * List missions with optional filtering
      */

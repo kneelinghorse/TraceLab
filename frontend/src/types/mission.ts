@@ -186,6 +186,7 @@ export interface ApiMissionUpdate {
   research_phases?: Record<string, unknown>;
   tags?: string[];
   metadata?: Record<string, unknown>;
+  research_depth?: ResearchDepth;
   status?: MissionStatus;
   deepsearch_job_id?: string;
   result_document_ids?: string[];

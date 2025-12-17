@@ -7,7 +7,7 @@ import { AuthGate } from "@/components/AuthGate";
 import { ExecutionTimeline, ResearchPhases, ResultLinks } from "@/components/missions";
 import { missionsApi } from "@/lib/api/missions";
 import { useApiMission } from "@/lib/hooks/useMissions";
-import type { MissionStatus, ReportPromotionResponse, ApiMissionUpdate } from "@/types/mission";
+import type { MissionStatus, ReportPromotionResponse, ApiMissionUpdate, ResearchDepth } from "@/types/mission";
 
 const STATUS_COLORS: Record<MissionStatus, { bg: string; text: string; dot: string }> = {
   draft: { bg: "bg-gray-100 dark:bg-gray-700", text: "text-gray-700 dark:text-gray-300", dot: "bg-gray-400" },
@@ -55,6 +55,7 @@ function MissionDetailContent() {
   const [editSuccessCriteria, setEditSuccessCriteria] = useState<string[]>([]);
   const [editDeliverables, setEditDeliverables] = useState<string[]>([]);
   const [editTags, setEditTags] = useState<string[]>([]);
+  const [editResearchDepth, setEditResearchDepth] = useState<ResearchDepth>("baseline");
   const [editError, setEditError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -120,6 +121,7 @@ function MissionDetailContent() {
     setEditSuccessCriteria([...mission.success_criteria]);
     setEditDeliverables([...mission.deliverables]);
     setEditTags([...mission.tags]);
+    setEditResearchDepth(mission.research_depth);
     setEditError(null);
     setIsEditing(true);
   };
@@ -151,6 +153,7 @@ function MissionDetailContent() {
         success_criteria: editSuccessCriteria.filter(c => c.trim() !== ""),
         deliverables: editDeliverables.filter(d => d.trim() !== ""),
         tags: editTags.filter(t => t.trim() !== ""),
+        research_depth: editResearchDepth,
       };
 
       await missionsApi.update(missionId, updateData);
@@ -411,6 +414,25 @@ function MissionDetailContent() {
                   </div>
                 </div>
 
+                {/* Research Depth */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Research Depth
+                  </label>
+                  <select
+                    value={editResearchDepth}
+                    onChange={(e) => setEditResearchDepth(e.target.value as ResearchDepth)}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="baseline">Baseline - Quick scan (~5 min)</option>
+                    <option value="deep">Deep - Comprehensive analysis (~15-30 min)</option>
+                    <option value="alpha">Alpha - Exhaustive research (~1+ hour)</option>
+                  </select>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Controls research thoroughness. Baseline for quick lookups, Deep for most research tasks, Alpha for critical decisions.
+                  </p>
+                </div>
+
                 {/* Error Display */}
                 {editError && (
                   <p className="text-sm text-red-600 dark:text-red-400">{editError}</p>
@@ -476,18 +498,33 @@ function MissionDetailContent() {
                   </div>
                 </div>
 
-                {mission.tags.length > 0 && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {mission.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
+                {/* Tags and Research Depth */}
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  {mission.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                  {mission.research_depth && (
+                    <span
+                      className={`px-2 py-1 text-xs rounded font-medium ${
+                        mission.research_depth === "alpha"
+                          ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300"
+                          : mission.research_depth === "deep"
+                          ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                          : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                      }`}
+                      title={`Research Depth: ${mission.research_depth}`}
+                    >
+                      {mission.research_depth === "alpha" && "⚡ Alpha"}
+                      {mission.research_depth === "deep" && "🔍 Deep"}
+                      {mission.research_depth === "baseline" && "📌 Baseline"}
+                    </span>
+                  )}
+                </div>
 
                 {/* Action Buttons */}
                 <div className="mt-6 flex flex-wrap gap-3">
