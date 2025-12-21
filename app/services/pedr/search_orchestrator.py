@@ -104,7 +104,7 @@ class PEDRConfig:
     enable_syntactic: bool = True
     enable_pragmatic: bool = True
     enable_governance: bool = True
-    enable_graph: bool = False
+    enable_graph: bool = True
 
     # Search parameters
     top_k_per_layer: int = 20  # Fetch more per layer, fuse down to top_k
