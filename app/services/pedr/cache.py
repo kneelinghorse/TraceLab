@@ -20,6 +20,10 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
+from sqlalchemy import event
+
+from app.models import GraphEdge
+
 logger = logging.getLogger(__name__)
 
 
@@ -285,6 +289,18 @@ def invalidate_pedr_cache() -> int:
     if _pedr_cache is not None:
         return _pedr_cache.invalidate_all()
     return 0
+
+
+def _invalidate_pedr_cache_on_edge_change(*_args: object, **_kwargs: object) -> None:
+    try:
+        invalidate_pedr_cache()
+    except Exception:
+        logger.exception("Failed to invalidate PEDR cache after graph edge change.")
+
+
+event.listen(GraphEdge, "after_insert", _invalidate_pedr_cache_on_edge_change)
+event.listen(GraphEdge, "after_update", _invalidate_pedr_cache_on_edge_change)
+event.listen(GraphEdge, "after_delete", _invalidate_pedr_cache_on_edge_change)
 
 
 __all__ = [

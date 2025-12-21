@@ -1,11 +1,12 @@
-"""PEDR Search Orchestrator - coordinates all 5 search layers with RRF fusion.
+"""PEDR Search Orchestrator - coordinates all 6 search layers with RRF fusion.
 
 This module implements the unified PEDR search orchestration, combining:
 1. Lexical layer (PostgreSQL full-text search)
 2. Semantic layer (Qdrant vector search)
-3. Syntactic layer (type detection and filtering)
-4. Pragmatic layer (intent classification)
-5. Governance layer (quality scoring and PII handling)
+3. Graph layer (graph expansion from retrieval seeds)
+4. Syntactic layer (type detection and filtering)
+5. Pragmatic layer (intent classification)
+6. Governance layer (quality scoring and PII handling)
 
 Results are fused using Reciprocal Rank Fusion (RRF) for robust ranking
 across heterogeneous retrieval methods.
@@ -31,6 +32,10 @@ from app.services.pedr.fusion import (
     LayerResult,
     RRFFusion,
     get_rrf_fusion,
+)
+from app.services.pedr.graph_layer import (
+    GraphLayerConfig,
+    GraphLayerService,
 )
 from app.services.pedr.pragmatic import (
     PragmaticFilters,
@@ -61,14 +66,26 @@ from app.services.pedr.cache import (
 logger = logging.getLogger(__name__)
 
 
-# Default layer weights for RRF (sum to 1.0 for interpretability)
-DEFAULT_LAYER_WEIGHTS = {
+BASE_LAYER_WEIGHTS = {
     "lexical": 0.25,
     "semantic": 0.35,
     "syntactic": 0.15,
     "pragmatic": 0.10,
     "governance": 0.15,
 }
+
+DEFAULT_GRAPH_WEIGHT = 0.12
+
+
+def _build_default_layer_weights(graph_weight: float) -> Dict[str, float]:
+    scale = max(0.0, 1.0 - graph_weight)
+    weights = {layer: weight * scale for layer, weight in BASE_LAYER_WEIGHTS.items()}
+    weights["graph"] = graph_weight
+    return weights
+
+
+# Default layer weights for RRF (sum to 1.0 for interpretability)
+DEFAULT_LAYER_WEIGHTS = _build_default_layer_weights(DEFAULT_GRAPH_WEIGHT)
 
 
 @dataclass(frozen=True)
@@ -87,6 +104,7 @@ class PEDRConfig:
     enable_syntactic: bool = True
     enable_pragmatic: bool = True
     enable_governance: bool = True
+    enable_graph: bool = False
 
     # Search parameters
     top_k_per_layer: int = 20  # Fetch more per layer, fuse down to top_k
@@ -106,6 +124,13 @@ class PEDRConfig:
     # Pragmatic layer
     intent_boost_enabled: bool = True
 
+    # Graph layer
+    graph_weight: float = DEFAULT_GRAPH_WEIGHT
+    graph_depth: int = 2
+    graph_decay: float = 0.7
+    graph_edge_types: Optional[Tuple[str, ...]] = None
+    graph_top_k_seeds: int = 10
+
 
 @dataclass
 class LayerTimings:
@@ -113,6 +138,7 @@ class LayerTimings:
 
     lexical_ms: float = 0.0
     semantic_ms: float = 0.0
+    graph_ms: float = 0.0
     syntactic_ms: float = 0.0
     pragmatic_ms: float = 0.0
     governance_ms: float = 0.0
@@ -135,6 +161,8 @@ class PEDRMetadata:
     timings: LayerTimings
     total_candidates: int
     result_count: int
+    graph_enabled: bool = False
+    graph_candidates_expanded: Optional[int] = None
     cache_hit: bool = False
     cache_stats: Optional[Dict[str, Any]] = None
 
@@ -234,6 +262,7 @@ class PEDRSearchResponse:
             "timings": {
                 "lexical_ms": self.metadata.timings.lexical_ms,
                 "semantic_ms": self.metadata.timings.semantic_ms,
+                "graph_ms": self.metadata.timings.graph_ms,
                 "syntactic_ms": self.metadata.timings.syntactic_ms,
                 "pragmatic_ms": self.metadata.timings.pragmatic_ms,
                 "governance_ms": self.metadata.timings.governance_ms,
@@ -241,6 +270,8 @@ class PEDRSearchResponse:
                 "relational_ms": self.metadata.timings.relational_ms,
                 "total_ms": self.metadata.timings.total_ms,
             },
+            "graph_enabled": self.metadata.graph_enabled,
+            "graph_candidates_expanded": self.metadata.graph_candidates_expanded,
             "total_candidates": self.metadata.total_candidates,
             "result_count": self.metadata.result_count,
             "cache_hit": self.metadata.cache_hit,
@@ -259,9 +290,10 @@ class PEDRSearchOrchestrator:
     The orchestrator coordinates:
     1. Lexical search (PostgreSQL full-text)
     2. Semantic search (Qdrant vectors)
-    3. Syntactic processing (type detection/filtering)
-    4. Pragmatic processing (intent classification)
-    5. Governance scoring (quality gates, PII)
+    3. Graph expansion (graph adjacency traversal)
+    4. Syntactic processing (type detection/filtering)
+    5. Pragmatic processing (intent classification)
+    6. Governance scoring (quality gates, PII)
 
     Results are fused using Reciprocal Rank Fusion (RRF).
     """
@@ -275,6 +307,7 @@ class PEDRSearchOrchestrator:
         quality_service: Optional[QualityScoringService] = None,
         semantic_protocol: Optional[SemanticProtocol] = None,
         rrf_fusion: Optional[RRFFusion] = None,
+        graph_service: Optional[GraphLayerService] = None,
         # External search providers (injected)
         lexical_search: Optional[Callable[..., List[Dict[str, Any]]]] = None,
         semantic_search: Optional[Callable[..., List[Dict[str, Any]]]] = None,
@@ -297,6 +330,7 @@ class PEDRSearchOrchestrator:
         self.quality_service = quality_service or get_quality_scoring_service()
         self.semantic_protocol = semantic_protocol or get_semantic_protocol()
         self.rrf_fusion = rrf_fusion or get_rrf_fusion()
+        self.graph_service = graph_service or GraphLayerService()
 
         # External search providers - will be set by factory or injection
         self._lexical_search = lexical_search
@@ -333,7 +367,13 @@ class PEDRSearchOrchestrator:
         enable_syntactic: Optional[bool] = None,
         enable_pragmatic: Optional[bool] = None,
         enable_governance: Optional[bool] = None,
+        enable_graph: Optional[bool] = None,
         layer_weights: Optional[Dict[str, float]] = None,
+        graph_weight: Optional[float] = None,
+        graph_depth: Optional[int] = None,
+        graph_decay: Optional[float] = None,
+        graph_edge_types: Optional[List[str]] = None,
+        graph_top_k_seeds: Optional[int] = None,
     ) -> PEDRSearchResponse:
         """Execute PEDR unified search across all layers.
 
@@ -360,13 +400,47 @@ class PEDRSearchOrchestrator:
             status_filters: Allowed mission statuses.
             allow_pii: Allow PII-flagged content.
             enable_*: Layer enablement overrides.
+            enable_graph: Enable graph expansion layer.
             layer_weights: Custom layer weights for RRF.
+            graph_weight: Weight for graph layer in RRF fusion.
+            graph_depth: Maximum graph traversal depth.
+            graph_decay: Score decay per hop in graph traversal.
+            graph_edge_types: Optional edge types to include (None = all).
+            graph_top_k_seeds: Number of top retrieval results to use as graph seeds.
 
         Returns:
             PEDRSearchResponse with fused results and metadata.
         """
         start_time = time.perf_counter()
         timings = LayerTimings()
+
+        # Merge config with runtime overrides (used for cache keys and execution)
+        config = self._merge_config(
+            element_type=element_type,
+            element_types=element_types,
+            auto_detect_type=auto_detect_type,
+            type_boost_enabled=type_boost_enabled,
+            intent_boost_enabled=intent_boost_enabled,
+            min_quality_gates=min_quality_gates,
+            status_filters=status_filters,
+            allow_pii=allow_pii,
+            enable_lexical=enable_lexical,
+            enable_semantic=enable_semantic,
+            enable_syntactic=enable_syntactic,
+            enable_pragmatic=enable_pragmatic,
+            enable_governance=enable_governance,
+            enable_graph=enable_graph,
+            layer_weights=layer_weights,
+            graph_weight=graph_weight,
+            graph_depth=graph_depth,
+            graph_decay=graph_decay,
+            graph_edge_types=graph_edge_types,
+            graph_top_k_seeds=graph_top_k_seeds,
+        )
+        effective_layer_weights = self._resolve_layer_weights(
+            config=config,
+            graph_weight_override=graph_weight,
+        )
 
         # Build cache filter key from all search parameters
         from app.core.config import settings as app_settings
@@ -384,6 +458,12 @@ class PEDRSearchOrchestrator:
             "element_type": element_type,
             "element_types": tuple(element_types) if element_types else None,
             "include_embeddings": include_embeddings,
+            "enable_graph": config.enable_graph,
+            "graph_weight": effective_layer_weights.get("graph"),
+            "graph_depth": config.graph_depth,
+            "graph_decay": config.graph_decay,
+            "graph_edge_types": config.graph_edge_types,
+            "graph_top_k_seeds": config.graph_top_k_seeds,
         }
 
         # Check cache first (if enabled)
@@ -406,26 +486,10 @@ class PEDRSearchOrchestrator:
                     query=query,
                     timings=timings,
                     cache_stats=cache_stats,
+                    graph_enabled=config.enable_graph,
                 )
 
         # Cache miss - execute full search pipeline
-        # Merge config with runtime overrides
-        config = self._merge_config(
-            element_type=element_type,
-            element_types=element_types,
-            auto_detect_type=auto_detect_type,
-            type_boost_enabled=type_boost_enabled,
-            intent_boost_enabled=intent_boost_enabled,
-            min_quality_gates=min_quality_gates,
-            status_filters=status_filters,
-            allow_pii=allow_pii,
-            enable_lexical=enable_lexical,
-            enable_semantic=enable_semantic,
-            enable_syntactic=enable_syntactic,
-            enable_pragmatic=enable_pragmatic,
-            enable_governance=enable_governance,
-            layer_weights=layer_weights,
-        )
 
         # Phase 1: Pre-analysis (syntactic and pragmatic)
         t0 = time.perf_counter()
@@ -438,6 +502,9 @@ class PEDRSearchOrchestrator:
 
         # Phase 2: Execute retrieval layers
         layer_results: List[LayerResult] = []
+        lexical_results: List[Dict[str, Any]] = []
+        semantic_results: List[Dict[str, Any]] = []
+        graph_candidates_expanded: Optional[int] = None
         fetch_count = max(top_k, config.top_k_per_layer) * config.result_multiplier
 
         search_params = {
@@ -467,7 +534,10 @@ class PEDRSearchOrchestrator:
                         LayerResult(
                             layer_name="lexical",
                             results=lexical_results,
-                            weight=config.layer_weights.get("lexical", 0.25),
+                            weight=effective_layer_weights.get(
+                                "lexical",
+                                BASE_LAYER_WEIGHTS["lexical"],
+                            ),
                             latency_ms=timings.lexical_ms,
                         )
                     )
@@ -486,13 +556,47 @@ class PEDRSearchOrchestrator:
                         LayerResult(
                             layer_name="semantic",
                             results=semantic_results,
-                            weight=config.layer_weights.get("semantic", 0.35),
+                            weight=effective_layer_weights.get(
+                                "semantic",
+                                BASE_LAYER_WEIGHTS["semantic"],
+                            ),
                             latency_ms=timings.semantic_ms,
                         )
                     )
             except Exception as e:
                 logger.warning("Semantic search failed: %s", e)
                 timings.semantic_ms = (time.perf_counter() - t0) * 1000
+
+        # Graph layer (between retrieval and fusion)
+        if config.enable_graph and self.graph_service:
+            t0 = time.perf_counter()
+            try:
+                seed_results = _interleave_results(lexical_results, semantic_results)
+                graph_layer = self.graph_service.expand_from_results(
+                    seed_results,
+                    top_k=config.graph_top_k_seeds,
+                    config=GraphLayerConfig(
+                        max_depth=config.graph_depth,
+                        decay_factor=config.graph_decay,
+                        allowed_edge_types=config.graph_edge_types,
+                    ),
+                )
+                timings.graph_ms = graph_layer.latency_ms or (
+                    (time.perf_counter() - t0) * 1000
+                )
+                graph_layer.weight = effective_layer_weights.get(
+                    "graph",
+                    config.graph_weight,
+                )
+                layer_results.append(graph_layer)
+                graph_candidates_expanded = int(
+                    (graph_layer.metadata or {}).get("total_candidates") or 0
+                )
+                _log_graph_layer_metrics(graph_layer)
+            except Exception as e:
+                logger.warning("Graph search failed: %s", e)
+                timings.graph_ms = (time.perf_counter() - t0) * 1000
+                graph_candidates_expanded = 0
 
         # Phase 3: Fuse results with RRF
         t0 = time.perf_counter()
@@ -562,8 +666,10 @@ class PEDRSearchOrchestrator:
             ),
             type_confidence=syntactic_filters.detection_confidence,
             layers_used=[lr.layer_name for lr in layer_results],
-            layer_weights=dict(config.layer_weights),
+            layer_weights=dict(effective_layer_weights),
             timings=timings,
+            graph_enabled=config.enable_graph,
+            graph_candidates_expanded=graph_candidates_expanded,
             total_candidates=len(fused_results),
             result_count=len(final_results),
             cache_hit=False,
@@ -588,8 +694,12 @@ class PEDRSearchOrchestrator:
     def _merge_config(self, **overrides: Any) -> PEDRConfig:
         """Merge runtime overrides with base config."""
         base = self.config
+        layer_weights = dict(base.layer_weights)
+        override_weights = overrides.get("layer_weights")
+        if override_weights is not None:
+            layer_weights.update(override_weights)
         return PEDRConfig(
-            layer_weights=overrides.get("layer_weights") or dict(base.layer_weights),
+            layer_weights=layer_weights,
             rrf_k=base.rrf_k,
             enable_lexical=(
                 overrides.get("enable_lexical")
@@ -615,6 +725,11 @@ class PEDRSearchOrchestrator:
                 overrides.get("enable_governance")
                 if overrides.get("enable_governance") is not None
                 else base.enable_governance
+            ),
+            enable_graph=(
+                overrides.get("enable_graph")
+                if overrides.get("enable_graph") is not None
+                else base.enable_graph
             ),
             top_k_per_layer=base.top_k_per_layer,
             result_multiplier=base.result_multiplier,
@@ -654,7 +769,72 @@ class PEDRSearchOrchestrator:
                 if overrides.get("intent_boost_enabled") is not None
                 else base.intent_boost_enabled
             ),
+            graph_weight=(
+                overrides.get("graph_weight")
+                if overrides.get("graph_weight") is not None
+                else base.graph_weight
+            ),
+            graph_depth=(
+                overrides.get("graph_depth")
+                if overrides.get("graph_depth") is not None
+                else base.graph_depth
+            ),
+            graph_decay=(
+                overrides.get("graph_decay")
+                if overrides.get("graph_decay") is not None
+                else base.graph_decay
+            ),
+            graph_edge_types=(
+                tuple(overrides.get("graph_edge_types"))
+                if overrides.get("graph_edge_types") is not None
+                else base.graph_edge_types
+            ),
+            graph_top_k_seeds=(
+                overrides.get("graph_top_k_seeds")
+                if overrides.get("graph_top_k_seeds") is not None
+                else base.graph_top_k_seeds
+            ),
         )
+
+    def _resolve_layer_weights(
+        self,
+        *,
+        config: PEDRConfig,
+        graph_weight_override: Optional[float],
+    ) -> Dict[str, float]:
+        weights = dict(DEFAULT_LAYER_WEIGHTS)
+        weights.update(config.layer_weights)
+
+        if config.enable_graph:
+            if graph_weight_override is not None:
+                weights["graph"] = config.graph_weight
+            else:
+                weights.setdefault("graph", config.graph_weight)
+        else:
+            weights["graph"] = 0.0
+
+        enabled_layers = {
+            "lexical": config.enable_lexical,
+            "semantic": config.enable_semantic,
+            "syntactic": config.enable_syntactic,
+            "pragmatic": config.enable_pragmatic,
+            "governance": config.enable_governance,
+            "graph": config.enable_graph,
+        }
+
+        normalized: Dict[str, float] = {}
+        total = 0.0
+        for layer, enabled in enabled_layers.items():
+            weight = float(weights.get(layer, 0.0))
+            if not enabled:
+                weight = 0.0
+            normalized[layer] = weight
+            total += weight
+
+        if total > 0:
+            normalized = {layer: weight / total for layer, weight in normalized.items()}
+
+        return normalized
 
     def _analyze_syntactic(
         self,
@@ -741,6 +921,8 @@ class PEDRSearchOrchestrator:
         query: str,
         timings: LayerTimings,
         cache_stats: Dict[str, Any],
+        graph_enabled: bool = False,
+        graph_candidates_expanded: Optional[int] = None,
     ) -> PEDRSearchResponse:
         """Build a PEDRSearchResponse from cached result dictionaries.
 
@@ -794,6 +976,8 @@ class PEDRSearchOrchestrator:
             layers_used=[],  # Not applicable for cache hits
             layer_weights={},
             timings=timings,
+            graph_enabled=graph_enabled,
+            graph_candidates_expanded=graph_candidates_expanded,
             total_candidates=len(results),
             result_count=len(results),
             cache_hit=True,
@@ -907,6 +1091,41 @@ def create_pedr_orchestrator(
         config=config,
         lexical_search=lexical_search or _lexical_wrapper,
         semantic_search=semantic_search or _semantic_wrapper,
+    )
+
+
+def _interleave_results(*result_sets: Sequence[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    combined: List[Dict[str, Any]] = []
+    max_len = max((len(results) for results in result_sets), default=0)
+    for idx in range(max_len):
+        for results in result_sets:
+            if idx < len(results):
+                combined.append(results[idx])
+    return combined
+
+
+def _log_graph_layer_metrics(graph_layer: LayerResult) -> None:
+    metadata = graph_layer.metadata or {}
+    total_candidates = metadata.get("total_candidates")
+    seed_count = metadata.get("seed_count")
+    cache_hits = int(metadata.get("cache_hits", 0) or 0)
+    cache_misses = int(metadata.get("cache_misses", 0) or 0)
+    cache_total = cache_hits + cache_misses
+    cache_hit_rate = (cache_hits / cache_total) if cache_total > 0 else None
+
+    if total_candidates is None and cache_total == 0:
+        return
+
+    cache_hit_rate_text = "n/a"
+    if cache_hit_rate is not None:
+        cache_hit_rate_text = f"{cache_hit_rate:.2f}"
+
+    logger.debug(
+        "Graph layer expanded %s candidates from %s seeds in %.2fms (adjacency cache hit rate %s)",
+        total_candidates if total_candidates is not None else 0,
+        seed_count if seed_count is not None else 0,
+        graph_layer.latency_ms,
+        cache_hit_rate_text,
     )
 
 

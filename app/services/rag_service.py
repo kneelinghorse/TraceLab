@@ -11,6 +11,8 @@ from app.services.context_compression import compress_context
 from app.services.embedding_service import EmbeddingService, get_embedding_service
 from app.services.cost_monitor import CostMonitor, get_cost_monitor
 from app.services.faceted_search import FacetFilters
+from app.services.pedr.graph_rag import GraphRAGHelper
+from app.services.pedr.semantic_protocol import URNGenerator
 from app.services.pedr.search_orchestrator import (
     PEDRSearchOrchestrator,
     PEDRSearchResponse,
@@ -56,6 +58,11 @@ MODEL_COST_ESTIMATES = {
 class RagService:
     """Compose semantic retrieval with GPT answer generation."""
 
+    GRAPH_CONTEXT_DEPTH = 2
+    GRAPH_CONTEXT_MAX_NODES = 50
+    GRAPH_CONTEXT_MAX_TOKENS = 800
+    GRAPH_CONTEXT_SEED_LIMIT = 8
+
     def __init__(
         self,
         retrieval_service: Optional[RetrievalService] = None,
@@ -68,6 +75,7 @@ class RagService:
         default_temperature: Optional[float] = None,
         quality_assessor: Optional[QualityAssessor] = None,
         cost_monitor: Optional[CostMonitor] | object = _UNSET,
+        graph_rag_helper: Optional[GraphRAGHelper] = None,
     ) -> None:
         if _openai_import_error is not None:
             raise RuntimeError(
@@ -115,6 +123,7 @@ class RagService:
         self.routing_metrics = {"total_queries": 0, "escalations": 0}
         self.cost_monitor = get_cost_monitor() if cost_monitor is _UNSET else cost_monitor
         self.cache_manager = get_cache_manager()
+        self.graph_rag_helper = graph_rag_helper or GraphRAGHelper(model_name=self.primary_model)
 
     def run_query(
         self,
@@ -139,6 +148,7 @@ class RagService:
         element_types: Optional[List[str]] = None,
         auto_detect_type: bool = True,
         type_boost_enabled: bool = True,
+        include_graph_context: bool = False,
     ) -> Dict[str, Any]:
         """
         Execute a full RAG workflow: retrieve context and synthesize an answer.
@@ -168,6 +178,7 @@ class RagService:
                 statuses=status_filters,
                 allow_pii=allow_pii,
             ),
+            graph_context_enabled=include_graph_context,
         )
         start = time.perf_counter()
 
@@ -194,6 +205,7 @@ class RagService:
                 element_types=element_types,
                 auto_detect_type=auto_detect_type,
                 type_boost_enabled=type_boost_enabled,
+                include_graph_context=include_graph_context,
             )
 
         result, hit = self.cache_manager.cached_value("rag_query_results", cache_key, _loader)
@@ -239,6 +251,7 @@ class RagService:
         element_types: Optional[List[str]] = None,
         auto_detect_type: bool = True,
         type_boost_enabled: bool = True,
+        include_graph_context: bool = False,
     ) -> Dict[str, Any]:
         start = time.perf_counter()
         normalized_mode = (search_mode or "semantic").strip().lower()
@@ -269,6 +282,7 @@ class RagService:
             "min_quality_gates": min_quality_gates,
             "status_filters": list(status_filters or []),
             "allow_pii": allow_pii if allow_pii is not None else True,
+            "graph_context_enabled": include_graph_context,
         }
 
         if self.cache_service is not None:
@@ -335,7 +349,18 @@ class RagService:
             threshold=self.compression_threshold,
         )
 
-        messages = self._build_messages(query=query, chunks=compressed_chunks)
+        graph_context = None
+        if include_graph_context:
+            graph_context = self._build_graph_context(
+                query=query,
+                chunks=compressed_chunks,
+            )
+
+        messages = self._build_messages(
+            query=query,
+            chunks=compressed_chunks,
+            graph_context=graph_context,
+        )
         (
             answer,
             citations,
@@ -417,7 +442,12 @@ class RagService:
         pii_token = "no_pii" if allow_pii is False else "any"
         return "|".join([gates_token, status_token, pii_token])
 
-    def _build_messages(self, query: str, chunks: List[Dict[str, Any]]) -> List[Dict[str, str]]:
+    def _build_messages(
+        self,
+        query: str,
+        chunks: List[Dict[str, Any]],
+        graph_context: Optional[str] = None,
+    ) -> List[Dict[str, str]]:
         """Compose chat messages incorporating retrieved context."""
         if chunks:
             context_blocks = []
@@ -433,6 +463,9 @@ class RagService:
                 "No relevant context was retrieved. If the query cannot be answered, "
                 "state that the repository does not contain sufficient information."
             )
+
+        if graph_context:
+            context_text = f"{context_text}\n\n{graph_context}".strip()
 
         system_prompt = (
             "You are a meticulous research assistant. Use the provided context to answer the query. "
@@ -454,6 +487,49 @@ class RagService:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ]
+
+    def _build_graph_context(
+        self,
+        *,
+        query: str,
+        chunks: List[Dict[str, Any]],
+    ) -> Optional[str]:
+        seeds = []
+        for chunk in chunks[: self.GRAPH_CONTEXT_SEED_LIMIT]:
+            urn = chunk.get("urn")
+            if urn:
+                seeds.append(str(urn))
+                continue
+            document_id = chunk.get("document_id")
+            chunk_index = chunk.get("chunk_index")
+            if document_id is not None and chunk_index is not None:
+                urn_value = str(
+                    URNGenerator.for_chunk(str(document_id), int(chunk_index))
+                )
+                seeds.append(urn_value)
+
+        seeds = list(dict.fromkeys(seeds))
+        if not seeds:
+            return None
+
+        subgraph = self.graph_rag_helper.extract_subgraph(
+            seeds,
+            depth=self.GRAPH_CONTEXT_DEPTH,
+            max_nodes=self.GRAPH_CONTEXT_MAX_NODES,
+        )
+        if not subgraph.nodes:
+            return None
+
+        pruned = self.graph_rag_helper.prune_by_relevance(
+            subgraph,
+            query=query,
+            max_tokens=self.GRAPH_CONTEXT_MAX_TOKENS,
+        )
+        if not pruned.nodes:
+            return None
+
+        rendered = self.graph_rag_helper.linearize(pruned)
+        return rendered or None
 
     def _generate_with_tiered_routing(
         self,

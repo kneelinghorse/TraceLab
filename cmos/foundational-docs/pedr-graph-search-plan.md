@@ -73,19 +73,22 @@ Phase 2: Graph Storage and Materialization ✅ COMPLETE (Sprint 24)
 - Upsert logic prevents duplicates; composite indexes support BFS traversal.
 - **Migration ready** for graph_edges table creation.
 
-Phase 3: Graph Retrieval and Scoring (L6)
-- Implement graph layer search in `app/services/pedr/search_orchestrator.py`.
-- Add graph layer timings and telemetry.
-- Tune default graph weight and depth for stable latency.
+Phase 3: Graph Retrieval and Scoring (L6) ✅ COMPLETE (Sprint 25)
+- Implemented GraphLayerService BFS traversal with decay scoring and adjacency cache.
+- Integrated graph layer into `app/services/pedr/search_orchestrator.py` between retrieval and RRF.
+- Added graph layer timings + telemetry; defaults: depth=2, decay=0.7, weight=0.12.
+- Added graph-layer tests in unified search suite.
 
-Phase 4: API and RAG Integration
-- Extend `app/schemas/pedr_search.py` and `app/api/v1/pedr_search.py`.
-- Optional: Graph RAG helper (subgraph -> prune -> linearize) in `app/services/rag_service.py`.
+Phase 4: API and RAG Integration ✅ COMPLETE (Sprint 25)
+- Extended `app/schemas/pedr_search.py` and `app/api/v1/pedr_search.py` with graph params.
+- Added graph metadata (graph_ms, candidates expanded) to responses.
+- Implemented GraphRAGHelper (subgraph -> prune -> linearize) and optional integration in `app/services/rag_service.py`.
 
-Phase 5: Validation and Documentation
-- Test graph layer correctness and ranking stability.
-- Validate end-to-end search with graph enabled.
-- Update docs with graph search behavior and usage.
+Phase 5: Validation and Documentation ✅ COMPLETE (Sprint 25)
+- Integration tests: graph layer correctness, ranking stability, cache invalidation.
+- End-to-end PEDR search validated with graph enabled.
+- Performance baseline recorded at `cmos/telemetry/events/sprint-25-graph-baseline.json`.
+- Documentation updated with graph search behavior and Sprint 25 retrospective.
 
 ## Validation Plan
 - Unit tests: deterministic signatures, edge normalization, graph traversal.
