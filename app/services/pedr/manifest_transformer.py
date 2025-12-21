@@ -13,6 +13,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, Sequence
 
 from app.services.pedr.semantic_protocol import (
+    Edge,
     EntityType,
     ProtocolManifest,
     SemanticProtocol,
@@ -109,6 +110,8 @@ class TransformationResult:
 class ManifestTransformer:
     """Transform Tracelab entities to PEDR manifest format."""
 
+    EDGE_VIA_OPTIONS = {"api", "ui", "data"}
+
     # Impact scores based on quality gates
     BASE_IMPACT: int = 5
     COMPLETE_STATUS_BONUS: int = 2
@@ -184,6 +187,7 @@ class ManifestTransformer:
 
         # Extract bindings (relationships)
         bindings = self._extract_bindings(mission_data, project_id)
+        edges = self._build_mission_edges(urn, mission_data, project_id)
 
         # Build the full manifest (for PEDR storage)
         full_manifest = {
@@ -194,6 +198,7 @@ class ManifestTransformer:
             "quality_gates": quality_gates,
             "created_at": mission_data.get("created_at") or mission_data.get("metadata", {}).get("created"),
             "updated_at": mission_data.get("updated_at"),
+            "relationships": self._relationships_from_edges(edges),
         }
 
         manifest = PEDRManifest(
@@ -238,6 +243,9 @@ class ManifestTransformer:
             "source_type": source_type,
             "project_id": str(project_id) if project_id else None,
             "uploaded_at": uploaded_at.isoformat() if uploaded_at else None,
+            "relationships": self._relationships_from_edges(
+                self._build_document_edges(urn, document_id, project_id, chunk_count, source_type)
+            ),
         }
 
         manifest = PEDRManifest(
@@ -292,6 +300,9 @@ class ManifestTransformer:
             "created_by": created_by,
             "validated": validated,
             "project_id": str(project_id) if project_id else None,
+            "relationships": self._relationships_from_edges(
+                self._build_insight_edges(urn, project_id, source_chunk_ids)
+            ),
         }
 
         manifest = PEDRManifest(
@@ -304,6 +315,49 @@ class ManifestTransformer:
             element_intent=intent,
             governance_pii=pii_flagged,
             governance_impact=impact,
+            bindings={
+                "project_id": str(project_id) if project_id else None,
+                "source_chunks": source_chunk_ids or [],
+            },
+        )
+
+        return TransformationResult(success=True, manifest=manifest)
+
+    def transform_report(
+        self,
+        report_id: str,
+        title: str,
+        content: str,
+        *,
+        project_id: Optional[str] = None,
+        source_chunk_ids: Optional[List[str]] = None,
+        status: Optional[str] = None,
+    ) -> TransformationResult:
+        """Transform a report to PEDR manifest format."""
+        urn = f"urn:research:report:{report_id}"
+
+        pii_flagged = self._detect_pii_in_text(content)
+
+        full_manifest = {
+            "id": str(report_id),
+            "title": title,
+            "status": status,
+            "project_id": str(project_id) if project_id else None,
+            "relationships": self._relationships_from_edges(
+                self._build_report_edges(urn, project_id, source_chunk_ids)
+            ),
+        }
+
+        manifest = PEDRManifest(
+            urn=urn,
+            manifest=full_manifest,
+            purpose=title,
+            description=self._truncate(content, 500),
+            context_domain="research",
+            element_type="report",
+            element_intent="Read",
+            governance_pii=pii_flagged,
+            governance_impact=self.BASE_IMPACT,
             bindings={
                 "project_id": str(project_id) if project_id else None,
                 "source_chunks": source_chunk_ids or [],
@@ -443,6 +497,160 @@ class ManifestTransformer:
 
         return bindings
 
+    def _normalize_via(self, value: Optional[str]) -> Optional[str]:
+        if not value:
+            return None
+        candidate = str(value).strip().lower()
+        if candidate in self.EDGE_VIA_OPTIONS:
+            return candidate
+        return None
+
+    def _to_urn(self, entity_type: str, identifier: Optional[str]) -> Optional[str]:
+        if not identifier:
+            return None
+        value = str(identifier)
+        if value.startswith("urn:"):
+            return value
+        return f"urn:research:{entity_type}:{value}"
+
+    def _build_edge(
+        self,
+        edge_type: str,
+        from_urn: str,
+        to_urn: str,
+        *,
+        via: Optional[str] = None,
+    ) -> Optional[Edge]:
+        if not from_urn or not to_urn:
+            return None
+        return Edge(
+            edge_type=edge_type,
+            from_urn=from_urn,
+            to_urn=to_urn,
+            via=self._normalize_via(via),
+        )
+
+    def _relationships_from_edges(self, edges: Sequence[Edge]) -> Dict[str, Any]:
+        relationships: Dict[str, List[str]] = {}
+        for edge in edges:
+            if edge.edge_type not in relationships:
+                relationships[edge.edge_type] = []
+            if edge.to_urn not in relationships[edge.edge_type]:
+                relationships[edge.edge_type].append(edge.to_urn)
+        relationships["edges"] = [edge.to_dict() for edge in edges]
+        return relationships
+
+    def _extract_chunk_binding(self, item: Any) -> tuple[Optional[str], Optional[str]]:
+        if isinstance(item, dict):
+            chunk_id = item.get("chunk_id") or item.get("chunkId") or item.get("chunk")
+            via = item.get("via") or item.get("binding") or item.get("source_type") or item.get("source")
+            return (str(chunk_id) if chunk_id else None, self._normalize_via(via))
+        if isinstance(item, str):
+            return (item, None)
+        return (None, None)
+
+    def _build_mission_edges(
+        self,
+        urn: str,
+        mission_data: Dict[str, Any],
+        project_id: Optional[str],
+    ) -> List[Edge]:
+        edges: List[Edge] = []
+
+        if project_id:
+            project_urn = self._to_urn("project", project_id)
+            edge = self._build_edge("belongs_to", urn, project_urn)
+            if edge:
+                edges.append(edge)
+
+        evidence = mission_data.get("evidence") or []
+        if isinstance(evidence, list):
+            for item in evidence:
+                chunk_id, via = self._extract_chunk_binding(item)
+                chunk_urn = self._to_urn("chunk", chunk_id)
+                edge = self._build_edge("evidence", urn, chunk_urn, via=via)
+                if edge:
+                    edges.append(edge)
+
+        return edges
+
+    def _build_document_edges(
+        self,
+        urn: str,
+        document_id: str,
+        project_id: Optional[str],
+        chunk_count: int,
+        source_type: Optional[str],
+    ) -> List[Edge]:
+        edges: List[Edge] = []
+        via = self._normalize_via(source_type)
+
+        if project_id:
+            project_urn = self._to_urn("project", project_id)
+            edge = self._build_edge("belongs_to", urn, project_urn, via=via)
+            if edge:
+                edges.append(edge)
+
+        try:
+            count = int(chunk_count or 0)
+        except (TypeError, ValueError):
+            count = 0
+
+        for chunk_index in range(max(0, count)):
+            chunk_id = f"{document_id}-chunk-{chunk_index}"
+            chunk_urn = self._to_urn("chunk", chunk_id)
+            edge = self._build_edge("contains", urn, chunk_urn, via=via)
+            if edge:
+                edges.append(edge)
+
+        return edges
+
+    def _build_insight_edges(
+        self,
+        urn: str,
+        project_id: Optional[str],
+        source_chunk_ids: Optional[List[str]],
+    ) -> List[Edge]:
+        edges: List[Edge] = []
+
+        if project_id:
+            project_urn = self._to_urn("project", project_id)
+            edge = self._build_edge("belongs_to", urn, project_urn)
+            if edge:
+                edges.append(edge)
+
+        for item in source_chunk_ids or []:
+            chunk_id, via = self._extract_chunk_binding(item)
+            chunk_urn = self._to_urn("chunk", chunk_id)
+            edge = self._build_edge("derived_from", urn, chunk_urn, via=via)
+            if edge:
+                edges.append(edge)
+
+        return edges
+
+    def _build_report_edges(
+        self,
+        urn: str,
+        project_id: Optional[str],
+        source_chunk_ids: Optional[List[str]],
+    ) -> List[Edge]:
+        edges: List[Edge] = []
+
+        if project_id:
+            project_urn = self._to_urn("project", project_id)
+            edge = self._build_edge("belongs_to", urn, project_urn)
+            if edge:
+                edges.append(edge)
+
+        for item in source_chunk_ids or []:
+            chunk_id, via = self._extract_chunk_binding(item)
+            chunk_urn = self._to_urn("chunk", chunk_id)
+            edge = self._build_edge("references", urn, chunk_urn, via=via)
+            if edge:
+                edges.append(edge)
+
+        return edges
+
     @staticmethod
     def _truncate(text: Optional[str], max_length: int) -> str:
         """Truncate text to max length with ellipsis."""
@@ -503,6 +711,15 @@ class ManifestTransformer:
                 project_id=project_id,
                 status=status,
             )
+            edges = self._build_mission_edges(
+                str(protocol_manifest.urn),
+                mission_data,
+                project_id,
+            )
+            if edges:
+                for edge in edges:
+                    protocol_manifest.add_edge(edge)
+                protocol._apply_hashes(protocol_manifest)
 
             # Convert to legacy PEDRManifest format
             legacy_manifest = PEDRManifest.from_protocol_manifest(protocol_manifest)
@@ -560,6 +777,17 @@ class ManifestTransformer:
                 project_id=project_id,
                 chunk_count=chunk_count,
             )
+            edges = self._build_document_edges(
+                str(protocol_manifest.urn),
+                document_id,
+                project_id,
+                chunk_count,
+                source_type,
+            )
+            if edges:
+                for edge in edges:
+                    protocol_manifest.add_edge(edge)
+                protocol._apply_hashes(protocol_manifest)
 
             legacy_manifest = PEDRManifest.from_protocol_manifest(protocol_manifest)
 
@@ -618,6 +846,15 @@ class ManifestTransformer:
                 project_id=project_id,
                 source_chunk_ids=source_chunk_ids,
             )
+            edges = self._build_insight_edges(
+                str(protocol_manifest.urn),
+                project_id,
+                source_chunk_ids,
+            )
+            if edges:
+                for edge in edges:
+                    protocol_manifest.add_edge(edge)
+                protocol._apply_hashes(protocol_manifest)
 
             legacy_manifest = PEDRManifest.from_protocol_manifest(protocol_manifest)
 

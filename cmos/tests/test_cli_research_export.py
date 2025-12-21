@@ -12,10 +12,21 @@ import unittest
 from pathlib import Path
 
 CMOS_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = CMOS_ROOT.parent
+
+# Add cmos to path and use runpy to properly load the module
 if str(CMOS_ROOT) not in sys.path:
     sys.path.insert(0, str(CMOS_ROOT))
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-from cli import Environment, _research_export  # type: ignore[attr-defined]
+# Rename cmos/cli.py module to avoid collision with project-level cli/
+import runpy
+import types
+
+_cli_globals = runpy.run_path(str(CMOS_ROOT / "cli.py"), run_name="cmos.cli")
+Environment = _cli_globals["Environment"]
+_research_export = _cli_globals["_research_export"]
 
 
 class ResearchExportCliTest(unittest.TestCase):

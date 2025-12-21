@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import uuid
 
-from sqlalchemy import CHAR, Text, TypeDecorator
-from sqlalchemy.dialects.postgresql import UUID as PGUUID, TSVECTOR as PGTSVECTOR
+from sqlalchemy import CHAR, JSON, Text, TypeDecorator
+from sqlalchemy.dialects.postgresql import JSONB as PGJSONB, UUID as PGUUID, TSVECTOR as PGTSVECTOR
 
 
 class GUID(TypeDecorator):
@@ -51,3 +51,19 @@ class TSVector(TypeDecorator):
         if dialect.name == "postgresql":
             return dialect.type_descriptor(PGTSVECTOR())
         return dialect.type_descriptor(Text)
+
+
+class CrossDBJSON(TypeDecorator):
+    """JSONB on PostgreSQL, JSON on SQLite/other databases.
+
+    Provides efficient JSONB storage on PostgreSQL (with GIN index support)
+    while maintaining compatibility with SQLite for testing.
+    """
+
+    impl = JSON
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):  # type: ignore[override]
+        if dialect.name == "postgresql":
+            return dialect.type_descriptor(PGJSONB())
+        return dialect.type_descriptor(JSON())
