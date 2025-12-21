@@ -107,6 +107,11 @@ async def pedr_search(
             enable_pragmatic=payload.enable_pragmatic,
             enable_governance=payload.enable_governance,
             layer_weights=layer_weights,
+            enable_graph=payload.enable_graph,
+            graph_depth=payload.graph_depth,
+            graph_decay=payload.graph_decay,
+            graph_edge_types=payload.graph_edge_types,
+            graph_weight=payload.graph_weight,
         )
 
         # Apply graph expansion if requested
@@ -233,6 +238,7 @@ async def _execute_hybrid_search(
     timings = PEDRLayerTimings(
         lexical_ms=hybrid_result.timings.fts_ms,
         semantic_ms=hybrid_result.timings.embedding_ms + hybrid_result.timings.rerank_ms,
+        graph_ms=0.0,
         syntactic_ms=0.0,
         pragmatic_ms=0.0,
         governance_ms=0.0,
@@ -250,6 +256,8 @@ async def _execute_hybrid_search(
         layers_used=["fts", "semantic"],
         layer_weights={"fts": 0.0, "semantic": 1.0},  # Semantic score is final
         timings=timings,
+        graph_enabled=False,
+        graph_candidates_expanded=None,
         total_candidates=hybrid_result.fts_candidates_count,
         result_count=len(results),
         rerank_mode="hybrid",
@@ -316,6 +324,7 @@ def _convert_to_response(
     timings = PEDRLayerTimings(
         lexical_ms=metadata.timings.lexical_ms,
         semantic_ms=metadata.timings.semantic_ms,
+        graph_ms=metadata.timings.graph_ms,
         syntactic_ms=metadata.timings.syntactic_ms,
         pragmatic_ms=metadata.timings.pragmatic_ms,
         governance_ms=metadata.timings.governance_ms,
@@ -333,6 +342,8 @@ def _convert_to_response(
         layers_used=metadata.layers_used,
         layer_weights=metadata.layer_weights,
         timings=timings,
+        graph_enabled=metadata.graph_enabled,
+        graph_candidates_expanded=metadata.graph_candidates_expanded,
         total_candidates=metadata.total_candidates,
         result_count=metadata.result_count,
         rerank_mode=rerank_mode,

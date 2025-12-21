@@ -26,19 +26,19 @@ docker-compose exec app alembic upgrade head
 
 ### Mission Protocol / CMOS Operations
 ```bash
-# Migrate/sync CMOS context mirrors into SQLite
-python cmos/scripts/migrate_cmos_memory.py --source cmos --target cmos --sync-db
+# Check CMOS database health (recommended before/after missions)
+./cmos/cli.py validate health
 
-# Seed SQLite from planning workspace
+# View current mission status
+./cmos/cli.py db show current
+
+# Seed SQLite from planning workspace (if needed)
 python cmos/scripts/seed_sqlite.py --data-root <planning-workspace>
-
-# Validate DB ↔ file parity (required before/after missions)
-python cmos/scripts/validate_parity.py --check
 
 # Run integration guardrails + telemetry updates
 node cmos/context/integration_test_runner.js --output telemetry/events/testing-summary.json
 
-# Package starter bundle once parity is green
+# Package starter bundle
 ./scripts/package_starter.sh
 ```
 
@@ -63,8 +63,8 @@ node cmos/context/integration_test_runner.js --output telemetry/events/testing-s
 ## AI Agent Specific Instructions
 1. **Pre-flight**
    - Load this `agents.md`, then `cmos/agents.md` to understand workspace restrictions.
-   - Run `python cmos/scripts/validate_parity.py --check` before promoting any mission; treat failures as blockers.
-   - Inspect mission candidates in SQLite (`db/cmos.sqlite`) via `context/mission_runtime.py` or the helper scripts—do not edit `cmos/missions/backlog.yaml` directly unless mirroring post-sync.
+   - Run `./cmos/cli.py validate health` to verify database is accessible; check `./cmos/cli.py db show current` for active missions.
+   - Use CMOS MCP tools or CLI for all mission operations—the SQLite database is the single source of truth (flat files like `backlog.yaml` are read-only exports).
 
 2. **Execution**
    - Use `context.db_client.SQLiteClient` or existing automation scripts for all context/session updates (`project_context`, `master_context`, `session_events`).
@@ -73,8 +73,8 @@ node cmos/context/integration_test_runner.js --output telemetry/events/testing-s
 
 3. **Validation & Closure**
    - Execute relevant test suites (`pytest`, targeted `npm run test:*`, integration runner) and record outcomes in telemetry (`telemetry/events/testing-summary.json` or mission-specific files).
-   - Re-run `validate_parity.py` and document confirmations in mission notes / SQLite `missions.metadata`.
-   - Update `MASTER_CONTEXT` and `PROJECT_CONTEXT` via the database client; regenerate JSON mirrors only through scripts (e.g., rerun `migrate_cmos_memory.py` with `--sync-db`).
+   - Run `./cmos/cli.py validate health` to confirm database integrity; update mission status via MCP tools or CLI.
+   - Contexts are updated automatically by session completion; no manual JSON file editing required.
 
 4. **Restricted Areas**
    - Do not place application code, generated packages, or new dependencies inside `cmos/`; use the root starter layout. Treat `cmos/` as read-mostly research/history per its local guardrails.
@@ -89,6 +89,6 @@ node cmos/context/integration_test_runner.js --output telemetry/events/testing-s
 - `foundational-docs/tech_arch_template.md` – authoritative technical architecture template for Mission Protocol deliverables.
 
 ---
-Last Updated: 2025-11-07  
-Version: 1.0.0  
+Last Updated: 2025-12-21
+Version: 1.1.0
 Maintained by: TraceLab Platform Team

@@ -127,6 +127,34 @@ class PEDRSearchRequest(BaseModel):
         description="Number of FTS candidates to retrieve for hybrid reranking (only used when rerank_mode='hybrid')",
     )
 
+    # Graph layer options (L6)
+    enable_graph: bool = Field(
+        default=False,
+        description="Enable graph layer expansion",
+    )
+    graph_depth: int = Field(
+        default=2,
+        ge=1,
+        le=5,
+        description="Max BFS traversal depth",
+    )
+    graph_decay: float = Field(
+        default=0.7,
+        ge=0.1,
+        le=1.0,
+        description="Score decay per hop",
+    )
+    graph_edge_types: Optional[List[str]] = Field(
+        default=None,
+        description="Filter to specific graph edge types (None = all)",
+    )
+    graph_weight: float = Field(
+        default=0.12,
+        ge=0.0,
+        le=0.5,
+        description="Graph layer weight in RRF fusion",
+    )
+
     # Graph expansion options (Relational Layer)
     include_related: bool = Field(
         default=False,
@@ -151,6 +179,7 @@ class PEDRLayerTimings(BaseModel):
 
     lexical_ms: float = Field(description="Lexical search latency in milliseconds")
     semantic_ms: float = Field(description="Semantic search latency in milliseconds")
+    graph_ms: float = Field(default=0.0, description="Graph layer latency in milliseconds")
     syntactic_ms: float = Field(description="Syntactic processing latency in milliseconds")
     pragmatic_ms: float = Field(description="Pragmatic processing latency in milliseconds")
     governance_ms: float = Field(description="Governance scoring latency in milliseconds")
@@ -170,6 +199,12 @@ class PEDRSearchMetadata(BaseModel):
     layers_used: List[str] = Field(description="List of layers that contributed results")
     layer_weights: Dict[str, float] = Field(description="Effective layer weights used")
     timings: PEDRLayerTimings = Field(description="Per-layer timing information")
+    graph_enabled: bool = Field(default=False, description="True if graph layer was enabled")
+    graph_candidates_expanded: Optional[int] = Field(
+        default=None,
+        ge=0,
+        description="Number of graph candidates expanded when graph layer enabled",
+    )
     total_candidates: int = Field(ge=0, description="Total unique candidates before final ranking")
     result_count: int = Field(ge=0, description="Number of results returned")
     rerank_mode: Optional[PEDRRerankMode] = Field(

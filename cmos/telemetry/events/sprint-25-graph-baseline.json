@@ -1,0 +1,22 @@
+{
+  "sprint": "25",
+  "metric": "graph_layer_baseline",
+  "edges": 1000,
+  "seed_urn": "urn:research:project:baseline-seed",
+  "generated_at": "2025-12-21T04:00:39.197145Z",
+  "depths": {
+    "1": {
+      "latency_ms": 21.95,
+      "total_candidates": 500
+    },
+    "2": {
+      "latency_ms": 41.73,
+      "total_candidates": 1000
+    },
+    "3": {
+      "latency_ms": 280.66,
+      "total_candidates": 1000
+    }
+  },
+  "notes": "SQLite baseline on local dev runtime; GraphLayerService.search"
+}

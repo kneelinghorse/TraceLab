@@ -68,10 +68,15 @@ def reset_database_and_reports(request):
         'test_pedr_relational',
         'test_qdrant_prewarm',
         'test_pedr_enhancements',
+        'test_pedr_unified_search',
         'test_rag_service',
         'test_pedr_semantic_protocol',
         'test_pedr_manifest_transformer',
+        'test_pedr_search_api',
         'test_edge_materialization',
+        'test_graph_layer',
+        'test_graph_search',
+        'test_graph_rag',
     ]
     if any(pattern in test_path for pattern in skip_patterns):
         yield

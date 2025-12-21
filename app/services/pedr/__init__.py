@@ -108,6 +108,16 @@ from .edge_materialization import (
     EdgeMaterializationService,
     MaterializationResult,
 )
+from .graph_layer import (
+    GraphLayerConfig,
+    GraphLayerService,
+    URNParser,
+)
+from .graph_rag import (
+    GraphNode,
+    GraphSubgraph,
+    GraphRAGHelper,
+)
 
 __all__ = [
     # Quality scoring
@@ -205,4 +215,12 @@ __all__ = [
     # Edge materialization
     "EdgeMaterializationService",
     "MaterializationResult",
+    # Graph layer
+    "GraphLayerConfig",
+    "GraphLayerService",
+    "URNParser",
+    # Graph RAG helper
+    "GraphNode",
+    "GraphSubgraph",
+    "GraphRAGHelper",
 ]

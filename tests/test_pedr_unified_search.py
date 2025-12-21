@@ -10,7 +10,7 @@ Note: These tests use pytest.mark.unit to avoid database fixture setup.
 """
 import pytest
 from datetime import date
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from unittest.mock import MagicMock, patch
 
 # Mark all tests in this module as unit tests to skip DB fixture
@@ -37,6 +37,21 @@ from app.schemas.pedr_search import (
     PEDRSearchResponse as PEDRSearchResponseSchema,
     PEDRLayerWeights,
 )
+
+
+class _GraphRecorder:
+    def __init__(self, layer_result: Optional[LayerResult] = None) -> None:
+        self.calls: List[Dict[str, Any]] = []
+        self.layer_result = layer_result or LayerResult(layer_name="graph", results=[])
+
+    def expand_from_results(
+        self,
+        results: List[Dict[str, Any]],
+        top_k: int,
+        config: Any,
+    ) -> LayerResult:
+        self.calls.append({"results": results, "top_k": top_k, "config": config})
+        return self.layer_result
 
 
 # -----------------------------------------------------------------------------
@@ -322,6 +337,103 @@ class TestPEDRSearchOrchestrator:
 
         assert response.results == []
         assert response.metadata.result_count == 0
+
+    def test_graph_layer_disabled_by_default(self, mock_lexical, mock_semantic):
+        """Graph layer is not executed unless enabled."""
+        graph_service = MagicMock()
+        orchestrator = PEDRSearchOrchestrator(
+            lexical_search=mock_lexical,
+            semantic_search=mock_semantic,
+            graph_service=graph_service,
+        )
+
+        response = orchestrator.search(query="graph disabled query")
+
+        graph_service.expand_from_results.assert_not_called()
+        assert "graph" not in response.metadata.layers_used
+
+    def test_graph_layer_enabled_includes_results(self, mock_lexical, mock_semantic):
+        """Graph layer results are fused when enabled."""
+        graph_layer = LayerResult(
+            layer_name="graph",
+            results=[{"chunk_id": "graph1", "content": "graph hit", "score": 0.42}],
+            latency_ms=12.5,
+        )
+        graph_service = MagicMock()
+        graph_service.expand_from_results.return_value = graph_layer
+        orchestrator = PEDRSearchOrchestrator(
+            lexical_search=mock_lexical,
+            semantic_search=mock_semantic,
+            graph_service=graph_service,
+        )
+
+        response = orchestrator.search(query="graph enabled query", enable_graph=True, top_k=10)
+
+        graph_service.expand_from_results.assert_called_once()
+        assert "graph" in response.metadata.layers_used
+        assert "graph1" in [r.chunk_id for r in response.results]
+
+    def test_graph_layer_config_passed_through(self, mock_lexical, mock_semantic):
+        """Graph layer receives the configured traversal settings."""
+        recorder = _GraphRecorder()
+        orchestrator = PEDRSearchOrchestrator(
+            lexical_search=mock_lexical,
+            semantic_search=mock_semantic,
+            graph_service=recorder,
+        )
+
+        orchestrator.search(
+            query="graph config query",
+            enable_graph=True,
+            graph_depth=3,
+            graph_decay=0.5,
+            graph_edge_types=["contains"],
+            graph_top_k_seeds=7,
+        )
+
+        assert recorder.calls
+        call = recorder.calls[0]
+        assert call["top_k"] == 7
+        config = call["config"]
+        assert config.max_depth == 3
+        assert config.decay_factor == 0.5
+        assert config.allowed_edge_types == ("contains",)
+
+    def test_graph_layer_timing_recorded(self, mock_lexical, mock_semantic):
+        """Graph layer latency is reported in timings."""
+        graph_layer = LayerResult(
+            layer_name="graph",
+            results=[],
+            latency_ms=18.0,
+        )
+        recorder = _GraphRecorder(layer_result=graph_layer)
+        orchestrator = PEDRSearchOrchestrator(
+            lexical_search=mock_lexical,
+            semantic_search=mock_semantic,
+            graph_service=recorder,
+        )
+
+        response = orchestrator.search(query="graph timing query", enable_graph=True)
+
+        assert response.metadata.timings.graph_ms == pytest.approx(18.0, rel=1e-3)
+
+    def test_graph_weights_normalized_and_back_compat(self, mock_lexical, mock_semantic):
+        """Graph weights normalize and defaults remain stable when disabled."""
+        recorder = _GraphRecorder()
+        orchestrator = PEDRSearchOrchestrator(
+            lexical_search=mock_lexical,
+            semantic_search=mock_semantic,
+            graph_service=recorder,
+        )
+
+        response_no_graph = orchestrator.search(query="graph weights baseline")
+        weights_no_graph = response_no_graph.metadata.layer_weights
+        assert weights_no_graph["lexical"] == pytest.approx(0.25, rel=1e-3)
+
+        response_graph = orchestrator.search(query="graph weights enabled", enable_graph=True)
+        weights_graph = response_graph.metadata.layer_weights
+        assert weights_graph["graph"] == pytest.approx(0.12, rel=1e-3)
+        assert sum(weights_graph.values()) == pytest.approx(1.0, rel=1e-3)
 
 
 # -----------------------------------------------------------------------------

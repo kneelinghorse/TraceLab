@@ -107,6 +107,7 @@ class CacheManager:
         search_mode: str,
         filters_signature: Optional[str] = None,
         quality_signature: Optional[str] = None,
+        graph_context_enabled: bool = False,
     ) -> Tuple[Any, ...]:
         return (
             query.strip(),
@@ -119,6 +120,7 @@ class CacheManager:
             (search_mode or "semantic").strip().lower(),
             filters_signature or "*",
             quality_signature or "*",
+            "graph" if graph_context_enabled else "no-graph",
         )
 
     @staticmethod
