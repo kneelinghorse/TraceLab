@@ -17,6 +17,7 @@ from app.models.collection import Collection, CollectionItem
 from app.models.api_key import APIKey
 from app.models.report import Report, ReportSource
 from app.models.synthesis_cache import SynthesisCache
+from app.models.graph_edge import GraphEdge
 
 __all__ = [
     "Base",
@@ -41,4 +42,5 @@ __all__ = [
     "Report",
     "ReportSource",
     "SynthesisCache",
+    "GraphEdge",
 ]

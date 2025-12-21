@@ -13,11 +13,10 @@ Reference: cmos/planning/PEDR-docs/protocol-enhanced-deep-research/PROTOCOL_ARCH
 """
 from __future__ import annotations
 
-import hashlib
+import json
 import math
 import re
 from dataclasses import dataclass, field
-from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
@@ -25,7 +24,95 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 # Constants and Configuration
 # ------------------------------------------------------------------
 
-PROTOCOL_VERSION = "3.2.0"
+PROTOCOL_VERSION = "3.3.0"
+
+# ------------------------------------------------------------------
+# Deterministic Signature Hashing (v3.3.0)
+# ------------------------------------------------------------------
+
+FNV1A_64_OFFSET_BASIS = 0xCBF29CE484222325
+FNV1A_64_PRIME = 0x100000001B3
+FNV1A_64_MASK = 0xFFFFFFFFFFFFFFFF
+
+# Stable node hash fields (exclude timestamps/runtime metadata).
+SIGNATURE_NODE_FIELDS = {
+    "element": ("type", "role", "intent", "criticality"),
+    "semantics": ("purpose", "tags"),
+    "context": ("domain", "flow", "step"),
+    "governance": ("piiHandling", "businessImpact", "userVisibility"),
+}
+
+
+def _utf16_code_units(value: str) -> List[int]:
+    """Return UTF-16 code units to match JS charCodeAt hashing."""
+    data = value.encode("utf-16-le")
+    return [data[i] | (data[i + 1] << 8) for i in range(0, len(data), 2)]
+
+
+def _json_canon(value: Any) -> str:
+    """Canonical JSON string matching the JS jsonCanon helper."""
+    if isinstance(value, Enum):
+        value = value.value
+    if isinstance(value, URN):
+        value = str(value)
+
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+
+    if isinstance(value, (list, tuple)):
+        return "[" + ",".join(_json_canon(item) for item in value) + "]"
+
+    if isinstance(value, dict):
+        parts = []
+        for key in sorted(value.keys(), key=lambda k: str(k)):
+            parts.append(
+                json.dumps(str(key), ensure_ascii=False, separators=(",", ":"))
+                + ":"
+                + _json_canon(value[key])
+            )
+        return "{" + ",".join(parts) + "}"
+
+    return json.dumps(str(value), ensure_ascii=False, separators=(",", ":"))
+
+
+def fnv1a_64_hash(value: Any) -> str:
+    """Hash any JSON-serializable value to fnv1a64-<16hex>."""
+    canonical = _json_canon(value)
+    h = FNV1A_64_OFFSET_BASIS
+    for code_unit in _utf16_code_units(canonical):
+        h ^= code_unit
+        h = (h * FNV1A_64_PRIME) & FNV1A_64_MASK
+    return f"fnv1a64-{h:016x}"
+
+# ------------------------------------------------------------------
+# Edge Direction Enum (v3.3.0)
+# ------------------------------------------------------------------
+
+class EdgeDirection(str, Enum):
+    """Direction of graph edge relationships."""
+
+    OUT = "out"  # From source to target
+    IN = "in"  # From target to source (inbound)
+    BIDIRECTIONAL = "bidirectional"  # Both directions
+
+
+# ------------------------------------------------------------------
+# Edge Type Constants (v3.3.0)
+# ------------------------------------------------------------------
+
+# Standard edge types for research graph
+EDGE_TYPES = frozenset({
+    "belongs_to",  # Entity belongs to parent (project, document)
+    "contains",  # Parent contains child
+    "references",  # Entity references sources (chunks, documents)
+    "derived_from",  # Insight derived from source chunks
+    "evidence",  # Mission evidence links to chunks
+    "related_to",  # General association
+    "binds_to",  # Protocol binding relationship
+    "part_of",  # Chunk is part of document
+    "sibling_of",  # Same parent relationship
+})
+
 
 # Entity types for URN generation
 class EntityType(str, Enum):
@@ -212,11 +299,194 @@ class ElementMetadata:
 
 
 @dataclass
+class Edge:
+    """Graph edge representing a relationship between entities (v3.3.0).
+
+    Edges are the foundation of graph-based search and traversal.
+    Each edge connects two URNs with typed, weighted relationships.
+
+    Attributes:
+        edge_type: Type of relationship (belongs_to, references, derived_from, etc.)
+        from_urn: Source entity URN
+        to_urn: Target entity URN
+        direction: Edge direction (out, in, bidirectional)
+        weight: Edge weight for scoring (0.0-1.0, default 0.5)
+        reason: Human-readable reason for the relationship
+        via: Binding category that created this edge (api, ui, data, etc.)
+        evidence: Optional evidence/metadata for the relationship
+    """
+
+    edge_type: str
+    from_urn: str
+    to_urn: str
+    direction: str = "out"
+    weight: float = 0.5
+    reason: Optional[str] = None
+    via: Optional[str] = None
+    evidence: Optional[Dict[str, Any]] = None
+
+    def __post_init__(self):
+        """Validate and normalize edge fields."""
+        # Normalize direction
+        if self.direction not in ("out", "in", "bidirectional"):
+            object.__setattr__(self, "direction", "out")
+        # Clamp weight to 0.0-1.0
+        if self.weight < 0.0 or self.weight > 1.0:
+            object.__setattr__(self, "weight", max(0.0, min(1.0, self.weight)))
+
+    @property
+    def normalization_key(self) -> str:
+        """Generate key for edge deduplication.
+
+        Edges with the same (type, from, to, direction) are considered duplicates.
+        """
+        return f"{self.edge_type}|{self.from_urn}|{self.to_urn}|{self.direction}"
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert edge to dictionary for serialization."""
+        result = {
+            "type": self.edge_type,
+            "from": self.from_urn,
+            "to": self.to_urn,
+            "direction": self.direction,
+            "weight": self.weight,
+        }
+        if self.reason:
+            result["reason"] = self.reason
+        if self.via:
+            result["via"] = self.via
+        if self.evidence:
+            result["evidence"] = self.evidence
+        return result
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "Edge":
+        """Create Edge from dictionary."""
+        return cls(
+            edge_type=data.get("type", data.get("edge_type", "related_to")),
+            from_urn=data.get("from", data.get("from_urn", "")),
+            to_urn=data.get("to", data.get("to_urn", "")),
+            direction=data.get("direction", "out"),
+            weight=float(data.get("weight", 0.5)),
+            reason=data.get("reason"),
+            via=data.get("via"),
+            evidence=data.get("evidence"),
+        )
+
+
+def normalize_edges(edges: List[Edge]) -> List[Edge]:
+    """Normalize and deduplicate a list of edges.
+
+    Removes duplicates based on (type, from, to, direction) key.
+    Keeps the first occurrence of each unique edge.
+
+    Args:
+        edges: List of Edge objects
+
+    Returns:
+        Deduplicated list of edges
+    """
+    seen: Dict[str, Edge] = {}
+    for edge in edges:
+        key = edge.normalization_key
+        if key not in seen:
+            seen[key] = edge
+    return list(seen.values())
+
+
+def sort_edges(edges: List[Edge]) -> List[Edge]:
+    """Sort edges deterministically for stable signatures.
+
+    Sorts by (type, from, to, direction) to ensure consistent ordering.
+
+    Args:
+        edges: List of Edge objects
+
+    Returns:
+        Sorted list of edges
+    """
+    return sorted(edges, key=lambda e: e.normalization_key)
+
+
+def normalize_and_sort_edges(edges: List[Edge]) -> List[Edge]:
+    """Normalize, deduplicate, and sort edges.
+
+    Convenience function combining normalize_edges and sort_edges.
+
+    Args:
+        edges: List of Edge objects
+
+    Returns:
+        Deduplicated and sorted list of edges
+    """
+    return sort_edges(normalize_edges(edges))
+
+
+@dataclass
+class RelationshipsV33:
+    """Graph-ready relationships container (v3.3.0).
+
+    Contains both legacy relationship lists and the new edges array.
+    """
+
+    # Legacy relationship format for backward compatibility
+    belongs_to: List[str] = field(default_factory=list)
+    references: List[str] = field(default_factory=list)
+    derived_from: List[str] = field(default_factory=list)
+    part_of: List[str] = field(default_factory=list)
+    related_to: List[str] = field(default_factory=list)
+
+    # v3.3.0 graph-ready edges
+    edges: List[Edge] = field(default_factory=list)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary with both legacy and edge formats."""
+        result: Dict[str, Any] = {}
+        if self.belongs_to:
+            result["belongs_to"] = self.belongs_to
+        if self.references:
+            result["references"] = self.references
+        if self.derived_from:
+            result["derived_from"] = self.derived_from
+        if self.part_of:
+            result["part_of"] = self.part_of
+        if self.related_to:
+            result["related_to"] = self.related_to
+        # Always include edges array (may be empty)
+        result["edges"] = [e.to_dict() for e in self.edges]
+        return result
+
+    def add_edge(self, edge: Edge) -> None:
+        """Add an edge and update legacy relationships."""
+        self.edges.append(edge)
+        # Also update legacy format for backward compatibility
+        self._update_legacy_from_edge(edge)
+
+    def _update_legacy_from_edge(self, edge: Edge) -> None:
+        """Update legacy relationship lists from an edge."""
+        target_urn = edge.to_urn
+        if edge.edge_type == "belongs_to" and target_urn not in self.belongs_to:
+            self.belongs_to.append(target_urn)
+        elif edge.edge_type == "references" and target_urn not in self.references:
+            self.references.append(target_urn)
+        elif edge.edge_type == "derived_from" and target_urn not in self.derived_from:
+            self.derived_from.append(target_urn)
+        elif edge.edge_type == "part_of" and target_urn not in self.part_of:
+            self.part_of.append(target_urn)
+        elif edge.edge_type == "related_to" and target_urn not in self.related_to:
+            self.related_to.append(target_urn)
+
+    def normalize(self) -> None:
+        """Normalize and sort edges in place."""
+        self.edges = normalize_and_sort_edges(self.edges)
+
+
+@dataclass
 class ProtocolManifest:
-    """Full PEDR Semantic Protocol manifest.
+    """Full PEDR Semantic Protocol manifest (v3.3.0).
 
     Contains all metadata, scoring, and relationship information
-    for a research entity.
+    for a research entity. Includes graph-ready edges for L6 layer.
     """
 
     urn: URN
@@ -235,8 +505,11 @@ class ProtocolManifest:
     confidence: float = 0.5
     criticality: float = 0.5
 
-    # Relationships
+    # Relationships (legacy format for backward compatibility)
     relationships: Dict[str, List[str]] = field(default_factory=dict)
+
+    # Graph-ready edges (v3.3.0)
+    edges: List[Edge] = field(default_factory=list)
 
     # Protocol bindings
     context: Dict[str, Any] = field(default_factory=dict)
@@ -246,9 +519,17 @@ class ProtocolManifest:
 
     # Manifest signature (for caching/validation)
     signature: str = ""
+    node_hash: str = ""
+    graph_hash: str = ""
+    text_hash: str = ""
+    sig_hash: str = ""
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert manifest to dictionary for serialization."""
+        # Build relationships dict with edges included
+        relationships_dict = dict(self.relationships)
+        relationships_dict["edges"] = [e.to_dict() for e in self.edges]
+
         return {
             "urn": str(self.urn),
             "version": self.version,
@@ -257,11 +538,32 @@ class ProtocolManifest:
             "governance": self.governance.to_dict(),
             "confidence": self.confidence,
             "criticality": self.criticality,
-            "relationships": self.relationships,
+            "relationships": relationships_dict,
             "context": self.context,
             "metadata": self.metadata,
             "__sig": self.signature,
+            "__hashes": {
+                "node_hash": self.node_hash,
+                "graph_hash": self.graph_hash,
+                "text_hash": self.text_hash,
+                "sig_hash": self.sig_hash,
+            },
         }
+
+    def add_edge(self, edge: Edge) -> None:
+        """Add an edge and update legacy relationships for backward compatibility."""
+        self.edges.append(edge)
+        # Update legacy relationship lists
+        target_urn = edge.to_urn
+        edge_type = edge.edge_type
+        if edge_type not in self.relationships:
+            self.relationships[edge_type] = []
+        if target_urn not in self.relationships[edge_type]:
+            self.relationships[edge_type].append(target_urn)
+
+    def normalize_edges(self) -> None:
+        """Normalize and sort edges in place for deterministic signatures."""
+        self.edges = normalize_and_sort_edges(self.edges)
 
 
 # ------------------------------------------------------------------
@@ -826,10 +1128,7 @@ class SemanticProtocol:
         # Build context
         context = self._build_context(data, project_id)
 
-        # Generate signature
-        signature = self._generate_signature(urn, data)
-
-        return ProtocolManifest(
+        manifest = ProtocolManifest(
             urn=urn,
             version=PROTOCOL_VERSION,
             element=element,
@@ -840,8 +1139,9 @@ class SemanticProtocol:
             relationships=relationships,
             context=context,
             metadata=self._extract_metadata(data),
-            signature=signature,
         )
+        self._apply_hashes(manifest)
+        return manifest
 
     def create_mission_manifest(
         self,
@@ -1262,13 +1562,81 @@ class SemanticProtocol:
 
         return metadata
 
-    def _generate_signature(self, urn: URN, data: Dict[str, Any]) -> str:
-        """Generate a signature for caching/validation."""
-        import json
-        # Use JSON serialization for nested structures
-        data_str = json.dumps(data, sort_keys=True, default=str) if data else ""
-        content = f"{urn}:{PROTOCOL_VERSION}:{data_str}"
-        return hashlib.sha256(content.encode()).hexdigest()[:16]
+    def _sorted_strings(self, values: Sequence[Any]) -> List[str]:
+        """Return sorted, non-empty string values."""
+        return sorted(str(value) for value in values if value)
+
+    def _build_node_shape(self, manifest: ProtocolManifest) -> Dict[str, Any]:
+        """Build the stable node shape for deterministic hashing."""
+        return {
+            "urn": str(manifest.urn),
+            "version": manifest.version,
+            "element": {
+                "type": manifest.element.element_type,
+                "role": manifest.element.role,
+                "intent": manifest.element.intent.value if manifest.element.intent else None,
+                "criticality": manifest.element.criticality,
+            },
+            "semantics": {
+                "purpose": manifest.semantics.purpose,
+                "tags": self._sorted_strings(manifest.semantics.tags),
+            },
+            "context": {
+                "domain": manifest.context.get("domain"),
+                "flow": manifest.context.get("flow"),
+                "step": manifest.context.get("step"),
+            },
+            "governance": {
+                "piiHandling": bool(manifest.governance.pii_handling),
+                "businessImpact": manifest.governance.business_impact,
+                "userVisibility": manifest.governance.user_visibility,
+            },
+        }
+
+    def _build_edges_shape(self, edges: Sequence[Edge]) -> List[Dict[str, Any]]:
+        """Build the stable edges shape for deterministic hashing."""
+        return [
+            {
+                "type": edge.edge_type,
+                "from": edge.from_urn,
+                "to": edge.to_urn,
+                "direction": edge.direction,
+                "weight": edge.weight,
+                "via": edge.via,
+            }
+            for edge in edges
+        ]
+
+    def _build_embedding_text(self, manifest: ProtocolManifest) -> str:
+        """Build canonical embedding text for text hashing."""
+        parts = [
+            str(manifest.urn),
+            manifest.element.element_type,
+            manifest.element.role,
+            manifest.semantics.purpose,
+            manifest.semantics.description,
+            *self._sorted_strings(manifest.semantics.tags),
+            manifest.context.get("domain"),
+            manifest.context.get("flow"),
+            manifest.context.get("step"),
+        ]
+        return " | ".join(part for part in parts if part)
+
+    def _apply_hashes(self, manifest: ProtocolManifest) -> None:
+        """Compute deterministic hashes for a manifest."""
+        manifest.normalize_edges()
+        node_shape = self._build_node_shape(manifest)
+        edges_shape = self._build_edges_shape(manifest.edges)
+        text = self._build_embedding_text(manifest)
+
+        manifest.node_hash = fnv1a_64_hash(node_shape)
+        manifest.graph_hash = fnv1a_64_hash(edges_shape)
+        manifest.text_hash = fnv1a_64_hash(text)
+        manifest.sig_hash = fnv1a_64_hash({
+            "node": manifest.node_hash,
+            "graph": manifest.graph_hash,
+        })
+        manifest.signature = manifest.sig_hash
 
 
 # ------------------------------------------------------------------
@@ -1294,6 +1662,13 @@ __all__ = [
     "SemanticFeatures",
     "ElementMetadata",
     "ProtocolManifest",
+    # Edge classes (v3.3.0)
+    "Edge",
+    "RelationshipsV33",
+    # Edge functions (v3.3.0)
+    "normalize_edges",
+    "sort_edges",
+    "normalize_and_sort_edges",
     # Scoring classes
     "ConfidenceScorer",
     "CriticalityCalculator",
@@ -1305,8 +1680,10 @@ __all__ = [
     # Enums
     "EntityType",
     "SemanticIntent",
+    "EdgeDirection",
     # Constants
     "PROTOCOL_VERSION",
     "CRITICALITY_WEIGHTS",
     "CONFIDENCE_PRIOR",
+    "EDGE_TYPES",
 ]

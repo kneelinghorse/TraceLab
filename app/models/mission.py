@@ -21,11 +21,10 @@ from sqlalchemy import (
     String,
     Text,
 )
-from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
-from app.models.types import GUID
+from app.models.types import CrossDBJSON, GUID
 
 
 # Valid mission statuses
@@ -78,34 +77,34 @@ class Mission(Base):
         comment="What this mission aims to achieve",
     )
     success_criteria = Column(
-        JSONB,
+        CrossDBJSON,
         nullable=False,
         comment="Array of measurable success conditions",
     )
 
     # DeepSearch Optional Fields
     context = Column(
-        JSONB,
+        CrossDBJSON,
         default=dict,
         comment="Additional context object for the mission",
     )
     deliverables = Column(
-        JSONB,
+        CrossDBJSON,
         default=list,
         comment="Array of expected deliverables",
     )
     research_phases = Column(
-        JSONB,
+        CrossDBJSON,
         default=dict,
         comment="Research phase configuration",
     )
     tags = Column(
-        JSONB,
+        CrossDBJSON,
         default=list,
         comment="Array of tags for categorization",
     )
     mission_metadata = Column(
-        JSONB,
+        CrossDBJSON,
         default=dict,
         comment="Arbitrary metadata object",
     )
@@ -148,12 +147,12 @@ class Mission(Base):
 
     # Results
     execution_metadata = Column(
-        JSONB,
+        CrossDBJSON,
         default=dict,
         comment="Execution metrics and debugging info",
     )
     result_document_ids = Column(
-        JSONB,
+        CrossDBJSON,
         default=list,
         comment="Array of document UUIDs produced by this mission",
     )
@@ -169,7 +168,7 @@ class Mission(Base):
         comment="Raw markdown output from mission execution",
     )
     result_protocol = Column(
-        JSONB,
+        CrossDBJSON,
         nullable=True,
         comment="Mission Protocol compliant result object",
     )
@@ -199,7 +198,7 @@ class Mission(Base):
 
     __table_args__ = (
         # Ensure success_criteria is a non-empty array
-        # PostgreSQL uses jsonb_array_length (success_criteria is stored as JSONB)
+        # PostgreSQL uses jsonb_array_length (success_criteria is stored as CrossDBJSON)
         CheckConstraint(
             "jsonb_array_length(success_criteria) > 0",
             name="success_criteria_not_empty",

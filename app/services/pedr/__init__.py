@@ -104,6 +104,10 @@ from .hybrid_rerank import (
     HybridReranker,
     get_hybrid_reranker,
 )
+from .edge_materialization import (
+    EdgeMaterializationService,
+    MaterializationResult,
+)
 
 __all__ = [
     # Quality scoring
@@ -198,4 +202,7 @@ __all__ = [
     "HybridRerankResult",
     "HybridReranker",
     "get_hybrid_reranker",
+    # Edge materialization
+    "EdgeMaterializationService",
+    "MaterializationResult",
 ]
