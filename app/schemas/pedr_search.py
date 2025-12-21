@@ -129,7 +129,7 @@ class PEDRSearchRequest(BaseModel):
 
     # Graph layer options (L6)
     enable_graph: bool = Field(
-        default=False,
+        default=True,
         description="Enable graph layer expansion",
     )
     graph_depth: int = Field(
