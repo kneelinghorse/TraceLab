@@ -20,7 +20,7 @@ from app.services.pedr.semantic_protocol import URN, URNGenerator
 class GraphLayerConfig:
     """Configuration for graph layer traversal and scoring."""
 
-    max_depth: int = 2
+    max_depth: int = 1
     decay_factor: float = 0.7
     allowed_edge_types: Optional[Tuple[str, ...]] = None
     max_candidates: int = 100
@@ -215,11 +215,21 @@ class GraphLayerService:
         config: GraphLayerConfig,
     ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
         allowed_edge_types = _normalize_edge_types(config.allowed_edge_types)
+        seed_score_stats = _build_score_stats(seed_scores.values())
         if allowed_edge_types == ():
-            return [], {"seed_count": len(seeds), "total_candidates": 0}
+            return [], {
+                "seed_count": len(seeds),
+                "total_candidates": 0,
+                "cache_hits": 0,
+                "cache_misses": 0,
+                "depth_stats": {},
+                "edge_type_usage": {},
+                "seed_score_stats": seed_score_stats,
+            }
 
         adjacency_cache: Dict[str, List[EdgeRecord]] = {}
         stats = {"cache_hits": 0, "cache_misses": 0}
+        edge_type_usage: Dict[str, int] = {}
         candidates: Dict[str, CandidateInfo] = {}
 
         seed_set = set(seeds)
@@ -241,6 +251,8 @@ class GraphLayerService:
                 if depth >= config.max_depth:
                     continue
                 for edge in adjacency_cache.get(current_urn, []):
+                    if edge.edge_type:
+                        edge_type_usage[edge.edge_type] = edge_type_usage.get(edge.edge_type, 0) + 1
                     next_urn = edge.to_urn
                     hop_depth = depth + 1
                     if hop_depth > config.max_depth:
@@ -263,11 +275,15 @@ class GraphLayerService:
                             queue.append((next_urn, hop_depth, seed_urn))
 
         results = self._build_results(session, candidates, config.max_candidates)
+        depth_stats = _build_depth_stats(candidates)
         metadata = {
             "seed_count": len(seeds),
             "total_candidates": len(candidates),
             "cache_hits": stats["cache_hits"],
             "cache_misses": stats["cache_misses"],
+            "depth_stats": depth_stats,
+            "edge_type_usage": edge_type_usage,
+            "seed_score_stats": seed_score_stats,
         }
         return results, metadata
 
@@ -494,6 +510,46 @@ def _drain_queue(
     while queue and len(batch) < size:
         batch.append(queue.popleft())
     return batch
+
+
+def _summarize_scores(scores: Sequence[float]) -> Dict[str, float]:
+    values = [float(value) for value in scores if value is not None]
+    if not values:
+        return {}
+    values.sort()
+    count = len(values)
+    mid = count // 2
+    if count % 2 == 1:
+        median = values[mid]
+    else:
+        median = (values[mid - 1] + values[mid]) / 2
+    p90_index = int(0.9 * (count - 1))
+    return {
+        "min": round(values[0], 6),
+        "max": round(values[-1], 6),
+        "avg": round(sum(values) / count, 6),
+        "p50": round(median, 6),
+        "p90": round(values[p90_index], 6),
+    }
+
+
+def _build_score_stats(scores: Sequence[float]) -> Dict[str, Any]:
+    values = [float(value) for value in scores if value is not None]
+    return {
+        "count": len(values),
+        "score_stats": _summarize_scores(values),
+    }
+
+
+def _build_depth_stats(candidates: Dict[str, CandidateInfo]) -> Dict[str, Dict[str, Any]]:
+    depth_scores: Dict[int, List[float]] = {}
+    for info in candidates.values():
+        depth_scores.setdefault(info.depth, []).append(info.score)
+
+    depth_stats: Dict[str, Dict[str, Any]] = {}
+    for depth, scores in depth_scores.items():
+        depth_stats[str(depth)] = _build_score_stats(scores)
+    return depth_stats
 
 
 __all__ = [

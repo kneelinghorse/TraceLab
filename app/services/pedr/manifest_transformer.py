@@ -230,6 +230,8 @@ class ManifestTransformer:
         project_id: Optional[str] = None,
         chunk_count: int = 0,
         uploaded_at: Optional[datetime] = None,
+        source_report_id: Optional[str] = None,
+        source_mission_id: Optional[str] = None,
     ) -> TransformationResult:
         """Transform a document to PEDR manifest format."""
         urn = f"urn:research:document:{document_id}"
@@ -242,9 +244,19 @@ class ManifestTransformer:
             "file_type": file_type,
             "source_type": source_type,
             "project_id": str(project_id) if project_id else None,
+            "source_report_id": str(source_report_id) if source_report_id else None,
+            "source_mission_id": str(source_mission_id) if source_mission_id else None,
             "uploaded_at": uploaded_at.isoformat() if uploaded_at else None,
             "relationships": self._relationships_from_edges(
-                self._build_document_edges(urn, document_id, project_id, chunk_count, source_type)
+                self._build_document_edges(
+                    urn,
+                    document_id,
+                    project_id,
+                    chunk_count,
+                    source_type,
+                    source_report_id,
+                    source_mission_id,
+                )
             ),
         }
 
@@ -261,6 +273,8 @@ class ManifestTransformer:
             bindings={
                 "project_id": str(project_id) if project_id else None,
                 "chunk_count": chunk_count,
+                "source_report_id": str(source_report_id) if source_report_id else None,
+                "source_mission_id": str(source_mission_id) if source_mission_id else None,
             },
         )
 
@@ -331,6 +345,7 @@ class ManifestTransformer:
         *,
         project_id: Optional[str] = None,
         source_chunk_ids: Optional[List[str]] = None,
+        source_collection_ids: Optional[List[str]] = None,
         status: Optional[str] = None,
     ) -> TransformationResult:
         """Transform a report to PEDR manifest format."""
@@ -344,7 +359,12 @@ class ManifestTransformer:
             "status": status,
             "project_id": str(project_id) if project_id else None,
             "relationships": self._relationships_from_edges(
-                self._build_report_edges(urn, project_id, source_chunk_ids)
+                self._build_report_edges(
+                    urn,
+                    project_id,
+                    source_chunk_ids,
+                    source_collection_ids,
+                )
             ),
         }
 
@@ -361,6 +381,7 @@ class ManifestTransformer:
             bindings={
                 "project_id": str(project_id) if project_id else None,
                 "source_chunks": source_chunk_ids or [],
+                "source_collections": source_collection_ids or [],
             },
         )
 
@@ -486,14 +507,24 @@ class ManifestTransformer:
         # Extract document references
         documents = mission_data.get("documents", [])
         if isinstance(documents, list):
-            doc_ids = [str(d.get("id") or d) for d in documents if d]
+            doc_ids = []
+            for item in documents:
+                doc_id, _ = self._extract_document_binding(item)
+                if doc_id:
+                    doc_ids.append(str(doc_id))
             if doc_ids:
                 bindings["related_documents"] = doc_ids
 
         # Extract related mission references
         related = mission_data.get("related_missions", [])
         if isinstance(related, list):
-            bindings["related_missions"] = [str(m) for m in related if m]
+            mission_ids = []
+            for item in related:
+                mission_id, _ = self._extract_mission_binding(item)
+                if mission_id:
+                    mission_ids.append(str(mission_id))
+            if mission_ids:
+                bindings["related_missions"] = mission_ids
 
         return bindings
 
@@ -549,6 +580,47 @@ class ManifestTransformer:
             return (item, None)
         return (None, None)
 
+    def _extract_insight_binding(self, item: Any) -> tuple[Optional[str], Optional[str]]:
+        if isinstance(item, dict):
+            insight_id = item.get("insight_id") or item.get("insightId") or item.get("insight")
+            via = item.get("via") or item.get("binding") or item.get("source_type") or item.get("source")
+            return (str(insight_id) if insight_id else None, self._normalize_via(via))
+        if isinstance(item, str):
+            return (item, None)
+        return (None, None)
+
+    def _extract_document_binding(self, item: Any) -> tuple[Optional[str], Optional[str]]:
+        if isinstance(item, dict):
+            doc_id = (
+                item.get("document_id")
+                or item.get("documentId")
+                or item.get("collection_id")
+                or item.get("collectionId")
+                or item.get("doc_id")
+                or item.get("docId")
+                or item.get("id")
+                or item.get("document")
+            )
+            via = item.get("via") or item.get("binding") or item.get("source_type") or item.get("source")
+            return (str(doc_id) if doc_id else None, self._normalize_via(via))
+        if isinstance(item, str):
+            return (item, None)
+        return (None, None)
+
+    def _extract_mission_binding(self, item: Any) -> tuple[Optional[str], Optional[str]]:
+        if isinstance(item, dict):
+            mission_id = (
+                item.get("mission_id")
+                or item.get("missionId")
+                or item.get("id")
+                or item.get("mission")
+            )
+            via = item.get("via") or item.get("binding") or item.get("source_type") or item.get("source")
+            return (str(mission_id) if mission_id else None, self._normalize_via(via))
+        if isinstance(item, str):
+            return (item, None)
+        return (None, None)
+
     def _build_mission_edges(
         self,
         urn: str,
@@ -571,6 +643,52 @@ class ManifestTransformer:
                 edge = self._build_edge("evidence", urn, chunk_urn, via=via)
                 if edge:
                     edges.append(edge)
+                insight_id, insight_via = self._extract_insight_binding(item)
+                insight_urn = self._to_urn("insight", insight_id)
+                edge = self._build_edge("evidence", urn, insight_urn, via=insight_via)
+                if edge:
+                    edges.append(edge)
+
+        documents = (
+            mission_data.get("documents")
+            or mission_data.get("related_documents")
+            or []
+        )
+        if isinstance(documents, list):
+            for item in documents:
+                doc_id, via = self._extract_document_binding(item)
+                doc_urn = self._to_urn("document", doc_id)
+                edge = self._build_edge("references", urn, doc_urn, via=via)
+                if edge:
+                    edges.append(edge)
+
+        related = mission_data.get("related_missions") or mission_data.get("relatedMissions") or []
+        if isinstance(related, list):
+            for item in related:
+                mission_id, via = self._extract_mission_binding(item)
+                mission_urn = self._to_urn("mission", mission_id)
+                edge = self._build_edge("related_to", urn, mission_urn, via=via)
+                if edge:
+                    edges.append(edge)
+
+        result_documents = (
+            mission_data.get("result_document_ids")
+            or mission_data.get("resultDocumentIds")
+            or []
+        )
+        if isinstance(result_documents, list):
+            for item in result_documents:
+                doc_id, via = self._extract_document_binding(item)
+                doc_urn = self._to_urn("document", doc_id)
+                edge = self._build_edge("references", urn, doc_urn, via=via)
+                if edge:
+                    edges.append(edge)
+
+        result_report_id = mission_data.get("result_report_id") or mission_data.get("resultReportId")
+        report_urn = self._to_urn("report", result_report_id)
+        edge = self._build_edge("references", urn, report_urn)
+        if edge:
+            edges.append(edge)
 
         return edges
 
@@ -581,6 +699,8 @@ class ManifestTransformer:
         project_id: Optional[str],
         chunk_count: int,
         source_type: Optional[str],
+        source_report_id: Optional[str] = None,
+        source_mission_id: Optional[str] = None,
     ) -> List[Edge]:
         edges: List[Edge] = []
         via = self._normalize_via(source_type)
@@ -602,6 +722,19 @@ class ManifestTransformer:
             edge = self._build_edge("contains", urn, chunk_urn, via=via)
             if edge:
                 edges.append(edge)
+            part_edge = self._build_edge("part_of", chunk_urn, urn, via=via)
+            if part_edge:
+                edges.append(part_edge)
+
+        report_urn = self._to_urn("report", source_report_id)
+        edge = self._build_edge("derived_from", urn, report_urn)
+        if edge:
+            edges.append(edge)
+
+        mission_urn = self._to_urn("mission", source_mission_id)
+        edge = self._build_edge("derived_from", urn, mission_urn)
+        if edge:
+            edges.append(edge)
 
         return edges
 
@@ -633,6 +766,7 @@ class ManifestTransformer:
         urn: str,
         project_id: Optional[str],
         source_chunk_ids: Optional[List[str]],
+        source_collection_ids: Optional[List[str]] = None,
     ) -> List[Edge]:
         edges: List[Edge] = []
 
@@ -646,6 +780,13 @@ class ManifestTransformer:
             chunk_id, via = self._extract_chunk_binding(item)
             chunk_urn = self._to_urn("chunk", chunk_id)
             edge = self._build_edge("references", urn, chunk_urn, via=via)
+            if edge:
+                edges.append(edge)
+
+        for item in source_collection_ids or []:
+            collection_id, via = self._extract_document_binding(item)
+            collection_urn = self._to_urn("collection", collection_id)
+            edge = self._build_edge("references", urn, collection_urn, via=via)
             if edge:
                 edges.append(edge)
 
@@ -750,6 +891,8 @@ class ManifestTransformer:
         source_type: Optional[str] = None,
         project_id: Optional[str] = None,
         chunk_count: int = 0,
+        source_report_id: Optional[str] = None,
+        source_mission_id: Optional[str] = None,
     ) -> TransformationResult:
         """Transform document using full Semantic Protocol.
 
@@ -783,6 +926,8 @@ class ManifestTransformer:
                 project_id,
                 chunk_count,
                 source_type,
+                source_report_id,
+                source_mission_id,
             )
             if edges:
                 for edge in edges:

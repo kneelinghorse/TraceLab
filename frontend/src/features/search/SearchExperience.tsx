@@ -69,6 +69,7 @@ function SearchExperience({ initialSection }: SearchPageProps) {
   const [ragError, setRagError] = useState<string | null>(null);
   const [highlightedChunkId, setHighlightedChunkId] = useState<string | null>(null);
   const [usePedr, setUsePedr] = useState(true); // Default to PEDR for main search
+  const [graphEnabled, setGraphEnabled] = useState(true);
 
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const resultsAnchorRef = useRef<HTMLDivElement | null>(null);
@@ -251,6 +252,7 @@ function SearchExperience({ initialSection }: SearchPageProps) {
             top_k: limit,
             project_id: projectId || undefined,
             source_type: documentType || undefined,
+            enable_graph: graphEnabled,
           });
 
           setPedrResults(pedrResponse.results);
@@ -318,7 +320,7 @@ function SearchExperience({ initialSection }: SearchPageProps) {
         setIsSearching(false);
       }
     },
-    [filters.documentType, filters.projectId, mutateHistory, query, topK, usePedr],
+    [filters.documentType, filters.projectId, graphEnabled, mutateHistory, query, topK, usePedr],
   );
 
   const handleHistoryRun = async (entry: SearchHistoryEntryPayload) => {
@@ -447,6 +449,8 @@ function SearchExperience({ initialSection }: SearchPageProps) {
           documentTypes={documentTypes}
           topK={topK}
           onTopKChange={setTopK}
+          graphEnabled={graphEnabled}
+          onGraphEnabledChange={setGraphEnabled}
         />
       </div>
 

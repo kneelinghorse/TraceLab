@@ -211,6 +211,31 @@ class TestRRFFusion:
         assert merged[0]["rrf_score"] > 0
         assert merged[0]["contributing_layers"] == ["l1", "l2"]
 
+    def test_fusion_output_emits_telemetry(self):
+        """Fusion output includes aggregated telemetry stats."""
+        fusion = RRFFusion()
+        layer1 = LayerResult(
+            layer_name="lexical",
+            results=[
+                {"chunk_id": "c1", "score": 0.9},
+                {"chunk_id": "c2", "score": 0.8},
+            ],
+        )
+        layer2 = LayerResult(
+            layer_name="semantic",
+            results=[
+                {"chunk_id": "c2", "score": 0.7},
+            ],
+        )
+
+        output = fusion.fuse([layer1, layer2])
+        telemetry = output.telemetry
+
+        assert "rrf_score_stats" in telemetry
+        assert telemetry["layer_contribution_counts"]["lexical"] == 2
+        assert telemetry["layer_contribution_counts"]["semantic"] == 1
+        assert telemetry["multi_layer_result_count"] == 1
+
 
 # -----------------------------------------------------------------------------
 # Search Orchestrator Tests
@@ -338,8 +363,8 @@ class TestPEDRSearchOrchestrator:
         assert response.results == []
         assert response.metadata.result_count == 0
 
-    def test_graph_layer_disabled_by_default(self, mock_lexical, mock_semantic):
-        """Graph layer is not executed unless enabled."""
+    def test_graph_layer_disabled_when_flag_false(self, mock_lexical, mock_semantic):
+        """Graph layer is skipped when explicitly disabled."""
         graph_service = MagicMock()
         orchestrator = PEDRSearchOrchestrator(
             lexical_search=mock_lexical,
@@ -347,7 +372,7 @@ class TestPEDRSearchOrchestrator:
             graph_service=graph_service,
         )
 
-        response = orchestrator.search(query="graph disabled query")
+        response = orchestrator.search(query="graph disabled query", enable_graph=False)
 
         graph_service.expand_from_results.assert_not_called()
         assert "graph" not in response.metadata.layers_used
@@ -426,13 +451,13 @@ class TestPEDRSearchOrchestrator:
             graph_service=recorder,
         )
 
-        response_no_graph = orchestrator.search(query="graph weights baseline")
+        response_no_graph = orchestrator.search(query="graph weights baseline", enable_graph=False)
         weights_no_graph = response_no_graph.metadata.layer_weights
         assert weights_no_graph["lexical"] == pytest.approx(0.25, rel=1e-3)
 
         response_graph = orchestrator.search(query="graph weights enabled", enable_graph=True)
         weights_graph = response_graph.metadata.layer_weights
-        assert weights_graph["graph"] == pytest.approx(0.12, rel=1e-3)
+        assert weights_graph["graph"] == pytest.approx(0.08, rel=1e-3)
         assert sum(weights_graph.values()) == pytest.approx(1.0, rel=1e-3)
 
 

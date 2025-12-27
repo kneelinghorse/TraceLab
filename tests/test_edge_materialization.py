@@ -19,6 +19,8 @@ from sqlalchemy import (
 
 from app.core.database import engine
 from app.models import (
+    Collection,
+    CollectionItem,
     Document,
     DocumentChunk,
     GraphEdge,
@@ -88,6 +90,8 @@ def edge_materialization_schema():
     ensure_missions_table()
     ensure_table(Document.__table__)
     ensure_document_chunks_table()
+    ensure_table(Collection.__table__)
+    ensure_table(CollectionItem.__table__)
     ensure_table(Insight.__table__)
     ensure_table(InsightSource.__table__)
     ensure_table(ReportSource.__table__)
@@ -97,12 +101,32 @@ def edge_materialization_schema():
 
 
 def test_materialize_implicit_edges_round_trip(db_session, project):
+    report = Report(
+        project_id=project.id,
+        title="Edge Report",
+        content="Report content",
+    )
+    db_session.add(report)
+
+    mission_id = f"M-EDGE-{uuid.uuid4()}"
+    mission = Mission(
+        project_id=project.id,
+        mission_id=mission_id,
+        title="Edge Mission",
+        objective="Test edge materialization",
+        success_criteria=["edges materialized"],
+    )
+    db_session.add(mission)
+    db_session.flush()
+
     document = Document(
         project_id=project.id,
         name="Edge Document",
         content="Content",
         file_type="txt",
         source_type="analysis",
+        source_report_id=report.id,
+        source_mission_id=mission.id,
     )
     db_session.add(document)
     db_session.flush()
@@ -119,15 +143,8 @@ def test_materialize_implicit_edges_round_trip(db_session, project):
     )
     db_session.add_all([chunk_a, chunk_b])
 
-    mission_id = f"M-EDGE-{uuid.uuid4()}"
-    mission = Mission(
-        project_id=project.id,
-        mission_id=mission_id,
-        title="Edge Mission",
-        objective="Test edge materialization",
-        success_criteria=["edges materialized"],
-    )
-    db_session.add(mission)
+    mission.result_document_ids = [str(document.id)]
+    mission.result_report_id = report.id
 
     insight = Insight(
         project_id=project.id,
@@ -137,12 +154,8 @@ def test_materialize_implicit_edges_round_trip(db_session, project):
     )
     db_session.add(insight)
 
-    report = Report(
-        project_id=project.id,
-        title="Edge Report",
-        content="Report content",
-    )
-    db_session.add(report)
+    collection = Collection(name="Edge Collection")
+    db_session.add(collection)
     db_session.flush()
 
     db_session.add_all([
@@ -155,6 +168,15 @@ def test_materialize_implicit_edges_round_trip(db_session, project):
             report_id=report.id,
             source_type="chunk",
             source_id=chunk_b.id,
+        ),
+        ReportSource(
+            report_id=report.id,
+            source_type="collection",
+            source_id=collection.id,
+        ),
+        CollectionItem(
+            collection_id=collection.id,
+            chunk_id=chunk_a.id,
         ),
     ])
     db_session.commit()
@@ -176,14 +198,27 @@ def test_materialize_implicit_edges_round_trip(db_session, project):
     insight_chunk_urn = str(URNGenerator.generate(EntityType.CHUNK, str(chunk_a.id)))
     report_urn = str(URNGenerator.generate(EntityType.REPORT, str(report.id)))
     report_chunk_urn = str(URNGenerator.generate(EntityType.CHUNK, str(chunk_b.id)))
+    collection_urn = str(URNGenerator.generate(EntityType.COLLECTION, str(collection.id)))
+    collection_chunk_urn = str(URNGenerator.generate(EntityType.CHUNK, str(chunk_a.id)))
 
     expected = {
         (project_urn, document_urn, "contains"),
         (document_urn, chunk_urn_a, "contains"),
         (document_urn, chunk_urn_b, "contains"),
+        (chunk_urn_a, document_urn, "part_of"),
+        (chunk_urn_b, document_urn, "part_of"),
+        (document_urn, project_urn, "belongs_to"),
         (mission_urn, project_urn, "belongs_to"),
+        (mission_urn, document_urn, "references"),
+        (mission_urn, report_urn, "references"),
         (insight_urn, insight_chunk_urn, "derived_from"),
+        (insight_urn, project_urn, "belongs_to"),
         (report_urn, report_chunk_urn, "references"),
+        (report_urn, collection_urn, "references"),
+        (report_urn, project_urn, "belongs_to"),
+        (document_urn, report_urn, "derived_from"),
+        (document_urn, mission_urn, "derived_from"),
+        (collection_urn, collection_chunk_urn, "contains"),
     }
 
     assert expected.issubset(edges)

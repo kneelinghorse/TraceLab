@@ -1,0 +1,36 @@
+# Mission File: B25.3_API_Schema_Extension.yaml
+
+missionId: B25.3
+objective: Extend the PEDR search API with graph layer parameters. Update request/response
+  schemas and API endpoint to accept and process graph options, with full OpenAPI
+  documentation.
+context: 'The PEDR search API is defined in:
+
+  - Schemas: app/schemas/pedr_search.py
+
+  - Endpoint: app/api/v1/pedr_search.py
+
+
+  The API needs to expose graph layer controls so clients can opt-in to graph expansion
+  and tune its behavior. Parameters should mirror the PEDRConfig additions from B25.2.
+
+
+  Keep defaults conservative (graph disabled) for backward compatibility. Clients
+  that want graph expansion must explicitly enable it.'
+successCriteria:
+- 'PEDRSearchRequest schema extended with graph parameters: enable_graph, graph_depth,
+  graph_decay, graph_edge_types, graph_weight'
+- PEDRSearchResponse metadata includes graph layer info when enabled
+- API endpoint passes graph params to orchestrator
+- OpenAPI docs updated with graph parameter descriptions
+- 'Validation: graph_depth 1-5, graph_decay 0.1-1.0, graph_weight 0.0-0.5'
+- curl/httpie examples work with graph params
+- 3+ API tests for graph-enabled requests
+deliverables:
+- app/schemas/pedr_search.py - Extended request/response schemas
+- app/api/v1/pedr_search.py - Updated endpoint
+- tests/api/test_pedr_search.py - API tests for graph params
+references:
+- app/schemas/pedr_search.py - Current PEDR schemas
+- app/api/v1/pedr_search.py - Current endpoint
+- app/services/pedr/search_orchestrator.py - PEDRConfig for param names

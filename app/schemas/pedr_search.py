@@ -1,7 +1,8 @@
 """Pydantic schemas for PEDR unified search API.
 
 These schemas define the request/response contract for the POST /api/v1/pedr/search
-endpoint that orchestrates all 5 PEDR layers with RRF fusion.
+endpoint that orchestrates all 6 PEDR layers (including optional graph expansion)
+with RRF fusion.
 """
 from datetime import date
 from typing import Any, Dict, List, Literal, Optional
@@ -129,11 +130,11 @@ class PEDRSearchRequest(BaseModel):
 
     # Graph layer options (L6)
     enable_graph: bool = Field(
-        default=True,
+        default=False,
         description="Enable graph layer expansion",
     )
     graph_depth: int = Field(
-        default=2,
+        default=1,
         ge=1,
         le=5,
         description="Max BFS traversal depth",
@@ -149,7 +150,7 @@ class PEDRSearchRequest(BaseModel):
         description="Filter to specific graph edge types (None = all)",
     )
     graph_weight: float = Field(
-        default=0.12,
+        default=0.08,
         ge=0.0,
         le=0.5,
         description="Graph layer weight in RRF fusion",

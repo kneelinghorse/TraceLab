@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generatedAt": "2025-11-15T20:38:21.819832+00:00",
+    "generatedAt": "2025-12-27T20:57:50.661692+00:00",
     "generator": "cmos/scripts/aggregate_test_telemetry.py",
     "status": "passed",
     "artifacts": {
@@ -10,15 +10,15 @@
       "output": "telemetry/events/testing-summary.json",
       "mirror": "cmos/telemetry/events/testing-summary.json"
     },
-    "gitSha": "d12b3d80f9850e566aab004b1b0b44b734be34d7"
+    "gitSha": "2a526609ba7f62ab075b56430c4edba7fc3e96c1"
   },
   "summary": {
     "pytest": {
       "status": "passed",
-      "total": 11,
+      "total": 6,
       "failed": 0,
       "skipped": 0,
-      "passed": 11,
+      "passed": 6,
       "artifact": "telemetry/events/.artifacts/pytest-latest.json"
     },
     "playwright": {
@@ -39,20 +39,20 @@
     },
     "aggregate": {
       "status": "passed",
-      "tests": 28,
+      "tests": 23,
       "testsFailed": 0
     }
   },
   "details": {
     "pytest": {
       "tool": "pytest",
-      "generatedAt": "2025-11-15T16:45:18.348096+00:00",
-      "completedAt": "2025-11-15T16:45:31.773135+00:00",
-      "durationSeconds": 13.4243,
+      "generatedAt": "2025-12-27T20:56:50.798762+00:00",
+      "completedAt": "2025-12-27T20:56:51.031687+00:00",
+      "durationSeconds": 0.2329,
       "status": "passed",
       "summary": {
-        "total": 11,
-        "passed": 11,
+        "total": 6,
+        "passed": 6,
         "failed": 0,
         "skipped": 0,
         "xfailed": 0,
@@ -60,8 +60,8 @@
         "error": 0
       },
       "environment": {
-        "python": "3.11.9",
-        "platform": "macOS-14.4.1-arm64-arm-64bit",
+        "python": "3.13.5",
+        "platform": "macOS-14.4.1-arm64-arm-64bit-Mach-O",
         "ci": {
           "provider": null,
           "runId": null,
@@ -69,326 +69,181 @@
         },
         "exitStatus": 0,
         "failed": 0,
-        "gitSha": "bf95d64734fe593526d044a7a4c5536b38364f1c"
+        "gitSha": "2a526609ba7f62ab075b56430c4edba7fc3e96c1"
       },
       "label": null,
       "tests": [
         {
-          "nodeid": "tests/test_admin_dashboard.py::test_dashboard_data_endpoint_returns_stub_payload",
-          "name": "test_dashboard_data_endpoint_returns_stub_payload",
-          "file": "tests/test_admin_dashboard.py",
-          "line": 199,
+          "nodeid": "tests/test_edge_materialization.py::test_materialize_from_manifest_upsert_updates_existing_edge",
+          "name": "test_materialize_from_manifest_upsert_updates_existing_edge",
+          "file": "tests/test_edge_materialization.py",
+          "line": 227,
           "markers": [
             "TraceLab",
-            "test_dashboard_data_endpoint_returns_stub_payload",
-            "tests/test_admin_dashboard.py"
+            "test_materialize_from_manifest_upsert_updates_existing_edge",
+            "tests/test_edge_materialization.py"
           ],
           "status": "passed",
           "phases": [
             {
               "phase": "setup",
               "outcome": "passed",
-              "duration": 0.07347008283250034
+              "duration": 0.0002025419962592423
             },
             {
               "phase": "call",
               "outcome": "passed",
-              "duration": 1.6985222920775414
+              "duration": 0.003684292001707945
             },
             {
               "phase": "teardown",
               "outcome": "passed",
-              "duration": 0.0641090830322355
+              "duration": 0.0006322499975794926
             }
           ]
         },
         {
-          "nodeid": "tests/test_admin_dashboard.py::test_dashboard_export_csv",
-          "name": "test_dashboard_export_csv",
-          "file": "tests/test_admin_dashboard.py",
-          "line": 207,
+          "nodeid": "tests/test_edge_materialization.py::test_materialize_implicit_edges_round_trip",
+          "name": "test_materialize_implicit_edges_round_trip",
+          "file": "tests/test_edge_materialization.py",
+          "line": 102,
           "markers": [
             "TraceLab",
-            "test_dashboard_export_csv",
-            "tests/test_admin_dashboard.py"
+            "test_materialize_implicit_edges_round_trip",
+            "tests/test_edge_materialization.py"
           ],
           "status": "passed",
           "phases": [
             {
               "phase": "setup",
               "outcome": "passed",
-              "duration": 0.18463712488301098
+              "duration": 0.029192374997364823
             },
             {
               "phase": "call",
               "outcome": "passed",
-              "duration": 1.1467405420262367
+              "duration": 0.030755583000427578
             },
             {
               "phase": "teardown",
               "outcome": "passed",
-              "duration": 0.011924875201657414
+              "duration": 0.0013559169965446927
             }
           ]
         },
         {
-          "nodeid": "tests/test_admin_dashboard.py::test_html_dashboard_route_renders_template",
-          "name": "test_html_dashboard_route_renders_template",
-          "file": "tests/test_admin_dashboard.py",
-          "line": 215,
+          "nodeid": "tests/test_pedr_manifest_transformer.py::test_transform_document_emits_edges",
+          "name": "test_transform_document_emits_edges",
+          "file": "tests/test_pedr_manifest_transformer.py",
+          "line": 65,
           "markers": [
             "TraceLab",
-            "test_html_dashboard_route_renders_template",
-            "tests/test_admin_dashboard.py"
+            "test_transform_document_emits_edges",
+            "tests/test_pedr_manifest_transformer.py"
           ],
           "status": "passed",
           "phases": [
             {
               "phase": "setup",
               "outcome": "passed",
-              "duration": 0.09058262500911951
+              "duration": 0.0002830829980666749
             },
             {
               "phase": "call",
               "outcome": "passed",
-              "duration": 1.0620044160168618
+              "duration": 0.00011529200128279626
             },
             {
               "phase": "teardown",
               "outcome": "passed",
-              "duration": 0.008796209003776312
+              "duration": 5.63749999855645e-05
             }
           ]
         },
         {
-          "nodeid": "tests/test_admin_dashboard.py::test_metrics_aggregator_generates_sections",
-          "name": "test_metrics_aggregator_generates_sections",
-          "file": "tests/test_admin_dashboard.py",
-          "line": 110,
+          "nodeid": "tests/test_pedr_manifest_transformer.py::test_transform_insight_emits_edges",
+          "name": "test_transform_insight_emits_edges",
+          "file": "tests/test_pedr_manifest_transformer.py",
+          "line": 111,
           "markers": [
             "TraceLab",
-            "test_metrics_aggregator_generates_sections",
-            "tests/test_admin_dashboard.py"
+            "test_transform_insight_emits_edges",
+            "tests/test_pedr_manifest_transformer.py"
           ],
           "status": "passed",
           "phases": [
             {
               "phase": "setup",
               "outcome": "passed",
-              "duration": 0.14929395890794694
+              "duration": 0.0002102090002154
             },
             {
               "phase": "call",
               "outcome": "passed",
-              "duration": 0.008688334142789245
+              "duration": 8.462499681627378e-05
             },
             {
               "phase": "teardown",
               "outcome": "passed",
-              "duration": 0.0005622920580208302
+              "duration": 5.645799683406949e-05
             }
           ]
         },
         {
-          "nodeid": "tests/test_admin_endpoints.py::test_health_reports_collection_readiness",
-          "name": "test_health_reports_collection_readiness",
-          "file": "tests/test_admin_endpoints.py",
-          "line": 205,
+          "nodeid": "tests/test_pedr_manifest_transformer.py::test_transform_mission_emits_edges",
+          "name": "test_transform_mission_emits_edges",
+          "file": "tests/test_pedr_manifest_transformer.py",
+          "line": 13,
           "markers": [
             "TraceLab",
-            "test_health_reports_collection_readiness",
-            "tests/test_admin_endpoints.py"
+            "test_transform_mission_emits_edges",
+            "tests/test_pedr_manifest_transformer.py"
           ],
           "status": "passed",
           "phases": [
             {
               "phase": "setup",
               "outcome": "passed",
-              "duration": 0.2295094160363078
+              "duration": 0.02238545800355496
             },
             {
               "phase": "call",
               "outcome": "passed",
-              "duration": 0.3945403750985861
+              "duration": 0.00015904199972283095
             },
             {
               "phase": "teardown",
               "outcome": "passed",
-              "duration": 0.012845916906371713
+              "duration": 7.179200474638492e-05
             }
           ]
         },
         {
-          "nodeid": "tests/test_admin_endpoints.py::test_health_returns_service_unavailable_on_errors",
-          "name": "test_health_returns_service_unavailable_on_errors",
-          "file": "tests/test_admin_endpoints.py",
-          "line": 228,
+          "nodeid": "tests/test_pedr_manifest_transformer.py::test_transform_report_emits_edges",
+          "name": "test_transform_report_emits_edges",
+          "file": "tests/test_pedr_manifest_transformer.py",
+          "line": 137,
           "markers": [
             "TraceLab",
-            "test_health_returns_service_unavailable_on_errors",
-            "tests/test_admin_endpoints.py"
+            "test_transform_report_emits_edges",
+            "tests/test_pedr_manifest_transformer.py"
           ],
           "status": "passed",
           "phases": [
             {
               "phase": "setup",
               "outcome": "passed",
-              "duration": 0.10774745815433562
+              "duration": 0.00011141700088046491
             },
             {
               "phase": "call",
               "outcome": "passed",
-              "duration": 0.39413670799694955
+              "duration": 7.987499702721834e-05
             },
             {
               "phase": "teardown",
               "outcome": "passed",
-              "duration": 0.008982749888673425
-            }
-          ]
-        },
-        {
-          "nodeid": "tests/test_admin_endpoints.py::test_init_qdrant_invokes_service_and_returns_payload",
-          "name": "test_init_qdrant_invokes_service_and_returns_payload",
-          "file": "tests/test_admin_endpoints.py",
-          "line": 170,
-          "markers": [
-            "TraceLab",
-            "test_init_qdrant_invokes_service_and_returns_payload",
-            "tests/test_admin_endpoints.py"
-          ],
-          "status": "passed",
-          "phases": [
-            {
-              "phase": "setup",
-              "outcome": "passed",
-              "duration": 0.154876375105232
-            },
-            {
-              "phase": "call",
-              "outcome": "passed",
-              "duration": 0.3893562078010291
-            },
-            {
-              "phase": "teardown",
-              "outcome": "passed",
-              "duration": 0.005250083981081843
-            }
-          ]
-        },
-        {
-          "nodeid": "tests/test_admin_endpoints.py::test_init_qdrant_surfaces_runtime_failures",
-          "name": "test_init_qdrant_surfaces_runtime_failures",
-          "file": "tests/test_admin_endpoints.py",
-          "line": 190,
-          "markers": [
-            "TraceLab",
-            "test_init_qdrant_surfaces_runtime_failures",
-            "tests/test_admin_endpoints.py"
-          ],
-          "status": "passed",
-          "phases": [
-            {
-              "phase": "setup",
-              "outcome": "passed",
-              "duration": 0.08140449994243681
-            },
-            {
-              "phase": "call",
-              "outcome": "passed",
-              "duration": 0.4460534160025418
-            },
-            {
-              "phase": "teardown",
-              "outcome": "passed",
-              "duration": 0.006948750000447035
-            }
-          ]
-        },
-        {
-          "nodeid": "tests/test_admin_endpoints.py::test_qdrant_config_endpoint_applies_settings",
-          "name": "test_qdrant_config_endpoint_applies_settings",
-          "file": "tests/test_admin_endpoints.py",
-          "line": 279,
-          "markers": [
-            "TraceLab",
-            "test_qdrant_config_endpoint_applies_settings",
-            "tests/test_admin_endpoints.py"
-          ],
-          "status": "passed",
-          "phases": [
-            {
-              "phase": "setup",
-              "outcome": "passed",
-              "duration": 0.19400650006718934
-            },
-            {
-              "phase": "call",
-              "outcome": "passed",
-              "duration": 0.6555655419360846
-            },
-            {
-              "phase": "teardown",
-              "outcome": "passed",
-              "duration": 0.010306708049029112
-            }
-          ]
-        },
-        {
-          "nodeid": "tests/test_admin_endpoints.py::test_qdrant_health_reports_degraded_when_quantization_missing",
-          "name": "test_qdrant_health_reports_degraded_when_quantization_missing",
-          "file": "tests/test_admin_endpoints.py",
-          "line": 261,
-          "markers": [
-            "TraceLab",
-            "test_qdrant_health_reports_degraded_when_quantization_missing",
-            "tests/test_admin_endpoints.py"
-          ],
-          "status": "passed",
-          "phases": [
-            {
-              "phase": "setup",
-              "outcome": "passed",
-              "duration": 0.2018440831452608
-            },
-            {
-              "phase": "call",
-              "outcome": "passed",
-              "duration": 0.41384820896200836
-            },
-            {
-              "phase": "teardown",
-              "outcome": "passed",
-              "duration": 0.007348124869167805
-            }
-          ]
-        },
-        {
-          "nodeid": "tests/test_admin_endpoints.py::test_qdrant_stats_endpoint_returns_memory_profile",
-          "name": "test_qdrant_stats_endpoint_returns_memory_profile",
-          "file": "tests/test_admin_endpoints.py",
-          "line": 243,
-          "markers": [
-            "TraceLab",
-            "test_qdrant_stats_endpoint_returns_memory_profile",
-            "tests/test_admin_endpoints.py"
-          ],
-          "status": "passed",
-          "phases": [
-            {
-              "phase": "setup",
-              "outcome": "passed",
-              "duration": 0.1240094171371311
-            },
-            {
-              "phase": "call",
-              "outcome": "passed",
-              "duration": 0.5140984999015927
-            },
-            {
-              "phase": "teardown",
-              "outcome": "passed",
-              "duration": 0.005225833971053362
+              "duration": 4.316600097808987e-05
             }
           ]
         }

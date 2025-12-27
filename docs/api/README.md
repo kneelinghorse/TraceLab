@@ -26,7 +26,7 @@ Authorization: Bearer <jwt_token>
 
 ### PEDR Unified Search
 
-Primary search interface combining 5 layers with RRF fusion.
+Primary search interface combining 6 layers (including optional L6 graph expansion) with RRF fusion.
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -41,7 +41,11 @@ Primary search interface combining 5 layers with RRF fusion.
   "project_id": "uuid",
   "source_type": "interview",
   "enable_lexical": true,
-  "enable_semantic": true
+  "enable_semantic": true,
+  "enable_graph": true,
+  "graph_depth": 1,
+  "graph_decay": 0.7,
+  "graph_weight": 0.08
 }
 ```
 
