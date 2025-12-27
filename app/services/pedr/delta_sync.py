@@ -312,6 +312,13 @@ class DeltaSyncService:
             latest_uploaded_at = last_sync_at
 
             for doc in documents:
+                source_mission_id = None
+                if isinstance(doc.document_metadata, dict):
+                    source_mission_id = (
+                        doc.document_metadata.get("mission_id")
+                        or doc.document_metadata.get("missionId")
+                    )
+
                 result = self.transformer.transform_document(
                     document_id=str(doc.id),
                     name=doc.name or "",
@@ -320,6 +327,8 @@ class DeltaSyncService:
                     source_type=doc.source_type,
                     project_id=str(doc.project_id) if doc.project_id else None,
                     uploaded_at=doc.uploaded_at,
+                    source_report_id=str(doc.source_report_id) if doc.source_report_id else None,
+                    source_mission_id=source_mission_id,
                 )
 
                 if result.success:

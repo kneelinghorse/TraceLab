@@ -1,0 +1,55 @@
+# Mission File: B25.1_Graph_Layer_Service.yaml
+
+missionId: B25.1
+objective: Implement GraphLayerService as the L6 graph search layer for PEDR. The
+  service performs BFS traversal from seed URNs, applies decay scoring based on hop
+  distance, and outputs scored candidates for RRF fusion.
+context: 'Sprint 24 delivered the graph foundation: GraphEdge model (app/models/graph_edge.py),
+  EdgeMaterializationService (app/services/pedr/edge_materialization.py), and migration
+  022_graph_edges.py. The graph_edges table stores materialized edges with URN endpoints,
+  edge types, weights, and composite indexes for BFS traversal. This mission implements
+  the retrieval layer that queries these edges to expand search results.
+
+
+  Key architecture decisions from pedr-graph-search-plan.md:
+
+  - Graph storage: Postgres-backed edges (no external graph DB)
+
+  - Graph scoring: Dedicated L6 layer fused with RRF (not post-fusion boost)
+
+  - MVP edge types: contains (project→doc, doc→chunk), belongs_to (mission→project),
+  references (report→chunk), derived_from (insight→chunk)
+
+
+  The GraphLayerService should mirror the pattern of other PEDR services (syntactic,
+  pragmatic, quality_scoring) with a clean interface for the orchestrator.'
+successCriteria:
+- GraphLayerService class created at app/services/pedr/graph_layer.py
+- 'BFS traversal with configurable depth cap (default: 2)'
+- 'Decay scoring: score = base_score * (decay_factor ^ hop_distance), default decay_factor=0.7'
+- Edge type filtering via allowed_edge_types parameter
+- 'Seed selection: accepts explicit URN seeds OR derives from top K retrieval results'
+- Output as LayerResult compatible with RRF fusion pipeline
+- Adjacency caching to avoid repeated edge lookups within single query
+- 20+ unit tests covering traversal, scoring, edge filtering, and caching
+- 'All tests passing: pytest tests/test_graph_layer.py'
+deliverables:
+- app/services/pedr/graph_layer.py - GraphLayerService implementation
+- tests/test_graph_layer.py - Unit tests for graph layer
+- Update app/services/pedr/__init__.py exports
+references:
+- cmos/foundational-docs/pedr-graph-search-plan.md - Phase 3 spec
+- app/models/graph_edge.py - GraphEdge model with URN schema
+- app/services/pedr/edge_materialization.py - Edge creation patterns
+- app/services/pedr/fusion.py - LayerResult and RRFFusion for output format
+- app/services/pedr/syntactic.py - Reference implementation pattern for PEDR services
+domainFields:
+  blocker: null
+  blockedSince: null
+  blockers: null
+  unblockedAt: '2025-12-21T02:13:06.629Z'
+  previousBlocker: validate_parity.py --check failed (missing missions in backlog
+    file and context mismatches).
+  previousBlockedSince: '2025-12-21T02:05:43.349Z'
+  resolution: Parity validation is deprecated per user; skipping validate_parity for
+    completion.

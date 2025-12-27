@@ -6,47 +6,8 @@
 
 ## Scope
 
-This document covers the L6 graph layer (GraphLayerService) and its API surface.
-Layers 1-5 remain documented in `docs/architecture/PEDR-search.md`.
-
-## L6 Graph Layer Overview
-
-- Graph edges are materialized in `graph_edges` and traversed via BFS.
-- Seeds come from explicit URNs or the top lexical/semantic results.
-- Scores decay per hop (`graph_decay`) and are fused via RRF (`graph_weight`).
-- Results include `chunk_id` (for RRF) and `urn` (for provenance).
-- Optional graph context can be appended to RAG prompts via GraphRAGHelper.
-
-## API Usage
-
-Request fields (see `app/schemas/pedr_search.py`):
-- `enable_graph` (bool)
-- `graph_depth` (1-5)
-- `graph_decay` (0.1-1.0)
-- `graph_edge_types` (list or null)
-- `graph_weight` (0.0-0.5)
-
-Example:
-
-```bash
-curl -X POST /api/v1/pedr/search \
-  -H "Content-Type: application/json" \
-  -d '{
-    "query": "governance risk",
-    "enable_graph": true,
-    "graph_depth": 2,
-    "graph_decay": 0.7,
-    "graph_edge_types": ["contains", "references"],
-    "graph_weight": 0.12
-  }'
-```
-
-## Response Metadata
-
-Graph execution surfaces in `metadata`:
-- `graph_enabled`
-- `graph_candidates_expanded`
-- `timings.graph_ms`
+This addendum captures L6 graph layer telemetry and tuning notes.
+Architecture, traversal flow, and configuration options live in `docs/architecture/PEDR-search.md`.
 
 ## Telemetry and Benchmarks
 

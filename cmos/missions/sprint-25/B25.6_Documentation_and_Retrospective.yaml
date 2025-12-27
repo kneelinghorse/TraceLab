@@ -1,0 +1,38 @@
+# Mission File: B25.6_Documentation_and_Retrospective.yaml
+
+missionId: B25.6
+objective: Complete Sprint 25 with documentation updates, performance benchmarks,
+  and retrospective. Mark Phases 3-5 complete in pedr-graph-search-plan.md and draft
+  Sprint 26 backlog.
+context: 'Sprint 25 completes the PEDR graph search capability started in Sprint 24.
+  Documentation must be updated to reflect:
+
+  1. Graph layer architecture and usage
+
+  2. API parameters for graph-enabled search
+
+  3. Performance characteristics and tuning guidance
+
+  4. Phase 3-5 completion in the planning doc
+
+
+  The retrospective should capture learnings about graph search performance, any architectural
+  decisions made during implementation, and recommendations for future enhancements.'
+successCriteria:
+- pedr-graph-search-plan.md updated with Phase 3-5 completion checkmarks
+- docs/pedr-search.md updated with graph layer documentation
+- 'Performance benchmarks documented: latency impact, memory usage, cache effectiveness'
+- Sprint 25 retrospective written at cmos/reports/sprint-25/retrospective.md
+- Sprint 26 backlog draft at cmos/reports/sprint-25/sprint-26-backlog-draft.md
+- MASTER_CONTEXT updated with Sprint 25 completion and key decisions
+- All mission YAMLs archived to cmos/missions/sprint-25/
+deliverables:
+- cmos/foundational-docs/pedr-graph-search-plan.md - Updated with completion status
+- docs/pedr-search.md - Graph layer documentation
+- cmos/reports/sprint-25/retrospective.md - Sprint retrospective
+- cmos/reports/sprint-25/sprint-26-backlog-draft.md - Next sprint draft
+- cmos/missions/sprint-25/*.yaml - Archived mission files
+references:
+- cmos/foundational-docs/pedr-graph-search-plan.md - Update Phases 3-5
+- cmos/reports/sprint-24/ - Previous retrospective format
+- cmos/agents.md - MASTER_CONTEXT update procedures

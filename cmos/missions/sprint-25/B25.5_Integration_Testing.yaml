@@ -1,0 +1,39 @@
+# Mission File: B25.5_Integration_Testing.yaml
+
+missionId: B25.5
+objective: Comprehensive integration testing for the L6 graph layer. Validate graph
+  layer correctness, ranking stability, end-to-end search with graph enabled, and
+  telemetry capture.
+context: 'Integration tests must verify:
+
+  1. Graph layer returns expected nodes given known edge structure
+
+  2. Ranking is deterministic (same query → same results)
+
+  3. Full PEDR pipeline works with graph enabled
+
+  4. Cache invalidation works when edges change
+
+  5. Telemetry captures graph_ms and related metrics
+
+
+  Use test fixtures with known graph structures to validate traversal correctness.
+  Tests should run against a test database with seeded edges.'
+successCriteria:
+- 15+ integration tests in tests/integration/test_graph_search.py
+- 'Graph traversal correctness: known seed → expected expanded nodes'
+- 'Ranking stability: 5 identical queries → identical result ordering'
+- 'E2E test: full PEDR search with enable_graph=True returns valid results'
+- 'Cache test: edge insertion/deletion invalidates relevant cache entries'
+- 'Telemetry test: graph_ms appears in response metadata when enabled'
+- 'Performance baseline: graph layer adds <200ms at depth=2 with 1000 edges'
+- All tests passing in CI
+deliverables:
+- tests/integration/test_graph_search.py - Integration test suite
+- tests/fixtures/graph_fixtures.py - Test data with known edge structures
+- cmos/telemetry/events/sprint-25-graph-baseline.json - Performance baseline
+references:
+- tests/test_edge_materialization.py - Existing edge tests for patterns
+- app/services/pedr/search_orchestrator.py - Full pipeline to test
+- cmos/docs/integration-testing-guide.md - Testing patterns
+- cmos/foundational-docs/pedr-graph-search-plan.md - Validation plan section

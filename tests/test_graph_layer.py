@@ -329,6 +329,32 @@ def test_cache_hits_recorded(db_session, graph_layer):
     assert layer.metadata["cache_misses"] >= 1
 
 
+def test_metadata_includes_depth_stats_edge_usage_and_seed_scores(db_session, graph_layer):
+    seed = "urn:research:project:seed-metrics"
+    mid = "urn:research:document:doc-metrics-mid"
+    leaf = "urn:research:document:doc-metrics-leaf"
+    _add_edge(db_session, seed, mid, "contains")
+    _add_edge(db_session, mid, leaf, "references")
+
+    layer = graph_layer.search(
+        [seed],
+        config=GraphLayerConfig(max_depth=2, decay_factor=0.7),
+    )
+
+    depth_stats = layer.metadata["depth_stats"]
+    assert depth_stats["1"]["count"] == 1
+    assert depth_stats["2"]["count"] == 1
+    assert depth_stats["1"]["score_stats"]["min"] == pytest.approx(0.7)
+
+    edge_usage = layer.metadata["edge_type_usage"]
+    assert edge_usage["contains"] == 1
+    assert edge_usage["references"] == 1
+
+    seed_stats = layer.metadata["seed_score_stats"]
+    assert seed_stats["count"] == 1
+    assert seed_stats["score_stats"]["min"] == pytest.approx(1.0)
+
+
 def test_seed_score_fallback_combined_score(db_session, graph_layer):
     seed = "urn:research:project:seed-combined"
     target = "urn:research:document:doc-combined"

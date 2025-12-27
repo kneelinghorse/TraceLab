@@ -128,6 +128,15 @@ Example GitHub Actions step:
 
 `pedr_baseline_capture.py` - Captures baseline metrics using direct DB access (Sprint 18).
 
+### Graph Tuning Baseline
+
+`pedr_graph_tuning_baseline.py` - Runs recent search history queries through PEDR with graph telemetry enabled and writes JSONL output for tuning analysis.
+
+```bash
+python scripts/pedr_graph_tuning_baseline.py \
+  --output cmos/telemetry/events/graph-tuning-baseline.jsonl
+```
+
 ### PEDR Benchmark
 
 `pedr_benchmark.py` - Direct orchestrator benchmark without HTTP layer.

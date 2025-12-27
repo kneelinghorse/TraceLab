@@ -5,11 +5,13 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
-from sqlalchemy import func, tuple_
+from sqlalchemy import func, or_, tuple_
 from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
 from app.models import (
+    Collection,
+    CollectionItem,
     Document,
     DocumentChunk,
     GraphEdge,
@@ -160,10 +162,19 @@ class EdgeMaterializationService:
         since: Optional[datetime],
     ) -> Iterable[EdgeSpec]:
         yield from self._project_document_edges(session, project_id=project_id, since=since)
+        yield from self._document_project_edges(session, project_id=project_id, since=since)
         yield from self._document_chunk_edges(session, project_id=project_id, since=since)
+        yield from self._chunk_document_edges(session, project_id=project_id, since=since)
         yield from self._mission_project_edges(session, project_id=project_id, since=since)
+        yield from self._mission_document_edges(session, project_id=project_id, since=since)
+        yield from self._mission_report_edges(session, project_id=project_id, since=since)
+        yield from self._insight_project_edges(session, project_id=project_id, since=since)
         yield from self._insight_chunk_edges(session, project_id=project_id, since=since)
+        yield from self._report_project_edges(session, project_id=project_id, since=since)
         yield from self._report_chunk_edges(session, project_id=project_id, since=since)
+        yield from self._report_collection_edges(session, project_id=project_id, since=since)
+        yield from self._document_source_edges(session, project_id=project_id, since=since)
+        yield from self._collection_chunk_edges(session, project_id=project_id, since=since)
 
     def _project_document_edges(
         self,
@@ -189,6 +200,36 @@ class EdgeMaterializationService:
             to_urn = str(URNGenerator.for_document(str(document_id)))
             yield EdgeSpec(
                 edge_type="contains",
+                from_urn=from_urn,
+                to_urn=to_urn,
+                direction="out",
+                weight=1.0,
+                reason="FK: documents.project_id",
+                via="data",
+            )
+
+    def _document_project_edges(
+        self,
+        session: Session,
+        *,
+        project_id: Optional[str],
+        since: Optional[datetime],
+    ) -> Iterable[EdgeSpec]:
+        query = (
+            session.query(Document.id, Document.project_id)
+            .filter(Document.project_id.isnot(None))
+            .filter(Document.deleted_at.is_(None))
+        )
+        if project_id:
+            query = query.filter(Document.project_id == project_id)
+        if since:
+            query = query.filter(Document.updated_at >= since)
+
+        for document_id, project_value in query.yield_per(self.batch_size):
+            from_urn = str(URNGenerator.for_document(str(document_id)))
+            to_urn = str(URNGenerator.for_project(str(project_value)))
+            yield EdgeSpec(
+                edge_type="belongs_to",
                 from_urn=from_urn,
                 to_urn=to_urn,
                 direction="out",
@@ -227,6 +268,36 @@ class EdgeMaterializationService:
                 via="data",
             )
 
+    def _chunk_document_edges(
+        self,
+        session: Session,
+        *,
+        project_id: Optional[str],
+        since: Optional[datetime],
+    ) -> Iterable[EdgeSpec]:
+        query = (
+            session.query(DocumentChunk.document_id, DocumentChunk.chunk_index)
+            .join(Document, DocumentChunk.document_id == Document.id)
+            .filter(Document.deleted_at.is_(None))
+        )
+        if project_id:
+            query = query.filter(Document.project_id == project_id)
+        if since:
+            query = query.filter(DocumentChunk.created_at >= since)
+
+        for document_id, chunk_index in query.yield_per(self.batch_size):
+            from_urn = str(URNGenerator.for_chunk(str(document_id), int(chunk_index)))
+            to_urn = str(URNGenerator.for_document(str(document_id)))
+            yield EdgeSpec(
+                edge_type="part_of",
+                from_urn=from_urn,
+                to_urn=to_urn,
+                direction="out",
+                weight=1.0,
+                reason="FK: document_chunks.document_id",
+                via="data",
+            )
+
     def _mission_project_edges(
         self,
         session: Session,
@@ -255,6 +326,100 @@ class EdgeMaterializationService:
                 direction="out",
                 weight=1.0,
                 reason="FK: missions.project_id",
+                via="data",
+            )
+
+    def _mission_document_edges(
+        self,
+        session: Session,
+        *,
+        project_id: Optional[str],
+        since: Optional[datetime],
+    ) -> Iterable[EdgeSpec]:
+        query = (
+            session.query(Mission.mission_id, Mission.result_document_ids)
+            .filter(Mission.result_document_ids.isnot(None))
+        )
+        if project_id:
+            query = query.filter(Mission.project_id == project_id)
+        if since:
+            query = query.filter(Mission.updated_at >= since)
+
+        for mission_id, result_doc_ids in query.yield_per(self.batch_size):
+            if not mission_id or not result_doc_ids or not isinstance(result_doc_ids, list):
+                continue
+            from_urn = str(URNGenerator.for_mission(str(mission_id)))
+            for doc_id in result_doc_ids:
+                if not doc_id:
+                    continue
+                to_urn = str(URNGenerator.for_document(str(doc_id)))
+                yield EdgeSpec(
+                    edge_type="references",
+                    from_urn=from_urn,
+                    to_urn=to_urn,
+                    direction="out",
+                    weight=1.0,
+                    reason="missions.result_document_ids",
+                    via="data",
+                )
+
+    def _mission_report_edges(
+        self,
+        session: Session,
+        *,
+        project_id: Optional[str],
+        since: Optional[datetime],
+    ) -> Iterable[EdgeSpec]:
+        query = (
+            session.query(Mission.mission_id, Mission.result_report_id)
+            .filter(Mission.result_report_id.isnot(None))
+        )
+        if project_id:
+            query = query.filter(Mission.project_id == project_id)
+        if since:
+            query = query.filter(Mission.updated_at >= since)
+
+        for mission_id, report_id in query.yield_per(self.batch_size):
+            if not mission_id or not report_id:
+                continue
+            from_urn = str(URNGenerator.for_mission(str(mission_id)))
+            to_urn = str(URNGenerator.generate(EntityType.REPORT, str(report_id)))
+            yield EdgeSpec(
+                edge_type="references",
+                from_urn=from_urn,
+                to_urn=to_urn,
+                direction="out",
+                weight=1.0,
+                reason="missions.result_report_id",
+                via="data",
+            )
+
+    def _insight_project_edges(
+        self,
+        session: Session,
+        *,
+        project_id: Optional[str],
+        since: Optional[datetime],
+    ) -> Iterable[EdgeSpec]:
+        query = (
+            session.query(Insight.id, Insight.project_id)
+            .filter(Insight.project_id.isnot(None))
+        )
+        if project_id:
+            query = query.filter(Insight.project_id == project_id)
+        if since:
+            query = query.filter(Insight.updated_at >= since)
+
+        for insight_id, project_value in query.yield_per(self.batch_size):
+            from_urn = str(URNGenerator.for_insight(str(insight_id)))
+            to_urn = str(URNGenerator.for_project(str(project_value)))
+            yield EdgeSpec(
+                edge_type="belongs_to",
+                from_urn=from_urn,
+                to_urn=to_urn,
+                direction="out",
+                weight=1.0,
+                reason="FK: insights.project_id",
                 via="data",
             )
 
@@ -314,6 +479,148 @@ class EdgeMaterializationService:
                 direction="out",
                 weight=1.0,
                 reason="FK: report_sources.source_id",
+                via="data",
+            )
+
+    def _report_project_edges(
+        self,
+        session: Session,
+        *,
+        project_id: Optional[str],
+        since: Optional[datetime],
+    ) -> Iterable[EdgeSpec]:
+        query = (
+            session.query(Report.id, Report.project_id)
+            .filter(Report.project_id.isnot(None))
+        )
+        if project_id:
+            query = query.filter(Report.project_id == project_id)
+        if since:
+            query = query.filter(Report.updated_at >= since)
+
+        for report_id, project_value in query.yield_per(self.batch_size):
+            from_urn = str(URNGenerator.generate(EntityType.REPORT, str(report_id)))
+            to_urn = str(URNGenerator.for_project(str(project_value)))
+            yield EdgeSpec(
+                edge_type="belongs_to",
+                from_urn=from_urn,
+                to_urn=to_urn,
+                direction="out",
+                weight=1.0,
+                reason="FK: reports.project_id",
+                via="data",
+            )
+
+    def _report_collection_edges(
+        self,
+        session: Session,
+        *,
+        project_id: Optional[str],
+        since: Optional[datetime],
+    ) -> Iterable[EdgeSpec]:
+        query = (
+            session.query(ReportSource.report_id, ReportSource.source_id)
+            .join(Report, ReportSource.report_id == Report.id)
+            .filter(ReportSource.source_type == "collection")
+        )
+        if project_id:
+            query = query.filter(Report.project_id == project_id)
+        if since:
+            query = query.filter(ReportSource.added_at >= since)
+
+        for report_id, collection_id in query.yield_per(self.batch_size):
+            from_urn = str(URNGenerator.generate(EntityType.REPORT, str(report_id)))
+            to_urn = str(URNGenerator.generate(EntityType.COLLECTION, str(collection_id)))
+            yield EdgeSpec(
+                edge_type="references",
+                from_urn=from_urn,
+                to_urn=to_urn,
+                direction="out",
+                weight=1.0,
+                reason="FK: report_sources.source_id",
+                via="data",
+            )
+
+    def _document_source_edges(
+        self,
+        session: Session,
+        *,
+        project_id: Optional[str],
+        since: Optional[datetime],
+    ) -> Iterable[EdgeSpec]:
+        query = (
+            session.query(
+                Document.id,
+                Document.source_report_id,
+                Mission.mission_id,
+            )
+            .outerjoin(Mission, Document.source_mission_id == Mission.id)
+            .filter(
+                or_(
+                    Document.source_report_id.isnot(None),
+                    Document.source_mission_id.isnot(None),
+                )
+            )
+            .filter(Document.deleted_at.is_(None))
+        )
+        if project_id:
+            query = query.filter(Document.project_id == project_id)
+        if since:
+            query = query.filter(Document.updated_at >= since)
+
+        for document_id, report_id, mission_id in query.yield_per(self.batch_size):
+            from_urn = str(URNGenerator.for_document(str(document_id)))
+            if report_id:
+                to_urn = str(URNGenerator.generate(EntityType.REPORT, str(report_id)))
+                yield EdgeSpec(
+                    edge_type="derived_from",
+                    from_urn=from_urn,
+                    to_urn=to_urn,
+                    direction="out",
+                    weight=1.0,
+                    reason="documents.source_report_id",
+                    via="data",
+                )
+            if mission_id:
+                to_urn = str(URNGenerator.for_mission(str(mission_id)))
+                yield EdgeSpec(
+                    edge_type="derived_from",
+                    from_urn=from_urn,
+                    to_urn=to_urn,
+                    direction="out",
+                    weight=1.0,
+                    reason="documents.source_mission_id",
+                    via="data",
+                )
+
+    def _collection_chunk_edges(
+        self,
+        session: Session,
+        *,
+        project_id: Optional[str],
+        since: Optional[datetime],
+    ) -> Iterable[EdgeSpec]:
+        query = session.query(CollectionItem.collection_id, CollectionItem.chunk_id)
+        if project_id:
+            query = (
+                query.join(DocumentChunk, CollectionItem.chunk_id == DocumentChunk.id)
+                .join(Document, DocumentChunk.document_id == Document.id)
+                .filter(Document.project_id == project_id)
+                .filter(Document.deleted_at.is_(None))
+            )
+        if since:
+            query = query.filter(CollectionItem.added_at >= since)
+
+        for collection_id, chunk_id in query.yield_per(self.batch_size):
+            from_urn = str(URNGenerator.generate(EntityType.COLLECTION, str(collection_id)))
+            to_urn = str(URNGenerator.generate(EntityType.CHUNK, str(chunk_id)))
+            yield EdgeSpec(
+                edge_type="contains",
+                from_urn=from_urn,
+                to_urn=to_urn,
+                direction="out",
+                weight=1.0,
+                reason="FK: collection_items.chunk_id",
                 via="data",
             )
 

@@ -1,0 +1,40 @@
+# Mission File: B25.4_Graph_RAG_Helper.yaml
+
+missionId: B25.4
+objective: Implement GraphRAGHelper for extracting, pruning, and linearizing graph
+  subgraphs for RAG context. Enable graph-expanded context in LLM prompts by providing
+  relevant relationship context alongside retrieved chunks.
+context: 'The RAG pipeline (app/services/rag_service.py) currently uses flat chunk
+  retrieval. With graph edges materialized, we can enrich RAG context by including
+  related entities discovered through graph traversal.
+
+
+  Use cases:
+
+  1. User asks about a mission → include related evidence chunks via graph
+
+  2. User asks about a concept → include chunks from related documents/projects
+
+  3. Research synthesis → traverse insight→chunk→document relationships
+
+
+  The helper should extract a relevant subgraph, prune it to fit context windows,
+  and linearize it into a format suitable for LLM prompts.'
+successCriteria:
+- GraphRAGHelper class at app/services/pedr/graph_rag.py
+- extract_subgraph(seeds, depth, max_nodes) → returns node list with relationships
+- prune_by_relevance(subgraph, query, max_tokens) → fits context window
+- linearize(subgraph) → topologically sorted text representation
+- Integration point in RAGService for graph-expanded context
+- Token counting using tiktoken for context window management
+- 10+ unit tests for extraction, pruning, and linearization
+- 'Example: mission context includes evidence chunks and their source documents'
+deliverables:
+- app/services/pedr/graph_rag.py - GraphRAGHelper implementation
+- tests/test_graph_rag.py - Unit tests
+- app/services/rag_service.py - Integration point (optional enhancement)
+references:
+- app/services/rag_service.py - Current RAG implementation
+- app/services/pedr/graph_layer.py - BFS traversal patterns from B25.1
+- app/models/graph_edge.py - Edge schema for relationship types
+- cmos/foundational-docs/pedr-graph-search-plan.md - Graph RAG section

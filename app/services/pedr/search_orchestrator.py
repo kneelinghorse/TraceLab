@@ -21,10 +21,13 @@ Reference: PEDR Protocol Architecture Guide
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
+import os
 import time
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime, timezone
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 from uuid import UUID
 
@@ -65,6 +68,8 @@ from app.services.pedr.cache import (
 
 logger = logging.getLogger(__name__)
 
+GRAPH_TELEMETRY_ENV = "PEDR_GRAPH_TELEMETRY_ENABLED"
+GRAPH_TELEMETRY_PATH = Path("cmos/telemetry/events/sprint-26-graph-telemetry.jsonl")
 
 BASE_LAYER_WEIGHTS = {
     "lexical": 0.25,
@@ -74,7 +79,7 @@ BASE_LAYER_WEIGHTS = {
     "governance": 0.15,
 }
 
-DEFAULT_GRAPH_WEIGHT = 0.12
+DEFAULT_GRAPH_WEIGHT = 0.08
 
 
 def _build_default_layer_weights(graph_weight: float) -> Dict[str, float]:
@@ -104,7 +109,7 @@ class PEDRConfig:
     enable_syntactic: bool = True
     enable_pragmatic: bool = True
     enable_governance: bool = True
-    enable_graph: bool = True
+    enable_graph: bool = False
 
     # Search parameters
     top_k_per_layer: int = 20  # Fetch more per layer, fuse down to top_k
@@ -126,10 +131,10 @@ class PEDRConfig:
 
     # Graph layer
     graph_weight: float = DEFAULT_GRAPH_WEIGHT
-    graph_depth: int = 2
+    graph_depth: int = 1
     graph_decay: float = 0.7
     graph_edge_types: Optional[Tuple[str, ...]] = None
-    graph_top_k_seeds: int = 10
+    graph_top_k_seeds: int = 5
 
 
 @dataclass
@@ -311,6 +316,8 @@ class PEDRSearchOrchestrator:
         # External search providers (injected)
         lexical_search: Optional[Callable[..., List[Dict[str, Any]]]] = None,
         semantic_search: Optional[Callable[..., List[Dict[str, Any]]]] = None,
+        telemetry_enabled: Optional[bool] = None,
+        telemetry_path: Optional[Path | str] = None,
     ) -> None:
         """Initialize the PEDR search orchestrator.
 
@@ -323,6 +330,8 @@ class PEDRSearchOrchestrator:
             rrf_fusion: RRF fusion instance.
             lexical_search: Callable for lexical search. Injected from HybridSearchService.
             semantic_search: Callable for semantic search. Injected from RetrievalService.
+            telemetry_enabled: Enable graph telemetry logging.
+            telemetry_path: Optional override path for graph telemetry JSONL.
         """
         self.config = config or PEDRConfig()
         self.syntactic_service = syntactic_service or get_syntactic_service()
@@ -331,6 +340,12 @@ class PEDRSearchOrchestrator:
         self.semantic_protocol = semantic_protocol or get_semantic_protocol()
         self.rrf_fusion = rrf_fusion or get_rrf_fusion()
         self.graph_service = graph_service or GraphLayerService()
+        self.telemetry_enabled = (
+            telemetry_enabled
+            if telemetry_enabled is not None
+            else _telemetry_enabled_from_env()
+        )
+        self.telemetry_path = Path(telemetry_path) if telemetry_path else GRAPH_TELEMETRY_PATH
 
         # External search providers - will be set by factory or injection
         self._lexical_search = lexical_search
@@ -413,6 +428,8 @@ class PEDRSearchOrchestrator:
         """
         start_time = time.perf_counter()
         timings = LayerTimings()
+        graph_layer_result = None
+        fusion_output = None
 
         # Merge config with runtime overrides (used for cache keys and execution)
         config = self._merge_config(
@@ -581,6 +598,7 @@ class PEDRSearchOrchestrator:
                         allowed_edge_types=config.graph_edge_types,
                     ),
                 )
+                graph_layer_result = graph_layer
                 timings.graph_ms = graph_layer.latency_ms or (
                     (time.perf_counter() - t0) * 1000
                 )
@@ -677,6 +695,23 @@ class PEDRSearchOrchestrator:
         )
 
         response = PEDRSearchResponse(results=final_results, metadata=metadata)
+
+        if (
+            self.telemetry_enabled
+            and graph_layer_result is not None
+            and fusion_output is not None
+        ):
+            _emit_graph_telemetry(
+                query=query,
+                config=config,
+                layer_weights=effective_layer_weights,
+                graph_layer=graph_layer_result,
+                fusion_output=fusion_output,
+                final_results=final_results,
+                timings=timings,
+                graph_candidates_expanded=graph_candidates_expanded,
+                telemetry_path=self.telemetry_path,
+            )
 
         # Store results in cache for future requests
         if cache_enabled and final_results:
@@ -1127,6 +1162,154 @@ def _log_graph_layer_metrics(graph_layer: LayerResult) -> None:
         graph_layer.latency_ms,
         cache_hit_rate_text,
     )
+
+
+def _telemetry_enabled_from_env() -> bool:
+    value = os.getenv(GRAPH_TELEMETRY_ENV, "1").strip().lower()
+    return value not in {"0", "false", "no"}
+
+
+def _summarize_scores(scores: Sequence[float]) -> Dict[str, float]:
+    values = [float(value) for value in scores if value is not None]
+    if not values:
+        return {}
+    values.sort()
+    count = len(values)
+    mid = count // 2
+    if count % 2 == 1:
+        median = values[mid]
+    else:
+        median = (values[mid - 1] + values[mid]) / 2
+    p90_index = int(0.9 * (count - 1))
+    return {
+        "min": round(values[0], 6),
+        "max": round(values[-1], 6),
+        "avg": round(sum(values) / count, 6),
+        "p50": round(median, 6),
+        "p90": round(values[p90_index], 6),
+    }
+
+
+def _compute_graph_impact(
+    results: Sequence[PEDRSearchResult],
+    *,
+    graph_weight: float,
+    rrf_k: int,
+) -> Dict[str, Any]:
+    total = len(results)
+    if total == 0:
+        return {
+            "results_with_graph": 0,
+            "result_share": 0.0,
+            "rank_stats": {},
+            "rrf_contribution_stats": {},
+            "rrf_contribution_share_stats": {},
+            "top_5_with_graph": 0,
+            "top_5_share": 0.0,
+        }
+
+    graph_ranks: List[float] = []
+    graph_contribs: List[float] = []
+    graph_shares: List[float] = []
+
+    for result in results:
+        rank = (result.layer_ranks or {}).get("graph", 0)
+        if rank > 0:
+            contrib = graph_weight * (1.0 / (rrf_k + rank))
+            graph_contribs.append(contrib)
+            graph_ranks.append(float(result.rrf_rank))
+            if result.rrf_score:
+                graph_shares.append(contrib / result.rrf_score)
+
+    top_n = min(5, total)
+    top_5_with_graph = sum(
+        1
+        for result in results[:top_n]
+        if (result.layer_ranks or {}).get("graph", 0) > 0
+    )
+    return {
+        "results_with_graph": len(graph_ranks),
+        "result_share": round(len(graph_ranks) / total, 4),
+        "rank_stats": _summarize_scores(graph_ranks),
+        "rrf_contribution_stats": _summarize_scores(graph_contribs),
+        "rrf_contribution_share_stats": _summarize_scores(graph_shares),
+        "top_5_with_graph": top_5_with_graph,
+        "top_5_share": round(top_5_with_graph / top_n, 4) if top_n > 0 else 0.0,
+    }
+
+
+def _emit_graph_telemetry(
+    *,
+    query: str,
+    config: PEDRConfig,
+    layer_weights: Dict[str, float],
+    graph_layer: LayerResult,
+    fusion_output: Any,
+    final_results: Sequence[PEDRSearchResult],
+    timings: LayerTimings,
+    graph_candidates_expanded: Optional[int],
+    telemetry_path: Path,
+) -> None:
+    metadata = graph_layer.metadata or {}
+    cache_hits = int(metadata.get("cache_hits") or 0)
+    cache_misses = int(metadata.get("cache_misses") or 0)
+    cache_total = cache_hits + cache_misses
+    cache_hit_rate = (
+        round(cache_hits / cache_total, 4) if cache_total > 0 else None
+    )
+    graph_weight = float(layer_weights.get("graph", config.graph_weight))
+
+    payload = {
+        "ts": datetime.now(timezone.utc).isoformat(),
+        "event": "pedr_graph_telemetry",
+        "query": query,
+        "graph": {
+            "depth": config.graph_depth,
+            "decay": config.graph_decay,
+            "edge_types": list(config.graph_edge_types or ()),
+            "top_k_seeds": config.graph_top_k_seeds,
+            "weight": graph_weight,
+            "seed_count": metadata.get("seed_count"),
+            "seed_score_stats": metadata.get("seed_score_stats", {}),
+            "depth_stats": metadata.get("depth_stats", {}),
+            "edge_type_usage": metadata.get("edge_type_usage", {}),
+            "total_candidates": metadata.get("total_candidates"),
+            "graph_candidates_expanded": graph_candidates_expanded,
+            "cache": {
+                "hits": cache_hits,
+                "misses": cache_misses,
+                "hit_rate": cache_hit_rate,
+            },
+        },
+        "rrf": {
+            "k": config.rrf_k,
+            "layers_used": fusion_output.layers_used,
+            "total_unique": fusion_output.total_unique,
+            "fusion_latency_ms": fusion_output.fusion_latency_ms,
+            "layer_weights": dict(layer_weights),
+            "telemetry": fusion_output.telemetry,
+        },
+        "ranking": {
+            "final_result_count": len(final_results),
+            "graph_impact": _compute_graph_impact(
+                final_results,
+                graph_weight=graph_weight,
+                rrf_k=config.rrf_k,
+            ),
+        },
+        "timings": {
+            "graph_ms": timings.graph_ms,
+            "fusion_ms": timings.fusion_ms,
+            "total_ms": timings.total_ms,
+        },
+    }
+
+    try:
+        telemetry_path.parent.mkdir(parents=True, exist_ok=True)
+        with telemetry_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(payload) + "\n")
+    except Exception as exc:  # pragma: no cover - telemetry best effort
+        logger.warning("Failed to write graph telemetry: %s", exc)
 
 
 __all__ = [

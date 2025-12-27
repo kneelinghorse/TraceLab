@@ -150,6 +150,7 @@ export interface PEDRSearchParams {
   project_id?: string;
   document_id?: string;
   source_type?: string;
+  enable_graph?: boolean;
   element_type?: PEDRElementType;
   element_types?: PEDRElementType[];
   auto_detect_type?: boolean;

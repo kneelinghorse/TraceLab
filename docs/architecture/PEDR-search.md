@@ -1,23 +1,26 @@
 # PEDR Search Architecture
 
-**Protocol-Enhanced Deep Research (PEDR)** is TraceLab's unified search architecture that combines five specialized search layers with Reciprocal Rank Fusion (RRF) to deliver accurate, context-aware results.
+**Protocol-Enhanced Deep Research (PEDR)** is TraceLab's unified search architecture that combines six specialized search layers (including the optional L6 graph expansion) with Reciprocal Rank Fusion (RRF) to deliver accurate, context-aware results.
 
 ## Overview
 
 PEDR replaces traditional single-mode search with a multi-layer approach:
 
 ```
-Query → [Pre-Analysis] → [Parallel Retrieval] → [RRF Fusion] → [Post-Processing] → Results
-              ↓                    ↓                   ↓               ↓
-         Syntactic +          Lexical +            Weighted       Governance +
-         Pragmatic            Semantic             Ranking        Quality Gates
+Query → [Pre-Analysis] → [Parallel Retrieval] → [Graph Expansion] → [RRF Fusion] → [Post-Processing] → Results
+              ↓                    ↓                   ↓               ↓               ↓
+         Syntactic +          Lexical +            BFS +           Weighted        Governance +
+         Pragmatic            Semantic             Decay           Ranking         Quality Gates
 ```
 
 **Key Reference**: `app/services/pedr/search_orchestrator.py`
+**Graph Layer Reference**: `app/services/pedr/graph_layer.py`
 
 ---
 
-## The 5 Layers
+## The 6 Layers
+
+Weights listed below are base weights; effective weights are normalized across enabled layers and rescaled when the graph layer is enabled.
 
 ### 1. Lexical Layer (Weight: 0.25)
 
@@ -145,6 +148,32 @@ QualityFilters(
 
 ---
 
+### 6. Graph Layer (L6) (Weight: 0.08, optional)
+
+**Purpose**: Expand retrieval results through the relationship graph to surface related entities beyond direct lexical/semantic matches.
+
+**Graph traversal flow**:
+1. **Seed selection**: Interleave top lexical + semantic results; use the top `graph_top_k_seeds` as seeds.
+2. **URN resolution**: Prefer explicit `urn` values; fall back to `document_id` + `chunk_index` or `chunk_id`.
+3. **BFS expansion**: Traverse `graph_edges` breadth-first up to `graph_depth`, optionally filtering by `graph_edge_types`.
+4. **Decay scoring**: Assign `score = seed_score * (graph_decay ** depth)` per hop; keep best score per candidate.
+5. **Chunk resolution**: Resolve chunk URNs to `chunk_id` so RRF can rank them; preserve `urn` for provenance.
+
+**Configuration (API)**:
+- `enable_graph` (bool) - Toggle graph expansion
+- `graph_depth` (1-5) - Max BFS depth
+- `graph_decay` (0.1-1.0) - Score decay per hop
+- `graph_edge_types` (list or null) - Edge type filter
+- `graph_weight` (0.0-0.5) - Graph layer weight in RRF
+
+**Internal defaults**:
+- `graph_top_k_seeds`: 5 (top retrieval seeds)
+- `max_candidates`: 100 (cap on expanded candidates)
+
+**Implementation**: `app/services/pedr/graph_layer.py`
+
+---
+
 ## RRF Fusion
 
 Reciprocal Rank Fusion combines results from multiple retrieval systems into a unified ranking.
@@ -164,14 +193,28 @@ Where:
 ### Default Layer Weights
 
 ```python
-DEFAULT_LAYER_WEIGHTS = {
+BASE_LAYER_WEIGHTS = {
     "lexical": 0.25,
     "semantic": 0.35,
     "syntactic": 0.15,
     "pragmatic": 0.10,
     "governance": 0.15,
 }
+DEFAULT_GRAPH_WEIGHT = 0.08
+
+# When graph is enabled, base weights are scaled by (1 - graph_weight)
+# and then normalized across enabled layers.
+DEFAULT_LAYER_WEIGHTS = {
+    "lexical": 0.23,
+    "semantic": 0.322,
+    "syntactic": 0.138,
+    "pragmatic": 0.092,
+    "governance": 0.138,
+    "graph": 0.08,
+}
 ```
+
+If the graph layer is disabled, its weight is set to 0 and the remaining enabled layers are normalized to sum to 1.
 
 ### Why RRF?
 
@@ -187,7 +230,7 @@ DEFAULT_LAYER_WEIGHTS = {
 
 ### Full Mode (Default)
 
-Standard 5-layer PEDR search with complete analysis.
+Standard PEDR search with complete analysis. The graph layer is opt-in.
 
 ```
 POST /api/v1/pedr/search
@@ -270,6 +313,16 @@ POST /api/v1/pedr/search
 | `enable_governance` | bool | Enable/disable governance layer |
 | `layer_weights` | object | Custom layer weights |
 
+### Graph Layer Options (L6)
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `enable_graph` | bool | Enable/disable graph expansion |
+| `graph_depth` | int | Max BFS traversal depth (1-5) |
+| `graph_decay` | float | Score decay per hop (0.1-1.0) |
+| `graph_edge_types` | list[string] | Optional edge type filter |
+| `graph_weight` | float | Graph layer weight in RRF (0.0-0.5) |
+
 ---
 
 ## Caching
@@ -322,14 +375,14 @@ Cache keys are built from:
       "project_id": "1ee7...0bc3",
       "rrf_score": 0.0234,
       "rrf_rank": 1,
-      "layer_ranks": {"lexical": 3, "semantic": 1},
-      "layer_scores": {"lexical": 0.78, "semantic": 0.92},
+      "layer_ranks": {"lexical": 3, "semantic": 1, "graph": 4},
+      "layer_scores": {"lexical": 0.78, "semantic": 0.92, "graph": 0.12},
       "urn": "urn:tracelab:chunk:f6c9...f1d8",
       "element_type": "finding",
       "query_intent": "factual",
       "quality_score": 0.85,
       "quality_gates_passed": 4,
-      "contributing_layers": ["lexical", "semantic"],
+      "contributing_layers": ["lexical", "semantic", "graph"],
       "source_type": "interview",
       "source_origin": "upload"
     }
@@ -340,17 +393,20 @@ Cache keys are built from:
     "intent_confidence": 0.82,
     "detected_type": "finding",
     "type_confidence": 0.75,
-    "layers_used": ["lexical", "semantic"],
-    "layer_weights": {"lexical": 0.25, "semantic": 0.35, ...},
+    "layers_used": ["lexical", "semantic", "graph"],
+    "layer_weights": {"lexical": 0.23, "semantic": 0.322, "graph": 0.08, ...},
     "timings": {
       "lexical_ms": 45.2,
       "semantic_ms": 89.1,
+      "graph_ms": 12.4,
       "syntactic_ms": 2.3,
       "pragmatic_ms": 1.8,
       "governance_ms": 5.4,
       "fusion_ms": 3.2,
       "total_ms": 147.0
     },
+    "graph_enabled": true,
+    "graph_candidates_expanded": 82,
     "total_candidates": 60,
     "result_count": 10,
     "cache_hit": false
@@ -363,6 +419,7 @@ Cache keys are built from:
 ## Related Documentation
 
 - [API Overview](../api/README.md) - Full endpoint reference
+- [Graph Layer Addendum](../pedr-search.md) - L6 telemetry and benchmarks
 - [Mission Protocol](./mission-protocol.md) - Evidence and synthesis schemas
 - [DeepSearch Integration](../integration/deepsearch.md) - Agent integration patterns
 - [Quality-Aware Search](../quality-aware-search.md) - Quality gate details

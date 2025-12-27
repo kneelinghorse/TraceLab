@@ -480,3 +480,10 @@
 {"ts": "2025-12-21T00:14:01Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
 {"ts": "2025-12-21T02:16:00Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
 {"ts": "2025-12-21T02:58:33Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
+{"ts": "2025-12-21T04:07:45Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
+{"ts": "2025-12-21T04:24:35Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
+{"ts": "2025-12-27T17:24:05Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
+{"ts": "2025-12-27T19:10:58Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
+{"ts": "2025-12-27T19:16:32Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
+{"ts": "2025-12-27T20:07:03Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}
+{"ts": "2025-12-27T20:56:59Z", "source": "mission_runtime", "status": "ok", "message": "database_available", "details": null}

@@ -1,0 +1,43 @@
+# Mission File: B25.2_Orchestrator_Integration.yaml
+
+missionId: B25.2
+objective: Integrate GraphLayerService into PEDRSearchOrchestrator as the 6th search
+  layer. Wire graph expansion into the search pipeline between retrieval (lexical/semantic)
+  and RRF fusion, with configurable enablement and weights.
+context: 'The PEDRSearchOrchestrator (app/services/pedr/search_orchestrator.py) currently
+  coordinates 5 layers: lexical, semantic, syntactic, pragmatic, and governance. The
+  graph layer (L6) needs to be added as a retrieval layer that expands the candidate
+  set based on graph relationships before RRF fusion.
+
+
+  Current layer weights sum to 1.0:
+
+  - lexical: 0.25, semantic: 0.35, syntactic: 0.15, pragmatic: 0.10, governance: 0.15
+
+
+  With graph layer (proposed):
+
+  - lexical: 0.22, semantic: 0.30, syntactic: 0.13, pragmatic: 0.10, governance: 0.13,
+  graph: 0.12
+
+
+  The graph layer should be optional (default: disabled) to preserve backward compatibility
+  and allow opt-in for queries that benefit from relationship expansion.'
+successCriteria:
+- 'PEDRConfig extended with: enable_graph (default False), graph_weight (0.12), graph_depth
+  (2), graph_decay (0.7), graph_edge_types (None = all)'
+- LayerTimings extended with graph_ms field
+- GraphLayerService wired into search() method after lexical/semantic retrieval
+- Graph layer results included in RRF fusion when enabled
+- DEFAULT_LAYER_WEIGHTS updated with graph layer (weights sum to 1.0)
+- Metadata.layers_used includes 'graph' when enabled
+- 'Backward compatible: existing searches work unchanged when enable_graph=False'
+- 5+ integration tests verifying graph layer in full pipeline
+- All existing PEDR tests still passing
+deliverables:
+- app/services/pedr/search_orchestrator.py - Updated with graph layer integration
+- tests/test_search_orchestrator.py - Extended with graph layer tests
+references:
+- app/services/pedr/search_orchestrator.py - Current orchestrator implementation
+- app/services/pedr/graph_layer.py - GraphLayerService from B25.1
+- cmos/foundational-docs/pedr-graph-search-plan.md - Architecture decisions

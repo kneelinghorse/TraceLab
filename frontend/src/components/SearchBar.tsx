@@ -22,6 +22,8 @@ type SearchBarProps = {
   documentTypes: string[];
   topK: number;
   onTopKChange: (value: number) => void;
+  graphEnabled: boolean;
+  onGraphEnabledChange: (value: boolean) => void;
 };
 
 export function SearchBar({
@@ -34,6 +36,8 @@ export function SearchBar({
   projects,
   topK,
   onTopKChange,
+  graphEnabled,
+  onGraphEnabledChange,
 }: SearchBarProps) {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -125,6 +129,19 @@ export function SearchBar({
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label htmlFor="graph-toggle" className="text-sm text-slate-400">
+              Graph expansion
+            </label>
+            <input
+              id="graph-toggle"
+              type="checkbox"
+              checked={graphEnabled}
+              onChange={(event) => onGraphEnabledChange(event.target.checked)}
+              className="h-4 w-4 rounded border-white/20 bg-white/5 text-sky-400 focus:ring-2 focus:ring-sky-400/40"
+            />
           </div>
 
           {(filters.projectId || topK !== 10) && (

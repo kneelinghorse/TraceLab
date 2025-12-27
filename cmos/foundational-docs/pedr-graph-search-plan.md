@@ -76,7 +76,7 @@ Phase 2: Graph Storage and Materialization ✅ COMPLETE (Sprint 24)
 Phase 3: Graph Retrieval and Scoring (L6) ✅ COMPLETE (Sprint 25)
 - Implemented GraphLayerService BFS traversal with decay scoring and adjacency cache.
 - Integrated graph layer into `app/services/pedr/search_orchestrator.py` between retrieval and RRF.
-- Added graph layer timings + telemetry; defaults: depth=2, decay=0.7, weight=0.12.
+- Added graph layer timings + telemetry; defaults: depth=1, decay=0.7, weight=0.08 (graph opt-in).
 - Added graph-layer tests in unified search suite.
 
 Phase 4: API and RAG Integration ✅ COMPLETE (Sprint 25)

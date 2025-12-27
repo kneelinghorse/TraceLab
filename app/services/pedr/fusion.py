@@ -72,6 +72,7 @@ class FusionOutput:
     layers_used: List[str]
     config: RRFConfig
     fusion_latency_ms: float = 0.0
+    telemetry: Dict[str, Any] = field(default_factory=dict)
 
 
 class RRFFusion:
@@ -212,12 +213,15 @@ class RRFFusion:
 
         elapsed_ms = (time.perf_counter() - start) * 1000
 
+        telemetry = _build_fusion_telemetry(fused_results, layers_used)
+
         return FusionOutput(
             results=output_results,
             total_unique=len(result_data),
             layers_used=layers_used,
             config=self.config,
             fusion_latency_ms=round(elapsed_ms, 2),
+            telemetry=telemetry,
         )
 
     def fuse_simple(
@@ -317,6 +321,62 @@ def rrf_score(ranks: Sequence[int], *, k: int = RRF_K) -> float:
         if rank > 0:
             score += 1.0 / (k + rank)
     return score
+
+
+def _summarize_scores(scores: Sequence[float]) -> Dict[str, float]:
+    values = [float(value) for value in scores if value is not None]
+    if not values:
+        return {}
+    values.sort()
+    count = len(values)
+    mid = count // 2
+    if count % 2 == 1:
+        median = values[mid]
+    else:
+        median = (values[mid - 1] + values[mid]) / 2
+    p90_index = int(0.9 * (count - 1))
+    return {
+        "min": round(values[0], 6),
+        "max": round(values[-1], 6),
+        "avg": round(sum(values) / count, 6),
+        "p50": round(median, 6),
+        "p90": round(values[p90_index], 6),
+    }
+
+
+def _build_fusion_telemetry(
+    fused_results: Sequence[Tuple[str, float, Dict[str, int], Dict[str, float]]],
+    layers_used: Sequence[str],
+) -> Dict[str, Any]:
+    total = len(fused_results)
+    if total == 0:
+        return {}
+
+    layer_counts = {layer: 0 for layer in layers_used}
+    multi_layer_count = 0
+    scores = []
+
+    for _, score, ranks, _ in fused_results:
+        scores.append(score)
+        contributed = 0
+        for layer in layers_used:
+            if ranks.get(layer, 0) > 0:
+                layer_counts[layer] += 1
+                contributed += 1
+        if contributed > 1:
+            multi_layer_count += 1
+
+    layer_rates = {
+        layer: round(count / total, 4) for layer, count in layer_counts.items()
+    }
+
+    return {
+        "rrf_score_stats": _summarize_scores(scores),
+        "layer_contribution_counts": layer_counts,
+        "layer_contribution_rates": layer_rates,
+        "multi_layer_result_count": multi_layer_count,
+        "multi_layer_result_rate": round(multi_layer_count / total, 4),
+    }
 
 
 __all__ = [

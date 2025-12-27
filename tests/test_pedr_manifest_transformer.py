@@ -19,7 +19,10 @@ def test_transform_mission_emits_edges() -> None:
         "evidence": [
             {"chunk_id": "chunk-1", "via": "api"},
             {"chunk_id": "chunk-2"},
+            {"insight_id": "insight-1"},
         ],
+        "documents": [{"id": "doc-10"}, "doc-11"],
+        "related_missions": [{"mission_id": "M200"}, "M201"],
     }
 
     result = transformer.transform_mission(
@@ -41,8 +44,23 @@ def test_transform_mission_emits_edges() -> None:
     assert evidence_targets == {
         "urn:research:chunk:chunk-1",
         "urn:research:chunk:chunk-2",
+        "urn:research:insight:insight-1",
     }
     assert any(edge.get("via") == "api" for edge in evidence_edges)
+
+    reference_edges = grouped.get("references", [])
+    reference_targets = {edge["to"] for edge in reference_edges}
+    assert reference_targets == {
+        "urn:research:document:doc-10",
+        "urn:research:document:doc-11",
+    }
+
+    related_edges = grouped.get("related_to", [])
+    related_targets = {edge["to"] for edge in related_edges}
+    assert related_targets == {
+        "urn:research:mission:M200",
+        "urn:research:mission:M201",
+    }
 
 
 def test_transform_document_emits_edges() -> None:
@@ -55,6 +73,8 @@ def test_transform_document_emits_edges() -> None:
         source_type="data",
         project_id="project-200",
         chunk_count=2,
+        source_report_id="report-1",
+        source_mission_id="M-EDGE-1",
     )
 
     assert result.success
@@ -71,6 +91,21 @@ def test_transform_document_emits_edges() -> None:
     assert contains_targets == {
         "urn:research:chunk:doc-200-chunk-0",
         "urn:research:chunk:doc-200-chunk-1",
+    }
+
+    part_of_edges = grouped.get("part_of", [])
+    part_of_sources = {edge["from"] for edge in part_of_edges}
+    assert part_of_sources == {
+        "urn:research:chunk:doc-200-chunk-0",
+        "urn:research:chunk:doc-200-chunk-1",
+    }
+    assert all(edge["to"] == "urn:research:document:doc-200" for edge in part_of_edges)
+
+    derived_edges = grouped.get("derived_from", [])
+    derived_targets = {edge["to"] for edge in derived_edges}
+    assert derived_targets == {
+        "urn:research:report:report-1",
+        "urn:research:mission:M-EDGE-1",
     }
 
 
@@ -108,6 +143,7 @@ def test_transform_report_emits_edges() -> None:
         content="Report content",
         project_id="project-400",
         source_chunk_ids=["chunk-5"],
+        source_collection_ids=["collection-9"],
     )
 
     assert result.success
@@ -119,5 +155,8 @@ def test_transform_report_emits_edges() -> None:
     assert belongs_edges[0]["to"] == "urn:research:project:project-400"
 
     reference_edges = grouped.get("references", [])
-    assert len(reference_edges) == 1
-    assert reference_edges[0]["to"] == "urn:research:chunk:chunk-5"
+    reference_targets = {edge["to"] for edge in reference_edges}
+    assert reference_targets == {
+        "urn:research:chunk:chunk-5",
+        "urn:research:collection:collection-9",
+    }
