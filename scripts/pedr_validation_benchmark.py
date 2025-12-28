@@ -2,7 +2,8 @@
 """PEDR validation benchmark using the R27.1 baseline corpus and queries.
 
 This script reuses the baseline corpus/query set and applies PEDR quality scoring
-and governance filters to validate quality-aware ranking effects.
+and governance filters to validate quality-aware ranking effects. Metadata can
+be sourced from synthetic assignments or PostgreSQL missions via a mapping file.
 """
 from __future__ import annotations
 
@@ -11,6 +12,7 @@ import json
 import math
 import sys
 import time
+import uuid
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +21,8 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 sys.path.insert(0, str(Path(__file__).parent))
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from app.core.database import SessionLocal
+from app.models.mission import Mission
 from app.services.pedr import QualityFilters, QualityScoringService
 
 from rag_baseline_benchmark import (  # noqa: E402
@@ -45,10 +49,14 @@ DEFAULT_COMPARISON_MD = PROJECT_ROOT / "artifacts/benchmarks/comparison-analysis
 DEFAULT_QUALITY_METADATA_PATH = DEFAULT_CORPUS_DIR / "quality_metadata.json"
 DEFAULT_RELATIONSHIPS_PATH = DEFAULT_CORPUS_DIR / "relationships.json"
 DEFAULT_BASELINE_METRICS_PATH = PROJECT_ROOT / "artifacts/benchmarks/rag-baseline-metrics.json"
+DEFAULT_MISSION_MAP_PATH = DEFAULT_CORPUS_DIR / "mission_map.json"
 
 DEFAULT_TOP_K = 5
 DEFAULT_SEMANTIC_WEIGHT = 0.7
 DEFAULT_KEYWORD_WEIGHT = 0.3
+DEFAULT_CANDIDATE_MULTIPLIER = 3
+DEFAULT_GOVERNANCE_MODE = "soft"
+DEFAULT_METADATA_SOURCE = "postgres"
 
 
 QUALITY_ASSIGNMENTS = {
@@ -75,6 +83,36 @@ EXPLICIT_RELATIONSHIPS = {
     "doc-010-pedr-baseline-capture": ["doc-002-pedr-search"],
 }
 
+DEFAULT_QUALITY_ASSIGNMENT_CYCLE = (
+    ("complete", 5, True),
+    ("review", 4, False),
+    ("in_progress", 3, False),
+    ("draft", 2, False),
+)
+
+STATUS_NORMALIZATION = {
+    "completed": "complete",
+    "complete": "complete",
+    "review": "review",
+    "in_progress": "in_progress",
+    "queued": "draft",
+    "draft": "draft",
+    "blocked": "draft",
+    "cancelled": "draft",
+}
+
+
+def default_quality_assignment(doc_id: str) -> Dict[str, Any]:
+    index = sum(ord(ch) for ch in doc_id) % len(DEFAULT_QUALITY_ASSIGNMENT_CYCLE)
+    status, passed_gates, validated = DEFAULT_QUALITY_ASSIGNMENT_CYCLE[index]
+    pii_flag = any(token in doc_id for token in ("auth", "pii", "data-protection"))
+    return {
+        "status": status,
+        "passed_gates": passed_gates,
+        "validated": validated,
+        "pii": pii_flag,
+    }
+
 
 def build_quality_gates(passed_gates: int, validated: bool) -> Dict[str, Dict[str, Any]]:
     gates: Dict[str, Dict[str, Any]] = {}
@@ -90,7 +128,7 @@ def build_quality_metadata(manifest: Dict[str, Any]) -> Dict[str, Any]:
     metadata: Dict[str, Any] = {}
     for doc in manifest.get("documents", []):
         doc_id = doc["doc_id"]
-        assignment = QUALITY_ASSIGNMENTS.get(doc_id, {})
+        assignment = QUALITY_ASSIGNMENTS.get(doc_id) or default_quality_assignment(doc_id)
         status = assignment.get("status", "draft")
         passed_gates = int(assignment.get("passed_gates", 2))
         validated = bool(assignment.get("validated", False))
@@ -129,12 +167,137 @@ def build_relationship_map(manifest: Dict[str, Any]) -> Dict[str, List[str]]:
     return relationships
 
 
+def _load_mission_map(path: Path) -> Dict[str, Dict[str, Optional[str]]]:
+    if not path.exists():
+        raise FileNotFoundError(f"Mission map not found: {path}")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError("Mission map must be a JSON object keyed by doc_id.")
+
+    mapping: Dict[str, Dict[str, Optional[str]]] = {}
+    for doc_id, entry in payload.items():
+        mission_id = None
+        mission_uuid = None
+        if isinstance(entry, str):
+            mission_id = entry
+        elif isinstance(entry, dict):
+            mission_id = entry.get("mission_id") or entry.get("missionId")
+            mission_uuid = entry.get("mission_uuid") or entry.get("missionUuid")
+        if mission_id or mission_uuid:
+            mapping[str(doc_id)] = {
+                "mission_id": str(mission_id) if mission_id else None,
+                "mission_uuid": str(mission_uuid) if mission_uuid else None,
+            }
+
+    if not mapping:
+        raise ValueError("Mission map is empty or missing valid mission identifiers.")
+    return mapping
+
+
+def load_postgres_quality_metadata(
+    manifest: Dict[str, Any],
+    mission_map_path: Path,
+) -> Dict[str, Any]:
+    mission_map = _load_mission_map(mission_map_path)
+
+    mission_ids = sorted(
+        {entry["mission_id"] for entry in mission_map.values() if entry.get("mission_id")}
+    )
+    mission_uuids: List[uuid.UUID] = []
+    for entry in mission_map.values():
+        mission_uuid = entry.get("mission_uuid")
+        if not mission_uuid:
+            continue
+        try:
+            mission_uuids.append(uuid.UUID(mission_uuid))
+        except (TypeError, ValueError):
+            continue
+
+    session = SessionLocal()
+    try:
+        missions: List[Mission] = []
+        if mission_ids:
+            missions.extend(
+                session.query(Mission).filter(Mission.mission_id.in_(mission_ids)).all()
+            )
+        if mission_uuids:
+            missions.extend(
+                session.query(Mission).filter(Mission.id.in_(mission_uuids)).all()
+            )
+
+        mission_lookup: Dict[str, Mission] = {}
+        for mission in missions:
+            mission_lookup[str(mission.id)] = mission
+            mission_lookup[str(mission.mission_id)] = mission
+
+        metadata: Dict[str, Any] = {}
+        missing_docs: List[str] = []
+        missing_missions: List[str] = []
+
+        for doc in manifest.get("documents", []):
+            doc_id = doc.get("doc_id")
+            if not doc_id:
+                continue
+            mapping = mission_map.get(doc_id)
+            if not mapping:
+                missing_docs.append(doc_id)
+                continue
+            mission = None
+            if mapping.get("mission_id"):
+                mission = mission_lookup.get(mapping["mission_id"])
+            if mission is None and mapping.get("mission_uuid"):
+                mission = mission_lookup.get(mapping["mission_uuid"])
+            if mission is None:
+                missing_missions.append(doc_id)
+                continue
+
+            raw_status = str(mission.status or "draft").strip().lower()
+            status = STATUS_NORMALIZATION.get(raw_status, "draft")
+            mission_metadata = mission.mission_metadata or {}
+            execution_metadata = mission.execution_metadata or {}
+            quality_gates = None
+            if isinstance(mission_metadata, dict):
+                quality_gates = mission_metadata.get("quality_gates")
+            if quality_gates is None and isinstance(execution_metadata, dict):
+                quality_gates = execution_metadata.get("quality_gates")
+            mission_data = execution_metadata if isinstance(execution_metadata, dict) else {}
+            if not mission_data and isinstance(mission_metadata, dict):
+                mission_data = mission_metadata
+
+            metadata[doc_id] = {
+                "mission_id": mission.mission_id,
+                "status": status,
+                "quality_gates": quality_gates or {},
+                "mission_data": mission_data or {},
+            }
+
+        if missing_docs or missing_missions:
+            details = []
+            if missing_docs:
+                details.append(f"missing doc mappings: {', '.join(missing_docs)}")
+            if missing_missions:
+                details.append(f"unresolved missions: {', '.join(missing_missions)}")
+            raise ValueError("Mission map incomplete: " + " | ".join(details))
+
+        return metadata
+    finally:
+        session.close()
+
+
 def load_or_build_quality_metadata(
     path: Path,
     manifest: Dict[str, Any],
     *,
     rebuild: bool = False,
+    source: str = DEFAULT_METADATA_SOURCE,
+    mission_map_path: Path = DEFAULT_MISSION_MAP_PATH,
 ) -> Dict[str, Any]:
+    if source == "postgres":
+        return load_postgres_quality_metadata(manifest, mission_map_path)
+
+    if source != "synthetic":
+        raise ValueError(f"Unsupported metadata source: {source}")
+
     if path.exists() and not rebuild:
         return json.loads(path.read_text(encoding="utf-8"))
     metadata = build_quality_metadata(manifest)
@@ -519,6 +682,9 @@ def run_benchmark(
     semantic_weight: float,
     keyword_weight: float,
     candidate_multiplier: int,
+    metadata_source: str,
+    mission_map_path: Path,
+    governance_mode: str,
     rebuild_metadata: bool,
     rebuild_relationships: bool,
 ) -> Dict[str, Any]:
@@ -530,6 +696,8 @@ def run_benchmark(
         DEFAULT_QUALITY_METADATA_PATH,
         manifest,
         rebuild=rebuild_metadata,
+        source=metadata_source,
+        mission_map_path=mission_map_path,
     )
     relationships = load_or_build_relationships(
         DEFAULT_RELATIONSHIPS_PATH,
@@ -537,7 +705,11 @@ def run_benchmark(
         rebuild=rebuild_relationships,
     )
 
-    governance_filters = QualityFilters(min_quality_gates=3, allow_pii=False)
+    governance_filters = QualityFilters(
+        min_quality_gates=3,
+        allow_pii=False,
+        governance_mode=governance_mode,
+    )
 
     pedr_results = evaluate_pedr_queries(
         index=index,
@@ -576,6 +748,9 @@ def run_benchmark(
             "query_count": len(queries),
             "top_k": top_k,
             "candidate_multiplier": candidate_multiplier,
+            "governance_mode": governance_mode,
+            "metadata_source": metadata_source,
+            "mission_map_path": str(mission_map_path),
         },
         "quality_metadata_path": str(DEFAULT_QUALITY_METADATA_PATH),
         "relationships_path": str(DEFAULT_RELATIONSHIPS_PATH),
@@ -637,6 +812,19 @@ def main() -> None:
         help="Baseline metrics JSON from R27.1.",
     )
     parser.add_argument(
+        "--metadata-source",
+        type=str,
+        default=DEFAULT_METADATA_SOURCE,
+        choices=["synthetic", "postgres"],
+        help="Quality metadata source: synthetic or postgres.",
+    )
+    parser.add_argument(
+        "--mission-map",
+        type=Path,
+        default=DEFAULT_MISSION_MAP_PATH,
+        help="Doc-to-mission mapping JSON for postgres metadata.",
+    )
+    parser.add_argument(
         "--top-k",
         type=int,
         default=DEFAULT_TOP_K,
@@ -657,8 +845,15 @@ def main() -> None:
     parser.add_argument(
         "--candidate-multiplier",
         type=int,
-        default=2,
+        default=DEFAULT_CANDIDATE_MULTIPLIER,
         help="Candidate pool multiplier before quality scoring.",
+    )
+    parser.add_argument(
+        "--governance-mode",
+        type=str,
+        default=DEFAULT_GOVERNANCE_MODE,
+        choices=["strict", "soft", "warn"],
+        help="Governance filtering mode (strict excludes, soft penalizes, warn logs).",
     )
     parser.add_argument(
         "--rebuild-metadata",
@@ -683,6 +878,9 @@ def main() -> None:
         semantic_weight=args.semantic_weight,
         keyword_weight=args.keyword_weight,
         candidate_multiplier=args.candidate_multiplier,
+        metadata_source=args.metadata_source,
+        mission_map_path=args.mission_map,
+        governance_mode=args.governance_mode,
         rebuild_metadata=args.rebuild_metadata,
         rebuild_relationships=args.rebuild_relationships,
     )

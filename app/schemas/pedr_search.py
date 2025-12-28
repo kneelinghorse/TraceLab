@@ -19,6 +19,7 @@ PEDRQueryIntent = Literal["search", "create", "update", "delete", "execute"]
 
 # Rerank mode for hybrid search optimization
 PEDRRerankMode = Literal["full", "hybrid"]
+PEDRGovernanceMode = Literal["strict", "soft", "warn"]
 
 
 class PEDRLayerWeights(BaseModel):
@@ -89,7 +90,11 @@ class PEDRSearchRequest(BaseModel):
     )
     allow_pii: bool = Field(
         default=True,
-        description="Include PII-flagged content in results",
+        description="When False, apply governance handling to PII-flagged content",
+    )
+    governance_mode: PEDRGovernanceMode = Field(
+        default="strict",
+        description="Governance behavior: strict (exclude), soft (penalize), warn (log only).",
     )
 
     # Layer control

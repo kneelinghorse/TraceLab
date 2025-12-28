@@ -78,6 +78,7 @@ class Settings(BaseSettings):
     pedr_cache_max_size: int = 1000  # Max cached queries
     pedr_cache_ttl_seconds: int = 300  # 5 minutes TTL
     pedr_cache_enabled: bool = True
+    pedr_candidate_multiplier: int = 3
 
     # DeepSearch integration
     # Mode: "worker" (DB polling, Railway prod) or "http" (API calls, local dev)

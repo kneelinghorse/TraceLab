@@ -321,6 +321,7 @@ def test_ingested_mission_available_via_search_endpoint(
             min_quality_gates: Optional[int] = None,
             status_filters: Optional[List[str]] = None,
             allow_pii: Optional[bool] = True,
+            governance_mode: Optional[str] = None,
         ) -> Dict[str, object]:
             self.calls.append(
                 {

@@ -122,6 +122,34 @@ Example GitHub Actions step:
 
 ---
 
+## PEDR Benchmark Regression
+
+`pedr_benchmark_regression.py` runs the offline PEDR benchmark, appends a
+benchmark history entry, and flags regressions when nDCG drops more than 5% from
+the stored baseline.
+
+Outputs:
+- `telemetry/events/benchmark-history.jsonl` (run history)
+- `telemetry/events/benchmark-baseline.json` (regression baseline)
+- `telemetry/events/.artifacts/pedr-benchmark-comparison.json` (comparison snapshot)
+
+Example usage:
+
+```bash
+# First run: generate corpus/queries and set baseline
+python scripts/pedr_benchmark_regression.py --rebuild-corpus --rebuild-queries --rebuild-baseline --init-baseline
+
+# Subsequent runs: compare to baseline
+python scripts/pedr_benchmark_regression.py --rebuild-corpus --rebuild-queries --rebuild-baseline
+```
+
+Exit codes:
+- `0`: No regression detected
+- `1`: Baseline missing (use --init-baseline)
+- `2`: Regression detected (>5% nDCG drop)
+
+---
+
 ## Other Scripts
 
 ### Baseline Capture
@@ -140,6 +168,11 @@ python scripts/pedr_graph_tuning_baseline.py \
 ### PEDR Benchmark
 
 `pedr_benchmark.py` - Direct orchestrator benchmark without HTTP layer.
+
+### Mission Map Generator
+
+`generate_mission_map.py` - Generates a `mission_map.json` mapping the benchmark
+corpus doc IDs to real mission IDs/UUIDs for production metadata scoring.
 
 ### Hybrid Rerank Benchmark
 

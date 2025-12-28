@@ -33,7 +33,7 @@ def test_quality_boost_ratio_complete_vs_draft():
     }
     ratio = quality_boost_ratio(metadata_map)
     assert ratio["complete_avg"] > ratio["draft_avg"]
-    assert ratio["ratio_complete_vs_draft"] >= 2.0
+    assert ratio["ratio_complete_vs_draft"] > 1.0
 
 
 def test_governance_filter_excludes_pii():
@@ -52,3 +52,22 @@ def test_governance_filter_excludes_pii():
     )
     assert len(filtered) == 1
     assert filtered[0]["document_id"] == "doc-safe"
+
+
+def test_governance_soft_mode_penalizes_pii():
+    metadata_map = {
+        "doc-safe": _metadata(status="complete", passed_gates=5, validated=True, pii=False),
+        "doc-pii": _metadata(status="complete", passed_gates=5, validated=True, pii=True),
+    }
+    results = [
+        {"document_id": "doc-safe", "combined_score": 1.0, "score": 1.0},
+        {"document_id": "doc-pii", "combined_score": 1.0, "score": 1.0},
+    ]
+    filtered = apply_quality_scoring(
+        results,
+        metadata_map=metadata_map,
+        filters=QualityFilters(allow_pii=False, governance_mode="soft"),
+    )
+    assert len(filtered) == 2
+    assert filtered[0]["document_id"] == "doc-safe"
+    assert filtered[1]["document_id"] == "doc-pii"

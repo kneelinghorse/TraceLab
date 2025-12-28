@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 # Valid element types for PEDR syntactic layer
 ElementTypeValue = Literal["mission", "document", "insight", "chunk"]
+GovernanceMode = Literal["strict", "soft", "warn"]
 
 
 class RetrievalQuery(BaseModel):
@@ -54,7 +55,11 @@ class RetrievalQuery(BaseModel):
     )
     allow_pii: Optional[bool] = Field(
         default=True,
-        description="When False, exclude missions flagged for PII handling.",
+        description="When False, apply governance handling to PII-flagged missions.",
+    )
+    governance_mode: GovernanceMode = Field(
+        default="strict",
+        description="Governance behavior: strict (exclude), soft (penalize), warn (log only).",
     )
     # PEDR syntactic layer parameters
     element_type: Optional[ElementTypeValue] = Field(

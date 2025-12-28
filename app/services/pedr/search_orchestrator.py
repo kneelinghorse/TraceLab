@@ -31,6 +31,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 from uuid import UUID
 
+from app.core.config import settings
 from app.services.pedr.fusion import (
     LayerResult,
     RRFFusion,
@@ -113,12 +114,15 @@ class PEDRConfig:
 
     # Search parameters
     top_k_per_layer: int = 20  # Fetch more per layer, fuse down to top_k
-    result_multiplier: int = 3
+    result_multiplier: int = field(
+        default_factory=lambda: max(1, settings.pedr_candidate_multiplier),
+    )
 
     # Quality filters
     min_quality_gates: Optional[int] = None
     status_filters: Optional[Tuple[str, ...]] = None
     allow_pii: bool = True
+    governance_mode: str = "strict"
 
     # Syntactic layer
     auto_detect_type: bool = True
@@ -376,6 +380,7 @@ class PEDRSearchOrchestrator:
         min_quality_gates: Optional[int] = None,
         status_filters: Optional[List[str]] = None,
         allow_pii: Optional[bool] = None,
+        governance_mode: Optional[str] = None,
         # Layer control
         enable_lexical: Optional[bool] = None,
         enable_semantic: Optional[bool] = None,
@@ -414,6 +419,7 @@ class PEDRSearchOrchestrator:
             min_quality_gates: Minimum passing quality gates.
             status_filters: Allowed mission statuses.
             allow_pii: Allow PII-flagged content.
+            governance_mode: Governance behavior (strict, soft, warn).
             enable_*: Layer enablement overrides.
             enable_graph: Enable graph expansion layer.
             layer_weights: Custom layer weights for RRF.
@@ -441,6 +447,7 @@ class PEDRSearchOrchestrator:
             min_quality_gates=min_quality_gates,
             status_filters=status_filters,
             allow_pii=allow_pii,
+            governance_mode=governance_mode,
             enable_lexical=enable_lexical,
             enable_semantic=enable_semantic,
             enable_syntactic=enable_syntactic,
@@ -475,6 +482,10 @@ class PEDRSearchOrchestrator:
             "element_type": element_type,
             "element_types": tuple(element_types) if element_types else None,
             "include_embeddings": include_embeddings,
+            "min_quality_gates": config.min_quality_gates,
+            "status_filters": tuple(config.status_filters or ()),
+            "allow_pii": config.allow_pii,
+            "governance_mode": config.governance_mode,
             "enable_graph": config.enable_graph,
             "graph_weight": effective_layer_weights.get("graph"),
             "graph_depth": config.graph_depth,
@@ -522,7 +533,8 @@ class PEDRSearchOrchestrator:
         lexical_results: List[Dict[str, Any]] = []
         semantic_results: List[Dict[str, Any]] = []
         graph_candidates_expanded: Optional[int] = None
-        fetch_count = max(top_k, config.top_k_per_layer) * config.result_multiplier
+        fetch_multiplier = max(1, config.result_multiplier)
+        fetch_count = max(top_k, config.top_k_per_layer) * fetch_multiplier
 
         search_params = {
             "query": query,
@@ -657,6 +669,7 @@ class PEDRSearchOrchestrator:
                 min_quality_gates=config.min_quality_gates,
                 statuses=tuple(config.status_filters or ()),
                 allow_pii=config.allow_pii,
+                governance_mode=config.governance_mode,
             )
             processed = self.quality_service.apply(processed, filters=quality_filters)
             timings.governance_ms = (time.perf_counter() - t0) * 1000
@@ -782,6 +795,11 @@ class PEDRSearchOrchestrator:
                 overrides.get("allow_pii")
                 if overrides.get("allow_pii") is not None
                 else base.allow_pii
+            ),
+            governance_mode=(
+                overrides.get("governance_mode")
+                if overrides.get("governance_mode") is not None
+                else base.governance_mode
             ),
             auto_detect_type=(
                 overrides.get("auto_detect_type")

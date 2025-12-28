@@ -144,6 +144,7 @@ class RagService:
         min_quality_gates: Optional[int] = None,
         status_filters: Optional[List[str]] = None,
         allow_pii: Optional[bool] = True,
+        governance_mode: Optional[str] = None,
         element_type: Optional[str] = None,
         element_types: Optional[List[str]] = None,
         auto_detect_type: bool = True,
@@ -177,6 +178,7 @@ class RagService:
                 min_quality_gates=min_quality_gates,
                 statuses=status_filters,
                 allow_pii=allow_pii,
+                governance_mode=governance_mode,
             ),
             graph_context_enabled=include_graph_context,
         )
@@ -201,6 +203,7 @@ class RagService:
                 min_quality_gates=min_quality_gates,
                 status_filters=status_filters,
                 allow_pii=allow_pii,
+                governance_mode=governance_mode,
                 element_type=element_type,
                 element_types=element_types,
                 auto_detect_type=auto_detect_type,
@@ -247,6 +250,7 @@ class RagService:
         min_quality_gates: Optional[int],
         status_filters: Optional[List[str]],
         allow_pii: Optional[bool],
+        governance_mode: Optional[str],
         element_type: Optional[str] = None,
         element_types: Optional[List[str]] = None,
         auto_detect_type: bool = True,
@@ -282,6 +286,7 @@ class RagService:
             "min_quality_gates": min_quality_gates,
             "status_filters": list(status_filters or []),
             "allow_pii": allow_pii if allow_pii is not None else True,
+            "governance_mode": governance_mode or "strict",
             "graph_context_enabled": include_graph_context,
         }
 
@@ -326,6 +331,7 @@ class RagService:
             min_quality_gates=min_quality_gates,
             status_filters=status_filters,
             allow_pii=allow_pii,
+            governance_mode=governance_mode,
         )
 
         # Convert PEDR results to dict format for context compression
@@ -416,6 +422,7 @@ class RagService:
         min_quality_gates: Optional[int],
         statuses: Optional[List[str]],
         allow_pii: Optional[bool],
+        governance_mode: Optional[str],
     ) -> str:
         """Generate a cache-friendly signature for governance filters."""
         if min_quality_gates is None:
@@ -440,7 +447,10 @@ class RagService:
             status_token = "*"
 
         pii_token = "no_pii" if allow_pii is False else "any"
-        return "|".join([gates_token, status_token, pii_token])
+        mode = (governance_mode or "strict").strip().lower()
+        if mode not in {"strict", "soft", "warn"}:
+            mode = "strict"
+        return "|".join([gates_token, status_token, pii_token, mode])
 
     def _build_messages(
         self,

@@ -307,6 +307,30 @@ class TestPEDRSearchOrchestrator:
         assert 0 <= response.metadata.intent_confidence <= 1
         assert response.metadata.timings.total_ms > 0
 
+    def test_candidate_multiplier_controls_fetch_count(self):
+        """Candidate multiplier scales per-layer fetch count."""
+        captured: Dict[str, int] = {}
+
+        def lexical_search(**kwargs: Any) -> List[Dict[str, Any]]:
+            captured["lexical_top_k"] = int(kwargs["top_k"])
+            return []
+
+        def semantic_search(**kwargs: Any) -> List[Dict[str, Any]]:
+            captured["semantic_top_k"] = int(kwargs["top_k"])
+            return []
+
+        config = PEDRConfig(top_k_per_layer=4, result_multiplier=3)
+        orchestrator = PEDRSearchOrchestrator(
+            config=config,
+            lexical_search=lexical_search,
+            semantic_search=semantic_search,
+        )
+
+        orchestrator.search(query="test query", top_k=2)
+
+        assert captured["lexical_top_k"] == 12
+        assert captured["semantic_top_k"] == 12
+
     def test_search_applies_syntactic_type(self, mock_lexical, mock_semantic):
         """Syntactic layer detects and applies element type."""
         orchestrator = PEDRSearchOrchestrator(

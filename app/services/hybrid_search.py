@@ -75,6 +75,7 @@ class HybridSearchService:
         min_quality_gates: Optional[int] = None,
         status_filters: Optional[List[str]] = None,
         allow_pii: Optional[bool] = None,
+        governance_mode: Optional[str] = None,
         element_type: Optional[str] = None,
         element_types: Optional[List[str]] = None,
         auto_detect_type: bool = True,
@@ -100,6 +101,7 @@ class HybridSearchService:
             min_quality_gates=min_quality_gates,
             statuses=tuple(status_filters or ()),
             allow_pii=allow_pii,
+            governance_mode=governance_mode or "strict",
         )
         syntactic_filters = self.syntactic_service.create_filters(
             element_type=element_type,

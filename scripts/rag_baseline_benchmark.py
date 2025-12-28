@@ -110,6 +110,276 @@ SOURCE_DOCS = [
         "category": "reports",
         "source_path": "cmos/reports/sprint-19/qdrant-optimization-research.md",
     },
+    {
+        "doc_id": "doc-013-docs-readme",
+        "title": "Docs README",
+        "category": "docs",
+        "source_path": "docs/README.md",
+    },
+    {
+        "doc_id": "doc-014-architecture-health-check",
+        "title": "Architecture Health Check",
+        "category": "docs",
+        "source_path": "docs/architecture-health-check.md",
+    },
+    {
+        "doc_id": "doc-015-auth-cors-guidance",
+        "title": "Auth and CORS Guidance",
+        "category": "docs",
+        "source_path": "docs/auth_and_cors_guidance.md",
+    },
+    {
+        "doc_id": "doc-016-authentication",
+        "title": "Authentication",
+        "category": "docs",
+        "source_path": "docs/authentication.md",
+    },
+    {
+        "doc_id": "doc-017-best-practices",
+        "title": "Best Practices",
+        "category": "docs",
+        "source_path": "docs/best-practices.md",
+    },
+    {
+        "doc_id": "doc-018-caching-strategy",
+        "title": "Caching Strategy",
+        "category": "docs",
+        "source_path": "docs/caching-strategy.md",
+    },
+    {
+        "doc_id": "doc-019-cli-architecture",
+        "title": "CLI Architecture",
+        "category": "docs",
+        "source_path": "docs/cli_architecture.md",
+    },
+    {
+        "doc_id": "doc-020-cli-usage",
+        "title": "CLI Usage",
+        "category": "docs",
+        "source_path": "docs/cli_usage.md",
+    },
+    {
+        "doc_id": "doc-021-console-guide",
+        "title": "Console Guide",
+        "category": "docs",
+        "source_path": "docs/console-guide.md",
+    },
+    {
+        "doc_id": "doc-022-correction-loop",
+        "title": "Correction Loop",
+        "category": "docs",
+        "source_path": "docs/correction-loop.md",
+    },
+    {
+        "doc_id": "doc-023-data-protection-audit",
+        "title": "Data Protection Audit",
+        "category": "docs",
+        "source_path": "docs/data-protection-audit.md",
+    },
+    {
+        "doc_id": "doc-024-database-optimization",
+        "title": "Database Optimization",
+        "category": "docs",
+        "source_path": "docs/database-optimization.md",
+    },
+    {
+        "doc_id": "doc-025-deepsearch-common-errors",
+        "title": "DeepSearch Common Errors",
+        "category": "docs",
+        "source_path": "docs/deepsearch-common-errors.md",
+    },
+    {
+        "doc_id": "doc-026-deepsearch-integration-testing",
+        "title": "DeepSearch Integration Testing",
+        "category": "docs",
+        "source_path": "docs/deepsearch-integration-testing.md",
+    },
+    {
+        "doc_id": "doc-027-deepsearch-integration",
+        "title": "DeepSearch Integration",
+        "category": "docs",
+        "source_path": "docs/deepsearch-integration.md",
+    },
+    {
+        "doc_id": "doc-028-deployment",
+        "title": "Deployment",
+        "category": "docs",
+        "source_path": "docs/deployment.md",
+    },
+    {
+        "doc_id": "doc-029-document-processing",
+        "title": "Document Processing",
+        "category": "docs",
+        "source_path": "docs/document-processing.md",
+    },
+    {
+        "doc_id": "doc-030-environment-setup",
+        "title": "Environment Setup",
+        "category": "docs",
+        "source_path": "docs/environment-setup.md",
+    },
+    {
+        "doc_id": "doc-031-frontend-architecture",
+        "title": "Frontend Architecture",
+        "category": "docs",
+        "source_path": "docs/frontend_architecture.md",
+    },
+    {
+        "doc_id": "doc-032-frontend-deployment-decisions",
+        "title": "Frontend Deployment Decisions",
+        "category": "docs",
+        "source_path": "docs/frontend_deployment_decisions.md",
+    },
+    {
+        "doc_id": "doc-033-getting-started",
+        "title": "Getting Started",
+        "category": "docs",
+        "source_path": "docs/getting-started.md",
+    },
+    {
+        "doc_id": "doc-034-ingestion-onboarding-runbook",
+        "title": "Ingestion Onboarding Runbook",
+        "category": "docs",
+        "source_path": "docs/ingestion_onboarding_runbook.md",
+    },
+    {
+        "doc_id": "doc-035-ingestion-pipeline-developer-guide",
+        "title": "Ingestion Pipeline Developer Guide",
+        "category": "docs",
+        "source_path": "docs/ingestion_pipeline_developer_guide.md",
+    },
+    {
+        "doc_id": "doc-036-local-development",
+        "title": "Local Development",
+        "category": "docs",
+        "source_path": "docs/local-development.md",
+    },
+    {
+        "doc_id": "doc-037-mcp-tools",
+        "title": "MCP Tools",
+        "category": "docs",
+        "source_path": "docs/mcp-tools.md",
+    },
+    {
+        "doc_id": "doc-038-mission-protocol-tutorial",
+        "title": "Mission Protocol Tutorial",
+        "category": "docs",
+        "source_path": "docs/mission-protocol-tutorial.md",
+    },
+    {
+        "doc_id": "doc-039-mission-protocol-api",
+        "title": "Mission Protocol API",
+        "category": "docs",
+        "source_path": "docs/mission_protocol_api.md",
+    },
+    {
+        "doc_id": "doc-040-mission-protocol-validation",
+        "title": "Mission Protocol Validation",
+        "category": "docs",
+        "source_path": "docs/mission_protocol_validation.md",
+    },
+    {
+        "doc_id": "doc-041-monitoring-dashboard",
+        "title": "Monitoring Dashboard",
+        "category": "docs",
+        "source_path": "docs/monitoring-dashboard.md",
+    },
+    {
+        "doc_id": "doc-042-pedr-sync",
+        "title": "PEDR Sync",
+        "category": "docs",
+        "source_path": "docs/pedr-sync.md",
+    },
+    {
+        "doc_id": "doc-043-preflight-queries",
+        "title": "Preflight Queries",
+        "category": "docs",
+        "source_path": "docs/preflight-queries.md",
+    },
+    {
+        "doc_id": "doc-044-qdrant-railway-setup",
+        "title": "Qdrant Railway Setup",
+        "category": "docs",
+        "source_path": "docs/qdrant-railway-setup.md",
+    },
+    {
+        "doc_id": "doc-045-quality-aware-search",
+        "title": "Quality Aware Search",
+        "category": "docs",
+        "source_path": "docs/quality-aware-search.md",
+    },
+    {
+        "doc_id": "doc-046-quality-automation",
+        "title": "Quality Automation",
+        "category": "docs",
+        "source_path": "docs/quality_automation.md",
+    },
+    {
+        "doc_id": "doc-047-relationship-api",
+        "title": "Relationship API",
+        "category": "docs",
+        "source_path": "docs/relationship-api.md",
+    },
+    {
+        "doc_id": "doc-048-report-metadata-analysis",
+        "title": "Report Metadata Analysis",
+        "category": "docs",
+        "source_path": "docs/report-metadata-analysis.md",
+    },
+    {
+        "doc_id": "doc-049-report-export",
+        "title": "Report Export",
+        "category": "docs",
+        "source_path": "docs/report_export.md",
+    },
+    {
+        "doc_id": "doc-050-saved-searches",
+        "title": "Saved Searches",
+        "category": "docs",
+        "source_path": "docs/saved-searches.md",
+    },
+    {
+        "doc_id": "doc-051-schema-evolution-guide",
+        "title": "Schema Evolution Guide",
+        "category": "docs",
+        "source_path": "docs/schema-evolution-guide.md",
+    },
+    {
+        "doc_id": "doc-052-schema-package",
+        "title": "Schema Package",
+        "category": "docs",
+        "source_path": "docs/schema-package.md",
+    },
+    {
+        "doc_id": "doc-053-schema-versioning",
+        "title": "Schema Versioning",
+        "category": "docs",
+        "source_path": "docs/schema-versioning.md",
+    },
+    {
+        "doc_id": "doc-054-search-filters",
+        "title": "Search Filters",
+        "category": "docs",
+        "source_path": "docs/search-filters.md",
+    },
+    {
+        "doc_id": "doc-055-search-history",
+        "title": "Search History",
+        "category": "docs",
+        "source_path": "docs/search-history.md",
+    },
+    {
+        "doc_id": "doc-056-telemetry-automation",
+        "title": "Telemetry Automation",
+        "category": "docs",
+        "source_path": "docs/telemetry-automation.md",
+    },
+    {
+        "doc_id": "doc-057-workflows",
+        "title": "Workflows",
+        "category": "docs",
+        "source_path": "docs/workflows.md",
+    },
 ]
 
 
@@ -508,6 +778,35 @@ def evaluate_queries(
 def load_queries(queries_path: Path) -> List[Dict[str, Any]]:
     payload = json.loads(queries_path.read_text(encoding="utf-8"))
     return payload["queries"]
+
+
+def build_queries(
+    *,
+    sources: List[Dict[str, str]],
+    top_k: int = DEFAULT_TOP_K,
+) -> Dict[str, Any]:
+    queries = []
+    for index, source in enumerate(sources, start=1):
+        queries.append(
+            {
+                "query_id": f"Q{index:02d}",
+                "query": f"What does {source['title']} cover?",
+                "relevance": [{"doc_id": source["doc_id"], "relevance": 2}],
+            }
+        )
+    return {"version": "1.0", "top_k": top_k, "queries": queries}
+
+
+def write_queries(
+    queries_path: Path,
+    *,
+    sources: List[Dict[str, str]],
+    top_k: int = DEFAULT_TOP_K,
+) -> Dict[str, Any]:
+    payload = build_queries(sources=sources, top_k=top_k)
+    queries_path.parent.mkdir(parents=True, exist_ok=True)
+    queries_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    return payload
 
 
 def run_benchmark(

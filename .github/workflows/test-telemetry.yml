@@ -30,6 +30,10 @@ jobs:
         run: |
           python -m pytest tests/test_health.py
 
+      - name: Run PEDR benchmark regression
+        run: |
+          python scripts/pedr_benchmark_regression.py --rebuild-corpus --rebuild-queries --rebuild-baseline
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -56,6 +60,8 @@ jobs:
           name: testing-summary
           path: |
             telemetry/events/testing-summary.json
+            telemetry/events/benchmark-history.jsonl
             telemetry/events/.artifacts/pytest-latest.json
             telemetry/events/.artifacts/playwright-latest.json
             telemetry/events/.artifacts/integration-runner.json
+            telemetry/events/.artifacts/pedr-benchmark-comparison.json
