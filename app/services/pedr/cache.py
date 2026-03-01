@@ -17,7 +17,8 @@ import hashlib
 import logging
 import threading
 import time
-from dataclasses import dataclass, field
+from collections import OrderedDict
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy import event
@@ -34,6 +35,7 @@ class CacheEntry:
     results: List[Dict[str, Any]]
     timestamp: float
     query_hash: str
+    filters: Dict[str, Any]
     hit_count: int = 0
 
 
@@ -99,7 +101,7 @@ class PEDRCache:
         """
         self.max_size = max_size
         self.ttl_seconds = ttl_seconds
-        self._cache: Dict[str, CacheEntry] = {}
+        self._cache: OrderedDict[str, CacheEntry] = OrderedDict()
         self._stats = CacheStats()
         self._lock = threading.RLock()
 
@@ -169,6 +171,7 @@ class PEDRCache:
             # Cache hit
             entry.hit_count += 1
             self._stats.cache_hits += 1
+            self._cache.move_to_end(key)
             logger.debug(
                 "PEDR cache hit for key %s (hit_count=%d)",
                 key,
@@ -196,21 +199,18 @@ class PEDRCache:
         key = self._generate_key(query, top_k, filters)
 
         with self._lock:
-            # Evict oldest if at max size (LRU)
-            if len(self._cache) >= self.max_size and key not in self._cache:
-                oldest_key = min(
-                    self._cache,
-                    key=lambda k: self._cache[k].timestamp,
-                )
-                del self._cache[oldest_key]
+            if key in self._cache:
+                self._cache.move_to_end(key)
+            elif len(self._cache) >= self.max_size:
+                evicted_key, _ = self._cache.popitem(last=False)
                 self._stats.evictions += 1
-                logger.debug("PEDR cache evicted oldest key %s", oldest_key)
+                logger.debug("PEDR cache evicted LRU key %s", evicted_key)
 
-            # Store new entry
             self._cache[key] = CacheEntry(
                 results=results,
                 timestamp=time.time(),
                 query_hash=key,
+                filters=dict(filters or {}),
             )
             self._stats.cache_size = len(self._cache)
             logger.debug("PEDR cache stored key %s", key)
@@ -233,6 +233,33 @@ class PEDRCache:
             logger.info("PEDR cache invalidated, cleared %d entries", count)
             return count
 
+    def invalidate_project(self, project_id: str) -> int:
+        """Invalidate cache entries for a specific project ID."""
+        project_text = str(project_id).strip()
+        if not project_text:
+            return 0
+
+        with self._lock:
+            removed_keys = [
+                key
+                for key, entry in self._cache.items()
+                if str(entry.filters.get("project_id") or "") == project_text
+            ]
+            for key in removed_keys:
+                del self._cache[key]
+
+            if removed_keys:
+                self._stats.invalidations += 1
+                self._stats.last_invalidation = time.time()
+                self._stats.cache_size = len(self._cache)
+                logger.info(
+                    "PEDR cache invalidated %d project-scoped entries for project_id=%s",
+                    len(removed_keys),
+                    project_text,
+                )
+
+            return len(removed_keys)
+
     def get_stats(self) -> CacheStats:
         """Get current cache statistics.
 
@@ -241,7 +268,14 @@ class PEDRCache:
         """
         with self._lock:
             self._stats.cache_size = len(self._cache)
-            return self._stats
+            return CacheStats(
+                cache_hits=self._stats.cache_hits,
+                cache_misses=self._stats.cache_misses,
+                cache_size=self._stats.cache_size,
+                evictions=self._stats.evictions,
+                invalidations=self._stats.invalidations,
+                last_invalidation=self._stats.last_invalidation,
+            )
 
     def reset_stats(self) -> None:
         """Reset cache statistics to zero."""

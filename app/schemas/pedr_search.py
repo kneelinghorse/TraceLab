@@ -8,14 +8,14 @@ from datetime import date
 from typing import Any, Dict, List, Literal, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 # Element types supported by PEDR syntactic layer
 PEDRElementType = Literal["mission", "document", "insight", "chunk"]
 
 # Query intents from PEDR pragmatic layer
-PEDRQueryIntent = Literal["search", "create", "update", "delete", "execute"]
+PEDRQueryIntent = Literal["search", "create", "update", "delete", "execute", "unknown"]
 
 # Rerank mode for hybrid search optimization
 PEDRRerankMode = Literal["full", "hybrid"]
@@ -178,6 +178,13 @@ class PEDRSearchRequest(BaseModel):
         default=False,
         description="Include embedding vectors in results (for RAG context compression)",
     )
+
+    @model_validator(mode="after")
+    def validate_hybrid_candidate_pool(self) -> "PEDRSearchRequest":
+        """Ensure hybrid rerank has room to rerank beyond final top_k."""
+        if self.rerank_mode == "hybrid" and self.candidate_pool <= self.top_k:
+            raise ValueError("candidate_pool must be greater than top_k when rerank_mode='hybrid'.")
+        return self
 
 
 class PEDRLayerTimings(BaseModel):

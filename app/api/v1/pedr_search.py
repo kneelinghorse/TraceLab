@@ -9,8 +9,10 @@ Supports two rerank modes (B19.4):
 - full: Standard semantic search across entire corpus (default)
 - hybrid: FTS-first with semantic reranking (<300ms target latency)
 """
+import asyncio
 import logging
 import time
+from functools import lru_cache
 from typing import Any, Dict
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -23,12 +25,20 @@ from app.schemas.pedr_search import (
     PEDRSearchMetadata,
     PEDRLayerTimings,
 )
+from app.services.pedr import QualityFilters, get_quality_scoring_service
 from app.services.pedr.hybrid_rerank import get_hybrid_reranker
 from app.services.pedr.relational import get_relational_service
 from app.services.pedr.search_orchestrator import create_pedr_orchestrator
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+INTERNAL_ERROR_DETAIL = "Search failed due to an internal error."
+
+
+@lru_cache(maxsize=1)
+def _get_pedr_orchestrator():
+    """Reuse one orchestrator instance across requests."""
+    return create_pedr_orchestrator()
 
 
 @router.post("/pedr/search", response_model=PEDRSearchResponse)
@@ -66,8 +76,7 @@ async def pedr_search(
             return await _execute_hybrid_search(payload, current_user)
 
         # Standard PEDR search for "full" mode
-        # Create orchestrator with wired search providers
-        orchestrator = create_pedr_orchestrator()
+        orchestrator = _get_pedr_orchestrator()
 
         # Build layer weights dict if provided
         layer_weights = None
@@ -81,18 +90,21 @@ async def pedr_search(
             }
 
         # Execute PEDR search
-        result = orchestrator.search(
+        result = await asyncio.to_thread(
+            orchestrator.search,
             query=payload.query,
             top_k=payload.top_k,
             project_id=str(payload.project_id) if payload.project_id else None,
             document_id=str(payload.document_id) if payload.document_id else None,
             source_type=payload.source_type,
+            source_origin=payload.source_origin,
             document_types=payload.document_types,
             source_types=payload.source_types,
             date_from=payload.date_from,
             date_to=payload.date_to,
             tags=payload.tags,
             hnsw_ef=payload.hnsw_ef,
+            include_embeddings=payload.include_embeddings,
             element_type=payload.element_type,
             element_types=list(payload.element_types) if payload.element_types else None,
             auto_detect_type=payload.auto_detect_type,
@@ -167,10 +179,7 @@ async def pedr_search(
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.exception("PEDR search failed: %s", e)
-        raise HTTPException(
-            status_code=500,
-            detail=f"Search failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=INTERNAL_ERROR_DETAIL)
 
 
 async def _execute_hybrid_search(
@@ -192,7 +201,8 @@ async def _execute_hybrid_search(
     """
     reranker = get_hybrid_reranker()
 
-    hybrid_result = reranker.search(
+    hybrid_result = await asyncio.to_thread(
+        reranker.search,
         query=payload.query,
         top_k=payload.top_k,
         candidate_pool=payload.candidate_pool,
@@ -200,12 +210,43 @@ async def _execute_hybrid_search(
         project_id=str(payload.project_id) if payload.project_id else None,
         document_id=str(payload.document_id) if payload.document_id else None,
         source_type=payload.source_type,
+        source_origin=payload.source_origin,
         hnsw_ef=payload.hnsw_ef,
+        include_embeddings=payload.include_embeddings,
     )
+
+    governance_ms = 0.0
+    hybrid_payloads = hybrid_result.results
+    if payload.enable_governance:
+        t0 = time.perf_counter()
+        quality_service = get_quality_scoring_service()
+        quality_filters = QualityFilters(
+            min_quality_gates=payload.min_quality_gates,
+            statuses=tuple(payload.status_filters or ()),
+            allow_pii=payload.allow_pii,
+            governance_mode=payload.governance_mode,
+        )
+        hybrid_payloads = await asyncio.to_thread(
+            quality_service.apply,
+            hybrid_payloads,
+            filters=quality_filters,
+        )
+        hybrid_payloads = sorted(
+            hybrid_payloads,
+            key=lambda item: float(
+                item.get("score")
+                or item.get("combined_score")
+                or item.get("semantic_score")
+                or item.get("fts_score")
+                or 0.0
+            ),
+            reverse=True,
+        )[: payload.top_k]
+        governance_ms = (time.perf_counter() - t0) * 1000
 
     # Build response from hybrid results
     results = []
-    for i, r in enumerate(hybrid_result.results, start=1):
+    for i, r in enumerate(hybrid_payloads, start=1):
         result = PEDRSearchResult(
             chunk_id=r.get("chunk_id", ""),
             content=r.get("content", ""),
@@ -223,14 +264,16 @@ async def _execute_hybrid_search(
             criticality=0.5,
             element_type=None,
             query_intent=None,
-            quality_score=1.0,
-            quality_status=None,
-            quality_gates_passed=0,
-            contributing_layers=["fts", "semantic"],
+            quality_score=float(r.get("quality_score") or 1.0),
+            quality_status=r.get("quality_status"),
+            quality_gates_passed=int(r.get("quality_gates_passed") or 0),
+            contributing_layers=["fts", "semantic"] + (["governance"] if payload.enable_governance else []),
             chunk_index=r.get("chunk_index"),
             source_type=r.get("source_type"),
+            source_origin=r.get("source_origin"),
             score=float(r.get("score") or r.get("semantic_score") or 0.0),
             combined_score=float(r.get("combined_score") or r.get("semantic_score") or 0.0),
+            embedding=r.get("embedding"),
             related_entities=None,
         )
         results.append(result)
@@ -242,10 +285,10 @@ async def _execute_hybrid_search(
         graph_ms=0.0,
         syntactic_ms=0.0,
         pragmatic_ms=0.0,
-        governance_ms=0.0,
+        governance_ms=governance_ms,
         fusion_ms=0.0,
         relational_ms=0.0,
-        total_ms=hybrid_result.timings.total_ms,
+        total_ms=hybrid_result.timings.total_ms + governance_ms,
     )
 
     metadata = PEDRSearchMetadata(
@@ -254,8 +297,8 @@ async def _execute_hybrid_search(
         intent_confidence=0.0,
         detected_type=None,
         type_confidence=0.0,
-        layers_used=["fts", "semantic"],
-        layer_weights={"fts": 0.0, "semantic": 1.0},  # Semantic score is final
+        layers_used=["fts", "semantic"] + (["governance"] if payload.enable_governance else []),
+        layer_weights={"fts": 0.0, "semantic": 1.0, "governance": 0.0},
         timings=timings,
         graph_enabled=False,
         graph_candidates_expanded=None,
@@ -315,6 +358,8 @@ def _convert_to_response(
             contributing_layers=r.contributing_layers,
             chunk_index=r.chunk_index,
             source_type=r.source_type,
+            source_origin=r.source_origin,
+            embedding=r.embedding,
             score=r.rrf_score,
             combined_score=r.rrf_score,
             related_entities=r.related_entities if include_related else None,

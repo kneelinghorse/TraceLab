@@ -20,7 +20,7 @@ Reference: PEDR Protocol Architecture Guide
 """
 from __future__ import annotations
 
-import asyncio
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import logging
 import os
@@ -491,6 +491,11 @@ class PEDRSearchOrchestrator:
             "status_filters": tuple(config.status_filters or ()),
             "allow_pii": config.allow_pii,
             "governance_mode": config.governance_mode,
+            "enable_lexical": config.enable_lexical,
+            "enable_semantic": config.enable_semantic,
+            "enable_syntactic": config.enable_syntactic,
+            "enable_pragmatic": config.enable_pragmatic,
+            "enable_governance": config.enable_governance,
             "enable_graph": config.enable_graph,
             "graph_weight": effective_layer_weights.get("graph"),
             "graph_depth": config.graph_depth,
@@ -557,49 +562,70 @@ class PEDRSearchOrchestrator:
             "include_embeddings": include_embeddings,
         }
 
-        # Lexical layer
-        if config.enable_lexical and self._lexical_search:
+        def _run_retrieval(
+            search_fn: Callable[..., List[Dict[str, Any]]],
+        ) -> Tuple[List[Dict[str, Any]], float, Optional[Exception]]:
             t0 = time.perf_counter()
             try:
-                lexical_results = self._lexical_search(**search_params)
-                timings.lexical_ms = (time.perf_counter() - t0) * 1000
-                if lexical_results:
-                    layer_results.append(
-                        LayerResult(
-                            layer_name="lexical",
-                            results=lexical_results,
-                            weight=effective_layer_weights.get(
-                                "lexical",
-                                BASE_LAYER_WEIGHTS["lexical"],
-                            ),
-                            latency_ms=timings.lexical_ms,
-                        )
-                    )
-            except Exception as e:
-                logger.warning("Lexical search failed: %s", e)
-                timings.lexical_ms = (time.perf_counter() - t0) * 1000
+                return search_fn(**search_params), (time.perf_counter() - t0) * 1000, None
+            except Exception as exc:  # pragma: no cover - exercised via caller assertions
+                return [], (time.perf_counter() - t0) * 1000, exc
 
-        # Semantic layer
+        retrieval_jobs: List[Tuple[str, Callable[..., List[Dict[str, Any]]]]] = []
+        if config.enable_lexical and self._lexical_search:
+            retrieval_jobs.append(("lexical", self._lexical_search))
         if config.enable_semantic and self._semantic_search:
-            t0 = time.perf_counter()
-            try:
-                semantic_results = self._semantic_search(**search_params)
-                timings.semantic_ms = (time.perf_counter() - t0) * 1000
-                if semantic_results:
-                    layer_results.append(
-                        LayerResult(
-                            layer_name="semantic",
-                            results=semantic_results,
-                            weight=effective_layer_weights.get(
-                                "semantic",
-                                BASE_LAYER_WEIGHTS["semantic"],
-                            ),
-                            latency_ms=timings.semantic_ms,
-                        )
+            retrieval_jobs.append(("semantic", self._semantic_search))
+
+        retrieval_outputs: Dict[str, Tuple[List[Dict[str, Any]], float, Optional[Exception]]] = {}
+        if len(retrieval_jobs) == 1:
+            layer_name, search_fn = retrieval_jobs[0]
+            retrieval_outputs[layer_name] = _run_retrieval(search_fn)
+        elif len(retrieval_jobs) > 1:
+            with ThreadPoolExecutor(max_workers=len(retrieval_jobs)) as pool:
+                future_to_layer = {
+                    pool.submit(_run_retrieval, search_fn): layer_name
+                    for layer_name, search_fn in retrieval_jobs
+                }
+                for future in as_completed(future_to_layer):
+                    layer_name = future_to_layer[future]
+                    retrieval_outputs[layer_name] = future.result()
+
+        lexical_payload = retrieval_outputs.get("lexical")
+        if lexical_payload is not None:
+            lexical_results, timings.lexical_ms, lexical_error = lexical_payload
+            if lexical_error is not None:
+                logger.warning("Lexical search failed: %s", lexical_error)
+            elif lexical_results:
+                layer_results.append(
+                    LayerResult(
+                        layer_name="lexical",
+                        results=lexical_results,
+                        weight=effective_layer_weights.get(
+                            "lexical",
+                            BASE_LAYER_WEIGHTS["lexical"],
+                        ),
+                        latency_ms=timings.lexical_ms,
                     )
-            except Exception as e:
-                logger.warning("Semantic search failed: %s", e)
-                timings.semantic_ms = (time.perf_counter() - t0) * 1000
+                )
+
+        semantic_payload = retrieval_outputs.get("semantic")
+        if semantic_payload is not None:
+            semantic_results, timings.semantic_ms, semantic_error = semantic_payload
+            if semantic_error is not None:
+                logger.warning("Semantic search failed: %s", semantic_error)
+            elif semantic_results:
+                layer_results.append(
+                    LayerResult(
+                        layer_name="semantic",
+                        results=semantic_results,
+                        weight=effective_layer_weights.get(
+                            "semantic",
+                            BASE_LAYER_WEIGHTS["semantic"],
+                        ),
+                        latency_ms=timings.semantic_ms,
+                    )
+                )
 
         # Graph layer (between retrieval and fusion)
         if config.enable_graph and self.graph_service:
@@ -1101,6 +1127,7 @@ def create_pedr_orchestrator(
         project_id: Optional[str] = None,
         document_id: Optional[str] = None,
         source_type: Optional[str] = None,
+        source_origin: Optional[str] = None,
         **kwargs: Any,
     ) -> List[Dict[str, Any]]:
         from app.services.faceted_search import FacetFilters
@@ -1115,6 +1142,7 @@ def create_pedr_orchestrator(
             project_id=project_id,
             document_id=document_id,
             source_type=source_type,
+            source_origin=source_origin,
             filters=filters,
             limit=top_k,
         )
