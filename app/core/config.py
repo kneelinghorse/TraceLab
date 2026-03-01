@@ -93,6 +93,11 @@ class Settings(BaseSettings):
     # DeepSearch worker health endpoint (for console monitoring)
     deepsearch_worker_health_url: str = "http://localhost:8080/health"
 
+    # Evidence auto-linking (T29.6: difflib → embeddings)
+    auto_link_similarity_threshold: float = 0.78
+    auto_link_top_k: int = 3
+    auto_link_fallback_to_difflib: bool = True
+
     class Config:
         env_file = ".env"
         case_sensitive = False

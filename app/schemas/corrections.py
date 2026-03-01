@@ -38,6 +38,8 @@ class CorrectionErrorType(str, Enum):
     VALIDATION_ERROR = "validation_error"
     EMPTY_CONTENT = "empty_content"
     DATABASE_ERROR = "database_error"
+    EMBEDDING_FAILED = "embedding_failed"
+    QDRANT_ERROR = "qdrant_error"
 
 
 class CorrectionItem(BaseModel):
