@@ -65,7 +65,8 @@ def test_rag_service_gpt5_chat_request_includes_reasoning_effort() -> None:
     assert request["model"] == "gpt-5.1"
     assert request["reasoning_effort"] == "none"
     assert request["temperature"] == 0.2
-    assert request["max_tokens"] == 128
+    assert request["max_completion_tokens"] == 128
+    assert "max_tokens" not in request
 
 
 def test_synthesis_service_gpt5_chat_request_includes_reasoning_effort() -> None:
@@ -87,7 +88,8 @@ def test_synthesis_service_gpt5_chat_request_includes_reasoning_effort() -> None
     assert request["model"] == "gpt-5.2"
     assert request["reasoning_effort"] == "none"
     assert request["temperature"] == 0.35
-    assert request["max_tokens"] == 256
+    assert request["max_completion_tokens"] == 256
+    assert "max_tokens" not in request
 
 
 def test_quality_assessor_flags_cant_assist_refusal() -> None:
