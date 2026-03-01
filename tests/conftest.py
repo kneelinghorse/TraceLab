@@ -77,6 +77,7 @@ def reset_database_and_reports(request):
         'test_graph_layer',
         'test_graph_search',
         'test_graph_rag',
+        'test_evidence_auto_linking',
     ]
     if any(pattern in test_path for pattern in skip_patterns):
         yield
