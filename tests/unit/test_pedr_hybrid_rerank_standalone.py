@@ -335,8 +335,8 @@ class TestPerformanceCharacteristics:
 
     def test_cosine_similarity_vectorized(self):
         """Cosine similarity should be fast with numpy."""
-        a = np.random.rand(1536)  # OpenAI embedding dimension
-        b = np.random.rand(1536)
+        a = np.random.rand(3072)  # OpenAI embedding dimension
+        b = np.random.rand(3072)
 
         start = time.perf_counter()
         for _ in range(1000):

@@ -39,12 +39,19 @@ class QdrantService:
     to eliminate cold-start latency on first query.
     """
 
-    def __init__(self, client: Optional[QdrantClient] = None):
+    def __init__(
+        self,
+        client: Optional[QdrantClient] = None,
+        collection_name: Optional[str] = None,
+        vector_size: Optional[int] = None,
+    ):
         """Initialize QdrantService.
 
         Args:
             client: Optional QdrantClient instance. If not provided, uses the
                     shared pre-warmed client from app.core.qdrant_client.
+            collection_name: Optional collection override for migrations.
+            vector_size: Optional vector dimension override for advanced testing.
         """
         if _qdrant_import_error is not None:
             raise RuntimeError(
@@ -54,8 +61,92 @@ class QdrantService:
 
         # Use provided client or fall back to shared singleton
         self.client = client if client is not None else get_qdrant_client()
-        self.collection_name = settings.qdrant_collection_name
-        self.vector_size = settings.openai_embedding_dimension
+        self.collection_name = collection_name or settings.qdrant_collection_name
+        self.vector_size = vector_size or settings.openai_embedding_dimension
+
+    @staticmethod
+    def _extract_vector_size(collection_info: Any) -> Optional[int]:
+        """Extract configured vector size from Qdrant collection metadata."""
+        config = getattr(collection_info, "config", None)
+        params = getattr(config, "params", None) if config else None
+        vectors = getattr(params, "vectors", None) if params else None
+        if vectors is None:
+            return None
+
+        direct_size = getattr(vectors, "size", None)
+        if isinstance(direct_size, int):
+            return direct_size
+
+        # Named-vector collections expose vectors as a mapping.
+        if isinstance(vectors, dict):
+            for value in vectors.values():
+                candidate = getattr(value, "size", None)
+                if isinstance(candidate, int):
+                    return candidate
+                if isinstance(value, dict):
+                    nested = value.get("size")
+                    if isinstance(nested, int):
+                        return nested
+        return None
+
+    def _create_collection(self, write_optimized: bool) -> None:
+        """Create collection using either write-optimized or query-optimized settings."""
+        if write_optimized:
+            # Create collection with relaxed HNSW settings and delayed indexing.
+            vectors_config = VectorParams(
+                size=self.vector_size,
+                distance=Distance.COSINE,
+                on_disk=True,
+                hnsw_config=HnswConfigDiff(
+                    m=16,
+                    ef_construct=32,
+                    full_scan_threshold=1_000_000,
+                    on_disk=False,
+                ),
+            )
+            optimizer_config = OptimizersConfigDiff(
+                indexing_threshold=1_000_000  # Prevent indexing during bulk import
+            )
+        else:
+            # Normal configuration with tuned HNSW indexing.
+            vectors_config = VectorParams(
+                size=self.vector_size,
+                distance=Distance.COSINE,
+                on_disk=True,
+                hnsw_config=HnswConfigDiff(
+                    m=16,
+                    ef_construct=100,
+                    full_scan_threshold=20_000,
+                    on_disk=False,  # Keep HNSW graph in RAM
+                ),
+            )
+            optimizer_config = None
+
+        self.client.create_collection(
+            collection_name=self.collection_name,
+            vectors_config=vectors_config,
+            optimizers_config=optimizer_config,
+            on_disk_payload=True,  # Store payloads on disk
+        )
+
+    def _validate_collection_vector_size(self) -> None:
+        """Ensure existing collection dimension matches configured embedding size."""
+        try:
+            info = self.client.get_collection(self.collection_name)
+        except Exception:
+            # Some managed Qdrant versions expose fields older SDKs cannot parse.
+            # Skip strict validation when metadata cannot be inspected safely.
+            return
+        current_size = self._extract_vector_size(info)
+        if current_size is None:
+            return
+        if current_size != self.vector_size:
+            raise RuntimeError(
+                f"Qdrant collection '{self.collection_name}' uses vector_size={current_size}, "
+                f"but the application is configured for {self.vector_size}. "
+                "Create and migrate to a new collection (for example, research_chunks_v2_3072d) "
+                "before ingesting embeddings."
+            )
         
     def ensure_collection(self, write_optimized: bool = False) -> None:
         """
@@ -68,65 +159,28 @@ class QdrantService:
         collection_names = [c.name for c in collections]
         
         if self.collection_name not in collection_names:
-            # Configure for write-optimized bulk import if requested
-            if write_optimized:
-                # Create collection with relaxed HNSW settings and delayed indexing.
-                vectors_config = VectorParams(
-                    size=self.vector_size,
-                    distance=Distance.COSINE,
-                    on_disk=True,
-                    hnsw_config=HnswConfigDiff(
-                        m=16,
-                        ef_construct=32,
-                        full_scan_threshold=1_000_000,
-                        on_disk=False
-                    )
-                )
-                optimizer_config = OptimizersConfigDiff(
-                    indexing_threshold=1_000_000  # Prevent indexing during bulk import
-                )
-            else:
-                # Normal configuration with tuned HNSW indexing.
-                vectors_config = VectorParams(
-                    size=self.vector_size,
-                    distance=Distance.COSINE,
-                    on_disk=True,
-                    hnsw_config=HnswConfigDiff(
-                        m=16,
-                        ef_construct=100,
-                        full_scan_threshold=20_000,
-                        on_disk=False  # Keep HNSW graph in RAM
-                    )
-                )
-                optimizer_config = None
-            
-            self.client.create_collection(
+            self._create_collection(write_optimized=write_optimized)
+            self._create_payload_indexes()
+            return
+
+        self._validate_collection_vector_size()
+        # Collection already exists; ensure payload indexes are present
+        self._create_payload_indexes()
+
+        # Switch to write-optimized mode on demand for bulk imports
+        if write_optimized:
+            self.client.update_collection(
                 collection_name=self.collection_name,
-                vectors_config=vectors_config,
-                optimizers_config=optimizer_config,
-                on_disk_payload=True  # Store payloads on disk
+                hnsw_config=HnswConfigDiff(
+                    m=16,
+                    ef_construct=32,
+                    full_scan_threshold=1_000_000
+                ),
+                optimizers_config=OptimizersConfigDiff(
+                    indexing_threshold=1_000_000
+                ),
+                quantization_config=None
             )
-            
-            # Create payload indexes for filtering BEFORE data ingestion
-            self._create_payload_indexes()
-        else:
-            # Collection already exists; ensure payload indexes are present
-            self._create_payload_indexes()
-            
-            # Switch to write-optimized mode on demand for bulk imports
-            if write_optimized:
-                self.client.update_collection(
-                    collection_name=self.collection_name,
-                    hnsw_config=HnswConfigDiff(
-                        m=16,
-                        ef_construct=32,
-                        full_scan_threshold=1_000_000
-                    ),
-                    optimizers_config=OptimizersConfigDiff(
-                        indexing_threshold=1_000_000
-                    ),
-                    quantization_config=None
-                )
     
     def _create_payload_indexes(self) -> None:
         """Create payload indexes for project_id, document_id, source_type, and source_origin."""
@@ -193,7 +247,7 @@ class QdrantService:
     def upsert_chunks(
         self,
         chunks: List[Dict[str, Any]],
-        batch_size: int = 2000,
+        batch_size: int = 100,
         parallel: int = 2
     ) -> None:
         """
@@ -233,12 +287,16 @@ class QdrantService:
             )
             points.append(point)
 
-        # Use upsert for efficient batch upload
-        self.client.upsert(
-            collection_name=self.collection_name,
-            points=points,
-            wait=True
-        )
+        # Respect batch_size to avoid oversize payloads on large corpora.
+        if batch_size <= 0:
+            batch_size = len(points) or 1
+        for start in range(0, len(points), batch_size):
+            batch = points[start : start + batch_size]
+            self.client.upsert(
+                collection_name=self.collection_name,
+                points=batch,
+                wait=True
+            )
     
     def search_chunks(
         self,

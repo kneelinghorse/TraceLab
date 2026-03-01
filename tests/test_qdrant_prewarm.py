@@ -77,7 +77,7 @@ class TestQdrantClientModule:
         with patch.object(qc_module, 'get_qdrant_client', return_value=mock_client):
             with patch('app.core.qdrant_client.settings') as mock_settings:
                 mock_settings.qdrant_collection_name = "research_chunks"
-                mock_settings.openai_embedding_dimension = 1536
+                mock_settings.openai_embedding_dimension = 3072
 
                 result = await qc_module.prewarm_qdrant()
 
@@ -373,6 +373,49 @@ class TestServiceIntegration:
 
         assert service.client is custom_client
 
+    def test_qdrant_service_rejects_vector_dimension_mismatch(self):
+        """Existing collection dimensions must match configured embedding size."""
+        from app.services.qdrant_service import QdrantService
+
+        mock_client = MagicMock()
+        mock_col = MagicMock()
+        mock_col.name = "research_chunks"
+        mock_client.get_collections.return_value = MagicMock(collections=[mock_col])
+        mock_client.get_collection.return_value = MagicMock(
+            config=MagicMock(
+                params=MagicMock(
+                    vectors=MagicMock(size=1536)
+                )
+            )
+        )
+
+        service = QdrantService(client=mock_client, collection_name="research_chunks", vector_size=3072)
+
+        with pytest.raises(RuntimeError, match="vector_size=1536"):
+            service.ensure_collection()
+
+    def test_qdrant_service_upsert_honors_batch_size(self):
+        """Upserts should be split into batches to avoid oversized payloads."""
+        from app.services.qdrant_service import QdrantService
+
+        mock_client = MagicMock()
+        service = QdrantService(client=mock_client, collection_name="research_chunks", vector_size=3)
+        chunks = [
+            {
+                "chunk_id": f"c-{idx}",
+                "embedding": [0.1, 0.2, 0.3],
+                "content": f"chunk-{idx}",
+                "document_id": "doc-1",
+                "project_id": "proj-1",
+                "chunk_index": idx,
+            }
+            for idx in range(3)
+        ]
+
+        service.upsert_chunks(chunks, batch_size=2)
+
+        assert mock_client.upsert.call_count == 2
+
     def test_semantic_cache_uses_shared_client(self):
         """Test SemanticCacheService uses shared client by default."""
         from app.core import qdrant_client as qc_module
@@ -402,3 +445,25 @@ class TestServiceIntegration:
         service = SemanticCacheService(client=custom_client, enabled=False)
 
         assert service._client is custom_client
+
+    def test_semantic_cache_recreates_collection_when_dimension_changes(self):
+        """Semantic cache should be recreated when vector dimensions drift."""
+        from app.core.config import settings
+        from app.services.semantic_cache import SemanticCacheService
+
+        mock_client = MagicMock()
+        cache_collection = MagicMock()
+        cache_collection.name = settings.semantic_cache_collection_name
+        mock_client.get_collections.return_value = MagicMock(collections=[cache_collection])
+        mock_client.get_collection.return_value = MagicMock(
+            config=MagicMock(
+                params=MagicMock(
+                    vectors=MagicMock(size=1536)
+                )
+            )
+        )
+
+        SemanticCacheService(client=mock_client, enabled=True)
+
+        mock_client.delete_collection.assert_called_once_with(settings.semantic_cache_collection_name)
+        mock_client.create_collection.assert_called_once()

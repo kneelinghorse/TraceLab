@@ -20,6 +20,9 @@ Usage:
 
     # Drop collection and start fresh
     python scripts/reprocess_embeddings.py --drop-collection
+
+    # Retry only documents that previously failed
+    python scripts/reprocess_embeddings.py --only-unembedded
 """
 import sys
 import os
@@ -35,6 +38,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.database import SessionLocal
 from app.models.document import Document
 from app.models.chunk import DocumentChunk
@@ -42,9 +46,28 @@ from app.services.embedding_service import get_embedding_service
 from app.services.qdrant_service import get_qdrant_service
 
 
-# Cost estimation constants (OpenAI text-embedding-3-small)
-COST_PER_1K_TOKENS = 0.00002  # $0.02 per 1M tokens = $0.00002 per 1K tokens
+# Cost estimation constants (OpenAI embeddings API)
+MODEL_COST_PER_1M_TOKENS = {
+    "text-embedding-3-small": 0.02,
+    "text-embedding-3-large": 0.13,
+}
+DEFAULT_COST_PER_1M_TOKENS = 0.13
 AVG_TOKENS_PER_CHUNK = 750  # Conservative estimate
+MAX_EMBEDDING_CHARS = 10000  # Conservative guardrail for 8K-token embedding limit
+
+
+def cost_per_1k_tokens(model_name: str) -> float:
+    """Return embedding API cost per 1K tokens for the configured model."""
+    cost_per_million = MODEL_COST_PER_1M_TOKENS.get(model_name, DEFAULT_COST_PER_1M_TOKENS)
+    return (cost_per_million / 1_000_000) * 1000
+
+
+def normalize_chunk_text(text: str) -> str:
+    """Trim and truncate chunk text to stay within embedding model context limits."""
+    cleaned = (text or "").strip()
+    if len(cleaned) > MAX_EMBEDDING_CHARS:
+        return cleaned[:MAX_EMBEDDING_CHARS]
+    return cleaned
 
 
 class ProgressTracker:
@@ -101,18 +124,25 @@ class ProgressTracker:
                 print(f"  - {doc}")
 
         # Estimate actual cost
+        model_name = settings.openai_embedding_model
+        cost_per_1k = cost_per_1k_tokens(model_name)
+        cost_per_million = MODEL_COST_PER_1M_TOKENS.get(model_name, DEFAULT_COST_PER_1M_TOKENS)
         est_tokens = self.processed_chunks * AVG_TOKENS_PER_CHUNK
-        est_cost = (est_tokens / 1000) * COST_PER_1K_TOKENS
-        print(f"\nEstimated API cost: ${est_cost:.4f}")
+        est_cost = (est_tokens / 1000) * cost_per_1k
+        print(f"\nEmbedding model: {model_name}")
+        print(f"Estimated API cost (@ ${cost_per_million:.2f}/1M tokens): ${est_cost:.4f}")
 
 
 def get_document_stats(
     db: Session,
     resume_from: Optional[UUID] = None,
-    project_id: Optional[UUID] = None
+    project_id: Optional[UUID] = None,
+    only_unembedded: bool = False,
 ) -> tuple[int, int]:
     """Get total document and chunk counts for progress tracking."""
     doc_query = db.query(Document).filter(Document.chunked == True)
+    if only_unembedded:
+        doc_query = doc_query.filter(Document.embedded == False)
 
     if project_id:
         doc_query = doc_query.filter(Document.project_id == project_id)
@@ -126,6 +156,8 @@ def get_document_stats(
     chunk_count = db.query(func.count(DocumentChunk.id)).join(Document).filter(
         Document.chunked == True
     )
+    if only_unembedded:
+        chunk_count = chunk_count.filter(Document.embedded == False)
     if project_id:
         chunk_count = chunk_count.filter(Document.project_id == project_id)
     if resume_from:
@@ -139,7 +171,8 @@ def get_document_stats(
 def dry_run(
     db: Session,
     resume_from: Optional[UUID] = None,
-    project_id: Optional[UUID] = None
+    project_id: Optional[UUID] = None,
+    only_unembedded: bool = False,
 ):
     """Show what would be processed without making API calls."""
     print("\n" + "=" * 60)
@@ -147,6 +180,8 @@ def dry_run(
     print("=" * 60 + "\n")
 
     doc_query = db.query(Document).filter(Document.chunked == True)
+    if only_unembedded:
+        doc_query = doc_query.filter(Document.embedded == False)
 
     if project_id:
         doc_query = doc_query.filter(Document.project_id == project_id)
@@ -169,16 +204,20 @@ def dry_run(
         print(f"[DRY RUN] {doc.name}: {chunk_count} chunks")
 
     # Cost estimation
+    model_name = settings.openai_embedding_model
+    cost_per_1k = cost_per_1k_tokens(model_name)
+    cost_per_million = MODEL_COST_PER_1M_TOKENS.get(model_name, DEFAULT_COST_PER_1M_TOKENS)
     est_tokens = total_chunks * AVG_TOKENS_PER_CHUNK
-    est_cost = (est_tokens / 1000) * COST_PER_1K_TOKENS
+    est_cost = (est_tokens / 1000) * cost_per_1k
 
     print("\n" + "-" * 60)
     print("SUMMARY")
     print("-" * 60)
+    print(f"Embedding model: {model_name}")
     print(f"Documents to process: {len(documents)}")
     print(f"Total chunks: {total_chunks}")
     print(f"Estimated tokens: {est_tokens:,}")
-    print(f"Estimated cost: ${est_cost:.4f}")
+    print(f"Estimated cost (@ ${cost_per_million:.2f}/1M tokens): ${est_cost:.4f}")
 
     # Time estimate (conservative: 50 chunks/second with batching)
     chunks_per_second = 50
@@ -196,6 +235,8 @@ def dry_run(
 
     if project_id:
         print(f"(Filtered to project ID: {project_id})")
+    if only_unembedded:
+        print("(Filtered to documents with embedded=false)")
 
     print("\nRun without --dry-run to execute the reprocessing.")
 
@@ -206,9 +247,12 @@ def reprocess_embeddings(
     qdrant_service,
     resume_from: Optional[UUID] = None,
     project_id: Optional[UUID] = None,
-    drop_collection: bool = False
+    drop_collection: bool = False,
+    expected_dimension: Optional[int] = None,
+    only_unembedded: bool = False,
 ):
     """Regenerate all embeddings from PostgreSQL chunks."""
+    expected_dimension = expected_dimension or qdrant_service.vector_size
 
     # Optionally drop collection for fresh start
     if drop_collection:
@@ -225,6 +269,8 @@ def reprocess_embeddings(
 
     # Build query for documents to process
     doc_query = db.query(Document).filter(Document.chunked == True)
+    if only_unembedded:
+        doc_query = doc_query.filter(Document.embedded == False)
 
     if project_id:
         doc_query = doc_query.filter(Document.project_id == project_id)
@@ -259,23 +305,31 @@ def reprocess_embeddings(
             ).order_by(DocumentChunk.chunk_index).all()
 
             if not chunks:
+                doc.embedded = True
+                db.commit()
                 tracker.update(doc.name, 0, success=True)
                 continue
 
             # Generate embeddings in batch
-            texts = [chunk.content for chunk in chunks]
-            embeddings = embedding_service.generate_embeddings_batch(texts)
+            normalized_texts = [normalize_chunk_text(chunk.content) for chunk in chunks]
+            embeddings = embedding_service.generate_embeddings_batch(normalized_texts)
+            invalid_dimensions = sorted({len(vector) for vector in embeddings if len(vector) != expected_dimension})
+            if invalid_dimensions:
+                raise RuntimeError(
+                    f"Embedding dimension mismatch: model produced dimensions {invalid_dimensions}, "
+                    f"expected {expected_dimension}."
+                )
 
             # Prepare Qdrant payload
             payload = []
-            for chunk, embedding in zip(chunks, embeddings):
+            for chunk, embedding, normalized_content in zip(chunks, embeddings, normalized_texts):
                 # Update embedding_id in PostgreSQL
                 chunk.embedding_id = str(chunk.id)
 
                 payload.append({
                     "chunk_id": chunk.id,
                     "embedding": embedding,
-                    "content": chunk.content,
+                    "content": normalized_content,
                     "document_id": doc.id,
                     "project_id": doc.project_id,
                     "chunk_index": chunk.chunk_index,
@@ -283,7 +337,7 @@ def reprocess_embeddings(
                 })
 
             # Upsert to Qdrant
-            qdrant_service.upsert_chunks(payload)
+            qdrant_service.upsert_chunks(payload, batch_size=25)
 
             # Mark document as embedded and commit
             doc.embedded = True
@@ -330,6 +384,9 @@ Examples:
 
   # Fresh start (drop collection first)
   python scripts/reprocess_embeddings.py --drop-collection
+
+  # Safe migration path: write into a new 3072d collection
+  python scripts/reprocess_embeddings.py --collection-name research_chunks_v2_3072d
         """
     )
 
@@ -358,6 +415,28 @@ Examples:
         action="store_true",
         help="Drop existing Qdrant collection before rebuild (fresh start)"
     )
+    parser.add_argument(
+        "--only-unembedded",
+        action="store_true",
+        help="Process only documents not yet marked embedded in PostgreSQL.",
+    )
+
+    parser.add_argument(
+        "--collection-name",
+        type=str,
+        default=None,
+        help=(
+            "Override target Qdrant collection name. "
+            "Recommended for no-downtime migrations (for example: research_chunks_v2_3072d)."
+        ),
+    )
+
+    parser.add_argument(
+        "--expected-dimension",
+        type=int,
+        default=settings.openai_embedding_dimension,
+        help="Expected embedding dimension for validation checks.",
+    )
 
     args = parser.parse_args()
 
@@ -368,6 +447,8 @@ Examples:
     print("=" * 60)
     print("TRACELAB EMBEDDING REPROCESSING")
     print(f"Started: {datetime.now().isoformat()}")
+    print(f"Embedding model: {settings.openai_embedding_model}")
+    print(f"Embedding dimension: {settings.openai_embedding_dimension}")
     print("=" * 60)
 
     # Create database session
@@ -375,7 +456,12 @@ Examples:
 
     try:
         if args.dry_run:
-            dry_run(db, resume_from=resume_from, project_id=project_id)
+            dry_run(
+                db,
+                resume_from=resume_from,
+                project_id=project_id,
+                only_unembedded=args.only_unembedded,
+            )
         else:
             # Confirm if dropping collection
             if args.drop_collection:
@@ -392,13 +478,19 @@ Examples:
             embedding_service = get_embedding_service()
             qdrant_service = get_qdrant_service()
 
+            if args.collection_name:
+                qdrant_service.collection_name = args.collection_name
+                print(f"Target collection override: {qdrant_service.collection_name}")
+
             reprocess_embeddings(
                 db=db,
                 embedding_service=embedding_service,
                 qdrant_service=qdrant_service,
                 resume_from=resume_from,
                 project_id=project_id,
-                drop_collection=args.drop_collection
+                drop_collection=args.drop_collection,
+                expected_dimension=args.expected_dimension,
+                only_unembedded=args.only_unembedded,
             )
 
     finally:

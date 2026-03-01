@@ -80,7 +80,7 @@ class _FakeQdrantClient:
 class _FakeQdrantService:
     def __init__(self) -> None:
         self.collection_name = "research_chunks"
-        self.vector_size = 1536
+        self.vector_size = 3072
         self.client = _FakeQdrantClient()
 
 
@@ -97,7 +97,7 @@ def _write_events(path: Path) -> None:
         },
         {
             "ts": "2025-11-15T13:00:00Z",
-            "model": "text-embedding-3-small",
+            "model": "text-embedding-3-large",
             "route": "embedding",
             "cost_usd": 0.05,
             "latency_ms": 600,
