@@ -18,6 +18,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
+from app.services.pedr.score_utils import ensure_base_score
+
 
 class QueryIntent(str, Enum):
     """User intent classification for search queries."""
@@ -294,8 +296,12 @@ class PragmaticService:
             boosted = []
             for result in results:
                 entry = dict(result)
+                base_score = ensure_base_score(entry)
                 entry["intent_boost"] = 0.0
                 entry["query_intent"] = filters.intent.value
+                entry["intent_adjusted_score"] = base_score
+                entry["combined_score"] = base_score
+                entry["score"] = base_score
                 boosted.append(entry)
             return boosted
 
@@ -311,14 +317,17 @@ class PragmaticService:
             boost_weight = intent_weights.get(result_type, 0.0) if result_type else 0.0
 
             entry["intent_boost"] = boost_weight
+            base_score = ensure_base_score(entry)
 
             if boost_weight > 0:
-                # Apply boost to combined_score
-                base_score = float(
-                    entry.get("combined_score") or entry.get("score") or 0.0
-                )
-                entry["combined_score"] = base_score * (1.0 + boost_weight)
-                entry["score"] = entry["combined_score"]
+                # Apply boost relative to the original fused score.
+                entry["intent_adjusted_score"] = base_score * (1.0 + boost_weight)
+                entry["combined_score"] = entry["intent_adjusted_score"]
+                entry["score"] = entry["intent_adjusted_score"]
+            else:
+                entry["intent_adjusted_score"] = base_score
+                entry["combined_score"] = base_score
+                entry["score"] = base_score
 
             boosted.append(entry)
 

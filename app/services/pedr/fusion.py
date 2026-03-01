@@ -18,6 +18,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
+from app.services.pedr.score_utils import summarize_scores
+
 
 # Default constant for RRF formula
 RRF_K = 60
@@ -323,27 +325,6 @@ def rrf_score(ranks: Sequence[int], *, k: int = RRF_K) -> float:
     return score
 
 
-def _summarize_scores(scores: Sequence[float]) -> Dict[str, float]:
-    values = [float(value) for value in scores if value is not None]
-    if not values:
-        return {}
-    values.sort()
-    count = len(values)
-    mid = count // 2
-    if count % 2 == 1:
-        median = values[mid]
-    else:
-        median = (values[mid - 1] + values[mid]) / 2
-    p90_index = int(0.9 * (count - 1))
-    return {
-        "min": round(values[0], 6),
-        "max": round(values[-1], 6),
-        "avg": round(sum(values) / count, 6),
-        "p50": round(median, 6),
-        "p90": round(values[p90_index], 6),
-    }
-
-
 def _build_fusion_telemetry(
     fused_results: Sequence[Tuple[str, float, Dict[str, int], Dict[str, float]]],
     layers_used: Sequence[str],
@@ -371,7 +352,7 @@ def _build_fusion_telemetry(
     }
 
     return {
-        "rrf_score_stats": _summarize_scores(scores),
+        "rrf_score_stats": summarize_scores(scores),
         "layer_contribution_counts": layer_counts,
         "layer_contribution_rates": layer_rates,
         "multi_layer_result_count": multi_layer_count,

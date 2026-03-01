@@ -25,6 +25,7 @@ from app.services.pedr.fusion import (
     rrf_score,
     RRF_K,
 )
+from app.services.pedr.pragmatic import PragmaticFilters, QueryIntent
 from app.services.pedr.search_orchestrator import (
     PEDRConfig,
     PEDRSearchOrchestrator,
@@ -32,6 +33,7 @@ from app.services.pedr.search_orchestrator import (
     PEDRSearchResponse,
     DEFAULT_LAYER_WEIGHTS,
 )
+from app.services.pedr.syntactic import SyntacticFilters
 from app.schemas.pedr_search import (
     PEDRSearchRequest,
     PEDRSearchResponse as PEDRSearchResponseSchema,
@@ -354,6 +356,101 @@ class TestPEDRSearchOrchestrator:
 
         assert response.metadata.intent == "search"
         assert response.metadata.intent_confidence >= 0.5
+
+    def test_post_processing_fuses_boosts_from_base_score(self):
+        """Final score fusion should be additive against base, not multiplicative chaining."""
+        lexical_search = MagicMock(return_value=[{"chunk_id": "stub", "content": "stub", "score": 0.9}])
+        semantic_search = MagicMock(return_value=[])
+
+        fused_results = [
+            FusedResult(
+                id="c1",
+                rrf_score=1.0,
+                rank=1,
+                layer_ranks={"lexical": 1},
+                layer_scores={},
+                data={"chunk_id": "c1", "content": "one", "document_id": "doc-1"},
+                contributing_layers=["lexical"],
+            ),
+            FusedResult(
+                id="c2",
+                rrf_score=1.0,
+                rank=2,
+                layer_ranks={"lexical": 2},
+                layer_scores={},
+                data={"chunk_id": "c2", "content": "two", "document_id": "doc-2"},
+                contributing_layers=["lexical"],
+            ),
+        ]
+        rrf_fusion = MagicMock()
+        rrf_fusion.fuse.return_value = FusionOutput(
+            results=fused_results,
+            total_unique=2,
+            layers_used=["lexical"],
+            config=RRFConfig(),
+        )
+
+        syntactic_service = MagicMock()
+        syntactic_service.create_filters.return_value = SyntacticFilters()
+
+        def _syntactic_apply(results, **_kwargs):
+            out = []
+            for row in results:
+                item = dict(row)
+                if item["chunk_id"] == "c1":
+                    item["type_boost"] = 0.5
+                    item["combined_score"] = float(item.get("combined_score") or 0.0) * 1.5
+                else:
+                    item["type_boost"] = 0.0
+                out.append(item)
+            return out
+
+        syntactic_service.apply.side_effect = _syntactic_apply
+
+        pragmatic_service = MagicMock()
+        pragmatic_service.create_filters.return_value = PragmaticFilters(
+            intent=QueryIntent.SEARCH,
+            confidence=0.9,
+            is_action_query=False,
+            intent_boost_enabled=True,
+            route_to_search=True,
+            route_to_action_handler=False,
+        )
+
+        def _pragmatic_apply(results, **_kwargs):
+            out = []
+            for row in results:
+                item = dict(row)
+                if item["chunk_id"] == "c1":
+                    item["intent_boost"] = 0.5
+                    item["combined_score"] = float(item.get("combined_score") or 0.0) * 1.5
+                else:
+                    item["intent_boost"] = 1.2
+                    item["combined_score"] = float(item.get("combined_score") or 0.0) * 2.2
+                out.append(item)
+            return out
+
+        pragmatic_service.apply.side_effect = _pragmatic_apply
+
+        quality_service = MagicMock()
+        quality_service.apply.side_effect = lambda results, **_kwargs: [
+            dict(item, quality_score=1.0) for item in results
+        ]
+
+        orchestrator = PEDRSearchOrchestrator(
+            lexical_search=lexical_search,
+            semantic_search=semantic_search,
+            rrf_fusion=rrf_fusion,
+            syntactic_service=syntactic_service,
+            pragmatic_service=pragmatic_service,
+            quality_service=quality_service,
+        )
+
+        response = orchestrator.search(query="test additive score fusion", top_k=2)
+
+        # Additive fusion from base 1.0 produces c2=2.2 and c1=2.0,
+        # while multiplicative chaining would incorrectly keep c1 first.
+        assert [item.chunk_id for item in response.results[:2]] == ["c2", "c1"]
 
     def test_config_override(self, mock_lexical, mock_semantic):
         """Runtime config overrides base config."""

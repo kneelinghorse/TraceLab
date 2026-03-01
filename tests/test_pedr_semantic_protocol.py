@@ -76,6 +76,10 @@ class TestURN:
         assert URN.parse("urn:other:mission:123") is None
         assert URN.parse("") is None
 
+    def test_urn_parse_non_string_returns_none(self):
+        """Non-string URN inputs return None."""
+        assert URN.parse(None) is None
+
     def test_urn_create(self):
         """URN.create factory method works correctly."""
         urn = URN.create("mission", "B12.1")
@@ -323,6 +327,14 @@ class TestIntentResolver:
         """Intent is resolved from keywords in purpose."""
         assert resolver.resolve(purpose) == expected_intent
 
+    def test_intent_resolution_prefers_higher_confidence_match(
+        self,
+        resolver: IntentResolver,
+    ):
+        """Intent uses scoring, not keyword-list iteration order."""
+        purpose = "Research and analyze user findings"
+        assert resolver.resolve(purpose) == SemanticIntent.EXECUTE
+
     def test_resolve_from_type_mission(self, resolver: IntentResolver):
         """Missions default to READ intent."""
         assert resolver.resolve_from_type("mission") == SemanticIntent.READ
@@ -428,6 +440,18 @@ class TestSemanticProtocol:
         )
         assert 0.0 <= criticality <= 1.0
         assert criticality > 0.5  # High values should give high criticality
+
+    def test_create_manifest_normalizes_blast_radius(self, protocol: SemanticProtocol):
+        """Governance blast radius uses the same normalized scale as criticality."""
+        dependents = [f"dep-{idx}" for idx in range(100)]
+        manifest = protocol.create_manifest(
+            entity_id="blast-test",
+            entity_type="mission",
+            data={"purpose": "Analyze blast radius handling"},
+            dependents=dependents,
+        )
+        expected = min(1.0, math.log1p(len(dependents)) / 10.0)
+        assert manifest.governance.blast_radius == pytest.approx(expected, rel=1e-6)
 
     def test_create_manifest_basic(self, protocol: SemanticProtocol):
         """Basic manifest creation with minimal data."""

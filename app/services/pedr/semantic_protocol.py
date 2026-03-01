@@ -85,18 +85,6 @@ def fnv1a_64_hash(value: Any) -> str:
     return f"fnv1a64-{h:016x}"
 
 # ------------------------------------------------------------------
-# Edge Direction Enum (v3.3.0)
-# ------------------------------------------------------------------
-
-class EdgeDirection(str, Enum):
-    """Direction of graph edge relationships."""
-
-    OUT = "out"  # From source to target
-    IN = "in"  # From target to source (inbound)
-    BIDIRECTIONAL = "bidirectional"  # Both directions
-
-
-# ------------------------------------------------------------------
 # Edge Type Constants (v3.3.0)
 # ------------------------------------------------------------------
 
@@ -162,6 +150,9 @@ EVIDENCE_FACTORS = [
 # Prior probability for confidence scoring
 CONFIDENCE_PRIOR = 0.4
 
+# Pre-compiled URN regex to avoid recompilation on every parse.
+URN_PARSE_PATTERN = re.compile(r"^urn:research:([a-z_]+):([^@]+)(?:@(.+))?$")
+
 # Intent keywords for classification
 INTENT_KEYWORDS: Dict[SemanticIntent, List[str]] = {
     SemanticIntent.CREATE: ["create", "add", "submit", "new", "generate", "make"],
@@ -170,6 +161,12 @@ INTENT_KEYWORDS: Dict[SemanticIntent, List[str]] = {
     SemanticIntent.DELETE: ["delete", "remove", "archive", "purge"],
     SemanticIntent.EXECUTE: ["execute", "trigger", "run", "process", "analyze", "synthesize"],
 }
+
+
+def _normalized_blast_radius(dependents: Optional[Sequence[Any]]) -> float:
+    dependent_count = len(dependents) if dependents else 0
+    blast_radius = math.log1p(dependent_count) / 10.0
+    return min(1.0, blast_radius)
 
 
 # ------------------------------------------------------------------
@@ -208,8 +205,9 @@ class URN:
         Returns:
             URN object or None if invalid
         """
-        pattern = r"^urn:research:([a-z_]+):([^@]+)(?:@(.+))?$"
-        match = re.match(pattern, urn_string)
+        if not isinstance(urn_string, str):
+            return None
+        match = URN_PARSE_PATTERN.match(urn_string)
         if not match:
             return None
         return cls(
@@ -420,65 +418,6 @@ def normalize_and_sort_edges(edges: List[Edge]) -> List[Edge]:
         Deduplicated and sorted list of edges
     """
     return sort_edges(normalize_edges(edges))
-
-
-@dataclass
-class RelationshipsV33:
-    """Graph-ready relationships container (v3.3.0).
-
-    Contains both legacy relationship lists and the new edges array.
-    """
-
-    # Legacy relationship format for backward compatibility
-    belongs_to: List[str] = field(default_factory=list)
-    references: List[str] = field(default_factory=list)
-    derived_from: List[str] = field(default_factory=list)
-    part_of: List[str] = field(default_factory=list)
-    related_to: List[str] = field(default_factory=list)
-
-    # v3.3.0 graph-ready edges
-    edges: List[Edge] = field(default_factory=list)
-
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary with both legacy and edge formats."""
-        result: Dict[str, Any] = {}
-        if self.belongs_to:
-            result["belongs_to"] = self.belongs_to
-        if self.references:
-            result["references"] = self.references
-        if self.derived_from:
-            result["derived_from"] = self.derived_from
-        if self.part_of:
-            result["part_of"] = self.part_of
-        if self.related_to:
-            result["related_to"] = self.related_to
-        # Always include edges array (may be empty)
-        result["edges"] = [e.to_dict() for e in self.edges]
-        return result
-
-    def add_edge(self, edge: Edge) -> None:
-        """Add an edge and update legacy relationships."""
-        self.edges.append(edge)
-        # Also update legacy format for backward compatibility
-        self._update_legacy_from_edge(edge)
-
-    def _update_legacy_from_edge(self, edge: Edge) -> None:
-        """Update legacy relationship lists from an edge."""
-        target_urn = edge.to_urn
-        if edge.edge_type == "belongs_to" and target_urn not in self.belongs_to:
-            self.belongs_to.append(target_urn)
-        elif edge.edge_type == "references" and target_urn not in self.references:
-            self.references.append(target_urn)
-        elif edge.edge_type == "derived_from" and target_urn not in self.derived_from:
-            self.derived_from.append(target_urn)
-        elif edge.edge_type == "part_of" and target_urn not in self.part_of:
-            self.part_of.append(target_urn)
-        elif edge.edge_type == "related_to" and target_urn not in self.related_to:
-            self.related_to.append(target_urn)
-
-    def normalize(self) -> None:
-        """Normalize and sort edges in place."""
-        self.edges = normalize_and_sort_edges(self.edges)
 
 
 @dataclass
@@ -816,9 +755,7 @@ class CriticalityCalculator:
         pii_factor = 1.0 if pii else 0.0
 
         # Blast radius using log1p for smooth scaling
-        dependent_count = len(dependents) if dependents else 0
-        blast_radius = math.log1p(dependent_count) / 10.0  # Normalize
-        blast_radius = min(1.0, blast_radius)
+        blast_radius = _normalized_blast_radius(dependents)
 
         # Calculate weighted score
         score = (
@@ -860,6 +797,15 @@ class CriticalityCalculator:
 class IntentResolver:
     """Resolve semantic intent from purpose/description text."""
 
+    _ACTION_INTENT_PRIORITY: Dict[SemanticIntent, int] = {
+        SemanticIntent.EXECUTE: 4,
+        SemanticIntent.UPDATE: 3,
+        SemanticIntent.DELETE: 2,
+        SemanticIntent.CREATE: 1,
+        SemanticIntent.READ: 0,
+        SemanticIntent.GENERIC: -1,
+    }
+
     def __init__(
         self,
         keywords: Optional[Dict[SemanticIntent, List[str]]] = None,
@@ -880,18 +826,39 @@ class IntentResolver:
         Returns:
             Resolved SemanticIntent
         """
-        if not purpose:
+        if not purpose or not isinstance(purpose, str):
             return SemanticIntent.GENERIC
 
         purpose_lower = purpose.lower()
+        intent_scores: List[Tuple[SemanticIntent, float, int]] = []
 
-        # Check each intent type
         for intent, keywords in self.keywords.items():
-            for keyword in keywords:
-                if keyword in purpose_lower:
-                    return intent
+            if not keywords:
+                continue
+            matches = sum(1 for keyword in keywords if self._keyword_matches(purpose_lower, keyword))
+            if matches <= 0:
+                continue
+            confidence = matches / len(keywords)
+            intent_scores.append((intent, confidence, matches))
+
+        if intent_scores:
+            intent_scores.sort(
+                key=lambda row: (
+                    row[1],
+                    row[2],
+                    self._ACTION_INTENT_PRIORITY.get(row[0], -1),
+                    row[0].value,
+                ),
+                reverse=True,
+            )
+            return intent_scores[0][0]
 
         return SemanticIntent.GENERIC
+
+    @staticmethod
+    def _keyword_matches(text: str, keyword: str) -> bool:
+        pattern = rf"\b{re.escape(keyword.lower())}\b"
+        return re.search(pattern, text) is not None
 
     def resolve_from_type(self, entity_type: str) -> SemanticIntent:
         """Resolve default intent based on entity type.
@@ -1382,7 +1349,7 @@ class SemanticProtocol:
             visibility = 1.0 if status == "complete" else 0.5
 
         # Calculate blast radius from dependents
-        blast_radius = math.log1p(len(dependents) if dependents else 0)
+        blast_radius = _normalized_blast_radius(dependents)
 
         return GovernanceMetadata(
             pii_handling=pii,
@@ -1664,7 +1631,6 @@ __all__ = [
     "ProtocolManifest",
     # Edge classes (v3.3.0)
     "Edge",
-    "RelationshipsV33",
     # Edge functions (v3.3.0)
     "normalize_edges",
     "sort_edges",
@@ -1680,7 +1646,6 @@ __all__ = [
     # Enums
     "EntityType",
     "SemanticIntent",
-    "EdgeDirection",
     # Constants
     "PROTOCOL_VERSION",
     "CRITICALITY_WEIGHTS",

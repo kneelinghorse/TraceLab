@@ -280,3 +280,16 @@ def test_draft_curve_relaxes_penalty():
 
     assert result["quality_base_score"] == pytest.approx(draft_base, rel=1e-3)
     assert result["quality_score"] == pytest.approx(expected, rel=1e-3)
+
+
+def test_zero_quality_gates_preserve_zero_base_score():
+    loader = _RecordingLoader({"doc-zero": _metadata(status="draft", passed_gates=0)})
+    service = QualityScoringService(metadata_loader=loader)
+
+    result = service.apply(
+        [{"document_id": "doc-zero", "combined_score": 0.4}],
+        filters=QualityFilters(),
+    )[0]
+
+    assert result["quality_base_score"] == 0.0
+    assert result["quality_score"] == pytest.approx(QualityScoringService.MIN_SCORE, rel=1e-3)
