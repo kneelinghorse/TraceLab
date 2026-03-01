@@ -50,8 +50,9 @@ _CITATION_PATTERN = re.compile(
 
 
 MODEL_COST_ESTIMATES = {
-    "gpt-4o-mini": 0.00018,
-    "gpt-4o": 0.00075,
+    # Fallback estimate per attempt when token usage is unavailable.
+    "gpt-5.1": 0.0010,
+    "gpt-5.2": 0.0016,
 }
 
 
@@ -105,7 +106,7 @@ class RagService:
         )
         self.primary_model = model or settings.openai_chat_model
         self.model = self.primary_model  # maintain backwards compatibility for callers accessing .model
-        self.escalation_model = escalation_model or getattr(settings, "openai_escalation_model", "gpt-4o")
+        self.escalation_model = escalation_model or getattr(settings, "openai_escalation_model", "gpt-5.2")
         self.default_temperature = (
             default_temperature if default_temperature is not None else settings.openai_chat_temperature
         )
@@ -144,6 +145,7 @@ class RagService:
         min_quality_gates: Optional[int] = None,
         status_filters: Optional[List[str]] = None,
         allow_pii: Optional[bool] = True,
+        governance_mode: Optional[str] = None,
         element_type: Optional[str] = None,
         element_types: Optional[List[str]] = None,
         auto_detect_type: bool = True,
@@ -177,6 +179,7 @@ class RagService:
                 min_quality_gates=min_quality_gates,
                 statuses=status_filters,
                 allow_pii=allow_pii,
+                governance_mode=governance_mode,
             ),
             graph_context_enabled=include_graph_context,
         )
@@ -201,6 +204,7 @@ class RagService:
                 min_quality_gates=min_quality_gates,
                 status_filters=status_filters,
                 allow_pii=allow_pii,
+                governance_mode=governance_mode,
                 element_type=element_type,
                 element_types=element_types,
                 auto_detect_type=auto_detect_type,
@@ -247,6 +251,7 @@ class RagService:
         min_quality_gates: Optional[int],
         status_filters: Optional[List[str]],
         allow_pii: Optional[bool],
+        governance_mode: Optional[str],
         element_type: Optional[str] = None,
         element_types: Optional[List[str]] = None,
         auto_detect_type: bool = True,
@@ -282,6 +287,7 @@ class RagService:
             "min_quality_gates": min_quality_gates,
             "status_filters": list(status_filters or []),
             "allow_pii": allow_pii if allow_pii is not None else True,
+            "governance_mode": governance_mode or "strict",
             "graph_context_enabled": include_graph_context,
         }
 
@@ -326,6 +332,7 @@ class RagService:
             min_quality_gates=min_quality_gates,
             status_filters=status_filters,
             allow_pii=allow_pii,
+            governance_mode=governance_mode,
         )
 
         # Convert PEDR results to dict format for context compression
@@ -416,6 +423,7 @@ class RagService:
         min_quality_gates: Optional[int],
         statuses: Optional[List[str]],
         allow_pii: Optional[bool],
+        governance_mode: Optional[str],
     ) -> str:
         """Generate a cache-friendly signature for governance filters."""
         if min_quality_gates is None:
@@ -440,7 +448,10 @@ class RagService:
             status_token = "*"
 
         pii_token = "no_pii" if allow_pii is False else "any"
-        return "|".join([gates_token, status_token, pii_token])
+        mode = (governance_mode or "strict").strip().lower()
+        if mode not in {"strict", "soft", "warn"}:
+            mode = "strict"
+        return "|".join([gates_token, status_token, pii_token, mode])
 
     def _build_messages(
         self,
@@ -645,12 +656,17 @@ class RagService:
         """Call the OpenAI chat completion API with simple exponential backoff."""
         for attempt in range(retry_max):
             try:
-                response = self.client.chat.completions.create(
-                    model=model if model is not None else self.primary_model,
-                    messages=messages,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                )
+                model_name = model if model is not None else self.primary_model
+                request = {
+                    "model": model_name,
+                    "messages": messages,
+                    "temperature": temperature,
+                    "max_tokens": max_tokens,
+                }
+                if model_name.lower().startswith(("gpt-5.1", "gpt-5.2")):
+                    # GPT-5.1/5.2 support temperature when reasoning_effort is explicitly none.
+                    request["reasoning_effort"] = "none"
+                response = self.client.chat.completions.create(**request)
                 content = response.choices[0].message.content if response.choices else ""
                 usage = self._extract_usage(response)
                 return (content or "").strip(), usage

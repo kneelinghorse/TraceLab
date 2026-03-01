@@ -27,7 +27,7 @@ from app.schemas.pedr_preflight import (
     PreflightRecommendation,
     PreflightTelemetry,
 )
-from app.services.pedr.quality_scoring import QualityFilters
+from app.services.pedr.quality_scoring import QualityFilters, QualityScoringService
 
 if TYPE_CHECKING:
     from app.services.hybrid_search import HybridSearchService
@@ -313,17 +313,15 @@ class PreflightService:
 
     def _compute_quality_score(self, passed_gates: int, status: Optional[str]) -> float:
         """Compute quality multiplier from gates and status."""
-        base = passed_gates / 5.0 if passed_gates > 0 else 0.6
-        boost = 0.0
-        if status:
-            status_lower = status.lower()
-            if status_lower == "complete":
-                boost = 0.20
-            elif status_lower == "review":
-                boost = 0.10
-            elif status_lower == "in_progress":
-                boost = 0.05
-        return round(min(1.5, max(0.1, base * (1.0 + boost))), 4)
+        base = passed_gates / 5.0 if passed_gates > 0 else QualityScoringService.DEFAULT_BASE_SCORE
+        status_lower = status.lower() if status else "unknown"
+        base = QualityScoringService._apply_status_curve(base, status_lower)
+        boost = QualityScoringService.STATUS_BOOSTS.get(status_lower, 0.0)
+        final = base * (1.0 + boost)
+        return round(
+            min(QualityScoringService.MAX_SCORE, max(QualityScoringService.MIN_SCORE, final)),
+            4,
+        )
 
     def _determine_recommendation(
         self,

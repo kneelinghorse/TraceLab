@@ -165,7 +165,7 @@ class TestCacheSet:
             content="Test content",
             citations=sample_citations,
             tokens_used=100,
-            model_used="gpt-4o",
+            model_used="gpt-5.1",
         )
 
         assert cache_id is not None
@@ -178,7 +178,7 @@ class TestCacheSet:
         assert entry is not None
         assert entry.content == "Test content"
         assert entry.tokens_used == 100
-        assert entry.model_used == "gpt-4o"
+        assert entry.model_used == "gpt-5.1"
         assert entry.hit_count == 0
 
     def test_set_handles_concurrent_writes(
@@ -510,11 +510,11 @@ class TestSynthesisServiceIntegration:
 
         # Patch OpenAI and settings
         with patch("app.services.synthesis.OpenAI") as mock_openai_class, \
-             patch("app.services.synthesis.settings") as mock_settings, \
+            patch("app.services.synthesis.settings") as mock_settings, \
              patch("app.services.synthesis._openai_import_error", None):
 
             mock_settings.openai_api_key = "test-key"
-            mock_settings.openai_chat_model = "gpt-4o"
+            mock_settings.openai_chat_model = "gpt-5.1"
 
             mock_client = MagicMock()
             mock_client.chat.completions.create.return_value = mock_response

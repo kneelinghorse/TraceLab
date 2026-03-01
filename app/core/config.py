@@ -33,8 +33,8 @@ class Settings(BaseSettings):
     openai_api_key: Optional[str] = None
     openai_embedding_model: str = "text-embedding-3-small"
     openai_embedding_dimension: int = 1536
-    openai_chat_model: str = "gpt-4o-mini"
-    openai_escalation_model: str = "gpt-4o"
+    openai_chat_model: str = "gpt-5.1"
+    openai_escalation_model: str = "gpt-5.2"
     openai_chat_temperature: float = 0.2
     rag_default_max_tokens: int = 350
     rag_context_threshold: float = 0.7
@@ -78,6 +78,7 @@ class Settings(BaseSettings):
     pedr_cache_max_size: int = 1000  # Max cached queries
     pedr_cache_ttl_seconds: int = 300  # 5 minutes TTL
     pedr_cache_enabled: bool = True
+    pedr_candidate_multiplier: int = 3
 
     # DeepSearch integration
     # Mode: "worker" (DB polling, Railway prod) or "http" (API calls, local dev)

@@ -412,12 +412,16 @@ class SynthesisService:
     ) -> Tuple[str, Optional[Dict[str, int]]]:
         """Call OpenAI API and return content with usage stats."""
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                temperature=self.temperature,
-                max_tokens=self.max_tokens,
-            )
+            request = {
+                "model": self.model,
+                "messages": messages,
+                "temperature": self.temperature,
+                "max_tokens": self.max_tokens,
+            }
+            if self.model.lower().startswith(("gpt-5.1", "gpt-5.2")):
+                # GPT-5.1/5.2 support temperature when reasoning_effort is explicitly none.
+                request["reasoning_effort"] = "none"
+            response = self.client.chat.completions.create(**request)
             content = response.choices[0].message.content if response.choices else ""
             usage = self._extract_usage(response)
             return (content or "").strip(), usage

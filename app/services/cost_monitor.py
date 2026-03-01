@@ -11,8 +11,9 @@ from typing import Any, Dict, List, Optional
 
 
 DEFAULT_MODEL_PRICING = {
-    "gpt-4o-mini": {"prompt": 0.00015, "completion": 0.00060},  # USD per 1K tokens
-    "gpt-4o": {"prompt": 0.00500, "completion": 0.01500},
+    # USD per 1K tokens. Pricing source: https://openai.com/api/pricing/
+    "gpt-5.1": {"prompt": 0.00125, "completion": 0.01000},
+    "gpt-5.2": {"prompt": 0.00200, "completion": 0.01600},
 }
 
 

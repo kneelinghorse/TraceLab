@@ -13,7 +13,7 @@ def test_cost_monitor_tracks_usage_and_summary(tmp_path):
 
     ts = datetime(2025, 1, 5, 12, 30, tzinfo=timezone.utc)
     monitor.track_usage(
-        model="gpt-4o-mini",
+        model="gpt-5.1",
         prompt_tokens=1000,
         completion_tokens=500,
         latency_ms=128.4,
@@ -26,12 +26,12 @@ def test_cost_monitor_tracks_usage_and_summary(tmp_path):
     assert summary["totals"]["queries"] == 1
     assert summary["totals"]["prompt_tokens"] == 1000
     assert summary["totals"]["completion_tokens"] == 500
-    assert summary["totals"]["cost_usd"] == pytest.approx(0.00045)
-    assert summary["recent"][0]["model"] == "gpt-4o-mini"
+    assert summary["totals"]["cost_usd"] == pytest.approx(0.00625)
+    assert summary["recent"][0]["model"] == "gpt-5.1"
     assert telemetry.exists()
     with telemetry.open() as handle:
         line = json.loads(handle.readline())
-        assert line["model"] == "gpt-4o-mini"
+        assert line["model"] == "gpt-5.1"
 
 
 def test_cost_monitor_retention_and_cache_hits(tmp_path):
@@ -39,7 +39,7 @@ def test_cost_monitor_retention_and_cache_hits(tmp_path):
     monitor = CostMonitor(telemetry_path=telemetry, retention_days=1)
 
     old_ts = datetime.now(timezone.utc) - timedelta(days=2)
-    monitor.track_usage(model="gpt-4o", prompt_tokens=2000, completion_tokens=1000, timestamp=old_ts)
+    monitor.track_usage(model="gpt-5.2", prompt_tokens=2000, completion_tokens=1000, timestamp=old_ts)
     monitor.record_cache_hit(latency_ms=42.5, project_id="proj-cache", query="cached result")
 
     summary = monitor.summary()

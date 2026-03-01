@@ -1,6 +1,7 @@
 """Quality scoring utilities powering PEDR-aware hybrid search."""
 from __future__ import annotations
 
+import logging
 import uuid
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Set
@@ -13,6 +14,7 @@ from app.models.mission import Mission
 from app.models.project import Project
 
 MetadataLoader = Callable[[Sequence[str]], Dict[str, Dict[str, Any]]]
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -22,6 +24,7 @@ class QualityFilters:
     min_quality_gates: Optional[int] = None
     statuses: tuple[str, ...] = field(default_factory=tuple)
     allow_pii: Optional[bool] = None
+    governance_mode: str = "strict"
 
 
 @dataclass(frozen=True)
@@ -50,11 +53,18 @@ class QualityScoringService:
         "contradictions_resolved",
     )
     STATUS_BOOSTS: Dict[str, float] = {
-        "complete": 0.20,
-        "review": 0.10,
+        "complete": 0.12,
+        "review": 0.09,
         "in_progress": 0.05,
         "draft": 0.0,
     }
+    STATUS_CURVE_EXPONENTS: Dict[str, float] = {
+        "review": 0.80,
+        "in_progress": 0.70,
+        "draft": 0.45,
+    }
+    GOVERNANCE_MODES: Set[str] = {"strict", "soft", "warn"}
+    SOFT_PII_PENALTY: float = -0.30
     VALIDATION_BOOST: float = 0.05
     DEFAULT_BASE_SCORE: float = 0.60
     MIN_SCORE: float = 0.10
@@ -87,8 +97,10 @@ class QualityScoringService:
         min_gates = self._normalized_min_gates(filters)
         status_filters = self._normalized_statuses(filters)
         allow_pii = filters.allow_pii if filters else None
+        governance_mode = self._normalized_governance_mode(filters)
 
         annotated: List[Dict[str, Any]] = []
+        warned_pii = 0
         for entry in results:
             doc_id = self._normalize_document_id(entry.get("document_id"))
             score = self._score_metadata(metadata_map.get(doc_id))
@@ -97,11 +109,18 @@ class QualityScoringService:
                 continue
             if status_filters and score.status.lower() not in status_filters:
                 continue
+            governance_penalty = 0.0
             if allow_pii is False and score.pii_flagged:
-                continue
+                if governance_mode == "strict":
+                    continue
+                if governance_mode == "soft":
+                    governance_penalty = self.SOFT_PII_PENALTY
+                elif governance_mode == "warn":
+                    warned_pii += 1
 
             payload = dict(entry)
-            payload["quality_score"] = score.final_score
+            effective_score = self._apply_governance_penalty(score.final_score, governance_penalty)
+            payload["quality_score"] = effective_score
             payload["quality_base_score"] = score.base_score
             payload["quality_boost"] = score.boost
             payload["quality_status"] = score.status
@@ -112,9 +131,14 @@ class QualityScoringService:
             payload["quality_pii_flagged"] = score.pii_flagged
 
             base_combined = float(payload.get("combined_score") or payload.get("score") or 0.0)
-            payload["combined_score"] = base_combined * score.final_score
+            payload["combined_score"] = base_combined * effective_score
             payload["score"] = payload["combined_score"]
             annotated.append(payload)
+        if warned_pii:
+            logger.warning(
+                "Governance warn mode included %d PII-flagged results.",
+                warned_pii,
+            )
         return annotated
 
     # ------------------------------------------------------------------
@@ -159,6 +183,13 @@ class QualityScoringService:
             for status in filters.statuses
             if isinstance(status, str) and status.strip()
         }
+
+    @classmethod
+    def _normalized_governance_mode(cls, filters: Optional[QualityFilters]) -> str:
+        if not filters:
+            return "strict"
+        value = str(filters.governance_mode or "").strip().lower()
+        return value if value in cls.GOVERNANCE_MODES else "strict"
 
     def _resolve_metadata(self, document_ids: Sequence[str]) -> Dict[str, Dict[str, Any]]:
         if not document_ids:
@@ -226,6 +257,7 @@ class QualityScoringService:
             base_score = max(0.0, min(1.0, passed / total))
         else:
             base_score = self.DEFAULT_BASE_SCORE
+        base_score = self._apply_status_curve(base_score, status)
 
         boost = self.STATUS_BOOSTS.get(status, 0.0)
         if validated:
@@ -321,6 +353,22 @@ class QualityScoringService:
             pii_flagged=False,
             final_score=self.DEFAULT_BASE_SCORE,
         )
+
+    @classmethod
+    def _apply_status_curve(cls, base_score: float, status: str) -> float:
+        exponent = cls.STATUS_CURVE_EXPONENTS.get(status)
+        if exponent is None:
+            return base_score
+        if base_score <= 0.0 or base_score >= 1.0:
+            return base_score
+        return max(0.0, min(1.0, base_score**exponent))
+
+    @classmethod
+    def _apply_governance_penalty(cls, score: float, penalty: float) -> float:
+        if not penalty:
+            return score
+        adjusted = score + penalty
+        return max(cls.MIN_SCORE, min(cls.MAX_SCORE, adjusted))
 
 
 _QUALITY_SCORING_SERVICE: Optional[QualityScoringService] = None

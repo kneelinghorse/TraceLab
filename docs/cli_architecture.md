@@ -189,7 +189,7 @@ tracelab search <project-id> "query text" --top-k 10 --json
 
 # RAG query (with LLM synthesis)
 tracelab rag query <project-id> "question?"
-tracelab rag query <project-id> "question?" --model gpt-4o --json
+tracelab rag query <project-id> "question?" --model gpt-5.2 --json
 
 # Search with filters
 tracelab search <project-id> "query" --document-type pdf --after 2024-01-01

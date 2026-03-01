@@ -101,6 +101,7 @@ async def pedr_search(
             min_quality_gates=payload.min_quality_gates,
             status_filters=payload.status_filters,
             allow_pii=payload.allow_pii,
+            governance_mode=payload.governance_mode,
             enable_lexical=payload.enable_lexical,
             enable_semantic=payload.enable_semantic,
             enable_syntactic=payload.enable_syntactic,

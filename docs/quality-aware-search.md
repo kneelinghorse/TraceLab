@@ -6,16 +6,20 @@ Sprint 10 introduces a PEDR-backed quality ranking layer that boosts complete, v
 
 Quality scoring is computed per mission and then applied to every chunk associated with that mission:
 
-1. **Base score** – count of passing gates across the five Mission Protocol checkpoints (`research_statement`, `evidence_links`, `synthesis_quality`, `traceability`, `contradictions_resolved`) divided by five.
-2. **Status boost** – applied according to mission status:
-   - `complete`: +0.20
-   - `review`: +0.10
+1. **Base score** - count of passing gates across the five Mission Protocol checkpoints (`research_statement`, `evidence_links`, `synthesis_quality`, `traceability`, `contradictions_resolved`) divided by five.
+2. **Status curve** - soften penalties with a gamma curve: `base_score = base_score ** gamma`.
+   - `review`: gamma = 0.80
+   - `in_progress`: gamma = 0.70
+   - `draft`: gamma = 0.45
+3. **Status boost** - applied according to mission status:
+   - `complete`: +0.12
+   - `review`: +0.09
    - `in_progress`: +0.05
    - `draft`: +0.00
-3. **Validation boost** – +0.05 when every gate reports `validated=True`.
-4. **Final multiplier** – `base_score * (1 + total_boost)`, clamped between `0.10` and `1.50`.
+4. **Validation boost** - +0.05 when every gate reports `validated=True`.
+5. **Final multiplier** - `base_score * (1 + total_boost)`, clamped between `0.10` and `1.50`.
 
-The multiplier is applied to each chunk’s `combined_score`, ensuring complete missions rank roughly 2× higher than drafts with partial gates.
+The multiplier is applied to each chunk's `combined_score`, relaxing the complete vs draft gap to reduce mid-quality penalties.
 
 ## Governance Filters
 
@@ -23,7 +27,8 @@ The multiplier is applied to each chunk’s `combined_score`, ensuring complete 
 
 - `min_quality_gates` (0–5): minimum number of passing gates required.
 - `status`: optional list of allowed mission statuses (e.g., `["complete", "review"]`).
-- `allow_pii`: when `False`, drops any mission flagged for PII handling (detected from mission governance metadata or tags).
+- `allow_pii`: when `False`, apply governance handling to PII-flagged missions (detected from mission governance metadata or tags).
+- `governance_mode`: choose `strict` (exclude), `soft` (apply -0.30 penalty), or `warn` (log only).
 
 Filters are normalized into the cache key (`CacheManager.rag_query_key`) so cached answers respect the same governance constraints.
 

@@ -321,6 +321,7 @@ def test_ingested_mission_available_via_search_endpoint(
             min_quality_gates: Optional[int] = None,
             status_filters: Optional[List[str]] = None,
             allow_pii: Optional[bool] = True,
+            governance_mode: Optional[str] = None,
         ) -> Dict[str, object]:
             self.calls.append(
                 {
@@ -389,18 +390,18 @@ def test_ingested_mission_available_via_search_endpoint(
                     "pre_escalation_score": 0.91,
                 },
                 "routing": {
-                    "selected_model": "gpt-4o-mini",
+                    "selected_model": "gpt-5.1",
                     "escalated": False,
                     "attempts": [
                         {
-                            "model": "gpt-4o-mini",
+                            "model": "gpt-5.1",
                             "quality_score": 0.95,
                             "below_threshold": False,
                             "hard_failures": [],
                             "citation_count": 1,
                         }
                     ],
-                    "estimated_cost_usd": 0.00018,
+                    "estimated_cost_usd": 0.001,
                     "metrics": {"total_queries": 1, "escalations": 0},
                 },
                 "search_mode": "semantic",

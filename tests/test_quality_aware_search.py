@@ -70,8 +70,8 @@ def test_validation_boost_adds_to_final_score():
         filters=QualityFilters(),
     )[0]
 
-    assert result["quality_boost"] == pytest.approx(0.15, rel=1e-3)
-    assert result["quality_score"] == pytest.approx(1.15, rel=1e-3)
+    assert result["quality_boost"] == pytest.approx(0.14, rel=1e-3)
+    assert result["quality_score"] == pytest.approx(1.14, rel=1e-3)
 
 
 def test_default_score_used_when_metadata_missing():
@@ -149,6 +149,41 @@ def test_allow_pii_filter():
     assert results[0]["document_id"] == "doc-safe"
 
 
+def test_soft_governance_penalty_keeps_pii():
+    loader = _RecordingLoader({"doc-pii": _metadata(status="complete", passed_gates=5, pii=True)})
+    service = QualityScoringService(metadata_loader=loader)
+
+    result = service.apply(
+        [{"document_id": "doc-pii", "combined_score": 1.0}],
+        filters=QualityFilters(allow_pii=False, governance_mode="soft"),
+    )[0]
+
+    base = 1.0
+    boost = QualityScoringService.STATUS_BOOSTS["complete"]
+    expected = QualityScoringService._apply_governance_penalty(
+        base * (1 + boost),
+        QualityScoringService.SOFT_PII_PENALTY,
+    )
+
+    assert result["quality_score"] == pytest.approx(expected, rel=1e-3)
+
+
+def test_warn_governance_keeps_pii_without_penalty():
+    loader = _RecordingLoader({"doc-pii": _metadata(status="complete", passed_gates=5, pii=True)})
+    service = QualityScoringService(metadata_loader=loader)
+
+    result = service.apply(
+        [{"document_id": "doc-pii", "combined_score": 1.0}],
+        filters=QualityFilters(allow_pii=False, governance_mode="warn"),
+    )[0]
+
+    base = 1.0
+    boost = QualityScoringService.STATUS_BOOSTS["complete"]
+    expected = base * (1 + boost)
+
+    assert result["quality_score"] == pytest.approx(expected, rel=1e-3)
+
+
 def test_combined_score_scaled_by_quality():
     loader = _RecordingLoader({"doc-scale": _metadata(status="complete", passed_gates=5)})
     service = QualityScoringService(metadata_loader=loader)
@@ -196,3 +231,52 @@ def test_in_progress_status_receives_small_boost():
     )[0]
 
     assert result["quality_boost"] == pytest.approx(0.05, rel=1e-3)
+
+
+def test_mid_quality_curve_softens_penalties():
+    loader = _RecordingLoader(
+        {
+            "doc-progress": _metadata(status="in_progress", passed_gates=2),
+            "doc-review": _metadata(status="review", passed_gates=3),
+        }
+    )
+    service = QualityScoringService(metadata_loader=loader)
+
+    results = service.apply(
+        [
+            {"document_id": "doc-progress", "combined_score": 0.2},
+            {"document_id": "doc-review", "combined_score": 0.2},
+        ],
+        filters=QualityFilters(),
+    )
+
+    progress = next(item for item in results if item["document_id"] == "doc-progress")
+    review = next(item for item in results if item["document_id"] == "doc-review")
+    total_gates = len(QualityScoringService.EXPECTED_GATES)
+
+    progress_base = (2 / total_gates) ** QualityScoringService.STATUS_CURVE_EXPONENTS["in_progress"]
+    review_base = (3 / total_gates) ** QualityScoringService.STATUS_CURVE_EXPONENTS["review"]
+    progress_expected = progress_base * (1 + QualityScoringService.STATUS_BOOSTS["in_progress"])
+    review_expected = review_base * (1 + QualityScoringService.STATUS_BOOSTS["review"])
+
+    assert progress["quality_base_score"] == pytest.approx(progress_base, rel=1e-3)
+    assert review["quality_base_score"] == pytest.approx(review_base, rel=1e-3)
+    assert progress["quality_score"] == pytest.approx(progress_expected, rel=1e-3)
+    assert review["quality_score"] == pytest.approx(review_expected, rel=1e-3)
+
+
+def test_draft_curve_relaxes_penalty():
+    loader = _RecordingLoader({"doc-draft": _metadata(status="draft", passed_gates=3)})
+    service = QualityScoringService(metadata_loader=loader)
+
+    result = service.apply(
+        [{"document_id": "doc-draft", "combined_score": 0.2}],
+        filters=QualityFilters(),
+    )[0]
+
+    total_gates = len(QualityScoringService.EXPECTED_GATES)
+    draft_base = (3 / total_gates) ** QualityScoringService.STATUS_CURVE_EXPONENTS["draft"]
+    expected = draft_base * (1 + QualityScoringService.STATUS_BOOSTS["draft"])
+
+    assert result["quality_base_score"] == pytest.approx(draft_base, rel=1e-3)
+    assert result["quality_score"] == pytest.approx(expected, rel=1e-3)
