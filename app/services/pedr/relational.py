@@ -17,13 +17,14 @@ Uses SQL joins for MVP - no separate graph DB required.
 from __future__ import annotations
 
 import logging
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 from uuid import UUID
 
-from sqlalchemy import select, and_, or_
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import and_, select
+from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
 from app.models import (
@@ -136,11 +137,22 @@ class RelationalService:
         self._session = session
         self._semantic_protocol = semantic_protocol or get_semantic_protocol()
 
-    def _get_session(self) -> Session:
-        """Get or create a database session."""
-        if self._session:
-            return self._session
-        return SessionLocal()
+    @contextmanager
+    def _session_scope(
+        self,
+        session: Optional[Session] = None,
+    ) -> Iterable[Session]:
+        if session is not None:
+            yield session
+            return
+        if self._session is not None:
+            yield self._session
+            return
+        created_session = SessionLocal()
+        try:
+            yield created_session
+        finally:
+            created_session.close()
 
     def parse_urn(self, urn: str) -> Tuple[EntityType, str]:
         """Parse a URN into entity type and ID.
@@ -189,6 +201,7 @@ class RelationalService:
         include_types: Optional[List[EntityType]] = None,
         exclude_types: Optional[List[EntityType]] = None,
         relation_types: Optional[List[RelationType]] = None,
+        session: Optional[Session] = None,
     ) -> GraphExpansionResult:
         """Get entities related to the given URN.
 
@@ -208,48 +221,47 @@ class RelationalService:
         """
         entity_type, entity_id = self.parse_urn(urn)
 
-        session = self._get_session()
-
         related: List[RelatedEntity] = []
         visited: Set[str] = {f"{entity_type.value}:{entity_id}"}
 
         # BFS traversal
         current_level = [(entity_type, entity_id, 0)]  # (type, id, depth)
 
-        while current_level and len(related) < limit:
-            next_level = []
+        with self._session_scope(session) as active_session:
+            while current_level and len(related) < limit:
+                next_level = []
 
-            for current_type, current_id, depth in current_level:
-                if depth >= max_depth:
-                    continue
+                for current_type, current_id, depth in current_level:
+                    if depth >= max_depth:
+                        continue
 
-                # Get direct relations at depth + 1
-                neighbors = self._get_neighbors(
-                    session,
-                    current_type,
-                    current_id,
-                    include_types=include_types,
-                    exclude_types=exclude_types,
-                    relation_types=relation_types,
-                )
+                    # Get direct relations at depth + 1
+                    neighbors = self._get_neighbors(
+                        active_session,
+                        current_type,
+                        current_id,
+                        include_types=include_types,
+                        exclude_types=exclude_types,
+                        relation_types=relation_types,
+                    )
 
-                for neighbor in neighbors:
-                    key = f"{neighbor.entity_type.value}:{neighbor.entity_id}"
-                    if key not in visited:
-                        visited.add(key)
-                        neighbor.distance = depth + 1
-                        related.append(neighbor)
+                    for neighbor in neighbors:
+                        key = f"{neighbor.entity_type.value}:{neighbor.entity_id}"
+                        if key not in visited:
+                            visited.add(key)
+                            neighbor.distance = depth + 1
+                            related.append(neighbor)
 
-                        if len(related) >= limit:
-                            break
+                            if len(related) >= limit:
+                                break
 
-                        # Queue for next level
-                        next_level.append((neighbor.entity_type, neighbor.entity_id, depth + 1))
+                            # Queue for next level
+                            next_level.append((neighbor.entity_type, neighbor.entity_id, depth + 1))
 
-                if len(related) >= limit:
-                    break
+                    if len(related) >= limit:
+                        break
 
-            current_level = next_level
+                current_level = next_level
 
         return GraphExpansionResult(
             source_urn=urn,
@@ -935,33 +947,33 @@ class RelationalService:
             return results
 
         enriched = []
-        session = self._get_session()
+        with self._session_scope() as session:
+            for result in results:
+                enriched_result = dict(result)
 
-        for result in results:
-            enriched_result = dict(result)
+                # Get URN or construct from chunk_id
+                urn = result.get("urn")
+                if not urn and result.get("chunk_id"):
+                    urn = self._semantic_protocol.generate_urn("chunk", result["chunk_id"])
 
-            # Get URN or construct from chunk_id
-            urn = result.get("urn")
-            if not urn and result.get("chunk_id"):
-                urn = self._semantic_protocol.generate_urn("chunk", result["chunk_id"])
-
-            if urn:
-                try:
-                    expansion = self.get_related(
-                        urn,
-                        max_depth=1,
-                        limit=max_related_per_result,
-                    )
-                    enriched_result["related_entities"] = [
-                        e.to_dict() for e in expansion.related_entities
-                    ]
-                except (ValueError, Exception) as e:
-                    logger.warning("Failed to expand relations for %s: %s", urn, e)
+                if urn:
+                    try:
+                        expansion = self.get_related(
+                            urn,
+                            max_depth=1,
+                            limit=max_related_per_result,
+                            session=session,
+                        )
+                        enriched_result["related_entities"] = [
+                            e.to_dict() for e in expansion.related_entities
+                        ]
+                    except (ValueError, Exception) as e:
+                        logger.warning("Failed to expand relations for %s: %s", urn, e)
+                        enriched_result["related_entities"] = []
+                else:
                     enriched_result["related_entities"] = []
-            else:
-                enriched_result["related_entities"] = []
 
-            enriched.append(enriched_result)
+                enriched.append(enriched_result)
 
         return enriched
 

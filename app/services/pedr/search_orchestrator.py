@@ -52,6 +52,11 @@ from app.services.pedr.quality_scoring import (
     QualityScoringService,
     get_quality_scoring_service,
 )
+from app.services.pedr.score_utils import (
+    ensure_base_score,
+    fuse_independent_adjustments,
+    summarize_scores,
+)
 from app.services.pedr.semantic_protocol import (
     SemanticProtocol,
     get_semantic_protocol,
@@ -647,6 +652,9 @@ class PEDRSearchOrchestrator:
             fused_results = []
         timings.fusion_ms = (time.perf_counter() - t0) * 1000
 
+        for entry in fused_results:
+            ensure_base_score(entry)
+
         # Phase 4: Apply post-processing layers
         processed = fused_results
 
@@ -673,6 +681,10 @@ class PEDRSearchOrchestrator:
             )
             processed = self.quality_service.apply(processed, filters=quality_filters)
             timings.governance_ms = (time.perf_counter() - t0) * 1000
+
+        # Phase 4.5: fuse independent layer adjustments into final ranking score.
+        for entry in processed:
+            fuse_independent_adjustments(entry)
 
         # Phase 5: Final ranking and enrichment
         final_results = self._finalize_results(
@@ -1187,27 +1199,6 @@ def _telemetry_enabled_from_env() -> bool:
     return value not in {"0", "false", "no"}
 
 
-def _summarize_scores(scores: Sequence[float]) -> Dict[str, float]:
-    values = [float(value) for value in scores if value is not None]
-    if not values:
-        return {}
-    values.sort()
-    count = len(values)
-    mid = count // 2
-    if count % 2 == 1:
-        median = values[mid]
-    else:
-        median = (values[mid - 1] + values[mid]) / 2
-    p90_index = int(0.9 * (count - 1))
-    return {
-        "min": round(values[0], 6),
-        "max": round(values[-1], 6),
-        "avg": round(sum(values) / count, 6),
-        "p50": round(median, 6),
-        "p90": round(values[p90_index], 6),
-    }
-
-
 def _compute_graph_impact(
     results: Sequence[PEDRSearchResult],
     *,
@@ -1248,9 +1239,9 @@ def _compute_graph_impact(
     return {
         "results_with_graph": len(graph_ranks),
         "result_share": round(len(graph_ranks) / total, 4),
-        "rank_stats": _summarize_scores(graph_ranks),
-        "rrf_contribution_stats": _summarize_scores(graph_contribs),
-        "rrf_contribution_share_stats": _summarize_scores(graph_shares),
+        "rank_stats": summarize_scores(graph_ranks),
+        "rrf_contribution_stats": summarize_scores(graph_contribs),
+        "rrf_contribution_share_stats": summarize_scores(graph_shares),
         "top_5_with_graph": top_5_with_graph,
         "top_5_share": round(top_5_with_graph / top_n, 4) if top_n > 0 else 0.0,
     }

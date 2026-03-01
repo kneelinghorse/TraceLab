@@ -1,0 +1,2954 @@
+{
+  "benchmark": {
+    "name": "pedr-validation-offline",
+    "generated_at": "2026-03-01T19:49:05.248244+00:00",
+    "corpus_manifest": "/Users/systemsystems/portfolio/TraceLab/artifacts/benchmarks/benchmark-corpus/corpus_manifest.json",
+    "queries_path": "/Users/systemsystems/portfolio/TraceLab/artifacts/benchmarks/benchmark-corpus/queries.json",
+    "doc_count": 57,
+    "query_count": 57,
+    "top_k": 5,
+    "candidate_multiplier": 3,
+    "governance_mode": "soft",
+    "metadata_source": "postgres",
+    "mission_map_path": "/Users/systemsystems/portfolio/TraceLab/artifacts/benchmarks/benchmark-corpus/mission_map.json"
+  },
+  "quality_metadata_path": "/Users/systemsystems/portfolio/TraceLab/artifacts/benchmarks/benchmark-corpus/quality_metadata.json",
+  "relationships_path": "/Users/systemsystems/portfolio/TraceLab/artifacts/benchmarks/benchmark-corpus/relationships.json",
+  "quality_boost_analysis": {
+    "complete_avg": 0.1,
+    "draft_avg": 0.0,
+    "ratio_complete_vs_draft": 0.0
+  },
+  "pedr_results": {
+    "pedr_quality": {
+      "summary": {
+        "precision_at_k": 0.16140350877192985,
+        "recall_at_k": 0.8070175438596491,
+        "ndcg_at_k": 0.6576873687222684,
+        "latency_ms": {
+          "mean": 0.11073691073984823,
+          "p50": 0.10845900396816432,
+          "p95": 0.13520801439881325
+        }
+      },
+      "queries": [
+        {
+          "query_id": "Q01",
+          "query": "What does TraceLab README cover?",
+          "relevance": {
+            "doc-001-readme": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-020-cli-usage",
+              "score": 0.07989407077734836
+            },
+            {
+              "doc_id": "doc-019-cli-architecture",
+              "score": 0.07351315254530658
+            },
+            {
+              "doc_id": "doc-052-schema-package",
+              "score": 0.07192271187321812
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.0586577802431286
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.04673652249667163
+            }
+          ],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.3062079777009785,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q02",
+          "query": "What does PEDR Search cover?",
+          "relevance": {
+            "doc-002-pedr-search": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-008-scripts-readme",
+              "score": 0.0888915322224928
+            },
+            {
+              "doc_id": "doc-002-pedr-search",
+              "score": 0.08440983042545958
+            },
+            {
+              "doc_id": "doc-042-pedr-sync",
+              "score": 0.08419000864012437
+            },
+            {
+              "doc_id": "doc-009-sprint-19-retrospective",
+              "score": 0.07680625996329622
+            },
+            {
+              "doc_id": "doc-014-architecture-health-check",
+              "score": 0.07284174041744769
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.6309297535714575,
+          "latency_ms": 0.15458397683687508,
+          "relationship_enrichment": {
+            "related_docs_total": 154,
+            "related_docs_unique": 54,
+            "results_with_related": 4
+          }
+        },
+        {
+          "query_id": "Q03",
+          "query": "What does Hybrid Search cover?",
+          "relevance": {
+            "doc-003-hybrid-search": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-003-hybrid-search",
+              "score": 0.09085048642504862
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.05322658011121733
+            },
+            {
+              "doc_id": "doc-009-sprint-19-retrospective",
+              "score": 0.04741095144473417
+            },
+            {
+              "doc_id": "doc-055-search-history",
+              "score": 0.04128377332289254
+            },
+            {
+              "doc_id": "doc-012-qdrant-optimization-research",
+              "score": 0.03896595623610209
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.13020899496041238,
+          "relationship_enrichment": {
+            "related_docs_total": 156,
+            "related_docs_unique": 55,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q04",
+          "query": "What does Qdrant Optimization cover?",
+          "relevance": {
+            "doc-004-qdrant-optimization": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-044-qdrant-railway-setup",
+              "score": 0.07721700132104076
+            },
+            {
+              "doc_id": "doc-009-sprint-19-retrospective",
+              "score": 0.07381974763059093
+            },
+            {
+              "doc_id": "doc-005-qdrant-resilience",
+              "score": 0.06520321408441963
+            },
+            {
+              "doc_id": "doc-012-qdrant-optimization-research",
+              "score": 0.06199953556973965
+            },
+            {
+              "doc_id": "doc-029-document-processing",
+              "score": 0.05942252470244558
+            }
+          ],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.1289999927394092,
+          "relationship_enrichment": {
+            "related_docs_total": 156,
+            "related_docs_unique": 55,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q05",
+          "query": "What does Qdrant Resilience cover?",
+          "relevance": {
+            "doc-005-qdrant-resilience": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-044-qdrant-railway-setup",
+              "score": 0.07774356514178957
+            },
+            {
+              "doc_id": "doc-005-qdrant-resilience",
+              "score": 0.07277391845635467
+            },
+            {
+              "doc_id": "doc-029-document-processing",
+              "score": 0.06090317468425195
+            },
+            {
+              "doc_id": "doc-014-architecture-health-check",
+              "score": 0.04852179901900389
+            },
+            {
+              "doc_id": "doc-009-sprint-19-retrospective",
+              "score": 0.04847122951058519
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.6309297535714575,
+          "latency_ms": 0.12954199337400496,
+          "relationship_enrichment": {
+            "related_docs_total": 203,
+            "related_docs_unique": 54,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q06",
+          "query": "What does Quality Gates cover?",
+          "relevance": {
+            "doc-006-quality-gates": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-045-quality-aware-search",
+              "score": 0.08427212628957731
+            },
+            {
+              "doc_id": "doc-027-deepsearch-integration",
+              "score": 0.08393765146336304
+            },
+            {
+              "doc_id": "doc-043-preflight-queries",
+              "score": 0.07675624517242013
+            },
+            {
+              "doc_id": "doc-046-quality-automation",
+              "score": 0.07008377236034725
+            },
+            {
+              "doc_id": "doc-006-quality-gates",
+              "score": 0.06986475716579878
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.38685280723454163,
+          "latency_ms": 0.1120000088121742,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q07",
+          "query": "What does Implementation Guide cover?",
+          "relevance": {
+            "doc-007-implementation-guide": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-028-deployment",
+              "score": 0.08748354875655248
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.08117054436095016
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.07627912101509547
+            },
+            {
+              "doc_id": "doc-012-qdrant-optimization-research",
+              "score": 0.06982740102475228
+            }
+          ],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.11212498066015542,
+          "relationship_enrichment": {
+            "related_docs_total": 203,
+            "related_docs_unique": 54,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q08",
+          "query": "What does Scripts README cover?",
+          "relevance": {
+            "doc-008-scripts-readme": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-052-schema-package",
+              "score": 0.08449943753346961
+            },
+            {
+              "doc_id": "doc-005-qdrant-resilience",
+              "score": 0.08277312643784618
+            },
+            {
+              "doc_id": "doc-001-readme",
+              "score": 0.07933546943818828
+            },
+            {
+              "doc_id": "doc-017-best-practices",
+              "score": 0.07818641805075689
+            }
+          ],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.11199997970834374,
+          "relationship_enrichment": {
+            "related_docs_total": 200,
+            "related_docs_unique": 51,
+            "results_with_related": 4
+          }
+        },
+        {
+          "query_id": "Q09",
+          "query": "What does Sprint 19 Retrospective cover?",
+          "relevance": {
+            "doc-009-sprint-19-retrospective": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-009-sprint-19-retrospective",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.026655971052337316
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.025710779921282213
+            },
+            {
+              "doc_id": "doc-008-scripts-readme",
+              "score": 0.024282625846274906
+            },
+            {
+              "doc_id": "doc-005-qdrant-resilience",
+              "score": 0.02114268042625246
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.11287498637102544,
+          "relationship_enrichment": {
+            "related_docs_total": 153,
+            "related_docs_unique": 54,
+            "results_with_related": 4
+          }
+        },
+        {
+          "query_id": "Q10",
+          "query": "What does PEDR Baseline Capture (Sprint 18) cover?",
+          "relevance": {
+            "doc-010-pedr-baseline-capture": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-008-scripts-readme",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-009-sprint-19-retrospective",
+              "score": 0.05230706585331557
+            },
+            {
+              "doc_id": "doc-002-pedr-search",
+              "score": 0.047663459458877705
+            },
+            {
+              "doc_id": "doc-042-pedr-sync",
+              "score": 0.034953223622997985
+            },
+            {
+              "doc_id": "doc-011-graph-parameter-optimization",
+              "score": 0.031746751442512454
+            }
+          ],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.11295898002572358,
+          "relationship_enrichment": {
+            "related_docs_total": 107,
+            "related_docs_unique": 55,
+            "results_with_related": 4
+          }
+        },
+        {
+          "query_id": "Q11",
+          "query": "What does Graph Parameter Optimization (Sprint 26) cover?",
+          "relevance": {
+            "doc-011-graph-parameter-optimization": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-011-graph-parameter-optimization",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-002-pedr-search",
+              "score": 0.04286654974781799
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.03314027140578988
+            },
+            {
+              "doc_id": "doc-012-qdrant-optimization-research",
+              "score": 0.03201562646830819
+            },
+            {
+              "doc_id": "doc-009-sprint-19-retrospective",
+              "score": 0.0295218048431063
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.11020799865946174,
+          "relationship_enrichment": {
+            "related_docs_total": 110,
+            "related_docs_unique": 55,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q12",
+          "query": "What does Qdrant Optimization Research (Sprint 19) cover?",
+          "relevance": {
+            "doc-012-qdrant-optimization-research": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-009-sprint-19-retrospective",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-044-qdrant-railway-setup",
+              "score": 0.045962534411403945
+            },
+            {
+              "doc_id": "doc-005-qdrant-resilience",
+              "score": 0.043049361035510186
+            },
+            {
+              "doc_id": "doc-012-qdrant-optimization-research",
+              "score": 0.03903431392400573
+            },
+            {
+              "doc_id": "doc-029-document-processing",
+              "score": 0.03623579075772923
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.43067655807339306,
+          "latency_ms": 0.11387499398551881,
+          "relationship_enrichment": {
+            "related_docs_total": 156,
+            "related_docs_unique": 55,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q13",
+          "query": "What does Docs README cover?",
+          "relevance": {
+            "doc-013-docs-readme": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-013-docs-readme",
+              "score": 0.07734973369697534
+            },
+            {
+              "doc_id": "doc-017-best-practices",
+              "score": 0.0614987235984537
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.06015006150168922
+            },
+            {
+              "doc_id": "doc-038-mission-protocol-tutorial",
+              "score": 0.04956571592352061
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.0473818072489993
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.11004199041053653,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q14",
+          "query": "What does Architecture Health Check cover?",
+          "relevance": {
+            "doc-014-architecture-health-check": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-001-readme",
+              "score": 0.0931176255462895
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.08511790566403361
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.07736429511256565
+            },
+            {
+              "doc_id": "doc-029-document-processing",
+              "score": 0.07238987543886298
+            },
+            {
+              "doc_id": "doc-020-cli-usage",
+              "score": 0.06616920084564748
+            }
+          ],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.13520801439881325,
+          "relationship_enrichment": {
+            "related_docs_total": 200,
+            "related_docs_unique": 51,
+            "results_with_related": 4
+          }
+        },
+        {
+          "query_id": "Q15",
+          "query": "What does Auth and CORS Guidance cover?",
+          "relevance": {
+            "doc-015-auth-cors-guidance": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-015-auth-cors-guidance",
+              "score": 0.09546128571650266
+            },
+            {
+              "doc_id": "doc-016-authentication",
+              "score": 0.09494804413013815
+            },
+            {
+              "doc_id": "doc-001-readme",
+              "score": 0.09311413225830599
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.06357110403945744
+            },
+            {
+              "doc_id": "doc-028-deployment",
+              "score": 0.05447960312030912
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.11216700659133494,
+          "relationship_enrichment": {
+            "related_docs_total": 200,
+            "related_docs_unique": 51,
+            "results_with_related": 4
+          }
+        },
+        {
+          "query_id": "Q16",
+          "query": "What does Authentication cover?",
+          "relevance": {
+            "doc-016-authentication": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-015-auth-cors-guidance",
+              "score": 0.0833500552214488
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.07826735554570836
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.07486462632010764
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.06371931581815497
+            },
+            {
+              "doc_id": "doc-043-preflight-queries",
+              "score": 0.05709302625873695
+            }
+          ],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.11274998541921377,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q17",
+          "query": "What does Best Practices cover?",
+          "relevance": {
+            "doc-017-best-practices": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-013-docs-readme",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-051-schema-evolution-guide",
+              "score": 0.06770501446520992
+            },
+            {
+              "doc_id": "doc-017-best-practices",
+              "score": 0.06478140683988681
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.05377762479885894
+            },
+            {
+              "doc_id": "doc-012-qdrant-optimization-research",
+              "score": 0.052180001100765316
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.5,
+          "latency_ms": 0.11112497304566205,
+          "relationship_enrichment": {
+            "related_docs_total": 203,
+            "related_docs_unique": 54,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q18",
+          "query": "What does Caching Strategy cover?",
+          "relevance": {
+            "doc-018-caching-strategy": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-012-qdrant-optimization-research",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-018-caching-strategy",
+              "score": 0.08401553368687557
+            },
+            {
+              "doc_id": "doc-009-sprint-19-retrospective",
+              "score": 0.06609941144589215
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.044810356624689844
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.038864880308562166
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.6309297535714575,
+          "latency_ms": 0.11070902110077441,
+          "relationship_enrichment": {
+            "related_docs_total": 156,
+            "related_docs_unique": 55,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q19",
+          "query": "What does CLI Architecture cover?",
+          "relevance": {
+            "doc-019-cli-architecture": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.09649915503325289
+            },
+            {
+              "doc_id": "doc-034-ingestion-onboarding-runbook",
+              "score": 0.08087382086200118
+            },
+            {
+              "doc_id": "doc-016-authentication",
+              "score": 0.07595965859330113
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.05345830544214475
+            },
+            {
+              "doc_id": "doc-042-pedr-sync",
+              "score": 0.04328698483923285
+            }
+          ],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.11187500786036253,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q20",
+          "query": "What does CLI Usage cover?",
+          "relevance": {
+            "doc-020-cli-usage": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.09329017891111252
+            },
+            {
+              "doc_id": "doc-016-authentication",
+              "score": 0.08348407940098981
+            },
+            {
+              "doc_id": "doc-034-ingestion-onboarding-runbook",
+              "score": 0.08241870574413301
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.053282768490211824
+            },
+            {
+              "doc_id": "doc-049-report-export",
+              "score": 0.04321046772838325
+            }
+          ],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.10845900396816432,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q21",
+          "query": "What does Console Guide cover?",
+          "relevance": {
+            "doc-021-console-guide": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-021-console-guide",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.03304211584930079
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.030707310149716296
+            },
+            {
+              "doc_id": "doc-046-quality-automation",
+              "score": 0.026031199465152102
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.025808990499440757
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.10970799485221505,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q22",
+          "query": "What does Correction Loop cover?",
+          "relevance": {
+            "doc-022-correction-loop": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-022-correction-loop",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-021-console-guide",
+              "score": 0.052105668781829144
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.02026890986131144
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.018723810872508868
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.016345993303917422
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.10845798533409834,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q23",
+          "query": "What does Data Protection Audit cover?",
+          "relevance": {
+            "doc-023-data-protection-audit": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-014-architecture-health-check",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-046-quality-automation",
+              "score": 0.07800284743776648
+            },
+            {
+              "doc_id": "doc-023-data-protection-audit",
+              "score": 0.07456249573068906
+            },
+            {
+              "doc_id": "doc-029-document-processing",
+              "score": 0.052691745023796546
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.05259291514281167
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.5,
+          "latency_ms": 0.11120797717012465,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q24",
+          "query": "What does Database Optimization cover?",
+          "relevance": {
+            "doc-024-database-optimization": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-009-sprint-19-retrospective",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-024-database-optimization",
+              "score": 0.07320869164375032
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.06644041196311536
+            },
+            {
+              "doc_id": "doc-030-environment-setup",
+              "score": 0.0646617714136011
+            },
+            {
+              "doc_id": "doc-012-qdrant-optimization-research",
+              "score": 0.06393283324579413
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.6309297535714575,
+          "latency_ms": 0.11237498256377876,
+          "relationship_enrichment": {
+            "related_docs_total": 156,
+            "related_docs_unique": 55,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q25",
+          "query": "What does DeepSearch Common Errors cover?",
+          "relevance": {
+            "doc-025-deepsearch-common-errors": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-025-deepsearch-common-errors",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.08336736967127333
+            },
+            {
+              "doc_id": "doc-037-mcp-tools",
+              "score": 0.07516425696610372
+            },
+            {
+              "doc_id": "doc-027-deepsearch-integration",
+              "score": 0.06657151218088722
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.055332733077632125
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.1069169957190752,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q26",
+          "query": "What does DeepSearch Integration Testing cover?",
+          "relevance": {
+            "doc-026-deepsearch-integration-testing": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-025-deepsearch-common-errors",
+              "score": 0.08184507137500036
+            },
+            {
+              "doc_id": "doc-027-deepsearch-integration",
+              "score": 0.06011761052871978
+            },
+            {
+              "doc_id": "doc-037-mcp-tools",
+              "score": 0.05767838917000567
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.04753199823828805
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.10562498937360942,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q27",
+          "query": "What does DeepSearch Integration cover?",
+          "relevance": {
+            "doc-027-deepsearch-integration": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-025-deepsearch-common-errors",
+              "score": 0.08398053635297117
+            },
+            {
+              "doc_id": "doc-037-mcp-tools",
+              "score": 0.06313121433959741
+            },
+            {
+              "doc_id": "doc-027-deepsearch-integration",
+              "score": 0.06162368315774189
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.05235555399750377
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.43067655807339306,
+          "latency_ms": 0.11429202277213335,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q28",
+          "query": "What does Deployment cover?",
+          "relevance": {
+            "doc-028-deployment": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-028-deployment",
+              "score": 0.08846981385676773
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.07780391367661528
+            },
+            {
+              "doc_id": "doc-029-document-processing",
+              "score": 0.06922447295000432
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.06683965598552895
+            },
+            {
+              "doc_id": "doc-030-environment-setup",
+              "score": 0.06412422668463683
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.10491700959391892,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q29",
+          "query": "What does Document Processing cover?",
+          "relevance": {
+            "doc-029-document-processing": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-005-qdrant-resilience",
+              "score": 0.087495047993664
+            },
+            {
+              "doc_id": "doc-035-ingestion-pipeline-developer-guide",
+              "score": 0.08539710826742941
+            },
+            {
+              "doc_id": "doc-029-document-processing",
+              "score": 0.07599814887017796
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.0691845395333311
+            },
+            {
+              "doc_id": "doc-057-workflows",
+              "score": 0.05828769600126146
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.5,
+          "latency_ms": 0.10974999167956412,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q30",
+          "query": "What does Environment Setup cover?",
+          "relevance": {
+            "doc-030-environment-setup": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-029-document-processing",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.07305628955172913
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.07184966898926913
+            },
+            {
+              "doc_id": "doc-030-environment-setup",
+              "score": 0.06606800739134432
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.05754570077333135
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.43067655807339306,
+          "latency_ms": 0.1087500131689012,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q31",
+          "query": "What does Frontend Architecture cover?",
+          "relevance": {
+            "doc-031-frontend-architecture": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-032-frontend-deployment-decisions",
+              "score": 0.06715278323335742
+            },
+            {
+              "doc_id": "doc-015-auth-cors-guidance",
+              "score": 0.05570428422864685
+            },
+            {
+              "doc_id": "doc-001-readme",
+              "score": 0.05070671828986898
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.04965771223071873
+            }
+          ],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.12024998432025313,
+          "relationship_enrichment": {
+            "related_docs_total": 200,
+            "related_docs_unique": 51,
+            "results_with_related": 4
+          }
+        },
+        {
+          "query_id": "Q32",
+          "query": "What does Frontend Deployment Decisions cover?",
+          "relevance": {
+            "doc-032-frontend-deployment-decisions": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-032-frontend-deployment-decisions",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.07668450914666097
+            },
+            {
+              "doc_id": "doc-016-authentication",
+              "score": 0.046998371790691065
+            },
+            {
+              "doc_id": "doc-015-auth-cors-guidance",
+              "score": 0.045633364307338026
+            },
+            {
+              "doc_id": "doc-001-readme",
+              "score": 0.044372174263673236
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.10008300887420774,
+          "relationship_enrichment": {
+            "related_docs_total": 200,
+            "related_docs_unique": 51,
+            "results_with_related": 4
+          }
+        },
+        {
+          "query_id": "Q33",
+          "query": "What does Getting Started cover?",
+          "relevance": {
+            "doc-033-getting-started": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-013-docs-readme",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-033-getting-started",
+              "score": 0.05161821505656803
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.035400324384206615
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.02989050640697303
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.02652091362369173
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.6309297535714575,
+          "latency_ms": 0.09937499999068677,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q34",
+          "query": "What does Ingestion Onboarding Runbook cover?",
+          "relevance": {
+            "doc-034-ingestion-onboarding-runbook": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-034-ingestion-onboarding-runbook",
+              "score": 0.09906260268948758
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.06069561373499081
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.04658685005894609
+            },
+            {
+              "doc_id": "doc-005-qdrant-resilience",
+              "score": 0.04251755866142584
+            },
+            {
+              "doc_id": "doc-027-deepsearch-integration",
+              "score": 0.030171324194791273
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.10083301458507776,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q35",
+          "query": "What does Ingestion Pipeline Developer Guide cover?",
+          "relevance": {
+            "doc-035-ingestion-pipeline-developer-guide": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-034-ingestion-onboarding-runbook",
+              "score": 0.08150843198603475
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.06927597056681237
+            },
+            {
+              "doc_id": "doc-035-ingestion-pipeline-developer-guide",
+              "score": 0.06045889265440551
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.056556989743123544
+            },
+            {
+              "doc_id": "doc-029-document-processing",
+              "score": 0.05043705910585653
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.5,
+          "latency_ms": 0.09870901703834534,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q36",
+          "query": "What does Local Development cover?",
+          "relevance": {
+            "doc-036-local-development": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-030-environment-setup",
+              "score": 0.09585578903557779
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.07834668376490853
+            },
+            {
+              "doc_id": "doc-001-readme",
+              "score": 0.06554870560159556
+            },
+            {
+              "doc_id": "doc-044-qdrant-railway-setup",
+              "score": 0.049237206207535494
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.04187737069205717
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.6309297535714575,
+          "latency_ms": 0.10154201299883425,
+          "relationship_enrichment": {
+            "related_docs_total": 200,
+            "related_docs_unique": 51,
+            "results_with_related": 4
+          }
+        },
+        {
+          "query_id": "Q37",
+          "query": "What does MCP Tools cover?",
+          "relevance": {
+            "doc-037-mcp-tools": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-037-mcp-tools",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-030-environment-setup",
+              "score": 0.043509876407457154
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.021231294398707586
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.01894461782421042
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.016554595708594987
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.10058301268145442,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q38",
+          "query": "What does Mission Protocol Tutorial cover?",
+          "relevance": {
+            "doc-038-mission-protocol-tutorial": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-038-mission-protocol-tutorial",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-013-docs-readme",
+              "score": 0.0842647402076915
+            },
+            {
+              "doc_id": "doc-039-mission-protocol-api",
+              "score": 0.06159228965172884
+            },
+            {
+              "doc_id": "doc-037-mcp-tools",
+              "score": 0.03805742557823616
+            },
+            {
+              "doc_id": "doc-040-mission-protocol-validation",
+              "score": 0.03609447949271389
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.10375000420026481,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q39",
+          "query": "What does Mission Protocol API cover?",
+          "relevance": {
+            "doc-039-mission-protocol-api": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-039-mission-protocol-api",
+              "score": 0.0942958625394579
+            },
+            {
+              "doc_id": "doc-038-mission-protocol-tutorial",
+              "score": 0.06117586784292567
+            },
+            {
+              "doc_id": "doc-037-mcp-tools",
+              "score": 0.053592642434602294
+            },
+            {
+              "doc_id": "doc-040-mission-protocol-validation",
+              "score": 0.05267526506527712
+            },
+            {
+              "doc_id": "doc-046-quality-automation",
+              "score": 0.05119350182260183
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.09887499618344009,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q40",
+          "query": "What does Mission Protocol Validation cover?",
+          "relevance": {
+            "doc-040-mission-protocol-validation": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-039-mission-protocol-api",
+              "score": 0.09555166102991501
+            },
+            {
+              "doc_id": "doc-040-mission-protocol-validation",
+              "score": 0.0740505436861983
+            },
+            {
+              "doc_id": "doc-038-mission-protocol-tutorial",
+              "score": 0.06566862170452484
+            },
+            {
+              "doc_id": "doc-013-docs-readme",
+              "score": 0.05647331299201998
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.05177501618509857
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.6309297535714575,
+          "latency_ms": 0.09787498856894672,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q41",
+          "query": "What does Monitoring Dashboard cover?",
+          "relevance": {
+            "doc-041-monitoring-dashboard": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-041-monitoring-dashboard",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-021-console-guide",
+              "score": 0.04420244960183081
+            },
+            {
+              "doc_id": "doc-030-environment-setup",
+              "score": 0.030220054925635894
+            },
+            {
+              "doc_id": "doc-009-sprint-19-retrospective",
+              "score": 0.028522564306251136
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.02804281038100073
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.09887499618344009,
+          "relationship_enrichment": {
+            "related_docs_total": 203,
+            "related_docs_unique": 54,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q42",
+          "query": "What does PEDR Sync cover?",
+          "relevance": {
+            "doc-042-pedr-sync": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-042-pedr-sync",
+              "score": 0.09700137608265165
+            },
+            {
+              "doc_id": "doc-014-architecture-health-check",
+              "score": 0.05687757815688658
+            },
+            {
+              "doc_id": "doc-008-scripts-readme",
+              "score": 0.04272040119683478
+            },
+            {
+              "doc_id": "doc-009-sprint-19-retrospective",
+              "score": 0.035934641503838315
+            },
+            {
+              "doc_id": "doc-002-pedr-search",
+              "score": 0.032669716812737296
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.10354199912399054,
+          "relationship_enrichment": {
+            "related_docs_total": 154,
+            "related_docs_unique": 54,
+            "results_with_related": 4
+          }
+        },
+        {
+          "query_id": "Q43",
+          "query": "What does Preflight Queries cover?",
+          "relevance": {
+            "doc-043-preflight-queries": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-043-preflight-queries",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-014-architecture-health-check",
+              "score": 0.0530843607716769
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.04084497187909067
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.03225970779930855
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.028178269211067083
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.10145900887437165,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q44",
+          "query": "What does Qdrant Railway Setup cover?",
+          "relevance": {
+            "doc-044-qdrant-railway-setup": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-044-qdrant-railway-setup",
+              "score": 0.08511120792945517
+            },
+            {
+              "doc_id": "doc-030-environment-setup",
+              "score": 0.08218456840114502
+            },
+            {
+              "doc_id": "doc-029-document-processing",
+              "score": 0.07491709283173445
+            },
+            {
+              "doc_id": "doc-032-frontend-deployment-decisions",
+              "score": 0.06267357907368563
+            },
+            {
+              "doc_id": "doc-007-implementation-guide",
+              "score": 0.04990989410861323
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.10891701094806194,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q45",
+          "query": "What does Quality Aware Search cover?",
+          "relevance": {
+            "doc-045-quality-aware-search": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-045-quality-aware-search",
+              "score": 0.09993909352887168
+            },
+            {
+              "doc_id": "doc-046-quality-automation",
+              "score": 0.06968893633378524
+            },
+            {
+              "doc_id": "doc-043-preflight-queries",
+              "score": 0.06520513936410201
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.06032065558413369
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.055879532749789046
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.09920800221152604,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q46",
+          "query": "What does Quality Automation cover?",
+          "relevance": {
+            "doc-046-quality-automation": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-046-quality-automation",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-013-docs-readme",
+              "score": 0.05318505858067775
+            },
+            {
+              "doc_id": "doc-045-quality-aware-search",
+              "score": 0.045849956745871334
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.04393068539574094
+            },
+            {
+              "doc_id": "doc-027-deepsearch-integration",
+              "score": 0.04244431787436868
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.09962500189431012,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q47",
+          "query": "What does Relationship API cover?",
+          "relevance": {
+            "doc-047-relationship-api": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-047-relationship-api",
+              "score": 0.09996808186478219
+            },
+            {
+              "doc_id": "doc-021-console-guide",
+              "score": 0.04852438975675946
+            },
+            {
+              "doc_id": "doc-014-architecture-health-check",
+              "score": 0.04658000434529722
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.045746361144550655
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.04460425778861313
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.09204199886880815,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q48",
+          "query": "What does Report Metadata Analysis cover?",
+          "relevance": {
+            "doc-048-report-metadata-analysis": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-014-architecture-health-check",
+              "score": 0.034196271948376065
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.030452277448814548
+            },
+            {
+              "doc_id": "doc-029-document-processing",
+              "score": 0.029344472859618456
+            },
+            {
+              "doc_id": "doc-054-search-filters",
+              "score": 0.027637343738396204
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.09120799950323999,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q49",
+          "query": "What does Report Export cover?",
+          "relevance": {
+            "doc-049-report-export": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-049-report-export",
+              "score": 0.06669242877698532
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.04081422585497855
+            },
+            {
+              "doc_id": "doc-039-mission-protocol-api",
+              "score": 0.03965028131362913
+            },
+            {
+              "doc_id": "doc-020-cli-usage",
+              "score": 0.03296526758766868
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.6309297535714575,
+          "latency_ms": 0.09049999061971903,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q50",
+          "query": "What does Saved Searches cover?",
+          "relevance": {
+            "doc-050-saved-searches": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-050-saved-searches",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-014-architecture-health-check",
+              "score": 0.02843865995443001
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.023695978443450148
+            },
+            {
+              "doc_id": "doc-051-schema-evolution-guide",
+              "score": 0.01996311841230356
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.017493114304348394
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.0914999982342124,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q51",
+          "query": "What does Schema Evolution Guide cover?",
+          "relevance": {
+            "doc-051-schema-evolution-guide": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-014-architecture-health-check",
+              "score": 0.09442634594830071
+            },
+            {
+              "doc_id": "doc-051-schema-evolution-guide",
+              "score": 0.09090593853393779
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.07797187719369539
+            },
+            {
+              "doc_id": "doc-053-schema-versioning",
+              "score": 0.07268581417833662
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.06721839821685135
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.6309297535714575,
+          "latency_ms": 0.0925839995034039,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q52",
+          "query": "What does Schema Package cover?",
+          "relevance": {
+            "doc-052-schema-package": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-052-schema-package",
+              "score": 0.09087737896331433
+            },
+            {
+              "doc_id": "doc-053-schema-versioning",
+              "score": 0.08084872473570721
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.040428061875852295
+            },
+            {
+              "doc_id": "doc-001-readme",
+              "score": 0.03151138882427464
+            },
+            {
+              "doc_id": "doc-051-schema-evolution-guide",
+              "score": 0.030790474967179595
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.09112499537877738,
+          "relationship_enrichment": {
+            "related_docs_total": 200,
+            "related_docs_unique": 51,
+            "results_with_related": 4
+          }
+        },
+        {
+          "query_id": "Q53",
+          "query": "What does Schema Versioning cover?",
+          "relevance": {
+            "doc-053-schema-versioning": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-053-schema-versioning",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-051-schema-evolution-guide",
+              "score": 0.06900447833144828
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.06823109238374885
+            },
+            {
+              "doc_id": "doc-014-architecture-health-check",
+              "score": 0.06204284980427277
+            },
+            {
+              "doc_id": "doc-052-schema-package",
+              "score": 0.057584527494818474
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.08991602226160467,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q54",
+          "query": "What does Search Filters cover?",
+          "relevance": {
+            "doc-054-search-filters": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-055-search-history",
+              "score": 0.08837248534351189
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.07204956933053909
+            },
+            {
+              "doc_id": "doc-054-search-filters",
+              "score": 0.05964888973438287
+            },
+            {
+              "doc_id": "doc-050-saved-searches",
+              "score": 0.058222871008624014
+            },
+            {
+              "doc_id": "doc-003-hybrid-search",
+              "score": 0.05311827191853499
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.5,
+          "latency_ms": 0.09112499537877738,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q55",
+          "query": "What does Search History cover?",
+          "relevance": {
+            "doc-055-search-history": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-055-search-history",
+              "score": 0.08895383918439403
+            },
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.04742572873458073
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.04700911947064847
+            },
+            {
+              "doc_id": "doc-050-saved-searches",
+              "score": 0.044276332904840815
+            },
+            {
+              "doc_id": "doc-014-architecture-health-check",
+              "score": 0.03784945719392943
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 1.0,
+          "latency_ms": 0.11299998732283711,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q56",
+          "query": "What does Telemetry Automation cover?",
+          "relevance": {
+            "doc-056-telemetry-automation": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-046-quality-automation",
+              "score": 0.1
+            },
+            {
+              "doc_id": "doc-056-telemetry-automation",
+              "score": 0.06885713532955687
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.05759914258173772
+            },
+            {
+              "doc_id": "doc-025-deepsearch-common-errors",
+              "score": 0.049222405825746655
+            },
+            {
+              "doc_id": "doc-036-local-development",
+              "score": 0.04376338465672536
+            }
+          ],
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "ndcg_at_k": 0.6309297535714575,
+          "latency_ms": 0.10587502038106322,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        },
+        {
+          "query_id": "Q57",
+          "query": "What does Workflows cover?",
+          "relevance": {
+            "doc-057-workflows": 2
+          },
+          "retrieved": [
+            {
+              "doc_id": "doc-048-report-metadata-analysis",
+              "score": 0.09592958747539038
+            },
+            {
+              "doc_id": "doc-025-deepsearch-common-errors",
+              "score": 0.08230547197892249
+            },
+            {
+              "doc_id": "doc-029-document-processing",
+              "score": 0.08143980601874011
+            },
+            {
+              "doc_id": "doc-026-deepsearch-integration-testing",
+              "score": 0.0805582723172143
+            },
+            {
+              "doc_id": "doc-039-mission-protocol-api",
+              "score": 0.07842237209762208
+            }
+          ],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08970801718533039,
+          "relationship_enrichment": {
+            "related_docs_total": 250,
+            "related_docs_unique": 51,
+            "results_with_related": 5
+          }
+        }
+      ]
+    },
+    "pedr_governance": {
+      "summary": {
+        "precision_at_k": 0.0,
+        "recall_at_k": 0.0,
+        "ndcg_at_k": 0.0,
+        "latency_ms": {
+          "mean": 0.0863523669785967,
+          "p50": 0.08233397966250777,
+          "p95": 0.10912501602433622
+        }
+      },
+      "queries": [
+        {
+          "query_id": "Q01",
+          "query": "What does TraceLab README cover?",
+          "relevance": {
+            "doc-001-readme": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.11550000635907054
+        },
+        {
+          "query_id": "Q02",
+          "query": "What does PEDR Search cover?",
+          "relevance": {
+            "doc-002-pedr-search": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.10912501602433622
+        },
+        {
+          "query_id": "Q03",
+          "query": "What does Hybrid Search cover?",
+          "relevance": {
+            "doc-003-hybrid-search": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.10458400356583297
+        },
+        {
+          "query_id": "Q04",
+          "query": "What does Qdrant Optimization cover?",
+          "relevance": {
+            "doc-004-qdrant-optimization": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.1042919757310301
+        },
+        {
+          "query_id": "Q05",
+          "query": "What does Qdrant Resilience cover?",
+          "relevance": {
+            "doc-005-qdrant-resilience": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.10416601435281336
+        },
+        {
+          "query_id": "Q06",
+          "query": "What does Quality Gates cover?",
+          "relevance": {
+            "doc-006-quality-gates": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.09133401908911765
+        },
+        {
+          "query_id": "Q07",
+          "query": "What does Implementation Guide cover?",
+          "relevance": {
+            "doc-007-implementation-guide": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.09133398998528719
+        },
+        {
+          "query_id": "Q08",
+          "query": "What does Scripts README cover?",
+          "relevance": {
+            "doc-008-scripts-readme": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.09025001781992614
+        },
+        {
+          "query_id": "Q09",
+          "query": "What does Sprint 19 Retrospective cover?",
+          "relevance": {
+            "doc-009-sprint-19-retrospective": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.09079198935069144
+        },
+        {
+          "query_id": "Q10",
+          "query": "What does PEDR Baseline Capture (Sprint 18) cover?",
+          "relevance": {
+            "doc-010-pedr-baseline-capture": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.09008299093693495
+        },
+        {
+          "query_id": "Q11",
+          "query": "What does Graph Parameter Optimization (Sprint 26) cover?",
+          "relevance": {
+            "doc-011-graph-parameter-optimization": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.09004102321341634
+        },
+        {
+          "query_id": "Q12",
+          "query": "What does Qdrant Optimization Research (Sprint 19) cover?",
+          "relevance": {
+            "doc-012-qdrant-optimization-research": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.09112499537877738
+        },
+        {
+          "query_id": "Q13",
+          "query": "What does Docs README cover?",
+          "relevance": {
+            "doc-013-docs-readme": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.089749984908849
+        },
+        {
+          "query_id": "Q14",
+          "query": "What does Architecture Health Check cover?",
+          "relevance": {
+            "doc-014-architecture-health-check": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.10624999413266778
+        },
+        {
+          "query_id": "Q15",
+          "query": "What does Auth and CORS Guidance cover?",
+          "relevance": {
+            "doc-015-auth-cors-guidance": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.09074999252334237
+        },
+        {
+          "query_id": "Q16",
+          "query": "What does Authentication cover?",
+          "relevance": {
+            "doc-016-authentication": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.09424999007023871
+        },
+        {
+          "query_id": "Q17",
+          "query": "What does Best Practices cover?",
+          "relevance": {
+            "doc-017-best-practices": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.09074999252334237
+        },
+        {
+          "query_id": "Q18",
+          "query": "What does Caching Strategy cover?",
+          "relevance": {
+            "doc-018-caching-strategy": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.0906249915715307
+        },
+        {
+          "query_id": "Q19",
+          "query": "What does CLI Architecture cover?",
+          "relevance": {
+            "doc-019-cli-architecture": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08999998681247234
+        },
+        {
+          "query_id": "Q20",
+          "query": "What does CLI Usage cover?",
+          "relevance": {
+            "doc-020-cli-usage": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08916697697713971
+        },
+        {
+          "query_id": "Q21",
+          "query": "What does Console Guide cover?",
+          "relevance": {
+            "doc-021-console-guide": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.09041701559908688
+        },
+        {
+          "query_id": "Q22",
+          "query": "What does Correction Loop cover?",
+          "relevance": {
+            "doc-022-correction-loop": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08895801147446036
+        },
+        {
+          "query_id": "Q23",
+          "query": "What does Data Protection Audit cover?",
+          "relevance": {
+            "doc-023-data-protection-audit": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08999998681247234
+        },
+        {
+          "query_id": "Q24",
+          "query": "What does Database Optimization cover?",
+          "relevance": {
+            "doc-024-database-optimization": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.09087499347515404
+        },
+        {
+          "query_id": "Q25",
+          "query": "What does DeepSearch Common Errors cover?",
+          "relevance": {
+            "doc-025-deepsearch-common-errors": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08070800686255097
+        },
+        {
+          "query_id": "Q26",
+          "query": "What does DeepSearch Integration Testing cover?",
+          "relevance": {
+            "doc-026-deepsearch-integration-testing": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.11904101120308042
+        },
+        {
+          "query_id": "Q27",
+          "query": "What does DeepSearch Integration cover?",
+          "relevance": {
+            "doc-027-deepsearch-integration": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08450000314041972
+        },
+        {
+          "query_id": "Q28",
+          "query": "What does Deployment cover?",
+          "relevance": {
+            "doc-028-deployment": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08254198473878205
+        },
+        {
+          "query_id": "Q29",
+          "query": "What does Document Processing cover?",
+          "relevance": {
+            "doc-029-document-processing": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08174998220056295
+        },
+        {
+          "query_id": "Q30",
+          "query": "What does Environment Setup cover?",
+          "relevance": {
+            "doc-030-environment-setup": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08470899774692953
+        },
+        {
+          "query_id": "Q31",
+          "query": "What does Frontend Architecture cover?",
+          "relevance": {
+            "doc-031-frontend-architecture": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08175001130439341
+        },
+        {
+          "query_id": "Q32",
+          "query": "What does Frontend Deployment Decisions cover?",
+          "relevance": {
+            "doc-032-frontend-deployment-decisions": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08075000368990004
+        },
+        {
+          "query_id": "Q33",
+          "query": "What does Getting Started cover?",
+          "relevance": {
+            "doc-033-getting-started": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08170798537321389
+        },
+        {
+          "query_id": "Q34",
+          "query": "What does Ingestion Onboarding Runbook cover?",
+          "relevance": {
+            "doc-034-ingestion-onboarding-runbook": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08195897680707276
+        },
+        {
+          "query_id": "Q35",
+          "query": "What does Ingestion Pipeline Developer Guide cover?",
+          "relevance": {
+            "doc-035-ingestion-pipeline-developer-guide": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08091700146906078
+        },
+        {
+          "query_id": "Q36",
+          "query": "What does Local Development cover?",
+          "relevance": {
+            "doc-036-local-development": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08154197712428868
+        },
+        {
+          "query_id": "Q37",
+          "query": "What does MCP Tools cover?",
+          "relevance": {
+            "doc-037-mcp-tools": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08175001130439341
+        },
+        {
+          "query_id": "Q38",
+          "query": "What does Mission Protocol Tutorial cover?",
+          "relevance": {
+            "doc-038-mission-protocol-tutorial": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08233397966250777
+        },
+        {
+          "query_id": "Q39",
+          "query": "What does Mission Protocol API cover?",
+          "relevance": {
+            "doc-039-mission-protocol-api": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08075000368990004
+        },
+        {
+          "query_id": "Q40",
+          "query": "What does Mission Protocol Validation cover?",
+          "relevance": {
+            "doc-040-mission-protocol-validation": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.07974999607540667
+        },
+        {
+          "query_id": "Q41",
+          "query": "What does Monitoring Dashboard cover?",
+          "relevance": {
+            "doc-041-monitoring-dashboard": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08008300210349262
+        },
+        {
+          "query_id": "Q42",
+          "query": "What does PEDR Sync cover?",
+          "relevance": {
+            "doc-042-pedr-sync": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08062500273808837
+        },
+        {
+          "query_id": "Q43",
+          "query": "What does Preflight Queries cover?",
+          "relevance": {
+            "doc-043-preflight-queries": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08062500273808837
+        },
+        {
+          "query_id": "Q44",
+          "query": "What does Qdrant Railway Setup cover?",
+          "relevance": {
+            "doc-044-qdrant-railway-setup": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08054199861362576
+        },
+        {
+          "query_id": "Q45",
+          "query": "What does Quality Aware Search cover?",
+          "relevance": {
+            "doc-045-quality-aware-search": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08075000368990004
+        },
+        {
+          "query_id": "Q46",
+          "query": "What does Quality Automation cover?",
+          "relevance": {
+            "doc-046-quality-automation": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.08012499893084168
+        },
+        {
+          "query_id": "Q47",
+          "query": "What does Relationship API cover?",
+          "relevance": {
+            "doc-047-relationship-api": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.0744159915484488
+        },
+        {
+          "query_id": "Q48",
+          "query": "What does Report Metadata Analysis cover?",
+          "relevance": {
+            "doc-048-report-metadata-analysis": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.07429200923070312
+        },
+        {
+          "query_id": "Q49",
+          "query": "What does Report Export cover?",
+          "relevance": {
+            "doc-049-report-export": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.07416700827889144
+        },
+        {
+          "query_id": "Q50",
+          "query": "What does Saved Searches cover?",
+          "relevance": {
+            "doc-050-saved-searches": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.07445801747962832
+        },
+        {
+          "query_id": "Q51",
+          "query": "What does Schema Evolution Guide cover?",
+          "relevance": {
+            "doc-051-schema-evolution-guide": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.07404098869301379
+        },
+        {
+          "query_id": "Q52",
+          "query": "What does Schema Package cover?",
+          "relevance": {
+            "doc-052-schema-package": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.07416601874865592
+        },
+        {
+          "query_id": "Q53",
+          "query": "What does Schema Versioning cover?",
+          "relevance": {
+            "doc-053-schema-versioning": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.07466698298230767
+        },
+        {
+          "query_id": "Q54",
+          "query": "What does Search Filters cover?",
+          "relevance": {
+            "doc-054-search-filters": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.07399998139590025
+        },
+        {
+          "query_id": "Q55",
+          "query": "What does Search History cover?",
+          "relevance": {
+            "doc-055-search-history": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.07383301272056997
+        },
+        {
+          "query_id": "Q56",
+          "query": "What does Telemetry Automation cover?",
+          "relevance": {
+            "doc-056-telemetry-automation": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.0738340022508055
+        },
+        {
+          "query_id": "Q57",
+          "query": "What does Workflows cover?",
+          "relevance": {
+            "doc-057-workflows": 2
+          },
+          "retrieved": [],
+          "precision_at_k": 0.0,
+          "recall_at_k": 0.0,
+          "ndcg_at_k": 0.0,
+          "latency_ms": 0.07658300455659628
+        }
+      ]
+    },
+    "relationship_enrichment": {
+      "avg_related_docs_per_query": 222.28070175438597,
+      "avg_related_docs_unique": 51.85964912280702,
+      "avg_results_with_related_pct": 0.9614035087719298
+    },
+    "governance_filtering": {
+      "pii_flagged_in_top_k": 0,
+      "pii_removed": 0,
+      "non_pii_removed": 285,
+      "pii_removal_rate": 0.0
+    }
+  },
+  "baseline_comparison": {
+    "baseline_summary": {
+      "precision_at_k": 0.1614035087719298,
+      "recall_at_k": 0.8070175438596491,
+      "ndcg_at_k": 0.6576873687222684,
+      "top_k": 5
+    },
+    "pedr_summary": {
+      "precision_at_k": 0.16140350877192985,
+      "recall_at_k": 0.8070175438596491,
+      "ndcg_at_k": 0.6576873687222684,
+      "latency_ms": {
+        "mean": 0.11073691073984823,
+        "p50": 0.10845900396816432,
+        "p95": 0.13520801439881325
+      }
+    },
+    "statistical_tests": {
+      "precision_at_k": {
+        "mean_delta": 0.0,
+        "wins": 0,
+        "losses": 0,
+        "ties": 57,
+        "sign_test_p_value": null
+      },
+      "recall_at_k": {
+        "mean_delta": 0.0,
+        "wins": 0,
+        "losses": 0,
+        "ties": 57,
+        "sign_test_p_value": null
+      },
+      "ndcg_at_k": {
+        "mean_delta": 0.0,
+        "wins": 0,
+        "losses": 0,
+        "ties": 57,
+        "sign_test_p_value": null
+      }
+    }
+  }
+}

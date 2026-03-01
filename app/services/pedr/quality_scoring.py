@@ -12,6 +12,7 @@ from app.core.database import SessionLocal
 from app.models.document import Document
 from app.models.mission import Mission
 from app.models.project import Project
+from app.services.pedr.score_utils import ensure_base_score
 
 MetadataLoader = Callable[[Sequence[str]], Dict[str, Dict[str, Any]]]
 logger = logging.getLogger(__name__)
@@ -130,8 +131,9 @@ class QualityScoringService:
             payload["quality_mission_id"] = score.mission_id
             payload["quality_pii_flagged"] = score.pii_flagged
 
-            base_combined = float(payload.get("combined_score") or payload.get("score") or 0.0)
-            payload["combined_score"] = base_combined * effective_score
+            base_combined = ensure_base_score(payload)
+            payload["quality_adjusted_score"] = base_combined * effective_score
+            payload["combined_score"] = payload["quality_adjusted_score"]
             payload["score"] = payload["combined_score"]
             annotated.append(payload)
         if warned_pii:
@@ -269,7 +271,7 @@ class QualityScoringService:
             status=status,
             passed_gates=passed,
             total_gates=total,
-            base_score=round(base_score or self.DEFAULT_BASE_SCORE, 4),
+            base_score=round(base_score, 4),
             boost=round(boost, 4),
             validated=validated,
             pii_flagged=self._detect_pii(metadata.get("mission_data")),
@@ -367,7 +369,7 @@ class QualityScoringService:
     def _apply_governance_penalty(cls, score: float, penalty: float) -> float:
         if not penalty:
             return score
-        adjusted = score + penalty
+        adjusted = score * (1.0 + penalty)
         return max(cls.MIN_SCORE, min(cls.MAX_SCORE, adjusted))
 
 

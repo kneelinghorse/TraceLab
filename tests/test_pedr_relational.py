@@ -520,3 +520,26 @@ class TestEnrichSearchResults:
 
         # Should have empty related_entities, not raise
         assert enriched[0]["related_entities"] == []
+
+
+class TestSessionManagement:
+    """Tests for session ownership behavior in RelationalService."""
+
+    def test_get_related_closes_owned_session(self):
+        service = RelationalService()
+        owned_session = MagicMock()
+
+        with patch("app.services.pedr.relational.SessionLocal", return_value=owned_session):
+            with patch.object(service, "_get_neighbors", return_value=[]):
+                service.get_related("urn:research:chunk:test", max_depth=1)
+
+        owned_session.close.assert_called_once()
+
+    def test_get_related_does_not_close_injected_session(self):
+        injected_session = MagicMock()
+        service = RelationalService(session=injected_session)
+
+        with patch.object(service, "_get_neighbors", return_value=[]):
+            service.get_related("urn:research:chunk:test", max_depth=1)
+
+        injected_session.close.assert_not_called()

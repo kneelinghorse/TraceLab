@@ -1,0 +1,605 @@
+{
+  "summary": {
+    "sample_count": 64,
+    "old": {
+      "min": 0.1,
+      "max": 1.5473249999999996,
+      "mean": 0.84265890625,
+      "pstdev": 0.4893236281189806
+    },
+    "new": {
+      "min": 0.1,
+      "max": 1.5209999999999997,
+      "mean": 0.83768125,
+      "pstdev": 0.4857142185981768
+    },
+    "delta": {
+      "min": 0.0,
+      "max": 0.026324999999999932,
+      "mean": 0.004977656249999996
+    },
+    "ratio_old_to_new": {
+      "min": 1.0,
+      "max": 1.0173076923076922,
+      "mean": 1.005586021923526
+    }
+  },
+  "samples": [
+    {
+      "type_boost": 0.0,
+      "intent_boost": 0.0,
+      "quality_multiplier": 0.1,
+      "old_multiplier": 0.1,
+      "new_multiplier": 0.1,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.0,
+      "intent_boost": 0.0,
+      "quality_multiplier": 0.6,
+      "old_multiplier": 0.6,
+      "new_multiplier": 0.6,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.0,
+      "intent_boost": 0.0,
+      "quality_multiplier": 1.0,
+      "old_multiplier": 1.0,
+      "new_multiplier": 1.0,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.0,
+      "intent_boost": 0.0,
+      "quality_multiplier": 1.17,
+      "old_multiplier": 1.17,
+      "new_multiplier": 1.17,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.0,
+      "intent_boost": 0.05,
+      "quality_multiplier": 0.1,
+      "old_multiplier": 0.10500000000000001,
+      "new_multiplier": 0.10500000000000001,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.0,
+      "intent_boost": 0.05,
+      "quality_multiplier": 0.6,
+      "old_multiplier": 0.63,
+      "new_multiplier": 0.63,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.0,
+      "intent_boost": 0.05,
+      "quality_multiplier": 1.0,
+      "old_multiplier": 1.05,
+      "new_multiplier": 1.05,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.0,
+      "intent_boost": 0.05,
+      "quality_multiplier": 1.17,
+      "old_multiplier": 1.2285,
+      "new_multiplier": 1.2285,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.0,
+      "intent_boost": 0.1,
+      "quality_multiplier": 0.1,
+      "old_multiplier": 0.11000000000000001,
+      "new_multiplier": 0.11000000000000001,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.0,
+      "intent_boost": 0.1,
+      "quality_multiplier": 0.6,
+      "old_multiplier": 0.66,
+      "new_multiplier": 0.66,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.0,
+      "intent_boost": 0.1,
+      "quality_multiplier": 1.0,
+      "old_multiplier": 1.1,
+      "new_multiplier": 1.1,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.0,
+      "intent_boost": 0.1,
+      "quality_multiplier": 1.17,
+      "old_multiplier": 1.287,
+      "new_multiplier": 1.287,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.0,
+      "intent_boost": 0.15,
+      "quality_multiplier": 0.1,
+      "old_multiplier": 0.11499999999999999,
+      "new_multiplier": 0.11499999999999999,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.0,
+      "intent_boost": 0.15,
+      "quality_multiplier": 0.6,
+      "old_multiplier": 0.69,
+      "new_multiplier": 0.69,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.0,
+      "intent_boost": 0.15,
+      "quality_multiplier": 1.0,
+      "old_multiplier": 1.15,
+      "new_multiplier": 1.15,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.0,
+      "intent_boost": 0.15,
+      "quality_multiplier": 1.17,
+      "old_multiplier": 1.3455,
+      "new_multiplier": 1.3455,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.1,
+      "intent_boost": 0.0,
+      "quality_multiplier": 0.1,
+      "old_multiplier": 0.11000000000000001,
+      "new_multiplier": 0.11000000000000001,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.1,
+      "intent_boost": 0.0,
+      "quality_multiplier": 0.6,
+      "old_multiplier": 0.66,
+      "new_multiplier": 0.66,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.1,
+      "intent_boost": 0.0,
+      "quality_multiplier": 1.0,
+      "old_multiplier": 1.1,
+      "new_multiplier": 1.1,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.1,
+      "intent_boost": 0.0,
+      "quality_multiplier": 1.17,
+      "old_multiplier": 1.287,
+      "new_multiplier": 1.287,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.1,
+      "intent_boost": 0.05,
+      "quality_multiplier": 0.1,
+      "old_multiplier": 0.11550000000000003,
+      "new_multiplier": 0.11500000000000002,
+      "delta": 0.0005000000000000143,
+      "ratio_old_to_new": 1.0043478260869567
+    },
+    {
+      "type_boost": 0.1,
+      "intent_boost": 0.05,
+      "quality_multiplier": 0.6,
+      "old_multiplier": 0.6930000000000002,
+      "new_multiplier": 0.6900000000000001,
+      "delta": 0.0030000000000001137,
+      "ratio_old_to_new": 1.0043478260869567
+    },
+    {
+      "type_boost": 0.1,
+      "intent_boost": 0.05,
+      "quality_multiplier": 1.0,
+      "old_multiplier": 1.1550000000000002,
+      "new_multiplier": 1.1500000000000001,
+      "delta": 0.0050000000000001155,
+      "ratio_old_to_new": 1.0043478260869567
+    },
+    {
+      "type_boost": 0.1,
+      "intent_boost": 0.05,
+      "quality_multiplier": 1.17,
+      "old_multiplier": 1.3513500000000003,
+      "new_multiplier": 1.3455000000000001,
+      "delta": 0.005850000000000133,
+      "ratio_old_to_new": 1.0043478260869567
+    },
+    {
+      "type_boost": 0.1,
+      "intent_boost": 0.1,
+      "quality_multiplier": 0.1,
+      "old_multiplier": 0.12100000000000002,
+      "new_multiplier": 0.12000000000000002,
+      "delta": 0.0010000000000000009,
+      "ratio_old_to_new": 1.0083333333333333
+    },
+    {
+      "type_boost": 0.1,
+      "intent_boost": 0.1,
+      "quality_multiplier": 0.6,
+      "old_multiplier": 0.7260000000000001,
+      "new_multiplier": 0.7200000000000001,
+      "delta": 0.006000000000000005,
+      "ratio_old_to_new": 1.0083333333333333
+    },
+    {
+      "type_boost": 0.1,
+      "intent_boost": 0.1,
+      "quality_multiplier": 1.0,
+      "old_multiplier": 1.2100000000000002,
+      "new_multiplier": 1.2000000000000002,
+      "delta": 0.010000000000000009,
+      "ratio_old_to_new": 1.0083333333333333
+    },
+    {
+      "type_boost": 0.1,
+      "intent_boost": 0.1,
+      "quality_multiplier": 1.17,
+      "old_multiplier": 1.4157000000000002,
+      "new_multiplier": 1.4040000000000001,
+      "delta": 0.011700000000000044,
+      "ratio_old_to_new": 1.0083333333333333
+    },
+    {
+      "type_boost": 0.1,
+      "intent_boost": 0.15,
+      "quality_multiplier": 0.1,
+      "old_multiplier": 0.1265,
+      "new_multiplier": 0.125,
+      "delta": 0.0015000000000000013,
+      "ratio_old_to_new": 1.012
+    },
+    {
+      "type_boost": 0.1,
+      "intent_boost": 0.15,
+      "quality_multiplier": 0.6,
+      "old_multiplier": 0.7589999999999999,
+      "new_multiplier": 0.75,
+      "delta": 0.008999999999999897,
+      "ratio_old_to_new": 1.0119999999999998
+    },
+    {
+      "type_boost": 0.1,
+      "intent_boost": 0.15,
+      "quality_multiplier": 1.0,
+      "old_multiplier": 1.265,
+      "new_multiplier": 1.25,
+      "delta": 0.014999999999999902,
+      "ratio_old_to_new": 1.012
+    },
+    {
+      "type_boost": 0.1,
+      "intent_boost": 0.15,
+      "quality_multiplier": 1.17,
+      "old_multiplier": 1.4800499999999999,
+      "new_multiplier": 1.4625,
+      "delta": 0.017549999999999955,
+      "ratio_old_to_new": 1.012
+    },
+    {
+      "type_boost": 0.12,
+      "intent_boost": 0.0,
+      "quality_multiplier": 0.1,
+      "old_multiplier": 0.11200000000000002,
+      "new_multiplier": 0.11200000000000002,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.12,
+      "intent_boost": 0.0,
+      "quality_multiplier": 0.6,
+      "old_multiplier": 0.672,
+      "new_multiplier": 0.672,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.12,
+      "intent_boost": 0.0,
+      "quality_multiplier": 1.0,
+      "old_multiplier": 1.12,
+      "new_multiplier": 1.12,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.12,
+      "intent_boost": 0.0,
+      "quality_multiplier": 1.17,
+      "old_multiplier": 1.3104,
+      "new_multiplier": 1.3104,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.12,
+      "intent_boost": 0.05,
+      "quality_multiplier": 0.1,
+      "old_multiplier": 0.11760000000000002,
+      "new_multiplier": 0.11700000000000002,
+      "delta": 0.0006000000000000033,
+      "ratio_old_to_new": 1.005128205128205
+    },
+    {
+      "type_boost": 0.12,
+      "intent_boost": 0.05,
+      "quality_multiplier": 0.6,
+      "old_multiplier": 0.7056000000000001,
+      "new_multiplier": 0.7020000000000001,
+      "delta": 0.0036000000000000476,
+      "ratio_old_to_new": 1.005128205128205
+    },
+    {
+      "type_boost": 0.12,
+      "intent_boost": 0.05,
+      "quality_multiplier": 1.0,
+      "old_multiplier": 1.1760000000000002,
+      "new_multiplier": 1.1700000000000002,
+      "delta": 0.006000000000000005,
+      "ratio_old_to_new": 1.005128205128205
+    },
+    {
+      "type_boost": 0.12,
+      "intent_boost": 0.05,
+      "quality_multiplier": 1.17,
+      "old_multiplier": 1.37592,
+      "new_multiplier": 1.3689,
+      "delta": 0.007020000000000026,
+      "ratio_old_to_new": 1.005128205128205
+    },
+    {
+      "type_boost": 0.12,
+      "intent_boost": 0.1,
+      "quality_multiplier": 0.1,
+      "old_multiplier": 0.12320000000000003,
+      "new_multiplier": 0.12200000000000003,
+      "delta": 0.0012000000000000066,
+      "ratio_old_to_new": 1.0098360655737706
+    },
+    {
+      "type_boost": 0.12,
+      "intent_boost": 0.1,
+      "quality_multiplier": 0.6,
+      "old_multiplier": 0.7392000000000001,
+      "new_multiplier": 0.7320000000000001,
+      "delta": 0.007199999999999984,
+      "ratio_old_to_new": 1.0098360655737704
+    },
+    {
+      "type_boost": 0.12,
+      "intent_boost": 0.1,
+      "quality_multiplier": 1.0,
+      "old_multiplier": 1.2320000000000002,
+      "new_multiplier": 1.2200000000000002,
+      "delta": 0.01200000000000001,
+      "ratio_old_to_new": 1.0098360655737706
+    },
+    {
+      "type_boost": 0.12,
+      "intent_boost": 0.1,
+      "quality_multiplier": 1.17,
+      "old_multiplier": 1.44144,
+      "new_multiplier": 1.4274000000000002,
+      "delta": 0.01403999999999983,
+      "ratio_old_to_new": 1.0098360655737704
+    },
+    {
+      "type_boost": 0.12,
+      "intent_boost": 0.15,
+      "quality_multiplier": 0.1,
+      "old_multiplier": 0.1288,
+      "new_multiplier": 0.127,
+      "delta": 0.001799999999999996,
+      "ratio_old_to_new": 1.0141732283464566
+    },
+    {
+      "type_boost": 0.12,
+      "intent_boost": 0.15,
+      "quality_multiplier": 0.6,
+      "old_multiplier": 0.7728,
+      "new_multiplier": 0.762,
+      "delta": 0.010800000000000032,
+      "ratio_old_to_new": 1.0141732283464568
+    },
+    {
+      "type_boost": 0.12,
+      "intent_boost": 0.15,
+      "quality_multiplier": 1.0,
+      "old_multiplier": 1.288,
+      "new_multiplier": 1.27,
+      "delta": 0.018000000000000016,
+      "ratio_old_to_new": 1.0141732283464566
+    },
+    {
+      "type_boost": 0.12,
+      "intent_boost": 0.15,
+      "quality_multiplier": 1.17,
+      "old_multiplier": 1.5069599999999999,
+      "new_multiplier": 1.4859,
+      "delta": 0.021059999999999857,
+      "ratio_old_to_new": 1.0141732283464566
+    },
+    {
+      "type_boost": 0.15,
+      "intent_boost": 0.0,
+      "quality_multiplier": 0.1,
+      "old_multiplier": 0.11499999999999999,
+      "new_multiplier": 0.11499999999999999,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.15,
+      "intent_boost": 0.0,
+      "quality_multiplier": 0.6,
+      "old_multiplier": 0.69,
+      "new_multiplier": 0.69,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.15,
+      "intent_boost": 0.0,
+      "quality_multiplier": 1.0,
+      "old_multiplier": 1.15,
+      "new_multiplier": 1.15,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.15,
+      "intent_boost": 0.0,
+      "quality_multiplier": 1.17,
+      "old_multiplier": 1.3455,
+      "new_multiplier": 1.3455,
+      "delta": 0.0,
+      "ratio_old_to_new": 1.0
+    },
+    {
+      "type_boost": 0.15,
+      "intent_boost": 0.05,
+      "quality_multiplier": 0.1,
+      "old_multiplier": 0.12075000000000001,
+      "new_multiplier": 0.12,
+      "delta": 0.0007500000000000145,
+      "ratio_old_to_new": 1.00625
+    },
+    {
+      "type_boost": 0.15,
+      "intent_boost": 0.05,
+      "quality_multiplier": 0.6,
+      "old_multiplier": 0.7245,
+      "new_multiplier": 0.72,
+      "delta": 0.0045000000000000595,
+      "ratio_old_to_new": 1.00625
+    },
+    {
+      "type_boost": 0.15,
+      "intent_boost": 0.05,
+      "quality_multiplier": 1.0,
+      "old_multiplier": 1.2075,
+      "new_multiplier": 1.2,
+      "delta": 0.007500000000000062,
+      "ratio_old_to_new": 1.00625
+    },
+    {
+      "type_boost": 0.15,
+      "intent_boost": 0.05,
+      "quality_multiplier": 1.17,
+      "old_multiplier": 1.412775,
+      "new_multiplier": 1.404,
+      "delta": 0.008774999999999977,
+      "ratio_old_to_new": 1.00625
+    },
+    {
+      "type_boost": 0.15,
+      "intent_boost": 0.1,
+      "quality_multiplier": 0.1,
+      "old_multiplier": 0.1265,
+      "new_multiplier": 0.125,
+      "delta": 0.0015000000000000013,
+      "ratio_old_to_new": 1.012
+    },
+    {
+      "type_boost": 0.15,
+      "intent_boost": 0.1,
+      "quality_multiplier": 0.6,
+      "old_multiplier": 0.7589999999999999,
+      "new_multiplier": 0.75,
+      "delta": 0.008999999999999897,
+      "ratio_old_to_new": 1.0119999999999998
+    },
+    {
+      "type_boost": 0.15,
+      "intent_boost": 0.1,
+      "quality_multiplier": 1.0,
+      "old_multiplier": 1.265,
+      "new_multiplier": 1.25,
+      "delta": 0.014999999999999902,
+      "ratio_old_to_new": 1.012
+    },
+    {
+      "type_boost": 0.15,
+      "intent_boost": 0.1,
+      "quality_multiplier": 1.17,
+      "old_multiplier": 1.4800499999999999,
+      "new_multiplier": 1.4625,
+      "delta": 0.017549999999999955,
+      "ratio_old_to_new": 1.012
+    },
+    {
+      "type_boost": 0.15,
+      "intent_boost": 0.15,
+      "quality_multiplier": 0.1,
+      "old_multiplier": 0.13224999999999998,
+      "new_multiplier": 0.12999999999999998,
+      "delta": 0.002250000000000002,
+      "ratio_old_to_new": 1.0173076923076922
+    },
+    {
+      "type_boost": 0.15,
+      "intent_boost": 0.15,
+      "quality_multiplier": 0.6,
+      "old_multiplier": 0.7934999999999999,
+      "new_multiplier": 0.7799999999999999,
+      "delta": 0.013499999999999956,
+      "ratio_old_to_new": 1.0173076923076922
+    },
+    {
+      "type_boost": 0.15,
+      "intent_boost": 0.15,
+      "quality_multiplier": 1.0,
+      "old_multiplier": 1.3224999999999998,
+      "new_multiplier": 1.2999999999999998,
+      "delta": 0.022499999999999964,
+      "ratio_old_to_new": 1.0173076923076922
+    },
+    {
+      "type_boost": 0.15,
+      "intent_boost": 0.15,
+      "quality_multiplier": 1.17,
+      "old_multiplier": 1.5473249999999996,
+      "new_multiplier": 1.5209999999999997,
+      "delta": 0.026324999999999932,
+      "ratio_old_to_new": 1.0173076923076922
+    }
+  ]
+}

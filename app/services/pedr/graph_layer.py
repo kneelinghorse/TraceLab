@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
 from app.models import DocumentChunk, GraphEdge
 from app.services.pedr.fusion import LayerResult
+from app.services.pedr.score_utils import summarize_scores
 from app.services.pedr.semantic_protocol import URN, URNGenerator
 
 
@@ -234,7 +235,7 @@ class GraphLayerService:
 
         seed_set = set(seeds)
         queue: Deque[Tuple[str, int, str]] = deque((seed, 0, seed) for seed in seeds)
-        visited = {(seed, seed) for seed in seeds}
+        visited = set(seeds)
 
         while queue:
             batch = _drain_queue(queue, self.PREFETCH_BATCH_SIZE)
@@ -268,10 +269,9 @@ class GraphLayerService:
                             decay_factor=config.decay_factor,
                             max_candidates=config.max_candidates,
                         )
-                    visit_key = (next_urn, seed_urn)
-                    if visit_key not in visited:
+                    if next_urn not in visited:
                         if len(candidates) < config.max_candidates or next_urn in candidates:
-                            visited.add(visit_key)
+                            visited.add(next_urn)
                             queue.append((next_urn, hop_depth, seed_urn))
 
         results = self._build_results(session, candidates, config.max_candidates)
@@ -512,32 +512,11 @@ def _drain_queue(
     return batch
 
 
-def _summarize_scores(scores: Sequence[float]) -> Dict[str, float]:
-    values = [float(value) for value in scores if value is not None]
-    if not values:
-        return {}
-    values.sort()
-    count = len(values)
-    mid = count // 2
-    if count % 2 == 1:
-        median = values[mid]
-    else:
-        median = (values[mid - 1] + values[mid]) / 2
-    p90_index = int(0.9 * (count - 1))
-    return {
-        "min": round(values[0], 6),
-        "max": round(values[-1], 6),
-        "avg": round(sum(values) / count, 6),
-        "p50": round(median, 6),
-        "p90": round(values[p90_index], 6),
-    }
-
-
 def _build_score_stats(scores: Sequence[float]) -> Dict[str, Any]:
     values = [float(value) for value in scores if value is not None]
     return {
         "count": len(values),
-        "score_stats": _summarize_scores(values),
+        "score_stats": summarize_scores(values),
     }
 
 

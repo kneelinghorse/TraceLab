@@ -17,6 +17,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
+from app.services.pedr.score_utils import ensure_base_score
+
 
 class ElementType(str, Enum):
     """Searchable entity types in TraceLab."""
@@ -273,8 +275,12 @@ class SyntacticService:
             boosted = []
             for result in results:
                 entry = dict(result)
+                base_score = ensure_base_score(entry)
                 entry["type_boost"] = 0.0
                 entry["element_type_match"] = False
+                entry["type_adjusted_score"] = base_score
+                entry["combined_score"] = base_score
+                entry["score"] = base_score
                 boosted.append(entry)
             return boosted
 
@@ -285,6 +291,7 @@ class SyntacticService:
             entry = dict(result)
             result_type = self._infer_element_type(entry)
             is_match = result_type in target_types
+            base_score = ensure_base_score(entry)
 
             if is_match and result_type:
                 boost_weight = self._boost_weights.get(
@@ -293,13 +300,16 @@ class SyntacticService:
                 entry["type_boost"] = boost_weight
                 entry["element_type_match"] = True
 
-                # Apply boost to combined_score
-                base_score = float(entry.get("combined_score") or entry.get("score") or 0.0)
-                entry["combined_score"] = base_score * (1.0 + boost_weight)
-                entry["score"] = entry["combined_score"]
+                # Apply boost relative to the original fused score.
+                entry["type_adjusted_score"] = base_score * (1.0 + boost_weight)
+                entry["combined_score"] = entry["type_adjusted_score"]
+                entry["score"] = entry["type_adjusted_score"]
             else:
                 entry["type_boost"] = 0.0
                 entry["element_type_match"] = False
+                entry["type_adjusted_score"] = base_score
+                entry["combined_score"] = base_score
+                entry["score"] = base_score
 
             entry["element_type"] = result_type
             boosted.append(entry)

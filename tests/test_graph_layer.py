@@ -325,8 +325,25 @@ def test_cache_hits_recorded(db_session, graph_layer):
         config=GraphLayerConfig(max_depth=2),
     )
 
-    assert layer.metadata["cache_hits"] >= 1
+    # Global visited-set traversal avoids duplicate queueing of shared nodes.
+    assert layer.metadata["cache_hits"] == 0
     assert layer.metadata["cache_misses"] >= 1
+
+
+def test_shared_node_traversed_once_with_global_visited_set(db_session, graph_layer):
+    seed_a = "urn:research:project:seed-global-a"
+    seed_b = "urn:research:project:seed-global-b"
+    mid = "urn:research:document:mid-global"
+    leaf = "urn:research:document:leaf-global"
+    _add_edge(db_session, seed_a, mid, "contains")
+    _add_edge(db_session, seed_b, mid, "contains")
+    _add_edge(db_session, mid, leaf, "references")
+
+    layer = graph_layer.search([seed_a, seed_b], config=GraphLayerConfig(max_depth=2))
+
+    edge_usage = layer.metadata["edge_type_usage"]
+    assert edge_usage["contains"] == 2
+    assert edge_usage["references"] == 1
 
 
 def test_metadata_includes_depth_stats_edge_usage_and_seed_scores(db_session, graph_layer):
