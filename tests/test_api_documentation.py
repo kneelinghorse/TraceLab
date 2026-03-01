@@ -8,6 +8,7 @@ def test_openapi_schema_exposes_mission_and_quality_routes():
     schema = app.openapi()
     paths = schema["paths"]
     assert "/api/v1/missions/" in paths
+    assert "/api/v1/missions/create-and-submit" in paths
     assert "/api/v1/quality/automated/run" in paths
     assert "/api/v1/missions/{mission_id}/quality" in paths
 

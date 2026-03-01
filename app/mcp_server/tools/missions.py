@@ -42,6 +42,7 @@ def _serialize_mission(mission) -> Dict[str, Any]:
     return {
         "id": str(mission.id) if mission.id else None,
         "project_id": str(mission.project_id) if mission.project_id else None,
+        "project_name": mission.project.name if getattr(mission, "project", None) else None,
         "mission_id": mission.mission_id,
         "title": mission.title,
         "objective": mission.objective,
@@ -385,9 +386,10 @@ async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
                 return [TextContent(
                     type="text",
                     text=json.dumps({
-                        "error": "Mission must be associated with a project before submission",
+                        "message": "Mission must have project_id set before submission.",
                         "mission_id": mission.mission_id,
-                        "suggestion": "Use PUT /missions/{id} to set project_id first",
+                        "uuid": str(mission.id),
+                        "suggestion": f"Use PUT /api/v1/missions/{mission.id} to set project_id first.",
                     })
                 )]
 
@@ -396,8 +398,10 @@ async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
                 return [TextContent(
                     type="text",
                     text=json.dumps({
-                        "error": "Mission must have at least one success criterion to be submitted",
+                        "message": "Mission must have at least one success criterion before submission.",
                         "mission_id": mission.mission_id,
+                        "uuid": str(mission.id),
+                        "suggestion": f"Use PUT /api/v1/missions/{mission.id} to add success_criteria.",
                     })
                 )]
 
@@ -406,8 +410,10 @@ async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
                 return [TextContent(
                     type="text",
                     text=json.dumps({
-                        "error": f"Mission is already {mission.status}",
+                        "message": f"Mission is already {mission.status}.",
                         "mission_id": mission.mission_id,
+                        "uuid": str(mission.id),
+                        "current_status": mission.status,
                         "deepsearch_job_id": mission.deepsearch_job_id,
                     })
                 )]

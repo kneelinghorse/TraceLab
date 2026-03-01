@@ -8,7 +8,7 @@ Provides full CRUD operations for missions with:
 from __future__ import annotations
 
 import logging
-from typing import Optional
+from typing import Any, Dict, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
@@ -19,6 +19,7 @@ from app.core.config import settings
 from app.core.database import get_db
 from app.schemas.mission import (
     MissionCreate,
+    MissionErrorResponse,
     MissionResponse,
     MissionSubmitResponse,
     MissionUpdate,
@@ -78,6 +79,95 @@ def _to_response(mission) -> MissionResponse:
     )
 
 
+def _get_mission_by_id_or_mission_id(db: Session, mission_id_str: str):
+    """Resolve mission by UUID or human-readable mission_id."""
+    try:
+        return _service.get_mission(db, UUID(mission_id_str))
+    except (ValueError, MissionNotFoundError):
+        pass
+    return _service.get_mission_by_mission_id(db, mission_id_str)
+
+
+def _build_actionable_detail(
+    *,
+    message: str,
+    mission=None,
+    suggestion: Optional[str] = None,
+    current_status: Optional[str] = None,
+) -> Dict[str, Any]:
+    detail: Dict[str, Any] = {"message": message}
+    if mission is not None:
+        detail["mission_id"] = mission.mission_id
+        detail["uuid"] = str(mission.id)
+    if suggestion:
+        detail["suggestion"] = suggestion
+    if current_status:
+        detail["current_status"] = current_status
+    return detail
+
+
+def _submit_existing_mission(
+    *,
+    db: Session,
+    mission,
+) -> MissionSubmitResponse:
+    """Validate and queue an existing mission for DeepSearch."""
+    if not mission.project_id:
+        raise HTTPException(
+            status_code=http_status.HTTP_400_BAD_REQUEST,
+            detail=_build_actionable_detail(
+                message="Mission must have project_id set before submission.",
+                mission=mission,
+                suggestion=f"Use PUT /api/v1/missions/{mission.id} to set project_id first.",
+            ),
+        )
+
+    if not mission.success_criteria or len(mission.success_criteria) == 0:
+        raise HTTPException(
+            status_code=http_status.HTTP_400_BAD_REQUEST,
+            detail=_build_actionable_detail(
+                message="Mission must have at least one success criterion before submission.",
+                mission=mission,
+                suggestion=f"Use PUT /api/v1/missions/{mission.id} to add success_criteria.",
+            ),
+        )
+
+    if mission.status in ("queued", "in_progress"):
+        raise HTTPException(
+            status_code=http_status.HTTP_400_BAD_REQUEST,
+            detail=_build_actionable_detail(
+                message=f"Mission is already {mission.status}.",
+                mission=mission,
+                current_status=mission.status,
+            ),
+        )
+
+    deepsearch_mode = getattr(settings, "deepsearch_mode", "worker").lower()
+    update_data = MissionUpdate(status="queued")
+    updated_mission = _service.update_mission(db, mission.id, update_data)
+
+    message = (
+        "Mission queued for DeepSearch worker."
+        if deepsearch_mode == "worker"
+        else "Mission submitted to DeepSearch via HTTP."
+    )
+
+    logger.info(
+        "Mission %s submitted (mode=%s)",
+        updated_mission.mission_id,
+        deepsearch_mode,
+    )
+
+    return MissionSubmitResponse(
+        status="queued",
+        mode=deepsearch_mode,
+        mission_id=updated_mission.mission_id,
+        uuid=updated_mission.id,
+        message=message,
+        job_id=updated_mission.deepsearch_job_id,
+    )
+
+
 @router.get("", response_model=PaginatedResponse[MissionResponse])
 def list_missions(
     page: int = Query(1, ge=1, description="Page number (1-indexed)"),
@@ -129,22 +219,35 @@ def list_missions(
         ) from exc
 
 
-@router.get("/{mission_id}", response_model=MissionResponse)
+@router.get(
+    "/{mission_id}",
+    response_model=MissionResponse,
+    summary="Get mission by UUID or mission_id",
+    responses={
+        404: {
+            "description": "Mission not found",
+            "model": MissionErrorResponse,
+        },
+    },
+)
 def get_mission(
-    mission_id: UUID,
+    mission_id: str,
     db: Session = Depends(get_db),
 ) -> MissionResponse:
-    """Get a mission by its UUID.
+    """Get a mission by UUID or human-readable mission_id.
 
-    - **mission_id**: The mission's UUID (not the human-readable mission_id)
+    - **mission_id**: UUID or mission_id (e.g. `B16.1`)
     """
     try:
-        mission = _service.get_mission(db, mission_id)
+        mission = _get_mission_by_id_or_mission_id(db, mission_id)
         return _to_response(mission)
     except MissionNotFoundError as exc:
         raise HTTPException(
             status_code=http_status.HTTP_404_NOT_FOUND,
-            detail=str(exc),
+            detail=_build_actionable_detail(
+                message=str(exc),
+                suggestion="Check mission_id spelling or query GET /api/v1/missions to list available missions.",
+            ),
         ) from exc
     except Exception as exc:
         logger.exception("Error getting mission")
@@ -196,6 +299,59 @@ def create_mission(
         raise HTTPException(
             status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error creating mission: {str(exc)[:200]}",
+        ) from exc
+
+
+@router.post(
+    "/create-and-submit",
+    response_model=MissionSubmitResponse,
+    status_code=http_status.HTTP_201_CREATED,
+    summary="Create and submit a mission in one request",
+    responses={
+        400: {
+            "description": "Validation or submission precondition failed",
+            "model": MissionErrorResponse,
+        },
+        409: {
+            "description": "mission_id already exists",
+            "model": MissionErrorResponse,
+        },
+    },
+)
+def create_and_submit_mission(
+    data: MissionCreate,
+    db: Session = Depends(get_db),
+) -> MissionSubmitResponse:
+    """Create a mission and immediately queue it for DeepSearch execution."""
+    try:
+        mission = _service.create_mission(db, data)
+        submit_response = _submit_existing_mission(db=db, mission=mission)
+        submit_response.message = f"Mission created and {submit_response.message.lower()}"
+        return submit_response
+    except HTTPException:
+        raise
+    except MissionValidationError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_400_BAD_REQUEST,
+            detail=_build_actionable_detail(
+                message=str(exc),
+                suggestion="Review request payload fields and retry.",
+            ),
+        ) from exc
+    except Exception as exc:
+        logger.exception("Error creating and submitting mission")
+        if "UNIQUE constraint failed" in str(exc) or "duplicate key" in str(exc).lower():
+            raise HTTPException(
+                status_code=http_status.HTTP_409_CONFLICT,
+                detail=_build_actionable_detail(
+                    message=f"Mission with mission_id '{data.mission_id}' already exists.",
+                    mission=None,
+                    suggestion=f"Use GET /api/v1/missions/{data.mission_id} or choose a new mission_id.",
+                ),
+            ) from exc
+        raise HTTPException(
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error creating and submitting mission: {str(exc)[:200]}",
         ) from exc
 
 
@@ -298,9 +454,23 @@ def delete_mission(
         ) from exc
 
 
-@router.post("/{mission_id}/submit", response_model=MissionSubmitResponse)
+@router.post(
+    "/{mission_id}/submit",
+    response_model=MissionSubmitResponse,
+    summary="Submit mission by UUID or mission_id",
+    responses={
+        400: {
+            "description": "Submission precondition failed",
+            "model": MissionErrorResponse,
+        },
+        404: {
+            "description": "Mission not found",
+            "model": MissionErrorResponse,
+        },
+    },
+)
 def submit_mission(
-    mission_id: UUID,
+    mission_id: str,
     db: Session = Depends(get_db),
 ) -> MissionSubmitResponse:
     """Submit a mission for DeepSearch execution.
@@ -313,70 +483,19 @@ def submit_mission(
     - Mission has at least one success criterion
     - Mission is not already queued or in progress
 
-    - **mission_id**: The mission's UUID
+    - **mission_id**: UUID or mission_id (e.g. `B16.1`)
     """
     try:
-        # Get mission
-        mission = _service.get_mission(db, mission_id)
-
-        # Validate project_id is set
-        if not mission.project_id:
-            raise HTTPException(
-                status_code=http_status.HTTP_400_BAD_REQUEST,
-                detail={
-                    "message": "Mission must be associated with a project before submission",
-                    "mission_id": str(mission_id),
-                    "suggestion": "Use PUT /missions/{id} to set project_id first",
-                },
-            )
-
-        # Validate success_criteria
-        if not mission.success_criteria or len(mission.success_criteria) == 0:
-            raise HTTPException(
-                status_code=http_status.HTTP_400_BAD_REQUEST,
-                detail="Mission must have at least one success criterion to be submitted",
-            )
-
-        # Check if already submitted
-        if mission.status in ("queued", "in_progress"):
-            raise HTTPException(
-                status_code=http_status.HTTP_400_BAD_REQUEST,
-                detail=f"Mission is already {mission.status}",
-            )
-
-        # Get execution mode from settings
-        deepsearch_mode = getattr(settings, "deepsearch_mode", "worker").lower()
-
-        # Update mission status to queued
-        update_data = MissionUpdate(status="queued")
-        updated_mission = _service.update_mission(db, mission_id, update_data)
-
-        # Build response
-        message = (
-            "Mission queued for DeepSearch worker."
-            if deepsearch_mode == "worker"
-            else "Mission submitted to DeepSearch via HTTP."
-        )
-
-        logger.info(
-            "Mission %s submitted (mode=%s)",
-            updated_mission.mission_id,
-            deepsearch_mode,
-        )
-
-        return MissionSubmitResponse(
-            status="queued",
-            mode=deepsearch_mode,
-            mission_id=updated_mission.mission_id,
-            uuid=updated_mission.id,
-            message=message,
-            job_id=updated_mission.deepsearch_job_id,
-        )
+        mission = _get_mission_by_id_or_mission_id(db, mission_id)
+        return _submit_existing_mission(db=db, mission=mission)
 
     except MissionNotFoundError as exc:
         raise HTTPException(
             status_code=http_status.HTTP_404_NOT_FOUND,
-            detail=str(exc),
+            detail=_build_actionable_detail(
+                message=str(exc),
+                suggestion="Check mission_id spelling or query GET /api/v1/missions to list available missions.",
+            ),
         ) from exc
     except HTTPException:
         raise

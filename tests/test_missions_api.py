@@ -409,6 +409,21 @@ class TestMissionGet:
         assert "created_at" in data
         assert "updated_at" in data
 
+    def test_get_mission_by_human_readable_id(self, auth_headers, db_session):
+        """Get mission by mission_id string."""
+        client = TestClient(app)
+        mission = _create_test_mission(db_session, mission_id="GET-HUMAN-001")
+
+        response = client.get(
+            f"/api/v1/missions/{mission.mission_id}",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["id"] == str(mission.id)
+        assert data["mission_id"] == "GET-HUMAN-001"
+
     def test_get_mission_not_found(self, auth_headers):
         """Get non-existent mission returns 404."""
         client = TestClient(app)
@@ -421,8 +436,8 @@ class TestMissionGet:
 
         assert response.status_code == 404
 
-    def test_get_mission_invalid_uuid(self, auth_headers):
-        """Get mission with invalid UUID returns 422."""
+    def test_get_mission_invalid_identifier_returns_404(self, auth_headers):
+        """Unknown non-UUID identifiers are treated as mission_id and return 404."""
         client = TestClient(app)
 
         response = client.get(
@@ -430,7 +445,7 @@ class TestMissionGet:
             headers=auth_headers,
         )
 
-        assert response.status_code == 422
+        assert response.status_code == 404
 
 
 class TestMissionUpdate:
@@ -739,6 +754,24 @@ class TestMissionSubmit:
         assert "message" in data
         assert data["mode"] in ("worker", "http")
 
+    def test_submit_mission_by_human_readable_id(self, auth_headers, db_session):
+        """Submit accepts mission_id path parameter (not only UUID)."""
+        client = TestClient(app)
+        project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session, mission_id="SUBMIT-HUMAN-001", status="draft", project_id=project.id
+        )
+
+        response = client.post(
+            f"/api/v1/missions/{mission.mission_id}/submit",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        payload = response.json()
+        assert payload["mission_id"] == "SUBMIT-HUMAN-001"
+        assert payload["uuid"] == str(mission.id)
+
     def test_submit_mission_without_project_fails(self, auth_headers, db_session):
         """Cannot submit a mission without a project."""
         client = TestClient(app)
@@ -754,7 +787,8 @@ class TestMissionSubmit:
         assert response.status_code == 400
         data = response.json()
         assert "project" in data["detail"]["message"].lower()
-        assert data["detail"]["mission_id"] == str(mission.id)
+        assert data["detail"]["mission_id"] == mission.mission_id
+        assert data["detail"]["uuid"] == str(mission.id)
         assert "suggestion" in data["detail"]
 
     def test_submit_mission_not_found(self, auth_headers):
@@ -836,3 +870,48 @@ class TestMissionSubmit:
         # Verify in database
         db_session.refresh(mission)
         assert mission.status == "queued"
+
+
+class TestCreateAndSubmitMission:
+    """Tests for POST /api/v1/missions/create-and-submit endpoint."""
+
+    def test_create_and_submit_success(self, auth_headers, db_session):
+        client = TestClient(app)
+        project = _create_test_project(db_session)
+
+        response = client.post(
+            "/api/v1/missions/create-and-submit",
+            json={
+                "mission_id": "CREATE-SUBMIT-001",
+                "title": "Create and submit",
+                "objective": "Create and immediately queue this mission for execution.",
+                "success_criteria": ["Queued for DeepSearch"],
+                "project_id": str(project.id),
+            },
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 201, response.text
+        data = response.json()
+        assert data["status"] == "queued"
+        assert data["mission_id"] == "CREATE-SUBMIT-001"
+        assert "created and" in data["message"].lower()
+
+    def test_create_and_submit_without_project_returns_actionable_error(self, auth_headers):
+        client = TestClient(app)
+
+        response = client.post(
+            "/api/v1/missions/create-and-submit",
+            json={
+                "mission_id": "CREATE-SUBMIT-002",
+                "title": "Create and submit without project",
+                "objective": "This should fail with an actionable project assignment suggestion.",
+                "success_criteria": ["Should fail"],
+            },
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 400
+        detail = response.json()["detail"]
+        assert "project_id" in detail["message"]
+        assert "suggestion" in detail

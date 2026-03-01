@@ -9,6 +9,7 @@ Tests cover:
 Note: These tests use pytest.mark.unit to avoid database fixture setup.
 """
 import pytest
+import time
 from datetime import date
 from typing import Any, Dict, List, Optional
 from unittest.mock import MagicMock, patch
@@ -333,6 +334,105 @@ class TestPEDRSearchOrchestrator:
         assert captured["lexical_top_k"] == 12
         assert captured["semantic_top_k"] == 12
 
+    def test_retrieval_layers_execute_in_parallel(self):
+        """Lexical and semantic retrieval should execute concurrently."""
+        def lexical_search(**_kwargs: Any) -> List[Dict[str, Any]]:
+            time.sleep(0.12)
+            return [{"chunk_id": "lex", "content": "lexical", "score": 0.7}]
+
+        def semantic_search(**_kwargs: Any) -> List[Dict[str, Any]]:
+            time.sleep(0.12)
+            return [{"chunk_id": "sem", "content": "semantic", "score": 0.9}]
+
+        orchestrator = PEDRSearchOrchestrator(
+            lexical_search=lexical_search,
+            semantic_search=semantic_search,
+        )
+
+        t0 = time.perf_counter()
+        response = orchestrator.search(query="parallel retrieval test", top_k=2)
+        elapsed_ms = (time.perf_counter() - t0) * 1000
+
+        assert response.metadata.result_count >= 1
+        # Sequential execution would be roughly >=240ms; parallel should be substantially lower.
+        assert elapsed_ms < 200
+
+    def test_cache_key_includes_layer_enable_flags(self):
+        """Cache filter payload includes all layer enable flags."""
+        class _Stats:
+            def to_dict(self) -> Dict[str, Any]:
+                return {}
+
+        class _CaptureCache:
+            def __init__(self) -> None:
+                self.filters: Dict[str, Any] = {}
+
+            def get(self, _query: str, _top_k: int, filters: Dict[str, Any]):
+                self.filters = dict(filters)
+                return None
+
+            def set(self, *_args: Any, **_kwargs: Any) -> None:
+                return None
+
+            def get_stats(self) -> _Stats:
+                return _Stats()
+
+        cache = _CaptureCache()
+        orchestrator = PEDRSearchOrchestrator(
+            lexical_search=MagicMock(return_value=[]),
+            semantic_search=MagicMock(return_value=[]),
+        )
+
+        with patch("app.services.pedr.search_orchestrator.get_pedr_cache", return_value=cache):
+            orchestrator.search(
+                query="cache key flags",
+                enable_lexical=False,
+                enable_semantic=True,
+                enable_syntactic=False,
+                enable_pragmatic=True,
+                enable_governance=False,
+                enable_graph=True,
+            )
+
+        assert cache.filters["enable_lexical"] is False
+        assert cache.filters["enable_semantic"] is True
+        assert cache.filters["enable_syntactic"] is False
+        assert cache.filters["enable_pragmatic"] is True
+        assert cache.filters["enable_governance"] is False
+        assert cache.filters["enable_graph"] is True
+
+    def test_lexical_wrapper_forwards_source_origin_filter(self):
+        """Factory lexical wrapper should forward source_origin into keyword search."""
+        captured: Dict[str, Any] = {}
+
+        class _HybridStub:
+            def _keyword_search(self, **kwargs: Any) -> List[Dict[str, Any]]:
+                captured.update(kwargs)
+                return []
+
+        class _RetrievalStub:
+            def search(self, **_kwargs: Any) -> List[Dict[str, Any]]:
+                return []
+
+        from app.services.pedr.search_orchestrator import create_pedr_orchestrator
+
+        with patch(
+            "app.services.hybrid_search.get_hybrid_search_service",
+            return_value=_HybridStub(),
+        ), patch(
+            "app.services.retrieval_service.get_retrieval_service",
+            return_value=_RetrievalStub(),
+        ):
+            orchestrator = create_pedr_orchestrator()
+            orchestrator.search(
+                query="source origin forwarding",
+                source_origin="synthesized",
+                enable_semantic=False,
+                top_k=2,
+            )
+
+        assert captured["source_origin"] == "synthesized"
+
     def test_search_applies_syntactic_type(self, mock_lexical, mock_semantic):
         """Syntactic layer detects and applies element type."""
         orchestrator = PEDRSearchOrchestrator(
@@ -619,6 +719,14 @@ class TestPEDRSchemas:
 
         with pytest.raises(ValueError):
             PEDRSearchRequest(query="test", top_k=0)  # top_k < 1
+
+        with pytest.raises(ValueError):
+            PEDRSearchRequest(
+                query="hybrid validation",
+                rerank_mode="hybrid",
+                top_k=10,
+                candidate_pool=10,
+            )
 
     def test_layer_weights_validation(self):
         """Layer weights validate ranges."""

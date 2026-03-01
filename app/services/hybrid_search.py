@@ -220,6 +220,7 @@ class HybridSearchService:
         project_id: Optional[str],
         document_id: Optional[str],
         source_type: Optional[str],
+        source_origin: Optional[str] = None,
         filters: FacetFilters,
         limit: int,
     ) -> List[Dict[str, Any]]:
@@ -256,6 +257,8 @@ class HybridSearchService:
                 stmt = stmt.where(DocumentChunk.document_id == document_uuid)
             if source_type:
                 stmt = stmt.where(Document.source_type == source_type)
+            if source_origin:
+                stmt = stmt.where(Document.source_origin == source_origin)
 
             rows = session.execute(stmt).all()
             results: List[Dict[str, Any]] = []

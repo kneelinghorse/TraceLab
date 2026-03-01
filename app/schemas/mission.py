@@ -280,6 +280,34 @@ class MissionSubmitResponse(BaseModel):
     job_id: Optional[str] = Field(None, description="DeepSearch job ID (http mode only)")
 
 
+class MissionActionableError(BaseModel):
+    """Structured error details for agent-facing mission workflows."""
+
+    message: str = Field(..., description="Human-readable error message")
+    mission_id: Optional[str] = Field(
+        None,
+        description="Human-readable mission identifier when available",
+    )
+    uuid: Optional[UUID] = Field(
+        None,
+        description="Mission UUID when available",
+    )
+    suggestion: Optional[str] = Field(
+        None,
+        description="Concrete follow-up action to resolve the issue",
+    )
+    current_status: Optional[MissionStatus] = Field(
+        None,
+        description="Current mission status, when relevant",
+    )
+
+
+class MissionErrorResponse(BaseModel):
+    """HTTP error envelope used by mission endpoints."""
+
+    detail: MissionActionableError
+
+
 class ReportPromotionResponse(BaseModel):
     """Response from promoting a mission report to a document."""
 
