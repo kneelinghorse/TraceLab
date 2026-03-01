@@ -135,7 +135,7 @@ class TestDryRun:
         assert "Documents to process: 2" in captured.out
         assert "test_doc_1.pdf" in captured.out
         assert "test_doc_2.pdf" in captured.out
-        assert "Estimated cost:" in captured.out
+        assert "Estimated cost (@" in captured.out
 
     def test_dry_run_with_resume_filter(self, capsys):
         """Dry run respects resume_from filter."""
@@ -222,6 +222,7 @@ class TestReprocessEmbeddings:
         ]
 
         mock_qdrant_service = MagicMock()
+        mock_qdrant_service.vector_size = 3
 
         # Run reprocessing
         reprocess_script.reprocess_embeddings(
@@ -313,14 +314,61 @@ class TestReprocessEmbeddings:
         # Should not call embedding service
         mock_embedding_service.generate_embeddings_batch.assert_not_called()
 
+    def test_reprocess_skips_document_on_embedding_dimension_mismatch(self):
+        """Reprocessing should not upsert when embedding size doesn't match expected."""
+        mock_doc = MagicMock()
+        mock_doc.id = uuid.uuid4()
+        mock_doc.project_id = uuid.uuid4()
+        mock_doc.name = "test.pdf"
+        mock_doc.source_type = "interview"
+        mock_doc.chunked = True
+
+        mock_chunk = MagicMock()
+        mock_chunk.id = uuid.uuid4()
+        mock_chunk.document_id = mock_doc.id
+        mock_chunk.chunk_index = 0
+        mock_chunk.content = "Chunk content"
+
+        mock_db = MagicMock()
+        call_counter = [0]
+
+        def route_query(*_args):
+            call_counter[0] += 1
+            mock_q = MagicMock()
+            # 1: doc list, 2: chunk count aggregate, 3: per-doc chunk count, 4: chunks query
+            if call_counter[0] == 1:
+                mock_q.filter.return_value.order_by.return_value.all.return_value = [mock_doc]
+            elif call_counter[0] in (2, 3):
+                mock_q.filter.return_value.scalar.return_value = 1
+            else:
+                mock_q.filter.return_value.order_by.return_value.all.return_value = [mock_chunk]
+            return mock_q
+
+        mock_db.query.side_effect = route_query
+
+        mock_embedding_service = MagicMock()
+        mock_embedding_service.generate_embeddings_batch.return_value = [[0.1, 0.2, 0.3]]
+
+        mock_qdrant_service = MagicMock()
+        mock_qdrant_service.vector_size = 3072
+
+        reprocess_script.reprocess_embeddings(
+            db=mock_db,
+            embedding_service=mock_embedding_service,
+            qdrant_service=mock_qdrant_service,
+            expected_dimension=3072,
+        )
+
+        mock_qdrant_service.upsert_chunks.assert_not_called()
+
 
 class TestCostEstimation:
     """Tests for cost estimation logic."""
 
     def test_cost_constants_are_reasonable(self):
         """Cost constants should be reasonable for OpenAI pricing."""
-        # $0.02 per 1M tokens = $0.00002 per 1K tokens
-        assert reprocess_script.COST_PER_1K_TOKENS == 0.00002
+        assert reprocess_script.MODEL_COST_PER_1M_TOKENS["text-embedding-3-small"] == 0.02
+        assert reprocess_script.MODEL_COST_PER_1M_TOKENS["text-embedding-3-large"] == 0.13
 
         # Average chunk should be 500-1000 tokens
         assert 500 <= reprocess_script.AVG_TOKENS_PER_CHUNK <= 1000
@@ -328,13 +376,24 @@ class TestCostEstimation:
     def test_cost_estimation_calculation(self):
         """Cost estimation should be mathematically correct."""
         # 1000 chunks * 750 tokens/chunk = 750,000 tokens
-        # 750,000 tokens / 1000 * $0.00002 = $0.015
+        # text-embedding-3-large is $0.13 / 1M tokens
         chunks = 1000
+        cost_per_1k = reprocess_script.cost_per_1k_tokens("text-embedding-3-large")
         expected_tokens = chunks * reprocess_script.AVG_TOKENS_PER_CHUNK
-        expected_cost = (expected_tokens / 1000) * reprocess_script.COST_PER_1K_TOKENS
+        expected_cost = (expected_tokens / 1000) * cost_per_1k
 
         assert expected_tokens == 750_000
-        assert expected_cost == pytest.approx(0.015)
+        assert expected_cost == pytest.approx(0.0975)
+
+    def test_cost_per_1k_tokens_fallback(self):
+        """Unknown models should use safe default pricing."""
+        assert reprocess_script.cost_per_1k_tokens("unknown-model") == pytest.approx(0.00013)
+
+    def test_normalize_chunk_text_truncates_long_content(self):
+        """Chunk text should be capped to the embedding safety threshold."""
+        oversized = "a" * (reprocess_script.MAX_EMBEDDING_CHARS + 10)
+        normalized = reprocess_script.normalize_chunk_text(oversized)
+        assert len(normalized) == reprocess_script.MAX_EMBEDDING_CHARS
 
 
 class TestGetDocumentStats:

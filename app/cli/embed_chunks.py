@@ -89,7 +89,7 @@ def process_chunks(
         
         # Store in Qdrant
         try:
-            qdrant_service.upsert_chunks(qdrant_chunks, batch_size=2000, parallel=2)
+            qdrant_service.upsert_chunks(qdrant_chunks, batch_size=100, parallel=2)
             
             # Update chunks in database
             for chunk, qdrant_chunk in zip(batch, qdrant_chunks):

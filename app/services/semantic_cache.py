@@ -67,25 +67,65 @@ class SemanticCacheService:
         """Return the underlying Qdrant client."""
         return self._client
 
+    @staticmethod
+    def _extract_vector_size(collection_info: Any) -> Optional[int]:
+        """Extract configured vector size from Qdrant collection metadata."""
+        config = getattr(collection_info, "config", None)
+        params = getattr(config, "params", None) if config else None
+        vectors = getattr(params, "vectors", None) if params else None
+        if vectors is None:
+            return None
+
+        size = getattr(vectors, "size", None)
+        if isinstance(size, int):
+            return size
+
+        if isinstance(vectors, dict):
+            for value in vectors.values():
+                nested = getattr(value, "size", None)
+                if isinstance(nested, int):
+                    return nested
+                if isinstance(value, dict):
+                    fallback = value.get("size")
+                    if isinstance(fallback, int):
+                        return fallback
+        return None
+
+    def _create_collection(self) -> None:
+        """Create semantic cache collection at the configured embedding dimension."""
+        vectors_config = VectorParams(
+            size=settings.openai_embedding_dimension,
+            distance=Distance.COSINE,
+            on_disk=True,
+        )
+        self.client.create_collection(
+            collection_name=self.collection_name,
+            vectors_config=vectors_config,
+            hnsw_config=None,
+            optimizers_config=None,
+            on_disk_payload=True,
+        )
+
     def _ensure_collection(self) -> None:
         collections = self.client.get_collections().collections
         names = [collection.name for collection in collections]
         if self.collection_name not in names:
-            vectors_config = VectorParams(
-                size=settings.openai_embedding_dimension,
-                distance=Distance.COSINE,
-                on_disk=True,
-            )
-            self.client.create_collection(
-                collection_name=self.collection_name,
-                vectors_config=vectors_config,
-                hnsw_config=None,
-                optimizers_config=None,
-                on_disk_payload=True,
-            )
+            self._create_collection()
             self._create_payload_indexes()
-        else:
+            return
+
+        # Semantic cache is ephemeral; safe to recreate when dimensions change.
+        try:
+            info = self.client.get_collection(self.collection_name)
+        except Exception:
             self._create_payload_indexes()
+            return
+        existing_size = self._extract_vector_size(info)
+        if existing_size and existing_size != settings.openai_embedding_dimension:
+            self.client.delete_collection(self.collection_name)
+            self._create_collection()
+
+        self._create_payload_indexes()
 
     def _create_payload_indexes(self) -> None:
         """Ensure common filter fields are indexed for quick lookups."""
