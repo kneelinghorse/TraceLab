@@ -194,7 +194,7 @@ tracelab documents delete <document-id> --confirm
 tracelab search semantic <project-id> "query text" --top-k 10
 
 # RAG query
-tracelab rag query <project-id> "question?" --model gpt-4o --top-k 5
+tracelab rag query <project-id> "question?" --model gpt-5.2 --top-k 5
 ```
 
 ### Missions

@@ -88,7 +88,7 @@ def _write_events(path: Path) -> None:
     rows = [
         {
             "ts": "2025-11-15T12:00:00Z",
-            "model": "gpt-4o",
+            "model": "gpt-5.2",
             "route": "primary",
             "cost_usd": 0.4,
             "latency_ms": 3200,

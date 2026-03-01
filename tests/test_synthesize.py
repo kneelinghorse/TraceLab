@@ -432,6 +432,35 @@ class TestSynthesizeService:
         assert result["tokens_used"] == 600  # From mock
         mock_cost_monitor.track_usage.assert_called_once()
 
+    @patch("app.services.synthesis.OpenAI")
+    def test_service_sets_reasoning_effort_for_gpt5_models(self, mock_openai_class, db_session):
+        """Test GPT-5.1/5.2 chat requests pin reasoning_effort for temperature compatibility."""
+        mock_client = MagicMock()
+        mock_client.chat.completions.create.return_value = _mock_openai_response()
+        mock_openai_class.return_value = mock_client
+
+        from app.services.synthesis import SynthesisService
+
+        service = SynthesisService(
+            session_factory=SessionLocal,
+            client=mock_client,
+            model="gpt-5.1",
+            temperature=0.35,
+            max_tokens=512,
+        )
+
+        project = _create_test_project(db_session)
+        document = _create_test_document(db_session, project.id)
+        chunk = _create_test_chunk(db_session, document.id, 0, "Compatibility test content.")
+
+        service.synthesize(chunk_ids=[uuid.UUID(str(chunk.id))])
+
+        kwargs = mock_client.chat.completions.create.call_args.kwargs
+        assert kwargs["model"] == "gpt-5.1"
+        assert kwargs["reasoning_effort"] == "none"
+        assert kwargs["temperature"] == 0.35
+        assert kwargs["max_tokens"] == 512
+
 
 class TestSynthesizeSchemas:
     """Tests for Pydantic request/response schemas."""

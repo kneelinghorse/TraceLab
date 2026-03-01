@@ -40,7 +40,7 @@ class QualityAssessmentConfig:
     )
     refusal_patterns: Sequence[str] = field(
         default_factory=lambda: [
-            r"\bi (?:cannot|can't) (?:help|comply|answer)",
+            r"\bi (?:cannot|can['’]t) (?:help|assist|comply|answer)\b",
             r"\bi'm sorry\b",
             r"\bas an ai (?:language )?model\b",
             r"\bi do not have access\b",

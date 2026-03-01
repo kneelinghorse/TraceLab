@@ -322,6 +322,35 @@ def test_rag_service_run_query(monkeypatch):
     assert result["search_mode"] == "semantic"
 
 
+def test_rag_service_sets_reasoning_effort_for_gpt5_models(monkeypatch):
+    fake_pedr = _FakePEDROrchestrator()
+    fake_embedding = _FakeEmbeddingService()
+    fake_client = _FakeOpenAIClient(
+        "Model compatibility check. [Document: doc-1, Chunk: 0]"
+    )
+
+    cache = _NoOpCacheService()
+    monkeypatch.setattr(rag_module, "_openai_import_error", None, raising=False)
+    monkeypatch.setattr(rag_module, "OpenAI", object, raising=False)
+    service = rag_module.RagService(
+        pedr_orchestrator=fake_pedr,
+        embedding_service=fake_embedding,
+        cache_service=cache,
+        client=fake_client,
+        model="gpt-5.1",
+        default_temperature=0.2,
+        cost_monitor=None,
+    )
+
+    service.run_query(query="Validate GPT-5 chat params", top_k=2, project_id="proj-1")
+
+    request = fake_client.chat.completions.requests[0]
+    assert request["model"] == "gpt-5.1"
+    assert request["reasoning_effort"] == "none"
+    assert request["temperature"] == 0.2
+    assert request["max_tokens"] == settings.rag_default_max_tokens
+
+
 def test_rag_service_respects_search_mode(monkeypatch):
     # PEDR doesn't use search_mode directly - it uses RRF fusion across layers
     # This test verifies search_mode is passed through to the response

@@ -50,8 +50,9 @@ _CITATION_PATTERN = re.compile(
 
 
 MODEL_COST_ESTIMATES = {
-    "gpt-4o-mini": 0.00018,
-    "gpt-4o": 0.00075,
+    # Fallback estimate per attempt when token usage is unavailable.
+    "gpt-5.1": 0.0010,
+    "gpt-5.2": 0.0016,
 }
 
 
@@ -105,7 +106,7 @@ class RagService:
         )
         self.primary_model = model or settings.openai_chat_model
         self.model = self.primary_model  # maintain backwards compatibility for callers accessing .model
-        self.escalation_model = escalation_model or getattr(settings, "openai_escalation_model", "gpt-4o")
+        self.escalation_model = escalation_model or getattr(settings, "openai_escalation_model", "gpt-5.2")
         self.default_temperature = (
             default_temperature if default_temperature is not None else settings.openai_chat_temperature
         )
@@ -655,12 +656,17 @@ class RagService:
         """Call the OpenAI chat completion API with simple exponential backoff."""
         for attempt in range(retry_max):
             try:
-                response = self.client.chat.completions.create(
-                    model=model if model is not None else self.primary_model,
-                    messages=messages,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                )
+                model_name = model if model is not None else self.primary_model
+                request = {
+                    "model": model_name,
+                    "messages": messages,
+                    "temperature": temperature,
+                    "max_tokens": max_tokens,
+                }
+                if model_name.lower().startswith(("gpt-5.1", "gpt-5.2")):
+                    # GPT-5.1/5.2 support temperature when reasoning_effort is explicitly none.
+                    request["reasoning_effort"] = "none"
+                response = self.client.chat.completions.create(**request)
                 content = response.choices[0].message.content if response.choices else ""
                 usage = self._extract_usage(response)
                 return (content or "").strip(), usage

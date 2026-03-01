@@ -142,8 +142,8 @@ def _build_service(monkeypatch, *, cache=None, responses=None):
         client=client,
         quality_assessor=assessor,
         cost_monitor=cost_monitor,
-        model="gpt-4o-mini",
-        escalation_model="gpt-4o",
+        model="gpt-5.1",
+        escalation_model="gpt-5.2",
     )
     return service, embedding, retrieval, cache_service, cost_monitor, assessor, client
 

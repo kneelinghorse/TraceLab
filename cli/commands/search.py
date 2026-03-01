@@ -63,7 +63,7 @@ def rag():
 @rag.command()
 @click.argument("project_id")
 @click.argument("query")
-@click.option("--model", default="gpt-4o-mini", help="LLM model to use")
+@click.option("--model", default="gpt-5.1", help="LLM model to use")
 @click.option("--top-k", default=5, help="Number of context chunks")
 @click.pass_obj
 def query(ctx, project_id, query, model, top_k):
@@ -101,4 +101,3 @@ def query(ctx, project_id, query, model, top_k):
         else:
             print(format_error_human(e), file=sys.stderr)
         sys.exit(e.exit_code)
-
