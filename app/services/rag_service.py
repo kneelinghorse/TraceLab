@@ -657,13 +657,14 @@ class RagService:
         for attempt in range(retry_max):
             try:
                 model_name = model if model is not None else self.primary_model
+                is_gpt5 = model_name.lower().startswith(("gpt-5.1", "gpt-5.2"))
                 request = {
                     "model": model_name,
                     "messages": messages,
                     "temperature": temperature,
-                    "max_tokens": max_tokens,
+                    "max_completion_tokens" if is_gpt5 else "max_tokens": max_tokens,
                 }
-                if model_name.lower().startswith(("gpt-5.1", "gpt-5.2")):
+                if is_gpt5:
                     # GPT-5.1/5.2 support temperature when reasoning_effort is explicitly none.
                     request["reasoning_effort"] = "none"
                 response = self.client.chat.completions.create(**request)

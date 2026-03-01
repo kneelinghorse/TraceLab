@@ -1,5 +1,7 @@
 # DeepSearch Ingestion & Evidence Auto-Linking
 
+> **Sprint 29 Update (March 2026)**: Major changes to LLM models, embedding dimensions, PEDR search quality, evidence auto-linking, and mission API endpoints. See the [Sprint 29 Impact Report](deepsearch-sprint29-impact-report.md) for a full migration checklist.
+
 TraceLab now exposes a dedicated ingestion surface for DeepSearch agents so completed missions can be pushed into the Mission Protocol engine without manual review. The workflow centers on the `POST /api/v1/deepsearch/ingest` endpoint and an evidence auto-linking service that matches DeepSearch evidence to TraceLab document chunks before quality gates execute.
 
 ## Endpoint Overview
@@ -15,7 +17,7 @@ TraceLab now exposes a dedicated ingestion surface for DeepSearch agents so comp
   "project_id": "existing-project-uuid",      // optional when auto_create_project is true
   "auto_create_project": false,
   "project_name": "DeepSearch Research Output", // required only for auto-create
-  "similarity_threshold": 0.75,               // optional override (default 0.70)
+  "similarity_threshold": 0.78,               // optional override (default 0.78, cosine similarity)
   "mission": { ...MissionProtocolComplete JSON... }
 }
 ```
@@ -44,7 +46,7 @@ Key call-outs:
     "linked": 3,
     "skipped": 0,
     "success_rate": 1.0,
-    "threshold": 0.7,
+    "threshold": 0.78,
     "matches": [
       { "evidence_id": "EV-001", "chunk_id": "f6c9...f1d8", "similarity": 0.91 }
     ]
@@ -66,9 +68,12 @@ Quality gate failures include the failing gate names, gate metadata, originating
 
 DeepSearch supplies URL-only evidence; TraceLab enriches those entries by matching evidence summaries against stored document chunks:
 
-- `app/services/evidence_auto_linking.py` loads recent chunks for the target project and uses `difflib.SequenceMatcher` to score similarity between evidence summaries and chunk content.
-- Matches above the configurable threshold update `chunk_id` and `relevance_score` in-memory before validation executes, ensuring the `evidence_links` and `traceability` gates evaluate against chunk-backed evidence.
-- Results (attempted/skipped/linked, per-evidence similarity measurements, and success rate) are written to `cmos/telemetry/events/sprint-10-deepsearch-ingestion.jsonl` for auditing.
+- `app/services/evidence_auto_linking.py` uses a **strategy pattern** with two linking approaches:
+  1. **Primary — Embedding similarity** (Sprint 29+): Embeds each evidence summary via `text-embedding-3-large` (3072d) and queries Qdrant for the nearest document chunks by cosine similarity. Faster and dramatically more accurate for paraphrased or summarized evidence.
+  2. **Fallback — difflib string similarity**: Activated only if the embedding service or Qdrant is unavailable and `auto_link_fallback_to_difflib` is `True` (default). Loads up to 750 chunks and uses `SequenceMatcher`.
+- Matches above the configurable threshold (default: 0.78 cosine similarity) update `chunk_id` and `relevance_score` in-memory before validation executes, ensuring the `evidence_links` and `traceability` gates evaluate against chunk-backed evidence.
+- Results (attempted/skipped/linked, per-evidence similarity measurements, linking method, and success rate) are written to `cmos/telemetry/events/sprint-10-deepsearch-ingestion.jsonl` for auditing.
+- New error types `EMBEDDING_FAILED` and `QDRANT_ERROR` are retryable via the correction queue.
 
 > **Note:** Tests override the telemetry sink to avoid mutating repository fixtures, but production deployments should keep the default path to satisfy the CMOS mission deliverable.
 
