@@ -33,8 +33,8 @@ class _StubSweepService:
             "vectors_count": 500_000,
             "payload_indexes": [],
             "hnsw": {
-                "m": 16,
-                "ef_construct": 100,
+                "m": 24,
+                "ef_construct": 128,
                 "full_scan_threshold": 20_000,
                 "on_disk": False,
             },

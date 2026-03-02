@@ -80,29 +80,29 @@ class RetrievalService:
         return self.faceted_service.filter_chunks(results, filters)
 
     def recommend_hnsw_ef(self, top_k: int) -> int:
-        """
-        Recommend an HNSW ef value that balances recall and latency.
+        """Recommend an HNSW ef value that balances recall and latency.
 
-        Tuned based on B19.3 benchmarks (2025-12-10):
-        - ef=32-64: ~40ms avg latency, 100% recall at 7K corpus
-        - ef=128: ~47ms avg latency (baseline)
+        Re-tuned for 3072d vectors (T30.4, text-embedding-3-large):
+        - B19.3 baseline (1536d): ef=64 gave 45% P99 improvement, 100% recall at 7K
+        - 3072d doubles distance-computation cost per candidate
+        - Scaling is slightly more conservative to maintain recall with higher dims
 
         Uses lower ef values for latency-sensitive interactive queries,
-        scaling up only for large result sets to maintain recall.
+        scaling up for larger result sets to maintain recall.
         """
         base_ef = settings.qdrant_hnsw_ef_default  # 64 by default
 
         if top_k <= 5:
-            # Small result sets: use base ef, very fast
+            # Small result sets: use base ef
             return base_ef
         if top_k <= 10:
             # Medium result sets: slight increase for recall margin
-            return max(base_ef, 72)
+            return max(base_ef, 80)
         if top_k <= 20:
-            # Larger result sets: increase for better recall
-            return max(base_ef, 96)
-        # Very large fan-outs: scale conservatively
-        return min(128, max(base_ef, int(top_k * 4)))
+            # Larger result sets: more aggressive scaling for 3072d recall
+            return max(base_ef, 112)
+        # Very large fan-outs: scale conservatively, cap at 160 for 3072d
+        return min(160, max(base_ef, int(top_k * 5)))
 
 
 # Singleton instance (lazy initialization)

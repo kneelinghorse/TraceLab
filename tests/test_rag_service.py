@@ -348,7 +348,7 @@ def test_rag_service_sets_reasoning_effort_for_gpt5_models(monkeypatch):
     assert request["model"] == "gpt-5.1"
     assert request["reasoning_effort"] == "none"
     assert request["temperature"] == 0.2
-    assert request["max_tokens"] == settings.rag_default_max_tokens
+    assert request["max_completion_tokens"] == settings.rag_default_max_tokens
 
 
 def test_rag_service_respects_search_mode(monkeypatch):

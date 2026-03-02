@@ -23,11 +23,13 @@ class Settings(BaseSettings):
     qdrant_collection_name: str = "research_chunks"
     qdrant_prefer_grpc: bool = False
     qdrant_timeout_seconds: float = 10.0
-    # HNSW tuning: ef_search controls recall/latency trade-off (B19.3)
-    # Lower values = faster but potentially lower recall
-    # Benchmarks (7K points): ef=32-64 gives ~40ms avg, ef=128 gives ~47ms avg
-    # All values tested showed 100% recall at current corpus size
-    qdrant_hnsw_ef_default: int = 64  # Optimized default (was 128)
+    # HNSW tuning for 3072d vectors (text-embedding-3-large)
+    # T30.4 re-tuned for 3072d (was 1536d in B19.3).
+    # Higher dimensions need higher m for graph quality; ef_construct raised for index quality.
+    # ef_search=64 retained — Sprint 19 showed 100% recall at current corpus.
+    qdrant_hnsw_m: int = 24  # Graph degree (was 16 for 1536d)
+    qdrant_hnsw_ef_construct: int = 128  # Index construction quality (was 100 for 1536d)
+    qdrant_hnsw_ef_default: int = 64  # Query-time ef (100% recall at 7K corpus)
     
     # OpenAI
     openai_api_key: Optional[str] = None
