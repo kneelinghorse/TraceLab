@@ -489,7 +489,7 @@ class TestAPIEndpointsWithSoftDelete:
         assert response.status_code == 400
         assert "not deleted" in response.json()["detail"]
 
-    def test_list_projects_with_include_deleted(self, db_session):
+    def test_list_projects_with_include_deleted(self, db_session, auth_headers):
         """GET /projects?include_deleted=true should return deleted projects."""
         active = Project(name="Active API Test")
         deleted = Project(name="Deleted API Test")
@@ -500,14 +500,14 @@ class TestAPIEndpointsWithSoftDelete:
         db_session.commit()
 
         # Without include_deleted
-        response = client.get("/api/v1/projects")
+        response = client.get("/api/v1/projects", headers=auth_headers)
         assert response.status_code == 200
         names = [p["name"] for p in response.json()["data"]]
         assert "Active API Test" in names
         assert "Deleted API Test" not in names
 
         # With include_deleted
-        response = client.get("/api/v1/projects?include_deleted=true")
+        response = client.get("/api/v1/projects?include_deleted=true", headers=auth_headers)
         assert response.status_code == 200
         names = [p["name"] for p in response.json()["data"]]
         assert "Active API Test" in names
@@ -560,7 +560,7 @@ class TestAPIEndpointsWithSoftDelete:
         doc = db_session.query(Document).filter(Document.id == doc_id).first()
         assert doc.is_deleted is False
 
-    def test_list_documents_with_include_deleted(self, db_session, project):
+    def test_list_documents_with_include_deleted(self, db_session, project, auth_headers):
         """GET /documents?include_deleted=true should return deleted documents."""
         active = Document(name="active_api.txt", project_id=project.id)
         deleted = Document(name="deleted_api.txt", project_id=project.id)
@@ -571,14 +571,14 @@ class TestAPIEndpointsWithSoftDelete:
         db_session.commit()
 
         # Without include_deleted
-        response = client.get("/api/v1/documents")
+        response = client.get("/api/v1/documents", headers=auth_headers)
         assert response.status_code == 200
         names = [d["name"] for d in response.json()["data"]]
         assert "active_api.txt" in names
         assert "deleted_api.txt" not in names
 
         # With include_deleted
-        response = client.get("/api/v1/documents?include_deleted=true")
+        response = client.get("/api/v1/documents?include_deleted=true", headers=auth_headers)
         assert response.status_code == 200
         names = [d["name"] for d in response.json()["data"]]
         assert "active_api.txt" in names

@@ -304,7 +304,7 @@ class TestWebhookProcessing:
 
         assert updated_mission.status == "cancelled"
         assert updated_mission.deepsearch_job_id == "ds-job-cancelled"
-        assert "cancelled" in updated_mission.error_message.lower()
+        assert "cancellation" in updated_mission.error_message.lower()
         assert status_msg == "cancelled"
 
     def test_process_webhook_mission_not_found(self, db_session):
