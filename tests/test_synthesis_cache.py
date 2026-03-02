@@ -20,7 +20,14 @@ from app.services.synthesis_cache import SynthesisCacheService
 def test_engine():
     """Create an in-memory SQLite engine for testing."""
     engine = create_engine("sqlite:///:memory:", echo=False)
-    Base.metadata.create_all(engine)
+    from tests.conftest import _sqlite_jsonb_array_length, _create_all_sqlite_safe
+    from sqlalchemy import event
+
+    @event.listens_for(engine, "connect")
+    def _register(dbapi_conn, connection_record):
+        dbapi_conn.create_function("jsonb_array_length", 1, _sqlite_jsonb_array_length)
+
+    _create_all_sqlite_safe(engine)
     return engine
 
 

@@ -29,9 +29,21 @@ os.environ["ENVIRONMENT"] = "test"
 os.environ.setdefault("AUTH_USERNAME", "tracelab-admin")
 os.environ.setdefault("AUTH_PASSWORD", "changeme")
 
+from sqlalchemy import event
+
 from app.core.database import Base, engine, SessionLocal
 from app.core.security import get_configured_credentials, issue_token_response
 from app.models.project import Project
+
+# Register PostgreSQL-only functions for SQLite test compatibility
+def _sqlite_jsonb_array_length(v):
+    import json
+    return len(json.loads(v)) if v else 0
+
+if "sqlite" in str(engine.url):
+    @event.listens_for(engine, "connect")
+    def _register_sqlite_functions(dbapi_conn, connection_record):
+        dbapi_conn.create_function("jsonb_array_length", 1, _sqlite_jsonb_array_length)
 
 pytest_plugins: tuple[str, ...] = ()
 
@@ -47,6 +59,28 @@ if _TELEMETRY_PLUGIN_PATH.exists():
         pytest_plugins = (*pytest_plugins, _TELEMETRY_PLUGIN_NAME)
 
 _COVERAGE_PATH = Path("cmos/reports/sprint-01/ingestion_format_coverage.json")
+
+
+def _create_all_sqlite_safe(eng):
+    """Create all tables, neutralizing PostgreSQL-only computed columns for SQLite."""
+    if "sqlite" not in str(eng.url):
+        Base.metadata.create_all(bind=eng)
+        return
+    # Ensure jsonb_array_length is available on all pooled connections
+    eng.dispose()
+    # Temporarily neutralize Computed columns (SQLite can't handle Postgres syntax)
+    _originals = {}
+    for table in Base.metadata.sorted_tables:
+        for col in list(table.columns):
+            if hasattr(col, "computed") and col.computed is not None:
+                _originals[(table.fullname, col.name)] = col.computed
+                col.computed = None
+    try:
+        Base.metadata.create_all(bind=eng)
+    finally:
+        for (table_name, col_name), computed in _originals.items():
+            table = Base.metadata.tables[table_name]
+            table.columns[col_name].computed = computed
 
 
 @pytest.fixture(autouse=True)
@@ -84,7 +118,7 @@ def reset_database_and_reports(request):
         return
 
     Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
+    _create_all_sqlite_safe(engine)
     original_bytes = None
     if _COVERAGE_PATH.exists():
         original_bytes = _COVERAGE_PATH.read_bytes()

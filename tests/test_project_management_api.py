@@ -1,15 +1,10 @@
 """Tests for project management API endpoints (B15.7)."""
 import pytest
-from fastapi.testclient import TestClient
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
 from datetime import datetime
 
-from app.main import app
 from app.schemas.project import ProjectCreate, ProjectUpdate, ProjectStats, ProjectRead
-
-
-client = TestClient(app)
 
 
 @pytest.fixture
