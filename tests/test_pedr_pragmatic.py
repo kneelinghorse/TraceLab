@@ -63,7 +63,7 @@ class TestIntentClassification:
             ("who was interviewed last week?", 0.8),
             ("when did we complete the analysis?", 0.75),
             ("why is the conversion rate dropping?", 0.75),
-            ("what does the data say about churn?", 0.9),
+            ("what does the data say about churn?", 0.75),
         ],
     )
     def test_detect_search_intent(

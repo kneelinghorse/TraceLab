@@ -63,7 +63,7 @@ INTENT_DETECTION_PATTERNS: Dict[QueryIntent, List[Tuple[str, float]]] = {
         (r"\bwhat\s+(?:is|are|was|were)\b", 0.90),
         (r"\bwhere\s+(?:is|are|can\s+i\s+find)\b", 0.90),
         (r"\bhow\s+(?:to|do|does|can)\b", 0.85),
-        (r"\bwhich\s+(?:\w+)\s+(?:has|have|contains|includes)\b", 0.85),
+        (r"\bwhich\s+(?:\w+)\s+(?:has|have|contains?|includes?)\b", 0.85),
         (r"\b(?:research|explore|investigate|look\s+for)\b", 0.90),
         (r"\b(?:about|related\s+to|regarding|concerning)\b", 0.75),
         # Medium confidence patterns
@@ -77,7 +77,8 @@ INTENT_DETECTION_PATTERNS: Dict[QueryIntent, List[Tuple[str, float]]] = {
         # High confidence create patterns
         (r"^(?:create|add|make|new)\b", 0.95),
         (r"\b(?:create|add)\s+(?:a\s+)?(?:new\s+)?(?:document|project|mission|collection|report)\b", 0.95),
-        (r"\b(?:start|begin|initialize)\s+(?:a\s+)?(?:new\s+)?(?:project|mission|research)\b", 0.90),
+        (r"\b(?:start|begin|initialize)\s+(?:a\s+)?(?:new\s+)?(?:project|mission|research|workspace)\b", 0.90),
+        (r"^(?:start|begin|initialize)\s+(?:a\s+)?(?:new\s+)?(?:\w+\s+)?(?:project|mission|workspace)\b", 0.96),
         (r"\bupload\s+(?:a\s+)?(?:new\s+)?(?:document|file)\b", 0.90),
         (r"\b(?:generate|produce|build)\s+(?:a\s+)?(?:new\s+)?(?:report|summary)\b", 0.85),
         # Medium confidence patterns
@@ -110,12 +111,12 @@ INTENT_DETECTION_PATTERNS: Dict[QueryIntent, List[Tuple[str, float]]] = {
     QueryIntent.EXECUTE: [
         # High confidence execute patterns
         (r"^(?:run|execute|trigger)\b", 0.95),
-        (r"^start\s+(?:the\s+)?(?:workflow|process|pipeline|analysis)\b", 0.95),
+        (r"^start\s+(?:the\s+)?(?:\w+\s+)?(?:workflow|process|pipeline|analysis)\b", 0.95),
         (r"\b(?:run|execute)\s+(?:the\s+)?(?:mission|analysis|search|sync)\b", 0.95),
         (r"\b(?:launch|activate|kick\s+off)\b", 0.90),
         (r"\b(?:submit|process|perform)\b", 0.85),
-        (r"\b(?:synthesize|analyze)\s+(?:the\s+)?(?:data|documents|results|findings)\b", 0.95),
-        (r"^synthesize\b", 0.90),  # "synthesize findings" at start of query
+        (r"\b(?:synthesize|analyze)\s+(?:the\s+)?(?:\w+\s+)?(?:data|documents?|results|findings)\b", 0.95),
+        (r"^(?:synthesize|analyze)\b", 0.91),  # Action verbs at start of query
         # Medium confidence patterns
         (r"\binitiate\s+(?:the\s+)?(?:process|workflow)\b", 0.80),
         (r"\bbegin\s+(?:the\s+)?(?:analysis|research)\b", 0.75),

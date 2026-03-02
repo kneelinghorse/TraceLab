@@ -90,16 +90,26 @@ class QdrantService:
         return None
 
     def _create_collection(self, write_optimized: bool) -> None:
-        """Create collection using either write-optimized or query-optimized settings."""
+        """Create collection using either write-optimized or query-optimized settings.
+
+        HNSW parameters are tuned for 3072d vectors (text-embedding-3-large):
+        - m=24: Higher graph degree for better recall in high-dimensional space
+          (increased from 16 used for 1536d vectors in Sprint 19)
+        - ef_construct=128: Better index quality for doubled dimensions
+          (increased from 100 used for 1536d vectors)
+        """
+        hnsw_m = settings.qdrant_hnsw_m
+        hnsw_ef_construct = settings.qdrant_hnsw_ef_construct
+
         if write_optimized:
-            # Create collection with relaxed HNSW settings and delayed indexing.
+            # Write-optimized: lower m for faster bulk import, delayed indexing.
             vectors_config = VectorParams(
                 size=self.vector_size,
                 distance=Distance.COSINE,
                 on_disk=True,
                 hnsw_config=HnswConfigDiff(
                     m=16,
-                    ef_construct=32,
+                    ef_construct=64,
                     full_scan_threshold=1_000_000,
                     on_disk=False,
                 ),
@@ -108,14 +118,14 @@ class QdrantService:
                 indexing_threshold=1_000_000  # Prevent indexing during bulk import
             )
         else:
-            # Normal configuration with tuned HNSW indexing.
+            # Query-optimized: tuned HNSW for 3072d vectors (T30.4).
             vectors_config = VectorParams(
                 size=self.vector_size,
                 distance=Distance.COSINE,
                 on_disk=True,
                 hnsw_config=HnswConfigDiff(
-                    m=16,
-                    ef_construct=100,
+                    m=hnsw_m,
+                    ef_construct=hnsw_ef_construct,
                     full_scan_threshold=20_000,
                     on_disk=False,  # Keep HNSW graph in RAM
                 ),
