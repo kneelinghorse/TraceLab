@@ -6,6 +6,7 @@ import type {
   Mission,
   MissionCreatePayload,
   MissionListParams,
+  MissionSubmitResponse,
   MissionUpdatePayload,
   QualityGateReport,
   ReportPromotionResponse,
@@ -64,11 +65,10 @@ export const missionsApi = {
   /**
    * Submit a draft mission to DeepSearch (sets status to queued).
    */
-  submitToDeepSearch(missionId: string): Promise<ApiMission> {
-    return httpClient.put<ApiMission>(`${MISSIONS_PATH}/${missionId}`, {
-      status: "queued",
-      queued_at: new Date().toISOString(),
-    });
+  submitToDeepSearch(missionId: string): Promise<MissionSubmitResponse> {
+    return httpClient.post<MissionSubmitResponse>(
+      `${MISSIONS_PATH}/${missionId}/submit`
+    );
   },
 
   /**

@@ -204,6 +204,15 @@ export interface MissionListParams {
   project_id?: string;
 }
 
+export interface MissionSubmitResponse {
+  status: string;
+  mode: string;
+  mission_id: string;
+  uuid: string;
+  message: string;
+  job_id: string | null;
+}
+
 export interface ReportPromotionResponse {
   document_id: string;
   document_name: string;
