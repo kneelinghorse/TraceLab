@@ -11,7 +11,7 @@ const components: Components = {
   // Style code blocks to match existing dark design
   pre({ children }) {
     return (
-      <pre className="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 overflow-x-auto text-sm">
+      <pre className="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 overflow-x-auto text-sm text-gray-800 dark:text-gray-200">
         {children}
       </pre>
     );
@@ -20,12 +20,12 @@ const components: Components = {
     const isInline = !className;
     if (isInline) {
       return (
-        <code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm font-mono">
+        <code className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-1.5 py-0.5 rounded text-sm font-mono">
           {children}
         </code>
       );
     }
-    return <code className={`${className ?? ""} font-mono`}>{children}</code>;
+    return <code className={`${className ?? ""} font-mono text-gray-800 dark:text-gray-200`}>{children}</code>;
   },
   // Ensure links open safely
   a({ href, children }) {
@@ -39,6 +39,38 @@ const components: Components = {
         {children}
       </a>
     );
+  },
+  // Explicit text colors for all content elements
+  h1({ children }) {
+    return <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-6 mb-3">{children}</h1>;
+  },
+  h2({ children }) {
+    return <h2 className="text-xl font-bold text-gray-900 dark:text-white mt-5 mb-2">{children}</h2>;
+  },
+  h3({ children }) {
+    return <h3 className="text-lg font-semibold text-gray-900 dark:text-white mt-4 mb-2">{children}</h3>;
+  },
+  h4({ children }) {
+    return <h4 className="text-base font-semibold text-gray-900 dark:text-white mt-3 mb-1">{children}</h4>;
+  },
+  p({ children }) {
+    return <p className="text-gray-700 dark:text-gray-300 mb-3 leading-relaxed">{children}</p>;
+  },
+  li({ children }) {
+    return <li className="text-gray-700 dark:text-gray-300 mb-1">{children}</li>;
+  },
+  strong({ children }) {
+    return <strong className="font-semibold text-gray-900 dark:text-white">{children}</strong>;
+  },
+  blockquote({ children }) {
+    return (
+      <blockquote className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 my-3 text-gray-600 dark:text-gray-400 italic">
+        {children}
+      </blockquote>
+    );
+  },
+  hr() {
+    return <hr className="border-gray-200 dark:border-gray-700 my-6" />;
   },
   // Style tables to match dark theme
   table({ children }) {

@@ -8,7 +8,7 @@ import { reportsApi, type ReportDetail, type ReportStatus } from "@/lib/api/repo
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useSWR from "swr";
 
 export default function ReportDetailPage() {
@@ -19,6 +19,18 @@ export default function ReportDetailPage() {
   const [editError, setEditError] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const exportRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
+        setShowExportMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const { data: report, mutate, isLoading } = useSWR<ReportDetail>(
     id ? `report-${id}` : null,
@@ -202,33 +214,36 @@ export default function ReportDetailPage() {
                     {getStatusBadge(report.status)}
                   </div>
                   <div className="flex gap-2">
-                    <div className="relative group">
+                    <div className="relative" ref={exportRef}>
                       <button
+                        onClick={() => setShowExportMenu((v) => !v)}
                         disabled={isExporting}
                         className="px-4 py-2 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 rounded disabled:opacity-50"
                       >
-                        {isExporting ? "Exporting..." : "Export"}
+                        {isExporting ? "Exporting..." : "Export ▾"}
                       </button>
-                      <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg hidden group-hover:block z-10 min-w-[140px]">
-                        <button
-                          onClick={() => handleExport("md")}
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
-                        >
-                          Markdown (.md)
-                        </button>
-                        <button
-                          onClick={() => handleExport("json")}
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        >
-                          JSON (.json)
-                        </button>
-                        <button
-                          onClick={() => handleExport("txt")}
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg"
-                        >
-                          Plain text (.txt)
-                        </button>
-                      </div>
+                      {showExportMenu && (
+                        <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-10 min-w-[140px]">
+                          <button
+                            onClick={() => { handleExport("md"); setShowExportMenu(false); }}
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
+                          >
+                            Markdown (.md)
+                          </button>
+                          <button
+                            onClick={() => { handleExport("json"); setShowExportMenu(false); }}
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            JSON (.json)
+                          </button>
+                          <button
+                            onClick={() => { handleExport("txt"); setShowExportMenu(false); }}
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg"
+                          >
+                            Plain text (.txt)
+                          </button>
+                        </div>
+                      )}
                     </div>
                     <button
                       onClick={handleCopy}
