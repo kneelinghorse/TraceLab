@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { AuthGate } from "@/components/AuthGate";
-import { Navigation } from "@/components/Navigation";
 import { apiRequest } from "@/lib/api/http";
 
 type InviteCode = {
@@ -27,12 +25,7 @@ type CreateInviteResponse = {
 };
 
 export default function InvitesPage() {
-  return (
-    <AuthGate>
-      <Navigation />
-      <InviteManagement />
-    </AuthGate>
-  );
+  return <InviteManagement />;
 }
 
 function InviteManagement() {
@@ -105,6 +98,7 @@ function InviteManagement() {
   };
 
   return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
     <main className="max-w-3xl mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Invite Codes</h1>
@@ -210,5 +204,6 @@ function InviteManagement() {
         )}
       </div>
     </main>
+    </div>
   );
 }
