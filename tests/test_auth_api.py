@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 
 from app.core.config import settings
 from app.main import app
+from tests.conftest import get_seed_user_email
 
 
 def _configured_password() -> str:
@@ -23,12 +24,12 @@ def client():
 def test_login_issues_bearer_token(client: TestClient):
     response = client.post(
         "/api/v1/auth/login",
-        json={"username": settings.auth_username, "password": _configured_password()},
+        json={"email": get_seed_user_email(), "password": _configured_password()},
     )
     assert response.status_code == 200
     payload = response.json()
     assert payload["token_type"] == "bearer"
-    assert payload["user"]["username"] == settings.auth_username
+    assert payload["user"]["display_name"] == settings.auth_username
     assert payload["access_token"]
     assert payload["expires_in"] == settings.access_token_expire_minutes * 60
 
@@ -36,7 +37,7 @@ def test_login_issues_bearer_token(client: TestClient):
 def test_login_rejects_invalid_password(client: TestClient):
     response = client.post(
         "/api/v1/auth/login",
-        json={"username": settings.auth_username, "password": "wrong-password"},
+        json={"email": get_seed_user_email(), "password": "wrong-password"},
     )
     assert response.status_code == 401
 
@@ -44,7 +45,7 @@ def test_login_rejects_invalid_password(client: TestClient):
 def test_refresh_requires_valid_token(client: TestClient):
     login_response = client.post(
         "/api/v1/auth/login",
-        json={"username": settings.auth_username, "password": _configured_password()},
+        json={"email": get_seed_user_email(), "password": _configured_password()},
     )
     token = login_response.json()["access_token"]
 
@@ -55,7 +56,7 @@ def test_refresh_requires_valid_token(client: TestClient):
     assert refresh_response.status_code == 200
     refreshed = refresh_response.json()
     assert refreshed["access_token"]
-    assert refreshed["user"]["username"] == settings.auth_username
+    assert refreshed["user"]["display_name"] == settings.auth_username
 
 
 def test_protected_route_blocks_anonymous_request(client: TestClient):

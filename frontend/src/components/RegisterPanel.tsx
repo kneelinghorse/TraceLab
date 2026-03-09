@@ -11,6 +11,7 @@ export function RegisterPanel({ onSwitchToLogin }: RegisterPanelProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -23,9 +24,19 @@ export function RegisterPanel({ onSwitchToLogin }: RegisterPanelProps) {
       return;
     }
 
+    if (!displayName.trim()) {
+      setError("Display name is required");
+      return;
+    }
+
+    if (inviteCode.trim().length !== 8) {
+      setError("Invite code must be 8 characters");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await register(email.trim(), password, displayName.trim() || undefined);
+      await register(email.trim(), password, displayName.trim(), inviteCode.trim().toUpperCase());
       setPassword("");
     } catch (submissionError) {
       const message = submissionError instanceof Error ? submissionError.message : "Registration failed";
@@ -49,6 +60,20 @@ export function RegisterPanel({ onSwitchToLogin }: RegisterPanelProps) {
       </div>
 
       <label className="block space-y-2 text-sm text-slate-200">
+        <span>Invite code</span>
+        <input
+          type="text"
+          value={inviteCode}
+          onChange={(event) => setInviteCode(event.target.value.toUpperCase())}
+          placeholder="Enter your 8-character invite code"
+          required
+          maxLength={8}
+          className="w-full rounded-xl bg-slate-900/40 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400 uppercase tracking-widest font-mono"
+          autoComplete="off"
+        />
+      </label>
+
+      <label className="block space-y-2 text-sm text-slate-200">
         <span>Email</span>
         <input
           type="email"
@@ -58,6 +83,19 @@ export function RegisterPanel({ onSwitchToLogin }: RegisterPanelProps) {
           required
           className="w-full rounded-xl bg-slate-900/40 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400"
           autoComplete="email"
+        />
+      </label>
+
+      <label className="block space-y-2 text-sm text-slate-200">
+        <span>Display name</span>
+        <input
+          type="text"
+          value={displayName}
+          onChange={(event) => setDisplayName(event.target.value)}
+          placeholder="How you want to be identified"
+          required
+          className="w-full rounded-xl bg-slate-900/40 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400"
+          autoComplete="name"
         />
       </label>
 
@@ -75,18 +113,6 @@ export function RegisterPanel({ onSwitchToLogin }: RegisterPanelProps) {
         />
       </label>
 
-      <label className="block space-y-2 text-sm text-slate-200">
-        <span>Display name <span className="text-slate-500">(optional)</span></span>
-        <input
-          type="text"
-          value={displayName}
-          onChange={(event) => setDisplayName(event.target.value)}
-          placeholder="How you want to be identified"
-          className="w-full rounded-xl bg-slate-900/40 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400"
-          autoComplete="name"
-        />
-      </label>
-
       {error && <p className="text-sm text-rose-300">{error}</p>}
 
       <button
@@ -94,7 +120,7 @@ export function RegisterPanel({ onSwitchToLogin }: RegisterPanelProps) {
         className="w-full py-3 rounded-xl bg-sky-400 text-slate-900 font-semibold disabled:opacity-50"
         disabled={isSubmitting}
       >
-        {isSubmitting ? "Creating account…" : "Create account"}
+        {isSubmitting ? "Creating account\u2026" : "Create account"}
       </button>
 
       {onSwitchToLogin && (

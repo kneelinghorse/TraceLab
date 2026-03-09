@@ -8,7 +8,7 @@ interface LoginPanelProps {
 
 export function LoginPanel({ onSwitchToRegister }: LoginPanelProps) {
   const { login } = useAuth();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,7 +18,7 @@ export function LoginPanel({ onSwitchToRegister }: LoginPanelProps) {
     setError(null);
     setIsSubmitting(true);
     try {
-      await login(username.trim(), password);
+      await login(email.trim(), password);
       setPassword("");
     } catch (submissionError) {
       const message = submissionError instanceof Error ? submissionError.message : "Unable to authenticate";
@@ -42,14 +42,15 @@ export function LoginPanel({ onSwitchToRegister }: LoginPanelProps) {
       </div>
 
       <label className="block space-y-2 text-sm text-slate-200">
-        <span>Username</span>
+        <span>Email</span>
         <input
-          type="text"
-          value={username}
-          onChange={(event) => setUsername(event.target.value)}
-          placeholder="Enter your username"
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="you@example.com"
+          required
           className="w-full rounded-xl bg-slate-900/40 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400"
-          autoComplete="username"
+          autoComplete="email"
         />
       </label>
 
@@ -72,7 +73,7 @@ export function LoginPanel({ onSwitchToRegister }: LoginPanelProps) {
         className="w-full py-3 rounded-xl bg-sky-400 text-slate-900 font-semibold disabled:opacity-50"
         disabled={isSubmitting}
       >
-        {isSubmitting ? "Signing in…" : "Sign in"}
+        {isSubmitting ? "Signing in\u2026" : "Sign in"}
       </button>
 
       {onSwitchToRegister && (

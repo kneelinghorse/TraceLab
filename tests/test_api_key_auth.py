@@ -30,9 +30,11 @@ def client():
 @pytest.fixture
 def auth_headers(client: TestClient) -> dict:
     """Get JWT auth headers for creating/managing API keys."""
+    # Login with email (seed user email is {auth_username}@tracelab.local)
+    email = settings.auth_username if "@" in settings.auth_username else f"{settings.auth_username}@tracelab.local"
     response = client.post(
         "/api/v1/auth/login",
-        json={"username": settings.auth_username, "password": _configured_password()},
+        json={"email": email, "password": _configured_password()},
     )
     token = response.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}

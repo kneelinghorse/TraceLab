@@ -188,9 +188,10 @@ def override_dashboard():
 
 
 def _auth_headers(client: TestClient) -> dict:
+    from tests.conftest import get_seed_user_email
     response = client.post(
         "/api/v1/auth/login",
-        json={"username": settings.auth_username, "password": settings.auth_password or "changeme"},
+        json={"email": get_seed_user_email(), "password": settings.auth_password or "changeme"},
     )
     assert response.status_code == 200, response.text
     token = response.json()["access_token"]

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import Literal, Optional
+from uuid import UUID
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -9,7 +10,10 @@ from pydantic import BaseModel, Field, field_validator
 class TokenUser(BaseModel):
     """Represents the authenticated user returned to the frontend."""
 
-    username: str = Field(..., description="Username associated with the issued token")
+    user_id: UUID = Field(..., description="User UUID")
+    email: str = Field(..., description="User email address")
+    display_name: str = Field(..., description="User display name")
+    username: Optional[str] = Field(None, description="Deprecated: use display_name")
 
 
 class TokenResponse(BaseModel):
@@ -24,8 +28,13 @@ class TokenResponse(BaseModel):
 class LoginRequest(BaseModel):
     """Credentials submitted to the login endpoint."""
 
-    username: str
+    email: str = Field(..., description="Email address")
     password: str
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, v: str) -> str:
+        return v.strip().lower()
 
 
 class RegisterRequest(BaseModel):
@@ -33,7 +42,8 @@ class RegisterRequest(BaseModel):
 
     email: str = Field(..., min_length=3, description="Email address")
     password: str = Field(..., min_length=8, description="Password (minimum 8 characters)")
-    display_name: Optional[str] = Field(None, max_length=100, description="Optional display name")
+    display_name: str = Field(..., max_length=100, description="Display name")
+    invite_code: str = Field(..., min_length=8, max_length=8, description="8-character invite code")
 
     @field_validator("email")
     @classmethod

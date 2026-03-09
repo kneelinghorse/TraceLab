@@ -34,6 +34,7 @@ from sqlalchemy import event
 from app.core.database import Base, engine, SessionLocal
 from app.core.security import get_configured_credentials, issue_token_response
 from app.models.project import Project
+from app.models.user import User
 
 # Register PostgreSQL-only functions for SQLite test compatibility
 def _sqlite_jsonb_array_length(v):
@@ -119,6 +120,19 @@ def reset_database_and_reports(request):
 
     Base.metadata.drop_all(bind=engine)
     _create_all_sqlite_safe(engine)
+    # Seed a test user so API key operations can resolve user UUID
+    _seed_session = SessionLocal()
+    try:
+        creds = get_configured_credentials()
+        _seed_session.add(User(
+            email=f"{creds.username}@tracelab.local",
+            display_name=creds.username,
+            password_hash=creds.password_hash,
+            role="admin",
+        ))
+        _seed_session.commit()
+    finally:
+        _seed_session.close()
     original_bytes = None
     if _COVERAGE_PATH.exists():
         original_bytes = _COVERAGE_PATH.read_bytes()
@@ -150,6 +164,12 @@ def project(db_session):
     db_session.commit()
     db_session.refresh(instance)
     return instance
+
+
+def get_seed_user_email() -> str:
+    """Return the seed user's email address for test login."""
+    username = os.environ.get("AUTH_USERNAME", "tracelab-admin")
+    return username if "@" in username else f"{username}@tracelab.local"
 
 
 @pytest.fixture(scope="session")

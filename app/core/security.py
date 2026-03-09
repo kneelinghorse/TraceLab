@@ -2,12 +2,13 @@
 from __future__ import annotations
 
 import secrets
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
 from typing import Optional
+from uuid import UUID
 
-from fastapi import Depends, Header, HTTPException, Request, status
+from fastapi import Depends, Header, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -34,14 +35,33 @@ class AuthCredentials:
 
 @dataclass(frozen=True)
 class AuthenticatedUser:
-    """Represents an authenticated principal for downstream dependencies."""
+    """Represents an authenticated principal for downstream dependencies.
 
-    username: str
+    Carries user_id (UUID), email, and display_name from the users table.
+    The 'username' property is kept for backward compatibility.
+    """
+
+    user_id: UUID
+    email: str
+    display_name: str
+
+    @property
+    def username(self) -> str:
+        """Backward-compatible alias for display_name."""
+        return self.display_name
+
+
+def hash_password(plain_password: str) -> str:
+    """Hash a password using bcrypt."""
+    return _pwd_context.hash(plain_password)
 
 
 @lru_cache(maxsize=1)
 def get_configured_credentials() -> AuthCredentials:
-    """Load configured credentials, hashing the fallback password when necessary."""
+    """Load configured credentials, hashing the fallback password when necessary.
+
+    Kept as fallback for migration period — if no users in DB, env-var auth still works.
+    """
     password_hash = settings.auth_password_hash
     if not password_hash:
         if not settings.auth_password:
@@ -60,7 +80,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def create_access_token(
     *, subject: str, expires_delta: Optional[timedelta] = None
 ) -> str:
-    """Create a signed JWT for the given subject."""
+    """Create a signed JWT for the given subject (user UUID as string)."""
     if not settings.secret_key:
         raise RuntimeError("SECRET_KEY must be configured to issue JWTs.")
 
@@ -86,16 +106,37 @@ def _decode_access_token(token: str) -> str:
     return subject
 
 
-def issue_token_response(user: AuthCredentials, *, expires_in_seconds: Optional[int] = None) -> dict:
-    """Helper to construct a JWT response payload."""
-    access_token = create_access_token(subject=user.username)
-    expires = expires_in_seconds or settings.access_token_expire_minutes * 60
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "expires_in": expires,
-        "user": {"username": user.username},
-    }
+def issue_token_response(user, *, expires_in_seconds: Optional[int] = None) -> dict:
+    """Helper to construct a JWT response payload.
+
+    Accepts either an AuthCredentials (legacy) or a User model instance.
+    """
+    from app.models.user import User
+
+    if isinstance(user, User):
+        access_token = create_access_token(subject=str(user.id))
+        expires = expires_in_seconds or settings.access_token_expire_minutes * 60
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "expires_in": expires,
+            "user": {
+                "user_id": str(user.id),
+                "email": user.email,
+                "display_name": user.display_name,
+                "username": user.display_name,
+            },
+        }
+    else:
+        # Legacy AuthCredentials path (fallback)
+        access_token = create_access_token(subject=user.username)
+        expires = expires_in_seconds or settings.access_token_expire_minutes * 60
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "expires_in": expires,
+            "user": {"username": user.username},
+        }
 
 
 # --- API Key Functions ---
@@ -126,33 +167,25 @@ def get_key_prefix(key: str) -> str:
 
 
 def _validate_api_key(api_key: str) -> Optional[AuthenticatedUser]:
-    """Validate an API key and return the authenticated user if valid.
-
-    This function checks the database for a matching key, verifies it hasn't expired,
-    and updates the last_used_at timestamp.
-    """
-    # Import here to avoid circular dependency
+    """Validate an API key and return the authenticated user if valid."""
     from app.models.api_key import APIKey
+    from app.models.user import User
 
     if not api_key.startswith(API_KEY_PREFIX):
         return None
 
     key_prefix = get_key_prefix(api_key)
 
-    # Use a fresh session for API key validation
     db = SessionLocal()
     try:
-        # Find keys with matching prefix
         candidates = db.query(APIKey).filter(APIKey.key_prefix == key_prefix).all()
 
         for candidate in candidates:
-            # Verify the full key against the hash
             if verify_api_key(api_key, candidate.key_hash):
-                # Check expiration
                 if candidate.expires_at and candidate.expires_at < datetime.utcnow():
                     return None
 
-                # Update last_used_at (debounced: only if >1 minute since last update)
+                # Update last_used_at (debounced)
                 if (
                     candidate.last_used_at is None
                     or (datetime.utcnow() - candidate.last_used_at).total_seconds() > 60
@@ -160,9 +193,53 @@ def _validate_api_key(api_key: str) -> Optional[AuthenticatedUser]:
                     candidate.last_used_at = datetime.utcnow()
                     db.commit()
 
-                return AuthenticatedUser(username=candidate.user_id)
+                # Look up user from UUID
+                db_user = db.query(User).filter(User.id == candidate.user_id).first()
+                if db_user:
+                    return AuthenticatedUser(
+                        user_id=db_user.id,
+                        email=db_user.email,
+                        display_name=db_user.display_name,
+                    )
+                return None
 
         return None
+    finally:
+        db.close()
+
+
+def _resolve_user_from_jwt(subject: str) -> AuthenticatedUser:
+    """Resolve a JWT subject to an AuthenticatedUser.
+
+    Tries UUID lookup first (new flow), falls back to display_name lookup (migration).
+    """
+    from app.models.user import User
+
+    db = SessionLocal()
+    try:
+        # Try UUID lookup first (new JWT format: sub=user.id)
+        try:
+            user_uuid = UUID(subject)
+            db_user = db.query(User).filter(User.id == user_uuid).first()
+            if db_user:
+                return AuthenticatedUser(
+                    user_id=db_user.id,
+                    email=db_user.email,
+                    display_name=db_user.display_name,
+                )
+        except (ValueError, AttributeError):
+            pass
+
+        # Fallback: subject is a username/display_name (legacy tokens)
+        db_user = db.query(User).filter(User.display_name == subject).first()
+        if db_user:
+            return AuthenticatedUser(
+                user_id=db_user.id,
+                email=db_user.email,
+                display_name=db_user.display_name,
+            )
+
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Token subject is not recognized")
     finally:
         db.close()
 
@@ -192,7 +269,4 @@ async def require_authenticated_user(
         )
 
     subject = _decode_access_token(credentials.credentials)
-    stored = get_configured_credentials()
-    if subject != stored.username:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Token subject is not recognized")
-    return AuthenticatedUser(username=subject)
+    return _resolve_user_from_jwt(subject)
