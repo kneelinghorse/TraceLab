@@ -39,7 +39,7 @@ export function AuthGate({ children }: AuthGateProps) {
         <div>
           <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Authenticated</p>
           <p className="text-white/90">
-            Signed in as <span className="font-semibold text-white">{user?.username}</span>
+            Signed in as <span className="font-semibold text-white">{user?.display_name || user?.email}</span>
           </p>
         </div>
         <button

@@ -18,6 +18,8 @@ from app.models.api_key import APIKey
 from app.models.report import Report, ReportSource
 from app.models.synthesis_cache import SynthesisCache
 from app.models.graph_edge import GraphEdge
+from app.models.user import User
+from app.models.invite_code import InviteCode
 
 __all__ = [
     "Base",
@@ -43,4 +45,6 @@ __all__ = [
     "ReportSource",
     "SynthesisCache",
     "GraphEdge",
+    "User",
+    "InviteCode",
 ]

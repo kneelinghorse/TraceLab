@@ -10,14 +10,16 @@ from app.core.database import get_db
 from app.core.security import (
     AuthenticatedUser,
     generate_api_key,
-    get_configured_credentials,
     get_key_prefix,
     hash_api_key,
+    hash_password,
     issue_token_response,
     require_authenticated_user,
     verify_password,
 )
 from app.models.api_key import APIKey
+from app.models.invite_code import InviteCode, generate_invite_code
+from app.models.user import User
 from app.schemas.api_key import (
     APIKeyCreate,
     APIKeyDeleted,
@@ -34,44 +36,71 @@ MAX_API_KEYS_PER_USER = 10
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(payload: LoginRequest) -> TokenResponse:
-    """Authenticate a user and return a signed JWT."""
-    credentials = get_configured_credentials()
-    if payload.username != credentials.username or not verify_password(
-        payload.password, credentials.password_hash
-    ):
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid username or password")
+def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
+    """Authenticate a user against the users table and return a signed JWT."""
+    db_user = db.query(User).filter(User.email == payload.email).first()
 
-    response_payload = issue_token_response(credentials)
+    if not db_user or not verify_password(payload.password, db_user.password_hash):
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
+
+    # Update last_login_at
+    db_user.last_login_at = datetime.utcnow()
+    db.commit()
+
+    response_payload = issue_token_response(db_user)
     return TokenResponse(**response_payload)
 
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-def register(payload: RegisterRequest) -> TokenResponse:
-    """Register a new user and return a signed JWT.
+def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> TokenResponse:
+    """Register a new user with a valid invite code and return a signed JWT."""
+    # Check email uniqueness
+    existing = db.query(User).filter(User.email == payload.email).first()
+    if existing:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail="Email already registered")
 
-    Sprint 31 (single-user mode): Validates input format and issues a token
-    using the configured environment credentials. Sprint 32 will add
-    DB-backed multi-user registration.
-    """
-    credentials = get_configured_credentials()
+    # Validate invite code
+    invite = db.query(InviteCode).filter(
+        InviteCode.code == payload.invite_code.upper(),
+        InviteCode.used_by.is_(None),
+    ).first()
+    if not invite:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Invalid or already used invite code")
+    if invite.expires_at and invite.expires_at < datetime.utcnow():
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Invite code has expired")
 
-    # In single-user mode, verify the password matches the configured password
-    if not verify_password(payload.password, credentials.password_hash):
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST,
-            detail="Registration is currently in single-user mode. Use the configured credentials.",
-        )
+    # Create user
+    new_user = User(
+        email=payload.email,
+        display_name=payload.display_name,
+        password_hash=hash_password(payload.password),
+        role="admin",
+        invite_code_used=payload.invite_code.upper(),
+    )
+    db.add(new_user)
+    db.flush()
 
-    response_payload = issue_token_response(credentials)
+    # Mark invite code as used
+    invite.used_by = new_user.id
+    invite.used_at = datetime.utcnow()
+
+    db.commit()
+    db.refresh(new_user)
+
+    response_payload = issue_token_response(new_user)
     return TokenResponse(**response_payload)
 
 
 @router.post("/refresh", response_model=TokenResponse)
-def refresh_token(_: AuthenticatedUser = Depends(require_authenticated_user)) -> TokenResponse:
-    """Refresh the caller's JWT while preserving the current session."""
-    credentials = get_configured_credentials()
-    response_payload = issue_token_response(credentials)
+def refresh_token(
+    user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+) -> TokenResponse:
+    """Refresh the caller's JWT."""
+    db_user = db.query(User).filter(User.id == user.user_id).first()
+    if not db_user:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="User not found")
+    response_payload = issue_token_response(db_user)
     return TokenResponse(**response_payload)
 
 
@@ -86,7 +115,7 @@ def create_api_key(
 ) -> APIKeyResponse:
     """Create a new API key. The full key is only returned once at creation time."""
     # Check rate limit (max 10 keys per user)
-    existing_count = db.query(APIKey).filter(APIKey.user_id == user.username).count()
+    existing_count = db.query(APIKey).filter(APIKey.user_id == user.user_id).count()
     if existing_count >= MAX_API_KEYS_PER_USER:
         raise HTTPException(
             status.HTTP_429_TOO_MANY_REQUESTS,
@@ -105,7 +134,7 @@ def create_api_key(
 
     # Create the key record
     api_key = APIKey(
-        user_id=user.username,
+        user_id=user.user_id,
         name=payload.name,
         key_hash=key_hash,
         key_prefix=key_prefix,
@@ -131,7 +160,7 @@ def list_api_keys(
     db: Session = Depends(get_db),
 ) -> APIKeyList:
     """List all API keys for the authenticated user (without key values)."""
-    keys = db.query(APIKey).filter(APIKey.user_id == user.username).order_by(APIKey.created_at.desc()).all()
+    keys = db.query(APIKey).filter(APIKey.user_id == user.user_id).order_by(APIKey.created_at.desc()).all()
 
     return APIKeyList(
         keys=[
@@ -156,7 +185,7 @@ def delete_api_key(
     db: Session = Depends(get_db),
 ) -> APIKeyDeleted:
     """Delete an API key by ID."""
-    api_key = db.query(APIKey).filter(APIKey.id == key_id, APIKey.user_id == user.username).first()
+    api_key = db.query(APIKey).filter(APIKey.id == key_id, APIKey.user_id == user.user_id).first()
 
     if not api_key:
         raise HTTPException(
@@ -169,3 +198,79 @@ def delete_api_key(
     db.commit()
 
     return APIKeyDeleted(success=True, message=f"API key '{key_name}' deleted successfully")
+
+
+# --- Invite Code Management Endpoints ---
+
+
+@router.post("/invite-codes", status_code=status.HTTP_201_CREATED)
+def create_invite_code(
+    user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Generate a new single-use invite code."""
+    code = generate_invite_code()
+    invite = InviteCode(
+        code=code,
+        created_by=user.user_id,
+    )
+    db.add(invite)
+    db.commit()
+    db.refresh(invite)
+
+    return {
+        "id": str(invite.id),
+        "code": invite.code,
+        "created_at": invite.created_at.isoformat(),
+        "expires_at": invite.expires_at.isoformat() if invite.expires_at else None,
+    }
+
+
+@router.get("/invite-codes")
+def list_invite_codes(
+    user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """List invite codes created by the current user."""
+    codes = db.query(InviteCode).filter(
+        InviteCode.created_by == user.user_id
+    ).order_by(InviteCode.created_at.desc()).all()
+
+    return {
+        "codes": [
+            {
+                "id": str(c.id),
+                "code": c.code,
+                "status": "used" if c.used_by else ("expired" if c.expires_at and c.expires_at < datetime.utcnow() else "unused"),
+                "created_at": c.created_at.isoformat(),
+                "used_at": c.used_at.isoformat() if c.used_at else None,
+                "expires_at": c.expires_at.isoformat() if c.expires_at else None,
+            }
+            for c in codes
+        ],
+        "total": len(codes),
+    }
+
+
+@router.delete("/invite-codes/{code_id}")
+def delete_invite_code(
+    code_id: UUID,
+    user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Revoke an unused invite code."""
+    invite = db.query(InviteCode).filter(
+        InviteCode.id == code_id,
+        InviteCode.created_by == user.user_id,
+    ).first()
+
+    if not invite:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Invite code not found")
+
+    if invite.used_by:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Cannot delete a used invite code")
+
+    db.delete(invite)
+    db.commit()
+
+    return {"success": True, "message": "Invite code deleted"}

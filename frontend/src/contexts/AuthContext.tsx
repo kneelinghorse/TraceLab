@@ -10,8 +10,8 @@ type AuthContextValue = {
   token: string | null;
   isAuthenticated: boolean;
   isReady: boolean;
-  login: (username: string, password: string) => Promise<void>;
-  register: (email: string, password: string, displayName?: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, displayName: string, inviteCode: string) => Promise<void>;
   logout: () => void;
   refresh: () => Promise<TokenResponse>;
 };
@@ -34,7 +34,12 @@ const TEST_AUTH_TOKEN = process.env.NEXT_PUBLIC_E2E_AUTH_TOKEN;
 const TEST_AUTH_USER = process.env.NEXT_PUBLIC_E2E_AUTH_USER ?? "mission-tester";
 
 function persistSession(response: TokenResponse) {
-  setStoredAuth({ token: response.access_token, username: response.user.username });
+  setStoredAuth({
+    token: response.access_token,
+    user_id: response.user.user_id,
+    email: response.user.email,
+    display_name: response.user.display_name,
+  });
   return {
     token: response.access_token,
     user: response.user,
@@ -46,21 +51,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(() => {
     const stored = getStoredAuth();
     if (stored) {
-      return { token: stored.token, user: { username: stored.username }, isReady: true } satisfies AuthState;
+      return {
+        token: stored.token,
+        user: {
+          user_id: stored.user_id,
+          email: stored.email,
+          display_name: stored.display_name,
+        },
+        isReady: true,
+      } satisfies AuthState;
     }
     if (TEST_AUTH_TOKEN) {
-      return { token: TEST_AUTH_TOKEN, user: { username: TEST_AUTH_USER }, isReady: true } satisfies AuthState;
+      return {
+        token: TEST_AUTH_TOKEN,
+        user: { user_id: "", email: "", display_name: TEST_AUTH_USER },
+        isReady: true,
+      } satisfies AuthState;
     }
     return { ...initialState, isReady: true } satisfies AuthState;
   });
 
-  const login = useCallback(async (username: string, password: string) => {
-    const response = await loginRequest({ username, password });
+  const login = useCallback(async (email: string, password: string) => {
+    const response = await loginRequest({ email, password });
     setState(persistSession(response));
   }, []);
 
-  const register = useCallback(async (email: string, password: string, displayName?: string) => {
-    const response = await registerRequest({ email, password, display_name: displayName });
+  const register = useCallback(async (email: string, password: string, displayName: string, inviteCode: string) => {
+    const response = await registerRequest({ email, password, display_name: displayName, invite_code: inviteCode });
     setState(persistSession(response));
   }, []);
 

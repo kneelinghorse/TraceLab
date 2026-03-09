@@ -64,7 +64,7 @@ class Settings(BaseSettings):
     # Security & authentication
     secret_key: str = "change-me"
     jwt_algorithm: str = "HS256"
-    access_token_expire_minutes: int = 60
+    access_token_expire_minutes: int = 10080  # 7 days
     auth_username: str = "tracelab-admin"
     auth_password: Optional[str] = "changeme"
     auth_password_hash: Optional[str] = None

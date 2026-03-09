@@ -1,5 +1,8 @@
 export type TokenUser = {
-  username: string;
+  user_id: string;
+  email: string;
+  display_name: string;
+  username?: string; // deprecated, use display_name
 };
 
 export type TokenResponse = {
@@ -10,12 +13,13 @@ export type TokenResponse = {
 };
 
 export type LoginPayload = {
-  username: string;
+  email: string;
   password: string;
 };
 
 export type RegisterPayload = {
   email: string;
   password: string;
-  display_name?: string;
+  display_name: string;
+  invite_code: string;
 };

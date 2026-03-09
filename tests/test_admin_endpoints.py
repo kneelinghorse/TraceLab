@@ -130,9 +130,10 @@ def client() -> TestClient:
 
 
 def _auth_headers(client: TestClient) -> dict:
+    from tests.conftest import get_seed_user_email
     response = client.post(
         "/api/v1/auth/login",
-        json={"username": settings.auth_username, "password": _configured_password()},
+        json={"email": get_seed_user_email(), "password": _configured_password()},
     )
     assert response.status_code == 200, response.text
     token = response.json()["access_token"]
