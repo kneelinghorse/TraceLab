@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
-import { login as loginRequest, refresh as refreshRequest } from "@/lib/api/auth";
+import { login as loginRequest, register as registerRequest, refresh as refreshRequest } from "@/lib/api/auth";
 import { clearStoredAuth, getStoredAuth, setStoredAuth } from "@/lib/auth/storage";
 import type { TokenResponse, TokenUser } from "@/types/auth";
 
@@ -11,6 +11,7 @@ type AuthContextValue = {
   isAuthenticated: boolean;
   isReady: boolean;
   login: (username: string, password: string) => Promise<void>;
+  register: (email: string, password: string, displayName?: string) => Promise<void>;
   logout: () => void;
   refresh: () => Promise<TokenResponse>;
 };
@@ -58,6 +59,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState(persistSession(response));
   }, []);
 
+  const register = useCallback(async (email: string, password: string, displayName?: string) => {
+    const response = await registerRequest({ email, password, display_name: displayName });
+    setState(persistSession(response));
+  }, []);
+
   const logout = useCallback(() => {
     clearStoredAuth();
     setState({ token: null, user: null, isReady: true });
@@ -76,10 +82,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: Boolean(state.token),
       isReady: state.isReady,
       login,
+      register,
       logout,
       refresh,
     }),
-    [login, logout, refresh, state.token, state.user, state.isReady],
+    [login, register, logout, refresh, state.token, state.user, state.isReady],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

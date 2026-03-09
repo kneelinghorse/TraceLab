@@ -50,7 +50,7 @@ class DeepSearchExecuteRequest(BaseModel):
     )
     research_depth: Optional[str] = Field(
         default="baseline",
-        description="Research depth tier: baseline (default), deep, or alpha",
+        description="Research depth tier. BASELINE (8-12 min, 50-60 sources): standard thorough research — use as default. DEEP (20-25 min, 30-40 vetted sources): stricter quality gates, min 5 loops. ALPHA (1+ hour, ~20 scrutinized sources): may reject if evidence insufficient.",
     )
 
 

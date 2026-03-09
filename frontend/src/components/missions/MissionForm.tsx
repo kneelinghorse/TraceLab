@@ -219,9 +219,9 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
           <div>
             <label className="form-label">Research Depth</label>
             <select {...register("research_depth")} className="form-input">
-              <option value="baseline">Baseline - Quick (2-4 min)</option>
-              <option value="deep">Deep - Thorough (5-10 min)</option>
-              <option value="alpha">Alpha - Comprehensive (8-15 min)</option>
+              <option value="baseline">Baseline - Standard (8-12 min, 50-60 sources)</option>
+              <option value="deep">Deep - Higher Rigor (20-25 min, 30-40 sources)</option>
+              <option value="alpha">Alpha - Maximum Rigor (1+ hour, ~20 sources)</option>
             </select>
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
               Controls research thoroughness and source depth

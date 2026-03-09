@@ -2,7 +2,8 @@
  * Reports API client
  */
 
-import { httpClient } from "./http";
+import { buildApiUrl, httpClient } from "./http";
+import { getStoredAuth } from "@/lib/auth/storage";
 
 export type ReportStatus = "draft" | "final";
 export type ReportFormat = "summary" | "report" | "bullets" | "markdown";
@@ -114,5 +115,25 @@ export const reportsApi = {
    */
   async delete(reportId: string): Promise<void> {
     return httpClient.delete(`/reports/${reportId}`);
+  },
+
+  /**
+   * Export a report as markdown, JSON, or plain text
+   */
+  async exportReport(reportId: string, format: "md" | "json" | "txt" = "md"): Promise<Blob> {
+    const auth = getStoredAuth();
+    const token = auth?.token ?? "";
+    const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
+    const response = await fetch(buildApiUrl(`/reports/${reportId}/export`, { format }), {
+      headers,
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: "Export failed" }));
+      throw new Error(error.detail || "Export failed");
+    }
+
+    return response.blob();
   },
 };

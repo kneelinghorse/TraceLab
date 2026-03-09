@@ -4,11 +4,11 @@ DeepSearch uses a three-tier research depth system that balances thoroughness ag
 
 ## Quick Reference
 
-| Tier | Max Loops | Min Loops | Max Sources | Convergence Threshold | Quality Floor | Extra Safeguards |
-|------|-----------|-----------|-------------|----------------------|---------------|------------------|
-| **Baseline** | 3 | 2 | 15 | 0.05 | 0.5 | None |
-| **Deep** | 5 | 3 | 20 | 0.04 | 0.6 | None |
-| **Alpha** | 6 | 4 | 25 | 0.03 | 0.7 | Source diversity, contradiction detection |
+| Tier | Typical Duration | Sources Produced | Min Loops | Quality Gates | Extra Safeguards |
+|------|------------------|-----------------|-----------|---------------|------------------|
+| **Baseline** | 8-12 min | 50-60 | 2 | Standard | None |
+| **Deep** | 20-25 min | 30-40 (vetted) | 5 | Stricter | None |
+| **Alpha** | 1+ hour | ~20 (scrutinized) | 4 | Very strict (may reject) | Source diversity, contradiction detection |
 
 ---
 
@@ -16,43 +16,46 @@ DeepSearch uses a three-tier research depth system that balances thoroughness ag
 
 ### Baseline (Default)
 
+The standard research tier. Produces thorough reports with 50-60 sources across multiple loops. Suitable for most research needs.
+
 **Use when:**
-- Quick verification of known facts
-- Researching well-established domains
-- Routine questions with expected answers
-- Time-sensitive queries where speed matters
-- Low-stakes decisions
+- Any general research task (this is the default)
+- Researching well-established or moderately complex domains
+- You need a comprehensive report without extended wait times
+- Good balance of thoroughness and turnaround
 
 **Example scenarios:**
-- "What are the system requirements for PostgreSQL 16?"
-- "How do I configure nginx reverse proxy?"
-- "What's the current version of React?"
+- "Compare PostgreSQL indexing strategies for time-series data"
+- "What are the best practices for API rate limiting?"
+- "Analyze authentication options for a microservices architecture"
 
-**Configuration:**
-- 2-3 research loops
-- Up to 15 sources
+**Observed behavior:**
+- 8-12 minutes typical duration
+- 50-60 sources across multiple loops
+- Standard quality gates
 - Convergence threshold: 0.05 (5% score delta)
-- Source quality floor: 0.5 (medium authority)
 
 ---
 
 ### Deep
 
+Higher-rigor research with 30-40 carefully vetted sources. Enforces stricter quality gates and runs a minimum of 5 loops.
+
 **Use when:**
-- Strategic decisions requiring comprehensive analysis
-- Comparing multiple solutions or approaches
-- Technical architecture research
-- Market or competitive analysis
-- Decisions with moderate risk
+- You need higher confidence in the findings
+- Strategic decisions requiring vetted sources
+- Comparing multiple solutions where source quality matters
+- Topics where you want fewer, more authoritative sources over volume
 
 **Example scenarios:**
-- "Compare PostgreSQL vs MongoDB for a time-series workload"
-- "What authentication strategies work best for microservices?"
-- "Analyze the tradeoffs between REST and GraphQL APIs"
+- "Compare PostgreSQL vs MongoDB for a time-series workload with production benchmarks"
+- "Evaluate authentication strategies for regulated healthcare microservices"
+- "Analyze tradeoffs between REST and GraphQL APIs with real-world case studies"
 
-**Configuration:**
-- 3-5 research loops
-- Up to 20 sources
+**Observed behavior:**
+- 20-25 minutes typical duration
+- 30-40 carefully vetted sources
+- Stricter quality gates, minimum 5 loops
 - Convergence threshold: 0.04 (4% score delta)
 - Source quality floor: 0.6 (higher authority required)
 
@@ -60,21 +63,28 @@ DeepSearch uses a three-tier research depth system that balances thoroughness ag
 
 ### Alpha
 
+Maximum-rigor research with ~20 highly scrutinized sources. Very strict quality gates that **may reject the research entirely** if the available evidence doesn't meet the bar. Not every topic is suitable for alpha.
+
 **Use when:**
-- Novel domains with limited prior research
-- Conflicting or contradictory sources expected
-- Foundational research for critical decisions
-- High-stakes decisions requiring maximum confidence
-- Research where source quality is paramount
+- Precision and source authority are critical
+- The topic domain has sufficient high-quality sources to satisfy strict gates
+- High-stakes decisions where you need maximum confidence
+- Research where source quality is more important than source quantity
+
+**Use with caution when:**
+- The topic is niche or has sparse authoritative sources (alpha may reject)
+- You need results quickly (1+ hour typical)
+- Broad exploratory questions (alpha's strict gates may filter too aggressively)
 
 **Example scenarios:**
-- "Evaluate emerging consensus on AI agent architectures"
-- "Research cutting-edge approaches to federated learning"
-- "Analyze conflicting studies on database performance claims"
+- "Evaluate emerging consensus on AI agent architectures with peer-reviewed sources"
+- "Analyze conflicting clinical studies on a specific treatment protocol"
+- "Research regulatory compliance requirements for financial data handling"
 
-**Configuration:**
-- 4-6 research loops
-- Up to 25 sources
+**Observed behavior:**
+- 1+ hour typical duration
+- ~20 highly scrutinized sources
+- Very strict quality gates (may reject research if evidence insufficient)
 - Convergence threshold: 0.03 (3% score delta)
 - Source quality floor: 0.7 (high authority required)
 
@@ -213,37 +223,37 @@ state = empty_state(
 
 ### Estimated Resource Usage
 
-| Tier | Typical Duration | API Calls | Token Usage | Relative Cost |
-|------|------------------|-----------|-------------|---------------|
-| Baseline | 2-4 minutes | 6-10 | 15-25K | 1x |
-| Deep | 5-10 minutes | 12-18 | 30-50K | 2-3x |
-| Alpha | 8-15 minutes | 18-25 | 50-80K | 3-5x |
+| Tier | Typical Duration | Sources Produced | Relative Cost |
+|------|------------------|-----------------|---------------|
+| Baseline | 8-12 minutes | 50-60 | 1x |
+| Deep | 20-25 minutes | 30-40 (vetted) | 2-3x |
+| Alpha | 1+ hour | ~20 (scrutinized) | 5-10x |
 
-*Estimates assume standard mission complexity. Actual usage varies based on topic breadth and source availability.*
+*Estimates based on observed production runs. Actual usage varies based on topic breadth, source availability, and quality gate outcomes. Alpha may take significantly longer or reject research entirely if domain sources are sparse.*
 
 ### When to Upgrade Tiers
 
 **Baseline → Deep:**
-- Initial research returns conflicting information
-- Coverage scores plateau below 0.8
-- Decision requires comparing multiple options
+- You need higher confidence in the findings
+- Source quality matters more than source quantity
+- Decision has meaningful consequences
 
 **Deep → Alpha:**
-- Sources conflict significantly
-- Novel domain with sparse authoritative sources
-- Foundational research for critical architecture decisions
+- Sources conflict significantly and you need contradiction detection
+- High-stakes decision requiring maximum source authority
+- Topic has sufficient high-quality sources to pass strict gates
 
 ### When to Downgrade Tiers
 
 **Alpha → Deep:**
-- Well-established topic with clear consensus
-- Time constraints require faster results
-- Previous Alpha run showed no contradictions
+- Topic lacks sufficient high-quality sources (alpha may reject)
+- Time constraints — alpha takes 1+ hour vs 20-25 min
+- Previous Alpha run rejected or showed diminishing returns
 
 **Deep → Baseline:**
-- Simple fact verification
-- Following up on previous comprehensive research
-- Reference lookups (versions, configurations, etc.)
+- Baseline already provides 50-60 sources — sufficient for most tasks
+- Time-sensitive research where 8-12 min matters
+- Following up on previous research
 
 ---
 

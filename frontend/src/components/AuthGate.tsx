@@ -1,7 +1,9 @@
+import { useState } from "react";
 import type { ReactNode } from "react";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { LoginPanel } from "@/components/LoginPanel";
+import { RegisterPanel } from "@/components/RegisterPanel";
 
 type AuthGateProps = {
   children: ReactNode;
@@ -9,6 +11,7 @@ type AuthGateProps = {
 
 export function AuthGate({ children }: AuthGateProps) {
   const { isReady, isAuthenticated, user, logout } = useAuth();
+  const [view, setView] = useState<"login" | "register">("login");
 
   if (!isReady) {
     return (
@@ -19,7 +22,15 @@ export function AuthGate({ children }: AuthGateProps) {
   }
 
   if (!isAuthenticated) {
-    return <LoginPanel />;
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-[hsl(var(--background))] px-4">
+        {view === "login" ? (
+          <LoginPanel onSwitchToRegister={() => setView("register")} />
+        ) : (
+          <RegisterPanel onSwitchToLogin={() => setView("login")} />
+        )}
+      </main>
+    );
   }
 
   return (
