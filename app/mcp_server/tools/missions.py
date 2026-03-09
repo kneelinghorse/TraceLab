@@ -140,7 +140,7 @@ MISSION_TOOLS: List[Tool] = [
                     "type": "string",
                     "enum": ["baseline", "deep", "alpha"],
                     "default": "baseline",
-                    "description": "Research depth tier: baseline (quick verification), deep (comprehensive analysis), alpha (novel domain exploration)",
+                    "description": "Research depth tier. BASELINE (8-12 min): Thorough reports with 50-60 sources across multiple loops — the standard tier for most research. DEEP (20-25 min): Higher-rigor research with 30-40 carefully vetted sources, stricter quality gates, minimum 5 loops — use when you need higher confidence. ALPHA (1+ hour): Maximum-rigor with ~20 highly scrutinized sources, very strict quality gates that may reject research if evidence is insufficient — use only when precision and source authority are critical.",
                 },
             },
             "required": ["mission_id", "title", "objective", "success_criteria"],

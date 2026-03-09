@@ -3,6 +3,7 @@
  */
 
 import { AuthGate } from "@/components/AuthGate";
+import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { reportsApi, type ReportDetail, type ReportStatus } from "@/lib/api/reports";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
@@ -17,6 +18,7 @@ export default function ReportDetailPage() {
   const [editTitle, setEditTitle] = useState("");
   const [editError, setEditError] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const { data: report, mutate, isLoading } = useSWR<ReportDetail>(
     id ? `report-${id}` : null,
@@ -81,6 +83,29 @@ export default function ReportDetailPage() {
       setTimeout(() => setIsCopied(false), 2000);
     } catch (error) {
       alert("Failed to copy to clipboard");
+    }
+  };
+
+  const handleExport = async (format: "md" | "json" | "txt") => {
+    if (!report) return;
+    setIsExporting(true);
+    try {
+      const blob = await reportsApi.exportReport(report.id, format);
+      const safeTitle = report.title.replace(/\s+/g, "-").replace(/\//g, "-").slice(0, 80);
+      const ext = format;
+      const url = window.URL.createObjectURL(blob);
+      const link = window.document.createElement("a");
+      link.href = url;
+      link.download = `${safeTitle}.${ext}`;
+      window.document.body.appendChild(link);
+      link.click();
+      window.document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Export failed";
+      alert(message);
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -177,6 +202,34 @@ export default function ReportDetailPage() {
                     {getStatusBadge(report.status)}
                   </div>
                   <div className="flex gap-2">
+                    <div className="relative group">
+                      <button
+                        disabled={isExporting}
+                        className="px-4 py-2 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 rounded disabled:opacity-50"
+                      >
+                        {isExporting ? "Exporting..." : "Export"}
+                      </button>
+                      <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg hidden group-hover:block z-10 min-w-[140px]">
+                        <button
+                          onClick={() => handleExport("md")}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
+                        >
+                          Markdown (.md)
+                        </button>
+                        <button
+                          onClick={() => handleExport("json")}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          JSON (.json)
+                        </button>
+                        <button
+                          onClick={() => handleExport("txt")}
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg"
+                        >
+                          Plain text (.txt)
+                        </button>
+                      </div>
+                    </div>
                     <button
                       onClick={handleCopy}
                       className="px-4 py-2 text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-gray-700 rounded"
@@ -238,11 +291,7 @@ export default function ReportDetailPage() {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Content
             </h2>
-            <div className="prose prose-gray dark:prose-invert max-w-none">
-              <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                {report.content}
-              </div>
-            </div>
+            <MarkdownRenderer content={report.content} />
           </div>
 
           {/* Citations */}

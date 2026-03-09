@@ -4,7 +4,9 @@ import { useRouter } from "next/router";
 import { formatDistanceToNow } from "date-fns";
 
 import { AuthGate } from "@/components/AuthGate";
+import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { ExecutionTimeline, ResearchPhases, ResultLinks } from "@/components/missions";
+import { downloadFile } from "@/lib/api/console";
 import { missionsApi } from "@/lib/api/missions";
 import { useApiMission } from "@/lib/hooks/useMissions";
 import type { MissionStatus, ReportPromotionResponse, ApiMissionUpdate, ResearchDepth } from "@/types/mission";
@@ -424,12 +426,12 @@ function MissionDetailContent() {
                     onChange={(e) => setEditResearchDepth(e.target.value as ResearchDepth)}
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="baseline">Baseline - Quick scan (~5 min)</option>
-                    <option value="deep">Deep - Comprehensive analysis (~15-30 min)</option>
-                    <option value="alpha">Alpha - Exhaustive research (~1+ hour)</option>
+                    <option value="baseline">Baseline - Standard (8-12 min, 50-60 sources)</option>
+                    <option value="deep">Deep - Higher Rigor (20-25 min, 30-40 sources)</option>
+                    <option value="alpha">Alpha - Maximum Rigor (1+ hour, ~20 sources)</option>
                   </select>
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Controls research thoroughness. Baseline for quick lookups, Deep for most research tasks, Alpha for critical decisions.
+                    Controls research thoroughness. Baseline is the standard tier for most research. Deep for higher confidence. Alpha for critical decisions (may reject if evidence insufficient).
                   </p>
                 </div>
 
@@ -646,10 +648,20 @@ function MissionDetailContent() {
           {/* Results Markdown Section */}
           {mission.result_markdown && (
             <Section title="Results">
+              <div className="flex justify-end mb-2">
+                <button
+                  onClick={() => downloadFile(
+                    mission.result_markdown!,
+                    `${mission.mission_id}-results.md`,
+                    "text/markdown"
+                  )}
+                  className="px-3 py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 rounded transition-colors"
+                >
+                  Export as .md
+                </button>
+              </div>
               <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 overflow-x-auto">
-                <pre className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300 font-mono">
-                  {mission.result_markdown}
-                </pre>
+                <MarkdownRenderer content={mission.result_markdown} />
               </div>
             </Section>
           )}

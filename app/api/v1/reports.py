@@ -159,6 +159,52 @@ def get_report(
     return _build_report_detail(report)
 
 
+@router.get("/{report_id}/export")
+def export_report(
+    report_id: UUID,
+    format: str = Query(default="md", description="Export format: md, json, or txt"),
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    service: ReportService = Depends(get_report_service),
+) -> Response:
+    """Export a report as markdown, JSON, or plain text."""
+    import json as json_lib
+
+    if format not in ("md", "json", "txt"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Format must be one of: md, json, txt",
+        )
+
+    report = service.get_report(report_id)
+    if report is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Report not found.",
+        )
+
+    safe_title = report.title.replace(" ", "-").replace("/", "-")[:80]
+
+    if format == "json":
+        detail = _build_report_detail(report)
+        content = json_lib.dumps(detail.model_dump(mode="json"), indent=2)
+        media_type = "application/json"
+        filename = f"{safe_title}.json"
+    elif format == "txt":
+        content = f"{report.title}\n{'=' * len(report.title)}\n\n{report.content}"
+        media_type = "text/plain"
+        filename = f"{safe_title}.txt"
+    else:  # md
+        content = f"# {report.title}\n\n{report.content}"
+        media_type = "text/markdown"
+        filename = f"{safe_title}.md"
+
+    return Response(
+        content=content,
+        media_type=media_type,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
 @router.put("/{report_id}", response_model=ReportDetailResponse)
 def update_report(
     report_id: UUID,

@@ -103,7 +103,7 @@ class MissionCreate(MissionBase):
     )
     research_depth: Optional[ResearchDepth] = Field(
         "baseline",
-        description="Research depth tier: baseline (default), deep, or alpha",
+        description="Research depth tier. BASELINE (8-12 min, 50-60 sources): standard thorough research — use as default. DEEP (20-25 min, 30-40 vetted sources): stricter quality gates, min 5 loops. ALPHA (1+ hour, ~20 scrutinized sources): may reject if evidence insufficient.",
     )
     status: Optional[MissionStatus] = Field(
         "draft",
@@ -160,7 +160,7 @@ class MissionUpdate(BaseModel):
     )
     research_depth: Optional[ResearchDepth] = Field(
         None,
-        description="Research depth tier: baseline, deep, or alpha",
+        description="Research depth tier. BASELINE (8-12 min, 50-60 sources): standard thorough research. DEEP (20-25 min, 30-40 vetted sources): stricter quality gates. ALPHA (1+ hour, ~20 scrutinized sources): may reject if evidence insufficient.",
     )
     status: Optional[MissionStatus] = Field(
         None,
@@ -224,7 +224,7 @@ class MissionResponse(MissionBase):
     tags: List[str] = Field(default_factory=list)
     metadata: Dict[str, Any] = Field(default_factory=dict)
     research_depth: Optional[ResearchDepth] = Field(
-        "baseline", description="Research depth tier: baseline, deep, or alpha"
+        "baseline", description="Research depth tier. BASELINE (8-12 min, 50-60 sources): standard thorough research. DEEP (20-25 min, 30-40 vetted sources): stricter quality gates. ALPHA (1+ hour, ~20 scrutinized sources): may reject if evidence insufficient."
     )
     status: MissionStatus
     queued_at: Optional[datetime] = None

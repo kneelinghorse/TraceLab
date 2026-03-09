@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 
 import { AuthGate } from "@/components/AuthGate";
+import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { RelationshipTree } from "@/components/console/RelationshipTree";
 import { ExportButtons } from "@/components/console/ExportButtons";
 import { StatCard, StatGrid } from "@/components/console/StatCard";
@@ -259,11 +260,7 @@ function MissionDetailContent() {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Result
             </h2>
-            <div className="prose dark:prose-invert max-w-none">
-              <pre className="whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg overflow-auto max-h-96">
-                {mission.result_markdown}
-              </pre>
-            </div>
+            <MarkdownRenderer content={mission.result_markdown} />
           </section>
         )}
 

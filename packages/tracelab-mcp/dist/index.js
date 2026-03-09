@@ -500,7 +500,7 @@ const TOOLS = [
                 research_depth: {
                     type: 'string',
                     enum: ['baseline', 'deep', 'alpha'],
-                    description: 'Controls research thoroughness and duration. BASELINE (~5 min): Quick scan of top sources, good for simple lookups or validation. DEEP (~15-30 min): Comprehensive multi-source analysis, recommended for most research tasks. ALPHA (~1+ hour): Exhaustive research with cross-validation and synthesis, use for critical strategic decisions. Default: baseline. Can be changed later via update_mission or at submission via submit_mission.',
+                    description: 'Controls research thoroughness and duration. BASELINE (8-12 min): Thorough reports with 50-60 sources across multiple loops — the standard tier for most research. DEEP (20-25 min): Higher-rigor research with 30-40 carefully vetted sources, stricter quality gates, minimum 5 loops — use when you need higher confidence. ALPHA (1+ hour): Maximum-rigor with ~20 highly scrutinized sources, very strict quality gates that may reject research if evidence is insufficient — use only when precision and source authority are critical. Default: baseline. Can be changed later via update_mission or at submission via submit_mission.',
                     default: 'baseline',
                 },
             },
@@ -576,7 +576,7 @@ const TOOLS = [
                 research_depth: {
                     type: 'string',
                     enum: ['baseline', 'deep', 'alpha'],
-                    description: 'Change research thoroughness. BASELINE (~5 min): Quick scan, good for simple lookups. DEEP (~15-30 min): Comprehensive analysis, recommended default. ALPHA (~1+ hour): Exhaustive research, use for critical decisions.',
+                    description: 'Change research thoroughness. BASELINE (8-12 min): Thorough reports with 50-60 sources — standard default. DEEP (20-25 min): 30-40 vetted sources, stricter quality gates, min 5 loops. ALPHA (1+ hour): ~20 scrutinized sources, may reject if evidence insufficient.',
                 },
                 deliverables: {
                     type: 'array',
@@ -609,7 +609,7 @@ const TOOLS = [
                 research_depth: {
                     type: 'string',
                     enum: ['baseline', 'deep', 'alpha'],
-                    description: 'Override mission research_depth at submission. BASELINE (~5 min): Quick scan for simple lookups. DEEP (~15-30 min): Comprehensive multi-source analysis (recommended). ALPHA (~1+ hour): Exhaustive research with synthesis for critical decisions. If not provided, uses the depth set on the mission.',
+                    description: 'Override mission research_depth at submission. BASELINE (8-12 min): Thorough reports with 50-60 sources — standard default. DEEP (20-25 min): 30-40 vetted sources, stricter quality gates, min 5 loops. ALPHA (1+ hour): ~20 scrutinized sources, may reject if evidence insufficient. If not provided, uses the depth set on the mission.',
                 },
             },
             required: ['mission_id'],

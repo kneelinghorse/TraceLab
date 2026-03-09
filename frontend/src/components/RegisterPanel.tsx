@@ -2,26 +2,33 @@ import { useState, type FormEvent } from "react";
 
 import { useAuth } from "@/contexts/AuthContext";
 
-interface LoginPanelProps {
-  onSwitchToRegister?: () => void;
+interface RegisterPanelProps {
+  onSwitchToLogin?: () => void;
 }
 
-export function LoginPanel({ onSwitchToRegister }: LoginPanelProps) {
-  const { login } = useAuth();
-  const [username, setUsername] = useState("");
+export function RegisterPanel({ onSwitchToLogin }: RegisterPanelProps) {
+  const { register } = useAuth();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setError(null);
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await login(username.trim(), password);
+      await register(email.trim(), password, displayName.trim() || undefined);
       setPassword("");
     } catch (submissionError) {
-      const message = submissionError instanceof Error ? submissionError.message : "Unable to authenticate";
+      const message = submissionError instanceof Error ? submissionError.message : "Registration failed";
       setError(message);
     } finally {
       setIsSubmitting(false);
@@ -35,21 +42,22 @@ export function LoginPanel({ onSwitchToRegister }: LoginPanelProps) {
     >
       <div>
         <p className="text-xs uppercase tracking-[0.4em] text-slate-400">TraceLab</p>
-        <h1 className="text-3xl text-white font-semibold mt-2">Sign in</h1>
+        <h1 className="text-3xl text-white font-semibold mt-2">Create account</h1>
         <p className="text-sm text-slate-300 mt-3">
-          Enter your credentials to access Mission Protocol.
+          Register for access to Mission Protocol.
         </p>
       </div>
 
       <label className="block space-y-2 text-sm text-slate-200">
-        <span>Username</span>
+        <span>Email</span>
         <input
-          type="text"
-          value={username}
-          onChange={(event) => setUsername(event.target.value)}
-          placeholder="Enter your username"
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="you@example.com"
+          required
           className="w-full rounded-xl bg-slate-900/40 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400"
-          autoComplete="username"
+          autoComplete="email"
         />
       </label>
 
@@ -59,9 +67,23 @@ export function LoginPanel({ onSwitchToRegister }: LoginPanelProps) {
           type="password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
-          placeholder="Enter your password"
+          placeholder="Minimum 8 characters"
+          required
+          minLength={8}
           className="w-full rounded-xl bg-slate-900/40 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400"
-          autoComplete="current-password"
+          autoComplete="new-password"
+        />
+      </label>
+
+      <label className="block space-y-2 text-sm text-slate-200">
+        <span>Display name <span className="text-slate-500">(optional)</span></span>
+        <input
+          type="text"
+          value={displayName}
+          onChange={(event) => setDisplayName(event.target.value)}
+          placeholder="How you want to be identified"
+          className="w-full rounded-xl bg-slate-900/40 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400"
+          autoComplete="name"
         />
       </label>
 
@@ -72,18 +94,18 @@ export function LoginPanel({ onSwitchToRegister }: LoginPanelProps) {
         className="w-full py-3 rounded-xl bg-sky-400 text-slate-900 font-semibold disabled:opacity-50"
         disabled={isSubmitting}
       >
-        {isSubmitting ? "Signing in…" : "Sign in"}
+        {isSubmitting ? "Creating account…" : "Create account"}
       </button>
 
-      {onSwitchToRegister && (
+      {onSwitchToLogin && (
         <p className="text-center text-sm text-slate-400">
-          Don&apos;t have an account?{" "}
+          Already have an account?{" "}
           <button
             type="button"
-            onClick={onSwitchToRegister}
+            onClick={onSwitchToLogin}
             className="text-sky-400 hover:text-sky-300 font-medium"
           >
-            Create one
+            Sign in
           </button>
         </p>
       )}

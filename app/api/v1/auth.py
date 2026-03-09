@@ -25,7 +25,7 @@ from app.schemas.api_key import (
     APIKeyList,
     APIKeyResponse,
 )
-from app.schemas.auth import LoginRequest, TokenResponse
+from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse
 
 router = APIRouter(tags=["auth"])
 
@@ -41,6 +41,27 @@ def login(payload: LoginRequest) -> TokenResponse:
         payload.password, credentials.password_hash
     ):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid username or password")
+
+    response_payload = issue_token_response(credentials)
+    return TokenResponse(**response_payload)
+
+
+@router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
+def register(payload: RegisterRequest) -> TokenResponse:
+    """Register a new user and return a signed JWT.
+
+    Sprint 31 (single-user mode): Validates input format and issues a token
+    using the configured environment credentials. Sprint 32 will add
+    DB-backed multi-user registration.
+    """
+    credentials = get_configured_credentials()
+
+    # In single-user mode, verify the password matches the configured password
+    if not verify_password(payload.password, credentials.password_hash):
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail="Registration is currently in single-user mode. Use the configured credentials.",
+        )
 
     response_payload = issue_token_response(credentials)
     return TokenResponse(**response_payload)

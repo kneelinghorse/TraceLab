@@ -1,9 +1,9 @@
 """Pydantic schemas for authentication APIs."""
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class TokenUser(BaseModel):
@@ -26,3 +26,20 @@ class LoginRequest(BaseModel):
 
     username: str
     password: str
+
+
+class RegisterRequest(BaseModel):
+    """Payload for user registration."""
+
+    email: str = Field(..., min_length=3, description="Email address")
+    password: str = Field(..., min_length=8, description="Password (minimum 8 characters)")
+    display_name: Optional[str] = Field(None, max_length=100, description="Optional display name")
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        """Basic email format validation."""
+        v = v.strip().lower()
+        if "@" not in v or "." not in v.split("@")[-1]:
+            raise ValueError("Invalid email format")
+        return v
