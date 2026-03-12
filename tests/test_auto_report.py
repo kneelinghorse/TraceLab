@@ -256,10 +256,12 @@ class TestCreateReportFromProtocol:
     def _create_test_mission(
         self,
         db_session,
-        mission_id: str = "AR-001",
+        mission_id: str = None,
         project_id: uuid.UUID = None,
     ) -> Mission:
         """Create a test mission with optional project."""
+        if mission_id is None:
+            mission_id = f"AR-{uuid.uuid4().hex[:8]}"
         if project_id is None:
             project = Project(name="Auto Report Test Project")
             db_session.add(project)
@@ -293,7 +295,7 @@ class TestCreateReportFromProtocol:
         assert report.report_type == "markdown"
         assert report.status == "draft"
         assert "Research findings summary." in report.content
-        assert report.project_id == str(mission.project_id)
+        assert str(report.project_id) == str(mission.project_id)
 
     def test_create_report_updates_mission(self, db_session):
         """Report creation updates mission.result_report_id."""

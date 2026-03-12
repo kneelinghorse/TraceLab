@@ -14,7 +14,7 @@ if str(REPO_ROOT) not in sys.path:
 
 # CRITICAL: Force test database to prevent accidental production wipes
 # setdefault doesn't override .env values, so we MUST force this
-_TEST_DB_URL = "sqlite:///./tests/test_ingestion.db"
+_TEST_DB_URL = "sqlite://"
 _current_db = os.environ.get("DATABASE_URL", "")
 
 # Safety check: refuse to run tests against production databases
@@ -68,7 +68,7 @@ def _create_all_sqlite_safe(eng):
     if "sqlite" not in str(eng.url):
         Base.metadata.create_all(bind=eng)
         return
-    # Ensure jsonb_array_length is available on all pooled connections
+    # Reset pool so create_all gets a fresh connection with clean schema caches
     eng.dispose()
     # Temporarily neutralize Computed columns (SQLite can't handle Postgres syntax)
     _originals = {}

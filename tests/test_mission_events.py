@@ -228,3 +228,82 @@ class TestSSEEndpoint:
         resp = client.get("/api/v1/missions/events/recent")
         assert resp.status_code == 200
         assert resp.json() == []
+
+    def test_sse_stream_accepts_query_param_token(self, auth_token: str):
+        """SSE auth dependency should accept a valid JWT via query param.
+
+        We test the dependency directly to avoid TestClient hanging on
+        the infinite SSE generator. The 401 tests below prove the
+        endpoint correctly wires the dependency.
+        """
+        import asyncio
+        from app.core.security import require_authenticated_user_sse
+
+        # Build a mock credentials=None (simulating EventSource — no header)
+        user = asyncio.get_event_loop().run_until_complete(
+            require_authenticated_user_sse(credentials=None, x_api_key=None, token=auth_token)
+        )
+        assert user is not None
+        assert user.display_name is not None
+
+    def test_sse_stream_rejects_missing_token(self):
+        """SSE stream should reject requests with no auth at all."""
+        with TestClient(app, raise_server_exceptions=False) as c:
+            with c.stream("GET", "/api/v1/missions/events/stream") as resp:
+                assert resp.status_code == 401
+
+    def test_sse_stream_rejects_invalid_token(self):
+        """SSE stream should reject an invalid JWT query param."""
+        with TestClient(app, raise_server_exceptions=False) as c:
+            with c.stream("GET", "/api/v1/missions/events/stream?token=bogus.jwt.token") as resp:
+                assert resp.status_code == 401
+
+    def test_recent_events_rejects_missing_auth(self):
+        """GET /events/recent should reject requests with no auth."""
+        with TestClient(app) as c:
+            resp = c.get("/api/v1/missions/events/recent")
+            assert resp.status_code == 401
+
+
+# ===========================================================================
+# 5. MISSION SERVICE EVENT EMISSION
+# ===========================================================================
+
+
+class TestMissionServiceEventEmission:
+    """Verify MissionService emits events on status transitions."""
+
+    def test_update_mission_emits_status_change(self, db_session, project):
+        """MissionService.update_mission should emit event on status change."""
+        from app.schemas.mission import MissionCreate, MissionUpdate
+        from app.services.mission_service import MissionService
+
+        service = MissionService()
+        mission = service.create_mission(
+            db_session,
+            MissionCreate(
+                project_id=project.id,
+                mission_id="EVT-001",
+                title="Event Test Mission",
+                objective="Test event emission",
+                success_criteria=["emits events"],
+                status="draft",
+            ),
+        )
+
+        bus = get_mission_event_bus()
+        before_count = len(bus.get_recent_events())
+
+        # Transition to queued
+        service.update_mission(
+            db_session,
+            mission.id,
+            MissionUpdate(status="queued"),
+        )
+
+        events = bus.get_recent_events()
+        new_events = events[before_count:]
+        assert len(new_events) == 1
+        assert new_events[0].event_type == MissionEventType.MISSION_QUEUED.value
+        assert new_events[0].status == "queued"
+        assert new_events[0].previous_status == "draft"

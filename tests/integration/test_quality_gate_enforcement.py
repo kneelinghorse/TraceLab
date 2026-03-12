@@ -6,7 +6,7 @@ from uuid import uuid4
 import pytest
 
 from app.models.mission_protocol import MissionProtocolDraft
-from app.schemas.mission import MissionCreate, MissionUpdate
+from app.schemas.mission import MissionUpdate
 from app.services.evidence_linking import EvidenceLinkingService
 from app.services.mission_protocol_service import MissionProtocolService, MissionProtocolServiceError
 from app.services.quality_gate_service import QualityGateService
@@ -53,24 +53,33 @@ def test_gates_block_completion_until_traceability_ok(db_session, project):
     )
 
     draft = _payload(with_chunk=False)
-    mission = service.create_mission(
+    mission = service.create_mission_from_draft(
         db_session,
-        MissionCreate(project_id=project.id, mission_data=draft),
+        project_id=project.id,
+        draft=draft,
     )
 
-    assert mission.status in {"review", "in_progress"}
-    assert "traceability" in mission.quality_gates
-    assert mission.quality_gates["traceability"]["status"] == "fail"
+    assert mission.status in {"in_progress", "draft"}
+    exec_meta = mission.execution_metadata or {}
+    quality_gates = exec_meta.get("quality_gates", {})
+    assert "traceability" in quality_gates
+    assert quality_gates["traceability"]["status"] == "fail"
 
-    update_payload = _payload(with_chunk=True)
+    # Update with traceability-passing draft
+    update_draft = _payload(with_chunk=True)
+    mission.context = update_draft.model_dump(mode="json")
+    db_session.commit()
+
     updated = service.update_mission(
         db_session,
         mission.id,
-        MissionUpdate(mission_data=update_payload, status="complete"),
+        MissionUpdate(status="completed"),
     )
 
-    assert updated.status == "complete"
-    assert updated.quality_gates["traceability"]["status"] == "pass"
+    assert updated.status == "completed"
+    updated_meta = updated.execution_metadata or {}
+    updated_gates = updated_meta.get("quality_gates", {})
+    assert updated_gates["traceability"]["status"] == "pass"
     assert any(event["gate"] == "traceability" for event in telemetry_events)
 
 
@@ -80,14 +89,15 @@ def test_explicit_complete_request_raises_when_gates_fail(db_session, project):
         quality_gate_service=QualityGateService(telemetry_sink=lambda _: None),
     )
     draft = _payload(with_chunk=False)
-    mission = service.create_mission(
+    mission = service.create_mission_from_draft(
         db_session,
-        MissionCreate(project_id=project.id, mission_data=draft),
+        project_id=project.id,
+        draft=draft,
     )
 
     with pytest.raises(MissionProtocolServiceError):
         service.update_mission(
             db_session,
             mission.id,
-            MissionUpdate(mission_data=draft, status="complete"),
+            MissionUpdate(status="completed"),
         )

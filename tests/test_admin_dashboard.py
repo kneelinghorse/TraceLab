@@ -5,6 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import json
+from datetime import datetime, timezone, timedelta
 import pytest
 from fastapi.testclient import TestClient
 
@@ -85,9 +86,10 @@ class _FakeQdrantService:
 
 
 def _write_events(path: Path) -> None:
+    now = datetime.now(timezone.utc)
     rows = [
         {
-            "ts": "2025-11-15T12:00:00Z",
+            "ts": (now - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "model": "gpt-5.2",
             "route": "primary",
             "cost_usd": 0.4,
@@ -96,7 +98,7 @@ def _write_events(path: Path) -> None:
             "project_id": "demo",
         },
         {
-            "ts": "2025-11-15T13:00:00Z",
+            "ts": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "model": "text-embedding-3-large",
             "route": "embedding",
             "cost_usd": 0.05,

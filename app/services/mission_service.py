@@ -12,6 +12,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session, joinedload
 
+from app.core.mission_events import emit_mission_status_change
 from app.models.mission import MISSION_STATUSES, Mission
 from app.schemas.mission import MissionCreate, MissionUpdate
 from app.schemas.pagination import PaginationMeta
@@ -220,13 +221,28 @@ class MissionService:
                 if new_status == "completed" and mission.completed_at is None:
                     mission.completed_at = now
 
+        previous_status = mission.status
+
         # Apply updates
         for key, value in update_data.items():
             if hasattr(mission, key):
+                # Convert UUID lists to strings for JSON columns
+                if key == "result_document_ids" and value is not None:
+                    value = [str(v) for v in value]
                 setattr(mission, key, value)
 
         db.commit()
         db.refresh(mission)
+
+        # Emit event if status changed
+        if "status" in update_data and mission.status != previous_status:
+            emit_mission_status_change(
+                mission_id=mission.mission_id or str(mission.id),
+                title=mission.title or "",
+                new_status=mission.status,
+                previous_status=previous_status,
+            )
+
         return mission
 
     def delete_mission(self, db: Session, mission_id: UUID) -> None:

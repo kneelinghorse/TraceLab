@@ -84,11 +84,11 @@ class TestMissionSchemas:
 
     def test_mission_create_empty_criteria_fails(self):
         """Test that empty success_criteria fails validation."""
-        with pytest.raises(ValueError, match="success_criteria must contain"):
+        with pytest.raises(ValueError, match="too_short|success_criteria must contain"):
             MissionCreate(
                 mission_id="B16.1",
-                title="Test",
-                objective="Test",
+                title="Test Mission",
+                objective="Test objective for validation",
                 success_criteria=[],
             )
 
@@ -208,8 +208,8 @@ class TestMissionCreate:
             json={
                 "mission_id": "DUPLICATE-001",
                 "title": "Duplicate Mission",
-                "objective": "Test",
-                "success_criteria": ["Test"],
+                "objective": "Test duplicate detection",
+                "success_criteria": ["Test criterion"],
             },
             headers=auth_headers,
         )
@@ -720,8 +720,8 @@ class TestMissionStatusTransitions:
                 json={
                     "mission_id": f"STAT-{i:03d}",
                     "title": f"Status {status}",
-                    "objective": "Test",
-                    "success_criteria": ["Test"],
+                    "objective": "Test status transitions for validation",
+                    "success_criteria": ["Test criterion"],
                     "status": status,
                 },
                 headers=auth_headers,
@@ -817,7 +817,8 @@ class TestMissionSubmit:
         )
 
         assert response.status_code == 400
-        assert "already queued" in response.json()["detail"]
+        detail = response.json()["detail"]
+        assert "already queued" in detail["message"]
 
     def test_submit_mission_in_progress(self, auth_headers, db_session):
         """Cannot submit a mission that is in progress."""
@@ -833,7 +834,8 @@ class TestMissionSubmit:
         )
 
         assert response.status_code == 400
-        assert "already in_progress" in response.json()["detail"]
+        detail = response.json()["detail"]
+        assert "already in_progress" in detail["message"]
 
     def test_submit_completed_mission(self, auth_headers, db_session):
         """Can resubmit a completed mission."""

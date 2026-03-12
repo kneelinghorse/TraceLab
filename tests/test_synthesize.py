@@ -459,7 +459,7 @@ class TestSynthesizeService:
         assert kwargs["model"] == "gpt-5.1"
         assert kwargs["reasoning_effort"] == "none"
         assert kwargs["temperature"] == 0.35
-        assert kwargs["max_tokens"] == 512
+        assert kwargs["max_completion_tokens"] == 512
 
 
 class TestSynthesizeSchemas:

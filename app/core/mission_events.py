@@ -178,6 +178,7 @@ def emit_mission_status_change(
         "queued": MissionEventType.MISSION_QUEUED,
         "in_progress": MissionEventType.MISSION_STARTED,
         "completed": MissionEventType.MISSION_COMPLETED,
+        "failed": MissionEventType.MISSION_FAILED,
     }
     event_type = type_map.get(new_status, MissionEventType.MISSION_STATUS_CHANGED)
 

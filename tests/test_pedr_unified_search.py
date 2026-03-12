@@ -744,7 +744,7 @@ class TestPEDRSchemas:
 class TestPEDRIntegration:
     """Integration tests requiring full service stack."""
 
-    @pytest.mark.skip(reason="Requires database connection")
+    @pytest.mark.skip(reason="Requires OpenAI + Qdrant services (orchestrator init fails without them)")
     def test_create_orchestrator_factory(self):
         """Factory creates fully wired orchestrator."""
         from app.services.pedr.search_orchestrator import create_pedr_orchestrator
@@ -753,7 +753,7 @@ class TestPEDRIntegration:
         assert orchestrator._lexical_search is not None
         assert orchestrator._semantic_search is not None
 
-    @pytest.mark.skip(reason="Requires database connection")
+    @pytest.mark.skip(reason="Requires OpenAI + Qdrant services (orchestrator init fails without them)")
     def test_full_search_pipeline(self):
         """Full search pipeline executes."""
         from app.services.pedr.search_orchestrator import create_pedr_orchestrator

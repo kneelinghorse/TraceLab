@@ -11,7 +11,6 @@ from app.models.chunk import DocumentChunk
 from app.models.document import Document
 from app.models.insight import Insight
 from app.models.mission_protocol import Evidence, MissionProtocolDraft, ResearchStatement
-from app.schemas.mission import MissionCreate
 from app.services.cache_manager import get_cache_manager
 from app.services.mission_protocol_service import MissionProtocolService
 
@@ -83,7 +82,7 @@ def relationship_data(db_session, project) -> Dict[str, str]:
             )
         ],
     )
-    mission = service.create_mission(db_session, MissionCreate(project_id=project.id, mission_data=draft))
+    mission = service.create_mission_from_draft(db_session, project_id=project.id, draft=draft)
 
     peer_draft = MissionProtocolDraft(
         mission_id="REL-PEER",
@@ -100,7 +99,7 @@ def relationship_data(db_session, project) -> Dict[str, str]:
             )
         ],
     )
-    peer_mission = service.create_mission(db_session, MissionCreate(project_id=project.id, mission_data=peer_draft))
+    peer_mission = service.create_mission_from_draft(db_session, project_id=project.id, draft=peer_draft)
 
     return {
         "mission_id": str(mission.id),
