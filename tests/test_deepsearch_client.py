@@ -725,3 +725,96 @@ class TestRequestHeaders:
         assert request.headers["Authorization"] == "Bearer test-api-key-12345"
         assert request.headers["Content-Type"] == "application/json"
         assert "TraceLab" in request.headers["User-Agent"]
+
+
+# =============================================================================
+# Event Emission Tests
+# =============================================================================
+
+
+class TestDeepSearchEventEmission:
+    """Verify DeepSearchClient emits mission events at key milestones."""
+
+    @pytest.fixture(autouse=True)
+    def _reset_event_bus(self):
+        import app.core.mission_events as mod
+        mod._event_bus = None
+        yield
+        mod._event_bus = None
+
+    @pytest.mark.asyncio
+    async def test_execute_emits_started_event(
+        self, client, httpx_mock: HTTPXMock, execute_response_data
+    ):
+        """Successful execute_mission emits in_progress status change."""
+        from app.core.mission_events import MissionEventType, get_mission_event_bus
+
+        httpx_mock.add_response(
+            method="POST",
+            url="https://deepsearch.example.com/missions/execute",
+            json=execute_response_data,
+        )
+
+        await client.execute_mission(
+            mission_id="EVT-001",
+            title="Event Test",
+            objective="Test",
+            success_criteria=["Test"],
+            callback_url="https://example.com/webhook",
+        )
+
+        bus = get_mission_event_bus()
+        events = bus.get_recent_events()
+        assert len(events) == 1
+        assert events[0].event_type == MissionEventType.MISSION_STARTED.value
+        assert events[0].mission_id == "EVT-001"
+        assert events[0].status == "in_progress"
+
+    @pytest.mark.asyncio
+    async def test_execute_emits_failed_on_error(
+        self, client, httpx_mock: HTTPXMock
+    ):
+        """Failed execute_mission emits failed status change."""
+        from app.core.mission_events import MissionEventType, get_mission_event_bus
+
+        httpx_mock.add_response(
+            method="POST",
+            url="https://deepsearch.example.com/missions/execute",
+            json={"error": "Server error", "error_code": "INTERNAL"},
+            status_code=500,
+        )
+
+        with pytest.raises(DeepSearchAPIError):
+            await client.execute_mission(
+                mission_id="EVT-002",
+                title="Fail Test",
+                objective="Test",
+                success_criteria=["Test"],
+                callback_url="https://example.com/webhook",
+            )
+
+        bus = get_mission_event_bus()
+        events = bus.get_recent_events()
+        assert len(events) == 1
+        assert events[0].event_type == MissionEventType.MISSION_FAILED.value
+        assert events[0].mission_id == "EVT-002"
+
+    @pytest.mark.asyncio
+    async def test_wait_for_completion_emits_completed(
+        self, client, httpx_mock: HTTPXMock, status_response_completed
+    ):
+        """wait_for_completion emits completed status change."""
+        from app.core.mission_events import MissionEventType, get_mission_event_bus
+
+        httpx_mock.add_response(
+            method="GET",
+            url="https://deepsearch.example.com/missions/job-abc-123/status",
+            json=status_response_completed,
+        )
+
+        await client.wait_for_completion("job-abc-123", poll_interval=0.01)
+
+        bus = get_mission_event_bus()
+        events = bus.get_recent_events()
+        assert len(events) == 1
+        assert events[0].event_type == MissionEventType.MISSION_COMPLETED.value
