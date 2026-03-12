@@ -471,6 +471,82 @@ def delete_mission(
         ) from exc
 
 
+@router.get("/{mission_id}/export", summary="Export mission as YAML or Markdown")
+def export_mission(
+    mission_id: str,
+    format: str = Query(default="yaml", description="Export format: yaml or md"),
+    db: Session = Depends(get_db),
+):
+    """Export a mission in the requested format."""
+    from fastapi.responses import PlainTextResponse
+    from app.services.mission_protocol_service import MissionProtocolService
+
+    try:
+        mission = _get_mission_by_id_or_mission_id(db, mission_id)
+    except MissionNotFoundError as exc:
+        raise HTTPException(status_code=http_status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+
+    protocol_service = MissionProtocolService()
+    if format == "md":
+        lines = [
+            f"# {mission.title}",
+            "",
+            f"**Mission ID:** {mission.mission_id}",
+            f"**Status:** {mission.status}",
+            "",
+            "## Objective",
+            mission.objective or "",
+            "",
+            "## Success Criteria",
+        ]
+        for criterion in (mission.success_criteria or []):
+            lines.append(f"- {criterion}")
+        if mission.tags:
+            lines.append("")
+            lines.append("## Tags")
+            lines.append(", ".join(mission.tags))
+        content = "\n".join(lines)
+        return PlainTextResponse(content, media_type="text/markdown")
+
+    yaml_content = protocol_service.export_mission_yaml(db, mission.id)
+    return PlainTextResponse(yaml_content, media_type="text/yaml")
+
+
+@router.post("/import", status_code=http_status.HTTP_201_CREATED, summary="Import mission from YAML")
+def import_mission(
+    payload: Dict[str, Any],
+    db: Session = Depends(get_db),
+):
+    """Import a mission from a YAML payload."""
+    from app.services.mission_protocol_service import MissionProtocolService
+
+    project_id = payload.get("project_id")
+    yaml_text = payload.get("yaml_text", "")
+    promote = payload.get("promote_to_complete", False)
+
+    if not project_id:
+        raise HTTPException(
+            status_code=http_status.HTTP_400_BAD_REQUEST,
+            detail="project_id is required",
+        )
+
+    protocol_service = MissionProtocolService()
+    try:
+        mission = protocol_service.import_mission_yaml(
+            db,
+            project_id=UUID(project_id),
+            yaml_text=yaml_text,
+            promote_to_complete=promote,
+        )
+        return {"mission": _to_response(mission).model_dump(mode="json")}
+    except Exception as exc:
+        logger.exception("Error importing mission YAML")
+        raise HTTPException(
+            status_code=http_status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+
+
 @router.post(
     "/{mission_id}/submit",
     response_model=MissionSubmitResponse,

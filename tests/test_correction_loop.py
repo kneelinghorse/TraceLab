@@ -117,7 +117,7 @@ class TestAutoLinkErrorType:
     """Tests for error taxonomy enum."""
 
     def test_all_error_types_defined(self):
-        """Verify all 7 error types are defined."""
+        """Verify all 9 error types are defined."""
         expected = {
             "no_embedding",
             "low_similarity",
@@ -126,6 +126,8 @@ class TestAutoLinkErrorType:
             "validation_error",
             "empty_content",
             "database_error",
+            "embedding_failed",
+            "qdrant_error",
         }
         actual = {e.value for e in AutoLinkErrorType}
         assert actual == expected
@@ -571,6 +573,8 @@ class TestEvidenceAutoLinkingWithErrors:
             AutoLinkErrorType.VALIDATION_ERROR,
             AutoLinkErrorType.EMPTY_CONTENT,
             AutoLinkErrorType.DATABASE_ERROR,
+            AutoLinkErrorType.EMBEDDING_FAILED,
+            AutoLinkErrorType.QDRANT_ERROR,
         }
         actual = set(AutoLinkErrorType)
         assert actual == required, f"Missing types: {required - actual}"

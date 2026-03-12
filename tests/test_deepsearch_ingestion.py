@@ -110,8 +110,9 @@ def test_ingest_endpoint_persists_mission_and_auto_links(
     assert body["quality_gates_passed"] is True
     assert body["auto_linking"]["linked"] == 1
     mission_record = db_session.query(Mission).one()
-    assert mission_record.evidence_linking_metadata["linked"] == 1
-    assert mission_record.mission_data["evidence"][0]["chunk_id"] == str(chunk.id)
+    exec_meta = mission_record.execution_metadata or {}
+    assert exec_meta.get("evidence_linking", {}).get("linked") == 1
+    assert mission_record.context["evidence"][0]["chunk_id"] == str(chunk.id)
 
 
 def test_ingest_endpoint_returns_quality_gate_failure(

@@ -137,7 +137,11 @@ class QualityAutomationService:
         self.cache_manager = get_cache_manager()
 
     def evaluate(self, db: Session, *, mission: Mission) -> List[QualityAutomationCheckResult]:
-        payload = MissionProtocolDraft.model_validate(mission.mission_data)
+        protocol_data = mission.context if isinstance(mission.context, dict) and "mission_id" in mission.context else {}
+        payload = MissionProtocolDraft.model_validate(protocol_data) if protocol_data else MissionProtocolDraft(
+            mission_id=mission.mission_id or "unknown",
+            title=mission.title,
+        )
         if not payload.project_id and mission.project_id:
             payload.project_id = str(mission.project_id)
 

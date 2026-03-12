@@ -223,6 +223,9 @@ class MissionService:
         # Apply updates
         for key, value in update_data.items():
             if hasattr(mission, key):
+                # Convert UUID lists to strings for JSON columns
+                if key == "result_document_ids" and value is not None:
+                    value = [str(v) for v in value]
                 setattr(mission, key, value)
 
         db.commit()

@@ -8,7 +8,7 @@ from uuid import UUID
 import pytest
 
 from app.models.mission_protocol import MissionProtocolDraft
-from app.schemas.mission import MissionCreate, MissionUpdate
+from app.schemas.mission import MissionUpdate
 from app.services.evidence_linking import EvidenceLinkingService
 from app.services.mission_protocol_service import (
     MissionNotFoundError,
@@ -64,37 +64,46 @@ def _service() -> MissionProtocolService:
 def test_create_mission_uses_progress_metrics(db_session, project):
     service = _service()
     draft = MissionProtocolDraft.model_validate(_mission_payload())
-    mission = service.create_mission(
+    mission = service.create_mission_from_draft(
         db_session,
-        MissionCreate(project_id=project.id, mission_data=draft),
+        project_id=project.id,
+        draft=draft,
     )
-    assert mission.status == "complete"
-    assert mission.completion_percentage == 100
-    assert mission.quality_gates["research_statement"]["status"] == "pass"
+    assert mission.status == "completed"
+    exec_meta = mission.execution_metadata or {}
+    assert exec_meta.get("completion_percentage") == 100
+    assert exec_meta["quality_gates"]["research_statement"]["status"] == "pass"
 
 
 def test_update_mission_promotes_status_when_ready(db_session, project):
     service = _service()
     initial_payload = _mission_payload(
+        mission_id="B3.2-update",
         evidence=[],
         key_questions=[{"question": "Q1", "status": "open"}],
         quality_checkpoints=[],
     )
     draft = MissionProtocolDraft.model_validate(initial_payload)
-    mission = service.create_mission(
+    mission = service.create_mission_from_draft(
         db_session,
-        MissionCreate(project_id=project.id, mission_data=draft),
+        project_id=project.id,
+        draft=draft,
     )
     assert mission.status in {"draft", "in_progress"}
 
-    update_payload = MissionProtocolDraft.model_validate(_mission_payload())
+    # Update context with full draft that passes all quality gates
+    update_payload = MissionProtocolDraft.model_validate(_mission_payload(mission_id="B3.2-update"))
+    mission.context = update_payload.model_dump(mode="json")
+    db_session.commit()
+
     updated = service.update_mission(
         db_session,
         mission.id,
-        MissionUpdate(mission_data=update_payload),
+        MissionUpdate(status="completed"),
     )
-    assert updated.status == "complete"
-    assert updated.completion_percentage == 100
+    assert updated.status == "completed"
+    exec_meta = updated.execution_metadata or {}
+    assert exec_meta.get("completion_percentage") == 100
 
 
 def test_import_and_export_yaml_round_trip(db_session, project):

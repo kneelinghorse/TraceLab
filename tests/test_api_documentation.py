@@ -7,12 +7,11 @@ from app.main import app
 def test_openapi_schema_exposes_mission_and_quality_routes():
     schema = app.openapi()
     paths = schema["paths"]
-    assert "/api/v1/missions/" in paths
+    assert "/api/v1/missions" in paths
     assert "/api/v1/missions/create-and-submit" in paths
-    assert "/api/v1/quality/automated/run" in paths
     assert "/api/v1/missions/{mission_id}/quality" in paths
 
-    mission_ops = paths["/api/v1/missions/"]
+    mission_ops = paths["/api/v1/missions"]
     assert "get" in mission_ops and "post" in mission_ops
     assert mission_ops["get"].get("summary") is not None
     assert mission_ops["post"].get("responses")

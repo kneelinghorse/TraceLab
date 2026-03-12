@@ -55,16 +55,21 @@ def test_yaml_to_database_round_trip(db_session, project):
     draft = parse_mission_yaml(MISSION_YAML)
     complete = promote_to_complete(draft)
 
+    protocol_data = complete.model_dump(mode="json")
     mission = Mission(
         project_id=project.id,
-        mission_data=complete.model_dump(),
-        status=complete.status,
+        mission_id=complete.mission_id,
+        title=complete.title or f"Mission {complete.mission_id}",
+        objective=complete.research_statement.objective if complete.research_statement else "Validation test",
+        success_criteria=["Quality gates pass"],
+        context=protocol_data,
+        status="completed",
     )
     db_session.add(mission)
     db_session.commit()
     db_session.refresh(mission)
 
-    stored = validate_mission_payload(mission.mission_data, state="complete")
+    stored = validate_mission_payload(mission.context, state="complete")
     assert stored.title == "Mission Protocol Validation"
     assert stored.evidence[0].evidence_id == "EV-001"
 

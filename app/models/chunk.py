@@ -18,7 +18,7 @@ class DocumentChunk(Base):
     content_tsv = Column(
         TSVector(),
         Computed("to_tsvector('english'::regconfig, coalesce(content, ''))", persisted=True),
-        nullable=False
+        nullable=True
     )
     
     # RAG metadata

@@ -161,7 +161,7 @@ class AutoIngestService:
             raise AutoIngestError(f"Ingestion error: {str(exc)}") from exc
 
         # Update mission with document reference
-        current_doc_ids = mission.result_document_ids or []
+        current_doc_ids = list(mission.result_document_ids or [])
         current_doc_ids.append(str(document.id))
         mission.result_document_ids = current_doc_ids
         db.commit()

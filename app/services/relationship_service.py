@@ -107,7 +107,8 @@ class RelationshipService:
         depth: int,
         filters: RelationshipFilters,
     ) -> RelationshipContextResponse:
-        evidence_payload = self._normalize_evidence((mission.mission_data or {}).get("evidence", []))
+        context = mission.context if isinstance(mission.context, dict) else {}
+        evidence_payload = self._normalize_evidence(context.get("evidence", []))
         chunk_ids = [link.chunk_id for link in evidence_payload if link.chunk_id]
         chunk_map, missing_chunk_ids = self._load_chunks(db, chunk_ids)
 
@@ -168,7 +169,7 @@ class RelationshipService:
 
         return RelationshipContextResponse(
             mission_id=mission.id,
-            mission_identifier=self._extract_mission_identifier(mission.mission_data),
+            mission_identifier=mission.mission_id or self._extract_mission_identifier(mission.context if isinstance(mission.context, dict) else None),
             project_id=mission.project_id,
             depth=depth,
             filters=filters,
@@ -380,7 +381,7 @@ class RelationshipService:
 
         related: List[RelatedMission] = []
         for sibling in siblings:
-            sibling_data = sibling.mission_data or {}
+            sibling_data = sibling.context if isinstance(sibling.context, dict) else {}
             shared_documents = 0
             shared_chunks = 0
             shared_insights = 0
@@ -401,10 +402,10 @@ class RelationshipService:
             related.append(
                 RelatedMission(
                     id=sibling.id,
-                    mission_identifier=self._extract_mission_identifier(sibling_data),
-                    title=self._extract_mission_title(sibling_data),
+                    mission_identifier=sibling.mission_id or self._extract_mission_identifier(sibling_data),
+                    title=sibling.title or self._extract_mission_title(sibling_data),
                     status=sibling.status or "draft",
-                    completion_percentage=sibling.completion_percentage or 0,
+                    completion_percentage=(sibling.execution_metadata or {}).get("completion_percentage", 0) or 0,
                     shared_documents=shared_documents,
                     shared_chunks=shared_chunks,
                     shared_insights=shared_insights,

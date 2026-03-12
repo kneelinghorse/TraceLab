@@ -21,7 +21,6 @@ from app.schemas.deepsearch import (
     DeepSearchIngestResponse,
     WorkerHealthResponse,
 )
-from app.schemas.mission import MissionCreate
 from app.services.correction_queue import get_correction_queue
 from app.services.evidence_auto_linking import EvidenceAutoLinkingService
 from app.services.mission_protocol_service import (
@@ -63,18 +62,21 @@ def ingest_deepsearch_payload(
             content=_quality_failure_payload(report, auto_link_result.as_dict()),
         )
 
-    mission_create = MissionCreate(
-        project_id=project.id if project else None,
-        mission_data=draft_payload,
-        status=mission_payload.status,
-    )
-
     try:
-        mission = _mission_service.create_mission(db, mission_create)
+        mission = _mission_service.create_mission_from_draft(
+            db,
+            project_id=project.id,
+            draft=draft_payload,
+            requested_status=mission_payload.status,
+        )
     except MissionProtocolServiceError as exc:  # pragma: no cover - defensive
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
-    mission.evidence_linking_metadata = auto_link_result.as_dict()
+    # Store auto-linking metadata in execution_metadata
+    mission.execution_metadata = {
+        **(mission.execution_metadata or {}),
+        "evidence_linking": auto_link_result.as_dict(),
+    }
     db.add(mission)
     db.commit()
     db.refresh(mission)
@@ -102,14 +104,14 @@ def ingest_deepsearch_payload(
                 callback_url=payload.callback_url,
             )
 
-    quality_summary = mission.quality_gates or report.as_dict()
+    quality_gates = (mission.execution_metadata or {}).get("quality_gates", report.as_dict())
     response = DeepSearchIngestResponse(
         mission_uuid=mission.id,
-        mission_id=mission.mission_data.get("mission_id") if isinstance(mission.mission_data, Dict) else mission_payload.mission_id,
+        mission_id=mission.mission_id,
         project_id=mission.project_id,
         status=mission.status,
         quality_gates_passed=True,
-        quality_gates=quality_summary,
+        quality_gates=quality_gates,
         auto_linking=AutoLinkingSummary(**auto_link_result.as_dict()),
         corrections=correction_info,
     )

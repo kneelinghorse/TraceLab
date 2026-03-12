@@ -108,7 +108,7 @@ def test_ingest_customer_onboarding_links_all_evidence(
 
     mission_record = db_session.query(Mission).order_by(Mission.created_at.desc()).first()
     assert mission_record is not None
-    chunk_ids = {ev["chunk_id"] for ev in mission_record.mission_data["evidence"]}
+    chunk_ids = {ev["chunk_id"] for ev in mission_record.context["evidence"]}
     assert len(chunk_ids) == len(evidence)
     assert None not in chunk_ids
 
@@ -274,7 +274,7 @@ def test_ingest_project_scoped_linking(
 
     assert response.status_code == 201, response.text
     mission_record = db_session.query(Mission).order_by(Mission.created_at.desc()).first()
-    chunk_ids = {item["chunk_id"] for item in mission_record.mission_data["evidence"]}
+    chunk_ids = {item["chunk_id"] for item in mission_record.context["evidence"]}
     assert chunk_ids == {str(chunk.id) for chunk in target_chunks}
 
 
@@ -295,7 +295,7 @@ def test_ingested_mission_available_via_search_endpoint(
     assert response.status_code == 201, response.text
 
     mission = db_session.query(Mission).order_by(Mission.created_at.desc()).first()
-    chunk_id = mission.mission_data["evidence"][0]["chunk_id"]
+    chunk_id = mission.context["evidence"][0]["chunk_id"]
     selected_chunk = next(chunk for chunk in chunks if str(chunk.id) == chunk_id)
 
     class _FakeRagService:
@@ -322,6 +322,7 @@ def test_ingested_mission_available_via_search_endpoint(
             status_filters: Optional[List[str]] = None,
             allow_pii: Optional[bool] = True,
             governance_mode: Optional[str] = None,
+            **kwargs,
         ) -> Dict[str, object]:
             self.calls.append(
                 {
@@ -362,7 +363,7 @@ def test_ingested_mission_available_via_search_endpoint(
                         "quality_gates_passed": 5,
                         "quality_gates_total": 5,
                         "quality_validated": True,
-                        "quality_mission_id": mission.mission_data["mission_id"],
+                        "quality_mission_id": mission.mission_id,
                         "quality_pii_flagged": False,
                     }
                 ],
