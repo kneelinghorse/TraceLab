@@ -8,7 +8,7 @@ from functools import lru_cache
 from typing import Optional
 from uuid import UUID
 
-from fastapi import Depends, Header, HTTPException, status
+from fastapi import Depends, Header, HTTPException, Query, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -270,3 +270,23 @@ async def require_authenticated_user(
 
     subject = _decode_access_token(credentials.credentials)
     return _resolve_user_from_jwt(subject)
+
+
+async def require_authenticated_user_sse(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme),
+    x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),
+    token: Optional[str] = Query(default=None),
+) -> AuthenticatedUser:
+    """Auth dependency for SSE endpoints that also accepts a JWT via query parameter.
+
+    EventSource API cannot send custom headers, so the frontend passes
+    the JWT as ``?token=<jwt>``. This dependency checks that first,
+    then falls back to the standard header-based auth.
+    """
+    # Check query param token first (SSE / EventSource)
+    if token:
+        subject = _decode_access_token(token)
+        return _resolve_user_from_jwt(subject)
+
+    # Fall through to standard auth
+    return await require_authenticated_user(credentials=credentials, x_api_key=x_api_key)

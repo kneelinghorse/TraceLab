@@ -11,12 +11,17 @@ from __future__ import annotations
 import logging
 from typing import List, Optional
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import StreamingResponse
 
 from app.core.mission_events import (
     MissionEvent,
     get_mission_event_bus,
+)
+from app.core.security import (
+    AuthenticatedUser,
+    require_authenticated_user,
+    require_authenticated_user_sse,
 )
 
 logger = logging.getLogger(__name__)
@@ -27,6 +32,7 @@ router = APIRouter()
 @router.get("/events/stream")
 async def stream_mission_events(
     limit: int = Query(50, ge=1, le=200, description="Number of history events to replay"),
+    _user: AuthenticatedUser = Depends(require_authenticated_user_sse),
 ):
     """Stream mission progress events via Server-Sent Events.
 
@@ -67,6 +73,7 @@ async def stream_mission_events(
 @router.get("/events/recent", response_model=List[dict])
 def get_recent_events(
     limit: int = Query(50, ge=1, le=200, description="Number of recent events"),
+    _user: AuthenticatedUser = Depends(require_authenticated_user),
 ):
     """Get recent mission events as JSON (non-streaming).
 

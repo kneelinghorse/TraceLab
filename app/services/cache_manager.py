@@ -158,6 +158,8 @@ class CacheManager:
     ) -> Tuple[Any, ...]:
         if kind == "detail" and identifier:
             return ("detail", identifier)
+        if kind == "stats" and identifier:
+            return ("stats", identifier)
         normalized_search = (search or "").strip().lower()
         return (
             "list",
@@ -207,6 +209,11 @@ class CacheManager:
         removed = self.invalidate(
             "project_metadata",
             predicate=lambda key: key[0] == "detail" and key[1] == project_id,
+        )
+        # Project updates also impact stats
+        removed += self.invalidate(
+            "project_metadata",
+            predicate=lambda key: key[0] == "stats" and key[1] == project_id,
         )
         # Project updates also impact listings
         removed += self.invalidate(

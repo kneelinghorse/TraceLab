@@ -14,6 +14,9 @@ from typing import Any, Dict, List, Optional
 import httpx
 
 from app.core.config import settings
+from app.core.mission_events import (
+    emit_mission_status_change,
+)
 from app.schemas.deepsearch import (
     DeepSearchErrorResponse,
     DeepSearchExecuteRequest,
@@ -218,10 +221,25 @@ class DeepSearchClient:
                 json_data=request.model_dump(mode="json", exclude_none=True),
             )
             self.stats.execute_successes += 1
-            return DeepSearchExecuteResponse.model_validate(response_data)
+            result = DeepSearchExecuteResponse.model_validate(response_data)
+
+            # Emit mission started event
+            emit_mission_status_change(
+                mission_id=mission_id,
+                title=title,
+                new_status="in_progress",
+                previous_status="queued",
+            )
+            return result
 
         except (DeepSearchConnectionError, DeepSearchTimeoutError, DeepSearchAPIError):
             self.stats.execute_failures += 1
+            emit_mission_status_change(
+                mission_id=mission_id,
+                title=title,
+                new_status="failed",
+                previous_status="queued",
+            )
             raise
 
     async def get_status(self, job_id: str) -> DeepSearchStatusResponse:
@@ -397,6 +415,14 @@ class DeepSearchClient:
             status = await self.get_status(job_id)
 
             if status.status in terminal_statuses:
+                # Emit terminal status event
+                final_status = "completed" if status.status == DeepSearchJobStatus.COMPLETED else "failed"
+                emit_mission_status_change(
+                    mission_id=job_id,
+                    title=f"DeepSearch job {job_id}",
+                    new_status=final_status,
+                    previous_status="in_progress",
+                )
                 return status
 
             logger.debug(
