@@ -78,9 +78,20 @@ from .fusion import (
     rrf_score,
     RRF_K,
 )
+from .exceptions import (
+    PEDRError,
+    LexicalSearchError,
+    SemanticSearchError,
+    GraphLayerError,
+    SyntacticLayerError,
+    PragmaticLayerError,
+    GovernanceLayerError,
+    FusionError,
+)
 from .search_orchestrator import (
     PEDRConfig,
     LayerTimings,
+    LayerDiagnostic,
     PEDRMetadata,
     PEDRSearchResult,
     PEDRSearchResponse,
@@ -189,9 +200,19 @@ __all__ = [
     "get_rrf_fusion",
     "rrf_score",
     "RRF_K",
+    # PEDR Exceptions
+    "PEDRError",
+    "LexicalSearchError",
+    "SemanticSearchError",
+    "GraphLayerError",
+    "SyntacticLayerError",
+    "PragmaticLayerError",
+    "GovernanceLayerError",
+    "FusionError",
     # Search Orchestrator
     "PEDRConfig",
     "LayerTimings",
+    "LayerDiagnostic",
     "PEDRMetadata",
     "PEDRSearchResult",
     "PEDRSearchResponse",

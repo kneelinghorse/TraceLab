@@ -1,0 +1,77 @@
+"""In-memory sliding-window rate limiter for auth endpoints.
+
+Tracks request counts per IP with a configurable window and limit.
+No external dependency required — uses a simple dict + TTL pruning.
+"""
+from __future__ import annotations
+
+import time
+from collections import defaultdict
+from dataclasses import dataclass, field
+from threading import Lock
+from typing import Dict, List, Tuple
+
+from fastapi import HTTPException, Request, status
+
+
+@dataclass
+class RateLimitConfig:
+    """Configuration for a rate limit rule."""
+
+    max_requests: int = 5
+    window_seconds: int = 60
+
+
+class RateLimiter:
+    """Sliding-window rate limiter keyed by client IP."""
+
+    def __init__(self, config: RateLimitConfig | None = None) -> None:
+        self.config = config or RateLimitConfig()
+        self._requests: Dict[str, List[float]] = defaultdict(list)
+        self._lock = Lock()
+
+    def _get_client_ip(self, request: Request) -> str:
+        """Extract client IP, respecting X-Forwarded-For from trusted proxies."""
+        forwarded = request.headers.get("x-forwarded-for")
+        if forwarded:
+            return forwarded.split(",")[0].strip()
+        return request.client.host if request.client else "unknown"
+
+    def _prune(self, key: str, now: float) -> None:
+        """Remove timestamps outside the current window."""
+        cutoff = now - self.config.window_seconds
+        self._requests[key] = [
+            ts for ts in self._requests[key] if ts > cutoff
+        ]
+
+    def check(self, request: Request) -> None:
+        """Check rate limit for the request. Raises HTTP 429 if exceeded."""
+        ip = self._get_client_ip(request)
+        now = time.monotonic()
+
+        with self._lock:
+            self._prune(ip, now)
+            if len(self._requests[ip]) >= self.config.max_requests:
+                retry_after = int(self.config.window_seconds)
+                raise HTTPException(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    detail=f"Rate limit exceeded. Try again in {retry_after} seconds.",
+                    headers={"Retry-After": str(retry_after)},
+                )
+            self._requests[ip].append(now)
+
+    def reset(self) -> None:
+        """Clear all tracked requests (useful for testing)."""
+        with self._lock:
+            self._requests.clear()
+
+
+# Shared instance for auth endpoints (5 requests per 60 seconds per IP)
+auth_rate_limiter = RateLimiter(RateLimitConfig(max_requests=5, window_seconds=60))
+
+
+__all__ = [
+    "RateLimitConfig",
+    "RateLimiter",
+    "auth_rate_limiter",
+]

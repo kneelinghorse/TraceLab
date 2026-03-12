@@ -71,6 +71,16 @@ from app.services.pedr.cache import (
     CacheStats,
     get_pedr_cache,
 )
+from app.services.pedr.exceptions import (
+    PEDRError,
+    LexicalSearchError,
+    SemanticSearchError,
+    GraphLayerError,
+    SyntacticLayerError,
+    PragmaticLayerError,
+    GovernanceLayerError,
+    FusionError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -162,6 +172,30 @@ class LayerTimings:
 
 
 @dataclass
+class LayerDiagnostic:
+    """Diagnostic information for a single PEDR layer execution."""
+
+    layer: str
+    status: str  # "ok", "error", "skipped", "disabled"
+    duration_ms: float = 0.0
+    result_count: int = 0
+    error: Optional[str] = None
+    error_type: Optional[str] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        d: Dict[str, Any] = {
+            "layer": self.layer,
+            "status": self.status,
+            "duration_ms": round(self.duration_ms, 2),
+            "result_count": self.result_count,
+        }
+        if self.error is not None:
+            d["error"] = self.error
+            d["error_type"] = self.error_type
+        return d
+
+
+@dataclass
 class PEDRMetadata:
     """Metadata about PEDR search execution."""
 
@@ -175,6 +209,8 @@ class PEDRMetadata:
     timings: LayerTimings
     total_candidates: int
     result_count: int
+    layer_diagnostics: List[LayerDiagnostic] = field(default_factory=list)
+    degraded: bool = False
     graph_enabled: bool = False
     graph_candidates_expanded: Optional[int] = None
     cache_hit: bool = False
@@ -284,6 +320,8 @@ class PEDRSearchResponse:
                 "relational_ms": self.metadata.timings.relational_ms,
                 "total_ms": self.metadata.timings.total_ms,
             },
+            "layer_diagnostics": [d.to_dict() for d in self.metadata.layer_diagnostics],
+            "degraded": self.metadata.degraded,
             "graph_enabled": self.metadata.graph_enabled,
             "graph_candidates_expanded": self.metadata.graph_candidates_expanded,
             "total_candidates": self.metadata.total_candidates,
@@ -528,15 +566,48 @@ class PEDRSearchOrchestrator:
                 )
 
         # Cache miss - execute full search pipeline
+        diagnostics: List[LayerDiagnostic] = []
 
         # Phase 1: Pre-analysis (syntactic and pragmatic)
         t0 = time.perf_counter()
-        syntactic_filters = self._analyze_syntactic(query, config)
-        timings.syntactic_ms = (time.perf_counter() - t0) * 1000
+        if config.enable_syntactic:
+            try:
+                syntactic_filters = self._analyze_syntactic(query, config)
+                timings.syntactic_ms = (time.perf_counter() - t0) * 1000
+            except Exception as exc:
+                timings.syntactic_ms = (time.perf_counter() - t0) * 1000
+                logger.warning(
+                    "Syntactic analysis failed: layer=syntactic query=%r error_type=%s error=%s",
+                    query[:80], type(exc).__name__, exc,
+                )
+                syntactic_filters = self.syntactic_service.create_filters(query=query, auto_detect=False)
+                diagnostics.append(LayerDiagnostic(
+                    layer="syntactic", status="error", duration_ms=timings.syntactic_ms,
+                    error=str(exc), error_type=type(exc).__name__,
+                ))
+        else:
+            syntactic_filters = self.syntactic_service.create_filters(query=query, auto_detect=False)
+            diagnostics.append(LayerDiagnostic(layer="syntactic", status="disabled"))
 
         t0 = time.perf_counter()
-        pragmatic_filters = self._analyze_pragmatic(query, config)
-        timings.pragmatic_ms = (time.perf_counter() - t0) * 1000
+        if config.enable_pragmatic:
+            try:
+                pragmatic_filters = self._analyze_pragmatic(query, config)
+                timings.pragmatic_ms = (time.perf_counter() - t0) * 1000
+            except Exception as exc:
+                timings.pragmatic_ms = (time.perf_counter() - t0) * 1000
+                logger.warning(
+                    "Pragmatic analysis failed: layer=pragmatic query=%r error_type=%s error=%s",
+                    query[:80], type(exc).__name__, exc,
+                )
+                pragmatic_filters = self.pragmatic_service.create_filters(query=query, intent_boost_enabled=False)
+                diagnostics.append(LayerDiagnostic(
+                    layer="pragmatic", status="error", duration_ms=timings.pragmatic_ms,
+                    error=str(exc), error_type=type(exc).__name__,
+                ))
+        else:
+            pragmatic_filters = self.pragmatic_service.create_filters(query=query, intent_boost_enabled=False)
+            diagnostics.append(LayerDiagnostic(layer="pragmatic", status="disabled"))
 
         # Phase 2: Execute retrieval layers
         layer_results: List[LayerResult] = []
@@ -568,14 +639,23 @@ class PEDRSearchOrchestrator:
             t0 = time.perf_counter()
             try:
                 return search_fn(**search_params), (time.perf_counter() - t0) * 1000, None
-            except Exception as exc:  # pragma: no cover - exercised via caller assertions
+            except Exception as exc:
                 return [], (time.perf_counter() - t0) * 1000, exc
 
         retrieval_jobs: List[Tuple[str, Callable[..., List[Dict[str, Any]]]]] = []
         if config.enable_lexical and self._lexical_search:
             retrieval_jobs.append(("lexical", self._lexical_search))
+        elif not config.enable_lexical:
+            diagnostics.append(LayerDiagnostic(layer="lexical", status="disabled"))
+        else:
+            diagnostics.append(LayerDiagnostic(layer="lexical", status="skipped"))
+
         if config.enable_semantic and self._semantic_search:
             retrieval_jobs.append(("semantic", self._semantic_search))
+        elif not config.enable_semantic:
+            diagnostics.append(LayerDiagnostic(layer="semantic", status="disabled"))
+        else:
+            diagnostics.append(LayerDiagnostic(layer="semantic", status="skipped"))
 
         retrieval_outputs: Dict[str, Tuple[List[Dict[str, Any]], float, Optional[Exception]]] = {}
         if len(retrieval_jobs) == 1:
@@ -595,37 +675,61 @@ class PEDRSearchOrchestrator:
         if lexical_payload is not None:
             lexical_results, timings.lexical_ms, lexical_error = lexical_payload
             if lexical_error is not None:
-                logger.warning("Lexical search failed: %s", lexical_error)
-            elif lexical_results:
-                layer_results.append(
-                    LayerResult(
-                        layer_name="lexical",
-                        results=lexical_results,
-                        weight=effective_layer_weights.get(
-                            "lexical",
-                            BASE_LAYER_WEIGHTS["lexical"],
-                        ),
-                        latency_ms=timings.lexical_ms,
-                    )
+                logger.warning(
+                    "Lexical search failed: layer=lexical query=%r error_type=%s error=%s",
+                    query[:80], type(lexical_error).__name__, lexical_error,
                 )
+                diagnostics.append(LayerDiagnostic(
+                    layer="lexical", status="error", duration_ms=timings.lexical_ms,
+                    error=str(lexical_error), error_type=type(lexical_error).__name__,
+                ))
+            else:
+                diagnostics.append(LayerDiagnostic(
+                    layer="lexical", status="ok", duration_ms=timings.lexical_ms,
+                    result_count=len(lexical_results),
+                ))
+                if lexical_results:
+                    layer_results.append(
+                        LayerResult(
+                            layer_name="lexical",
+                            results=lexical_results,
+                            weight=effective_layer_weights.get(
+                                "lexical",
+                                BASE_LAYER_WEIGHTS["lexical"],
+                            ),
+                            latency_ms=timings.lexical_ms,
+                        )
+                    )
 
         semantic_payload = retrieval_outputs.get("semantic")
         if semantic_payload is not None:
             semantic_results, timings.semantic_ms, semantic_error = semantic_payload
             if semantic_error is not None:
-                logger.warning("Semantic search failed: %s", semantic_error)
-            elif semantic_results:
-                layer_results.append(
-                    LayerResult(
-                        layer_name="semantic",
-                        results=semantic_results,
-                        weight=effective_layer_weights.get(
-                            "semantic",
-                            BASE_LAYER_WEIGHTS["semantic"],
-                        ),
-                        latency_ms=timings.semantic_ms,
-                    )
+                logger.warning(
+                    "Semantic search failed: layer=semantic query=%r error_type=%s error=%s",
+                    query[:80], type(semantic_error).__name__, semantic_error,
                 )
+                diagnostics.append(LayerDiagnostic(
+                    layer="semantic", status="error", duration_ms=timings.semantic_ms,
+                    error=str(semantic_error), error_type=type(semantic_error).__name__,
+                ))
+            else:
+                diagnostics.append(LayerDiagnostic(
+                    layer="semantic", status="ok", duration_ms=timings.semantic_ms,
+                    result_count=len(semantic_results),
+                ))
+                if semantic_results:
+                    layer_results.append(
+                        LayerResult(
+                            layer_name="semantic",
+                            results=semantic_results,
+                            weight=effective_layer_weights.get(
+                                "semantic",
+                                BASE_LAYER_WEIGHTS["semantic"],
+                            ),
+                            latency_ms=timings.semantic_ms,
+                        )
+                    )
 
         # Graph layer (between retrieval and fusion)
         if config.enable_graph and self.graph_service:
@@ -654,10 +758,23 @@ class PEDRSearchOrchestrator:
                     (graph_layer.metadata or {}).get("total_candidates") or 0
                 )
                 _log_graph_layer_metrics(graph_layer)
+                diagnostics.append(LayerDiagnostic(
+                    layer="graph", status="ok", duration_ms=timings.graph_ms,
+                    result_count=graph_candidates_expanded,
+                ))
             except Exception as e:
-                logger.warning("Graph search failed: %s", e)
                 timings.graph_ms = (time.perf_counter() - t0) * 1000
                 graph_candidates_expanded = 0
+                logger.warning(
+                    "Graph search failed: layer=graph query=%r error_type=%s error=%s",
+                    query[:80], type(e).__name__, e,
+                )
+                diagnostics.append(LayerDiagnostic(
+                    layer="graph", status="error", duration_ms=timings.graph_ms,
+                    error=str(e), error_type=type(e).__name__,
+                ))
+        elif not config.enable_graph:
+            diagnostics.append(LayerDiagnostic(layer="graph", status="disabled"))
 
         # Phase 3: Fuse results with RRF
         t0 = time.perf_counter()
@@ -686,15 +803,59 @@ class PEDRSearchOrchestrator:
 
         # Syntactic boost
         if config.enable_syntactic and processed:
-            processed = self.syntactic_service.apply(
-                processed,
-                filters=syntactic_filters,
-                filter_mode=False,
-            )
+            # Diagnostic already recorded in Phase 1 if error occurred;
+            # only add "ok" if not already in diagnostics for syntactic
+            if not any(d.layer == "syntactic" for d in diagnostics):
+                t0_syn = time.perf_counter()
+                try:
+                    processed = self.syntactic_service.apply(
+                        processed,
+                        filters=syntactic_filters,
+                        filter_mode=False,
+                    )
+                    diagnostics.append(LayerDiagnostic(
+                        layer="syntactic", status="ok",
+                        duration_ms=timings.syntactic_ms,
+                        result_count=len(processed),
+                    ))
+                except Exception as exc:
+                    logger.warning(
+                        "Syntactic boost failed: layer=syntactic query=%r error_type=%s error=%s",
+                        query[:80], type(exc).__name__, exc,
+                    )
+                    diagnostics.append(LayerDiagnostic(
+                        layer="syntactic", status="error",
+                        duration_ms=(time.perf_counter() - t0_syn) * 1000,
+                        error=str(exc), error_type=type(exc).__name__,
+                    ))
+            else:
+                # Syntactic analysis failed earlier; skip boost but keep results
+                processed = self.syntactic_service.apply(
+                    processed,
+                    filters=syntactic_filters,
+                    filter_mode=False,
+                ) if not any(d.layer == "syntactic" and d.status == "error" for d in diagnostics) else processed
 
         # Pragmatic boost
         if config.enable_pragmatic and processed:
-            processed = self.pragmatic_service.apply(processed, filters=pragmatic_filters)
+            if not any(d.layer == "pragmatic" for d in diagnostics):
+                try:
+                    processed = self.pragmatic_service.apply(processed, filters=pragmatic_filters)
+                    diagnostics.append(LayerDiagnostic(
+                        layer="pragmatic", status="ok",
+                        duration_ms=timings.pragmatic_ms,
+                        result_count=len(processed),
+                    ))
+                except Exception as exc:
+                    logger.warning(
+                        "Pragmatic boost failed: layer=pragmatic query=%r error_type=%s error=%s",
+                        query[:80], type(exc).__name__, exc,
+                    )
+                    diagnostics.append(LayerDiagnostic(
+                        layer="pragmatic", status="error",
+                        duration_ms=timings.pragmatic_ms,
+                        error=str(exc), error_type=type(exc).__name__,
+                    ))
 
         # Governance scoring
         if config.enable_governance and processed:
@@ -705,8 +866,27 @@ class PEDRSearchOrchestrator:
                 allow_pii=config.allow_pii,
                 governance_mode=config.governance_mode,
             )
-            processed = self.quality_service.apply(processed, filters=quality_filters)
-            timings.governance_ms = (time.perf_counter() - t0) * 1000
+            try:
+                processed = self.quality_service.apply(processed, filters=quality_filters)
+                timings.governance_ms = (time.perf_counter() - t0) * 1000
+                diagnostics.append(LayerDiagnostic(
+                    layer="governance", status="ok",
+                    duration_ms=timings.governance_ms,
+                    result_count=len(processed),
+                ))
+            except Exception as exc:
+                timings.governance_ms = (time.perf_counter() - t0) * 1000
+                logger.warning(
+                    "Governance scoring failed: layer=governance query=%r error_type=%s error=%s",
+                    query[:80], type(exc).__name__, exc,
+                )
+                diagnostics.append(LayerDiagnostic(
+                    layer="governance", status="error",
+                    duration_ms=timings.governance_ms,
+                    error=str(exc), error_type=type(exc).__name__,
+                ))
+        elif not config.enable_governance:
+            diagnostics.append(LayerDiagnostic(layer="governance", status="disabled"))
 
         # Phase 4.5: fuse independent layer adjustments into final ranking score.
         for entry in processed:
@@ -721,6 +901,9 @@ class PEDRSearchOrchestrator:
         )
 
         timings.total_ms = (time.perf_counter() - start_time) * 1000
+
+        # Determine if we're in degraded mode (any layer errored)
+        has_errors = any(d.status == "error" for d in diagnostics)
 
         # Build response
         cache_stats = cache.get_stats().to_dict() if cache_enabled else None
@@ -737,6 +920,8 @@ class PEDRSearchOrchestrator:
             layers_used=[lr.layer_name for lr in layer_results],
             layer_weights=dict(effective_layer_weights),
             timings=timings,
+            layer_diagnostics=diagnostics,
+            degraded=has_errors,
             graph_enabled=config.enable_graph,
             graph_candidates_expanded=graph_candidates_expanded,
             total_candidates=len(fused_results),
@@ -1352,6 +1537,7 @@ def _emit_graph_telemetry(
 __all__ = [
     "PEDRConfig",
     "LayerTimings",
+    "LayerDiagnostic",
     "PEDRMetadata",
     "PEDRSearchResult",
     "PEDRSearchResponse",

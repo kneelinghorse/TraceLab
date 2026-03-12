@@ -1,0 +1,246 @@
+"""In-memory mission event bus with SSE support.
+
+Provides a publish/subscribe event system for real-time mission progress.
+SSE consumers subscribe via async generators; backend code emits events
+at key execution points (status changes, PEDR layer progress, etc.).
+
+Recent events are kept in a ring buffer so new SSE connections get
+immediate context without waiting for the next event.
+"""
+from __future__ import annotations
+
+import asyncio
+import json
+import logging
+import time
+from collections import deque
+from dataclasses import asdict, dataclass, field
+from datetime import datetime, timezone
+from enum import Enum
+from typing import Any, AsyncGenerator, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
+
+
+class MissionEventType(str, Enum):
+    """Event types emitted during mission lifecycle."""
+
+    # Mission lifecycle
+    MISSION_QUEUED = "mission.queued"
+    MISSION_STARTED = "mission.started"
+    MISSION_COMPLETED = "mission.completed"
+    MISSION_FAILED = "mission.failed"
+    MISSION_STATUS_CHANGED = "mission.status_changed"
+
+    # PEDR search progress
+    PEDR_SEARCH_STARTED = "pedr.search_started"
+    PEDR_LAYER_STARTED = "pedr.layer_started"
+    PEDR_LAYER_COMPLETED = "pedr.layer_completed"
+    PEDR_LAYER_FAILED = "pedr.layer_failed"
+    PEDR_FUSION_COMPLETED = "pedr.fusion_completed"
+    PEDR_SEARCH_COMPLETED = "pedr.search_completed"
+
+    # Quality & governance
+    QUALITY_GATES_EVALUATED = "quality.gates_evaluated"
+
+    # System
+    HEARTBEAT = "system.heartbeat"
+
+
+@dataclass
+class MissionEvent:
+    """A single mission progress event."""
+
+    event_type: str
+    timestamp: str
+    mission_id: Optional[str] = None
+    mission_title: Optional[str] = None
+    layer: Optional[str] = None
+    duration_ms: Optional[float] = None
+    result_count: Optional[int] = None
+    status: Optional[str] = None
+    previous_status: Optional[str] = None
+    error: Optional[str] = None
+    details: Optional[Dict[str, Any]] = None
+
+    def to_sse(self) -> str:
+        """Format as Server-Sent Event."""
+        data = {k: v for k, v in asdict(self).items() if v is not None}
+        return f"event: {self.event_type}\ndata: {json.dumps(data)}\n\n"
+
+
+class MissionEventBus:
+    """Pub/sub event bus for mission progress with SSE support.
+
+    Thread-safe for emit (called from sync FastAPI endpoints).
+    Async-safe for subscribe (called from SSE streaming responses).
+    """
+
+    def __init__(self, max_history: int = 100) -> None:
+        self._history: deque[MissionEvent] = deque(maxlen=max_history)
+        self._subscribers: List[asyncio.Queue[MissionEvent]] = []
+        self._lock = asyncio.Lock()
+
+    def emit(self, event: MissionEvent) -> None:
+        """Publish an event to all subscribers and history buffer."""
+        self._history.append(event)
+        # Fan out to all subscriber queues (non-blocking)
+        stale: List[asyncio.Queue] = []
+        for queue in self._subscribers:
+            try:
+                queue.put_nowait(event)
+            except asyncio.QueueFull:
+                stale.append(queue)
+        # Remove stale subscribers that aren't consuming
+        for q in stale:
+            if q in self._subscribers:
+                self._subscribers.remove(q)
+                logger.debug("Removed stale SSE subscriber (queue full)")
+
+    async def subscribe(
+        self,
+        include_history: bool = True,
+        heartbeat_seconds: int = 15,
+    ) -> AsyncGenerator[MissionEvent, None]:
+        """Subscribe to events as an async generator for SSE streaming.
+
+        Yields recent history first (if include_history=True), then
+        live events as they arrive. Sends heartbeat events to keep
+        the connection alive.
+        """
+        queue: asyncio.Queue[MissionEvent] = asyncio.Queue(maxsize=200)
+        self._subscribers.append(queue)
+
+        try:
+            # Replay recent history
+            if include_history:
+                for event in self._history:
+                    yield event
+
+            # Stream live events with heartbeat
+            while True:
+                try:
+                    event = await asyncio.wait_for(
+                        queue.get(), timeout=heartbeat_seconds
+                    )
+                    yield event
+                except asyncio.TimeoutError:
+                    # Send heartbeat to keep connection alive
+                    yield MissionEvent(
+                        event_type=MissionEventType.HEARTBEAT.value,
+                        timestamp=datetime.now(timezone.utc).isoformat(),
+                    )
+        finally:
+            if queue in self._subscribers:
+                self._subscribers.remove(queue)
+
+    def get_recent_events(self, limit: int = 50) -> List[MissionEvent]:
+        """Get recent events from history buffer."""
+        events = list(self._history)
+        return events[-limit:] if len(events) > limit else events
+
+    @property
+    def subscriber_count(self) -> int:
+        return len(self._subscribers)
+
+
+# ─── Singleton ───────────────────────────────────────────────────────────────
+
+_event_bus: Optional[MissionEventBus] = None
+
+
+def get_mission_event_bus() -> MissionEventBus:
+    """Get or create the singleton event bus."""
+    global _event_bus
+    if _event_bus is None:
+        _event_bus = MissionEventBus()
+    return _event_bus
+
+
+# ─── Convenience emitters ────────────────────────────────────────────────────
+
+
+def _now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def emit_mission_status_change(
+    mission_id: str,
+    title: str,
+    new_status: str,
+    previous_status: Optional[str] = None,
+) -> None:
+    """Emit a mission status change event."""
+    bus = get_mission_event_bus()
+
+    # Map status to specific event type
+    type_map = {
+        "queued": MissionEventType.MISSION_QUEUED,
+        "in_progress": MissionEventType.MISSION_STARTED,
+        "completed": MissionEventType.MISSION_COMPLETED,
+    }
+    event_type = type_map.get(new_status, MissionEventType.MISSION_STATUS_CHANGED)
+
+    bus.emit(MissionEvent(
+        event_type=event_type.value,
+        timestamp=_now(),
+        mission_id=mission_id,
+        mission_title=title,
+        status=new_status,
+        previous_status=previous_status,
+    ))
+
+
+def emit_pedr_layer_event(
+    *,
+    event_type: MissionEventType,
+    layer: str,
+    mission_id: Optional[str] = None,
+    duration_ms: Optional[float] = None,
+    result_count: Optional[int] = None,
+    error: Optional[str] = None,
+    details: Optional[Dict[str, Any]] = None,
+) -> None:
+    """Emit a PEDR search layer progress event."""
+    bus = get_mission_event_bus()
+    bus.emit(MissionEvent(
+        event_type=event_type.value,
+        timestamp=_now(),
+        mission_id=mission_id,
+        layer=layer,
+        duration_ms=duration_ms,
+        result_count=result_count,
+        error=error,
+        details=details,
+    ))
+
+
+def emit_quality_gates(
+    mission_id: str,
+    gates_passed: int,
+    total_gates: int,
+    score: float,
+) -> None:
+    """Emit quality gate evaluation results."""
+    bus = get_mission_event_bus()
+    bus.emit(MissionEvent(
+        event_type=MissionEventType.QUALITY_GATES_EVALUATED.value,
+        timestamp=_now(),
+        mission_id=mission_id,
+        details={
+            "gates_passed": gates_passed,
+            "total_gates": total_gates,
+            "score": round(score, 3),
+        },
+    ))
+
+
+__all__ = [
+    "MissionEventType",
+    "MissionEvent",
+    "MissionEventBus",
+    "get_mission_event_bus",
+    "emit_mission_status_change",
+    "emit_pedr_layer_event",
+    "emit_quality_gates",
+]

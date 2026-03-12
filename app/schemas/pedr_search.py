@@ -201,6 +201,21 @@ class PEDRLayerTimings(BaseModel):
     total_ms: float = Field(description="Total search latency in milliseconds")
 
 
+# Layer status: ok, error, skipped, disabled
+PEDRLayerStatus = Literal["ok", "error", "skipped", "disabled"]
+
+
+class PEDRLayerDiagnostic(BaseModel):
+    """Diagnostic information for a single PEDR layer execution."""
+
+    layer: str = Field(description="Layer name (lexical, semantic, graph, syntactic, pragmatic, governance)")
+    status: PEDRLayerStatus = Field(description="Layer execution status")
+    duration_ms: float = Field(default=0.0, ge=0.0, description="Execution time in milliseconds")
+    result_count: int = Field(default=0, ge=0, description="Number of results produced by this layer")
+    error: Optional[str] = Field(default=None, description="Error message if status is 'error'")
+    error_type: Optional[str] = Field(default=None, description="Exception class name if status is 'error'")
+
+
 class PEDRSearchMetadata(BaseModel):
     """Metadata about PEDR search execution."""
 
@@ -212,6 +227,14 @@ class PEDRSearchMetadata(BaseModel):
     layers_used: List[str] = Field(description="List of layers that contributed results")
     layer_weights: Dict[str, float] = Field(description="Effective layer weights used")
     timings: PEDRLayerTimings = Field(description="Per-layer timing information")
+    layer_diagnostics: List[PEDRLayerDiagnostic] = Field(
+        default_factory=list,
+        description="Per-layer execution diagnostics (timing, status, result count, errors)",
+    )
+    degraded: bool = Field(
+        default=False,
+        description="True if one or more layers failed but partial results were returned",
+    )
     graph_enabled: bool = Field(default=False, description="True if graph layer was enabled")
     graph_candidates_expanded: Optional[int] = Field(
         default=None,
@@ -309,9 +332,11 @@ __all__ = [
     "PEDRElementType",
     "PEDRQueryIntent",
     "PEDRRerankMode",
+    "PEDRLayerStatus",
     "PEDRLayerWeights",
     "PEDRSearchRequest",
     "PEDRLayerTimings",
+    "PEDRLayerDiagnostic",
     "PEDRSearchMetadata",
     "PEDRSearchResult",
     "PEDRSearchResponse",
