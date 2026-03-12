@@ -10,6 +10,7 @@ import { AuthGate } from "@/components/AuthGate";
 import { StatCard, StatGrid } from "@/components/console/StatCard";
 import { CorrectionStatusCard } from "@/components/console/CorrectionStatusCard";
 import { WorkerHealthCard } from "@/components/console/WorkerHealthCard";
+import { MissionActivityFeed } from "@/components/console/MissionActivityFeed";
 import {
   getConsoleMissions,
   getCorrectionStatus,
@@ -98,10 +99,10 @@ function ConsoleDashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Operator Console
+            Mission Operations Center
           </h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            Mission Protocol visibility and correction management
+            Real-time mission progress, PEDR search activity, and operations visibility
           </p>
         </div>
 
@@ -118,12 +119,9 @@ function ConsoleDashboard() {
           </div>
         ) : (
           <>
-            {/* Mission Stats */}
+            {/* Compact Mission Stats */}
             <section className="mb-8">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Mission Overview
-              </h2>
-              <StatGrid columns={5}>
+              <StatGrid columns={4}>
                 <StatCard
                   label="Total Missions"
                   value={data.stats?.totalMissions ?? 0}
@@ -140,57 +138,21 @@ function ConsoleDashboard() {
                   color="green"
                 />
                 <StatCard
-                  label="Draft"
-                  value={data.stats?.missionsByStatus?.draft ?? 0}
-                  color="default"
-                />
-                <StatCard
-                  label="In Review"
-                  value={data.stats?.missionsByStatus?.review ?? 0}
+                  label="Queued"
+                  value={data.stats?.missionsByStatus?.queued ?? 0}
                   color="purple"
                 />
               </StatGrid>
             </section>
 
-            {/* Quality Distribution */}
-            <section className="mb-8">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Quality Distribution
-              </h2>
-              <StatGrid columns={4}>
-                <StatCard
-                  label="Excellent (80-100%)"
-                  value={data.stats?.qualityDistribution.excellent ?? 0}
-                  sublabel="missions"
-                  color="green"
-                />
-                <StatCard
-                  label="Good (60-79%)"
-                  value={data.stats?.qualityDistribution.good ?? 0}
-                  sublabel="missions"
-                  color="blue"
-                />
-                <StatCard
-                  label="Fair (40-59%)"
-                  value={data.stats?.qualityDistribution.fair ?? 0}
-                  sublabel="missions"
-                  color="yellow"
-                />
-                <StatCard
-                  label="Poor (0-39%)"
-                  value={data.stats?.qualityDistribution.poor ?? 0}
-                  sublabel="missions"
-                  color="red"
-                />
-              </StatGrid>
-            </section>
-
-            {/* DeepSearch Worker Health */}
-            <section className="mb-8">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                DeepSearch Worker Status
-              </h2>
-              <WorkerHealthCard refreshInterval={30000} />
+            {/* Live Activity Feed + Worker Health side by side */}
+            <section className="mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <MissionActivityFeed maxDisplay={30} />
+              </div>
+              <div>
+                <WorkerHealthCard refreshInterval={30000} />
+              </div>
             </section>
 
             {/* Quick Links */}

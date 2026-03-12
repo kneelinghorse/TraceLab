@@ -32,6 +32,7 @@ os.environ.setdefault("AUTH_PASSWORD", "changeme")
 from sqlalchemy import event
 
 from app.core.database import Base, engine, SessionLocal
+from app.core.rate_limit import auth_rate_limiter
 from app.core.security import get_configured_credentials, issue_token_response
 from app.models.project import Project
 from app.models.user import User
@@ -118,6 +119,7 @@ def reset_database_and_reports(request):
         yield
         return
 
+    auth_rate_limiter.reset()
     Base.metadata.drop_all(bind=engine)
     _create_all_sqlite_safe(engine)
     # Seed a test user so API key operations can resolve user UUID

@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.database import get_db
+from app.core.mission_events import emit_mission_status_change
 from app.schemas.mission import (
     MissionCreate,
     MissionErrorResponse,
@@ -156,6 +157,13 @@ def _submit_existing_mission(
         "Mission %s submitted (mode=%s)",
         updated_mission.mission_id,
         deepsearch_mode,
+    )
+
+    emit_mission_status_change(
+        mission_id=updated_mission.mission_id or str(updated_mission.id),
+        title=updated_mission.title or "Untitled",
+        new_status="queued",
+        previous_status=mission.status,
     )
 
     return MissionSubmitResponse(
@@ -376,6 +384,15 @@ def update_mission(
         old_has_report = old_mission.result_report_id is not None
 
         mission = _service.update_mission(db, mission_id, data)
+
+        # Emit status change event
+        if data.status and data.status != old_status:
+            emit_mission_status_change(
+                mission_id=mission.mission_id or str(mission.id),
+                title=mission.title or "Untitled",
+                new_status=data.status,
+                previous_status=old_status,
+            )
 
         # Auto-create report if transitioning to completed with result_protocol
         # and no report exists yet

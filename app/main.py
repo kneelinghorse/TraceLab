@@ -18,6 +18,7 @@ from app.api.v1 import (
     documents,
     facets,
     health,
+    mission_events,
     missions,
     monitoring,
     pedr_preflight,
@@ -175,6 +176,7 @@ app.include_router(
 )
 app.include_router(facets.router, prefix=settings.api_v1_prefix, tags=["facets"], dependencies=protected_dependencies)
 app.include_router(retrieval.router, prefix=f"{settings.api_v1_prefix}/retrieval", tags=["retrieval"], dependencies=protected_dependencies)
+app.include_router(mission_events.router, prefix=f"{settings.api_v1_prefix}/missions", tags=["mission-events"], dependencies=protected_dependencies)
 app.include_router(missions.router, prefix=f"{settings.api_v1_prefix}/missions", tags=["missions"], dependencies=protected_dependencies)
 app.include_router(
     relationships.router,

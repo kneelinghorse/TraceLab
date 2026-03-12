@@ -17,6 +17,10 @@ from typing import Any, Dict
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from app.core.mission_events import (
+    MissionEventType,
+    emit_pedr_layer_event,
+)
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.schemas.pedr_search import (
     PEDRSearchRequest,
@@ -170,6 +174,32 @@ async def pedr_search(
             response.metadata.timings.total_ms,
             relational_ms,
             current_user.username,
+        )
+
+        # Emit layer diagnostics to mission event bus
+        for diag in response.metadata.layer_diagnostics:
+            evt = (
+                MissionEventType.PEDR_LAYER_COMPLETED
+                if diag.status == "ok"
+                else MissionEventType.PEDR_LAYER_FAILED
+                if diag.status == "error"
+                else None
+            )
+            if evt:
+                emit_pedr_layer_event(
+                    event_type=evt,
+                    layer=diag.layer,
+                    duration_ms=diag.duration_ms,
+                    result_count=diag.result_count,
+                    error=diag.error,
+                )
+
+        emit_pedr_layer_event(
+            event_type=MissionEventType.PEDR_SEARCH_COMPLETED,
+            layer="fusion",
+            duration_ms=response.metadata.timings.total_ms,
+            result_count=response.metadata.result_count,
+            details={"degraded": response.metadata.degraded},
         )
 
         return response

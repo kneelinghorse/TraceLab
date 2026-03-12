@@ -1,12 +1,14 @@
 """Authentication API endpoints for JWT login, refresh, and API key management."""
+import logging
 from datetime import datetime, timedelta
 from typing import List
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.rate_limit import auth_rate_limiter
 from app.core.security import (
     AuthenticatedUser,
     generate_api_key,
@@ -29,6 +31,8 @@ from app.schemas.api_key import (
 )
 from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(tags=["auth"])
 
 # Maximum API keys per user
@@ -36,11 +40,18 @@ MAX_API_KEYS_PER_USER = 10
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
+def login(
+    payload: LoginRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> TokenResponse:
     """Authenticate a user against the users table and return a signed JWT."""
+    auth_rate_limiter.check(request)
+
     db_user = db.query(User).filter(User.email == payload.email).first()
 
     if not db_user or not verify_password(payload.password, db_user.password_hash):
+        _log_auth_failure(request, payload.email, "invalid_credentials")
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
 
     # Update last_login_at
@@ -52,11 +63,18 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse
 
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> TokenResponse:
+def register(
+    payload: RegisterRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> TokenResponse:
     """Register a new user with a valid invite code and return a signed JWT."""
+    auth_rate_limiter.check(request)
+
     # Check email uniqueness
     existing = db.query(User).filter(User.email == payload.email).first()
     if existing:
+        _log_auth_failure(request, payload.email, "email_already_registered")
         raise HTTPException(status.HTTP_409_CONFLICT, detail="Email already registered")
 
     # Validate invite code
@@ -65,8 +83,10 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> TokenRe
         InviteCode.used_by.is_(None),
     ).first()
     if not invite:
+        _log_auth_failure(request, payload.email, "invalid_invite_code")
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Invalid or already used invite code")
     if invite.expires_at and invite.expires_at < datetime.utcnow():
+        _log_auth_failure(request, payload.email, "expired_invite_code")
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Invite code has expired")
 
     # Create user
@@ -274,3 +294,29 @@ def delete_invite_code(
     db.commit()
 
     return {"success": True, "message": "Invite code deleted"}
+
+
+# --- Audit Logging ---
+
+
+def _get_client_ip(request: Request) -> str:
+    """Extract client IP, respecting X-Forwarded-For."""
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
+def _log_auth_failure(request: Request, email: str, reason: str) -> None:
+    """Log a failed authentication attempt with structured context.
+
+    Logs IP and failure reason for security audit. Does NOT log passwords or
+    other sensitive data.
+    """
+    ip = _get_client_ip(request)
+    logger.warning(
+        "auth_failure: ip=%s email=%s reason=%s",
+        ip,
+        email,
+        reason,
+    )
