@@ -48,6 +48,12 @@ Personal-scale research repository with RAG-powered semantic search, structured 
    - Health check: http://localhost:8000/api/v1/health
    - DB health check: http://localhost:8000/api/v1/health/db
 
+### Dev Container (Recommended)
+
+If you use VS Code with the Dev Containers extension, open the repo and select "Reopen in Container". This builds from `.devcontainer/devcontainer.json`, spinning up PostgreSQL, Qdrant, and a preconfigured Python environment with all dev tooling installed.
+
+Ports forwarded automatically: `8000` (API), `3000` (frontend), `5433` (PostgreSQL), `6333` (Qdrant).
+
 ### Local Development (Without Docker)
 
 1. **Create virtual environment:**
@@ -134,18 +140,26 @@ npx playwright test tests/e2e/production-smoke.spec.ts
 
 ```
 TraceLab/
+├── .devcontainer/     # Dev container configuration
 ├── app/
 │   ├── api/           # API endpoints
 │   │   └── v1/        # API v1 routes
+│   ├── adapters/      # Hexagonal adapter implementations
 │   ├── core/          # Core configuration and database
 │   ├── models/        # SQLAlchemy models
+│   ├── ports/         # Protocol interfaces (hexagonal ports)
+│   ├── dependencies.py # Composition root (DI wiring)
 │   ├── services/      # Business logic services
 │   └── utils/         # Utility functions
 ├── alembic/           # Database migrations
+├── docs/adr/          # Architecture Decision Records
 ├── tests/             # Test files
+│   ├── unit/          # Unit tests (mocked, no DB)
+│   ├── integration/   # Integration tests (real PostgreSQL)
+│   └── e2e/           # End-to-end tests
 ├── docker-compose.yml  # Docker Compose configuration
 ├── Dockerfile         # Application Dockerfile
-└── requirements.txt   # Python dependencies
+└── pyproject.toml     # Python project config (deps, tooling)
 ```
 
 ## Database Schema
