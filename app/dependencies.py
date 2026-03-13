@@ -42,7 +42,7 @@ def get_embedding_port() -> EmbeddingPort | None:
 
         return OpenAIEmbeddingAdapter(get_embedding_service())
     except Exception:
-        logger.warning("EmbeddingPort unavailable: OpenAI not configured")
+        logger.warning("EmbeddingPort unavailable: OpenAI not configured", exc_info=True)
         return None
 
 
@@ -53,7 +53,7 @@ def get_vector_db_port() -> VectorDBPort | None:
 
         return QdrantVectorDBAdapter(get_qdrant_service())
     except Exception:
-        logger.warning("VectorDBPort unavailable: Qdrant not configured")
+        logger.warning("VectorDBPort unavailable: Qdrant not configured", exc_info=True)
         return None
 
 
@@ -64,5 +64,5 @@ def get_llm_port() -> LLMPort | None:
     try:
         return OpenAILLMAdapter()
     except Exception:
-        logger.warning("LLMPort unavailable: OpenAI not configured")
+        logger.warning("LLMPort unavailable: OpenAI not configured", exc_info=True)
         return None

@@ -38,7 +38,9 @@ class VectorDBPort(Protocol):
     def delete_chunks(
         self,
         document_id: str,
-    ) -> None: ...
+    ) -> None:
+        """Remove all chunks for a document. Not yet implemented in QdrantService."""
+        ...
 
 
 class LLMPort(Protocol):
@@ -59,6 +61,7 @@ class SearchPort(Protocol):
 
     def search(
         self,
+        *,
         query: str,
         top_k: int = 5,
         project_id: str | None = None,
