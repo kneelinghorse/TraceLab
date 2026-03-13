@@ -99,6 +99,8 @@ EDGE_TYPES = frozenset({
     "binds_to",  # Protocol binding relationship
     "part_of",  # Chunk is part of document
     "sibling_of",  # Same parent relationship
+    "co_occurs",  # Chunks appearing in same collection (T38.1)
+    "topic_similar",  # Chunks with high embedding cosine similarity (T38.1)
 })
 
 

@@ -100,19 +100,21 @@ class _QualityAutomationTelemetry:
         self.path = path or (repo_root / "telemetry" / "events" / "quality-automation.jsonl")
 
     def __call__(self, record: QualityCheck, result: QualityAutomationCheckResult) -> None:  # pragma: no cover - simple IO
-        payload = {
-            "ts": result.evaluated_at.isoformat().replace("+00:00", "Z"),
-            "entity_type": record.entity_type,
-            "entity_id": str(record.entity_id),
-            "check_type": record.check_type,
-            "status": record.status,
-            "summary": result.summary,
-            "metrics": result.metrics,
-            "recommendations": result.recommendations,
-        }
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self.path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
+        from app.core.telemetry import emit_telemetry
+        emit_telemetry(
+            path=self.path,
+            event_type=f"quality.automation.{record.check_type}",
+            source="quality",
+            payload={
+                "entity_type": record.entity_type,
+                "entity_id": str(record.entity_id),
+                "check_type": record.check_type,
+                "status": record.status,
+                "summary": result.summary,
+                "metrics": result.metrics,
+                "recommendations": result.recommendations,
+            },
+        )
 
 
 class QualityAutomationService:

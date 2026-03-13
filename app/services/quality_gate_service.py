@@ -57,16 +57,22 @@ class QualityGateReport:
 
 
 class _FileTelemetrySink:
-    """Append telemetry events to telemetry/events/quality-gates.jsonl."""
+    """Append telemetry events to telemetry/events/quality-gates.jsonl via TelemetryEnvelope."""
 
     def __init__(self, path: Path | None = None) -> None:
         repo_root = Path(__file__).resolve().parents[2]
         self.path = path or (repo_root / "telemetry" / "events" / "quality-gates.jsonl")
 
     def __call__(self, payload: Dict[str, Any]) -> None:  # pragma: no cover - simple IO
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self.path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
+        from app.core.telemetry import emit_telemetry
+        event_payload = dict(payload)
+        event_payload.pop("ts", None)
+        emit_telemetry(
+            path=self.path,
+            event_type="quality.gate.evaluated",
+            source="quality",
+            payload=event_payload,
+        )
 
 
 class QualityGateService:

@@ -177,6 +177,8 @@ class EdgeMaterializationService:
         yield from self._report_collection_edges(session, project_id=project_id, since=since)
         yield from self._document_source_edges(session, project_id=project_id, since=since)
         yield from self._collection_chunk_edges(session, project_id=project_id, since=since)
+        # Semantic edge types (T38.1)
+        yield from self._collection_cooccurrence_edges(session, project_id=project_id, since=since)
 
     def _project_document_edges(
         self,
@@ -625,6 +627,248 @@ class EdgeMaterializationService:
                 reason="FK: collection_items.chunk_id",
                 via="data",
             )
+
+    # ------------------------------------------------------------------
+    # Semantic edge types (T38.1)
+    # ------------------------------------------------------------------
+
+    MAX_COOCCURRENCE_COLLECTION_SIZE: int = 100
+
+    def _collection_cooccurrence_edges(
+        self,
+        session: Session,
+        *,
+        project_id: Optional[str],
+        since: Optional[datetime],
+    ) -> Iterable[EdgeSpec]:
+        """Create co_occurs edges between chunks in the same collection.
+
+        If chunks A and B both belong to collection C, they co-occur.
+        Generates bidirectional pairs (A→B and B→A) for BFS traversal.
+        Skips collections larger than MAX_COOCCURRENCE_COLLECTION_SIZE
+        to prevent combinatorial explosion.
+        """
+        query = (
+            session.query(CollectionItem.collection_id, CollectionItem.chunk_id)
+            .join(Collection, CollectionItem.collection_id == Collection.id)
+        )
+        if project_id:
+            query = (
+                query.join(DocumentChunk, CollectionItem.chunk_id == DocumentChunk.id)
+                .join(Document, DocumentChunk.document_id == Document.id)
+                .filter(Document.project_id == project_id)
+                .filter(Document.deleted_at.is_(None))
+            )
+        if since:
+            query = query.filter(CollectionItem.added_at >= since)
+
+        # Group chunk IDs by collection
+        collection_chunks: Dict[str, List[str]] = {}
+        for collection_id, chunk_id in query.all():
+            cid = str(collection_id)
+            collection_chunks.setdefault(cid, []).append(str(chunk_id))
+
+        for collection_id, chunk_ids in collection_chunks.items():
+            if len(chunk_ids) < 2 or len(chunk_ids) > self.MAX_COOCCURRENCE_COLLECTION_SIZE:
+                continue
+            unique_ids = list(dict.fromkeys(chunk_ids))
+            for i, id_a in enumerate(unique_ids):
+                urn_a = str(URNGenerator.generate(EntityType.CHUNK, id_a))
+                for id_b in unique_ids[i + 1:]:
+                    urn_b = str(URNGenerator.generate(EntityType.CHUNK, id_b))
+                    # Bidirectional: A→B and B→A
+                    yield EdgeSpec(
+                        edge_type="co_occurs",
+                        from_urn=urn_a,
+                        to_urn=urn_b,
+                        direction="out",
+                        weight=0.8,
+                        reason=f"collection:{collection_id}",
+                        via="semantic",
+                    )
+                    yield EdgeSpec(
+                        edge_type="co_occurs",
+                        from_urn=urn_b,
+                        to_urn=urn_a,
+                        direction="out",
+                        weight=0.8,
+                        reason=f"collection:{collection_id}",
+                        via="semantic",
+                    )
+
+    DEFAULT_SIMILARITY_THRESHOLD: float = 0.85
+    DEFAULT_SIMILARITY_TOP_K: int = 10
+
+    def materialize_topic_similarity_edges(
+        self,
+        session: Optional[Session] = None,
+        *,
+        project_id: Optional[str] = None,
+        similarity_threshold: float = DEFAULT_SIMILARITY_THRESHOLD,
+        top_k: int = DEFAULT_SIMILARITY_TOP_K,
+        qdrant_client: Optional[Any] = None,
+        collection_name: Optional[str] = None,
+    ) -> MaterializationResult:
+        """Materialize topic_similar edges using Qdrant embedding similarity.
+
+        For each chunk, queries Qdrant for nearest neighbors above the
+        similarity threshold and creates bidirectional topic_similar edges.
+
+        This is a separate pass from implicit edges because it requires
+        Qdrant and is more expensive to compute.
+
+        Args:
+            session: SQLAlchemy session (created if not provided).
+            project_id: Limit to chunks in this project.
+            similarity_threshold: Minimum cosine similarity (default 0.85).
+            top_k: Max neighbors per chunk (default 10).
+            qdrant_client: Qdrant client instance (auto-resolved if not provided).
+            collection_name: Qdrant collection name (auto-resolved if not provided).
+        """
+        session, managed = self._get_session(session)
+        try:
+            edges = list(self._topic_similarity_edge_specs(
+                session,
+                project_id=project_id,
+                similarity_threshold=similarity_threshold,
+                top_k=top_k,
+                qdrant_client=qdrant_client,
+                collection_name=collection_name,
+            ))
+            return self._upsert_edges(edges, session=session, commit=managed)
+        finally:
+            if managed:
+                session.close()
+
+    def _topic_similarity_edge_specs(
+        self,
+        session: Session,
+        *,
+        project_id: Optional[str],
+        similarity_threshold: float,
+        top_k: int,
+        qdrant_client: Optional[Any],
+        collection_name: Optional[str],
+    ) -> Iterable[EdgeSpec]:
+        """Yield topic_similar edges by querying Qdrant for embedding neighbors."""
+        import logging
+        logger = logging.getLogger(__name__)
+
+        # Resolve Qdrant client
+        client = qdrant_client
+        if client is None:
+            try:
+                from app.core.qdrant_client import get_qdrant_client
+                client = get_qdrant_client()
+            except Exception as exc:
+                logger.warning("Qdrant unavailable for topic similarity: %s", exc)
+                return
+
+        if collection_name is None:
+            try:
+                from app.core.config import settings
+                collection_name = settings.qdrant_collection_name
+            except Exception:
+                collection_name = "research_chunks"
+
+        # Get chunk IDs to process
+        query = session.query(DocumentChunk.id, DocumentChunk.document_id, DocumentChunk.chunk_index)
+        if project_id:
+            query = (
+                query.join(Document, DocumentChunk.document_id == Document.id)
+                .filter(Document.project_id == project_id)
+                .filter(Document.deleted_at.is_(None))
+            )
+
+        chunks = query.all()
+        if not chunks:
+            return
+
+        # Build chunk_id -> URN mapping
+        chunk_urn_map: Dict[str, str] = {}
+        for chunk_id, doc_id, chunk_index in chunks:
+            chunk_urn_map[str(chunk_id)] = str(
+                URNGenerator.for_chunk(str(doc_id), int(chunk_index))
+            )
+
+        # Query Qdrant for similar chunks per point
+        try:
+            from qdrant_client.models import Filter, FieldCondition, MatchValue
+        except ImportError:
+            logger.warning("qdrant_client.models not available")
+            return
+
+        seen_pairs: set = set()
+        chunk_ids = list(chunk_urn_map.keys())
+
+        for chunk_id in chunk_ids:
+            try:
+                query_filter = None
+                if project_id:
+                    query_filter = Filter(must=[
+                        FieldCondition(key="project_id", match=MatchValue(value=str(project_id)))
+                    ])
+
+                results = client.recommend(
+                    collection_name=collection_name,
+                    positive=[chunk_id],
+                    limit=top_k,
+                    score_threshold=similarity_threshold,
+                    query_filter=query_filter,
+                )
+            except Exception as exc:
+                logger.debug("Qdrant recommend failed for %s: %s", chunk_id, exc)
+                continue
+
+            from_urn = chunk_urn_map.get(chunk_id)
+            if not from_urn:
+                continue
+
+            for result in results:
+                neighbor_id = str(result.id)
+                if neighbor_id == chunk_id:
+                    continue
+                score = float(result.score)
+
+                # Deduplicate: only process each pair once
+                pair_key = tuple(sorted([chunk_id, neighbor_id]))
+                if pair_key in seen_pairs:
+                    continue
+                seen_pairs.add(pair_key)
+
+                # Resolve neighbor URN
+                to_urn = chunk_urn_map.get(neighbor_id)
+                if not to_urn:
+                    # Neighbor may be outside our chunk set; resolve from payload
+                    payload = getattr(result, "payload", {}) or {}
+                    n_doc_id = payload.get("document_id")
+                    n_chunk_idx = payload.get("chunk_index")
+                    if n_doc_id is not None and n_chunk_idx is not None:
+                        to_urn = str(URNGenerator.for_chunk(str(n_doc_id), int(n_chunk_idx)))
+                    else:
+                        to_urn = str(URNGenerator.generate(EntityType.CHUNK, neighbor_id))
+
+                # Bidirectional edges
+                yield EdgeSpec(
+                    edge_type="topic_similar",
+                    from_urn=from_urn,
+                    to_urn=to_urn,
+                    direction="out",
+                    weight=round(score, 4),
+                    reason=f"cosine>={similarity_threshold}",
+                    via="semantic",
+                    evidence={"cosine_similarity": round(score, 4)},
+                )
+                yield EdgeSpec(
+                    edge_type="topic_similar",
+                    from_urn=to_urn,
+                    to_urn=from_urn,
+                    direction="out",
+                    weight=round(score, 4),
+                    reason=f"cosine>={similarity_threshold}",
+                    via="semantic",
+                    evidence={"cosine_similarity": round(score, 4)},
+                )
 
     def _upsert_edges(
         self,

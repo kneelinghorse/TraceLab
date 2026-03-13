@@ -1527,9 +1527,17 @@ def _emit_graph_telemetry(
     }
 
     try:
-        telemetry_path.parent.mkdir(parents=True, exist_ok=True)
-        with telemetry_path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(payload) + "\n")
+        from app.core.telemetry import emit_telemetry
+        # Extract ts from payload since emit_telemetry generates its own
+        graph_payload = dict(payload)
+        graph_payload.pop("ts", None)
+        graph_payload.pop("event", None)
+        emit_telemetry(
+            path=telemetry_path,
+            event_type="pedr.graph.telemetry",
+            source="pedr",
+            payload=graph_payload,
+        )
     except Exception as exc:  # pragma: no cover - telemetry best effort
         logger.warning("Failed to write graph telemetry: %s", exc)
 
