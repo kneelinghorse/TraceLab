@@ -95,7 +95,7 @@ BASE_LAYER_WEIGHTS = {
     "governance": 0.15,
 }
 
-DEFAULT_GRAPH_WEIGHT = 0.08
+DEFAULT_GRAPH_WEIGHT = 0.12
 
 
 def _build_default_layer_weights(graph_weight: float) -> Dict[str, float]:
@@ -148,12 +148,12 @@ class PEDRConfig:
     # Pragmatic layer
     intent_boost_enabled: bool = True
 
-    # Graph layer
+    # Graph layer — tuned via T36.2 quality proof (sprint25 config validated)
     graph_weight: float = DEFAULT_GRAPH_WEIGHT
-    graph_depth: int = 1
+    graph_depth: int = 2
     graph_decay: float = 0.7
     graph_edge_types: Optional[Tuple[str, ...]] = None
-    graph_top_k_seeds: int = 5
+    graph_top_k_seeds: int = 10
 
 
 @dataclass

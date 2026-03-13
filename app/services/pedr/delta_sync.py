@@ -554,24 +554,22 @@ class DeltaSyncService:
         if not self.telemetry_path:
             return
 
-        event = {
-            "ts": datetime.now(timezone.utc).isoformat(),
-            "event": "pedr_sync",
-            "entity_type": entity_type.value,
-            "mode": mode.value,
-            "synced_count": synced,
-            "failed_count": failed,
-            "skipped_count": skipped,
-            "duration_ms": round(duration_ms, 2),
-            "success": failed == 0,
-        }
+        from app.core.telemetry import emit_telemetry
 
-        try:
-            self.telemetry_path.parent.mkdir(parents=True, exist_ok=True)
-            with self.telemetry_path.open("a") as f:
-                f.write(json.dumps(event) + "\n")
-        except Exception as e:
-            logger.warning(f"Failed to write telemetry: {e}")
+        emit_telemetry(
+            path=self.telemetry_path,
+            event_type="pedr.delta_sync.completed",
+            source="pedr",
+            payload={
+                "entity_type": entity_type.value,
+                "mode": mode.value,
+                "synced_count": synced,
+                "failed_count": failed,
+                "skipped_count": skipped,
+                "duration_ms": round(duration_ms, 2),
+                "success": failed == 0,
+            },
+        )
 
 
 # Singleton instance

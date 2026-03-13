@@ -77,11 +77,11 @@ SAMPLE_EVENT_WITH_GRAPH = {
     "event": "pedr_graph_telemetry",
     "query": "test query with graph impact",
     "graph": {
-        "depth": 1,
+        "depth": 2,
         "decay": 0.7,
         "edge_types": [],
-        "top_k_seeds": 5,
-        "weight": 0.08,
+        "top_k_seeds": 10,
+        "weight": 0.12,
         "seed_count": 5,
         "seed_score_stats": {},
         "depth_stats": {},
@@ -157,9 +157,11 @@ def test_parse_event_config_inference():
     assert result is not None
     assert result.config_name == "default"
 
+    # SAMPLE_EVENT_NO_GRAPH uses d2/w0.12/k10 which now matches "default"
+    # (sprint25_original and default were reconciled in T36.4)
     result_s25 = parse_telemetry_event(SAMPLE_EVENT_NO_GRAPH)
     assert result_s25 is not None
-    assert result_s25.config_name == "sprint25_original"
+    assert result_s25.config_name == "default"
 
 
 # ---------------------------------------------------------------------------

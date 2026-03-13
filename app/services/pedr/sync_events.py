@@ -238,17 +238,25 @@ class SyncEventEmitter:
 
     def _log_event(self, event: SyncEvent) -> None:
         """Log event to telemetry."""
+        from app.core.telemetry import emit_telemetry
+
         logger.info(f"Sync event: {event.event_type.value} for {event.entity_type}:{event.entity_id}")
 
         if not self._telemetry_path:
             return
 
-        try:
-            self._telemetry_path.parent.mkdir(parents=True, exist_ok=True)
-            with self._telemetry_path.open("a") as f:
-                f.write(json.dumps(event.to_dict()) + "\n")
-        except Exception as e:
-            logger.warning(f"Failed to write event telemetry: {e}")
+        emit_telemetry(
+            path=self._telemetry_path,
+            event_type=f"sync.{event.event_type.value}",
+            source="tracelab",
+            payload={
+                "entity_id": event.entity_id,
+                "entity_type": event.entity_type,
+                "timestamp": event.timestamp.isoformat(),
+                "metadata": event.metadata,
+                "priority": event.priority,
+            },
+        )
 
 
 # Convenience functions for common events

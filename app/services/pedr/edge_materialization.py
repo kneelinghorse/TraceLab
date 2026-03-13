@@ -103,11 +103,13 @@ class EdgeMaterializationService:
             since = None
             if mode == "incremental":
                 since = self._resolve_incremental_cutoff(session)
-            edges = self._implicit_edge_specs(
+            # Materialize all specs before upserting so yield_per cursors
+            # complete before any mid-batch commits invalidate them.
+            edges = list(self._implicit_edge_specs(
                 session,
                 project_id=project_id,
                 since=since,
-            )
+            ))
             return self._upsert_edges(edges, session=session, commit=managed)
         finally:
             if managed:

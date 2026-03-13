@@ -678,7 +678,7 @@ class TestPEDRSearchOrchestrator:
 
         response_graph = orchestrator.search(query="graph weights enabled", enable_graph=True)
         weights_graph = response_graph.metadata.layer_weights
-        assert weights_graph["graph"] == pytest.approx(0.08, rel=1e-3)
+        assert weights_graph["graph"] == pytest.approx(0.12, rel=1e-3)
         assert sum(weights_graph.values()) == pytest.approx(1.0, rel=1e-3)
 
 

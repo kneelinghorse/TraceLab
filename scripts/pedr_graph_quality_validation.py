@@ -54,10 +54,10 @@ GRAPH_CONFIGS = {
     "disabled": {"enable_graph": False},
     "default": {
         "enable_graph": True,
-        "graph_weight": 0.08,
-        "graph_depth": 1,
+        "graph_weight": 0.12,
+        "graph_depth": 2,
         "graph_decay": 0.7,
-        "graph_top_k_seeds": 5,
+        "graph_top_k_seeds": 10,
     },
     "sprint25_original": {
         "enable_graph": True,
@@ -394,11 +394,11 @@ def generate_recommendations(
                 f"avg result share."
             )
 
-    # Config discrepancy note
+    # Config note (discrepancy resolved in T36.2/T36.4)
     recs.append(
-        "NOTE: Sprint 25 decision recorded depth=2, decay=0.7, weight=0.12 but "
-        "current code defaults are depth=1, weight=0.08. This discrepancy should "
-        "be resolved — either update the decision record or the code defaults."
+        "NOTE: Code defaults (depth=2, decay=0.7, weight=0.12, seeds=10) are the "
+        "authoritative graph config, validated by T36.2 quality proof against "
+        "33,780 production edges."
     )
 
     return recs
