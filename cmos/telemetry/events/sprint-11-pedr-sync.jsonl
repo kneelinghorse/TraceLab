@@ -1,2 +1,2 @@
-{"event_type": "mission.completed", "entity_id": "test-id", "entity_type": "mission", "timestamp": "2025-12-05T02:11:36.232182+00:00", "metadata": {"project_id": "proj-123", "status": "complete"}, "priority": 0}
-{"ts": "2025-12-05T02:00:00Z", "event": "pedr_sync_service_initialized", "version": "1.0.0"}
+{"ts": "1970-01-01T00:00:00Z", "event_type": "mission.completed", "source": "pedr", "payload": {"entity_id": "test-id", "entity_type": "mission", "timestamp": "2025-12-05T02:11:36.232182+00:00", "metadata": {"project_id": "proj-123", "status": "complete"}, "priority": 0}, "sprint_id": "sprint-11"}
+{"ts": "2025-12-05T02:00:00Z", "event_type": "pedr_sync_service_initialized", "source": "pedr", "payload": {"version": "1.0.0"}, "sprint_id": "sprint-11"}

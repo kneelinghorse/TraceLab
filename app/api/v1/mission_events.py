@@ -5,6 +5,9 @@ GET /api/v1/missions/events/stream
 
 GET /api/v1/missions/events/recent
   → JSON array of recent events (for initial page load)
+
+POST /api/v1/missions/events/cmos
+  → Ingest a CMOS mission transition as a TraceLab SSE event
 """
 from __future__ import annotations
 
@@ -13,9 +16,11 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
 
 from app.core.mission_events import (
     MissionEvent,
+    emit_cmos_mission_event,
     get_mission_event_bus,
 )
 from app.core.security import (
@@ -68,6 +73,48 @@ async def stream_mission_events(
             "X-Accel-Buffering": "no",  # Disable nginx buffering
         },
     )
+
+
+class CmosMissionEventRequest(BaseModel):
+    """Payload for the CMOS mission event bridge endpoint."""
+
+    mission_id: str = Field(..., description="CMOS mission ID (e.g. T35.2)")
+    name: str = Field(..., description="Mission name/title")
+    new_status: str = Field(..., description="Target status (e.g. In Progress, Completed, Blocked)")
+    previous_status: Optional[str] = Field(None, description="Previous status")
+    notes: Optional[str] = Field(None, description="Transition notes")
+    reason: Optional[str] = Field(None, description="Block reason (for blocked transitions)")
+    sprint_id: Optional[str] = Field(None, description="Sprint ID (e.g. sprint-35)")
+
+
+@router.post("/events/cmos")
+def ingest_cmos_mission_event(
+    payload: CmosMissionEventRequest,
+    _user: AuthenticatedUser = Depends(require_authenticated_user),
+):
+    """Ingest a CMOS mission transition as a TraceLab SSE event.
+
+    Called by the CMOS MCP server when a mission transitions state.
+    Emits the event to the SSE bus so the Mission Operations Center
+    dashboard reflects CMOS activity in real-time.
+
+    Gracefully degrades: returns success even if event emission fails.
+    """
+    emitted = emit_cmos_mission_event(
+        mission_id=payload.mission_id,
+        name=payload.name,
+        new_status=payload.new_status,
+        previous_status=payload.previous_status,
+        notes=payload.notes,
+        reason=payload.reason,
+        sprint_id=payload.sprint_id,
+    )
+    return {
+        "ok": True,
+        "emitted": emitted,
+        "mission_id": payload.mission_id,
+        "status": payload.new_status,
+    }
 
 
 @router.get("/events/recent", response_model=List[dict])

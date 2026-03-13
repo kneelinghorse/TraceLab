@@ -123,6 +123,11 @@ CREATE TABLE IF NOT EXISTS strategic_decisions (
   sprint_id TEXT,
   snapshot_id INTEGER,
   project_domain TEXT,  -- e.g., 'ai-studio', allows multi-project support
+  mission_id TEXT,      -- CMOS mission ID (e.g., 'T35.3') for cross-reference
+  category TEXT,        -- Decision categorization
+  superseded_by INTEGER,-- FK to another decision (decision chains)
+  status TEXT DEFAULT 'active',  -- active, superseded, archived, stale
+  evidence TEXT,        -- JSON array of TraceLab evidence refs [{type, id}]
   FOREIGN KEY (context_id) REFERENCES contexts(id) ON DELETE CASCADE,
   FOREIGN KEY (sprint_id) REFERENCES sprints(id) ON DELETE SET NULL,
   FOREIGN KEY (snapshot_id) REFERENCES context_snapshots(id) ON DELETE SET NULL
@@ -131,6 +136,7 @@ CREATE TABLE IF NOT EXISTS strategic_decisions (
 CREATE INDEX IF NOT EXISTS idx_strategic_decisions_created ON strategic_decisions (created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_strategic_decisions_sprint ON strategic_decisions (sprint_id);
 CREATE INDEX IF NOT EXISTS idx_strategic_decisions_domain ON strategic_decisions (project_domain);
+CREATE INDEX IF NOT EXISTS idx_strategic_decisions_mission ON strategic_decisions (mission_id);
 
 CREATE VIEW IF NOT EXISTS active_missions AS
 SELECT m.id,

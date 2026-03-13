@@ -267,14 +267,14 @@ class CacheManager:
         return snapshot
 
     def _write_telemetry(self, snapshot: Dict[str, Any]) -> None:
-        payload = {
-            "ts": _utc_now_str(),
-            "caches": snapshot,
-        }
-        self.telemetry_path.parent.mkdir(parents=True, exist_ok=True)
-        with self.telemetry_path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(payload, ensure_ascii=False))
-            handle.write("\n")
+        from app.core.telemetry import emit_telemetry
+
+        emit_telemetry(
+            path=self.telemetry_path,
+            event_type="cache.metrics.snapshot",
+            source="tracelab",
+            payload={"caches": snapshot},
+        )
 
 
 _CACHE_MANAGER: CacheManager | None = None
