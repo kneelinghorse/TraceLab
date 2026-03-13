@@ -8,7 +8,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.services.mission_service import MissionService
+from app.services.mission_service import MissionNotFoundError, MissionService
 
 
 class SQLAlchemyMissionRepository:
@@ -18,7 +18,10 @@ class SQLAlchemyMissionRepository:
         self._service = service or MissionService()
 
     def get_mission(self, db: Session, mission_id: UUID):
-        return self._service.get_mission(db, mission_id)
+        try:
+            return self._service.get_mission(db, mission_id)
+        except MissionNotFoundError:
+            return None
 
     def list_missions(
         self,
@@ -41,7 +44,10 @@ class SQLAlchemyMissionRepository:
         return self._service.create_mission(db, data)
 
     def update_mission(self, db: Session, mission_id: UUID, data: Any):
-        return self._service.update_mission(db, mission_id, data)
+        try:
+            return self._service.update_mission(db, mission_id, data)
+        except MissionNotFoundError:
+            return None
 
     def transition_status(
         self,
@@ -50,4 +56,7 @@ class SQLAlchemyMissionRepository:
         new_status: str,
         error_message: str | None = None,
     ):
-        return self._service.transition_status(db, mission_id, new_status, error_message=error_message)
+        try:
+            return self._service.transition_status(db, mission_id, new_status, error_message=error_message)
+        except MissionNotFoundError:
+            return None
