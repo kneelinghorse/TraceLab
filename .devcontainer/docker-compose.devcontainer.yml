@@ -1,0 +1,17 @@
+# ABOUTME: Dev container overlay for docker-compose.dev.yml.
+# ABOUTME: Overrides backend service for interactive development with dev deps.
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/app:cached
+    command: sleep infinity
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/tracelab
+      QDRANT_URL: http://qdrant:6333
+      ENVIRONMENT: development
+      DEBUG: "true"
