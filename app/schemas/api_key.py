@@ -1,8 +1,8 @@
 """Pydantic schemas for API key management."""
+
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -11,8 +11,10 @@ from pydantic import BaseModel, Field
 class APIKeyCreate(BaseModel):
     """Request to create a new API key."""
 
-    name: str = Field(..., description="Human-readable label (e.g., 'MCP Server', 'CI Pipeline')")
-    expires_in_days: Optional[int] = Field(
+    name: str = Field(
+        ..., description="Human-readable label (e.g., 'MCP Server', 'CI Pipeline')"
+    )
+    expires_in_days: int | None = Field(
         default=None,
         description="Number of days until the key expires (null = never expires)",
     )
@@ -24,9 +26,11 @@ class APIKeyResponse(BaseModel):
     id: UUID
     name: str
     key: str = Field(..., description="Full API key - shown only at creation time")
-    key_prefix: str = Field(..., description="Key prefix for identification (e.g., tl_a1b2c3d4)")
+    key_prefix: str = Field(
+        ..., description="Key prefix for identification (e.g., tl_a1b2c3d4)"
+    )
     created_at: datetime
-    expires_at: Optional[datetime]
+    expires_at: datetime | None
 
     class Config:
         from_attributes = True
@@ -37,10 +41,12 @@ class APIKeyInfo(BaseModel):
 
     id: UUID
     name: str
-    key_prefix: str = Field(..., description="Key prefix for identification (e.g., tl_a1b2c3d4)")
+    key_prefix: str = Field(
+        ..., description="Key prefix for identification (e.g., tl_a1b2c3d4)"
+    )
     created_at: datetime
-    last_used_at: Optional[datetime]
-    expires_at: Optional[datetime]
+    last_used_at: datetime | None
+    expires_at: datetime | None
 
     class Config:
         from_attributes = True

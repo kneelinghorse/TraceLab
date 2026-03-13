@@ -2,6 +2,7 @@
 
 Mission B13.9: Format Support - JSON, XML, YAML
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -255,7 +256,9 @@ class TestFormatSupport:
             (".exe", False),
         ],
     )
-    def test_is_format_supported(self, extension: str, expected: bool, tmp_path: Path) -> None:
+    def test_is_format_supported(
+        self, extension: str, expected: bool, tmp_path: Path
+    ) -> None:
         """Check format support detection."""
         file_path = tmp_path / f"test{extension}"
         assert DocumentParser.is_format_supported(file_path) == expected

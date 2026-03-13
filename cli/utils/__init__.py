@@ -1,2 +1,1 @@
 """Utilities for TraceLab CLI."""
-

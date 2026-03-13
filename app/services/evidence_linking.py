@@ -1,14 +1,16 @@
 """Helpers for linking insights to supporting document chunks."""
+
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, Optional
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.models.insight import Insight, InsightSource
 from app.models.chunk import DocumentChunk
+from app.models.insight import Insight, InsightSource
 
 
 @dataclass
@@ -28,7 +30,9 @@ class EvidenceLinkingService:
     def __init__(self, *, require_entities: bool = True) -> None:
         self.require_entities = require_entities
 
-    def sync_from_evidence(self, db: Session, evidence_items: Iterable[Dict[str, Any]]) -> EvidenceLinkSummary:
+    def sync_from_evidence(
+        self, db: Session, evidence_items: Iterable[dict[str, Any]]
+    ) -> EvidenceLinkSummary:
         summary = EvidenceLinkSummary()
 
         for payload in evidence_items:
@@ -52,7 +56,10 @@ class EvidenceLinkingService:
 
             link = (
                 db.query(InsightSource)
-                .filter(InsightSource.insight_id == insight_id, InsightSource.chunk_id == chunk_id)
+                .filter(
+                    InsightSource.insight_id == insight_id,
+                    InsightSource.chunk_id == chunk_id,
+                )
                 .one_or_none()
             )
 
@@ -71,7 +78,7 @@ class EvidenceLinkingService:
         return summary
 
     @staticmethod
-    def _parse_uuid(value: Any) -> Optional[UUID]:
+    def _parse_uuid(value: Any) -> UUID | None:
         if not value:
             return None
         try:
@@ -88,4 +95,3 @@ class EvidenceLinkingService:
             .scalar()
             is not None
         )
-

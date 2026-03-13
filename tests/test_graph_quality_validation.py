@@ -1,4 +1,5 @@
 """Tests for the graph quality validation script."""
+
 from __future__ import annotations
 
 import json
@@ -36,7 +37,16 @@ SAMPLE_EVENT_NO_GRAPH = {
         "top_k_seeds": 10,
         "weight": 0.12,
         "seed_count": 10,
-        "seed_score_stats": {"count": 10, "score_stats": {"min": 0.4, "max": 0.5, "avg": 0.45, "p50": 0.45, "p90": 0.5}},
+        "seed_score_stats": {
+            "count": 10,
+            "score_stats": {
+                "min": 0.4,
+                "max": 0.5,
+                "avg": 0.45,
+                "p50": 0.45,
+                "p90": 0.5,
+            },
+        },
         "depth_stats": {},
         "edge_type_usage": {},
         "total_candidates": 0,
@@ -50,7 +60,13 @@ SAMPLE_EVENT_NO_GRAPH = {
         "fusion_latency_ms": 0.99,
         "layer_weights": {"lexical": 0.22, "semantic": 0.308, "graph": 0.12},
         "telemetry": {
-            "rrf_score_stats": {"min": 0.002, "max": 0.005, "avg": 0.003, "p50": 0.003, "p90": 0.004},
+            "rrf_score_stats": {
+                "min": 0.002,
+                "max": 0.005,
+                "avg": 0.003,
+                "p50": 0.003,
+                "p90": 0.004,
+            },
             "layer_contribution_counts": {"semantic": 60, "graph": 0},
             "layer_contribution_rates": {"semantic": 1.0, "graph": 0.0},
             "multi_layer_result_count": 0,
@@ -97,9 +113,19 @@ SAMPLE_EVENT_WITH_GRAPH = {
         "fusion_latency_ms": 0.02,
         "layer_weights": {"lexical": 0.23, "semantic": 0.322, "graph": 0.08},
         "telemetry": {
-            "rrf_score_stats": {"min": 0.001, "max": 0.009, "avg": 0.005, "p50": 0.004, "p90": 0.005},
+            "rrf_score_stats": {
+                "min": 0.001,
+                "max": 0.009,
+                "avg": 0.005,
+                "p50": 0.004,
+                "p90": 0.005,
+            },
             "layer_contribution_counts": {"lexical": 2, "semantic": 2, "graph": 1},
-            "layer_contribution_rates": {"lexical": 0.5, "semantic": 0.5, "graph": 0.25},
+            "layer_contribution_rates": {
+                "lexical": 0.5,
+                "semantic": 0.5,
+                "graph": 0.25,
+            },
             "multi_layer_result_count": 1,
             "multi_layer_result_rate": 0.25,
         },
@@ -110,8 +136,20 @@ SAMPLE_EVENT_WITH_GRAPH = {
             "results_with_graph": 1,
             "result_share": 0.25,
             "rank_stats": {"min": 4.0, "max": 4.0, "avg": 4.0, "p50": 4.0, "p90": 4.0},
-            "rrf_contribution_stats": {"min": 0.001, "max": 0.001, "avg": 0.001, "p50": 0.001, "p90": 0.001},
-            "rrf_contribution_share_stats": {"min": 1.0, "max": 1.0, "avg": 1.0, "p50": 1.0, "p90": 1.0},
+            "rrf_contribution_stats": {
+                "min": 0.001,
+                "max": 0.001,
+                "avg": 0.001,
+                "p50": 0.001,
+                "p90": 0.001,
+            },
+            "rrf_contribution_share_stats": {
+                "min": 1.0,
+                "max": 1.0,
+                "avg": 1.0,
+                "p50": 1.0,
+                "p90": 1.0,
+            },
             "top_5_with_graph": 1,
             "top_5_share": 0.25,
         },
@@ -170,9 +208,7 @@ def test_parse_event_config_inference():
 
 
 def test_load_from_jsonl_file():
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".jsonl", delete=False
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".jsonl", delete=False) as f:
         f.write(json.dumps(SAMPLE_EVENT_NO_GRAPH) + "\n")
         f.write(json.dumps(SAMPLE_EVENT_WITH_GRAPH) + "\n")
         f.write("\n")  # blank line
@@ -317,9 +353,7 @@ def test_config_comparison_format():
 
 
 def test_analyze_telemetry_pipeline():
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".jsonl", delete=False
-    ) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".jsonl", delete=False) as f:
         for _ in range(5):
             f.write(json.dumps(SAMPLE_EVENT_NO_GRAPH) + "\n")
         for _ in range(3):

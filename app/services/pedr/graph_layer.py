@@ -1,11 +1,13 @@
 """Graph layer service for PEDR L6 graph search."""
+
 from __future__ import annotations
 
 import time
 from collections import deque
+from collections.abc import Callable, Iterable, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Any, Callable, Deque, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any
 
 from sqlalchemy import tuple_
 from sqlalchemy.orm import Session
@@ -23,7 +25,7 @@ class GraphLayerConfig:
 
     max_depth: int = 1
     decay_factor: float = 0.7
-    allowed_edge_types: Optional[Tuple[str, ...]] = None
+    allowed_edge_types: tuple[str, ...] | None = None
     max_candidates: int = 100
 
 
@@ -42,7 +44,7 @@ class CandidateInfo:
     score: float
     depth: int
     seed_urn: str
-    edge_type: Optional[str]
+    edge_type: str | None
 
 
 class URNParser:
@@ -51,7 +53,7 @@ class URNParser:
     _CHUNK_MARKER = "-chunk-"
 
     @staticmethod
-    def parse_chunk_urn(urn: str) -> Optional[Tuple[str, int]]:
+    def parse_chunk_urn(urn: str) -> tuple[str, int] | None:
         """Parse a chunk URN into (document_id, chunk_index)."""
         parsed = URN.parse(urn)
         if not parsed or parsed.entity_type != "chunk":
@@ -78,8 +80,8 @@ class GraphLayerService:
     def __init__(
         self,
         *,
-        session: Optional[Session] = None,
-        session_factory: Optional[Callable[[], Session]] = None,
+        session: Session | None = None,
+        session_factory: Callable[[], Session] | None = None,
     ) -> None:
         if session and session_factory:
             raise ValueError("Provide either session or session_factory, not both.")
@@ -99,8 +101,8 @@ class GraphLayerService:
 
     def search(
         self,
-        seeds: List[str],
-        config: Optional[GraphLayerConfig] = None,
+        seeds: list[str],
+        config: GraphLayerConfig | None = None,
     ) -> LayerResult:
         """Run graph expansion from explicit URN seeds."""
         config = config or GraphLayerConfig()
@@ -128,13 +130,18 @@ class GraphLayerService:
 
     def expand_from_results(
         self,
-        results: List[Dict[str, Any]],
+        results: list[dict[str, Any]],
         top_k: int,
-        config: Optional[GraphLayerConfig] = None,
+        config: GraphLayerConfig | None = None,
     ) -> LayerResult:
         """Expand graph from top-k retrieval results."""
         config = config or GraphLayerConfig()
-        if not results or top_k <= 0 or config.max_depth <= 0 or config.max_candidates <= 0:
+        if (
+            not results
+            or top_k <= 0
+            or config.max_depth <= 0
+            or config.max_candidates <= 0
+        ):
             return LayerResult(layer_name=self.LAYER_NAME, results=[])
 
         start = time.perf_counter()
@@ -164,12 +171,12 @@ class GraphLayerService:
         self,
         *,
         session: Session,
-        results: List[Dict[str, Any]],
+        results: list[dict[str, Any]],
         top_k: int,
-    ) -> Tuple[List[str], Dict[str, float]]:
-        seed_entries: List[Tuple[str, float]] = []
-        chunk_id_scores: Dict[str, float] = {}
-        chunk_id_order: List[str] = []
+    ) -> tuple[list[str], dict[str, float]]:
+        seed_entries: list[tuple[str, float]] = []
+        chunk_id_scores: dict[str, float] = {}
+        chunk_id_order: list[str] = []
 
         for result in results[:top_k]:
             score = _extract_seed_score(result)
@@ -198,7 +205,9 @@ class GraphLayerService:
                     chunk_id_scores[chunk_id_value] = score
 
         if chunk_id_scores:
-            chunk_id_map = self._resolve_chunk_ids_to_urns(session, chunk_id_scores.keys())
+            chunk_id_map = self._resolve_chunk_ids_to_urns(
+                session, chunk_id_scores.keys()
+            )
             for chunk_id in chunk_id_order:
                 urn = chunk_id_map.get(chunk_id)
                 if urn:
@@ -211,10 +220,10 @@ class GraphLayerService:
         self,
         *,
         session: Session,
-        seeds: List[str],
-        seed_scores: Dict[str, float],
+        seeds: list[str],
+        seed_scores: dict[str, float],
         config: GraphLayerConfig,
-    ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+    ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
         allowed_edge_types = _normalize_edge_types(config.allowed_edge_types)
         seed_score_stats = _build_score_stats(seed_scores.values())
         if allowed_edge_types == ():
@@ -228,13 +237,13 @@ class GraphLayerService:
                 "seed_score_stats": seed_score_stats,
             }
 
-        adjacency_cache: Dict[str, List[EdgeRecord]] = {}
+        adjacency_cache: dict[str, list[EdgeRecord]] = {}
         stats = {"cache_hits": 0, "cache_misses": 0}
-        edge_type_usage: Dict[str, int] = {}
-        candidates: Dict[str, CandidateInfo] = {}
+        edge_type_usage: dict[str, int] = {}
+        candidates: dict[str, CandidateInfo] = {}
 
         seed_set = set(seeds)
-        queue: Deque[Tuple[str, int, str]] = deque((seed, 0, seed) for seed in seeds)
+        queue: deque[tuple[str, int, str]] = deque((seed, 0, seed) for seed in seeds)
         visited = set(seeds)
 
         while queue:
@@ -253,7 +262,9 @@ class GraphLayerService:
                     continue
                 for edge in adjacency_cache.get(current_urn, []):
                     if edge.edge_type:
-                        edge_type_usage[edge.edge_type] = edge_type_usage.get(edge.edge_type, 0) + 1
+                        edge_type_usage[edge.edge_type] = (
+                            edge_type_usage.get(edge.edge_type, 0) + 1
+                        )
                     next_urn = edge.to_urn
                     hop_depth = depth + 1
                     if hop_depth > config.max_depth:
@@ -270,7 +281,10 @@ class GraphLayerService:
                             max_candidates=config.max_candidates,
                         )
                     if next_urn not in visited:
-                        if len(candidates) < config.max_candidates or next_urn in candidates:
+                        if (
+                            len(candidates) < config.max_candidates
+                            or next_urn in candidates
+                        ):
                             visited.add(next_urn)
                             queue.append((next_urn, hop_depth, seed_urn))
 
@@ -292,9 +306,9 @@ class GraphLayerService:
         *,
         session: Session,
         from_urns: Iterable[str],
-        allowed_edge_types: Optional[Tuple[str, ...]],
-        cache: Dict[str, List[EdgeRecord]],
-        stats: Dict[str, int],
+        allowed_edge_types: tuple[str, ...] | None,
+        cache: dict[str, list[EdgeRecord]],
+        stats: dict[str, int],
     ) -> None:
         urn_list = [urn for urn in from_urns if urn]
         if not urn_list:
@@ -322,7 +336,7 @@ class GraphLayerService:
             if allowed_edge_types is not None:
                 query = query.filter(GraphEdge.edge_type.in_(allowed_edge_types))
 
-            edges_by_from: Dict[str, List[EdgeRecord]] = {urn: [] for urn in batch}
+            edges_by_from: dict[str, list[EdgeRecord]] = {urn: [] for urn in batch}
             for row in query.all():
                 from_urn = str(row.from_urn)
                 edges_by_from.setdefault(from_urn, []).append(
@@ -334,22 +348,24 @@ class GraphLayerService:
     def _update_candidate(
         self,
         *,
-        candidates: Dict[str, CandidateInfo],
+        candidates: dict[str, CandidateInfo],
         urn: str,
         depth: int,
         seed_urn: str,
-        edge_type: Optional[str],
-        seed_scores: Dict[str, float],
+        edge_type: str | None,
+        seed_scores: dict[str, float],
         decay_factor: float,
         max_candidates: int,
     ) -> None:
         if urn not in candidates and len(candidates) >= max_candidates:
             return
         base_score = seed_scores.get(seed_urn, 1.0)
-        score = base_score * (decay_factor ** depth)
+        score = base_score * (decay_factor**depth)
         existing = candidates.get(urn)
-        if existing is None or score > existing.score or (
-            score == existing.score and depth < existing.depth
+        if (
+            existing is None
+            or score > existing.score
+            or (score == existing.score and depth < existing.depth)
         ):
             candidates[urn] = CandidateInfo(
                 score=score,
@@ -361,9 +377,9 @@ class GraphLayerService:
     def _build_results(
         self,
         session: Session,
-        candidates: Dict[str, CandidateInfo],
+        candidates: dict[str, CandidateInfo],
         max_candidates: int,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         if not candidates:
             return []
 
@@ -374,9 +390,9 @@ class GraphLayerService:
             candidates.items(),
             key=lambda item: (-item[1].score, item[0]),
         )
-        results: List[Dict[str, Any]] = []
+        results: list[dict[str, Any]] = []
         for urn, info in sorted_candidates[:max_candidates]:
-            entry: Dict[str, Any] = {
+            entry: dict[str, Any] = {
                 "urn": urn,
                 "score": float(info.score),
                 "combined_score": float(info.score),
@@ -402,8 +418,8 @@ class GraphLayerService:
         self,
         session: Session,
         chunk_urns: Iterable[str],
-    ) -> Dict[str, str]:
-        pair_to_urns: Dict[Tuple[str, int], List[str]] = {}
+    ) -> dict[str, str]:
+        pair_to_urns: dict[tuple[str, int], list[str]] = {}
         for urn in chunk_urns:
             parsed = URNParser.parse_chunk_urn(urn)
             if not parsed:
@@ -422,7 +438,7 @@ class GraphLayerService:
             tuple_(DocumentChunk.document_id, DocumentChunk.chunk_index).in_(pairs)
         )
 
-        resolved: Dict[str, str] = {}
+        resolved: dict[str, str] = {}
         for row in query.all():
             key = (str(row.document_id), int(row.chunk_index))
             for urn in pair_to_urns.get(key, []):
@@ -433,7 +449,7 @@ class GraphLayerService:
         self,
         session: Session,
         chunk_ids: Iterable[str],
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         ids = [str(chunk_id) for chunk_id in set(chunk_ids)]
         if not ids:
             return {}
@@ -444,7 +460,7 @@ class GraphLayerService:
             DocumentChunk.chunk_index,
         ).filter(DocumentChunk.id.in_(ids))
 
-        resolved: Dict[str, str] = {}
+        resolved: dict[str, str] = {}
         for row in query.all():
             resolved[str(row.id)] = str(
                 URNGenerator.for_chunk(str(row.document_id), int(row.chunk_index))
@@ -452,9 +468,9 @@ class GraphLayerService:
         return resolved
 
 
-def _dedupe_preserve_order(items: Sequence[str]) -> List[str]:
+def _dedupe_preserve_order(items: Sequence[str]) -> list[str]:
     seen = set()
-    output: List[str] = []
+    output: list[str] = []
     for item in items:
         if not item or item in seen:
             continue
@@ -464,10 +480,10 @@ def _dedupe_preserve_order(items: Sequence[str]) -> List[str]:
 
 
 def _dedupe_seed_entries(
-    seed_entries: Sequence[Tuple[str, float]],
-) -> Tuple[List[str], Dict[str, float]]:
-    seen: Dict[str, float] = {}
-    ordered: List[str] = []
+    seed_entries: Sequence[tuple[str, float]],
+) -> tuple[list[str], dict[str, float]]:
+    seen: dict[str, float] = {}
+    ordered: list[str] = []
     for urn, score in seed_entries:
         if urn not in seen:
             ordered.append(urn)
@@ -478,15 +494,15 @@ def _dedupe_seed_entries(
 
 
 def _normalize_edge_types(
-    allowed_edge_types: Optional[Sequence[str]],
-) -> Optional[Tuple[str, ...]]:
+    allowed_edge_types: Sequence[str] | None,
+) -> tuple[str, ...] | None:
     if allowed_edge_types is None:
         return None
     normalized = tuple(str(edge_type) for edge_type in allowed_edge_types if edge_type)
     return normalized
 
 
-def _extract_seed_score(result: Dict[str, Any]) -> float:
+def _extract_seed_score(result: dict[str, Any]) -> float:
     for key in ("score", "combined_score", "rrf_score"):
         value = result.get(key)
         if value is not None:
@@ -497,22 +513,22 @@ def _extract_seed_score(result: Dict[str, Any]) -> float:
     return 1.0
 
 
-def _chunked(items: Sequence[str], size: int) -> Iterable[List[str]]:
+def _chunked(items: Sequence[str], size: int) -> Iterable[list[str]]:
     for idx in range(0, len(items), size):
         yield list(items[idx : idx + size])
 
 
 def _drain_queue(
-    queue: Deque[Tuple[str, int, str]],
+    queue: deque[tuple[str, int, str]],
     size: int,
-) -> List[Tuple[str, int, str]]:
-    batch: List[Tuple[str, int, str]] = []
+) -> list[tuple[str, int, str]]:
+    batch: list[tuple[str, int, str]] = []
     while queue and len(batch) < size:
         batch.append(queue.popleft())
     return batch
 
 
-def _build_score_stats(scores: Sequence[float]) -> Dict[str, Any]:
+def _build_score_stats(scores: Sequence[float]) -> dict[str, Any]:
     values = [float(value) for value in scores if value is not None]
     return {
         "count": len(values),
@@ -520,12 +536,14 @@ def _build_score_stats(scores: Sequence[float]) -> Dict[str, Any]:
     }
 
 
-def _build_depth_stats(candidates: Dict[str, CandidateInfo]) -> Dict[str, Dict[str, Any]]:
-    depth_scores: Dict[int, List[float]] = {}
+def _build_depth_stats(
+    candidates: dict[str, CandidateInfo],
+) -> dict[str, dict[str, Any]]:
+    depth_scores: dict[int, list[float]] = {}
     for info in candidates.values():
         depth_scores.setdefault(info.depth, []).append(info.score)
 
-    depth_stats: Dict[str, Dict[str, Any]] = {}
+    depth_stats: dict[str, dict[str, Any]] = {}
     for depth, scores in depth_scores.items():
         depth_stats[str(depth)] = _build_score_stats(scores)
     return depth_stats

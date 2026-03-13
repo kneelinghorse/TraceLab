@@ -33,7 +33,13 @@ from app.models import (
 )
 from app.models.types import GUID
 from app.services.pedr.edge_materialization import EdgeMaterializationService
-from app.services.pedr.semantic_protocol import Edge, EntityType, ProtocolManifest, URN, URNGenerator
+from app.services.pedr.semantic_protocol import (
+    URN,
+    Edge,
+    EntityType,
+    ProtocolManifest,
+    URNGenerator,
+)
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -52,7 +58,9 @@ def edge_materialization_schema():
         Report.__table__.to_metadata(metadata)
         mission_table = Mission.__table__.to_metadata(metadata)
         for constraint in list(mission_table.constraints):
-            if isinstance(constraint, CheckConstraint) and "jsonb_array_length" in str(constraint.sqltext):
+            if isinstance(constraint, CheckConstraint) and "jsonb_array_length" in str(
+                constraint.sqltext
+            ):
                 mission_table.constraints.remove(constraint)
         mission_table.create(engine, checkfirst=True)
 
@@ -81,7 +89,9 @@ def edge_materialization_schema():
             Column("prev_chunk_id", GUID(), ForeignKey("document_chunks.id")),
             Column("next_chunk_id", GUID(), ForeignKey("document_chunks.id")),
             Column("created_at", DateTime, nullable=True),
-            UniqueConstraint("document_id", "chunk_index", name="uq_document_chunks_document_index"),
+            UniqueConstraint(
+                "document_id", "chunk_index", name="uq_document_chunks_document_index"
+            ),
         )
         metadata.create_all(engine, checkfirst=True)
 
@@ -158,27 +168,29 @@ def test_materialize_implicit_edges_round_trip(db_session, project):
     db_session.add(collection)
     db_session.flush()
 
-    db_session.add_all([
-        InsightSource(
-            insight_id=insight.id,
-            chunk_id=chunk_a.id,
-            relevance_score=0.85,
-        ),
-        ReportSource(
-            report_id=report.id,
-            source_type="chunk",
-            source_id=chunk_b.id,
-        ),
-        ReportSource(
-            report_id=report.id,
-            source_type="collection",
-            source_id=collection.id,
-        ),
-        CollectionItem(
-            collection_id=collection.id,
-            chunk_id=chunk_a.id,
-        ),
-    ])
+    db_session.add_all(
+        [
+            InsightSource(
+                insight_id=insight.id,
+                chunk_id=chunk_a.id,
+                relevance_score=0.85,
+            ),
+            ReportSource(
+                report_id=report.id,
+                source_type="chunk",
+                source_id=chunk_b.id,
+            ),
+            ReportSource(
+                report_id=report.id,
+                source_type="collection",
+                source_id=collection.id,
+            ),
+            CollectionItem(
+                collection_id=collection.id,
+                chunk_id=chunk_a.id,
+            ),
+        ]
+    )
     db_session.commit()
 
     service = EdgeMaterializationService()
@@ -198,7 +210,9 @@ def test_materialize_implicit_edges_round_trip(db_session, project):
     insight_chunk_urn = str(URNGenerator.generate(EntityType.CHUNK, str(chunk_a.id)))
     report_urn = str(URNGenerator.generate(EntityType.REPORT, str(report.id)))
     report_chunk_urn = str(URNGenerator.generate(EntityType.CHUNK, str(chunk_b.id)))
-    collection_urn = str(URNGenerator.generate(EntityType.COLLECTION, str(collection.id)))
+    collection_urn = str(
+        URNGenerator.generate(EntityType.COLLECTION, str(collection.id))
+    )
     collection_chunk_urn = str(URNGenerator.generate(EntityType.CHUNK, str(chunk_a.id)))
 
     expected = {
@@ -274,7 +288,9 @@ def test_materialize_from_manifest_upsert_updates_existing_edge(db_session):
     db_session.add(existing)
     db_session.commit()
 
-    manifest = ProtocolManifest(urn=URN.create(EntityType.MISSION, f"M-UPSERT-{unique_suffix}"))
+    manifest = ProtocolManifest(
+        urn=URN.create(EntityType.MISSION, f"M-UPSERT-{unique_suffix}")
+    )
     manifest.add_edge(
         Edge(
             edge_type="belongs_to",

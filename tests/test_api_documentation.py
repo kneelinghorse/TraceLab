@@ -1,4 +1,5 @@
 """Validates the generated OpenAPI schema for documentation completeness."""
+
 from __future__ import annotations
 
 from app.main import app

@@ -9,26 +9,26 @@ Tests cover:
 
 Note: These are pure unit tests that don't require database access.
 """
+
 from __future__ import annotations
 
-import uuid
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 # Note: This file is listed in conftest.py skip_patterns to skip DB reset
 from app.services.pedr.relational import (
-    RelationType,
     EntityType,
-    RelatedEntity,
     GraphExpansionResult,
+    RelatedEntity,
     RelationalService,
+    RelationType,
 )
-
 
 # ==============================================================================
 # URN Parsing Tests
 # ==============================================================================
+
 
 class TestURNParsing:
     """Tests for URN parsing functionality."""
@@ -92,6 +92,7 @@ class TestURNParsing:
 # RelatedEntity Tests
 # ==============================================================================
 
+
 class TestRelatedEntity:
     """Tests for RelatedEntity data class."""
 
@@ -141,6 +142,7 @@ class TestRelatedEntity:
 # GraphExpansionResult Tests
 # ==============================================================================
 
+
 class TestGraphExpansionResult:
     """Tests for GraphExpansionResult data class."""
 
@@ -178,6 +180,7 @@ class TestGraphExpansionResult:
 # ==============================================================================
 # RelationalService Unit Tests
 # ==============================================================================
+
 
 class TestRelationalServiceFiltering:
     """Tests for filtering in RelationalService."""
@@ -372,12 +375,20 @@ class TestRelationalServiceLimits:
 # Enum Tests
 # ==============================================================================
 
+
 class TestRelationType:
     """Tests for RelationType enum."""
 
     def test_all_relation_types_exist(self):
         """All expected relation types are defined."""
-        expected = {"belongs_to", "contains", "references", "derived_from", "sibling_of", "related_to"}
+        expected = {
+            "belongs_to",
+            "contains",
+            "references",
+            "derived_from",
+            "sibling_of",
+            "related_to",
+        }
         actual = {r.value for r in RelationType}
         assert expected == actual
 
@@ -396,13 +407,14 @@ class TestEntityType:
 # Singleton Tests
 # ==============================================================================
 
+
 class TestSingleton:
     """Tests for singleton pattern."""
 
     def test_get_relational_service_singleton(self):
         """get_relational_service returns same instance."""
-        from app.services.pedr.relational import get_relational_service
         import app.services.pedr.relational as relational_module
+        from app.services.pedr.relational import get_relational_service
 
         # Reset singleton for test
         relational_module._relational_service = None
@@ -419,6 +431,7 @@ class TestSingleton:
 # ==============================================================================
 # Integration-style Tests (with mocked DB)
 # ==============================================================================
+
 
 class TestEnrichSearchResults:
     """Tests for search result enrichment."""
@@ -529,7 +542,9 @@ class TestSessionManagement:
         service = RelationalService()
         owned_session = MagicMock()
 
-        with patch("app.services.pedr.relational.SessionLocal", return_value=owned_session):
+        with patch(
+            "app.services.pedr.relational.SessionLocal", return_value=owned_session
+        ):
             with patch.object(service, "_get_neighbors", return_value=[]):
                 service.get_related("urn:research:chunk:test", max_depth=1)
 

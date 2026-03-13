@@ -3,6 +3,7 @@
 Tests the save_as_report parameter on the /api/v1/synthesize endpoint,
 which allows persisting synthesis results as reports in a single API call.
 """
+
 from __future__ import annotations
 
 import uuid
@@ -12,12 +13,11 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.models.document import Document
 from app.models.chunk import DocumentChunk
 from app.models.collection import Collection, CollectionItem
+from app.models.document import Document
 from app.models.project import Project
 from app.models.report import Report
-from app.core.database import SessionLocal
 
 
 def _create_test_project(db_session) -> Project:
@@ -29,7 +29,9 @@ def _create_test_project(db_session) -> Project:
     return project
 
 
-def _create_test_document(db_session, project_id: uuid.UUID, name: str = "Test Doc") -> Document:
+def _create_test_document(
+    db_session, project_id: uuid.UUID, name: str = "Test Doc"
+) -> Document:
     """Create a test document."""
     doc = Document(
         project_id=project_id,
@@ -44,7 +46,10 @@ def _create_test_document(db_session, project_id: uuid.UUID, name: str = "Test D
 
 
 def _create_test_chunk(
-    db_session, document_id: uuid.UUID, index: int = 0, content: str = "Test chunk content"
+    db_session,
+    document_id: uuid.UUID,
+    index: int = 0,
+    content: str = "Test chunk content",
 ) -> DocumentChunk:
     """Create a test document chunk."""
     from sqlalchemy import text
@@ -71,7 +76,9 @@ def _create_test_collection(db_session, name: str = "Test Collection") -> Collec
     return collection
 
 
-def _add_chunk_to_collection(db_session, collection_id: str, chunk_id: str) -> CollectionItem:
+def _add_chunk_to_collection(
+    db_session, collection_id: str, chunk_id: str
+) -> CollectionItem:
     """Add a chunk to a collection."""
     item = CollectionItem(
         collection_id=collection_id,
@@ -117,7 +124,9 @@ class TestSynthesizeToReportIntegration:
         # Create test data
         project = _create_test_project(db_session)
         document = _create_test_document(db_session, project.id)
-        chunk = _create_test_chunk(db_session, document.id, 0, "Test content for synthesis.")
+        chunk = _create_test_chunk(
+            db_session, document.id, 0, "Test content for synthesis."
+        )
         collection = _create_test_collection(db_session, "Normal Synthesis")
         _add_chunk_to_collection(db_session, str(collection.id), str(chunk.id))
 
@@ -311,7 +320,9 @@ class TestSynthesizeToReportValidation:
         assert response.status_code == 422
         assert "report_title" in response.text.lower()
 
-    def test_report_title_without_save_as_report_is_ignored(self, auth_headers, db_session):
+    def test_report_title_without_save_as_report_is_ignored(
+        self, auth_headers, db_session
+    ):
         """Test that report_title without save_as_report is allowed (no-op)."""
         # This should pass validation but not create a report
 
@@ -374,7 +385,7 @@ class TestSynthesizeSchemaExtensions:
 
     def test_response_schema_has_report_id_field(self):
         """Test SynthesizeResponse has report_id field."""
-        from app.schemas.synthesis import SynthesizeResponse, CitationInfo
+        from app.schemas.synthesis import SynthesizeResponse
 
         # With report_id
         response = SynthesizeResponse(
@@ -397,8 +408,9 @@ class TestSynthesizeSchemaExtensions:
 
     def test_report_title_max_length(self):
         """Test report_title respects max_length constraint."""
-        from app.schemas.synthesis import SynthesizeRequest
         from pydantic import ValidationError
+
+        from app.schemas.synthesis import SynthesizeRequest
 
         with pytest.raises(ValidationError):
             SynthesizeRequest(
@@ -412,7 +424,9 @@ class TestBackwardCompatibility:
     """Tests ensuring existing synthesis calls work unchanged."""
 
     @patch("app.services.synthesis.OpenAI")
-    def test_existing_calls_unchanged(self, mock_openai_class, auth_headers, db_session):
+    def test_existing_calls_unchanged(
+        self, mock_openai_class, auth_headers, db_session
+    ):
         """Test that existing API calls without new params work identically."""
         client = TestClient(app)
 
@@ -450,7 +464,9 @@ class TestBackwardCompatibility:
         assert data["report_id"] is None
 
     @patch("app.services.synthesis.OpenAI")
-    def test_no_reports_created_without_flag(self, mock_openai_class, auth_headers, db_session):
+    def test_no_reports_created_without_flag(
+        self, mock_openai_class, auth_headers, db_session
+    ):
         """Test that reports are NOT created unless explicitly requested."""
         client = TestClient(app)
 

@@ -14,13 +14,9 @@ Success Criteria:
 """
 
 import time
-from pathlib import Path
-from unittest.mock import MagicMock, patch
-
-import pytest
+from unittest.mock import MagicMock
 
 from app.core.config import settings
-
 
 # ============================================================================
 # SC-1: HNSW parameters benchmarked for 3072d vectors
@@ -79,7 +75,9 @@ class TestCollectionCreationParameters:
         service._create_collection(write_optimized=False)
 
         call_args = mock_client.create_collection.call_args
-        vectors_config = call_args.kwargs.get("vectors_config") or call_args[1].get("vectors_config")
+        vectors_config = call_args.kwargs.get("vectors_config") or call_args[1].get(
+            "vectors_config"
+        )
 
         # Verify HNSW config uses settings-driven m and ef_construct
         hnsw = vectors_config.hnsw_config
@@ -102,7 +100,9 @@ class TestCollectionCreationParameters:
         service._create_collection(write_optimized=True)
 
         call_args = mock_client.create_collection.call_args
-        vectors_config = call_args.kwargs.get("vectors_config") or call_args[1].get("vectors_config")
+        vectors_config = call_args.kwargs.get("vectors_config") or call_args[1].get(
+            "vectors_config"
+        )
 
         hnsw = vectors_config.hnsw_config
         assert hnsw.m == 16  # Lower m for write speed
@@ -124,7 +124,9 @@ class TestCollectionCreationParameters:
         service._create_collection(write_optimized=False)
 
         call_args = mock_client.create_collection.call_args
-        vectors_config = call_args.kwargs.get("vectors_config") or call_args[1].get("vectors_config")
+        vectors_config = call_args.kwargs.get("vectors_config") or call_args[1].get(
+            "vectors_config"
+        )
         assert vectors_config.size == 3072
 
 
@@ -186,7 +188,9 @@ class TestAdaptiveEfScaling:
         prev_ef = 0
         for k in [1, 3, 5, 8, 10, 15, 20, 30, 50]:
             ef = service.recommend_hnsw_ef(k)
-            assert ef >= prev_ef, f"ef should not decrease: top_k={k}, ef={ef} < prev={prev_ef}"
+            assert ef >= prev_ef, (
+                f"ef should not decrease: top_k={k}, ef={ef} < prev={prev_ef}"
+            )
             prev_ef = ef
 
 
@@ -260,6 +264,7 @@ class TestBenchmarkScriptCompatibility:
     def test_sweep_reports_correct_hnsw_config(self, tmp_path):
         """Benchmark output should report m=24, ef_construct=128."""
         import json
+
         import scripts.qdrant_parameter_sweep as sweep
 
         class _StubService:
@@ -285,7 +290,12 @@ class TestBenchmarkScriptCompatibility:
                         "full_scan_threshold": 20_000,
                         "on_disk": False,
                     },
-                    "quantization": {"enabled": True, "type": "INT8", "always_ram": True, "quantile": 0.99},
+                    "quantization": {
+                        "enabled": True,
+                        "type": "INT8",
+                        "always_ram": True,
+                        "quantile": 0.99,
+                    },
                     "optimizer": {"indexing_threshold": 20_000},
                     "vector_size": 3072,
                     "memory_estimate_bytes": 30_000_000,
@@ -338,7 +348,9 @@ class TestApplyHNSWSettings:
         )
 
         call_args = mock_client.update_collection.call_args
-        hnsw_config = call_args.kwargs.get("hnsw_config") or call_args[1].get("hnsw_config")
+        hnsw_config = call_args.kwargs.get("hnsw_config") or call_args[1].get(
+            "hnsw_config"
+        )
         assert hnsw_config.m == 24
         assert hnsw_config.ef_construct == 128
         assert hnsw_config.full_scan_threshold == 20_000
@@ -366,7 +378,9 @@ class TestApplyHNSWSettings:
         )
 
         call_args = mock_client.update_collection.call_args
-        quant = call_args.kwargs.get("quantization_config") or call_args[1].get("quantization_config")
+        quant = call_args.kwargs.get("quantization_config") or call_args[1].get(
+            "quantization_config"
+        )
         assert quant is not None
 
 

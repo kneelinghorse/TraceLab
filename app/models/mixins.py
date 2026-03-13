@@ -1,5 +1,7 @@
 """SQLAlchemy model mixins for reusable functionality."""
+
 from datetime import datetime
+
 from sqlalchemy import Column, DateTime, String
 
 

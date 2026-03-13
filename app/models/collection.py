@@ -1,10 +1,19 @@
 """Collection and CollectionItem models for grouping chunks."""
+
 from __future__ import annotations
 
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, Index, String, Text, UniqueConstraint
+from sqlalchemy import (
+    Column,
+    DateTime,
+    ForeignKey,
+    Index,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -20,7 +29,9 @@ class Collection(Base):
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = Column(
+        DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Relationships
     items = relationship(
@@ -42,8 +53,12 @@ class CollectionItem(Base):
     __tablename__ = "collection_items"
 
     id = Column(GUID(), primary_key=True, default=uuid.uuid4)
-    collection_id = Column(GUID(), ForeignKey("collections.id", ondelete="CASCADE"), nullable=False)
-    chunk_id = Column(GUID(), ForeignKey("document_chunks.id", ondelete="CASCADE"), nullable=False)
+    collection_id = Column(
+        GUID(), ForeignKey("collections.id", ondelete="CASCADE"), nullable=False
+    )
+    chunk_id = Column(
+        GUID(), ForeignKey("document_chunks.id", ondelete="CASCADE"), nullable=False
+    )
     notes = Column(Text, nullable=True)
     added_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
@@ -52,7 +67,9 @@ class CollectionItem(Base):
     chunk = relationship("DocumentChunk", lazy="joined")
 
     __table_args__ = (
-        UniqueConstraint("collection_id", "chunk_id", name="uq_collection_item_collection_chunk"),
+        UniqueConstraint(
+            "collection_id", "chunk_id", name="uq_collection_item_collection_chunk"
+        ),
         Index("ix_collection_items_collection_id", "collection_id"),
         Index("ix_collection_items_chunk_id", "chunk_id"),
         {"extend_existing": True},

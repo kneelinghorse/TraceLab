@@ -17,7 +17,9 @@ def _find_cmos_root() -> Path:
     """Find cmos/ directory from any working directory."""
     script_dir = Path(__file__).resolve().parent
     candidate = script_dir.parent
-    if (candidate / "db" / "schema.sql").exists() and (candidate / "agents.md").exists():
+    if (candidate / "db" / "schema.sql").exists() and (
+        candidate / "agents.md"
+    ).exists():
         return candidate
     if (Path.cwd() / "cmos" / "db" / "schema.sql").exists():
         return Path.cwd() / "cmos"
@@ -179,7 +181,11 @@ def _load_sessions_from_db(db_path: Path) -> List[Dict[str, Any]]:
         payload.setdefault("summary", row["summary"])
         if row["next_hint"]:
             payload.setdefault("next_hint", row["next_hint"])
-        payload.setdefault("__raw__", raw_event or json.dumps({k: payload.get(k) for k in payload if k != "__raw__"}))
+        payload.setdefault(
+            "__raw__",
+            raw_event
+            or json.dumps({k: payload.get(k) for k in payload if k != "__raw__"}),
+        )
         events.append(payload)
     return events
 
@@ -200,13 +206,19 @@ def _load_sessions(path: Path) -> List[Dict[str, Any]]:
                     parsed = _parse_loose_mapping(stripped)
                 except ValueError:
                     if yaml is None:
-                        raise ValueError(f"Invalid JSONL entry in {path}: {stripped}") from exc
+                        raise ValueError(
+                            f"Invalid JSONL entry in {path}: {stripped}"
+                        ) from exc
                     try:
                         loaded = yaml.safe_load(stripped)
                     except yaml.YAMLError as yaml_exc:  # type: ignore[attr-defined]
-                        raise ValueError(f"Invalid JSONL entry in {path}: {stripped}") from yaml_exc
+                        raise ValueError(
+                            f"Invalid JSONL entry in {path}: {stripped}"
+                        ) from yaml_exc
                     if not isinstance(loaded, dict):
-                        raise ValueError(f"Unsupported session entry in {path}: {stripped}")
+                        raise ValueError(
+                            f"Unsupported session entry in {path}: {stripped}"
+                        )
                     parsed = loaded
             parsed["__raw__"] = stripped
             entries.append(parsed)
@@ -215,7 +227,10 @@ def _load_sessions(path: Path) -> List[Dict[str, Any]]:
 
 def _write_sessions(path: Path, entries: Iterable[Dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    lines = [json.dumps({k: v for k, v in item.items() if k != "__raw__"}) for item in entries]
+    lines = [
+        json.dumps({k: v for k, v in item.items() if k != "__raw__"})
+        for item in entries
+    ]
     path.write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
 
 
@@ -230,7 +245,7 @@ def _parse_loose_mapping(payload: str) -> Dict[str, Any]:
     in_quotes = False
     prev_char = ""
     for index, char in enumerate(body):
-        if char == "\"" and prev_char != "\\":
+        if char == '"' and prev_char != "\\":
             in_quotes = not in_quotes
         if in_quotes:
             prev_char = char
@@ -252,9 +267,11 @@ def _parse_loose_mapping(payload: str) -> Dict[str, Any]:
         if ":" not in segment:
             raise ValueError("Loose mapping entry missing colon")
         key, raw_value = segment.split(":", 1)
-        key = key.strip().strip('"\'')
+        key = key.strip().strip("\"'")
         value = raw_value.strip()
-        if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
+        if (value.startswith('"') and value.endswith('"')) or (
+            value.startswith("'") and value.endswith("'")
+        ):
             value = value[1:-1]
         result[key] = value
     return result
@@ -278,7 +295,9 @@ def _parse_timestamp(value: Any) -> datetime:
     return datetime.min.replace(tzinfo=timezone.utc)
 
 
-def _merge_sessions(old_entries: List[Dict[str, Any]], new_entries: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def _merge_sessions(
+    old_entries: List[Dict[str, Any]], new_entries: List[Dict[str, Any]]
+) -> List[Dict[str, Any]]:
     combined: Dict[Tuple[Any, Any, Any, Any], Tuple[Dict[str, Any], int]] = {}
     order = 0
     for source_entries in (new_entries, old_entries):
@@ -371,7 +390,11 @@ def _merge_master_context(old: Dict[str, Any], new: Dict[str, Any]) -> Dict[str,
     def deep_merge(target: Dict[str, Any], incoming: Dict[str, Any]) -> None:
         for key, value in incoming.items():
             if isinstance(value, dict):
-                node = target.setdefault(key, {}) if isinstance(target.get(key), dict) else {}
+                node = (
+                    target.setdefault(key, {})
+                    if isinstance(target.get(key), dict)
+                    else {}
+                )
                 target[key] = node or target.get(key, {})
                 deep_merge(target[key], value)
             elif isinstance(value, list):
@@ -419,7 +442,7 @@ def _sync_database(
     sessions: Iterable[Dict[str, Any]],
     *,
     project_source: Path,
-    master_source: Path
+    master_source: Path,
 ) -> None:
     db_path.parent.mkdir(parents=True, exist_ok=True)
     client = SQLiteClient(db_path, schema_path=schema_path)
@@ -458,7 +481,9 @@ def _sync_database(
                         "summary": event.get("summary"),
                         "next_hint": event.get("next_hint"),
                         "raw_event": event.get("__raw__")
-                        or json.dumps({k: v for k, v in event.items() if k != "__raw__"})
+                        or json.dumps(
+                            {k: v for k, v in event.items() if k != "__raw__"}
+                        ),
                     }
                     for event in sessions
                 ),
@@ -475,8 +500,12 @@ def main() -> int:
     sessions_src = _resolve_file(
         source, ["SESSIONS.jsonl", "sessions.jsonl", "session.jsonl"], "sessions JSONL"
     )
-    project_src = _resolve_file(source, ["PROJECT_CONTEXT.json"], "PROJECT_CONTEXT.json")
-    master_src = _resolve_file(source / "context", ["MASTER_CONTEXT.json"], "MASTER_CONTEXT.json")
+    project_src = _resolve_file(
+        source, ["PROJECT_CONTEXT.json"], "PROJECT_CONTEXT.json"
+    )
+    master_src = _resolve_file(
+        source / "context", ["MASTER_CONTEXT.json"], "MASTER_CONTEXT.json"
+    )
 
     sessions_dst = target / "SESSIONS.jsonl"
     project_dst = target / "PROJECT_CONTEXT.json"
@@ -528,7 +557,9 @@ def main() -> int:
         print("Flat-file mirror updates skipped (--skip-files).")
 
     if args.sync_db:
-        db_path = args.db_path.resolve() if args.db_path else target / "db" / "cmos.sqlite"
+        db_path = (
+            args.db_path.resolve() if args.db_path else target / "db" / "cmos.sqlite"
+        )
         schema_path = target / "db" / "schema.sql"
         _sync_database(
             db_path,

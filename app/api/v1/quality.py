@@ -1,4 +1,5 @@
 """Quality gate status endpoints."""
+
 from __future__ import annotations
 
 from uuid import UUID
@@ -7,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.models.mission_protocol import MissionProtocolDraft
 from app.schemas.quality_gates import QualityGateReportResponse, QualityGateStatus
 from app.services.cache_manager import get_cache_manager
 from app.services.mission_protocol_service import (
@@ -15,8 +17,6 @@ from app.services.mission_protocol_service import (
     MissionProtocolServiceError,
 )
 from app.services.quality_gate_service import QualityGateService
-from app.models.mission_protocol import MissionProtocolDraft
-
 
 router = APIRouter()
 _mission_service = MissionProtocolService()
@@ -25,12 +25,18 @@ _cache_manager = get_cache_manager()
 
 
 def _http_error(exc: MissionProtocolServiceError) -> HTTPException:
-    status_code = status.HTTP_404_NOT_FOUND if isinstance(exc, MissionNotFoundError) else status.HTTP_400_BAD_REQUEST
+    status_code = (
+        status.HTTP_404_NOT_FOUND
+        if isinstance(exc, MissionNotFoundError)
+        else status.HTTP_400_BAD_REQUEST
+    )
     return HTTPException(status_code=status_code, detail=str(exc))
 
 
 @router.get("/missions/{mission_id}/quality", response_model=QualityGateReportResponse)
-def mission_quality_status(mission_id: UUID, db: Session = Depends(get_db)) -> QualityGateReportResponse:
+def mission_quality_status(
+    mission_id: UUID, db: Session = Depends(get_db)
+) -> QualityGateReportResponse:
     cache_key = _cache_manager.quality_gate_key(str(mission_id))
 
     def _loader() -> QualityGateReportResponse:
@@ -39,10 +45,18 @@ def mission_quality_status(mission_id: UUID, db: Session = Depends(get_db)) -> Q
         except MissionProtocolServiceError as exc:  # pragma: no cover - thin wrapper
             raise _http_error(exc) from exc
 
-        protocol_data = mission.context if isinstance(mission.context, dict) and "mission_id" in mission.context else {}
-        payload = MissionProtocolDraft.model_validate(protocol_data) if protocol_data else MissionProtocolDraft(
-            mission_id=mission.mission_id or "unknown",
-            title=mission.title,
+        protocol_data = (
+            mission.context
+            if isinstance(mission.context, dict) and "mission_id" in mission.context
+            else {}
+        )
+        payload = (
+            MissionProtocolDraft.model_validate(protocol_data)
+            if protocol_data
+            else MissionProtocolDraft(
+                mission_id=mission.mission_id or "unknown",
+                title=mission.title,
+            )
         )
         report = _quality_service.evaluate(payload, db=db, mission_uuid=mission.id)
         gates = {

@@ -18,20 +18,24 @@ Includes query result caching for latency optimization (B19.2):
 
 Reference: PEDR Protocol Architecture Guide
 """
+
 from __future__ import annotations
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import logging
 import os
 import time
+from collections.abc import Callable, Sequence
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
-from uuid import UUID
+from typing import Any
 
 from app.core.config import settings
+from app.services.pedr.cache import (
+    get_pedr_cache,
+)
 from app.services.pedr.fusion import (
     LayerResult,
     RRFFusion,
@@ -44,7 +48,6 @@ from app.services.pedr.graph_layer import (
 from app.services.pedr.pragmatic import (
     PragmaticFilters,
     PragmaticService,
-    QueryIntent,
     get_pragmatic_service,
 )
 from app.services.pedr.quality_scoring import (
@@ -62,24 +65,9 @@ from app.services.pedr.semantic_protocol import (
     get_semantic_protocol,
 )
 from app.services.pedr.syntactic import (
-    ElementType,
     SyntacticFilters,
     SyntacticService,
     get_syntactic_service,
-)
-from app.services.pedr.cache import (
-    CacheStats,
-    get_pedr_cache,
-)
-from app.services.pedr.exceptions import (
-    PEDRError,
-    LexicalSearchError,
-    SemanticSearchError,
-    GraphLayerError,
-    SyntacticLayerError,
-    PragmaticLayerError,
-    GovernanceLayerError,
-    FusionError,
 )
 
 logger = logging.getLogger(__name__)
@@ -95,10 +83,10 @@ BASE_LAYER_WEIGHTS = {
     "governance": 0.15,
 }
 
-DEFAULT_GRAPH_WEIGHT = 0.12
+DEFAULT_GRAPH_WEIGHT = 0.08
 
 
-def _build_default_layer_weights(graph_weight: float) -> Dict[str, float]:
+def _build_default_layer_weights(graph_weight: float) -> dict[str, float]:
     scale = max(0.0, 1.0 - graph_weight)
     weights = {layer: weight * scale for layer, weight in BASE_LAYER_WEIGHTS.items()}
     weights["graph"] = graph_weight
@@ -114,7 +102,9 @@ class PEDRConfig:
     """Configuration for PEDR search orchestration."""
 
     # Layer weights for RRF fusion
-    layer_weights: Dict[str, float] = field(default_factory=lambda: dict(DEFAULT_LAYER_WEIGHTS))
+    layer_weights: dict[str, float] = field(
+        default_factory=lambda: dict(DEFAULT_LAYER_WEIGHTS)
+    )
 
     # RRF constant (k parameter)
     rrf_k: int = 60
@@ -125,7 +115,7 @@ class PEDRConfig:
     enable_syntactic: bool = True
     enable_pragmatic: bool = True
     enable_governance: bool = True
-    enable_graph: bool = True
+    enable_graph: bool = False
 
     # Search parameters
     top_k_per_layer: int = 20  # Fetch more per layer, fuse down to top_k
@@ -134,26 +124,26 @@ class PEDRConfig:
     )
 
     # Quality filters
-    min_quality_gates: Optional[int] = None
-    status_filters: Optional[Tuple[str, ...]] = None
+    min_quality_gates: int | None = None
+    status_filters: tuple[str, ...] | None = None
     allow_pii: bool = True
     governance_mode: str = "strict"
 
     # Syntactic layer
     auto_detect_type: bool = True
     type_boost_enabled: bool = True
-    element_type: Optional[str] = None
-    element_types: Optional[Tuple[str, ...]] = None
+    element_type: str | None = None
+    element_types: tuple[str, ...] | None = None
 
     # Pragmatic layer
     intent_boost_enabled: bool = True
 
-    # Graph layer — tuned via T36.2 quality proof (sprint25 config validated)
+    # Graph layer
     graph_weight: float = DEFAULT_GRAPH_WEIGHT
-    graph_depth: int = 2
+    graph_depth: int = 1
     graph_decay: float = 0.7
-    graph_edge_types: Optional[Tuple[str, ...]] = None
-    graph_top_k_seeds: int = 10
+    graph_edge_types: tuple[str, ...] | None = None
+    graph_top_k_seeds: int = 5
 
 
 @dataclass
@@ -172,49 +162,23 @@ class LayerTimings:
 
 
 @dataclass
-class LayerDiagnostic:
-    """Diagnostic information for a single PEDR layer execution."""
-
-    layer: str
-    status: str  # "ok", "error", "skipped", "disabled"
-    duration_ms: float = 0.0
-    result_count: int = 0
-    error: Optional[str] = None
-    error_type: Optional[str] = None
-
-    def to_dict(self) -> Dict[str, Any]:
-        d: Dict[str, Any] = {
-            "layer": self.layer,
-            "status": self.status,
-            "duration_ms": round(self.duration_ms, 2),
-            "result_count": self.result_count,
-        }
-        if self.error is not None:
-            d["error"] = self.error
-            d["error_type"] = self.error_type
-        return d
-
-
-@dataclass
 class PEDRMetadata:
     """Metadata about PEDR search execution."""
 
     query: str
     intent: str
     intent_confidence: float
-    detected_type: Optional[str]
+    detected_type: str | None
     type_confidence: float
-    layers_used: List[str]
-    layer_weights: Dict[str, float]
+    layers_used: list[str]
+    layer_weights: dict[str, float]
     timings: LayerTimings
     total_candidates: int
     result_count: int
-    layer_diagnostics: List[LayerDiagnostic] = field(default_factory=list)
-    degraded: bool = False
     graph_enabled: bool = False
-    graph_candidates_expanded: Optional[int] = None
+    graph_candidates_expanded: int | None = None
     cache_hit: bool = False
-    cache_stats: Optional[Dict[str, Any]] = None
+    cache_stats: dict[str, Any] | None = None
 
 
 @dataclass
@@ -224,42 +188,42 @@ class PEDRSearchResult:
     # Core identification
     chunk_id: str
     content: str
-    document_id: Optional[str] = None
-    project_id: Optional[str] = None
+    document_id: str | None = None
+    project_id: str | None = None
 
     # Scores
     rrf_score: float = 0.0
     rrf_rank: int = 0
-    layer_ranks: Dict[str, int] = field(default_factory=dict)
-    layer_scores: Dict[str, float] = field(default_factory=dict)
+    layer_ranks: dict[str, int] = field(default_factory=dict)
+    layer_scores: dict[str, float] = field(default_factory=dict)
 
     # Semantic Protocol metadata
-    urn: Optional[str] = None
+    urn: str | None = None
     confidence: float = 0.5
     criticality: float = 0.5
 
     # Layer annotations
-    element_type: Optional[str] = None
-    query_intent: Optional[str] = None
+    element_type: str | None = None
+    query_intent: str | None = None
     quality_score: float = 1.0
-    quality_status: Optional[str] = None
+    quality_status: str | None = None
     quality_gates_passed: int = 0
 
     # Contributing layers
-    contributing_layers: List[str] = field(default_factory=list)
+    contributing_layers: list[str] = field(default_factory=list)
 
     # Original chunk metadata
-    chunk_index: Optional[int] = None
-    source_type: Optional[str] = None
-    source_origin: Optional[str] = None
+    chunk_index: int | None = None
+    source_type: str | None = None
+    source_origin: str | None = None
 
     # Embedding vector (populated when include_embeddings=True)
-    embedding: Optional[List[float]] = None
+    embedding: list[float] | None = None
 
     # Graph expansion (populated by API layer when include_related=True)
-    related_entities: Optional[List[Dict[str, Any]]] = None
+    related_entities: list[dict[str, Any]] | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for API response."""
         result = {
             "chunk_id": self.chunk_id,
@@ -296,10 +260,10 @@ class PEDRSearchResult:
 class PEDRSearchResponse:
     """Response from PEDR unified search."""
 
-    results: List[PEDRSearchResult]
+    results: list[PEDRSearchResult]
     metadata: PEDRMetadata
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for API response."""
         metadata_dict = {
             "query": self.metadata.query,
@@ -320,8 +284,6 @@ class PEDRSearchResponse:
                 "relational_ms": self.metadata.timings.relational_ms,
                 "total_ms": self.metadata.timings.total_ms,
             },
-            "layer_diagnostics": [d.to_dict() for d in self.metadata.layer_diagnostics],
-            "degraded": self.metadata.degraded,
             "graph_enabled": self.metadata.graph_enabled,
             "graph_candidates_expanded": self.metadata.graph_candidates_expanded,
             "total_candidates": self.metadata.total_candidates,
@@ -353,18 +315,18 @@ class PEDRSearchOrchestrator:
     def __init__(
         self,
         *,
-        config: Optional[PEDRConfig] = None,
-        syntactic_service: Optional[SyntacticService] = None,
-        pragmatic_service: Optional[PragmaticService] = None,
-        quality_service: Optional[QualityScoringService] = None,
-        semantic_protocol: Optional[SemanticProtocol] = None,
-        rrf_fusion: Optional[RRFFusion] = None,
-        graph_service: Optional[GraphLayerService] = None,
+        config: PEDRConfig | None = None,
+        syntactic_service: SyntacticService | None = None,
+        pragmatic_service: PragmaticService | None = None,
+        quality_service: QualityScoringService | None = None,
+        semantic_protocol: SemanticProtocol | None = None,
+        rrf_fusion: RRFFusion | None = None,
+        graph_service: GraphLayerService | None = None,
         # External search providers (injected)
-        lexical_search: Optional[Callable[..., List[Dict[str, Any]]]] = None,
-        semantic_search: Optional[Callable[..., List[Dict[str, Any]]]] = None,
-        telemetry_enabled: Optional[bool] = None,
-        telemetry_path: Optional[Path | str] = None,
+        lexical_search: Callable[..., list[dict[str, Any]]] | None = None,
+        semantic_search: Callable[..., list[dict[str, Any]]] | None = None,
+        telemetry_enabled: bool | None = None,
+        telemetry_path: Path | str | None = None,
     ) -> None:
         """Initialize the PEDR search orchestrator.
 
@@ -392,7 +354,9 @@ class PEDRSearchOrchestrator:
             if telemetry_enabled is not None
             else _telemetry_enabled_from_env()
         )
-        self.telemetry_path = Path(telemetry_path) if telemetry_path else GRAPH_TELEMETRY_PATH
+        self.telemetry_path = (
+            Path(telemetry_path) if telemetry_path else GRAPH_TELEMETRY_PATH
+        )
 
         # External search providers - will be set by factory or injection
         self._lexical_search = lexical_search
@@ -403,40 +367,40 @@ class PEDRSearchOrchestrator:
         *,
         query: str,
         top_k: int = 10,
-        project_id: Optional[str] = None,
-        document_id: Optional[str] = None,
-        source_type: Optional[str] = None,
-        source_origin: Optional[str] = None,
-        document_types: Optional[List[str]] = None,
-        source_types: Optional[List[str]] = None,
-        date_from: Optional[date] = None,
-        date_to: Optional[date] = None,
-        tags: Optional[List[str]] = None,
-        hnsw_ef: Optional[int] = None,
+        project_id: str | None = None,
+        document_id: str | None = None,
+        source_type: str | None = None,
+        source_origin: str | None = None,
+        document_types: list[str] | None = None,
+        source_types: list[str] | None = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
+        tags: list[str] | None = None,
+        hnsw_ef: int | None = None,
         include_embeddings: bool = False,
         # PEDR-specific parameters
-        element_type: Optional[str] = None,
-        element_types: Optional[List[str]] = None,
-        auto_detect_type: Optional[bool] = None,
-        type_boost_enabled: Optional[bool] = None,
-        intent_boost_enabled: Optional[bool] = None,
-        min_quality_gates: Optional[int] = None,
-        status_filters: Optional[List[str]] = None,
-        allow_pii: Optional[bool] = None,
-        governance_mode: Optional[str] = None,
+        element_type: str | None = None,
+        element_types: list[str] | None = None,
+        auto_detect_type: bool | None = None,
+        type_boost_enabled: bool | None = None,
+        intent_boost_enabled: bool | None = None,
+        min_quality_gates: int | None = None,
+        status_filters: list[str] | None = None,
+        allow_pii: bool | None = None,
+        governance_mode: str | None = None,
         # Layer control
-        enable_lexical: Optional[bool] = None,
-        enable_semantic: Optional[bool] = None,
-        enable_syntactic: Optional[bool] = None,
-        enable_pragmatic: Optional[bool] = None,
-        enable_governance: Optional[bool] = None,
-        enable_graph: Optional[bool] = None,
-        layer_weights: Optional[Dict[str, float]] = None,
-        graph_weight: Optional[float] = None,
-        graph_depth: Optional[int] = None,
-        graph_decay: Optional[float] = None,
-        graph_edge_types: Optional[List[str]] = None,
-        graph_top_k_seeds: Optional[int] = None,
+        enable_lexical: bool | None = None,
+        enable_semantic: bool | None = None,
+        enable_syntactic: bool | None = None,
+        enable_pragmatic: bool | None = None,
+        enable_governance: bool | None = None,
+        enable_graph: bool | None = None,
+        layer_weights: dict[str, float] | None = None,
+        graph_weight: float | None = None,
+        graph_depth: int | None = None,
+        graph_decay: float | None = None,
+        graph_edge_types: list[str] | None = None,
+        graph_top_k_seeds: int | None = None,
     ) -> PEDRSearchResponse:
         """Execute PEDR unified search across all layers.
 
@@ -566,54 +530,21 @@ class PEDRSearchOrchestrator:
                 )
 
         # Cache miss - execute full search pipeline
-        diagnostics: List[LayerDiagnostic] = []
 
         # Phase 1: Pre-analysis (syntactic and pragmatic)
         t0 = time.perf_counter()
-        if config.enable_syntactic:
-            try:
-                syntactic_filters = self._analyze_syntactic(query, config)
-                timings.syntactic_ms = (time.perf_counter() - t0) * 1000
-            except Exception as exc:
-                timings.syntactic_ms = (time.perf_counter() - t0) * 1000
-                logger.warning(
-                    "Syntactic analysis failed: layer=syntactic query=%r error_type=%s error=%s",
-                    query[:80], type(exc).__name__, exc,
-                )
-                syntactic_filters = self.syntactic_service.create_filters(query=query, auto_detect=False)
-                diagnostics.append(LayerDiagnostic(
-                    layer="syntactic", status="error", duration_ms=timings.syntactic_ms,
-                    error=str(exc), error_type=type(exc).__name__,
-                ))
-        else:
-            syntactic_filters = self.syntactic_service.create_filters(query=query, auto_detect=False)
-            diagnostics.append(LayerDiagnostic(layer="syntactic", status="disabled"))
+        syntactic_filters = self._analyze_syntactic(query, config)
+        timings.syntactic_ms = (time.perf_counter() - t0) * 1000
 
         t0 = time.perf_counter()
-        if config.enable_pragmatic:
-            try:
-                pragmatic_filters = self._analyze_pragmatic(query, config)
-                timings.pragmatic_ms = (time.perf_counter() - t0) * 1000
-            except Exception as exc:
-                timings.pragmatic_ms = (time.perf_counter() - t0) * 1000
-                logger.warning(
-                    "Pragmatic analysis failed: layer=pragmatic query=%r error_type=%s error=%s",
-                    query[:80], type(exc).__name__, exc,
-                )
-                pragmatic_filters = self.pragmatic_service.create_filters(query=query, intent_boost_enabled=False)
-                diagnostics.append(LayerDiagnostic(
-                    layer="pragmatic", status="error", duration_ms=timings.pragmatic_ms,
-                    error=str(exc), error_type=type(exc).__name__,
-                ))
-        else:
-            pragmatic_filters = self.pragmatic_service.create_filters(query=query, intent_boost_enabled=False)
-            diagnostics.append(LayerDiagnostic(layer="pragmatic", status="disabled"))
+        pragmatic_filters = self._analyze_pragmatic(query, config)
+        timings.pragmatic_ms = (time.perf_counter() - t0) * 1000
 
         # Phase 2: Execute retrieval layers
-        layer_results: List[LayerResult] = []
-        lexical_results: List[Dict[str, Any]] = []
-        semantic_results: List[Dict[str, Any]] = []
-        graph_candidates_expanded: Optional[int] = None
+        layer_results: list[LayerResult] = []
+        lexical_results: list[dict[str, Any]] = []
+        semantic_results: list[dict[str, Any]] = []
+        graph_candidates_expanded: int | None = None
         fetch_multiplier = max(1, config.result_multiplier)
         fetch_count = max(top_k, config.top_k_per_layer) * fetch_multiplier
 
@@ -634,30 +565,29 @@ class PEDRSearchOrchestrator:
         }
 
         def _run_retrieval(
-            search_fn: Callable[..., List[Dict[str, Any]]],
-        ) -> Tuple[List[Dict[str, Any]], float, Optional[Exception]]:
+            search_fn: Callable[..., list[dict[str, Any]]],
+        ) -> tuple[list[dict[str, Any]], float, Exception | None]:
             t0 = time.perf_counter()
             try:
-                return search_fn(**search_params), (time.perf_counter() - t0) * 1000, None
-            except Exception as exc:
+                return (
+                    search_fn(**search_params),
+                    (time.perf_counter() - t0) * 1000,
+                    None,
+                )
+            except (
+                Exception
+            ) as exc:  # pragma: no cover - exercised via caller assertions
                 return [], (time.perf_counter() - t0) * 1000, exc
 
-        retrieval_jobs: List[Tuple[str, Callable[..., List[Dict[str, Any]]]]] = []
+        retrieval_jobs: list[tuple[str, Callable[..., list[dict[str, Any]]]]] = []
         if config.enable_lexical and self._lexical_search:
             retrieval_jobs.append(("lexical", self._lexical_search))
-        elif not config.enable_lexical:
-            diagnostics.append(LayerDiagnostic(layer="lexical", status="disabled"))
-        else:
-            diagnostics.append(LayerDiagnostic(layer="lexical", status="skipped"))
-
         if config.enable_semantic and self._semantic_search:
             retrieval_jobs.append(("semantic", self._semantic_search))
-        elif not config.enable_semantic:
-            diagnostics.append(LayerDiagnostic(layer="semantic", status="disabled"))
-        else:
-            diagnostics.append(LayerDiagnostic(layer="semantic", status="skipped"))
 
-        retrieval_outputs: Dict[str, Tuple[List[Dict[str, Any]], float, Optional[Exception]]] = {}
+        retrieval_outputs: dict[
+            str, tuple[list[dict[str, Any]], float, Exception | None]
+        ] = {}
         if len(retrieval_jobs) == 1:
             layer_name, search_fn = retrieval_jobs[0]
             retrieval_outputs[layer_name] = _run_retrieval(search_fn)
@@ -675,61 +605,37 @@ class PEDRSearchOrchestrator:
         if lexical_payload is not None:
             lexical_results, timings.lexical_ms, lexical_error = lexical_payload
             if lexical_error is not None:
-                logger.warning(
-                    "Lexical search failed: layer=lexical query=%r error_type=%s error=%s",
-                    query[:80], type(lexical_error).__name__, lexical_error,
-                )
-                diagnostics.append(LayerDiagnostic(
-                    layer="lexical", status="error", duration_ms=timings.lexical_ms,
-                    error=str(lexical_error), error_type=type(lexical_error).__name__,
-                ))
-            else:
-                diagnostics.append(LayerDiagnostic(
-                    layer="lexical", status="ok", duration_ms=timings.lexical_ms,
-                    result_count=len(lexical_results),
-                ))
-                if lexical_results:
-                    layer_results.append(
-                        LayerResult(
-                            layer_name="lexical",
-                            results=lexical_results,
-                            weight=effective_layer_weights.get(
-                                "lexical",
-                                BASE_LAYER_WEIGHTS["lexical"],
-                            ),
-                            latency_ms=timings.lexical_ms,
-                        )
+                logger.warning("Lexical search failed: %s", lexical_error)
+            elif lexical_results:
+                layer_results.append(
+                    LayerResult(
+                        layer_name="lexical",
+                        results=lexical_results,
+                        weight=effective_layer_weights.get(
+                            "lexical",
+                            BASE_LAYER_WEIGHTS["lexical"],
+                        ),
+                        latency_ms=timings.lexical_ms,
                     )
+                )
 
         semantic_payload = retrieval_outputs.get("semantic")
         if semantic_payload is not None:
             semantic_results, timings.semantic_ms, semantic_error = semantic_payload
             if semantic_error is not None:
-                logger.warning(
-                    "Semantic search failed: layer=semantic query=%r error_type=%s error=%s",
-                    query[:80], type(semantic_error).__name__, semantic_error,
-                )
-                diagnostics.append(LayerDiagnostic(
-                    layer="semantic", status="error", duration_ms=timings.semantic_ms,
-                    error=str(semantic_error), error_type=type(semantic_error).__name__,
-                ))
-            else:
-                diagnostics.append(LayerDiagnostic(
-                    layer="semantic", status="ok", duration_ms=timings.semantic_ms,
-                    result_count=len(semantic_results),
-                ))
-                if semantic_results:
-                    layer_results.append(
-                        LayerResult(
-                            layer_name="semantic",
-                            results=semantic_results,
-                            weight=effective_layer_weights.get(
-                                "semantic",
-                                BASE_LAYER_WEIGHTS["semantic"],
-                            ),
-                            latency_ms=timings.semantic_ms,
-                        )
+                logger.warning("Semantic search failed: %s", semantic_error)
+            elif semantic_results:
+                layer_results.append(
+                    LayerResult(
+                        layer_name="semantic",
+                        results=semantic_results,
+                        weight=effective_layer_weights.get(
+                            "semantic",
+                            BASE_LAYER_WEIGHTS["semantic"],
+                        ),
+                        latency_ms=timings.semantic_ms,
                     )
+                )
 
         # Graph layer (between retrieval and fusion)
         if config.enable_graph and self.graph_service:
@@ -758,23 +664,10 @@ class PEDRSearchOrchestrator:
                     (graph_layer.metadata or {}).get("total_candidates") or 0
                 )
                 _log_graph_layer_metrics(graph_layer)
-                diagnostics.append(LayerDiagnostic(
-                    layer="graph", status="ok", duration_ms=timings.graph_ms,
-                    result_count=graph_candidates_expanded,
-                ))
             except Exception as e:
+                logger.warning("Graph search failed: %s", e)
                 timings.graph_ms = (time.perf_counter() - t0) * 1000
                 graph_candidates_expanded = 0
-                logger.warning(
-                    "Graph search failed: layer=graph query=%r error_type=%s error=%s",
-                    query[:80], type(e).__name__, e,
-                )
-                diagnostics.append(LayerDiagnostic(
-                    layer="graph", status="error", duration_ms=timings.graph_ms,
-                    error=str(e), error_type=type(e).__name__,
-                ))
-        elif not config.enable_graph:
-            diagnostics.append(LayerDiagnostic(layer="graph", status="disabled"))
 
         # Phase 3: Fuse results with RRF
         t0 = time.perf_counter()
@@ -803,59 +696,17 @@ class PEDRSearchOrchestrator:
 
         # Syntactic boost
         if config.enable_syntactic and processed:
-            # Diagnostic already recorded in Phase 1 if error occurred;
-            # only add "ok" if not already in diagnostics for syntactic
-            if not any(d.layer == "syntactic" for d in diagnostics):
-                t0_syn = time.perf_counter()
-                try:
-                    processed = self.syntactic_service.apply(
-                        processed,
-                        filters=syntactic_filters,
-                        filter_mode=False,
-                    )
-                    diagnostics.append(LayerDiagnostic(
-                        layer="syntactic", status="ok",
-                        duration_ms=timings.syntactic_ms,
-                        result_count=len(processed),
-                    ))
-                except Exception as exc:
-                    logger.warning(
-                        "Syntactic boost failed: layer=syntactic query=%r error_type=%s error=%s",
-                        query[:80], type(exc).__name__, exc,
-                    )
-                    diagnostics.append(LayerDiagnostic(
-                        layer="syntactic", status="error",
-                        duration_ms=(time.perf_counter() - t0_syn) * 1000,
-                        error=str(exc), error_type=type(exc).__name__,
-                    ))
-            else:
-                # Syntactic analysis failed earlier; skip boost but keep results
-                processed = self.syntactic_service.apply(
-                    processed,
-                    filters=syntactic_filters,
-                    filter_mode=False,
-                ) if not any(d.layer == "syntactic" and d.status == "error" for d in diagnostics) else processed
+            processed = self.syntactic_service.apply(
+                processed,
+                filters=syntactic_filters,
+                filter_mode=False,
+            )
 
         # Pragmatic boost
         if config.enable_pragmatic and processed:
-            if not any(d.layer == "pragmatic" for d in diagnostics):
-                try:
-                    processed = self.pragmatic_service.apply(processed, filters=pragmatic_filters)
-                    diagnostics.append(LayerDiagnostic(
-                        layer="pragmatic", status="ok",
-                        duration_ms=timings.pragmatic_ms,
-                        result_count=len(processed),
-                    ))
-                except Exception as exc:
-                    logger.warning(
-                        "Pragmatic boost failed: layer=pragmatic query=%r error_type=%s error=%s",
-                        query[:80], type(exc).__name__, exc,
-                    )
-                    diagnostics.append(LayerDiagnostic(
-                        layer="pragmatic", status="error",
-                        duration_ms=timings.pragmatic_ms,
-                        error=str(exc), error_type=type(exc).__name__,
-                    ))
+            processed = self.pragmatic_service.apply(
+                processed, filters=pragmatic_filters
+            )
 
         # Governance scoring
         if config.enable_governance and processed:
@@ -866,27 +717,8 @@ class PEDRSearchOrchestrator:
                 allow_pii=config.allow_pii,
                 governance_mode=config.governance_mode,
             )
-            try:
-                processed = self.quality_service.apply(processed, filters=quality_filters)
-                timings.governance_ms = (time.perf_counter() - t0) * 1000
-                diagnostics.append(LayerDiagnostic(
-                    layer="governance", status="ok",
-                    duration_ms=timings.governance_ms,
-                    result_count=len(processed),
-                ))
-            except Exception as exc:
-                timings.governance_ms = (time.perf_counter() - t0) * 1000
-                logger.warning(
-                    "Governance scoring failed: layer=governance query=%r error_type=%s error=%s",
-                    query[:80], type(exc).__name__, exc,
-                )
-                diagnostics.append(LayerDiagnostic(
-                    layer="governance", status="error",
-                    duration_ms=timings.governance_ms,
-                    error=str(exc), error_type=type(exc).__name__,
-                ))
-        elif not config.enable_governance:
-            diagnostics.append(LayerDiagnostic(layer="governance", status="disabled"))
+            processed = self.quality_service.apply(processed, filters=quality_filters)
+            timings.governance_ms = (time.perf_counter() - t0) * 1000
 
         # Phase 4.5: fuse independent layer adjustments into final ranking score.
         for entry in processed:
@@ -901,9 +733,6 @@ class PEDRSearchOrchestrator:
         )
 
         timings.total_ms = (time.perf_counter() - start_time) * 1000
-
-        # Determine if we're in degraded mode (any layer errored)
-        has_errors = any(d.status == "error" for d in diagnostics)
 
         # Build response
         cache_stats = cache.get_stats().to_dict() if cache_enabled else None
@@ -920,8 +749,6 @@ class PEDRSearchOrchestrator:
             layers_used=[lr.layer_name for lr in layer_results],
             layer_weights=dict(effective_layer_weights),
             timings=timings,
-            layer_diagnostics=diagnostics,
-            degraded=has_errors,
             graph_enabled=config.enable_graph,
             graph_candidates_expanded=graph_candidates_expanded,
             total_candidates=len(fused_results),
@@ -1076,8 +903,8 @@ class PEDRSearchOrchestrator:
         self,
         *,
         config: PEDRConfig,
-        graph_weight_override: Optional[float],
-    ) -> Dict[str, float]:
+        graph_weight_override: float | None,
+    ) -> dict[str, float]:
         weights = dict(DEFAULT_LAYER_WEIGHTS)
         weights.update(config.layer_weights)
 
@@ -1098,7 +925,7 @@ class PEDRSearchOrchestrator:
             "graph": config.enable_graph,
         }
 
-        normalized: Dict[str, float] = {}
+        normalized: dict[str, float] = {}
         total = 0.0
         for layer, enabled in enabled_layers.items():
             weight = float(weights.get(layer, 0.0))
@@ -1139,12 +966,12 @@ class PEDRSearchOrchestrator:
 
     def _finalize_results(
         self,
-        results: List[Dict[str, Any]],
+        results: list[dict[str, Any]],
         *,
         top_k: int,
         syntactic_filters: SyntacticFilters,
         pragmatic_filters: PragmaticFilters,
-    ) -> List[PEDRSearchResult]:
+    ) -> list[PEDRSearchResult]:
         """Finalize and structure results for response."""
         # Re-sort by combined_score (includes all boosts)
         sorted_results = sorted(
@@ -1153,7 +980,7 @@ class PEDRSearchOrchestrator:
             reverse=True,
         )[:top_k]
 
-        final: List[PEDRSearchResult] = []
+        final: list[PEDRSearchResult] = []
         for i, r in enumerate(sorted_results, start=1):
             # Generate URN if we have enough info
             chunk_id = r.get("chunk_id", "")
@@ -1167,8 +994,12 @@ class PEDRSearchOrchestrator:
                     chunk_id=str(chunk_id),
                     content=r.get("content", ""),
                     document_id=str(document_id) if document_id else None,
-                    project_id=str(r.get("project_id")) if r.get("project_id") else None,
-                    rrf_score=float(r.get("rrf_score") or r.get("combined_score") or 0.0),
+                    project_id=str(r.get("project_id"))
+                    if r.get("project_id")
+                    else None,
+                    rrf_score=float(
+                        r.get("rrf_score") or r.get("combined_score") or 0.0
+                    ),
                     rrf_rank=i,
                     layer_ranks=r.get("layer_ranks", {}),
                     layer_scores=r.get("layer_scores", {}),
@@ -1192,13 +1023,13 @@ class PEDRSearchOrchestrator:
 
     def _build_cached_response(
         self,
-        cached_results: List[Dict[str, Any]],
+        cached_results: list[dict[str, Any]],
         *,
         query: str,
         timings: LayerTimings,
-        cache_stats: Dict[str, Any],
+        cache_stats: dict[str, Any],
         graph_enabled: bool = False,
-        graph_candidates_expanded: Optional[int] = None,
+        graph_candidates_expanded: int | None = None,
     ) -> PEDRSearchResponse:
         """Build a PEDRSearchResponse from cached result dictionaries.
 
@@ -1212,7 +1043,7 @@ class PEDRSearchOrchestrator:
             PEDRSearchResponse built from cached data.
         """
         # Reconstruct PEDRSearchResult objects from cached dicts
-        results: List[PEDRSearchResult] = []
+        results: list[PEDRSearchResult] = []
         for r in cached_results:
             results.append(
                 PEDRSearchResult(
@@ -1264,7 +1095,7 @@ class PEDRSearchOrchestrator:
 
 
 # Singleton instance
-_pedr_orchestrator: Optional[PEDRSearchOrchestrator] = None
+_pedr_orchestrator: PEDRSearchOrchestrator | None = None
 
 
 def get_pedr_orchestrator() -> PEDRSearchOrchestrator:
@@ -1281,9 +1112,9 @@ def get_pedr_orchestrator() -> PEDRSearchOrchestrator:
 
 def create_pedr_orchestrator(
     *,
-    lexical_search: Optional[Callable[..., List[Dict[str, Any]]]] = None,
-    semantic_search: Optional[Callable[..., List[Dict[str, Any]]]] = None,
-    config: Optional[PEDRConfig] = None,
+    lexical_search: Callable[..., list[dict[str, Any]]] | None = None,
+    semantic_search: Callable[..., list[dict[str, Any]]] | None = None,
+    config: PEDRConfig | None = None,
 ) -> PEDRSearchOrchestrator:
     """Create a fully configured PEDR orchestrator.
 
@@ -1309,18 +1140,23 @@ def create_pedr_orchestrator(
     def _lexical_wrapper(
         query: str,
         top_k: int = 20,
-        project_id: Optional[str] = None,
-        document_id: Optional[str] = None,
-        source_type: Optional[str] = None,
-        source_origin: Optional[str] = None,
+        project_id: str | None = None,
+        document_id: str | None = None,
+        source_type: str | None = None,
+        source_origin: str | None = None,
         **kwargs: Any,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         from app.services.faceted_search import FacetFilters
 
         filters = FacetFilters.from_kwargs(
             project_id=project_id,
             source_type=source_type,
-            **{k: v for k, v in kwargs.items() if k in ("document_types", "source_types", "date_from", "date_to", "tags")},
+            **{
+                k: v
+                for k, v in kwargs.items()
+                if k
+                in ("document_types", "source_types", "date_from", "date_to", "tags")
+            },
         )
         return hybrid_service._keyword_search(
             query=query,
@@ -1336,19 +1172,19 @@ def create_pedr_orchestrator(
     def _semantic_wrapper(
         query: str,
         top_k: int = 20,
-        project_id: Optional[str] = None,
-        document_id: Optional[str] = None,
-        source_type: Optional[str] = None,
-        source_origin: Optional[str] = None,
-        document_types: Optional[List[str]] = None,
-        source_types: Optional[List[str]] = None,
-        date_from: Optional[date] = None,
-        date_to: Optional[date] = None,
-        tags: Optional[List[str]] = None,
-        hnsw_ef: Optional[int] = None,
+        project_id: str | None = None,
+        document_id: str | None = None,
+        source_type: str | None = None,
+        source_origin: str | None = None,
+        document_types: list[str] | None = None,
+        source_types: list[str] | None = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
+        tags: list[str] | None = None,
+        hnsw_ef: int | None = None,
         include_embeddings: bool = False,
         **kwargs: Any,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         return retrieval_service.search(
             query=query,
             top_k=top_k,
@@ -1372,8 +1208,8 @@ def create_pedr_orchestrator(
     )
 
 
-def _interleave_results(*result_sets: Sequence[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    combined: List[Dict[str, Any]] = []
+def _interleave_results(*result_sets: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
+    combined: list[dict[str, Any]] = []
     max_len = max((len(results) for results in result_sets), default=0)
     for idx in range(max_len):
         for results in result_sets:
@@ -1417,7 +1253,7 @@ def _compute_graph_impact(
     *,
     graph_weight: float,
     rrf_k: int,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     total = len(results)
     if total == 0:
         return {
@@ -1430,9 +1266,9 @@ def _compute_graph_impact(
             "top_5_share": 0.0,
         }
 
-    graph_ranks: List[float] = []
-    graph_contribs: List[float] = []
-    graph_shares: List[float] = []
+    graph_ranks: list[float] = []
+    graph_contribs: list[float] = []
+    graph_shares: list[float] = []
 
     for result in results:
         rank = (result.layer_ranks or {}).get("graph", 0)
@@ -1464,25 +1300,23 @@ def _emit_graph_telemetry(
     *,
     query: str,
     config: PEDRConfig,
-    layer_weights: Dict[str, float],
+    layer_weights: dict[str, float],
     graph_layer: LayerResult,
     fusion_output: Any,
     final_results: Sequence[PEDRSearchResult],
     timings: LayerTimings,
-    graph_candidates_expanded: Optional[int],
+    graph_candidates_expanded: int | None,
     telemetry_path: Path,
 ) -> None:
     metadata = graph_layer.metadata or {}
     cache_hits = int(metadata.get("cache_hits") or 0)
     cache_misses = int(metadata.get("cache_misses") or 0)
     cache_total = cache_hits + cache_misses
-    cache_hit_rate = (
-        round(cache_hits / cache_total, 4) if cache_total > 0 else None
-    )
+    cache_hit_rate = round(cache_hits / cache_total, 4) if cache_total > 0 else None
     graph_weight = float(layer_weights.get("graph", config.graph_weight))
 
     payload = {
-        "ts": datetime.now(timezone.utc).isoformat(),
+        "ts": datetime.now(UTC).isoformat(),
         "event": "pedr_graph_telemetry",
         "query": query,
         "graph": {
@@ -1527,17 +1361,9 @@ def _emit_graph_telemetry(
     }
 
     try:
-        from app.core.telemetry import emit_telemetry
-        # Extract ts from payload since emit_telemetry generates its own
-        graph_payload = dict(payload)
-        graph_payload.pop("ts", None)
-        graph_payload.pop("event", None)
-        emit_telemetry(
-            path=telemetry_path,
-            event_type="pedr.graph.telemetry",
-            source="pedr",
-            payload=graph_payload,
-        )
+        telemetry_path.parent.mkdir(parents=True, exist_ok=True)
+        with telemetry_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(payload) + "\n")
     except Exception as exc:  # pragma: no cover - telemetry best effort
         logger.warning("Failed to write graph telemetry: %s", exc)
 
@@ -1545,7 +1371,6 @@ def _emit_graph_telemetry(
 __all__ = [
     "PEDRConfig",
     "LayerTimings",
-    "LayerDiagnostic",
     "PEDRMetadata",
     "PEDRSearchResult",
     "PEDRSearchResponse",

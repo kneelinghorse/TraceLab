@@ -1,9 +1,9 @@
 """Prometheus-compatible metrics helpers for the semantic cache service."""
+
 from __future__ import annotations
 
 import threading
-import time
-from typing import ClassVar, Optional
+from typing import ClassVar
 
 try:  # pragma: no cover - prometheus optional
     from prometheus_client import Counter, Histogram
@@ -14,7 +14,7 @@ except ModuleNotFoundError:  # pragma: no cover
 class CacheMetrics:
     """Collect and expose semantic cache metrics with in-memory fallbacks."""
 
-    _PROM_METRICS: ClassVar[Optional[dict[str, object]]] = None
+    _PROM_METRICS: ClassVar[dict[str, object] | None] = None
     _PROM_LOCK: ClassVar[threading.Lock] = threading.Lock()
 
     def __init__(self) -> None:
@@ -40,14 +40,14 @@ class CacheMetrics:
             self._evictions = None
             self._lookup_latency = None
 
-    def record_hit(self, project_id: Optional[str]) -> None:
+    def record_hit(self, project_id: str | None) -> None:
         label = project_id or "unknown"
         with self._lock:
             self.hit_count += 1
         if self._hits:
             self._hits.labels(project_id=label).inc()
 
-    def record_miss(self, project_id: Optional[str]) -> None:
+    def record_miss(self, project_id: str | None) -> None:
         label = project_id or "unknown"
         with self._lock:
             self.miss_count += 1
@@ -102,7 +102,7 @@ class CacheMetrics:
             }
 
     @classmethod
-    def _get_prometheus_metrics(cls) -> Optional[dict[str, object]]:
+    def _get_prometheus_metrics(cls) -> dict[str, object] | None:
         """Return shared Prometheus collectors, creating them once per process."""
         if not (Counter and Histogram):
             return None
@@ -110,12 +110,18 @@ class CacheMetrics:
             if cls._PROM_METRICS is None:
                 cls._PROM_METRICS = {
                     "hits": Counter(
-                        "semantic_cache_hits_total", "Semantic cache hits", ["project_id"]
+                        "semantic_cache_hits_total",
+                        "Semantic cache hits",
+                        ["project_id"],
                     ),
                     "misses": Counter(
-                        "semantic_cache_misses_total", "Semantic cache misses", ["project_id"]
+                        "semantic_cache_misses_total",
+                        "Semantic cache misses",
+                        ["project_id"],
                     ),
-                    "errors": Counter("semantic_cache_errors_total", "Semantic cache errors"),
+                    "errors": Counter(
+                        "semantic_cache_errors_total", "Semantic cache errors"
+                    ),
                     "evictions": Counter(
                         "semantic_cache_evictions_total", "Semantic cache evictions"
                     ),

@@ -1,7 +1,8 @@
 """Tests for search history logging, listing, and replay APIs."""
+
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
 from fastapi.testclient import TestClient
 
@@ -15,9 +16,9 @@ class _StubRagService:
     """Minimal fake RAG service returning deterministic payloads."""
 
     def __init__(self) -> None:
-        self.calls: List[Dict[str, Any]] = []
+        self.calls: list[dict[str, Any]] = []
 
-    def run_query(self, **kwargs: Any) -> Dict[str, Any]:
+    def run_query(self, **kwargs: Any) -> dict[str, Any]:
         self.calls.append(kwargs)
         return {
             "answer": "Search results summarized.",
@@ -52,7 +53,12 @@ class _StubRagService:
                 "threshold": 0.7,
                 "compression_ms": 5.2,
             },
-            "cache": {"hit": False, "score": None, "age_seconds": None, "ttl_seconds": None},
+            "cache": {
+                "hit": False,
+                "score": None,
+                "age_seconds": None,
+                "ttl_seconds": None,
+            },
             "quality": {
                 "composite_score": 0.92,
                 "threshold": 0.85,
@@ -88,9 +94,9 @@ class _StubRetrievalService:
     """Return deterministic semantic search results."""
 
     def __init__(self) -> None:
-        self.calls: List[Dict[str, Any]] = []
+        self.calls: list[dict[str, Any]] = []
 
-    def search(self, **kwargs: Any) -> List[Dict[str, Any]]:
+    def search(self, **kwargs: Any) -> list[dict[str, Any]]:
         self.calls.append(kwargs)
         return [
             {
@@ -118,7 +124,9 @@ def test_search_history_logged_and_listed(monkeypatch, auth_headers):
     )
     assert response.status_code == 200
 
-    history_response = client.get("/api/v1/search/history?limit=5", headers=auth_headers)
+    history_response = client.get(
+        "/api/v1/search/history?limit=5", headers=auth_headers
+    )
     assert history_response.status_code == 200
     payload = history_response.json()
     assert payload["entries"], "Expected at least one history entry."
@@ -157,7 +165,9 @@ def test_replay_endpoint_runs_query_and_logs(monkeypatch, auth_headers):
     assert payload["rag"]["answer"] == "Search results summarized."
     assert payload["semantic"]["results"][0]["chunk_id"] == "chunk-1"
 
-    history = client.get("/api/v1/search/history", headers=auth_headers).json()["entries"]
+    history = client.get("/api/v1/search/history", headers=auth_headers).json()[
+        "entries"
+    ]
     assert len(history) >= 2, "Expected replay to insert a new entry."
 
 

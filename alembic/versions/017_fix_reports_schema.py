@@ -26,30 +26,56 @@ def upgrade() -> None:
 
         # Add missing columns
         if "report_type" not in existing_columns:
-            op.add_column("reports", sa.Column("report_type", sa.String(50), nullable=False, server_default="summary"))
+            op.add_column(
+                "reports",
+                sa.Column(
+                    "report_type",
+                    sa.String(50),
+                    nullable=False,
+                    server_default="summary",
+                ),
+            )
 
         if "prompt" not in existing_columns:
             op.add_column("reports", sa.Column("prompt", sa.Text(), nullable=True))
 
         if "content_hash" not in existing_columns:
-            op.add_column("reports", sa.Column("content_hash", sa.String(64), nullable=True))
+            op.add_column(
+                "reports", sa.Column("content_hash", sa.String(64), nullable=True)
+            )
 
         if "version" not in existing_columns:
-            op.add_column("reports", sa.Column("version", sa.Integer(), nullable=False, server_default="1"))
+            op.add_column(
+                "reports",
+                sa.Column("version", sa.Integer(), nullable=False, server_default="1"),
+            )
 
         if "parent_id" not in existing_columns:
-            op.add_column("reports", sa.Column(
-                "parent_id",
-                postgresql.UUID(as_uuid=True),
-                sa.ForeignKey("reports.id", ondelete="SET NULL"),
-                nullable=True
-            ))
+            op.add_column(
+                "reports",
+                sa.Column(
+                    "parent_id",
+                    postgresql.UUID(as_uuid=True),
+                    sa.ForeignKey("reports.id", ondelete="SET NULL"),
+                    nullable=True,
+                ),
+            )
 
         if "tokens_used" not in existing_columns:
-            op.add_column("reports", sa.Column("tokens_used", sa.Integer(), nullable=False, server_default="0"))
+            op.add_column(
+                "reports",
+                sa.Column(
+                    "tokens_used", sa.Integer(), nullable=False, server_default="0"
+                ),
+            )
 
         if "chunk_count" not in existing_columns:
-            op.add_column("reports", sa.Column("chunk_count", sa.Integer(), nullable=False, server_default="0"))
+            op.add_column(
+                "reports",
+                sa.Column(
+                    "chunk_count", sa.Integer(), nullable=False, server_default="0"
+                ),
+            )
 
         # Make content NOT NULL if it was nullable
         # First update any NULL values
@@ -59,15 +85,31 @@ def upgrade() -> None:
     if not inspector.has_table("report_sources"):
         print("Creating missing report_sources table...")
         op.create_table(
-            'report_sources',
-            sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text('gen_random_uuid()')),
-            sa.Column('report_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('reports.id', ondelete='CASCADE'), nullable=False),
-            sa.Column('source_type', sa.String(20), nullable=False),
-            sa.Column('source_id', postgresql.UUID(as_uuid=True), nullable=False),
-            sa.Column('added_at', sa.DateTime(), server_default=sa.func.now(), nullable=False),
+            "report_sources",
+            sa.Column(
+                "id",
+                postgresql.UUID(as_uuid=True),
+                primary_key=True,
+                server_default=sa.text("gen_random_uuid()"),
+            ),
+            sa.Column(
+                "report_id",
+                postgresql.UUID(as_uuid=True),
+                sa.ForeignKey("reports.id", ondelete="CASCADE"),
+                nullable=False,
+            ),
+            sa.Column("source_type", sa.String(20), nullable=False),
+            sa.Column("source_id", postgresql.UUID(as_uuid=True), nullable=False),
+            sa.Column(
+                "added_at", sa.DateTime(), server_default=sa.func.now(), nullable=False
+            ),
         )
-        op.create_index('ix_report_sources_report_id', 'report_sources', ['report_id'])
-        op.create_index('ix_report_sources_source_type_source_id', 'report_sources', ['source_type', 'source_id'])
+        op.create_index("ix_report_sources_report_id", "report_sources", ["report_id"])
+        op.create_index(
+            "ix_report_sources_source_type_source_id",
+            "report_sources",
+            ["source_type", "source_id"],
+        )
 
     print("Reports schema fix complete!")
 

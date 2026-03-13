@@ -3,6 +3,7 @@
 Tests the ability to promote a mission's report to a searchable document,
 running it through the chunking/embedding pipeline.
 """
+
 from __future__ import annotations
 
 import uuid
@@ -97,10 +98,7 @@ class TestReportPromotionService:
         """Verify service module is importable."""
         from app.services.report_promotion import (
             ReportPromotionService,
-            ReportPromotionError,
-            ReportAlreadyPromotedError,
             get_report_promotion_service,
-            promote_mission_report,
         )
 
         service = get_report_promotion_service()
@@ -110,8 +108,8 @@ class TestReportPromotionService:
     def test_promote_report_no_content_fails(self, db_session):
         """Promoting report with no content fails."""
         from app.services.report_promotion import (
-            ReportPromotionService,
             ReportPromotionError,
+            ReportPromotionService,
         )
 
         project = _create_test_project(db_session)
@@ -141,8 +139,8 @@ class TestReportPromotionService:
     def test_promote_report_no_project_fails(self, db_session):
         """Promoting report from mission without project fails."""
         from app.services.report_promotion import (
-            ReportPromotionService,
             ReportPromotionError,
+            ReportPromotionService,
         )
 
         report = _create_test_report(db_session)
@@ -162,8 +160,8 @@ class TestReportPromotionService:
     def test_promote_report_already_promoted_fails(self, db_session):
         """Promoting already-promoted report fails with 409."""
         from app.services.report_promotion import (
-            ReportPromotionService,
             ReportAlreadyPromotedError,
+            ReportPromotionService,
         )
 
         project = _create_test_project(db_session)
@@ -322,7 +320,9 @@ class TestPromoteReportEndpoint:
         assert "already been promoted" in response.json()["detail"]
 
     @patch("app.services.report_promotion.DocumentIngestionService")
-    def test_promote_report_success(self, mock_ingestion_class, auth_headers, db_session):
+    def test_promote_report_success(
+        self, mock_ingestion_class, auth_headers, db_session
+    ):
         """Successfully promote a report via API."""
         client = TestClient(app)
 
@@ -388,9 +388,11 @@ class TestPromoteReportEndpoint:
         data = response.json()
 
         # Verify document was created with correct provenance
-        doc = db_session.query(Document).filter(
-            Document.id == data["document_id"]
-        ).first()
+        doc = (
+            db_session.query(Document)
+            .filter(Document.id == data["document_id"])
+            .first()
+        )
         assert doc is not None
         assert doc.source_report_id == report.id
         assert doc.source_mission_id == mission.id
@@ -480,13 +482,15 @@ class TestDocumentProvenanceFields:
         db_session.commit()
 
         # Query by origin
-        synthesized = db_session.query(Document).filter(
-            Document.source_origin == "synthesized"
-        ).all()
+        synthesized = (
+            db_session.query(Document)
+            .filter(Document.source_origin == "synthesized")
+            .all()
+        )
         assert len(synthesized) == 1
         assert synthesized[0].name == "Synthesized Doc"
 
-        uploaded = db_session.query(Document).filter(
-            Document.source_origin == "upload"
-        ).all()
+        uploaded = (
+            db_session.query(Document).filter(Document.source_origin == "upload").all()
+        )
         assert len(uploaded) == 1

@@ -11,12 +11,14 @@ Intent types:
 - DELETE: Remove content (delete, remove, archive)
 - EXECUTE: Run/trigger operations (run analysis, execute mission)
 """
+
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any
 
 from app.services.pedr.score_utils import ensure_base_score
 
@@ -37,7 +39,7 @@ class IntentDetectionResult:
 
     intent: QueryIntent
     confidence: float  # 0.0 to 1.0
-    signals: List[str] = field(default_factory=list)
+    signals: list[str] = field(default_factory=list)
     query_normalized: str = ""
     is_action_query: bool = False  # True for CREATE/UPDATE/DELETE/EXECUTE
 
@@ -56,7 +58,7 @@ class PragmaticFilters:
 
 
 # Intent detection patterns - ordered by specificity
-INTENT_DETECTION_PATTERNS: Dict[QueryIntent, List[Tuple[str, float]]] = {
+INTENT_DETECTION_PATTERNS: dict[QueryIntent, list[tuple[str, float]]] = {
     QueryIntent.SEARCH: [
         # High confidence search patterns
         (r"^(?:find|search|show|list|get|display)\b", 0.95),
@@ -76,11 +78,23 @@ INTENT_DETECTION_PATTERNS: Dict[QueryIntent, List[Tuple[str, float]]] = {
     QueryIntent.CREATE: [
         # High confidence create patterns
         (r"^(?:create|add|make|new)\b", 0.95),
-        (r"\b(?:create|add)\s+(?:a\s+)?(?:new\s+)?(?:document|project|mission|collection|report)\b", 0.95),
-        (r"\b(?:start|begin|initialize)\s+(?:a\s+)?(?:new\s+)?(?:project|mission|research|workspace)\b", 0.90),
-        (r"^(?:start|begin|initialize)\s+(?:a\s+)?(?:new\s+)?(?:\w+\s+)?(?:project|mission|workspace)\b", 0.96),
+        (
+            r"\b(?:create|add)\s+(?:a\s+)?(?:new\s+)?(?:document|project|mission|collection|report)\b",
+            0.95,
+        ),
+        (
+            r"\b(?:start|begin|initialize)\s+(?:a\s+)?(?:new\s+)?(?:project|mission|research|workspace)\b",
+            0.90,
+        ),
+        (
+            r"^(?:start|begin|initialize)\s+(?:a\s+)?(?:new\s+)?(?:\w+\s+)?(?:project|mission|workspace)\b",
+            0.96,
+        ),
         (r"\bupload\s+(?:a\s+)?(?:new\s+)?(?:document|file)\b", 0.90),
-        (r"\b(?:generate|produce|build)\s+(?:a\s+)?(?:new\s+)?(?:report|summary)\b", 0.85),
+        (
+            r"\b(?:generate|produce|build)\s+(?:a\s+)?(?:new\s+)?(?:report|summary)\b",
+            0.85,
+        ),
         # Medium confidence patterns
         (r"\bset\s+up\b", 0.75),
         (r"\binitiate\b", 0.75),
@@ -89,7 +103,10 @@ INTENT_DETECTION_PATTERNS: Dict[QueryIntent, List[Tuple[str, float]]] = {
     QueryIntent.UPDATE: [
         # High confidence update patterns
         (r"^(?:update|edit|modify|change|revise)\b", 0.95),
-        (r"\b(?:update|edit|modify|change)\s+(?:the\s+)?(?:document|project|mission|report)\b", 0.95),
+        (
+            r"\b(?:update|edit|modify|change)\s+(?:the\s+)?(?:document|project|mission|report)\b",
+            0.95,
+        ),
         (r"\b(?:rename|revise|amend)\s+(?:the\s+)?", 0.95),
         (r"\b(?:fix|correct|adjust)\b", 0.85),
         # Medium confidence patterns
@@ -100,7 +117,10 @@ INTENT_DETECTION_PATTERNS: Dict[QueryIntent, List[Tuple[str, float]]] = {
     QueryIntent.DELETE: [
         # High confidence delete patterns
         (r"^(?:delete|remove|erase)\b", 0.95),
-        (r"\b(?:delete|remove)\s+(?:the\s+)?(?:document|project|mission|collection|report)\b", 0.95),
+        (
+            r"\b(?:delete|remove)\s+(?:the\s+)?(?:document|project|mission|collection|report)\b",
+            0.95,
+        ),
         (r"\b(?:archive|discard|purge)\b", 0.85),
         (r"\b(?:trash|eliminate|destroy)\b", 0.85),
         # Medium confidence patterns
@@ -111,11 +131,17 @@ INTENT_DETECTION_PATTERNS: Dict[QueryIntent, List[Tuple[str, float]]] = {
     QueryIntent.EXECUTE: [
         # High confidence execute patterns
         (r"^(?:run|execute|trigger)\b", 0.95),
-        (r"^start\s+(?:the\s+)?(?:\w+\s+)?(?:workflow|process|pipeline|analysis)\b", 0.95),
+        (
+            r"^start\s+(?:the\s+)?(?:\w+\s+)?(?:workflow|process|pipeline|analysis)\b",
+            0.95,
+        ),
         (r"\b(?:run|execute)\s+(?:the\s+)?(?:mission|analysis|search|sync)\b", 0.95),
         (r"\b(?:launch|activate|kick\s+off)\b", 0.90),
         (r"\b(?:submit|process|perform)\b", 0.85),
-        (r"\b(?:synthesize|analyze)\s+(?:the\s+)?(?:\w+\s+)?(?:data|documents?|results|findings)\b", 0.95),
+        (
+            r"\b(?:synthesize|analyze)\s+(?:the\s+)?(?:\w+\s+)?(?:data|documents?|results|findings)\b",
+            0.95,
+        ),
         (r"^(?:synthesize|analyze)\b", 0.91),  # Action verbs at start of query
         # Medium confidence patterns
         (r"\binitiate\s+(?:the\s+)?(?:process|workflow)\b", 0.80),
@@ -124,7 +150,7 @@ INTENT_DETECTION_PATTERNS: Dict[QueryIntent, List[Tuple[str, float]]] = {
 }
 
 # Intent-based result boost weights
-INTENT_BOOST_WEIGHTS: Dict[QueryIntent, Dict[str, float]] = {
+INTENT_BOOST_WEIGHTS: dict[QueryIntent, dict[str, float]] = {
     QueryIntent.SEARCH: {
         "research": 0.15,  # Boost research artifacts
         "insight": 0.15,  # Boost insights
@@ -163,8 +189,8 @@ class PragmaticService:
     def __init__(
         self,
         *,
-        patterns: Optional[Dict[QueryIntent, List[Tuple[str, float]]]] = None,
-        boost_weights: Optional[Dict[QueryIntent, Dict[str, float]]] = None,
+        patterns: dict[QueryIntent, list[tuple[str, float]]] | None = None,
+        boost_weights: dict[QueryIntent, dict[str, float]] | None = None,
         confidence_threshold: float = 0.5,
     ) -> None:
         """Initialize the pragmatic service.
@@ -177,7 +203,7 @@ class PragmaticService:
         self._patterns = patterns or INTENT_DETECTION_PATTERNS
         self._boost_weights = boost_weights or INTENT_BOOST_WEIGHTS
         self._confidence_threshold = confidence_threshold
-        self._compiled_patterns: Dict[QueryIntent, List[Tuple[re.Pattern, float]]] = {}
+        self._compiled_patterns: dict[QueryIntent, list[tuple[re.Pattern, float]]] = {}
         self._compile_patterns()
 
     def _compile_patterns(self) -> None:
@@ -212,7 +238,7 @@ class PragmaticService:
         normalized = query.strip().lower()
         best_intent: QueryIntent = QueryIntent.SEARCH
         best_confidence: float = 0.0
-        signals: List[str] = []
+        signals: list[str] = []
 
         for intent, pattern_list in self._compiled_patterns.items():
             for pattern, confidence in pattern_list:
@@ -267,16 +293,17 @@ class PragmaticService:
             confidence=result.confidence,
             is_action_query=result.is_action_query,
             intent_boost_enabled=intent_boost_enabled,
-            route_to_search=result.intent == QueryIntent.SEARCH or not result.is_action_query,
+            route_to_search=result.intent == QueryIntent.SEARCH
+            or not result.is_action_query,
             route_to_action_handler=result.is_action_query,
         )
 
     def apply_intent_boost(
         self,
-        results: Sequence[Dict[str, Any]],
+        results: Sequence[dict[str, Any]],
         *,
         filters: PragmaticFilters,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Apply intent-based boost to search results.
 
         Results are boosted based on their type and the detected intent.
@@ -307,7 +334,7 @@ class PragmaticService:
             return boosted
 
         intent_weights = self._boost_weights.get(filters.intent, {})
-        boosted: List[Dict[str, Any]] = []
+        boosted: list[dict[str, Any]] = []
 
         for result in results:
             entry = dict(result)
@@ -336,10 +363,10 @@ class PragmaticService:
 
     def apply(
         self,
-        results: Sequence[Dict[str, Any]],
+        results: Sequence[dict[str, Any]],
         *,
         filters: PragmaticFilters,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Apply pragmatic processing to search results.
 
         This is the main entry point that combines intent detection
@@ -361,7 +388,7 @@ class PragmaticService:
         return processed
 
     @staticmethod
-    def _infer_result_type(result: Dict[str, Any]) -> Optional[str]:
+    def _infer_result_type(result: dict[str, Any]) -> str | None:
         """Infer the type of a search result for boost lookup.
 
         Args:
@@ -400,7 +427,7 @@ class PragmaticService:
 
 
 # Singleton instance
-_pragmatic_service: Optional[PragmaticService] = None
+_pragmatic_service: PragmaticService | None = None
 
 
 def get_pragmatic_service() -> PragmaticService:

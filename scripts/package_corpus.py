@@ -58,7 +58,9 @@ def package_corpus(
 
     metadata_path = corpus_dir / "corpus_metadata.json"
     if not metadata_path.exists():
-        raise FileNotFoundError(f"corpus_metadata.json not found at {metadata_path}. Generate the corpus first.")
+        raise FileNotFoundError(
+            f"corpus_metadata.json not found at {metadata_path}. Generate the corpus first."
+        )
 
     with open(metadata_path, "r", encoding="utf-8") as handle:
         corpus_metadata = json.load(handle)
@@ -97,7 +99,9 @@ def package_corpus(
                 "source": str(resolved_baseline),
             }
         else:
-            print(f"Warning: Baseline report not found at {resolved_baseline}. Skipping copy.")
+            print(
+                f"Warning: Baseline report not found at {resolved_baseline}. Skipping copy."
+            )
 
     manifest_path = archive_path.with_name(f"{archive_path.stem}_manifest.json")
     with open(manifest_path, "w", encoding="utf-8") as handle:
@@ -111,7 +115,9 @@ def package_corpus(
 
 
 def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Package the synthetic corpus into an archive with manifest.")
+    parser = argparse.ArgumentParser(
+        description="Package the synthetic corpus into an archive with manifest."
+    )
     parser.add_argument(
         "--corpus-dir",
         type=Path,
@@ -165,7 +171,9 @@ def main(argv: Optional[list[str]] = None) -> None:
     print("=" * 72)
     print("Next steps:")
     print("  - Inspect the manifest for configuration details.")
-    print("  - Transfer the archive to your secure bucket or vault using your preferred tool.")
+    print(
+        "  - Transfer the archive to your secure bucket or vault using your preferred tool."
+    )
     print("  - Record the SHA-256 checksum for integrity verification.")
     print("=" * 72)
 

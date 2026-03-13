@@ -16,7 +16,9 @@ def _find_cmos_root() -> Path:
     """Find cmos/ directory from any working directory."""
     script_dir = Path(__file__).resolve().parent
     candidate = script_dir.parent
-    if (candidate / "db" / "schema.sql").exists() and (candidate / "agents.md").exists():
+    if (candidate / "db" / "schema.sql").exists() and (
+        candidate / "agents.md"
+    ).exists():
         return candidate
     if (Path.cwd() / "cmos" / "db" / "schema.sql").exists():
         return Path.cwd() / "cmos"
@@ -76,7 +78,9 @@ def load_sessions_file(sessions_path: Path) -> List[str]:
         return [line.strip() for line in handle if line.strip()]
 
 
-def compare_missions(db_rows: List[Dict[str, Any]], file_missions: Dict[str, Dict[str, Any]]) -> List[str]:
+def compare_missions(
+    db_rows: List[Dict[str, Any]], file_missions: Dict[str, Dict[str, Any]]
+) -> List[str]:
     mismatches: List[str] = []
     for row in db_rows:
         mission_id = row["id"]
@@ -88,12 +92,18 @@ def compare_missions(db_rows: List[Dict[str, Any]], file_missions: Dict[str, Dic
             db_value = row.get(field) or ""
             file_value = file_entry.get(field) or ""
             if db_value != file_value:
-                mismatches.append(f"{mission_id}: {field} mismatch (db='{db_value}' vs file='{file_value}')")
+                mismatches.append(
+                    f"{mission_id}: {field} mismatch (db='{db_value}' vs file='{file_value}')"
+                )
     return mismatches
 
 
-def compare_contexts(client: SQLiteClient, path: Path, context_id: str) -> Tuple[bool, str]:
-    db_row = client.fetchone("SELECT content FROM contexts WHERE id = :id", {"id": context_id})
+def compare_contexts(
+    client: SQLiteClient, path: Path, context_id: str
+) -> Tuple[bool, str]:
+    db_row = client.fetchone(
+        "SELECT content FROM contexts WHERE id = :id", {"id": context_id}
+    )
     if not db_row:
         return False, f"{context_id}: missing from database"
     file_payload = {}
@@ -105,7 +115,9 @@ def compare_contexts(client: SQLiteClient, path: Path, context_id: str) -> Tuple
     return True, f"{context_id}: OK"
 
 
-def compare_sessions(db_rows: List[Dict[str, Any]], file_events: List[str]) -> List[str]:
+def compare_sessions(
+    db_rows: List[Dict[str, Any]], file_events: List[str]
+) -> List[str]:
     db_set = {row["raw_event"].strip() for row in db_rows}
     file_set = set(file_events)
     missing_in_db = file_set - db_set
@@ -130,7 +142,9 @@ def run_parity_check(root: Path, data_root: Path | None = None) -> int:
 
     client = SQLiteClient(db_path, schema_path=schema_path, create_missing=False)
     try:
-        mission_rows = client.fetchall("SELECT id, status, completed_at, notes FROM missions")
+        mission_rows = client.fetchall(
+            "SELECT id, status, completed_at, notes FROM missions"
+        )
         session_rows = client.fetchall("SELECT raw_event FROM session_events")
     except SQLiteClientError as error:  # pragma: no cover - defensive
         raise SystemExit(f"Database access failed: {error}") from error
@@ -164,8 +178,15 @@ def run_parity_check(root: Path, data_root: Path | None = None) -> int:
 
 
 def main(argv: List[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(description="Validate parity between SQLite DB and file mirrors.")
-    parser.add_argument("--root", type=Path, default=ROOT_DIR, help="CMOS root directory (default: %(default)s)")
+    parser = argparse.ArgumentParser(
+        description="Validate parity between SQLite DB and file mirrors."
+    )
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=ROOT_DIR,
+        help="CMOS root directory (default: %(default)s)",
+    )
     parser.add_argument(
         "--data-root",
         type=Path,

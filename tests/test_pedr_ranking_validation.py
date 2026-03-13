@@ -8,6 +8,7 @@ Runs 5+ representative queries against a synthetic corpus to verify:
 
 This serves as the T33.1 ranking validation deliverable.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -36,19 +37,22 @@ def _clear_cache():
 # Synthetic corpus builder
 # ---------------------------------------------------------------------------
 
+
 def _make_corpus(n: int = 20) -> List[Dict[str, Any]]:
     """Build a synthetic corpus of chunks with varying relevance signals."""
     corpus = []
     for i in range(n):
-        corpus.append({
-            "chunk_id": f"doc-{i:03d}",
-            "content": f"Research finding {i} about machine learning and neural networks",
-            "document_id": f"parent-{i // 5}",
-            "project_id": "proj-001",
-            "score": max(0.1, 1.0 - i * 0.045),
-            "quality_score": 0.8 if i < 10 else 0.4,
-            "element_type": "document" if i % 3 == 0 else "chunk",
-        })
+        corpus.append(
+            {
+                "chunk_id": f"doc-{i:03d}",
+                "content": f"Research finding {i} about machine learning and neural networks",
+                "document_id": f"parent-{i // 5}",
+                "project_id": "proj-001",
+                "score": max(0.1, 1.0 - i * 0.045),
+                "quality_score": 0.8 if i < 10 else 0.4,
+                "element_type": "document" if i % 3 == 0 else "chunk",
+            }
+        )
     return corpus
 
 
@@ -57,15 +61,19 @@ CORPUS = _make_corpus()
 
 def _lexical_search_factory(results: List[Dict[str, Any]]):
     """Create a lexical search function returning specified results."""
+
     def _search(**kwargs) -> List[Dict[str, Any]]:
         return list(results)
+
     return _search
 
 
 def _semantic_search_factory(results: List[Dict[str, Any]]):
     """Create a semantic search function returning specified results."""
+
     def _search(**kwargs) -> List[Dict[str, Any]]:
         return list(results)
+
     return _search
 
 
@@ -85,6 +93,7 @@ def _make_orch(
 # ---------------------------------------------------------------------------
 # Query 1: Broad research query — both layers contribute
 # ---------------------------------------------------------------------------
+
 
 class TestQuery1BroadSearch:
     """Broad query: 'machine learning research findings'"""
@@ -106,26 +115,36 @@ class TestQuery1BroadSearch:
 
         # rrf_rank should be 1, 2, 3, ... (assigned after final sort)
         ranks = [r.rrf_rank for r in response.results]
-        assert ranks == list(range(1, len(ranks) + 1)), "Ranks should be sequential 1..N"
+        assert ranks == list(range(1, len(ranks) + 1)), (
+            "Ranks should be sequential 1..N"
+        )
 
 
 # ---------------------------------------------------------------------------
 # Query 2: Type-specific query — syntactic layer should detect type
 # ---------------------------------------------------------------------------
 
+
 class TestQuery2TypeSpecific:
     """Type-specific query: 'find all documents about neural networks'"""
 
     def test_syntactic_detects_document_type(self):
         orch = _make_orch()
-        response = orch.search(query="find all documents about neural networks", top_k=10)
+        response = orch.search(
+            query="find all documents about neural networks", top_k=10
+        )
 
         # Syntactic layer should detect "document" type
-        assert response.metadata.detected_type in ("document", None)  # detection is best-effort
+        assert response.metadata.detected_type in (
+            "document",
+            None,
+        )  # detection is best-effort
 
     def test_layer_diagnostics_present(self):
         orch = _make_orch()
-        response = orch.search(query="find all documents about neural networks", top_k=10)
+        response = orch.search(
+            query="find all documents about neural networks", top_k=10
+        )
 
         layer_names = {d.layer for d in response.metadata.layer_diagnostics}
         assert "lexical" in layer_names
@@ -136,18 +155,23 @@ class TestQuery2TypeSpecific:
 # Query 3: Intent-driven query — pragmatic layer detects intent
 # ---------------------------------------------------------------------------
 
+
 class TestQuery3IntentDriven:
     """Intent-driven query: 'search for evidence of bias in training data'"""
 
     def test_intent_classified(self):
         orch = _make_orch()
-        response = orch.search(query="search for evidence of bias in training data", top_k=10)
+        response = orch.search(
+            query="search for evidence of bias in training data", top_k=10
+        )
 
         assert response.metadata.intent in ("search", "unknown")
 
     def test_results_have_query_intent_annotation(self):
         orch = _make_orch()
-        response = orch.search(query="search for evidence of bias in training data", top_k=10)
+        response = orch.search(
+            query="search for evidence of bias in training data", top_k=10
+        )
 
         for result in response.results:
             assert result.query_intent is not None
@@ -156,6 +180,7 @@ class TestQuery3IntentDriven:
 # ---------------------------------------------------------------------------
 # Query 4: Degraded mode — lexical fails, semantic succeeds
 # ---------------------------------------------------------------------------
+
 
 class TestQuery4DegradedMode:
     """Degraded query: lexical layer fails, semantic succeeds."""
@@ -181,7 +206,9 @@ class TestQuery4DegradedMode:
 
         response = orch.search(query="neural network architecture", top_k=10)
 
-        lex_diag = next(d for d in response.metadata.layer_diagnostics if d.layer == "lexical")
+        lex_diag = next(
+            d for d in response.metadata.layer_diagnostics if d.layer == "lexical"
+        )
         assert lex_diag.status == "error"
         assert lex_diag.error_type == "RuntimeError"
 
@@ -201,6 +228,7 @@ class TestQuery4DegradedMode:
 # ---------------------------------------------------------------------------
 # Query 5: All layers disabled except one
 # ---------------------------------------------------------------------------
+
 
 class TestQuery5SingleLayer:
     """Single-layer query: only semantic enabled."""
@@ -229,7 +257,11 @@ class TestQuery5SingleLayer:
         orch = _make_orch(config=config)
         response = orch.search(query="machine learning", top_k=5)
 
-        disabled = {d.layer for d in response.metadata.layer_diagnostics if d.status == "disabled"}
+        disabled = {
+            d.layer
+            for d in response.metadata.layer_diagnostics
+            if d.status == "disabled"
+        }
         assert "lexical" in disabled
         assert "syntactic" in disabled
         assert "pragmatic" in disabled
@@ -240,6 +272,7 @@ class TestQuery5SingleLayer:
 # ---------------------------------------------------------------------------
 # Query 6: Overlapping results — RRF boost for multi-layer hits
 # ---------------------------------------------------------------------------
+
 
 class TestQuery6OverlappingResults:
     """Verify RRF correctly boosts results that appear in both layers."""
@@ -260,23 +293,29 @@ class TestQuery6OverlappingResults:
         top_5_ids = {r.chunk_id for r in response.results[:5]}
         shared_ids = {r["chunk_id"] for r in shared}
         overlap = top_5_ids & shared_ids
-        assert len(overlap) >= 3, f"Expected shared results to dominate top-5, got {overlap}"
+        assert len(overlap) >= 3, (
+            f"Expected shared results to dominate top-5, got {overlap}"
+        )
 
 
 # ---------------------------------------------------------------------------
 # Summary: diagnostic completeness across all queries
 # ---------------------------------------------------------------------------
 
+
 class TestDiagnosticCompleteness:
     """Ensure every search response has complete diagnostics."""
 
-    @pytest.mark.parametrize("query", [
-        "machine learning research",
-        "find documents about transformers",
-        "search evidence of bias",
-        "neural network training procedures",
-        "latest findings on attention mechanisms",
-    ])
+    @pytest.mark.parametrize(
+        "query",
+        [
+            "machine learning research",
+            "find documents about transformers",
+            "search evidence of bias",
+            "neural network training procedures",
+            "latest findings on attention mechanisms",
+        ],
+    )
     def test_diagnostics_cover_all_enabled_layers(self, query):
         orch = _make_orch()
         response = orch.search(query=query, top_k=5)

@@ -1,4 +1,5 @@
 """Integration tests for the Mission Protocol validation pipeline."""
+
 from __future__ import annotations
 
 import pytest
@@ -60,7 +61,9 @@ def test_yaml_to_database_round_trip(db_session, project):
         project_id=project.id,
         mission_id=complete.mission_id,
         title=complete.title or f"Mission {complete.mission_id}",
-        objective=complete.research_statement.objective if complete.research_statement else "Validation test",
+        objective=complete.research_statement.objective
+        if complete.research_statement
+        else "Validation test",
         success_criteria=["Quality gates pass"],
         context=protocol_data,
         status="completed",
@@ -80,7 +83,9 @@ def test_invalid_yaml_reports_structured_error():
         parse_mission_yaml("[]")
 
     with pytest.raises(ValidationError) as excinfo:
-        validate_mission_payload({"mission_id": "", "status": "complete"}, state="complete")
+        validate_mission_payload(
+            {"mission_id": "", "status": "complete"}, state="complete"
+        )
     response = transform_validation_error(excinfo.value)
     assert response["error"] == "validation_error"
     assert response["details"]

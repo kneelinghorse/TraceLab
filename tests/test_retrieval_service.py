@@ -1,8 +1,9 @@
 """Validate retrieval service and API plumbing."""
+
 from fastapi.testclient import TestClient
 
-from app.main import app
 from app.api.v1 import retrieval as retrieval_router
+from app.main import app
 from app.services import retrieval_service as retrieval_module
 
 
@@ -45,9 +46,7 @@ def test_retrieval_service_search(monkeypatch):
     monkeypatch.setattr(
         retrieval_module, "get_embedding_service", lambda: fake_embedding
     )
-    monkeypatch.setattr(
-        retrieval_module, "get_qdrant_service", lambda: fake_qdrant
-    )
+    monkeypatch.setattr(retrieval_module, "get_qdrant_service", lambda: fake_qdrant)
 
     service = retrieval_module.RetrievalService(faceted_service=_StubFacetedService())
     results = service.search(
@@ -73,9 +72,7 @@ def test_retrieval_service_auto_hnsw(monkeypatch):
     monkeypatch.setattr(
         retrieval_module, "get_embedding_service", lambda: fake_embedding
     )
-    monkeypatch.setattr(
-        retrieval_module, "get_qdrant_service", lambda: fake_qdrant
-    )
+    monkeypatch.setattr(retrieval_module, "get_qdrant_service", lambda: fake_qdrant)
 
     service = retrieval_module.RetrievalService(faceted_service=_StubFacetedService())
     results = service.search(
@@ -97,14 +94,14 @@ def test_retrieval_api_endpoint(monkeypatch, auth_headers):
     monkeypatch.setattr(
         retrieval_router,
         "get_retrieval_service",
-        lambda: retrieval_module.RetrievalService(faceted_service=_StubFacetedService()),
+        lambda: retrieval_module.RetrievalService(
+            faceted_service=_StubFacetedService()
+        ),
     )
     monkeypatch.setattr(
         retrieval_module, "get_embedding_service", lambda: fake_embedding
     )
-    monkeypatch.setattr(
-        retrieval_module, "get_qdrant_service", lambda: fake_qdrant
-    )
+    monkeypatch.setattr(retrieval_module, "get_qdrant_service", lambda: fake_qdrant)
 
     client = TestClient(app)
     response = client.post(

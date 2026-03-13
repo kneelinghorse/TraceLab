@@ -4,6 +4,7 @@ This plugin captures per-test outcomes along with aggregate metadata and
 persists them as JSON so the telemetry aggregator can build
 ``testing-summary.json`` without manual editing.
 """
+
 from __future__ import annotations
 
 import json
@@ -125,21 +126,31 @@ class PytestTelemetryPlugin:
         self._timer = time.perf_counter()
         self.records: Dict[str, TestRecord] = {}
 
-        output_override = config.getoption("pytest_telemetry_output") or os.getenv("PYTEST_TELEMETRY_OUTPUT")
+        output_override = config.getoption("pytest_telemetry_output") or os.getenv(
+            "PYTEST_TELEMETRY_OUTPUT"
+        )
         self.output_path = self._resolve_path(output_override or DEFAULT_OUTPUT)
         self.output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        self.label = config.getoption("pytest_telemetry_label") or os.getenv("PYTEST_TELEMETRY_LABEL")
+        self.label = config.getoption("pytest_telemetry_label") or os.getenv(
+            "PYTEST_TELEMETRY_LABEL"
+        )
 
     # --- Pytest hook implementations -------------------------------------------------
-    def pytest_runtest_logreport(self, report):  # pragma: no cover - exercised via pytest runtime
+    def pytest_runtest_logreport(
+        self, report
+    ):  # pragma: no cover - exercised via pytest runtime
         # Skip collection stage noise.
         if report.nodeid.startswith("collect"):
             return
 
         record = self.records.get(report.nodeid)
         if record is None:
-            rel_file = self._relative_path(report.location[0]) if report.location else report.nodeid
+            rel_file = (
+                self._relative_path(report.location[0])
+                if report.location
+                else report.nodeid
+            )
             record = TestRecord(
                 nodeid=report.nodeid,
                 file=rel_file,
@@ -158,7 +169,9 @@ class PytestTelemetryPlugin:
         )
         record.add_phase(phase)
 
-    def pytest_sessionfinish(self, session, exitstatus):  # pragma: no cover - exercised via pytest runtime
+    def pytest_sessionfinish(
+        self, session, exitstatus
+    ):  # pragma: no cover - exercised via pytest runtime
         payload = self._build_payload(session, exitstatus)
         with self.output_path.open("w", encoding="utf-8") as handle:
             json.dump(payload, handle, indent=2)
@@ -178,7 +191,14 @@ class PytestTelemetryPlugin:
 
     def _build_payload(self, session, exitstatus) -> Dict[str, Any]:
         duration = time.perf_counter() - self._timer
-        aggregated: Dict[str, int] = {"passed": 0, "failed": 0, "skipped": 0, "xfailed": 0, "xpassed": 0, "error": 0}
+        aggregated: Dict[str, int] = {
+            "passed": 0,
+            "failed": 0,
+            "skipped": 0,
+            "xfailed": 0,
+            "xpassed": 0,
+            "error": 0,
+        }
         serialized_tests: List[Dict[str, Any]] = []
 
         for record in sorted(self.records.values(), key=lambda item: item.nodeid):
@@ -206,7 +226,11 @@ class PytestTelemetryPlugin:
             )
 
         total = sum(aggregated.values())
-        failures = aggregated.get("failed", 0) + aggregated.get("error", 0) + aggregated.get("xpassed", 0)
+        failures = (
+            aggregated.get("failed", 0)
+            + aggregated.get("error", 0)
+            + aggregated.get("xpassed", 0)
+        )
         status = "passed" if failures == 0 else "failed"
 
         payload: Dict[str, Any] = {
@@ -222,7 +246,11 @@ class PytestTelemetryPlugin:
             "environment": self._environment_block(session, exitstatus),
             "label": self.label,
             "tests": serialized_tests,
-            "artifactPath": str(self.output_path.relative_to(self.repo_root) if self.output_path.is_relative_to(self.repo_root) else self.output_path),
+            "artifactPath": str(
+                self.output_path.relative_to(self.repo_root)
+                if self.output_path.is_relative_to(self.repo_root)
+                else self.output_path
+            ),
         }
 
         return payload
@@ -247,13 +275,17 @@ class PytestTelemetryPlugin:
             return env_sha
 
         try:
-            result = subprocess.run([
-                "git",
-                "rev-parse",
-                "HEAD",
-            ], capture_output=True, check=True, text=True)
+            result = subprocess.run(
+                [
+                    "git",
+                    "rev-parse",
+                    "HEAD",
+                ],
+                capture_output=True,
+                check=True,
+                text=True,
+            )
         except Exception:
             return None
 
         return result.stdout.strip() or None
-

@@ -1,17 +1,14 @@
 """Tests for SynthesisCacheService."""
+
 from __future__ import annotations
 
-import hashlib
-import json
-from datetime import datetime, timezone
 from unittest.mock import MagicMock, patch
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
-from app.core.database import Base
 from app.models.synthesis_cache import SynthesisCache
 from app.services.synthesis_cache import SynthesisCacheService
 
@@ -20,8 +17,9 @@ from app.services.synthesis_cache import SynthesisCacheService
 def test_engine():
     """Create an in-memory SQLite engine for testing."""
     engine = create_engine("sqlite:///:memory:", echo=False)
-    from tests.conftest import _sqlite_jsonb_array_length, _create_all_sqlite_safe
     from sqlalchemy import event
+
+    from tests.conftest import _create_all_sqlite_safe, _sqlite_jsonb_array_length
 
     @event.listens_for(engine, "connect")
     def _register(dbapi_conn, connection_record):
@@ -53,8 +51,16 @@ def sample_chunk_ids():
 def sample_citations():
     """Generate sample citations."""
     return [
-        {"chunk_id": str(uuid4()), "document_id": str(uuid4()), "excerpt": "Sample excerpt 1"},
-        {"chunk_id": str(uuid4()), "document_id": str(uuid4()), "excerpt": "Sample excerpt 2"},
+        {
+            "chunk_id": str(uuid4()),
+            "document_id": str(uuid4()),
+            "excerpt": "Sample excerpt 1",
+        },
+        {
+            "chunk_id": str(uuid4()),
+            "document_id": str(uuid4()),
+            "excerpt": "Sample excerpt 2",
+        },
     ]
 
 
@@ -143,7 +149,9 @@ class TestComputeHash:
         )
         assert hash1 == hash2
 
-    def test_compute_hash_different_inputs_different_hashes(self, cache_service, sample_chunk_ids):
+    def test_compute_hash_different_inputs_different_hashes(
+        self, cache_service, sample_chunk_ids
+    ):
         """Test that different inputs produce different hashes."""
         hash1 = cache_service.compute_hash(
             chunk_ids=sample_chunk_ids,
@@ -179,7 +187,11 @@ class TestCacheSet:
 
         # Verify entry exists in DB
         session = test_session_factory()
-        entry = session.query(SynthesisCache).filter(SynthesisCache.id == cache_id).one_or_none()
+        entry = (
+            session.query(SynthesisCache)
+            .filter(SynthesisCache.id == cache_id)
+            .one_or_none()
+        )
         session.close()
 
         assert entry is not None
@@ -305,7 +317,9 @@ class TestCacheGet:
 
         # Verify last_hit_at is None initially
         session = test_session_factory()
-        entry = session.query(SynthesisCache).filter(SynthesisCache.id == cache_id).one()
+        entry = (
+            session.query(SynthesisCache).filter(SynthesisCache.id == cache_id).one()
+        )
         initial_hit_at = entry.last_hit_at
         session.close()
 
@@ -320,7 +334,9 @@ class TestCacheGet:
 
         # Verify last_hit_at is now set
         session = test_session_factory()
-        entry = session.query(SynthesisCache).filter(SynthesisCache.id == cache_id).one()
+        entry = (
+            session.query(SynthesisCache).filter(SynthesisCache.id == cache_id).one()
+        )
         session.close()
 
         assert entry.last_hit_at is not None
@@ -348,7 +364,9 @@ class TestRecordHit:
 
         # Verify count
         session = test_session_factory()
-        entry = session.query(SynthesisCache).filter(SynthesisCache.id == cache_id).one()
+        entry = (
+            session.query(SynthesisCache).filter(SynthesisCache.id == cache_id).one()
+        )
         session.close()
 
         assert entry.hit_count == 2
@@ -372,9 +390,7 @@ class TestGetStats:
         assert stats["total_tokens_saved"] == 0
         assert stats["top_entries"] == []
 
-    def test_get_stats_with_entries(
-        self, cache_service, sample_citations
-    ):
+    def test_get_stats_with_entries(self, cache_service, sample_citations):
         """Test stats with cache entries."""
         # Add entries
         ids1 = [uuid4() for _ in range(3)]
@@ -411,9 +427,7 @@ class TestGetStats:
         assert stats["total_tokens_saved"] == 400
         assert len(stats["top_entries"]) == 2
 
-    def test_get_stats_top_entries_ordered(
-        self, cache_service, sample_citations
-    ):
+    def test_get_stats_top_entries_ordered(self, cache_service, sample_citations):
         """Test that top entries are ordered by hit count."""
         # Add entries with different hit counts
         ids1 = [uuid4() for _ in range(2)]
@@ -483,7 +497,11 @@ class TestInvalidate:
 
         # Verify entry is deleted
         session = test_session_factory()
-        entry = session.query(SynthesisCache).filter(SynthesisCache.id == cache_id).one_or_none()
+        entry = (
+            session.query(SynthesisCache)
+            .filter(SynthesisCache.id == cache_id)
+            .one_or_none()
+        )
         session.close()
 
         assert entry is None
@@ -502,9 +520,10 @@ class TestInvalidate:
 class TestSynthesisServiceIntegration:
     """Integration tests with SynthesisService."""
 
-    def test_synthesis_service_uses_cache(self, cache_service, sample_chunk_ids, sample_citations):
+    def test_synthesis_service_uses_cache(
+        self, cache_service, sample_chunk_ids, sample_citations
+    ):
         """Test that SynthesisService integrates with cache."""
-        from unittest.mock import MagicMock, patch
 
         # Mock the OpenAI client
         mock_response = MagicMock()
@@ -516,10 +535,11 @@ class TestSynthesisServiceIntegration:
         mock_response.usage.total_tokens = 150
 
         # Patch OpenAI and settings
-        with patch("app.services.synthesis.OpenAI") as mock_openai_class, \
-            patch("app.services.synthesis.settings") as mock_settings, \
-             patch("app.services.synthesis._openai_import_error", None):
-
+        with (
+            patch("app.services.synthesis.OpenAI") as mock_openai_class,
+            patch("app.services.synthesis.settings") as mock_settings,
+            patch("app.services.synthesis._openai_import_error", None),
+        ):
             mock_settings.openai_api_key = "test-key"
             mock_settings.openai_chat_model = "gpt-5.1"
 

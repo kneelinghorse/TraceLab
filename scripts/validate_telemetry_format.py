@@ -8,6 +8,7 @@ Usage:
 
 Exit code 0 if all files pass, 1 if any violations found (strict mode).
 """
+
 from __future__ import annotations
 
 import argparse
@@ -33,16 +34,18 @@ def find_jsonl_files() -> list[Path]:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Validate telemetry JSONL envelope conformance")
+    parser = argparse.ArgumentParser(
+        description="Validate telemetry JSONL envelope conformance"
+    )
     parser.add_argument("--strict", action="store_true", help="Exit 1 on any violation")
     parser.add_argument("--file", type=Path, help="Validate a single file")
     args = parser.parse_args()
 
     files = [args.file] if args.file else find_jsonl_files()
 
-    print(f"\n{'='*70}")
+    print(f"\n{'=' * 70}")
     print(f" Telemetry Envelope Conformance Report")
-    print(f"{'='*70}\n")
+    print(f"{'=' * 70}\n")
 
     total_files = 0
     total_events = 0
@@ -75,14 +78,16 @@ def main():
         )
         if result["first_violations"]:
             for v in result["first_violations"][:2]:
-                print(f"            Line {v['line']}: {v['error']} {v.get('missing', '')}")
+                print(
+                    f"            Line {v['line']}: {v['error']} {v.get('missing', '')}"
+                )
 
     overall_rate = total_conforming / total_events if total_events else 1.0
-    print(f"\n{'='*70}")
+    print(f"\n{'=' * 70}")
     print(f" Summary: {total_files} files, {total_events} events")
     print(f"   Conforming: {total_conforming} ({overall_rate:.1%})")
     print(f"   Violations: {total_violations}")
-    print(f"{'='*70}\n")
+    print(f"{'=' * 70}\n")
 
     if args.strict and total_violations > 0:
         sys.exit(1)

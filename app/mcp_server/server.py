@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Optional
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
@@ -42,7 +41,7 @@ def create_mcp_server(name: str = "tracelab") -> Server:
     return server
 
 
-async def run_server(server: Optional[Server] = None) -> None:
+async def run_server(server: Server | None = None) -> None:
     """Run the MCP server using stdio transport.
 
     Args:

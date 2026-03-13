@@ -1,4 +1,5 @@
 """Tests for ProxyHeadersMiddleware to ensure HTTPS redirects work correctly."""
+
 import pytest
 from fastapi import FastAPI, Request
 from fastapi.testclient import TestClient
@@ -16,16 +17,10 @@ class TestProxyHeadersMiddleware:
 
         @app.get("/scheme-check")
         async def scheme_check(request: Request):
-            return {
-                "scheme": request.url.scheme,
-                "url": str(request.url)
-            }
+            return {"scheme": request.url.scheme, "url": str(request.url)}
 
         client = TestClient(app)
-        response = client.get(
-            "/scheme-check",
-            headers={"X-Forwarded-Proto": "https"}
-        )
+        response = client.get("/scheme-check", headers={"X-Forwarded-Proto": "https"})
         assert response.status_code == 200
         data = response.json()
         assert data["scheme"] == "https", f"Expected https scheme, got: {data}"
@@ -57,8 +52,7 @@ class TestProxyHeadersMiddleware:
 
         client = TestClient(app)
         response = client.get(
-            "/host-check",
-            headers={"X-Forwarded-Host": "api.namozine.com"}
+            "/host-check", headers={"X-Forwarded-Host": "api.namozine.com"}
         )
         assert response.status_code == 200
         # The middleware should update the host header
@@ -78,15 +72,17 @@ class TestProxyHeadersMiddleware:
 
         # Use httpx with ASGITransport for async apps
         transport = httpx.ASGITransport(app=app)
-        async with httpx.AsyncClient(transport=transport, base_url="http://testserver") as client:
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://testserver"
+        ) as client:
             response = await client.get(
-                "/test",
-                headers={"X-Forwarded-Proto": "https"},
-                follow_redirects=False
+                "/test", headers={"X-Forwarded-Proto": "https"}, follow_redirects=False
             )
             assert response.status_code == 307
             location = response.headers.get("location", "")
-            assert location.startswith("https://"), f"Expected HTTPS redirect, got: {location}"
+            assert location.startswith("https://"), (
+                f"Expected HTTPS redirect, got: {location}"
+            )
 
     def test_no_redirect_when_trailing_slash_present(self):
         """Verify no redirect when URL has trailing slash."""
@@ -98,9 +94,6 @@ class TestProxyHeadersMiddleware:
             return {"status": "ok"}
 
         client = TestClient(app)
-        response = client.get(
-            "/test/",
-            headers={"X-Forwarded-Proto": "https"}
-        )
+        response = client.get("/test/", headers={"X-Forwarded-Proto": "https"})
         assert response.status_code == 200
         assert response.json() == {"status": "ok"}

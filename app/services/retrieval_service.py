@@ -1,38 +1,39 @@
 """Retrieval service for RAG query functionality."""
+
 from datetime import date
-from typing import List, Dict, Any, Optional
+from typing import Any
 
 from app.core.config import settings
 from app.services.embedding_service import get_embedding_service
-from app.services.faceted_search import FacetFilters, FacetedSearchService
+from app.services.faceted_search import FacetedSearchService, FacetFilters
 from app.services.qdrant_service import get_qdrant_service
 
 
 class RetrievalService:
     """Service for retrieving relevant document chunks using semantic search."""
-    
-    def __init__(self, faceted_service: Optional[FacetedSearchService] = None):
+
+    def __init__(self, faceted_service: FacetedSearchService | None = None):
         self.embedding_service = get_embedding_service()
         self.qdrant_service = get_qdrant_service()
         self.faceted_service = faceted_service or FacetedSearchService()
-    
+
     def search(
         self,
         query: str,
         top_k: int = 5,
-        project_id: Optional[str] = None,
-        document_id: Optional[str] = None,
-        source_type: Optional[str] = None,
-        source_origin: Optional[str] = None,
-        document_types: Optional[List[str]] = None,
-        source_types: Optional[List[str]] = None,
-        date_from: Optional[date] = None,
-        date_to: Optional[date] = None,
-        tags: Optional[List[str]] = None,
-        hnsw_ef: Optional[int] = None,
-        query_embedding: Optional[List[float]] = None,
-        include_embeddings: bool = False
-    ) -> List[Dict[str, Any]]:
+        project_id: str | None = None,
+        document_id: str | None = None,
+        source_type: str | None = None,
+        source_origin: str | None = None,
+        document_types: list[str] | None = None,
+        source_types: list[str] | None = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
+        tags: list[str] | None = None,
+        hnsw_ef: int | None = None,
+        query_embedding: list[float] | None = None,
+        include_embeddings: bool = False,
+    ) -> list[dict[str, Any]]:
         """
         Search for relevant chunks using semantic similarity.
 
@@ -53,7 +54,9 @@ class RetrievalService:
 
         # Generate query embedding (can be precomputed by caller)
         effective_query_embedding = (
-            query_embedding if query_embedding is not None else self.embedding_service.generate_embedding(query)
+            query_embedding
+            if query_embedding is not None
+            else self.embedding_service.generate_embedding(query)
         )
 
         # Search Qdrant
@@ -65,7 +68,7 @@ class RetrievalService:
             source_type=source_type,
             source_origin=source_origin,
             hnsw_ef=resolved_hnsw_ef,
-            with_vectors=include_embeddings
+            with_vectors=include_embeddings,
         )
 
         filters = FacetFilters.from_kwargs(
@@ -106,7 +109,7 @@ class RetrievalService:
 
 
 # Singleton instance (lazy initialization)
-_retrieval_service: Optional[RetrievalService] = None
+_retrieval_service: RetrievalService | None = None
 
 
 def get_retrieval_service() -> RetrievalService:

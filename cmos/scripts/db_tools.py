@@ -18,29 +18,31 @@ except ModuleNotFoundError as exc:  # pragma: no cover - optional dependency
 
 def _find_cmos_root() -> Path:
     """Find cmos/ directory from any working directory.
-    
+
     Searches in order:
     1. Check if script is in cmos/scripts/ (standard location)
     2. Check if cmos/ exists relative to cwd
     3. Walk up parent directories looking for cmos/
-    
+
     Returns:
         Path to cmos/ directory
-        
+
     Raises:
         RuntimeError: If cmos/ directory cannot be found
     """
     script_dir = Path(__file__).resolve().parent
-    
+
     # Are we in cmos/scripts/?
     candidate = script_dir.parent
-    if (candidate / "db" / "schema.sql").exists() and (candidate / "agents.md").exists():
+    if (candidate / "db" / "schema.sql").exists() and (
+        candidate / "agents.md"
+    ).exists():
         return candidate
-    
+
     # Is cmos/ a subdirectory of cwd?
     if (Path.cwd() / "cmos" / "db" / "schema.sql").exists():
         return Path.cwd() / "cmos"
-    
+
     # Walk up from cwd looking for cmos/
     current = Path.cwd().resolve()
     for _ in range(5):
@@ -49,7 +51,7 @@ def _find_cmos_root() -> Path:
         if current.parent == current:  # Reached filesystem root
             break
         current = current.parent
-    
+
     raise RuntimeError(
         "Cannot find cmos/ directory. Please run from project root or set CMOS_ROOT environment variable."
     )
@@ -154,8 +156,12 @@ def export_contexts(args: argparse.Namespace) -> None:
     master_path = output_root / "context" / "MASTER_CONTEXT.json"
     _ensure_output_path(project_path)
     _ensure_output_path(master_path)
-    project_path.write_text(json.dumps(project, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    master_path.write_text(json.dumps(master, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    project_path.write_text(
+        json.dumps(project, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    master_path.write_text(
+        json.dumps(master, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     print(f"Exported project context to {project_path}")
     print(f"Exported master context to {master_path}")
 
@@ -187,7 +193,9 @@ def export_backlog(args: argparse.Namespace) -> None:
     output_path = args.output.resolve()
     _ensure_output_path(output_path)
     with output_path.open("w", encoding="utf-8") as handle:
-        yaml.safe_dump_all([metadata_doc, {"domainFields": domain_fields}], handle, sort_keys=False)
+        yaml.safe_dump_all(
+            [metadata_doc, {"domainFields": domain_fields}], handle, sort_keys=False
+        )
     print(f"Exported backlog to {output_path}")
 
 
@@ -203,9 +211,13 @@ def show_backlog(args: argparse.Namespace) -> None:
         return
 
     for sprint in backlog["sprints"]:
-        print(f"[{sprint.get('sprintId') or 'UNSET'}] {sprint.get('title') or '(untitled sprint)'}")
+        print(
+            f"[{sprint.get('sprintId') or 'UNSET'}] {sprint.get('title') or '(untitled sprint)'}"
+        )
         status = sprint.get("status") or "unknown"
-        window = " - ".join(filter(None, [sprint.get("startDate"), sprint.get("endDate")]))
+        window = " - ".join(
+            filter(None, [sprint.get("startDate"), sprint.get("endDate")])
+        )
         print(f"  status: {status}")
         if window:
             print(f"  window: {window}")
@@ -264,7 +276,10 @@ def parse_args() -> argparse.Namespace:
 
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    export_ctx = subparsers.add_parser("export-contexts", help="Write PROJECT_CONTEXT.json and MASTER_CONTEXT.json from the database")
+    export_ctx = subparsers.add_parser(
+        "export-contexts",
+        help="Write PROJECT_CONTEXT.json and MASTER_CONTEXT.json from the database",
+    )
     export_ctx.add_argument(
         "--output-root",
         type=Path,
@@ -273,7 +288,9 @@ def parse_args() -> argparse.Namespace:
     )
     export_ctx.set_defaults(func=export_contexts)
 
-    export_backlog_parser = subparsers.add_parser("export-backlog", help="Write missions/backlog.yaml based on the database")
+    export_backlog_parser = subparsers.add_parser(
+        "export-backlog", help="Write missions/backlog.yaml based on the database"
+    )
     export_backlog_parser.add_argument(
         "--output",
         type=Path,
@@ -282,10 +299,14 @@ def parse_args() -> argparse.Namespace:
     )
     export_backlog_parser.set_defaults(func=export_backlog)
 
-    show_backlog_parser = subparsers.add_parser("show-backlog", help="Display sprint and mission status from the database")
+    show_backlog_parser = subparsers.add_parser(
+        "show-backlog", help="Display sprint and mission status from the database"
+    )
     show_backlog_parser.set_defaults(func=show_backlog)
 
-    current_parser = subparsers.add_parser("show-current", help="Display the current mission and active work indicators")
+    current_parser = subparsers.add_parser(
+        "show-current", help="Display the current mission and active work indicators"
+    )
     current_parser.set_defaults(func=show_current_mission)
 
     return parser.parse_args()

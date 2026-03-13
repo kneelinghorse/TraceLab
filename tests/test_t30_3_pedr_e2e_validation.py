@@ -16,17 +16,10 @@ Success Criteria:
 5. Cache returns correct results (no poisoning)
 """
 
-import hashlib
 import time
-from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
-from unittest.mock import MagicMock, patch
-from uuid import uuid4
-
-import pytest
+from unittest.mock import MagicMock
 
 from app.core.config import settings
-
 
 # ============================================================================
 # SC-1: Search queries return relevant results with correct scoring
@@ -38,7 +31,7 @@ class TestSearchQueryScoringCorrectness:
 
     def test_rrf_fusion_produces_valid_scores(self):
         """RRF scores should be bounded and correctly computed."""
-        from app.services.pedr.fusion import RRFFusion, LayerResult
+        from app.services.pedr.fusion import LayerResult, RRFFusion
 
         fusion = RRFFusion(k=60)
 
@@ -94,11 +87,13 @@ class TestSearchQueryScoringCorrectness:
 
     def test_rrf_weighted_layers_respect_weights(self):
         """Layer weights should proportionally affect RRF scores."""
-        from app.services.pedr.fusion import RRFFusion, LayerResult
+        from app.services.pedr.fusion import LayerResult, RRFFusion
 
         # Same result in two layers, but with different weights
         high_weight = LayerResult(
-            layer_name="semantic", results=[{"chunk_id": "c1", "score": 0.9}], weight=0.5
+            layer_name="semantic",
+            results=[{"chunk_id": "c1", "score": 0.9}],
+            weight=0.5,
         )
         low_weight = LayerResult(
             layer_name="lexical", results=[{"chunk_id": "c2", "score": 0.9}], weight=0.1
@@ -132,7 +127,10 @@ class TestSearchQueryScoringCorrectness:
 
     def test_ensure_base_score_persists_canonical_value(self):
         """Base score should be set once and not overwritten by subsequent boosts."""
-        from app.services.pedr.score_utils import ensure_base_score, fuse_independent_adjustments
+        from app.services.pedr.score_utils import (
+            ensure_base_score,
+            fuse_independent_adjustments,
+        )
 
         payload = {"rrf_score": 0.45}
 
@@ -170,7 +168,11 @@ class TestSearchQueryScoringCorrectness:
         service = PragmaticService()
 
         # Search queries
-        for q in ["find documents about research", "show me insights", "what is the status?"]:
+        for q in [
+            "find documents about research",
+            "show me insights",
+            "what is the status?",
+        ]:
             result = service.classify_intent(q)
             assert result.intent == QueryIntent.SEARCH, f"'{q}' should be SEARCH"
             assert result.confidence >= 0.85
@@ -247,7 +249,9 @@ class TestSynthesisCoherence:
         service.run_query(query="test GPT-5 params", top_k=2, project_id="proj-1")
 
         request = fake_client.chat.completions.requests[0]
-        assert "max_completion_tokens" in request, "GPT-5.x must use max_completion_tokens"
+        assert "max_completion_tokens" in request, (
+            "GPT-5.x must use max_completion_tokens"
+        )
         assert "max_tokens" not in request, "GPT-5.x must NOT use max_tokens"
         assert request["reasoning_effort"] == "none"
 
@@ -301,7 +305,9 @@ class TestSynthesisCoherence:
             cost_monitor=None,
         )
 
-        result = service.run_query(query="user research findings", top_k=5, project_id="proj-1")
+        result = service.run_query(
+            query="user research findings", top_k=5, project_id="proj-1"
+        )
 
         assert "answer" in result
         assert len(result["answer"]) > 0
@@ -351,8 +357,8 @@ class TestEvidenceAutoLinking:
     def test_embedding_path_links_high_similarity_chunk(self):
         """Embedding path should link evidence to chunk when similarity > threshold."""
         from app.services.evidence_auto_linking import (
-            EvidenceAutoLinkingService,
             EvidenceAutoLinkingResult,
+            EvidenceAutoLinkingService,
         )
 
         mock_embedding = MagicMock()
@@ -397,9 +403,9 @@ class TestEvidenceAutoLinking:
     def test_embedding_path_rejects_low_similarity(self):
         """Evidence below threshold should NOT be linked."""
         from app.services.evidence_auto_linking import (
-            EvidenceAutoLinkingService,
-            EvidenceAutoLinkingResult,
             AutoLinkErrorType,
+            EvidenceAutoLinkingResult,
+            EvidenceAutoLinkingService,
         )
 
         mock_embedding = MagicMock()
@@ -505,7 +511,7 @@ class TestScoreDistributionIntegrity:
 
     def test_score_distribution_not_inflated_by_rrf(self):
         """RRF scores should be in reasonable range, not exceeding theoretical maximum."""
-        from app.services.pedr.fusion import RRFFusion, LayerResult
+        from app.services.pedr.fusion import LayerResult, RRFFusion
 
         fusion = RRFFusion(k=60)
 
@@ -529,24 +535,20 @@ class TestScoreDistributionIntegrity:
 
     def test_typical_score_distribution(self):
         """Typical query should produce scores in expected RRF range."""
-        from app.services.pedr.fusion import RRFFusion, LayerResult
+        from app.services.pedr.fusion import LayerResult, RRFFusion
 
         fusion = RRFFusion(k=60)
 
         # Typical: 10 results across 2 layers with partial overlap
         layer_a = LayerResult(
             layer_name="semantic",
-            results=[
-                {"chunk_id": f"c{i}", "score": 1.0 - i * 0.1}
-                for i in range(10)
-            ],
+            results=[{"chunk_id": f"c{i}", "score": 1.0 - i * 0.1} for i in range(10)],
             weight=0.35,
         )
         layer_b = LayerResult(
             layer_name="lexical",
             results=[
-                {"chunk_id": f"c{i+3}", "score": 0.9 - i * 0.1}
-                for i in range(8)
+                {"chunk_id": f"c{i + 3}", "score": 0.9 - i * 0.1} for i in range(8)
             ],
             weight=0.25,
         )
@@ -620,16 +622,26 @@ class TestCacheCorrectness:
         results_proj2 = [{"chunk_id": "c2"}]
 
         cache.set(
-            query="test", top_k=10,
-            filters={"project_id": "proj-1"}, results=results_proj1,
+            query="test",
+            top_k=10,
+            filters={"project_id": "proj-1"},
+            results=results_proj1,
         )
         cache.set(
-            query="test", top_k=10,
-            filters={"project_id": "proj-2"}, results=results_proj2,
+            query="test",
+            top_k=10,
+            filters={"project_id": "proj-2"},
+            results=results_proj2,
         )
 
-        assert cache.get(query="test", top_k=10, filters={"project_id": "proj-1"}) == results_proj1
-        assert cache.get(query="test", top_k=10, filters={"project_id": "proj-2"}) == results_proj2
+        assert (
+            cache.get(query="test", top_k=10, filters={"project_id": "proj-1"})
+            == results_proj1
+        )
+        assert (
+            cache.get(query="test", top_k=10, filters={"project_id": "proj-2"})
+            == results_proj2
+        )
 
     def test_ttl_expiration(self):
         """Expired entries should return None (cache miss)."""
@@ -666,12 +678,16 @@ class TestCacheCorrectness:
         cache = PEDRCache(max_size=100, ttl_seconds=300)
 
         cache.set(
-            query="q1", top_k=10,
-            filters={"project_id": "proj-A"}, results=[{"id": "1"}],
+            query="q1",
+            top_k=10,
+            filters={"project_id": "proj-A"},
+            results=[{"id": "1"}],
         )
         cache.set(
-            query="q2", top_k=10,
-            filters={"project_id": "proj-B"}, results=[{"id": "2"}],
+            query="q2",
+            top_k=10,
+            filters={"project_id": "proj-B"},
+            results=[{"id": "2"}],
         )
 
         removed = cache.invalidate_project("proj-A")
@@ -680,7 +696,9 @@ class TestCacheCorrectness:
         # proj-A entry gone
         assert cache.get(query="q1", top_k=10, filters={"project_id": "proj-A"}) is None
         # proj-B entry still there
-        assert cache.get(query="q2", top_k=10, filters={"project_id": "proj-B"}) == [{"id": "2"}]
+        assert cache.get(query="q2", top_k=10, filters={"project_id": "proj-B"}) == [
+            {"id": "2"}
+        ]
 
     def test_lru_eviction(self):
         """LRU eviction should remove oldest entries when max_size exceeded."""
@@ -698,7 +716,9 @@ class TestCacheCorrectness:
         # Adding q4 should evict q2 (oldest non-accessed)
         cache.set(query="q4", top_k=10, filters={}, results=[{"id": "4"}])
 
-        assert cache.get(query="q1", top_k=10, filters={}) is not None  # recently accessed
+        assert (
+            cache.get(query="q1", top_k=10, filters={}) is not None
+        )  # recently accessed
         assert cache.get(query="q2", top_k=10, filters={}) is None  # evicted
         assert cache.get(query="q3", top_k=10, filters={}) is not None
         assert cache.get(query="q4", top_k=10, filters={}) is not None
@@ -710,7 +730,9 @@ class TestCacheCorrectness:
         cache = PEDRCache()
         key1 = cache._generate_key("test query", 10, {"project_id": "p1"})
         key2 = cache._generate_key("test query", 10, {"project_id": "p1"})
-        key3 = cache._generate_key("Test Query", 10, {"project_id": "p1"})  # case-insensitive
+        key3 = cache._generate_key(
+            "Test Query", 10, {"project_id": "p1"}
+        )  # case-insensitive
 
         assert key1 == key2
         assert key1 == key3  # normalized to lowercase
@@ -797,10 +819,10 @@ class _FakePEDROrchestrator:
 
     def search(self, **kwargs):
         from app.services.pedr.search_orchestrator import (
+            LayerTimings,
+            PEDRMetadata,
             PEDRSearchResponse,
             PEDRSearchResult,
-            PEDRMetadata,
-            LayerTimings,
         )
 
         self.calls.append(kwargs)

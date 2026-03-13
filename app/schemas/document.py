@@ -1,17 +1,18 @@
 """Pydantic schemas for document entities."""
+
 from __future__ import annotations
 
-from datetime import datetime, date
+from datetime import date, datetime
 from decimal import Decimal
-from typing import List, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
 if TYPE_CHECKING:
     from app.schemas.chunk import DocumentChunkRead
-    from app.schemas.tag import DocumentTagRead
     from app.schemas.document_status import DocumentProcessingStatusRead
+    from app.schemas.tag import DocumentTagRead
 
 
 class DocumentBase(BaseModel):
@@ -19,21 +20,21 @@ class DocumentBase(BaseModel):
 
     project_id: UUID
     name: str
-    file_path: Optional[str] = None
-    file_type: Optional[str] = None
-    content: Optional[str] = None
-    raw_content: Optional[bytes] = None
-    uploaded_at: Optional[datetime] = None
-    file_size: Optional[int] = None
-    mime_type: Optional[str] = None
-    source_type: Optional[str] = None
-    participant_count: Optional[int] = None
-    collection_date: Optional[date] = None
-    processed: Optional[bool] = False
-    chunked: Optional[bool] = False
-    embedded: Optional[bool] = False
-    transcription_accuracy: Optional[Decimal] = None
-    validation_status: Optional[str] = None
+    file_path: str | None = None
+    file_type: str | None = None
+    content: str | None = None
+    raw_content: bytes | None = None
+    uploaded_at: datetime | None = None
+    file_size: int | None = None
+    mime_type: str | None = None
+    source_type: str | None = None
+    participant_count: int | None = None
+    collection_date: date | None = None
+    processed: bool | None = False
+    chunked: bool | None = False
+    embedded: bool | None = False
+    transcription_accuracy: Decimal | None = None
+    validation_status: str | None = None
 
 
 class DocumentCreate(DocumentBase):
@@ -45,38 +46,38 @@ class DocumentCreate(DocumentBase):
 class DocumentUpdate(BaseModel):
     """Payload for updating a document."""
 
-    project_id: Optional[UUID] = None
-    name: Optional[str] = None
-    file_path: Optional[str] = None
-    file_type: Optional[str] = None
-    content: Optional[str] = None
-    raw_content: Optional[bytes] = None
-    uploaded_at: Optional[datetime] = None
-    file_size: Optional[int] = None
-    mime_type: Optional[str] = None
-    source_type: Optional[str] = None
-    participant_count: Optional[int] = None
-    collection_date: Optional[date] = None
-    processed: Optional[bool] = None
-    chunked: Optional[bool] = None
-    embedded: Optional[bool] = None
-    transcription_accuracy: Optional[Decimal] = None
-    validation_status: Optional[str] = None
+    project_id: UUID | None = None
+    name: str | None = None
+    file_path: str | None = None
+    file_type: str | None = None
+    content: str | None = None
+    raw_content: bytes | None = None
+    uploaded_at: datetime | None = None
+    file_size: int | None = None
+    mime_type: str | None = None
+    source_type: str | None = None
+    participant_count: int | None = None
+    collection_date: date | None = None
+    processed: bool | None = None
+    chunked: bool | None = None
+    embedded: bool | None = None
+    transcription_accuracy: Decimal | None = None
+    validation_status: str | None = None
 
 
 class DocumentRead(DocumentBase):
     """Representation of a persisted document."""
 
     id: UUID
-    chunks: Optional[List["DocumentChunkRead"]] = None
-    tags: Optional[List["DocumentTagRead"]] = None
-    processing_events: Optional[List["DocumentProcessingStatusRead"]] = None
+    chunks: list[DocumentChunkRead] | None = None
+    tags: list[DocumentTagRead] | None = None
+    processing_events: list[DocumentProcessingStatusRead] | None = None
 
     # Stats computed from chunks
-    chunk_count: Optional[int] = None
-    total_tokens: Optional[int] = None
-    word_count: Optional[int] = None
-    preview: Optional[str] = None
+    chunk_count: int | None = None
+    total_tokens: int | None = None
+    word_count: int | None = None
+    preview: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -87,21 +88,21 @@ class DocumentListItem(BaseModel):
     id: UUID
     project_id: UUID
     name: str
-    file_type: Optional[str] = None
-    file_size: Optional[int] = None
-    mime_type: Optional[str] = None
-    source_type: Optional[str] = None
-    uploaded_at: Optional[datetime] = None
+    file_type: str | None = None
+    file_size: int | None = None
+    mime_type: str | None = None
+    source_type: str | None = None
+    uploaded_at: datetime | None = None
     processed: bool = False
     chunked: bool = False
     embedded: bool = False
-    validation_status: Optional[str] = None
+    validation_status: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
 
 from app.schemas.chunk import DocumentChunkRead  # noqa: E402
-from app.schemas.tag import DocumentTagRead  # noqa: E402
 from app.schemas.document_status import DocumentProcessingStatusRead  # noqa: E402
+from app.schemas.tag import DocumentTagRead  # noqa: E402
 
 DocumentRead.model_rebuild()

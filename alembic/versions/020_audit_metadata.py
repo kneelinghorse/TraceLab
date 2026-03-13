@@ -44,7 +44,9 @@ def upgrade() -> None:
             )
             # Backfill: set updated_at = uploaded_at for existing records
             op.execute(
-                text("UPDATE documents SET updated_at = uploaded_at WHERE updated_at IS NULL")
+                text(
+                    "UPDATE documents SET updated_at = uploaded_at WHERE updated_at IS NULL"
+                )
             )
             print("Added documents.updated_at column and backfilled from uploaded_at")
 
@@ -112,7 +114,9 @@ def upgrade() -> None:
                 ),
             )
             # Backfill with current timestamp for existing records
-            op.execute(text("UPDATE tags SET created_at = NOW() WHERE created_at IS NULL"))
+            op.execute(
+                text("UPDATE tags SET created_at = NOW() WHERE created_at IS NULL")
+            )
             print("Added tags.created_at column")
         else:
             print("tags.created_at already exists, skipping")
@@ -128,7 +132,9 @@ def upgrade() -> None:
                 ),
             )
             # Backfill with current timestamp for existing records
-            op.execute(text("UPDATE tags SET updated_at = NOW() WHERE updated_at IS NULL"))
+            op.execute(
+                text("UPDATE tags SET updated_at = NOW() WHERE updated_at IS NULL")
+            )
             print("Added tags.updated_at column")
 
             # Create trigger function for tags auto-update
@@ -210,7 +216,9 @@ def downgrade() -> None:
 
     # Drop documents updated_at and trigger
     if inspector.has_table("documents"):
-        op.execute(text("DROP TRIGGER IF EXISTS trigger_documents_updated_at ON documents"))
+        op.execute(
+            text("DROP TRIGGER IF EXISTS trigger_documents_updated_at ON documents")
+        )
         op.execute(text("DROP FUNCTION IF EXISTS update_documents_updated_at()"))
 
         doc_columns = {col["name"] for col in inspector.get_columns("documents")}

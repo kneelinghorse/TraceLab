@@ -68,7 +68,9 @@ def convert(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     decision_entries: List[Dict[str, Any]] = []
     decision_entries.extend(
-        _normalize_decisions(domain.get("decisions_made") or [], source="working_memory")
+        _normalize_decisions(
+            domain.get("decisions_made") or [], source="working_memory"
+        )
     )
     for summary in session_summaries:
         decision_entries.extend(
@@ -184,9 +186,15 @@ def main() -> None:
     original = json.loads(path.read_text(encoding="utf-8") or "{}")
     upgraded = convert(original)
 
-    backup_path = path.with_suffix(path.suffix + f".backup-{datetime.now().strftime('%Y%m%d%H%M%S')}")
-    backup_path.write_text(json.dumps(original, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    path.write_text(json.dumps(upgraded, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    backup_path = path.with_suffix(
+        path.suffix + f".backup-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    )
+    backup_path.write_text(
+        json.dumps(original, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+    path.write_text(
+        json.dumps(upgraded, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
 
     print(f"Backup written to {backup_path}")
     print(f"Upgraded context written to {path}")

@@ -1,10 +1,13 @@
 """Shared SQLAlchemy custom types."""
+
 from __future__ import annotations
 
 import uuid
 
 from sqlalchemy import CHAR, JSON, Text, TypeDecorator
-from sqlalchemy.dialects.postgresql import JSONB as PGJSONB, UUID as PGUUID, TSVECTOR as PGTSVECTOR
+from sqlalchemy.dialects.postgresql import JSONB as PGJSONB
+from sqlalchemy.dialects.postgresql import TSVECTOR as PGTSVECTOR
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
 
 
 class GUID(TypeDecorator):

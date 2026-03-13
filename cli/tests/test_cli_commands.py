@@ -44,13 +44,7 @@ def test_documents_upload_requires_process_for_wait(tmp_path):
     doc.write_text("hello")
 
     runner = CliRunner()
-    result = runner.invoke(cli, [
-        "documents",
-        "upload",
-        "proj-123",
-        str(doc),
-        "--wait"
-    ])
+    result = runner.invoke(cli, ["documents", "upload", "proj-123", str(doc), "--wait"])
 
     assert result.exit_code == 2
     assert "--wait option requires --process" in result.output

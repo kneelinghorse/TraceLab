@@ -1,12 +1,12 @@
 """Faceted search endpoints for filter metadata."""
+
 from datetime import date
-from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
-from app.services.faceted_search import FacetFilters, FacetedSearchService
+from app.services.faceted_search import FacetedSearchService, FacetFilters
 
 router = APIRouter()
 
@@ -14,12 +14,22 @@ router = APIRouter()
 class FacetRequest(BaseModel):
     """Request payload for fetching available facet values."""
 
-    project_id: Optional[UUID] = Field(None, description="Optional project scope for facets.")
-    document_types: Optional[List[str]] = Field(None, description="Current document type selections.")
-    source_types: Optional[List[str]] = Field(None, description="Current source type selections.")
-    date_from: Optional[date] = Field(None, description="Restrict results collected on/after this date.")
-    date_to: Optional[date] = Field(None, description="Restrict results collected on/before this date.")
-    tags: Optional[List[str]] = Field(None, description="Tag filters currently applied.")
+    project_id: UUID | None = Field(
+        None, description="Optional project scope for facets."
+    )
+    document_types: list[str] | None = Field(
+        None, description="Current document type selections."
+    )
+    source_types: list[str] | None = Field(
+        None, description="Current source type selections."
+    )
+    date_from: date | None = Field(
+        None, description="Restrict results collected on/after this date."
+    )
+    date_to: date | None = Field(
+        None, description="Restrict results collected on/before this date."
+    )
+    tags: list[str] | None = Field(None, description="Tag filters currently applied.")
 
 
 class FacetValue(BaseModel):
@@ -33,17 +43,17 @@ class FacetValue(BaseModel):
 class DateRangeFacet(BaseModel):
     """Date range facet describing the available collection window."""
 
-    min: Optional[date]
-    max: Optional[date]
+    min: date | None
+    max: date | None
 
 
 class FacetResponse(BaseModel):
     """Response payload containing facet values for each supported dimension."""
 
-    projects: List[FacetValue]
-    document_types: List[FacetValue]
-    source_types: List[FacetValue]
-    tags: List[FacetValue]
+    projects: list[FacetValue]
+    document_types: list[FacetValue]
+    source_types: list[FacetValue]
+    tags: list[FacetValue]
     date_range: DateRangeFacet
 
 

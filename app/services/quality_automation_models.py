@@ -1,16 +1,17 @@
 """Shared dataclasses for the quality automation pipeline."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Literal, Optional
+from datetime import UTC, datetime
+from typing import Any, Literal
 
 Severity = Literal["low", "medium", "high"]
 CheckStatus = Literal["passed", "warning", "failed"]
 
 
 def _utc_now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 @dataclass(slots=True)
@@ -20,7 +21,7 @@ class QualityIssue:
     code: str
     severity: Severity
     message: str
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(slots=True)
@@ -29,10 +30,10 @@ class QualityAutomationCheckResult:
 
     check_type: str
     summary: str
-    issues: List[QualityIssue] = field(default_factory=list)
-    score: Optional[float] = None
-    metrics: Dict[str, Any] = field(default_factory=dict)
-    recommendations: List[str] = field(default_factory=list)
+    issues: list[QualityIssue] = field(default_factory=list)
+    score: float | None = None
+    metrics: dict[str, Any] = field(default_factory=dict)
+    recommendations: list[str] = field(default_factory=list)
     evaluated_at: datetime = field(default_factory=_utc_now)
 
     @property
@@ -44,7 +45,7 @@ class QualityAutomationCheckResult:
             return "warning"
         return "passed"
 
-    def to_details(self) -> Dict[str, Any]:
+    def to_details(self) -> dict[str, Any]:
         """Convert to JSON-serialisable structure for persistence."""
         return {
             "summary": self.summary,

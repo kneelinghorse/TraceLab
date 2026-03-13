@@ -12,20 +12,22 @@ Tests cover:
 - Statistics tracking
 - Thread safety
 """
-import hashlib
-import time
-import threading
-from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
 
+import hashlib
+import threading
+import time
+from dataclasses import dataclass
+from typing import Any
 
 # Self-contained implementations to test the cache logic
 # These mirror the actual implementations in app/services/pedr/cache.py
 
+
 @dataclass
 class CacheEntry:
     """A single cache entry with results and metadata."""
-    results: List[Dict[str, Any]]
+
+    results: list[dict[str, Any]]
     timestamp: float
     query_hash: str
     hit_count: int = 0
@@ -34,19 +36,20 @@ class CacheEntry:
 @dataclass
 class CacheStats:
     """Statistics for cache performance monitoring."""
+
     cache_hits: int = 0
     cache_misses: int = 0
     cache_size: int = 0
     evictions: int = 0
     invalidations: int = 0
-    last_invalidation: Optional[float] = None
+    last_invalidation: float | None = None
 
     @property
     def hit_rate(self) -> float:
         total = self.cache_hits + self.cache_misses
         return self.cache_hits / total if total > 0 else 0.0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "cache_hits": self.cache_hits,
             "cache_misses": self.cache_misses,
@@ -64,7 +67,7 @@ class PEDRCache:
     def __init__(self, max_size: int = 1000, ttl_seconds: int = 300) -> None:
         self.max_size = max_size
         self.ttl_seconds = ttl_seconds
-        self._cache: Dict[str, CacheEntry] = {}
+        self._cache: dict[str, CacheEntry] = {}
         self._stats = CacheStats()
         self._lock = threading.RLock()
 
@@ -72,7 +75,7 @@ class PEDRCache:
         self,
         query: str,
         top_k: int,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
     ) -> str:
         normalized_query = query.lower().strip()
         normalized_filters = sorted((filters or {}).items())
@@ -83,8 +86,8 @@ class PEDRCache:
         self,
         query: str,
         top_k: int,
-        filters: Optional[Dict[str, Any]] = None,
-    ) -> Optional[List[Dict[str, Any]]]:
+        filters: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]] | None:
         key = self._generate_key(query, top_k, filters)
         with self._lock:
             entry = self._cache.get(key)
@@ -104,8 +107,8 @@ class PEDRCache:
         self,
         query: str,
         top_k: int,
-        filters: Optional[Dict[str, Any]],
-        results: List[Dict[str, Any]],
+        filters: dict[str, Any] | None,
+        results: list[dict[str, Any]],
     ) -> None:
         key = self._generate_key(query, top_k, filters)
         with self._lock:

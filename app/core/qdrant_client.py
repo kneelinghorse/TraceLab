@@ -13,8 +13,8 @@ Usage:
     # In services:
     client = get_qdrant_client()
 """
+
 import logging
-from typing import Optional
 
 from app.core.config import settings
 
@@ -29,7 +29,7 @@ else:
 logger = logging.getLogger(__name__)
 
 # Singleton client instance
-_client: Optional[QdrantClient] = None
+_client: QdrantClient | None = None
 
 # Pre-warm status
 _is_prewarmed: bool = False
@@ -72,7 +72,10 @@ def get_qdrant_client() -> QdrantClient:
         )
         logger.info(
             "Qdrant client initialized",
-            extra={"url": settings.qdrant_url, "prefer_grpc": settings.qdrant_prefer_grpc}
+            extra={
+                "url": settings.qdrant_url,
+                "prefer_grpc": settings.qdrant_prefer_grpc,
+            },
         )
 
     return _client
@@ -100,7 +103,7 @@ async def prewarm_qdrant() -> bool:
         collection_names = [c.name for c in collections.collections]
         logger.info(
             "Qdrant connection verified",
-            extra={"collections_count": len(collection_names)}
+            extra={"collections_count": len(collection_names)},
         )
 
         # Run a dummy search to fully warm the connection
@@ -111,7 +114,7 @@ async def prewarm_qdrant() -> bool:
             client.search(
                 collection_name=settings.qdrant_collection_name,
                 query_vector=dummy_vector,
-                limit=1
+                limit=1,
             )
             logger.info("Qdrant search path pre-warmed")
         else:

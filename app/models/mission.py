@@ -6,11 +6,12 @@ This model supports Mission Protocol missions with explicit fields for:
 - Execution tracking (status, timestamps, deepsearch_job_id)
 - Results storage (documents, reports, markdown, protocol)
 """
+
 from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from sqlalchemy import (
     CheckConstraint,
@@ -24,18 +25,19 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
-from app.models.types import CrossDBJSON, GUID
-
+from app.models.types import GUID, CrossDBJSON
 
 # Valid mission statuses
-MISSION_STATUSES = frozenset({
-    "draft",
-    "queued",
-    "in_progress",
-    "completed",
-    "blocked",
-    "cancelled",
-})
+MISSION_STATUSES = frozenset(
+    {
+        "draft",
+        "queued",
+        "in_progress",
+        "completed",
+        "blocked",
+        "cancelled",
+    }
+)
 
 
 class Mission(Base):
@@ -225,7 +227,7 @@ class Mission(Base):
         {"extend_existing": True},
     )
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert mission to dictionary representation."""
         return {
             "id": str(self.id) if self.id else None,
@@ -243,11 +245,15 @@ class Mission(Base):
             "status": self.status,
             "queued_at": self.queued_at.isoformat() if self.queued_at else None,
             "started_at": self.started_at.isoformat() if self.started_at else None,
-            "completed_at": self.completed_at.isoformat() if self.completed_at else None,
+            "completed_at": self.completed_at.isoformat()
+            if self.completed_at
+            else None,
             "deepsearch_job_id": self.deepsearch_job_id,
             "execution_metadata": self.execution_metadata or {},
             "result_document_ids": self.result_document_ids or [],
-            "result_report_id": str(self.result_report_id) if self.result_report_id else None,
+            "result_report_id": str(self.result_report_id)
+            if self.result_report_id
+            else None,
             "result_markdown": self.result_markdown,
             "result_protocol": self.result_protocol,
             "error_message": self.error_message,
@@ -256,7 +262,7 @@ class Mission(Base):
             "created_by": self.created_by,
         }
 
-    def to_mission_protocol(self) -> Dict[str, Any]:
+    def to_mission_protocol(self) -> dict[str, Any]:
         """Convert to Mission Protocol format for DeepSearch submission."""
         return {
             "mission_id": self.mission_id,
@@ -274,10 +280,10 @@ class Mission(Base):
     @classmethod
     def from_mission_protocol(
         cls,
-        protocol: Dict[str, Any],
-        project_id: Optional[uuid.UUID] = None,
-        created_by: Optional[str] = None,
-    ) -> "Mission":
+        protocol: dict[str, Any],
+        project_id: uuid.UUID | None = None,
+        created_by: str | None = None,
+    ) -> Mission:
         """Create a Mission from a Mission Protocol definition."""
         return cls(
             project_id=project_id,

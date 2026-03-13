@@ -1,10 +1,12 @@
 """Tests for project management API endpoints (B15.7)."""
-import pytest
-from unittest.mock import MagicMock, patch
-from uuid import uuid4
-from datetime import datetime
 
-from app.schemas.project import ProjectCreate, ProjectUpdate, ProjectStats, ProjectRead
+from datetime import datetime
+from unittest.mock import MagicMock
+from uuid import uuid4
+
+import pytest
+
+from app.schemas.project import ProjectCreate, ProjectStats, ProjectUpdate
 
 
 @pytest.fixture
@@ -127,6 +129,7 @@ class TestProjectQueryService:
         service = ProjectQueryService()
         # Method signature includes project_id parameter
         import inspect
+
         sig = inspect.signature(service.get_project_stats)
         params = list(sig.parameters.keys())
         assert "db" in params

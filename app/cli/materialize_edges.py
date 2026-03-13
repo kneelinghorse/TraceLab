@@ -4,6 +4,7 @@
 Usage:
     python -m app.cli.materialize_edges [--full|--incremental]
 """
+
 from __future__ import annotations
 
 import argparse

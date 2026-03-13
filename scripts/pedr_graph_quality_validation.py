@@ -26,6 +26,7 @@ Usage:
     # Output report to file
     python scripts/pedr_graph_quality_validation.py --output reports/graph-quality-report.json
 """
+
 from __future__ import annotations
 
 import argparse
@@ -305,9 +306,7 @@ def assess_graph_edges(metrics: List[QueryMetrics]) -> Dict[str, Any]:
     total_queries = len(metrics)
     total_seeds = sum(m.seed_count or 0 for m in metrics)
     total_candidates = sum(m.graph_candidates_expanded for m in metrics)
-    queries_with_candidates = sum(
-        1 for m in metrics if m.graph_candidates_expanded > 0
-    )
+    queries_with_candidates = sum(1 for m in metrics if m.graph_candidates_expanded > 0)
 
     seed_scores = [
         m.seed_count for m in metrics if m.seed_count is not None and m.seed_count > 0
@@ -332,9 +331,7 @@ def assess_graph_edges(metrics: List[QueryMetrics]) -> Dict[str, Any]:
             else "HEALTHY"
         ),
         "latency_cost_ms_avg": _safe_avg([m.graph_ms for m in metrics]),
-        "latency_cost_ms_p90": _percentile(
-            sorted([m.graph_ms for m in metrics]), 0.90
-        ),
+        "latency_cost_ms_p90": _percentile(sorted([m.graph_ms for m in metrics]), 0.90),
     }
 
 
@@ -508,9 +505,7 @@ def run_live_comparison(
                 print(f"  ERROR: {exc}", file=sys.stderr)
                 continue
 
-            chunk_ids = [
-                str(r.chunk_id) for r in response.results if r.chunk_id
-            ]
+            chunk_ids = [str(r.chunk_id) for r in response.results if r.chunk_id]
             results_by_query[query][config_name] = chunk_ids
 
             meta = response.metadata
@@ -522,10 +517,16 @@ def run_live_comparison(
                 graph_weight=cfg.get("graph_weight", 0.0),
                 graph_top_k_seeds=cfg.get("graph_top_k_seeds", 0),
                 seed_count=None,
-                total_candidates=meta.graph_candidates_expanded if hasattr(meta, "graph_candidates_expanded") else 0,
-                graph_candidates_expanded=meta.graph_candidates_expanded if hasattr(meta, "graph_candidates_expanded") else 0,
+                total_candidates=meta.graph_candidates_expanded
+                if hasattr(meta, "graph_candidates_expanded")
+                else 0,
+                graph_candidates_expanded=meta.graph_candidates_expanded
+                if hasattr(meta, "graph_candidates_expanded")
+                else 0,
                 results_with_graph=sum(
-                    1 for r in response.results if "graph" in (r.contributing_layers or [])
+                    1
+                    for r in response.results
+                    if "graph" in (r.contributing_layers or [])
                 ),
                 result_share=0.0,
                 top_5_with_graph=sum(
@@ -534,9 +535,15 @@ def run_live_comparison(
                     if "graph" in (r.contributing_layers or [])
                 ),
                 top_5_share=0.0,
-                graph_ms=meta.timings.graph_ms if hasattr(meta.timings, "graph_ms") else 0.0,
-                fusion_ms=meta.timings.fusion_ms if hasattr(meta.timings, "fusion_ms") else 0.0,
-                total_ms=meta.timings.total_ms if hasattr(meta.timings, "total_ms") else 0.0,
+                graph_ms=meta.timings.graph_ms
+                if hasattr(meta.timings, "graph_ms")
+                else 0.0,
+                fusion_ms=meta.timings.fusion_ms
+                if hasattr(meta.timings, "fusion_ms")
+                else 0.0,
+                total_ms=meta.timings.total_ms
+                if hasattr(meta.timings, "total_ms")
+                else 0.0,
                 layers_used=meta.layers_used or [],
                 graph_contribution_rate=0.0,
                 multi_layer_result_rate=0.0,
@@ -706,9 +713,9 @@ def main() -> int:
     )
 
     # Print summary to stdout
-    print(f"\n{'='*70}")
+    print(f"\n{'=' * 70}")
     print("GRAPH L6 QUALITY VALIDATION REPORT")
-    print(f"{'='*70}")
+    print(f"{'=' * 70}")
     print(f"Mode: {report.mode}")
     print(f"Events analyzed: {report.total_events_analyzed}")
     print(f"Generated: {report.generated_at}")
@@ -718,18 +725,22 @@ def main() -> int:
     print(f"Graph Edge Assessment: {edge['edge_density_verdict']}")
     print(f"  Total seeds attempted: {edge['total_seeds_attempted']}")
     print(f"  Total candidates found: {edge['total_candidates_found']}")
-    print(f"  Queries with results: {edge['queries_with_graph_results']}/{edge['total_queries_analyzed']} ({edge['queries_with_graph_results_pct']:.1f}%)")
+    print(
+        f"  Queries with results: {edge['queries_with_graph_results']}/{edge['total_queries_analyzed']} ({edge['queries_with_graph_results_pct']:.1f}%)"
+    )
     print(f"  Avg latency cost: {edge['latency_cost_ms_avg']:.1f}ms")
     print()
 
     print("Configuration Comparison:")
-    print(f"{'Config':<25} {'Queries':>7} {'Impact%':>8} {'AvgGraphMS':>10} {'AvgTotalMS':>10}")
+    print(
+        f"{'Config':<25} {'Queries':>7} {'Impact%':>8} {'AvgGraphMS':>10} {'AvgTotalMS':>10}"
+    )
     print("-" * 65)
     for row in report.config_comparison:
         if isinstance(row, dict) and "config" in row:
             print(
                 f"{row['config']:<25} {row.get('queries', 0):>7} "
-                f"{row.get('impact_rate', 0)*100:>7.1f}% "
+                f"{row.get('impact_rate', 0) * 100:>7.1f}% "
                 f"{row.get('avg_graph_ms', 0):>10.1f} "
                 f"{row.get('avg_total_ms', 0):>10.1f}"
             )

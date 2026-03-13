@@ -1,9 +1,12 @@
 """Invite code model for user registration."""
+
 import secrets
 import string
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, ForeignKey, Index
+
+from sqlalchemy import Column, DateTime, ForeignKey, String
+
 from app.core.database import Base
 from app.models.types import GUID
 

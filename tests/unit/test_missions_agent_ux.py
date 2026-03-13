@@ -1,8 +1,9 @@
 """Unit tests for mission ID resolution and create-and-submit workflow."""
+
 from __future__ import annotations
 
-from types import SimpleNamespace
 from datetime import datetime
+from types import SimpleNamespace
 from uuid import uuid4
 
 import pytest
@@ -10,11 +11,12 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 
-
 pytestmark = pytest.mark.unit
 
 
-def _mission_stub(*, mission_id: str = "B16.1", status: str = "draft", project_set: bool = True):
+def _mission_stub(
+    *, mission_id: str = "B16.1", status: str = "draft", project_set: bool = True
+):
     project_id = uuid4() if project_set else None
     return SimpleNamespace(
         id=uuid4(),
@@ -79,7 +81,9 @@ def mission_client(monkeypatch):
     service = _MissionServiceStub(mission)
 
     monkeypatch.setattr(missions_api, "_service", service)
-    monkeypatch.setattr(missions_api.settings, "deepsearch_mode", "worker", raising=False)
+    monkeypatch.setattr(
+        missions_api.settings, "deepsearch_mode", "worker", raising=False
+    )
 
     def _fake_db():
         yield object()
@@ -93,7 +97,9 @@ def mission_client(monkeypatch):
 def test_get_mission_allows_human_readable_id(mission_client, auth_headers):
     client, service, mission = mission_client
 
-    response = client.get(f"/api/v1/missions/{mission.mission_id}", headers=auth_headers)
+    response = client.get(
+        f"/api/v1/missions/{mission.mission_id}", headers=auth_headers
+    )
 
     assert response.status_code == 200
     assert response.json()["mission_id"] == mission.mission_id
@@ -103,7 +109,9 @@ def test_get_mission_allows_human_readable_id(mission_client, auth_headers):
 def test_submit_mission_allows_human_readable_id(mission_client, auth_headers):
     client, service, mission = mission_client
 
-    response = client.post(f"/api/v1/missions/{mission.mission_id}/submit", headers=auth_headers)
+    response = client.post(
+        f"/api/v1/missions/{mission.mission_id}/submit", headers=auth_headers
+    )
 
     assert response.status_code == 200
     payload = response.json()
@@ -147,7 +155,9 @@ def test_submit_without_project_returns_actionable_error(monkeypatch, auth_heade
 
     app.dependency_overrides[missions_api.get_db] = _fake_db
     with TestClient(app) as client:
-        response = client.post(f"/api/v1/missions/{mission.mission_id}/submit", headers=auth_headers)
+        response = client.post(
+            f"/api/v1/missions/{mission.mission_id}/submit", headers=auth_headers
+        )
     app.dependency_overrides.clear()
 
     assert response.status_code == 400

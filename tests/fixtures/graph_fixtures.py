@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List
 
 import pytest
 
@@ -13,13 +12,15 @@ from app.services.pedr.semantic_protocol import URNGenerator
 class SeededGraph:
     project_id: str
     project_urn: str
-    documents: Dict[str, Document]
-    chunks: Dict[str, DocumentChunk]
-    urns: Dict[str, str]
-    edges: List[GraphEdge]
+    documents: dict[str, Document]
+    chunks: dict[str, DocumentChunk]
+    urns: dict[str, str]
+    edges: list[GraphEdge]
 
 
-def _create_document_with_chunks(db_session, project_id: str, *, name: str, chunks: List[str]):
+def _create_document_with_chunks(
+    db_session, project_id: str, *, name: str, chunks: list[str]
+):
     document = Document(
         project_id=project_id,
         name=name,
@@ -28,7 +29,7 @@ def _create_document_with_chunks(db_session, project_id: str, *, name: str, chun
     db_session.add(document)
     db_session.flush()
 
-    created_chunks: List[DocumentChunk] = []
+    created_chunks: list[DocumentChunk] = []
     for index, content in enumerate(chunks):
         chunk = DocumentChunk(
             document_id=document.id,

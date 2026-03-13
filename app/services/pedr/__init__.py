@@ -1,123 +1,26 @@
 """PEDR (Protocol-Enhanced Deep Research) helpers."""
 
-from .quality_scoring import (
-    QualityFilters,
-    QualityScore,
-    QualityScoringService,
-    get_quality_scoring_service,
-)
-from .manifest_transformer import (
-    PEDRManifest,
-    TransformationResult,
-    ManifestTransformer,
-    get_manifest_transformer,
-)
 from .delta_sync import (
+    DeltaSyncService,
     EntityType,
+    ParityCheckResult,
     SyncMode,
     SyncResult,
-    ParityCheckResult,
-    DeltaSyncService,
     get_delta_sync_service,
-)
-from .sync_events import (
-    SyncEventType,
-    SyncEvent,
-    SyncEventEmitter,
-    emit_mission_completed,
-    emit_mission_updated,
-    emit_document_processed,
-    emit_batch_sync_requested,
-    get_sync_event_emitter,
-)
-from .preflight import (
-    PreflightThresholds,
-    PreflightService,
-    get_preflight_service,
-)
-from .syntactic import (
-    ElementType as SyntacticElementType,
-    TypeDetectionResult,
-    SyntacticFilters,
-    SyntacticService,
-    get_syntactic_service,
-)
-from .pragmatic import (
-    QueryIntent,
-    IntentDetectionResult,
-    PragmaticFilters,
-    PragmaticService,
-    get_pragmatic_service,
-)
-from .semantic_protocol import (
-    URN,
-    URNGenerator,
-    GovernanceMetadata,
-    SemanticFeatures,
-    ElementMetadata,
-    ProtocolManifest,
-    ConfidenceScorer,
-    CriticalityCalculator,
-    IntentResolver,
-    SemanticVectorGenerator,
-    SemanticProtocol,
-    get_semantic_protocol,
-    EntityType as SemanticEntityType,
-    SemanticIntent,
-    PROTOCOL_VERSION,
-    CRITICALITY_WEIGHTS,
-    CONFIDENCE_PRIOR,
-)
-from .fusion import (
-    RRFConfig,
-    LayerResult,
-    FusedResult,
-    FusionOutput,
-    RRFFusion,
-    get_rrf_fusion,
-    rrf_score,
-    RRF_K,
-)
-from .exceptions import (
-    PEDRError,
-    LexicalSearchError,
-    SemanticSearchError,
-    GraphLayerError,
-    SyntacticLayerError,
-    PragmaticLayerError,
-    GovernanceLayerError,
-    FusionError,
-)
-from .search_orchestrator import (
-    PEDRConfig,
-    LayerTimings,
-    LayerDiagnostic,
-    PEDRMetadata,
-    PEDRSearchResult,
-    PEDRSearchResponse,
-    PEDRSearchOrchestrator,
-    get_pedr_orchestrator,
-    create_pedr_orchestrator,
-    DEFAULT_LAYER_WEIGHTS,
-)
-from .relational import (
-    RelationType,
-    EntityType as RelationalEntityType,
-    RelatedEntity,
-    GraphExpansionResult,
-    RelationalService,
-    get_relational_service,
-)
-from .hybrid_rerank import (
-    RerankMode,
-    HybridRerankTimings,
-    HybridRerankResult,
-    HybridReranker,
-    get_hybrid_reranker,
 )
 from .edge_materialization import (
     EdgeMaterializationService,
     MaterializationResult,
+)
+from .fusion import (
+    RRF_K,
+    FusedResult,
+    FusionOutput,
+    LayerResult,
+    RRFConfig,
+    RRFFusion,
+    get_rrf_fusion,
+    rrf_score,
 )
 from .graph_layer import (
     GraphLayerConfig,
@@ -126,8 +29,100 @@ from .graph_layer import (
 )
 from .graph_rag import (
     GraphNode,
-    GraphSubgraph,
     GraphRAGHelper,
+    GraphSubgraph,
+)
+from .hybrid_rerank import (
+    HybridReranker,
+    HybridRerankResult,
+    HybridRerankTimings,
+    RerankMode,
+    get_hybrid_reranker,
+)
+from .manifest_transformer import (
+    ManifestTransformer,
+    PEDRManifest,
+    TransformationResult,
+    get_manifest_transformer,
+)
+from .pragmatic import (
+    IntentDetectionResult,
+    PragmaticFilters,
+    PragmaticService,
+    QueryIntent,
+    get_pragmatic_service,
+)
+from .preflight import (
+    PreflightService,
+    PreflightThresholds,
+    get_preflight_service,
+)
+from .quality_scoring import (
+    QualityFilters,
+    QualityScore,
+    QualityScoringService,
+    get_quality_scoring_service,
+)
+from .relational import (
+    EntityType as RelationalEntityType,
+)
+from .relational import (
+    GraphExpansionResult,
+    RelatedEntity,
+    RelationalService,
+    RelationType,
+    get_relational_service,
+)
+from .search_orchestrator import (
+    DEFAULT_LAYER_WEIGHTS,
+    LayerTimings,
+    PEDRConfig,
+    PEDRMetadata,
+    PEDRSearchOrchestrator,
+    PEDRSearchResponse,
+    PEDRSearchResult,
+    create_pedr_orchestrator,
+    get_pedr_orchestrator,
+)
+from .semantic_protocol import (
+    CONFIDENCE_PRIOR,
+    CRITICALITY_WEIGHTS,
+    PROTOCOL_VERSION,
+    URN,
+    ConfidenceScorer,
+    CriticalityCalculator,
+    ElementMetadata,
+    GovernanceMetadata,
+    IntentResolver,
+    ProtocolManifest,
+    SemanticFeatures,
+    SemanticIntent,
+    SemanticProtocol,
+    SemanticVectorGenerator,
+    URNGenerator,
+    get_semantic_protocol,
+)
+from .semantic_protocol import (
+    EntityType as SemanticEntityType,
+)
+from .sync_events import (
+    SyncEvent,
+    SyncEventEmitter,
+    SyncEventType,
+    emit_batch_sync_requested,
+    emit_document_processed,
+    emit_mission_completed,
+    emit_mission_updated,
+    get_sync_event_emitter,
+)
+from .syntactic import (
+    ElementType as SyntacticElementType,
+)
+from .syntactic import (
+    SyntacticFilters,
+    SyntacticService,
+    TypeDetectionResult,
+    get_syntactic_service,
 )
 
 __all__ = [
@@ -200,19 +195,9 @@ __all__ = [
     "get_rrf_fusion",
     "rrf_score",
     "RRF_K",
-    # PEDR Exceptions
-    "PEDRError",
-    "LexicalSearchError",
-    "SemanticSearchError",
-    "GraphLayerError",
-    "SyntacticLayerError",
-    "PragmaticLayerError",
-    "GovernanceLayerError",
-    "FusionError",
     # Search Orchestrator
     "PEDRConfig",
     "LayerTimings",
-    "LayerDiagnostic",
     "PEDRMetadata",
     "PEDRSearchResult",
     "PEDRSearchResponse",

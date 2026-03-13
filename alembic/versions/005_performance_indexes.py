@@ -16,8 +16,12 @@ depends_on = None
 
 def upgrade() -> None:
     op.create_index("idx_documents_project_id", "documents", ["project_id"])
-    op.create_index("idx_document_chunks_document_id", "document_chunks", ["document_id"])
-    op.create_index("idx_document_chunks_embedding_id", "document_chunks", ["embedding_id"])
+    op.create_index(
+        "idx_document_chunks_document_id", "document_chunks", ["document_id"]
+    )
+    op.create_index(
+        "idx_document_chunks_embedding_id", "document_chunks", ["embedding_id"]
+    )
     op.create_index("idx_insights_project_id", "insights", ["project_id"])
     op.create_index("idx_insight_sources_chunk_id", "insight_sources", ["chunk_id"])
     op.create_index("idx_missions_project_status", "missions", ["project_id", "status"])

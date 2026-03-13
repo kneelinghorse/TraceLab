@@ -1,4 +1,5 @@
 """Regression coverage for database performance safeguards."""
+
 from __future__ import annotations
 
 from sqlalchemy import inspect

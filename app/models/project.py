@@ -1,10 +1,13 @@
 """Project model."""
+
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, Text, Integer, DateTime, CheckConstraint
+
+from sqlalchemy import CheckConstraint, Column, DateTime, Integer, String, Text
+
 from app.core.database import Base
-from app.models.types import GUID
 from app.models.mixins import SoftDeleteMixin
+from app.models.types import GUID
 
 
 class Project(Base, SoftDeleteMixin):
@@ -14,30 +17,33 @@ class Project(Base, SoftDeleteMixin):
     deleted but marked with deleted_at timestamp. Use project.soft_delete()
     and project.restore() methods.
     """
+
     __tablename__ = "projects"
-    
+
     id = Column(GUID(), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
     description = Column(Text)
     user_id = Column(GUID())  # Placeholder for auth
     mission_protocol_id = Column(GUID())  # References missions table
-    
+
     # Metadata
-    research_type = Column(String)  # 'strategic' | 'tactical' | 'generative' | 'evaluative'
+    research_type = Column(
+        String
+    )  # 'strategic' | 'tactical' | 'generative' | 'evaluative'
     methodology = Column(String)  # 'qualitative' | 'quantitative' | 'mixed'
-    status = Column(String, default='active')  # 'active' | 'archived' | 'completed'
-    
+    status = Column(String, default="active")  # 'active' | 'archived' | 'completed'
+
     # Quality tracking
     quality_score = Column(Integer)  # 0-100
     last_quality_check = Column(DateTime)
-    
+
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     __table_args__ = (
         CheckConstraint(
             "research_type IS NULL OR research_type IN ('strategic', 'tactical', 'generative', 'evaluative')",
-            name='valid_research_type'
+            name="valid_research_type",
         ),
     )

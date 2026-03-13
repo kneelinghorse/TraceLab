@@ -6,7 +6,12 @@ from pathlib import Path
 import click
 
 from cli.utils.api import APIClient
-from cli.utils.errors import CLIError, ValidationError, format_error_human, format_error_json
+from cli.utils.errors import (
+    CLIError,
+    ValidationError,
+    format_error_human,
+    format_error_json,
+)
 
 
 def _filename_from_disposition(disposition: str | None) -> str | None:
@@ -16,7 +21,7 @@ def _filename_from_disposition(disposition: str | None) -> str | None:
     for part in parts:
         if part.lower().startswith("filename="):
             _, _, value = part.partition("=")
-            return value.strip().strip('"\'')
+            return value.strip().strip("\"'")
     return None
 
 
@@ -28,7 +33,11 @@ def missions():
 
 @missions.command()
 @click.argument("project_id")
-@click.option("--status", type=click.Choice(["draft", "in_progress", "review", "complete"]), help="Filter by status")
+@click.option(
+    "--status",
+    type=click.Choice(["draft", "in_progress", "review", "complete"]),
+    help="Filter by status",
+)
 @click.pass_obj
 def list(ctx, project_id, status):
     """List missions in a project."""
@@ -40,7 +49,9 @@ def list(ctx, project_id, status):
 
         # Filter by status if specified
         if status:
-            missions = [m for m in missions if m.get("mission_data", {}).get("status") == status]
+            missions = [
+                m for m in missions if m.get("mission_data", {}).get("status") == status
+            ]
 
         if ctx.json_mode:
             ctx.output.print_data(missions)
@@ -54,7 +65,9 @@ def list(ctx, project_id, status):
                     title = mission_data.get("title", "Untitled")
                     status = mission_data.get("status", "unknown")
                     progress = mission.get("completion_percentage", 0)
-                    ctx.output.info(f"  [{status}] {title} ({progress}% complete) - {mission['id']}")
+                    ctx.output.info(
+                        f"  [{status}] {title} ({progress}% complete) - {mission['id']}"
+                    )
 
     except CLIError as e:
         if ctx.json_mode:
@@ -86,7 +99,9 @@ def get(ctx, mission_id):
 @missions.command()
 @click.argument("project_id")
 @click.option("--title", required=True, help="Mission title")
-@click.option("--yaml", "yaml_file", type=click.Path(exists=True), help="Import from YAML file")
+@click.option(
+    "--yaml", "yaml_file", type=click.Path(exists=True), help="Import from YAML file"
+)
 @click.pass_obj
 def create(ctx, project_id, title, yaml_file):
     """Create a new mission."""
@@ -99,7 +114,7 @@ def create(ctx, project_id, title, yaml_file):
             data = {
                 "project_id": project_id,
                 "yaml_text": yaml_content,
-                "promote_to_complete": False
+                "promote_to_complete": False,
             }
             with ctx.output.progress_spinner(f"Importing mission from {yaml_file}..."):
                 result = client.post("/api/v1/missions/import", data=data)
@@ -109,12 +124,9 @@ def create(ctx, project_id, title, yaml_file):
             mission_data = {
                 "mission_id": f"M-{project_id[:8]}",
                 "title": title,
-                "status": "draft"
+                "status": "draft",
             }
-            data = {
-                "project_id": project_id,
-                "mission_data": mission_data
-            }
+            data = {"project_id": project_id, "mission_data": mission_data}
             with ctx.output.progress_spinner(f"Creating mission '{title}'..."):
                 mission = client.post("/api/v1/missions/", data=data)
 
@@ -146,7 +158,7 @@ def import_cmd(ctx, project_id, yaml_file, promote):
         data = {
             "project_id": project_id,
             "yaml_text": yaml_content,
-            "promote_to_complete": promote
+            "promote_to_complete": promote,
         }
 
         with ctx.output.progress_spinner(f"Importing mission from {yaml_file}..."):
@@ -204,7 +216,10 @@ def export(ctx, mission_id, fmt, output):
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 destination.write_text(yaml_text)
                 if ctx.json_mode:
-                    ctx.output.success("Export complete", data={"file": str(destination), "format": fmt})
+                    ctx.output.success(
+                        "Export complete",
+                        data={"file": str(destination), "format": fmt},
+                    )
                 else:
                     ctx.output.success(f"YAML exported to: {destination}")
             else:
@@ -214,7 +229,9 @@ def export(ctx, mission_id, fmt, output):
                     print(yaml_text)
             return
 
-        suggested_name = _filename_from_disposition(response.headers.get("content-disposition"))
+        suggested_name = _filename_from_disposition(
+            response.headers.get("content-disposition")
+        )
         default_name = suggested_name or f"{mission_id}.{fmt}"
 
         if fmt == "md" and not output:
@@ -230,7 +247,9 @@ def export(ctx, mission_id, fmt, output):
         destination.write_bytes(response.content)
 
         if ctx.json_mode:
-            ctx.output.success("Export complete", data={"file": str(destination), "format": fmt})
+            ctx.output.success(
+                "Export complete", data={"file": str(destination), "format": fmt}
+            )
         else:
             ctx.output.success(f"Report exported to: {destination}")
 
@@ -258,15 +277,14 @@ def add_evidence(ctx, mission_id, chunk_id, note):
 
         # Add evidence
         evidence = mission_data.get("evidence", [])
-        new_evidence = {
-            "chunk_id": chunk_id,
-            "note": note or ""
-        }
+        new_evidence = {"chunk_id": chunk_id, "note": note or ""}
         evidence.append(new_evidence)
         mission_data["evidence"] = evidence
 
         # Update mission
-        updated = client.put(f"/api/v1/missions/{mission_id}", data={"mission_data": mission_data})
+        updated = client.put(
+            f"/api/v1/missions/{mission_id}", data={"mission_data": mission_data}
+        )
 
         if ctx.json_mode:
             ctx.output.print_data(updated)
@@ -319,7 +337,9 @@ def delete(ctx, mission_id, confirm):
     """Delete a mission."""
     try:
         if not confirm and not ctx.json_mode:
-            click.confirm(f"Are you sure you want to delete mission {mission_id}?", abort=True)
+            click.confirm(
+                f"Are you sure you want to delete mission {mission_id}?", abort=True
+            )
 
         client = APIClient(base_url=ctx.api_url, token=ctx.token)
         client.delete(f"/api/v1/missions/{mission_id}")

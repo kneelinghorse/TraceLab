@@ -3,13 +3,14 @@
 Provides typed methods for submitting missions and checking execution status.
 Includes retry logic with exponential backoff and comprehensive error handling.
 """
+
 from __future__ import annotations
 
 import asyncio
 import logging
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from datetime import UTC, datetime
+from typing import Any
 
 import httpx
 
@@ -35,9 +36,9 @@ class DeepSearchClientError(Exception):
         self,
         message: str,
         *,
-        error_code: Optional[str] = None,
-        status_code: Optional[int] = None,
-        details: Optional[Dict[str, Any]] = None,
+        error_code: str | None = None,
+        status_code: int | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(message)
         self.error_code = error_code
@@ -111,12 +112,12 @@ class DeepSearchClient:
     def __init__(
         self,
         *,
-        api_url: Optional[str] = None,
-        api_key: Optional[str] = None,
-        timeout: Optional[float] = None,
-        max_retries: Optional[int] = None,
-        backoff_multiplier: Optional[float] = None,
-        initial_backoff: Optional[float] = None,
+        api_url: str | None = None,
+        api_key: str | None = None,
+        timeout: float | None = None,
+        max_retries: int | None = None,
+        backoff_multiplier: float | None = None,
+        initial_backoff: float | None = None,
     ) -> None:
         """Initialize DeepSearch client.
 
@@ -153,7 +154,7 @@ class DeepSearchClient:
                 "Set DEEPSEARCH_API_KEY environment variable or pass api_key parameter."
             )
 
-    def _get_headers(self) -> Dict[str, str]:
+    def _get_headers(self) -> dict[str, str]:
         """Build request headers with authentication."""
         return {
             "Content-Type": "application/json",
@@ -167,14 +168,14 @@ class DeepSearchClient:
         mission_id: str,
         title: str,
         objective: str,
-        success_criteria: List[str],
+        success_criteria: list[str],
         callback_url: str,
         *,
-        context: Optional[Dict[str, Any]] = None,
-        deliverables: Optional[List[str]] = None,
-        research_phases: Optional[Dict[str, Any]] = None,
-        metadata: Optional[Dict[str, Any]] = None,
-        research_depth: Optional[str] = "baseline",
+        context: dict[str, Any] | None = None,
+        deliverables: list[str] | None = None,
+        research_phases: dict[str, Any] | None = None,
+        metadata: dict[str, Any] | None = None,
+        research_depth: str | None = "baseline",
     ) -> DeepSearchExecuteResponse:
         """Submit a mission for execution on DeepSearch.
 
@@ -275,8 +276,8 @@ class DeepSearchClient:
         method: str,
         endpoint: str,
         *,
-        json_data: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        json_data: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Execute HTTP request with exponential backoff retry.
 
         Args:
@@ -294,7 +295,7 @@ class DeepSearchClient:
         """
         url = f"{self.api_url}{endpoint}"
         backoff = self.initial_backoff
-        last_error: Optional[Exception] = None
+        last_error: Exception | None = None
 
         for attempt in range(1, self.max_retries + 1):
             try:
@@ -398,7 +399,7 @@ class DeepSearchClient:
             DeepSearchTimeoutError: If max_wait exceeded.
             DeepSearchAPIError: If status check fails.
         """
-        start_time = datetime.now(timezone.utc)
+        start_time = datetime.now(UTC)
         terminal_statuses = {
             DeepSearchJobStatus.COMPLETED,
             DeepSearchJobStatus.FAILED,
@@ -406,7 +407,7 @@ class DeepSearchClient:
         }
 
         while True:
-            elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
+            elapsed = (datetime.now(UTC) - start_time).total_seconds()
             if elapsed > max_wait:
                 raise DeepSearchTimeoutError(
                     f"Job {job_id} did not complete within {max_wait}s"
@@ -416,7 +417,11 @@ class DeepSearchClient:
 
             if status.status in terminal_statuses:
                 # Emit terminal status event
-                final_status = "completed" if status.status == DeepSearchJobStatus.COMPLETED else "failed"
+                final_status = (
+                    "completed"
+                    if status.status == DeepSearchJobStatus.COMPLETED
+                    else "failed"
+                )
                 emit_mission_status_change(
                     mission_id=job_id,
                     title=f"DeepSearch job {job_id}",
@@ -434,7 +439,7 @@ class DeepSearchClient:
             )
             await asyncio.sleep(poll_interval)
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Return current client statistics."""
         return {
             "execute_requests": self.stats.execute_requests,
@@ -454,7 +459,7 @@ async def execute_mission(
     mission_id: str,
     title: str,
     objective: str,
-    success_criteria: List[str],
+    success_criteria: list[str],
     callback_url: str,
     **kwargs: Any,
 ) -> DeepSearchExecuteResponse:

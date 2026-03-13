@@ -1,16 +1,17 @@
 """Context compression utilities for filtering retrieved chunks by relevance."""
+
 from __future__ import annotations
 
 import math
 import time
-from typing import Dict, Iterable, List, Tuple
+from collections.abc import Iterable
 
 
 def compress_context(
-    chunks: List[Dict],
+    chunks: list[dict],
     query_embedding: Iterable[float],
     threshold: float = 0.7,
-) -> Tuple[List[Dict], Dict[str, float]]:
+) -> tuple[list[dict], dict[str, float]]:
     """
     Filter retrieved chunks using cosine similarity against the query embedding.
 
@@ -28,7 +29,7 @@ def compress_context(
     if not query_vector:
         return chunks, _build_metrics(chunks, chunks, threshold, start=start)
 
-    scored_chunks: List[Tuple[Dict, float]] = []
+    scored_chunks: list[tuple[dict, float]] = []
     for chunk in chunks:
         similarity = _compute_similarity(query_vector, chunk)
         scored_chunk = dict(chunk)
@@ -54,7 +55,7 @@ def compress_context(
     return filtered_chunks, metrics
 
 
-def _compute_similarity(query_vector: List[float], chunk: Dict) -> float:
+def _compute_similarity(query_vector: list[float], chunk: dict) -> float:
     """Compute cosine similarity using chunk embedding or fall back to score."""
     embedding = chunk.get("embedding")
     if isinstance(embedding, dict):
@@ -96,11 +97,11 @@ def _estimate_tokens(text: str) -> int:
 
 
 def _build_metrics(
-    original_chunks: List[Dict],
-    filtered_chunks: List[Dict],
+    original_chunks: list[dict],
+    filtered_chunks: list[dict],
     threshold: float,
     start: float,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """Assemble compression metrics for observability."""
     original_tokens = sum(
         _estimate_tokens(chunk.get("content", "")) for chunk in original_chunks
@@ -110,9 +111,7 @@ def _build_metrics(
     )
 
     reduction_ratio = (
-        0.0
-        if original_tokens == 0
-        else 1.0 - (filtered_tokens / original_tokens)
+        0.0 if original_tokens == 0 else 1.0 - (filtered_tokens / original_tokens)
     )
 
     duration_ms = (time.perf_counter() - start) * 1000

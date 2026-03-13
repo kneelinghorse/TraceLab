@@ -1,9 +1,8 @@
 """DeepSearch ingestion and worker health endpoints."""
+
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Optional
-from uuid import UUID
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -21,6 +20,7 @@ from app.schemas.deepsearch import (
     DeepSearchIngestResponse,
     WorkerHealthResponse,
 )
+from app.schemas.mission import MissionCreate
 from app.services.correction_queue import get_correction_queue
 from app.services.evidence_auto_linking import EvidenceAutoLinkingService
 from app.services.mission_protocol_service import (
@@ -38,7 +38,11 @@ _quality_service = QualityGateService()
 _auto_linker = EvidenceAutoLinkingService()
 
 
-@router.post("/ingest", response_model=DeepSearchIngestResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/ingest",
+    response_model=DeepSearchIngestResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 def ingest_deepsearch_payload(
     payload: DeepSearchIngestRequest,
     db: Session = Depends(get_db),
@@ -62,32 +66,30 @@ def ingest_deepsearch_payload(
             content=_quality_failure_payload(report, auto_link_result.as_dict()),
         )
 
-    try:
-        mission = _mission_service.create_mission_from_draft(
-            db,
-            project_id=project.id,
-            draft=draft_payload,
-            requested_status=mission_payload.status,
-        )
-    except MissionProtocolServiceError as exc:  # pragma: no cover - defensive
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    mission_create = MissionCreate(
+        project_id=project.id if project else None,
+        mission_data=draft_payload,
+        status=mission_payload.status,
+    )
 
-    # Store auto-linking metadata in execution_metadata
-    mission.execution_metadata = {
-        **(mission.execution_metadata or {}),
-        "evidence_linking": auto_link_result.as_dict(),
-    }
+    try:
+        mission = _mission_service.create_mission(db, mission_create)
+    except MissionProtocolServiceError as exc:  # pragma: no cover - defensive
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
+        ) from exc
+
+    mission.evidence_linking_metadata = auto_link_result.as_dict()
     db.add(mission)
     db.commit()
     db.refresh(mission)
 
     # Queue failed auto-link items for async correction
-    correction_info: Optional[CorrectionQueueInfo] = None
+    correction_info: CorrectionQueueInfo | None = None
     if auto_link_result.failed > 0:
         correction_queue = get_correction_queue()
         evidence_summaries = {
-            ev.evidence_id: ev.summary or ""
-            for ev in (mission_payload.evidence or [])
+            ev.evidence_id: ev.summary or "" for ev in (mission_payload.evidence or [])
         }
         queued_ids = correction_queue.queue_failed_items(
             mission_uuid=mission.id,
@@ -104,14 +106,16 @@ def ingest_deepsearch_payload(
                 callback_url=payload.callback_url,
             )
 
-    quality_gates = (mission.execution_metadata or {}).get("quality_gates", report.as_dict())
+    quality_summary = mission.quality_gates or report.as_dict()
     response = DeepSearchIngestResponse(
         mission_uuid=mission.id,
-        mission_id=mission.mission_id,
+        mission_id=mission.mission_data.get("mission_id")
+        if isinstance(mission.mission_data, dict)
+        else mission_payload.mission_id,
         project_id=mission.project_id,
         status=mission.status,
         quality_gates_passed=True,
-        quality_gates=quality_gates,
+        quality_gates=quality_summary,
         auto_linking=AutoLinkingSummary(**auto_link_result.as_dict()),
         corrections=correction_info,
     )
@@ -124,7 +128,9 @@ def _resolve_project(db: Session, payload: DeepSearchIngestRequest) -> Project:
     if payload.project_id:
         project = db.query(Project).filter(Project.id == payload.project_id).first()
         if not project:
-            raise HTTPException(status_code=404, detail=f"Project {payload.project_id} not found")
+            raise HTTPException(
+                status_code=404, detail=f"Project {payload.project_id} not found"
+            )
         return project
 
     if payload.auto_create_project:
@@ -151,8 +157,8 @@ def _resolve_project(db: Session, payload: DeepSearchIngestRequest) -> Project:
 
 def _quality_failure_payload(
     report: QualityGateReport,
-    auto_linking: Dict[str, object],
-) -> Dict[str, object]:
+    auto_linking: dict[str, object],
+) -> dict[str, object]:
     """Shape error payload for quality gate failures."""
 
     failing = report.failing_gates()

@@ -19,12 +19,14 @@ Trade-offs:
 
 Reference: R19.0 Qdrant Optimization Research (cmos/reports/sprint-19/)
 """
+
 from __future__ import annotations
 
 import logging
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Literal, Optional
+from typing import Any, Literal
 
 import numpy as np
 from sqlalchemy import func, select
@@ -57,7 +59,7 @@ class HybridRerankTimings:
 class HybridRerankResult:
     """Result from hybrid rerank search."""
 
-    results: List[Dict[str, Any]]
+    results: list[dict[str, Any]]
     timings: HybridRerankTimings
     mode_used: RerankMode
     fts_candidates_count: int
@@ -80,8 +82,8 @@ class HybridReranker:
     def __init__(
         self,
         *,
-        embedding_service: Optional[EmbeddingService] = None,
-        qdrant_service: Optional[QdrantService] = None,
+        embedding_service: EmbeddingService | None = None,
+        qdrant_service: QdrantService | None = None,
         session_factory: SessionFactory = SessionLocal,
         fts_language: str = "english",
     ) -> None:
@@ -105,11 +107,11 @@ class HybridReranker:
         top_k: int = 10,
         candidate_pool: int = 50,
         mode: RerankMode = "hybrid",
-        project_id: Optional[str] = None,
-        document_id: Optional[str] = None,
-        source_type: Optional[str] = None,
-        source_origin: Optional[str] = None,
-        hnsw_ef: Optional[int] = None,
+        project_id: str | None = None,
+        document_id: str | None = None,
+        source_type: str | None = None,
+        source_origin: str | None = None,
+        hnsw_ef: int | None = None,
         include_embeddings: bool = False,
     ) -> HybridRerankResult:
         """Execute hybrid rerank search.
@@ -229,11 +231,11 @@ class HybridReranker:
         *,
         query: str,
         limit: int,
-        project_id: Optional[str] = None,
-        document_id: Optional[str] = None,
-        source_type: Optional[str] = None,
-        source_origin: Optional[str] = None,
-    ) -> List[Dict[str, Any]]:
+        project_id: str | None = None,
+        document_id: str | None = None,
+        source_type: str | None = None,
+        source_origin: str | None = None,
+    ) -> list[dict[str, Any]]:
         """Retrieve candidate chunks using PostgreSQL full-text search.
 
         Uses the existing content_tsv GIN index on document_chunks table
@@ -255,7 +257,9 @@ class HybridReranker:
         session = self.session_factory()
         try:
             ts_query = func.websearch_to_tsquery(self.fts_language, query)
-            rank = func.ts_rank_cd(DocumentChunk.content_tsv, ts_query).label("fts_score")
+            rank = func.ts_rank_cd(DocumentChunk.content_tsv, ts_query).label(
+                "fts_score"
+            )
 
             stmt = (
                 select(
@@ -277,9 +281,11 @@ class HybridReranker:
             # Apply filters
             if project_id:
                 from uuid import UUID
+
                 stmt = stmt.where(Document.project_id == UUID(project_id))
             if document_id:
                 from uuid import UUID
+
                 stmt = stmt.where(DocumentChunk.document_id == UUID(document_id))
             if source_type:
                 stmt = stmt.where(Document.source_type == source_type)
@@ -291,16 +297,20 @@ class HybridReranker:
             candidates = []
             for row in rows:
                 mapping = row._mapping
-                candidates.append({
-                    "chunk_id": str(mapping["chunk_id"]),
-                    "content": mapping["content"],
-                    "document_id": str(mapping["document_id"]),
-                    "project_id": str(mapping["project_id"]) if mapping["project_id"] else None,
-                    "chunk_index": mapping["chunk_index"],
-                    "source_type": mapping["source_type"],
-                    "source_origin": mapping["source_origin"],
-                    "fts_score": float(mapping["fts_score"] or 0.0),
-                })
+                candidates.append(
+                    {
+                        "chunk_id": str(mapping["chunk_id"]),
+                        "content": mapping["content"],
+                        "document_id": str(mapping["document_id"]),
+                        "project_id": str(mapping["project_id"])
+                        if mapping["project_id"]
+                        else None,
+                        "chunk_index": mapping["chunk_index"],
+                        "source_type": mapping["source_type"],
+                        "source_origin": mapping["source_origin"],
+                        "fts_score": float(mapping["fts_score"] or 0.0),
+                    }
+                )
             return candidates
 
         finally:
@@ -309,11 +319,11 @@ class HybridReranker:
     def _semantic_rerank(
         self,
         *,
-        query_embedding: List[float],
-        candidates: List[Dict[str, Any]],
+        query_embedding: list[float],
+        candidates: list[dict[str, Any]],
         top_k: int,
         include_embeddings: bool = False,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Rerank candidates using semantic similarity.
 
         Retrieves embeddings from Qdrant for candidates and computes
@@ -350,7 +360,7 @@ class HybridReranker:
             )[:top_k]
 
         # Build ID → vector mapping
-        id_to_vector: Dict[str, List[float]] = {}
+        id_to_vector: dict[str, list[float]] = {}
         for point in points:
             vector = point.vector
             if isinstance(vector, dict):
@@ -360,8 +370,8 @@ class HybridReranker:
                 id_to_vector[str(point.id)] = vector
 
         # Batch cosine computation (matrix multiply) for better rerank latency.
-        candidate_ids: List[str] = []
-        candidate_vectors: List[List[float]] = []
+        candidate_ids: list[str] = []
+        candidate_vectors: list[list[float]] = []
         for chunk_id in chunk_ids:
             vector = id_to_vector.get(chunk_id)
             if vector is None:
@@ -393,7 +403,7 @@ class HybridReranker:
 
         # Map back to candidates and annotate with scores
         id_to_candidate = {c["chunk_id"]: c for c in candidates}
-        reranked: List[Dict[str, Any]] = []
+        reranked: list[dict[str, Any]] = []
 
         for idx in ordered_indices[:top_k]:
             chunk_id = candidate_ids[int(idx)]
@@ -416,13 +426,13 @@ class HybridReranker:
         *,
         query: str,
         top_k: int,
-        project_id: Optional[str] = None,
-        document_id: Optional[str] = None,
-        source_type: Optional[str] = None,
-        source_origin: Optional[str] = None,
-        hnsw_ef: Optional[int] = None,
+        project_id: str | None = None,
+        document_id: str | None = None,
+        source_type: str | None = None,
+        source_origin: str | None = None,
+        hnsw_ef: int | None = None,
         include_embeddings: bool = False,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Execute full semantic search via retrieval service.
 
         Args:
@@ -479,7 +489,7 @@ class HybridReranker:
 
 
 # Singleton instance
-_hybrid_reranker: Optional[HybridReranker] = None
+_hybrid_reranker: HybridReranker | None = None
 
 
 def get_hybrid_reranker() -> HybridReranker:

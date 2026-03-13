@@ -47,7 +47,9 @@ def _close_session(session: Session, provided: Optional[Session]) -> None:
         session.close()
 
 
-def _derive_metrics(document: Document, chunks: List[DocumentChunk], source_text: str) -> ParityMetrics:
+def _derive_metrics(
+    document: Document, chunks: List[DocumentChunk], source_text: str
+) -> ParityMetrics:
     chunk_char_count = sum(len(chunk.content or "") for chunk in chunks)
     source_chars = len(source_text)
     ratio = (chunk_char_count / source_chars) if source_chars else 0.0
@@ -76,7 +78,9 @@ def generate_parity_report(
     db = _open_session(session)
     try:
         document = db.query(Document).filter(Document.id == document_id).one()
-        source_path = markdown_path or (Path(document.file_path) if document.file_path else None)
+        source_path = markdown_path or (
+            Path(document.file_path) if document.file_path else None
+        )
         if source_path and not source_path.exists():
             source_text = ""
         elif source_path:
@@ -109,7 +113,9 @@ def generate_parity_report(
                     "stage": event.stage,
                     "status": event.status,
                     "detail": event.message,
-                    "created_at": event.created_at.isoformat() + "Z" if event.created_at else None,
+                    "created_at": event.created_at.isoformat() + "Z"
+                    if event.created_at
+                    else None,
                 }
                 for event in events
             ],
@@ -123,8 +129,12 @@ def generate_parity_report(
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Generate ingestion parity report")
     parser.add_argument("document_id", help="Target document identifier")
-    parser.add_argument("--output-dir", type=Path, default=Path("artifacts/ingestion-parity"))
-    parser.add_argument("--markdown-path", type=Path, help="Optional path to source markdown file")
+    parser.add_argument(
+        "--output-dir", type=Path, default=Path("artifacts/ingestion-parity")
+    )
+    parser.add_argument(
+        "--markdown-path", type=Path, help="Optional path to source markdown file"
+    )
     return parser
 
 

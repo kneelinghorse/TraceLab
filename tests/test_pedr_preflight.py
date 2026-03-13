@@ -1,17 +1,15 @@
 """Unit tests for the PEDR pre-flight query service."""
+
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from app.schemas.pedr_preflight import (
-    PreflightMatch,
-    PreflightMatchInsight,
     PreflightQuery,
-    PreflightRecommendation,
 )
 from app.services.pedr.preflight import (
     PreflightService,
@@ -22,11 +20,11 @@ from app.services.pedr.preflight import (
 class _FakeHybridSearchService:
     """Fake search service for testing."""
 
-    def __init__(self, results: Optional[List[Dict[str, Any]]] = None):
-        self.calls: List[Dict[str, Any]] = []
+    def __init__(self, results: list[dict[str, Any]] | None = None):
+        self.calls: list[dict[str, Any]] = []
         self._results = results or []
 
-    def search(self, **kwargs) -> List[Dict[str, Any]]:
+    def search(self, **kwargs) -> list[dict[str, Any]]:
         self.calls.append(kwargs)
         return [dict(item) for item in self._results]
 
@@ -35,7 +33,7 @@ def _make_search_result(
     document_id: str,
     score: float,
     **extras: Any,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Create a mock search result."""
     return {
         "chunk_id": f"chunk-{document_id}",
@@ -54,7 +52,7 @@ def _make_mission_metadata(
     status: str = "complete",
     passed_gates: int = 5,
     **extras: Any,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Create mock mission metadata."""
     return {
         "mission_uuid": f"uuid-{mission_id}",
@@ -376,8 +374,7 @@ class TestPreflightQuery:
     def test_respects_top_k_limit(self):
         """Should limit results to top_k."""
         search_results = [
-            _make_search_result(f"doc-{i}", score=0.90 - i * 0.05)
-            for i in range(10)
+            _make_search_result(f"doc-{i}", score=0.90 - i * 0.05) for i in range(10)
         ]
         fake_search = _FakeHybridSearchService(search_results)
 
@@ -391,7 +388,9 @@ class TestPreflightQuery:
             service,
             "_load_mission_metadata",
             return_value={
-                f"doc-{i}": _make_mission_metadata(f"M{i}", f"Mission {i}", passed_gates=5)
+                f"doc-{i}": _make_mission_metadata(
+                    f"M{i}", f"Mission {i}", passed_gates=5
+                )
                 for i in range(10)
             },
         ):

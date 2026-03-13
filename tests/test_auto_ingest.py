@@ -16,25 +16,33 @@ conftest.py's drop/create_all approach. Run with:
 
 For unit tests that don't need the database, see TestAutoIngestSingleton.
 """
+
 from __future__ import annotations
 
 import uuid
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
+
 
 # Lazy imports to allow schema tests to run without DB
 def _get_mission_model():
     from app.models.mission import Mission
+
     return Mission
+
 
 def _get_document_model():
     from app.models.document import Document
+
     return Document
+
 
 def _get_project_model():
     from app.models.project import Project
+
     return Project
+
 
 from app.services.auto_ingest import (
     AutoIngestError,
@@ -141,7 +149,9 @@ class TestAutoIngestService:
         assert document.id is not None
         assert document.project_id == mission.project_id
 
-    def test_auto_ingest_document_filename(self, db_session, mission, sample_markdown, mock_ingestion_service):
+    def test_auto_ingest_document_filename(
+        self, db_session, mission, sample_markdown, mock_ingestion_service
+    ):
         """Test that document filename follows {mission_id}_report.md pattern."""
         service = AutoIngestService(ingestion_service=mock_ingestion_service)
 
@@ -153,7 +163,9 @@ class TestAutoIngestService:
 
         assert document.name == f"{mission.mission_id}_report.md"
 
-    def test_auto_ingest_source_type_deepsearch(self, db_session, mission, sample_markdown, mock_ingestion_service):
+    def test_auto_ingest_source_type_deepsearch(
+        self, db_session, mission, sample_markdown, mock_ingestion_service
+    ):
         """Test that document source_type is set to 'deepsearch'."""
         service = AutoIngestService(ingestion_service=mock_ingestion_service)
 
@@ -165,7 +177,9 @@ class TestAutoIngestService:
 
         assert document.source_type == "deepsearch"
 
-    def test_auto_ingest_document_metadata(self, db_session, mission, sample_markdown, mock_ingestion_service):
+    def test_auto_ingest_document_metadata(
+        self, db_session, mission, sample_markdown, mock_ingestion_service
+    ):
         """Test that document metadata includes mission_id, job_id, auto_generated."""
         service = AutoIngestService(ingestion_service=mock_ingestion_service)
 
@@ -177,7 +191,9 @@ class TestAutoIngestService:
 
         assert document.document_metadata is not None
         assert document.document_metadata["mission_id"] == mission.mission_id
-        assert document.document_metadata["deepsearch_job_id"] == mission.deepsearch_job_id
+        assert (
+            document.document_metadata["deepsearch_job_id"] == mission.deepsearch_job_id
+        )
         assert document.document_metadata["auto_generated"] is True
 
     def test_auto_ingest_updates_mission_result_document_ids(
@@ -201,7 +217,9 @@ class TestAutoIngestService:
         assert mission.result_document_ids is not None
         assert str(document.id) in mission.result_document_ids
 
-    def test_auto_ingest_document_content_stored(self, db_session, mission, sample_markdown, mock_ingestion_service):
+    def test_auto_ingest_document_content_stored(
+        self, db_session, mission, sample_markdown, mock_ingestion_service
+    ):
         """Test that markdown content is stored in document."""
         service = AutoIngestService(ingestion_service=mock_ingestion_service)
 
@@ -213,7 +231,9 @@ class TestAutoIngestService:
 
         assert document.content == sample_markdown
 
-    def test_auto_ingest_document_file_type(self, db_session, mission, sample_markdown, mock_ingestion_service):
+    def test_auto_ingest_document_file_type(
+        self, db_session, mission, sample_markdown, mock_ingestion_service
+    ):
         """Test that document file_type is 'report'."""
         service = AutoIngestService(ingestion_service=mock_ingestion_service)
 
@@ -225,7 +245,9 @@ class TestAutoIngestService:
 
         assert document.file_type == "report"
 
-    def test_auto_ingest_document_mime_type(self, db_session, mission, sample_markdown, mock_ingestion_service):
+    def test_auto_ingest_document_mime_type(
+        self, db_session, mission, sample_markdown, mock_ingestion_service
+    ):
         """Test that document mime_type is text/markdown."""
         service = AutoIngestService(ingestion_service=mock_ingestion_service)
 
@@ -237,7 +259,9 @@ class TestAutoIngestService:
 
         assert document.mime_type == "text/markdown"
 
-    def test_auto_ingest_document_file_size(self, db_session, mission, sample_markdown, mock_ingestion_service):
+    def test_auto_ingest_document_file_size(
+        self, db_session, mission, sample_markdown, mock_ingestion_service
+    ):
         """Test that document file_size is calculated correctly."""
         service = AutoIngestService(ingestion_service=mock_ingestion_service)
 
@@ -250,7 +274,9 @@ class TestAutoIngestService:
         expected_size = len(sample_markdown.encode("utf-8"))
         assert document.file_size == expected_size
 
-    def test_auto_ingest_triggers_ingestion_pipeline(self, db_session, mission, sample_markdown):
+    def test_auto_ingest_triggers_ingestion_pipeline(
+        self, db_session, mission, sample_markdown
+    ):
         """Test that ingestion pipeline is called with correct parameters."""
         mock_service = MagicMock(spec=DocumentIngestionService)
         mock_service.process_document.return_value = {"status": "completed"}
@@ -298,7 +324,9 @@ class TestAutoIngestErrorHandling:
                 result_markdown=None,
             )
 
-    def test_auto_ingest_raises_on_missing_project_id(self, db_session, mission_without_project, sample_markdown):
+    def test_auto_ingest_raises_on_missing_project_id(
+        self, db_session, mission_without_project, sample_markdown
+    ):
         """Test that mission without project_id raises AutoIngestError."""
         service = AutoIngestService()
 
@@ -309,7 +337,9 @@ class TestAutoIngestErrorHandling:
                 result_markdown=sample_markdown,
             )
 
-    def test_auto_ingest_raises_on_ingestion_failure(self, db_session, mission, sample_markdown):
+    def test_auto_ingest_raises_on_ingestion_failure(
+        self, db_session, mission, sample_markdown
+    ):
         """Test that ingestion pipeline failure raises AutoIngestError."""
         mock_service = MagicMock(spec=DocumentIngestionService)
         mock_service.process_document.return_value = {
@@ -326,7 +356,9 @@ class TestAutoIngestErrorHandling:
                 result_markdown=sample_markdown,
             )
 
-    def test_auto_ingest_wraps_unexpected_exceptions(self, db_session, mission, sample_markdown):
+    def test_auto_ingest_wraps_unexpected_exceptions(
+        self, db_session, mission, sample_markdown
+    ):
         """Test that unexpected exceptions are wrapped in AutoIngestError."""
         mock_service = MagicMock(spec=DocumentIngestionService)
         mock_service.process_document.side_effect = RuntimeError("Unexpected error")
@@ -344,7 +376,9 @@ class TestAutoIngestErrorHandling:
 class TestAutoIngestIntegration:
     """Integration tests for auto-ingest with real document processing."""
 
-    @pytest.mark.skip(reason="Full pipeline test requires embedding service and Qdrant — chunks not created in SQLite test env")
+    @pytest.mark.skip(
+        reason="Full pipeline test requires embedding service and Qdrant — chunks not created in SQLite test env"
+    )
     def test_auto_ingest_full_pipeline(self, db_session, mission, sample_markdown):
         """Test auto-ingest with real ingestion service (no mocking).
 
@@ -370,7 +404,9 @@ class TestAutoIngestIntegration:
         db_session.refresh(document)
         assert len(document.chunks) > 0
 
-    def test_auto_ingest_multiple_documents(self, db_session, mission, sample_markdown, mock_ingestion_service):
+    def test_auto_ingest_multiple_documents(
+        self, db_session, mission, sample_markdown, mock_ingestion_service
+    ):
         """Test that multiple ingests append to result_document_ids."""
         service = AutoIngestService(ingestion_service=mock_ingestion_service)
 
@@ -411,7 +447,9 @@ class TestAutoIngestSingleton:
         assert service1 is service2
 
     @pytest.mark.asyncio
-    async def test_auto_ingest_result_convenience_function(self, db_session, mission, sample_markdown):
+    async def test_auto_ingest_result_convenience_function(
+        self, db_session, mission, sample_markdown
+    ):
         """Test the async convenience function."""
         # Reset singleton and inject mock
         import app.services.auto_ingest as auto_ingest_module
@@ -474,7 +512,9 @@ class TestWebhookHandlerAutoIngestIntegration:
         )
 
         # Process webhook
-        updated_mission, status = handler.process_deepsearch_webhook(db_session, payload)
+        updated_mission, status = handler.process_deepsearch_webhook(
+            db_session, payload
+        )
 
         # Verify mission was updated
         assert updated_mission.status == "completed"
@@ -522,13 +562,20 @@ class TestWebhookHandlerAutoIngestIntegration:
             result_markdown=None,  # No markdown
         )
 
-        updated_mission, status = handler.process_deepsearch_webhook(db_session, payload)
+        updated_mission, status = handler.process_deepsearch_webhook(
+            db_session, payload
+        )
 
         assert updated_mission.status == "completed"
         # No documents should be created
-        assert updated_mission.result_document_ids is None or updated_mission.result_document_ids == []
+        assert (
+            updated_mission.result_document_ids is None
+            or updated_mission.result_document_ids == []
+        )
 
-    def test_webhook_auto_ingest_failure_does_not_fail_webhook(self, db_session, project):
+    def test_webhook_auto_ingest_failure_does_not_fail_webhook(
+        self, db_session, project
+    ):
         """Test that auto-ingest failure doesn't fail the webhook processing."""
         from app.schemas.webhook import (
             DeepSearchWebhookPayload,
@@ -564,7 +611,9 @@ class TestWebhookHandlerAutoIngestIntegration:
         )
 
         # Should not raise - webhook processing should succeed
-        updated_mission, status = handler.process_deepsearch_webhook(db_session, payload)
+        updated_mission, status = handler.process_deepsearch_webhook(
+            db_session, payload
+        )
 
         # Mission should still be completed
         assert updated_mission.status == "completed"

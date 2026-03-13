@@ -6,11 +6,12 @@ for the PEDR L6 layer.
 
 Sprint 24: PEDR Graph Foundation
 """
+
 from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any
 
 from sqlalchemy import (
     Column,
@@ -23,7 +24,7 @@ from sqlalchemy import (
 )
 
 from app.core.database import Base
-from app.models.types import CrossDBJSON, GUID
+from app.models.types import GUID, CrossDBJSON
 
 
 class GraphEdge(Base):
@@ -118,7 +119,10 @@ class GraphEdge(Base):
     # Composite unique constraint for deduplication
     __table_args__ = (
         UniqueConstraint(
-            "from_urn", "to_urn", "edge_type", "direction",
+            "from_urn",
+            "to_urn",
+            "edge_type",
+            "direction",
             name="uq_graph_edges_from_to_type_direction",
         ),
         # Composite index for traversal queries
@@ -127,12 +131,9 @@ class GraphEdge(Base):
     )
 
     def __repr__(self) -> str:
-        return (
-            f"<GraphEdge {self.edge_type}: "
-            f"{self.from_urn} -> {self.to_urn}>"
-        )
+        return f"<GraphEdge {self.edge_type}: {self.from_urn} -> {self.to_urn}>"
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for API responses."""
         result = {
             "id": str(self.id),
@@ -160,10 +161,10 @@ class GraphEdge(Base):
         to_urn: str,
         direction: str = "out",
         weight: float = 1.0,
-        reason: Optional[str] = None,
-        via: Optional[str] = None,
-        evidence: Optional[Dict[str, Any]] = None,
-    ) -> "GraphEdge":
+        reason: str | None = None,
+        via: str | None = None,
+        evidence: dict[str, Any] | None = None,
+    ) -> GraphEdge:
         """Create GraphEdge from Semantic Protocol Edge data.
 
         Args:

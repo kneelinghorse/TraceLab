@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Generate a doc_id -> mission_id/mission_uuid map for PEDR benchmarks."""
+
 from __future__ import annotations
 
 import argparse
@@ -83,7 +84,10 @@ def score_mission(doc: Dict[str, str], mission: MissionRecord) -> float:
     sprint = _extract_sprint(doc.get("source_path", ""))
     if sprint:
         mission_id_norm = mission.mission_id.lower()
-        if f"b{sprint}" in mission_id_norm or f"sprint {sprint}" in mission.title.lower():
+        if (
+            f"b{sprint}" in mission_id_norm
+            or f"sprint {sprint}" in mission.title.lower()
+        ):
             score += 0.2
 
     score += 0.05 * _keyword_overlap(doc_tokens, mission_tokens)
@@ -108,12 +112,12 @@ def assign_missions(
     *,
     min_score: float,
 ) -> Tuple[Dict[str, Dict[str, str]], List[Tuple[str, float, str]]]:
-    candidates = {
-        doc["doc_id"]: rank_missions(doc, missions) for doc in docs
-    }
+    candidates = {doc["doc_id"]: rank_missions(doc, missions) for doc in docs}
     doc_order = sorted(
         docs,
-        key=lambda doc: candidates[doc["doc_id"]][0][1] if candidates[doc["doc_id"]] else 0,
+        key=lambda doc: (
+            candidates[doc["doc_id"]][0][1] if candidates[doc["doc_id"]] else 0
+        ),
         reverse=True,
     )
 
@@ -200,7 +204,9 @@ def main() -> int:
     print(f"Available missions: {len(missions)}")
     if low_confidence:
         print("Low-confidence matches:")
-        for doc_id, score, mission_id in sorted(low_confidence, key=lambda item: item[1]):
+        for doc_id, score, mission_id in sorted(
+            low_confidence, key=lambda item: item[1]
+        ):
             print(f"  {doc_id}: {score:.2f} -> {mission_id}")
 
     return 0

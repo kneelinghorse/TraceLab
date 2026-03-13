@@ -8,8 +8,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
-
 from app.models.document import Document
 from scripts.verify_ingestion_parity import generate_parity_report
 
@@ -29,7 +27,9 @@ def _markdown_fixture(path: Path) -> Path:
     return path
 
 
-@pytest.mark.skip(reason="CLI subprocess requires running server with auth — not available in test environment")
+@pytest.mark.skip(
+    reason="CLI subprocess requires running server with auth — not available in test environment"
+)
 def test_markdown_cli_flow(tmp_path, db_session, project):
     markdown_path = _markdown_fixture(tmp_path / "sample.md")
 
@@ -67,4 +67,7 @@ def test_markdown_cli_flow(tmp_path, db_session, project):
     metrics = report["metrics"]
     assert metrics["chunk_count"] >= 1
     assert metrics["coverage_ratio"] >= 0.95
-    assert any(event["stage"] == "chunked" and event["status"] == "succeeded" for event in report["processing_events"])
+    assert any(
+        event["stage"] == "chunked" and event["status"] == "succeeded"
+        for event in report["processing_events"]
+    )

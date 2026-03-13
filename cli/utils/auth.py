@@ -18,7 +18,12 @@ class TokenManager:
         self.token_dir.mkdir(parents=True, exist_ok=True)
         self.token_dir.chmod(0o700)  # Owner read/write/execute only
 
-    def save_token(self, access_token: str, token_type: str = "bearer", expires_in: Optional[int] = None) -> None:
+    def save_token(
+        self,
+        access_token: str,
+        token_type: str = "bearer",
+        expires_in: Optional[int] = None,
+    ) -> None:
         """Save token to disk."""
         self.ensure_token_dir()
 
@@ -30,7 +35,7 @@ class TokenManager:
         token_data = {
             "access_token": access_token,
             "token_type": token_type,
-            "expires_at": expires_at
+            "expires_at": expires_at,
         }
 
         with open(self.token_file, "w") as f:
@@ -73,4 +78,3 @@ class TokenManager:
     def is_authenticated(self) -> bool:
         """Check if user has a valid token."""
         return self.get_token() is not None
-

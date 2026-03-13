@@ -1,18 +1,16 @@
 """Unit tests for the PEDR pragmatic layer (intent classification and routing)."""
+
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 
 from app.services.pedr.pragmatic import (
-    QueryIntent,
-    IntentDetectionResult,
     PragmaticFilters,
     PragmaticService,
+    QueryIntent,
     get_pragmatic_service,
-    INTENT_DETECTION_PATTERNS,
-    INTENT_BOOST_WEIGHTS,
 )
 
 
@@ -276,7 +274,7 @@ class TestIntentBoost:
         score: float,
         element_type: str | None = None,
         **extras,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create a mock search result."""
         result = {
             "chunk_id": chunk_id,
@@ -405,7 +403,7 @@ class TestApplyMethod:
         chunk_id: str,
         score: float,
         element_type: str | None = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         result = {
             "chunk_id": chunk_id,
             "content": f"Content for {chunk_id}",
@@ -542,9 +540,7 @@ class TestCustomConfiguration:
         }
         service = PragmaticService(boost_weights=custom_weights)
 
-        results = [
-            {"chunk_id": "c1", "element_type": "insight", "combined_score": 1.0}
-        ]
+        results = [{"chunk_id": "c1", "element_type": "insight", "combined_score": 1.0}]
         filters = PragmaticFilters(
             intent=QueryIntent.SEARCH,
             confidence=0.9,
@@ -671,15 +667,17 @@ class TestAccuracyValidation:
         print(f"\nAccuracy: {accuracy:.1%} ({correct}/{total})")
 
         assert accuracy >= 0.80, (
-            f"Intent classification accuracy {accuracy:.1%} is below 80% target. "
-            f"Failed on {len(failures)} queries."
+            f"Intent classification accuracy {accuracy:.1%} is below 80% target. Failed on {len(failures)} queries."
         )
 
     def test_search_intent_recall(self, service: PragmaticService):
         """Search intent has high recall (doesn't miss search queries)."""
-        search_queries = [q for q, intent in self.TEST_QUERIES if intent == QueryIntent.SEARCH]
+        search_queries = [
+            q for q, intent in self.TEST_QUERIES if intent == QueryIntent.SEARCH
+        ]
         correct = sum(
-            1 for q in search_queries
+            1
+            for q in search_queries
             if service.classify_intent(q).intent == QueryIntent.SEARCH
         )
         recall = correct / len(search_queries)
@@ -689,8 +687,15 @@ class TestAccuracyValidation:
     def test_action_intent_precision(self, service: PragmaticService):
         """Action intents (CREATE/UPDATE/DELETE/EXECUTE) have high precision."""
         action_queries = [
-            q for q, intent in self.TEST_QUERIES
-            if intent in {QueryIntent.CREATE, QueryIntent.UPDATE, QueryIntent.DELETE, QueryIntent.EXECUTE}
+            q
+            for q, intent in self.TEST_QUERIES
+            if intent
+            in {
+                QueryIntent.CREATE,
+                QueryIntent.UPDATE,
+                QueryIntent.DELETE,
+                QueryIntent.EXECUTE,
+            }
         ]
 
         correct = 0

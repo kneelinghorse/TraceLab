@@ -7,6 +7,7 @@ Validates:
 - Layer failure isolation (other layers still return results)
 - Disabled/skipped layer diagnostic reporting
 """
+
 from __future__ import annotations
 
 import pytest
@@ -93,6 +94,7 @@ def _value_error_search(**kwargs) -> List[Dict[str, Any]]:
 # Exception hierarchy tests
 # ---------------------------------------------------------------------------
 
+
 class TestExceptionHierarchy:
     """Verify PEDR exception types and inheritance."""
 
@@ -134,6 +136,7 @@ class TestExceptionHierarchy:
 # Graceful degradation tests
 # ---------------------------------------------------------------------------
 
+
 class TestGracefulDegradation:
     """Verify the orchestrator continues with available layers when one fails."""
 
@@ -149,13 +152,17 @@ class TestGracefulDegradation:
         assert response.metadata.degraded is True
 
         # Find lexical diagnostic
-        lex_diag = next(d for d in response.metadata.layer_diagnostics if d.layer == "lexical")
+        lex_diag = next(
+            d for d in response.metadata.layer_diagnostics if d.layer == "lexical"
+        )
         assert lex_diag.status == "error"
         assert "Database connection lost" in lex_diag.error
         assert lex_diag.error_type == "ConnectionError"
 
         # Semantic should be ok
-        sem_diag = next(d for d in response.metadata.layer_diagnostics if d.layer == "semantic")
+        sem_diag = next(
+            d for d in response.metadata.layer_diagnostics if d.layer == "semantic"
+        )
         assert sem_diag.status == "ok"
         assert sem_diag.result_count == 5
 
@@ -169,11 +176,15 @@ class TestGracefulDegradation:
         assert len(response.results) > 0
         assert response.metadata.degraded is True
 
-        sem_diag = next(d for d in response.metadata.layer_diagnostics if d.layer == "semantic")
+        sem_diag = next(
+            d for d in response.metadata.layer_diagnostics if d.layer == "semantic"
+        )
         assert sem_diag.status == "error"
         assert sem_diag.error_type == "TimeoutError"
 
-        lex_diag = next(d for d in response.metadata.layer_diagnostics if d.layer == "lexical")
+        lex_diag = next(
+            d for d in response.metadata.layer_diagnostics if d.layer == "lexical"
+        )
         assert lex_diag.status == "ok"
 
     def test_both_retrieval_layers_fail_returns_empty(self):
@@ -187,7 +198,9 @@ class TestGracefulDegradation:
         assert response.metadata.degraded is True
         assert response.metadata.result_count == 0
 
-        error_layers = [d for d in response.metadata.layer_diagnostics if d.status == "error"]
+        error_layers = [
+            d for d in response.metadata.layer_diagnostics if d.status == "error"
+        ]
         assert len(error_layers) >= 2
 
     def test_graph_failure_still_returns_lexical_semantic(self):
@@ -198,14 +211,18 @@ class TestGracefulDegradation:
         )
         # Mock graph service to fail
         orch.graph_service = MagicMock()
-        orch.graph_service.expand_from_results.side_effect = RuntimeError("Graph DB unavailable")
+        orch.graph_service.expand_from_results.side_effect = RuntimeError(
+            "Graph DB unavailable"
+        )
 
         response = orch.search(query="test query", top_k=5)
 
         assert len(response.results) > 0
         assert response.metadata.degraded is True
 
-        graph_diag = next(d for d in response.metadata.layer_diagnostics if d.layer == "graph")
+        graph_diag = next(
+            d for d in response.metadata.layer_diagnostics if d.layer == "graph"
+        )
         assert graph_diag.status == "error"
         assert "Graph DB unavailable" in graph_diag.error
 
@@ -213,6 +230,7 @@ class TestGracefulDegradation:
 # ---------------------------------------------------------------------------
 # Diagnostic reporting tests
 # ---------------------------------------------------------------------------
+
 
 class TestLayerDiagnostics:
     """Verify per-layer diagnostic metadata is correctly populated."""
@@ -226,7 +244,9 @@ class TestLayerDiagnostics:
 
         assert response.metadata.degraded is False
 
-        ok_diagnostics = [d for d in response.metadata.layer_diagnostics if d.status == "ok"]
+        ok_diagnostics = [
+            d for d in response.metadata.layer_diagnostics if d.status == "ok"
+        ]
         assert len(ok_diagnostics) >= 2  # At least lexical + semantic
 
         for diag in ok_diagnostics:
@@ -251,7 +271,9 @@ class TestLayerDiagnostics:
         response = orch.search(query="test query", top_k=5)
 
         disabled_layers = {
-            d.layer for d in response.metadata.layer_diagnostics if d.status == "disabled"
+            d.layer
+            for d in response.metadata.layer_diagnostics
+            if d.status == "disabled"
         }
         assert "syntactic" in disabled_layers
         assert "pragmatic" in disabled_layers
@@ -265,7 +287,9 @@ class TestLayerDiagnostics:
         )
         response = orch.search(query="test query", top_k=5)
 
-        lex_diag = next(d for d in response.metadata.layer_diagnostics if d.layer == "lexical")
+        lex_diag = next(
+            d for d in response.metadata.layer_diagnostics if d.layer == "lexical"
+        )
         assert lex_diag.status == "error"
         assert lex_diag.error_type == "ValueError"
         assert "Invalid query embedding dimension" in lex_diag.error
@@ -313,6 +337,7 @@ class TestLayerDiagnostics:
 # Response schema tests
 # ---------------------------------------------------------------------------
 
+
 class TestResponseSchema:
     """Verify the response to_dict includes new diagnostic fields."""
 
@@ -338,7 +363,8 @@ class TestResponseSchema:
 
         assert response_dict["metadata"]["degraded"] is True
         error_diags = [
-            d for d in response_dict["metadata"]["layer_diagnostics"]
+            d
+            for d in response_dict["metadata"]["layer_diagnostics"]
             if d["status"] == "error"
         ]
         assert len(error_diags) >= 1
@@ -347,6 +373,7 @@ class TestResponseSchema:
 # ---------------------------------------------------------------------------
 # Governance layer failure test
 # ---------------------------------------------------------------------------
+
 
 class TestGovernanceLayerFailure:
     """Verify governance layer failure is handled gracefully."""
@@ -366,6 +393,8 @@ class TestGovernanceLayerFailure:
         assert len(response.results) > 0
         assert response.metadata.degraded is True
 
-        gov_diag = next(d for d in response.metadata.layer_diagnostics if d.layer == "governance")
+        gov_diag = next(
+            d for d in response.metadata.layer_diagnostics if d.layer == "governance"
+        )
         assert gov_diag.status == "error"
         assert "DB session expired" in gov_diag.error

@@ -9,6 +9,7 @@ GET  /api/v1/decisions/linked/{decision_id}
 POST /api/v1/decisions/linked/{decision_id}/evidence
   → Add evidence references to an existing decision
 """
+
 from __future__ import annotations
 
 import json
@@ -77,7 +78,10 @@ def _update_cmos(sql: str, params: dict | None = None) -> int:
 class EvidenceRef(BaseModel):
     """A reference to a TraceLab entity used as evidence for a decision."""
 
-    type: str = Field(..., description="Evidence type: insight, document, chunk, mission, search_result")
+    type: str = Field(
+        ...,
+        description="Evidence type: insight, document, chunk, mission, search_result",
+    )
     id: str = Field(..., description="TraceLab entity ID (UUID or URN)")
 
 
@@ -96,7 +100,9 @@ class LinkedDecision(BaseModel):
 class AddEvidenceRequest(BaseModel):
     """Payload for adding evidence to a decision."""
 
-    evidence: List[EvidenceRef] = Field(..., min_length=1, description="Evidence references to add")
+    evidence: List[EvidenceRef] = Field(
+        ..., min_length=1, description="Evidence references to add"
+    )
     mission_id: Optional[str] = Field(None, description="CMOS mission ID to associate")
 
 
@@ -107,7 +113,9 @@ class AddEvidenceRequest(BaseModel):
 def list_linked_decisions(
     mission_id: Optional[str] = Query(None, description="Filter by CMOS mission ID"),
     sprint_id: Optional[str] = Query(None, description="Filter by sprint ID"),
-    has_evidence: bool = Query(False, description="Only return decisions with evidence links"),
+    has_evidence: bool = Query(
+        False, description="Only return decisions with evidence links"
+    ),
     limit: int = Query(50, ge=1, le=200),
     _user: AuthenticatedUser = Depends(require_authenticated_user),
 ):
@@ -167,7 +175,9 @@ def get_linked_decision(
         )
 
         if not rows:
-            raise HTTPException(status_code=404, detail=f"Decision {decision_id} not found")
+            raise HTTPException(
+                status_code=404, detail=f"Decision {decision_id} not found"
+            )
 
         return _row_to_linked_decision(rows[0])
 
@@ -198,7 +208,9 @@ def add_evidence_to_decision(
         )
 
         if not rows:
-            raise HTTPException(status_code=404, detail=f"Decision {decision_id} not found")
+            raise HTTPException(
+                status_code=404, detail=f"Decision {decision_id} not found"
+            )
 
         row = rows[0]
 
@@ -211,7 +223,10 @@ def add_evidence_to_decision(
                 existing_evidence.append({"type": ref.type, "id": ref.id})
                 existing_keys.add(key)
 
-        updates = {"evidence": json.dumps(existing_evidence, ensure_ascii=False), "id": decision_id}
+        updates = {
+            "evidence": json.dumps(existing_evidence, ensure_ascii=False),
+            "id": decision_id,
+        }
         update_sql = "UPDATE strategic_decisions SET evidence = :evidence"
 
         if payload.mission_id and not row.get("mission_id"):

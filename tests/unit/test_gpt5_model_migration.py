@@ -1,4 +1,5 @@
 """Unit tests for GPT-5 model migration behavior."""
+
 from __future__ import annotations
 
 from types import SimpleNamespace

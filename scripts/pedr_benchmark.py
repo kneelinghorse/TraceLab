@@ -7,6 +7,7 @@ unified search API and compares results.
 Usage:
     python scripts/pedr_benchmark.py --output cmos/reports/sprint-18/pedr-benchmark.json
 """
+
 import argparse
 import json
 import sys
@@ -80,43 +81,49 @@ def run_pedr_benchmark(
             # Build result summary
             top_results = []
             for r in response.results[:3]:
-                top_results.append({
-                    "rank": r.rrf_rank,
-                    "rrf_score": r.rrf_score,
-                    "contributing_layers": r.contributing_layers,
-                    "element_type": r.element_type,
-                    "document_id": r.document_id,
-                    "content_preview": r.content[:100] if r.content else "",
-                })
+                top_results.append(
+                    {
+                        "rank": r.rrf_rank,
+                        "rrf_score": r.rrf_score,
+                        "contributing_layers": r.contributing_layers,
+                        "element_type": r.element_type,
+                        "document_id": r.document_id,
+                        "content_preview": r.content[:100] if r.content else "",
+                    }
+                )
 
-            results.append({
-                "query": query,
-                "latency_ms": latency_ms,
-                "result_count": len(response.results),
-                "intent": response.metadata.intent,
-                "intent_confidence": response.metadata.intent_confidence,
-                "detected_type": response.metadata.detected_type,
-                "type_confidence": response.metadata.type_confidence,
-                "layers_used": response.metadata.layers_used,
-                "layer_timings": {
-                    "lexical_ms": response.metadata.timings.lexical_ms,
-                    "semantic_ms": response.metadata.timings.semantic_ms,
-                    "syntactic_ms": response.metadata.timings.syntactic_ms,
-                    "pragmatic_ms": response.metadata.timings.pragmatic_ms,
-                    "governance_ms": response.metadata.timings.governance_ms,
-                    "fusion_ms": response.metadata.timings.fusion_ms,
-                },
-                "top_results": top_results,
-            })
+            results.append(
+                {
+                    "query": query,
+                    "latency_ms": latency_ms,
+                    "result_count": len(response.results),
+                    "intent": response.metadata.intent,
+                    "intent_confidence": response.metadata.intent_confidence,
+                    "detected_type": response.metadata.detected_type,
+                    "type_confidence": response.metadata.type_confidence,
+                    "layers_used": response.metadata.layers_used,
+                    "layer_timings": {
+                        "lexical_ms": response.metadata.timings.lexical_ms,
+                        "semantic_ms": response.metadata.timings.semantic_ms,
+                        "syntactic_ms": response.metadata.timings.syntactic_ms,
+                        "pragmatic_ms": response.metadata.timings.pragmatic_ms,
+                        "governance_ms": response.metadata.timings.governance_ms,
+                        "fusion_ms": response.metadata.timings.fusion_ms,
+                    },
+                    "top_results": top_results,
+                }
+            )
 
         except Exception as e:
             print(f"    Error: {e}")
-            results.append({
-                "query": query,
-                "error": str(e),
-                "latency_ms": 0,
-                "result_count": 0,
-            })
+            results.append(
+                {
+                    "query": query,
+                    "error": str(e),
+                    "latency_ms": 0,
+                    "result_count": 0,
+                }
+            )
             latencies.append(0)
 
     # Calculate summary statistics
@@ -131,11 +138,18 @@ def run_pedr_benchmark(
             "capture_timestamp": datetime.now(timezone.utc).isoformat(),
             "query_count": len(queries),
             "successful_queries": len(valid_latencies),
-            "latency_p50_ms": latencies_sorted[p50_idx] if p50_idx < len(latencies_sorted) else 0,
-            "latency_p90_ms": latencies_sorted[p90_idx] if p90_idx < len(latencies_sorted) else 0,
-            "latency_p95_ms": latencies_sorted[max(0, min(p95_idx, len(latencies_sorted) - 1))],
+            "latency_p50_ms": latencies_sorted[p50_idx]
+            if p50_idx < len(latencies_sorted)
+            else 0,
+            "latency_p90_ms": latencies_sorted[p90_idx]
+            if p90_idx < len(latencies_sorted)
+            else 0,
+            "latency_p95_ms": latencies_sorted[
+                max(0, min(p95_idx, len(latencies_sorted) - 1))
+            ],
             "latency_mean_ms": sum(valid_latencies) / len(valid_latencies),
-            "avg_results_per_query": sum(r.get("result_count", 0) for r in results) / len(results),
+            "avg_results_per_query": sum(r.get("result_count", 0) for r in results)
+            / len(results),
             "total_candidates": total_candidates,
         }
     else:
@@ -176,16 +190,20 @@ def _run_mock_benchmark(queries: List[str], top_k: int) -> Dict[str, Any]:
 
         latency = (time.perf_counter() - start) * 1000
 
-        results.append({
-            "query": query,
-            "latency_ms": latency,
-            "result_count": 0,
-            "intent": prag_filters.intent.value,
-            "intent_confidence": prag_filters.confidence,
-            "detected_type": syn_filters.detected_type.value if syn_filters.detected_type else None,
-            "type_confidence": syn_filters.detection_confidence,
-            "note": "Mock benchmark - no DB search",
-        })
+        results.append(
+            {
+                "query": query,
+                "latency_ms": latency,
+                "result_count": 0,
+                "intent": prag_filters.intent.value,
+                "intent_confidence": prag_filters.confidence,
+                "detected_type": syn_filters.detected_type.value
+                if syn_filters.detected_type
+                else None,
+                "type_confidence": syn_filters.detection_confidence,
+                "note": "Mock benchmark - no DB search",
+            }
+        )
 
     return {
         "summary": {
@@ -229,13 +247,17 @@ def compare_with_baseline(
 
     comparison = {
         "baseline": {
-            "search_mode": baseline.get("search_config", {}).get("search_mode", "unknown"),
+            "search_mode": baseline.get("search_config", {}).get(
+                "search_mode", "unknown"
+            ),
             "latency_p50_ms": baseline_p50,
             "latency_mean_ms": baseline_summary.get("latency_mean_ms", 0),
             "avg_results": baseline_summary.get("avg_results_per_query", 0),
         },
         "pedr": {
-            "search_mode": pedr_results.get("search_config", {}).get("search_mode", "unknown"),
+            "search_mode": pedr_results.get("search_config", {}).get(
+                "search_mode", "unknown"
+            ),
             "latency_p50_ms": pedr_p50,
             "latency_p95_ms": pedr_summary.get("latency_p95_ms", 0),
             "latency_mean_ms": pedr_summary.get("latency_mean_ms", 0),

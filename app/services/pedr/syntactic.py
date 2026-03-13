@@ -10,12 +10,14 @@ Entity types:
 - insight: Synthesized findings and observations
 - chunk: Raw text fragments from documents
 """
+
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
+from typing import Any
 
 from app.services.pedr.score_utils import ensure_base_score
 
@@ -29,7 +31,7 @@ class ElementType(str, Enum):
     CHUNK = "chunk"
 
     @classmethod
-    def values(cls) -> Set[str]:
+    def values(cls) -> set[str]:
         """Return all valid element type values."""
         return {e.value for e in cls}
 
@@ -38,9 +40,9 @@ class ElementType(str, Enum):
 class TypeDetectionResult:
     """Result of auto-detecting element type from a query."""
 
-    detected_type: Optional[ElementType]
+    detected_type: ElementType | None
     confidence: float  # 0.0 to 1.0
-    signals: List[str] = field(default_factory=list)
+    signals: list[str] = field(default_factory=list)
     query_normalized: str = ""
 
 
@@ -48,14 +50,14 @@ class TypeDetectionResult:
 class SyntacticFilters:
     """Filters applied by the syntactic layer."""
 
-    element_types: Tuple[ElementType, ...] = field(default_factory=tuple)
-    detected_type: Optional[ElementType] = None
+    element_types: tuple[ElementType, ...] = field(default_factory=tuple)
+    detected_type: ElementType | None = None
     detection_confidence: float = 0.0
     type_boost_enabled: bool = True
 
 
 # Type detection patterns - ordered by specificity
-TYPE_DETECTION_PATTERNS: Dict[ElementType, List[Tuple[str, float]]] = {
+TYPE_DETECTION_PATTERNS: dict[ElementType, list[tuple[str, float]]] = {
     ElementType.MISSION: [
         # High confidence patterns
         (r"\b(?:find|show|list|get)\s+(?:all\s+)?missions?\b", 0.95),
@@ -110,7 +112,7 @@ TYPE_DETECTION_PATTERNS: Dict[ElementType, List[Tuple[str, float]]] = {
 }
 
 # Type boost weights applied when scoring results
-TYPE_BOOST_WEIGHTS: Dict[ElementType, float] = {
+TYPE_BOOST_WEIGHTS: dict[ElementType, float] = {
     ElementType.MISSION: 0.15,
     ElementType.DOCUMENT: 0.12,
     ElementType.INSIGHT: 0.15,
@@ -130,8 +132,8 @@ class SyntacticService:
     def __init__(
         self,
         *,
-        patterns: Optional[Dict[ElementType, List[Tuple[str, float]]]] = None,
-        boost_weights: Optional[Dict[ElementType, float]] = None,
+        patterns: dict[ElementType, list[tuple[str, float]]] | None = None,
+        boost_weights: dict[ElementType, float] | None = None,
         confidence_threshold: float = 0.5,
     ) -> None:
         """Initialize the syntactic service.
@@ -144,7 +146,7 @@ class SyntacticService:
         self._patterns = patterns or TYPE_DETECTION_PATTERNS
         self._boost_weights = boost_weights or TYPE_BOOST_WEIGHTS
         self._confidence_threshold = confidence_threshold
-        self._compiled_patterns: Dict[ElementType, List[Tuple[re.Pattern, float]]] = {}
+        self._compiled_patterns: dict[ElementType, list[tuple[re.Pattern, float]]] = {}
         self._compile_patterns()
 
     def _compile_patterns(self) -> None:
@@ -176,9 +178,9 @@ class SyntacticService:
             )
 
         normalized = query.strip().lower()
-        best_type: Optional[ElementType] = None
+        best_type: ElementType | None = None
         best_confidence: float = 0.0
-        signals: List[str] = []
+        signals: list[str] = []
 
         for element_type, pattern_list in self._compiled_patterns.items():
             for pattern, confidence in pattern_list:
@@ -191,7 +193,9 @@ class SyntacticService:
                         best_type = element_type
 
         return TypeDetectionResult(
-            detected_type=best_type if best_confidence >= self._confidence_threshold else None,
+            detected_type=best_type
+            if best_confidence >= self._confidence_threshold
+            else None,
             confidence=best_confidence,
             signals=signals,
             query_normalized=normalized,
@@ -200,9 +204,9 @@ class SyntacticService:
     def create_filters(
         self,
         *,
-        element_type: Optional[str] = None,
-        element_types: Optional[List[str]] = None,
-        query: Optional[str] = None,
+        element_type: str | None = None,
+        element_types: list[str] | None = None,
+        query: str | None = None,
         auto_detect: bool = True,
         type_boost_enabled: bool = True,
     ) -> SyntacticFilters:
@@ -219,7 +223,7 @@ class SyntacticService:
             SyntacticFilters with normalized types and detection results.
         """
         # Collect explicit types
-        types: Set[ElementType] = set()
+        types: set[ElementType] = set()
 
         if element_type:
             normalized = element_type.strip().lower()
@@ -233,7 +237,7 @@ class SyntacticService:
                     types.add(ElementType(normalized))
 
         # Auto-detect if no explicit types and query provided
-        detected_type: Optional[ElementType] = None
+        detected_type: ElementType | None = None
         detection_confidence: float = 0.0
 
         if not types and query and auto_detect:
@@ -252,10 +256,10 @@ class SyntacticService:
 
     def apply_type_boost(
         self,
-        results: Sequence[Dict[str, Any]],
+        results: Sequence[dict[str, Any]],
         *,
         filters: SyntacticFilters,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Apply type boost to search results.
 
         Results matching the target element type(s) receive a score boost.
@@ -285,7 +289,7 @@ class SyntacticService:
             return boosted
 
         target_types = {t.value for t in filters.element_types}
-        boosted: List[Dict[str, Any]] = []
+        boosted: list[dict[str, Any]] = []
 
         for result in results:
             entry = dict(result)
@@ -294,9 +298,7 @@ class SyntacticService:
             base_score = ensure_base_score(entry)
 
             if is_match and result_type:
-                boost_weight = self._boost_weights.get(
-                    ElementType(result_type), 0.10
-                )
+                boost_weight = self._boost_weights.get(ElementType(result_type), 0.10)
                 entry["type_boost"] = boost_weight
                 entry["element_type_match"] = True
 
@@ -318,10 +320,10 @@ class SyntacticService:
 
     def filter_by_type(
         self,
-        results: Sequence[Dict[str, Any]],
+        results: Sequence[dict[str, Any]],
         *,
         filters: SyntacticFilters,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Filter results to only include matching element types.
 
         Args:
@@ -339,7 +341,7 @@ class SyntacticService:
             return list(results)
 
         target_types = {t.value for t in filters.element_types}
-        filtered: List[Dict[str, Any]] = []
+        filtered: list[dict[str, Any]] = []
 
         for result in results:
             result_type = self._infer_element_type(result)
@@ -352,11 +354,11 @@ class SyntacticService:
 
     def apply(
         self,
-        results: Sequence[Dict[str, Any]],
+        results: Sequence[dict[str, Any]],
         *,
         filters: SyntacticFilters,
         filter_mode: bool = False,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Apply syntactic processing to search results.
 
         This is the main entry point that combines type detection, filtering,
@@ -384,7 +386,7 @@ class SyntacticService:
         return processed
 
     @staticmethod
-    def _infer_element_type(result: Dict[str, Any]) -> Optional[str]:
+    def _infer_element_type(result: dict[str, Any]) -> str | None:
         """Infer the element type from a search result.
 
         Uses available metadata to determine if result is a mission,
@@ -427,7 +429,7 @@ class SyntacticService:
 
 
 # Singleton instance
-_syntactic_service: Optional[SyntacticService] = None
+_syntactic_service: SyntacticService | None = None
 
 
 def get_syntactic_service() -> SyntacticService:

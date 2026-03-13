@@ -1,11 +1,11 @@
 """Tests for correction loop: retry logic and webhook delivery."""
+
 from __future__ import annotations
 
 import asyncio
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, Generator
 from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
@@ -23,16 +23,13 @@ from app.services.correction_queue import (
     MAX_RETRIES,
     CorrectionQueueItem,
     CorrectionQueueService,
-    get_correction_queue,
 )
 from app.services.evidence_auto_linking import (
     AutoLinkErrorType,
     EvidenceAutoLinkingResult,
-    EvidenceAutoLinkingService,
 )
 from app.services.webhook_client import (
     WebhookClient,
-    WebhookDeliveryResult,
     create_failure_payload,
     create_success_payload,
 )
@@ -354,7 +351,7 @@ class TestCorrectionQueueService:
     ):
         """Test force retry of failed items."""
         # Create a failed item manually
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         item = CorrectionQueueItem(
             correction_id=uuid4(),
             mission_uuid=uuid4(),
@@ -410,10 +407,16 @@ class TestCorrectionQueueService:
         correction_queue: CorrectionQueueService,
     ):
         """Test clearing completed items."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         # Add completed and pending items
-        for i, status in enumerate([CorrectionStatus.COMPLETED, CorrectionStatus.PENDING, CorrectionStatus.FAILED]):
+        for i, status in enumerate(
+            [
+                CorrectionStatus.COMPLETED,
+                CorrectionStatus.PENDING,
+                CorrectionStatus.FAILED,
+            ]
+        ):
             item = CorrectionQueueItem(
                 correction_id=uuid4(),
                 mission_uuid=uuid4(),
@@ -468,7 +471,7 @@ class TestBackoffSchedule:
         for item in correction_queue._queue.values():
             assert item.next_retry_at is not None
             # First retry should be ~5 seconds from now
-            time_until = (item.next_retry_at - datetime.now(timezone.utc)).total_seconds()
+            time_until = (item.next_retry_at - datetime.now(UTC)).total_seconds()
             assert 0 < time_until <= BACKOFF_SCHEDULE[0] + 1
 
 
@@ -500,10 +503,12 @@ class TestTelemetry:
             mock_response.text = '{"status": "received"}'
             mock_post.return_value = mock_response
 
-            asyncio.run(webhook_client.send_correction_notification(
-                "https://deepsearch.example/webhook",
-                payload,
-            ))
+            asyncio.run(
+                webhook_client.send_correction_notification(
+                    "https://deepsearch.example/webhook",
+                    payload,
+                )
+            )
 
         # Check telemetry file uses unified envelope format
         assert temp_telemetry_path.exists()
@@ -582,7 +587,9 @@ class TestEvidenceAutoLinkingWithErrors:
         assert actual == required, f"Missing types: {required - actual}"
         assert len(actual) >= 5, "Must have at least 5 error types per spec"
 
-    def test_error_result_structure(self, sample_auto_link_result: EvidenceAutoLinkingResult):
+    def test_error_result_structure(
+        self, sample_auto_link_result: EvidenceAutoLinkingResult
+    ):
         """Verify error results include all required fields."""
         # Our sample result should have errors with proper structure
         assert sample_auto_link_result.failed == 2
@@ -593,13 +600,17 @@ class TestEvidenceAutoLinkingWithErrors:
             assert "error_type" in error
             assert "message" in error
 
-    def test_failure_rate_calculation(self, sample_auto_link_result: EvidenceAutoLinkingResult):
+    def test_failure_rate_calculation(
+        self, sample_auto_link_result: EvidenceAutoLinkingResult
+    ):
         """Verify failure rate is calculated correctly."""
         # 2 failed out of 3 attempted
         expected_failure_rate = round(2 / 3, 3)
         assert sample_auto_link_result.failure_rate == expected_failure_rate
 
-    def test_error_types_in_sample(self, sample_auto_link_result: EvidenceAutoLinkingResult):
+    def test_error_types_in_sample(
+        self, sample_auto_link_result: EvidenceAutoLinkingResult
+    ):
         """Verify sample contains expected error types."""
         error_types = [e["error_type"] for e in sample_auto_link_result.errors]
         assert AutoLinkErrorType.LOW_SIMILARITY.value in error_types

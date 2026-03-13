@@ -1,10 +1,11 @@
 """SynthesisCache model for caching synthesis results by content hash."""
+
 from __future__ import annotations
 
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Index, Integer, JSON, String, Text
+from sqlalchemy import JSON, Column, DateTime, Index, Integer, String, Text
 
 from app.core.database import Base
 from app.models.types import GUID

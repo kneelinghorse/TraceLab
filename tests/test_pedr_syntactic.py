@@ -1,7 +1,8 @@
 """Unit tests for the PEDR syntactic layer (type detection and filtering)."""
+
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
 import pytest
 
@@ -9,10 +10,7 @@ from app.services.pedr.syntactic import (
     ElementType,
     SyntacticFilters,
     SyntacticService,
-    TypeDetectionResult,
     get_syntactic_service,
-    TYPE_DETECTION_PATTERNS,
-    TYPE_BOOST_WEIGHTS,
 )
 
 
@@ -196,7 +194,9 @@ class TestSyntacticFilters:
         assert filters.detected_type == ElementType.MISSION
         assert filters.detection_confidence > 0.5
 
-    def test_create_filters_explicit_overrides_auto_detect(self, service: SyntacticService):
+    def test_create_filters_explicit_overrides_auto_detect(
+        self, service: SyntacticService
+    ):
         """Explicit element_type takes precedence over auto-detection."""
         filters = service.create_filters(
             element_type="document",
@@ -253,7 +253,7 @@ class TestTypeBoost:
         score: float,
         element_type: str | None = None,
         **extras,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create a mock search result."""
         result = {
             "chunk_id": chunk_id,
@@ -354,7 +354,7 @@ class TestTypeFiltering:
         chunk_id: str,
         element_type: str | None = None,
         **extras,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         result = {
             "chunk_id": chunk_id,
             "content": f"Content for {chunk_id}",
@@ -421,7 +421,7 @@ class TestApplyMethod:
         chunk_id: str,
         score: float,
         element_type: str | None = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         result = {
             "chunk_id": chunk_id,
             "content": f"Content for {chunk_id}",

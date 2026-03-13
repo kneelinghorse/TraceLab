@@ -3,6 +3,7 @@
 MCP tool unit tests don't require database access and should not
 trigger the autouse database reset fixture from the main conftest.
 """
+
 from __future__ import annotations
 
 import os

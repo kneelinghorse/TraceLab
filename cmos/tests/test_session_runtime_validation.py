@@ -39,8 +39,12 @@ class SessionRuntimeValidationTest(unittest.TestCase):
         client = self.runtime.client
         client.execute("DELETE FROM sessions")
         client.execute("DELETE FROM session_events")
-        client.execute("DELETE FROM context_snapshots WHERE context_id IN ('project_context', 'master_context')")
-        client.execute("DELETE FROM strategic_decisions WHERE context_id = 'master_context'")
+        client.execute(
+            "DELETE FROM context_snapshots WHERE context_id IN ('project_context', 'master_context')"
+        )
+        client.execute(
+            "DELETE FROM strategic_decisions WHERE context_id = 'master_context'"
+        )
         project_context = {"working_memory": {}}
         master_context = {
             "project_identity": {},
@@ -85,7 +89,12 @@ class SessionRuntimeValidationTest(unittest.TestCase):
         active = working.get("active_session") or {}
         active["started_at"] = "2023-01-01T00:00:00Z"
         working["active_session"] = active
-        client.set_context("project_context", project_context, source_path="tests/reset", snapshot=False)
+        client.set_context(
+            "project_context",
+            project_context,
+            source_path="tests/reset",
+            snapshot=False,
+        )
         client.close()
 
         with self.assertRaises(ActiveSessionError) as ctx:
@@ -94,7 +103,9 @@ class SessionRuntimeValidationTest(unittest.TestCase):
         self.assertIn(session_id, str(ctx.exception))
 
     def test_capture_validates_category_and_length(self) -> None:
-        session_id = self.runtime.start_session("planning", "Validation", agent="unittest")
+        session_id = self.runtime.start_session(
+            "planning", "Validation", agent="unittest"
+        )
         with self.assertRaises(ValidationError) as ctx:
             self.runtime.capture_insight(session_id, "idea", "Should fail")
         self.assertIn("Valid options", str(ctx.exception))
@@ -105,7 +116,9 @@ class SessionRuntimeValidationTest(unittest.TestCase):
         self.assertIn("1000", str(ctx.exception))
 
     def test_complete_requires_summary(self) -> None:
-        session_id = self.runtime.start_session("planning", "Needs summary", agent="unittest")
+        session_id = self.runtime.start_session(
+            "planning", "Needs summary", agent="unittest"
+        )
         with self.assertRaises(ValidationError) as ctx:
             self.runtime.complete_session(session_id, "   ")
         self.assertIn("summary", str(ctx.exception))

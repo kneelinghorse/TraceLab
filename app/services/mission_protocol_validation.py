@@ -1,7 +1,9 @@
 """Helpers for Mission Protocol validation workflows."""
+
 from __future__ import annotations
 
-from typing import Any, Dict, Literal, Sequence
+from collections.abc import Sequence
+from typing import Any, Literal
 
 import yaml
 
@@ -32,7 +34,7 @@ def parse_mission_yaml(yaml_text: str) -> MissionProtocolDraft:
 
 
 def validate_mission_payload(
-    payload: Dict[str, Any],
+    payload: dict[str, Any],
     *,
     state: MissionState = "draft",
 ) -> MissionProtocolDraft | MissionProtocolComplete:
@@ -42,7 +44,7 @@ def validate_mission_payload(
 
 
 def promote_to_complete(
-    payload: MissionProtocolDraft | Dict[str, Any]
+    payload: MissionProtocolDraft | dict[str, Any],
 ) -> MissionProtocolComplete:
     """Promote a draft payload (or raw dict) to a complete payload."""
     if isinstance(payload, MissionProtocolDraft):
@@ -54,9 +56,13 @@ def promote_to_complete(
     return MissionProtocolComplete.model_validate(data)
 
 
-def mission_protocol_schema(state: MissionState = "draft") -> Dict[str, Any]:
+def mission_protocol_schema(state: MissionState = "draft") -> dict[str, Any]:
     """Return the JSON Schema for the requested mission protocol state."""
-    return MissionProtocolDraft.model_json_schema() if state == "draft" else MissionProtocolComplete.model_json_schema()
+    return (
+        MissionProtocolDraft.model_json_schema()
+        if state == "draft"
+        else MissionProtocolComplete.model_json_schema()
+    )
 
 
 def _array_literal(fields: Sequence[str]) -> str:
@@ -124,10 +130,7 @@ def _build_postgres_constraint() -> str:
     return " AND ".join(f"({clause})" for clause in clauses)
 
 
-_SQLITE_COMPLETE_EXPR = (
-    "COALESCE(json_extract(mission_data, '$.status'), '\"draft\"') "
-    "IN ('\"complete\"','\"review\"')"
-)
+_SQLITE_COMPLETE_EXPR = "COALESCE(json_extract(mission_data, '$.status'), '\"draft\"') IN ('\"complete\"','\"review\"')"
 
 
 def _build_sqlite_constraint() -> str:
@@ -147,16 +150,10 @@ def _build_sqlite_constraint() -> str:
         clauses.append(f"(NOT {_SQLITE_COMPLETE_EXPR} OR ({required_checks}))")
 
     clauses.append(
-        "("
-        f"NOT {_SQLITE_COMPLETE_EXPR} "
-        "OR json_type(mission_data, '$.research_statement') = 'object'"
-        ")"
+        f"(NOT {_SQLITE_COMPLETE_EXPR} OR json_type(mission_data, '$.research_statement') = 'object')"
     )
     clauses.append(
-        "("
-        f"NOT {_SQLITE_COMPLETE_EXPR} "
-        "OR json_type(mission_data, '$.synthesis') = 'object'"
-        ")"
+        f"(NOT {_SQLITE_COMPLETE_EXPR} OR json_type(mission_data, '$.synthesis') = 'object')"
     )
     clauses.append(
         "("

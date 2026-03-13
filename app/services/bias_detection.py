@@ -1,10 +1,15 @@
 """Rule-based bias detection service."""
+
 from __future__ import annotations
 
 import re
-from typing import Iterable, List, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 
-from app.models.mission_protocol import MethodologyDetails, MissionProtocolDraft, ParticipantSegment
+from app.models.mission_protocol import (
+    MethodologyDetails,
+    MissionProtocolDraft,
+    ParticipantSegment,
+)
 from app.services.quality_automation_models import (
     QualityAutomationCheckResult,
     QualityIssue,
@@ -37,10 +42,12 @@ class BiasDetector:
         """Run bias detection rules on the mission payload."""
         script_text = self._discussion_text(mission)
         leading_matches = self._detect_leading_questions(script_text)
-        demographic_issues = self._detect_demographic_imbalance(mission.methodology_details)
+        demographic_issues = self._detect_demographic_imbalance(
+            mission.methodology_details
+        )
 
-        issues: List[QualityIssue] = []
-        recommendations: List[str] = []
+        issues: list[QualityIssue] = []
+        recommendations: list[str] = []
         metrics = {
             "leading_question_matches": leading_matches,
             "segment_issues": len(demographic_issues),
@@ -54,7 +61,9 @@ class BiasDetector:
                     message=f"Detected {leading_matches} potential leading questions in the discussion guide.",
                 )
             )
-            recommendations.append("Rewrite moderator prompts as neutral, open-ended questions.")
+            recommendations.append(
+                "Rewrite moderator prompts as neutral, open-ended questions."
+            )
 
         if demographic_issues:
             for segment, ratio in demographic_issues.items():
@@ -66,7 +75,9 @@ class BiasDetector:
                         metadata={"segment": segment, "ratio": ratio},
                     )
                 )
-            recommendations.append("Recruit additional participants from under-represented cohorts.")
+            recommendations.append(
+                "Recruit additional participants from under-represented cohorts."
+            )
 
         summary = (
             "Bias detection completed with no findings."
@@ -83,11 +94,17 @@ class BiasDetector:
         )
 
     def _discussion_text(self, mission: MissionProtocolDraft) -> str:
-        prompts: List[str] = []
+        prompts: list[str] = []
         if mission.discussion_guide:
             prompts.extend([item for item in mission.discussion_guide if item])
         if mission.key_questions:
-            prompts.extend([question.question for question in mission.key_questions if question.question])
+            prompts.extend(
+                [
+                    question.question
+                    for question in mission.key_questions
+                    if question.question
+                ]
+            )
         return " ".join(prompts).lower()
 
     def _detect_leading_questions(self, script_text: str) -> int:
@@ -105,7 +122,9 @@ class BiasDetector:
         if not details or not details.participant_segments:
             return {}
 
-        totals = self._segment_ratios(details.participant_segments, details.total_participants)
+        totals = self._segment_ratios(
+            details.participant_segments, details.total_participants
+        )
         return {
             name: ratio
             for name, ratio in totals.items()
@@ -118,7 +137,9 @@ class BiasDetector:
         total_participants: int | None,
     ) -> Mapping[str, float]:
         distributions: dict[str, float] = {}
-        total = total_participants or sum(seg.count or 0 for seg in segments if seg.count)
+        total = total_participants or sum(
+            seg.count or 0 for seg in segments if seg.count
+        )
 
         for entry in segments:
             ratio: float | None = entry.percentage

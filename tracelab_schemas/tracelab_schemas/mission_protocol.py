@@ -1,4 +1,5 @@
 """Pydantic models that define the Mission Protocol contract."""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -30,8 +31,12 @@ class ResearchStatement(BaseModel):
     """Defines the hypothesis and guardrails for a mission."""
 
     topic: str = Field(..., min_length=1, description="Primary research topic")
-    objective: str = Field(..., min_length=1, description="Desired business or research outcome")
-    scope: str = Field(..., min_length=1, description="Boundaries for the research effort")
+    objective: str = Field(
+        ..., min_length=1, description="Desired business or research outcome"
+    )
+    scope: str = Field(
+        ..., min_length=1, description="Boundaries for the research effort"
+    )
     audience: Optional[str] = Field(
         default=None,
         description="Intended audience for the insights",
@@ -226,16 +231,28 @@ class MissionProtocolComplete(MissionProtocolDraft):
     def enforce_completion_gates(self) -> "MissionProtocolComplete":
         """Ensure completion-ready payloads honour quality gate requirements."""
         if not self.evidence:
-            raise ValueError("Completed missions must reference at least one piece of evidence.")
+            raise ValueError(
+                "Completed missions must reference at least one piece of evidence."
+            )
         if not self.key_questions:
             raise ValueError("Completed missions must document key questions.")
-        answered = [question for question in self.key_questions if question.status == "answered"]
+        answered = [
+            question for question in self.key_questions if question.status == "answered"
+        ]
         if not answered:
-            raise ValueError("At least one key question must be answered before completion.")
+            raise ValueError(
+                "At least one key question must be answered before completion."
+            )
         if not self.synthesis.key_insights:
             raise ValueError("Synthesis must include at least one key insight.")
-        passed_gates = {checkpoint.gate for checkpoint in self.quality_checkpoints if checkpoint.status == "pass"}
-        missing = [gate for gate in REQUIRED_COMPLETION_GATES if gate not in passed_gates]
+        passed_gates = {
+            checkpoint.gate
+            for checkpoint in self.quality_checkpoints
+            if checkpoint.status == "pass"
+        }
+        missing = [
+            gate for gate in REQUIRED_COMPLETION_GATES if gate not in passed_gates
+        ]
         if missing:
             raise ValueError(
                 f"Missing required quality checkpoints with pass status: {', '.join(missing)}"

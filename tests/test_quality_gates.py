@@ -1,4 +1,5 @@
 """Unit tests for individual quality gate validators."""
+
 from __future__ import annotations
 
 from app.models.mission_protocol import MissionProtocolDraft
@@ -23,7 +24,11 @@ def _base_payload() -> dict:
             "contradiction_resolutions": [],
         },
         "key_questions": [
-            {"question": "How do gates work?", "status": "answered", "answer": "Deterministic validators"}
+            {
+                "question": "How do gates work?",
+                "status": "answered",
+                "answer": "Deterministic validators",
+            }
         ],
         "evidence": [
             {

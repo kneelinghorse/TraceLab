@@ -79,8 +79,8 @@ def compute_validation_coverage(events: Sequence[Dict[str, Any]]) -> MetricResul
 
     for event in events:
         layers = event.get("layers", {})
-        multi_layer_pass = (
-            event.get("status") == "pass" and all(layers.get(layer) for layer in required_layers)
+        multi_layer_pass = event.get("status") == "pass" and all(
+            layers.get(layer) for layer in required_layers
         )
         if multi_layer_pass:
             passing += 1
@@ -113,7 +113,9 @@ def compute_validation_coverage(events: Sequence[Dict[str, Any]]) -> MetricResul
     )
 
 
-def compute_quality_gate_effectiveness(events: Sequence[Dict[str, Any]]) -> MetricResult:
+def compute_quality_gate_effectiveness(
+    events: Sequence[Dict[str, Any]],
+) -> MetricResult:
     """Quality gate failures must block promotion and include actionable notes."""
 
     gate_totals: Dict[str, Dict[str, int]] = {}
@@ -140,7 +142,9 @@ def compute_quality_gate_effectiveness(events: Sequence[Dict[str, Any]]) -> Metr
     actionable = sum(
         1
         for record in fail_records
-        if record["blocked"] and record["actionable_feedback"] and record["resolution_logged"]
+        if record["blocked"]
+        and record["actionable_feedback"]
+        and record["resolution_logged"]
     )
     actionable_ratio = _pct(actionable, fail_count) if fail_count else 1.0
     met = actionable_ratio == 1.0
@@ -165,7 +169,11 @@ def compute_api_stability(events: Sequence[Dict[str, Any]]) -> MetricResult:
     if not events:
         raise ValueError("No API telemetry events recorded.")
     uptimes = [event["uptime"] for event in events if event.get("uptime") is not None]
-    latencies = [event["p95_latency_ms"] for event in events if event.get("p95_latency_ms") is not None]
+    latencies = [
+        event["p95_latency_ms"]
+        for event in events
+        if event.get("p95_latency_ms") is not None
+    ]
     error_rates = [event.get("error_rate", 0.0) for event in events]
 
     avg_uptime = fmean(uptimes)
@@ -196,13 +204,17 @@ def compute_yaml_roundtrip(events: Sequence[Dict[str, Any]]) -> MetricResult:
     """Import→export→import loop must retain 100% fidelity."""
 
     total = len(events)
-    perfect_roundtrips = sum(1 for event in events if (event.get("round_trip_diff") or 0) == 0)
+    perfect_roundtrips = sum(
+        1 for event in events if (event.get("round_trip_diff") or 0) == 0
+    )
     met = perfect_roundtrips == total
     details = {
         "total_round_trips": total,
         "perfect_round_trips": perfect_roundtrips,
         "round_trip_failures": total - perfect_roundtrips,
-        "total_fields_reviewed": sum(event.get("fields_checked", 0) for event in events),
+        "total_fields_reviewed": sum(
+            event.get("fields_checked", 0) for event in events
+        ),
     }
     return MetricResult(
         name="YAML round-trip accuracy (import/export/import parity)",
@@ -219,9 +231,14 @@ def compute_evidence_integrity(events: Sequence[Dict[str, Any]]) -> MetricResult
     missing_events = [
         event
         for event in events
-        if (event.get("missing_chunks", 0) > 0) or (event.get("invalid_relevance", 0) > 0)
+        if (event.get("missing_chunks", 0) > 0)
+        or (event.get("invalid_relevance", 0) > 0)
     ]
-    avg_relevance = fmean(event.get("average_relevance", 0.0) for event in events) if events else 0.0
+    avg_relevance = (
+        fmean(event.get("average_relevance", 0.0) for event in events)
+        if events
+        else 0.0
+    )
     met = not missing_events and avg_relevance >= 0.8
     details = {
         "checked_missions": len(events),
@@ -231,13 +248,18 @@ def compute_evidence_integrity(events: Sequence[Dict[str, Any]]) -> MetricResult
     return MetricResult(
         name="Evidence linking integrity (chunk presence + relevance >= 0.8)",
         met=met,
-        actual={"missing_chunk_events": len(missing_events), "average_relevance": avg_relevance},
+        actual={
+            "missing_chunk_events": len(missing_events),
+            "average_relevance": avg_relevance,
+        },
         target={"missing_chunk_events": 0, "average_relevance": 0.8},
         details=details,
     )
 
 
-def compute_progress_accuracy(events: Sequence[Dict[str, Any]], tolerance: float = 0.05) -> MetricResult:
+def compute_progress_accuracy(
+    events: Sequence[Dict[str, Any]], tolerance: float = 0.05
+) -> MetricResult:
     """Progress tracker must stay within ±5% of actual field coverage."""
 
     if not events:
@@ -245,7 +267,11 @@ def compute_progress_accuracy(events: Sequence[Dict[str, Any]], tolerance: float
     within_tolerance = [
         event
         for event in events
-        if abs(event.get("declared_completion", 0.0) - event.get("observed_completion", 0.0)) <= tolerance
+        if abs(
+            event.get("declared_completion", 0.0)
+            - event.get("observed_completion", 0.0)
+        )
+        <= tolerance
     ]
     out_of_tolerance = len(events) - len(within_tolerance)
     met = out_of_tolerance == 0
@@ -308,11 +334,15 @@ def write_reports(results: Sequence[MetricResult]) -> None:
         "results": [result.as_dict() for result in results],
     }
     SUMMARY_PATH.write_text(build_summary(results) + "\n", encoding="utf-8")
-    METRICS_PATH.write_text(json.dumps(metrics_payload, indent=2) + "\n", encoding="utf-8")
+    METRICS_PATH.write_text(
+        json.dumps(metrics_payload, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 def _parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Sprint 03 Mission Protocol evaluation runner.")
+    parser = argparse.ArgumentParser(
+        description="Sprint 03 Mission Protocol evaluation runner."
+    )
     parser.add_argument(
         "--format",
         choices=["markdown", "json"],
@@ -357,4 +387,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

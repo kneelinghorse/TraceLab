@@ -1,7 +1,8 @@
 """Unit tests for the BiasDetector service."""
+
 from __future__ import annotations
 
-from app.models.mission_protocol import MethodologyDetails, MissionProtocolDraft, ParticipantSegment
+from app.models.mission_protocol import MissionProtocolDraft
 from app.services.bias_detection import BiasDetector
 
 
@@ -48,4 +49,6 @@ def test_bias_detector_flags_leading_questions_and_imbalance():
     codes = {issue.code for issue in result.issues}
     assert "leading_questions" in codes
     assert "demographic_imbalance" in codes
-    assert any("APAC" in (issue.metadata or {}).get("segment", "") for issue in result.issues)
+    assert any(
+        "APAC" in (issue.metadata or {}).get("segment", "") for issue in result.issues
+    )

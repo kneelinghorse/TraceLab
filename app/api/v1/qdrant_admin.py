@@ -1,15 +1,15 @@
 """Dedicated endpoints for Qdrant tuning, stats, and health."""
+
 from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from app.services.qdrant_service import QdrantService, get_qdrant_service
-
 
 router = APIRouter(tags=["qdrant-admin"])
 _REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -25,19 +25,19 @@ def get_qdrant_admin_service() -> QdrantService:
 class HnswStatus(BaseModel):
     """Serialized view of current HNSW configuration."""
 
-    m: Optional[int] = None
-    ef_construct: Optional[int] = None
-    full_scan_threshold: Optional[int] = None
-    on_disk: Optional[bool] = None
+    m: int | None = None
+    ef_construct: int | None = None
+    full_scan_threshold: int | None = None
+    on_disk: bool | None = None
 
 
 class QuantizationStatus(BaseModel):
     """Quantization readiness information."""
 
     enabled: bool
-    type: Optional[str] = None
-    always_ram: Optional[bool] = None
-    quantile: Optional[float] = None
+    type: str | None = None
+    always_ram: bool | None = None
+    quantile: float | None = None
 
 
 class MemoryProfile(BaseModel):
@@ -45,7 +45,9 @@ class MemoryProfile(BaseModel):
 
     estimate_bytes: int
     estimate_gb: float
-    limit_gb: float = Field(2.5, description="Hard memory budget for 500K vectors in RAM")
+    limit_gb: float = Field(
+        2.5, description="Hard memory budget for 500K vectors in RAM"
+    )
 
 
 class QdrantStatsResponse(BaseModel):
@@ -55,13 +57,13 @@ class QdrantStatsResponse(BaseModel):
     collection_exists: bool
     points_count: int
     vectors_count: int
-    payload_indexes: List[Dict[str, Any]]
+    payload_indexes: list[dict[str, Any]]
     hnsw: HnswStatus
     quantization: QuantizationStatus
-    optimizer: Dict[str, Any]
+    optimizer: dict[str, Any]
     vector_size: int
     memory: MemoryProfile
-    error: Optional[str] = None
+    error: str | None = None
 
 
 class BenchmarkSummary(BaseModel):
@@ -72,8 +74,8 @@ class BenchmarkSummary(BaseModel):
     recall_threshold: float
     trials: int
     top_k: int
-    ef_values: List[int]
-    recommendation: Dict[str, Any]
+    ef_values: list[int]
+    recommendation: dict[str, Any]
 
 
 class QdrantHealthResponse(BaseModel):
@@ -84,7 +86,7 @@ class QdrantHealthResponse(BaseModel):
     recall_target: float
     memory_limit_gb: float
     diagnostics: QdrantStatsResponse
-    benchmark: Optional[BenchmarkSummary] = None
+    benchmark: BenchmarkSummary | None = None
 
 
 class HnswUpdateRequest(BaseModel):
@@ -104,7 +106,7 @@ class ConfigUpdateResponse(BaseModel):
     """Payload returned after successfully applying config changes."""
 
     status: Literal["updated"]
-    applied: Dict[str, Any]
+    applied: dict[str, Any]
 
 
 def _serialize_stats(service: QdrantService) -> QdrantStatsResponse:
@@ -127,7 +129,7 @@ def _serialize_stats(service: QdrantService) -> QdrantStatsResponse:
     )
 
 
-def _load_latest_benchmark() -> Optional[BenchmarkSummary]:
+def _load_latest_benchmark() -> BenchmarkSummary | None:
     if not _BENCHMARK_PATH.exists():
         return None
     try:
@@ -135,7 +137,15 @@ def _load_latest_benchmark() -> Optional[BenchmarkSummary]:
     except json.JSONDecodeError:
         return None
 
-    required = {"generated_at", "target_latency_ms", "recall_threshold", "trials", "top_k", "ef_values", "recommendation"}
+    required = {
+        "generated_at",
+        "target_latency_ms",
+        "recall_threshold",
+        "trials",
+        "top_k",
+        "ef_values",
+        "recommendation",
+    }
     if not required.issubset(payload):
         return None
     subset = {key: payload[key] for key in required}
@@ -143,22 +153,31 @@ def _load_latest_benchmark() -> Optional[BenchmarkSummary]:
 
 
 @router.get("/stats", response_model=QdrantStatsResponse)
-def qdrant_stats(service: QdrantService = Depends(get_qdrant_admin_service)) -> QdrantStatsResponse:
+def qdrant_stats(
+    service: QdrantService = Depends(get_qdrant_admin_service),
+) -> QdrantStatsResponse:
     """Expose current collection stats, indexes, and memory usage."""
 
     return _serialize_stats(service)
 
 
 @router.get("/health", response_model=QdrantHealthResponse)
-def qdrant_health_snapshot(service: QdrantService = Depends(get_qdrant_admin_service)) -> QdrantHealthResponse:
+def qdrant_health_snapshot(
+    service: QdrantService = Depends(get_qdrant_admin_service),
+) -> QdrantHealthResponse:
     """Return consolidated health status with latest benchmark snapshot."""
 
     stats = _serialize_stats(service)
     latency_target = 10.0
     recall_target = 0.99
     if not stats.collection_exists:
-        status: Literal["healthy", "degraded", "collection_missing"] = "collection_missing"
-    elif not stats.quantization.enabled or stats.memory.estimate_gb > stats.memory.limit_gb:
+        status: Literal["healthy", "degraded", "collection_missing"] = (
+            "collection_missing"
+        )
+    elif (
+        not stats.quantization.enabled
+        or stats.memory.estimate_gb > stats.memory.limit_gb
+    ):
         status = "degraded"
     else:
         status = "healthy"
@@ -184,6 +203,8 @@ def update_hnsw_config(
     try:
         service.apply_hnsw_settings(**payload.model_dump())
     except Exception as exc:  # pragma: no cover - requires real Qdrant
-        raise HTTPException(status_code=503, detail=f"Failed to update collection: {exc}") from exc
+        raise HTTPException(
+            status_code=503, detail=f"Failed to update collection: {exc}"
+        ) from exc
 
     return ConfigUpdateResponse(status="updated", applied=payload.model_dump())

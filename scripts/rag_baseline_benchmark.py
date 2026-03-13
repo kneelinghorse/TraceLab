@@ -8,6 +8,7 @@ documentation and evaluates two baseline retrieval modes:
 
 Outputs precision@k, recall@k, nDCG@k, and latency metrics.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -498,8 +499,7 @@ def build_index(documents: List[CorpusDocument]) -> CorpusIndex:
     avg_doc_len = sum(doc.length for doc in documents) / doc_count if doc_count else 0.0
 
     tfidf_idf = {
-        term: math.log((1 + doc_count) / (1 + df)) + 1
-        for term, df in doc_freqs.items()
+        term: math.log((1 + doc_count) / (1 + df)) + 1 for term, df in doc_freqs.items()
     }
     tfidf_doc_norms = _compute_tfidf_doc_norms(documents, tfidf_idf)
 
@@ -684,7 +684,9 @@ def evaluate_queries(
 
     for query in queries:
         query_text = query["query"]
-        relevance = {item["doc_id"]: int(item.get("relevance", 1)) for item in query["relevance"]}
+        relevance = {
+            item["doc_id"]: int(item.get("relevance", 1)) for item in query["relevance"]
+        }
         query_tokens = tokenize(query_text)
 
         semantic_start = time.perf_counter()
@@ -730,7 +732,8 @@ def evaluate_queries(
                 "query": query_text,
                 "relevance": relevance,
                 "retrieved": [
-                    {"doc_id": doc_id, "score": score} for doc_id, score in semantic_ranked
+                    {"doc_id": doc_id, "score": score}
+                    for doc_id, score in semantic_ranked
                 ],
                 "precision_at_k": semantic_precision,
                 "recall_at_k": semantic_recall,
@@ -744,7 +747,8 @@ def evaluate_queries(
                 "query": query_text,
                 "relevance": relevance,
                 "retrieved": [
-                    {"doc_id": doc_id, "score": score} for doc_id, score in hybrid_ranked
+                    {"doc_id": doc_id, "score": score}
+                    for doc_id, score in hybrid_ranked
                 ],
                 "precision_at_k": hybrid_precision,
                 "recall_at_k": hybrid_recall,
@@ -756,18 +760,30 @@ def evaluate_queries(
     return {
         "rag_semantic": {
             "summary": {
-                "precision_at_k": sum(semantic_metrics) / len(semantic_metrics) if semantic_metrics else 0.0,
-                "recall_at_k": sum(semantic_recalls) / len(semantic_recalls) if semantic_recalls else 0.0,
-                "ndcg_at_k": sum(semantic_ndcg) / len(semantic_ndcg) if semantic_ndcg else 0.0,
+                "precision_at_k": sum(semantic_metrics) / len(semantic_metrics)
+                if semantic_metrics
+                else 0.0,
+                "recall_at_k": sum(semantic_recalls) / len(semantic_recalls)
+                if semantic_recalls
+                else 0.0,
+                "ndcg_at_k": sum(semantic_ndcg) / len(semantic_ndcg)
+                if semantic_ndcg
+                else 0.0,
                 "latency_ms": summarize_metric(semantic_latencies),
             },
             "queries": semantic_results,
         },
         "hybrid_baseline": {
             "summary": {
-                "precision_at_k": sum(hybrid_metrics) / len(hybrid_metrics) if hybrid_metrics else 0.0,
-                "recall_at_k": sum(hybrid_recalls) / len(hybrid_recalls) if hybrid_recalls else 0.0,
-                "ndcg_at_k": sum(hybrid_ndcg) / len(hybrid_ndcg) if hybrid_ndcg else 0.0,
+                "precision_at_k": sum(hybrid_metrics) / len(hybrid_metrics)
+                if hybrid_metrics
+                else 0.0,
+                "recall_at_k": sum(hybrid_recalls) / len(hybrid_recalls)
+                if hybrid_recalls
+                else 0.0,
+                "ndcg_at_k": sum(hybrid_ndcg) / len(hybrid_ndcg)
+                if hybrid_ndcg
+                else 0.0,
                 "latency_ms": summarize_metric(hybrid_latencies),
             },
             "queries": hybrid_results,

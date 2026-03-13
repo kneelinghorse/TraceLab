@@ -1,10 +1,10 @@
 """Job registry helpers for onboarding ingestion workflow."""
+
 from __future__ import annotations
 
 import logging
 from datetime import datetime
 from enum import Enum
-from typing import Dict, Optional
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -43,9 +43,7 @@ def process_job(job_id: UUID) -> None:
     session = SessionLocal()
     try:
         job = (
-            session.query(IngestionJob)
-            .filter(IngestionJob.id == job_id)
-            .one_or_none()
+            session.query(IngestionJob).filter(IngestionJob.id == job_id).one_or_none()
         )
         if not job:
             logger.warning("Ingestion job %s not found; aborting", job_id)
@@ -57,17 +55,17 @@ def process_job(job_id: UUID) -> None:
         session.commit()
 
         document = (
-            session.query(Document)
-            .filter(Document.id == job.document_id)
-            .first()
+            session.query(Document).filter(Document.id == job.document_id).first()
         )
         if not document:
             raise ValueError(f"Document {job.document_id} not found")
 
-        from app.api.v1.documents import get_ingestion_service  # late import to avoid cycle
+        from app.api.v1.documents import (
+            get_ingestion_service,
+        )  # late import to avoid cycle
 
         ingestion_service = get_ingestion_service()
-        result: Dict[str, object] = ingestion_service.process_document(
+        result: dict[str, object] = ingestion_service.process_document(
             db=session,
             document_id=document.id,
             file_path=document.file_path,

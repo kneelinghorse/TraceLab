@@ -61,12 +61,9 @@ def downgrade() -> None:
     op.drop_constraint(CHECK_NAME, "missions", type_="check")
     conn = op.get_bind()
     conn.execute(
-        text(
-            "DELETE FROM metadata WHERE key IN (:draft_key, :complete_key)"
-        ),
+        text("DELETE FROM metadata WHERE key IN (:draft_key, :complete_key)"),
         {
             "draft_key": "mission_protocol_schema_draft",
             "complete_key": "mission_protocol_schema_complete",
         },
     )
-

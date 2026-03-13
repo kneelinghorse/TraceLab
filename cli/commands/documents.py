@@ -7,7 +7,12 @@ from pathlib import Path
 import click
 
 from cli.utils.api import APIClient
-from cli.utils.errors import CLIError, ValidationError, format_error_human, format_error_json
+from cli.utils.errors import (
+    CLIError,
+    ValidationError,
+    format_error_human,
+    format_error_json,
+)
 
 
 @click.group()
@@ -20,7 +25,9 @@ def documents():
 @click.argument("project_id")
 @click.argument("file_path", type=click.Path(exists=True))
 @click.option("--process", is_flag=True, help="Process document after upload")
-@click.option("--wait", is_flag=True, help="Wait for processing to complete (requires --process)")
+@click.option(
+    "--wait", is_flag=True, help="Wait for processing to complete (requires --process)"
+)
 @click.pass_obj
 def upload(ctx, project_id, file_path, process, wait):
     """Upload a document."""
@@ -39,7 +46,9 @@ def upload(ctx, project_id, file_path, process, wait):
             with open(file_path, "rb") as f:
                 files = {"file": (file_path.name, f)}
                 form_fields = {"project_id": project_id}
-                document = client.post("/api/v1/documents/upload", data=form_fields, files=files)
+                document = client.post(
+                    "/api/v1/documents/upload", data=form_fields, files=files
+                )
 
         document_id = document["id"]
 
@@ -83,7 +92,9 @@ def upload(ctx, project_id, file_path, process, wait):
     help="Pipeline completion filter",
 )
 @click.option("--page", default=1, show_default=True, type=int, help="Page number")
-@click.option("--page-size", default=20, show_default=True, type=int, help="Results per page")
+@click.option(
+    "--page-size", default=20, show_default=True, type=int, help="Results per page"
+)
 @click.option("--search", help="Search by document name")
 @click.pass_obj
 def list(ctx, project_id, status, page, page_size, search):
@@ -196,7 +207,7 @@ def status(ctx, document_id):
             "processed": document.get("processed", False),
             "chunked": document.get("chunked", False),
             "embedded": document.get("embedded", False),
-            "validation_status": document.get("validation_status", "unknown")
+            "validation_status": document.get("validation_status", "unknown"),
         }
 
         if ctx.json_mode:
@@ -224,7 +235,9 @@ def delete(ctx, document_id, confirm):
     """Delete a document."""
     try:
         if not confirm and not ctx.json_mode:
-            click.confirm(f"Are you sure you want to delete document {document_id}?", abort=True)
+            click.confirm(
+                f"Are you sure you want to delete document {document_id}?", abort=True
+            )
 
         client = APIClient(base_url=ctx.api_url, token=ctx.token)
         client.delete(f"/api/v1/documents/{document_id}")

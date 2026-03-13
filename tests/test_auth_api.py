@@ -1,4 +1,5 @@
 """Tests covering JWT authentication and CORS behavior."""
+
 from __future__ import annotations
 
 import pytest
@@ -72,6 +73,8 @@ def test_cors_headers_reflect_allowed_origin(client: TestClient):
 
 
 def test_disallowed_origin_does_not_receive_cors_headers(client: TestClient):
-    response = client.get("/api/v1/health", headers={"Origin": "https://malicious.example.com"})
+    response = client.get(
+        "/api/v1/health", headers={"Origin": "https://malicious.example.com"}
+    )
     assert response.status_code == 200
     assert "access-control-allow-origin" not in response.headers

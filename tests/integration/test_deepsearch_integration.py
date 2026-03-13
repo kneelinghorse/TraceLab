@@ -1,28 +1,28 @@
 """End-to-end DeepSearch integration tests covering ingestion + search."""
+
 from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Dict, List, Optional
 from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
 
+import app.services.rag_service as rag_service_module
+from app.api.v1 import deepsearch as deepsearch_module
+from app.api.v1 import search as search_module
 from app.main import app
 from app.models.chunk import DocumentChunk
 from app.models.document import Document
 from app.models.mission import Mission
 from app.models.project import Project
 from app.services.evidence_auto_linking import EvidenceAutoLinkingService
-import app.services.rag_service as rag_service_module
-
-from app.api.v1 import deepsearch as deepsearch_module, search as search_module
 
 FIXTURE_DIR = Path(__file__).resolve().parents[1] / "fixtures" / "deepsearch_missions"
 
 
-def _load_mission_payload(name: str) -> Dict[str, object]:
+def _load_mission_payload(name: str) -> dict[str, object]:
     path = FIXTURE_DIR / f"{name}.json"
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -31,8 +31,8 @@ def _request_payload(
     project_id: UUID | str,
     fixture_name: str,
     **overrides: object,
-) -> Dict[str, object]:
-    payload: Dict[str, object] = {
+) -> dict[str, object]:
+    payload: dict[str, object] = {
         "project_id": str(project_id),
         "mission": _load_mission_payload(fixture_name),
     }
@@ -44,8 +44,8 @@ def _seed_chunks(
     db_session,
     *,
     project_id: UUID | str,
-    contents: List[str],
-) -> List[DocumentChunk]:
+    contents: list[str],
+) -> list[DocumentChunk]:
     """Persist document + chunk rows matching the supplied contents."""
     document = Document(
         project_id=project_id,
@@ -58,7 +58,7 @@ def _seed_chunks(
     db_session.add(document)
     db_session.flush()
 
-    chunks: List[DocumentChunk] = []
+    chunks: list[DocumentChunk] = []
     for index, text in enumerate(contents):
         chunk = DocumentChunk(
             document_id=document.id,
@@ -106,9 +106,11 @@ def test_ingest_customer_onboarding_links_all_evidence(
     body = response.json()
     assert body["auto_linking"]["linked"] == len(evidence)
 
-    mission_record = db_session.query(Mission).order_by(Mission.created_at.desc()).first()
+    mission_record = (
+        db_session.query(Mission).order_by(Mission.created_at.desc()).first()
+    )
     assert mission_record is not None
-    chunk_ids = {ev["chunk_id"] for ev in mission_record.context["evidence"]}
+    chunk_ids = {ev["chunk_id"] for ev in mission_record.mission_data["evidence"]}
     assert len(chunk_ids) == len(evidence)
     assert None not in chunk_ids
 
@@ -176,9 +178,7 @@ def test_ingest_similarity_threshold_override_blocks_links(
         similarity_threshold=1.0,
     )
     evidence = payload["mission"]["evidence"]  # type: ignore[index]
-    modified_contents = [
-        f"{item['summary']} :: extracted signals" for item in evidence
-    ]
+    modified_contents = [f"{item['summary']} :: extracted signals" for item in evidence]
     _seed_chunks(db_session, project_id=project.id, contents=modified_contents)
 
     response = client.post("/api/v1/deepsearch/ingest", json=payload)
@@ -246,8 +246,7 @@ def test_ingest_writes_auto_linking_telemetry(
     lines = configure_auto_linker.read_text(encoding="utf-8").strip().splitlines()
     assert len(lines) == 1
     entry = json.loads(lines[0])
-    assert entry["event_type"] == "evidence.auto_linking.completed"
-    assert entry["payload"]["mission_id"] == payload["mission"]["mission_id"]
+    assert entry["mission_id"] == payload["mission"]["mission_id"]
 
 
 def test_ingest_project_scoped_linking(
@@ -274,8 +273,10 @@ def test_ingest_project_scoped_linking(
     response = client.post("/api/v1/deepsearch/ingest", json=payload)
 
     assert response.status_code == 201, response.text
-    mission_record = db_session.query(Mission).order_by(Mission.created_at.desc()).first()
-    chunk_ids = {item["chunk_id"] for item in mission_record.context["evidence"]}
+    mission_record = (
+        db_session.query(Mission).order_by(Mission.created_at.desc()).first()
+    )
+    chunk_ids = {item["chunk_id"] for item in mission_record.mission_data["evidence"]}
     assert chunk_ids == {str(chunk.id) for chunk in target_chunks}
 
 
@@ -296,35 +297,34 @@ def test_ingested_mission_available_via_search_endpoint(
     assert response.status_code == 201, response.text
 
     mission = db_session.query(Mission).order_by(Mission.created_at.desc()).first()
-    chunk_id = mission.context["evidence"][0]["chunk_id"]
+    chunk_id = mission.mission_data["evidence"][0]["chunk_id"]
     selected_chunk = next(chunk for chunk in chunks if str(chunk.id) == chunk_id)
 
     class _FakeRagService:
         def __init__(self):
-            self.calls: List[Dict[str, object]] = []
+            self.calls: list[dict[str, object]] = []
 
         def run_query(
             self,
             query: str,
             top_k: int = 5,
-            project_id: Optional[str] = None,
-            document_id: Optional[str] = None,
-            source_type: Optional[str] = None,
-            document_types: Optional[List[str]] = None,
-            source_types: Optional[List[str]] = None,
-            date_from: Optional[object] = None,
-            date_to: Optional[object] = None,
-            tags: Optional[List[str]] = None,
-            hnsw_ef: Optional[int] = None,
-            temperature: Optional[float] = None,
-            max_tokens: Optional[int] = None,
+            project_id: str | None = None,
+            document_id: str | None = None,
+            source_type: str | None = None,
+            document_types: list[str] | None = None,
+            source_types: list[str] | None = None,
+            date_from: object | None = None,
+            date_to: object | None = None,
+            tags: list[str] | None = None,
+            hnsw_ef: int | None = None,
+            temperature: float | None = None,
+            max_tokens: int | None = None,
             search_mode: str = "semantic",
-            min_quality_gates: Optional[int] = None,
-            status_filters: Optional[List[str]] = None,
-            allow_pii: Optional[bool] = True,
-            governance_mode: Optional[str] = None,
-            **kwargs,
-        ) -> Dict[str, object]:
+            min_quality_gates: int | None = None,
+            status_filters: list[str] | None = None,
+            allow_pii: bool | None = True,
+            governance_mode: str | None = None,
+        ) -> dict[str, object]:
             self.calls.append(
                 {
                     "query": query,
@@ -364,7 +364,7 @@ def test_ingested_mission_available_via_search_endpoint(
                         "quality_gates_passed": 5,
                         "quality_gates_total": 5,
                         "quality_validated": True,
-                        "quality_mission_id": mission.mission_id,
+                        "quality_mission_id": mission.mission_data["mission_id"],
                         "quality_pii_flagged": False,
                     }
                 ],
@@ -378,7 +378,12 @@ def test_ingested_mission_available_via_search_endpoint(
                     "threshold": 0.6,
                     "compression_ms": 2.2,
                 },
-                "cache": {"hit": False, "score": None, "age_seconds": None, "ttl_seconds": 30},
+                "cache": {
+                    "hit": False,
+                    "score": None,
+                    "age_seconds": None,
+                    "ttl_seconds": 30,
+                },
                 "quality": {
                     "composite_score": 0.95,
                     "threshold": 0.8,
@@ -411,7 +416,7 @@ def test_ingested_mission_available_via_search_endpoint(
 
     class _FakeHistory:
         def __init__(self):
-            self.records: List[Dict[str, object]] = []
+            self.records: list[dict[str, object]] = []
 
         def record_search(self, **kwargs: object):
             self.records.append(kwargs)
@@ -420,7 +425,9 @@ def test_ingested_mission_available_via_search_endpoint(
     fake_history = _FakeHistory()
     monkeypatch.setattr(search_module, "get_rag_service", lambda: fake_rag)
     monkeypatch.setattr(rag_service_module, "get_rag_service", lambda: fake_rag)
-    client.app.dependency_overrides[search_module.get_search_history_service] = lambda: fake_history
+    client.app.dependency_overrides[search_module.get_search_history_service] = lambda: (
+        fake_history
+    )
 
     search_payload = {
         "query": "activation checklist",
@@ -431,7 +438,9 @@ def test_ingested_mission_available_via_search_endpoint(
     try:
         search_response = client.post("/api/v1/search", json=search_payload)
     finally:
-        client.app.dependency_overrides.pop(search_module.get_search_history_service, None)
+        client.app.dependency_overrides.pop(
+            search_module.get_search_history_service, None
+        )
 
     assert search_response.status_code == 200, search_response.text
     body = search_response.json()

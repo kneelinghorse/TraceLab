@@ -1,10 +1,10 @@
 """Unit tests for PEDR cache behavior in production implementation."""
+
 from __future__ import annotations
 
 import pytest
 
 from app.services.pedr.cache import PEDRCache
-
 
 pytestmark = pytest.mark.unit
 

@@ -1,19 +1,19 @@
 """Query helpers for project read endpoints."""
+
 from __future__ import annotations
 
 import math
-from typing import List, Optional, Tuple
 from uuid import UUID
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app.models.project import Project
-from app.models.document import Document
 from app.models.chunk import DocumentChunk as Chunk
+from app.models.document import Document
+from app.models.project import Project
 from app.models.report import Report
 from app.schemas.pagination import PaginationMeta
-from app.schemas.project import ProjectCreate, ProjectUpdate, ProjectStats
+from app.schemas.project import ProjectCreate, ProjectStats, ProjectUpdate
 
 
 class ProjectQueryService:
@@ -28,9 +28,9 @@ class ProjectQueryService:
         *,
         page: int,
         page_size: int,
-        search: Optional[str] = None,
+        search: str | None = None,
         include_deleted: bool = False,
-    ) -> Tuple[List[Project], PaginationMeta]:
+    ) -> tuple[list[Project], PaginationMeta]:
         """Return paginated projects ordered by recency.
 
         Args:
@@ -55,9 +55,7 @@ class ProjectQueryService:
         query = query.order_by(Project.created_at.desc())
         total = query.count()
         items = (
-            query.offset((page - 1) * clamped_page_size)
-            .limit(clamped_page_size)
-            .all()
+            query.offset((page - 1) * clamped_page_size).limit(clamped_page_size).all()
         )
 
         total_pages = math.ceil(total / clamped_page_size) if total else 0
@@ -74,7 +72,7 @@ class ProjectQueryService:
         db: Session,
         project_id: UUID,
         include_deleted: bool = False,
-    ) -> Optional[Project]:
+    ) -> Project | None:
         """Fetch a single project.
 
         Args:
@@ -107,7 +105,7 @@ class ProjectQueryService:
 
     def update_project(
         self, db: Session, project_id: UUID, data: ProjectUpdate
-    ) -> Optional[Project]:
+    ) -> Project | None:
         """Update an existing project."""
         project = db.query(Project).filter(Project.id == project_id).first()
         if not project:
@@ -140,7 +138,7 @@ class ProjectQueryService:
         db: Session,
         project_id: UUID,
         deleted_by: str = None,
-    ) -> Optional[bool]:
+    ) -> bool | None:
         """Soft delete a project.
 
         Args:
@@ -167,7 +165,7 @@ class ProjectQueryService:
         self,
         db: Session,
         project_id: UUID,
-    ) -> Optional[bool]:
+    ) -> bool | None:
         """Restore a soft-deleted project.
 
         Args:
@@ -189,7 +187,7 @@ class ProjectQueryService:
         db.commit()
         return True
 
-    def get_project_stats(self, db: Session, project_id: UUID) -> Optional[ProjectStats]:
+    def get_project_stats(self, db: Session, project_id: UUID) -> ProjectStats | None:
         """Get aggregated statistics for a project.
 
         Only counts non-deleted documents in the statistics.

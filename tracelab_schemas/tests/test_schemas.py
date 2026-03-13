@@ -1,4 +1,8 @@
-from tracelab_schemas import MissionProtocolComplete, MissionProtocolDraft, REQUIRED_COMPLETION_GATES
+from tracelab_schemas import (
+    MissionProtocolComplete,
+    MissionProtocolDraft,
+    REQUIRED_COMPLETION_GATES,
+)
 
 
 def _base_payload() -> dict:
@@ -18,9 +22,15 @@ def _base_payload() -> dict:
             "key_insights": ["Schemas validated"],
         },
         "evidence": [
-            {"evidence_id": "E-1", "source": "unit-test", "summary": "payload validated"}
+            {
+                "evidence_id": "E-1",
+                "source": "unit-test",
+                "summary": "payload validated",
+            }
         ],
-        "quality_checkpoints": [{"gate": gate, "status": "pass"} for gate in REQUIRED_COMPLETION_GATES],
+        "quality_checkpoints": [
+            {"gate": gate, "status": "pass"} for gate in REQUIRED_COMPLETION_GATES
+        ],
     }
 
 
@@ -35,4 +45,7 @@ def test_complete_payload_round_trip() -> None:
     mission = MissionProtocolComplete.model_validate(payload)
     dumped = mission.model_dump()
     assert dumped["mission_id"] == payload["mission_id"]
-    assert dumped["quality_checkpoints"][0]["gate"] == payload["quality_checkpoints"][0]["gate"]
+    assert (
+        dumped["quality_checkpoints"][0]["gate"]
+        == payload["quality_checkpoints"][0]["gate"]
+    )

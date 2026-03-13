@@ -1,8 +1,9 @@
 """Mission relationship traversal surface via SQL-backed lookups."""
+
 from __future__ import annotations
 
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -35,24 +36,24 @@ class MissionRelationshipNotFound(RelationshipServiceError):
 @dataclass(frozen=True)
 class _EvidenceLink:
     evidence_id: str
-    chunk_id: Optional[UUID]
-    insight_id: Optional[UUID]
+    chunk_id: UUID | None
+    insight_id: UUID | None
     summary: str
     source: str
-    relevance_score: Optional[float]
+    relevance_score: float | None
 
 
 @dataclass(frozen=True)
 class _ChunkRecord:
     chunk: DocumentChunk
-    document: Optional[Document]
+    document: Document | None
 
 
 class RelationshipService:
     """Encapsulates relationship traversal, filtering, and caching."""
 
-    SUPPORTED_ENTITY_TYPES: Set[str] = {"documents", "insights", "chunks", "missions"}
-    _ENTITY_ALIASES: Dict[str, str] = {
+    SUPPORTED_ENTITY_TYPES: set[str] = {"documents", "insights", "chunks", "missions"}
+    _ENTITY_ALIASES: dict[str, str] = {
         "document": "documents",
         "documents": "documents",
         "doc": "documents",
@@ -73,15 +74,17 @@ class RelationshipService:
         mission_id: UUID,
         *,
         depth: int = 1,
-        entity_types: Optional[Sequence[str]] = None,
-        min_relevance: Optional[float] = None,
+        entity_types: Sequence[str] | None = None,
+        min_relevance: float | None = None,
     ) -> RelationshipContextResponse:
         normalized_depth = self._normalize_depth(depth)
         normalized_types = self._normalize_entity_types(entity_types)
         normalized_relevance = self._normalize_relevance(min_relevance)
 
         mission = self._load_mission(db, mission_id)
-        filters = RelationshipFilters(entity_types=normalized_types, min_relevance=normalized_relevance)
+        filters = RelationshipFilters(
+            entity_types=normalized_types, min_relevance=normalized_relevance
+        )
 
         cache_key = self.cache_manager.relationship_context_key(
             mission_id=str(mission.id),
@@ -90,11 +93,13 @@ class RelationshipService:
             min_relevance=filters.min_relevance,
         )
 
-        def _loader() -> Dict:
+        def _loader() -> dict:
             context = self._build_context(db, mission, normalized_depth, filters)
             return context.model_dump(exclude={"cached"})
 
-        payload, cache_hit = self.cache_manager.cached_value("relationship_context", cache_key, _loader)
+        payload, cache_hit = self.cache_manager.cached_value(
+            "relationship_context", cache_key, _loader
+        )
         return RelationshipContextResponse(**payload, cached=cache_hit)
 
     # ------------------------------------------------------------------
@@ -135,7 +140,9 @@ class RelationshipService:
             db,
             mission,
             chunk_map=chunk_map,
-            current_insights={link.insight_id for link in evidence_payload if link.insight_id},
+            current_insights={
+                link.insight_id for link in evidence_payload if link.insight_id
+            },
             depth=depth,
         )
 
@@ -152,7 +159,9 @@ class RelationshipService:
         documents.sort(key=lambda item: item.name.lower())
         insights.sort(key=lambda item: item.title.lower())
         chunks.sort(key=lambda item: (item.document_name or "", item.chunk_index))
-        related_missions.sort(key=lambda item: item.title or item.mission_identifier or "")
+        related_missions.sort(
+            key=lambda item: item.title or item.mission_identifier or ""
+        )
 
         totals = RelationshipTotals(
             documents=len(documents),
@@ -161,7 +170,7 @@ class RelationshipService:
             missions=len(related_missions),
         )
 
-        warnings: List[str] = []
+        warnings: list[str] = []
         if missing_chunk_ids:
             warnings.append(
                 f"{len(missing_chunk_ids)} evidence entries reference missing document chunks"
@@ -169,7 +178,10 @@ class RelationshipService:
 
         return RelationshipContextResponse(
             mission_id=mission.id,
-            mission_identifier=mission.mission_id or self._extract_mission_identifier(mission.context if isinstance(mission.context, dict) else None),
+            mission_identifier=mission.mission_id
+            or self._extract_mission_identifier(
+                mission.context if isinstance(mission.context, dict) else None
+            ),
             project_id=mission.project_id,
             depth=depth,
             filters=filters,
@@ -184,14 +196,14 @@ class RelationshipService:
 
     def _build_chunk_relationships(
         self,
-        chunk_map: Dict[UUID, _ChunkRecord],
+        chunk_map: dict[UUID, _ChunkRecord],
         evidence_payload: Sequence[_EvidenceLink],
         *,
         include_preview: bool,
-        min_relevance: Optional[float],
-    ) -> List[RelatedChunk]:
-        relationships: List[RelatedChunk] = []
-        evidence_by_chunk: Dict[UUID, List[_EvidenceLink]] = {}
+        min_relevance: float | None,
+    ) -> list[RelatedChunk]:
+        relationships: list[RelatedChunk] = []
+        evidence_by_chunk: dict[UUID, list[_EvidenceLink]] = {}
         for link in evidence_payload:
             if not link.chunk_id:
                 continue
@@ -201,7 +213,11 @@ class RelationshipService:
             supporting = evidence_by_chunk.get(chunk_id, [])
             if not supporting:
                 continue
-            relevance_values = [link.relevance_score for link in supporting if link.relevance_score is not None]
+            relevance_values = [
+                link.relevance_score
+                for link in supporting
+                if link.relevance_score is not None
+            ]
             best_relevance = max(relevance_values) if relevance_values else None
             effective_relevance = best_relevance if best_relevance is not None else 1.0
             if min_relevance is not None and effective_relevance < min_relevance:
@@ -229,20 +245,24 @@ class RelationshipService:
 
     def _build_document_relationships(
         self,
-        chunk_map: Dict[UUID, _ChunkRecord],
+        chunk_map: dict[UUID, _ChunkRecord],
         chunk_relationships: Sequence[RelatedChunk],
         *,
-        min_relevance: Optional[float],
-    ) -> List[RelatedDocument]:
-        grouped: Dict[UUID, Dict[str, object]] = {}
+        min_relevance: float | None,
+    ) -> list[RelatedDocument]:
+        grouped: dict[UUID, dict[str, object]] = {}
         for chunk_rel in chunk_relationships:
             grouped.setdefault(chunk_rel.document_id, {"chunks": []})
             grouped[chunk_rel.document_id]["chunks"].append(chunk_rel)
 
-        documents: List[RelatedDocument] = []
+        documents: list[RelatedDocument] = []
         for document_id, payload in grouped.items():
-            chunk_rels: List[RelatedChunk] = payload["chunks"]  # type: ignore[assignment]
-            relevance_values = [rel.relationship.relevance_score for rel in chunk_rels if rel.relationship.relevance_score is not None]
+            chunk_rels: list[RelatedChunk] = payload["chunks"]  # type: ignore[assignment]
+            relevance_values = [
+                rel.relationship.relevance_score
+                for rel in chunk_rels
+                if rel.relationship.relevance_score is not None
+            ]
             best_relevance = max(relevance_values) if relevance_values else None
             effective_relevance = best_relevance if best_relevance is not None else 1.0
             if min_relevance is not None and effective_relevance < min_relevance:
@@ -256,7 +276,9 @@ class RelationshipService:
 
             relationship = RelationshipEdgeInfo(
                 relationship_type="evidence_document",
-                evidence_ids=[eid for rel in chunk_rels for eid in rel.relationship.evidence_ids],
+                evidence_ids=[
+                    eid for rel in chunk_rels for eid in rel.relationship.evidence_ids
+                ],
                 summary=None,
                 source=document.source_type if document else None,
                 relevance_score=best_relevance,
@@ -278,16 +300,16 @@ class RelationshipService:
         self,
         db: Session,
         evidence_payload: Sequence[_EvidenceLink],
-        chunk_map: Dict[UUID, _ChunkRecord],
+        chunk_map: dict[UUID, _ChunkRecord],
         *,
-        min_relevance: Optional[float],
-    ) -> List[RelatedInsight]:
+        min_relevance: float | None,
+    ) -> list[RelatedInsight]:
         chunk_ids = list(chunk_map.keys())
         if not chunk_ids:
             return []
 
         # Map each insight to its supporting chunks and relevance scores
-        insight_details: Dict[UUID, Dict[str, object]] = {}
+        insight_details: dict[UUID, dict[str, object]] = {}
 
         if chunk_ids:
             rows = (
@@ -296,11 +318,14 @@ class RelationshipService:
                 .all()
             )
             for row in rows:
-                payload = insight_details.setdefault(row.insight_id, {
-                    "chunk_ids": set(),
-                    "relevance_scores": [],
-                    "evidence_ids": [],
-                })
+                payload = insight_details.setdefault(
+                    row.insight_id,
+                    {
+                        "chunk_ids": set(),
+                        "relevance_scores": [],
+                        "evidence_ids": [],
+                    },
+                )
                 payload["chunk_ids"].add(row.chunk_id)  # type: ignore[assignment]
                 if row.relevance_score is not None:
                     payload["relevance_scores"].append(float(row.relevance_score))  # type: ignore[assignment]
@@ -308,11 +333,14 @@ class RelationshipService:
         for link in evidence_payload:
             if not link.insight_id:
                 continue
-            payload = insight_details.setdefault(link.insight_id, {
-                "chunk_ids": set(),
-                "relevance_scores": [],
-                "evidence_ids": [],
-            })
+            payload = insight_details.setdefault(
+                link.insight_id,
+                {
+                    "chunk_ids": set(),
+                    "relevance_scores": [],
+                    "evidence_ids": [],
+                },
+            )
             if link.chunk_id:
                 payload["chunk_ids"].add(link.chunk_id)  # type: ignore[assignment]
             if link.relevance_score is not None:
@@ -323,22 +351,20 @@ class RelationshipService:
             return []
 
         insights = (
-            db.query(Insight)
-            .filter(Insight.id.in_(list(insight_details.keys())))
-            .all()
+            db.query(Insight).filter(Insight.id.in_(list(insight_details.keys()))).all()
         )
         indexed = {insight.id: insight for insight in insights}
-        relationships: List[RelatedInsight] = []
+        relationships: list[RelatedInsight] = []
         for insight_id, payload in insight_details.items():
             instance = indexed.get(insight_id)
             if not instance:
                 continue
-            relevance_scores: List[float] = payload["relevance_scores"]  # type: ignore[assignment]
+            relevance_scores: list[float] = payload["relevance_scores"]  # type: ignore[assignment]
             best_relevance = max(relevance_scores) if relevance_scores else None
             effective_relevance = best_relevance if best_relevance is not None else 1.0
             if min_relevance is not None and effective_relevance < min_relevance:
                 continue
-            evidence_ids: List[str] = payload["evidence_ids"]  # type: ignore[assignment]
+            evidence_ids: list[str] = payload["evidence_ids"]  # type: ignore[assignment]
             relationships.append(
                 RelatedInsight(
                     id=insight_id,
@@ -361,10 +387,10 @@ class RelationshipService:
         db: Session,
         mission: Mission,
         *,
-        chunk_map: Dict[UUID, _ChunkRecord],
-        current_insights: Set[UUID],
+        chunk_map: dict[UUID, _ChunkRecord],
+        current_insights: set[UUID],
         depth: int,
-    ) -> List[RelatedMission]:
+    ) -> list[RelatedMission]:
         if mission.project_id is None:
             return []
         siblings = (
@@ -379,7 +405,7 @@ class RelationshipService:
         current_chunk_ids = set(chunk_map.keys())
         include_shared_stats = depth >= 2 and bool(current_chunk_ids)
 
-        related: List[RelatedMission] = []
+        related: list[RelatedMission] = []
         for sibling in siblings:
             sibling_data = sibling.context if isinstance(sibling.context, dict) else {}
             shared_documents = 0
@@ -388,13 +414,27 @@ class RelationshipService:
             summary = None
 
             if include_shared_stats:
-                sibling_evidence = self._normalize_evidence((sibling_data or {}).get("evidence", []))
-                sibling_chunk_ids = {link.chunk_id for link in sibling_evidence if link.chunk_id}
-                overlapping_chunk_ids = {cid for cid in sibling_chunk_ids if cid in current_chunk_ids}
+                sibling_evidence = self._normalize_evidence(
+                    (sibling_data or {}).get("evidence", [])
+                )
+                sibling_chunk_ids = {
+                    link.chunk_id for link in sibling_evidence if link.chunk_id
+                }
+                overlapping_chunk_ids = {
+                    cid for cid in sibling_chunk_ids if cid in current_chunk_ids
+                }
                 shared_chunks = len(overlapping_chunk_ids)
                 if overlapping_chunk_ids:
-                    shared_documents = len({chunk_map[cid].chunk.document_id for cid in overlapping_chunk_ids if cid in chunk_map})
-                sibling_insight_ids = {link.insight_id for link in sibling_evidence if link.insight_id}
+                    shared_documents = len(
+                        {
+                            chunk_map[cid].chunk.document_id
+                            for cid in overlapping_chunk_ids
+                            if cid in chunk_map
+                        }
+                    )
+                sibling_insight_ids = {
+                    link.insight_id for link in sibling_evidence if link.insight_id
+                }
                 shared_insights = len(current_insights & sibling_insight_ids)
                 if shared_documents:
                     summary = f"Shares {shared_documents} documents"
@@ -402,10 +442,14 @@ class RelationshipService:
             related.append(
                 RelatedMission(
                     id=sibling.id,
-                    mission_identifier=sibling.mission_id or self._extract_mission_identifier(sibling_data),
+                    mission_identifier=sibling.mission_id
+                    or self._extract_mission_identifier(sibling_data),
                     title=sibling.title or self._extract_mission_title(sibling_data),
                     status=sibling.status or "draft",
-                    completion_percentage=(sibling.execution_metadata or {}).get("completion_percentage", 0) or 0,
+                    completion_percentage=(sibling.execution_metadata or {}).get(
+                        "completion_percentage", 0
+                    )
+                    or 0,
                     shared_documents=shared_documents,
                     shared_chunks=shared_chunks,
                     shared_insights=shared_insights,
@@ -431,10 +475,10 @@ class RelationshipService:
             return 2
         return value
 
-    def _normalize_entity_types(self, entity_types: Optional[Sequence[str]]) -> List[str]:
+    def _normalize_entity_types(self, entity_types: Sequence[str] | None) -> list[str]:
         if not entity_types:
             return sorted(self.SUPPORTED_ENTITY_TYPES)
-        normalized: Set[str] = set()
+        normalized: set[str] = set()
         for raw in entity_types:
             token = (raw or "").strip().lower()
             if not token:
@@ -445,7 +489,7 @@ class RelationshipService:
         return sorted(normalized or self.SUPPORTED_ENTITY_TYPES)
 
     @staticmethod
-    def _normalize_relevance(value: Optional[float]) -> Optional[float]:
+    def _normalize_relevance(value: float | None) -> float | None:
         if value is None:
             return None
         try:
@@ -459,7 +503,7 @@ class RelationshipService:
         return numeric
 
     @staticmethod
-    def _safe_uuid(value: object) -> Optional[UUID]:
+    def _safe_uuid(value: object) -> UUID | None:
         if not value:
             return None
         try:
@@ -467,8 +511,8 @@ class RelationshipService:
         except (TypeError, ValueError):
             return None
 
-    def _normalize_evidence(self, payload: Iterable[dict]) -> List[_EvidenceLink]:
-        normalized: List[_EvidenceLink] = []
+    def _normalize_evidence(self, payload: Iterable[dict]) -> list[_EvidenceLink]:
+        normalized: list[_EvidenceLink] = []
         for index, item in enumerate(payload):
             if not isinstance(item, dict):
                 continue
@@ -497,11 +541,7 @@ class RelationshipService:
         return normalized
 
     def _load_mission(self, db: Session, mission_id: UUID) -> Mission:
-        mission = (
-            db.query(Mission)
-            .filter(Mission.id == mission_id)
-            .one_or_none()
-        )
+        mission = db.query(Mission).filter(Mission.id == mission_id).one_or_none()
         if not mission:
             raise MissionRelationshipNotFound(f"Mission {mission_id} not found")
         return mission
@@ -509,8 +549,8 @@ class RelationshipService:
     def _load_chunks(
         self,
         db: Session,
-        chunk_ids: Sequence[Optional[UUID]],
-    ) -> Tuple[Dict[UUID, _ChunkRecord], Set[str]]:
+        chunk_ids: Sequence[UUID | None],
+    ) -> tuple[dict[UUID, _ChunkRecord], set[str]]:
         normalized_ids = {cid for cid in chunk_ids if cid}
         if not normalized_ids:
             return {}, set()
@@ -519,22 +559,24 @@ class RelationshipService:
             .filter(DocumentChunk.id.in_(list(normalized_ids)))
             .all()
         )
-        chunk_map: Dict[UUID, DocumentChunk] = {chunk.id: chunk for chunk in chunks}
+        chunk_map: dict[UUID, DocumentChunk] = {chunk.id: chunk for chunk in chunks}
         missing = {str(cid) for cid in normalized_ids if cid not in chunk_map}
 
         document_ids = {chunk.document_id for chunk in chunks}
-        documents: Dict[UUID, Document] = {}
+        documents: dict[UUID, Document] = {}
         if document_ids:
             rows = db.query(Document).filter(Document.id.in_(list(document_ids))).all()
             documents = {row.id: row for row in rows}
 
-        records: Dict[UUID, _ChunkRecord] = {}
+        records: dict[UUID, _ChunkRecord] = {}
         for chunk in chunks:
-            records[chunk.id] = _ChunkRecord(chunk=chunk, document=documents.get(chunk.document_id))
+            records[chunk.id] = _ChunkRecord(
+                chunk=chunk, document=documents.get(chunk.document_id)
+            )
         return records, missing
 
     @staticmethod
-    def _preview(text: Optional[str], limit: int = 220) -> Optional[str]:
+    def _preview(text: str | None, limit: int = 220) -> str | None:
         if not text:
             return None
         cleaned = " ".join(text.split())
@@ -543,7 +585,9 @@ class RelationshipService:
         return f"{cleaned[: limit - 3]}..."
 
     @staticmethod
-    def _combine_summaries(links: Sequence[_EvidenceLink], limit: int = 160) -> Optional[str]:
+    def _combine_summaries(
+        links: Sequence[_EvidenceLink], limit: int = 160
+    ) -> str | None:
         summaries = [link.summary.strip() for link in links if link.summary.strip()]
         if not summaries:
             return None
@@ -553,14 +597,14 @@ class RelationshipService:
         return f"{combined[: limit - 3]}..."
 
     @staticmethod
-    def _extract_mission_identifier(payload: Optional[dict]) -> Optional[str]:
+    def _extract_mission_identifier(payload: dict | None) -> str | None:
         if not isinstance(payload, dict):
             return None
         mission_id = payload.get("mission_id")
         return str(mission_id).strip() if mission_id else None
 
     @staticmethod
-    def _extract_mission_title(payload: Optional[dict]) -> Optional[str]:
+    def _extract_mission_title(payload: dict | None) -> str | None:
         if not isinstance(payload, dict):
             return None
         title = payload.get("title")

@@ -1,8 +1,8 @@
 """Pydantic schemas for Collection and CollectionItem APIs."""
+
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -12,7 +12,7 @@ class CollectionItemBase(BaseModel):
     """Base fields for collection items."""
 
     chunk_id: UUID
-    notes: Optional[str] = Field(default=None, max_length=2000)
+    notes: str | None = Field(default=None, max_length=2000)
 
 
 class CollectionItemCreate(CollectionItemBase):
@@ -28,8 +28,10 @@ class CollectionItemResponse(CollectionItemBase):
     collection_id: UUID
     added_at: datetime
     # Include chunk preview for convenience
-    chunk_content: Optional[str] = Field(default=None, description="Preview of chunk content")
-    document_id: Optional[UUID] = Field(default=None, description="Source document ID")
+    chunk_content: str | None = Field(
+        default=None, description="Preview of chunk content"
+    )
+    document_id: UUID | None = Field(default=None, description="Source document ID")
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -38,7 +40,7 @@ class CollectionBase(BaseModel):
     """Common fields for collection operations."""
 
     name: str = Field(..., min_length=1, max_length=255)
-    description: Optional[str] = Field(default=None, max_length=2000)
+    description: str | None = Field(default=None, max_length=2000)
 
 
 class CollectionCreate(CollectionBase):
@@ -50,8 +52,8 @@ class CollectionCreate(CollectionBase):
 class CollectionUpdate(BaseModel):
     """Payload for updating collection metadata."""
 
-    name: Optional[str] = Field(default=None, min_length=1, max_length=255)
-    description: Optional[str] = Field(default=None, max_length=2000)
+    name: str | None = Field(default=None, min_length=1, max_length=255)
+    description: str | None = Field(default=None, max_length=2000)
 
 
 class CollectionResponse(CollectionBase):
@@ -68,11 +70,11 @@ class CollectionResponse(CollectionBase):
 class CollectionDetailResponse(CollectionResponse):
     """Collection with full list of items for detail view."""
 
-    items: List[CollectionItemResponse] = Field(default_factory=list)
+    items: list[CollectionItemResponse] = Field(default_factory=list)
 
 
 class CollectionListResponse(BaseModel):
     """Response for listing collections."""
 
-    data: List[CollectionResponse]
+    data: list[CollectionResponse]
     total: int

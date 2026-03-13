@@ -38,7 +38,12 @@ def upgrade() -> None:
                 nullable=True,
             ),
             sa.Column("title", sa.String(length=255), nullable=False),
-            sa.Column("report_type", sa.String(length=50), nullable=False, server_default="summary"),
+            sa.Column(
+                "report_type",
+                sa.String(length=50),
+                nullable=False,
+                server_default="summary",
+            ),
             sa.Column("prompt", sa.Text(), nullable=True),
             sa.Column("content", sa.Text(), nullable=False),
             sa.Column("content_hash", sa.String(length=64), nullable=True),
@@ -49,11 +54,23 @@ def upgrade() -> None:
                 sa.ForeignKey("reports.id", ondelete="SET NULL"),
                 nullable=True,
             ),
-            sa.Column("status", sa.String(length=20), nullable=False, server_default="draft"),
+            sa.Column(
+                "status", sa.String(length=20), nullable=False, server_default="draft"
+            ),
             sa.Column("tokens_used", sa.Integer(), nullable=False, server_default="0"),
             sa.Column("chunk_count", sa.Integer(), nullable=False, server_default="0"),
-            sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
-            sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
+            sa.Column(
+                "created_at",
+                sa.DateTime(),
+                nullable=False,
+                server_default=sa.func.now(),
+            ),
+            sa.Column(
+                "updated_at",
+                sa.DateTime(),
+                nullable=False,
+                server_default=sa.func.now(),
+            ),
         )
         op.create_index("ix_reports_project_id", "reports", ["project_id"])
         op.create_index("ix_reports_status", "reports", ["status"])
@@ -77,7 +94,9 @@ def upgrade() -> None:
             ),
             sa.Column("source_type", sa.String(length=20), nullable=False),
             sa.Column("source_id", postgresql.UUID(as_uuid=True), nullable=False),
-            sa.Column("added_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
+            sa.Column(
+                "added_at", sa.DateTime(), nullable=False, server_default=sa.func.now()
+            ),
         )
         op.create_index("ix_report_sources_report_id", "report_sources", ["report_id"])
         op.create_index(
@@ -101,11 +120,18 @@ def upgrade() -> None:
             sa.Column("citations", postgresql.JSONB(), nullable=True),
             sa.Column("model_used", sa.String(length=50), nullable=True),
             sa.Column("tokens_used", sa.Integer(), nullable=False, server_default="0"),
-            sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
+            sa.Column(
+                "created_at",
+                sa.DateTime(),
+                nullable=False,
+                server_default=sa.func.now(),
+            ),
             sa.Column("hit_count", sa.Integer(), nullable=False, server_default="0"),
             sa.Column("last_hit_at", sa.DateTime(), nullable=True),
         )
-        op.create_index("ix_synthesis_cache_input_hash", "synthesis_cache", ["input_hash"])
+        op.create_index(
+            "ix_synthesis_cache_input_hash", "synthesis_cache", ["input_hash"]
+        )
 
 
 def downgrade() -> None:
@@ -117,7 +143,9 @@ def downgrade() -> None:
         op.drop_table("synthesis_cache")
 
     if inspector.has_table("report_sources"):
-        op.drop_index("ix_report_sources_source_type_source_id", table_name="report_sources")
+        op.drop_index(
+            "ix_report_sources_source_type_source_id", table_name="report_sources"
+        )
         op.drop_index("ix_report_sources_report_id", table_name="report_sources")
         op.drop_table("report_sources")
 

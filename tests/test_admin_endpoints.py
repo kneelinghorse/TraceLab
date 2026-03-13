@@ -1,4 +1,5 @@
 """Tests for Qdrant admin endpoints."""
+
 from __future__ import annotations
 
 import json
@@ -16,7 +17,9 @@ from app.main import app
 class _FakeQdrantClient:
     """Minimal stub that behaves like the qdrant-client for tests."""
 
-    def __init__(self, *, collection_name: str, exists: bool, raise_errors: bool = False):
+    def __init__(
+        self, *, collection_name: str, exists: bool, raise_errors: bool = False
+    ):
         self._collection_name = collection_name
         self.collection_exists = exists
         self.raise_errors = raise_errors
@@ -116,7 +119,6 @@ class _FakeQdrantService:
         self.hnsw_updates.append(kwargs)
 
 
-
 def _configured_password() -> str:
     if settings.auth_password:
         return settings.auth_password
@@ -131,6 +133,7 @@ def client() -> TestClient:
 
 def _auth_headers(client: TestClient) -> dict:
     from tests.conftest import get_seed_user_email
+
     response = client.post(
         "/api/v1/auth/login",
         json={"email": get_seed_user_email(), "password": _configured_password()},
@@ -142,7 +145,9 @@ def _auth_headers(client: TestClient) -> dict:
 
 def _override_qdrant_service(service: _FakeQdrantService):
     app.dependency_overrides[get_admin_qdrant_service] = lambda: service
-    app.dependency_overrides[qdrant_admin_router.get_qdrant_admin_service] = lambda: service
+    app.dependency_overrides[qdrant_admin_router.get_qdrant_admin_service] = lambda: (
+        service
+    )
 
 
 def _clear_override():
@@ -161,7 +166,11 @@ def _seed_benchmark(monkeypatch, tmp_path):
                 "trials": 12,
                 "top_k": 10,
                 "ef_values": [64, 96, 128],
-                "recommendation": {"hnsw_ef": 96, "p99_latency_ms": 9.1, "recall": 0.992},
+                "recommendation": {
+                    "hnsw_ef": 96,
+                    "p99_latency_ms": 9.1,
+                    "recall": 0.992,
+                },
             }
         ),
         encoding="utf-8",
@@ -260,7 +269,9 @@ def test_qdrant_stats_endpoint_returns_memory_profile(client: TestClient):
     assert payload["quantization"]["enabled"] is True
 
 
-def test_qdrant_health_reports_degraded_when_quantization_missing(client: TestClient, monkeypatch, tmp_path):
+def test_qdrant_health_reports_degraded_when_quantization_missing(
+    client: TestClient, monkeypatch, tmp_path
+):
     service = _FakeQdrantService(exists=True, quantized=False)
     _seed_benchmark(monkeypatch, tmp_path)
     _override_qdrant_service(service)

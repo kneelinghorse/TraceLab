@@ -10,20 +10,22 @@ Tests cover:
 - Result dataclass behavior
 - Mode selection logic
 """
+
 import time
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
-
 
 # -----------------------------------------------------------------------------
 # Self-contained implementations mirroring app/services/pedr/hybrid_rerank.py
 # -----------------------------------------------------------------------------
 
+
 @dataclass
 class HybridRerankTimings:
     """Timing breakdown for hybrid rerank stages."""
+
     fts_ms: float = 0.0
     embedding_ms: float = 0.0
     rerank_ms: float = 0.0
@@ -33,7 +35,8 @@ class HybridRerankTimings:
 @dataclass
 class HybridRerankResult:
     """Result from hybrid rerank search."""
-    results: List[Dict[str, Any]]
+
+    results: list[dict[str, Any]]
     timings: HybridRerankTimings
     mode_used: str
     fts_candidates_count: int
@@ -50,11 +53,11 @@ def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
 
 
 def semantic_rerank(
-    query_embedding: List[float],
-    candidates: List[Dict[str, Any]],
-    id_to_vector: Dict[str, List[float]],
+    query_embedding: list[float],
+    candidates: list[dict[str, Any]],
+    id_to_vector: dict[str, list[float]],
     top_k: int,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """Rerank candidates by semantic similarity.
 
     This is a simplified version of the actual implementation for testing.
@@ -63,7 +66,7 @@ def semantic_rerank(
         return []
 
     query_np = np.array(query_embedding)
-    scored: List[tuple] = []
+    scored: list[tuple] = []
 
     for candidate in candidates:
         chunk_id = candidate.get("chunk_id")
@@ -78,7 +81,7 @@ def semantic_rerank(
 
     # Map back to candidates
     id_to_candidate = {c["chunk_id"]: c for c in candidates}
-    reranked: List[Dict[str, Any]] = []
+    reranked: list[dict[str, Any]] = []
 
     for chunk_id, semantic_score in scored[:top_k]:
         if chunk_id not in id_to_candidate:
@@ -94,6 +97,7 @@ def semantic_rerank(
 # -----------------------------------------------------------------------------
 # Cosine Similarity Tests
 # -----------------------------------------------------------------------------
+
 
 class TestCosineSimilarity:
     """Test cosine similarity calculation."""
@@ -152,6 +156,7 @@ class TestCosineSimilarity:
 # Semantic Rerank Tests
 # -----------------------------------------------------------------------------
 
+
 class TestSemanticRerank:
     """Test semantic reranking logic."""
 
@@ -200,10 +205,7 @@ class TestSemanticRerank:
             for i in range(10)
         ]
 
-        id_to_vector = {
-            f"c{i}": [float(i) / 10, 0.0, 0.0]
-            for i in range(10)
-        }
+        id_to_vector = {f"c{i}": [float(i) / 10, 0.0, 0.0] for i in range(10)}
 
         reranked = semantic_rerank(
             query_embedding=[1.0, 0.0, 0.0],
@@ -245,6 +247,7 @@ class TestSemanticRerank:
 # Timing Dataclass Tests
 # -----------------------------------------------------------------------------
 
+
 class TestHybridRerankTimings:
     """Test timing dataclass behavior."""
 
@@ -273,6 +276,7 @@ class TestHybridRerankTimings:
 # -----------------------------------------------------------------------------
 # Result Dataclass Tests
 # -----------------------------------------------------------------------------
+
 
 class TestHybridRerankResult:
     """Test result dataclass behavior."""
@@ -330,6 +334,7 @@ class TestHybridRerankResult:
 # Performance Characteristics Tests
 # -----------------------------------------------------------------------------
 
+
 class TestPerformanceCharacteristics:
     """Test expected performance characteristics."""
 
@@ -356,8 +361,7 @@ class TestPerformanceCharacteristics:
                 for i in range(pool_size)
             ]
             id_to_vector = {
-                f"c{i}": list(np.random.rand(128))
-                for i in range(pool_size)
+                f"c{i}": list(np.random.rand(128)) for i in range(pool_size)
             }
 
             start = time.perf_counter()
@@ -404,7 +408,9 @@ if __name__ == "__main__":
                     print(f"  ✗ {test_class.__name__}.{method_name}: {e}")
                     failed += 1
                 except Exception as e:
-                    print(f"  ✗ {test_class.__name__}.{method_name}: {type(e).__name__}: {e}")
+                    print(
+                        f"  ✗ {test_class.__name__}.{method_name}: {type(e).__name__}: {e}"
+                    )
                     failed += 1
 
     print(f"\n{passed} passed, {failed} failed")

@@ -159,7 +159,9 @@ def insert_rows(db_path: Path, rows: List[SessionRow]) -> int:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Backfill sessions from legacy context.")
+    parser = argparse.ArgumentParser(
+        description="Backfill sessions from legacy context."
+    )
     parser.add_argument(
         "--legacy-context",
         type=Path,

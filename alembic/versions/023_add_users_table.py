@@ -43,8 +43,12 @@ def upgrade() -> None:
         sa.Column("password_hash", sa.String(255), nullable=False),
         sa.Column("role", sa.String(50), nullable=False, server_default="admin"),
         sa.Column("invite_code_used", sa.String(50), nullable=True),
-        sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
-        sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
+        sa.Column(
+            "created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(), nullable=False, server_default=sa.func.now()
+        ),
         sa.Column("last_login_at", sa.DateTime(), nullable=True),
     )
 
@@ -59,12 +63,15 @@ def upgrade() -> None:
     if not auth_password_hash:
         auth_password = os.environ.get("AUTH_PASSWORD", "changeme")
         import bcrypt
+
         auth_password_hash = bcrypt.hashpw(
             auth_password.encode("utf-8"), bcrypt.gensalt()
         ).decode("utf-8")
 
     # Use username as email if it doesn't look like an email
-    admin_email = auth_username if "@" in auth_username else f"{auth_username}@tracelab.local"
+    admin_email = (
+        auth_username if "@" in auth_username else f"{auth_username}@tracelab.local"
+    )
 
     bind.execute(
         text(
@@ -95,7 +102,9 @@ def upgrade() -> None:
     # Step 3c: Drop old column and rename
     op.drop_index("ix_api_keys_user_id", table_name="api_keys")
     op.drop_column("api_keys", "user_id")
-    op.alter_column("api_keys", "user_id_new", new_column_name="user_id", nullable=False)
+    op.alter_column(
+        "api_keys", "user_id_new", new_column_name="user_id", nullable=False
+    )
 
     # Step 3d: Add FK and index
     op.create_foreign_key(
@@ -114,11 +123,18 @@ def downgrade() -> None:
     if "api_keys" in existing_tables:
         op.drop_constraint("fk_api_keys_user_id", "api_keys", type_="foreignkey")
         op.drop_index("ix_api_keys_user_id", table_name="api_keys")
-        op.add_column("api_keys", sa.Column("user_id_old", sa.String(), nullable=True, server_default="default"))
+        op.add_column(
+            "api_keys",
+            sa.Column(
+                "user_id_old", sa.String(), nullable=True, server_default="default"
+            ),
+        )
         bind = op.get_bind()
         bind.execute(text("UPDATE api_keys SET user_id_old = 'default'"))
         op.drop_column("api_keys", "user_id")
-        op.alter_column("api_keys", "user_id_old", new_column_name="user_id", nullable=False)
+        op.alter_column(
+            "api_keys", "user_id_old", new_column_name="user_id", nullable=False
+        )
         op.create_index("ix_api_keys_user_id", "api_keys", ["user_id"])
 
     if "users" in existing_tables:

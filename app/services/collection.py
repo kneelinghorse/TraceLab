@@ -1,16 +1,18 @@
 """Service for managing chunk collections."""
+
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
-from app.models.collection import Collection, CollectionItem
 from app.models.chunk import DocumentChunk
+from app.models.collection import Collection, CollectionItem
 from app.models.document import Document
 
 SessionFactory = Callable[[], Session]
@@ -33,19 +35,17 @@ class CollectionService:
     # ------------------------------------------------------------------
     # Collection CRUD
     # ------------------------------------------------------------------
-    def list_collections(self) -> List[Collection]:
+    def list_collections(self) -> list[Collection]:
         """Return all collections ordered by most recent."""
         session = self.session_factory()
         try:
             return (
-                session.query(Collection)
-                .order_by(Collection.updated_at.desc())
-                .all()
+                session.query(Collection).order_by(Collection.updated_at.desc()).all()
             )
         finally:
             session.close()
 
-    def get(self, collection_id: UUID | str) -> Optional[Collection]:
+    def get(self, collection_id: UUID | str) -> Collection | None:
         """Look up a collection by ID."""
         session = self.session_factory()
         try:
@@ -61,7 +61,7 @@ class CollectionService:
         self,
         *,
         name: str,
-        description: Optional[str] = None,
+        description: str | None = None,
     ) -> Collection:
         """Create a new collection."""
         name_value = self._clean_name(name)
@@ -88,8 +88,8 @@ class CollectionService:
         self,
         collection_id: UUID | str,
         *,
-        updates: Dict[str, Any],
-    ) -> Optional[Collection]:
+        updates: dict[str, Any],
+    ) -> Collection | None:
         """Update mutable fields for a collection."""
         session = self.session_factory()
         try:
@@ -146,7 +146,7 @@ class CollectionService:
         collection_id: UUID | str,
         *,
         chunk_id: UUID | str,
-        notes: Optional[str] = None,
+        notes: str | None = None,
     ) -> CollectionItem:
         """Add a chunk to a collection."""
         session = self.session_factory()
@@ -225,7 +225,7 @@ class CollectionService:
         finally:
             session.close()
 
-    def get_items(self, collection_id: UUID | str) -> List[CollectionItem]:
+    def get_items(self, collection_id: UUID | str) -> list[CollectionItem]:
         """Get all items in a collection with chunk data."""
         session = self.session_factory()
         try:
@@ -253,7 +253,7 @@ class CollectionService:
     # ------------------------------------------------------------------
     # Export
     # ------------------------------------------------------------------
-    def export_markdown(self, collection_id: UUID | str) -> Optional[str]:
+    def export_markdown(self, collection_id: UUID | str) -> str | None:
         """Export collection as markdown bundle for agent synthesis.
 
         Returns None if collection not found, otherwise a markdown string.
@@ -282,17 +282,13 @@ class CollectionService:
                 if item.chunk and item.chunk.document_id:
                     doc_ids.add(str(item.chunk.document_id))
 
-            documents: Dict[str, Document] = {}
+            documents: dict[str, Document] = {}
             if doc_ids:
-                docs = (
-                    session.query(Document)
-                    .filter(Document.id.in_(doc_ids))
-                    .all()
-                )
+                docs = session.query(Document).filter(Document.id.in_(doc_ids)).all()
                 documents = {str(d.id): d for d in docs}
 
             # Build markdown
-            lines: List[str] = []
+            lines: list[str] = []
             lines.append(f"# {collection.name}")
             lines.append("")
             if collection.description:
@@ -303,8 +299,12 @@ class CollectionService:
             lines.append("## Metadata")
             lines.append("")
             lines.append(f"- **Collection ID:** `{collection.id}`")
-            lines.append(f"- **Created:** {collection.created_at.strftime('%Y-%m-%d %H:%M UTC')}")
-            lines.append(f"- **Updated:** {collection.updated_at.strftime('%Y-%m-%d %H:%M UTC')}")
+            lines.append(
+                f"- **Created:** {collection.created_at.strftime('%Y-%m-%d %H:%M UTC')}"
+            )
+            lines.append(
+                f"- **Updated:** {collection.updated_at.strftime('%Y-%m-%d %H:%M UTC')}"
+            )
             lines.append(f"- **Total Chunks:** {len(items)}")
             lines.append("")
             lines.append("---")
@@ -332,7 +332,9 @@ class CollectionService:
                 if chunk:
                     lines.append(f"**Chunk Index:** {chunk.chunk_index}")
 
-                lines.append(f"**Added to Collection:** {item.added_at.strftime('%Y-%m-%d %H:%M UTC')}")
+                lines.append(
+                    f"**Added to Collection:** {item.added_at.strftime('%Y-%m-%d %H:%M UTC')}"
+                )
 
                 if item.notes:
                     lines.append("")
@@ -352,7 +354,9 @@ class CollectionService:
             # Footer for agent context
             lines.append("## Export Info")
             lines.append("")
-            lines.append(f"*Exported at {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')} for agent synthesis.*")
+            lines.append(
+                f"*Exported at {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')} for agent synthesis.*"
+            )
             lines.append("")
 
             return "\n".join(lines)
@@ -367,12 +371,12 @@ class CollectionService:
         return (name or "").strip()
 
     @staticmethod
-    def _clean_description(description: str | None) -> Optional[str]:
+    def _clean_description(description: str | None) -> str | None:
         text = (description or "").strip()
         return text or None
 
 
-_collection_service: Optional[CollectionService] = None
+_collection_service: CollectionService | None = None
 
 
 def get_collection_service() -> CollectionService:

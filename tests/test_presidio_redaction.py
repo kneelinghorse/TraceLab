@@ -1,14 +1,13 @@
 """Tests for the lightweight redaction service and API integration."""
+
 from __future__ import annotations
 
 import json
-import re
 import os
-from typing import List
+import re
 
 import pytest
-
-from httpx import AsyncClient, ASGITransport
+from httpx import ASGITransport, AsyncClient
 
 os.environ.setdefault("ENVIRONMENT", "test")
 os.environ.setdefault("DATABASE_URL", "sqlite:///./tests/test.db")
@@ -63,8 +62,14 @@ def test_custom_recognizers_cover_expected_patterns():
         for match in re.finditer(pattern.regex, text)
     }
 
-    assert {"PID-2024-1234", "PARTICIPANT-UX99-4321", "P-2024-0001"} <= participant_matches
-    assert {"PROJ-ALPHA-9876"} <= project_matches or {"PROJECT-BETA-9999"} <= project_matches
+    assert {
+        "PID-2024-1234",
+        "PARTICIPANT-UX99-4321",
+        "P-2024-0001",
+    } <= participant_matches
+    assert {"PROJ-ALPHA-9876"} <= project_matches or {
+        "PROJECT-BETA-9999"
+    } <= project_matches
 
 
 def test_redact_document_uses_pseudonymization_and_audit(passthrough_redaction_service):
@@ -96,9 +101,10 @@ def test_redact_document_uses_pseudonymization_and_audit(passthrough_redaction_s
 @pytest.mark.asyncio
 async def test_redaction_endpoint(monkeypatch, auth_headers):
     """Validate API surface using the stubbed redaction service."""
+
     class _FakeRedactionService:
         def __init__(self):
-            self.calls: List[dict] = []
+            self.calls: list[dict] = []
 
         def redact_document(self, **payload):
             self.calls.append(payload)
