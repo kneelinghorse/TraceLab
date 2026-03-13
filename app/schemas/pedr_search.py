@@ -6,7 +6,7 @@ with RRF fusion.
 """
 
 from datetime import date
-from typing import Any, Literal
+from typing import Any, List, Literal, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator
