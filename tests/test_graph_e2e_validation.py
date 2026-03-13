@@ -6,6 +6,7 @@ producing a before/after comparison report proving graph layer impact.
 Uses real graph layer with in-memory SQLite (synthetic but realistic data)
 and stub lexical/semantic providers so the test is self-contained.
 """
+
 from __future__ import annotations
 
 import json
@@ -41,12 +42,42 @@ PROJECT_C_ID = str(uuid4())
 DOC_IDS = {f"doc_{i}": str(uuid4()) for i in range(6)}
 
 DOCUMENTS_META = [
-    {"key": "doc_0", "project": PROJECT_A_ID, "name": "UX Research Findings Q1", "content": "User testing revealed friction in onboarding flow. 40% drop-off at step 3."},
-    {"key": "doc_1", "project": PROJECT_A_ID, "name": "Onboarding Redesign Proposal", "content": "Proposed redesign reduces onboarding steps from 5 to 3. A/B test plan included."},
-    {"key": "doc_2", "project": PROJECT_A_ID, "name": "Sprint Retrospective Notes", "content": "Team discussed onboarding improvements. Decision: prioritize mobile-first approach."},
-    {"key": "doc_3", "project": PROJECT_B_ID, "name": "API Performance Report", "content": "P95 latency reduced from 450ms to 120ms after query optimization. Database indexes added."},
-    {"key": "doc_4", "project": PROJECT_B_ID, "name": "Infrastructure Cost Analysis", "content": "Cloud spending up 30% due to unoptimized queries. Recommendation: implement caching layer."},
-    {"key": "doc_5", "project": PROJECT_C_ID, "name": "Competitive Analysis 2026", "content": "Competitor X launched graph-based search. Market share implications for our product line."},
+    {
+        "key": "doc_0",
+        "project": PROJECT_A_ID,
+        "name": "UX Research Findings Q1",
+        "content": "User testing revealed friction in onboarding flow. 40% drop-off at step 3.",
+    },
+    {
+        "key": "doc_1",
+        "project": PROJECT_A_ID,
+        "name": "Onboarding Redesign Proposal",
+        "content": "Proposed redesign reduces onboarding steps from 5 to 3. A/B test plan included.",
+    },
+    {
+        "key": "doc_2",
+        "project": PROJECT_A_ID,
+        "name": "Sprint Retrospective Notes",
+        "content": "Team discussed onboarding improvements. Decision: prioritize mobile-first approach.",
+    },
+    {
+        "key": "doc_3",
+        "project": PROJECT_B_ID,
+        "name": "API Performance Report",
+        "content": "P95 latency reduced from 450ms to 120ms after query optimization. Database indexes added.",
+    },
+    {
+        "key": "doc_4",
+        "project": PROJECT_B_ID,
+        "name": "Infrastructure Cost Analysis",
+        "content": "Cloud spending up 30% due to unoptimized queries. Recommendation: implement caching layer.",
+    },
+    {
+        "key": "doc_5",
+        "project": PROJECT_C_ID,
+        "name": "Competitive Analysis 2026",
+        "content": "Competitor X launched graph-based search. Market share implications for our product line.",
+    },
 ]
 
 # 3 chunks per document
@@ -55,13 +86,15 @@ for doc_meta in DOCUMENTS_META:
     doc_id = DOC_IDS[doc_meta["key"]]
     base_content = doc_meta["content"]
     for idx in range(3):
-        CHUNKS.append({
-            "doc_key": doc_meta["key"],
-            "doc_id": doc_id,
-            "project_id": doc_meta["project"],
-            "chunk_index": idx,
-            "content": f"[chunk {idx}] {base_content} (section {idx + 1})",
-        })
+        CHUNKS.append(
+            {
+                "doc_key": doc_meta["key"],
+                "doc_id": doc_id,
+                "project_id": doc_meta["project"],
+                "chunk_index": idx,
+                "content": f"[chunk {idx}] {base_content} (section {idx + 1})",
+            }
+        )
 
 
 # 12 diverse queries covering different intents and topics
@@ -84,6 +117,7 @@ VALIDATION_QUERIES = [
 @dataclass
 class QueryComparison:
     """Single query comparison result."""
+
     query: str
     graph_off_count: int
     graph_on_count: int
@@ -196,15 +230,22 @@ def graph_search_env(db_session):
         db_session.add(chunk)
         db_session.flush()
         key = f"{chunk_data['doc_id']}::{chunk_data['chunk_index']}"
-        chunk_records[key] = {"id": chunk.id, "doc_id": chunk_data["doc_id"], "chunk_index": chunk_data["chunk_index"]}
+        chunk_records[key] = {
+            "id": chunk.id,
+            "doc_id": chunk_data["doc_id"],
+            "chunk_index": chunk_data["chunk_index"],
+        }
     db_session.commit()
 
     # Materialize edges (full mode — creates all implicit FK edges)
     edge_service = EdgeMaterializationService(session_factory=lambda: db_session)
-    mat_result = edge_service.materialize_implicit_edges(session=db_session, mode="full")
+    mat_result = edge_service.materialize_implicit_edges(
+        session=db_session, mode="full"
+    )
 
     # Add cross-document reference edges (doc_0 ↔ doc_1 via "references" — UX findings → redesign)
     from app.services.pedr.semantic_protocol import URNGenerator
+
     cross_edges = [
         ("references", DOC_IDS["doc_0"], DOC_IDS["doc_1"]),  # UX findings → redesign
         ("references", DOC_IDS["doc_1"], DOC_IDS["doc_2"]),  # redesign → retro notes
@@ -290,9 +331,15 @@ def _compare_query(env: Dict[str, Any], query: str) -> QueryComparison:
     on_scores = {r.chunk_id: r.rrf_score for r in result_on.results}
 
     graph_candidates = result_on.metadata.graph_candidates_expanded or 0
-    graph_ms = result_on.metadata.timings.graph_ms if result_on.metadata.timings else 0.0
-    total_off = result_off.metadata.timings.total_ms if result_off.metadata.timings else 0.0
-    total_on = result_on.metadata.timings.total_ms if result_on.metadata.timings else 0.0
+    graph_ms = (
+        result_on.metadata.timings.graph_ms if result_on.metadata.timings else 0.0
+    )
+    total_off = (
+        result_off.metadata.timings.total_ms if result_off.metadata.timings else 0.0
+    )
+    total_on = (
+        result_on.metadata.timings.total_ms if result_on.metadata.timings else 0.0
+    )
 
     return QueryComparison(
         query=query,
@@ -316,7 +363,9 @@ class TestGraphSearchE2EValidation:
 
     def test_graph_layer_produces_candidates(self, graph_search_env):
         """Graph layer expands at least some candidates on relevant queries."""
-        result = _run_search(graph_search_env, "user research onboarding", enable_graph=True)
+        result = _run_search(
+            graph_search_env, "user research onboarding", enable_graph=True
+        )
         assert result.metadata.graph_enabled is True
         # Graph should be listed in layers_used if it found candidates
         assert "graph" in result.metadata.layers_used
@@ -331,12 +380,13 @@ class TestGraphSearchE2EValidation:
         comparisons = [_compare_query(graph_search_env, q) for q in VALIDATION_QUERIES]
         queries_with_new = [c for c in comparisons if len(c.new_results_from_graph) > 0]
         queries_with_rank_changes = [
-            c for c in comparisons
+            c
+            for c in comparisons
             if any(delta != 0 for delta in c.rank_changes.values())
         ]
-        impacted = len(set(
-            c.query for c in queries_with_new + queries_with_rank_changes
-        ))
+        impacted = len(
+            set(c.query for c in queries_with_new + queries_with_rank_changes)
+        )
         # Graph should impact at least some queries (new results or re-ranking)
         assert impacted >= 1, (
             f"Expected graph to impact at least 1 query via new results or re-ranking, "
@@ -347,7 +397,8 @@ class TestGraphSearchE2EValidation:
         """Graph layer affects result rankings for at least some queries."""
         comparisons = [_compare_query(graph_search_env, q) for q in VALIDATION_QUERIES]
         queries_with_rank_changes = [
-            c for c in comparisons
+            c
+            for c in comparisons
             if any(delta != 0 for delta in c.rank_changes.values())
         ]
         # Graph should change rankings for some queries
@@ -389,7 +440,9 @@ class TestGraphSearchE2EValidation:
         for query in VALIDATION_QUERIES:
             result_off = _run_search(graph_search_env, query, enable_graph=False)
             result_on = _run_search(graph_search_env, query, enable_graph=True)
-            assert not result_off.metadata.degraded, f"Query '{query}' degraded with graph off"
+            assert not result_off.metadata.degraded, (
+                f"Query '{query}' degraded with graph off"
+            )
             # Graph-on may be degraded if graph layer had no results, that's ok
 
     def test_generate_comparison_report(self, graph_search_env, tmp_path):
@@ -397,7 +450,9 @@ class TestGraphSearchE2EValidation:
         comparisons = [_compare_query(graph_search_env, q) for q in VALIDATION_QUERIES]
 
         # Aggregate stats
-        queries_with_new_results = sum(1 for c in comparisons if c.new_results_from_graph)
+        queries_with_new_results = sum(
+            1 for c in comparisons if c.new_results_from_graph
+        )
         queries_with_rank_changes = sum(
             1 for c in comparisons if any(d != 0 for d in c.rank_changes.values())
         )
@@ -448,20 +503,28 @@ class TestGraphSearchE2EValidation:
         assert report_path.exists()
 
         # Print summary for test output
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"GRAPH SEARCH E2E VALIDATION REPORT")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
         print(f"Queries tested: {report['summary']['total_queries']}")
-        print(f"Queries with new graph results: {report['summary']['queries_with_new_graph_results']}")
-        print(f"Queries with rank changes: {report['summary']['queries_with_rank_changes']}")
-        print(f"Total new results surfaced: {report['summary']['total_new_results_surfaced']}")
+        print(
+            f"Queries with new graph results: {report['summary']['queries_with_new_graph_results']}"
+        )
+        print(
+            f"Queries with rank changes: {report['summary']['queries_with_rank_changes']}"
+        )
+        print(
+            f"Total new results surfaced: {report['summary']['total_new_results_surfaced']}"
+        )
         print(f"Avg graph latency: {report['summary']['avg_graph_latency_ms']:.2f}ms")
         print(f"Max graph latency: {report['summary']['max_graph_latency_ms']:.2f}ms")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
         for pq in report["per_query"]:
             delta = pq["graph_on_results"] - pq["graph_off_results"]
             indicator = f"+{delta}" if delta > 0 else str(delta)
-            print(f"  [{indicator:>3}] {pq['query'][:45]:<45} "
-                  f"off={pq['graph_off_results']} on={pq['graph_on_results']} "
-                  f"new={pq['new_results_from_graph']} graph={pq['graph_layer_ms']:.1f}ms")
-        print(f"{'='*60}")
+            print(
+                f"  [{indicator:>3}] {pq['query'][:45]:<45} "
+                f"off={pq['graph_off_results']} on={pq['graph_on_results']} "
+                f"new={pq['new_results_from_graph']} graph={pq['graph_layer_ms']:.1f}ms"
+            )
+        print(f"{'=' * 60}")

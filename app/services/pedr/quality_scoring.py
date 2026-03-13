@@ -1,10 +1,12 @@
 """Quality scoring utilities powering PEDR-aware hybrid search."""
+
 from __future__ import annotations
 
 import logging
 import uuid
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Set
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -14,7 +16,7 @@ from app.models.mission import Mission
 from app.models.project import Project
 from app.services.pedr.score_utils import ensure_base_score
 
-MetadataLoader = Callable[[Sequence[str]], Dict[str, Dict[str, Any]]]
+MetadataLoader = Callable[[Sequence[str]], dict[str, dict[str, Any]]]
 logger = logging.getLogger(__name__)
 
 
@@ -22,9 +24,9 @@ logger = logging.getLogger(__name__)
 class QualityFilters:
     """Normalized governance filters accepted by the scoring service."""
 
-    min_quality_gates: Optional[int] = None
+    min_quality_gates: int | None = None
     statuses: tuple[str, ...] = field(default_factory=tuple)
-    allow_pii: Optional[bool] = None
+    allow_pii: bool | None = None
     governance_mode: str = "strict"
 
 
@@ -32,7 +34,7 @@ class QualityFilters:
 class QualityScore:
     """Structured representation of a mission's quality metadata."""
 
-    mission_id: Optional[str]
+    mission_id: str | None
     status: str
     passed_gates: int
     total_gates: int
@@ -53,18 +55,18 @@ class QualityScoringService:
         "traceability",
         "contradictions_resolved",
     )
-    STATUS_BOOSTS: Dict[str, float] = {
+    STATUS_BOOSTS: dict[str, float] = {
         "complete": 0.12,
         "review": 0.09,
         "in_progress": 0.05,
         "draft": 0.0,
     }
-    STATUS_CURVE_EXPONENTS: Dict[str, float] = {
+    STATUS_CURVE_EXPONENTS: dict[str, float] = {
         "review": 0.80,
         "in_progress": 0.70,
         "draft": 0.45,
     }
-    GOVERNANCE_MODES: Set[str] = {"strict", "soft", "warn"}
+    GOVERNANCE_MODES: set[str] = {"strict", "soft", "warn"}
     SOFT_PII_PENALTY: float = -0.30
     VALIDATION_BOOST: float = 0.05
     DEFAULT_BASE_SCORE: float = 0.60
@@ -75,7 +77,7 @@ class QualityScoringService:
         self,
         *,
         session_factory: Callable[[], Session] = SessionLocal,
-        metadata_loader: Optional[MetadataLoader] = None,
+        metadata_loader: MetadataLoader | None = None,
     ) -> None:
         self.session_factory = session_factory
         self._metadata_loader = metadata_loader
@@ -85,10 +87,10 @@ class QualityScoringService:
     # ------------------------------------------------------------------
     def apply(
         self,
-        results: Sequence[Dict[str, Any]],
+        results: Sequence[dict[str, Any]],
         *,
-        filters: Optional[QualityFilters] = None,
-    ) -> List[Dict[str, Any]]:
+        filters: QualityFilters | None = None,
+    ) -> list[dict[str, Any]]:
         """Annotate + filter ranked chunks with PEDR quality metadata."""
         if not results:
             return []
@@ -100,7 +102,7 @@ class QualityScoringService:
         allow_pii = filters.allow_pii if filters else None
         governance_mode = self._normalized_governance_mode(filters)
 
-        annotated: List[Dict[str, Any]] = []
+        annotated: list[dict[str, Any]] = []
         warned_pii = 0
         for entry in results:
             doc_id = self._normalize_document_id(entry.get("document_id"))
@@ -120,7 +122,9 @@ class QualityScoringService:
                     warned_pii += 1
 
             payload = dict(entry)
-            effective_score = self._apply_governance_penalty(score.final_score, governance_penalty)
+            effective_score = self._apply_governance_penalty(
+                score.final_score, governance_penalty
+            )
             payload["quality_score"] = effective_score
             payload["quality_base_score"] = score.base_score
             payload["quality_boost"] = score.boost
@@ -147,9 +151,9 @@ class QualityScoringService:
     # Internals
     # ------------------------------------------------------------------
     @staticmethod
-    def _collect_document_ids(results: Sequence[Dict[str, Any]]) -> List[str]:
-        seen: Set[str] = set()
-        ordered: List[str] = []
+    def _collect_document_ids(results: Sequence[dict[str, Any]]) -> list[str]:
+        seen: set[str] = set()
+        ordered: list[str] = []
         for item in results:
             doc_id = item.get("document_id")
             normalized = QualityScoringService._normalize_document_id(doc_id)
@@ -160,13 +164,13 @@ class QualityScoringService:
         return ordered
 
     @staticmethod
-    def _normalize_document_id(document_id: Any) -> Optional[str]:
+    def _normalize_document_id(document_id: Any) -> str | None:
         if not document_id:
             return None
         return str(document_id)
 
     @staticmethod
-    def _normalized_min_gates(filters: Optional[QualityFilters]) -> Optional[int]:
+    def _normalized_min_gates(filters: QualityFilters | None) -> int | None:
         if not filters or filters.min_quality_gates is None:
             return None
         try:
@@ -177,7 +181,7 @@ class QualityScoringService:
         return value
 
     @staticmethod
-    def _normalized_statuses(filters: Optional[QualityFilters]) -> Set[str]:
+    def _normalized_statuses(filters: QualityFilters | None) -> set[str]:
         if not filters or not filters.statuses:
             return set()
         return {
@@ -187,20 +191,24 @@ class QualityScoringService:
         }
 
     @classmethod
-    def _normalized_governance_mode(cls, filters: Optional[QualityFilters]) -> str:
+    def _normalized_governance_mode(cls, filters: QualityFilters | None) -> str:
         if not filters:
             return "strict"
         value = str(filters.governance_mode or "").strip().lower()
         return value if value in cls.GOVERNANCE_MODES else "strict"
 
-    def _resolve_metadata(self, document_ids: Sequence[str]) -> Dict[str, Dict[str, Any]]:
+    def _resolve_metadata(
+        self, document_ids: Sequence[str]
+    ) -> dict[str, dict[str, Any]]:
         if not document_ids:
             return {}
         if self._metadata_loader is not None:
             return dict(self._metadata_loader(document_ids))
         return self._load_metadata_from_db(document_ids)
 
-    def _load_metadata_from_db(self, document_ids: Sequence[str]) -> Dict[str, Dict[str, Any]]:
+    def _load_metadata_from_db(
+        self, document_ids: Sequence[str]
+    ) -> dict[str, dict[str, Any]]:
         session = self.session_factory()
         try:
             parsed_ids = self._parse_document_ids(document_ids)
@@ -221,13 +229,15 @@ class QualityScoringService:
                 .all()
             )
 
-            mapping: Dict[str, Dict[str, Any]] = {}
+            mapping: dict[str, dict[str, Any]] = {}
             for row in rows:
                 payload = row._mapping
                 # Extract quality gates from mission_metadata if present
                 mission_meta = payload.get("mission_metadata") or {}
                 mapping[str(payload["document_id"])] = {
-                    "mission_id": str(payload["mission_id"]) if payload["mission_id"] else None,
+                    "mission_id": str(payload["mission_id"])
+                    if payload["mission_id"]
+                    else None,
                     "status": payload["mission_status"],
                     "quality_gates": mission_meta.get("quality_gates"),
                     "mission_data": payload.get("execution_metadata"),
@@ -237,8 +247,8 @@ class QualityScoringService:
             session.close()
 
     @staticmethod
-    def _parse_document_ids(document_ids: Sequence[str]) -> List[uuid.UUID]:
-        parsed: List[uuid.UUID] = []
+    def _parse_document_ids(document_ids: Sequence[str]) -> list[uuid.UUID]:
+        parsed: list[uuid.UUID] = []
         for value in document_ids:
             try:
                 parsed.append(uuid.UUID(str(value)))
@@ -246,12 +256,14 @@ class QualityScoringService:
                 continue
         return parsed
 
-    def _score_metadata(self, metadata: Optional[Dict[str, Any]]) -> QualityScore:
+    def _score_metadata(self, metadata: dict[str, Any] | None) -> QualityScore:
         if not metadata:
             return self._default_score()
 
         status = str(metadata.get("status") or "unknown").strip().lower() or "unknown"
-        gates = self._extract_gates(metadata.get("quality_gates"), metadata.get("mission_data"))
+        gates = self._extract_gates(
+            metadata.get("quality_gates"), metadata.get("mission_data")
+        )
         passed, validated = self._summarize_gates(gates)
         total = len(self.EXPECTED_GATES)
 
@@ -280,10 +292,10 @@ class QualityScoringService:
 
     def _extract_gates(
         self,
-        quality_gates: Optional[Dict[str, Any]],
-        mission_data: Optional[Dict[str, Any]],
-    ) -> Dict[str, Dict[str, Any]]:
-        gates: Dict[str, Dict[str, Any]] = {}
+        quality_gates: dict[str, Any] | None,
+        mission_data: dict[str, Any] | None,
+    ) -> dict[str, dict[str, Any]]:
+        gates: dict[str, dict[str, Any]] = {}
         if isinstance(quality_gates, dict):
             for name, payload in quality_gates.items():
                 normalized = str(name).strip().lower()
@@ -310,7 +322,7 @@ class QualityScoringService:
                 )
         return gates
 
-    def _summarize_gates(self, gates: Dict[str, Dict[str, Any]]) -> tuple[int, bool]:
+    def _summarize_gates(self, gates: dict[str, dict[str, Any]]) -> tuple[int, bool]:
         passed = 0
         validated = True
         for gate in self.EXPECTED_GATES:
@@ -322,13 +334,19 @@ class QualityScoringService:
         return passed, validated if gates else False
 
     @staticmethod
-    def _detect_pii(mission_data: Optional[Dict[str, Any]]) -> bool:
+    def _detect_pii(mission_data: dict[str, Any] | None) -> bool:
         if not isinstance(mission_data, dict):
             return False
 
         governance = mission_data.get("governance")
         if isinstance(governance, dict):
-            for key in ("pii", "pii_flag", "pii_handling", "piihandling", "piiHandling"):
+            for key in (
+                "pii",
+                "pii_flag",
+                "pii_handling",
+                "piihandling",
+                "piiHandling",
+            ):
                 if governance.get(key) is not None:
                     return bool(governance[key])
 
@@ -339,7 +357,11 @@ class QualityScoringService:
         tags = mission_data.get("tags")
         if isinstance(tags, Iterable):
             for tag in tags:
-                if isinstance(tag, str) and tag.strip().lower() in {"pii", "privacy", "redaction"}:
+                if isinstance(tag, str) and tag.strip().lower() in {
+                    "pii",
+                    "privacy",
+                    "redaction",
+                }:
                     return True
         return False
 
@@ -373,7 +395,7 @@ class QualityScoringService:
         return max(cls.MIN_SCORE, min(cls.MAX_SCORE, adjusted))
 
 
-_QUALITY_SCORING_SERVICE: Optional[QualityScoringService] = None
+_QUALITY_SCORING_SERVICE: QualityScoringService | None = None
 
 
 def get_quality_scoring_service() -> QualityScoringService:

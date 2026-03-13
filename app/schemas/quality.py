@@ -1,8 +1,8 @@
 """Pydantic schemas for quality check entities."""
+
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
@@ -15,9 +15,9 @@ class QualityCheckBase(BaseModel):
     entity_id: UUID
     check_type: str
     status: str
-    details: Optional[dict] = None
-    recommendations: Optional[List[str]] = None
-    performed_by: Optional[str] = None
+    details: dict | None = None
+    recommendations: list[str] | None = None
+    performed_by: str | None = None
 
 
 class QualityCheckCreate(QualityCheckBase):
@@ -29,12 +29,12 @@ class QualityCheckCreate(QualityCheckBase):
 class QualityCheckUpdate(BaseModel):
     """Payload for updating a quality check record."""
 
-    check_type: Optional[str] = None
-    status: Optional[str] = None
-    details: Optional[dict] = None
-    recommendations: Optional[List[str]] = None
-    performed_by: Optional[str] = None
-    performed_at: Optional[datetime] = None
+    check_type: str | None = None
+    status: str | None = None
+    details: dict | None = None
+    recommendations: list[str] | None = None
+    performed_by: str | None = None
+    performed_at: datetime | None = None
 
 
 class QualityCheckRead(QualityCheckBase):

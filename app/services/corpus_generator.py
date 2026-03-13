@@ -11,10 +11,11 @@ import csv
 import json
 import random
 import textwrap
+from collections.abc import Iterable
 from datetime import datetime
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any
 
 from docx import Document
 from faker import Faker
@@ -30,7 +31,7 @@ class CorpusGenerator:
         self,
         output_dir: str = "data/corpus",
         seed: int = 42,
-        locales: Optional[Iterable[str]] = None,
+        locales: Iterable[str] | None = None,
     ) -> None:
         """
         Args:
@@ -42,7 +43,13 @@ class CorpusGenerator:
         self.output_dir = Path(output_dir)
         self.annotations_dir = self.output_dir / "annotations"
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        for subdirectory in ("transcripts", "surveys", "personas", "test_notes", "briefs"):
+        for subdirectory in (
+            "transcripts",
+            "surveys",
+            "personas",
+            "test_notes",
+            "briefs",
+        ):
             (self.output_dir / subdirectory).mkdir(exist_ok=True)
         self.annotations_dir.mkdir(exist_ok=True)
 
@@ -52,12 +59,14 @@ class CorpusGenerator:
             locale_list = ("en_US", "en_GB")
 
         if not locale_list:
-            raise ValueError("At least one locale must be provided for corpus generation.")
+            raise ValueError(
+                "At least one locale must be provided for corpus generation."
+            )
 
         self.seed = seed
         random.seed(seed)
 
-        self.fakers: Dict[str, Faker] = {}
+        self.fakers: dict[str, Faker] = {}
         for locale in locale_list:
             faker_instance = Faker(locale)
             faker_instance.seed_instance(seed)
@@ -69,7 +78,7 @@ class CorpusGenerator:
     # Helper utilities
     # --------------------------------------------------------------------------
 
-    def _select_locale(self, preferred: Optional[str] = None) -> str:
+    def _select_locale(self, preferred: str | None = None) -> str:
         """Return a valid locale, defaulting to a random choice."""
         if preferred and preferred in self.fakers:
             return preferred
@@ -86,17 +95,17 @@ class CorpusGenerator:
     def _annotate_text(
         self,
         text: str,
-        entities: Dict[str, Any],
+        entities: dict[str, Any],
         base_offset: int = 0,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Create annotations for PII entities found in text.
 
         Returns list of annotation dicts with start, end, entity_type, value.
         """
 
-        annotations: List[Dict[str, Any]] = []
-        seen: set[Tuple[str, int, int]] = set()
+        annotations: list[dict[str, Any]] = []
+        seen: set[tuple[str, int, int]] = set()
 
         def add_entity(entity_type: str, raw_value: Any) -> None:
             if raw_value in (None, ""):
@@ -140,13 +149,17 @@ class CorpusGenerator:
         annotations.sort(key=lambda item: item["start"])
         return annotations
 
-    def _generate_pii_entities(self, locale: Optional[str] = None) -> Tuple[str, Dict[str, Any]]:
+    def _generate_pii_entities(
+        self, locale: str | None = None
+    ) -> tuple[str, dict[str, Any]]:
         """Generate a consistent set of PII entities for a document."""
         locale = self._select_locale(locale)
         fake = self.fakers[locale]
 
         gender = random.choice(["M", "F"])
-        first_name = fake.first_name_male() if gender == "M" else fake.first_name_female()
+        first_name = (
+            fake.first_name_male() if gender == "M" else fake.first_name_female()
+        )
         last_name = fake.last_name()
         full_name = f"{first_name} {last_name}"
 
@@ -167,7 +180,9 @@ class CorpusGenerator:
             "EMAIL_ADDRESS": f"{first_name.lower()}.{last_name.lower()}@{fake.domain_name()}",
             "PHONE_NUMBER": fake.phone_number(),
             "LOCATION": location,
-            "DATE_TIME": fake.date_time_between(start_date="-2y", end_date="now").isoformat(),
+            "DATE_TIME": fake.date_time_between(
+                start_date="-2y", end_date="now"
+            ).isoformat(),
             "AGE": random.randint(25, 65),
             "CREDIT_CARD": fake.credit_card_number(),
             "US_SSN": fake.ssn() if locale == "en_US" else None,
@@ -181,7 +196,7 @@ class CorpusGenerator:
 
     def _register_document(
         self,
-        corpus_metadata: Dict[str, Any],
+        corpus_metadata: dict[str, Any],
         file_path: Path,
         doc_type: str,
         locale: str,
@@ -197,16 +212,20 @@ class CorpusGenerator:
                 "annotation_count": annotation_count,
             }
         )
-        corpus_metadata["document_counts"][doc_type] = corpus_metadata["document_counts"].get(doc_type, 0) + 1
-        corpus_metadata["locale_counts"][locale] = corpus_metadata["locale_counts"].get(locale, 0) + 1
+        corpus_metadata["document_counts"][doc_type] = (
+            corpus_metadata["document_counts"].get(doc_type, 0) + 1
+        )
+        corpus_metadata["locale_counts"][locale] = (
+            corpus_metadata["locale_counts"].get(locale, 0) + 1
+        )
         corpus_metadata["total_annotations"] += annotation_count
 
     def _save_annotations(
         self,
         file_path: Path,
-        annotations: List[Dict[str, Any]],
+        annotations: list[dict[str, Any]],
         source_text: str,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         """Persist annotations and source text for later evaluation."""
         file_path = Path(file_path)
@@ -215,7 +234,7 @@ class CorpusGenerator:
         except ValueError:
             relative_path = file_path.name
 
-        annotation_payload: Dict[str, Any] = {
+        annotation_payload: dict[str, Any] = {
             "document_path": str(relative_path),
             "document_absolute": str(file_path.resolve()),
             "generated_at": datetime.utcnow().isoformat() + "Z",
@@ -238,25 +257,25 @@ class CorpusGenerator:
     def generate_interview_transcript_txt(
         self,
         doc_id: str,
-        locale: Optional[str] = None,
-    ) -> Tuple[str, List[Dict[str, Any]], str, Dict[str, Any]]:
+        locale: str | None = None,
+    ) -> tuple[str, list[dict[str, Any]], str, dict[str, Any]]:
         """Generate a synthetic interview transcript in TXT format."""
         locale, entities = self._generate_pii_entities(locale)
         colleague_fake = self.fakers.get("en_US", self.fakers[locale])
         colleague_name = colleague_fake.name()
 
         transcript = f"""User Interview Transcript - Session {doc_id}
-Interview Date: {entities['DATE_TIME'][:10]}
-Participant ID: {entities['PARTICIPANT_ID']}
-Participant: {entities['PERSON']}
-Project Code: {entities['PROJECT_ID']}
-Email: {entities['EMAIL_ADDRESS']}
-Phone: {entities['PHONE_NUMBER']}
-Location: {entities['LOCATION']['city']}, {entities['LOCATION']['state']}
+Interview Date: {entities["DATE_TIME"][:10]}
+Participant ID: {entities["PARTICIPANT_ID"]}
+Participant: {entities["PERSON"]}
+Project Code: {entities["PROJECT_ID"]}
+Email: {entities["EMAIL_ADDRESS"]}
+Phone: {entities["PHONE_NUMBER"]}
+Location: {entities["LOCATION"]["city"]}, {entities["LOCATION"]["state"]}
 
 Interviewer: Thank you for taking the time to speak with us today. Can you start by telling us a bit about yourself?
 
-Participant: Sure. My name is {entities['PERSON']}, and I'm {entities['AGE']} years old. I work as a {entities['OCCUPATION']} at {entities['ORGANIZATION']}, which is located in {entities['LOCATION']['city']}, {entities['LOCATION']['state']}. I'm currently participating in project {entities['PROJECT_ID']}.
+Participant: Sure. My name is {entities["PERSON"]}, and I'm {entities["AGE"]} years old. I work as a {entities["OCCUPATION"]} at {entities["ORGANIZATION"]}, which is located in {entities["LOCATION"]["city"]}, {entities["LOCATION"]["state"]}. I'm currently participating in project {entities["PROJECT_ID"]}.
 
 Interviewer: Can you tell us about your experience with the product?
 
@@ -264,11 +283,11 @@ Participant: I've been using it for about six months now. At first, I was a bit 
 
 Interviewer: What would you say are the main pain points?
 
-Participant: The main thing is the navigation. Sometimes I can't find what I'm looking for, especially when I'm working from {entities['LOCATION']['city']}. Also, I wish the mobile version had better support for my workflow.
+Participant: The main thing is the navigation. Sometimes I can't find what I'm looking for, especially when I'm working from {entities["LOCATION"]["city"]}. Also, I wish the mobile version had better support for my workflow.
 
 Interviewer: Thank you for that feedback. Is there anything else you'd like to share?
 
-Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you have any follow-up questions. My direct number is {entities['PHONE_NUMBER']}.
+Participant: Not really. You can reach me at {entities["EMAIL_ADDRESS"]} if you have any follow-up questions. My direct number is {entities["PHONE_NUMBER"]}.
 """
 
         annotations = self._annotate_text(transcript, entities)
@@ -277,10 +296,12 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
     def generate_interview_transcript_docx(
         self,
         doc_id: str,
-        locale: Optional[str] = None,
-    ) -> Tuple[Path, List[Dict[str, Any]], str, str, Dict[str, Any]]:
+        locale: str | None = None,
+    ) -> tuple[Path, list[dict[str, Any]], str, str, dict[str, Any]]:
         """Generate a synthetic interview transcript in DOCX format."""
-        transcript, annotations, locale, entities = self.generate_interview_transcript_txt(doc_id, locale)
+        transcript, annotations, locale, entities = (
+            self.generate_interview_transcript_txt(doc_id, locale)
+        )
 
         document = Document()
         document.add_heading("User Interview Transcript", 0)
@@ -296,10 +317,11 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
     def generate_survey_responses_csv(
         self,
         num_responses: int = 10,
-        locale: Optional[str] = None,
-    ) -> Tuple[Path, List[Dict[str, Any]], str, List[str]]:
+        locale: str | None = None,
+    ) -> tuple[Path, list[dict[str, Any]], str, list[str]]:
         """Generate synthetic survey responses in CSV format."""
-        def serialize_row(row: List[Any]) -> str:
+
+        def serialize_row(row: list[Any]) -> str:
             buffer = StringIO()
             writer = csv.writer(buffer, lineterminator="\n")
             writer.writerow(row)
@@ -320,9 +342,9 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
             "feedback",
         ]
 
-        locales_used: List[str] = []
-        annotations: List[Dict[str, Any]] = []
-        lines: List[str] = [serialize_row(header)]
+        locales_used: list[str] = []
+        annotations: list[dict[str, Any]] = []
+        lines: list[str] = [serialize_row(header)]
         offset = len(lines[0])
 
         for index in range(num_responses):
@@ -353,7 +375,9 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
             ]
 
             row_line = serialize_row(row)
-            annotations.extend(self._annotate_text(row_line, entities, base_offset=offset))
+            annotations.extend(
+                self._annotate_text(row_line, entities, base_offset=offset)
+            )
             offset += len(row_line)
             lines.append(row_line)
 
@@ -367,18 +391,18 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
     def generate_user_persona_pdf(
         self,
         doc_id: str,
-        locale: Optional[str] = None,
-    ) -> Tuple[Path, List[Dict[str, Any]], str, str, Dict[str, Any]]:
+        locale: str | None = None,
+    ) -> tuple[Path, list[dict[str, Any]], str, str, dict[str, Any]]:
         """Generate a synthetic user persona in PDF format."""
         locale, entities = self._generate_pii_entities(locale)
 
         persona_text = textwrap.dedent(
             f"""
-            User Persona: {entities['PERSON']}
+            User Persona: {entities["PERSON"]}
 
             Background:
-            {entities['PERSON']} is a {entities['AGE']}-year-old {entities['OCCUPATION']} living in {entities['LOCATION']['city']}, {entities['LOCATION']['state']}.
-            They work at {entities['ORGANIZATION']} and have been in their current role for several years.
+            {entities["PERSON"]} is a {entities["AGE"]}-year-old {entities["OCCUPATION"]} living in {entities["LOCATION"]["city"]}, {entities["LOCATION"]["state"]}.
+            They work at {entities["ORGANIZATION"]} and have been in their current role for several years.
 
             Goals:
             - Improve productivity and workflow efficiency
@@ -391,17 +415,17 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
             - Integration challenges with current systems
 
             Contact:
-            Email: {entities['EMAIL_ADDRESS']}
-            Phone: {entities['PHONE_NUMBER']}
-            Location: {entities['LOCATION']['full_address']}
-            Participant ID: {entities['PARTICIPANT_ID']}
-            Project Code: {entities['PROJECT_ID']}
+            Email: {entities["EMAIL_ADDRESS"]}
+            Phone: {entities["PHONE_NUMBER"]}
+            Location: {entities["LOCATION"]["full_address"]}
+            Participant ID: {entities["PARTICIPANT_ID"]}
+            Project Code: {entities["PROJECT_ID"]}
             """
         ).strip()
 
         output_path = self.output_dir / "personas" / f"persona_{doc_id}.pdf"
         styles = getSampleStyleSheet()
-        story: List[Any] = []
+        story: list[Any] = []
         for line in persona_text.strip().split("\n"):
             if line.strip():
                 story.append(Paragraph(line, styles["Normal"]))
@@ -416,27 +440,27 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
     def generate_user_persona_docx(
         self,
         doc_id: str,
-        locale: Optional[str] = None,
-    ) -> Tuple[Path, List[Dict[str, Any]], str, str, Dict[str, Any]]:
+        locale: str | None = None,
+    ) -> tuple[Path, list[dict[str, Any]], str, str, dict[str, Any]]:
         """Generate a synthetic user persona in DOCX format."""
         locale, entities = self._generate_pii_entities(locale)
 
         persona_content = textwrap.dedent(
             f"""
             Background:
-            {entities['PERSON']} is a {entities['AGE']}-year-old {entities['OCCUPATION']} living in {entities['LOCATION']['city']}, {entities['LOCATION']['state']}.
-            They work at {entities['ORGANIZATION']} and have been in their current role for several years.
+            {entities["PERSON"]} is a {entities["AGE"]}-year-old {entities["OCCUPATION"]} living in {entities["LOCATION"]["city"]}, {entities["LOCATION"]["state"]}.
+            They work at {entities["ORGANIZATION"]} and have been in their current role for several years.
 
             Goals:
             - Improve productivity and workflow efficiency
             - Better integration with existing tools
 
             Contact:
-            Email: {entities['EMAIL_ADDRESS']}
-            Phone: {entities['PHONE_NUMBER']}
-            Location: {entities['LOCATION']['full_address']}
-            Participant ID: {entities['PARTICIPANT_ID']}
-            Project Code: {entities['PROJECT_ID']}
+            Email: {entities["EMAIL_ADDRESS"]}
+            Phone: {entities["PHONE_NUMBER"]}
+            Location: {entities["LOCATION"]["full_address"]}
+            Participant ID: {entities["PARTICIPANT_ID"]}
+            Project Code: {entities["PROJECT_ID"]}
             """
         ).strip()
 
@@ -455,8 +479,8 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
     def generate_usability_test_notes_txt(
         self,
         doc_id: str,
-        locale: Optional[str] = None,
-    ) -> Tuple[str, List[Dict[str, Any]], str, Dict[str, Any]]:
+        locale: str | None = None,
+    ) -> tuple[str, list[dict[str, Any]], str, dict[str, Any]]:
         """Generate synthetic usability test notes in TXT format."""
         locale, entities = self._generate_pii_entities(locale)
         fake = self.fakers[locale]
@@ -466,14 +490,14 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
         notes = textwrap.dedent(
             f"""
             Usability Test Notes - Session {doc_id}
-            Date: {entities['DATE_TIME'][:10]}
-            Participant ID: {entities['PARTICIPANT_ID']}
-            Participant: {entities['PERSON']}
-            Project Code: {entities['PROJECT_ID']}
-            Email: {entities['EMAIL_ADDRESS']}
+            Date: {entities["DATE_TIME"][:10]}
+            Participant ID: {entities["PARTICIPANT_ID"]}
+            Participant: {entities["PERSON"]}
+            Project Code: {entities["PROJECT_ID"]}
+            Email: {entities["EMAIL_ADDRESS"]}
 
             Session Overview:
-            Participant {entities['PERSON']} (age {entities['AGE']}, {entities['OCCUPATION']}) from {entities['LOCATION']['city']}, {entities['LOCATION']['state']}
+            Participant {entities["PERSON"]} (age {entities["AGE"]}, {entities["OCCUPATION"]}) from {entities["LOCATION"]["city"]}, {entities["LOCATION"]["state"]}
             tested the prototype interface.
 
             Key Observations:
@@ -489,7 +513,7 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
             - Recording URL: https://test.example.com/recordings/{doc_id}
 
             Follow-up:
-            Contact {entities['PERSON']} at {entities['EMAIL_ADDRESS']} or {entities['PHONE_NUMBER']} for debrief.
+            Contact {entities["PERSON"]} at {entities["EMAIL_ADDRESS"]} or {entities["PHONE_NUMBER"]} for debrief.
             """
         ).strip()
 
@@ -499,8 +523,8 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
     def generate_research_brief_markdown(
         self,
         doc_id: str,
-        locale: Optional[str] = None,
-    ) -> Tuple[str, List[Dict[str, Any]], str, Dict[str, Any]]:
+        locale: str | None = None,
+    ) -> tuple[str, list[dict[str, Any]], str, dict[str, Any]]:
         """Generate a synthetic research brief in Markdown format."""
         locale, entities = self._generate_pii_entities(locale)
 
@@ -508,35 +532,35 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
             f"""
             ---
             title: "UX Research Brief {doc_id}"
-            author: "{entities['PERSON']}"
-            author_email: "{entities['EMAIL_ADDRESS']}"
-            interview_date: "{entities['DATE_TIME'][:10]}"
+            author: "{entities["PERSON"]}"
+            author_email: "{entities["EMAIL_ADDRESS"]}"
+            interview_date: "{entities["DATE_TIME"][:10]}"
             locale: "{locale}"
-            participant_id: "{entities['PARTICIPANT_ID']}"
-            project_id: "{entities['PROJECT_ID']}"
+            participant_id: "{entities["PARTICIPANT_ID"]}"
+            project_id: "{entities["PROJECT_ID"]}"
             ---
 
             # Executive Summary
-            Stakeholder {entities['PERSON']} ({entities['OCCUPATION']} at {entities['ORGANIZATION']}) participated in a moderated study conducted in {entities['LOCATION']['city']}, {entities['LOCATION']['state']}. Key findings highlight workflow gaps that affect teams located near {entities['LOCATION']['full_address']}.
+            Stakeholder {entities["PERSON"]} ({entities["OCCUPATION"]} at {entities["ORGANIZATION"]}) participated in a moderated study conducted in {entities["LOCATION"]["city"]}, {entities["LOCATION"]["state"]}. Key findings highlight workflow gaps that affect teams located near {entities["LOCATION"]["full_address"]}.
 
             # Participant Snapshot
-            - Name: {entities['PERSON']}
-            - Participant ID: {entities['PARTICIPANT_ID']}
-            - Project Code: {entities['PROJECT_ID']}
-            - Email: {entities['EMAIL_ADDRESS']}
-            - Phone: {entities['PHONE_NUMBER']}
-            - Age: {entities['AGE']}
-            - Location: {entities['LOCATION']['city']}, {entities['LOCATION']['state']}
+            - Name: {entities["PERSON"]}
+            - Participant ID: {entities["PARTICIPANT_ID"]}
+            - Project Code: {entities["PROJECT_ID"]}
+            - Email: {entities["EMAIL_ADDRESS"]}
+            - Phone: {entities["PHONE_NUMBER"]}
+            - Age: {entities["AGE"]}
+            - Location: {entities["LOCATION"]["city"]}, {entities["LOCATION"]["state"]}
 
             # Key Quotes
-            > "When I log in from {entities['LOCATION']['city']}, the dashboard buries the most critical metrics."
+            > "When I log in from {entities["LOCATION"]["city"]}, the dashboard buries the most critical metrics."
 
-            > "Feel free to reach me at {entities['EMAIL_ADDRESS']} if you need clarification."
+            > "Feel free to reach me at {entities["EMAIL_ADDRESS"]} if you need clarification."
 
             # Recommendations
             1. Streamline navigation for regional dashboards.
             2. Improve sign-in audit logging for IP addresses similar to the ones observed during testing.
-            3. Provide guided tours targeted at organizations like {entities['ORGANIZATION']}.
+            3. Provide guided tours targeted at organizations like {entities["ORGANIZATION"]}.
             """
         ).strip()
 
@@ -556,14 +580,14 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
         persona_docx_count: int = 75,
         test_notes_count: int = 150,
         research_brief_count: int = 100,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate the complete corpus.
 
         Returns corpus metadata including totals and per-document stats.
         """
 
-        corpus_metadata: Dict[str, Any] = {
+        corpus_metadata: dict[str, Any] = {
             "generation_timestamp": datetime.utcnow().isoformat() + "Z",
             "seed": self.seed,
             "files": [],
@@ -589,30 +613,54 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
         print(f"Generating {transcript_txt_count} interview transcripts (TXT)...")
         for _ in range(transcript_txt_count):
             doc_id = f"TXT{doc_counter:04d}"
-            transcript, annotations, locale, entities = self.generate_interview_transcript_txt(doc_id)
+            transcript, annotations, locale, entities = (
+                self.generate_interview_transcript_txt(doc_id)
+            )
             output_path = self.output_dir / "transcripts" / f"transcript_{doc_id}.txt"
             with open(output_path, "w", encoding="utf-8") as handle:
                 handle.write(transcript)
 
-            annotation_metadata = {"doc_type": "transcript_txt", "locale": locale, "entities": entities}
-            self._save_annotations(output_path, annotations, transcript, annotation_metadata)
-            self._register_document(corpus_metadata, output_path, "transcript_txt", locale, len(annotations))
+            annotation_metadata = {
+                "doc_type": "transcript_txt",
+                "locale": locale,
+                "entities": entities,
+            }
+            self._save_annotations(
+                output_path, annotations, transcript, annotation_metadata
+            )
+            self._register_document(
+                corpus_metadata, output_path, "transcript_txt", locale, len(annotations)
+            )
             doc_counter += 1
 
         # Interview transcripts (DOCX)
         print(f"Generating {transcript_docx_count} interview transcripts (DOCX)...")
         for _ in range(transcript_docx_count):
             doc_id = f"DOCX{doc_counter:04d}"
-            output_path, annotations, transcript, locale, entities = self.generate_interview_transcript_docx(doc_id)
-            annotation_metadata = {"doc_type": "transcript_docx", "locale": locale, "entities": entities}
-            self._save_annotations(output_path, annotations, transcript, annotation_metadata)
-            self._register_document(corpus_metadata, output_path, "transcript_docx", locale, len(annotations))
+            output_path, annotations, transcript, locale, entities = (
+                self.generate_interview_transcript_docx(doc_id)
+            )
+            annotation_metadata = {
+                "doc_type": "transcript_docx",
+                "locale": locale,
+                "entities": entities,
+            }
+            self._save_annotations(
+                output_path, annotations, transcript, annotation_metadata
+            )
+            self._register_document(
+                corpus_metadata,
+                output_path,
+                "transcript_docx",
+                locale,
+                len(annotations),
+            )
             doc_counter += 1
 
         # Survey responses (CSV)
         print("Generating survey responses (CSV)...")
-        output_path, annotations, csv_content, locales_used = self.generate_survey_responses_csv(
-            num_responses=survey_responses
+        output_path, annotations, csv_content, locales_used = (
+            self.generate_survey_responses_csv(num_responses=survey_responses)
         )
         annotation_metadata = {
             "doc_type": "survey_csv",
@@ -620,55 +668,101 @@ Participant: Not really. You can reach me at {entities['EMAIL_ADDRESS']} if you 
             "locales": locales_used,
             "records": survey_responses,
         }
-        self._save_annotations(output_path, annotations, csv_content, annotation_metadata)
-        self._register_document(corpus_metadata, output_path, "survey_csv", "mixed", len(annotations))
+        self._save_annotations(
+            output_path, annotations, csv_content, annotation_metadata
+        )
+        self._register_document(
+            corpus_metadata, output_path, "survey_csv", "mixed", len(annotations)
+        )
 
         # User personas (PDF)
         print(f"Generating {persona_pdf_count} user personas (PDF)...")
         for _ in range(persona_pdf_count):
             doc_id = f"PDF{doc_counter:04d}"
-            output_path, annotations, persona_text, locale, entities = self.generate_user_persona_pdf(doc_id)
-            annotation_metadata = {"doc_type": "persona_pdf", "locale": locale, "entities": entities}
-            self._save_annotations(output_path, annotations, persona_text, annotation_metadata)
-            self._register_document(corpus_metadata, output_path, "persona_pdf", locale, len(annotations))
+            output_path, annotations, persona_text, locale, entities = (
+                self.generate_user_persona_pdf(doc_id)
+            )
+            annotation_metadata = {
+                "doc_type": "persona_pdf",
+                "locale": locale,
+                "entities": entities,
+            }
+            self._save_annotations(
+                output_path, annotations, persona_text, annotation_metadata
+            )
+            self._register_document(
+                corpus_metadata, output_path, "persona_pdf", locale, len(annotations)
+            )
             doc_counter += 1
 
         # User personas (DOCX)
         print(f"Generating {persona_docx_count} user personas (DOCX)...")
         for _ in range(persona_docx_count):
             doc_id = f"PDC{doc_counter:04d}"
-            output_path, annotations, persona_content, locale, entities = self.generate_user_persona_docx(doc_id)
-            annotation_metadata = {"doc_type": "persona_docx", "locale": locale, "entities": entities}
-            self._save_annotations(output_path, annotations, persona_content, annotation_metadata)
-            self._register_document(corpus_metadata, output_path, "persona_docx", locale, len(annotations))
+            output_path, annotations, persona_content, locale, entities = (
+                self.generate_user_persona_docx(doc_id)
+            )
+            annotation_metadata = {
+                "doc_type": "persona_docx",
+                "locale": locale,
+                "entities": entities,
+            }
+            self._save_annotations(
+                output_path, annotations, persona_content, annotation_metadata
+            )
+            self._register_document(
+                corpus_metadata, output_path, "persona_docx", locale, len(annotations)
+            )
             doc_counter += 1
 
         # Usability test notes (TXT)
         print(f"Generating {test_notes_count} usability test notes (TXT)...")
         for _ in range(test_notes_count):
             doc_id = f"TST{doc_counter:04d}"
-            notes, annotations, locale, entities = self.generate_usability_test_notes_txt(doc_id)
+            notes, annotations, locale, entities = (
+                self.generate_usability_test_notes_txt(doc_id)
+            )
             output_path = self.output_dir / "test_notes" / f"test_notes_{doc_id}.txt"
             with open(output_path, "w", encoding="utf-8") as handle:
                 handle.write(notes)
 
-            annotation_metadata = {"doc_type": "test_notes_txt", "locale": locale, "entities": entities}
+            annotation_metadata = {
+                "doc_type": "test_notes_txt",
+                "locale": locale,
+                "entities": entities,
+            }
             self._save_annotations(output_path, annotations, notes, annotation_metadata)
-            self._register_document(corpus_metadata, output_path, "test_notes_txt", locale, len(annotations))
+            self._register_document(
+                corpus_metadata, output_path, "test_notes_txt", locale, len(annotations)
+            )
             doc_counter += 1
 
         # Research briefs (Markdown)
         print(f"Generating {research_brief_count} research briefs (Markdown)...")
         for _ in range(research_brief_count):
             doc_id = f"MD{doc_counter:04d}"
-            markdown, annotations, locale, entities = self.generate_research_brief_markdown(doc_id)
+            markdown, annotations, locale, entities = (
+                self.generate_research_brief_markdown(doc_id)
+            )
             output_path = self.output_dir / "briefs" / f"brief_{doc_id}.md"
             with open(output_path, "w", encoding="utf-8") as handle:
                 handle.write(markdown)
 
-            annotation_metadata = {"doc_type": "research_brief_md", "locale": locale, "entities": entities}
-            self._save_annotations(output_path, annotations, markdown, annotation_metadata)
-            self._register_document(corpus_metadata, output_path, "research_brief_md", locale, len(annotations))
+            annotation_metadata = {
+                "doc_type": "research_brief_md",
+                "locale": locale,
+                "entities": entities,
+            }
+            self._save_annotations(
+                output_path, annotations, markdown, annotation_metadata
+            )
+            self._register_document(
+                corpus_metadata,
+                output_path,
+                "research_brief_md",
+                locale,
+                len(annotations),
+            )
             doc_counter += 1
 
         corpus_metadata["total_documents"] = len(corpus_metadata["files"])

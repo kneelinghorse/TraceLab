@@ -23,7 +23,9 @@ def _utc_now() -> str:
 def _load_master_context(db_path: Path) -> Dict[str, Any]:
     conn = sqlite3.connect(db_path)
     try:
-        row = conn.execute("SELECT content FROM contexts WHERE id = 'master_context'").fetchone()
+        row = conn.execute(
+            "SELECT content FROM contexts WHERE id = 'master_context'"
+        ).fetchone()
     finally:
         conn.close()
     if not row or not row[0]:
@@ -35,7 +37,9 @@ def _decision_entries(decisions: Iterable[Any]) -> Iterable[Dict[str, Any]]:
     for entry in decisions or []:
         if isinstance(entry, dict):
             yield {
-                "decision": entry.get("decision") or entry.get("decision_text") or str(entry),
+                "decision": entry.get("decision")
+                or entry.get("decision_text")
+                or str(entry),
                 "date": entry.get("date"),
                 "sprint_id": entry.get("sprint_id"),
                 "source": entry.get("source"),
@@ -93,7 +97,9 @@ def populate(db_path: Path, project_domain: str) -> int:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Index strategic decisions from master context.")
+    parser = argparse.ArgumentParser(
+        description="Index strategic decisions from master context."
+    )
     parser.add_argument(
         "--db-path",
         type=Path,

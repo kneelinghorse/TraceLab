@@ -39,11 +39,18 @@ class HealthStatus:
 
 
 def _utc_now() -> str:
-    return datetime.now(tz=timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return (
+        datetime.now(tz=timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
 
 
 def _canonical_json(payload: Dict[str, Any]) -> str:
-    return json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return json.dumps(
+        payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    )
 
 
 class SQLiteClient:
@@ -55,7 +62,7 @@ class SQLiteClient:
         *,
         schema_path: Path | str | None = None,
         timeout: float = 5.0,
-        create_missing: bool = True
+        create_missing: bool = True,
     ) -> None:
         self.db_path = Path(db_path)
         self.schema_path = Path(schema_path) if schema_path else None
@@ -68,7 +75,9 @@ class SQLiteClient:
         if self._connection is None:
             if not self.db_path.exists():
                 if not self.create_missing:
-                    raise DatabaseUnavailable(f"Database does not exist: {self.db_path}")
+                    raise DatabaseUnavailable(
+                        f"Database does not exist: {self.db_path}"
+                    )
                 self.db_path.parent.mkdir(parents=True, exist_ok=True)
             try:
                 self._connection = sqlite3.connect(
@@ -78,13 +87,17 @@ class SQLiteClient:
                     isolation_level=None,
                 )
             except sqlite3.Error as error:
-                raise DatabaseUnavailable(f"Unable to open database {self.db_path}") from error
+                raise DatabaseUnavailable(
+                    f"Unable to open database {self.db_path}"
+                ) from error
 
             self._connection.row_factory = _dict_factory
             try:
                 self._connection.execute("PRAGMA foreign_keys = ON;")
             except sqlite3.Error as error:
-                raise SQLiteClientError(f"Failed to enable foreign keys: {error}") from error
+                raise SQLiteClientError(
+                    f"Failed to enable foreign keys: {error}"
+                ) from error
 
             if self.schema_path:
                 self.apply_schema()
@@ -117,7 +130,9 @@ class SQLiteClient:
             conn.rollback()
             raise
 
-    def execute(self, sql: str, parameters: Dict[str, Any] | Tuple[Any, ...] | None = None) -> None:
+    def execute(
+        self, sql: str, parameters: Dict[str, Any] | Tuple[Any, ...] | None = None
+    ) -> None:
         try:
             if parameters is None:
                 self.connection.execute(sql)
@@ -126,16 +141,16 @@ class SQLiteClient:
         except sqlite3.Error as error:
             raise SQLiteClientError(str(error)) from error
 
-    def executemany(self, sql: str, parameters: Iterable[Dict[str, Any] | Tuple[Any, ...]]) -> None:
+    def executemany(
+        self, sql: str, parameters: Iterable[Dict[str, Any] | Tuple[Any, ...]]
+    ) -> None:
         try:
             self.connection.executemany(sql, parameters)
         except sqlite3.Error as error:
             raise SQLiteClientError(str(error)) from error
 
     def fetchone(
-        self,
-        sql: str,
-        parameters: Dict[str, Any] | Tuple[Any, ...] | None = None
+        self, sql: str, parameters: Dict[str, Any] | Tuple[Any, ...] | None = None
     ) -> Optional[Dict[str, Any]]:
         try:
             cursor = self.connection.execute(sql, parameters or ())
@@ -144,9 +159,7 @@ class SQLiteClient:
             raise SQLiteClientError(str(error)) from error
 
     def fetchall(
-        self,
-        sql: str,
-        parameters: Dict[str, Any] | Tuple[Any, ...] | None = None
+        self, sql: str, parameters: Dict[str, Any] | Tuple[Any, ...] | None = None
     ) -> List[Dict[str, Any]]:
         try:
             cursor = self.connection.execute(sql, parameters or ())
@@ -167,15 +180,16 @@ class SQLiteClient:
     def get_context(self, context_id: str) -> Optional[Dict[str, Any]]:
         """Return the JSON payload for a context record."""
         row = self.fetchone(
-            "SELECT content FROM contexts WHERE id = :id",
-            {"id": context_id}
+            "SELECT content FROM contexts WHERE id = :id", {"id": context_id}
         )
         if not row:
             return None
         try:
             return json.loads(row["content"])
         except json.JSONDecodeError as error:
-            raise SQLiteClientError(f"Context {context_id} contains invalid JSON") from error
+            raise SQLiteClientError(
+                f"Context {context_id} contains invalid JSON"
+            ) from error
 
     def add_context_snapshot(
         self,
@@ -184,14 +198,14 @@ class SQLiteClient:
         *,
         session_id: str | None = None,
         source: str | None = None,
-        created_at: str | None = None
+        created_at: str | None = None,
     ) -> int | None:
         """Add a context snapshot. Returns snapshot ID if created, None if duplicate."""
         canonical = _canonical_json(payload)
         digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
         last = self.fetchone(
             "SELECT content_hash FROM context_snapshots WHERE context_id = :id ORDER BY created_at DESC LIMIT 1",
-            {"id": context_id}
+            {"id": context_id},
         )
         if last and last.get("content_hash") == digest:
             return None
@@ -209,14 +223,16 @@ class SQLiteClient:
                 "content_hash": digest,
                 "content": pretty,
                 "created_at": timestamp,
-            }
+            },
         )
         # Return the new snapshot ID
         result = self.fetchone("SELECT last_insert_rowid() as id")
         return result["id"] if result else None
 
     @staticmethod
-    def _parse_decision_entry(entry: Any, project_domain: str = "general") -> Optional[Dict[str, Any]]:
+    def _parse_decision_entry(
+        entry: Any, project_domain: str = "general"
+    ) -> Optional[Dict[str, Any]]:
         """Parse a decision entry that may be a plain string or a rich dict."""
         if isinstance(entry, str):
             cleaned = entry.strip()
@@ -234,7 +250,9 @@ class SQLiteClient:
                 return {
                     "decision_text": text,
                     "project_domain": project_domain,
-                    "evidence": json.dumps(evidence, ensure_ascii=False) if evidence else None,
+                    "evidence": json.dumps(evidence, ensure_ascii=False)
+                    if evidence
+                    else None,
                     "mission_id": entry.get("mission_id"),
                 }
         return None
@@ -243,14 +261,17 @@ class SQLiteClient:
     def _compute_content_hash(text: str, domain: str) -> str:
         """Compute SHA-256 content hash for dedup. Matches cmos-mcp computeContentHash()."""
         import json as _json
-        canonical = _json.dumps({"d": domain, "t": text}, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+        canonical = _json.dumps(
+            {"d": domain, "t": text},
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
     def _sync_strategic_decisions(
-        self,
-        master_context: Dict[str, Any],
-        snapshot_id: int | None,
-        timestamp: str
+        self, master_context: Dict[str, Any], snapshot_id: int | None, timestamp: str
     ) -> None:
         """Sync decisions from MASTER_CONTEXT to strategic_decisions table.
 
@@ -299,7 +320,11 @@ class SQLiteClient:
             domain = d.get("project_domain") or "general"
             content_hash = self._compute_content_hash(d["decision_text"], domain)
             # Skip if hash matches existing DB, current batch, OR text matches (backward compat)
-            if content_hash in existing_hashes or content_hash in batch_hashes or d["decision_text"] in existing_texts:
+            if (
+                content_hash in existing_hashes
+                or content_hash in batch_hashes
+                or d["decision_text"] in existing_texts
+            ):
                 continue
             d["content_hash"] = content_hash
             batch_hashes.add(content_hash)
@@ -327,7 +352,7 @@ class SQLiteClient:
                         "content_hash": d.get("content_hash"),
                     }
                     for d in new_decisions
-                ]
+                ],
             )
 
     def set_context(
@@ -338,12 +363,11 @@ class SQLiteClient:
         source_path: str | None = None,
         session_id: str | None = None,
         snapshot: bool = True,
-        snapshot_source: str | None = None
+        snapshot_source: str | None = None,
     ) -> None:
         """Persist a JSON payload to the contexts table and stamp updated_at."""
         existing = self.fetchone(
-            "SELECT source_path FROM contexts WHERE id = :id",
-            {"id": context_id}
+            "SELECT source_path FROM contexts WHERE id = :id", {"id": context_id}
         )
         resolved_source = (
             source_path
@@ -352,7 +376,7 @@ class SQLiteClient:
         )
         content = json.dumps(payload, ensure_ascii=False, indent=2)
         timestamp = _utc_now()
-        
+
         # Use UPDATE if exists, INSERT if new (avoids CASCADE DELETE)
         if existing:
             self.execute(
@@ -396,17 +420,26 @@ class SQLiteClient:
 
 def _run_cli(args: argparse.Namespace) -> int:
     client = SQLiteClient(
-        args.database,
-        schema_path=args.schema,
-        create_missing=not args.read_only
+        args.database, schema_path=args.schema, create_missing=not args.read_only
     )
     try:
         if args.command == "ping":
             status = client.health_check()
-            print(json.dumps({"ok": status.ok, "message": status.message, "details": status.details}, indent=2))
+            print(
+                json.dumps(
+                    {
+                        "ok": status.ok,
+                        "message": status.message,
+                        "details": status.details,
+                    },
+                    indent=2,
+                )
+            )
             return 0 if status.ok else 1
         if args.command == "query":
-            rows = client.fetchall(args.sql, json.loads(args.parameters) if args.parameters else None)
+            rows = client.fetchall(
+                args.sql, json.loads(args.parameters) if args.parameters else None
+            )
             print(json.dumps(rows, indent=2, ensure_ascii=False))
             return 0
         if args.command == "exec":
@@ -422,13 +455,29 @@ def _run_cli(args: argparse.Namespace) -> int:
 
 
 def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="SQLite client utility for CMOS runtime.")
-    parser.add_argument("command", choices=("ping", "query", "exec"), help="Command to execute.")
-    parser.add_argument("--database", "-d", required=True, help="Path to the SQLite database file.")
-    parser.add_argument("--schema", "-s", help="Optional schema file to apply before executing commands.")
+    parser = argparse.ArgumentParser(
+        description="SQLite client utility for CMOS runtime."
+    )
+    parser.add_argument(
+        "command", choices=("ping", "query", "exec"), help="Command to execute."
+    )
+    parser.add_argument(
+        "--database", "-d", required=True, help="Path to the SQLite database file."
+    )
+    parser.add_argument(
+        "--schema",
+        "-s",
+        help="Optional schema file to apply before executing commands.",
+    )
     parser.add_argument("--sql", help="SQL statement for query/exec commands.")
-    parser.add_argument("--parameters", help="JSON encoded parameters for SQL execution.")
-    parser.add_argument("--read-only", action="store_true", help="Do not create the database if missing.")
+    parser.add_argument(
+        "--parameters", help="JSON encoded parameters for SQL execution."
+    )
+    parser.add_argument(
+        "--read-only",
+        action="store_true",
+        help="Do not create the database if missing.",
+    )
     return parser.parse_args(argv)
 
 

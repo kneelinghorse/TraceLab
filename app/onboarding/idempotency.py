@@ -1,10 +1,11 @@
 """Idempotency helpers for onboarding API endpoints."""
+
 from __future__ import annotations
 
 import hashlib
 import json
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Any
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
@@ -12,7 +13,7 @@ from sqlalchemy.orm import Session
 from app.models.idempotency import IdempotencyRecord
 
 
-def _canonical_body(payload: Optional[Dict[str, Any]]) -> str:
+def _canonical_body(payload: dict[str, Any] | None) -> str:
     """Return deterministic JSON string for hashing."""
     if not payload:
         return "{}"
@@ -25,7 +26,7 @@ def _canonical_body(payload: Optional[Dict[str, Any]]) -> str:
         ) from exc
 
 
-def _hash_payload(payload: Optional[Dict[str, Any]]) -> str:
+def _hash_payload(payload: dict[str, Any] | None) -> str:
     """Compute SHA-256 hash for a request payload."""
     return hashlib.sha256(_canonical_body(payload).encode("utf-8")).hexdigest()
 
@@ -35,19 +36,21 @@ class CachedResponse:
     """Container for cached responses."""
 
     status_code: int
-    data: Dict[str, Any]
+    data: dict[str, Any]
 
 
 class IdempotencyService:
     """Store and retrieve cached responses keyed by the Idempotency-Key header."""
 
-    def __init__(self, db: Session, *, method: str, path: str, key: Optional[str]) -> None:
+    def __init__(self, db: Session, *, method: str, path: str, key: str | None) -> None:
         self.db = db
         self.method = method.upper()
         self.path = path
         self.key = key
 
-    def check_replay(self, request_payload: Optional[Dict[str, Any]]) -> Optional[CachedResponse]:
+    def check_replay(
+        self, request_payload: dict[str, Any] | None
+    ) -> CachedResponse | None:
         """Return cached response if the request has been processed."""
         if not self.key:
             return None
@@ -68,15 +71,17 @@ class IdempotencyService:
                 detail="Idempotency key reused with different payload",
             )
 
-        return CachedResponse(status_code=record.status_code, data=record.response_data or {})
+        return CachedResponse(
+            status_code=record.status_code, data=record.response_data or {}
+        )
 
     def save_response(
         self,
         *,
-        request_payload: Optional[Dict[str, Any]],
-        response_payload: Dict[str, Any],
+        request_payload: dict[str, Any] | None,
+        response_payload: dict[str, Any],
         status_code: int,
-        error_message: Optional[str] = None,
+        error_message: str | None = None,
     ) -> None:
         """Persist response payload for future replays."""
         if not self.key:

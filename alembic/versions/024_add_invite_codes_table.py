@@ -44,7 +44,9 @@ def upgrade() -> None:
         sa.Column("code", sa.String(8), unique=True, nullable=False),
         sa.Column("created_by", sa.UUID(), sa.ForeignKey("users.id"), nullable=False),
         sa.Column("used_by", sa.UUID(), sa.ForeignKey("users.id"), nullable=True),
-        sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
+        sa.Column(
+            "created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()
+        ),
         sa.Column("used_at", sa.DateTime(), nullable=True),
         sa.Column("expires_at", sa.DateTime(), nullable=True),
     )
@@ -68,10 +70,10 @@ def upgrade() -> None:
             },
         )
         # Print the bootstrap code so the admin can share it
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"  BOOTSTRAP INVITE CODE: {bootstrap_code}")
         print(f"  Share this code to allow the first user to register.")
-        print(f"{'='*60}\n")
+        print(f"{'=' * 60}\n")
 
 
 def downgrade() -> None:

@@ -1,8 +1,10 @@
 """Search history logging + replay state management."""
+
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable
 from datetime import datetime, timedelta
-from typing import Any, Callable, Dict, Iterable, List, Optional
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -35,14 +37,14 @@ class SearchHistoryService:
         *,
         query: str,
         search_mode: str,
-        filters: Dict[str, Any],
+        filters: dict[str, Any],
         top_k: int,
         result_count: int,
-        duration_ms: Optional[float],
+        duration_ms: float | None,
         cache_hit: bool,
-        executed_by: Optional[str],
+        executed_by: str | None,
         top_chunks: Iterable[str] | None = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> SearchHistory:
         """Store a search entry and enforce retention controls."""
         session = self.session_factory()
@@ -53,7 +55,9 @@ class SearchHistoryService:
                 filters=dict(filters or {}),
                 top_k=int(top_k) if top_k else 5,
                 result_count=max(0, int(result_count or 0)),
-                duration_ms=int(round(duration_ms)) if isinstance(duration_ms, (float, int)) else None,
+                duration_ms=int(round(duration_ms))
+                if isinstance(duration_ms, (float, int))
+                else None,
                 cache_hit=bool(cache_hit),
                 user_label=executed_by,
                 metadata_payload=dict(metadata or {}),
@@ -71,7 +75,7 @@ class SearchHistoryService:
         finally:
             session.close()
 
-    def list_history(self, limit: int = 20) -> List[SearchHistory]:
+    def list_history(self, limit: int = 20) -> list[SearchHistory]:
         """Return the most recent search entries."""
         session = self.session_factory()
         try:
@@ -85,15 +89,19 @@ class SearchHistoryService:
         finally:
             session.close()
 
-    def get_entry(self, entry_id: UUID | str) -> Optional[SearchHistory]:
+    def get_entry(self, entry_id: UUID | str) -> SearchHistory | None:
         """Return a specific search entry by identifier."""
         session = self.session_factory()
         try:
-            return session.query(SearchHistory).filter(SearchHistory.id == str(entry_id)).one_or_none()
+            return (
+                session.query(SearchHistory)
+                .filter(SearchHistory.id == str(entry_id))
+                .one_or_none()
+            )
         finally:
             session.close()
 
-    def retention_policy(self) -> Dict[str, int]:
+    def retention_policy(self) -> dict[str, int]:
         """Expose configured retention limits."""
         return {
             "max_entries": self.max_entries,
@@ -119,7 +127,9 @@ class SearchHistoryService:
     def _enforce_retention(self, session: Session) -> None:
         """Delete search records that exceed age/count limits."""
         cutoff = datetime.utcnow() - timedelta(days=self.max_age_days)
-        session.query(SearchHistory).filter(SearchHistory.created_at < cutoff).delete(synchronize_session=False)
+        session.query(SearchHistory).filter(SearchHistory.created_at < cutoff).delete(
+            synchronize_session=False
+        )
 
         extra_ids = (
             session.query(SearchHistory.id)
@@ -129,12 +139,12 @@ class SearchHistoryService:
         )
         if not extra_ids:
             return
-        session.query(SearchHistory).filter(SearchHistory.id.in_(row.id for row in extra_ids)).delete(
-            synchronize_session=False
-        )
+        session.query(SearchHistory).filter(
+            SearchHistory.id.in_(row.id for row in extra_ids)
+        ).delete(synchronize_session=False)
 
 
-_history_service: Optional[SearchHistoryService] = None
+_history_service: SearchHistoryService | None = None
 
 
 def get_search_history_service() -> SearchHistoryService:

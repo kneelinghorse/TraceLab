@@ -1,9 +1,10 @@
 """Schemas for retrieval queries and responses."""
-from datetime import date
-from typing import List, Literal, Optional
-from uuid import UUID
-from pydantic import BaseModel, Field
 
+from datetime import date
+from typing import Literal
+from uuid import UUID
+
+from pydantic import BaseModel, Field
 
 # Valid element types for PEDR syntactic layer
 ElementTypeValue = Literal["mission", "document", "insight", "chunk"]
@@ -12,48 +13,49 @@ GovernanceMode = Literal["strict", "soft", "warn"]
 
 class RetrievalQuery(BaseModel):
     """Client payload for semantic search."""
+
     query: str = Field(..., min_length=1, description="Natural language search query.")
     top_k: int = Field(5, ge=1, le=50, description="Number of chunks to return.")
-    project_id: Optional[UUID] = Field(None, description="Filter by project UUID.")
-    document_id: Optional[UUID] = Field(None, description="Filter by document UUID.")
-    source_type: Optional[str] = Field(None, description="Filter by document source type.")
-    document_types: Optional[List[str]] = Field(
+    project_id: UUID | None = Field(None, description="Filter by project UUID.")
+    document_id: UUID | None = Field(None, description="Filter by document UUID.")
+    source_type: str | None = Field(None, description="Filter by document source type.")
+    document_types: list[str] | None = Field(
         default=None,
         description="Optional list of document types to include (e.g., transcript, survey).",
     )
-    source_types: Optional[List[str]] = Field(
+    source_types: list[str] | None = Field(
         default=None,
         description="Optional list of source types to include.",
     )
-    date_from: Optional[date] = Field(
+    date_from: date | None = Field(
         default=None,
         description="Restrict documents collected on/after this date.",
     )
-    date_to: Optional[date] = Field(
+    date_to: date | None = Field(
         default=None,
         description="Restrict documents collected on/before this date.",
     )
-    tags: Optional[List[str]] = Field(
+    tags: list[str] | None = Field(
         default=None,
         description="Optional list of tag names to match (OR semantics).",
     )
-    hnsw_ef: Optional[int] = Field(
+    hnsw_ef: int | None = Field(
         default=None,
         ge=1,
         le=512,
-        description="Optional HNSW ef override; defaults to tuned mission latency tiers."
+        description="Optional HNSW ef override; defaults to tuned mission latency tiers.",
     )
-    min_quality_gates: Optional[int] = Field(
+    min_quality_gates: int | None = Field(
         default=None,
         ge=0,
         le=5,
         description="Minimum number of passing quality gates required for a mission.",
     )
-    status: Optional[List[str]] = Field(
+    status: list[str] | None = Field(
         default=None,
         description="Allowed mission statuses (draft, in_progress, review, complete).",
     )
-    allow_pii: Optional[bool] = Field(
+    allow_pii: bool | None = Field(
         default=True,
         description="When False, apply governance handling to PII-flagged missions.",
     )
@@ -62,11 +64,11 @@ class RetrievalQuery(BaseModel):
         description="Governance behavior: strict (exclude), soft (penalize), warn (log only).",
     )
     # PEDR syntactic layer parameters
-    element_type: Optional[ElementTypeValue] = Field(
+    element_type: ElementTypeValue | None = Field(
         default=None,
         description="Filter by entity type (mission, document, insight, chunk). Auto-detected from query if not specified.",
     )
-    element_types: Optional[List[ElementTypeValue]] = Field(
+    element_types: list[ElementTypeValue] | None = Field(
         default=None,
         description="Filter by multiple entity types (OR semantics).",
     )
@@ -82,31 +84,33 @@ class RetrievalQuery(BaseModel):
 
 class RetrievedChunk(BaseModel):
     """Chunk returned from semantic search."""
+
     chunk_id: str
     content: str
-    document_id: Optional[str]
-    project_id: Optional[str]
-    chunk_index: Optional[int]
-    source_type: Optional[str] = None
-    document_type: Optional[str] = None
-    collection_date: Optional[date] = None
-    tags: Optional[List[str]] = None
+    document_id: str | None
+    project_id: str | None
+    chunk_index: int | None
+    source_type: str | None = None
+    document_type: str | None = None
+    collection_date: date | None = None
+    tags: list[str] | None = None
     score: float
-    quality_score: Optional[float] = None
-    quality_base_score: Optional[float] = None
-    quality_boost: Optional[float] = None
-    quality_status: Optional[str] = None
-    quality_gates_passed: Optional[int] = None
-    quality_gates_total: Optional[int] = None
-    quality_validated: Optional[bool] = None
-    quality_mission_id: Optional[str] = None
-    quality_pii_flagged: Optional[bool] = None
+    quality_score: float | None = None
+    quality_base_score: float | None = None
+    quality_boost: float | None = None
+    quality_status: str | None = None
+    quality_gates_passed: int | None = None
+    quality_gates_total: int | None = None
+    quality_validated: bool | None = None
+    quality_mission_id: str | None = None
+    quality_pii_flagged: bool | None = None
     # PEDR syntactic layer fields
-    element_type: Optional[str] = None
-    element_type_match: Optional[bool] = None
-    type_boost: Optional[float] = None
+    element_type: str | None = None
+    element_type_match: bool | None = None
+    type_boost: float | None = None
 
 
 class RetrievalResponse(BaseModel):
     """Response payload containing ranked chunks."""
-    results: List[RetrievedChunk]
+
+    results: list[RetrievedChunk]

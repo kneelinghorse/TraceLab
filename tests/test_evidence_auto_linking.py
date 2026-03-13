@@ -1,18 +1,16 @@
 """Unit tests for the evidence auto-linking service."""
+
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from unittest.mock import MagicMock
-from uuid import uuid4
 
 import pytest
 from sqlalchemy import text
 
-from app.core.database import engine, SessionLocal
-from app.models.document import Document
+from app.core.database import engine
 from app.models.chunk import DocumentChunk
-from app.models.project import Project
+from app.models.document import Document
 from app.models.mission_protocol import MissionProtocolComplete
 from app.services.evidence_auto_linking import (
     AutoLinkErrorType,
@@ -168,7 +166,12 @@ def _build_mission(evidence_texts: list[str]) -> MissionProtocolComplete:
 
 
 def _seed_chunks(db_session, project_id, texts: list[str]) -> list[DocumentChunk]:
-    document = Document(project_id=project_id, name="DeepSearch drop", file_type="report", content=" ".join(texts))
+    document = Document(
+        project_id=project_id,
+        name="DeepSearch drop",
+        file_type="report",
+        content=" ".join(texts),
+    )
     db_session.add(document)
     db_session.flush()
     chunks: list[DocumentChunk] = []
@@ -217,10 +220,12 @@ def test_auto_linking_assigns_chunk_and_writes_telemetry(db_session, project, tm
     assert telemetry_path.exists()
     events = telemetry_path.read_text(encoding="utf-8").strip().splitlines()
     assert len(events) == 1
-    assert "\"mission_id\": \"DSR.10.2\"" in events[0]
+    assert '"mission_id": "DSR.10.2"' in events[0]
 
 
-def test_auto_linking_respects_threshold_and_counts_skips(db_session, project, tmp_path):
+def test_auto_linking_respects_threshold_and_counts_skips(
+    db_session, project, tmp_path
+):
     """Evidence below the similarity threshold should remain unlinked while existing links are skipped."""
 
     _seed_chunks(db_session, project.id, ["Magic links dominate consumer onboarding."])
@@ -243,7 +248,9 @@ def test_auto_linking_respects_threshold_and_counts_skips(db_session, project, t
     )
     service._resolve_services = lambda: (None, None)
 
-    result = service.link_evidence(db_session, mission, project_id=project.id, similarity_threshold=0.95)
+    result = service.link_evidence(
+        db_session, mission, project_id=project.id, similarity_threshold=0.95
+    )
 
     assert result.linked == 0
     assert result.skipped == 1  # already linked evidence
@@ -265,10 +272,20 @@ def test_embedding_path_links_evidence(db_session, project, tmp_path):
 
     mock_qdrant_svc = MagicMock()
     mock_qdrant_svc.search_chunks.return_value = [
-        {"chunk_id": "qdrant-chunk-001", "content": "Magic links dominate.",
-         "score": 0.92, "document_id": "doc-1", "project_id": str(project.id)},
-        {"chunk_id": "qdrant-chunk-002", "content": "WebAuthn for high-assurance.",
-         "score": 0.71, "document_id": "doc-1", "project_id": str(project.id)},
+        {
+            "chunk_id": "qdrant-chunk-001",
+            "content": "Magic links dominate.",
+            "score": 0.92,
+            "document_id": "doc-1",
+            "project_id": str(project.id),
+        },
+        {
+            "chunk_id": "qdrant-chunk-002",
+            "content": "WebAuthn for high-assurance.",
+            "score": 0.71,
+            "document_id": "doc-1",
+            "project_id": str(project.id),
+        },
     ]
 
     telemetry_path = tmp_path / "embed-link.jsonl"
@@ -304,8 +321,13 @@ def test_embedding_path_below_threshold(db_session, project, tmp_path):
 
     mock_qdrant_svc = MagicMock()
     mock_qdrant_svc.search_chunks.return_value = [
-        {"chunk_id": "chunk-low", "content": "Unrelated content.",
-         "score": 0.50, "document_id": "doc-1", "project_id": str(project.id)},
+        {
+            "chunk_id": "chunk-low",
+            "content": "Unrelated content.",
+            "score": 0.50,
+            "document_id": "doc-1",
+            "project_id": str(project.id),
+        },
     ]
 
     telemetry_path = tmp_path / "embed-low.jsonl"

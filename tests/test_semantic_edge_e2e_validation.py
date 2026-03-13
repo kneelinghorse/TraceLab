@@ -6,6 +6,7 @@ Extends Sprint 37 E2E validation to compare:
 
 Uses the same 12 diverse queries to measure graph improvement.
 """
+
 from __future__ import annotations
 
 import json
@@ -41,18 +42,42 @@ PROJECT_C_ID = str(uuid4())
 DOC_IDS = {f"doc_{i}": str(uuid4()) for i in range(6)}
 
 DOCUMENTS_META = [
-    {"key": "doc_0", "project": PROJECT_A_ID, "name": "UX Research Findings Q1",
-     "content": "User testing revealed friction in onboarding flow. 40% drop-off at step 3."},
-    {"key": "doc_1", "project": PROJECT_A_ID, "name": "Onboarding Redesign Proposal",
-     "content": "Proposed redesign reduces onboarding steps from 5 to 3. A/B test plan included."},
-    {"key": "doc_2", "project": PROJECT_A_ID, "name": "Sprint Retrospective Notes",
-     "content": "Team discussed onboarding improvements. Decision: prioritize mobile-first approach."},
-    {"key": "doc_3", "project": PROJECT_B_ID, "name": "API Performance Report",
-     "content": "P95 latency reduced from 450ms to 120ms after query optimization. Database indexes added."},
-    {"key": "doc_4", "project": PROJECT_B_ID, "name": "Infrastructure Cost Analysis",
-     "content": "Cloud spending up 30% due to unoptimized queries. Recommendation: implement caching layer."},
-    {"key": "doc_5", "project": PROJECT_C_ID, "name": "Competitive Analysis 2026",
-     "content": "Competitor X launched graph-based search. Market share implications for our product line."},
+    {
+        "key": "doc_0",
+        "project": PROJECT_A_ID,
+        "name": "UX Research Findings Q1",
+        "content": "User testing revealed friction in onboarding flow. 40% drop-off at step 3.",
+    },
+    {
+        "key": "doc_1",
+        "project": PROJECT_A_ID,
+        "name": "Onboarding Redesign Proposal",
+        "content": "Proposed redesign reduces onboarding steps from 5 to 3. A/B test plan included.",
+    },
+    {
+        "key": "doc_2",
+        "project": PROJECT_A_ID,
+        "name": "Sprint Retrospective Notes",
+        "content": "Team discussed onboarding improvements. Decision: prioritize mobile-first approach.",
+    },
+    {
+        "key": "doc_3",
+        "project": PROJECT_B_ID,
+        "name": "API Performance Report",
+        "content": "P95 latency reduced from 450ms to 120ms after query optimization. Database indexes added.",
+    },
+    {
+        "key": "doc_4",
+        "project": PROJECT_B_ID,
+        "name": "Infrastructure Cost Analysis",
+        "content": "Cloud spending up 30% due to unoptimized queries. Recommendation: implement caching layer.",
+    },
+    {
+        "key": "doc_5",
+        "project": PROJECT_C_ID,
+        "name": "Competitive Analysis 2026",
+        "content": "Competitor X launched graph-based search. Market share implications for our product line.",
+    },
 ]
 
 CHUNKS = []
@@ -60,13 +85,15 @@ for doc_meta in DOCUMENTS_META:
     doc_id = DOC_IDS[doc_meta["key"]]
     base_content = doc_meta["content"]
     for idx in range(3):
-        CHUNKS.append({
-            "doc_key": doc_meta["key"],
-            "doc_id": doc_id,
-            "project_id": doc_meta["project"],
-            "chunk_index": idx,
-            "content": f"[chunk {idx}] {base_content} (section {idx + 1})",
-        })
+        CHUNKS.append(
+            {
+                "doc_key": doc_meta["key"],
+                "doc_id": doc_id,
+                "project_id": doc_meta["project"],
+                "chunk_index": idx,
+                "content": f"[chunk {idx}] {base_content} (section {idx + 1})",
+            }
+        )
 
 VALIDATION_QUERIES = [
     "user research onboarding friction",
@@ -94,7 +121,9 @@ class _SearchProviderStub:
     def set_chunk_records(self, records: Dict[str, Dict[str, Any]]) -> None:
         self._chunk_records = records
 
-    def search(self, query: str, top_k: int = 20, **kwargs: Any) -> List[Dict[str, Any]]:
+    def search(
+        self, query: str, top_k: int = 20, **kwargs: Any
+    ) -> List[Dict[str, Any]]:
         query_terms = set(query.lower().split())
         scored: List[tuple[float, Dict[str, Any]]] = []
         for chunk in self.chunks:
@@ -103,7 +132,9 @@ class _SearchProviderStub:
             if overlap == 0:
                 continue
             score = overlap / max(len(query_terms), 1)
-            chunk_record = self._chunk_records.get(f"{chunk['doc_id']}::{chunk['chunk_index']}")
+            chunk_record = self._chunk_records.get(
+                f"{chunk['doc_id']}::{chunk['chunk_index']}"
+            )
             result = {
                 "chunk_id": str(chunk_record["id"]) if chunk_record else str(uuid4()),
                 "content": chunk["content"],
@@ -132,17 +163,19 @@ def semantic_edge_env(db_session):
 
     # Create documents
     for doc_meta in DOCUMENTS_META:
-        db_session.add(Document(
-            id=DOC_IDS[doc_meta["key"]],
-            project_id=doc_meta["project"],
-            name=doc_meta["name"],
-            content=doc_meta["content"],
-            file_type="notes",
-            mime_type="text/plain",
-            processed=True,
-            chunked=True,
-            validation_status="validated",
-        ))
+        db_session.add(
+            Document(
+                id=DOC_IDS[doc_meta["key"]],
+                project_id=doc_meta["project"],
+                name=doc_meta["name"],
+                content=doc_meta["content"],
+                file_type="notes",
+                mime_type="text/plain",
+                processed=True,
+                chunked=True,
+                validation_status="validated",
+            )
+        )
     db_session.commit()
 
     # Create chunks
@@ -177,15 +210,17 @@ def semantic_edge_env(db_session):
         ("references", DOC_IDS["doc_3"], DOC_IDS["doc_4"]),
     ]
     for edge_type, from_doc, to_doc in cross_edges:
-        db_session.add(GraphEdge.from_semantic_edge(
-            edge_type=edge_type,
-            from_urn=str(URNGenerator.for_document(from_doc)),
-            to_urn=str(URNGenerator.for_document(to_doc)),
-            direction="out",
-            weight=1.0,
-            reason="cross-document reference",
-            via="test",
-        ))
+        db_session.add(
+            GraphEdge.from_semantic_edge(
+                edge_type=edge_type,
+                from_urn=str(URNGenerator.for_document(from_doc)),
+                to_urn=str(URNGenerator.for_document(to_doc)),
+                direction="out",
+                weight=1.0,
+                reason="cross-document reference",
+                via="test",
+            )
+        )
     db_session.commit()
 
     fk_only_edge_count = db_session.query(GraphEdge).count()
@@ -205,7 +240,9 @@ def semantic_edge_env(db_session):
         chunk_objs[f"{DOC_IDS['doc_2']}::0"],
     ]
     for chunk in onboarding_chunks:
-        db_session.add(CollectionItem(collection_id=coll_onboarding.id, chunk_id=chunk.id))
+        db_session.add(
+            CollectionItem(collection_id=coll_onboarding.id, chunk_id=chunk.id)
+        )
 
     # Collection 2: "Infrastructure Perf" — groups API perf and infra cost chunks
     coll_infra = Collection(name="Infrastructure Performance Bundle")
@@ -223,15 +260,25 @@ def semantic_edge_env(db_session):
     db_session.commit()
 
     # Re-materialize to pick up co_occurs edges
-    semantic_result = edge_service.materialize_implicit_edges(session=db_session, mode="full")
+    semantic_result = edge_service.materialize_implicit_edges(
+        session=db_session, mode="full"
+    )
 
     # Add synthetic topic_similar edges (simulating Qdrant results)
     # doc_0 chunk 0 ↔ doc_1 chunk 0 (both about onboarding, topic_similar)
     topic_pairs = [
         (f"{DOC_IDS['doc_0']}::0", f"{DOC_IDS['doc_1']}::0", 0.91),  # onboarding topics
         (f"{DOC_IDS['doc_0']}::1", f"{DOC_IDS['doc_2']}::0", 0.88),  # UX ↔ retro
-        (f"{DOC_IDS['doc_3']}::0", f"{DOC_IDS['doc_4']}::0", 0.93),  # API perf ↔ infra cost
-        (f"{DOC_IDS['doc_3']}::1", f"{DOC_IDS['doc_4']}::1", 0.87),  # optimization topics
+        (
+            f"{DOC_IDS['doc_3']}::0",
+            f"{DOC_IDS['doc_4']}::0",
+            0.93,
+        ),  # API perf ↔ infra cost
+        (
+            f"{DOC_IDS['doc_3']}::1",
+            f"{DOC_IDS['doc_4']}::1",
+            0.87,
+        ),  # optimization topics
     ]
     for key_a, key_b, score in topic_pairs:
         rec_a = chunk_records[key_a]
@@ -239,21 +286,29 @@ def semantic_edge_env(db_session):
         urn_a = str(URNGenerator.for_chunk(str(rec_a["doc_id"]), rec_a["chunk_index"]))
         urn_b = str(URNGenerator.for_chunk(str(rec_b["doc_id"]), rec_b["chunk_index"]))
         for from_urn, to_urn in [(urn_a, urn_b), (urn_b, urn_a)]:
-            db_session.add(GraphEdge.from_semantic_edge(
-                edge_type="topic_similar",
-                from_urn=from_urn,
-                to_urn=to_urn,
-                direction="out",
-                weight=round(score, 4),
-                reason=f"cosine>={score:.2f}",
-                via="semantic",
-                evidence={"cosine_similarity": round(score, 4)},
-            ))
+            db_session.add(
+                GraphEdge.from_semantic_edge(
+                    edge_type="topic_similar",
+                    from_urn=from_urn,
+                    to_urn=to_urn,
+                    direction="out",
+                    weight=round(score, 4),
+                    reason=f"cosine>={score:.2f}",
+                    via="semantic",
+                    evidence={"cosine_similarity": round(score, 4)},
+                )
+            )
     db_session.commit()
 
     total_edges = db_session.query(GraphEdge).count()
-    co_occurs_count = db_session.query(GraphEdge).filter(GraphEdge.edge_type == "co_occurs").count()
-    topic_similar_count = db_session.query(GraphEdge).filter(GraphEdge.edge_type == "topic_similar").count()
+    co_occurs_count = (
+        db_session.query(GraphEdge).filter(GraphEdge.edge_type == "co_occurs").count()
+    )
+    topic_similar_count = (
+        db_session.query(GraphEdge)
+        .filter(GraphEdge.edge_type == "topic_similar")
+        .count()
+    )
 
     stub = _SearchProviderStub(CHUNKS)
     stub.set_chunk_records(chunk_records)
@@ -317,7 +372,9 @@ class TestSemanticEdgeE2EValidation:
 
         assert cross_doc > 0, "co_occurs should create cross-document chunk edges"
 
-    def test_graph_search_with_semantic_edges_impacts_more_queries(self, semantic_edge_env):
+    def test_graph_search_with_semantic_edges_impacts_more_queries(
+        self, semantic_edge_env
+    ):
         """With semantic edges, graph should impact more queries than FK-only baseline."""
         env = semantic_edge_env
 
@@ -333,7 +390,8 @@ class TestSemanticEdgeE2EValidation:
             off_ranks = {cid: i for i, cid in enumerate(off_ids)}
             new_from_graph = [cid for cid in on_ids if cid not in off_ranks]
             rank_changes = sum(
-                1 for cid in on_ids
+                1
+                for cid in on_ids
                 if cid in off_ranks and off_ranks[cid] != on_ids.index(cid)
             )
 
@@ -352,7 +410,9 @@ class TestSemanticEdgeE2EValidation:
         latencies = []
         for query in VALIDATION_QUERIES:
             result = _run_search(env, query, enable_graph=True)
-            graph_ms = result.metadata.timings.graph_ms if result.metadata.timings else 0.0
+            graph_ms = (
+                result.metadata.timings.graph_ms if result.metadata.timings else 0.0
+            )
             latencies.append(graph_ms)
 
         avg_latency = statistics.mean(latencies)
@@ -371,14 +431,24 @@ class TestSemanticEdgeE2EValidation:
 
         # Only co_occurs + topic_similar
         result_semantic = _run_search(
-            env, query, enable_graph=True,
+            env,
+            query,
+            enable_graph=True,
             edge_types=("co_occurs", "topic_similar"),
         )
 
         # Only FK edges (contains, belongs_to, etc.)
         result_fk = _run_search(
-            env, query, enable_graph=True,
-            edge_types=("contains", "belongs_to", "references", "part_of", "derived_from"),
+            env,
+            query,
+            enable_graph=True,
+            edge_types=(
+                "contains",
+                "belongs_to",
+                "references",
+                "part_of",
+                "derived_from",
+            ),
         )
 
         # All three should execute without error
@@ -405,21 +475,28 @@ class TestSemanticEdgeE2EValidation:
                 if cid in off_ranks:
                     rank_changes[cid] = on_ids.index(cid) - off_ranks[cid]
 
-            graph_ms = result_on.metadata.timings.graph_ms if result_on.metadata.timings else 0.0
+            graph_ms = (
+                result_on.metadata.timings.graph_ms
+                if result_on.metadata.timings
+                else 0.0
+            )
             candidates = result_on.metadata.graph_candidates_expanded or 0
 
-            comparisons.append({
-                "query": query,
-                "graph_off_results": len(off_ids),
-                "graph_on_results": len(on_ids),
-                "new_results_from_graph": len(new_from_graph),
-                "rank_changes": sum(1 for d in rank_changes.values() if d != 0),
-                "graph_candidates_expanded": candidates,
-                "graph_layer_ms": round(graph_ms, 2),
-            })
+            comparisons.append(
+                {
+                    "query": query,
+                    "graph_off_results": len(off_ids),
+                    "graph_on_results": len(on_ids),
+                    "new_results_from_graph": len(new_from_graph),
+                    "rank_changes": sum(1 for d in rank_changes.values() if d != 0),
+                    "graph_candidates_expanded": candidates,
+                    "graph_layer_ms": round(graph_ms, 2),
+                }
+            )
 
         queries_with_impact = sum(
-            1 for c in comparisons
+            1
+            for c in comparisons
             if c["new_results_from_graph"] > 0 or c["rank_changes"] > 0
         )
         avg_latency = statistics.mean(c["graph_layer_ms"] for c in comparisons)
@@ -435,7 +512,9 @@ class TestSemanticEdgeE2EValidation:
                 "topic_similar_edges": env["topic_similar_count"],
                 "edge_increase_pct": round(
                     (env["total_edges"] - env["fk_only_edge_count"])
-                    / max(env["fk_only_edge_count"], 1) * 100, 1
+                    / max(env["fk_only_edge_count"], 1)
+                    * 100,
+                    1,
                 ),
             },
             "search_impact": {
@@ -456,28 +535,41 @@ class TestSemanticEdgeE2EValidation:
         # Assertions
         assert report["edge_summary"]["co_occurs_edges"] > 0
         assert report["edge_summary"]["topic_similar_edges"] > 0
-        assert report["edge_summary"]["total_edges_with_semantic"] > report["edge_summary"]["fk_only_edges"]
+        assert (
+            report["edge_summary"]["total_edges_with_semantic"]
+            > report["edge_summary"]["fk_only_edges"]
+        )
         assert report["search_impact"]["queries_with_graph_impact"] >= 4
         assert report_path.exists()
 
         # Print summary
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print("T38.1 SEMANTIC EDGE TYPES E2E VALIDATION REPORT")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
         es = report["edge_summary"]
         print(f"FK-only edges:           {es['fk_only_edges']}")
         print(f"+ co_occurs edges:       {es['co_occurs_edges']}")
         print(f"+ topic_similar edges:   {es['topic_similar_edges']}")
-        print(f"Total with semantic:     {es['total_edges_with_semantic']} (+{es['edge_increase_pct']}%)")
-        print(f"{'='*70}")
+        print(
+            f"Total with semantic:     {es['total_edges_with_semantic']} (+{es['edge_increase_pct']}%)"
+        )
+        print(f"{'=' * 70}")
         si = report["search_impact"]
-        print(f"Queries impacted:        {si['queries_with_graph_impact']}/{si['total_queries']}")
+        print(
+            f"Queries impacted:        {si['queries_with_graph_impact']}/{si['total_queries']}"
+        )
         print(f"Sprint 37 baseline:      {si['sprint_37_baseline_impacted']}/12")
         print(f"Avg graph latency:       {si['avg_graph_latency_ms']:.2f}ms")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
         for c in comparisons:
-            indicator = f"+{c['new_results_from_graph']}" if c["new_results_from_graph"] > 0 else " 0"
-            print(f"  [{indicator:>3}] {c['query'][:45]:<45} "
-                  f"off={c['graph_off_results']} on={c['graph_on_results']} "
-                  f"ranks={c['rank_changes']} graph={c['graph_layer_ms']:.1f}ms")
-        print(f"{'='*70}")
+            indicator = (
+                f"+{c['new_results_from_graph']}"
+                if c["new_results_from_graph"] > 0
+                else " 0"
+            )
+            print(
+                f"  [{indicator:>3}] {c['query'][:45]:<45} "
+                f"off={c['graph_off_results']} on={c['graph_on_results']} "
+                f"ranks={c['rank_changes']} graph={c['graph_layer_ms']:.1f}ms"
+            )
+        print(f"{'=' * 70}")

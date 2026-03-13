@@ -1,21 +1,22 @@
 """Tests for the RAG service orchestration and API endpoint."""
+
 import copy
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
 
 from app.api.v1 import search as search_router
-from app.main import app
 from app.core.config import settings
+from app.main import app
 from app.services import rag_service as rag_module
 from app.services.cache_metrics import CacheMetrics
 from app.services.pedr.search_orchestrator import (
+    LayerTimings,
+    PEDRMetadata,
     PEDRSearchResponse,
     PEDRSearchResult,
-    PEDRMetadata,
-    LayerTimings,
 )
 
 
@@ -62,8 +63,8 @@ class _FakeRetrievalService:
 class _FakePEDROrchestrator:
     """Fake PEDR orchestrator that returns PEDRSearchResponse objects."""
 
-    def __init__(self, results: Optional[List[Dict[str, Any]]] = None):
-        self.calls: List[Dict[str, Any]] = []
+    def __init__(self, results: list[dict[str, Any]] | None = None):
+        self.calls: list[dict[str, Any]] = []
         default_results = results or [
             {
                 "chunk_id": "chunk-1",
@@ -223,7 +224,9 @@ class _WorkloadCacheService:
         age_seconds = max(0.0, time.time() - entry["created_at"])
         cached_response = dict(entry["payload"])
         cached_response["cache"] = dict(cached_response["cache"])
-        cached_response["cache"].update({"hit": True, "age_seconds": round(age_seconds, 3)})
+        cached_response["cache"].update(
+            {"hit": True, "age_seconds": round(age_seconds, 3)}
+        )
         self.metrics.record_hit(metadata.get("project_id"))
         self.metrics.observe_lookup(0.0001)
         return cached_response
@@ -235,7 +238,12 @@ class _WorkloadCacheService:
             "citations": result["citations"],
             "sources": result["sources"],
             "compression": result["compression"],
-            "cache": {"hit": True, "score": 0.99, "age_seconds": 0.0, "ttl_seconds": None},
+            "cache": {
+                "hit": True,
+                "score": 0.99,
+                "age_seconds": 0.0,
+                "ttl_seconds": None,
+            },
             "quality": copy.deepcopy(result["quality"]),
             "routing": copy.deepcopy(result["routing"]),
         }
@@ -354,18 +362,20 @@ def test_rag_service_sets_reasoning_effort_for_gpt5_models(monkeypatch):
 def test_rag_service_respects_search_mode(monkeypatch):
     # PEDR doesn't use search_mode directly - it uses RRF fusion across layers
     # This test verifies search_mode is passed through to the response
-    fake_pedr = _FakePEDROrchestrator(results=[
-        {
-            "chunk_id": "chunk-h",
-            "content": "Keyword weighted content about governance hybrids.",
-            "document_id": "doc-h",
-            "project_id": "proj-h",
-            "chunk_index": 0,
-            "source_type": "report",
-            "rrf_score": 0.78,
-            "embedding": [0.11, 0.22, 0.33],
-        }
-    ])
+    fake_pedr = _FakePEDROrchestrator(
+        results=[
+            {
+                "chunk_id": "chunk-h",
+                "content": "Keyword weighted content about governance hybrids.",
+                "document_id": "doc-h",
+                "project_id": "proj-h",
+                "chunk_index": 0,
+                "source_type": "report",
+                "rrf_score": 0.78,
+                "embedding": [0.11, 0.22, 0.33],
+            }
+        ]
+    )
     fake_embedding = _FakeEmbeddingService()
     fake_client = _FakeOpenAIClient(
         "Hybrid search ensures coverage. [Document: doc-h, Chunk: 0]"
@@ -496,8 +506,7 @@ def test_tiered_routing_escalates_on_low_quality(monkeypatch):
     responses = {
         settings.openai_chat_model: "I'm sorry, I cannot help with that request.",
         settings.openai_escalation_model: (
-            "Tiered routing ensures high quality answers while controlling cost. "
-            "[Document: doc-1, Chunk: 0]"
+            "Tiered routing ensures high quality answers while controlling cost. [Document: doc-1, Chunk: 0]"
         ),
     }
     fake_client = _TieredFakeOpenAIClient(responses)
@@ -559,7 +568,9 @@ def test_rag_service_emits_cost_metrics(monkeypatch):
         cost_monitor=monitor,
     )
 
-    result = service.run_query(query="Record telemetry?", top_k=2, project_id="proj-telemetry")
+    result = service.run_query(
+        query="Record telemetry?", top_k=2, project_id="proj-telemetry"
+    )
 
     assert result["routing"]["estimated_cost_usd"] == pytest.approx(0.002)
     assert result["routing"]["attempts"][0]["cost_usd"] == pytest.approx(0.002)
@@ -606,7 +617,12 @@ class _FakeRagService:
                 "threshold": 0.7,
                 "compression_ms": 12.4,
             },
-            "cache": {"hit": False, "score": None, "age_seconds": None, "ttl_seconds": None},
+            "cache": {
+                "hit": False,
+                "score": None,
+                "age_seconds": None,
+                "ttl_seconds": None,
+            },
             "quality": {
                 "composite_score": 0.93,
                 "threshold": settings.tiered_routing_threshold,
@@ -640,9 +656,7 @@ class _FakeRagService:
 
 def test_rag_search_endpoint(monkeypatch, auth_headers):
     fake_service = _FakeRagService()
-    monkeypatch.setattr(
-        search_router, "get_rag_service", lambda: fake_service
-    )
+    monkeypatch.setattr(search_router, "get_rag_service", lambda: fake_service)
 
     client = TestClient(app)
     response = client.post(

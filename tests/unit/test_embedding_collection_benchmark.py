@@ -1,4 +1,5 @@
 """Tests for embedding collection benchmark helpers."""
+
 from __future__ import annotations
 
 import pytest

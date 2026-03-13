@@ -22,7 +22,10 @@ def upgrade() -> None:
         sa.Column(
             "content_tsv",
             postgresql.TSVECTOR(),
-            sa.Computed("to_tsvector('english'::regconfig, coalesce(content, ''))", persisted=True),
+            sa.Computed(
+                "to_tsvector('english'::regconfig, coalesce(content, ''))",
+                persisted=True,
+            ),
             nullable=False,
         ),
     )

@@ -1,8 +1,9 @@
 """Unit tests for the MethodologyRigorChecker."""
+
 from __future__ import annotations
 
 from app.models.document import Document
-from app.models.mission_protocol import MethodologyDetails, MissionProtocolDraft
+from app.models.mission_protocol import MissionProtocolDraft
 from app.services.methodology_rigor import MethodologyRigorChecker
 
 

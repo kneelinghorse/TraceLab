@@ -1,4 +1,5 @@
 """Aggregate pytest, Playwright, and integration runner telemetry artifacts."""
+
 from __future__ import annotations
 
 import argparse
@@ -19,16 +20,56 @@ def repo_root() -> Path:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--pytest-artifact", default="telemetry/events/.artifacts/pytest-latest.json", help="Path to the pytest telemetry JSON artifact")
-    parser.add_argument("--playwright-artifact", default="telemetry/events/.artifacts/playwright-latest.json", help="Path to the Playwright telemetry JSON artifact")
-    parser.add_argument("--integration-artifact", default="telemetry/events/.artifacts/integration-runner.json", help="Path to write/read the integration runner JSON report")
-    parser.add_argument("--output", default="telemetry/events/testing-summary.json", help="Final aggregated telemetry path")
-    parser.add_argument("--mirror-output", default="cmos/telemetry/events/testing-summary.json", help="Secondary mirror path for Mission Protocol documentation")
-    parser.add_argument("--no-mirror", action="store_true", help="Skip writing the mirrored telemetry artifact")
-    parser.add_argument("--manifest", default=None, help="Optional integration test manifest path (defaults to runner builtin)")
-    parser.add_argument("--skip-integration", action="store_true", help="Skip running the integration test runner (expects existing artifact)")
-    parser.add_argument("--integration-runner", default="cmos/context/integration_test_runner.js", help="Path to the integration runner entrypoint")
-    parser.add_argument("--allow-failures", action="store_true", help="Exit successfully even if any suite failed")
+    parser.add_argument(
+        "--pytest-artifact",
+        default="telemetry/events/.artifacts/pytest-latest.json",
+        help="Path to the pytest telemetry JSON artifact",
+    )
+    parser.add_argument(
+        "--playwright-artifact",
+        default="telemetry/events/.artifacts/playwright-latest.json",
+        help="Path to the Playwright telemetry JSON artifact",
+    )
+    parser.add_argument(
+        "--integration-artifact",
+        default="telemetry/events/.artifacts/integration-runner.json",
+        help="Path to write/read the integration runner JSON report",
+    )
+    parser.add_argument(
+        "--output",
+        default="telemetry/events/testing-summary.json",
+        help="Final aggregated telemetry path",
+    )
+    parser.add_argument(
+        "--mirror-output",
+        default="cmos/telemetry/events/testing-summary.json",
+        help="Secondary mirror path for Mission Protocol documentation",
+    )
+    parser.add_argument(
+        "--no-mirror",
+        action="store_true",
+        help="Skip writing the mirrored telemetry artifact",
+    )
+    parser.add_argument(
+        "--manifest",
+        default=None,
+        help="Optional integration test manifest path (defaults to runner builtin)",
+    )
+    parser.add_argument(
+        "--skip-integration",
+        action="store_true",
+        help="Skip running the integration test runner (expects existing artifact)",
+    )
+    parser.add_argument(
+        "--integration-runner",
+        default="cmos/context/integration_test_runner.js",
+        help="Path to the integration runner entrypoint",
+    )
+    parser.add_argument(
+        "--allow-failures",
+        action="store_true",
+        help="Exit successfully even if any suite failed",
+    )
     return parser.parse_args()
 
 
@@ -50,7 +91,9 @@ class TelemetryAggregator:
             playwright=self._resolve(args.playwright_artifact),
             integration=self._resolve(args.integration_artifact),
             output=self._resolve(args.output),
-            mirror=None if args.no_mirror or not args.mirror_output else self._resolve(args.mirror_output),
+            mirror=None
+            if args.no_mirror or not args.mirror_output
+            else self._resolve(args.mirror_output),
         )
 
     def run(self) -> Dict[str, Any]:
@@ -86,16 +129,27 @@ class TelemetryAggregator:
 
     def _load_json(self, path: Path, label: str) -> Dict[str, Any]:
         if not path.exists():
-            raise FileNotFoundError(f"Missing {label} artifact at {path}. Run the corresponding test suite first.")
+            raise FileNotFoundError(
+                f"Missing {label} artifact at {path}. Run the corresponding test suite first."
+            )
         return json.loads(path.read_text())
 
-    def _build_payload(self, pytest_data: Dict[str, Any], playwright_data: Dict[str, Any], integration_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _build_payload(
+        self,
+        pytest_data: Dict[str, Any],
+        playwright_data: Dict[str, Any],
+        integration_data: Dict[str, Any],
+    ) -> Dict[str, Any]:
         sources = {
             "pytest": pytest_data.get("status", "unknown"),
             "playwright": playwright_data.get("status", "unknown"),
             "integration": integration_data.get("status", "unknown"),
         }
-        status = "passed" if all(value == "passed" for value in sources.values()) else "failed"
+        status = (
+            "passed"
+            if all(value == "passed" for value in sources.values())
+            else "failed"
+        )
 
         summary = {
             "pytest": self._summarize_pytest(pytest_data),
@@ -114,7 +168,11 @@ class TelemetryAggregator:
                     "playwright": self._relative(self.paths.playwright),
                     "integration": self._relative(self.paths.integration),
                     "output": self._relative(self.paths.output),
-                    **({"mirror": self._relative(self.paths.mirror)} if self.paths.mirror else {}),
+                    **(
+                        {"mirror": self._relative(self.paths.mirror)}
+                        if self.paths.mirror
+                        else {}
+                    ),
                 },
                 "gitSha": self._git_sha(),
             },
@@ -133,7 +191,9 @@ class TelemetryAggregator:
         return {
             "status": data.get("status"),
             "total": summary.get("total", 0),
-            "failed": summary.get("failed", 0) + summary.get("error", 0) + summary.get("xpassed", 0),
+            "failed": summary.get("failed", 0)
+            + summary.get("error", 0)
+            + summary.get("xpassed", 0),
             "skipped": summary.get("skipped", 0) + summary.get("xfailed", 0),
             "passed": summary.get("passed", 0),
             "artifact": self._relative(self.paths.pytest),
@@ -162,11 +222,20 @@ class TelemetryAggregator:
         }
 
     def _aggregate(self, summary: Dict[str, Any]) -> Dict[str, Any]:
-        all_green = summary["pytest"]["status"] == summary["playwright"]["status"] == summary["integration"]["status"] == "passed"
+        all_green = (
+            summary["pytest"]["status"]
+            == summary["playwright"]["status"]
+            == summary["integration"]["status"]
+            == "passed"
+        )
         return {
             "status": "passed" if all_green else "failed",
-            "tests": summary["pytest"]["total"] + summary["playwright"]["total"] + summary["integration"]["tests"],
-            "testsFailed": summary["pytest"]["failed"] + summary["playwright"]["failed"] + summary["integration"]["testsFailed"],
+            "tests": summary["pytest"]["total"]
+            + summary["playwright"]["total"]
+            + summary["integration"]["tests"],
+            "testsFailed": summary["pytest"]["failed"]
+            + summary["playwright"]["failed"]
+            + summary["integration"]["testsFailed"],
         }
 
     def _write_output(self, payload: Dict[str, Any]) -> None:
@@ -194,7 +263,13 @@ class TelemetryAggregator:
 
     def _git_sha(self) -> str | None:
         try:
-            result = subprocess.run(["git", "rev-parse", "HEAD"], cwd=self.root, capture_output=True, check=True, text=True)
+            result = subprocess.run(
+                ["git", "rev-parse", "HEAD"],
+                cwd=self.root,
+                capture_output=True,
+                check=True,
+                text=True,
+            )
             return result.stdout.strip()
         except Exception:
             return os.getenv("GITHUB_SHA")

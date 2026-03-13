@@ -1,13 +1,15 @@
 """API tests for DeepSearch ingestion endpoint."""
+
 from __future__ import annotations
 
 import json
-from fastapi.testclient import TestClient
+
 import pytest
+from fastapi.testclient import TestClient
 
 from app.main import app
-from app.models.document import Document
 from app.models.chunk import DocumentChunk
+from app.models.document import Document
 from app.models.mission import Mission
 from app.schemas.deepsearch import DeepSearchIngestRequest
 from app.services.evidence_auto_linking import EvidenceAutoLinkingService
@@ -64,7 +66,12 @@ def _mission_request() -> dict:
 
 
 def _seed_documents(db_session, project_id):
-    document = Document(project_id=project_id, name="DeepSearch Output", file_type="report", content="Magic links dominate.")
+    document = Document(
+        project_id=project_id,
+        name="DeepSearch Output",
+        file_type="report",
+        content="Magic links dominate.",
+    )
     db_session.add(document)
     db_session.flush()
     chunk = DocumentChunk(
@@ -102,7 +109,9 @@ def test_ingest_endpoint_persists_mission_and_auto_links(
         "project_id": str(project.id),
         "mission": _mission_request(),
     }
-    response = client.post("/api/v1/deepsearch/ingest", json=payload, headers=auth_headers)
+    response = client.post(
+        "/api/v1/deepsearch/ingest", json=payload, headers=auth_headers
+    )
 
     assert response.status_code == 201, response.text
     body = response.json()

@@ -26,6 +26,7 @@ Example workflow:
     4. If action == "review": Check matches before proceeding
     5. If action == "proceed": Launch new research mission
 """
+
 from __future__ import annotations
 
 import argparse
@@ -45,6 +46,7 @@ except ImportError:
 @dataclass
 class PreflightConfig:
     """Configuration for pre-flight queries."""
+
     base_url: str
     token: str
     min_quality_gates: int = 4
@@ -109,13 +111,17 @@ def format_match(match: Dict[str, Any], index: int) -> str:
 
     objective = match.get("objective", "")
     if objective:
-        lines.append(f"      Objective: {objective[:80]}{'...' if len(objective) > 80 else ''}")
+        lines.append(
+            f"      Objective: {objective[:80]}{'...' if len(objective) > 80 else ''}"
+        )
 
     insights = match.get("key_insights", [])
     if insights:
         lines.append("      Key Insights:")
         for insight in insights[:3]:
-            text = insight.get("text", "") if isinstance(insight, dict) else str(insight)
+            text = (
+                insight.get("text", "") if isinstance(insight, dict) else str(insight)
+            )
             lines.append(f"        - {text[:60]}{'...' if len(text) > 60 else ''}")
 
     return "\n".join(lines)
@@ -152,11 +158,13 @@ def format_recommendation(result: Dict[str, Any]) -> str:
         for i, match in enumerate(matches):
             lines.append(format_match(match, i))
 
-    lines.extend([
-        "",
-        f"{'=' * 60}",
-        "",
-    ])
+    lines.extend(
+        [
+            "",
+            f"{'=' * 60}",
+            "",
+        ]
+    )
 
     return "\n".join(lines)
 

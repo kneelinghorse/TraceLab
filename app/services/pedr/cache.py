@@ -11,6 +11,7 @@ similar queries. The cache provides:
 Reference: B19.2 - Semantic Search Result Caching
            R19.0 - Qdrant Optimization Research (three-tier cache architecture)
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -19,7 +20,7 @@ import threading
 import time
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from sqlalchemy import event
 
@@ -32,10 +33,10 @@ logger = logging.getLogger(__name__)
 class CacheEntry:
     """A single cache entry with results and metadata."""
 
-    results: List[Dict[str, Any]]
+    results: list[dict[str, Any]]
     timestamp: float
     query_hash: str
-    filters: Dict[str, Any]
+    filters: dict[str, Any]
     hit_count: int = 0
 
 
@@ -48,7 +49,7 @@ class CacheStats:
     cache_size: int = 0
     evictions: int = 0
     invalidations: int = 0
-    last_invalidation: Optional[float] = None
+    last_invalidation: float | None = None
 
     @property
     def hit_rate(self) -> float:
@@ -56,7 +57,7 @@ class CacheStats:
         total = self.cache_hits + self.cache_misses
         return self.cache_hits / total if total > 0 else 0.0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for API response."""
         return {
             "cache_hits": self.cache_hits,
@@ -109,7 +110,7 @@ class PEDRCache:
         self,
         query: str,
         top_k: int,
-        filters: Optional[Dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
     ) -> str:
         """Generate deterministic cache key from query parameters.
 
@@ -138,8 +139,8 @@ class PEDRCache:
         self,
         query: str,
         top_k: int,
-        filters: Optional[Dict[str, Any]] = None,
-    ) -> Optional[List[Dict[str, Any]]]:
+        filters: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]] | None:
         """Retrieve cached results if available and not expired.
 
         Args:
@@ -183,8 +184,8 @@ class PEDRCache:
         self,
         query: str,
         top_k: int,
-        filters: Optional[Dict[str, Any]],
-        results: List[Dict[str, Any]],
+        filters: dict[str, Any] | None,
+        results: list[dict[str, Any]],
     ) -> None:
         """Store search results in cache.
 
@@ -284,7 +285,7 @@ class PEDRCache:
 
 
 # Lazy singleton - initialized on first access to allow config to load
-_pedr_cache: Optional[PEDRCache] = None
+_pedr_cache: PEDRCache | None = None
 
 
 def get_pedr_cache() -> PEDRCache:

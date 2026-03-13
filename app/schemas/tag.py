@@ -1,7 +1,7 @@
 """Pydantic schemas for tagging entities."""
+
 from __future__ import annotations
 
-from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
@@ -11,10 +11,10 @@ class TagBase(BaseModel):
     """Shared attributes for tag operations."""
 
     name: str
-    user_id: Optional[UUID] = None
-    category: Optional[str] = None
-    color: Optional[str] = None
-    parent_id: Optional[UUID] = None
+    user_id: UUID | None = None
+    category: str | None = None
+    color: str | None = None
+    parent_id: UUID | None = None
 
 
 class TagCreate(TagBase):
@@ -26,18 +26,18 @@ class TagCreate(TagBase):
 class TagUpdate(BaseModel):
     """Payload for updating a tag."""
 
-    name: Optional[str] = None
-    user_id: Optional[UUID] = None
-    category: Optional[str] = None
-    color: Optional[str] = None
-    parent_id: Optional[UUID] = None
+    name: str | None = None
+    user_id: UUID | None = None
+    category: str | None = None
+    color: str | None = None
+    parent_id: UUID | None = None
 
 
 class TagRead(TagBase):
     """Representation of a persisted tag with hierarchy support."""
 
     id: UUID
-    children: Optional[List["TagRead"]] = None
+    children: list[TagRead] | None = None
 
     model_config = ConfigDict(from_attributes=True)
 

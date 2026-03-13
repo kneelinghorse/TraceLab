@@ -6,36 +6,30 @@ Tests cover:
 - Event emission (sync triggers on completion)
 - Parity validation (count comparison)
 """
+
 from __future__ import annotations
 
 import json
-import uuid
-from datetime import datetime, timedelta, timezone
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence
-from unittest.mock import MagicMock, patch
+from datetime import UTC, datetime
+from unittest.mock import MagicMock
 
 import pytest
 
-from app.services.pedr.manifest_transformer import (
-    ManifestTransformer,
-    PEDRManifest,
-    TransformationResult,
-    get_manifest_transformer,
-)
 from app.services.pedr.delta_sync import (
     DeltaSyncService,
     EntityType,
-    SyncMode,
-    SyncResult,
     ParityCheckResult,
+    SyncMode,
+)
+from app.services.pedr.manifest_transformer import (
+    ManifestTransformer,
+    get_manifest_transformer,
 )
 from app.services.pedr.sync_events import (
     SyncEvent,
     SyncEventEmitter,
     SyncEventType,
     emit_mission_completed,
-    emit_mission_updated,
 )
 
 
@@ -70,7 +64,9 @@ class TestManifestTransformer:
         assert result.manifest.context_domain == "research"
         assert "Test the transformation process" in result.manifest.purpose
 
-    def test_transform_mission_with_quality_gates(self, transformer: ManifestTransformer) -> None:
+    def test_transform_mission_with_quality_gates(
+        self, transformer: ManifestTransformer
+    ) -> None:
         """Quality gates influence governance impact score."""
         mission_data = {
             "missionId": "M002",
@@ -96,7 +92,9 @@ class TestManifestTransformer:
         # Complete + all gates pass = 5 + 2 + 1 = 8
         assert result.manifest.governance_impact >= 8
 
-    def test_transform_mission_pii_detection(self, transformer: ManifestTransformer) -> None:
+    def test_transform_mission_pii_detection(
+        self, transformer: ManifestTransformer
+    ) -> None:
         """PII is detected from governance flags."""
         mission_data = {
             "missionId": "M003",
@@ -112,7 +110,9 @@ class TestManifestTransformer:
         assert result.success
         assert result.manifest.governance_pii is True
 
-    def test_transform_mission_pii_from_tags(self, transformer: ManifestTransformer) -> None:
+    def test_transform_mission_pii_from_tags(
+        self, transformer: ManifestTransformer
+    ) -> None:
         """PII detected from tags."""
         mission_data = {
             "missionId": "M004",
@@ -154,7 +154,9 @@ class TestManifestTransformer:
         assert result.manifest.bindings["evidence_chunks"] == ["chunk-1", "chunk-2"]
         assert result.manifest.bindings["related_documents"] == ["doc-1", "doc-2"]
 
-    def test_transform_empty_mission_fails(self, transformer: ManifestTransformer) -> None:
+    def test_transform_empty_mission_fails(
+        self, transformer: ManifestTransformer
+    ) -> None:
         """Empty mission data returns error."""
         result = transformer.transform_mission(
             mission_id="uuid-empty",
@@ -240,7 +242,7 @@ class TestDeltaSyncService:
 
         # Setup sync state with last_sync_at
         mock_sync_state = MagicMock()
-        mock_sync_state.last_sync_at = datetime(2025, 1, 1, tzinfo=timezone.utc)
+        mock_sync_state.last_sync_at = datetime(2025, 1, 1, tzinfo=UTC)
         mock_sync_state.sync_count = 10
 
         service = DeltaSyncService(session_factory=mock_session_factory)
@@ -447,10 +449,12 @@ class TestIntegration:
         sync_triggered = []
 
         def sync_handler(event: SyncEvent) -> None:
-            sync_triggered.append({
-                "entity_id": event.entity_id,
-                "timestamp": event.timestamp,
-            })
+            sync_triggered.append(
+                {
+                    "entity_id": event.entity_id,
+                    "timestamp": event.timestamp,
+                }
+            )
 
         emitter = SyncEventEmitter()
         emitter.on(SyncEventType.MISSION_COMPLETED, sync_handler)
@@ -485,7 +489,10 @@ class TestIntegration:
             },
         )
         assert 1 <= result_max.manifest.governance_impact <= 10
-        assert result_max.manifest.governance_impact > result_min.manifest.governance_impact
+        assert (
+            result_max.manifest.governance_impact
+            > result_min.manifest.governance_impact
+        )
 
 
 if __name__ == "__main__":

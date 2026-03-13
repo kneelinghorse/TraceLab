@@ -3,10 +3,11 @@
 Pre-flight queries allow DeepSearch to check TraceLab before launching
 new research missions, enabling reuse of existing high-quality research.
 """
+
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List, Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel, Field, confloat, conint
 
@@ -24,7 +25,7 @@ class PreflightQuery(BaseModel):
         default=4,
         description="Minimum passing quality gates for reuse recommendation.",
     )
-    status: List[str] = Field(
+    status: list[str] = Field(
         default_factory=lambda: ["complete"],
         description="Allowed mission statuses (default: complete only).",
     )
@@ -67,16 +68,16 @@ class PreflightMatch(BaseModel):
         ...,
         description="Semantic similarity to query.",
     )
-    key_insights: List[PreflightMatchInsight] = Field(
+    key_insights: list[PreflightMatchInsight] = Field(
         default_factory=list,
         max_length=3,
         description="Top 3 key insights from the mission.",
     )
-    created_at: Optional[datetime] = Field(
+    created_at: datetime | None = Field(
         default=None,
         description="When the mission was created.",
     )
-    tags: List[str] = Field(default_factory=list, description="Mission tags.")
+    tags: list[str] = Field(default_factory=list, description="Mission tags.")
 
 
 class PreflightRecommendation(BaseModel):
@@ -90,7 +91,7 @@ class PreflightRecommendation(BaseModel):
             "'proceed' (no relevant existing research)."
         ),
     )
-    matches: List[PreflightMatch] = Field(
+    matches: list[PreflightMatch] = Field(
         default_factory=list,
         description="Matching missions ordered by relevance.",
     )
@@ -98,7 +99,7 @@ class PreflightRecommendation(BaseModel):
         ...,
         description="Human-readable summary of the recommendation.",
     )
-    top_score: Optional[confloat(ge=0.0, le=1.0)] = Field(
+    top_score: confloat(ge=0.0, le=1.0) | None = Field(
         default=None,
         description="Highest similarity score among matches.",
     )
@@ -123,9 +124,9 @@ class PreflightTelemetry(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     query: str
     action: Literal["reuse", "review", "proceed"]
-    top_score: Optional[float] = None
+    top_score: float | None = None
     match_count: int = 0
     latency_ms: float = 0.0
     min_quality_gates: int = 4
-    status_filters: List[str] = Field(default_factory=list)
+    status_filters: list[str] = Field(default_factory=list)
     agent: str = Field(default="unknown", description="Calling agent identifier.")

@@ -7,6 +7,7 @@ Covers:
 - Dedup behavior for semantic edges
 - Integration with graph search layer
 """
+
 from __future__ import annotations
 
 import uuid
@@ -163,11 +164,13 @@ def test_collection_cooccurrence_creates_bidirectional_edges(db_session, project
     db_session.add(coll)
     db_session.flush()
 
-    db_session.add_all([
-        CollectionItem(collection_id=coll.id, chunk_id=chunk_a.id),
-        CollectionItem(collection_id=coll.id, chunk_id=chunk_b.id),
-        CollectionItem(collection_id=coll.id, chunk_id=chunk_c.id),
-    ])
+    db_session.add_all(
+        [
+            CollectionItem(collection_id=coll.id, chunk_id=chunk_a.id),
+            CollectionItem(collection_id=coll.id, chunk_id=chunk_b.id),
+            CollectionItem(collection_id=coll.id, chunk_id=chunk_c.id),
+        ]
+    )
     db_session.commit()
 
     service = EdgeMaterializationService()
@@ -190,7 +193,9 @@ def test_collection_cooccurrence_creates_bidirectional_edges(db_session, project
     for i, urn_a in enumerate(chunk_urns):
         for j, urn_b in enumerate(chunk_urns):
             if i != j:
-                assert (urn_a, urn_b) in co_pairs, f"Missing co_occurs edge {urn_a} → {urn_b}"
+                assert (urn_a, urn_b) in co_pairs, (
+                    f"Missing co_occurs edge {urn_a} → {urn_b}"
+                )
 
     # Verify weight and via
     for edge in co_edges:
@@ -240,7 +245,9 @@ def test_collection_cooccurrence_skips_single_chunk_collection(db_session, proje
         .count()
     )
 
-    assert after_count == before_count, "Single-chunk collection should not produce co_occurs edges"
+    assert after_count == before_count, (
+        "Single-chunk collection should not produce co_occurs edges"
+    )
 
 
 def test_collection_cooccurrence_idempotent(db_session, project):
@@ -264,10 +271,12 @@ def test_collection_cooccurrence_idempotent(db_session, project):
     db_session.add(coll)
     db_session.flush()
 
-    db_session.add_all([
-        CollectionItem(collection_id=coll.id, chunk_id=chunk_a.id),
-        CollectionItem(collection_id=coll.id, chunk_id=chunk_b.id),
-    ])
+    db_session.add_all(
+        [
+            CollectionItem(collection_id=coll.id, chunk_id=chunk_a.id),
+            CollectionItem(collection_id=coll.id, chunk_id=chunk_b.id),
+        ]
+    )
     db_session.commit()
 
     service = EdgeMaterializationService()
@@ -306,10 +315,12 @@ def test_cooccurrence_project_filter(db_session, project):
     db_session.add(coll)
     db_session.flush()
 
-    db_session.add_all([
-        CollectionItem(collection_id=coll.id, chunk_id=chunk_a.id),
-        CollectionItem(collection_id=coll.id, chunk_id=chunk_b.id),
-    ])
+    db_session.add_all(
+        [
+            CollectionItem(collection_id=coll.id, chunk_id=chunk_a.id),
+            CollectionItem(collection_id=coll.id, chunk_id=chunk_b.id),
+        ]
+    )
     db_session.commit()
 
     service = EdgeMaterializationService()
@@ -338,6 +349,7 @@ def test_cooccurrence_project_filter(db_session, project):
 @dataclass
 class MockQdrantResult:
     """Mimics a Qdrant ScoredPoint."""
+
     id: str
     score: float
     payload: Dict[str, Any]
@@ -375,30 +387,38 @@ def test_topic_similarity_creates_edges(db_session, project):
     db_session.add(doc)
     db_session.flush()
 
-    chunk_a = DocumentChunk(document_id=doc.id, chunk_index=0, content="Apples and oranges")
-    chunk_b = DocumentChunk(document_id=doc.id, chunk_index=1, content="Fruits and vegetables")
-    chunk_c = DocumentChunk(document_id=doc.id, chunk_index=2, content="Unrelated content")
+    chunk_a = DocumentChunk(
+        document_id=doc.id, chunk_index=0, content="Apples and oranges"
+    )
+    chunk_b = DocumentChunk(
+        document_id=doc.id, chunk_index=1, content="Fruits and vegetables"
+    )
+    chunk_c = DocumentChunk(
+        document_id=doc.id, chunk_index=2, content="Unrelated content"
+    )
     db_session.add_all([chunk_a, chunk_b, chunk_c])
     db_session.commit()
 
     # Mock: chunk_a is similar to chunk_b (0.92), chunk_b similar to chunk_a (0.92)
-    mock_client = _make_mock_qdrant_client({
-        str(chunk_a.id): [
-            MockQdrantResult(
-                id=str(chunk_b.id),
-                score=0.92,
-                payload={"document_id": str(doc.id), "chunk_index": 1},
-            ),
-        ],
-        str(chunk_b.id): [
-            MockQdrantResult(
-                id=str(chunk_a.id),
-                score=0.92,
-                payload={"document_id": str(doc.id), "chunk_index": 0},
-            ),
-        ],
-        str(chunk_c.id): [],  # No similar chunks
-    })
+    mock_client = _make_mock_qdrant_client(
+        {
+            str(chunk_a.id): [
+                MockQdrantResult(
+                    id=str(chunk_b.id),
+                    score=0.92,
+                    payload={"document_id": str(doc.id), "chunk_index": 1},
+                ),
+            ],
+            str(chunk_b.id): [
+                MockQdrantResult(
+                    id=str(chunk_a.id),
+                    score=0.92,
+                    payload={"document_id": str(doc.id), "chunk_index": 0},
+                ),
+            ],
+            str(chunk_c.id): [],  # No similar chunks
+        }
+    )
 
     service = EdgeMaterializationService()
     result = service.materialize_topic_similarity_edges(
@@ -412,9 +432,7 @@ def test_topic_similarity_creates_edges(db_session, project):
 
     # Should create bidirectional edges for the A↔B pair
     topic_edges = (
-        db_session.query(GraphEdge)
-        .filter(GraphEdge.edge_type == "topic_similar")
-        .all()
+        db_session.query(GraphEdge).filter(GraphEdge.edge_type == "topic_similar").all()
     )
 
     topic_pairs = {(e.from_urn, e.to_urn) for e in topic_edges}
@@ -452,10 +470,12 @@ def test_topic_similarity_respects_threshold(db_session, project):
 
     # Mock: returns result at 0.80, below threshold of 0.85
     # Qdrant's score_threshold should filter this, but we also verify our logic
-    mock_client = _make_mock_qdrant_client({
-        str(chunk_x.id): [],  # Qdrant already filtered by score_threshold
-        str(chunk_y.id): [],
-    })
+    mock_client = _make_mock_qdrant_client(
+        {
+            str(chunk_x.id): [],  # Qdrant already filtered by score_threshold
+            str(chunk_y.id): [],
+        }
+    )
 
     service = EdgeMaterializationService()
     result = service.materialize_topic_similarity_edges(
@@ -487,22 +507,24 @@ def test_topic_similarity_dedup_pairs(db_session, project):
     db_session.commit()
 
     # Both chunks recommend each other — should only produce 2 edges (one pair, bidirectional)
-    mock_client = _make_mock_qdrant_client({
-        str(chunk_p.id): [
-            MockQdrantResult(
-                id=str(chunk_q.id),
-                score=0.90,
-                payload={"document_id": str(doc.id), "chunk_index": 1},
-            ),
-        ],
-        str(chunk_q.id): [
-            MockQdrantResult(
-                id=str(chunk_p.id),
-                score=0.90,
-                payload={"document_id": str(doc.id), "chunk_index": 0},
-            ),
-        ],
-    })
+    mock_client = _make_mock_qdrant_client(
+        {
+            str(chunk_p.id): [
+                MockQdrantResult(
+                    id=str(chunk_q.id),
+                    score=0.90,
+                    payload={"document_id": str(doc.id), "chunk_index": 1},
+                ),
+            ],
+            str(chunk_q.id): [
+                MockQdrantResult(
+                    id=str(chunk_p.id),
+                    score=0.90,
+                    payload={"document_id": str(doc.id), "chunk_index": 0},
+                ),
+            ],
+        }
+    )
 
     service = EdgeMaterializationService()
     result = service.materialize_topic_similarity_edges(
@@ -577,22 +599,24 @@ def test_topic_similarity_idempotent(db_session, project):
     db_session.add_all([chunk_r, chunk_s])
     db_session.commit()
 
-    mock_client = _make_mock_qdrant_client({
-        str(chunk_r.id): [
-            MockQdrantResult(
-                id=str(chunk_s.id),
-                score=0.88,
-                payload={"document_id": str(doc.id), "chunk_index": 1},
-            ),
-        ],
-        str(chunk_s.id): [
-            MockQdrantResult(
-                id=str(chunk_r.id),
-                score=0.88,
-                payload={"document_id": str(doc.id), "chunk_index": 0},
-            ),
-        ],
-    })
+    mock_client = _make_mock_qdrant_client(
+        {
+            str(chunk_r.id): [
+                MockQdrantResult(
+                    id=str(chunk_s.id),
+                    score=0.88,
+                    payload={"document_id": str(doc.id), "chunk_index": 1},
+                ),
+            ],
+            str(chunk_s.id): [
+                MockQdrantResult(
+                    id=str(chunk_r.id),
+                    score=0.88,
+                    payload={"document_id": str(doc.id), "chunk_index": 0},
+                ),
+            ],
+        }
+    )
 
     service = EdgeMaterializationService()
     first = service.materialize_topic_similarity_edges(

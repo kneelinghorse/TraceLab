@@ -11,7 +11,9 @@ def _find_cmos_root() -> Path:
     """Find cmos/ directory from any working directory."""
     script_dir = Path(__file__).resolve().parent
     candidate = script_dir.parent
-    if (candidate / "db" / "schema.sql").exists() and (candidate / "agents.md").exists():
+    if (candidate / "db" / "schema.sql").exists() and (
+        candidate / "agents.md"
+    ).exists():
         return candidate
     if (Path.cwd() / "cmos" / "db" / "schema.sql").exists():
         return Path.cwd() / "cmos"

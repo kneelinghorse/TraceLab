@@ -7,6 +7,7 @@ Covers:
 - Migration script correctness
 - Duplicate detection across decisions and learnings
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -22,6 +23,7 @@ from cmos.context.db_client import SQLiteClient
 
 
 # ─── Content Hash Tests ──────────────────────────────────────────────────────
+
 
 class TestContentHash:
     """Content hash computation matches cmos-mcp computeContentHash()."""
@@ -71,6 +73,7 @@ class TestContentHash:
 
 # ─── Hash-Based Dedup Tests ──────────────────────────────────────────────────
 
+
 class TestHashBasedDedup:
     """_sync_strategic_decisions() uses content hash for dedup."""
 
@@ -106,44 +109,44 @@ class TestHashBasedDedup:
         }
 
         # First sync
-        db_client._sync_strategic_decisions(master_context, None, "2026-01-01T00:00:00Z")
-
-        count1 = db_client.fetchone(
-            "SELECT COUNT(*) as cnt FROM strategic_decisions"
+        db_client._sync_strategic_decisions(
+            master_context, None, "2026-01-01T00:00:00Z"
         )
+
+        count1 = db_client.fetchone("SELECT COUNT(*) as cnt FROM strategic_decisions")
         assert count1 and count1["cnt"] == 2
 
         # Second sync with same decisions
-        db_client._sync_strategic_decisions(master_context, None, "2026-01-02T00:00:00Z")
-
-        count2 = db_client.fetchone(
-            "SELECT COUNT(*) as cnt FROM strategic_decisions"
+        db_client._sync_strategic_decisions(
+            master_context, None, "2026-01-02T00:00:00Z"
         )
+
+        count2 = db_client.fetchone("SELECT COUNT(*) as cnt FROM strategic_decisions")
         assert count2 and count2["cnt"] == 2  # No duplicates
 
     def test_new_decisions_are_added(self, db_client: SQLiteClient):
         """New decisions get inserted alongside existing ones."""
-        master_context1: Dict[str, Any] = {
-            "decisions_made": ["Decision A"]
-        }
-        db_client._sync_strategic_decisions(master_context1, None, "2026-01-01T00:00:00Z")
+        master_context1: Dict[str, Any] = {"decisions_made": ["Decision A"]}
+        db_client._sync_strategic_decisions(
+            master_context1, None, "2026-01-01T00:00:00Z"
+        )
 
         master_context2: Dict[str, Any] = {
             "decisions_made": ["Decision A", "Decision B"]
         }
-        db_client._sync_strategic_decisions(master_context2, None, "2026-01-02T00:00:00Z")
-
-        count = db_client.fetchone(
-            "SELECT COUNT(*) as cnt FROM strategic_decisions"
+        db_client._sync_strategic_decisions(
+            master_context2, None, "2026-01-02T00:00:00Z"
         )
+
+        count = db_client.fetchone("SELECT COUNT(*) as cnt FROM strategic_decisions")
         assert count and count["cnt"] == 2
 
     def test_content_hash_stored_on_insert(self, db_client: SQLiteClient):
         """content_hash is computed and stored for new decisions."""
-        master_context: Dict[str, Any] = {
-            "decisions_made": ["Use PostgreSQL"]
-        }
-        db_client._sync_strategic_decisions(master_context, None, "2026-01-01T00:00:00Z")
+        master_context: Dict[str, Any] = {"decisions_made": ["Use PostgreSQL"]}
+        db_client._sync_strategic_decisions(
+            master_context, None, "2026-01-01T00:00:00Z"
+        )
 
         row = db_client.fetchone(
             "SELECT content_hash FROM strategic_decisions WHERE decision_text = 'Use PostgreSQL'"
@@ -157,19 +160,15 @@ class TestHashBasedDedup:
         master_context: Dict[str, Any] = {
             "decisions_made": ["Use PostgreSQL"],
             "working_memory": {
-                "domains": {
-                    "tracelab": {
-                        "decisions_made": ["Use PostgreSQL"]
-                    }
-                }
+                "domains": {"tracelab": {"decisions_made": ["Use PostgreSQL"]}}
             },
         }
 
-        db_client._sync_strategic_decisions(master_context, None, "2026-01-01T00:00:00Z")
-
-        count = db_client.fetchone(
-            "SELECT COUNT(*) as cnt FROM strategic_decisions"
+        db_client._sync_strategic_decisions(
+            master_context, None, "2026-01-01T00:00:00Z"
         )
+
+        count = db_client.fetchone("SELECT COUNT(*) as cnt FROM strategic_decisions")
         # Same text but different domains → 2 distinct decisions
         assert count and count["cnt"] == 2
 
@@ -182,11 +181,11 @@ class TestHashBasedDedup:
             ]
         }
 
-        db_client._sync_strategic_decisions(master_context, None, "2026-01-01T00:00:00Z")
-
-        count = db_client.fetchone(
-            "SELECT COUNT(*) as cnt FROM strategic_decisions"
+        db_client._sync_strategic_decisions(
+            master_context, None, "2026-01-01T00:00:00Z"
         )
+
+        count = db_client.fetchone("SELECT COUNT(*) as cnt FROM strategic_decisions")
         # Same text + same domain → only 1 inserted (hash dedup)
         assert count and count["cnt"] == 1
 
@@ -198,19 +197,18 @@ class TestHashBasedDedup:
             "VALUES ('master_context', 'Legacy decision', '2025-01-01T00:00:00Z', 'general')"
         )
 
-        master_context: Dict[str, Any] = {
-            "decisions_made": ["Legacy decision"]
-        }
+        master_context: Dict[str, Any] = {"decisions_made": ["Legacy decision"]}
 
-        db_client._sync_strategic_decisions(master_context, None, "2026-01-01T00:00:00Z")
-
-        count = db_client.fetchone(
-            "SELECT COUNT(*) as cnt FROM strategic_decisions"
+        db_client._sync_strategic_decisions(
+            master_context, None, "2026-01-01T00:00:00Z"
         )
+
+        count = db_client.fetchone("SELECT COUNT(*) as cnt FROM strategic_decisions")
         assert count and count["cnt"] == 1  # No duplicate
 
 
 # ─── Migration Script Tests ──────────────────────────────────────────────────
+
 
 class TestMigrationScript:
     """migrate_content_hash.py computes hashes for existing records."""
@@ -357,7 +355,9 @@ class TestMigrationScript:
 
         stats2 = migrate(str(db_path))
         assert stats2["decisions_hashed"] == 0  # Already hashed
-        assert "strategic_decisions.content_hash" not in stats2["columns_added"]  # Column exists
+        assert (
+            "strategic_decisions.content_hash" not in stats2["columns_added"]
+        )  # Column exists
 
     def test_hash_cross_language_consistency(self):
         """Python hash matches expected canonical JSON format for TypeScript compat."""

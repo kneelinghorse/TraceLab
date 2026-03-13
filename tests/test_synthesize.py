@@ -1,31 +1,35 @@
 """Tests for the synthesize API endpoint."""
+
 from __future__ import annotations
 
 import uuid
-from typing import Any, Dict, List
 from unittest.mock import MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
 
+from app.core.database import SessionLocal
 from app.main import app
-from app.models.document import Document
 from app.models.chunk import DocumentChunk
 from app.models.collection import Collection, CollectionItem
+from app.models.document import Document
 from app.models.project import Project
-from app.core.database import SessionLocal
 
 
 def _create_test_project(db_session) -> Project:
     """Create a test project."""
-    project = Project(name="Synthesis Test Project", description="For testing synthesis")
+    project = Project(
+        name="Synthesis Test Project", description="For testing synthesis"
+    )
     db_session.add(project)
     db_session.commit()
     db_session.refresh(project)
     return project
 
 
-def _create_test_document(db_session, project_id: uuid.UUID, name: str = "Test Document") -> Document:
+def _create_test_document(
+    db_session, project_id: uuid.UUID, name: str = "Test Document"
+) -> Document:
     """Create a test document."""
     doc = Document(
         project_id=project_id,
@@ -40,7 +44,10 @@ def _create_test_document(db_session, project_id: uuid.UUID, name: str = "Test D
 
 
 def _create_test_chunk(
-    db_session, document_id: uuid.UUID, index: int = 0, content: str = "Test chunk content"
+    db_session,
+    document_id: uuid.UUID,
+    index: int = 0,
+    content: str = "Test chunk content",
 ) -> DocumentChunk:
     """Create a test document chunk."""
     from sqlalchemy import text
@@ -67,7 +74,9 @@ def _create_test_collection(db_session, name: str = "Test Collection") -> Collec
     return collection
 
 
-def _add_chunk_to_collection(db_session, collection_id: str, chunk_id: str) -> CollectionItem:
+def _add_chunk_to_collection(
+    db_session, collection_id: str, chunk_id: str
+) -> CollectionItem:
     """Add a chunk to a collection."""
     item = CollectionItem(
         collection_id=collection_id,
@@ -100,7 +109,9 @@ class TestSynthesizeEndpoint:
     """Tests for POST /api/v1/synthesize endpoint."""
 
     @patch("app.services.synthesis.OpenAI")
-    def test_synthesize_collection_success(self, mock_openai_class, auth_headers, db_session):
+    def test_synthesize_collection_success(
+        self, mock_openai_class, auth_headers, db_session
+    ):
         """Test successful synthesis from a collection."""
         client = TestClient(app)
 
@@ -114,8 +125,12 @@ class TestSynthesizeEndpoint:
         # Create test data
         project = _create_test_project(db_session)
         document = _create_test_document(db_session, project.id, "Research Report")
-        chunk1 = _create_test_chunk(db_session, document.id, 0, "First chunk with important findings.")
-        chunk2 = _create_test_chunk(db_session, document.id, 1, "Second chunk with supporting data.")
+        chunk1 = _create_test_chunk(
+            db_session, document.id, 0, "First chunk with important findings."
+        )
+        chunk2 = _create_test_chunk(
+            db_session, document.id, 1, "Second chunk with supporting data."
+        )
         collection = _create_test_collection(db_session, "Research Collection")
         _add_chunk_to_collection(db_session, str(collection.id), str(chunk1.id))
         _add_chunk_to_collection(db_session, str(collection.id), str(chunk2.id))
@@ -137,7 +152,9 @@ class TestSynthesizeEndpoint:
         assert isinstance(data["citations"], list)
 
     @patch("app.services.synthesis.OpenAI")
-    def test_synthesize_chunk_ids_success(self, mock_openai_class, auth_headers, db_session):
+    def test_synthesize_chunk_ids_success(
+        self, mock_openai_class, auth_headers, db_session
+    ):
         """Test successful synthesis from specific chunk IDs."""
         client = TestClient(app)
 
@@ -167,7 +184,9 @@ class TestSynthesizeEndpoint:
         assert data["chunk_count"] == 2
 
     @patch("app.services.synthesis.OpenAI")
-    def test_synthesize_with_custom_prompt(self, mock_openai_class, auth_headers, db_session):
+    def test_synthesize_with_custom_prompt(
+        self, mock_openai_class, auth_headers, db_session
+    ):
         """Test synthesis with a custom prompt instruction."""
         client = TestClient(app)
 
@@ -211,7 +230,10 @@ class TestSynthesizeEndpoint:
         )
 
         assert response.status_code == 422  # Validation error
-        assert "collection_id" in response.text.lower() or "chunk_ids" in response.text.lower()
+        assert (
+            "collection_id" in response.text.lower()
+            or "chunk_ids" in response.text.lower()
+        )
 
     def test_synthesize_both_sources_validation(self, auth_headers):
         """Test that request fails when both collection_id and chunk_ids provided."""
@@ -249,7 +271,9 @@ class TestSynthesizeEndpoint:
         assert "not found" in response.json()["detail"].lower()
 
     @patch("app.services.synthesis.OpenAI")
-    def test_synthesize_empty_collection(self, mock_openai_class, auth_headers, db_session):
+    def test_synthesize_empty_collection(
+        self, mock_openai_class, auth_headers, db_session
+    ):
         """Test synthesis with empty collection returns appropriate message."""
         client = TestClient(app)
 
@@ -268,7 +292,10 @@ class TestSynthesizeEndpoint:
         assert response.status_code == 200
         data = response.json()
         assert data["chunk_count"] == 0
-        assert "empty" in data["content"].lower() or "no content" in data["content"].lower()
+        assert (
+            "empty" in data["content"].lower()
+            or "no content" in data["content"].lower()
+        )
         assert data["tokens_used"] == 0
 
     @patch("app.services.synthesis.OpenAI")
@@ -291,7 +318,9 @@ class TestSynthesizeEndpoint:
         assert data["chunk_count"] == 0
 
     @patch("app.services.synthesis.OpenAI")
-    def test_synthesize_citations_extracted(self, mock_openai_class, auth_headers, db_session):
+    def test_synthesize_citations_extracted(
+        self, mock_openai_class, auth_headers, db_session
+    ):
         """Test that citations are properly extracted from LLM response."""
         client = TestClient(app)
 
@@ -306,8 +335,12 @@ class TestSynthesizeEndpoint:
         # Create test data with 2 chunks
         project = _create_test_project(db_session)
         document = _create_test_document(db_session, project.id, "Multi-Source Doc")
-        chunk1 = _create_test_chunk(db_session, document.id, 0, "First source content here.")
-        chunk2 = _create_test_chunk(db_session, document.id, 1, "Second source content here.")
+        chunk1 = _create_test_chunk(
+            db_session, document.id, 0, "First source content here."
+        )
+        chunk2 = _create_test_chunk(
+            db_session, document.id, 1, "Second source content here."
+        )
         collection = _create_test_collection(db_session)
         _add_chunk_to_collection(db_session, str(collection.id), str(chunk1.id))
         _add_chunk_to_collection(db_session, str(collection.id), str(chunk2.id))
@@ -330,7 +363,9 @@ class TestSynthesizeEndpoint:
             assert "document_id" in citation
 
     @patch("app.services.synthesis.OpenAI")
-    def test_synthesize_format_options(self, mock_openai_class, auth_headers, db_session):
+    def test_synthesize_format_options(
+        self, mock_openai_class, auth_headers, db_session
+    ):
         """Test all four format options work correctly."""
         client = TestClient(app)
 
@@ -383,7 +418,7 @@ class TestSynthesizeService:
     @patch("app.services.synthesis.OpenAI")
     def test_service_truncation_handling(self, mock_openai_class, db_session):
         """Test that service properly handles truncation when too many chunks."""
-        from app.services.synthesis import SynthesisService, MAX_CHUNKS_PER_REQUEST
+        from app.services.synthesis import MAX_CHUNKS_PER_REQUEST, SynthesisService
 
         mock_client = MagicMock()
         mock_client.chat.completions.create.return_value = _mock_openai_response()
@@ -397,7 +432,9 @@ class TestSynthesizeService:
 
         chunk_ids = []
         for i in range(MAX_CHUNKS_PER_REQUEST + 10):
-            chunk = _create_test_chunk(db_session, document.id, i, f"Chunk {i} content.")
+            chunk = _create_test_chunk(
+                db_session, document.id, i, f"Chunk {i} content."
+            )
             chunk_ids.append(uuid.UUID(str(chunk.id)))
 
         result = service.synthesize(chunk_ids=chunk_ids)
@@ -433,7 +470,9 @@ class TestSynthesizeService:
         mock_cost_monitor.track_usage.assert_called_once()
 
     @patch("app.services.synthesis.OpenAI")
-    def test_service_sets_reasoning_effort_for_gpt5_models(self, mock_openai_class, db_session):
+    def test_service_sets_reasoning_effort_for_gpt5_models(
+        self, mock_openai_class, db_session
+    ):
         """Test GPT-5.1/5.2 chat requests pin reasoning_effort for temperature compatibility."""
         mock_client = MagicMock()
         mock_client.chat.completions.create.return_value = _mock_openai_response()
@@ -451,7 +490,9 @@ class TestSynthesizeService:
 
         project = _create_test_project(db_session)
         document = _create_test_document(db_session, project.id)
-        chunk = _create_test_chunk(db_session, document.id, 0, "Compatibility test content.")
+        chunk = _create_test_chunk(
+            db_session, document.id, 0, "Compatibility test content."
+        )
 
         service.synthesize(chunk_ids=[uuid.UUID(str(chunk.id))])
 
@@ -508,7 +549,7 @@ class TestSynthesizeSchemas:
 
     def test_response_schema_structure(self):
         """Test response schema has all required fields."""
-        from app.schemas.synthesis import SynthesizeResponse, CitationInfo
+        from app.schemas.synthesis import CitationInfo, SynthesizeResponse
 
         response = SynthesizeResponse(
             content="Test content [1]",

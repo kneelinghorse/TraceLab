@@ -32,7 +32,9 @@ def graph_rag_schema():
 
     mission_table = Mission.__table__.to_metadata(metadata)
     for constraint in list(mission_table.constraints):
-        if isinstance(constraint, CheckConstraint) and "jsonb_array_length" in str(constraint.sqltext):
+        if isinstance(constraint, CheckConstraint) and "jsonb_array_length" in str(
+            constraint.sqltext
+        ):
             mission_table.constraints.remove(constraint)
 
     Document.__table__.to_metadata(metadata)
@@ -56,7 +58,9 @@ def graph_rag_schema():
         Column("prev_chunk_id", GUID(), ForeignKey("document_chunks.id")),
         Column("next_chunk_id", GUID(), ForeignKey("document_chunks.id")),
         Column("created_at", DateTime, nullable=True),
-        UniqueConstraint("document_id", "chunk_index", name="uq_document_chunks_document_index"),
+        UniqueConstraint(
+            "document_id", "chunk_index", name="uq_document_chunks_document_index"
+        ),
     )
     GraphEdge.__table__.to_metadata(metadata)
 

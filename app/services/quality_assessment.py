@@ -1,10 +1,10 @@
 """Rule-based quality assessment for tiered LLM routing."""
+
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 import re
-from typing import Dict, Iterable, List, Sequence
-
+from collections.abc import Iterable, Sequence
+from dataclasses import dataclass, field
 
 _CITATION_PATTERN = re.compile(
     r"\[Document:\s*[^,\]]+,\s*Chunk:\s*[^]]+\]", re.IGNORECASE
@@ -13,7 +13,7 @@ _CITATION_PATTERN = re.compile(
 _SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+")
 
 
-def _normalize_patterns(patterns: Sequence[str]) -> List[re.Pattern[str]]:
+def _normalize_patterns(patterns: Sequence[str]) -> list[re.Pattern[str]]:
     return [re.compile(pat, re.IGNORECASE) for pat in patterns]
 
 
@@ -66,10 +66,10 @@ class QualityAssessmentResult:
 
     composite_score: float
     threshold: float
-    pillar_scores: Dict[str, float]
-    hard_failures: List[str]
+    pillar_scores: dict[str, float]
+    hard_failures: list[str]
     escalate: bool
-    reasons: List[str] = field(default_factory=list)
+    reasons: list[str] = field(default_factory=list)
 
 
 class QualityAssessor:
@@ -86,8 +86,8 @@ class QualityAssessor:
         *,
         query: str,
         answer: str,
-        citations: Iterable[Dict[str, object]],
-        context_chunks: Iterable[Dict[str, object]] | None = None,
+        citations: Iterable[dict[str, object]],
+        context_chunks: Iterable[dict[str, object]] | None = None,
     ) -> QualityAssessmentResult:
         """Run the quality heuristics and return an assessment result."""
         del query  # currently unused but retained for future heuristics
@@ -101,7 +101,7 @@ class QualityAssessor:
         }
 
         composite_score = self._composite_score(pillar_scores)
-        reasons: List[str] = []
+        reasons: list[str] = []
 
         if hard_failures:
             reasons.extend(f"hard_fail:{failure}" for failure in hard_failures)
@@ -111,7 +111,9 @@ class QualityAssessor:
                 f"score_below_threshold:{composite_score:.2f}<{self.config.escalation_threshold:.2f}"
             )
 
-        escalate = bool(hard_failures) or composite_score < self.config.escalation_threshold
+        escalate = (
+            bool(hard_failures) or composite_score < self.config.escalation_threshold
+        )
 
         return QualityAssessmentResult(
             composite_score=composite_score,
@@ -122,8 +124,8 @@ class QualityAssessor:
             reasons=reasons,
         )
 
-    def _detect_hard_failures(self, answer: str) -> List[str]:
-        failures: List[str] = []
+    def _detect_hard_failures(self, answer: str) -> list[str]:
+        failures: list[str] = []
         if not answer.strip():
             failures.append("empty_answer")
             return failures
@@ -157,23 +159,36 @@ class QualityAssessor:
     def _score_answer_integrity(
         self,
         answer: str,
-        context_chunks: Iterable[Dict[str, object]] | None,
+        context_chunks: Iterable[dict[str, object]] | None,
     ) -> float:
         content = answer.strip()
         if len(content) < self.config.min_answer_chars:
             return 0.6
 
         lowered = content.lower()
-        if any(token in lowered for token in ("insufficient information", "cannot determine", "not provided")):
+        if any(
+            token in lowered
+            for token in (
+                "insufficient information",
+                "cannot determine",
+                "not provided",
+            )
+        ):
             return 0.55
 
         if context_chunks:
-            unique_docs = {chunk.get("document_id") for chunk in context_chunks if chunk.get("document_id")}
+            unique_docs = {
+                chunk.get("document_id")
+                for chunk in context_chunks
+                if chunk.get("document_id")
+            }
             if unique_docs and len(unique_docs) < 1:
                 return 0.7
         return 0.95
 
-    def _score_source_provenance(self, answer: str, citations: Sequence[Dict[str, object]]) -> float:
+    def _score_source_provenance(
+        self, answer: str, citations: Sequence[dict[str, object]]
+    ) -> float:
         if not citations:
             return 0.4
 
@@ -181,7 +196,9 @@ class QualityAssessor:
         if not sentences:
             return 0.4
 
-        sentences_with_citations = sum(1 for sentence in sentences if _CITATION_PATTERN.search(sentence))
+        sentences_with_citations = sum(
+            1 for sentence in sentences if _CITATION_PATTERN.search(sentence)
+        )
         coverage = sentences_with_citations / max(len(sentences), 1)
         if coverage >= self.config.min_sentences_with_citations:
             return 0.95
@@ -189,7 +206,7 @@ class QualityAssessor:
             return 0.75
         return 0.55
 
-    def _composite_score(self, pillar_scores: Dict[str, float]) -> float:
+    def _composite_score(self, pillar_scores: dict[str, float]) -> float:
         score = (
             pillar_scores["linguistic_uncertainty"] * self.config.linguistic_weight
             + pillar_scores["answer_integrity"] * self.config.integrity_weight

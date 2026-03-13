@@ -3,16 +3,16 @@
 Enables agents to check for existing research before launching new missions.
 Returns reuse recommendations based on similarity and quality thresholds.
 """
+
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Header, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.schemas.pedr_preflight import PreflightQuery, PreflightRecommendation
-from app.services.pedr import get_preflight_service, PreflightService
+from app.services.pedr import PreflightService, get_preflight_service
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -83,7 +83,9 @@ async def preflight_query(
     request: PreflightQuery,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
     service: PreflightService = Depends(get_service),
-    x_agent_id: Optional[str] = Header(default=None, description="Optional agent identifier"),
+    x_agent_id: str | None = Header(
+        default=None, description="Optional agent identifier"
+    ),
 ) -> PreflightRecommendation:
     """Execute pre-flight query to check for existing research.
 

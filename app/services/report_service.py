@@ -1,11 +1,12 @@
 """Report service for CRUD operations and synthesis integration."""
+
 from __future__ import annotations
 
 import hashlib
-import json
 import logging
+from collections.abc import Callable
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
+from typing import Any, Literal
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -27,7 +28,7 @@ class ReportService:
         self,
         *,
         session_factory: SessionFactory = SessionLocal,
-        synthesis_service: Optional[SynthesisService] = None,
+        synthesis_service: SynthesisService | None = None,
     ) -> None:
         self.session_factory = session_factory
         self._synthesis_service = synthesis_service
@@ -43,12 +44,12 @@ class ReportService:
         self,
         *,
         title: str,
-        collection_id: Optional[UUID] = None,
-        chunk_ids: Optional[List[UUID]] = None,
-        project_id: Optional[UUID] = None,
-        prompt: Optional[str] = None,
+        collection_id: UUID | None = None,
+        chunk_ids: list[UUID] | None = None,
+        project_id: UUID | None = None,
+        prompt: str | None = None,
         output_format: Literal["summary", "report", "bullets", "markdown"] = "summary",
-    ) -> Tuple[Report, List[Dict[str, Any]]]:
+    ) -> tuple[Report, list[dict[str, Any]]]:
         """Create a new report by synthesizing content.
 
         Args:
@@ -111,7 +112,9 @@ class ReportService:
                 session.add(source)
 
                 # Also snapshot individual chunk IDs from collection
-                collection_chunks = self._get_collection_chunk_ids(session, collection_id)
+                collection_chunks = self._get_collection_chunk_ids(
+                    session, collection_id
+                )
                 for chunk_id in collection_chunks:
                     chunk_source = ReportSource(
                         report_id=report.id,
@@ -139,7 +142,9 @@ class ReportService:
         finally:
             session.close()
 
-    def _get_collection_chunk_ids(self, session: Session, collection_id: UUID) -> List[UUID]:
+    def _get_collection_chunk_ids(
+        self, session: Session, collection_id: UUID
+    ) -> list[UUID]:
         """Get all chunk IDs from a collection."""
         items = (
             session.query(CollectionItem)
@@ -148,14 +153,12 @@ class ReportService:
         )
         return [UUID(str(item.chunk_id)) for item in items if item.chunk_id]
 
-    def get_report(self, report_id: UUID) -> Optional[Report]:
+    def get_report(self, report_id: UUID) -> Report | None:
         """Get a report by ID with sources loaded."""
         session = self.session_factory()
         try:
             report = (
-                session.query(Report)
-                .filter(Report.id == str(report_id))
-                .one_or_none()
+                session.query(Report).filter(Report.id == str(report_id)).one_or_none()
             )
             if report:
                 # Force load sources relationship
@@ -168,11 +171,11 @@ class ReportService:
     def list_reports(
         self,
         *,
-        project_id: Optional[UUID] = None,
-        status: Optional[str] = None,
+        project_id: UUID | None = None,
+        status: str | None = None,
         page: int = 1,
         page_size: int = 20,
-    ) -> Tuple[List[Report], int]:
+    ) -> tuple[list[Report], int]:
         """List reports with optional filtering and pagination.
 
         Returns:
@@ -207,8 +210,8 @@ class ReportService:
         self,
         report_id: UUID,
         *,
-        updates: Dict[str, Any],
-    ) -> Optional[Report]:
+        updates: dict[str, Any],
+    ) -> Report | None:
         """Update report metadata.
 
         Args:
@@ -221,9 +224,7 @@ class ReportService:
         session = self.session_factory()
         try:
             report = (
-                session.query(Report)
-                .filter(Report.id == str(report_id))
-                .one_or_none()
+                session.query(Report).filter(Report.id == str(report_id)).one_or_none()
             )
             if not report:
                 return None
@@ -254,9 +255,7 @@ class ReportService:
         session = self.session_factory()
         try:
             report = (
-                session.query(Report)
-                .filter(Report.id == str(report_id))
-                .one_or_none()
+                session.query(Report).filter(Report.id == str(report_id)).one_or_none()
             )
             if not report:
                 return False
@@ -272,7 +271,7 @@ class ReportService:
             session.close()
 
 
-_report_service: Optional[ReportService] = None
+_report_service: ReportService | None = None
 
 
 def get_report_service() -> ReportService:

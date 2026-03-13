@@ -5,6 +5,7 @@ This script reuses the baseline corpus/query set and applies PEDR quality scorin
 and governance filters to validate quality-aware ranking effects. Metadata can
 be sourced from synthetic assignments or PostgreSQL missions via a mapping file.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -48,7 +49,9 @@ DEFAULT_OUTPUT_PATH = PROJECT_ROOT / "artifacts/benchmarks/pedr-benchmark-result
 DEFAULT_COMPARISON_MD = PROJECT_ROOT / "artifacts/benchmarks/comparison-analysis.md"
 DEFAULT_QUALITY_METADATA_PATH = DEFAULT_CORPUS_DIR / "quality_metadata.json"
 DEFAULT_RELATIONSHIPS_PATH = DEFAULT_CORPUS_DIR / "relationships.json"
-DEFAULT_BASELINE_METRICS_PATH = PROJECT_ROOT / "artifacts/benchmarks/rag-baseline-metrics.json"
+DEFAULT_BASELINE_METRICS_PATH = (
+    PROJECT_ROOT / "artifacts/benchmarks/rag-baseline-metrics.json"
+)
 DEFAULT_MISSION_MAP_PATH = DEFAULT_CORPUS_DIR / "mission_map.json"
 
 DEFAULT_TOP_K = 5
@@ -60,18 +63,78 @@ DEFAULT_METADATA_SOURCE = "postgres"
 
 
 QUALITY_ASSIGNMENTS = {
-    "doc-001-readme": {"status": "draft", "passed_gates": 3, "validated": False, "pii": False},
-    "doc-002-pedr-search": {"status": "complete", "passed_gates": 5, "validated": True, "pii": False},
-    "doc-003-hybrid-search": {"status": "complete", "passed_gates": 5, "validated": True, "pii": False},
-    "doc-004-qdrant-optimization": {"status": "review", "passed_gates": 4, "validated": False, "pii": False},
-    "doc-005-qdrant-resilience": {"status": "review", "passed_gates": 4, "validated": False, "pii": False},
-    "doc-006-quality-gates": {"status": "in_progress", "passed_gates": 3, "validated": False, "pii": False},
-    "doc-007-implementation-guide": {"status": "draft", "passed_gates": 3, "validated": False, "pii": True},
-    "doc-008-scripts-readme": {"status": "draft", "passed_gates": 3, "validated": False, "pii": True},
-    "doc-009-sprint-19-retrospective": {"status": "complete", "passed_gates": 5, "validated": True, "pii": False},
-    "doc-010-pedr-baseline-capture": {"status": "in_progress", "passed_gates": 3, "validated": False, "pii": False},
-    "doc-011-graph-parameter-optimization": {"status": "draft", "passed_gates": 3, "validated": False, "pii": False},
-    "doc-012-qdrant-optimization-research": {"status": "complete", "passed_gates": 5, "validated": True, "pii": False},
+    "doc-001-readme": {
+        "status": "draft",
+        "passed_gates": 3,
+        "validated": False,
+        "pii": False,
+    },
+    "doc-002-pedr-search": {
+        "status": "complete",
+        "passed_gates": 5,
+        "validated": True,
+        "pii": False,
+    },
+    "doc-003-hybrid-search": {
+        "status": "complete",
+        "passed_gates": 5,
+        "validated": True,
+        "pii": False,
+    },
+    "doc-004-qdrant-optimization": {
+        "status": "review",
+        "passed_gates": 4,
+        "validated": False,
+        "pii": False,
+    },
+    "doc-005-qdrant-resilience": {
+        "status": "review",
+        "passed_gates": 4,
+        "validated": False,
+        "pii": False,
+    },
+    "doc-006-quality-gates": {
+        "status": "in_progress",
+        "passed_gates": 3,
+        "validated": False,
+        "pii": False,
+    },
+    "doc-007-implementation-guide": {
+        "status": "draft",
+        "passed_gates": 3,
+        "validated": False,
+        "pii": True,
+    },
+    "doc-008-scripts-readme": {
+        "status": "draft",
+        "passed_gates": 3,
+        "validated": False,
+        "pii": True,
+    },
+    "doc-009-sprint-19-retrospective": {
+        "status": "complete",
+        "passed_gates": 5,
+        "validated": True,
+        "pii": False,
+    },
+    "doc-010-pedr-baseline-capture": {
+        "status": "in_progress",
+        "passed_gates": 3,
+        "validated": False,
+        "pii": False,
+    },
+    "doc-011-graph-parameter-optimization": {
+        "status": "draft",
+        "passed_gates": 3,
+        "validated": False,
+        "pii": False,
+    },
+    "doc-012-qdrant-optimization-research": {
+        "status": "complete",
+        "passed_gates": 5,
+        "validated": True,
+        "pii": False,
+    },
 }
 
 
@@ -114,7 +177,9 @@ def default_quality_assignment(doc_id: str) -> Dict[str, Any]:
     }
 
 
-def build_quality_gates(passed_gates: int, validated: bool) -> Dict[str, Dict[str, Any]]:
+def build_quality_gates(
+    passed_gates: int, validated: bool
+) -> Dict[str, Dict[str, Any]]:
     gates: Dict[str, Dict[str, Any]] = {}
     for index, gate in enumerate(QualityScoringService.EXPECTED_GATES):
         gates[gate] = {
@@ -128,7 +193,9 @@ def build_quality_metadata(manifest: Dict[str, Any]) -> Dict[str, Any]:
     metadata: Dict[str, Any] = {}
     for doc in manifest.get("documents", []):
         doc_id = doc["doc_id"]
-        assignment = QUALITY_ASSIGNMENTS.get(doc_id) or default_quality_assignment(doc_id)
+        assignment = QUALITY_ASSIGNMENTS.get(doc_id) or default_quality_assignment(
+            doc_id
+        )
         status = assignment.get("status", "draft")
         passed_gates = int(assignment.get("passed_gates", 2))
         validated = bool(assignment.get("validated", False))
@@ -154,7 +221,9 @@ def build_relationship_map(manifest: Dict[str, Any]) -> Dict[str, List[str]]:
     relationships: Dict[str, List[str]] = {}
     for doc in manifest.get("documents", []):
         doc_id = doc["doc_id"]
-        related = [item for item in category_map.get(doc["category"], []) if item != doc_id]
+        related = [
+            item for item in category_map.get(doc["category"], []) if item != doc_id
+        ]
         related.extend(EXPLICIT_RELATIONSHIPS.get(doc_id, []))
         deduped = []
         seen = set()
@@ -201,7 +270,11 @@ def load_postgres_quality_metadata(
     mission_map = _load_mission_map(mission_map_path)
 
     mission_ids = sorted(
-        {entry["mission_id"] for entry in mission_map.values() if entry.get("mission_id")}
+        {
+            entry["mission_id"]
+            for entry in mission_map.values()
+            if entry.get("mission_id")
+        }
     )
     mission_uuids: List[uuid.UUID] = []
     for entry in mission_map.values():
@@ -260,7 +333,9 @@ def load_postgres_quality_metadata(
                 quality_gates = mission_metadata.get("quality_gates")
             if quality_gates is None and isinstance(execution_metadata, dict):
                 quality_gates = execution_metadata.get("quality_gates")
-            mission_data = execution_metadata if isinstance(execution_metadata, dict) else {}
+            mission_data = (
+                execution_metadata if isinstance(execution_metadata, dict) else {}
+            )
             if not mission_data and isinstance(mission_metadata, dict):
                 mission_data = mission_metadata
 
@@ -323,7 +398,7 @@ def sign_test_p_value(positives: int, negatives: int) -> Optional[float]:
     if n == 0:
         return None
     k = min(positives, negatives)
-    cumulative = sum(math.comb(n, i) for i in range(k + 1)) / (2 ** n)
+    cumulative = sum(math.comb(n, i) for i in range(k + 1)) / (2**n)
     return min(1.0, 2 * cumulative)
 
 
@@ -346,7 +421,9 @@ def apply_quality_scoring(
 ) -> List[Dict[str, Any]]:
     service = QualityScoringService(metadata_loader=_quality_loader(metadata_map))
     scored = service.apply(results, filters=filters or QualityFilters())
-    ranked = sorted(scored, key=lambda item: float(item.get("combined_score") or 0.0), reverse=True)
+    ranked = sorted(
+        scored, key=lambda item: float(item.get("combined_score") or 0.0), reverse=True
+    )
     return ranked
 
 
@@ -385,7 +462,9 @@ def evaluate_pedr_queries(
 
     for query in queries:
         query_text = query["query"]
-        relevance = {item["doc_id"]: int(item.get("relevance", 1)) for item in query["relevance"]}
+        relevance = {
+            item["doc_id"]: int(item.get("relevance", 1)) for item in query["relevance"]
+        }
         query_tokens = tokenize(query_text)
 
         baseline_scores = tfidf_scores(query_tokens, index=index)
@@ -399,7 +478,8 @@ def evaluate_pedr_queries(
         candidate_k = max(top_k, top_k * max(1, candidate_multiplier))
         ranked = rank_scores(combined_scores, top_k=candidate_k)
         base_results = [
-            {"document_id": doc_id, "combined_score": score, "score": score} for doc_id, score in ranked
+            {"document_id": doc_id, "combined_score": score, "score": score}
+            for doc_id, score in ranked
         ]
 
         quality_start = time.perf_counter()
@@ -442,7 +522,9 @@ def evaluate_pedr_queries(
             related_unique.extend(related)
         relationship_counts.append(sum(related_counts))
         if quality_docs:
-            relationship_coverages.append(sum(1 for count in related_counts if count > 0) / len(quality_docs))
+            relationship_coverages.append(
+                sum(1 for count in related_counts if count > 0) / len(quality_docs)
+            )
         relationship_uniques.append(len(set(related_unique)))
 
         quality_entry = {
@@ -450,7 +532,8 @@ def evaluate_pedr_queries(
             "query": query_text,
             "relevance": relevance,
             "retrieved": [
-                {"doc_id": item["document_id"], "score": item["combined_score"]} for item in quality_ranked[:top_k]
+                {"doc_id": item["document_id"], "score": item["combined_score"]}
+                for item in quality_ranked[:top_k]
             ],
             "precision_at_k": quality_precision,
             "recall_at_k": quality_recall,
@@ -468,7 +551,8 @@ def evaluate_pedr_queries(
             "query": query_text,
             "relevance": relevance,
             "retrieved": [
-                {"doc_id": item["document_id"], "score": item["combined_score"]} for item in governance_ranked[:top_k]
+                {"doc_id": item["document_id"], "score": item["combined_score"]}
+                for item in governance_ranked[:top_k]
             ],
             "precision_at_k": governance_precision,
             "recall_at_k": governance_recall,
@@ -482,9 +566,10 @@ def evaluate_pedr_queries(
         pii_flagged = sum(
             1
             for item in quality_ranked[:top_k]
-            if metadata_map.get(item["document_id"], {}).get("mission_data", {}).get("governance", {}).get(
-                "piiHandling"
-            )
+            if metadata_map.get(item["document_id"], {})
+            .get("mission_data", {})
+            .get("governance", {})
+            .get("piiHandling")
         )
         pii_flagged_total += pii_flagged
 
@@ -492,22 +577,27 @@ def evaluate_pedr_queries(
             1
             for item in quality_ranked[:top_k]
             if item["document_id"] not in governance_docs
-            and metadata_map.get(item["document_id"], {}).get("mission_data", {}).get("governance", {}).get(
-                "piiHandling"
-            )
+            and metadata_map.get(item["document_id"], {})
+            .get("mission_data", {})
+            .get("governance", {})
+            .get("piiHandling")
         )
         pii_removed_total += pii_removed
 
-        gate_removed_total += max(0, len(quality_docs) - len(governance_docs) - pii_removed)
+        gate_removed_total += max(
+            0, len(quality_docs) - len(governance_docs) - pii_removed
+        )
 
     relationship_summary = {
-        "avg_related_docs_per_query": sum(relationship_counts) / len(relationship_counts)
+        "avg_related_docs_per_query": sum(relationship_counts)
+        / len(relationship_counts)
         if relationship_counts
         else 0.0,
         "avg_related_docs_unique": sum(relationship_uniques) / len(relationship_uniques)
         if relationship_uniques
         else 0.0,
-        "avg_results_with_related_pct": sum(relationship_coverages) / len(relationship_coverages)
+        "avg_results_with_related_pct": sum(relationship_coverages)
+        / len(relationship_coverages)
         if relationship_coverages
         else 0.0,
     }
@@ -516,28 +606,39 @@ def evaluate_pedr_queries(
         "pii_flagged_in_top_k": pii_flagged_total,
         "pii_removed": pii_removed_total,
         "non_pii_removed": gate_removed_total,
-        "pii_removal_rate": (pii_removed_total / pii_flagged_total) if pii_flagged_total else 0.0,
+        "pii_removal_rate": (pii_removed_total / pii_flagged_total)
+        if pii_flagged_total
+        else 0.0,
     }
 
     return {
         "pedr_quality": {
             "summary": {
-                "precision_at_k": sum(quality_precisions) / len(quality_precisions) if quality_precisions else 0.0,
-                "recall_at_k": sum(quality_recalls) / len(quality_recalls) if quality_recalls else 0.0,
-                "ndcg_at_k": sum(quality_ndcg) / len(quality_ndcg) if quality_ndcg else 0.0,
+                "precision_at_k": sum(quality_precisions) / len(quality_precisions)
+                if quality_precisions
+                else 0.0,
+                "recall_at_k": sum(quality_recalls) / len(quality_recalls)
+                if quality_recalls
+                else 0.0,
+                "ndcg_at_k": sum(quality_ndcg) / len(quality_ndcg)
+                if quality_ndcg
+                else 0.0,
                 "latency_ms": summarize_metric(quality_latencies),
             },
             "queries": pedr_quality_results,
         },
         "pedr_governance": {
             "summary": {
-                "precision_at_k": sum(governance_precisions) / len(governance_precisions)
+                "precision_at_k": sum(governance_precisions)
+                / len(governance_precisions)
                 if governance_precisions
                 else 0.0,
                 "recall_at_k": sum(governance_recalls) / len(governance_recalls)
                 if governance_recalls
                 else 0.0,
-                "ndcg_at_k": sum(governance_ndcg) / len(governance_ndcg) if governance_ndcg else 0.0,
+                "ndcg_at_k": sum(governance_ndcg) / len(governance_ndcg)
+                if governance_ndcg
+                else 0.0,
                 "latency_ms": summarize_metric(governance_latencies),
             },
             "queries": pedr_governance_results,
@@ -604,15 +705,29 @@ def compare_methods(
 def quality_boost_ratio(metadata_map: Dict[str, Any]) -> Dict[str, float]:
     service = QualityScoringService(metadata_loader=_quality_loader(metadata_map))
     results = [
-        {"document_id": doc_id, "combined_score": 1.0}
-        for doc_id in metadata_map.keys()
+        {"document_id": doc_id, "combined_score": 1.0} for doc_id in metadata_map.keys()
     ]
     scored = service.apply(results, filters=QualityFilters())
-    complete_scores = [item["quality_score"] for item in scored if item.get("quality_status") == "complete"]
-    draft_scores = [item["quality_score"] for item in scored if item.get("quality_status") == "draft"]
-    ratio = (sum(complete_scores) / len(complete_scores)) / (sum(draft_scores) / len(draft_scores)) if draft_scores else 0.0
+    complete_scores = [
+        item["quality_score"]
+        for item in scored
+        if item.get("quality_status") == "complete"
+    ]
+    draft_scores = [
+        item["quality_score"]
+        for item in scored
+        if item.get("quality_status") == "draft"
+    ]
+    ratio = (
+        (sum(complete_scores) / len(complete_scores))
+        / (sum(draft_scores) / len(draft_scores))
+        if draft_scores
+        else 0.0
+    )
     return {
-        "complete_avg": sum(complete_scores) / len(complete_scores) if complete_scores else 0.0,
+        "complete_avg": sum(complete_scores) / len(complete_scores)
+        if complete_scores
+        else 0.0,
         "draft_avg": sum(draft_scores) / len(draft_scores) if draft_scores else 0.0,
         "ratio_complete_vs_draft": ratio,
     }
@@ -780,7 +895,9 @@ def run_benchmark(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run PEDR validation benchmark (offline).")
+    parser = argparse.ArgumentParser(
+        description="Run PEDR validation benchmark (offline)."
+    )
     parser.add_argument(
         "--corpus-dir",
         type=Path,

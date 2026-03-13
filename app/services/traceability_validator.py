@@ -1,7 +1,8 @@
 """Enhanced traceability validator for Mission Protocol evidence."""
+
 from __future__ import annotations
 
-from typing import Dict, List, Sequence, Set
+from collections.abc import Sequence
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -21,11 +22,13 @@ class TraceabilityValidator:
     def __init__(self, *, low_relevance_threshold: float = 0.55) -> None:
         self.low_relevance_threshold = low_relevance_threshold
 
-    def evaluate(self, mission: MissionProtocolDraft, db: Session) -> QualityAutomationCheckResult:
+    def evaluate(
+        self, mission: MissionProtocolDraft, db: Session
+    ) -> QualityAutomationCheckResult:
         evidence = mission.evidence or []
-        issues: List[QualityIssue] = []
-        recommendations: List[str] = []
-        metrics: Dict[str, int | float] = {
+        issues: list[QualityIssue] = []
+        recommendations: list[str] = []
+        metrics: dict[str, int | float] = {
             "evidence_items": len(evidence),
             "chunk_backed": 0,
             "broken_chunks": 0,
@@ -41,7 +44,9 @@ class TraceabilityValidator:
                     message="Mission evidence list is empty, preventing traceability verification.",
                 )
             )
-            recommendations.append("Attach at least one chunk-backed evidence entry before completion.")
+            recommendations.append(
+                "Attach at least one chunk-backed evidence entry before completion."
+            )
             return QualityAutomationCheckResult(
                 check_type="traceability",
                 summary=summary,
@@ -73,7 +78,9 @@ class TraceabilityValidator:
                     metadata={"chunk_ids": sorted(missing_chunks)},
                 )
             )
-            recommendations.append("Re-link evidence to valid document chunks or regenerate the traceability map.")
+            recommendations.append(
+                "Re-link evidence to valid document chunks or regenerate the traceability map."
+            )
         metrics["broken_chunks"] = len(missing_chunks)
 
         orphaned_insights = self._orphaned_insights(db, evidence)
@@ -86,12 +93,15 @@ class TraceabilityValidator:
                     metadata={"insight_ids": sorted(orphaned_insights)},
                 )
             )
-            recommendations.append("Backfill insight_sources rows for every insight/evidence pair.")
+            recommendations.append(
+                "Backfill insight_sources rows for every insight/evidence pair."
+            )
 
         low_relevance = [
             item.evidence_id
             for item in evidence
-            if item.relevance_score is not None and item.relevance_score < self.low_relevance_threshold
+            if item.relevance_score is not None
+            and item.relevance_score < self.low_relevance_threshold
         ]
         if low_relevance:
             issues.append(
@@ -103,7 +113,9 @@ class TraceabilityValidator:
                 )
             )
             metrics["low_relevance"] = len(low_relevance)
-            recommendations.append("Review low-scoring sources and prune or replace them with higher-signal chunks.")
+            recommendations.append(
+                "Review low-scoring sources and prune or replace them with higher-signal chunks."
+            )
 
         summary = (
             "All evidence entries maintain healthy traceability."
@@ -119,9 +131,9 @@ class TraceabilityValidator:
             recommendations=recommendations,
         )
 
-    def _normalize_chunk_ids(self, evidence: Sequence) -> tuple[List[str], List[str]]:
-        ids: List[str] = []
-        invalid: List[str] = []
+    def _normalize_chunk_ids(self, evidence: Sequence) -> tuple[list[str], list[str]]:
+        ids: list[str] = []
+        invalid: list[str] = []
         for item in evidence:
             chunk_id = (item.chunk_id or "").strip()
             if chunk_id:
@@ -133,27 +145,23 @@ class TraceabilityValidator:
                 ids.append(chunk_id)
         return ids, invalid
 
-    def _missing_chunks(self, db: Session, chunk_ids: Sequence[str]) -> Set[str]:
+    def _missing_chunks(self, db: Session, chunk_ids: Sequence[str]) -> set[str]:
         if not chunk_ids:
             return set()
-        rows = (
-            db.query(DocumentChunk.id)
-            .filter(DocumentChunk.id.in_(chunk_ids))
-            .all()
-        )
+        rows = db.query(DocumentChunk.id).filter(DocumentChunk.id.in_(chunk_ids)).all()
         existing = {str(row[0]) for row in rows}
         return set(chunk_ids) - existing
 
-    def _orphaned_insights(self, db: Session, evidence: Sequence) -> Set[str]:
-        insight_ids: Set[str] = set()
+    def _orphaned_insights(self, db: Session, evidence: Sequence) -> set[str]:
+        insight_ids: set[str] = set()
         for item in evidence:
             if item.insight_id:
                 insight_ids.add(str(item.insight_id))
         if not insight_ids:
             return set()
 
-        valid_ids: Set[str] = set()
-        converted: List[UUID] = []
+        valid_ids: set[str] = set()
+        converted: list[UUID] = []
         for identifier in insight_ids:
             try:
                 converted.append(UUID(identifier))

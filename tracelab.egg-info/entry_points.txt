@@ -1,0 +1,2 @@
+[console_scripts]
+tracelab = cli.main:main

@@ -8,6 +8,7 @@ Compares tuned configuration (en_core_web_lg + custom recognizers) against basel
 import argparse
 import sys
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Run regression evaluation for Presidio redaction service"
@@ -16,23 +17,23 @@ def main():
         "--corpus-dir",
         type=str,
         default="data/corpus",
-        help="Directory containing corpus files and annotations (default: data/corpus)"
+        help="Directory containing corpus files and annotations (default: data/corpus)",
     )
     parser.add_argument(
         "--baseline-report",
         type=str,
         default="cmos/reports/sprint-01/presidio_corpus_baseline.json",
-        help="Path to baseline evaluation report (default: cmos/reports/sprint-01/presidio_corpus_baseline.json)"
+        help="Path to baseline evaluation report (default: cmos/reports/sprint-01/presidio_corpus_baseline.json)",
     )
     parser.add_argument(
         "--output",
         type=str,
         default="cmos/reports/sprint-01/presidio_tuned_results.json",
-        help="Output path for comparison results (default: cmos/reports/sprint-01/presidio_tuned_results.json)"
+        help="Output path for comparison results (default: cmos/reports/sprint-01/presidio_tuned_results.json)",
     )
-    
+
     parser.parse_args()
-    
+
     print("=" * 60)
     print("Presidio redaction evaluation retired")
     print("=" * 60)

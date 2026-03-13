@@ -1,9 +1,8 @@
 """Integration tests for the RAG pipeline orchestration."""
+
 from __future__ import annotations
 
 from types import SimpleNamespace
-
-import pytest
 
 from app.services import rag_service as rag_module
 from app.services.quality_assessment import QualityAssessmentResult
@@ -51,11 +50,21 @@ class _StubCostMonitor:
         self.usage_events = []
         self.cache_hits = 0
 
-    def track_usage(self, *, model, prompt_tokens=None, completion_tokens=None, total_tokens=None, **kwargs):
+    def track_usage(
+        self,
+        *,
+        model,
+        prompt_tokens=None,
+        completion_tokens=None,
+        total_tokens=None,
+        **kwargs,
+    ):
         usage = {
             "prompt_tokens": int(prompt_tokens or 0),
             "completion_tokens": int(completion_tokens or 0),
-            "total_tokens": int(total_tokens or (prompt_tokens or 0) + (completion_tokens or 0)),
+            "total_tokens": int(
+                total_tokens or (prompt_tokens or 0) + (completion_tokens or 0)
+            ),
         }
         event = {"model": model, "usage": usage, "cost_usd": 0.00042}
         self.usage_events.append({"event": event, "kwargs": kwargs})
@@ -96,7 +105,9 @@ def _completion_payload(content: str) -> SimpleNamespace:
 
 def _build_service(monkeypatch, *, cache=None, responses=None):
     monkeypatch.setattr(rag_module, "_openai_import_error", None)
-    monkeypatch.setattr(rag_module.settings, "openai_api_key", "test-key", raising=False)
+    monkeypatch.setattr(
+        rag_module.settings, "openai_api_key", "test-key", raising=False
+    )
     embedding = _StubEmbeddingService()
     retrieval = _StubRetrievalService(
         [
@@ -133,7 +144,9 @@ def _build_service(monkeypatch, *, cache=None, responses=None):
         reasons=[],
     )
     assessor = _StubQualityAssessor(quality_result)
-    client = _StubChatClient(responses or [_completion_payload("Answer [Document: doc-1, Chunk: 0]")])
+    client = _StubChatClient(
+        responses or [_completion_payload("Answer [Document: doc-1, Chunk: 0]")]
+    )
 
     service = rag_module.RagService(
         retrieval_service=retrieval,
@@ -148,9 +161,13 @@ def _build_service(monkeypatch, *, cache=None, responses=None):
     return service, embedding, retrieval, cache_service, cost_monitor, assessor, client
 
 
-@pytest.mark.skip(reason="openai/httpx version incompatibility — httpx removed 'proxies' kwarg; needs openai SDK upgrade")
+@pytest.mark.skip(
+    reason="openai/httpx version incompatibility — httpx removed 'proxies' kwarg; needs openai SDK upgrade"
+)
 def test_rag_pipeline_generates_cited_answer(monkeypatch):
-    service, embedding, retrieval, cache_service, cost_monitor, assessor, client = _build_service(monkeypatch)
+    service, embedding, retrieval, cache_service, cost_monitor, assessor, client = (
+        _build_service(monkeypatch)
+    )
 
     result = service.run_query("Summarize Mission Protocol quality gates", top_k=2)
 
@@ -158,7 +175,10 @@ def test_rag_pipeline_generates_cited_answer(monkeypatch):
     assert result["citations"][0]["document_id"] == "doc-1"
     assert result["cache"]["hit"] is False
     assert result["routing"]["attempts"][0]["usage"]["prompt_tokens"] == 12
-    assert retrieval.calls and retrieval.calls[0]["query"] == "Summarize Mission Protocol quality gates"
+    assert (
+        retrieval.calls
+        and retrieval.calls[0]["query"] == "Summarize Mission Protocol quality gates"
+    )
     assert embedding.queries == ["Summarize Mission Protocol quality gates"]
     assert cache_service.stored, "Result should be cached for future hits"
     assert cost_monitor.usage_events, "Usage telemetry should be recorded"
@@ -166,7 +186,9 @@ def test_rag_pipeline_generates_cited_answer(monkeypatch):
     assert client.calls and client.calls[0]["messages"]
 
 
-@pytest.mark.skip(reason="openai/httpx version incompatibility — httpx removed 'proxies' kwarg; needs openai SDK upgrade")
+@pytest.mark.skip(
+    reason="openai/httpx version incompatibility — httpx removed 'proxies' kwarg; needs openai SDK upgrade"
+)
 def test_rag_pipeline_returns_cached_payload(monkeypatch):
     cached = {
         "answer": "Cached answer",

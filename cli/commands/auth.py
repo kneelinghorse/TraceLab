@@ -29,7 +29,10 @@ def login(ctx, username, password):
             token_data = client.login(username, password)
 
         if ctx.json_mode:
-            ctx.output.success("Authenticated successfully", data={"token_type": token_data.get("token_type")})
+            ctx.output.success(
+                "Authenticated successfully",
+                data={"token_type": token_data.get("token_type")},
+            )
         else:
             ctx.output.success("Authenticated successfully")
             ctx.output.info(f"Token saved to ~/.tracelab/token")
@@ -62,7 +65,7 @@ def status(ctx):
             else:
                 ctx.output.error(
                     "Not authenticated",
-                    details={"suggestion": "Run 'tracelab auth login' to authenticate"}
+                    details={"suggestion": "Run 'tracelab auth login' to authenticate"},
                 )
                 sys.exit(3)
 
@@ -110,11 +113,14 @@ def refresh(ctx):
         token_mgr.save_token(
             access_token=response["access_token"],
             token_type=response.get("token_type", "bearer"),
-            expires_in=response.get("expires_in")
+            expires_in=response.get("expires_in"),
         )
 
         if ctx.json_mode:
-            ctx.output.success("Token refreshed successfully", data={"token_type": response.get("token_type")})
+            ctx.output.success(
+                "Token refreshed successfully",
+                data={"token_type": response.get("token_type")},
+            )
         else:
             ctx.output.success("Token refreshed successfully")
 
@@ -124,4 +130,3 @@ def refresh(ctx):
         else:
             print(format_error_human(e), file=sys.stderr)
         sys.exit(e.exit_code)
-

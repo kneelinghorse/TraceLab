@@ -1,8 +1,10 @@
 """Service for managing saved search records."""
+
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy.exc import IntegrityError
@@ -29,7 +31,7 @@ class SavedSearchService:
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
-    def list_for_owner(self, owner: str) -> List[SavedSearch]:
+    def list_for_owner(self, owner: str) -> list[SavedSearch]:
         """Return all saved searches for the authenticated owner."""
         session = self.session_factory()
         try:
@@ -42,13 +44,15 @@ class SavedSearchService:
         finally:
             session.close()
 
-    def get(self, saved_search_id: UUID | str, owner: str) -> Optional[SavedSearch]:
+    def get(self, saved_search_id: UUID | str, owner: str) -> SavedSearch | None:
         """Look up a saved search owned by the specified user."""
         session = self.session_factory()
         try:
             return (
                 session.query(SavedSearch)
-                .filter(SavedSearch.id == str(saved_search_id), SavedSearch.owner == owner)
+                .filter(
+                    SavedSearch.id == str(saved_search_id), SavedSearch.owner == owner
+                )
                 .one_or_none()
             )
         finally:
@@ -61,9 +65,9 @@ class SavedSearchService:
         name: str,
         query_text: str,
         search_mode: str,
-        filters: Dict[str, Any],
+        filters: dict[str, Any],
         top_k: int,
-        description: Optional[str] = None,
+        description: str | None = None,
     ) -> SavedSearch:
         """Persist a saved search configuration enforcing per-user limits."""
         owner_key = self._clean_owner(owner)
@@ -81,9 +85,15 @@ class SavedSearchService:
         normalized_filters = dict(filters or {})
         session = self.session_factory()
         try:
-            current_total = session.query(SavedSearch).filter(SavedSearch.owner == owner_key).count()
+            current_total = (
+                session.query(SavedSearch)
+                .filter(SavedSearch.owner == owner_key)
+                .count()
+            )
             if current_total >= self.max_saved_per_user:
-                raise ValueError(f"Saved search limit of {self.max_saved_per_user} reached.")
+                raise ValueError(
+                    f"Saved search limit of {self.max_saved_per_user} reached."
+                )
 
             entry = SavedSearch(
                 name=name_value,
@@ -112,14 +122,16 @@ class SavedSearchService:
         saved_search_id: UUID | str,
         *,
         owner: str,
-        updates: Dict[str, Any],
-    ) -> Optional[SavedSearch]:
+        updates: dict[str, Any],
+    ) -> SavedSearch | None:
         """Update mutable fields for a saved search."""
         session = self.session_factory()
         try:
             entry = (
                 session.query(SavedSearch)
-                .filter(SavedSearch.id == str(saved_search_id), SavedSearch.owner == owner)
+                .filter(
+                    SavedSearch.id == str(saved_search_id), SavedSearch.owner == owner
+                )
                 .one_or_none()
             )
             if entry is None:
@@ -165,7 +177,9 @@ class SavedSearchService:
         try:
             deleted = (
                 session.query(SavedSearch)
-                .filter(SavedSearch.id == str(saved_search_id), SavedSearch.owner == owner)
+                .filter(
+                    SavedSearch.id == str(saved_search_id), SavedSearch.owner == owner
+                )
                 .delete(synchronize_session=False)
             )
             session.commit()
@@ -176,13 +190,17 @@ class SavedSearchService:
         finally:
             session.close()
 
-    def mark_used(self, saved_search_id: UUID | str, *, owner: str) -> Optional[SavedSearch]:
+    def mark_used(
+        self, saved_search_id: UUID | str, *, owner: str
+    ) -> SavedSearch | None:
         """Increment usage metrics for a saved search."""
         session = self.session_factory()
         try:
             entry = (
                 session.query(SavedSearch)
-                .filter(SavedSearch.id == str(saved_search_id), SavedSearch.owner == owner)
+                .filter(
+                    SavedSearch.id == str(saved_search_id), SavedSearch.owner == owner
+                )
                 .one_or_none()
             )
             if entry is None:
@@ -210,7 +228,7 @@ class SavedSearchService:
         return (name or "").strip()
 
     @staticmethod
-    def _clean_description(description: str | None) -> Optional[str]:
+    def _clean_description(description: str | None) -> str | None:
         text = (description or "").strip()
         return text or None
 
@@ -229,7 +247,7 @@ class SavedSearchService:
         return value
 
 
-_saved_search_service: Optional[SavedSearchService] = None
+_saved_search_service: SavedSearchService | None = None
 
 
 def get_saved_search_service() -> SavedSearchService:

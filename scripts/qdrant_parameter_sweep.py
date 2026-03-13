@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Benchmark helper that sweeps Qdrant HNSW parameters and quantization."""
+
 from __future__ import annotations
 
 import argparse
@@ -147,13 +148,17 @@ def run_sweep(
         (
             entry
             for entry in sweep_results
-            if entry["p99_latency_ms"] <= target_latency and entry["recall"] >= recall_threshold
+            if entry["p99_latency_ms"] <= target_latency
+            and entry["recall"] >= recall_threshold
         ),
         sweep_results[-1],
     )
 
     payload = {
-        "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        "generated_at": datetime.now(timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z"),
         "collection": diagnostics["collection"],
         "points_count": diagnostics["points_count"],
         "vectors_count": diagnostics["vectors_count"],
@@ -173,9 +178,15 @@ def run_sweep(
 
 
 def _parse_args(argv: Optional[Iterable[str]] = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Sweep Qdrant HNSW parameters and log metrics.")
-    parser.add_argument("--top-k", type=int, default=10, help="Result count for evaluation queries")
-    parser.add_argument("--trials", type=int, default=12, help="Number of random queries to execute")
+    parser = argparse.ArgumentParser(
+        description="Sweep Qdrant HNSW parameters and log metrics."
+    )
+    parser.add_argument(
+        "--top-k", type=int, default=10, help="Result count for evaluation queries"
+    )
+    parser.add_argument(
+        "--trials", type=int, default=12, help="Number of random queries to execute"
+    )
     parser.add_argument(
         "--ef-values",
         type=int,

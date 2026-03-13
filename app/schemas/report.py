@@ -1,8 +1,9 @@
 """Pydantic schemas for Report APIs."""
+
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List, Literal, Optional
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -12,7 +13,7 @@ class CitationSchema(BaseModel):
     """A citation to a source chunk."""
 
     chunk_id: str
-    document_id: Optional[str] = None
+    document_id: str | None = None
     excerpt: str = Field(default="", description="Brief excerpt from source")
 
 
@@ -38,19 +39,19 @@ class ReportCreate(BaseModel):
     """Payload for creating a new report."""
 
     title: str = Field(..., min_length=1, max_length=255)
-    collection_id: Optional[UUID] = Field(
+    collection_id: UUID | None = Field(
         default=None,
         description="Collection to synthesize (mutually exclusive with chunk_ids)",
     )
-    chunk_ids: Optional[List[UUID]] = Field(
+    chunk_ids: list[UUID] | None = Field(
         default=None,
         description="Specific chunks to synthesize (mutually exclusive with collection_id)",
     )
-    project_id: Optional[UUID] = Field(
+    project_id: UUID | None = Field(
         default=None,
         description="Optional project to associate report with",
     )
-    prompt: Optional[str] = Field(
+    prompt: str | None = Field(
         default=None,
         max_length=2000,
         description="Custom synthesis prompt",
@@ -64,8 +65,8 @@ class ReportCreate(BaseModel):
 class ReportUpdate(BaseModel):
     """Payload for updating report metadata."""
 
-    title: Optional[str] = Field(default=None, min_length=1, max_length=255)
-    status: Optional[Literal["draft", "final"]] = Field(default=None)
+    title: str | None = Field(default=None, min_length=1, max_length=255)
+    status: Literal["draft", "final"] | None = Field(default=None)
 
 
 class ReportResponse(BaseModel):
@@ -74,7 +75,7 @@ class ReportResponse(BaseModel):
     id: UUID
     title: str
     content: str
-    citations: List[CitationSchema] = Field(default_factory=list)
+    citations: list[CitationSchema] = Field(default_factory=list)
     tokens_used: int = 0
     status: str = "draft"
     created_at: datetime
@@ -85,11 +86,11 @@ class ReportResponse(BaseModel):
 class ReportDetailResponse(ReportResponse):
     """Report with full details including sources."""
 
-    project_id: Optional[UUID] = None
+    project_id: UUID | None = None
     report_type: str = "summary"
-    prompt: Optional[str] = None
+    prompt: str | None = None
     chunk_count: int = 0
-    sources: List[ReportSourceSchema] = Field(default_factory=list)
+    sources: list[ReportSourceSchema] = Field(default_factory=list)
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
@@ -104,7 +105,7 @@ class ReportListItem(BaseModel):
     report_type: str
     tokens_used: int
     chunk_count: int
-    project_id: Optional[UUID] = None
+    project_id: UUID | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -114,7 +115,7 @@ class ReportListItem(BaseModel):
 class ReportListResponse(BaseModel):
     """Paginated list of reports."""
 
-    items: List[ReportListItem]
+    items: list[ReportListItem]
     total: int
     page: int
     page_size: int

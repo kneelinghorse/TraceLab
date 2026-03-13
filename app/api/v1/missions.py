@@ -5,10 +5,11 @@ Provides full CRUD operations for missions with:
 - Pagination support
 - Proper Pydantic schema validation
 """
+
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
@@ -93,10 +94,10 @@ def _build_actionable_detail(
     *,
     message: str,
     mission=None,
-    suggestion: Optional[str] = None,
-    current_status: Optional[str] = None,
-) -> Dict[str, Any]:
-    detail: Dict[str, Any] = {"message": message}
+    suggestion: str | None = None,
+    current_status: str | None = None,
+) -> dict[str, Any]:
+    detail: dict[str, Any] = {"message": message}
     if mission is not None:
         detail["mission_id"] = mission.mission_id
         detail["uuid"] = str(mission.id)
@@ -185,11 +186,11 @@ def list_missions(
         le=MissionService.MAX_PAGE_SIZE,
         description="Results per page",
     ),
-    status: Optional[str] = Query(
+    status: str | None = Query(
         None,
         description="Filter by mission status (draft, queued, in_progress, completed, blocked, cancelled)",
     ),
-    project_id: Optional[UUID] = Query(
+    project_id: UUID | None = Query(
         None,
         description="Filter by project UUID",
     ),
@@ -265,7 +266,9 @@ def get_mission(
         ) from exc
 
 
-@router.post("", response_model=MissionResponse, status_code=http_status.HTTP_201_CREATED)
+@router.post(
+    "", response_model=MissionResponse, status_code=http_status.HTTP_201_CREATED
+)
 def create_mission(
     data: MissionCreate,
     db: Session = Depends(get_db),
@@ -299,7 +302,10 @@ def create_mission(
     except Exception as exc:
         logger.exception("Error creating mission")
         # Check for unique constraint violation
-        if "UNIQUE constraint failed" in str(exc) or "duplicate key" in str(exc).lower():
+        if (
+            "UNIQUE constraint failed" in str(exc)
+            or "duplicate key" in str(exc).lower()
+        ):
             raise HTTPException(
                 status_code=http_status.HTTP_409_CONFLICT,
                 detail=f"Mission with mission_id '{data.mission_id}' already exists",
@@ -334,7 +340,9 @@ def create_and_submit_mission(
     try:
         mission = _service.create_mission(db, data)
         submit_response = _submit_existing_mission(db=db, mission=mission)
-        submit_response.message = f"Mission created and {submit_response.message.lower()}"
+        submit_response.message = (
+            f"Mission created and {submit_response.message.lower()}"
+        )
         return submit_response
     except HTTPException:
         raise
@@ -348,7 +356,10 @@ def create_and_submit_mission(
         ) from exc
     except Exception as exc:
         logger.exception("Error creating and submitting mission")
-        if "UNIQUE constraint failed" in str(exc) or "duplicate key" in str(exc).lower():
+        if (
+            "UNIQUE constraint failed" in str(exc)
+            or "duplicate key" in str(exc).lower()
+        ):
             raise HTTPException(
                 status_code=http_status.HTTP_409_CONFLICT,
                 detail=_build_actionable_detail(
@@ -406,6 +417,7 @@ def update_mission(
         ):
             try:
                 from app.services.auto_report import AutoReportService
+
                 auto_report_service = AutoReportService()
                 report = auto_report_service.create_report_from_protocol(
                     db=db,
@@ -484,7 +496,9 @@ def export_mission(
     try:
         mission = _get_mission_by_id_or_mission_id(db, mission_id)
     except MissionNotFoundError as exc:
-        raise HTTPException(status_code=http_status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=http_status.HTTP_404_NOT_FOUND, detail=str(exc)
+        ) from exc
 
     protocol_service = MissionProtocolService()
     if format == "md":
@@ -499,7 +513,7 @@ def export_mission(
             "",
             "## Success Criteria",
         ]
-        for criterion in (mission.success_criteria or []):
+        for criterion in mission.success_criteria or []:
             lines.append(f"- {criterion}")
         if mission.tags:
             lines.append("")
@@ -512,7 +526,11 @@ def export_mission(
     return PlainTextResponse(yaml_content, media_type="text/yaml")
 
 
-@router.post("/import", status_code=http_status.HTTP_201_CREATED, summary="Import mission from YAML")
+@router.post(
+    "/import",
+    status_code=http_status.HTTP_201_CREATED,
+    summary="Import mission from YAML",
+)
 def import_mission(
     payload: Dict[str, Any],
     db: Session = Depends(get_db),
@@ -648,10 +666,9 @@ def promote_mission_report(
 
         # Check if already promoted (either via report or markdown)
         from app.models.document import Document
+
         existing_doc = (
-            db.query(Document)
-            .filter(Document.source_mission_id == mission.id)
-            .first()
+            db.query(Document).filter(Document.source_mission_id == mission.id).first()
         )
         if existing_doc:
             raise ReportAlreadyPromotedError(
@@ -660,7 +677,9 @@ def promote_mission_report(
 
         # Try to promote from report first, fall back to markdown
         if mission.result_report_id:
-            report = db.query(Report).filter(Report.id == mission.result_report_id).first()
+            report = (
+                db.query(Report).filter(Report.id == mission.result_report_id).first()
+            )
             if report:
                 document = promotion_service.promote_report(db, mission, report)
                 logger.info(
@@ -693,7 +712,9 @@ def promote_mission_report(
             document_id=document.id,
             document_name=document.name,
             status=status,
-            message="Report promoted to document. Processing complete." if status == "completed" else "Report promoted to document. Processing started.",
+            message="Report promoted to document. Processing complete."
+            if status == "completed"
+            else "Report promoted to document. Processing started.",
             chunk_count=chunk_count,
         )
 

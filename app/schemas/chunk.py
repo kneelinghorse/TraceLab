@@ -1,8 +1,8 @@
 """Pydantic schemas for document chunk entities."""
+
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
@@ -14,12 +14,12 @@ class DocumentChunkBase(BaseModel):
     document_id: UUID
     chunk_index: int
     content: str
-    embedding_id: Optional[str] = None
-    token_count: Optional[int] = None
-    start_char: Optional[int] = None
-    end_char: Optional[int] = None
-    prev_chunk_id: Optional[UUID] = None
-    next_chunk_id: Optional[UUID] = None
+    embedding_id: str | None = None
+    token_count: int | None = None
+    start_char: int | None = None
+    end_char: int | None = None
+    prev_chunk_id: UUID | None = None
+    next_chunk_id: UUID | None = None
 
 
 class DocumentChunkCreate(DocumentChunkBase):
@@ -31,14 +31,14 @@ class DocumentChunkCreate(DocumentChunkBase):
 class DocumentChunkUpdate(BaseModel):
     """Payload for updating a document chunk."""
 
-    chunk_index: Optional[int] = None
-    content: Optional[str] = None
-    embedding_id: Optional[str] = None
-    token_count: Optional[int] = None
-    start_char: Optional[int] = None
-    end_char: Optional[int] = None
-    prev_chunk_id: Optional[UUID] = None
-    next_chunk_id: Optional[UUID] = None
+    chunk_index: int | None = None
+    content: str | None = None
+    embedding_id: str | None = None
+    token_count: int | None = None
+    start_char: int | None = None
+    end_char: int | None = None
+    prev_chunk_id: UUID | None = None
+    next_chunk_id: UUID | None = None
 
 
 class DocumentChunkRead(DocumentChunkBase):

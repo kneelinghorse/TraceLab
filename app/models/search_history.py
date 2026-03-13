@@ -1,10 +1,11 @@
 """Search history persistence model."""
+
 from __future__ import annotations
 
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, Index, Integer, JSON, String, Text
+from sqlalchemy import JSON, Boolean, Column, DateTime, Index, Integer, String, Text
 
 from app.core.database import Base
 from app.models.types import GUID

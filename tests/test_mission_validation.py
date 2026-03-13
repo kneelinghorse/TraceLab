@@ -10,14 +10,14 @@ Tests all validation rules:
 - Pydantic schema validation
 - MissionValidator service
 """
+
 from __future__ import annotations
 
 import pytest
 from pydantic import ValidationError
 
-from app.schemas.mission import MissionCreate, MissionUpdate, MISSION_ID_PATTERN
-from app.services.mission_validator import MissionValidator, ValidationResult
-
+from app.schemas.mission import MISSION_ID_PATTERN, MissionCreate, MissionUpdate
+from app.services.mission_validator import MissionValidator
 
 # ============================================================================
 # mission_id Validation Tests
@@ -70,7 +70,9 @@ class TestMissionIdValidation:
         """Invalid mission_id formats should fail validation."""
         # Test regex directly
         if mission_id:  # Empty string handled differently
-            assert MISSION_ID_PATTERN.match(mission_id) is None, f"Should reject: {reason}"
+            assert MISSION_ID_PATTERN.match(mission_id) is None, (
+                f"Should reject: {reason}"
+            )
 
         # Test via schema
         with pytest.raises(ValidationError) as excinfo:
@@ -81,7 +83,9 @@ class TestMissionIdValidation:
                 success_criteria=["Criterion 1"],
             )
         errors = excinfo.value.errors()
-        assert any(e["loc"] == ("mission_id",) for e in errors), f"Should fail for: {reason}"
+        assert any(e["loc"] == ("mission_id",) for e in errors), (
+            f"Should fail for: {reason}"
+        )
 
     def test_mission_id_max_length(self):
         """mission_id exceeding max length should fail."""
@@ -442,7 +446,9 @@ class TestMissionValidatorService:
 
     def test_validate_success_criteria_valid(self):
         """Valid success_criteria should pass."""
-        errors = self.validator.validate_success_criteria(["Criterion 1", "Criterion 2"])
+        errors = self.validator.validate_success_criteria(
+            ["Criterion 1", "Criterion 2"]
+        )
         assert len(errors) == 0
 
     def test_validate_success_criteria_empty_array(self):
@@ -476,34 +482,40 @@ class TestMissionValidatorService:
 
     def test_validate_create_payload_complete(self):
         """Complete valid payload should pass."""
-        result = self.validator.validate_create_payload({
-            "mission_id": "B16.1",
-            "title": "Test Mission",
-            "objective": "This is a valid objective",
-            "success_criteria": ["Criterion 1"],
-        })
+        result = self.validator.validate_create_payload(
+            {
+                "mission_id": "B16.1",
+                "title": "Test Mission",
+                "objective": "This is a valid objective",
+                "success_criteria": ["Criterion 1"],
+            }
+        )
         assert result.is_valid
         assert len(result.errors) == 0
 
     def test_validate_create_payload_multiple_errors(self):
         """Payload with multiple errors should report all."""
-        result = self.validator.validate_create_payload({
-            "mission_id": "-invalid",
-            "title": "AB",
-            "objective": "short",
-            "success_criteria": [],
-        })
+        result = self.validator.validate_create_payload(
+            {
+                "mission_id": "-invalid",
+                "title": "AB",
+                "objective": "short",
+                "success_criteria": [],
+            }
+        )
         assert not result.is_valid
         assert len(result.errors) >= 4  # At least one error per field
 
     def test_validation_result_to_dict(self):
         """ValidationResult.to_dict should return proper structure."""
-        result = self.validator.validate_create_payload({
-            "mission_id": "",
-            "title": "",
-            "objective": "",
-            "success_criteria": None,
-        })
+        result = self.validator.validate_create_payload(
+            {
+                "mission_id": "",
+                "title": "",
+                "objective": "",
+                "success_criteria": None,
+            }
+        )
         response = result.to_dict()
         assert "valid" in response
         assert "errors" in response
@@ -512,12 +524,14 @@ class TestMissionValidatorService:
 
     def test_validation_result_to_422_response(self):
         """ValidationResult.to_422_response should return FastAPI format."""
-        result = self.validator.validate_create_payload({
-            "mission_id": "",
-            "title": "AB",
-            "objective": "",
-            "success_criteria": None,
-        })
+        result = self.validator.validate_create_payload(
+            {
+                "mission_id": "",
+                "title": "AB",
+                "objective": "",
+                "success_criteria": None,
+            }
+        )
         response = result.to_422_response()
         assert "detail" in response
         assert isinstance(response["detail"], list)
@@ -544,7 +558,10 @@ class TestValidationErrorMessages:
         errors = excinfo.value.errors()
         mission_id_error = next(e for e in errors if e["loc"] == ("mission_id",))
         # Check message is descriptive
-        assert "alphanumeric" in mission_id_error["msg"].lower() or "start" in mission_id_error["msg"].lower()
+        assert (
+            "alphanumeric" in mission_id_error["msg"].lower()
+            or "start" in mission_id_error["msg"].lower()
+        )
 
     def test_success_criteria_item_error_identifies_index(self):
         """success_criteria item error should identify which item failed."""

@@ -22,7 +22,6 @@ from app.services.pedr.graph_layer import GraphLayerConfig, GraphLayerService
 from app.services.pedr.search_orchestrator import PEDRSearchOrchestrator
 from tests.fixtures.graph_fixtures import SeededGraph
 
-
 pytest_plugins = ("tests.fixtures.graph_fixtures",)
 
 
@@ -35,7 +34,9 @@ def graph_search_schema():
 
     mission_table = Mission.__table__.to_metadata(metadata)
     for constraint in list(mission_table.constraints):
-        if isinstance(constraint, CheckConstraint) and "jsonb_array_length" in str(constraint.sqltext):
+        if isinstance(constraint, CheckConstraint) and "jsonb_array_length" in str(
+            constraint.sqltext
+        ):
             mission_table.constraints.remove(constraint)
 
     Document.__table__.to_metadata(metadata)
@@ -59,7 +60,9 @@ def graph_search_schema():
         Column("prev_chunk_id", GUID(), ForeignKey("document_chunks.id")),
         Column("next_chunk_id", GUID(), ForeignKey("document_chunks.id")),
         Column("created_at", DateTime, nullable=True),
-        UniqueConstraint("document_id", "chunk_index", name="uq_document_chunks_document_index"),
+        UniqueConstraint(
+            "document_id", "chunk_index", name="uq_document_chunks_document_index"
+        ),
     )
     GraphEdge.__table__.to_metadata(metadata)
 
@@ -146,7 +149,9 @@ def enable_pedr_cache(monkeypatch):
     monkeypatch.setattr(config.settings, "pedr_cache_enabled", True, raising=False)
 
 
-def test_graph_expands_project_seed_to_expected_chunks(db_session, seeded_graph: SeededGraph):
+def test_graph_expands_project_seed_to_expected_chunks(
+    db_session, seeded_graph: SeededGraph
+):
     service = GraphLayerService(session=db_session)
     result = service.search(
         [seeded_graph.project_urn],
@@ -179,7 +184,9 @@ def test_graph_layer_maps_chunk_ids(db_session, seeded_graph: SeededGraph):
         config=GraphLayerConfig(max_depth=2),
     )
 
-    entry = next(item for item in result.results if item["urn"] == seeded_graph.urns["chunk1"])
+    entry = next(
+        item for item in result.results if item["urn"] == seeded_graph.urns["chunk1"]
+    )
     assert entry["chunk_id"] == str(seeded_graph.chunks["chunk1"].id)
 
 
@@ -190,7 +197,9 @@ def test_graph_layer_includes_edge_types(db_session, seeded_graph: SeededGraph):
         config=GraphLayerConfig(max_depth=2),
     )
 
-    entry = next(item for item in result.results if item["urn"] == seeded_graph.urns["chunk1"])
+    entry = next(
+        item for item in result.results if item["urn"] == seeded_graph.urns["chunk1"]
+    )
     assert entry["edge_type"] == "contains"
 
 
@@ -234,7 +243,9 @@ def test_orchestrator_includes_graph_layer(graph_orchestrator, disable_pedr_cach
     assert "graph" in response.metadata.layers_used
 
 
-def test_orchestrator_skips_graph_layer_when_disabled(graph_orchestrator, disable_pedr_cache):
+def test_orchestrator_skips_graph_layer_when_disabled(
+    graph_orchestrator, disable_pedr_cache
+):
     orchestrator, _, _ = graph_orchestrator
     response = orchestrator.search(
         query="graph disabled",
@@ -245,7 +256,9 @@ def test_orchestrator_skips_graph_layer_when_disabled(graph_orchestrator, disabl
     assert "graph" not in response.metadata.layers_used
 
 
-def test_orchestrator_graph_metadata_includes_graph_ms(graph_orchestrator, disable_pedr_cache):
+def test_orchestrator_graph_metadata_includes_graph_ms(
+    graph_orchestrator, disable_pedr_cache
+):
     orchestrator, _, _ = graph_orchestrator
     response = orchestrator.search(
         query="graph timings",
@@ -268,7 +281,9 @@ def test_orchestrator_graph_candidates_expanded(graph_orchestrator, disable_pedr
     assert response.metadata.graph_candidates_expanded == 2
 
 
-def test_orchestrator_e2e_returns_results_with_graph_enabled(graph_orchestrator, disable_pedr_cache):
+def test_orchestrator_e2e_returns_results_with_graph_enabled(
+    graph_orchestrator, disable_pedr_cache
+):
     orchestrator, _, _ = graph_orchestrator
     response = orchestrator.search(
         query="graph e2e",

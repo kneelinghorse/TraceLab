@@ -1,15 +1,17 @@
 import pytest
 
+from app.services.pedr import QualityFilters
 from scripts.pedr_validation_benchmark import (
     apply_quality_scoring,
     build_quality_gates,
     quality_boost_ratio,
     sign_test_p_value,
 )
-from app.services.pedr import QualityFilters
 
 
-def _metadata(*, status: str, passed_gates: int, validated: bool = False, pii: bool = False) -> dict:
+def _metadata(
+    *, status: str, passed_gates: int, validated: bool = False, pii: bool = False
+) -> dict:
     mission_data = {}
     if pii:
         mission_data["tags"] = ["pii"]
@@ -38,8 +40,12 @@ def test_quality_boost_ratio_complete_vs_draft():
 
 def test_governance_filter_excludes_pii():
     metadata_map = {
-        "doc-safe": _metadata(status="complete", passed_gates=5, validated=True, pii=False),
-        "doc-pii": _metadata(status="complete", passed_gates=5, validated=True, pii=True),
+        "doc-safe": _metadata(
+            status="complete", passed_gates=5, validated=True, pii=False
+        ),
+        "doc-pii": _metadata(
+            status="complete", passed_gates=5, validated=True, pii=True
+        ),
     }
     results = [
         {"document_id": "doc-safe", "combined_score": 1.0, "score": 1.0},
@@ -56,8 +62,12 @@ def test_governance_filter_excludes_pii():
 
 def test_governance_soft_mode_penalizes_pii():
     metadata_map = {
-        "doc-safe": _metadata(status="complete", passed_gates=5, validated=True, pii=False),
-        "doc-pii": _metadata(status="complete", passed_gates=5, validated=True, pii=True),
+        "doc-safe": _metadata(
+            status="complete", passed_gates=5, validated=True, pii=False
+        ),
+        "doc-pii": _metadata(
+            status="complete", passed_gates=5, validated=True, pii=True
+        ),
     }
     results = [
         {"document_id": "doc-safe", "combined_score": 1.0, "score": 1.0},

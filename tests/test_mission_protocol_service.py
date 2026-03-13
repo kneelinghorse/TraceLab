@@ -1,8 +1,9 @@
 """Unit tests for Mission Protocol service operations."""
+
 from __future__ import annotations
 
 from textwrap import dedent
-from typing import Any, Dict
+from typing import Any
 from uuid import UUID
 
 import pytest
@@ -16,8 +17,8 @@ from app.services.mission_protocol_service import (
 )
 
 
-def _mission_payload(**overrides: Any) -> Dict[str, Any]:
-    payload: Dict[str, Any] = {
+def _mission_payload(**overrides: Any) -> dict[str, Any]:
+    payload: dict[str, Any] = {
         "mission_id": "B3.2-demo",
         "title": "Protocol Engine",
         "summary": "Implement CRUD + YAML flows",
@@ -28,7 +29,11 @@ def _mission_payload(**overrides: Any) -> Dict[str, Any]:
             "scope": "Backend services",
         },
         "key_questions": [
-            {"question": "How do we track progress?", "status": "answered", "answer": "Derived metrics"}
+            {
+                "question": "How do we track progress?",
+                "status": "answered",
+                "answer": "Derived metrics",
+            }
         ],
         "synthesis": {
             "key_insights": [
@@ -58,7 +63,9 @@ def _mission_payload(**overrides: Any) -> Dict[str, Any]:
 
 
 def _service() -> MissionProtocolService:
-    return MissionProtocolService(evidence_service=EvidenceLinkingService(require_entities=False))
+    return MissionProtocolService(
+        evidence_service=EvidenceLinkingService(require_entities=False)
+    )
 
 
 def test_create_mission_uses_progress_metrics(db_session, project):
@@ -92,7 +99,9 @@ def test_update_mission_promotes_status_when_ready(db_session, project):
     assert mission.status in {"draft", "in_progress"}
 
     # Update context with full draft that passes all quality gates
-    update_payload = MissionProtocolDraft.model_validate(_mission_payload(mission_id="B3.2-update"))
+    update_payload = MissionProtocolDraft.model_validate(
+        _mission_payload(mission_id="B3.2-update")
+    )
     mission.context = update_payload.model_dump(mode="json")
     db_session.commit()
 

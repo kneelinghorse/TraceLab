@@ -1,10 +1,12 @@
 """Admin endpoints for Qdrant operations and the cost monitoring dashboard."""
+
 from __future__ import annotations
 
 import csv
 import io
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Literal
+from typing import Any, Literal
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, status
 from fastapi.responses import HTMLResponse, StreamingResponse
@@ -17,7 +19,9 @@ from app.services.qdrant_service import QdrantService, get_qdrant_service
 
 router = APIRouter(tags=["admin"])
 _EXPECTED_PAYLOAD_INDEXES = ("project_id", "document_id", "source_type")
-_TEMPLATES = Jinja2Templates(directory=str(Path(__file__).resolve().parents[2] / "templates"))
+_TEMPLATES = Jinja2Templates(
+    directory=str(Path(__file__).resolve().parents[2] / "templates")
+)
 
 
 class PayloadIndexStatus(BaseModel):
@@ -43,9 +47,9 @@ class QdrantHealthResponse(BaseModel):
     collection: str
     collection_exists: bool
     qdrant_url: str
-    expected: Dict[str, Any]
-    actual: Dict[str, Any]
-    payload_indexes: List[PayloadIndexStatus]
+    expected: dict[str, Any]
+    actual: dict[str, Any]
+    payload_indexes: list[PayloadIndexStatus]
 
 
 def get_admin_qdrant_service() -> QdrantService:
@@ -68,11 +72,11 @@ def _extract_attr(obj: Any, path: Iterable[str]) -> Any:
     return current
 
 
-def _payload_indexes(info: Any) -> List[PayloadIndexStatus]:
+def _payload_indexes(info: Any) -> list[PayloadIndexStatus]:
     """Return readiness information for payload indexes we rely on."""
     payload_schema = getattr(info, "payload_schema", None) if info else None
     schema_dict = payload_schema if isinstance(payload_schema, dict) else {}
-    statuses: List[PayloadIndexStatus] = []
+    statuses: list[PayloadIndexStatus] = []
     for field in _EXPECTED_PAYLOAD_INDEXES:
         statuses.append(PayloadIndexStatus(field=field, present=field in schema_dict))
     return statuses
@@ -86,13 +90,15 @@ def init_qdrant_collection(
         description="Apply write-optimized settings for bulk loads",
     ),
     service: QdrantService = Depends(get_admin_qdrant_service),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Create the Qdrant collection if missing and ensure payload indexes exist."""
 
     try:
         service.ensure_collection(write_optimized=write_optimized)
     except RuntimeError as exc:
-        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)
+        ) from exc
     except Exception as exc:  # pragma: no cover - defensive guardrail
         raise HTTPException(
             status.HTTP_502_BAD_GATEWAY,
@@ -108,7 +114,9 @@ def init_qdrant_collection(
 
 
 @router.get("/health", response_model=QdrantHealthResponse)
-def qdrant_health(service: QdrantService = Depends(get_admin_qdrant_service)) -> Dict[str, Any]:
+def qdrant_health(
+    service: QdrantService = Depends(get_admin_qdrant_service),
+) -> dict[str, Any]:
     """Report Qdrant connectivity and collection readiness."""
 
     try:
@@ -119,15 +127,30 @@ def qdrant_health(service: QdrantService = Depends(get_admin_qdrant_service)) ->
         if exists:
             info = service.client.get_collection(service.collection_name)
     except RuntimeError as exc:
-        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)
+        ) from exc
     except Exception as exc:  # pragma: no cover - defensive guardrail
-        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=f"Qdrant health check failed: {exc}") from exc
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Qdrant health check failed: {exc}",
+        ) from exc
 
-    vector_size = _extract_attr(info, ("config", "params", "vectors", "size")) if info else None
-    distance = _extract_attr(info, ("config", "params", "vectors", "distance")) if info else None
+    vector_size = (
+        _extract_attr(info, ("config", "params", "vectors", "size")) if info else None
+    )
+    distance = (
+        _extract_attr(info, ("config", "params", "vectors", "distance"))
+        if info
+        else None
+    )
     status_value = getattr(info, "status", None)
     if status_value is not None:
-        status_value = getattr(status_value, "value", None) or getattr(status_value, "name", None) or str(status_value)
+        status_value = (
+            getattr(status_value, "value", None)
+            or getattr(status_value, "name", None)
+            or str(status_value)
+        )
     vectors_count = getattr(info, "vectors_count", None)
 
     return {
@@ -165,7 +188,9 @@ def dashboard_page(
 
 
 @router.get("/dashboard/data")
-def dashboard_data(aggregator: MetricsAggregator = Depends(get_dashboard_aggregator)) -> Dict[str, Any]:
+def dashboard_data(
+    aggregator: MetricsAggregator = Depends(get_dashboard_aggregator),
+) -> dict[str, Any]:
     """Return the dashboard metrics as JSON for auto-refresh."""
 
     return aggregator.collect()
@@ -184,7 +209,9 @@ def dashboard_export(
 
     rows = metrics.get("export_rows", [])
     buffer = io.StringIO()
-    writer = csv.DictWriter(buffer, fieldnames=["category", "metric", "value", "unit", "notes"])
+    writer = csv.DictWriter(
+        buffer, fieldnames=["category", "metric", "value", "unit", "notes"]
+    )
     writer.writeheader()
     for row in rows:
         writer.writerow(row)

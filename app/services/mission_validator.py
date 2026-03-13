@@ -8,11 +8,11 @@ Implements B16.3 validation requirements:
 - Uniqueness checks
 - Clear, actionable error messages
 """
+
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -27,7 +27,7 @@ class ValidationError:
     field: str
     message: str
     code: str
-    context: Dict[str, Any] = field(default_factory=dict)
+    context: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -35,9 +35,9 @@ class ValidationResult:
     """Result of validation containing errors if any."""
 
     is_valid: bool
-    errors: List[ValidationError] = field(default_factory=list)
+    errors: list[ValidationError] = field(default_factory=list)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to API response format."""
         return {
             "valid": self.is_valid,
@@ -52,7 +52,7 @@ class ValidationResult:
             ],
         }
 
-    def to_422_response(self) -> Dict[str, Any]:
+    def to_422_response(self) -> dict[str, Any]:
         """Convert to FastAPI 422 error response format."""
         return {
             "detail": [
@@ -81,7 +81,7 @@ class MissionValidator:
     TITLE_MAX_LENGTH = 255
     OBJECTIVE_MIN_LENGTH = 10
 
-    def validate_mission_id(self, mission_id: str) -> List[ValidationError]:
+    def validate_mission_id(self, mission_id: str) -> list[ValidationError]:
         """Validate mission_id format.
 
         Rules:
@@ -89,7 +89,7 @@ class MissionValidator:
         - Max length 50
         - Pattern: starts with alphanumeric, can contain letters, numbers, dots, dashes, underscores
         """
-        errors: List[ValidationError] = []
+        errors: list[ValidationError] = []
 
         if not mission_id:
             errors.append(
@@ -123,7 +123,7 @@ class MissionValidator:
 
         return errors
 
-    def validate_title(self, title: str) -> List[ValidationError]:
+    def validate_title(self, title: str) -> list[ValidationError]:
         """Validate title field.
 
         Rules:
@@ -131,7 +131,7 @@ class MissionValidator:
         - Min length 3
         - Max length 255
         """
-        errors: List[ValidationError] = []
+        errors: list[ValidationError] = []
 
         if not title:
             errors.append(
@@ -165,14 +165,14 @@ class MissionValidator:
 
         return errors
 
-    def validate_objective(self, objective: str) -> List[ValidationError]:
+    def validate_objective(self, objective: str) -> list[ValidationError]:
         """Validate objective field.
 
         Rules:
         - Required (non-empty)
         - Min length 10
         """
-        errors: List[ValidationError] = []
+        errors: list[ValidationError] = []
 
         if not objective:
             errors.append(
@@ -197,15 +197,15 @@ class MissionValidator:
         return errors
 
     def validate_success_criteria(
-        self, success_criteria: Optional[List[Any]]
-    ) -> List[ValidationError]:
+        self, success_criteria: list[Any] | None
+    ) -> list[ValidationError]:
         """Validate success_criteria field.
 
         Rules:
         - Required (non-empty array)
         - Each item must be a non-empty string
         """
-        errors: List[ValidationError] = []
+        errors: list[ValidationError] = []
 
         if success_criteria is None:
             errors.append(
@@ -258,9 +258,9 @@ class MissionValidator:
 
         return errors
 
-    def validate_status(self, status: str) -> List[ValidationError]:
+    def validate_status(self, status: str) -> list[ValidationError]:
         """Validate status field against allowed values."""
-        errors: List[ValidationError] = []
+        errors: list[ValidationError] = []
 
         if status not in MISSION_STATUSES:
             errors.append(
@@ -275,8 +275,8 @@ class MissionValidator:
         return errors
 
     def validate_uniqueness(
-        self, db: Session, mission_id: str, exclude_id: Optional[str] = None
-    ) -> List[ValidationError]:
+        self, db: Session, mission_id: str, exclude_id: str | None = None
+    ) -> list[ValidationError]:
         """Check that mission_id is unique in the database.
 
         Args:
@@ -284,7 +284,7 @@ class MissionValidator:
             mission_id: The mission_id to check
             exclude_id: UUID to exclude (for updates)
         """
-        errors: List[ValidationError] = []
+        errors: list[ValidationError] = []
 
         query = db.query(Mission).filter(Mission.mission_id == mission_id)
         if exclude_id:
@@ -303,7 +303,7 @@ class MissionValidator:
         return errors
 
     def validate_create_payload(
-        self, payload: Dict[str, Any], db: Optional[Session] = None
+        self, payload: dict[str, Any], db: Session | None = None
     ) -> ValidationResult:
         """Validate a complete mission creation payload.
 
@@ -314,7 +314,7 @@ class MissionValidator:
         Returns:
             ValidationResult with all errors found
         """
-        errors: List[ValidationError] = []
+        errors: list[ValidationError] = []
 
         # Required field validations
         errors.extend(self.validate_mission_id(payload.get("mission_id", "")))
@@ -327,8 +327,10 @@ class MissionValidator:
             errors.extend(self.validate_status(payload["status"]))
 
         # Uniqueness check
-        if db and payload.get("mission_id") and not any(
-            e.field == "mission_id" for e in errors
+        if (
+            db
+            and payload.get("mission_id")
+            and not any(e.field == "mission_id" for e in errors)
         ):
             errors.extend(self.validate_uniqueness(db, payload["mission_id"]))
 
@@ -336,9 +338,9 @@ class MissionValidator:
 
     def validate_update_payload(
         self,
-        payload: Dict[str, Any],
-        db: Optional[Session] = None,
-        exclude_id: Optional[str] = None,
+        payload: dict[str, Any],
+        db: Session | None = None,
+        exclude_id: str | None = None,
     ) -> ValidationResult:
         """Validate a mission update payload.
 
@@ -352,7 +354,7 @@ class MissionValidator:
         Returns:
             ValidationResult with all errors found
         """
-        errors: List[ValidationError] = []
+        errors: list[ValidationError] = []
 
         # Only validate fields that are present
         if "mission_id" in payload:

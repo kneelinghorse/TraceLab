@@ -8,7 +8,8 @@ on in-memory samples and analyzer stubs provided by the caller.
 
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List, Sequence, Set
+from collections.abc import Iterable, Sequence
+from typing import Any
 
 
 class PresidioEvaluator:
@@ -19,14 +20,14 @@ class PresidioEvaluator:
         self.analyzer = None  # Tests inject stub analyzers directly.
 
     # -- Legacy compatibility -------------------------------------------------
-    def load_corpus_samples(self) -> List[Any]:
+    def load_corpus_samples(self) -> list[Any]:
         """Return corpus samples. Overridden/mocked in tests."""
         return []
 
     # -- Evaluation -----------------------------------------------------------
     def evaluate_priority_entities(
         self, priority_entities: Sequence[str]
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         if self.analyzer is None:
             raise RuntimeError("Analyzer not configured for PresidioEvaluator.")
 
@@ -70,8 +71,12 @@ class PresidioEvaluator:
 
         for entity in priority:
             stats = per_entity[entity]
-            stats["precision"] = self._precision(stats["true_positives"], stats["false_positives"])
-            stats["recall"] = self._recall(stats["true_positives"], stats["false_negatives"])
+            stats["precision"] = self._precision(
+                stats["true_positives"], stats["false_positives"]
+            )
+            stats["recall"] = self._recall(
+                stats["true_positives"], stats["false_negatives"]
+            )
             stats["f1"] = self._f1(stats["precision"], stats["recall"])
 
         overall["precision"] = self._precision(
@@ -99,10 +104,10 @@ class PresidioEvaluator:
     # -- Helpers --------------------------------------------------------------
     def _expected_entities(
         self, sample: Any, priority: Sequence[str]
-    ) -> Dict[str, Set[str]]:
+    ) -> dict[str, set[str]]:
         metadata = getattr(sample, "metadata", {}) or {}
         entities = metadata.get("entities", {})
-        expected: Dict[str, Set[str]] = {entity: set() for entity in priority}
+        expected: dict[str, set[str]] = {entity: set() for entity in priority}
         for entity, values in entities.items():
             if entity not in expected:
                 continue
@@ -111,8 +116,8 @@ class PresidioEvaluator:
 
     def _predicted_entities(
         self, sample: Any, priority: Sequence[str]
-    ) -> Dict[str, Set[str]]:
-        predictions: Dict[str, Set[str]] = {entity: set() for entity in priority}
+    ) -> dict[str, set[str]]:
+        predictions: dict[str, set[str]] = {entity: set() for entity in priority}
         text = getattr(sample, "full_text", "")
         spans = self.analyzer.analyze(text, language="en")
         for span in spans:
@@ -126,8 +131,8 @@ class PresidioEvaluator:
         return predictions
 
     @staticmethod
-    def _normalize_metadata_values(values: Any) -> Set[str]:
-        normalized: Set[str] = set()
+    def _normalize_metadata_values(values: Any) -> set[str]:
+        normalized: set[str] = set()
         if values is None:
             return normalized
         if isinstance(values, dict):

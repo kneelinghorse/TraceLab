@@ -1,4 +1,5 @@
 """Comprehensive auth flow coverage for login, refresh, and protected routes."""
+
 from __future__ import annotations
 
 import pytest
@@ -35,7 +36,9 @@ def test_login_returns_full_payload(client: TestClient):
     assert payload["token_type"] == "bearer"
     assert payload["expires_in"] == settings.access_token_expire_minutes * 60
     assert payload["user"]["display_name"] == settings.auth_username
-    assert isinstance(payload["access_token"], str) and len(payload["access_token"]) > 20
+    assert (
+        isinstance(payload["access_token"], str) and len(payload["access_token"]) > 20
+    )
 
 
 def test_login_rejects_unknown_email(client: TestClient):

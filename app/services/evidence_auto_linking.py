@@ -1,15 +1,17 @@
 """Similarity-based evidence auto-linking for DeepSearch ingestion."""
+
 from __future__ import annotations
 
 import json
 import logging
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from difflib import SequenceMatcher
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -66,13 +68,13 @@ class EvidenceMatchResult:
     """Individual evidence matching outcome with error tracking."""
 
     evidence_id: str
-    chunk_id: Optional[str] = None
+    chunk_id: str | None = None
     similarity: float = 0.0
     summary_preview: str = ""
     success: bool = False
-    error_type: Optional[AutoLinkErrorType] = None
+    error_type: AutoLinkErrorType | None = None
     retry_count: int = 0
-    last_error: Optional[str] = None
+    last_error: str | None = None
 
 
 @dataclass(slots=True)
@@ -84,8 +86,8 @@ class EvidenceAutoLinkingResult:
     skipped: int = 0
     failed: int = 0
     threshold: float = 0.7
-    matches: List[Dict[str, Any]] = field(default_factory=list)
-    errors: List[Dict[str, Any]] = field(default_factory=list)
+    matches: list[dict[str, Any]] = field(default_factory=list)
+    errors: list[dict[str, Any]] = field(default_factory=list)
 
     @property
     def success_rate(self) -> float:
@@ -101,7 +103,7 @@ class EvidenceAutoLinkingResult:
             return 0.0
         return round(self.failed / self.attempted, 3)
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self) -> dict[str, Any]:
         return {
             "attempted": self.attempted,
             "linked": self.linked,
@@ -129,8 +131,8 @@ class EvidenceAutoLinkingService:
         similarity_threshold: float | None = None,
         candidate_limit: int = 750,
         telemetry_path: Path | None = None,
-        embedding_service: "EmbeddingService | None" = None,
-        qdrant_service: "QdrantService | None" = None,
+        embedding_service: EmbeddingService | None = None,
+        qdrant_service: QdrantService | None = None,
         top_k: int | None = None,
         fallback_to_difflib: bool | None = None,
     ) -> None:
@@ -153,7 +155,13 @@ class EvidenceAutoLinkingService:
         self._qdrant_service = qdrant_service
 
         repo_root = Path(__file__).resolve().parents[2]
-        default_path = repo_root / "cmos" / "telemetry" / "events" / "sprint-10-deepsearch-ingestion.jsonl"
+        default_path = (
+            repo_root
+            / "cmos"
+            / "telemetry"
+            / "events"
+            / "sprint-10-deepsearch-ingestion.jsonl"
+        )
         self.telemetry_path = telemetry_path or default_path
 
     # ------------------------------------------------------------------
@@ -166,7 +174,7 @@ class EvidenceAutoLinkingService:
         mission: MissionProtocolComplete,
         *,
         project_id: UUID | None = None,
-        similarity_threshold: Optional[float] = None,
+        similarity_threshold: float | None = None,
     ) -> EvidenceAutoLinkingResult:
         """Populate chunk identifiers for evidence rows lacking traceability."""
 
@@ -184,8 +192,13 @@ class EvidenceAutoLinkingService:
 
         if use_embeddings:
             return self._link_via_embeddings(
-                db, mission, project_id, result, threshold,
-                embedding_svc, qdrant_svc,
+                db,
+                mission,
+                project_id,
+                result,
+                threshold,
+                embedding_svc,
+                qdrant_svc,
             )
 
         if self.fallback_to_difflib:
@@ -199,20 +212,24 @@ class EvidenceAutoLinkingService:
                 continue
             result.attempted += 1
             result.failed += 1
-            result.errors.append({
-                "evidence_id": item.evidence_id,
-                "error_type": AutoLinkErrorType.EMBEDDING_FAILED.value,
-                "message": "Embedding service unavailable and fallback disabled",
-            })
-            result.matches.append({
-                "evidence_id": item.evidence_id,
-                "chunk_id": None,
-                "similarity": 0.0,
-                "summary_preview": self._preview(item.summary),
-                "success": False,
-                "error_type": AutoLinkErrorType.EMBEDDING_FAILED.value,
-                "method": "none",
-            })
+            result.errors.append(
+                {
+                    "evidence_id": item.evidence_id,
+                    "error_type": AutoLinkErrorType.EMBEDDING_FAILED.value,
+                    "message": "Embedding service unavailable and fallback disabled",
+                }
+            )
+            result.matches.append(
+                {
+                    "evidence_id": item.evidence_id,
+                    "chunk_id": None,
+                    "similarity": 0.0,
+                    "summary_preview": self._preview(item.summary),
+                    "success": False,
+                    "error_type": AutoLinkErrorType.EMBEDDING_FAILED.value,
+                    "method": "none",
+                }
+            )
 
         self._log_telemetry(mission, project_id, result)
         return result
@@ -228,8 +245,8 @@ class EvidenceAutoLinkingService:
         project_id: UUID | None,
         result: EvidenceAutoLinkingResult,
         threshold: float,
-        embedding_svc: "EmbeddingService",
-        qdrant_svc: "QdrantService",
+        embedding_svc: EmbeddingService,
+        qdrant_svc: QdrantService,
     ) -> EvidenceAutoLinkingResult:
         """Link evidence using embed + Qdrant cosine similarity search."""
 
@@ -242,7 +259,7 @@ class EvidenceAutoLinkingService:
 
             result.attempted += 1
             summary = (item.summary or "").strip()
-            match_payload: Dict[str, Any] = {
+            match_payload: dict[str, Any] = {
                 "evidence_id": item.evidence_id,
                 "chunk_id": None,
                 "similarity": 0.0,
@@ -256,11 +273,13 @@ class EvidenceAutoLinkingService:
             if not summary:
                 result.failed += 1
                 match_payload["error_type"] = AutoLinkErrorType.EMPTY_CONTENT.value
-                result.errors.append({
-                    "evidence_id": item.evidence_id,
-                    "error_type": AutoLinkErrorType.EMPTY_CONTENT.value,
-                    "message": "Evidence summary is empty or whitespace-only",
-                })
+                result.errors.append(
+                    {
+                        "evidence_id": item.evidence_id,
+                        "error_type": AutoLinkErrorType.EMPTY_CONTENT.value,
+                        "message": "Evidence summary is empty or whitespace-only",
+                    }
+                )
                 result.matches.append(match_payload)
                 continue
 
@@ -271,11 +290,13 @@ class EvidenceAutoLinkingService:
                 logger.warning("Embedding failed for %s: %s", item.evidence_id, exc)
                 result.failed += 1
                 match_payload["error_type"] = AutoLinkErrorType.EMBEDDING_FAILED.value
-                result.errors.append({
-                    "evidence_id": item.evidence_id,
-                    "error_type": AutoLinkErrorType.EMBEDDING_FAILED.value,
-                    "message": f"Embedding generation failed: {exc}",
-                })
+                result.errors.append(
+                    {
+                        "evidence_id": item.evidence_id,
+                        "error_type": AutoLinkErrorType.EMBEDDING_FAILED.value,
+                        "message": f"Embedding generation failed: {exc}",
+                    }
+                )
                 result.matches.append(match_payload)
                 continue
 
@@ -290,11 +311,13 @@ class EvidenceAutoLinkingService:
                 logger.warning("Qdrant search failed for %s: %s", item.evidence_id, exc)
                 result.failed += 1
                 match_payload["error_type"] = AutoLinkErrorType.QDRANT_ERROR.value
-                result.errors.append({
-                    "evidence_id": item.evidence_id,
-                    "error_type": AutoLinkErrorType.QDRANT_ERROR.value,
-                    "message": f"Qdrant search failed: {exc}",
-                })
+                result.errors.append(
+                    {
+                        "evidence_id": item.evidence_id,
+                        "error_type": AutoLinkErrorType.QDRANT_ERROR.value,
+                        "message": f"Qdrant search failed: {exc}",
+                    }
+                )
                 result.matches.append(match_payload)
                 continue
 
@@ -302,11 +325,13 @@ class EvidenceAutoLinkingService:
             if not hits:
                 result.failed += 1
                 match_payload["error_type"] = AutoLinkErrorType.NO_CHUNKS.value
-                result.errors.append({
-                    "evidence_id": item.evidence_id,
-                    "error_type": AutoLinkErrorType.NO_CHUNKS.value,
-                    "message": "No chunks returned from Qdrant search",
-                })
+                result.errors.append(
+                    {
+                        "evidence_id": item.evidence_id,
+                        "error_type": AutoLinkErrorType.NO_CHUNKS.value,
+                        "message": "No chunks returned from Qdrant search",
+                    }
+                )
                 result.matches.append(match_payload)
                 continue
 
@@ -328,13 +353,15 @@ class EvidenceAutoLinkingService:
             else:
                 result.failed += 1
                 match_payload["error_type"] = AutoLinkErrorType.LOW_SIMILARITY.value
-                result.errors.append({
-                    "evidence_id": item.evidence_id,
-                    "error_type": AutoLinkErrorType.LOW_SIMILARITY.value,
-                    "message": f"Best match ({score:.3f}) below threshold ({threshold})",
-                    "best_similarity": round(score, 3),
-                    "threshold": threshold,
-                })
+                result.errors.append(
+                    {
+                        "evidence_id": item.evidence_id,
+                        "error_type": AutoLinkErrorType.LOW_SIMILARITY.value,
+                        "message": f"Best match ({score:.3f}) below threshold ({threshold})",
+                        "best_similarity": round(score, 3),
+                        "threshold": threshold,
+                    }
+                )
 
             result.matches.append(match_payload)
 
@@ -366,7 +393,7 @@ class EvidenceAutoLinkingService:
 
             result.attempted += 1
             summary = self._normalize_text(item.summary)
-            match_payload: Dict[str, Any] = {
+            match_payload: dict[str, Any] = {
                 "evidence_id": item.evidence_id,
                 "chunk_id": None,
                 "similarity": 0.0,
@@ -380,11 +407,13 @@ class EvidenceAutoLinkingService:
             if not summary:
                 result.failed += 1
                 match_payload["error_type"] = AutoLinkErrorType.EMPTY_CONTENT.value
-                result.errors.append({
-                    "evidence_id": item.evidence_id,
-                    "error_type": AutoLinkErrorType.EMPTY_CONTENT.value,
-                    "message": "Evidence summary is empty or whitespace-only",
-                })
+                result.errors.append(
+                    {
+                        "evidence_id": item.evidence_id,
+                        "error_type": AutoLinkErrorType.EMPTY_CONTENT.value,
+                        "message": "Evidence summary is empty or whitespace-only",
+                    }
+                )
                 result.matches.append(match_payload)
                 continue
 
@@ -392,11 +421,13 @@ class EvidenceAutoLinkingService:
             if no_chunks:
                 result.failed += 1
                 match_payload["error_type"] = AutoLinkErrorType.NO_CHUNKS.value
-                result.errors.append({
-                    "evidence_id": item.evidence_id,
-                    "error_type": AutoLinkErrorType.NO_CHUNKS.value,
-                    "message": "No chunks exist in project for matching",
-                })
+                result.errors.append(
+                    {
+                        "evidence_id": item.evidence_id,
+                        "error_type": AutoLinkErrorType.NO_CHUNKS.value,
+                        "message": "No chunks exist in project for matching",
+                    }
+                )
                 result.matches.append(match_payload)
                 continue
 
@@ -415,21 +446,25 @@ class EvidenceAutoLinkingService:
                     # Below threshold - classify as LOW_SIMILARITY
                     result.failed += 1
                     match_payload["error_type"] = AutoLinkErrorType.LOW_SIMILARITY.value
-                    result.errors.append({
-                        "evidence_id": item.evidence_id,
-                        "error_type": AutoLinkErrorType.LOW_SIMILARITY.value,
-                        "message": f"Best match ({score:.3f}) below threshold ({threshold})",
-                        "best_similarity": round(score, 3),
-                        "threshold": threshold,
-                    })
+                    result.errors.append(
+                        {
+                            "evidence_id": item.evidence_id,
+                            "error_type": AutoLinkErrorType.LOW_SIMILARITY.value,
+                            "message": f"Best match ({score:.3f}) below threshold ({threshold})",
+                            "best_similarity": round(score, 3),
+                            "threshold": threshold,
+                        }
+                    )
             else:
                 result.failed += 1
                 match_payload["error_type"] = AutoLinkErrorType.NO_EMBEDDING.value
-                result.errors.append({
-                    "evidence_id": item.evidence_id,
-                    "error_type": AutoLinkErrorType.NO_EMBEDDING.value,
-                    "message": "Could not find any matching candidate",
-                })
+                result.errors.append(
+                    {
+                        "evidence_id": item.evidence_id,
+                        "error_type": AutoLinkErrorType.NO_EMBEDDING.value,
+                        "message": "Could not find any matching candidate",
+                    }
+                )
 
             result.matches.append(match_payload)
 
@@ -442,7 +477,7 @@ class EvidenceAutoLinkingService:
 
     def _resolve_services(
         self,
-    ) -> "Tuple[EmbeddingService | None, QdrantService | None]":
+    ) -> tuple[EmbeddingService | None, QdrantService | None]:
         """Lazily resolve embedding and Qdrant services from singletons."""
         embedding = self._embedding_service
         qdrant = self._qdrant_service
@@ -450,6 +485,7 @@ class EvidenceAutoLinkingService:
         if embedding is None:
             try:
                 from app.services.embedding_service import get_embedding_service
+
                 embedding = get_embedding_service()
             except Exception:
                 embedding = None
@@ -457,6 +493,7 @@ class EvidenceAutoLinkingService:
         if qdrant is None:
             try:
                 from app.services.qdrant_service import get_qdrant_service
+
                 qdrant = get_qdrant_service()
             except Exception:
                 qdrant = None
@@ -467,10 +504,9 @@ class EvidenceAutoLinkingService:
         self,
         db: Session,
         project_id: UUID | None,
-    ) -> Sequence[Tuple[UUID, str]]:
-        query = (
-            db.query(DocumentChunk.id, DocumentChunk.content)
-            .join(Document, Document.id == DocumentChunk.document_id)
+    ) -> Sequence[tuple[UUID, str]]:
+        query = db.query(DocumentChunk.id, DocumentChunk.content).join(
+            Document, Document.id == DocumentChunk.document_id
         )
         if project_id:
             query = query.filter(Document.project_id == project_id)
@@ -484,12 +520,12 @@ class EvidenceAutoLinkingService:
     def _best_candidate(
         self,
         summary: str,
-        candidates: Sequence[Tuple[UUID, str]],
-    ) -> Optional[Tuple[UUID, float]]:
+        candidates: Sequence[tuple[UUID, str]],
+    ) -> tuple[UUID, float] | None:
         if not summary:
             return None
 
-        best: Tuple[UUID, float] | None = None
+        best: tuple[UUID, float] | None = None
         for chunk_id, content in candidates:
             normalized = self._normalize_text(content)
             if not normalized:
@@ -505,31 +541,28 @@ class EvidenceAutoLinkingService:
         project_id: UUID | None,
         result: EvidenceAutoLinkingResult,
     ) -> None:
-        from app.core.telemetry import emit_telemetry
-
         methods_used = {m.get("method", "unknown") for m in result.matches}
         linking_method = "embedding" if "embedding" in methods_used else "difflib"
 
-        emit_telemetry(
-            path=self.telemetry_path,
-            event_type="evidence.auto_linking.completed",
-            source="tracelab",
-            payload={
-                "mission_id": mission.mission_id,
-                "project_id": str(project_id) if project_id else None,
-                "linking_method": linking_method,
-                "auto_linking": result.as_dict(),
-            },
-        )
+        payload = {
+            "ts": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+            "mission_id": mission.mission_id,
+            "project_id": str(project_id) if project_id else None,
+            "linking_method": linking_method,
+            "auto_linking": result.as_dict(),
+        }
+        self.telemetry_path.parent.mkdir(parents=True, exist_ok=True)
+        with self.telemetry_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
 
     @staticmethod
-    def _normalize_text(text: Optional[str]) -> str:
+    def _normalize_text(text: str | None) -> str:
         if not text:
             return ""
         return _WHITESPACE.sub(" ", text.lower()).strip()
 
     @staticmethod
-    def _preview(text: Optional[str], limit: int = 120) -> str:
+    def _preview(text: str | None, limit: int = 120) -> str:
         if not text:
             return ""
         normalized = _WHITESPACE.sub(" ", text).strip()

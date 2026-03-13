@@ -23,6 +23,7 @@ Usage:
         sprint_id="sprint-35",
     )
 """
+
 from __future__ import annotations
 
 import json
@@ -188,11 +189,13 @@ def validate_jsonl_file(path: Path) -> Dict[str, Any]:
                 conforming += 1
             else:
                 missing = {"ts", "event_type", "source", "payload"} - set(event.keys())
-                violations.append({
-                    "line": line_no,
-                    "error": "missing envelope fields",
-                    "missing": sorted(missing),
-                })
+                violations.append(
+                    {
+                        "line": line_no,
+                        "error": "missing envelope fields",
+                        "missing": sorted(missing),
+                    }
+                )
 
     return {
         "path": str(path),

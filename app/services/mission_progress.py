@@ -1,19 +1,21 @@
 """Mission Protocol progress and quality gate evaluation helpers."""
+
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, List, Sequence, Tuple, Union, get_args
+from typing import Any, Union, get_args
 
 from app.models.mission_protocol import (
+    REQUIRED_COMPLETION_GATES,
     MissionProtocolComplete,
     MissionProtocolDraft,
     QualityCheckpoint,
     QualityGateName,
-    REQUIRED_COMPLETION_GATES,
 )
 
-MissionPayload = Union[MissionProtocolDraft, MissionProtocolComplete, Dict[str, Any]]
+MissionPayload = Union[MissionProtocolDraft, MissionProtocolComplete, dict[str, Any]]
 
 
 @dataclass
@@ -21,9 +23,9 @@ class MissionProgressSnapshot:
     """Represents derived progress metrics for a Mission Protocol payload."""
 
     completion_percentage: int
-    completed_checks: List[str]
-    pending_checks: List[str]
-    quality_gates: Dict[str, Dict[str, Any]]
+    completed_checks: list[str]
+    pending_checks: list[str]
+    quality_gates: dict[str, dict[str, Any]]
 
     def is_completion_ready(self) -> bool:
         """Return True when the mission satisfies completion criteria."""
@@ -82,14 +84,19 @@ def _coerce_payload(payload: MissionPayload) -> MissionProtocolDraft:
     raise TypeError("Unsupported mission payload type")
 
 
-def _evaluate_required_fields(mission: MissionProtocolDraft) -> Tuple[List[str], List[str]]:
-    checks: Sequence[Tuple[str, bool]] = (
+def _evaluate_required_fields(
+    mission: MissionProtocolDraft,
+) -> tuple[list[str], list[str]]:
+    checks: Sequence[tuple[str, bool]] = (
         ("mission_id", bool(mission.mission_id)),
         ("title", bool(mission.title)),
         ("research_statement", mission.research_statement is not None),
         (
             "answered_key_question",
-            any(q.status == "answered" and (q.answer or "").strip() for q in mission.key_questions),
+            any(
+                q.status == "answered" and (q.answer or "").strip()
+                for q in mission.key_questions
+            ),
         ),
         (
             "synthesis_key_insight",
@@ -109,11 +116,18 @@ def _calculate_percentage(completed: int, total: int) -> int:
     return int(round((completed / total) * 100))
 
 
-def _collect_quality_gates(checkpoints: Sequence[QualityCheckpoint]) -> Dict[str, Dict[str, Any]]:
-    gate_names: Tuple[str, ...] = get_args(QualityGateName)  # type: ignore[arg-type]
-    gates: Dict[str, Dict[str, Any]] = {
-        gate: {"status": "pending", "validated": False, "notes": None,
-               "validated_by": None, "validated_at": None}
+def _collect_quality_gates(
+    checkpoints: Sequence[QualityCheckpoint],
+) -> dict[str, dict[str, Any]]:
+    gate_names: tuple[str, ...] = get_args(QualityGateName)  # type: ignore[arg-type]
+    gates: dict[str, dict[str, Any]] = {
+        gate: {
+            "status": "pending",
+            "validated": False,
+            "notes": None,
+            "validated_by": None,
+            "validated_at": None,
+        }
         for gate in gate_names
     }
 

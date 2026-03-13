@@ -1,16 +1,17 @@
 """Materialize Semantic Protocol edges into graph_edges storage."""
+
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any
 
 from sqlalchemy import func, or_, tuple_
 from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
 from app.models import (
-    Collection,
     CollectionItem,
     Document,
     DocumentChunk,
@@ -39,12 +40,12 @@ class EdgeSpec:
     to_urn: str
     direction: str = "out"
     weight: float = 1.0
-    reason: Optional[str] = None
-    via: Optional[str] = None
-    evidence: Optional[Dict[str, Any]] = None
+    reason: str | None = None
+    via: str | None = None
+    evidence: dict[str, Any] | None = None
 
     @property
-    def key(self) -> Tuple[str, str, str, str]:
+    def key(self) -> tuple[str, str, str, str]:
         return (self.from_urn, self.to_urn, self.edge_type, self.direction)
 
 
@@ -55,7 +56,7 @@ class MaterializationResult:
     inserted_count: int = 0
     updated_count: int = 0
     skipped_count: int = 0
-    errors: List[str] = field(default_factory=list)
+    errors: list[str] = field(default_factory=list)
 
     @property
     def total(self) -> int:
@@ -79,7 +80,7 @@ class EdgeMaterializationService:
     def materialize_from_manifest(
         self,
         manifest: ProtocolManifest,
-        session: Optional[Session] = None,
+        session: Session | None = None,
     ) -> MaterializationResult:
         """Persist explicit edges from a ProtocolManifest."""
         session, managed = self._get_session(session)
@@ -92,10 +93,10 @@ class EdgeMaterializationService:
 
     def materialize_implicit_edges(
         self,
-        session: Optional[Session] = None,
+        session: Session | None = None,
         *,
         mode: str = "full",
-        project_id: Optional[str] = None,
+        project_id: str | None = None,
     ) -> MaterializationResult:
         """Persist implicit edges derived from FK relationships."""
         session, managed = self._get_session(session)
@@ -105,30 +106,32 @@ class EdgeMaterializationService:
                 since = self._resolve_incremental_cutoff(session)
             # Materialize all specs before upserting so yield_per cursors
             # complete before any mid-batch commits invalidate them.
-            edges = list(self._implicit_edge_specs(
-                session,
-                project_id=project_id,
-                since=since,
-            ))
+            edges = list(
+                self._implicit_edge_specs(
+                    session,
+                    project_id=project_id,
+                    since=since,
+                )
+            )
             return self._upsert_edges(edges, session=session, commit=managed)
         finally:
             if managed:
                 session.close()
 
-    def _get_session(self, session: Optional[Session]) -> Tuple[Session, bool]:
+    def _get_session(self, session: Session | None) -> tuple[Session, bool]:
         if session is not None:
             return session, False
         return self.session_factory(), True
 
     @staticmethod
-    def _resolve_incremental_cutoff(session: Session) -> Optional[datetime]:
+    def _resolve_incremental_cutoff(session: Session) -> datetime | None:
         return session.query(func.max(GraphEdge.updated_at)).scalar()
 
     def _edges_from_manifest(
         self,
         manifest: ProtocolManifest,
     ) -> Iterable[EdgeSpec]:
-        edges: List[Edge] = []
+        edges: list[Edge] = []
 
         if getattr(manifest, "edges", None):
             edges = list(manifest.edges)
@@ -160,32 +163,60 @@ class EdgeMaterializationService:
         self,
         session: Session,
         *,
-        project_id: Optional[str],
-        since: Optional[datetime],
+        project_id: str | None,
+        since: datetime | None,
     ) -> Iterable[EdgeSpec]:
-        yield from self._project_document_edges(session, project_id=project_id, since=since)
-        yield from self._document_project_edges(session, project_id=project_id, since=since)
-        yield from self._document_chunk_edges(session, project_id=project_id, since=since)
-        yield from self._chunk_document_edges(session, project_id=project_id, since=since)
-        yield from self._mission_project_edges(session, project_id=project_id, since=since)
-        yield from self._mission_document_edges(session, project_id=project_id, since=since)
-        yield from self._mission_report_edges(session, project_id=project_id, since=since)
-        yield from self._insight_project_edges(session, project_id=project_id, since=since)
-        yield from self._insight_chunk_edges(session, project_id=project_id, since=since)
-        yield from self._report_project_edges(session, project_id=project_id, since=since)
+        yield from self._project_document_edges(
+            session, project_id=project_id, since=since
+        )
+        yield from self._document_project_edges(
+            session, project_id=project_id, since=since
+        )
+        yield from self._document_chunk_edges(
+            session, project_id=project_id, since=since
+        )
+        yield from self._chunk_document_edges(
+            session, project_id=project_id, since=since
+        )
+        yield from self._mission_project_edges(
+            session, project_id=project_id, since=since
+        )
+        yield from self._mission_document_edges(
+            session, project_id=project_id, since=since
+        )
+        yield from self._mission_report_edges(
+            session, project_id=project_id, since=since
+        )
+        yield from self._insight_project_edges(
+            session, project_id=project_id, since=since
+        )
+        yield from self._insight_chunk_edges(
+            session, project_id=project_id, since=since
+        )
+        yield from self._report_project_edges(
+            session, project_id=project_id, since=since
+        )
         yield from self._report_chunk_edges(session, project_id=project_id, since=since)
-        yield from self._report_collection_edges(session, project_id=project_id, since=since)
-        yield from self._document_source_edges(session, project_id=project_id, since=since)
-        yield from self._collection_chunk_edges(session, project_id=project_id, since=since)
+        yield from self._report_collection_edges(
+            session, project_id=project_id, since=since
+        )
+        yield from self._document_source_edges(
+            session, project_id=project_id, since=since
+        )
+        yield from self._collection_chunk_edges(
+            session, project_id=project_id, since=since
+        )
         # Semantic edge types (T38.1)
-        yield from self._collection_cooccurrence_edges(session, project_id=project_id, since=since)
+        yield from self._collection_cooccurrence_edges(
+            session, project_id=project_id, since=since
+        )
 
     def _project_document_edges(
         self,
         session: Session,
         *,
-        project_id: Optional[str],
-        since: Optional[datetime],
+        project_id: str | None,
+        since: datetime | None,
     ) -> Iterable[EdgeSpec]:
         query = (
             session.query(Document.project_id, Document.id)
@@ -216,8 +247,8 @@ class EdgeMaterializationService:
         self,
         session: Session,
         *,
-        project_id: Optional[str],
-        since: Optional[datetime],
+        project_id: str | None,
+        since: datetime | None,
     ) -> Iterable[EdgeSpec]:
         query = (
             session.query(Document.id, Document.project_id)
@@ -246,8 +277,8 @@ class EdgeMaterializationService:
         self,
         session: Session,
         *,
-        project_id: Optional[str],
-        since: Optional[datetime],
+        project_id: str | None,
+        since: datetime | None,
     ) -> Iterable[EdgeSpec]:
         query = (
             session.query(DocumentChunk.document_id, DocumentChunk.chunk_index)
@@ -276,8 +307,8 @@ class EdgeMaterializationService:
         self,
         session: Session,
         *,
-        project_id: Optional[str],
-        since: Optional[datetime],
+        project_id: str | None,
+        since: datetime | None,
     ) -> Iterable[EdgeSpec]:
         query = (
             session.query(DocumentChunk.document_id, DocumentChunk.chunk_index)
@@ -306,12 +337,11 @@ class EdgeMaterializationService:
         self,
         session: Session,
         *,
-        project_id: Optional[str],
-        since: Optional[datetime],
+        project_id: str | None,
+        since: datetime | None,
     ) -> Iterable[EdgeSpec]:
-        query = (
-            session.query(Mission.mission_id, Mission.project_id)
-            .filter(Mission.project_id.isnot(None))
+        query = session.query(Mission.mission_id, Mission.project_id).filter(
+            Mission.project_id.isnot(None)
         )
         if project_id:
             query = query.filter(Mission.project_id == project_id)
@@ -337,12 +367,11 @@ class EdgeMaterializationService:
         self,
         session: Session,
         *,
-        project_id: Optional[str],
-        since: Optional[datetime],
+        project_id: str | None,
+        since: datetime | None,
     ) -> Iterable[EdgeSpec]:
-        query = (
-            session.query(Mission.mission_id, Mission.result_document_ids)
-            .filter(Mission.result_document_ids.isnot(None))
+        query = session.query(Mission.mission_id, Mission.result_document_ids).filter(
+            Mission.result_document_ids.isnot(None)
         )
         if project_id:
             query = query.filter(Mission.project_id == project_id)
@@ -350,7 +379,11 @@ class EdgeMaterializationService:
             query = query.filter(Mission.updated_at >= since)
 
         for mission_id, result_doc_ids in query.yield_per(self.batch_size):
-            if not mission_id or not result_doc_ids or not isinstance(result_doc_ids, list):
+            if (
+                not mission_id
+                or not result_doc_ids
+                or not isinstance(result_doc_ids, list)
+            ):
                 continue
             from_urn = str(URNGenerator.for_mission(str(mission_id)))
             for doc_id in result_doc_ids:
@@ -371,12 +404,11 @@ class EdgeMaterializationService:
         self,
         session: Session,
         *,
-        project_id: Optional[str],
-        since: Optional[datetime],
+        project_id: str | None,
+        since: datetime | None,
     ) -> Iterable[EdgeSpec]:
-        query = (
-            session.query(Mission.mission_id, Mission.result_report_id)
-            .filter(Mission.result_report_id.isnot(None))
+        query = session.query(Mission.mission_id, Mission.result_report_id).filter(
+            Mission.result_report_id.isnot(None)
         )
         if project_id:
             query = query.filter(Mission.project_id == project_id)
@@ -402,12 +434,11 @@ class EdgeMaterializationService:
         self,
         session: Session,
         *,
-        project_id: Optional[str],
-        since: Optional[datetime],
+        project_id: str | None,
+        since: datetime | None,
     ) -> Iterable[EdgeSpec]:
-        query = (
-            session.query(Insight.id, Insight.project_id)
-            .filter(Insight.project_id.isnot(None))
+        query = session.query(Insight.id, Insight.project_id).filter(
+            Insight.project_id.isnot(None)
         )
         if project_id:
             query = query.filter(Insight.project_id == project_id)
@@ -431,12 +462,11 @@ class EdgeMaterializationService:
         self,
         session: Session,
         *,
-        project_id: Optional[str],
-        since: Optional[datetime],
+        project_id: str | None,
+        since: datetime | None,
     ) -> Iterable[EdgeSpec]:
-        query = (
-            session.query(InsightSource.insight_id, InsightSource.chunk_id)
-            .join(Insight, InsightSource.insight_id == Insight.id)
+        query = session.query(InsightSource.insight_id, InsightSource.chunk_id).join(
+            Insight, InsightSource.insight_id == Insight.id
         )
         if project_id:
             query = query.filter(Insight.project_id == project_id)
@@ -460,8 +490,8 @@ class EdgeMaterializationService:
         self,
         session: Session,
         *,
-        project_id: Optional[str],
-        since: Optional[datetime],
+        project_id: str | None,
+        since: datetime | None,
     ) -> Iterable[EdgeSpec]:
         query = (
             session.query(ReportSource.report_id, ReportSource.source_id)
@@ -490,12 +520,11 @@ class EdgeMaterializationService:
         self,
         session: Session,
         *,
-        project_id: Optional[str],
-        since: Optional[datetime],
+        project_id: str | None,
+        since: datetime | None,
     ) -> Iterable[EdgeSpec]:
-        query = (
-            session.query(Report.id, Report.project_id)
-            .filter(Report.project_id.isnot(None))
+        query = session.query(Report.id, Report.project_id).filter(
+            Report.project_id.isnot(None)
         )
         if project_id:
             query = query.filter(Report.project_id == project_id)
@@ -519,8 +548,8 @@ class EdgeMaterializationService:
         self,
         session: Session,
         *,
-        project_id: Optional[str],
-        since: Optional[datetime],
+        project_id: str | None,
+        since: datetime | None,
     ) -> Iterable[EdgeSpec]:
         query = (
             session.query(ReportSource.report_id, ReportSource.source_id)
@@ -534,7 +563,9 @@ class EdgeMaterializationService:
 
         for report_id, collection_id in query.yield_per(self.batch_size):
             from_urn = str(URNGenerator.generate(EntityType.REPORT, str(report_id)))
-            to_urn = str(URNGenerator.generate(EntityType.COLLECTION, str(collection_id)))
+            to_urn = str(
+                URNGenerator.generate(EntityType.COLLECTION, str(collection_id))
+            )
             yield EdgeSpec(
                 edge_type="references",
                 from_urn=from_urn,
@@ -549,8 +580,8 @@ class EdgeMaterializationService:
         self,
         session: Session,
         *,
-        project_id: Optional[str],
-        since: Optional[datetime],
+        project_id: str | None,
+        since: datetime | None,
     ) -> Iterable[EdgeSpec]:
         query = (
             session.query(
@@ -601,8 +632,8 @@ class EdgeMaterializationService:
         self,
         session: Session,
         *,
-        project_id: Optional[str],
-        since: Optional[datetime],
+        project_id: str | None,
+        since: datetime | None,
     ) -> Iterable[EdgeSpec]:
         query = session.query(CollectionItem.collection_id, CollectionItem.chunk_id)
         if project_id:
@@ -616,7 +647,9 @@ class EdgeMaterializationService:
             query = query.filter(CollectionItem.added_at >= since)
 
         for collection_id, chunk_id in query.yield_per(self.batch_size):
-            from_urn = str(URNGenerator.generate(EntityType.COLLECTION, str(collection_id)))
+            from_urn = str(
+                URNGenerator.generate(EntityType.COLLECTION, str(collection_id))
+            )
             to_urn = str(URNGenerator.generate(EntityType.CHUNK, str(chunk_id)))
             yield EdgeSpec(
                 edge_type="contains",
@@ -648,10 +681,9 @@ class EdgeMaterializationService:
         Skips collections larger than MAX_COOCCURRENCE_COLLECTION_SIZE
         to prevent combinatorial explosion.
         """
-        query = (
-            session.query(CollectionItem.collection_id, CollectionItem.chunk_id)
-            .join(Collection, CollectionItem.collection_id == Collection.id)
-        )
+        query = session.query(
+            CollectionItem.collection_id, CollectionItem.chunk_id
+        ).join(Collection, CollectionItem.collection_id == Collection.id)
         if project_id:
             query = (
                 query.join(DocumentChunk, CollectionItem.chunk_id == DocumentChunk.id)
@@ -669,12 +701,15 @@ class EdgeMaterializationService:
             collection_chunks.setdefault(cid, []).append(str(chunk_id))
 
         for collection_id, chunk_ids in collection_chunks.items():
-            if len(chunk_ids) < 2 or len(chunk_ids) > self.MAX_COOCCURRENCE_COLLECTION_SIZE:
+            if (
+                len(chunk_ids) < 2
+                or len(chunk_ids) > self.MAX_COOCCURRENCE_COLLECTION_SIZE
+            ):
                 continue
             unique_ids = list(dict.fromkeys(chunk_ids))
             for i, id_a in enumerate(unique_ids):
                 urn_a = str(URNGenerator.generate(EntityType.CHUNK, id_a))
-                for id_b in unique_ids[i + 1:]:
+                for id_b in unique_ids[i + 1 :]:
                     urn_b = str(URNGenerator.generate(EntityType.CHUNK, id_b))
                     # Bidirectional: A→B and B→A
                     yield EdgeSpec(
@@ -727,14 +762,16 @@ class EdgeMaterializationService:
         """
         session, managed = self._get_session(session)
         try:
-            edges = list(self._topic_similarity_edge_specs(
-                session,
-                project_id=project_id,
-                similarity_threshold=similarity_threshold,
-                top_k=top_k,
-                qdrant_client=qdrant_client,
-                collection_name=collection_name,
-            ))
+            edges = list(
+                self._topic_similarity_edge_specs(
+                    session,
+                    project_id=project_id,
+                    similarity_threshold=similarity_threshold,
+                    top_k=top_k,
+                    qdrant_client=qdrant_client,
+                    collection_name=collection_name,
+                )
+            )
             return self._upsert_edges(edges, session=session, commit=managed)
         finally:
             if managed:
@@ -752,6 +789,7 @@ class EdgeMaterializationService:
     ) -> Iterable[EdgeSpec]:
         """Yield topic_similar edges by querying Qdrant for embedding neighbors."""
         import logging
+
         logger = logging.getLogger(__name__)
 
         # Resolve Qdrant client
@@ -759,6 +797,7 @@ class EdgeMaterializationService:
         if client is None:
             try:
                 from app.core.qdrant_client import get_qdrant_client
+
                 client = get_qdrant_client()
             except Exception as exc:
                 logger.warning("Qdrant unavailable for topic similarity: %s", exc)
@@ -767,12 +806,15 @@ class EdgeMaterializationService:
         if collection_name is None:
             try:
                 from app.core.config import settings
+
                 collection_name = settings.qdrant_collection_name
             except Exception:
                 collection_name = "research_chunks"
 
         # Get chunk IDs to process
-        query = session.query(DocumentChunk.id, DocumentChunk.document_id, DocumentChunk.chunk_index)
+        query = session.query(
+            DocumentChunk.id, DocumentChunk.document_id, DocumentChunk.chunk_index
+        )
         if project_id:
             query = (
                 query.join(Document, DocumentChunk.document_id == Document.id)
@@ -805,9 +847,14 @@ class EdgeMaterializationService:
             try:
                 query_filter = None
                 if project_id:
-                    query_filter = Filter(must=[
-                        FieldCondition(key="project_id", match=MatchValue(value=str(project_id)))
-                    ])
+                    query_filter = Filter(
+                        must=[
+                            FieldCondition(
+                                key="project_id",
+                                match=MatchValue(value=str(project_id)),
+                            )
+                        ]
+                    )
 
                 results = client.recommend(
                     collection_name=collection_name,
@@ -844,9 +891,13 @@ class EdgeMaterializationService:
                     n_doc_id = payload.get("document_id")
                     n_chunk_idx = payload.get("chunk_index")
                     if n_doc_id is not None and n_chunk_idx is not None:
-                        to_urn = str(URNGenerator.for_chunk(str(n_doc_id), int(n_chunk_idx)))
+                        to_urn = str(
+                            URNGenerator.for_chunk(str(n_doc_id), int(n_chunk_idx))
+                        )
                     else:
-                        to_urn = str(URNGenerator.generate(EntityType.CHUNK, neighbor_id))
+                        to_urn = str(
+                            URNGenerator.generate(EntityType.CHUNK, neighbor_id)
+                        )
 
                 # Bidirectional edges
                 yield EdgeSpec(
@@ -878,7 +929,7 @@ class EdgeMaterializationService:
         commit: bool,
     ) -> MaterializationResult:
         result = MaterializationResult()
-        batch: List[EdgeSpec] = []
+        batch: list[EdgeSpec] = []
 
         for edge in edges:
             if not edge.from_urn or not edge.to_urn:
@@ -929,8 +980,8 @@ class EdgeMaterializationService:
             for edge in existing_edges
         }
 
-        new_edges: List[GraphEdge] = []
-        seen: set[Tuple[str, str, str, str]] = set()
+        new_edges: list[GraphEdge] = []
+        seen: set[tuple[str, str, str, str]] = set()
 
         for spec in batch:
             if spec.key in seen:

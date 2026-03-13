@@ -10,6 +10,7 @@ Runs representative queries through PostgreSQL full-text search and records:
 Usage:
     python scripts/pedr_baseline_capture.py
 """
+
 from __future__ import annotations
 
 import json
@@ -35,17 +36,14 @@ BASELINE_QUERIES = [
     "user research interview methodology",
     "usability testing best practices",
     "participant recruitment strategy",
-
     # Technical queries
     "API integration authentication",
     "database schema design patterns",
     "embedding service configuration",
-
     # Process/Workflow queries
     "sprint planning backlog prioritization",
     "code review quality checklist",
     "deployment pipeline CI/CD",
-
     # Domain-specific queries
     "mission protocol validation",
 ]
@@ -79,19 +77,23 @@ def keyword_search(session, query: str, limit: int = 5) -> List[Dict[str, Any]]:
     results: List[Dict[str, Any]] = []
     for row in rows:
         mapping = row._mapping
-        results.append({
-            "chunk_id": str(mapping["chunk_id"]),
-            "content": mapping["content"],
-            "document_id": str(mapping["document_id"]),
-            "document_name": mapping["document_name"],
-            "project_id": str(mapping["project_id"]) if mapping["project_id"] else None,
-            "chunk_index": mapping["chunk_index"],
-            "source_type": mapping["source_type"],
-            "score": float(mapping["score"] or 0.0),
-            "keyword_score": float(mapping["score"] or 0.0),
-            "semantic_score": 0.0,
-            "search_mode": "keyword",
-        })
+        results.append(
+            {
+                "chunk_id": str(mapping["chunk_id"]),
+                "content": mapping["content"],
+                "document_id": str(mapping["document_id"]),
+                "document_name": mapping["document_name"],
+                "project_id": str(mapping["project_id"])
+                if mapping["project_id"]
+                else None,
+                "chunk_index": mapping["chunk_index"],
+                "source_type": mapping["source_type"],
+                "score": float(mapping["score"] or 0.0),
+                "keyword_score": float(mapping["score"] or 0.0),
+                "semantic_score": 0.0,
+                "search_mode": "keyword",
+            }
+        )
     return results
 
 
@@ -137,29 +139,35 @@ def run_baseline_capture() -> Dict[str, Any]:
                 doc_id = chunk.get("document_id", "unknown")
                 search_mode = chunk.get("search_mode", "unknown")
 
-                print(f"  [{j}] Score: {score:.3f} (sem:{semantic:.2f}, kw:{keyword:.2f}) - {search_mode}")
+                print(
+                    f"  [{j}] Score: {score:.3f} (sem:{semantic:.2f}, kw:{keyword:.2f}) - {search_mode}"
+                )
                 print(f"      Preview: {content_preview}...")
 
-                query_result["top_results"].append({
-                    "rank": j,
-                    "score": score,
-                    "semantic_score": semantic,
-                    "keyword_score": keyword,
-                    "search_mode": search_mode,
-                    "document_id": doc_id,
-                    "document_name": chunk.get("document_name", "unknown"),
-                    "content_preview": content_preview,
-                })
+                query_result["top_results"].append(
+                    {
+                        "rank": j,
+                        "score": score,
+                        "semantic_score": semantic,
+                        "keyword_score": keyword,
+                        "search_mode": search_mode,
+                        "document_id": doc_id,
+                        "document_name": chunk.get("document_name", "unknown"),
+                        "content_preview": content_preview,
+                    }
+                )
 
             results.append(query_result)
 
         except Exception as e:
             print(f"  ERROR: {e}")
-            results.append({
-                "query": query,
-                "error": str(e),
-                "latency_ms": None,
-            })
+            results.append(
+                {
+                    "query": query,
+                    "error": str(e),
+                    "latency_ms": None,
+                }
+            )
 
     session.close()
 
@@ -170,10 +178,18 @@ def run_baseline_capture() -> Dict[str, Any]:
         "capture_timestamp": datetime.now(timezone.utc).isoformat(),
         "query_count": len(BASELINE_QUERIES),
         "successful_queries": len(valid_latencies),
-        "latency_p50_ms": statistics.median(valid_latencies) if valid_latencies else None,
-        "latency_p90_ms": sorted(valid_latencies)[int(len(valid_latencies) * 0.9)] if len(valid_latencies) > 1 else None,
-        "latency_mean_ms": statistics.mean(valid_latencies) if valid_latencies else None,
-        "avg_results_per_query": statistics.mean([r.get("result_count", 0) for r in results if r.get("result_count")]),
+        "latency_p50_ms": statistics.median(valid_latencies)
+        if valid_latencies
+        else None,
+        "latency_p90_ms": sorted(valid_latencies)[int(len(valid_latencies) * 0.9)]
+        if len(valid_latencies) > 1
+        else None,
+        "latency_mean_ms": statistics.mean(valid_latencies)
+        if valid_latencies
+        else None,
+        "avg_results_per_query": statistics.mean(
+            [r.get("result_count", 0) for r in results if r.get("result_count")]
+        ),
     }
 
     print("\n" + "=" * 60)
@@ -181,9 +197,21 @@ def run_baseline_capture() -> Dict[str, Any]:
     print("=" * 60)
     print(f"Queries run: {summary['query_count']}")
     print(f"Successful: {summary['successful_queries']}")
-    print(f"Latency P50: {summary['latency_p50_ms']:.1f}ms" if summary['latency_p50_ms'] else "Latency P50: N/A")
-    print(f"Latency P90: {summary['latency_p90_ms']:.1f}ms" if summary['latency_p90_ms'] else "Latency P90: N/A")
-    print(f"Latency Mean: {summary['latency_mean_ms']:.1f}ms" if summary['latency_mean_ms'] else "Latency Mean: N/A")
+    print(
+        f"Latency P50: {summary['latency_p50_ms']:.1f}ms"
+        if summary["latency_p50_ms"]
+        else "Latency P50: N/A"
+    )
+    print(
+        f"Latency P90: {summary['latency_p90_ms']:.1f}ms"
+        if summary["latency_p90_ms"]
+        else "Latency P90: N/A"
+    )
+    print(
+        f"Latency Mean: {summary['latency_mean_ms']:.1f}ms"
+        if summary["latency_mean_ms"]
+        else "Latency Mean: N/A"
+    )
     print(f"Avg results/query: {summary['avg_results_per_query']:.1f}")
 
     return {
@@ -232,14 +260,28 @@ def main() -> int:
         f.write(f"**Captured**: {baseline['summary']['capture_timestamp']}\n\n")
         f.write("## Summary Metrics\n\n")
         f.write(f"- **Queries**: {baseline['summary']['query_count']}\n")
-        f.write(f"- **Latency P50**: {baseline['summary']['latency_p50_ms']:.1f}ms\n" if baseline['summary']['latency_p50_ms'] else "- **Latency P50**: N/A\n")
-        f.write(f"- **Latency P90**: {baseline['summary']['latency_p90_ms']:.1f}ms\n" if baseline['summary']['latency_p90_ms'] else "- **Latency P90**: N/A\n")
-        f.write(f"- **Average Results**: {baseline['summary']['avg_results_per_query']:.1f} per query\n\n")
+        f.write(
+            f"- **Latency P50**: {baseline['summary']['latency_p50_ms']:.1f}ms\n"
+            if baseline["summary"]["latency_p50_ms"]
+            else "- **Latency P50**: N/A\n"
+        )
+        f.write(
+            f"- **Latency P90**: {baseline['summary']['latency_p90_ms']:.1f}ms\n"
+            if baseline["summary"]["latency_p90_ms"]
+            else "- **Latency P90**: N/A\n"
+        )
+        f.write(
+            f"- **Average Results**: {baseline['summary']['avg_results_per_query']:.1f} per query\n\n"
+        )
         f.write("## Search Configuration\n\n")
         f.write(f"- Mode: {baseline['search_config']['search_mode']}\n")
         f.write(f"- Top K: {baseline['search_config']['top_k']}\n")
-        f.write(f"- Semantic Weight: {baseline['search_config']['semantic_weight']:.2f}\n")
-        f.write(f"- Keyword Weight: {baseline['search_config']['keyword_weight']:.2f}\n\n")
+        f.write(
+            f"- Semantic Weight: {baseline['search_config']['semantic_weight']:.2f}\n"
+        )
+        f.write(
+            f"- Keyword Weight: {baseline['search_config']['keyword_weight']:.2f}\n\n"
+        )
         f.write("## Query Results\n\n")
         for result in baseline["results"]:
             if result.get("error"):
@@ -251,11 +293,19 @@ def main() -> int:
             f.write("| Rank | Score | Semantic | Keyword | Mode | Preview |\n")
             f.write("|------|-------|----------|---------|------|--------|\n")
             for top in result.get("top_results", []):
-                preview = top["content_preview"][:60] + "..." if len(top["content_preview"]) > 60 else top["content_preview"]
-                f.write(f"| {top['rank']} | {top['score']:.3f} | {top['semantic_score']:.2f} | {top['keyword_score']:.2f} | {top['search_mode']} | {preview} |\n")
+                preview = (
+                    top["content_preview"][:60] + "..."
+                    if len(top["content_preview"]) > 60
+                    else top["content_preview"]
+                )
+                f.write(
+                    f"| {top['rank']} | {top['score']:.3f} | {top['semantic_score']:.2f} | {top['keyword_score']:.2f} | {top['search_mode']} | {preview} |\n"
+                )
             f.write("\n")
         f.write("## Notes\n\n")
-        f.write("This baseline establishes the 'before' picture for PEDR enhancements.\n")
+        f.write(
+            "This baseline establishes the 'before' picture for PEDR enhancements.\n"
+        )
         f.write("Key areas to improve after B18.4:\n")
         f.write("- Precision: Are top results highly relevant?\n")
         f.write("- Quality awareness: Do complete/validated items rank higher?\n")

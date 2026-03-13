@@ -3,15 +3,17 @@
 Event-driven sync architecture with delta detection based on updated_at timestamps.
 Reference: cmos/planning/PEDR-docs/tracelab-to-pedr-mapping.md
 """
+
 from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Sequence
+from typing import Any
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -55,8 +57,8 @@ class SyncResult:
     failed_count: int
     skipped_count: int
     duration_ms: float
-    errors: List[str] = field(default_factory=list)
-    last_sync_at: Optional[datetime] = None
+    errors: list[str] = field(default_factory=list)
+    last_sync_at: datetime | None = None
 
     @property
     def success(self) -> bool:
@@ -78,8 +80,8 @@ class ParityCheckResult:
 class SyncBatch:
     """A batch of entities to sync."""
 
-    entities: List[Dict[str, Any]]
-    manifests: List[PEDRManifest]
+    entities: list[dict[str, Any]]
+    manifests: list[PEDRManifest]
     batch_id: str
 
 
@@ -106,10 +108,10 @@ class DeltaSyncService:
         self,
         *,
         session_factory: Callable[[], Session] = SessionLocal,
-        transformer: Optional[ManifestTransformer] = None,
-        ingest_callback: Optional[PEDRIngestCallback] = None,
+        transformer: ManifestTransformer | None = None,
+        ingest_callback: PEDRIngestCallback | None = None,
         batch_size: int = DEFAULT_BATCH_SIZE,
-        telemetry_path: Optional[Path] = None,
+        telemetry_path: Path | None = None,
     ) -> None:
         self.session_factory = session_factory
         self.transformer = transformer or get_manifest_transformer()
@@ -121,7 +123,7 @@ class DeltaSyncService:
         self,
         mode: SyncMode = SyncMode.DELTA,
         *,
-        project_id: Optional[str] = None,
+        project_id: str | None = None,
         dry_run: bool = False,
     ) -> SyncResult:
         """Sync missions to PEDR.
@@ -134,12 +136,12 @@ class DeltaSyncService:
         Returns:
             SyncResult with sync statistics
         """
-        start_time = datetime.now(timezone.utc)
+        start_time = datetime.now(UTC)
         session = self.session_factory()
         synced = 0
         failed = 0
         skipped = 0
-        errors: List[str] = []
+        errors: list[str] = []
 
         try:
             # Get last sync timestamp for delta mode
@@ -175,7 +177,7 @@ class DeltaSyncService:
                 )
 
             # Transform and sync in batches
-            batch_manifests: List[PEDRManifest] = []
+            batch_manifests: list[PEDRManifest] = []
             latest_updated_at = last_sync_at
 
             for mission in missions:
@@ -200,7 +202,10 @@ class DeltaSyncService:
 
                 # Track latest updated_at for sync state
                 if mission.updated_at:
-                    if latest_updated_at is None or mission.updated_at > latest_updated_at:
+                    if (
+                        latest_updated_at is None
+                        or mission.updated_at > latest_updated_at
+                    ):
                         latest_updated_at = mission.updated_at
 
                 # Process batch when full
@@ -211,7 +216,9 @@ class DeltaSyncService:
                             synced += len(batch_manifests)
                         else:
                             failed += len(batch_manifests)
-                            errors.append(f"Batch ingestion failed for {len(batch_manifests)} manifests")
+                            errors.append(
+                                f"Batch ingestion failed for {len(batch_manifests)} manifests"
+                            )
                     else:
                         synced += len(batch_manifests)
                     batch_manifests = []
@@ -224,7 +231,9 @@ class DeltaSyncService:
                         synced += len(batch_manifests)
                     else:
                         failed += len(batch_manifests)
-                        errors.append(f"Batch ingestion failed for {len(batch_manifests)} manifests")
+                        errors.append(
+                            f"Batch ingestion failed for {len(batch_manifests)} manifests"
+                        )
                 else:
                     synced += len(batch_manifests)
 
@@ -238,7 +247,7 @@ class DeltaSyncService:
                 )
                 session.commit()
 
-            duration_ms = (datetime.now(timezone.utc) - start_time).total_seconds() * 1000
+            duration_ms = (datetime.now(UTC) - start_time).total_seconds() * 1000
 
             # Log telemetry
             self._log_sync_event(
@@ -270,7 +279,7 @@ class DeltaSyncService:
                 synced_count=synced,
                 failed_count=failed + 1,
                 skipped_count=skipped,
-                duration_ms=(datetime.now(timezone.utc) - start_time).total_seconds() * 1000,
+                duration_ms=(datetime.now(UTC) - start_time).total_seconds() * 1000,
                 errors=errors + [str(e)],
                 last_sync_at=last_sync_at,
             )
@@ -281,15 +290,15 @@ class DeltaSyncService:
         self,
         mode: SyncMode = SyncMode.DELTA,
         *,
-        project_id: Optional[str] = None,
+        project_id: str | None = None,
         dry_run: bool = False,
     ) -> SyncResult:
         """Sync documents to PEDR."""
-        start_time = datetime.now(timezone.utc)
+        start_time = datetime.now(UTC)
         session = self.session_factory()
         synced = 0
         failed = 0
-        errors: List[str] = []
+        errors: list[str] = []
 
         try:
             last_sync_at = None
@@ -308,16 +317,15 @@ class DeltaSyncService:
             query = query.order_by(Document.uploaded_at.asc())
             documents = query.all()
 
-            batch_manifests: List[PEDRManifest] = []
+            batch_manifests: list[PEDRManifest] = []
             latest_uploaded_at = last_sync_at
 
             for doc in documents:
                 source_mission_id = None
                 if isinstance(doc.document_metadata, dict):
-                    source_mission_id = (
-                        doc.document_metadata.get("mission_id")
-                        or doc.document_metadata.get("missionId")
-                    )
+                    source_mission_id = doc.document_metadata.get(
+                        "mission_id"
+                    ) or doc.document_metadata.get("missionId")
 
                 result = self.transformer.transform_document(
                     document_id=str(doc.id),
@@ -327,14 +335,19 @@ class DeltaSyncService:
                     source_type=doc.source_type,
                     project_id=str(doc.project_id) if doc.project_id else None,
                     uploaded_at=doc.uploaded_at,
-                    source_report_id=str(doc.source_report_id) if doc.source_report_id else None,
+                    source_report_id=str(doc.source_report_id)
+                    if doc.source_report_id
+                    else None,
                     source_mission_id=source_mission_id,
                 )
 
                 if result.success:
                     batch_manifests.append(result.manifest)
                     if doc.uploaded_at:
-                        if latest_uploaded_at is None or doc.uploaded_at > latest_uploaded_at:
+                        if (
+                            latest_uploaded_at is None
+                            or doc.uploaded_at > latest_uploaded_at
+                        ):
                             latest_uploaded_at = doc.uploaded_at
                 else:
                     failed += 1
@@ -368,7 +381,7 @@ class DeltaSyncService:
                 )
                 session.commit()
 
-            duration_ms = (datetime.now(timezone.utc) - start_time).total_seconds() * 1000
+            duration_ms = (datetime.now(UTC) - start_time).total_seconds() * 1000
 
             return SyncResult(
                 entity_type=EntityType.DOCUMENT,
@@ -390,7 +403,7 @@ class DeltaSyncService:
                 synced_count=synced,
                 failed_count=failed + 1,
                 skipped_count=0,
-                duration_ms=(datetime.now(timezone.utc) - start_time).total_seconds() * 1000,
+                duration_ms=(datetime.now(UTC) - start_time).total_seconds() * 1000,
                 errors=errors + [str(e)],
             )
         finally:
@@ -401,9 +414,9 @@ class DeltaSyncService:
         mode: SyncMode = SyncMode.DELTA,
         *,
         dry_run: bool = False,
-    ) -> Dict[EntityType, SyncResult]:
+    ) -> dict[EntityType, SyncResult]:
         """Sync all entity types."""
-        results: Dict[EntityType, SyncResult] = {}
+        results: dict[EntityType, SyncResult] = {}
 
         results[EntityType.MISSION] = self.sync_missions(mode, dry_run=dry_run)
         results[EntityType.DOCUMENT] = self.sync_documents(mode, dry_run=dry_run)
@@ -443,18 +456,22 @@ class DeltaSyncService:
         finally:
             session.close()
 
-    def get_sync_status(self) -> Dict[str, Any]:
+    def get_sync_status(self) -> dict[str, Any]:
         """Get current sync status for all entity types."""
         session = self.session_factory()
         try:
-            status: Dict[str, Any] = {}
+            status: dict[str, Any] = {}
             for entity_type in EntityType:
                 sync_state = self._get_sync_state(session, entity_type)
                 if sync_state:
                     status[entity_type.value] = {
-                        "last_sync_at": sync_state.last_sync_at.isoformat() if sync_state.last_sync_at else None,
+                        "last_sync_at": sync_state.last_sync_at.isoformat()
+                        if sync_state.last_sync_at
+                        else None,
                         "sync_count": sync_state.sync_count,
-                        "updated_at": sync_state.updated_at.isoformat() if sync_state.updated_at else None,
+                        "updated_at": sync_state.updated_at.isoformat()
+                        if sync_state.updated_at
+                        else None,
                     }
                 else:
                     status[entity_type.value] = {
@@ -488,11 +505,15 @@ class DeltaSyncService:
         finally:
             session.close()
 
-    def _get_sync_state(self, session: Session, entity_type: EntityType) -> Optional[SyncState]:
+    def _get_sync_state(
+        self, session: Session, entity_type: EntityType
+    ) -> SyncState | None:
         """Get sync state for entity type."""
-        return session.query(SyncState).filter(
-            SyncState.entity_type == entity_type.value
-        ).first()
+        return (
+            session.query(SyncState)
+            .filter(SyncState.entity_type == entity_type.value)
+            .first()
+        )
 
     def _update_sync_state(
         self,
@@ -554,36 +575,39 @@ class DeltaSyncService:
         if not self.telemetry_path:
             return
 
-        from app.core.telemetry import emit_telemetry
+        event = {
+            "ts": datetime.now(UTC).isoformat(),
+            "event": "pedr_sync",
+            "entity_type": entity_type.value,
+            "mode": mode.value,
+            "synced_count": synced,
+            "failed_count": failed,
+            "skipped_count": skipped,
+            "duration_ms": round(duration_ms, 2),
+            "success": failed == 0,
+        }
 
-        emit_telemetry(
-            path=self.telemetry_path,
-            event_type="pedr.delta_sync.completed",
-            source="pedr",
-            payload={
-                "entity_type": entity_type.value,
-                "mode": mode.value,
-                "synced_count": synced,
-                "failed_count": failed,
-                "skipped_count": skipped,
-                "duration_ms": round(duration_ms, 2),
-                "success": failed == 0,
-            },
-        )
+        try:
+            self.telemetry_path.parent.mkdir(parents=True, exist_ok=True)
+            with self.telemetry_path.open("a") as f:
+                f.write(json.dumps(event) + "\n")
+        except Exception as e:
+            logger.warning(f"Failed to write telemetry: {e}")
 
 
 # Singleton instance
-_delta_sync_service: Optional[DeltaSyncService] = None
+_delta_sync_service: DeltaSyncService | None = None
 
 
 def get_delta_sync_service(
-    telemetry_path: Optional[Path] = None,
+    telemetry_path: Path | None = None,
 ) -> DeltaSyncService:
     """Return singleton delta sync service."""
     global _delta_sync_service
     if _delta_sync_service is None:
         _delta_sync_service = DeltaSyncService(
-            telemetry_path=telemetry_path or Path("cmos/telemetry/events/sprint-11-pedr-sync.jsonl"),
+            telemetry_path=telemetry_path
+            or Path("cmos/telemetry/events/sprint-11-pedr-sync.jsonl"),
         )
     return _delta_sync_service
 

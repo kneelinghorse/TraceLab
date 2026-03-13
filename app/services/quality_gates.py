@@ -1,9 +1,11 @@
 """Deterministic quality gate validators for Mission Protocol payloads."""
+
 from __future__ import annotations
 
+from collections.abc import Mapping, MutableMapping, Sequence
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Sequence
+from datetime import UTC, datetime
+from typing import Any
 
 from app.models.mission_protocol import (
     MissionProtocolComplete,
@@ -11,8 +13,7 @@ from app.models.mission_protocol import (
     QualityGateName,
 )
 
-
-MissionPayload = MissionProtocolDraft | MissionProtocolComplete | Dict[str, Any]
+MissionPayload = MissionProtocolDraft | MissionProtocolComplete | dict[str, Any]
 
 
 @dataclass(slots=True)
@@ -24,13 +25,13 @@ class QualityGateResult:
     details: str
     blocking: bool = True
     metadata: MutableMapping[str, Any] = field(default_factory=dict)
-    evaluated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    evaluated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     @property
     def passed(self) -> bool:
         return self.status == "pass"
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         payload = {
             "gate": self.gate,
             "status": self.status,
@@ -57,7 +58,7 @@ def check_research_statement_completeness(payload: MissionPayload) -> QualityGat
     """Ensure topic, scope, and hypothesis (objective) are supplied."""
 
     mission = _coerce_mission(payload)
-    missing: List[str] = []
+    missing: list[str] = []
     statement = mission.research_statement
     if not statement:
         missing.extend(["topic", "scope", "hypothesis"])
@@ -115,12 +116,12 @@ def check_evidence_links(
             details="Evidence entries are missing chunk_id traceability.",
         )
 
-    assigned: Dict[str, set[str]] = {}
+    assigned: dict[str, set[str]] = {}
     for item in chunk_linked:
         key = (item.insight_id or "unassigned").strip()
         assigned.setdefault(key, set()).add(item.chunk_id.strip())
 
-    metadata: Dict[str, Any] = {
+    metadata: dict[str, Any] = {
         "insight_count": len(insights),
         "evidence_items": len(evidence),
         "chunk_backed": len(chunk_linked),
@@ -275,7 +276,9 @@ def check_source_traceability(
             details="Mission includes no evidence to verify traceability.",
         )
 
-    missing_chunk = [item.evidence_id for item in evidence if not (item.chunk_id or "").strip()]
+    missing_chunk = [
+        item.evidence_id for item in evidence if not (item.chunk_id or "").strip()
+    ]
     if missing_chunk:
         return QualityGateResult(
             gate="traceability",
@@ -286,9 +289,7 @@ def check_source_traceability(
 
     if expected_links:
         insufficient = [
-            insight_id
-            for insight_id, count in expected_links.items()
-            if count <= 0
+            insight_id for insight_id, count in expected_links.items() if count <= 0
         ]
         if insufficient:
             return QualityGateResult(

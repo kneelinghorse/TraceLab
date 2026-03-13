@@ -3,18 +3,20 @@
 Aligned with the Mission model from B16.1 with explicit DeepSearch-compatible fields.
 Implements comprehensive validation per B16.3 spec.
 """
+
 from __future__ import annotations
 
 import re
 from datetime import datetime
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-
 # Valid mission statuses
-MissionStatus = Literal["draft", "queued", "in_progress", "completed", "blocked", "cancelled"]
+MissionStatus = Literal[
+    "draft", "queued", "in_progress", "completed", "blocked", "cancelled"
+]
 
 # Valid research depth tiers
 ResearchDepth = Literal["baseline", "deep", "alpha"]
@@ -43,7 +45,7 @@ class MissionBase(BaseModel):
         min_length=10,
         description="What this mission aims to achieve (minimum 10 characters)",
     )
-    success_criteria: List[str] = Field(
+    success_criteria: list[str] = Field(
         ...,
         min_length=1,
         description="Array of measurable success conditions",
@@ -62,7 +64,7 @@ class MissionBase(BaseModel):
 
     @field_validator("success_criteria")
     @classmethod
-    def validate_success_criteria(cls, v: List[str]) -> List[str]:
+    def validate_success_criteria(cls, v: list[str]) -> list[str]:
         """Validate success_criteria is non-empty and each item is a non-empty string."""
         if not v:
             raise ValueError("success_criteria must contain at least one item")
@@ -77,39 +79,39 @@ class MissionBase(BaseModel):
 class MissionCreate(MissionBase):
     """Payload for creating a mission."""
 
-    project_id: Optional[UUID] = Field(
+    project_id: UUID | None = Field(
         None,
         description="Project to associate this mission with",
     )
-    context: Optional[Dict[str, Any]] = Field(
+    context: dict[str, Any] | None = Field(
         default_factory=dict,
         description="Additional context object for the mission",
     )
-    deliverables: Optional[List[str]] = Field(
+    deliverables: list[str] | None = Field(
         default_factory=list,
         description="Array of expected deliverables",
     )
-    research_phases: Optional[Dict[str, Any]] = Field(
+    research_phases: dict[str, Any] | None = Field(
         default_factory=dict,
         description="Research phase configuration",
     )
-    tags: Optional[List[str]] = Field(
+    tags: list[str] | None = Field(
         default_factory=list,
         description="Array of tags for categorization",
     )
-    metadata: Optional[Dict[str, Any]] = Field(
+    metadata: dict[str, Any] | None = Field(
         default_factory=dict,
         description="Arbitrary metadata object",
     )
-    research_depth: Optional[ResearchDepth] = Field(
+    research_depth: ResearchDepth | None = Field(
         "baseline",
         description="Research depth tier. BASELINE (8-12 min, 50-60 sources): standard thorough research — use as default. DEEP (20-25 min, 30-40 vetted sources): stricter quality gates, min 5 loops. ALPHA (1+ hour, ~20 scrutinized sources): may reject if evidence insufficient.",
     )
-    status: Optional[MissionStatus] = Field(
+    status: MissionStatus | None = Field(
         "draft",
         description="Initial mission status",
     )
-    created_by: Optional[str] = Field(
+    created_by: str | None = Field(
         None,
         max_length=100,
         description="Agent or user who created this mission",
@@ -122,88 +124,90 @@ class MissionUpdate(BaseModel):
     All fields are optional - only provided fields will be updated.
     """
 
-    title: Optional[str] = Field(
+    title: str | None = Field(
         None,
         min_length=3,
         max_length=255,
         description="Mission title",
     )
-    objective: Optional[str] = Field(
+    objective: str | None = Field(
         None,
         min_length=10,
         description="What this mission aims to achieve (minimum 10 characters)",
     )
-    success_criteria: Optional[List[str]] = Field(
+    success_criteria: list[str] | None = Field(
         None,
         min_length=1,
         description="Array of measurable success conditions",
     )
-    context: Optional[Dict[str, Any]] = Field(
+    context: dict[str, Any] | None = Field(
         None,
         description="Additional context object for the mission",
     )
-    deliverables: Optional[List[str]] = Field(
+    deliverables: list[str] | None = Field(
         None,
         description="Array of expected deliverables",
     )
-    research_phases: Optional[Dict[str, Any]] = Field(
+    research_phases: dict[str, Any] | None = Field(
         None,
         description="Research phase configuration",
     )
-    tags: Optional[List[str]] = Field(
+    tags: list[str] | None = Field(
         None,
         description="Array of tags for categorization",
     )
-    metadata: Optional[Dict[str, Any]] = Field(
+    metadata: dict[str, Any] | None = Field(
         None,
         description="Arbitrary metadata object",
     )
-    research_depth: Optional[ResearchDepth] = Field(
+    research_depth: ResearchDepth | None = Field(
         None,
         description="Research depth tier. BASELINE (8-12 min, 50-60 sources): standard thorough research. DEEP (20-25 min, 30-40 vetted sources): stricter quality gates. ALPHA (1+ hour, ~20 scrutinized sources): may reject if evidence insufficient.",
     )
-    status: Optional[MissionStatus] = Field(
+    status: MissionStatus | None = Field(
         None,
         description="Mission status",
     )
-    deepsearch_job_id: Optional[str] = Field(
+    deepsearch_job_id: str | None = Field(
         None,
         max_length=100,
         description="DeepSearch job ID for tracking async execution",
     )
-    result_document_ids: Optional[List[UUID]] = Field(
+    result_document_ids: list[UUID] | None = Field(
         None,
         description="Array of document UUIDs produced by this mission",
     )
-    result_report_id: Optional[UUID] = Field(
+    result_report_id: UUID | None = Field(
         None,
         description="Primary report generated from mission results",
     )
-    result_markdown: Optional[str] = Field(
+    result_markdown: str | None = Field(
         None,
         description="Raw markdown output from mission execution",
     )
-    result_protocol: Optional[Dict[str, Any]] = Field(
+    result_protocol: dict[str, Any] | None = Field(
         None,
         description="Mission Protocol compliant result object",
     )
-    error_message: Optional[str] = Field(
+    error_message: str | None = Field(
         None,
         description="Error details if mission failed",
     )
-    execution_metadata: Optional[Dict[str, Any]] = Field(
+    execution_metadata: dict[str, Any] | None = Field(
         None,
         description="Execution metrics and debugging info",
     )
 
     @field_validator("success_criteria")
     @classmethod
-    def validate_success_criteria(cls, v: Optional[List[str]]) -> Optional[List[str]]:
+    def validate_success_criteria(cls, v: list[str] | None) -> list[str] | None:
         """Validate success_criteria when provided."""
         if v is None:
             return v
         if len(v) == 0:
-            raise ValueError("success_criteria must contain at least one item if provided")
+            raise ValueError(
+                "success_criteria must contain at least one item if provided"
+            )
         for i, item in enumerate(v):
             if not isinstance(item, str):
                 raise ValueError(f"success_criteria[{i}] must be a string")
@@ -216,36 +220,37 @@ class MissionResponse(MissionBase):
     """Full mission representation returned from API."""
 
     id: UUID
-    project_id: Optional[UUID] = None
-    project_name: Optional[str] = Field(None, description="Name of the associated project")
-    context: Dict[str, Any] = Field(default_factory=dict)
-    deliverables: List[str] = Field(default_factory=list)
-    research_phases: Dict[str, Any] = Field(default_factory=dict)
-    tags: List[str] = Field(default_factory=list)
-    metadata: Dict[str, Any] = Field(default_factory=dict)
-    research_depth: Optional[ResearchDepth] = Field(
-        "baseline", description="Research depth tier. BASELINE (8-12 min, 50-60 sources): standard thorough research. DEEP (20-25 min, 30-40 vetted sources): stricter quality gates. ALPHA (1+ hour, ~20 scrutinized sources): may reject if evidence insufficient."
+    project_id: UUID | None = None
+    project_name: str | None = Field(None, description="Name of the associated project")
+    context: dict[str, Any] = Field(default_factory=dict)
+    deliverables: list[str] = Field(default_factory=list)
+    research_phases: dict[str, Any] = Field(default_factory=dict)
+    tags: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    research_depth: ResearchDepth | None = Field(
+        "baseline",
+        description="Research depth tier. BASELINE (8-12 min, 50-60 sources): standard thorough research. DEEP (20-25 min, 30-40 vetted sources): stricter quality gates. ALPHA (1+ hour, ~20 scrutinized sources): may reject if evidence insufficient.",
     )
     status: MissionStatus
-    queued_at: Optional[datetime] = None
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
-    deepsearch_job_id: Optional[str] = None
-    execution_metadata: Dict[str, Any] = Field(default_factory=dict)
-    result_document_ids: List[UUID] = Field(default_factory=list)
-    result_report_id: Optional[UUID] = None
-    result_markdown: Optional[str] = None
-    result_protocol: Optional[Dict[str, Any]] = None
-    error_message: Optional[str] = None
+    queued_at: datetime | None = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
+    deepsearch_job_id: str | None = None
+    execution_metadata: dict[str, Any] = Field(default_factory=dict)
+    result_document_ids: list[UUID] = Field(default_factory=list)
+    result_report_id: UUID | None = None
+    result_markdown: str | None = None
+    result_protocol: dict[str, Any] | None = None
+    error_message: str | None = None
     created_at: datetime
     updated_at: datetime
-    created_by: Optional[str] = None
+    created_by: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
     @field_validator("metadata", mode="before")
     @classmethod
-    def map_mission_metadata(cls, v: Any, info) -> Dict[str, Any]:
+    def map_mission_metadata(cls, v: Any, info) -> dict[str, Any]:
         """Map mission_metadata column to metadata field."""
         # Handle case where we get mission_metadata from ORM
         if v is None:
@@ -256,7 +261,7 @@ class MissionResponse(MissionBase):
 
     @field_validator("result_document_ids", mode="before")
     @classmethod
-    def parse_document_ids(cls, v: Any) -> List[UUID]:
+    def parse_document_ids(cls, v: Any) -> list[UUID]:
         """Parse document IDs from JSON storage."""
         if v is None:
             return []
@@ -277,26 +282,26 @@ class MissionSubmitResponse(BaseModel):
     mission_id: str = Field(..., description="Human-readable mission ID")
     uuid: UUID = Field(..., description="Mission UUID")
     message: str = Field(..., description="Status message")
-    job_id: Optional[str] = Field(None, description="DeepSearch job ID (http mode only)")
+    job_id: str | None = Field(None, description="DeepSearch job ID (http mode only)")
 
 
 class MissionActionableError(BaseModel):
     """Structured error details for agent-facing mission workflows."""
 
     message: str = Field(..., description="Human-readable error message")
-    mission_id: Optional[str] = Field(
+    mission_id: str | None = Field(
         None,
         description="Human-readable mission identifier when available",
     )
-    uuid: Optional[UUID] = Field(
+    uuid: UUID | None = Field(
         None,
         description="Mission UUID when available",
     )
-    suggestion: Optional[str] = Field(
+    suggestion: str | None = Field(
         None,
         description="Concrete follow-up action to resolve the issue",
     )
-    current_status: Optional[MissionStatus] = Field(
+    current_status: MissionStatus | None = Field(
         None,
         description="Current mission status, when relevant",
     )
@@ -315,4 +320,4 @@ class ReportPromotionResponse(BaseModel):
     document_name: str = Field(..., description="Name of the created document")
     status: str = Field(..., description="Processing status (processing or completed)")
     message: str = Field(..., description="Status message")
-    chunk_count: Optional[int] = Field(None, description="Number of chunks created")
+    chunk_count: int | None = Field(None, description="Number of chunks created")

@@ -7,8 +7,7 @@ status of missions in TraceLab.
 from __future__ import annotations
 
 import logging
-from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import UUID
 
 from mcp.server import Server
@@ -34,7 +33,7 @@ logger = logging.getLogger(__name__)
 _mission_service = MissionService()
 
 
-def _serialize_mission(mission) -> Dict[str, Any]:
+def _serialize_mission(mission) -> dict[str, Any]:
     """Serialize a Mission ORM object to a dictionary.
 
     Handles UUID and datetime serialization for JSON output.
@@ -42,7 +41,9 @@ def _serialize_mission(mission) -> Dict[str, Any]:
     return {
         "id": str(mission.id) if mission.id else None,
         "project_id": str(mission.project_id) if mission.project_id else None,
-        "project_name": mission.project.name if getattr(mission, "project", None) else None,
+        "project_name": mission.project.name
+        if getattr(mission, "project", None)
+        else None,
         "mission_id": mission.mission_id,
         "title": mission.title,
         "objective": mission.objective,
@@ -56,11 +57,15 @@ def _serialize_mission(mission) -> Dict[str, Any]:
         "status": mission.status,
         "queued_at": mission.queued_at.isoformat() if mission.queued_at else None,
         "started_at": mission.started_at.isoformat() if mission.started_at else None,
-        "completed_at": mission.completed_at.isoformat() if mission.completed_at else None,
+        "completed_at": mission.completed_at.isoformat()
+        if mission.completed_at
+        else None,
         "deepsearch_job_id": mission.deepsearch_job_id,
         "execution_metadata": mission.execution_metadata or {},
         "result_document_ids": [str(d) for d in (mission.result_document_ids or [])],
-        "result_report_id": str(mission.result_report_id) if mission.result_report_id else None,
+        "result_report_id": str(mission.result_report_id)
+        if mission.result_report_id
+        else None,
         "result_markdown": mission.result_markdown,
         "result_protocol": mission.result_protocol,
         "error_message": mission.error_message,
@@ -71,7 +76,7 @@ def _serialize_mission(mission) -> Dict[str, Any]:
 
 
 # Tool definitions for MCP server registration
-MISSION_TOOLS: List[Tool] = [
+MISSION_TOOLS: list[Tool] = [
     Tool(
         name="create_mission",
         description="Create a new mission in TraceLab for research tracking or DeepSearch execution.",
@@ -158,7 +163,14 @@ MISSION_TOOLS: List[Tool] = [
                 },
                 "status": {
                     "type": "string",
-                    "enum": ["draft", "queued", "in_progress", "completed", "blocked", "cancelled"],
+                    "enum": [
+                        "draft",
+                        "queued",
+                        "in_progress",
+                        "completed",
+                        "blocked",
+                        "cancelled",
+                    ],
                     "description": "Filter by mission status (optional)",
                 },
                 "page": {
@@ -240,7 +252,7 @@ def _get_mission_by_id_or_mission_id(db, mission_id_str: str):
     return _mission_service.get_mission_by_mission_id(db, mission_id_str)
 
 
-async def handle_create_mission(arguments: Dict[str, Any]) -> List[TextContent]:
+async def handle_create_mission(arguments: dict[str, Any]) -> list[TextContent]:
     """Handle the create_mission tool call."""
     import json
 
@@ -287,10 +299,15 @@ async def handle_create_mission(arguments: Dict[str, Any]) -> List[TextContent]:
         return [TextContent(type="text", text=json.dumps({"error": str(e)}))]
     except Exception as e:
         logger.exception("Error creating mission")
-        return [TextContent(type="text", text=json.dumps({"error": f"Failed to create mission: {str(e)}"}))]
+        return [
+            TextContent(
+                type="text",
+                text=json.dumps({"error": f"Failed to create mission: {str(e)}"}),
+            )
+        ]
 
 
-async def handle_list_missions(arguments: Dict[str, Any]) -> List[TextContent]:
+async def handle_list_missions(arguments: dict[str, Any]) -> list[TextContent]:
     """Handle the list_missions tool call."""
     import json
 
@@ -330,10 +347,15 @@ async def handle_list_missions(arguments: Dict[str, Any]) -> List[TextContent]:
         return [TextContent(type="text", text=json.dumps({"error": str(e)}))]
     except Exception as e:
         logger.exception("Error listing missions")
-        return [TextContent(type="text", text=json.dumps({"error": f"Failed to list missions: {str(e)}"}))]
+        return [
+            TextContent(
+                type="text",
+                text=json.dumps({"error": f"Failed to list missions: {str(e)}"}),
+            )
+        ]
 
 
-async def handle_get_mission(arguments: Dict[str, Any]) -> List[TextContent]:
+async def handle_get_mission(arguments: dict[str, Any]) -> list[TextContent]:
     """Handle the get_mission tool call."""
     import json
 
@@ -352,10 +374,15 @@ async def handle_get_mission(arguments: Dict[str, Any]) -> List[TextContent]:
         return [TextContent(type="text", text=json.dumps({"error": str(e)}))]
     except Exception as e:
         logger.exception("Error getting mission")
-        return [TextContent(type="text", text=json.dumps({"error": f"Failed to get mission: {str(e)}"}))]
+        return [
+            TextContent(
+                type="text",
+                text=json.dumps({"error": f"Failed to get mission: {str(e)}"}),
+            )
+        ]
 
 
-async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
+async def handle_submit_mission(arguments: dict[str, Any]) -> list[TextContent]:
     """Handle the submit_mission tool call.
 
     Supports two modes (controlled by DEEPSEARCH_MODE env var):
@@ -383,51 +410,69 @@ async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
 
             # 2. Validate project_id is set
             if not mission.project_id:
-                return [TextContent(
-                    type="text",
-                    text=json.dumps({
-                        "message": "Mission must have project_id set before submission.",
-                        "mission_id": mission.mission_id,
-                        "uuid": str(mission.id),
-                        "suggestion": f"Use PUT /api/v1/missions/{mission.id} to set project_id first.",
-                    })
-                )]
+                return [
+                    TextContent(
+                        type="text",
+                        text=json.dumps(
+                            {
+                                "message": "Mission must have project_id set before submission.",
+                                "mission_id": mission.mission_id,
+                                "uuid": str(mission.id),
+                                "suggestion": f"Use PUT /api/v1/missions/{mission.id} to set project_id first.",
+                            }
+                        ),
+                    )
+                ]
 
             # 3. Validate success_criteria
             if not mission.success_criteria or len(mission.success_criteria) == 0:
-                return [TextContent(
-                    type="text",
-                    text=json.dumps({
-                        "message": "Mission must have at least one success criterion before submission.",
-                        "mission_id": mission.mission_id,
-                        "uuid": str(mission.id),
-                        "suggestion": f"Use PUT /api/v1/missions/{mission.id} to add success_criteria.",
-                    })
-                )]
+                return [
+                    TextContent(
+                        type="text",
+                        text=json.dumps(
+                            {
+                                "message": "Mission must have at least one success criterion before submission.",
+                                "mission_id": mission.mission_id,
+                                "uuid": str(mission.id),
+                                "suggestion": f"Use PUT /api/v1/missions/{mission.id} to add success_criteria.",
+                            }
+                        ),
+                    )
+                ]
 
             # 4. Check if already submitted
             if mission.status in ("queued", "in_progress"):
-                return [TextContent(
-                    type="text",
-                    text=json.dumps({
-                        "message": f"Mission is already {mission.status}.",
-                        "mission_id": mission.mission_id,
-                        "uuid": str(mission.id),
-                        "current_status": mission.status,
-                        "deepsearch_job_id": mission.deepsearch_job_id,
-                    })
-                )]
+                return [
+                    TextContent(
+                        type="text",
+                        text=json.dumps(
+                            {
+                                "message": f"Mission is already {mission.status}.",
+                                "mission_id": mission.mission_id,
+                                "uuid": str(mission.id),
+                                "current_status": mission.status,
+                                "deepsearch_job_id": mission.deepsearch_job_id,
+                            }
+                        ),
+                    )
+                ]
 
             # 5. Check mode: worker (DB polling) or http (API calls)
-            deepsearch_mode = getattr(settings, 'deepsearch_mode', 'worker').lower()
+            deepsearch_mode = getattr(settings, "deepsearch_mode", "worker").lower()
 
             if deepsearch_mode == "http":
                 # HTTP mode: POST to DeepSearch API (for local dev)
-                base_url = getattr(settings, 'api_base_url', None) or "http://localhost:8000"
+                base_url = (
+                    getattr(settings, "api_base_url", None) or "http://localhost:8000"
+                )
                 callback_url = f"{base_url}/api/v1/webhooks/deepsearch"
 
                 # Use override research_depth if provided, else mission's depth
-                effective_depth = arguments.get("research_depth") or mission.research_depth or "baseline"
+                effective_depth = (
+                    arguments.get("research_depth")
+                    or mission.research_depth
+                    or "baseline"
+                )
 
                 try:
                     client = DeepSearchClient()
@@ -450,25 +495,33 @@ async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
                         job_id,
                     )
                 except DeepSearchConfigurationError as e:
-                    return [TextContent(
-                        type="text",
-                        text=json.dumps({
-                            "error": f"DeepSearch not configured: {e}",
-                            "mission_id": mission.mission_id,
-                            "hint": "Set DEEPSEARCH_API_URL and DEEPSEARCH_API_KEY, or use DEEPSEARCH_MODE=worker",
-                        })
-                    )]
+                    return [
+                        TextContent(
+                            type="text",
+                            text=json.dumps(
+                                {
+                                    "error": f"DeepSearch not configured: {e}",
+                                    "mission_id": mission.mission_id,
+                                    "hint": "Set DEEPSEARCH_API_URL and DEEPSEARCH_API_KEY, or use DEEPSEARCH_MODE=worker",
+                                }
+                            ),
+                        )
+                    ]
                 except DeepSearchClientError as e:
                     logger.error("DeepSearch HTTP submission failed: %s", e)
-                    return [TextContent(
-                        type="text",
-                        text=json.dumps({
-                            "error": f"DeepSearch submission failed: {e}",
-                            "mission_id": mission.mission_id,
-                            "error_code": getattr(e, 'error_code', None),
-                            "status_code": getattr(e, 'status_code', None),
-                        })
-                    )]
+                    return [
+                        TextContent(
+                            type="text",
+                            text=json.dumps(
+                                {
+                                    "error": f"DeepSearch submission failed: {e}",
+                                    "mission_id": mission.mission_id,
+                                    "error_code": getattr(e, "error_code", None),
+                                    "status_code": getattr(e, "status_code", None),
+                                }
+                            ),
+                        )
+                    ]
 
                 # Update with job_id from HTTP response
                 update_data = MissionUpdate(
@@ -487,7 +540,9 @@ async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
                 )
 
             # 6. Update mission status
-            updated_mission = _mission_service.update_mission(db, mission.id, update_data)
+            updated_mission = _mission_service.update_mission(
+                db, mission.id, update_data
+            )
 
             result = {
                 "status": "queued",
@@ -507,10 +562,15 @@ async def handle_submit_mission(arguments: Dict[str, Any]) -> List[TextContent]:
         return [TextContent(type="text", text=json.dumps({"error": str(e)}))]
     except Exception as e:
         logger.exception("Error submitting mission")
-        return [TextContent(type="text", text=json.dumps({"error": f"Failed to submit mission: {str(e)}"}))]
+        return [
+            TextContent(
+                type="text",
+                text=json.dumps({"error": f"Failed to submit mission: {str(e)}"}),
+            )
+        ]
 
 
-async def handle_get_mission_status(arguments: Dict[str, Any]) -> List[TextContent]:
+async def handle_get_mission_status(arguments: dict[str, Any]) -> list[TextContent]:
     """Handle the get_mission_status tool call.
 
     Returns:
@@ -534,10 +594,18 @@ async def handle_get_mission_status(arguments: Dict[str, Any]) -> List[TextConte
                 "status": mission.status,
                 "deepsearch_job_id": mission.deepsearch_job_id,
                 "timestamps": {
-                    "created_at": mission.created_at.isoformat() if mission.created_at else None,
-                    "queued_at": mission.queued_at.isoformat() if mission.queued_at else None,
-                    "started_at": mission.started_at.isoformat() if mission.started_at else None,
-                    "completed_at": mission.completed_at.isoformat() if mission.completed_at else None,
+                    "created_at": mission.created_at.isoformat()
+                    if mission.created_at
+                    else None,
+                    "queued_at": mission.queued_at.isoformat()
+                    if mission.queued_at
+                    else None,
+                    "started_at": mission.started_at.isoformat()
+                    if mission.started_at
+                    else None,
+                    "completed_at": mission.completed_at.isoformat()
+                    if mission.completed_at
+                    else None,
                 },
             }
 
@@ -552,14 +620,20 @@ async def handle_get_mission_status(arguments: Dict[str, Any]) -> List[TextConte
             # Add results if completed
             if mission.status == "completed":
                 result["results"] = {
-                    "document_ids": [str(d) for d in (mission.result_document_ids or [])],
-                    "report_id": str(mission.result_report_id) if mission.result_report_id else None,
+                    "document_ids": [
+                        str(d) for d in (mission.result_document_ids or [])
+                    ],
+                    "report_id": str(mission.result_report_id)
+                    if mission.result_report_id
+                    else None,
                     "has_markdown": bool(mission.result_markdown),
                     "has_protocol": bool(mission.result_protocol),
                 }
                 if mission.result_markdown:
                     # Include first 500 chars of markdown as preview
-                    result["results"]["markdown_preview"] = mission.result_markdown[:500]
+                    result["results"]["markdown_preview"] = mission.result_markdown[
+                        :500
+                    ]
                     if len(mission.result_markdown) > 500:
                         result["results"]["markdown_preview"] += "..."
 
@@ -572,7 +646,12 @@ async def handle_get_mission_status(arguments: Dict[str, Any]) -> List[TextConte
         return [TextContent(type="text", text=json.dumps({"error": str(e)}))]
     except Exception as e:
         logger.exception("Error getting mission status")
-        return [TextContent(type="text", text=json.dumps({"error": f"Failed to get mission status: {str(e)}"}))]
+        return [
+            TextContent(
+                type="text",
+                text=json.dumps({"error": f"Failed to get mission status: {str(e)}"}),
+            )
+        ]
 
 
 # Handler dispatch map
@@ -589,11 +668,11 @@ def register_mission_tools(server: Server) -> None:
     """Register all mission management tools with the MCP server."""
 
     @server.list_tools()
-    async def list_tools() -> List[Tool]:
+    async def list_tools() -> list[Tool]:
         return MISSION_TOOLS
 
     @server.call_tool()
-    async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
+    async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
         handler = TOOL_HANDLERS.get(name)
         if handler is None:
             return [TextContent(type="text", text=f"Unknown tool: {name}")]

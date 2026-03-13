@@ -9,6 +9,7 @@ Validates the complete TraceLab operational flow:
 6. Error response consistency across endpoints
 7. Invite code generation and validation
 """
+
 from __future__ import annotations
 
 import json
@@ -25,6 +26,7 @@ from tests.conftest import get_seed_user_email
 
 def _configured_password() -> str:
     from app.core.config import settings
+
     if settings.auth_password:
         return settings.auth_password
     pytest.skip("AUTH_PASSWORD must be configured")
@@ -33,6 +35,7 @@ def _configured_password() -> str:
 @pytest.fixture(autouse=True)
 def _reset_event_bus():
     import app.core.mission_events as mod
+
     mod._event_bus = None
     yield
     mod._event_bus = None
@@ -41,6 +44,7 @@ def _reset_event_bus():
 @pytest.fixture
 def client():
     from app.core.rate_limit import auth_rate_limiter
+
     auth_rate_limiter.reset()
     with TestClient(app) as c:
         yield c
@@ -52,7 +56,9 @@ def auth_headers(client: TestClient) -> dict:
     """Get auth headers via login endpoint."""
     email = get_seed_user_email()
     password = _configured_password()
-    resp = client.post("/api/v1/auth/login", json={"email": email, "password": password})
+    resp = client.post(
+        "/api/v1/auth/login", json={"email": email, "password": password}
+    )
     assert resp.status_code == 200, f"Login failed: {resp.text}"
     token = resp.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
@@ -67,10 +73,13 @@ class TestAuthFlowE2E:
     """End-to-end auth: login → refresh → protected route."""
 
     def test_login_returns_token_and_user(self, client: TestClient):
-        resp = client.post("/api/v1/auth/login", json={
-            "email": get_seed_user_email(),
-            "password": _configured_password(),
-        })
+        resp = client.post(
+            "/api/v1/auth/login",
+            json={
+                "email": get_seed_user_email(),
+                "password": _configured_password(),
+            },
+        )
         assert resp.status_code == 200
         data = resp.json()
         assert "access_token" in data
@@ -104,9 +113,12 @@ class TestAuthFlowE2E:
 class TestMissionLifecycleE2E:
     """Create → verify response shape → update status."""
 
-    def test_create_mission_response_shape(self, client: TestClient, auth_headers: dict, db_session):
+    def test_create_mission_response_shape(
+        self, client: TestClient, auth_headers: dict, db_session
+    ):
         """Create mission and verify all expected fields present."""
         from app.models.project import Project
+
         project = Project(name="E2E Test Project", description="Smoke test")
         db_session.add(project)
         db_session.commit()
@@ -126,8 +138,14 @@ class TestMissionLifecycleE2E:
 
         # Verify required fields
         required_fields = [
-            "id", "mission_id", "title", "objective", "status",
-            "success_criteria", "created_at", "updated_at",
+            "id",
+            "mission_id",
+            "title",
+            "objective",
+            "status",
+            "success_criteria",
+            "created_at",
+            "updated_at",
         ]
         for field in required_fields:
             assert field in data, f"Missing field: {field}"
@@ -135,9 +153,12 @@ class TestMissionLifecycleE2E:
         assert data["status"] == "draft"
         assert data["mission_id"] == mission_data["mission_id"]
 
-    def test_mission_status_change_emits_event(self, client: TestClient, auth_headers: dict, db_session):
+    def test_mission_status_change_emits_event(
+        self, client: TestClient, auth_headers: dict, db_session
+    ):
         """Updating mission status emits an event to the event bus."""
         from app.models.project import Project
+
         project = Project(name="Event Test Project", description="Event test")
         db_session.add(project)
         db_session.commit()
@@ -151,7 +172,9 @@ class TestMissionLifecycleE2E:
             "success_criteria": ["Event emitted on status change"],
             "project_id": str(project.id),
         }
-        create_resp = client.post("/api/v1/missions", json=mission_data, headers=auth_headers)
+        create_resp = client.post(
+            "/api/v1/missions", json=mission_data, headers=auth_headers
+        )
         assert create_resp.status_code == 201
         mission_uuid = create_resp.json()["id"]
 
@@ -179,16 +202,23 @@ class TestMissionLifecycleE2E:
 class TestMissionEventsEndpointE2E:
     """Verify SSE infrastructure endpoints work."""
 
-    def test_recent_events_returns_json_array(self, client: TestClient, auth_headers: dict):
+    def test_recent_events_returns_json_array(
+        self, client: TestClient, auth_headers: dict
+    ):
         resp = client.get("/api/v1/missions/events/recent", headers=auth_headers)
         assert resp.status_code == 200
         assert isinstance(resp.json(), list)
 
-    def test_events_appear_in_recent_after_emission(self, client: TestClient, auth_headers: dict):
+    def test_events_appear_in_recent_after_emission(
+        self, client: TestClient, auth_headers: dict
+    ):
         from app.core.mission_events import emit_mission_status_change
+
         emit_mission_status_change("SMOKE-1", "Smoke Test", "queued")
 
-        resp = client.get("/api/v1/missions/events/recent?limit=5", headers=auth_headers)
+        resp = client.get(
+            "/api/v1/missions/events/recent?limit=5", headers=auth_headers
+        )
         assert resp.status_code == 200
         events = resp.json()
         assert len(events) >= 1
@@ -212,17 +242,25 @@ class TestErrorResponseConsistencyE2E:
         assert "detail" in resp.json()
 
     def test_auth_401_has_detail(self, client: TestClient):
-        resp = client.post("/api/v1/auth/login", json={
-            "email": "nonexistent@test.com", "password": "wrong",
-        })
+        resp = client.post(
+            "/api/v1/auth/login",
+            json={
+                "email": "nonexistent@test.com",
+                "password": "wrong",
+            },
+        )
         assert resp.status_code == 401
         assert "detail" in resp.json()
 
     def test_rate_limit_429_has_retry_after(self, client: TestClient):
         for _ in range(5):
-            client.post("/api/v1/auth/login", json={"email": "x@x.com", "password": "y"})
+            client.post(
+                "/api/v1/auth/login", json={"email": "x@x.com", "password": "y"}
+            )
 
-        resp = client.post("/api/v1/auth/login", json={"email": "x@x.com", "password": "y"})
+        resp = client.post(
+            "/api/v1/auth/login", json={"email": "x@x.com", "password": "y"}
+        )
         assert resp.status_code == 429
         assert "Retry-After" in resp.headers
         assert "detail" in resp.json()
@@ -236,7 +274,9 @@ class TestErrorResponseConsistencyE2E:
 class TestInviteCodeFlowE2E:
     """Invite code generation and validation."""
 
-    def test_generate_and_list_invite_codes(self, client: TestClient, auth_headers: dict):
+    def test_generate_and_list_invite_codes(
+        self, client: TestClient, auth_headers: dict
+    ):
         # Generate code
         gen_resp = client.post("/api/v1/auth/invite-codes", headers=auth_headers)
         assert gen_resp.status_code in (200, 201)

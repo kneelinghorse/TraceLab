@@ -9,6 +9,7 @@ Covers:
 - Migration script line-level migration
 - Idempotent migration (already-migrated events untouched)
 """
+
 from __future__ import annotations
 
 import json
@@ -101,19 +102,29 @@ class TestTelemetryEnvelope:
 
     def test_from_legacy_extracts_ts(self):
         raw = {"ts": "2026-01-01T00:00:00Z", "model": "gpt-4", "cost": 0.01}
-        env = TelemetryEnvelope.from_legacy(raw, event_type="cost.event", source="tracelab")
+        env = TelemetryEnvelope.from_legacy(
+            raw, event_type="cost.event", source="tracelab"
+        )
         assert env.ts == "2026-01-01T00:00:00Z"
         assert env.event_type == "cost.event"
         assert env.payload == {"model": "gpt-4", "cost": 0.01}
 
     def test_from_legacy_extracts_event_type_field(self):
-        raw = {"ts": "2026-01-01T00:00:00Z", "event_type": "pedr.baseline.capture", "data": {}}
+        raw = {
+            "ts": "2026-01-01T00:00:00Z",
+            "event_type": "pedr.baseline.capture",
+            "data": {},
+        }
         env = TelemetryEnvelope.from_legacy(raw, source="pedr")
         assert env.event_type == "pedr.baseline.capture"
         assert "event_type" not in env.payload
 
     def test_from_legacy_extracts_event_field(self):
-        raw = {"ts": "2026-01-01T00:00:00Z", "event": "pedr_graph_telemetry", "graph": {}}
+        raw = {
+            "ts": "2026-01-01T00:00:00Z",
+            "event": "pedr_graph_telemetry",
+            "graph": {},
+        }
         env = TelemetryEnvelope.from_legacy(raw, source="pedr")
         assert env.event_type == "pedr_graph_telemetry"
 
@@ -151,7 +162,11 @@ class TestIsEnvelopeFormat:
         assert is_envelope_format(event) is True
 
     def test_missing_payload(self):
-        event = {"ts": "2026-01-01T00:00:00Z", "event_type": "test", "source": "tracelab"}
+        event = {
+            "ts": "2026-01-01T00:00:00Z",
+            "event_type": "test",
+            "source": "tracelab",
+        }
         assert is_envelope_format(event) is False
 
     def test_payload_not_dict(self):
@@ -259,8 +274,12 @@ class TestValidateJsonlFile:
 
     def test_valid_file(self, tmp_path):
         path = tmp_path / "valid.jsonl"
-        emit_telemetry(path=path, event_type="test", source="tracelab", payload={"a": 1})
-        emit_telemetry(path=path, event_type="test", source="tracelab", payload={"b": 2})
+        emit_telemetry(
+            path=path, event_type="test", source="tracelab", payload={"a": 1}
+        )
+        emit_telemetry(
+            path=path, event_type="test", source="tracelab", payload={"b": 2}
+        )
 
         result = validate_jsonl_file(path)
         assert result["total"] == 2
@@ -323,7 +342,9 @@ class TestMigrationScript:
         from scripts.migrate_telemetry_format import migrate_line
 
         filepath = tmp_path / "quality-automation.jsonl"
-        legacy = json.dumps({"ts": "2026-01-01T00:00:00Z", "check_type": "bias", "status": "passed"})
+        legacy = json.dumps(
+            {"ts": "2026-01-01T00:00:00Z", "check_type": "bias", "status": "passed"}
+        )
         result = migrate_line(legacy, filepath)
         parsed = json.loads(result)
 
@@ -335,12 +356,14 @@ class TestMigrationScript:
         from scripts.migrate_telemetry_format import migrate_line
 
         filepath = tmp_path / "test.jsonl"
-        envelope = json.dumps({
-            "ts": "2026-01-01T00:00:00Z",
-            "event_type": "test",
-            "source": "tracelab",
-            "payload": {},
-        })
+        envelope = json.dumps(
+            {
+                "ts": "2026-01-01T00:00:00Z",
+                "event_type": "test",
+                "source": "tracelab",
+                "payload": {},
+            }
+        )
         result = migrate_line(envelope, filepath)
         assert result == envelope
 
@@ -349,7 +372,10 @@ class TestMigrationScript:
 
         path = tmp_path / "quality-gates.jsonl"
         with open(path, "w") as fh:
-            fh.write(json.dumps({"ts": "2026-01-01", "gate": "test", "status": "pass"}) + "\n")
+            fh.write(
+                json.dumps({"ts": "2026-01-01", "gate": "test", "status": "pass"})
+                + "\n"
+            )
 
         stats = migrate_file(path, apply=True)
         assert stats["migrated"] == 1
@@ -378,7 +404,9 @@ class TestMigrationScript:
         from scripts.migrate_telemetry_format import migrate_file
 
         path = tmp_path / "test.jsonl"
-        emit_telemetry(path=path, event_type="test", source="tracelab", payload={"x": 1})
+        emit_telemetry(
+            path=path, event_type="test", source="tracelab", payload={"x": 1}
+        )
 
         stats = migrate_file(path, apply=True)
         assert stats["migrated"] == 0
@@ -388,7 +416,9 @@ class TestMigrationScript:
         from scripts.migrate_telemetry_format import migrate_line
 
         filepath = tmp_path / "sprint-26-graph-telemetry.jsonl"
-        legacy = json.dumps({"ts": "2026-01-01", "event": "pedr_graph_telemetry", "graph": {}})
+        legacy = json.dumps(
+            {"ts": "2026-01-01", "event": "pedr_graph_telemetry", "graph": {}}
+        )
         result = migrate_line(legacy, filepath)
         parsed = json.loads(result)
 

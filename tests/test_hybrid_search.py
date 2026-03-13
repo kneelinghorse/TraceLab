@@ -1,7 +1,8 @@
 """Unit tests for the hybrid search service."""
+
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
 import pytest
 
@@ -9,8 +10,8 @@ from app.services import hybrid_search as hybrid_module
 
 
 class _FakeRetrievalService:
-    def __init__(self, results: List[Dict[str, Any]] | None = None):
-        self.calls: List[Dict[str, Any]] = []
+    def __init__(self, results: list[dict[str, Any]] | None = None):
+        self.calls: list[dict[str, Any]] = []
         self._results = results or [
             {
                 "chunk_id": "chunk-1",
@@ -55,7 +56,7 @@ class _IdentityQualityService:
         return annotated
 
 
-def _keyword_payload(chunk_id: str, score: float) -> Dict[str, Any]:
+def _keyword_payload(chunk_id: str, score: float) -> dict[str, Any]:
     return {
         "chunk_id": chunk_id,
         "content": f"Keyword result {chunk_id}",
@@ -76,7 +77,9 @@ def test_semantic_mode_delegates_to_retriever(monkeypatch):
         quality_service=_IdentityQualityService(),
     )
 
-    results = service.search(query="climate goals", top_k=2, search_mode="semantic", include_embeddings=True)
+    results = service.search(
+        query="climate goals", top_k=2, search_mode="semantic", include_embeddings=True
+    )
 
     assert fake_retrieval.calls[0]["top_k"] == 2
     assert fake_retrieval.calls[0]["include_embeddings"] is True

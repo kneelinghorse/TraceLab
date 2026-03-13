@@ -3,8 +3,16 @@ from scripts.generate_mission_map import MissionRecord, assign_missions
 
 def test_assign_missions_prefers_unique_ids() -> None:
     docs = [
-        {"doc_id": "doc-1", "title": "PEDR Search", "source_path": "docs/pedr-search.md"},
-        {"doc_id": "doc-2", "title": "Qdrant Optimization", "source_path": "docs/qdrant-optimization.md"},
+        {
+            "doc_id": "doc-1",
+            "title": "PEDR Search",
+            "source_path": "docs/pedr-search.md",
+        },
+        {
+            "doc_id": "doc-2",
+            "title": "Qdrant Optimization",
+            "source_path": "docs/qdrant-optimization.md",
+        },
     ]
     missions = [
         MissionRecord(

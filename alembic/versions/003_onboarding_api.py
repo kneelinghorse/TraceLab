@@ -24,10 +24,23 @@ def upgrade() -> None:
         sa.Column("path", sa.String(length=255), nullable=False),
         sa.Column("request_hash", sa.String(length=128), nullable=False),
         sa.Column("status_code", sa.Integer(), nullable=False),
-        sa.Column("response_data", sa.JSON(), nullable=False, server_default=sa.text("'{}'::jsonb")),
+        sa.Column(
+            "response_data",
+            sa.JSON(),
+            nullable=False,
+            server_default=sa.text("'{}'::jsonb"),
+        ),
         sa.Column("error_message", sa.Text()),
-        sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
-        sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.func.now(), onupdate=sa.func.now()),
+        sa.Column(
+            "created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(),
+            nullable=False,
+            server_default=sa.func.now(),
+            onupdate=sa.func.now(),
+        ),
     )
     op.create_index(
         "idx_idempotency_method_path",
@@ -45,10 +58,20 @@ def upgrade() -> None:
         ),
         sa.Column("project_id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("document_id", postgresql.UUID(as_uuid=True), nullable=False),
-        sa.Column("status", sa.String(length=32), nullable=False, server_default="PENDING"),
+        sa.Column(
+            "status", sa.String(length=32), nullable=False, server_default="PENDING"
+        ),
         sa.Column("status_detail", sa.Text()),
-        sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
-        sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.func.now(), onupdate=sa.func.now()),
+        sa.Column(
+            "created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(),
+            nullable=False,
+            server_default=sa.func.now(),
+            onupdate=sa.func.now(),
+        ),
         sa.Column("started_at", sa.DateTime()),
         sa.Column("completed_at", sa.DateTime()),
         sa.ForeignKeyConstraint(["project_id"], ["projects.id"], ondelete="CASCADE"),

@@ -6,7 +6,13 @@ from typing import Any, Dict, Optional
 class CLIError(Exception):
     """Base exception for CLI errors."""
 
-    def __init__(self, message: str, code: str = "CLI_ERROR", details: Optional[Dict[str, Any]] = None, exit_code: int = 1):
+    def __init__(
+        self,
+        message: str,
+        code: str = "CLI_ERROR",
+        details: Optional[Dict[str, Any]] = None,
+        exit_code: int = 1,
+    ):
         self.message = message
         self.code = code
         self.details = details or {}
@@ -17,29 +23,50 @@ class CLIError(Exception):
 class AuthenticationError(CLIError):
     """Authentication failed."""
 
-    def __init__(self, message: str = "Authentication failed", details: Optional[Dict[str, Any]] = None):
-        super().__init__(message, code="AUTHENTICATION_ERROR", details=details, exit_code=3)
+    def __init__(
+        self,
+        message: str = "Authentication failed",
+        details: Optional[Dict[str, Any]] = None,
+    ):
+        super().__init__(
+            message, code="AUTHENTICATION_ERROR", details=details, exit_code=3
+        )
 
 
 class ResourceNotFoundError(CLIError):
     """Resource not found."""
 
-    def __init__(self, resource: str, resource_id: str, details: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self, resource: str, resource_id: str, details: Optional[Dict[str, Any]] = None
+    ):
         message = f"{resource} not found: {resource_id}"
-        super().__init__(message, code="RESOURCE_NOT_FOUND", details=details, exit_code=4)
+        super().__init__(
+            message, code="RESOURCE_NOT_FOUND", details=details, exit_code=4
+        )
 
 
 class PermissionDeniedError(CLIError):
     """Permission denied."""
 
-    def __init__(self, message: str = "Permission denied", details: Optional[Dict[str, Any]] = None):
-        super().__init__(message, code="PERMISSION_DENIED", details=details, exit_code=5)
+    def __init__(
+        self,
+        message: str = "Permission denied",
+        details: Optional[Dict[str, Any]] = None,
+    ):
+        super().__init__(
+            message, code="PERMISSION_DENIED", details=details, exit_code=5
+        )
 
 
 class APIError(CLIError):
     """API request failed."""
 
-    def __init__(self, message: str, status_code: Optional[int] = None, details: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str,
+        status_code: Optional[int] = None,
+        details: Optional[Dict[str, Any]] = None,
+    ):
         details = details or {}
         if status_code:
             details["status_code"] = status_code
@@ -49,7 +76,12 @@ class APIError(CLIError):
 class ValidationError(CLIError):
     """Input validation failed."""
 
-    def __init__(self, message: str, field: Optional[str] = None, details: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        message: str,
+        field: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+    ):
         details = details or {}
         if field:
             details["field"] = field
@@ -78,7 +110,6 @@ def format_error_json(error: CLIError) -> Dict[str, Any]:
         "error": {
             "code": error.code,
             "message": error.message,
-            "details": error.details
-        }
+            "details": error.details,
+        },
     }
-

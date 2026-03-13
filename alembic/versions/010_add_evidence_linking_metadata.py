@@ -17,7 +17,9 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.add_column("missions", sa.Column("evidence_linking_metadata", sa.JSON(), nullable=True))
+    op.add_column(
+        "missions", sa.Column("evidence_linking_metadata", sa.JSON(), nullable=True)
+    )
 
 
 def downgrade() -> None:

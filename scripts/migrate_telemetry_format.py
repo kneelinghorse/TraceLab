@@ -12,6 +12,7 @@ The migration wraps each legacy event in the unified envelope:
 Events already in envelope format are left untouched.
 Original files are backed up to *.pre-migration before modification.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -169,16 +170,20 @@ def find_jsonl_files() -> list[Path]:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Migrate telemetry JSONL files to unified envelope format")
-    parser.add_argument("--apply", action="store_true", help="Apply migration (default: dry-run)")
+    parser = argparse.ArgumentParser(
+        description="Migrate telemetry JSONL files to unified envelope format"
+    )
+    parser.add_argument(
+        "--apply", action="store_true", help="Apply migration (default: dry-run)"
+    )
     parser.add_argument("--file", type=Path, help="Migrate a single file")
     args = parser.parse_args()
 
     files = [args.file] if args.file else find_jsonl_files()
     mode = "APPLY" if args.apply else "DRY-RUN"
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f" Telemetry Format Migration ({mode})")
-    print(f"{'='*60}\n")
+    print(f"{'=' * 60}\n")
 
     total_migrated = 0
     total_already = 0
@@ -203,13 +208,13 @@ def main():
             f"({stats['migrated']} to migrate, {stats['already_migrated']} already ok)"
         )
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f" Summary: {total_events} events across {len(files)} files")
     print(f"   To migrate:       {total_migrated}")
     print(f"   Already migrated: {total_already}")
     if not args.apply and total_migrated > 0:
         print(f"\n   Run with --apply to apply migration")
-    print(f"{'='*60}\n")
+    print(f"{'=' * 60}\n")
 
 
 if __name__ == "__main__":

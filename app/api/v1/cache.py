@@ -1,7 +1,6 @@
 """Cache management endpoints for stats and invalidation."""
-from __future__ import annotations
 
-from typing import Dict, List, Optional
+from __future__ import annotations
 
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
@@ -22,22 +21,22 @@ class CacheInfo(BaseModel):
     sets: float
     invalidations: float
     hit_rate: float = Field(ge=0.0, le=1.0)
-    last_event_ts: Optional[str]
+    last_event_ts: str | None
 
 
 class CacheStatsResponse(BaseModel):
-    caches: Dict[str, CacheInfo]
+    caches: dict[str, CacheInfo]
 
 
 class CacheClearRequest(BaseModel):
-    caches: Optional[List[str]] = Field(
+    caches: list[str] | None = Field(
         default=None,
         description="Subset of cache names to clear. Clears all caches when omitted.",
     )
 
 
 class CacheClearResponse(CacheStatsResponse):
-    cleared: Dict[str, int]
+    cleared: dict[str, int]
 
 
 @router.get("/stats", response_model=CacheStatsResponse)

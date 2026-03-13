@@ -24,6 +24,7 @@ Usage:
     # Retry only documents that previously failed
     python scripts/reprocess_embeddings.py --only-unembedded
 """
+
 import sys
 import os
 import argparse
@@ -58,7 +59,9 @@ MAX_EMBEDDING_CHARS = 10000  # Conservative guardrail for 8K-token embedding lim
 
 def cost_per_1k_tokens(model_name: str) -> float:
     """Return embedding API cost per 1K tokens for the configured model."""
-    cost_per_million = MODEL_COST_PER_1M_TOKENS.get(model_name, DEFAULT_COST_PER_1M_TOKENS)
+    cost_per_million = MODEL_COST_PER_1M_TOKENS.get(
+        model_name, DEFAULT_COST_PER_1M_TOKENS
+    )
     return (cost_per_million / 1_000_000) * 1000
 
 
@@ -126,11 +129,15 @@ class ProgressTracker:
         # Estimate actual cost
         model_name = settings.openai_embedding_model
         cost_per_1k = cost_per_1k_tokens(model_name)
-        cost_per_million = MODEL_COST_PER_1M_TOKENS.get(model_name, DEFAULT_COST_PER_1M_TOKENS)
+        cost_per_million = MODEL_COST_PER_1M_TOKENS.get(
+            model_name, DEFAULT_COST_PER_1M_TOKENS
+        )
         est_tokens = self.processed_chunks * AVG_TOKENS_PER_CHUNK
         est_cost = (est_tokens / 1000) * cost_per_1k
         print(f"\nEmbedding model: {model_name}")
-        print(f"Estimated API cost (@ ${cost_per_million:.2f}/1M tokens): ${est_cost:.4f}")
+        print(
+            f"Estimated API cost (@ ${cost_per_million:.2f}/1M tokens): ${est_cost:.4f}"
+        )
 
 
 def get_document_stats(
@@ -153,8 +160,10 @@ def get_document_stats(
     doc_count = doc_query.count()
 
     # Count chunks across those documents
-    chunk_count = db.query(func.count(DocumentChunk.id)).join(Document).filter(
-        Document.chunked == True
+    chunk_count = (
+        db.query(func.count(DocumentChunk.id))
+        .join(Document)
+        .filter(Document.chunked == True)
     )
     if only_unembedded:
         chunk_count = chunk_count.filter(Document.embedded == False)
@@ -195,9 +204,12 @@ def dry_run(
     doc_details = []
 
     for doc in documents:
-        chunk_count = db.query(func.count(DocumentChunk.id)).filter(
-            DocumentChunk.document_id == doc.id
-        ).scalar() or 0
+        chunk_count = (
+            db.query(func.count(DocumentChunk.id))
+            .filter(DocumentChunk.document_id == doc.id)
+            .scalar()
+            or 0
+        )
 
         total_chunks += chunk_count
         doc_details.append((doc.name, chunk_count, doc.id))
@@ -206,7 +218,9 @@ def dry_run(
     # Cost estimation
     model_name = settings.openai_embedding_model
     cost_per_1k = cost_per_1k_tokens(model_name)
-    cost_per_million = MODEL_COST_PER_1M_TOKENS.get(model_name, DEFAULT_COST_PER_1M_TOKENS)
+    cost_per_million = MODEL_COST_PER_1M_TOKENS.get(
+        model_name, DEFAULT_COST_PER_1M_TOKENS
+    )
     est_tokens = total_chunks * AVG_TOKENS_PER_CHUNK
     est_cost = (est_tokens / 1000) * cost_per_1k
 
@@ -287,9 +301,10 @@ def reprocess_embeddings(
     # Get stats for progress tracking
     total_docs = len(documents)
     total_chunks = sum(
-        db.query(func.count(DocumentChunk.id)).filter(
-            DocumentChunk.document_id == doc.id
-        ).scalar() or 0
+        db.query(func.count(DocumentChunk.id))
+        .filter(DocumentChunk.document_id == doc.id)
+        .scalar()
+        or 0
         for doc in documents
     )
 
@@ -300,9 +315,12 @@ def reprocess_embeddings(
     for doc in documents:
         try:
             # Get chunks for this document
-            chunks = db.query(DocumentChunk).filter(
-                DocumentChunk.document_id == doc.id
-            ).order_by(DocumentChunk.chunk_index).all()
+            chunks = (
+                db.query(DocumentChunk)
+                .filter(DocumentChunk.document_id == doc.id)
+                .order_by(DocumentChunk.chunk_index)
+                .all()
+            )
 
             if not chunks:
                 doc.embedded = True
@@ -313,7 +331,13 @@ def reprocess_embeddings(
             # Generate embeddings in batch
             normalized_texts = [normalize_chunk_text(chunk.content) for chunk in chunks]
             embeddings = embedding_service.generate_embeddings_batch(normalized_texts)
-            invalid_dimensions = sorted({len(vector) for vector in embeddings if len(vector) != expected_dimension})
+            invalid_dimensions = sorted(
+                {
+                    len(vector)
+                    for vector in embeddings
+                    if len(vector) != expected_dimension
+                }
+            )
             if invalid_dimensions:
                 raise RuntimeError(
                     f"Embedding dimension mismatch: model produced dimensions {invalid_dimensions}, "
@@ -322,19 +346,23 @@ def reprocess_embeddings(
 
             # Prepare Qdrant payload
             payload = []
-            for chunk, embedding, normalized_content in zip(chunks, embeddings, normalized_texts):
+            for chunk, embedding, normalized_content in zip(
+                chunks, embeddings, normalized_texts
+            ):
                 # Update embedding_id in PostgreSQL
                 chunk.embedding_id = str(chunk.id)
 
-                payload.append({
-                    "chunk_id": chunk.id,
-                    "embedding": embedding,
-                    "content": normalized_content,
-                    "document_id": doc.id,
-                    "project_id": doc.project_id,
-                    "chunk_index": chunk.chunk_index,
-                    "source_type": doc.source_type,
-                })
+                payload.append(
+                    {
+                        "chunk_id": chunk.id,
+                        "embedding": embedding,
+                        "content": normalized_content,
+                        "document_id": doc.id,
+                        "project_id": doc.project_id,
+                        "chunk_index": chunk.chunk_index,
+                        "source_type": doc.source_type,
+                    }
+                )
 
             # Upsert to Qdrant
             qdrant_service.upsert_chunks(payload, batch_size=25)
@@ -387,33 +415,33 @@ Examples:
 
   # Safe migration path: write into a new 3072d collection
   python scripts/reprocess_embeddings.py --collection-name research_chunks_v2_3072d
-        """
+        """,
     )
 
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Show what would be processed without making API calls"
+        help="Show what would be processed without making API calls",
     )
 
     parser.add_argument(
         "--resume-from",
         type=str,
         metavar="UUID",
-        help="Resume processing from this document UUID (alphabetical ordering)"
+        help="Resume processing from this document UUID (alphabetical ordering)",
     )
 
     parser.add_argument(
         "--project-id",
         type=str,
         metavar="UUID",
-        help="Only process documents from this project"
+        help="Only process documents from this project",
     )
 
     parser.add_argument(
         "--drop-collection",
         action="store_true",
-        help="Drop existing Qdrant collection before rebuild (fresh start)"
+        help="Drop existing Qdrant collection before rebuild (fresh start)",
     )
     parser.add_argument(
         "--only-unembedded",

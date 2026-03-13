@@ -3,6 +3,7 @@
 Provides structured error types for each PEDR search layer so failures
 can be diagnosed precisely rather than caught as generic Exception.
 """
+
 from __future__ import annotations
 
 from typing import Optional
@@ -19,6 +20,7 @@ class PEDRError(Exception):
 # ---------------------------------------------------------------------------
 # Retrieval layer errors
 # ---------------------------------------------------------------------------
+
 
 class LexicalSearchError(PEDRError):
     """Failure in the lexical (PostgreSQL full-text) search layer."""
@@ -45,6 +47,7 @@ class GraphLayerError(PEDRError):
 # Post-processing layer errors
 # ---------------------------------------------------------------------------
 
+
 class SyntacticLayerError(PEDRError):
     """Failure in the syntactic (type detection / filtering) layer."""
 
@@ -69,6 +72,7 @@ class GovernanceLayerError(PEDRError):
 # ---------------------------------------------------------------------------
 # Fusion / pipeline errors
 # ---------------------------------------------------------------------------
+
 
 class FusionError(PEDRError):
     """Failure during RRF fusion of layer results."""

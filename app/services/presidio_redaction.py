@@ -11,9 +11,10 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any
 
 DEFAULT_DENY_LIST_PATH = Path("config/redaction_deny_list.json")
 
@@ -33,14 +34,14 @@ class _SimpleRecognizer:
         self,
         supported_entity: str,
         patterns: Sequence[Pattern],
-        deny_list: Optional[List[str]] = None,
+        deny_list: list[str] | None = None,
     ) -> None:
         self.supported_entity = supported_entity
         self.patterns = list(patterns)
         self.deny_list = [value.strip() for value in (deny_list or []) if value]
 
-    def find_matches(self, text: str) -> List[Dict[str, Any]]:
-        matches: List[Dict[str, Any]] = []
+    def find_matches(self, text: str) -> list[dict[str, Any]]:
+        matches: list[dict[str, Any]] = []
         for pattern in self.patterns:
             for match in re.finditer(pattern.regex, text, flags=re.IGNORECASE):
                 matches.append(
@@ -56,13 +57,13 @@ class _SimpleRecognizer:
         matches.extend(self._deny_matches(text))
         return matches
 
-    def _deny_matches(self, text: str) -> List[Dict[str, Any]]:
+    def _deny_matches(self, text: str) -> list[dict[str, Any]]:
         """Produce spans for explicit deny-list values."""
         if not self.deny_list:
             return []
 
         lowered = text.lower()
-        spans: List[Dict[str, Any]] = []
+        spans: list[dict[str, Any]] = []
 
         for token in self.deny_list:
             if not token:
@@ -86,7 +87,7 @@ class _SimpleRecognizer:
 class ParticipantIDRecognizer(_SimpleRecognizer):
     """Recognizer for participant identifiers such as PID-2024-1234."""
 
-    def __init__(self, deny_list: Optional[List[str]] = None) -> None:
+    def __init__(self, deny_list: list[str] | None = None) -> None:
         super().__init__(
             supported_entity="PARTICIPANT_ID",
             patterns=[
@@ -101,7 +102,7 @@ class ParticipantIDRecognizer(_SimpleRecognizer):
 class ProjectIDRecognizer(_SimpleRecognizer):
     """Recognizer for research project identifiers."""
 
-    def __init__(self, deny_list: Optional[List[str]] = None) -> None:
+    def __init__(self, deny_list: list[str] | None = None) -> None:
         super().__init__(
             supported_entity="PROJECT_ID",
             patterns=[
@@ -122,7 +123,7 @@ class PresidioRedactionService:
 
     def __init__(
         self,
-        deny_list_path: Optional[str | Path] = None,
+        deny_list_path: str | Path | None = None,
         ensure_spacy_model: bool = False,  # kept for backwards compatibility
         **_: Any,
     ) -> None:
@@ -140,10 +141,10 @@ class PresidioRedactionService:
     def redact_document(
         self,
         text: str,
-        document_id: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
+        document_id: str | None = None,
+        metadata: dict[str, Any] | None = None,
         use_pseudonymization: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Perform lightweight redaction over known identifier patterns.
 
@@ -171,15 +172,15 @@ class PresidioRedactionService:
             },
         }
 
-    def _detect_entities(self, text: str) -> List[Dict[str, Any]]:
-        entities: List[Dict[str, Any]] = []
+    def _detect_entities(self, text: str) -> list[dict[str, Any]]:
+        entities: list[dict[str, Any]] = []
         for recognizer in self.recognizers:
             entities.extend(recognizer.find_matches(text))
 
         entities.extend(self._match_common_entities(text))
         # Remove duplicate spans (same start/end/entity) while preserving order.
-        seen: set[Tuple[str, int, int]] = set()
-        unique: List[Dict[str, Any]] = []
+        seen: set[tuple[str, int, int]] = set()
+        unique: list[dict[str, Any]] = []
         for entity in sorted(entities, key=lambda e: (e["start"], e["end"])):
             key = (entity["entity_type"], entity["start"], entity["end"])
             if key in seen:
@@ -188,8 +189,8 @@ class PresidioRedactionService:
             unique.append(entity)
         return unique
 
-    def _match_common_entities(self, text: str) -> List[Dict[str, Any]]:
-        matches: List[Dict[str, Any]] = []
+    def _match_common_entities(self, text: str) -> list[dict[str, Any]]:
+        matches: list[dict[str, Any]] = []
         for match in self._EMAIL_PATTERN.finditer(text):
             matches.append(
                 {
@@ -217,10 +218,10 @@ class PresidioRedactionService:
 
     def _build_replacements(
         self,
-        entities: List[Dict[str, Any]],
+        entities: list[dict[str, Any]],
         use_pseudonymization: bool,
-    ) -> List[Tuple[int, int, str]]:
-        replacements: List[Tuple[int, int, str]] = []
+    ) -> list[tuple[int, int, str]]:
+        replacements: list[tuple[int, int, str]] = []
         for index, entity in enumerate(entities):
             placeholder = (
                 self._pseudonym_for(entity["entity_type"], index)
@@ -231,11 +232,11 @@ class PresidioRedactionService:
         return replacements
 
     @staticmethod
-    def _apply_replacements(text: str, replacements: List[Tuple[int, int, str]]) -> str:
+    def _apply_replacements(text: str, replacements: list[tuple[int, int, str]]) -> str:
         if not replacements:
             return text
         replacements.sort(key=lambda span: span[0])
-        pieces: List[str] = []
+        pieces: list[str] = []
         cursor = 0
         for start, end, value in replacements:
             pieces.append(text[cursor:start])
@@ -248,8 +249,8 @@ class PresidioRedactionService:
     def _pseudonym_for(entity_type: str, index: int) -> str:
         return f"{entity_type}-PSEUDO-{index:04d}"
 
-    def _count_deny_list_hits(self, entities: List[Dict[str, Any]]) -> Dict[str, int]:
-        counts: Dict[str, int] = {}
+    def _count_deny_list_hits(self, entities: list[dict[str, Any]]) -> dict[str, int]:
+        counts: dict[str, int] = {}
         for entity in entities:
             deny_tokens = self._deny_lists.get(entity["entity_type"], [])
             if not deny_tokens:
@@ -260,7 +261,7 @@ class PresidioRedactionService:
         return counts
 
     @staticmethod
-    def _load_deny_lists(path: Path) -> Dict[str, List[str]]:
+    def _load_deny_lists(path: Path) -> dict[str, list[str]]:
         if not path.exists():
             return {}
         try:
@@ -272,7 +273,7 @@ class PresidioRedactionService:
         if not isinstance(raw, dict):
             return {}
 
-        cleaned: Dict[str, List[str]] = {}
+        cleaned: dict[str, list[str]] = {}
         for key, value in raw.items():
             if isinstance(value, list):
                 cleaned[str(key)] = [str(item) for item in value if item]

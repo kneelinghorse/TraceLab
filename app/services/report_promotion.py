@@ -3,11 +3,10 @@
 Promotes mission reports to documents, running them through the chunking/embedding
 pipeline so synthesized research feeds back into future searches.
 """
+
 from __future__ import annotations
 
 import logging
-from typing import Optional
-from uuid import UUID
 
 from sqlalchemy.orm import Session
 
@@ -33,8 +32,8 @@ class ReportPromotionService:
 
     def __init__(
         self,
-        ingestion_service: Optional[DocumentIngestionService] = None,
-        status_recorder: Optional[ProcessingStatusRecorder] = None,
+        ingestion_service: DocumentIngestionService | None = None,
+        status_recorder: ProcessingStatusRecorder | None = None,
     ):
         self._ingestion_service = ingestion_service
         self._status_recorder = status_recorder or ProcessingStatusRecorder()
@@ -78,9 +77,7 @@ class ReportPromotionService:
 
         # Check if report has already been promoted
         existing_doc = (
-            db.query(Document)
-            .filter(Document.source_report_id == report.id)
-            .first()
+            db.query(Document).filter(Document.source_report_id == report.id).first()
         )
         if existing_doc:
             raise ReportAlreadyPromotedError(
@@ -180,9 +177,7 @@ class ReportPromotionService:
             raise
         except Exception as exc:
             logger.exception("Unexpected error during report promotion")
-            raise ReportPromotionError(
-                f"Promotion error: {str(exc)}"
-            ) from exc
+            raise ReportPromotionError(f"Promotion error: {str(exc)}") from exc
 
         return document
 
@@ -217,9 +212,7 @@ class ReportPromotionService:
 
         # Check if mission markdown has already been promoted
         existing_doc = (
-            db.query(Document)
-            .filter(Document.source_mission_id == mission.id)
-            .first()
+            db.query(Document).filter(Document.source_mission_id == mission.id).first()
         )
         if existing_doc:
             raise ReportAlreadyPromotedError(
@@ -316,15 +309,13 @@ class ReportPromotionService:
             raise
         except Exception as exc:
             logger.exception("Unexpected error during markdown promotion")
-            raise ReportPromotionError(
-                f"Promotion error: {str(exc)}"
-            ) from exc
+            raise ReportPromotionError(f"Promotion error: {str(exc)}") from exc
 
         return document
 
 
 # Module-level singleton
-_service: Optional[ReportPromotionService] = None
+_service: ReportPromotionService | None = None
 
 
 def get_report_promotion_service() -> ReportPromotionService:

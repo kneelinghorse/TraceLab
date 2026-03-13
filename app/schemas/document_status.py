@@ -1,8 +1,9 @@
 """Pydantic schemas for document processing status entries."""
+
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
@@ -14,8 +15,8 @@ class DocumentProcessingStatusBase(BaseModel):
     document_id: UUID
     stage: str
     status: str
-    message: Optional[str] = None
-    details: Optional[Dict[str, Any]] = None
+    message: str | None = None
+    details: dict[str, Any] | None = None
 
 
 class DocumentProcessingStatusRead(DocumentProcessingStatusBase):

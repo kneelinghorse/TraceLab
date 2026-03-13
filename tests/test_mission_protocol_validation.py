@@ -1,4 +1,5 @@
 """Unit tests for Mission Protocol validation framework."""
+
 from __future__ import annotations
 
 import pytest
@@ -27,13 +28,19 @@ def _complete_payload(**overrides):
             "scope": "Backend services",
         },
         "key_questions": [
-            {"question": "What layers are required?", "status": "answered", "answer": "API + business + DB"},
+            {
+                "question": "What layers are required?",
+                "status": "answered",
+                "answer": "API + business + DB",
+            },
         ],
         "synthesis": {
             "key_insights": [
                 "Pydantic + JSON schema keeps parity across API, services, and database layers."
             ],
-            "recommendations": ["Adopt MissionProtocolDraft and MissionProtocolComplete"],
+            "recommendations": [
+                "Adopt MissionProtocolDraft and MissionProtocolComplete"
+            ],
             "next_steps": ["Publish schema diffs to docs"],
         },
         "evidence": [

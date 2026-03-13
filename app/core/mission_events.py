@@ -7,6 +7,7 @@ at key execution points (status changes, PEDR layer progress, etc.).
 Recent events are kept in a ring buffer so new SSE connections get
 immediate context without waiting for the next event.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -189,14 +190,16 @@ def emit_mission_status_change(
     }
     event_type = type_map.get(new_status, MissionEventType.MISSION_STATUS_CHANGED)
 
-    bus.emit(MissionEvent(
-        event_type=event_type.value,
-        timestamp=_now(),
-        mission_id=mission_id,
-        mission_title=title,
-        status=new_status,
-        previous_status=previous_status,
-    ))
+    bus.emit(
+        MissionEvent(
+            event_type=event_type.value,
+            timestamp=_now(),
+            mission_id=mission_id,
+            mission_title=title,
+            status=new_status,
+            previous_status=previous_status,
+        )
+    )
 
 
 def emit_pedr_layer_event(
@@ -211,16 +214,18 @@ def emit_pedr_layer_event(
 ) -> None:
     """Emit a PEDR search layer progress event."""
     bus = get_mission_event_bus()
-    bus.emit(MissionEvent(
-        event_type=event_type.value,
-        timestamp=_now(),
-        mission_id=mission_id,
-        layer=layer,
-        duration_ms=duration_ms,
-        result_count=result_count,
-        error=error,
-        details=details,
-    ))
+    bus.emit(
+        MissionEvent(
+            event_type=event_type.value,
+            timestamp=_now(),
+            mission_id=mission_id,
+            layer=layer,
+            duration_ms=duration_ms,
+            result_count=result_count,
+            error=error,
+            details=details,
+        )
+    )
 
 
 def emit_quality_gates(
@@ -231,16 +236,18 @@ def emit_quality_gates(
 ) -> None:
     """Emit quality gate evaluation results."""
     bus = get_mission_event_bus()
-    bus.emit(MissionEvent(
-        event_type=MissionEventType.QUALITY_GATES_EVALUATED.value,
-        timestamp=_now(),
-        mission_id=mission_id,
-        details={
-            "gates_passed": gates_passed,
-            "total_gates": total_gates,
-            "score": round(score, 3),
-        },
-    ))
+    bus.emit(
+        MissionEvent(
+            event_type=MissionEventType.QUALITY_GATES_EVALUATED.value,
+            timestamp=_now(),
+            mission_id=mission_id,
+            details={
+                "gates_passed": gates_passed,
+                "total_gates": total_gates,
+                "score": round(score, 3),
+            },
+        )
+    )
 
 
 # ─── CMOS bridge emitter ────────────────────────────────────────────────────
@@ -283,15 +290,19 @@ def emit_cmos_mission_event(
             details["sprint_id"] = sprint_id
 
         bus = get_mission_event_bus()
-        bus.emit(MissionEvent(
-            event_type=event_type.value,
-            timestamp=_now(),
-            mission_id=mission_id,
-            mission_title=name,
-            status=status_key,
-            previous_status=previous_status.strip().lower() if previous_status else None,
-            details=details,
-        ))
+        bus.emit(
+            MissionEvent(
+                event_type=event_type.value,
+                timestamp=_now(),
+                mission_id=mission_id,
+                mission_title=name,
+                status=status_key,
+                previous_status=previous_status.strip().lower()
+                if previous_status
+                else None,
+                details=details,
+            )
+        )
         logger.info(
             "CMOS bridge: emitted %s for %s (%s → %s)",
             event_type.value,

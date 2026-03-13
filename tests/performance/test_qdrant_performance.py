@@ -1,4 +1,5 @@
 """Tests for the Qdrant parameter sweep benchmark."""
+
 from __future__ import annotations
 
 import time
@@ -18,7 +19,9 @@ class _StubSweepService:
         del query_vector
         quality = top_k if hnsw_ef >= 96 else max(top_k - 2, 1)
         stable_ids = [f"chunk-{idx}" for idx in range(top_k)]
-        blended = stable_ids[:quality] + [f"approx-{idx}" for idx in range(top_k - quality)]
+        blended = stable_ids[:quality] + [
+            f"approx-{idx}" for idx in range(top_k - quality)
+        ]
         time.sleep(0.001 + hnsw_ef / 50000.0)
         return [
             {"chunk_id": chunk_id, "score": 1.0 - (idx * 0.01)}
@@ -57,7 +60,9 @@ def sample_vectors() -> list[list[float]]:
     return [[0.01 * idx for _ in range(8)] for idx in range(12)]
 
 
-def test_parameter_sweep_finds_configuration_with_latency_headroom(tmp_path: Path, sample_vectors):
+def test_parameter_sweep_finds_configuration_with_latency_headroom(
+    tmp_path: Path, sample_vectors
+):
     service = _StubSweepService()
     output = tmp_path / "qdrant-sweep.json"
     payload = sweep.run_sweep(

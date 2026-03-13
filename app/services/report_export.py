@@ -1,12 +1,14 @@
 """Report export service that generates Markdown, PDF, or DOCX outputs."""
+
 from __future__ import annotations
 
 import io
+from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from html import escape as html_escape
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -22,7 +24,13 @@ except ImportError:  # pragma: no cover - exercised via error path
 try:  # Optional dependency used for PDF generation
     from reportlab.lib.pagesizes import LETTER
     from reportlab.lib.styles import getSampleStyleSheet
-    from reportlab.platypus import ListFlowable, ListItem, Paragraph, SimpleDocTemplate, Spacer
+    from reportlab.platypus import (
+        ListFlowable,
+        ListItem,
+        Paragraph,
+        SimpleDocTemplate,
+        Spacer,
+    )
 
     REPORTLAB_AVAILABLE = True
 except ImportError:  # pragma: no cover - exercised via error path
@@ -49,22 +57,32 @@ class ReportExportResult:
 class ReportExportService:
     """Builds traceable reports for missions across multiple formats."""
 
-    SUPPORTED_FORMATS: Tuple[str, ...] = ("md", "pdf", "docx")
+    SUPPORTED_FORMATS: tuple[str, ...] = ("md", "pdf", "docx")
 
-    def __init__(self, *, template_dir: Path | None = None, template_name: str = "mission.md.j2") -> None:
-        base_dir = template_dir or Path(__file__).resolve().parent.parent / "templates" / "reports"
+    def __init__(
+        self, *, template_dir: Path | None = None, template_name: str = "mission.md.j2"
+    ) -> None:
+        base_dir = (
+            template_dir
+            or Path(__file__).resolve().parent.parent / "templates" / "reports"
+        )
         if not base_dir.exists():
             raise ReportExportError(f"Report template directory not found: {base_dir}")
 
         self.template_dir = base_dir
         self.template_name = template_name
-        self.env = Environment(loader=FileSystemLoader(str(self.template_dir)), autoescape=False, trim_blocks=True, lstrip_blocks=True)
+        self.env = Environment(
+            loader=FileSystemLoader(str(self.template_dir)),
+            autoescape=False,
+            trim_blocks=True,
+            lstrip_blocks=True,
+        )
         self.env.filters["markdown_escape"] = self._markdown_escape
         self.template = self.env.get_template(self.template_name)
 
     def export(
         self,
-        mission_payload: MissionProtocolDraft | Dict[str, Any],
+        mission_payload: MissionProtocolDraft | dict[str, Any],
         *,
         format: str = "md",
         completion_percentage: int | None = None,
@@ -100,11 +118,20 @@ class ReportExportService:
     # ------------------------------------------------------------------
     def _build_context(
         self,
-        mission_payload: MissionProtocolDraft | Dict[str, Any],
+        mission_payload: MissionProtocolDraft | dict[str, Any],
         completion_percentage: int | None,
-    ) -> Dict[str, Any]:
-        draft = mission_payload if isinstance(mission_payload, MissionProtocolDraft) else MissionProtocolDraft.model_validate(mission_payload)
-        generated_at = datetime.now(tz=timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    ) -> dict[str, Any]:
+        draft = (
+            mission_payload
+            if isinstance(mission_payload, MissionProtocolDraft)
+            else MissionProtocolDraft.model_validate(mission_payload)
+        )
+        generated_at = (
+            datetime.now(tz=UTC)
+            .replace(microsecond=0)
+            .isoformat()
+            .replace("+00:00", "Z")
+        )
         completion = completion_percentage if completion_percentage is not None else 0
         meta = {
             "mission_id": draft.mission_id,
@@ -128,7 +155,9 @@ class ReportExportService:
                 "scope": rs.scope,
                 "audience": rs.audience or "—",
                 "methodology": rs.methodology or "—",
-                "success_metrics": ", ".join(rs.success_metrics) if rs.success_metrics else "",
+                "success_metrics": ", ".join(rs.success_metrics)
+                if rs.success_metrics
+                else "",
                 "risks": ", ".join(rs.risks) if rs.risks else "",
             }
 
@@ -153,7 +182,9 @@ class ReportExportService:
                 "summary_long": item.summary,
                 "source": item.source,
                 "source_type": item.source_type or "",
-                "citation": self._format_citation(item.source, item.chunk_id, item.relevance_score),
+                "citation": self._format_citation(
+                    item.source, item.chunk_id, item.relevance_score
+                ),
                 "chunk_id": item.chunk_id,
                 "relevance_display": self._format_relevance(item.relevance_score),
             }
@@ -178,8 +209,10 @@ class ReportExportService:
             "discussion_guide": draft.discussion_guide or [],
         }
 
-    def _build_synthesis_sections(self, draft: MissionProtocolDraft) -> List[Dict[str, Any]]:
-        sections: List[Tuple[str, Iterable[str]]] = []
+    def _build_synthesis_sections(
+        self, draft: MissionProtocolDraft
+    ) -> list[dict[str, Any]]:
+        sections: list[tuple[str, Iterable[str]]] = []
         if draft.synthesis:
             synthesis = draft.synthesis
             sections = [
@@ -195,7 +228,7 @@ class ReportExportService:
             for title, items in sections
         ]
 
-    def _build_quality_rows(self, draft: MissionProtocolDraft) -> List[Dict[str, Any]]:
+    def _build_quality_rows(self, draft: MissionProtocolDraft) -> list[dict[str, Any]]:
         rows = []
         for checkpoint in draft.quality_checkpoints:
             rows.append(
@@ -208,7 +241,7 @@ class ReportExportService:
             )
         return rows
 
-    def _summarize_quality(self, checkpoints: List[Dict[str, Any]]) -> Dict[str, int]:
+    def _summarize_quality(self, checkpoints: list[dict[str, Any]]) -> dict[str, int]:
         summary = {"passed": 0, "failed": 0, "pending": 0}
         for checkpoint in checkpoints:
             status = checkpoint.get("status", "pending")
@@ -220,14 +253,18 @@ class ReportExportService:
                 summary["pending"] += 1
         return summary
 
-    def _build_methodology(self, draft: MissionProtocolDraft) -> Dict[str, Any] | None:
+    def _build_methodology(self, draft: MissionProtocolDraft) -> dict[str, Any] | None:
         if not draft.methodology_details:
             return None
         details = draft.methodology_details
         segments = []
         for segment in details.participant_segments:
             if segment.percentage is not None:
-                pct = segment.percentage if segment.percentage <= 1 else segment.percentage / 100
+                pct = (
+                    segment.percentage
+                    if segment.percentage <= 1
+                    else segment.percentage / 100
+                )
                 descriptor = f"{segment.segment} ({pct:.0%})"
             elif segment.count is not None:
                 descriptor = f"{segment.segment} ({segment.count})"
@@ -235,7 +272,9 @@ class ReportExportService:
                 descriptor = segment.segment
             segments.append(descriptor)
         return {
-            "total_participants": details.total_participants if details.total_participants is not None else "n/a",
+            "total_participants": details.total_participants
+            if details.total_participants is not None
+            else "n/a",
             "segments": segments,
             "recruitment_method": details.recruitment_method,
             "validation_steps": details.validation_steps_completed or [],
@@ -249,7 +288,9 @@ class ReportExportService:
     @staticmethod
     def _slugify(value: str) -> str:
         sanitized = "-".join(value.strip().split()) if value else "report"
-        return "".join(char if char.isalnum() or char == "-" else "-" for char in sanitized).lower()
+        return "".join(
+            char if char.isalnum() or char == "-" else "-" for char in sanitized
+        ).lower()
 
     @staticmethod
     def _format_confidence(confidence: float | None) -> str:
@@ -289,15 +330,21 @@ class ReportExportService:
     # ------------------------------------------------------------------
     def _markdown_to_docx(self, markdown_text: str) -> bytes:
         if not DOCX_AVAILABLE:
-            raise ReportExportError("DOCX export requires python-docx. Install python-docx to continue.")
+            raise ReportExportError(
+                "DOCX export requires python-docx. Install python-docx to continue."
+            )
         document = DocxDocument()
         for block in self._parse_blocks(markdown_text):
             if block["type"] == "heading":
                 level = min(block.get("level", 1), 4)
-                document.add_heading(self._normalize_block_text(block["text"]), level=level)
+                document.add_heading(
+                    self._normalize_block_text(block["text"]), level=level
+                )
             elif block["type"] == "bullet":
                 for item in block["items"]:
-                    document.add_paragraph(self._normalize_block_text(item), style="List Bullet")
+                    document.add_paragraph(
+                        self._normalize_block_text(item), style="List Bullet"
+                    )
             else:
                 document.add_paragraph(self._normalize_block_text(block["text"]))
         buffer = io.BytesIO()
@@ -307,9 +354,18 @@ class ReportExportService:
 
     def _markdown_to_pdf(self, markdown_text: str) -> bytes:
         if not REPORTLAB_AVAILABLE:
-            raise ReportExportError("PDF export requires reportlab. Install reportlab to continue.")
+            raise ReportExportError(
+                "PDF export requires reportlab. Install reportlab to continue."
+            )
         buffer = io.BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=LETTER, leftMargin=54, rightMargin=54, topMargin=54, bottomMargin=54)
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=LETTER,
+            leftMargin=54,
+            rightMargin=54,
+            topMargin=54,
+            bottomMargin=54,
+        )
         styles = getSampleStyleSheet()
         heading_styles = {
             1: styles["Heading1"],
@@ -318,7 +374,7 @@ class ReportExportService:
             4: styles["Heading4"],
         }
         body_style = styles["BodyText"]
-        elements: List[Any] = []
+        elements: list[Any] = []
 
         for block in self._parse_blocks(markdown_text):
             block_type = block["type"]
@@ -328,12 +384,18 @@ class ReportExportService:
                 elements.append(Paragraph(text, heading_styles[level]))
             elif block_type == "bullet":
                 items = [
-                    ListItem(Paragraph(html_escape(self._normalize_block_text(item)), body_style))
+                    ListItem(
+                        Paragraph(
+                            html_escape(self._normalize_block_text(item)), body_style
+                        )
+                    )
                     for item in block["items"]
                 ]
                 elements.append(ListFlowable(items, bulletType="bullet", leftIndent=18))
             else:
-                text = html_escape(self._normalize_block_text(block["text"])).replace("\n", "<br/>")
+                text = html_escape(self._normalize_block_text(block["text"])).replace(
+                    "\n", "<br/>"
+                )
                 elements.append(Paragraph(text, body_style))
             elements.append(Spacer(1, 8))
 
@@ -341,9 +403,9 @@ class ReportExportService:
         buffer.seek(0)
         return buffer.getvalue()
 
-    def _parse_blocks(self, markdown_text: str) -> List[Dict[str, Any]]:
-        blocks: List[Dict[str, Any]] = []
-        current_bullets: List[str] = []
+    def _parse_blocks(self, markdown_text: str) -> list[dict[str, Any]]:
+        blocks: list[dict[str, Any]] = []
+        current_bullets: list[str] = []
         for line in markdown_text.splitlines():
             stripped = line.strip()
             if not stripped:

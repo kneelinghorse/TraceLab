@@ -1,4 +1,5 @@
 """API tests for PEDR search graph parameters."""
+
 from __future__ import annotations
 
 import pytest
@@ -21,7 +22,9 @@ def client() -> TestClient:
 
 
 class _FakeOrchestrator:
-    def __init__(self, *, graph_enabled: bool = False, graph_candidates: int | None = None) -> None:
+    def __init__(
+        self, *, graph_enabled: bool = False, graph_candidates: int | None = None
+    ) -> None:
         self.calls: list[dict] = []
         self._graph_enabled = graph_enabled
         self._graph_candidates = graph_candidates
@@ -55,13 +58,18 @@ class _FakeOrchestrator:
 
 
 class _FailingOrchestrator:
-    def search(self, **_kwargs):  # pragma: no cover - validated through endpoint response
+    def search(
+        self, **_kwargs
+    ):  # pragma: no cover - validated through endpoint response
         raise RuntimeError("internal stack trace details")
 
 
 class _FakeHybridReranker:
     def search(self, **_kwargs):
-        from app.services.pedr.hybrid_rerank import HybridRerankResult, HybridRerankTimings
+        from app.services.pedr.hybrid_rerank import (
+            HybridRerankResult,
+            HybridRerankTimings,
+        )
 
         return HybridRerankResult(
             results=[
@@ -88,7 +96,9 @@ class _FakeHybridReranker:
                     "source_origin": "synthesized",
                 },
             ],
-            timings=HybridRerankTimings(fts_ms=5.0, embedding_ms=2.0, rerank_ms=3.0, total_ms=10.0),
+            timings=HybridRerankTimings(
+                fts_ms=5.0, embedding_ms=2.0, rerank_ms=3.0, total_ms=10.0
+            ),
             mode_used="hybrid",
             fts_candidates_count=2,
             fallback_used=False,
@@ -135,7 +145,9 @@ def test_pedr_search_passes_graph_params(client: TestClient, auth_headers, monke
     assert call["include_embeddings"] is True
 
 
-def test_pedr_search_returns_graph_metadata(client: TestClient, auth_headers, monkeypatch):
+def test_pedr_search_returns_graph_metadata(
+    client: TestClient, auth_headers, monkeypatch
+):
     """Graph metadata is included in the response when enabled."""
     fake = _FakeOrchestrator(graph_enabled=True, graph_candidates=8)
     import app.api.v1.pedr_search as pedr_search_api
@@ -153,7 +165,9 @@ def test_pedr_search_returns_graph_metadata(client: TestClient, auth_headers, mo
     assert metadata["timings"]["graph_ms"] == pytest.approx(12.5, rel=1e-3)
 
 
-def test_pedr_search_rejects_invalid_graph_params(client: TestClient, auth_headers, monkeypatch):
+def test_pedr_search_rejects_invalid_graph_params(
+    client: TestClient, auth_headers, monkeypatch
+):
     """Graph parameter validation rejects out-of-range values."""
     fake = _FakeOrchestrator(graph_enabled=True, graph_candidates=0)
     import app.api.v1.pedr_search as pedr_search_api
@@ -167,7 +181,9 @@ def test_pedr_search_rejects_invalid_graph_params(client: TestClient, auth_heade
     assert fake.calls == []
 
 
-def test_pedr_search_uses_to_thread_for_full_mode(client: TestClient, auth_headers, monkeypatch):
+def test_pedr_search_uses_to_thread_for_full_mode(
+    client: TestClient, auth_headers, monkeypatch
+):
     """Endpoint delegates sync orchestrator work through asyncio.to_thread."""
     fake = _FakeOrchestrator(graph_enabled=False, graph_candidates=None)
     import app.api.v1.pedr_search as pedr_search_api
@@ -181,30 +197,44 @@ def test_pedr_search_uses_to_thread_for_full_mode(client: TestClient, auth_heade
     monkeypatch.setattr(pedr_search_api, "_get_pedr_orchestrator", lambda: fake)
     monkeypatch.setattr(pedr_search_api.asyncio, "to_thread", _fake_to_thread)
 
-    response = client.post("/api/v1/pedr/search", json={"query": "threaded search"}, headers=auth_headers)
+    response = client.post(
+        "/api/v1/pedr/search", json={"query": "threaded search"}, headers=auth_headers
+    )
 
     assert response.status_code == 200
     assert called["to_thread"] >= 1
 
 
-def test_pedr_search_sanitizes_internal_errors(client: TestClient, auth_headers, monkeypatch):
+def test_pedr_search_sanitizes_internal_errors(
+    client: TestClient, auth_headers, monkeypatch
+):
     """500 responses should not leak internal exception details."""
     import app.api.v1.pedr_search as pedr_search_api
 
-    monkeypatch.setattr(pedr_search_api, "_get_pedr_orchestrator", lambda: _FailingOrchestrator())
+    monkeypatch.setattr(
+        pedr_search_api, "_get_pedr_orchestrator", lambda: _FailingOrchestrator()
+    )
 
-    response = client.post("/api/v1/pedr/search", json={"query": "boom"}, headers=auth_headers)
+    response = client.post(
+        "/api/v1/pedr/search", json={"query": "boom"}, headers=auth_headers
+    )
     assert response.status_code == 500
     assert response.json()["detail"] == pedr_search_api.INTERNAL_ERROR_DETAIL
     assert "stack trace" not in response.json()["detail"]
 
 
-def test_hybrid_search_applies_governance_post_processing(client: TestClient, auth_headers, monkeypatch):
+def test_hybrid_search_applies_governance_post_processing(
+    client: TestClient, auth_headers, monkeypatch
+):
     """Hybrid mode runs governance filters as post-processing."""
     import app.api.v1.pedr_search as pedr_search_api
 
-    monkeypatch.setattr(pedr_search_api, "get_hybrid_reranker", lambda: _FakeHybridReranker())
-    monkeypatch.setattr(pedr_search_api, "get_quality_scoring_service", lambda: _GovernanceFilter())
+    monkeypatch.setattr(
+        pedr_search_api, "get_hybrid_reranker", lambda: _FakeHybridReranker()
+    )
+    monkeypatch.setattr(
+        pedr_search_api, "get_quality_scoring_service", lambda: _GovernanceFilter()
+    )
 
     async def _fake_to_thread(func, *args, **kwargs):
         return func(*args, **kwargs)

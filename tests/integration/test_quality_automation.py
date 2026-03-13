@@ -1,4 +1,5 @@
 """Integration tests for the quality automation workflow."""
+
 from __future__ import annotations
 
 from uuid import uuid4
@@ -10,8 +11,9 @@ from app.main import app
 from app.models.chunk import DocumentChunk
 from app.models.document import Document
 from app.models.insight import InsightSource
-from app.models.quality import QualityCheck
 from app.models.mission_protocol import MissionProtocolDraft
+from app.models.quality import QualityCheck
+from app.schemas.mission import MissionCreate
 from app.services.evidence_linking import EvidenceLinkingService
 from app.services.mission_protocol_service import MissionProtocolService
 from app.services.quality_checks import QualityAutomationRunner
@@ -102,12 +104,15 @@ def _seed_supporting_documents(db_session, project):
         document_id=document.id,
         chunk_index=0,
         content="Automation chunk",
+        content_tsv="Automation chunk",
     )
     db_session.add(chunk)
     db_session.flush()
 
     insight_id = uuid4()
-    insight_source = InsightSource(insight_id=insight_id, chunk_id=chunk_id, relevance_score=0.95)
+    insight_source = InsightSource(
+        insight_id=insight_id, chunk_id=chunk_id, relevance_score=0.95
+    )
     db_session.add(insight_source)
     db_session.commit()
     return chunk_id, insight_id
@@ -121,10 +126,9 @@ def test_mission_updates_trigger_quality_automation(db_session, project):
         quality_runner=runner,
     )
     mission_payload = _build_mission_payload(project.id, chunk_id, insight_id)
-    mission = service.create_mission_from_draft(
+    mission = service.create_mission(
         db_session,
-        project_id=project.id,
-        draft=mission_payload,
+        MissionCreate(project_id=project.id, mission_data=mission_payload),
     )
 
     db_session.expire_all()
@@ -136,7 +140,9 @@ def test_mission_updates_trigger_quality_automation(db_session, project):
     assert len(records) == 4  # bias, traceability, rigor, synthesis
 
 
-def test_quality_automation_api_run_and_history(client: TestClient, db_session, project):
+def test_quality_automation_api_run_and_history(
+    client: TestClient, db_session, project
+):
     chunk_id, insight_id = _seed_supporting_documents(db_session, project)
     payload = _build_mission_payload(project.id, chunk_id, insight_id)
     runner = QualityAutomationRunner(async_enabled=False)
@@ -144,10 +150,8 @@ def test_quality_automation_api_run_and_history(client: TestClient, db_session, 
         evidence_service=EvidenceLinkingService(require_entities=False),
         quality_runner=runner,
     )
-    mission = service.create_mission_from_draft(
-        db_session,
-        project_id=project.id,
-        draft=payload,
+    mission = service.create_mission(
+        db_session, MissionCreate(project_id=project.id, mission_data=payload)
     )
 
     run_resp = client.post(
@@ -159,7 +163,9 @@ def test_quality_automation_api_run_and_history(client: TestClient, db_session, 
     assert body["mission_id"] == str(mission.id)
     assert len(body["checks"]) == 4
 
-    history_resp = client.get(f"/api/v1/quality/automated/history/{mission.id}?limit=10")
+    history_resp = client.get(
+        f"/api/v1/quality/automated/history/{mission.id}?limit=10"
+    )
     assert history_resp.status_code == 200
     history = history_resp.json()
     assert history["mission_id"] == str(mission.id)

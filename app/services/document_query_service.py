@@ -1,11 +1,11 @@
 """Query helpers for document read endpoints."""
+
 from __future__ import annotations
 
 import math
-from typing import List, Optional, Tuple
 from uuid import UUID
 
-from sqlalchemy.orm import Session, selectinload, load_only
+from sqlalchemy.orm import Session, load_only, selectinload
 
 from app.models.chunk import DocumentChunk
 from app.models.document import Document
@@ -24,11 +24,11 @@ class DocumentQueryService:
         *,
         page: int,
         page_size: int,
-        project_id: Optional[UUID] = None,
-        processed: Optional[bool] = None,
-        search: Optional[str] = None,
+        project_id: UUID | None = None,
+        processed: bool | None = None,
+        search: str | None = None,
         include_deleted: bool = False,
-    ) -> Tuple[List[Document], PaginationMeta]:
+    ) -> tuple[list[Document], PaginationMeta]:
         """Return paginated documents ordered by upload time.
 
         Args:
@@ -76,9 +76,7 @@ class DocumentQueryService:
         query = query.order_by(Document.uploaded_at.desc())
         total = query.count()
         items = (
-            query.offset((page - 1) * clamped_page_size)
-            .limit(clamped_page_size)
-            .all()
+            query.offset((page - 1) * clamped_page_size).limit(clamped_page_size).all()
         )
 
         total_pages = math.ceil(total / clamped_page_size) if total else 0
@@ -95,7 +93,7 @@ class DocumentQueryService:
         db: Session,
         document_id: UUID,
         include_deleted: bool = False,
-    ) -> Optional[Document]:
+    ) -> Document | None:
         """Fetch a single document by identifier.
 
         Args:
@@ -123,7 +121,7 @@ class DocumentQueryService:
         *,
         page: int,
         page_size: int,
-    ) -> Tuple[List[DocumentChunk], PaginationMeta]:
+    ) -> tuple[list[DocumentChunk], PaginationMeta]:
         """Return paginated chunks for a document, ordered by chunk_index."""
 
         clamped_page_size = min(max(page_size, 1), self.MAX_PAGE_SIZE)
@@ -132,9 +130,7 @@ class DocumentQueryService:
         query = query.order_by(DocumentChunk.chunk_index.asc())
         total = query.count()
         items = (
-            query.offset((page - 1) * clamped_page_size)
-            .limit(clamped_page_size)
-            .all()
+            query.offset((page - 1) * clamped_page_size).limit(clamped_page_size).all()
         )
 
         total_pages = math.ceil(total / clamped_page_size) if total else 0

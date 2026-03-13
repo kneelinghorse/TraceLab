@@ -6,6 +6,7 @@ TelemetryEnvelope-compliant output:
 2. _QualityAutomationTelemetry (quality_checks.py)
 3. _emit_graph_telemetry (search_orchestrator.py)
 """
+
 from __future__ import annotations
 
 import json
@@ -26,14 +27,16 @@ class TestQualityGateTelemetryEnvelope:
         path = tmp_path / "quality-gates.jsonl"
         sink = _FileTelemetrySink(path=path)
 
-        sink({
-            "ts": "2026-03-13T00:00:00Z",
-            "mission_id": "T38.3",
-            "gate": "research_statement",
-            "status": "pass",
-            "details": "Statement present",
-            "metadata": None,
-        })
+        sink(
+            {
+                "ts": "2026-03-13T00:00:00Z",
+                "mission_id": "T38.3",
+                "gate": "research_statement",
+                "status": "pass",
+                "details": "Statement present",
+                "metadata": None,
+            }
+        )
 
         lines = path.read_text().strip().split("\n")
         assert len(lines) == 1
@@ -141,6 +144,7 @@ class TestNoRemainingNonConformingEmitters:
         """_FileTelemetrySink should import and call emit_telemetry."""
         import inspect
         from app.services.quality_gate_service import _FileTelemetrySink
+
         source = inspect.getsource(_FileTelemetrySink.__call__)
         assert "emit_telemetry" in source
         assert "json.dumps" not in source
@@ -149,6 +153,7 @@ class TestNoRemainingNonConformingEmitters:
         """_QualityAutomationTelemetry should import and call emit_telemetry."""
         import inspect
         from app.services.quality_checks import _QualityAutomationTelemetry
+
         source = inspect.getsource(_QualityAutomationTelemetry.__call__)
         assert "emit_telemetry" in source
         assert "json.dumps" not in source
@@ -157,6 +162,7 @@ class TestNoRemainingNonConformingEmitters:
         """_emit_graph_telemetry should use emit_telemetry instead of raw file write."""
         import inspect
         from app.services.pedr.search_orchestrator import _emit_graph_telemetry
+
         source = inspect.getsource(_emit_graph_telemetry)
         assert "emit_telemetry" in source
         assert "handle.write" not in source

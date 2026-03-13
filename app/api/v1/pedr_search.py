@@ -9,11 +9,12 @@ Supports two rerank modes (B19.4):
 - full: Standard semantic search across entire corpus (default)
 - hybrid: FTS-first with semantic reranking (<300ms target latency)
 """
+
 import asyncio
 import logging
 import time
 from functools import lru_cache
-from typing import Any, Dict
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -23,11 +24,11 @@ from app.core.mission_events import (
 )
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.schemas.pedr_search import (
+    PEDRLayerTimings,
+    PEDRSearchMetadata,
     PEDRSearchRequest,
     PEDRSearchResponse,
     PEDRSearchResult,
-    PEDRSearchMetadata,
-    PEDRLayerTimings,
 )
 from app.services.pedr import QualityFilters, get_quality_scoring_service
 from app.services.pedr.hybrid_rerank import get_hybrid_reranker
@@ -110,7 +111,9 @@ async def pedr_search(
             hnsw_ef=payload.hnsw_ef,
             include_embeddings=payload.include_embeddings,
             element_type=payload.element_type,
-            element_types=list(payload.element_types) if payload.element_types else None,
+            element_types=list(payload.element_types)
+            if payload.element_types
+            else None,
             auto_detect_type=payload.auto_detect_type,
             type_boost_enabled=payload.type_boost_enabled,
             intent_boost_enabled=payload.intent_boost_enabled,
@@ -297,12 +300,15 @@ async def _execute_hybrid_search(
             quality_score=float(r.get("quality_score") or 1.0),
             quality_status=r.get("quality_status"),
             quality_gates_passed=int(r.get("quality_gates_passed") or 0),
-            contributing_layers=["fts", "semantic"] + (["governance"] if payload.enable_governance else []),
+            contributing_layers=["fts", "semantic"]
+            + (["governance"] if payload.enable_governance else []),
             chunk_index=r.get("chunk_index"),
             source_type=r.get("source_type"),
             source_origin=r.get("source_origin"),
             score=float(r.get("score") or r.get("semantic_score") or 0.0),
-            combined_score=float(r.get("combined_score") or r.get("semantic_score") or 0.0),
+            combined_score=float(
+                r.get("combined_score") or r.get("semantic_score") or 0.0
+            ),
             embedding=r.get("embedding"),
             related_entities=None,
         )
@@ -311,7 +317,8 @@ async def _execute_hybrid_search(
     # Build timings from hybrid result
     timings = PEDRLayerTimings(
         lexical_ms=hybrid_result.timings.fts_ms,
-        semantic_ms=hybrid_result.timings.embedding_ms + hybrid_result.timings.rerank_ms,
+        semantic_ms=hybrid_result.timings.embedding_ms
+        + hybrid_result.timings.rerank_ms,
         graph_ms=0.0,
         syntactic_ms=0.0,
         pragmatic_ms=0.0,
@@ -327,7 +334,8 @@ async def _execute_hybrid_search(
         intent_confidence=0.0,
         detected_type=None,
         type_confidence=0.0,
-        layers_used=["fts", "semantic"] + (["governance"] if payload.enable_governance else []),
+        layers_used=["fts", "semantic"]
+        + (["governance"] if payload.enable_governance else []),
         layer_weights={"fts": 0.0, "semantic": 1.0, "governance": 0.0},
         timings=timings,
         graph_enabled=False,

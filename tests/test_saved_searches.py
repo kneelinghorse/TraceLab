@@ -1,7 +1,8 @@
 """Tests covering the saved searches API + execution flow."""
+
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
 from fastapi.testclient import TestClient
 
@@ -15,9 +16,9 @@ class _StubRagService:
     """Minimal fake RAG service returning deterministic payloads."""
 
     def __init__(self) -> None:
-        self.calls: List[Dict[str, Any]] = []
+        self.calls: list[dict[str, Any]] = []
 
-    def run_query(self, **kwargs: Any) -> Dict[str, Any]:
+    def run_query(self, **kwargs: Any) -> dict[str, Any]:
         self.calls.append(kwargs)
         return {
             "answer": "Saved search results summarized.",
@@ -43,7 +44,12 @@ class _StubRagService:
                 "threshold": 0.7,
                 "compression_ms": 4.5,
             },
-            "cache": {"hit": False, "score": None, "age_seconds": None, "ttl_seconds": None},
+            "cache": {
+                "hit": False,
+                "score": None,
+                "age_seconds": None,
+                "ttl_seconds": None,
+            },
             "quality": {
                 "composite_score": 0.9,
                 "threshold": 0.85,
@@ -79,9 +85,9 @@ class _StubRetrievalService:
     """Return deterministic semantic search results."""
 
     def __init__(self) -> None:
-        self.calls: List[Dict[str, Any]] = []
+        self.calls: list[dict[str, Any]] = []
 
-    def search(self, **kwargs: Any) -> List[Dict[str, Any]]:
+    def search(self, **kwargs: Any) -> list[dict[str, Any]]:
         self.calls.append(kwargs)
         return [
             {
@@ -133,7 +139,9 @@ def test_saved_search_crud_flow(auth_headers):
     assert updated["name"] == "Checkout fallout"
     assert updated["top_k"] == 10
 
-    delete_resp = client.delete(f"/api/v1/saved-searches/{created['id']}", headers=auth_headers)
+    delete_resp = client.delete(
+        f"/api/v1/saved-searches/{created['id']}", headers=auth_headers
+    )
     assert delete_resp.status_code == 204
 
     after_delete = client.get("/api/v1/saved-searches", headers=auth_headers).json()
@@ -162,7 +170,9 @@ def test_execute_saved_search_runs_services(monkeypatch, auth_headers):
     monkeypatch.setattr(saved_router, "get_rag_service", lambda: fake_rag)
     monkeypatch.setattr(saved_router, "get_retrieval_service", lambda: fake_retrieval)
 
-    execute = client.post(f"/api/v1/saved-searches/{saved_id}/execute", headers=auth_headers)
+    execute = client.post(
+        f"/api/v1/saved-searches/{saved_id}/execute", headers=auth_headers
+    )
     assert execute.status_code == 200, execute.text
     payload = execute.json()
     assert payload["saved_search"]["id"] == saved_id
@@ -179,7 +189,9 @@ def test_saved_search_limit_enforced(monkeypatch, auth_headers):
     """Creating more than the configured limit returns HTTP 400."""
     limited_service = SavedSearchService(max_saved_per_user=1)
     monkeypatch.setattr(saved_service_module, "_saved_search_service", limited_service)
-    monkeypatch.setattr(saved_router, "get_saved_search_service", lambda: limited_service)
+    monkeypatch.setattr(
+        saved_router, "get_saved_search_service", lambda: limited_service
+    )
 
     client = TestClient(app)
     first = client.post(

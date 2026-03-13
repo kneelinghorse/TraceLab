@@ -1,8 +1,8 @@
 """FastAPI router implementing the onboarding workflow."""
+
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List, Optional
 from uuid import UUID
 
 from fastapi import (
@@ -21,8 +21,8 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.database import get_db
 from app.models.document import Document
-from app.models.project import Project
 from app.models.ingestion_job import IngestionJob
+from app.models.project import Project
 from app.onboarding.idempotency import IdempotencyService
 from app.onboarding.jobs import create_job, process_job
 from app.onboarding.schemas import JobRead
@@ -40,7 +40,7 @@ _cache_manager = get_cache_manager()
 def _idempotency(
     *,
     request: Request,
-    key: Optional[str],
+    key: str | None,
     db: Session,
 ) -> IdempotencyService:
     return IdempotencyService(
@@ -60,7 +60,7 @@ def create_project(
     payload: ProjectCreate,
     request: Request,
     db: Session = Depends(get_db),
-    idempotency_key: Optional[str] = Header(default=None, alias="Idempotency-Key"),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> Response:
     """Create a new project record with idempotent semantics."""
     idempotency = _idempotency(request=request, key=idempotency_key, db=db)
@@ -92,7 +92,7 @@ def update_project(
     payload: ProjectUpdate,
     request: Request,
     db: Session = Depends(get_db),
-    idempotency_key: Optional[str] = Header(default=None, alias="Idempotency-Key"),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> Response:
     """Update project metadata with idempotent replay support."""
     idempotency = _idempotency(request=request, key=idempotency_key, db=db)
@@ -132,7 +132,7 @@ def register_document(
     payload: DocumentCreate,
     request: Request,
     db: Session = Depends(get_db),
-    idempotency_key: Optional[str] = Header(default=None, alias="Idempotency-Key"),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> Response:
     """Register a document for ingestion via the onboarding workflow."""
     payload_dict = payload.model_dump()
@@ -143,7 +143,9 @@ def register_document(
 
     project = db.query(Project).filter(Project.id == payload.project_id).first()
     if not project:
-        raise HTTPException(status_code=404, detail=f"Project {payload.project_id} not found")
+        raise HTTPException(
+            status_code=404, detail=f"Project {payload.project_id} not found"
+        )
 
     if not payload.file_path:
         raise HTTPException(
@@ -153,7 +155,9 @@ def register_document(
 
     path = Path(payload.file_path)
     if not path.exists():
-        raise HTTPException(status_code=404, detail=f"File not found at {payload.file_path}")
+        raise HTTPException(
+            status_code=404, detail=f"File not found at {payload.file_path}"
+        )
 
     mutable_payload = payload.model_dump(exclude_none=True)
     mutable_payload.setdefault("file_size", path.stat().st_size)
@@ -194,7 +198,7 @@ def update_document(
     payload: DocumentUpdate,
     request: Request,
     db: Session = Depends(get_db),
-    idempotency_key: Optional[str] = Header(default=None, alias="Idempotency-Key"),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> Response:
     """Update document metadata."""
     payload_dict = payload.model_dump(exclude_unset=True)
@@ -245,7 +249,7 @@ def enqueue_ingestion_job(
     background_tasks: BackgroundTasks,
     request: Request,
     db: Session = Depends(get_db),
-    idempotency_key: Optional[str] = Header(default=None, alias="Idempotency-Key"),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> Response:
     """Create an ingestion job and dispatch it to the background runner."""
     payload_dict = {"document_id": str(document_id)}
@@ -284,7 +288,9 @@ def enqueue_ingestion_job(
     db.commit()
 
     headers = {"Location": f"{settings.api_v1_prefix}/jobs/{job.id}"}
-    return JSONResponse(content=response_body, status_code=status.HTTP_202_ACCEPTED, headers=headers)
+    return JSONResponse(
+        content=response_body, status_code=status.HTTP_202_ACCEPTED, headers=headers
+    )
 
 
 @router.get("/jobs/{job_id}", response_model=JobRead)
@@ -296,14 +302,14 @@ def get_job(job_id: UUID, db: Session = Depends(get_db)) -> JobRead:
     return JobRead.model_validate(job)
 
 
-@router.get("/jobs", response_model=List[JobRead])
-def list_jobs(db: Session = Depends(get_db)) -> List[JobRead]:
+@router.get("/jobs", response_model=list[JobRead])
+def list_jobs(db: Session = Depends(get_db)) -> list[JobRead]:
     """List all ingestion jobs."""
     jobs = db.query(IngestionJob).order_by(IngestionJob.created_at.desc()).all()
     return [JobRead.model_validate(job) for job in jobs]
 
 
-def _infer_mime_type(path: Path) -> Optional[str]:
+def _infer_mime_type(path: Path) -> str | None:
     """Infer MIME type based on file extension."""
     mapping = {
         ".pdf": "application/pdf",

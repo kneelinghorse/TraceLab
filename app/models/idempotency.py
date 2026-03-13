@@ -1,9 +1,10 @@
 """SQLAlchemy model for API idempotency records."""
+
 from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import Column, String, Integer, DateTime, JSON, Text
+from sqlalchemy import JSON, Column, DateTime, Integer, String, Text
 
 from app.core.database import Base
 
@@ -21,4 +22,6 @@ class IdempotencyRecord(Base):
     response_data = Column(JSON, nullable=False)
     error_message = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    updated_at = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )

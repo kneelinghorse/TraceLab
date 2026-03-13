@@ -1,4 +1,5 @@
 """Unit tests for the context compression utilities."""
+
 from app.services.context_compression import compress_context
 
 

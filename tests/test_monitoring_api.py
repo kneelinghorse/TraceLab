@@ -35,7 +35,11 @@ def test_monitoring_costs_endpoint(monkeypatch):
 def test_monitoring_performance_endpoint(monkeypatch):
     monitor = _DummyMonitor()
     monkeypatch.setattr(monitoring_router, "get_cost_monitor", lambda: monitor)
-    monkeypatch.setattr(monitoring_router, "_routing_snapshot", lambda: {"total_queries": 3, "escalations": 0})
+    monkeypatch.setattr(
+        monitoring_router,
+        "_routing_snapshot",
+        lambda: {"total_queries": 3, "escalations": 0},
+    )
     payload = monitoring_router.read_performance()
     assert payload["routing"]["total_queries"] == 3
     assert monitor.calls[-1]["days"] == 7

@@ -1,30 +1,28 @@
 """Async correction queue for failed evidence auto-linking retries."""
+
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from collections.abc import Callable
+from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 from uuid import UUID, uuid4
 
 from sqlalchemy.orm import Session
 
 from app.models.mission_protocol import MissionProtocolComplete
 from app.schemas.corrections import (
-    BatchWebhookPayload,
     CorrectionErrorType,
     CorrectionItem,
     CorrectionQueueStats,
     CorrectionStatus,
     CorrectionStatusResponse,
     CorrectionTriggerResponse,
-    WebhookNotificationType,
 )
 from app.services.evidence_auto_linking import (
-    AutoLinkErrorType,
     EvidenceAutoLinkingResult,
     EvidenceAutoLinkingService,
 )
@@ -50,18 +48,18 @@ class CorrectionQueueItem:
     mission_uuid: UUID
     mission_id: str
     evidence_id: str
-    project_id: Optional[UUID]
+    project_id: UUID | None
     status: CorrectionStatus
     error_type: CorrectionErrorType
     retry_count: int
     max_retries: int
-    best_similarity: Optional[float]
+    best_similarity: float | None
     similarity_threshold: float
-    last_error: Optional[str]
+    last_error: str | None
     created_at: datetime
     updated_at: datetime
-    next_retry_at: Optional[datetime]
-    callback_url: Optional[str]
+    next_retry_at: datetime | None
+    callback_url: str | None
     evidence_summary: str
 
 
@@ -77,47 +75,55 @@ class CorrectionQueueService:
 
     def __init__(
         self,
-        auto_linker: Optional[EvidenceAutoLinkingService] = None,
-        webhook_client: Optional[WebhookClient] = None,
-        telemetry_path: Optional[Path] = None,
+        auto_linker: EvidenceAutoLinkingService | None = None,
+        webhook_client: WebhookClient | None = None,
+        telemetry_path: Path | None = None,
     ) -> None:
-        self._queue: Dict[UUID, CorrectionQueueItem] = {}
+        self._queue: dict[UUID, CorrectionQueueItem] = {}
         self._auto_linker = auto_linker or EvidenceAutoLinkingService()
         self._webhook_client = webhook_client or WebhookClient()
         self._processing = False
         self._stats = CorrectionQueueStats()
 
         repo_root = Path(__file__).resolve().parents[2]
-        default_path = repo_root / "cmos" / "telemetry" / "events" / "sprint-11-corrections.jsonl"
+        default_path = (
+            repo_root / "cmos" / "telemetry" / "events" / "sprint-11-corrections.jsonl"
+        )
         self.telemetry_path = telemetry_path or default_path
 
     def queue_failed_items(
         self,
         mission_uuid: UUID,
         mission_id: str,
-        project_id: Optional[UUID],
+        project_id: UUID | None,
         result: EvidenceAutoLinkingResult,
-        callback_url: Optional[str] = None,
-        evidence_summaries: Optional[Dict[str, str]] = None,
-    ) -> List[UUID]:
+        callback_url: str | None = None,
+        evidence_summaries: dict[str, str] | None = None,
+    ) -> list[UUID]:
         """Queue failed auto-link items from an ingestion result.
 
         Returns list of correction IDs for the queued items.
         """
         queued_ids = []
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         summaries = evidence_summaries or {}
 
         for error in result.errors:
             evidence_id = error.get("evidence_id", "")
-            error_type_str = error.get("error_type", CorrectionErrorType.LOW_SIMILARITY.value)
+            error_type_str = error.get(
+                "error_type", CorrectionErrorType.LOW_SIMILARITY.value
+            )
 
             # Skip non-retryable errors
             if error_type_str in (
                 CorrectionErrorType.VALIDATION_ERROR.value,
                 CorrectionErrorType.EMPTY_CONTENT.value,
             ):
-                logger.debug("Skipping non-retryable error for %s: %s", evidence_id, error_type_str)
+                logger.debug(
+                    "Skipping non-retryable error for %s: %s",
+                    evidence_id,
+                    error_type_str,
+                )
                 continue
 
             try:
@@ -168,11 +174,12 @@ class CorrectionQueueService:
 
         self._processing = True
         processed = 0
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         try:
             ready_items = [
-                item for item in self._queue.values()
+                item
+                for item in self._queue.values()
                 if item.status == CorrectionStatus.PENDING
                 and item.next_retry_at is not None
                 and item.next_retry_at <= now
@@ -198,16 +205,22 @@ class CorrectionQueueService:
                             await self._send_failure_notification(item)
                         else:
                             item.status = CorrectionStatus.PENDING
-                            backoff_idx = min(item.retry_count, len(BACKOFF_SCHEDULE) - 1)
-                            item.next_retry_at = now + timedelta(seconds=BACKOFF_SCHEDULE[backoff_idx])
+                            backoff_idx = min(
+                                item.retry_count, len(BACKOFF_SCHEDULE) - 1
+                            )
+                            item.next_retry_at = now + timedelta(
+                                seconds=BACKOFF_SCHEDULE[backoff_idx]
+                            )
                             self._log_telemetry("correction_retry_scheduled", item)
 
                 except Exception as e:
-                    logger.exception("Error processing correction %s", item.correction_id)
+                    logger.exception(
+                        "Error processing correction %s", item.correction_id
+                    )
                     item.status = CorrectionStatus.PENDING
                     item.last_error = str(e)
 
-                item.updated_at = datetime.now(timezone.utc)
+                item.updated_at = datetime.now(UTC)
 
             self._update_stats()
 
@@ -260,14 +273,18 @@ class CorrectionQueueService:
 
             if result.linked > 0 and evidence.chunk_id:
                 # Success - send notification
-                await self._send_success_notification(item, evidence.chunk_id, evidence.relevance_score or 0.0)
+                await self._send_success_notification(
+                    item, evidence.chunk_id, evidence.relevance_score or 0.0
+                )
                 return True
 
             # Failed - update item with latest error info
             if result.errors:
                 error = result.errors[0]
                 item.last_error = error.get("message", "Unknown error")
-                item.best_similarity = error.get("best_similarity", item.best_similarity)
+                item.best_similarity = error.get(
+                    "best_similarity", item.best_similarity
+                )
 
             return False
 
@@ -292,7 +309,9 @@ class CorrectionQueueService:
             similarity=similarity,
             retry_count=item.retry_count,
         )
-        await self._webhook_client.send_correction_notification(item.callback_url, payload)
+        await self._webhook_client.send_correction_notification(
+            item.callback_url, payload
+        )
 
     async def _send_failure_notification(
         self,
@@ -311,14 +330,16 @@ class CorrectionQueueService:
             retry_count=item.retry_count,
             best_similarity=item.best_similarity,
         )
-        await self._webhook_client.send_correction_notification(item.callback_url, payload)
+        await self._webhook_client.send_correction_notification(
+            item.callback_url, payload
+        )
 
     def trigger_retry(
         self,
-        mission_uuid: Optional[UUID] = None,
-        evidence_ids: Optional[List[str]] = None,
+        mission_uuid: UUID | None = None,
+        evidence_ids: list[str] | None = None,
         force_retry: bool = False,
-        callback_url: Optional[str] = None,
+        callback_url: str | None = None,
     ) -> CorrectionTriggerResponse:
         """Trigger manual retry of pending corrections.
 
@@ -334,7 +355,7 @@ class CorrectionQueueService:
         triggered = 0
         skipped = 0
         triggered_ids = []
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         for item in self._queue.values():
             # Apply filters
@@ -379,7 +400,7 @@ class CorrectionQueueService:
         self._update_stats()
 
         # Calculate error distribution
-        error_dist: Dict[str, int] = {}
+        error_dist: dict[str, int] = {}
         for item in self._queue.values():
             if item.status in (CorrectionStatus.PENDING, CorrectionStatus.FAILED):
                 key = item.error_type.value
@@ -416,7 +437,7 @@ class CorrectionQueueService:
             stats=self._stats,
             error_distribution=error_dist,
             recent_items=recent_items,
-            last_updated=datetime.now(timezone.utc),
+            last_updated=datetime.now(UTC),
         )
 
     def _update_stats(self) -> None:
@@ -438,29 +459,30 @@ class CorrectionQueueService:
 
     def _log_telemetry(self, event: str, item: CorrectionQueueItem) -> None:
         """Write telemetry record for Grafana dashboards."""
-        from app.core.telemetry import emit_telemetry
+        record = {
+            "ts": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+            "event": event,
+            "mission_id": item.mission_id,
+            "evidence_id": item.evidence_id,
+            "error_type": item.error_type.value,
+            "retry_count": item.retry_count,
+            "similarity": item.best_similarity,
+            "threshold": item.similarity_threshold,
+            "status": item.status.value,
+            "success": item.status == CorrectionStatus.COMPLETED,
+        }
+        try:
+            self.telemetry_path.parent.mkdir(parents=True, exist_ok=True)
+            with self.telemetry_path.open("a", encoding="utf-8") as f:
+                f.write(json.dumps(record, ensure_ascii=False) + "\n")
+        except OSError as e:
+            logger.warning("Failed to write correction telemetry: %s", e)
 
-        emit_telemetry(
-            path=self.telemetry_path,
-            event_type=f"correction.{event}",
-            source="tracelab",
-            payload={
-                "mission_id": item.mission_id,
-                "evidence_id": item.evidence_id,
-                "error_type": item.error_type.value,
-                "retry_count": item.retry_count,
-                "similarity": item.best_similarity,
-                "threshold": item.similarity_threshold,
-                "status": item.status.value,
-                "success": item.status == CorrectionStatus.COMPLETED,
-            },
-        )
-
-    def get_telemetry_summary(self) -> Dict[str, Any]:
+    def get_telemetry_summary(self) -> dict[str, Any]:
         """Generate Grafana-ready telemetry summary."""
         self._update_stats()
         return {
-            "ts": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "ts": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
             "event": "correction_summary",
             "pending": self._stats.pending,
             "in_progress": self._stats.in_progress,
@@ -475,7 +497,8 @@ class CorrectionQueueService:
     def clear_completed(self) -> int:
         """Remove completed items from queue. Returns count removed."""
         to_remove = [
-            cid for cid, item in self._queue.items()
+            cid
+            for cid, item in self._queue.items()
             if item.status in (CorrectionStatus.COMPLETED, CorrectionStatus.SKIPPED)
         ]
         for cid in to_remove:
@@ -485,7 +508,7 @@ class CorrectionQueueService:
 
 
 # Global singleton for the correction queue
-_correction_queue: Optional[CorrectionQueueService] = None
+_correction_queue: CorrectionQueueService | None = None
 
 
 def get_correction_queue() -> CorrectionQueueService:

@@ -46,7 +46,9 @@ def upgrade() -> None:
             # We need to drop old columns and add new ones
             # First, drop old constraints
             try:
-                op.drop_constraint("missions_mission_data_check", "missions", type_="check")
+                op.drop_constraint(
+                    "missions_mission_data_check", "missions", type_="check"
+                )
             except Exception:
                 pass  # Constraint might not exist
 
@@ -57,7 +59,9 @@ def upgrade() -> None:
 
         # Add new columns if they don't exist
         new_columns = {
-            "mission_id": sa.Column("mission_id", sa.String(50), nullable=True),  # Will add constraint after backfill
+            "mission_id": sa.Column(
+                "mission_id", sa.String(50), nullable=True
+            ),  # Will add constraint after backfill
             "title": sa.Column("title", sa.String(255), nullable=True),
             "objective": sa.Column("objective", sa.Text(), nullable=True),
             "success_criteria": sa.Column(
@@ -93,7 +97,9 @@ def upgrade() -> None:
             "queued_at": sa.Column("queued_at", sa.DateTime(), nullable=True),
             "started_at": sa.Column("started_at", sa.DateTime(), nullable=True),
             "completed_at": sa.Column("completed_at", sa.DateTime(), nullable=True),
-            "deepsearch_job_id": sa.Column("deepsearch_job_id", sa.String(100), nullable=True),
+            "deepsearch_job_id": sa.Column(
+                "deepsearch_job_id", sa.String(100), nullable=True
+            ),
             "execution_metadata": sa.Column(
                 "execution_metadata",
                 postgresql.JSONB() if is_pg else sa.JSON(),
@@ -164,7 +170,12 @@ def upgrade() -> None:
 
         # Drop old columns AFTER data migration
         if has_old_schema:
-            for old_col in ["mission_data", "quality_gates", "evidence_linking_metadata", "completion_percentage"]:
+            for old_col in [
+                "mission_data",
+                "quality_gates",
+                "evidence_linking_metadata",
+                "completion_percentage",
+            ]:
                 if old_col in existing_columns:
                     op.drop_column("missions", old_col)
 
@@ -192,7 +203,9 @@ def upgrade() -> None:
 
         # Add unique constraint on mission_id
         try:
-            op.create_unique_constraint("uq_missions_mission_id", "missions", ["mission_id"])
+            op.create_unique_constraint(
+                "uq_missions_mission_id", "missions", ["mission_id"]
+            )
         except Exception:
             pass
 
@@ -206,11 +219,15 @@ def upgrade() -> None:
         except Exception:
             pass
         try:
-            op.create_index("idx_missions_deepsearch_job_id", "missions", ["deepsearch_job_id"])
+            op.create_index(
+                "idx_missions_deepsearch_job_id", "missions", ["deepsearch_job_id"]
+            )
         except Exception:
             pass
         try:
-            op.create_index("idx_missions_project_status", "missions", ["project_id", "status"])
+            op.create_index(
+                "idx_missions_project_status", "missions", ["project_id", "status"]
+            )
         except Exception:
             pass
 
@@ -296,8 +313,18 @@ def upgrade() -> None:
             ),
             sa.Column("error_message", sa.Text(), nullable=True),
             # Housekeeping
-            sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
-            sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
+            sa.Column(
+                "created_at",
+                sa.DateTime(),
+                nullable=False,
+                server_default=sa.func.now(),
+            ),
+            sa.Column(
+                "updated_at",
+                sa.DateTime(),
+                nullable=False,
+                server_default=sa.func.now(),
+            ),
             sa.Column("created_by", sa.String(100), nullable=True),
         )
 
@@ -305,8 +332,12 @@ def upgrade() -> None:
         op.create_index("idx_missions_project_id", "missions", ["project_id"])
         op.create_index("idx_missions_mission_id", "missions", ["mission_id"])
         op.create_index("idx_missions_status", "missions", ["status"])
-        op.create_index("idx_missions_deepsearch_job_id", "missions", ["deepsearch_job_id"])
-        op.create_index("idx_missions_project_status", "missions", ["project_id", "status"])
+        op.create_index(
+            "idx_missions_deepsearch_job_id", "missions", ["deepsearch_job_id"]
+        )
+        op.create_index(
+            "idx_missions_project_status", "missions", ["project_id", "status"]
+        )
 
     # Migrate existing status values to new schema before adding constraints
     # Old schema: 'draft', 'in_progress', 'review', 'complete'
@@ -368,7 +399,9 @@ def downgrade() -> None:
         # Drop constraints
         if is_pg:
             try:
-                op.drop_constraint("success_criteria_not_empty", "missions", type_="check")
+                op.drop_constraint(
+                    "success_criteria_not_empty", "missions", type_="check"
+                )
             except Exception:
                 pass
             try:
@@ -401,11 +434,26 @@ def downgrade() -> None:
 
         # Drop new columns
         new_cols = [
-            "mission_id", "title", "objective", "success_criteria",
-            "context", "deliverables", "research_phases", "tags", "mission_metadata",
-            "queued_at", "started_at", "completed_at", "deepsearch_job_id",
-            "execution_metadata", "result_document_ids", "result_report_id",
-            "result_markdown", "result_protocol", "error_message", "created_by",
+            "mission_id",
+            "title",
+            "objective",
+            "success_criteria",
+            "context",
+            "deliverables",
+            "research_phases",
+            "tags",
+            "mission_metadata",
+            "queued_at",
+            "started_at",
+            "completed_at",
+            "deepsearch_job_id",
+            "execution_metadata",
+            "result_document_ids",
+            "result_report_id",
+            "result_markdown",
+            "result_protocol",
+            "error_message",
+            "created_by",
         ]
         existing_columns = {col["name"] for col in inspector.get_columns("missions")}
         for col in new_cols:
@@ -444,4 +492,6 @@ def downgrade() -> None:
         )
 
         # Re-add old index
-        op.create_index("idx_missions_project_status", "missions", ["project_id", "status"])
+        op.create_index(
+            "idx_missions_project_status", "missions", ["project_id", "status"]
+        )

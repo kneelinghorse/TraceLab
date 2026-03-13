@@ -41,7 +41,10 @@ class MissionRuntimeHelpersTest(unittest.TestCase):
                 (
                     self.mission_id,
                     "Helper mission for API regression tests",
-                    json.dumps({"metadata": {"description": "API regression mission"}}, ensure_ascii=False),
+                    json.dumps(
+                        {"metadata": {"description": "API regression mission"}},
+                        ensure_ascii=False,
+                    ),
                 ),
             )
             conn.commit()

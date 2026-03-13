@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Run PEDR offline benchmarks, track history, and detect regressions."""
+
 from __future__ import annotations
 
 import argparse
@@ -18,7 +19,9 @@ from scripts import rag_baseline_benchmark as rbb  # noqa: E402
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_HISTORY_PATH = PROJECT_ROOT / "telemetry/events/benchmark-history.jsonl"
-DEFAULT_REGRESSION_BASELINE_PATH = PROJECT_ROOT / "telemetry/events/benchmark-baseline.json"
+DEFAULT_REGRESSION_BASELINE_PATH = (
+    PROJECT_ROOT / "telemetry/events/benchmark-baseline.json"
+)
 DEFAULT_COMPARISON_OUTPUT = (
     PROJECT_ROOT / "telemetry/events/.artifacts/pedr-benchmark-comparison.json"
 )
@@ -58,7 +61,8 @@ def compare_metrics(
 
     ndcg_baseline = baseline.get("ndcg_at_k", 0.0)
     regression_alert = bool(
-        ndcg_baseline and current.get("ndcg_at_k", 0.0) < ndcg_baseline * (1 - threshold)
+        ndcg_baseline
+        and current.get("ndcg_at_k", 0.0) < ndcg_baseline * (1 - threshold)
     )
     return {
         "baseline": baseline,
@@ -328,7 +332,9 @@ def main() -> int:
                 "generated_at": _now_iso(),
                 "comparison": comparison,
                 "benchmark": pedr_output["benchmark"],
-                "baseline_summary": pedr_output["baseline_comparison"]["baseline_summary"],
+                "baseline_summary": pedr_output["baseline_comparison"][
+                    "baseline_summary"
+                ],
                 "pedr_summary": pedr_summary,
                 "quality_boost_analysis": pedr_output["quality_boost_analysis"],
             },
@@ -369,9 +375,7 @@ def main() -> int:
         return 1
 
     if comparison.get("regression_alert"):
-        print(
-            "  WARNING: Regression detected (nDCG drop exceeds threshold)."
-        )
+        print("  WARNING: Regression detected (nDCG drop exceeds threshold).")
         return 2
 
     return 0

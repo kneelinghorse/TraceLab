@@ -29,8 +29,12 @@ def upgrade() -> None:
         sa.Column("stage", sa.String(), nullable=False),
         sa.Column("status", sa.String(), nullable=False),
         sa.Column("message", sa.Text()),
-        sa.Column("details", sa.JSON(), nullable=False, server_default=sa.text("'{}'::jsonb")),
-        sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
+        sa.Column(
+            "details", sa.JSON(), nullable=False, server_default=sa.text("'{}'::jsonb")
+        ),
+        sa.Column(
+            "created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()
+        ),
         sa.Column(
             "updated_at",
             sa.DateTime(),
@@ -53,6 +57,10 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.drop_index("idx_processing_status_stage", table_name="document_processing_statuses")
-    op.drop_index("idx_processing_status_document", table_name="document_processing_statuses")
+    op.drop_index(
+        "idx_processing_status_stage", table_name="document_processing_statuses"
+    )
+    op.drop_index(
+        "idx_processing_status_document", table_name="document_processing_statuses"
+    )
     op.drop_table("document_processing_statuses")

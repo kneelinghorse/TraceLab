@@ -5,9 +5,9 @@ These tests verify that:
 2. DELETE endpoints require confirm=true query parameter (returns 400 without confirm)
 3. DELETE operations succeed with both auth AND confirm=true
 """
+
 from __future__ import annotations
 
-from typing import List
 from uuid import uuid4
 
 import pytest
@@ -62,9 +62,14 @@ class TestProjectDeleteSecurity:
         response = client.delete(f"/api/v1/projects/{project.id}?confirm=true")
 
         assert response.status_code == 401
-        assert "Authorization" in response.json()["detail"] or "token" in response.json()["detail"].lower()
+        assert (
+            "Authorization" in response.json()["detail"]
+            or "token" in response.json()["detail"].lower()
+        )
 
-    def test_delete_project_requires_confirmation(self, client: TestClient, db_session, auth_headers):
+    def test_delete_project_requires_confirmation(
+        self, client: TestClient, db_session, auth_headers
+    ):
         """DELETE /projects/{id} returns 400 without confirm=true."""
         project = _create_project(db_session)
 
@@ -74,33 +79,47 @@ class TestProjectDeleteSecurity:
         assert response.status_code == 400
         assert "confirm=true" in response.json()["detail"]
 
-    def test_delete_project_requires_confirm_true(self, client: TestClient, db_session, auth_headers):
+    def test_delete_project_requires_confirm_true(
+        self, client: TestClient, db_session, auth_headers
+    ):
         """DELETE /projects/{id} returns 400 when confirm=false."""
         project = _create_project(db_session)
 
-        response = client.delete(f"/api/v1/projects/{project.id}?confirm=false", headers=auth_headers)
+        response = client.delete(
+            f"/api/v1/projects/{project.id}?confirm=false", headers=auth_headers
+        )
 
         assert response.status_code == 400
         assert "confirm=true" in response.json()["detail"]
 
-    def test_delete_project_succeeds_with_auth_and_confirm(self, client: TestClient, db_session, auth_headers):
+    def test_delete_project_succeeds_with_auth_and_confirm(
+        self, client: TestClient, db_session, auth_headers
+    ):
         """DELETE /projects/{id} succeeds with auth and confirm=true."""
         project = _create_project(db_session)
         project_id = project.id
 
-        response = client.delete(f"/api/v1/projects/{project_id}?confirm=true", headers=auth_headers)
+        response = client.delete(
+            f"/api/v1/projects/{project_id}?confirm=true", headers=auth_headers
+        )
 
         assert response.status_code == 200
 
         # Verify project is actually deleted
-        get_response = client.get(f"/api/v1/projects/{project_id}", headers=auth_headers)
+        get_response = client.get(
+            f"/api/v1/projects/{project_id}", headers=auth_headers
+        )
         assert get_response.status_code == 404
 
-    def test_delete_nonexistent_project_returns_404(self, client: TestClient, auth_headers):
+    def test_delete_nonexistent_project_returns_404(
+        self, client: TestClient, auth_headers
+    ):
         """DELETE /projects/{id} returns 404 for nonexistent project (after auth/confirm check)."""
         fake_id = uuid4()
 
-        response = client.delete(f"/api/v1/projects/{fake_id}?confirm=true", headers=auth_headers)
+        response = client.delete(
+            f"/api/v1/projects/{fake_id}?confirm=true", headers=auth_headers
+        )
 
         assert response.status_code == 404
         assert "not found" in response.json()["detail"].lower()
@@ -118,49 +137,70 @@ class TestDocumentDeleteSecurity:
         response = client.delete(f"/api/v1/documents/{document.id}?confirm=true")
 
         assert response.status_code == 401
-        assert "Authorization" in response.json()["detail"] or "token" in response.json()["detail"].lower()
+        assert (
+            "Authorization" in response.json()["detail"]
+            or "token" in response.json()["detail"].lower()
+        )
 
-    def test_delete_document_requires_confirmation(self, client: TestClient, db_session, auth_headers):
+    def test_delete_document_requires_confirmation(
+        self, client: TestClient, db_session, auth_headers
+    ):
         """DELETE /documents/{id} returns 400 without confirm=true."""
         project = _create_project(db_session)
         document = _create_document(db_session, project.id)
 
         # Request with auth but no confirm parameter
-        response = client.delete(f"/api/v1/documents/{document.id}", headers=auth_headers)
+        response = client.delete(
+            f"/api/v1/documents/{document.id}", headers=auth_headers
+        )
 
         assert response.status_code == 400
         assert "confirm=true" in response.json()["detail"]
 
-    def test_delete_document_requires_confirm_true(self, client: TestClient, db_session, auth_headers):
+    def test_delete_document_requires_confirm_true(
+        self, client: TestClient, db_session, auth_headers
+    ):
         """DELETE /documents/{id} returns 400 when confirm=false."""
         project = _create_project(db_session)
         document = _create_document(db_session, project.id)
 
-        response = client.delete(f"/api/v1/documents/{document.id}?confirm=false", headers=auth_headers)
+        response = client.delete(
+            f"/api/v1/documents/{document.id}?confirm=false", headers=auth_headers
+        )
 
         assert response.status_code == 400
         assert "confirm=true" in response.json()["detail"]
 
-    def test_delete_document_succeeds_with_auth_and_confirm(self, client: TestClient, db_session, auth_headers):
+    def test_delete_document_succeeds_with_auth_and_confirm(
+        self, client: TestClient, db_session, auth_headers
+    ):
         """DELETE /documents/{id} succeeds with auth and confirm=true."""
         project = _create_project(db_session)
         document = _create_document(db_session, project.id)
         document_id = document.id
 
-        response = client.delete(f"/api/v1/documents/{document_id}?confirm=true", headers=auth_headers)
+        response = client.delete(
+            f"/api/v1/documents/{document_id}?confirm=true", headers=auth_headers
+        )
 
         assert response.status_code == 200
         assert "deleted" in response.json()["message"].lower()
 
         # Verify document is actually deleted
-        get_response = client.get(f"/api/v1/documents/{document_id}", headers=auth_headers)
+        get_response = client.get(
+            f"/api/v1/documents/{document_id}", headers=auth_headers
+        )
         assert get_response.status_code == 404
 
-    def test_delete_nonexistent_document_returns_404(self, client: TestClient, auth_headers):
+    def test_delete_nonexistent_document_returns_404(
+        self, client: TestClient, auth_headers
+    ):
         """DELETE /documents/{id} returns 404 for nonexistent document (after auth/confirm check)."""
         fake_id = uuid4()
 
-        response = client.delete(f"/api/v1/documents/{fake_id}?confirm=true", headers=auth_headers)
+        response = client.delete(
+            f"/api/v1/documents/{fake_id}?confirm=true", headers=auth_headers
+        )
 
         assert response.status_code == 404
         assert "not found" in response.json()["detail"].lower()
@@ -169,7 +209,9 @@ class TestDocumentDeleteSecurity:
 class TestDeleteEndpointErrorMessages:
     """Tests for clear, actionable error messages on DELETE endpoints."""
 
-    def test_project_delete_error_explains_cascade(self, client: TestClient, db_session, auth_headers):
+    def test_project_delete_error_explains_cascade(
+        self, client: TestClient, db_session, auth_headers
+    ):
         """Project delete error message explains confirmation requirement."""
         project = _create_project(db_session)
 
@@ -178,12 +220,16 @@ class TestDeleteEndpointErrorMessages:
         detail = response.json()["detail"]
         assert "confirm=true" in detail
 
-    def test_document_delete_error_explains_cascade(self, client: TestClient, db_session, auth_headers):
+    def test_document_delete_error_explains_cascade(
+        self, client: TestClient, db_session, auth_headers
+    ):
         """Document delete error message explains confirmation requirement."""
         project = _create_project(db_session)
         document = _create_document(db_session, project.id)
 
-        response = client.delete(f"/api/v1/documents/{document.id}", headers=auth_headers)
+        response = client.delete(
+            f"/api/v1/documents/{document.id}", headers=auth_headers
+        )
 
         detail = response.json()["detail"]
         assert "confirm=true" in detail
@@ -197,4 +243,8 @@ class TestDeleteEndpointErrorMessages:
         assert response.status_code == 401
         # Should indicate authorization is needed
         detail = response.json()["detail"]
-        assert "bearer" in detail.lower() or "api-key" in detail.lower() or "authorization" in detail.lower()
+        assert (
+            "bearer" in detail.lower()
+            or "api-key" in detail.lower()
+            or "authorization" in detail.lower()
+        )

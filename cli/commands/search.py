@@ -25,11 +25,10 @@ def semantic(ctx, project_id, query, top_k):
         client = APIClient(base_url=ctx.api_url, token=ctx.token)
 
         with ctx.output.progress_spinner(f"Searching..."):
-            results = client.post("/api/v1/search", data={
-                "project_id": project_id,
-                "query": query,
-                "top_k": top_k
-            })
+            results = client.post(
+                "/api/v1/search",
+                data={"project_id": project_id, "query": query, "top_k": top_k},
+            )
 
         if ctx.json_mode:
             ctx.output.print_data(results)
@@ -72,12 +71,15 @@ def query(ctx, project_id, query, model, top_k):
         client = APIClient(base_url=ctx.api_url, token=ctx.token)
 
         with ctx.output.progress_spinner(f"Querying with {model}..."):
-            results = client.post("/api/v1/rag/query", data={
-                "project_id": project_id,
-                "query": query,
-                "model": model,
-                "top_k": top_k
-            })
+            results = client.post(
+                "/api/v1/rag/query",
+                data={
+                    "project_id": project_id,
+                    "query": query,
+                    "model": model,
+                    "top_k": top_k,
+                },
+            )
 
         if ctx.json_mode:
             ctx.output.print_data(results)

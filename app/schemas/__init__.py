@@ -1,86 +1,87 @@
 """Pydantic schemas exposing the core domain entities."""
-from app.schemas.project import ProjectBase, ProjectCreate, ProjectUpdate, ProjectRead
+
+from app.schemas.chunk import (
+    DocumentChunkBase,
+    DocumentChunkCreate,
+    DocumentChunkRead,
+    DocumentChunkUpdate,
+)
 from app.schemas.document import (
     DocumentBase,
     DocumentCreate,
     DocumentListItem,
-    DocumentUpdate,
     DocumentRead,
+    DocumentUpdate,
 )
 from app.schemas.document_status import DocumentProcessingStatusRead
-from app.schemas.chunk import (
-    DocumentChunkBase,
-    DocumentChunkCreate,
-    DocumentChunkUpdate,
-    DocumentChunkRead,
-)
-from app.schemas.tag import (
-    TagBase,
-    TagCreate,
-    TagUpdate,
-    TagRead,
-    DocumentTagBase,
-    DocumentTagCreate,
-    DocumentTagRead,
-)
 from app.schemas.insight import (
     InsightBase,
     InsightCreate,
-    InsightUpdate,
     InsightRead,
     InsightSourceBase,
     InsightSourceCreate,
     InsightSourceRead,
+    InsightUpdate,
 )
 from app.schemas.mission import (
     MissionBase,
     MissionCreate,
-    MissionUpdate,
     MissionRead,
+    MissionUpdate,
 )
 from app.schemas.mission_protocol import (
     MissionExportResponse,
     MissionImportRequest,
     MissionImportResponse,
 )
-from app.schemas.quality_gates import (
-    QualityGateReportResponse,
-    QualityGateStatus,
+from app.schemas.pagination import (
+    PaginatedResponse,
+    PaginationMeta,
 )
+from app.schemas.project import ProjectBase, ProjectCreate, ProjectRead, ProjectUpdate
 from app.schemas.quality import (
     QualityCheckBase,
     QualityCheckCreate,
-    QualityCheckUpdate,
     QualityCheckRead,
+    QualityCheckUpdate,
 )
 from app.schemas.quality_automation import (
     QualityAutomationHistoryResponse,
     QualityAutomationRunRequest,
     QualityAutomationRunResponse,
 )
+from app.schemas.quality_gates import (
+    QualityGateReportResponse,
+    QualityGateStatus,
+)
+from app.schemas.rag import (
+    RagCitation,
+    RagQuery,
+    RagResponse,
+)
+from app.schemas.relationships import (
+    RelatedChunk,
+    RelatedDocument,
+    RelatedInsight,
+    RelatedMission,
+    RelationshipContextResponse,
+    RelationshipEdgeInfo,
+    RelationshipFilters,
+    RelationshipTotals,
+)
 from app.schemas.retrieval import (
     RetrievalQuery,
     RetrievalResponse,
     RetrievedChunk,
 )
-from app.schemas.rag import (
-    RagQuery,
-    RagResponse,
-    RagCitation,
-)
-from app.schemas.pagination import (
-    PaginatedResponse,
-    PaginationMeta,
-)
-from app.schemas.relationships import (
-    RelationshipContextResponse,
-    RelationshipEdgeInfo,
-    RelationshipFilters,
-    RelationshipTotals,
-    RelatedChunk,
-    RelatedDocument,
-    RelatedInsight,
-    RelatedMission,
+from app.schemas.tag import (
+    DocumentTagBase,
+    DocumentTagCreate,
+    DocumentTagRead,
+    TagBase,
+    TagCreate,
+    TagRead,
+    TagUpdate,
 )
 
 __all__ = [

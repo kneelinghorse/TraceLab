@@ -1,14 +1,14 @@
 """Cost monitoring service with telemetry exports."""
+
 from __future__ import annotations
 
 import json
 import threading
 from collections import defaultdict
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from statistics import mean
-from typing import Any, Dict, List, Optional
-
+from typing import Any
 
 DEFAULT_MODEL_PRICING = {
     # USD per 1K tokens. Pricing source: https://openai.com/api/pricing/
@@ -26,40 +26,46 @@ class CostMonitor:
         telemetry_path: Path | None = None,
         retention_days: int = 45,
         currency: str = "USD",
-        model_pricing: Dict[str, Dict[str, float]] | None = None,
+        model_pricing: dict[str, dict[str, float]] | None = None,
         max_query_chars: int = 120,
     ) -> None:
         repo_root = Path(__file__).resolve().parents[2]
-        self.telemetry_path = telemetry_path or (repo_root / "telemetry" / "events" / "sprint-04-performance.jsonl")
+        self.telemetry_path = telemetry_path or (
+            repo_root / "telemetry" / "events" / "sprint-04-performance.jsonl"
+        )
         self.retention_days = max(1, retention_days)
         self.currency = currency
         self.model_pricing = model_pricing or dict(DEFAULT_MODEL_PRICING)
         self.max_query_chars = max(40, max_query_chars)
         self._lock = threading.Lock()
-        self._events: List[Dict[str, Any]] = []
+        self._events: list[dict[str, Any]] = []
 
     def track_usage(
         self,
         *,
         model: str,
-        prompt_tokens: Optional[int] = None,
-        completion_tokens: Optional[int] = None,
-        total_tokens: Optional[int] = None,
-        latency_ms: Optional[float] = None,
-        cache_hit: Optional[bool] = None,
-        project_id: Optional[str] = None,
-        query: Optional[str] = None,
+        prompt_tokens: int | None = None,
+        completion_tokens: int | None = None,
+        total_tokens: int | None = None,
+        latency_ms: float | None = None,
+        cache_hit: bool | None = None,
+        project_id: str | None = None,
+        query: str | None = None,
         route: str = "primary",
-        metadata: Optional[Dict[str, Any]] = None,
-        timestamp: Optional[datetime] = None,
-        estimated_cost: Optional[float] = None,
-    ) -> Dict[str, Any]:
+        metadata: dict[str, Any] | None = None,
+        timestamp: datetime | None = None,
+        estimated_cost: float | None = None,
+    ) -> dict[str, Any]:
         """Record a usage event and append it to telemetry."""
 
         prompt = max(0, int(prompt_tokens or 0))
         completion = max(0, int(completion_tokens or 0))
-        total = max(prompt + completion, int(total_tokens or 0)) if total_tokens is not None else prompt + completion
-        ts = (timestamp or datetime.now(timezone.utc)).astimezone(timezone.utc)
+        total = (
+            max(prompt + completion, int(total_tokens or 0))
+            if total_tokens is not None
+            else prompt + completion
+        )
+        ts = (timestamp or datetime.now(UTC)).astimezone(UTC)
         normalized_query = (query or "").strip() or None
         if normalized_query:
             normalized_query = normalized_query[: self.max_query_chars]
@@ -70,7 +76,12 @@ class CostMonitor:
             "total_tokens": total,
         }
 
-        cost = self._estimate_cost(model=model, prompt_tokens=prompt, completion_tokens=completion, fallback=estimated_cost)
+        cost = self._estimate_cost(
+            model=model,
+            prompt_tokens=prompt,
+            completion_tokens=completion,
+            fallback=estimated_cost,
+        )
 
         record = {
             "ts": ts.isoformat().replace("+00:00", "Z"),
@@ -96,7 +107,7 @@ class CostMonitor:
         self,
         *,
         latency_ms: float,
-        project_id: Optional[str],
+        project_id: str | None,
         query: str,
     ) -> None:
         """Log a cache hit with zero cost."""
@@ -113,10 +124,10 @@ class CostMonitor:
             estimated_cost=0.0,
         )
 
-    def summary(self, *, days: int = 30, months: int = 3) -> Dict[str, Any]:
+    def summary(self, *, days: int = 30, months: int = 3) -> dict[str, Any]:
         """Return aggregated statistics for dashboards and APIs."""
 
-        snapshot: List[Dict[str, Any]]
+        snapshot: list[dict[str, Any]]
         with self._lock:
             snapshot = list(self._events)
 
@@ -134,7 +145,7 @@ class CostMonitor:
             "recent": recent,
         }
 
-    def _aggregate_totals(self, events: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _aggregate_totals(self, events: list[dict[str, Any]]) -> dict[str, Any]:
         if not events:
             return {
                 "queries": 0,
@@ -147,9 +158,17 @@ class CostMonitor:
 
         queries = len(events)
         total_cost = sum(event.get("cost_usd", 0.0) for event in events)
-        prompt_tokens = sum((event.get("usage") or {}).get("prompt_tokens", 0) for event in events)
-        completion_tokens = sum((event.get("usage") or {}).get("completion_tokens", 0) for event in events)
-        latencies = [event.get("latency_ms") for event in events if event.get("latency_ms") is not None]
+        prompt_tokens = sum(
+            (event.get("usage") or {}).get("prompt_tokens", 0) for event in events
+        )
+        completion_tokens = sum(
+            (event.get("usage") or {}).get("completion_tokens", 0) for event in events
+        )
+        latencies = [
+            event.get("latency_ms")
+            for event in events
+            if event.get("latency_ms") is not None
+        ]
         cache_hit_count = sum(1 for event in events if event.get("cache_hit"))
         return {
             "queries": queries,
@@ -160,16 +179,20 @@ class CostMonitor:
             "cache_hit_rate": round(cache_hit_count / queries, 4) if queries else 0.0,
         }
 
-    def _group_by_day(self, events: List[Dict[str, Any]], *, limit: int) -> List[Dict[str, Any]]:
-        buckets: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+    def _group_by_day(
+        self, events: list[dict[str, Any]], *, limit: int
+    ) -> list[dict[str, Any]]:
+        buckets: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for event in events:
             ts: datetime = event["_ts"]
             buckets[ts.date().isoformat()].append(event)
         ordered_keys = sorted(buckets.keys(), reverse=True)[:limit]
         return [self._summarize_bucket(key, buckets[key]) for key in ordered_keys]
 
-    def _group_by_month(self, events: List[Dict[str, Any]], *, limit: int) -> List[Dict[str, Any]]:
-        buckets: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+    def _group_by_month(
+        self, events: list[dict[str, Any]], *, limit: int
+    ) -> list[dict[str, Any]]:
+        buckets: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for event in events:
             ts: datetime = event["_ts"]
             label = f"{ts.year:04d}-{ts.month:02d}"
@@ -177,15 +200,21 @@ class CostMonitor:
         ordered_keys = sorted(buckets.keys(), reverse=True)[:limit]
         return [self._summarize_bucket(key, buckets[key]) for key in ordered_keys]
 
-    def _summarize_bucket(self, label: str, events: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _summarize_bucket(
+        self, label: str, events: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         return {
             "label": label,
             "queries": len(events),
             "cost_usd": round(sum(event.get("cost_usd", 0.0) for event in events), 6),
-            "avg_latency_ms": self._safe_mean(event.get("latency_ms") for event in events),
+            "avg_latency_ms": self._safe_mean(
+                event.get("latency_ms") for event in events
+            ),
         }
 
-    def _recent_events(self, events: List[Dict[str, Any]], *, limit: int) -> List[Dict[str, Any]]:
+    def _recent_events(
+        self, events: list[dict[str, Any]], *, limit: int
+    ) -> list[dict[str, Any]]:
         recent = sorted(events, key=lambda event: event["_ts"], reverse=True)[:limit]
         return [
             {
@@ -206,7 +235,7 @@ class CostMonitor:
         model: str,
         prompt_tokens: int,
         completion_tokens: int,
-        fallback: Optional[float],
+        fallback: float | None,
     ) -> float:
         if fallback is not None:
             return float(fallback)
@@ -221,15 +250,12 @@ class CostMonitor:
         cutoff = now - timedelta(days=self.retention_days)
         self._events = [event for event in self._events if event["_ts"] >= cutoff]
 
-    def _append_telemetry(self, payload: Dict[str, Any]) -> None:  # pragma: no cover - simple IO
-        from app.core.telemetry import emit_telemetry
-
-        emit_telemetry(
-            path=self.telemetry_path,
-            event_type="cost.monitor.event",
-            source="tracelab",
-            payload=payload,
-        )
+    def _append_telemetry(
+        self, payload: dict[str, Any]
+    ) -> None:  # pragma: no cover - simple IO
+        self.telemetry_path.parent.mkdir(parents=True, exist_ok=True)
+        with self.telemetry_path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
 
     @staticmethod
     def _safe_mean(values: Any) -> float:

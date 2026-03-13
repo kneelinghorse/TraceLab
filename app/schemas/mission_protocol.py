@@ -1,4 +1,5 @@
 """API schemas for Mission Protocol import/export workflows."""
+
 from __future__ import annotations
 
 from uuid import UUID
@@ -31,4 +32,3 @@ class MissionExportResponse(BaseModel):
 
     mission_id: UUID
     yaml_text: str
-

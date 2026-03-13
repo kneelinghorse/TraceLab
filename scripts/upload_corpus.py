@@ -95,7 +95,9 @@ def main(argv: Optional[list[str]] = None) -> None:
         result["manifest_path"],
         result.get("baseline_path"),
     ]
-    copied_files = copy_to_destination([p for p in files_to_copy if p], args.destination)
+    copied_files = copy_to_destination(
+        [p for p in files_to_copy if p], args.destination
+    )
 
     if not args.retain_local:
         for file_path in [result["archive_path"], result["manifest_path"]]:
@@ -123,7 +125,9 @@ def main(argv: Optional[list[str]] = None) -> None:
             f"    aws s3 cp {example_path} "
             f"s3://<bucket>/presidio/{datetime.now(timezone.utc):%Y%m%d}/"
         )
-        print(f"    az storage blob upload --file {example_path} --container-name <container>")
+        print(
+            f"    az storage blob upload --file {example_path} --container-name <container>"
+        )
     print("=" * 72)
 
 

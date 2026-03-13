@@ -9,6 +9,7 @@ GET /api/v1/missions/events/recent
 POST /api/v1/missions/events/cmos
   → Ingest a CMOS mission transition as a TraceLab SSE event
 """
+
 from __future__ import annotations
 
 import logging
@@ -36,7 +37,9 @@ router = APIRouter()
 
 @router.get("/events/stream")
 async def stream_mission_events(
-    limit: int = Query(50, ge=1, le=200, description="Number of history events to replay"),
+    limit: int = Query(
+        50, ge=1, le=200, description="Number of history events to replay"
+    ),
     _user: AuthenticatedUser = Depends(require_authenticated_user_sse),
 ):
     """Stream mission progress events via Server-Sent Events.
@@ -80,10 +83,14 @@ class CmosMissionEventRequest(BaseModel):
 
     mission_id: str = Field(..., description="CMOS mission ID (e.g. T35.2)")
     name: str = Field(..., description="Mission name/title")
-    new_status: str = Field(..., description="Target status (e.g. In Progress, Completed, Blocked)")
+    new_status: str = Field(
+        ..., description="Target status (e.g. In Progress, Completed, Blocked)"
+    )
     previous_status: Optional[str] = Field(None, description="Previous status")
     notes: Optional[str] = Field(None, description="Transition notes")
-    reason: Optional[str] = Field(None, description="Block reason (for blocked transitions)")
+    reason: Optional[str] = Field(
+        None, description="Block reason (for blocked transitions)"
+    )
     sprint_id: Optional[str] = Field(None, description="Sprint ID (e.g. sprint-35)")
 
 
@@ -129,6 +136,5 @@ def get_recent_events(
     bus = get_mission_event_bus()
     events = bus.get_recent_events(limit=limit)
     return [
-        {k: v for k, v in event.__dict__.items() if v is not None}
-        for event in events
+        {k: v for k, v in event.__dict__.items() if v is not None} for event in events
     ]
