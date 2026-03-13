@@ -222,9 +222,14 @@ class CostMonitor:
         self._events = [event for event in self._events if event["_ts"] >= cutoff]
 
     def _append_telemetry(self, payload: Dict[str, Any]) -> None:  # pragma: no cover - simple IO
-        self.telemetry_path.parent.mkdir(parents=True, exist_ok=True)
-        with self.telemetry_path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
+        from app.core.telemetry import emit_telemetry
+
+        emit_telemetry(
+            path=self.telemetry_path,
+            event_type="cost.monitor.event",
+            source="tracelab",
+            payload=payload,
+        )
 
     @staticmethod
     def _safe_mean(values: Any) -> float:

@@ -1,0 +1,4 @@
+{"ts": "2025-11-09T10:10:00Z", "check": "bias_detection", "runs": 34, "issues_detected": 2, "issues_blocked": 2, "status": "pass", "median_runtime_ms": 210}
+{"ts": "2025-11-09T10:10:10Z", "check": "traceability", "runs": 34, "broken_links": 0, "low_relevance": 1, "issues_blocked": 1, "status": "pass", "median_runtime_ms": 265}
+{"ts": "2025-11-09T10:10:20Z", "check": "methodology", "runs": 34, "violations": 0, "status": "pass", "median_runtime_ms": 185}
+{"ts": "2025-11-09T10:10:30Z", "check": "synthesis", "runs": 34, "violations": 0, "status": "pass", "median_runtime_ms": 172}

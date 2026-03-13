@@ -1,8 +1,8 @@
-{"ts": "2025-12-05T03:58:41Z", "event": "sprint_11_retrospective_started", "mission": "B11.6", "agent": "claude-opus"}
-{"ts": "2025-12-05T04:00:00Z", "event": "sprint_11_missions_analyzed", "missions_completed": 5, "total_tests": 63, "pass_rate": 1.0}
-{"ts": "2025-12-05T04:00:01Z", "event": "sprint_11_correction_loop_metrics", "error_types": 7, "max_retries": 2, "backoff_schedule": ["5s", "30s"], "tests_passing": 22}
-{"ts": "2025-12-05T04:00:02Z", "event": "sprint_11_pedr_sync_metrics", "sync_modes": ["delta", "full"], "event_driven": true, "governance_metadata": ["pii", "impact", "bindings"], "tests_passing": 22}
-{"ts": "2025-12-05T04:00:03Z", "event": "sprint_11_preflight_metrics", "thresholds": {"reuse": 0.85, "review": 0.70}, "quality_gates_required": 4, "tests_passing": 19}
-{"ts": "2025-12-05T04:00:04Z", "event": "sprint_11_schema_metrics", "version": "1.0.0", "github_packages": true, "semver_validation": true}
-{"ts": "2025-12-05T04:00:05Z", "event": "sprint_11_console_metrics", "files_created": 11, "dashboard_pages": ["missions", "evidence", "telemetry", "corrections"]}
-{"ts": "2025-12-05T04:00:10Z", "event": "sprint_11_retrospective_completed", "mission": "B11.6", "deliverables": ["retrospective.md", "sprint-12-backlog-draft.md", "sprint-11-retro.jsonl"]}
+{"ts": "2025-12-05T03:58:41Z", "event_type": "sprint_11_retrospective_started", "source": "cmos", "payload": {"mission": "B11.6", "agent": "claude-opus"}, "sprint_id": "sprint-11"}
+{"ts": "2025-12-05T04:00:00Z", "event_type": "sprint_11_missions_analyzed", "source": "cmos", "payload": {"missions_completed": 5, "total_tests": 63, "pass_rate": 1.0}, "sprint_id": "sprint-11"}
+{"ts": "2025-12-05T04:00:01Z", "event_type": "sprint_11_correction_loop_metrics", "source": "cmos", "payload": {"error_types": 7, "max_retries": 2, "backoff_schedule": ["5s", "30s"], "tests_passing": 22}, "sprint_id": "sprint-11"}
+{"ts": "2025-12-05T04:00:02Z", "event_type": "sprint_11_pedr_sync_metrics", "source": "cmos", "payload": {"sync_modes": ["delta", "full"], "event_driven": true, "governance_metadata": ["pii", "impact", "bindings"], "tests_passing": 22}, "sprint_id": "sprint-11"}
+{"ts": "2025-12-05T04:00:03Z", "event_type": "sprint_11_preflight_metrics", "source": "cmos", "payload": {"thresholds": {"reuse": 0.85, "review": 0.7}, "quality_gates_required": 4, "tests_passing": 19}, "sprint_id": "sprint-11"}
+{"ts": "2025-12-05T04:00:04Z", "event_type": "sprint_11_schema_metrics", "source": "cmos", "payload": {"version": "1.0.0", "github_packages": true, "semver_validation": true}, "sprint_id": "sprint-11"}
+{"ts": "2025-12-05T04:00:05Z", "event_type": "sprint_11_console_metrics", "source": "cmos", "payload": {"files_created": 11, "dashboard_pages": ["missions", "evidence", "telemetry", "corrections"]}, "sprint_id": "sprint-11"}
+{"ts": "2025-12-05T04:00:10Z", "event_type": "sprint_11_retrospective_completed", "source": "cmos", "payload": {"mission": "B11.6", "deliverables": ["retrospective.md", "sprint-12-backlog-draft.md", "sprint-11-retro.jsonl"]}, "sprint_id": "sprint-11"}

@@ -53,15 +53,21 @@ class SessionCapture:
     category: str
     content: str
     context: Optional[str] = None
+    evidence: Optional[List[Dict[str, str]]] = None
+    mission_id: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, str]:
-        payload = {
+    def to_dict(self) -> Dict[str, Any]:
+        payload: Dict[str, Any] = {
             "timestamp": self.timestamp,
             "category": self.category,
             "content": self.content,
         }
         if self.context:
             payload["context"] = self.context
+        if self.evidence:
+            payload["evidence"] = self.evidence
+        if self.mission_id:
+            payload["mission_id"] = self.mission_id
         return payload
 
 
@@ -216,7 +222,9 @@ class SessionRuntime:
         content: str,
         *,
         context: str | None = None,
-        agent: str = "assistant"
+        agent: str = "assistant",
+        evidence: List[Dict[str, str]] | None = None,
+        mission_id: str | None = None,
     ) -> None:
         """Capture an insight for the active session."""
         normalized_category = self._run_validation(
@@ -226,12 +234,16 @@ class SessionRuntime:
         clean_content = self._run_validation(validators.normalize_capture_content, content)
         context_text = context.strip() if context else None
 
+        clean_evidence = self._validate_evidence(evidence) if evidence else None
+
         self.ensure_database()
         capture = SessionCapture(
             timestamp=_utc_now(),
             category=normalized_category,
             content=clean_content,
             context=context_text,
+            evidence=clean_evidence,
+            mission_id=mission_id.strip() if mission_id else None,
         )
 
         try:
@@ -602,9 +614,21 @@ class SessionRuntime:
 
             counts[category] += 1
             if category == "decision":
-                entry = self._with_session_reference(content, session_id)
-                if entry:
-                    decisions.append(entry)
+                evidence = capture.get("evidence")
+                cap_mission_id = capture.get("mission_id")
+                if evidence or cap_mission_id:
+                    entry_text = self._with_session_reference(content, session_id)
+                    if entry_text:
+                        rich: Dict[str, Any] = {"text": entry_text}
+                        if evidence:
+                            rich["evidence"] = evidence
+                        if cap_mission_id:
+                            rich["mission_id"] = cap_mission_id
+                        decisions.append(rich)
+                else:
+                    entry = self._with_session_reference(content, session_id)
+                    if entry:
+                        decisions.append(entry)
             elif category == "learning":
                 entry = self._with_session_reference(content, session_id)
                 if entry:
@@ -631,6 +655,23 @@ class SessionRuntime:
         if session_id in cleaned:
             return cleaned
         return f"{cleaned} (from {session_id})"
+
+    @staticmethod
+    def _validate_evidence(evidence: List[Any]) -> List[Dict[str, str]]:
+        """Validate and normalize evidence references.
+
+        Each entry must have at least ``type`` and ``id`` string fields.
+        Invalid entries are silently dropped.
+        """
+        valid: List[Dict[str, str]] = []
+        for entry in evidence:
+            if not isinstance(entry, dict):
+                continue
+            etype = entry.get("type")
+            eid = entry.get("id")
+            if isinstance(etype, str) and isinstance(eid, str) and etype.strip() and eid.strip():
+                valid.append({"type": etype.strip(), "id": eid.strip()})
+        return valid or None  # type: ignore[return-value]
 
     @staticmethod
     def _constraint_exists(existing: List[Any], candidate: str) -> bool:
@@ -771,6 +812,8 @@ def capture(
     *,
     context: str | None = None,
     agent: str = "assistant",
+    evidence: List[Dict[str, str]] | None = None,
+    mission_id: str | None = None,
     repo_root: Path | str | None = None,
     db_path: Path | str | None = None,
 ) -> None:
@@ -782,6 +825,8 @@ def capture(
             content=content,
             context=context,
             agent=agent,
+            evidence=evidence,
+            mission_id=mission_id,
         )
 
 

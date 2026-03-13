@@ -215,6 +215,30 @@ class SQLiteClient:
         result = self.fetchone("SELECT last_insert_rowid() as id")
         return result["id"] if result else None
 
+    @staticmethod
+    def _parse_decision_entry(entry: Any, project_domain: str = "general") -> Optional[Dict[str, Any]]:
+        """Parse a decision entry that may be a plain string or a rich dict."""
+        if isinstance(entry, str):
+            cleaned = entry.strip()
+            if cleaned:
+                return {
+                    "decision_text": cleaned,
+                    "project_domain": project_domain,
+                    "evidence": None,
+                    "mission_id": None,
+                }
+        elif isinstance(entry, dict):
+            text = (entry.get("text") or "").strip()
+            if text:
+                evidence = entry.get("evidence")
+                return {
+                    "decision_text": text,
+                    "project_domain": project_domain,
+                    "evidence": json.dumps(evidence, ensure_ascii=False) if evidence else None,
+                    "mission_id": entry.get("mission_id"),
+                }
+        return None
+
     def _sync_strategic_decisions(
         self,
         master_context: Dict[str, Any],
@@ -222,20 +246,14 @@ class SQLiteClient:
         timestamp: str
     ) -> None:
         """Sync decisions from MASTER_CONTEXT to strategic_decisions table."""
-        decisions = []
+        decisions: List[Dict[str, Any]] = []
 
         general_decisions = master_context.get("decisions_made") or []
         if isinstance(general_decisions, list):
-            for decision_text in general_decisions:
-                if isinstance(decision_text, str):
-                    cleaned = decision_text.strip()
-                    if cleaned:
-                        decisions.append(
-                            {
-                                "decision_text": cleaned,
-                                "project_domain": "general",
-                            }
-                        )
+            for entry in general_decisions:
+                parsed = self._parse_decision_entry(entry, "general")
+                if parsed:
+                    decisions.append(parsed)
 
         domains = master_context.get("working_memory", {}).get("domains", {})
         if isinstance(domains, dict):
@@ -245,16 +263,10 @@ class SQLiteClient:
                 domain_decisions = domain_data.get("decisions_made", [])
                 if not isinstance(domain_decisions, list):
                     continue
-                for decision_text in domain_decisions:
-                    if isinstance(decision_text, str):
-                        cleaned = decision_text.strip()
-                        if cleaned:
-                            decisions.append(
-                                {
-                                    "decision_text": cleaned,
-                                    "project_domain": domain_name,
-                                }
-                            )
+                for entry in domain_decisions:
+                    parsed = self._parse_decision_entry(entry, domain_name)
+                    if parsed:
+                        decisions.append(parsed)
 
         if not decisions:
             return
@@ -270,8 +282,12 @@ class SQLiteClient:
             self.executemany(
                 """
                 INSERT INTO strategic_decisions (
-                    context_id, decision_text, created_at, snapshot_id, project_domain
-                ) VALUES ('master_context', :decision_text, :created_at, :snapshot_id, :project_domain)
+                    context_id, decision_text, created_at, snapshot_id,
+                    project_domain, evidence, mission_id
+                ) VALUES (
+                    'master_context', :decision_text, :created_at, :snapshot_id,
+                    :project_domain, :evidence, :mission_id
+                )
                 """,
                 [
                     {
@@ -279,6 +295,8 @@ class SQLiteClient:
                         "created_at": timestamp,
                         "snapshot_id": snapshot_id,
                         "project_domain": d.get("project_domain"),
+                        "evidence": d.get("evidence"),
+                        "mission_id": d.get("mission_id"),
                     }
                     for d in new_decisions
                 ]

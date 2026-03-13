@@ -1,0 +1,2 @@
+{"ts": "2025-11-09T08:30:00Z", "suite": "playwright", "tests_migrated": 12, "tests_passing": 12, "ci_duration_minutes": 5.4, "trace_viewer_verified": true, "cypress_removed": true, "cypress_cost_monthly": 70.0, "playwright_cost_monthly": 0.0, "github_actions_job": "frontend-e2e", "notes": "All Mission Protocol flows migrated to Playwright"}
+{"ts": "2025-11-09T08:45:00Z", "suite": "decommission", "package_json_clean": true, "ci_config_updated": true, "artifacts_cleaned": ["frontend/cypress", "cypress"], "status": "complete"}

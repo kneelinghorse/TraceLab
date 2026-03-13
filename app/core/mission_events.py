@@ -43,6 +43,13 @@ class MissionEventType(str, Enum):
     # Quality & governance
     QUALITY_GATES_EVALUATED = "quality.gates_evaluated"
 
+    # CMOS bridge
+    CMOS_MISSION_STARTED = "cmos.mission.started"
+    CMOS_MISSION_COMPLETED = "cmos.mission.completed"
+    CMOS_MISSION_BLOCKED = "cmos.mission.blocked"
+    CMOS_MISSION_UNBLOCKED = "cmos.mission.unblocked"
+    CMOS_MISSION_STATUS_CHANGED = "cmos.mission.status_changed"
+
     # System
     HEARTBEAT = "system.heartbeat"
 
@@ -236,6 +243,72 @@ def emit_quality_gates(
     ))
 
 
+# ─── CMOS bridge emitter ────────────────────────────────────────────────────
+
+# Maps CMOS transition statuses to event types.
+_CMOS_STATUS_MAP: Dict[str, MissionEventType] = {
+    "in progress": MissionEventType.CMOS_MISSION_STARTED,
+    "completed": MissionEventType.CMOS_MISSION_COMPLETED,
+    "blocked": MissionEventType.CMOS_MISSION_BLOCKED,
+    "unblocked": MissionEventType.CMOS_MISSION_UNBLOCKED,
+}
+
+
+def emit_cmos_mission_event(
+    *,
+    mission_id: str,
+    name: str,
+    new_status: str,
+    previous_status: Optional[str] = None,
+    notes: Optional[str] = None,
+    reason: Optional[str] = None,
+    sprint_id: Optional[str] = None,
+) -> bool:
+    """Emit a TraceLab SSE event for a CMOS mission transition.
+
+    Graceful degradation: returns False and logs on failure, never raises.
+    """
+    try:
+        status_key = new_status.strip().lower()
+        event_type = _CMOS_STATUS_MAP.get(
+            status_key, MissionEventType.CMOS_MISSION_STATUS_CHANGED
+        )
+
+        details: Dict[str, Any] = {"source": "cmos"}
+        if notes:
+            details["notes"] = notes
+        if reason:
+            details["reason"] = reason
+        if sprint_id:
+            details["sprint_id"] = sprint_id
+
+        bus = get_mission_event_bus()
+        bus.emit(MissionEvent(
+            event_type=event_type.value,
+            timestamp=_now(),
+            mission_id=mission_id,
+            mission_title=name,
+            status=status_key,
+            previous_status=previous_status.strip().lower() if previous_status else None,
+            details=details,
+        ))
+        logger.info(
+            "CMOS bridge: emitted %s for %s (%s → %s)",
+            event_type.value,
+            mission_id,
+            previous_status,
+            new_status,
+        )
+        return True
+    except Exception:
+        logger.warning(
+            "CMOS bridge: failed to emit event for %s (degraded)",
+            mission_id,
+            exc_info=True,
+        )
+        return False
+
+
 __all__ = [
     "MissionEventType",
     "MissionEvent",
@@ -244,4 +317,5 @@ __all__ = [
     "emit_mission_status_change",
     "emit_pedr_layer_event",
     "emit_quality_gates",
+    "emit_cmos_mission_event",
 ]
