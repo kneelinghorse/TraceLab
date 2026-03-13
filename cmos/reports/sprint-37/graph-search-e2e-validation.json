@@ -7,8 +7,8 @@
     "queries_with_new_graph_results": 0,
     "queries_with_rank_changes": 4,
     "total_new_results_surfaced": 0,
-    "avg_graph_latency_ms": 0.57,
-    "max_graph_latency_ms": 0.94
+    "avg_graph_latency_ms": 0.58,
+    "max_graph_latency_ms": 1.04
   },
   "per_query": [
     {
@@ -18,9 +18,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 6,
       "graph_candidates_expanded": 5,
-      "graph_layer_ms": 0.94,
-      "total_ms_off": 0.79,
-      "total_ms_on": 1.66
+      "graph_layer_ms": 1.04,
+      "total_ms_off": 0.83,
+      "total_ms_on": 1.75
     },
     {
       "query": "how to reduce API latency",
@@ -29,9 +29,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 6,
       "graph_candidates_expanded": 7,
-      "graph_layer_ms": 0.92,
-      "total_ms_off": 0.71,
-      "total_ms_on": 1.63
+      "graph_layer_ms": 0.88,
+      "total_ms_off": 0.74,
+      "total_ms_on": 1.6
     },
     {
       "query": "mobile-first design approach",
@@ -40,9 +40,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 0,
       "graph_candidates_expanded": 2,
-      "graph_layer_ms": 0.69,
-      "total_ms_off": 0.64,
-      "total_ms_on": 1.29
+      "graph_layer_ms": 0.72,
+      "total_ms_off": 0.67,
+      "total_ms_on": 1.32
     },
     {
       "query": "find all UX research findings",
@@ -62,9 +62,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 0,
       "graph_candidates_expanded": 3,
-      "graph_layer_ms": 0.6,
+      "graph_layer_ms": 0.65,
       "total_ms_off": 0.62,
-      "total_ms_on": 1.19
+      "total_ms_on": 1.28
     },
     {
       "query": "competitive analysis graph search",
@@ -75,7 +75,7 @@
       "graph_candidates_expanded": 0,
       "graph_layer_ms": 0.0,
       "total_ms_off": 0.18,
-      "total_ms_on": 0.17
+      "total_ms_on": 0.18
     },
     {
       "query": "onboarding drop-off rate",
@@ -84,9 +84,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 6,
       "graph_candidates_expanded": 5,
-      "graph_layer_ms": 0.82,
-      "total_ms_off": 0.67,
-      "total_ms_on": 1.5
+      "graph_layer_ms": 0.88,
+      "total_ms_off": 0.69,
+      "total_ms_on": 1.57
     },
     {
       "query": "cloud cost reduction strategies",
@@ -95,9 +95,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 0,
       "graph_candidates_expanded": 2,
-      "graph_layer_ms": 0.62,
-      "total_ms_off": 0.61,
-      "total_ms_on": 1.22
+      "graph_layer_ms": 0.6,
+      "total_ms_off": 0.6,
+      "total_ms_on": 1.2
     },
     {
       "query": "sprint retrospective decisions",
@@ -117,9 +117,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 6,
       "graph_candidates_expanded": 5,
-      "graph_layer_ms": 0.92,
-      "total_ms_off": 0.71,
-      "total_ms_on": 1.6
+      "graph_layer_ms": 0.88,
+      "total_ms_off": 0.8,
+      "total_ms_on": 1.59
     },
     {
       "query": "infrastructure caching layer",
@@ -128,9 +128,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 0,
       "graph_candidates_expanded": 2,
-      "graph_layer_ms": 0.7,
-      "total_ms_off": 0.61,
-      "total_ms_on": 1.29
+      "graph_layer_ms": 0.69,
+      "total_ms_off": 0.6,
+      "total_ms_on": 1.28
     },
     {
       "query": "market share competitor analysis",
@@ -139,7 +139,7 @@
       "new_results_from_graph": 0,
       "rank_changes": 0,
       "graph_candidates_expanded": 2,
-      "graph_layer_ms": 0.6,
+      "graph_layer_ms": 0.59,
       "total_ms_off": 0.61,
       "total_ms_on": 1.19
     }

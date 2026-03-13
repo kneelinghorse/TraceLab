@@ -1,0 +1,44 @@
+{
+  "title": "T38.2 DeepSearch SSE Triage & Project Stats Bug Report",
+  "date": "2026-03-13",
+  "sprint": "38",
+  "deepsearch_sse": {
+    "status": "no_code_bug",
+    "summary": "DeepSearch SSE infrastructure is fully implemented and functional. The 'disconnected' status is an infrastructure availability issue — the DeepSearch worker is not deployed/running, not a code defect.",
+    "root_cause": "DeepSearch worker (external service) is offline. TraceLab SSE endpoints are correctly registered, authenticated, and tested.",
+    "timeline": {
+      "T33.4": "SSE infrastructure established: event bus, /events/stream endpoint, frontend MissionActivityFeed component, 12 tests",
+      "T34.3": "SSE auth fixed: added require_authenticated_user_sse() supporting JWT via query param for EventSource compatibility",
+      "current": "Endpoints return 401 without auth (correct behavior). Events flow when worker is active."
+    },
+    "evidence": {
+      "endpoints_registered": [
+        "GET /api/v1/missions/events/stream — SSE stream with JWT query param auth",
+        "GET /api/v1/missions/events/recent — JSON recent events",
+        "POST /api/v1/missions/events/cmos — CMOS event bridge"
+      ],
+      "auth_mechanism": "require_authenticated_user_sse() in app/core/security.py:275-292",
+      "frontend_component": "frontend/src/components/console/MissionActivityFeed.tsx",
+      "tests": "12 tests in tests/test_mission_events.py (all passing)"
+    },
+    "decision": "No code fix needed. DeepSearch SSE shows 'disconnected' because the external DeepSearch worker service is not running. When deployed, events will flow through the established pipeline. No deprecation warranted — the architecture is sound.",
+    "recommendation": "Deploy DeepSearch worker or configure DEEPSEARCH_API_URL to resolve the 'disconnected' status. The code path is fully operational."
+  },
+  "project_stats_bug": {
+    "status": "already_fixed",
+    "summary": "Cache key collision bug was identified and fixed in T34.2 (commit aa32f9d).",
+    "root_cause": "project_metadata_key() in cache_manager.py did not differentiate stats requests by project_id, causing all projects to share the same cache slot.",
+    "fix_applied": {
+      "file": "app/services/cache_manager.py",
+      "change": "Added 'if kind == \"stats\" and identifier: return (\"stats\", identifier)' to produce unique per-project cache keys",
+      "commit": "aa32f9d",
+      "sprint": "Sprint 34"
+    },
+    "tests": [
+      "test_project_stats_cache_key_is_per_project()",
+      "test_project_stats_cache_key_differs_from_detail_and_list()",
+      "test_invalidate_project_metadata_clears_stats()"
+    ],
+    "decision": "No further action needed. Bug was fixed in Sprint 34 with proper test coverage."
+  }
+}
