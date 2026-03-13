@@ -289,9 +289,11 @@ def test_embedding_path_links_evidence(db_session, project, tmp_path):
     mock_embedding_svc.generate_embedding.assert_called_once()
     mock_qdrant_svc.search_chunks.assert_called_once()
 
-    # Verify telemetry includes linking_method
+    # Verify telemetry uses unified envelope format
     entry = json.loads(telemetry_path.read_text().strip())
-    assert entry["linking_method"] == "embedding"
+    assert entry["event_type"] == "evidence.auto_linking.completed"
+    assert entry["source"] == "tracelab"
+    assert entry["payload"]["linking_method"] == "embedding"
 
 
 def test_embedding_path_below_threshold(db_session, project, tmp_path):

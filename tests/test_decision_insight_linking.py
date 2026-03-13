@@ -275,7 +275,8 @@ class TestStrategicDecisionsSyncWithEvidence:
                 category TEXT,
                 superseded_by INTEGER,
                 status TEXT DEFAULT 'active',
-                evidence TEXT
+                evidence TEXT,
+                content_hash TEXT
             )
         """)
         conn.commit()

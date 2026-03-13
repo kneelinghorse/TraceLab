@@ -505,19 +505,22 @@ class EvidenceAutoLinkingService:
         project_id: UUID | None,
         result: EvidenceAutoLinkingResult,
     ) -> None:
+        from app.core.telemetry import emit_telemetry
+
         methods_used = {m.get("method", "unknown") for m in result.matches}
         linking_method = "embedding" if "embedding" in methods_used else "difflib"
 
-        payload = {
-            "ts": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-            "mission_id": mission.mission_id,
-            "project_id": str(project_id) if project_id else None,
-            "linking_method": linking_method,
-            "auto_linking": result.as_dict(),
-        }
-        self.telemetry_path.parent.mkdir(parents=True, exist_ok=True)
-        with self.telemetry_path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
+        emit_telemetry(
+            path=self.telemetry_path,
+            event_type="evidence.auto_linking.completed",
+            source="tracelab",
+            payload={
+                "mission_id": mission.mission_id,
+                "project_id": str(project_id) if project_id else None,
+                "linking_method": linking_method,
+                "auto_linking": result.as_dict(),
+            },
+        )
 
     @staticmethod
     def _normalize_text(text: Optional[str]) -> str:

@@ -246,7 +246,8 @@ def test_ingest_writes_auto_linking_telemetry(
     lines = configure_auto_linker.read_text(encoding="utf-8").strip().splitlines()
     assert len(lines) == 1
     entry = json.loads(lines[0])
-    assert entry["mission_id"] == payload["mission"]["mission_id"]
+    assert entry["event_type"] == "evidence.auto_linking.completed"
+    assert entry["payload"]["mission_id"] == payload["mission"]["mission_id"]
 
 
 def test_ingest_project_scoped_linking(

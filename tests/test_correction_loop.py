@@ -505,12 +505,13 @@ class TestTelemetry:
                 payload,
             ))
 
-        # Check telemetry file
+        # Check telemetry file uses unified envelope format
         assert temp_telemetry_path.exists()
         with open(temp_telemetry_path) as f:
             record = json.loads(f.readline())
-            assert record["event"] == "webhook_success"
-            assert record["success"] is True
+            assert record["event_type"] == "webhook.webhook_success"
+            assert record["source"] == "tracelab"
+            assert record["payload"]["success"] is True
 
     def test_correction_queue_telemetry(
         self,
@@ -526,15 +527,16 @@ class TestTelemetry:
             result=sample_auto_link_result,
         )
 
-        # Check telemetry file
+        # Check telemetry file uses unified envelope format
         assert temp_telemetry_path.exists()
         with open(temp_telemetry_path) as f:
             lines = f.readlines()
             assert len(lines) == 2  # 2 items queued
             for line in lines:
                 record = json.loads(line)
-                assert record["event"] == "correction_queued"
-                assert "error_type" in record
+                assert record["event_type"] == "correction.correction_queued"
+                assert record["source"] == "tracelab"
+                assert "error_type" in record["payload"]
 
     def test_telemetry_summary_format(
         self,

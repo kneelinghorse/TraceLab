@@ -1,0 +1,415 @@
+{
+  "generated_at": "2026-03-12T20:13:22Z",
+  "mode": "live_graph_layer",
+  "edge_count": 33780,
+  "seed_sets": 10,
+  "seeds_per_set": 5,
+  "configs": {
+    "default": {
+      "queries": 10,
+      "avg_seeds": 5.0,
+      "avg_candidates": 5.0,
+      "avg_chunk_results": 0.0,
+      "avg_latency_ms": 103.38,
+      "p90_latency_ms": 178.64,
+      "impact_rate": 100.0
+    },
+    "sprint25": {
+      "queries": 10,
+      "avg_seeds": 5.0,
+      "avg_candidates": 58.2,
+      "avg_chunk_results": 47.9,
+      "avg_latency_ms": 180.84,
+      "p90_latency_ms": 224.28,
+      "impact_rate": 100.0
+    },
+    "aggressive": {
+      "queries": 10,
+      "avg_seeds": 5.0,
+      "avg_candidates": 100.0,
+      "avg_chunk_results": 47.9,
+      "avg_latency_ms": 261.46,
+      "p90_latency_ms": 348.66,
+      "impact_rate": 100.0
+    },
+    "conservative": {
+      "queries": 10,
+      "avg_seeds": 5.0,
+      "avg_candidates": 5.0,
+      "avg_chunk_results": 0.0,
+      "avg_latency_ms": 81.25,
+      "p90_latency_ms": 144.28,
+      "impact_rate": 100.0
+    }
+  },
+  "raw_results": {
+    "default": [
+      {
+        "query": "query_set_1",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 178.64,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_2",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 133.89,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_3",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 63.74,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_4",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 64.82,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_5",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 59.94,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_6",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 126.63,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_7",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 61.9,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_8",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 130.68,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_9",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 150.98,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_10",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 62.62,
+        "seed_count": 5,
+        "total_candidates": 5
+      }
+    ],
+    "sprint25": [
+      {
+        "query": "query_set_1",
+        "seeds": 5,
+        "candidates": 50,
+        "chunk_results": 39,
+        "latency_ms": 221.98,
+        "seed_count": 5,
+        "total_candidates": 50
+      },
+      {
+        "query": "query_set_2",
+        "seeds": 5,
+        "candidates": 48,
+        "chunk_results": 38,
+        "latency_ms": 133.61,
+        "seed_count": 5,
+        "total_candidates": 48
+      },
+      {
+        "query": "query_set_3",
+        "seeds": 5,
+        "candidates": 26,
+        "chunk_results": 17,
+        "latency_ms": 127.12,
+        "seed_count": 5,
+        "total_candidates": 26
+      },
+      {
+        "query": "query_set_4",
+        "seeds": 5,
+        "candidates": 67,
+        "chunk_results": 56,
+        "latency_ms": 210.34,
+        "seed_count": 5,
+        "total_candidates": 67
+      },
+      {
+        "query": "query_set_5",
+        "seeds": 5,
+        "candidates": 56,
+        "chunk_results": 47,
+        "latency_ms": 202.52,
+        "seed_count": 5,
+        "total_candidates": 56
+      },
+      {
+        "query": "query_set_6",
+        "seeds": 5,
+        "candidates": 58,
+        "chunk_results": 49,
+        "latency_ms": 224.28,
+        "seed_count": 5,
+        "total_candidates": 58
+      },
+      {
+        "query": "query_set_7",
+        "seeds": 5,
+        "candidates": 47,
+        "chunk_results": 37,
+        "latency_ms": 204.33,
+        "seed_count": 5,
+        "total_candidates": 47
+      },
+      {
+        "query": "query_set_8",
+        "seeds": 5,
+        "candidates": 71,
+        "chunk_results": 60,
+        "latency_ms": 125.81,
+        "seed_count": 5,
+        "total_candidates": 71
+      },
+      {
+        "query": "query_set_9",
+        "seeds": 5,
+        "candidates": 80,
+        "chunk_results": 67,
+        "latency_ms": 140.4,
+        "seed_count": 5,
+        "total_candidates": 80
+      },
+      {
+        "query": "query_set_10",
+        "seeds": 5,
+        "candidates": 79,
+        "chunk_results": 69,
+        "latency_ms": 217.96,
+        "seed_count": 5,
+        "total_candidates": 79
+      }
+    ],
+    "aggressive": [
+      {
+        "query": "query_set_1",
+        "seeds": 5,
+        "candidates": 100,
+        "chunk_results": 39,
+        "latency_ms": 269.76,
+        "seed_count": 5,
+        "total_candidates": 100
+      },
+      {
+        "query": "query_set_2",
+        "seeds": 5,
+        "candidates": 100,
+        "chunk_results": 38,
+        "latency_ms": 266.53,
+        "seed_count": 5,
+        "total_candidates": 100
+      },
+      {
+        "query": "query_set_3",
+        "seeds": 5,
+        "candidates": 100,
+        "chunk_results": 17,
+        "latency_ms": 336.82,
+        "seed_count": 5,
+        "total_candidates": 100
+      },
+      {
+        "query": "query_set_4",
+        "seeds": 5,
+        "candidates": 100,
+        "chunk_results": 56,
+        "latency_ms": 235.89,
+        "seed_count": 5,
+        "total_candidates": 100
+      },
+      {
+        "query": "query_set_5",
+        "seeds": 5,
+        "candidates": 100,
+        "chunk_results": 47,
+        "latency_ms": 230.75,
+        "seed_count": 5,
+        "total_candidates": 100
+      },
+      {
+        "query": "query_set_6",
+        "seeds": 5,
+        "candidates": 100,
+        "chunk_results": 49,
+        "latency_ms": 171.27,
+        "seed_count": 5,
+        "total_candidates": 100
+      },
+      {
+        "query": "query_set_7",
+        "seeds": 5,
+        "candidates": 100,
+        "chunk_results": 37,
+        "latency_ms": 257.6,
+        "seed_count": 5,
+        "total_candidates": 100
+      },
+      {
+        "query": "query_set_8",
+        "seeds": 5,
+        "candidates": 100,
+        "chunk_results": 60,
+        "latency_ms": 245.71,
+        "seed_count": 5,
+        "total_candidates": 100
+      },
+      {
+        "query": "query_set_9",
+        "seeds": 5,
+        "candidates": 100,
+        "chunk_results": 67,
+        "latency_ms": 348.66,
+        "seed_count": 5,
+        "total_candidates": 100
+      },
+      {
+        "query": "query_set_10",
+        "seeds": 5,
+        "candidates": 100,
+        "chunk_results": 69,
+        "latency_ms": 251.61,
+        "seed_count": 5,
+        "total_candidates": 100
+      }
+    ],
+    "conservative": [
+      {
+        "query": "query_set_1",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 63.06,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_2",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 144.28,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_3",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 63.55,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_4",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 59.74,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_5",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 98.03,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_6",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 127.83,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_7",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 59.61,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_8",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 67.37,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_9",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 62.58,
+        "seed_count": 5,
+        "total_candidates": 5
+      },
+      {
+        "query": "query_set_10",
+        "seeds": 5,
+        "candidates": 5,
+        "chunk_results": 0,
+        "latency_ms": 66.48,
+        "seed_count": 5,
+        "total_candidates": 5
+      }
+    ]
+  }
+}

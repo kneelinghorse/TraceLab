@@ -225,6 +225,38 @@ def test_materialize_implicit_edges_round_trip(db_session, project):
     assert result.inserted_count >= len(expected)
 
 
+def test_materialize_implicit_edges_idempotent(db_session, project):
+    """Second materialization run should skip all existing edges."""
+    document = Document(
+        project_id=project.id,
+        name="Idempotent Doc",
+        content="Content",
+        file_type="txt",
+        source_type="analysis",
+    )
+    db_session.add(document)
+    db_session.flush()
+
+    chunk = DocumentChunk(
+        document_id=document.id,
+        chunk_index=0,
+        content="Chunk",
+    )
+    db_session.add(chunk)
+    db_session.commit()
+
+    service = EdgeMaterializationService()
+
+    first = service.materialize_implicit_edges(db_session)
+    assert first.inserted_count > 0
+
+    second = service.materialize_implicit_edges(db_session)
+    assert second.inserted_count == 0
+    assert second.updated_count == 0
+    assert second.skipped_count == second.total
+    assert second.total == first.total
+
+
 def test_materialize_from_manifest_upsert_updates_existing_edge(db_session):
     unique_suffix = str(uuid.uuid4())
     from_urn = f"urn:research:mission:M-UPSERT-{unique_suffix}"
