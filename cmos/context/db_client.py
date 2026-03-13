@@ -239,13 +239,24 @@ class SQLiteClient:
                 }
         return None
 
+    @staticmethod
+    def _compute_content_hash(text: str, domain: str) -> str:
+        """Compute SHA-256 content hash for dedup. Matches cmos-mcp computeContentHash()."""
+        import json as _json
+        canonical = _json.dumps({"d": domain, "t": text}, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
     def _sync_strategic_decisions(
         self,
         master_context: Dict[str, Any],
         snapshot_id: int | None,
         timestamp: str
     ) -> None:
-        """Sync decisions from MASTER_CONTEXT to strategic_decisions table."""
+        """Sync decisions from MASTER_CONTEXT to strategic_decisions table.
+
+        Uses content hash (SHA-256 of decision_text + project_domain) for dedup,
+        falling back to text-based matching for backward compatibility.
+        """
         decisions: List[Dict[str, Any]] = []
 
         general_decisions = master_context.get("decisions_made") or []
@@ -271,22 +282,38 @@ class SQLiteClient:
         if not decisions:
             return
 
+        # Fetch existing hashes and texts for dedup
         existing = self.fetchall(
-            "SELECT decision_text FROM strategic_decisions WHERE context_id = 'master_context'"
+            "SELECT decision_text, content_hash FROM strategic_decisions WHERE context_id = 'master_context'"
         )
-        existing_texts = {(row["decision_text"] or "").strip() for row in existing}
+        existing_hashes: set[str] = set()
+        existing_texts: set[str] = set()
+        for row in existing:
+            if row.get("content_hash"):
+                existing_hashes.add(row["content_hash"])
+            existing_texts.add((row["decision_text"] or "").strip())
 
-        new_decisions = [d for d in decisions if d["decision_text"] not in existing_texts]
+        new_decisions = []
+        batch_hashes: set[str] = set()
+        for d in decisions:
+            domain = d.get("project_domain") or "general"
+            content_hash = self._compute_content_hash(d["decision_text"], domain)
+            # Skip if hash matches existing DB, current batch, OR text matches (backward compat)
+            if content_hash in existing_hashes or content_hash in batch_hashes or d["decision_text"] in existing_texts:
+                continue
+            d["content_hash"] = content_hash
+            batch_hashes.add(content_hash)
+            new_decisions.append(d)
 
         if new_decisions:
             self.executemany(
                 """
                 INSERT INTO strategic_decisions (
                     context_id, decision_text, created_at, snapshot_id,
-                    project_domain, evidence, mission_id
+                    project_domain, evidence, mission_id, content_hash
                 ) VALUES (
                     'master_context', :decision_text, :created_at, :snapshot_id,
-                    :project_domain, :evidence, :mission_id
+                    :project_domain, :evidence, :mission_id, :content_hash
                 )
                 """,
                 [
@@ -297,6 +324,7 @@ class SQLiteClient:
                         "project_domain": d.get("project_domain"),
                         "evidence": d.get("evidence"),
                         "mission_id": d.get("mission_id"),
+                        "content_hash": d.get("content_hash"),
                     }
                     for d in new_decisions
                 ]

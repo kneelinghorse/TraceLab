@@ -128,6 +128,7 @@ CREATE TABLE IF NOT EXISTS strategic_decisions (
   superseded_by INTEGER,-- FK to another decision (decision chains)
   status TEXT DEFAULT 'active',  -- active, superseded, archived, stale
   evidence TEXT,        -- JSON array of TraceLab evidence refs [{type, id}]
+  content_hash TEXT,    -- SHA-256 hash for dedup (hash of decision_text + project_domain)
   FOREIGN KEY (context_id) REFERENCES contexts(id) ON DELETE CASCADE,
   FOREIGN KEY (sprint_id) REFERENCES sprints(id) ON DELETE SET NULL,
   FOREIGN KEY (snapshot_id) REFERENCES context_snapshots(id) ON DELETE SET NULL
@@ -137,6 +138,7 @@ CREATE INDEX IF NOT EXISTS idx_strategic_decisions_created ON strategic_decision
 CREATE INDEX IF NOT EXISTS idx_strategic_decisions_sprint ON strategic_decisions (sprint_id);
 CREATE INDEX IF NOT EXISTS idx_strategic_decisions_domain ON strategic_decisions (project_domain);
 CREATE INDEX IF NOT EXISTS idx_strategic_decisions_mission ON strategic_decisions (mission_id);
+CREATE INDEX IF NOT EXISTS idx_strategic_decisions_hash ON strategic_decisions (content_hash);
 
 CREATE VIEW IF NOT EXISTS active_missions AS
 SELECT m.id,

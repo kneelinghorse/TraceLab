@@ -23,6 +23,7 @@ from app.services.coverage_report import CoverageReportGenerator
 from app.services.embedding_service import EmbeddingService, get_embedding_service
 from app.services.qdrant_service import QdrantService, get_qdrant_service
 from app.services.pedr.cache import invalidate_pedr_cache
+from app.services.pedr.edge_materialization import EdgeMaterializationService
 from app.models.document import Document
 from app.models.chunk import DocumentChunk
 
@@ -397,6 +398,46 @@ class DocumentIngestionService:
                     document_id,
                     invalidated_count,
                 )
+
+            # Stage 6: Incremental edge materialization (T37.3)
+            current_stage = "edges_materialized"
+            try:
+                edge_start = time.perf_counter()
+                edge_service = EdgeMaterializationService()
+                edge_result = edge_service.materialize_implicit_edges(
+                    session=db,
+                    mode="incremental",
+                    project_id=str(document.project_id) if document.project_id else None,
+                )
+                edge_duration = round(time.perf_counter() - edge_start, 4)
+                logger.info(
+                    "Incremental edge materialization for document %s: "
+                    "inserted=%d updated=%d skipped=%d (%.4fs)",
+                    document_id,
+                    edge_result.inserted_count,
+                    edge_result.updated_count,
+                    edge_result.skipped_count,
+                    edge_duration,
+                )
+                result["stages"]["edges_materialized"] = {
+                    "status": "success",
+                    "inserted": edge_result.inserted_count,
+                    "updated": edge_result.updated_count,
+                    "skipped": edge_result.skipped_count,
+                    "duration_seconds": edge_duration,
+                }
+                result.setdefault("metrics", {})
+                result["metrics"]["edge_materialization_duration_seconds"] = edge_duration
+            except Exception as edge_exc:
+                logger.warning(
+                    "Incremental edge materialization failed for document %s: %s",
+                    document_id,
+                    edge_exc,
+                )
+                result["stages"]["edges_materialized"] = {
+                    "status": "failed",
+                    "error": str(edge_exc),
+                }
 
             return result
             

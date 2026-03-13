@@ -1,0 +1,147 @@
+{
+  "title": "T37.4 Graph-Enhanced Search E2E Validation Report",
+  "date": "2026-03-12",
+  "sprint": "37",
+  "summary": {
+    "total_queries": 12,
+    "queries_with_new_graph_results": 0,
+    "queries_with_rank_changes": 4,
+    "total_new_results_surfaced": 0,
+    "avg_graph_latency_ms": 0.57,
+    "max_graph_latency_ms": 0.94
+  },
+  "per_query": [
+    {
+      "query": "user research onboarding friction",
+      "graph_off_results": 9,
+      "graph_on_results": 9,
+      "new_results_from_graph": 0,
+      "rank_changes": 6,
+      "graph_candidates_expanded": 5,
+      "graph_layer_ms": 0.94,
+      "total_ms_off": 0.79,
+      "total_ms_on": 1.66
+    },
+    {
+      "query": "how to reduce API latency",
+      "graph_off_results": 9,
+      "graph_on_results": 9,
+      "new_results_from_graph": 0,
+      "rank_changes": 6,
+      "graph_candidates_expanded": 7,
+      "graph_layer_ms": 0.92,
+      "total_ms_off": 0.71,
+      "total_ms_on": 1.63
+    },
+    {
+      "query": "mobile-first design approach",
+      "graph_off_results": 3,
+      "graph_on_results": 3,
+      "new_results_from_graph": 0,
+      "rank_changes": 0,
+      "graph_candidates_expanded": 2,
+      "graph_layer_ms": 0.69,
+      "total_ms_off": 0.64,
+      "total_ms_on": 1.29
+    },
+    {
+      "query": "find all UX research findings",
+      "graph_off_results": 0,
+      "graph_on_results": 0,
+      "new_results_from_graph": 0,
+      "rank_changes": 0,
+      "graph_candidates_expanded": 0,
+      "graph_layer_ms": 0.0,
+      "total_ms_off": 0.18,
+      "total_ms_on": 0.19
+    },
+    {
+      "query": "database optimization recommendations",
+      "graph_off_results": 3,
+      "graph_on_results": 3,
+      "new_results_from_graph": 0,
+      "rank_changes": 0,
+      "graph_candidates_expanded": 3,
+      "graph_layer_ms": 0.6,
+      "total_ms_off": 0.62,
+      "total_ms_on": 1.19
+    },
+    {
+      "query": "competitive analysis graph search",
+      "graph_off_results": 0,
+      "graph_on_results": 0,
+      "new_results_from_graph": 0,
+      "rank_changes": 0,
+      "graph_candidates_expanded": 0,
+      "graph_layer_ms": 0.0,
+      "total_ms_off": 0.18,
+      "total_ms_on": 0.17
+    },
+    {
+      "query": "onboarding drop-off rate",
+      "graph_off_results": 9,
+      "graph_on_results": 9,
+      "new_results_from_graph": 0,
+      "rank_changes": 6,
+      "graph_candidates_expanded": 5,
+      "graph_layer_ms": 0.82,
+      "total_ms_off": 0.67,
+      "total_ms_on": 1.5
+    },
+    {
+      "query": "cloud cost reduction strategies",
+      "graph_off_results": 3,
+      "graph_on_results": 3,
+      "new_results_from_graph": 0,
+      "rank_changes": 0,
+      "graph_candidates_expanded": 2,
+      "graph_layer_ms": 0.62,
+      "total_ms_off": 0.61,
+      "total_ms_on": 1.22
+    },
+    {
+      "query": "sprint retrospective decisions",
+      "graph_off_results": 0,
+      "graph_on_results": 0,
+      "new_results_from_graph": 0,
+      "rank_changes": 0,
+      "graph_candidates_expanded": 0,
+      "graph_layer_ms": 0.0,
+      "total_ms_off": 0.18,
+      "total_ms_on": 0.19
+    },
+    {
+      "query": "A/B testing onboarding redesign",
+      "graph_off_results": 9,
+      "graph_on_results": 9,
+      "new_results_from_graph": 0,
+      "rank_changes": 6,
+      "graph_candidates_expanded": 5,
+      "graph_layer_ms": 0.92,
+      "total_ms_off": 0.71,
+      "total_ms_on": 1.6
+    },
+    {
+      "query": "infrastructure caching layer",
+      "graph_off_results": 3,
+      "graph_on_results": 3,
+      "new_results_from_graph": 0,
+      "rank_changes": 0,
+      "graph_candidates_expanded": 2,
+      "graph_layer_ms": 0.7,
+      "total_ms_off": 0.61,
+      "total_ms_on": 1.29
+    },
+    {
+      "query": "market share competitor analysis",
+      "graph_off_results": 3,
+      "graph_on_results": 3,
+      "new_results_from_graph": 0,
+      "rank_changes": 0,
+      "graph_candidates_expanded": 2,
+      "graph_layer_ms": 0.6,
+      "total_ms_off": 0.61,
+      "total_ms_on": 1.19
+    }
+  ]
+}
