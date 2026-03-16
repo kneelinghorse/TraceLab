@@ -44,6 +44,10 @@ mypy app/ --config-file pyproject.toml
 pre-commit install
 ```
 
+### Frontend Dependency Management
+- After adding or updating frontend dependencies, always run `npm install` inside `frontend/` and commit the updated `package-lock.json` alongside any `package.json` changes.
+- Railway (Nixpacks) runs `npm ci` during its install phase, which requires the lock file to be in sync. A stale lock file will fail the build before `buildCommand` even runs.
+
 ### Testing
 ```bash
 # Unit tests (no database required)
@@ -154,6 +158,6 @@ def get_doc(doc_id: UUID, repo: DocumentRepository = Depends(get_document_reposi
 - `foundational-docs/tech_arch_template.md` – authoritative technical architecture template for Mission Protocol deliverables.
 
 ---
-Last Updated: 2026-03-13
+Last Updated: 2026-03-16
 Version: 2.0.0
 Maintained by: TraceLab Platform Team
