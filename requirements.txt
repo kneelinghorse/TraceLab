@@ -1,3 +1,2 @@
-# ABOUTME: Thin shim pointing to pyproject.toml for backward compatibility.
-# ABOUTME: Docker builds and existing workflows that reference this file continue to work.
--e ".[dev,test]"
+# ABOUTME: Intentionally empty. Nixpacks/Docker use pyproject.toml directly.
+# ABOUTME: All dependencies are defined in pyproject.toml [project.dependencies].
