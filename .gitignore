@@ -60,3 +60,10 @@ artifacts/**/*
 
 # Telemetry build artifacts
 telemetry/events/.artifacts/
+
+# CMOS v2 — local runtime only
+cmos/db/cmos.sqlite
+cmos/db/cmos.sqlite-shm
+cmos/db/cmos.sqlite-wal
+cmos/context/master_context.json
+cmos/context/project_context.json

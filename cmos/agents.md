@@ -1,400 +1,111 @@
-# CMOS Operations - AI Agent Configuration
+# ABOUTME: CMOS v2 context for AI agents working in the TraceLab repo.
+# ABOUTME: Use this alongside the root agents.md / CLAUDE.md for application code guidance.
 
-**Purpose**: Instructions for AI agents working with CMOS project management system.
+# TraceLab — CMOS Agent Context
 
-**Scope**: This file covers CMOS operations ONLY (missions, contexts, database). For application code guidance, see `project-root/agents.md`.
+## Project
 
----
+TraceLab is a FastAPI + PostgreSQL research platform with RAG pipelines, document ingestion,
+and a React/Vite frontend. The `cmos/` directory is a planning workbench — it does not contain
+application code.
 
-## Critical Boundary
-
-**CMOS is project management, NOT application code**.
-
-✅ **CMOS manages**: Missions, sprints, contexts, sessions, backlog  
-❌ **CMOS does NOT contain**: Application code, application tests, deployment configs
-
-**When working with CMOS**:
-- Read/write to: `cmos/missions/`, `cmos/db/`, `cmos/contexts/`
-- Never write to: `src/`, `app/`, `tests/` (that's application code)
-- Use: `cmos/scripts/` for operations
-- Reference: `cmos/docs/` for procedures
+**Stack**: Python 3.11+, FastAPI, PostgreSQL 15, Alembic, React/Vite (frontend), SQLite (CMOS)
+**Architecture**: Hexagonal — ports (`app/ports/`) define contracts, adapters wire implementations,
+composition root in `app/dependencies.py`
+**CI**: GitHub Actions — ruff, mypy, pytest, frontend vitest run in parallel gates
 
 ---
 
-## Data Storage & Telemetry
-
-### SQLite as Source of Truth
-- **Database**: `cmos/db/cmos.sqlite` is the single source of truth for all missions, contexts, and sessions
-- **Export on-demand**: Generate file views when needed via `./cmos/cli.py db export [backlog|contexts]`
-- **Health checks**: Use `./cmos/cli.py db show current` to verify database state
-
-### Database Operations
-- Use `context/mission_runtime.py` helpers (`next_mission`, `start`, `complete`, `block`) for mission operations. The MissionRuntime class remains available for advanced workflows.
-- Use `context/db_client.py` SQLiteClient for context operations
-- Never write raw SQL in prompts or mission code
-- Database is authoritative - no file mirrors to maintain
-
-### Key Commands
-```bash
-# Seed database from backlog
-python cmos/scripts/seed_sqlite.py --data-root <path>
-
-# View mission status
-./cmos/cli.py db show current
-
-# View full backlog
-./cmos/cli.py db show backlog
-
-# Export backlog from DB
-./cmos/cli.py db export backlog --output cmos/missions/backlog.yaml
-
-# Export contexts from DB
-./cmos/cli.py db export contexts
-```
-
----
-
-## Mission Lifecycle
-
-### Mission Status Flow
-`Queued` → `Current` → `In Progress` → `Completed` (or `Blocked`)
-
-### Selection Priority
-1. First mission with status `In Progress`
-2. Otherwise, first mission with status `Current`
-3. Otherwise, first mission with status `Queued` (auto-promote to `In Progress`)
-
-### Mission Operations
-
-**Using mission runtime helpers**:
-```python
-from context.mission_runtime import next_mission, start, complete, block
-
-# Fetch next mission
-candidate = next_mission()
-
-# Start mission
-start(
-    mission_id="B3.1",
-    agent="assistant",
-    summary="Starting database work"
-)
-
-# Complete mission
-complete(
-    mission_id="B3.1",
-    agent="assistant",
-    summary="Database schema implemented",
-    notes="Created schema.sql with all tables. Tests passing."
-)
-
-# Block mission if needed
-block(
-    mission_id="B3.1",
-    agent="assistant",
-    summary="Blocked on decision",
-    reason="Waiting for schema approval",
-    needs=["Review from architect"]
-)
-```
-
----
-
-### Session Operations
-
-For planning, onboarding, research, or review work (anything that's not a build mission), use the session commands:
+## Test Commands
 
 ```bash
-# Start any session
-./cmos/cli.py session start --type planning --title "Sprint planning"
+# Unit tests (no DB)
+pytest -m unit -v
 
-# Capture insights
-./cmos/cli.py session capture decision "Your decision"
+# Integration tests (requires Docker — testcontainers)
+pytest -m integration -v
 
-# Complete session
-./cmos/cli.py session complete --summary "What was accomplished"
-```
+# Lint + format
+ruff check app/ tests/
+ruff format app/ tests/
 
-Sessions automatically write captures to the SQLite store and refresh `project_context`/`master_context` when completed. Run `./cmos/cli.py session onboard` before onboarding or review work to see the latest state.
+# Type checking
+mypy app/ --config-file pyproject.toml
 
----
+# Frontend unit tests
+cd frontend && npm run test:unit
 
-## Context Management
-
-### Two Contexts
-
-**PROJECT_CONTEXT.json**: Current session state
-- Active mission
-- Session count
-- Working memory (temporary)
-- Context health metrics
-- **Updated frequently** during sessions
-
-**context/MASTER_CONTEXT.json**: Project history & strategic memory
-- Project identity
-- Technical foundation
-- **Decisions made (permanent record)**
-- **Constraints and quality standards**
-- **Research findings and learnings**
-- **Updated at strategic milestones only**
-
-### Critical: MASTER_CONTEXT is Project Memory
-
-MASTER_CONTEXT is your **historical record** of the project. It should capture:
-- Major architectural decisions
-- Strategic pivots or direction changes
-- Completed sprint summaries (what was learned)
-- New constraints or quality standards
-- Important research findings that inform future work
-
-**DO NOT use MASTER_CONTEXT for**:
-- Session-level updates (use PROJECT_CONTEXT)
-- Mission status tracking (use database)
-- Temporary working notes (use PROJECT_CONTEXT)
-
-### Operations
-
-**Reading contexts**:
-```python
-from context.db_client import SQLiteClient
-
-client = SQLiteClient("cmos/db/cmos.sqlite", create_missing=False)
-
-project = client.get_context("project_context") or {}
-master = client.get_context("master_context") or {}
-
-client.close()
-```
-
-**Updating contexts**:
-```python
-# Update and save (snapshot=True by default)
-master["decisions_made"].append("Chose PostgreSQL for ACID compliance")
-client.set_context(
-    "master_context",
-    master,
-    source_path="context/MASTER_CONTEXT.json",
-    snapshot=True  # Creates historical snapshot
-)
-```
-
-**When to update**:
-- **PROJECT_CONTEXT**: Session start/end, mission transitions (frequent)
-- **MASTER_CONTEXT**: Major decisions, architecture changes, sprint completions (rare)
-
-### Context Snapshots
-
-The database maintains a **historical timeline** of MASTER_CONTEXT changes.
-
-**Take a snapshot manually** at strategic moments:
-```bash
-# After sprint completion
-./cmos/cli.py context snapshot master --source "Sprint 03 completed - workflow orchestration delivered"
-
-# After major architectural decision
-./cmos/cli.py context snapshot master --source "Decision: switched to PostgreSQL for ACID compliance"
-
-# After research phase
-./cmos/cli.py context snapshot master --source "Research phase complete - 5 protocols analyzed"
-```
-
-**View snapshot history**:
-```bash
-# See timeline of MASTER_CONTEXT changes
-./cmos/cli.py context history master
-
-# View a specific snapshot
-./cmos/cli.py context view <snapshot-id>
-```
-
-**When to snapshot MASTER_CONTEXT**:
-- ✅ Sprint completion (capture what was learned)
-- ✅ Major architectural decisions (PostgreSQL vs MongoDB)
-- ✅ Strategic pivots (changing from X to Y approach)
-- ✅ Research phase completion (before starting build)
-- ✅ New constraints or quality standards established
-- ❌ NOT after every mission (too granular)
-- ❌ NOT for session-level updates (use PROJECT_CONTEXT)
-
-**Automatic vs Manual Snapshots**:
-- Automatic: When you call `set_context(snapshot=True)` - only if content changed
-- Manual: Run `./cmos/cli.py context snapshot master --source "..."` to force a snapshot with descriptive label
-
----
-
-## Session Logging
-
-**SESSIONS.jsonl**: Append-only chronological log
-
-**Format**:
-```json
-{
-  "ts": "2025-11-08T12:34:56Z",
-  "agent": "assistant",
-  "mission": "B3.1",
-  "action": "start",
-  "status": "in_progress",
-  "summary": "Starting database schema work"
-}
-```
-
-**Mission runtime helpers handle this automatically** - don't write directly to SESSIONS.jsonl.
-
----
-
-## Backlog Management
-
-### DB-First History Pattern
-
-**Database**: Complete history (all sprints, unlimited)  
-**backlog.yaml**: Current work view (3-5 sprints max)
-
-**Workflow**:
-1. All missions live in SQLite `missions` table
-2. Export minimal backlog for readability: `./cmos/cli.py db export backlog`
-3. Edit backlog.yaml to keep only current/recent sprints
-4. Validate database health to ensure sync
-5. Old sprints stay in DB, queryable anytime
-
-**Querying history**:
-```bash
-# View all sprints (including old ones)
-./cmos/cli.py db show backlog
-
-# Query specific sprint
-sqlite3 cmos/db/cmos.sqlite "SELECT * FROM missions WHERE sprint_id = 'Sprint 05'"
+# Frontend E2E
+cd frontend && npx playwright test
 ```
 
 ---
 
-## Validation & Guardrails
+## What to Avoid
 
-### Mandatory Checkpoints
+- Do not place application code inside `cmos/` — it is a planning workbench only
+- Do not use the v1 Python CLI (`./cmos/cli.py`) or `cmos/context/mission_runtime.py` — use MCP tools below
+- Do not edit `cmos/db/cmos.sqlite` directly — use MCP tools
+- Do not edit `cmos/context/master_context.json` or `project_context.json` by hand
+- Do not bypass hexagonal boundaries: routers call services, services call ports, adapters implement ports
+- Do not commit `cmos/db/cmos.sqlite` — it is gitignored
 
-**After each mission**:
-```bash
-./cmos/cli.py db show current
+---
+
+## CMOS v2 Operations (MCP Tools)
+
+This instance uses **cmos-mcp v2** (SQLite schema 2.0). All mission and session operations go
+through MCP tools — not the Python CLI from the old v1 setup.
+
+**Project root**: `/home/birch/Code/TraceLab`
+
+### Key tools
+
+```
+cmos_project action=list                          # list registered instances
+cmos_mission_list projectRoot=<root>              # list missions (filter by status/sprint)
+cmos_mission_show missionId=<id> projectRoot=...  # show a single mission
+cmos_mission_start missionId=<id> projectRoot=... # Queued → In Progress
+cmos_mission_complete missionId=<id> notes=...    # In Progress → Completed
+cmos_mission_block missionId=<id> reason=...      # → Blocked
+cmos_session_start type=<build|research|...>      # open a session
+cmos_session_capture content=... type=...         # log a decision/finding
+cmos_session_complete summary=...                 # close the session
+cmos_sprint_list projectRoot=...                  # list sprints
+cmos_context_view projectRoot=...                 # current project context
+cmos_context_snapshot projectRoot=...             # take a context snapshot
 ```
 
-**Before session end**:
-```bash
-./cmos/cli.py db show current
-./cmos/cli.py db show backlog
+### Current sprint
+
+**sprint-tl-01** — Stabilize and Bootstrap
+Focus: migrate from v1 CMOS to v2, establish clean test baseline, surface active work in the
+instance network.
+
+---
+
+## Architecture Reference
+
+```
+app/
+  ports/          # typing.Protocol interfaces — depend on these, not concrete classes
+  adapters/       # thin wrappers: repositories/, external/
+  dependencies.py # composition root — wires ports to adapters via FastAPI Depends()
+  routers/        # thin — call services, return responses
+  services/       # orchestration logic
+tests/
+  unit/           # @pytest.mark.unit — no DB, mock at ports
+  integration/    # @pytest.mark.integration — real PostgreSQL via testcontainers
+  e2e/            # full-stack
 ```
 
-**After documentation updates**:
-```bash
-./cmos/cli.py validate docs
-```
-
-### Test Requirements for CMOS Changes
-
-If modifying CMOS system itself:
-- Run: `node cmos/context/integration_test_runner.js`
-- Security fixtures: `cmos/tests/security/`
-- Quality fixtures: `cmos/tests/quality/`
-
-**Note**: These are tests FOR CMOS, not for your application!
+ADRs: `docs/adr/001-005`
 
 ---
 
-## Advanced Orchestration Patterns
+## Boundary
 
-### Pattern Selection
-Choose ONE pattern per mission:
-- `none` - Linear execution
-- `rsip` - Refinement loops
-- `delegation` - Worker distribution
-- `boomerang` - Checkpointed execution
+CMOS manages: missions, sprints, sessions, context snapshots
+CMOS does NOT contain: application code, migrations, routers, services, tests for the app
 
-### Configuration
-- Patterns configured in mission templates (`cmos/missions/templates/*.yaml`)
-- Worker manifest: `cmos/workers/manifest.yaml`
-- Runtime state: `cmos/runtime/boomerang/`
-- Telemetry: `cmos/telemetry/events/`
-
-### Failure Escalation
-- **Tier 1**: Automatic retry
-- **Tier 2**: Pattern-specific limits
-- **Tier 3**: Fallback to linear
-- **Tier 4**: Human review required
-
----
-
-## Runtime Directories
-
-**Do not write application code to these directories**:
-
-| Directory | Purpose | When to Touch |
-|-----------|---------|---------------|
-| `cmos/runtime/boomerang/` | Checkpoint storage | Automatic (orchestration pattern) |
-| `cmos/telemetry/events/` | Runtime metrics | Automatic (mission runtime) |
-| `cmos/db/` | SQLite database | Via scripts only |
-| `cmos/dist/` | Distribution archives | Via package_starter.sh |
-
----
-
-## Environment Variables
-
-```bash
-# Development
-NODE_ENV=development
-DEBUG=true
-DB_PATH=cmos/db/cmos.sqlite
-
-# Production (if packaging)
-NODE_ENV=production
-DEBUG=false
-```
-
----
-
-## Documentation References
-
-**For CMOS usage**:
-- Setup: `cmos/docs/getting-started.md`
-- Operations: `cmos/docs/operations-guide.md`
-- Build sessions: `cmos/docs/build-session-prompt.md`
-- Migration: `cmos/docs/legacy-migration-guide.md`
-- Schema: `cmos/docs/sqlite-schema-reference.md`
-- Security & Quality Guardrails: mirror the project-root guidance from
-  `../agents.md` so telemetry, OWASP, and documentation workflows stay aligned.
-- AI Agent Specific Instructions: when CMOS procedures change, ensure the same
-  section in `../agents.md` stays synchronized to avoid drift between contexts.
-
-**For YOUR project**:
-- Application guidance: `project-root/agents.md` (you create this)
-- Project roadmap: start from `cmos/foundational-docs/roadmap_template.md` and copy it into your docs workspace
-- Technical architecture: start from `cmos/foundational-docs/tech_arch_template.md` and copy it into your docs workspace
-
----
-
-## Key Principles for AI Agents
-
-1. **Read both agents.md files** at session start:
-   - Read `project-root/agents.md` for application code rules
-   - Read `cmos/agents.md` (this file) for CMOS operations
-
-2. **Respect boundaries**:
-   - Application work → Use project-root/agents.md as guide
-   - Mission management → Use cmos/agents.md as guide
-
-3. **Use provided scripts**:
-   - Don't recreate functionality that exists in `cmos/scripts/`
-   - Use mission runtime helpers, SQLiteClient, or `./cmos/cli.py`
-
-4. **Verify frequently**:
-   - After mission completion (check show-current)
-   - After context updates (verify in database)
-   - Before session end (review show-backlog)
-
-5. **Keep separation**:
-   - CMOS operations stay in cmos/
-   - Application code stays in project root
-   - Never mix them
-
----
-
-**Last Updated**: 2025-11-08  
-**Version**: 2.0 (SQLite-first architecture)  
-**Scope**: CMOS operations only (not application code)
+Last updated: 2026-03-29
