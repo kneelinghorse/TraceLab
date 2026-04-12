@@ -3,14 +3,11 @@
 These tests use mocked database sessions to avoid PostgreSQL-specific
 features (computed columns, tsvector) that SQLite doesn't support.
 """
+
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
-from types import SimpleNamespace
-from unittest.mock import MagicMock, patch, call, PropertyMock
-from io import StringIO
-import sys
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -79,7 +76,9 @@ class TestProgressTracker:
 
     def test_eta_calculation(self, capsys):
         """ETA is calculated and displayed."""
-        tracker = reprocess_script.ProgressTracker(total_documents=100, total_chunks=1000)
+        tracker = reprocess_script.ProgressTracker(
+            total_documents=100, total_chunks=1000
+        )
 
         # Process one doc
         tracker.update("doc.pdf", 10, success=True)
@@ -201,12 +200,16 @@ class TestReprocessEmbeddings:
             mock_q = MagicMock()
 
             # For document queries
-            if 'Document' in str(model) and 'Chunk' not in str(model):
-                mock_q.filter.return_value.order_by.return_value.all.return_value = [mock_doc]
+            if "Document" in str(model) and "Chunk" not in str(model):
+                mock_q.filter.return_value.order_by.return_value.all.return_value = [
+                    mock_doc
+                ]
                 mock_q.filter.return_value.count.return_value = 1
             else:
                 # For chunk queries
-                mock_q.filter.return_value.order_by.return_value.all.return_value = mock_chunks
+                mock_q.filter.return_value.order_by.return_value.all.return_value = (
+                    mock_chunks
+                )
                 mock_q.filter.return_value.scalar.return_value = 3
 
             return mock_q
@@ -266,13 +269,17 @@ class TestReprocessEmbeddings:
 
         mock_db = MagicMock()
         # Setup query chain
-        mock_db.query.return_value.filter.return_value.order_by.return_value.all.return_value = [mock_doc]
+        mock_db.query.return_value.filter.return_value.order_by.return_value.all.return_value = [
+            mock_doc
+        ]
         mock_db.query.return_value.filter.return_value.scalar.return_value = 1
 
         # Second query for chunks
         def query_router(*args):
             mock_q = MagicMock()
-            mock_q.filter.return_value.order_by.return_value.all.return_value = [mock_chunk]
+            mock_q.filter.return_value.order_by.return_value.all.return_value = [
+                mock_chunk
+            ]
             mock_q.filter.return_value.scalar.return_value = 1
             return mock_q
 
@@ -292,7 +299,9 @@ class TestReprocessEmbeddings:
         )
 
         # Verify collection was dropped
-        mock_qdrant_service.client.delete_collection.assert_called_once_with("test_collection")
+        mock_qdrant_service.client.delete_collection.assert_called_once_with(
+            "test_collection"
+        )
 
     def test_reprocess_empty_documents(self, capsys):
         """Reprocessing handles empty document list."""
@@ -337,17 +346,23 @@ class TestReprocessEmbeddings:
             mock_q = MagicMock()
             # 1: doc list, 2: chunk count aggregate, 3: per-doc chunk count, 4: chunks query
             if call_counter[0] == 1:
-                mock_q.filter.return_value.order_by.return_value.all.return_value = [mock_doc]
+                mock_q.filter.return_value.order_by.return_value.all.return_value = [
+                    mock_doc
+                ]
             elif call_counter[0] in (2, 3):
                 mock_q.filter.return_value.scalar.return_value = 1
             else:
-                mock_q.filter.return_value.order_by.return_value.all.return_value = [mock_chunk]
+                mock_q.filter.return_value.order_by.return_value.all.return_value = [
+                    mock_chunk
+                ]
             return mock_q
 
         mock_db.query.side_effect = route_query
 
         mock_embedding_service = MagicMock()
-        mock_embedding_service.generate_embeddings_batch.return_value = [[0.1, 0.2, 0.3]]
+        mock_embedding_service.generate_embeddings_batch.return_value = [
+            [0.1, 0.2, 0.3]
+        ]
 
         mock_qdrant_service = MagicMock()
         mock_qdrant_service.vector_size = 3072
@@ -367,8 +382,12 @@ class TestCostEstimation:
 
     def test_cost_constants_are_reasonable(self):
         """Cost constants should be reasonable for OpenAI pricing."""
-        assert reprocess_script.MODEL_COST_PER_1M_TOKENS["text-embedding-3-small"] == 0.02
-        assert reprocess_script.MODEL_COST_PER_1M_TOKENS["text-embedding-3-large"] == 0.13
+        assert (
+            reprocess_script.MODEL_COST_PER_1M_TOKENS["text-embedding-3-small"] == 0.02
+        )
+        assert (
+            reprocess_script.MODEL_COST_PER_1M_TOKENS["text-embedding-3-large"] == 0.13
+        )
 
         # Average chunk should be 500-1000 tokens
         assert 500 <= reprocess_script.AVG_TOKENS_PER_CHUNK <= 1000
@@ -387,7 +406,9 @@ class TestCostEstimation:
 
     def test_cost_per_1k_tokens_fallback(self):
         """Unknown models should use safe default pricing."""
-        assert reprocess_script.cost_per_1k_tokens("unknown-model") == pytest.approx(0.00013)
+        assert reprocess_script.cost_per_1k_tokens("unknown-model") == pytest.approx(
+            0.00013
+        )
 
     def test_normalize_chunk_text_truncates_long_content(self):
         """Chunk text should be capped to the embedding safety threshold."""

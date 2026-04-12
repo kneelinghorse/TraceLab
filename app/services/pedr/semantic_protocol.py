@@ -11,14 +11,16 @@ Key capabilities:
 
 Reference: cmos/planning/PEDR-docs/protocol-enhanced-deep-research/PROTOCOL_ARCHITECTURE_GUIDE.md
 """
+
 from __future__ import annotations
 
 import json
 import math
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any
 
 # ------------------------------------------------------------------
 # Constants and Configuration
@@ -43,7 +45,7 @@ SIGNATURE_NODE_FIELDS = {
 }
 
 
-def _utf16_code_units(value: str) -> List[int]:
+def _utf16_code_units(value: str) -> list[int]:
     """Return UTF-16 code units to match JS charCodeAt hashing."""
     data = value.encode("utf-16-le")
     return [data[i] | (data[i + 1] << 8) for i in range(0, len(data), 2)]
@@ -84,24 +86,25 @@ def fnv1a_64_hash(value: Any) -> str:
         h = (h * FNV1A_64_PRIME) & FNV1A_64_MASK
     return f"fnv1a64-{h:016x}"
 
+
 # ------------------------------------------------------------------
 # Edge Type Constants (v3.3.0)
 # ------------------------------------------------------------------
 
 # Standard edge types for research graph
-EDGE_TYPES = frozenset({
-    "belongs_to",  # Entity belongs to parent (project, document)
-    "contains",  # Parent contains child
-    "references",  # Entity references sources (chunks, documents)
-    "derived_from",  # Insight derived from source chunks
-    "evidence",  # Mission evidence links to chunks
-    "related_to",  # General association
-    "binds_to",  # Protocol binding relationship
-    "part_of",  # Chunk is part of document
-    "sibling_of",  # Same parent relationship
-    "co_occurs",  # Chunks appearing in same collection (T38.1)
-    "topic_similar",  # Chunks with high embedding cosine similarity (T38.1)
-})
+EDGE_TYPES = frozenset(
+    {
+        "belongs_to",  # Entity belongs to parent (project, document)
+        "contains",  # Parent contains child
+        "references",  # Entity references sources (chunks, documents)
+        "derived_from",  # Insight derived from source chunks
+        "evidence",  # Mission evidence links to chunks
+        "related_to",  # General association
+        "binds_to",  # Protocol binding relationship
+        "part_of",  # Chunk is part of document
+        "sibling_of",  # Same parent relationship
+    }
+)
 
 
 # Entity types for URN generation
@@ -156,16 +159,32 @@ CONFIDENCE_PRIOR = 0.4
 URN_PARSE_PATTERN = re.compile(r"^urn:research:([a-z_]+):([^@]+)(?:@(.+))?$")
 
 # Intent keywords for classification
-INTENT_KEYWORDS: Dict[SemanticIntent, List[str]] = {
+INTENT_KEYWORDS: dict[SemanticIntent, list[str]] = {
     SemanticIntent.CREATE: ["create", "add", "submit", "new", "generate", "make"],
-    SemanticIntent.READ: ["read", "get", "view", "display", "show", "find", "search", "research"],
+    SemanticIntent.READ: [
+        "read",
+        "get",
+        "view",
+        "display",
+        "show",
+        "find",
+        "search",
+        "research",
+    ],
     SemanticIntent.UPDATE: ["update", "edit", "save", "modify", "change", "revise"],
     SemanticIntent.DELETE: ["delete", "remove", "archive", "purge"],
-    SemanticIntent.EXECUTE: ["execute", "trigger", "run", "process", "analyze", "synthesize"],
+    SemanticIntent.EXECUTE: [
+        "execute",
+        "trigger",
+        "run",
+        "process",
+        "analyze",
+        "synthesize",
+    ],
 }
 
 
-def _normalized_blast_radius(dependents: Optional[Sequence[Any]]) -> float:
+def _normalized_blast_radius(dependents: Sequence[Any] | None) -> float:
     dependent_count = len(dependents) if dependents else 0
     blast_radius = math.log1p(dependent_count) / 10.0
     return min(1.0, blast_radius)
@@ -174,6 +193,7 @@ def _normalized_blast_radius(dependents: Optional[Sequence[Any]]) -> float:
 # ------------------------------------------------------------------
 # Data Classes
 # ------------------------------------------------------------------
+
 
 @dataclass(frozen=True)
 class URN:
@@ -189,7 +209,7 @@ class URN:
 
     entity_type: str
     entity_id: str
-    version: Optional[str] = None
+    version: str | None = None
 
     def __str__(self) -> str:
         base = f"urn:research:{self.entity_type}:{self.entity_id}"
@@ -198,7 +218,7 @@ class URN:
         return base
 
     @classmethod
-    def parse(cls, urn_string: str) -> Optional["URN"]:
+    def parse(cls, urn_string: str) -> URN | None:
         """Parse a URN string into components.
 
         Args:
@@ -221,10 +241,10 @@ class URN:
     @classmethod
     def create(
         cls,
-        entity_type: Union[str, EntityType],
+        entity_type: str | EntityType,
         entity_id: str,
-        version: Optional[str] = None,
-    ) -> "URN":
+        version: str | None = None,
+    ) -> URN:
         """Create a new URN.
 
         Args:
@@ -253,7 +273,7 @@ class GovernanceMetadata:
     user_visibility: float = 0.5  # 0.0-1.0 scale
     blast_radius: float = 0.0  # Calculated from dependents
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "piiHandling": self.pii_handling,
             "businessImpact": self.business_impact,
@@ -268,10 +288,10 @@ class SemanticFeatures:
 
     purpose: str = ""
     description: str = ""
-    tags: List[str] = field(default_factory=list)
-    vector: List[Dict[str, Any]] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
+    vector: list[dict[str, Any]] = field(default_factory=list)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "purpose": self.purpose,
             "description": self.description,
@@ -289,7 +309,7 @@ class ElementMetadata:
     intent: SemanticIntent = SemanticIntent.GENERIC
     criticality: float = 0.5
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "type": self.element_type,
             "role": self.role,
@@ -321,9 +341,9 @@ class Edge:
     to_urn: str
     direction: str = "out"
     weight: float = 0.5
-    reason: Optional[str] = None
-    via: Optional[str] = None
-    evidence: Optional[Dict[str, Any]] = None
+    reason: str | None = None
+    via: str | None = None
+    evidence: dict[str, Any] | None = None
 
     def __post_init__(self):
         """Validate and normalize edge fields."""
@@ -342,7 +362,7 @@ class Edge:
         """
         return f"{self.edge_type}|{self.from_urn}|{self.to_urn}|{self.direction}"
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert edge to dictionary for serialization."""
         result = {
             "type": self.edge_type,
@@ -360,7 +380,7 @@ class Edge:
         return result
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Edge":
+    def from_dict(cls, data: dict[str, Any]) -> Edge:
         """Create Edge from dictionary."""
         return cls(
             edge_type=data.get("type", data.get("edge_type", "related_to")),
@@ -374,7 +394,7 @@ class Edge:
         )
 
 
-def normalize_edges(edges: List[Edge]) -> List[Edge]:
+def normalize_edges(edges: list[Edge]) -> list[Edge]:
     """Normalize and deduplicate a list of edges.
 
     Removes duplicates based on (type, from, to, direction) key.
@@ -386,7 +406,7 @@ def normalize_edges(edges: List[Edge]) -> List[Edge]:
     Returns:
         Deduplicated list of edges
     """
-    seen: Dict[str, Edge] = {}
+    seen: dict[str, Edge] = {}
     for edge in edges:
         key = edge.normalization_key
         if key not in seen:
@@ -394,7 +414,7 @@ def normalize_edges(edges: List[Edge]) -> List[Edge]:
     return list(seen.values())
 
 
-def sort_edges(edges: List[Edge]) -> List[Edge]:
+def sort_edges(edges: list[Edge]) -> list[Edge]:
     """Sort edges deterministically for stable signatures.
 
     Sorts by (type, from, to, direction) to ensure consistent ordering.
@@ -408,7 +428,7 @@ def sort_edges(edges: List[Edge]) -> List[Edge]:
     return sorted(edges, key=lambda e: e.normalization_key)
 
 
-def normalize_and_sort_edges(edges: List[Edge]) -> List[Edge]:
+def normalize_and_sort_edges(edges: list[Edge]) -> list[Edge]:
     """Normalize, deduplicate, and sort edges.
 
     Convenience function combining normalize_edges and sort_edges.
@@ -447,16 +467,16 @@ class ProtocolManifest:
     criticality: float = 0.5
 
     # Relationships (legacy format for backward compatibility)
-    relationships: Dict[str, List[str]] = field(default_factory=dict)
+    relationships: dict[str, list[str]] = field(default_factory=dict)
 
     # Graph-ready edges (v3.3.0)
-    edges: List[Edge] = field(default_factory=list)
+    edges: list[Edge] = field(default_factory=list)
 
     # Protocol bindings
-    context: Dict[str, Any] = field(default_factory=dict)
+    context: dict[str, Any] = field(default_factory=dict)
 
     # Original entity data
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     # Manifest signature (for caching/validation)
     signature: str = ""
@@ -465,7 +485,7 @@ class ProtocolManifest:
     text_hash: str = ""
     sig_hash: str = ""
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert manifest to dictionary for serialization."""
         # Build relationships dict with edges included
         relationships_dict = dict(self.relationships)
@@ -511,14 +531,15 @@ class ProtocolManifest:
 # URN Generator
 # ------------------------------------------------------------------
 
+
 class URNGenerator:
     """Utility class for generating URNs."""
 
     @staticmethod
     def generate(
-        entity_type: Union[str, EntityType],
+        entity_type: str | EntityType,
         entity_id: str,
-        version: Optional[str] = None,
+        version: str | None = None,
     ) -> URN:
         """Generate a URN for an entity.
 
@@ -573,6 +594,7 @@ class URNGenerator:
 # Confidence Scoring
 # ------------------------------------------------------------------
 
+
 class ConfidenceScorer:
     """Bayesian confidence scoring based on evidence presence.
 
@@ -583,7 +605,7 @@ class ConfidenceScorer:
     def __init__(
         self,
         prior: float = CONFIDENCE_PRIOR,
-        evidence_factors: Optional[List[Tuple[str, float]]] = None,
+        evidence_factors: list[tuple[str, float]] | None = None,
     ):
         """Initialize the confidence scorer.
 
@@ -594,7 +616,7 @@ class ConfidenceScorer:
         self.prior = prior
         self.evidence_factors = evidence_factors or EVIDENCE_FACTORS
 
-    def calculate(self, evidence: Dict[str, bool]) -> float:
+    def calculate(self, evidence: dict[str, bool]) -> float:
         """Calculate confidence score using Bayesian update.
 
         Args:
@@ -621,7 +643,7 @@ class ConfidenceScorer:
         # Round to 3 decimal places
         return round(confidence, 3)
 
-    def score_manifest(self, manifest_data: Dict[str, Any]) -> float:
+    def score_manifest(self, manifest_data: dict[str, Any]) -> float:
         """Calculate confidence for a manifest data dictionary.
 
         Args:
@@ -633,7 +655,7 @@ class ConfidenceScorer:
         evidence = self._extract_evidence(manifest_data)
         return self.calculate(evidence)
 
-    def _extract_evidence(self, data: Dict[str, Any]) -> Dict[str, bool]:
+    def _extract_evidence(self, data: dict[str, Any]) -> dict[str, bool]:
         """Extract evidence factors from entity data.
 
         Args:
@@ -642,65 +664,61 @@ class ConfidenceScorer:
         Returns:
             Evidence dictionary
         """
-        evidence: Dict[str, bool] = {}
+        evidence: dict[str, bool] = {}
 
         # Check for purpose/objective
         evidence["has_purpose"] = bool(
-            data.get("purpose") or
-            data.get("objective") or
-            data.get("researchStatement", {}).get("objective") or
-            data.get("research_statement", {}).get("objective")
+            data.get("purpose")
+            or data.get("objective")
+            or data.get("researchStatement", {}).get("objective")
+            or data.get("research_statement", {}).get("objective")
         )
 
         # Check for element type
         evidence["has_type"] = bool(
-            data.get("element_type") or
-            data.get("type") or
-            data.get("element", {}).get("type")
+            data.get("element_type")
+            or data.get("type")
+            or data.get("element", {}).get("type")
         )
 
         # Check for governance metadata
         governance = data.get("governance") or {}
         evidence["has_governance"] = bool(
-            governance.get("businessImpact") or
-            governance.get("business_impact") or
-            data.get("governance_impact")
+            governance.get("businessImpact")
+            or governance.get("business_impact")
+            or data.get("governance_impact")
         )
 
         # Check for requires relationships
         relationships = data.get("relationships") or {}
         evidence["has_requires"] = bool(
-            relationships.get("requires") or
-            relationships.get("depends_on") or
-            data.get("evidence")  # Evidence is a form of "requires"
+            relationships.get("requires")
+            or relationships.get("depends_on")
+            or data.get("evidence")  # Evidence is a form of "requires"
         )
 
         # Check for provides relationships
         evidence["has_provides"] = bool(
-            relationships.get("provides") or
-            relationships.get("deliverables") or
-            data.get("deliverables")
+            relationships.get("provides")
+            or relationships.get("deliverables")
+            or data.get("deliverables")
         )
 
         # Check for quality gates
         evidence["has_quality_gates"] = bool(
-            data.get("quality_gates") or
-            data.get("qualityGates") or
-            data.get("quality_checkpoints")
+            data.get("quality_gates")
+            or data.get("qualityGates")
+            or data.get("quality_checkpoints")
         )
 
         # Check for evidence/sources
         evidence["has_evidence"] = bool(
-            data.get("evidence") or
-            data.get("sources") or
-            data.get("references")
+            data.get("evidence") or data.get("sources") or data.get("references")
         )
 
         # Check for synthesis/summary
         evidence["has_synthesis"] = bool(
-            data.get("synthesis") or
-            data.get("summary") or
-            data.get("key_insights")
+            data.get("synthesis") or data.get("summary") or data.get("key_insights")
         )
 
         return evidence
@@ -709,6 +727,7 @@ class ConfidenceScorer:
 # ------------------------------------------------------------------
 # Criticality Calculation
 # ------------------------------------------------------------------
+
 
 class CriticalityCalculator:
     """Calculate criticality scores using weighted formula.
@@ -720,7 +739,7 @@ class CriticalityCalculator:
 
     def __init__(
         self,
-        weights: Optional[Dict[str, float]] = None,
+        weights: dict[str, float] | None = None,
     ):
         """Initialize the criticality calculator.
 
@@ -734,7 +753,7 @@ class CriticalityCalculator:
         impact: float = 5.0,
         visibility: float = 0.5,
         pii: bool = False,
-        dependents: Optional[List[str]] = None,
+        dependents: list[str] | None = None,
     ) -> float:
         """Calculate criticality score.
 
@@ -761,10 +780,10 @@ class CriticalityCalculator:
 
         # Calculate weighted score
         score = (
-            (normalized_impact * self.weights["impact"]) +
-            (normalized_visibility * self.weights["visibility"]) +
-            (pii_factor * self.weights["pii"]) +
-            (blast_radius * self.weights["blast_radius"])
+            (normalized_impact * self.weights["impact"])
+            + (normalized_visibility * self.weights["visibility"])
+            + (pii_factor * self.weights["pii"])
+            + (blast_radius * self.weights["blast_radius"])
         )
 
         # Clamp to 0-1 range and round
@@ -773,7 +792,7 @@ class CriticalityCalculator:
     def calculate_from_governance(
         self,
         governance: GovernanceMetadata,
-        dependents: Optional[List[str]] = None,
+        dependents: list[str] | None = None,
     ) -> float:
         """Calculate criticality from governance metadata.
 
@@ -796,10 +815,11 @@ class CriticalityCalculator:
 # Intent Resolver
 # ------------------------------------------------------------------
 
+
 class IntentResolver:
     """Resolve semantic intent from purpose/description text."""
 
-    _ACTION_INTENT_PRIORITY: Dict[SemanticIntent, int] = {
+    _ACTION_INTENT_PRIORITY: dict[SemanticIntent, int] = {
         SemanticIntent.EXECUTE: 4,
         SemanticIntent.UPDATE: 3,
         SemanticIntent.DELETE: 2,
@@ -810,7 +830,7 @@ class IntentResolver:
 
     def __init__(
         self,
-        keywords: Optional[Dict[SemanticIntent, List[str]]] = None,
+        keywords: dict[SemanticIntent, list[str]] | None = None,
     ):
         """Initialize the intent resolver.
 
@@ -832,12 +852,16 @@ class IntentResolver:
             return SemanticIntent.GENERIC
 
         purpose_lower = purpose.lower()
-        intent_scores: List[Tuple[SemanticIntent, float, int]] = []
+        intent_scores: list[tuple[SemanticIntent, float, int]] = []
 
         for intent, keywords in self.keywords.items():
             if not keywords:
                 continue
-            matches = sum(1 for keyword in keywords if self._keyword_matches(purpose_lower, keyword))
+            matches = sum(
+                1
+                for keyword in keywords
+                if self._keyword_matches(purpose_lower, keyword)
+            )
             if matches <= 0:
                 continue
             confidence = matches / len(keywords)
@@ -887,6 +911,7 @@ class IntentResolver:
 # Semantic Vector Generator
 # ------------------------------------------------------------------
 
+
 class SemanticVectorGenerator:
     """Generate simplified semantic vectors from text.
 
@@ -894,11 +919,52 @@ class SemanticVectorGenerator:
     """
 
     STOPWORDS = {
-        "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for",
-        "of", "with", "by", "from", "as", "is", "was", "are", "were", "been",
-        "be", "have", "has", "had", "do", "does", "did", "will", "would",
-        "could", "should", "may", "might", "must", "shall", "can", "this",
-        "that", "these", "those", "it", "its", "they", "them", "their",
+        "the",
+        "a",
+        "an",
+        "and",
+        "or",
+        "but",
+        "in",
+        "on",
+        "at",
+        "to",
+        "for",
+        "of",
+        "with",
+        "by",
+        "from",
+        "as",
+        "is",
+        "was",
+        "are",
+        "were",
+        "been",
+        "be",
+        "have",
+        "has",
+        "had",
+        "do",
+        "does",
+        "did",
+        "will",
+        "would",
+        "could",
+        "should",
+        "may",
+        "might",
+        "must",
+        "shall",
+        "can",
+        "this",
+        "that",
+        "these",
+        "those",
+        "it",
+        "its",
+        "they",
+        "them",
+        "their",
     }
 
     def __init__(self, max_dimensions: int = 50, min_word_length: int = 3):
@@ -911,7 +977,7 @@ class SemanticVectorGenerator:
         self.max_dimensions = max_dimensions
         self.min_word_length = min_word_length
 
-    def generate(self, text: str) -> List[Dict[str, Any]]:
+    def generate(self, text: str) -> list[dict[str, Any]]:
         """Generate semantic vector from text.
 
         Args:
@@ -924,9 +990,10 @@ class SemanticVectorGenerator:
             return []
 
         # Tokenize and clean
-        words = re.findall(r'\b[a-zA-Z]+\b', text.lower())
+        words = re.findall(r"\b[a-zA-Z]+\b", text.lower())
         words = [
-            w for w in words
+            w
+            for w in words
             if len(w) >= self.min_word_length and w not in self.STOPWORDS
         ]
 
@@ -934,16 +1001,16 @@ class SemanticVectorGenerator:
             return []
 
         # Calculate term frequency
-        term_freq: Dict[str, int] = {}
+        term_freq: dict[str, int] = {}
         for word in words:
             term_freq[word] = term_freq.get(word, 0) + 1
 
         # Sort by frequency and take top N
         entries = sorted(term_freq.items(), key=lambda x: x[1], reverse=True)
-        entries = entries[:self.max_dimensions]
+        entries = entries[: self.max_dimensions]
 
         # Calculate magnitude for normalization
-        magnitude = math.sqrt(sum(freq ** 2 for _, freq in entries))
+        magnitude = math.sqrt(sum(freq**2 for _, freq in entries))
 
         if magnitude == 0:
             return []
@@ -954,7 +1021,7 @@ class SemanticVectorGenerator:
             for term, freq in entries
         ]
 
-    def from_manifest_data(self, data: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def from_manifest_data(self, data: dict[str, Any]) -> list[dict[str, Any]]:
         """Generate vector from manifest data fields.
 
         Args:
@@ -978,7 +1045,9 @@ class SemanticVectorGenerator:
             text_parts.extend(data["tags"])
 
         # Check nested fields
-        research_statement = data.get("researchStatement") or data.get("research_statement") or {}
+        research_statement = (
+            data.get("researchStatement") or data.get("research_statement") or {}
+        )
         if research_statement.get("objective"):
             text_parts.append(research_statement["objective"])
 
@@ -1002,6 +1071,7 @@ class SemanticVectorGenerator:
 # Semantic Protocol Service
 # ------------------------------------------------------------------
 
+
 class SemanticProtocol:
     """Main Semantic Protocol service - The Namer.
 
@@ -1016,8 +1086,8 @@ class SemanticProtocol:
         self,
         *,
         confidence_prior: float = CONFIDENCE_PRIOR,
-        criticality_weights: Optional[Dict[str, float]] = None,
-        intent_keywords: Optional[Dict[SemanticIntent, List[str]]] = None,
+        criticality_weights: dict[str, float] | None = None,
+        intent_keywords: dict[SemanticIntent, list[str]] | None = None,
     ):
         """Initialize the Semantic Protocol service.
 
@@ -1035,11 +1105,11 @@ class SemanticProtocol:
     def create_manifest(
         self,
         entity_id: str,
-        entity_type: Union[str, EntityType],
-        data: Dict[str, Any],
+        entity_type: str | EntityType,
+        data: dict[str, Any],
         *,
-        project_id: Optional[str] = None,
-        dependents: Optional[List[str]] = None,
+        project_id: str | None = None,
+        dependents: list[str] | None = None,
     ) -> ProtocolManifest:
         """Create a full protocol manifest for an entity.
 
@@ -1063,7 +1133,11 @@ class SemanticProtocol:
         purpose = self._extract_purpose(data)
         intent = self.intent_resolver.resolve(purpose)
         if intent == SemanticIntent.GENERIC:
-            type_str = entity_type.value if isinstance(entity_type, EntityType) else entity_type
+            type_str = (
+                entity_type.value
+                if isinstance(entity_type, EntityType)
+                else entity_type
+            )
             intent = self.intent_resolver.resolve_from_type(type_str)
 
         # Calculate confidence
@@ -1083,7 +1157,9 @@ class SemanticProtocol:
         )
 
         # Build element metadata
-        type_str = entity_type.value if isinstance(entity_type, EntityType) else entity_type
+        type_str = (
+            entity_type.value if isinstance(entity_type, EntityType) else entity_type
+        )
         element = ElementMetadata(
             element_type=f"research.{type_str}",
             role=self._extract_role(data, type_str),
@@ -1115,10 +1191,10 @@ class SemanticProtocol:
     def create_mission_manifest(
         self,
         mission_id: str,
-        mission_data: Dict[str, Any],
+        mission_data: dict[str, Any],
         *,
-        quality_gates: Optional[Dict[str, Any]] = None,
-        project_id: Optional[str] = None,
+        quality_gates: dict[str, Any] | None = None,
+        project_id: str | None = None,
         status: str = "unknown",
     ) -> ProtocolManifest:
         """Create manifest specifically for a mission.
@@ -1151,10 +1227,10 @@ class SemanticProtocol:
         document_id: str,
         name: str,
         *,
-        content: Optional[str] = None,
-        file_type: Optional[str] = None,
-        source_type: Optional[str] = None,
-        project_id: Optional[str] = None,
+        content: str | None = None,
+        file_type: str | None = None,
+        source_type: str | None = None,
+        project_id: str | None = None,
         chunk_count: int = 0,
     ) -> ProtocolManifest:
         """Create manifest for a document.
@@ -1181,7 +1257,9 @@ class SemanticProtocol:
         }
 
         # Documents with many chunks are more important
-        dependents = [f"chunk-{i}" for i in range(chunk_count)] if chunk_count > 0 else None
+        dependents = (
+            [f"chunk-{i}" for i in range(chunk_count)] if chunk_count > 0 else None
+        )
 
         return self.create_manifest(
             entity_id=document_id,
@@ -1197,10 +1275,10 @@ class SemanticProtocol:
         title: str,
         content: str,
         *,
-        insight_type: Optional[str] = None,
+        insight_type: str | None = None,
         validated: bool = False,
-        project_id: Optional[str] = None,
-        source_chunk_ids: Optional[List[str]] = None,
+        project_id: str | None = None,
+        source_chunk_ids: list[str] | None = None,
     ) -> ProtocolManifest:
         """Create manifest for an insight.
 
@@ -1241,7 +1319,7 @@ class SemanticProtocol:
         chunk_index: int,
         content: str,
         *,
-        project_id: Optional[str] = None,
+        project_id: str | None = None,
     ) -> ProtocolManifest:
         """Create manifest for a document chunk.
 
@@ -1269,7 +1347,7 @@ class SemanticProtocol:
             project_id=project_id,
         )
 
-    def calculate_confidence(self, data: Dict[str, Any]) -> float:
+    def calculate_confidence(self, data: dict[str, Any]) -> float:
         """Calculate confidence score for entity data.
 
         Args:
@@ -1285,7 +1363,7 @@ class SemanticProtocol:
         impact: float = 5.0,
         visibility: float = 0.5,
         pii: bool = False,
-        dependents: Optional[List[str]] = None,
+        dependents: list[str] | None = None,
     ) -> float:
         """Calculate criticality score.
 
@@ -1307,7 +1385,7 @@ class SemanticProtocol:
 
     def generate_urn(
         self,
-        entity_type: Union[str, EntityType],
+        entity_type: str | EntityType,
         entity_id: str,
     ) -> str:
         """Generate URN string for an entity.
@@ -1327,8 +1405,8 @@ class SemanticProtocol:
 
     def _extract_governance(
         self,
-        data: Dict[str, Any],
-        dependents: Optional[List[str]] = None,
+        data: dict[str, Any],
+        dependents: list[str] | None = None,
     ) -> GovernanceMetadata:
         """Extract governance metadata from entity data."""
         governance = data.get("governance") or {}
@@ -1338,15 +1416,17 @@ class SemanticProtocol:
 
         # Get business impact
         impact = (
-            governance.get("businessImpact") or
-            governance.get("business_impact") or
-            data.get("governance_impact") or
-            5
+            governance.get("businessImpact")
+            or governance.get("business_impact")
+            or data.get("governance_impact")
+            or 5
         )
 
         # Get visibility
         status = str(data.get("status") or "unknown").lower()
-        visibility = governance.get("userVisibility") or governance.get("user_visibility")
+        visibility = governance.get("userVisibility") or governance.get(
+            "user_visibility"
+        )
         if visibility is None:
             visibility = 1.0 if status == "complete" else 0.5
 
@@ -1360,7 +1440,7 @@ class SemanticProtocol:
             blast_radius=blast_radius,
         )
 
-    def _detect_pii(self, data: Dict[str, Any]) -> bool:
+    def _detect_pii(self, data: dict[str, Any]) -> bool:
         """Detect PII handling flag from entity data."""
         # Check explicit governance flags
         governance = data.get("governance") or {}
@@ -1379,7 +1459,7 @@ class SemanticProtocol:
 
         return False
 
-    def _extract_purpose(self, data: Dict[str, Any]) -> str:
+    def _extract_purpose(self, data: dict[str, Any]) -> str:
         """Extract purpose/objective from entity data."""
         # Try various locations
         if data.get("purpose"):
@@ -1397,7 +1477,7 @@ class SemanticProtocol:
 
         return data.get("title") or data.get("name") or ""
 
-    def _extract_description(self, data: Dict[str, Any]) -> str:
+    def _extract_description(self, data: dict[str, Any]) -> str:
         """Extract description from entity data."""
         if data.get("description"):
             return str(data["description"])
@@ -1408,14 +1488,14 @@ class SemanticProtocol:
             return content[:500] + "..." if len(content) > 500 else content
         return data.get("title") or data.get("name") or ""
 
-    def _extract_tags(self, data: Dict[str, Any]) -> List[str]:
+    def _extract_tags(self, data: dict[str, Any]) -> list[str]:
         """Extract tags from entity data."""
         tags = data.get("tags") or []
         if isinstance(tags, list):
             return [str(t) for t in tags if t]
         return []
 
-    def _extract_role(self, data: Dict[str, Any], entity_type: str) -> str:
+    def _extract_role(self, data: dict[str, Any], entity_type: str) -> str:
         """Extract role from entity data."""
         element = data.get("element") or {}
         if element.get("role"):
@@ -1435,11 +1515,11 @@ class SemanticProtocol:
 
     def _extract_relationships(
         self,
-        data: Dict[str, Any],
-        project_id: Optional[str],
-    ) -> Dict[str, List[str]]:
+        data: dict[str, Any],
+        project_id: str | None,
+    ) -> dict[str, list[str]]:
         """Extract relationships from entity data."""
-        relationships: Dict[str, List[str]] = {}
+        relationships: dict[str, list[str]] = {}
 
         # Project relationship
         if project_id:
@@ -1477,17 +1557,19 @@ class SemanticProtocol:
         # Related missions
         related = data.get("related_missions") or []
         if isinstance(related, list):
-            relationships["related_to"] = [f"urn:research:mission:{m}" for m in related if m]
+            relationships["related_to"] = [
+                f"urn:research:mission:{m}" for m in related if m
+            ]
 
         return relationships
 
     def _build_context(
         self,
-        data: Dict[str, Any],
-        project_id: Optional[str],
-    ) -> Dict[str, Any]:
+        data: dict[str, Any],
+        project_id: str | None,
+    ) -> dict[str, Any]:
         """Build context dictionary for manifest."""
-        context: Dict[str, Any] = {
+        context: dict[str, Any] = {
             "domain": "research",
         }
 
@@ -1507,9 +1589,9 @@ class SemanticProtocol:
 
         return context
 
-    def _extract_metadata(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_metadata(self, data: dict[str, Any]) -> dict[str, Any]:
         """Extract relevant metadata to store with manifest."""
-        metadata: Dict[str, Any] = {}
+        metadata: dict[str, Any] = {}
 
         # Store IDs
         for key in ("id", "mission_id", "missionId", "document_id", "insight_id"):
@@ -1531,11 +1613,11 @@ class SemanticProtocol:
 
         return metadata
 
-    def _sorted_strings(self, values: Sequence[Any]) -> List[str]:
+    def _sorted_strings(self, values: Sequence[Any]) -> list[str]:
         """Return sorted, non-empty string values."""
         return sorted(str(value) for value in values if value)
 
-    def _build_node_shape(self, manifest: ProtocolManifest) -> Dict[str, Any]:
+    def _build_node_shape(self, manifest: ProtocolManifest) -> dict[str, Any]:
         """Build the stable node shape for deterministic hashing."""
         return {
             "urn": str(manifest.urn),
@@ -1543,7 +1625,9 @@ class SemanticProtocol:
             "element": {
                 "type": manifest.element.element_type,
                 "role": manifest.element.role,
-                "intent": manifest.element.intent.value if manifest.element.intent else None,
+                "intent": manifest.element.intent.value
+                if manifest.element.intent
+                else None,
                 "criticality": manifest.element.criticality,
             },
             "semantics": {
@@ -1562,7 +1646,7 @@ class SemanticProtocol:
             },
         }
 
-    def _build_edges_shape(self, edges: Sequence[Edge]) -> List[Dict[str, Any]]:
+    def _build_edges_shape(self, edges: Sequence[Edge]) -> list[dict[str, Any]]:
         """Build the stable edges shape for deterministic hashing."""
         return [
             {
@@ -1601,10 +1685,12 @@ class SemanticProtocol:
         manifest.node_hash = fnv1a_64_hash(node_shape)
         manifest.graph_hash = fnv1a_64_hash(edges_shape)
         manifest.text_hash = fnv1a_64_hash(text)
-        manifest.sig_hash = fnv1a_64_hash({
-            "node": manifest.node_hash,
-            "graph": manifest.graph_hash,
-        })
+        manifest.sig_hash = fnv1a_64_hash(
+            {
+                "node": manifest.node_hash,
+                "graph": manifest.graph_hash,
+            }
+        )
         manifest.signature = manifest.sig_hash
 
 
@@ -1612,7 +1698,7 @@ class SemanticProtocol:
 # Singleton Access
 # ------------------------------------------------------------------
 
-_semantic_protocol: Optional[SemanticProtocol] = None
+_semantic_protocol: SemanticProtocol | None = None
 
 
 def get_semantic_protocol() -> SemanticProtocol:

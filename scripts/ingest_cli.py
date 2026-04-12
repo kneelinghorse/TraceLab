@@ -65,10 +65,14 @@ def _resolve_auth_config(
         *(env.get(key) for key in AUTH_PASSWORD_ENV),
         settings.auth_password,
     )
-    return AuthConfig(token=resolved_token, username=resolved_username, password=resolved_password)
+    return AuthConfig(
+        token=resolved_token, username=resolved_username, password=resolved_password
+    )
 
 
-def _acquire_token(client: httpx.Client | TestClient, api_prefix: str, auth: AuthConfig) -> str:
+def _acquire_token(
+    client: httpx.Client | TestClient, api_prefix: str, auth: AuthConfig
+) -> str:
     """Ensure a bearer token is available, logging in when necessary."""
 
     if auth.token:
@@ -129,7 +133,9 @@ def run_ingestion(
     else:
         if not base_url:
             raise ValueError("base_url must be provided when not running offline")
-        client_context = httpx.Client(timeout=30.0, base_url=(base_url or "").rstrip("/"))
+        client_context = httpx.Client(
+            timeout=30.0, base_url=(base_url or "").rstrip("/")
+        )
 
     auth = _resolve_auth_config(token=token, username=username, password=password)
 
@@ -160,7 +166,9 @@ def run_ingestion(
         detail_payload = detail_response.json()
 
     if not detail_payload.get("processed"):
-        raise RuntimeError("Document ingestion did not complete: processed flag is False")
+        raise RuntimeError(
+            "Document ingestion did not complete: processed flag is False"
+        )
     if not detail_payload.get("chunked"):
         raise RuntimeError("Document ingestion did not complete: chunked flag is False")
 
@@ -177,12 +185,24 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Drive ingestion flow via CLI")
     parser.add_argument("file", help="Path to document to ingest")
     parser.add_argument("project_id", help="Project identifier (UUID)")
-    parser.add_argument("--base-url", dest="base_url", help="API base URL (required when not using --offline)")
-    parser.add_argument("--offline", action="store_true", help="Execute against in-process FastAPI app")
+    parser.add_argument(
+        "--base-url",
+        dest="base_url",
+        help="API base URL (required when not using --offline)",
+    )
+    parser.add_argument(
+        "--offline", action="store_true", help="Execute against in-process FastAPI app"
+    )
     parser.add_argument("--output", help="Optional path to write JSON results")
-    parser.add_argument("--username", help="Authentication username (defaults to env AUTH_USERNAME)")
-    parser.add_argument("--password", help="Authentication password (defaults to env AUTH_PASSWORD)")
-    parser.add_argument("--token", help="Existing bearer token to use instead of logging in")
+    parser.add_argument(
+        "--username", help="Authentication username (defaults to env AUTH_USERNAME)"
+    )
+    parser.add_argument(
+        "--password", help="Authentication password (defaults to env AUTH_PASSWORD)"
+    )
+    parser.add_argument(
+        "--token", help="Existing bearer token to use instead of logging in"
+    )
     return parser
 
 

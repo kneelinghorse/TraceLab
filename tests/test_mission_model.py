@@ -4,6 +4,7 @@ These tests focus on unit testing the Mission model's methods and structure.
 Database integration tests require PostgreSQL due to TSVECTOR columns in
 other models.
 """
+
 from __future__ import annotations
 
 import uuid
@@ -15,13 +16,14 @@ import pytest
 pytestmark = pytest.mark.usefixtures()
 
 # Import Mission directly without triggering database creation
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 # Avoid importing from app.models (which triggers Base creation)
 # Instead import just the mission module directly
-from app.models.mission import Mission, MISSION_STATUSES
+from app.models.mission import MISSION_STATUSES, Mission
 
 
 class TestMissionStatuses:
@@ -29,8 +31,15 @@ class TestMissionStatuses:
 
     def test_all_statuses_defined(self):
         """Verify all expected status values are in MISSION_STATUSES."""
-        expected = {"draft", "queued", "in_progress", "completed", "blocked", "cancelled"}
-        assert MISSION_STATUSES == expected
+        expected = {
+            "draft",
+            "queued",
+            "in_progress",
+            "completed",
+            "blocked",
+            "cancelled",
+        }
+        assert expected == MISSION_STATUSES
 
 
 class TestMissionInstantiation:
@@ -316,12 +325,31 @@ class TestMissionTableDefinition:
         """Verify all required columns are defined."""
         columns = {col.name for col in Mission.__table__.columns}
         required = {
-            "id", "project_id", "mission_id", "title", "objective", "success_criteria",
-            "context", "deliverables", "research_phases", "tags", "mission_metadata",
-            "status", "queued_at", "started_at", "completed_at", "deepsearch_job_id",
-            "execution_metadata", "result_document_ids", "result_report_id",
-            "result_markdown", "result_protocol", "error_message",
-            "created_at", "updated_at", "created_by",
+            "id",
+            "project_id",
+            "mission_id",
+            "title",
+            "objective",
+            "success_criteria",
+            "context",
+            "deliverables",
+            "research_phases",
+            "tags",
+            "mission_metadata",
+            "status",
+            "queued_at",
+            "started_at",
+            "completed_at",
+            "deepsearch_job_id",
+            "execution_metadata",
+            "result_document_ids",
+            "result_report_id",
+            "result_markdown",
+            "result_protocol",
+            "error_message",
+            "created_at",
+            "updated_at",
+            "created_by",
         }
         assert required.issubset(columns), f"Missing columns: {required - columns}"
 
@@ -329,13 +357,22 @@ class TestMissionTableDefinition:
         """Verify expected indexes are defined."""
         index_names = {idx.name for idx in Mission.__table__.indexes}
         expected = {"idx_missions_project_status", "idx_missions_mission_id"}
-        assert expected.issubset(index_names), f"Missing indexes: {expected - index_names}"
+        assert expected.issubset(index_names), (
+            f"Missing indexes: {expected - index_names}"
+        )
 
     def test_constraints_defined(self):
         """Verify check constraints are defined."""
         constraint_names = {
-            c.name for c in Mission.__table__.constraints
+            c.name
+            for c in Mission.__table__.constraints
             if hasattr(c, "name") and c.name
         }
-        expected = {"success_criteria_not_empty", "title_length", "valid_mission_status"}
-        assert expected.issubset(constraint_names), f"Missing constraints: {expected - constraint_names}"
+        expected = {
+            "success_criteria_not_empty",
+            "title_length",
+            "valid_mission_status",
+        }
+        assert expected.issubset(constraint_names), (
+            f"Missing constraints: {expected - constraint_names}"
+        )

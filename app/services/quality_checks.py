@@ -1,12 +1,12 @@
 """Quality automation orchestration and persistence helpers."""
+
 from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Sequence
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterable, List, Sequence
 from uuid import UUID
 
 from sqlalchemy import func
@@ -37,8 +37,8 @@ class QualityCheckRepository:
         results: Sequence[QualityAutomationCheckResult],
         *,
         performed_by: str,
-    ) -> List[QualityCheck]:
-        records: List[QualityCheck] = []
+    ) -> list[QualityCheck]:
+        records: list[QualityCheck] = []
         for result in results:
             record = QualityCheck(
                 entity_type="mission",
@@ -61,22 +61,28 @@ class QualityCheckRepository:
         mission_id: UUID,
         *,
         limit: int = 200,
-    ) -> List[QualityCheck]:
+    ) -> list[QualityCheck]:
         return (
             db.query(QualityCheck)
-            .filter(QualityCheck.entity_type == "mission", QualityCheck.entity_id == mission_id)
+            .filter(
+                QualityCheck.entity_type == "mission",
+                QualityCheck.entity_id == mission_id,
+            )
             .order_by(QualityCheck.performed_at.desc())
             .limit(limit)
             .all()
         )
 
-    def latest_for_mission(self, db: Session, mission_id: UUID) -> List[QualityCheck]:
+    def latest_for_mission(self, db: Session, mission_id: UUID) -> list[QualityCheck]:
         subquery = (
             db.query(
                 QualityCheck.check_type,
                 func.max(QualityCheck.performed_at).label("max_performed_at"),
             )
-            .filter(QualityCheck.entity_type == "mission", QualityCheck.entity_id == mission_id)
+            .filter(
+                QualityCheck.entity_type == "mission",
+                QualityCheck.entity_id == mission_id,
+            )
             .group_by(QualityCheck.check_type)
             .subquery()
         )
@@ -87,7 +93,10 @@ class QualityCheckRepository:
                 (QualityCheck.check_type == subquery.c.check_type)
                 & (QualityCheck.performed_at == subquery.c.max_performed_at),
             )
-            .filter(QualityCheck.entity_type == "mission", QualityCheck.entity_id == mission_id)
+            .filter(
+                QualityCheck.entity_type == "mission",
+                QualityCheck.entity_id == mission_id,
+            )
             .all()
         )
 
@@ -97,24 +106,26 @@ class _QualityAutomationTelemetry:
 
     def __init__(self, path: Path | None = None) -> None:
         repo_root = Path(__file__).resolve().parents[2]
-        self.path = path or (repo_root / "telemetry" / "events" / "quality-automation.jsonl")
-
-    def __call__(self, record: QualityCheck, result: QualityAutomationCheckResult) -> None:  # pragma: no cover - simple IO
-        from app.core.telemetry import emit_telemetry
-        emit_telemetry(
-            path=self.path,
-            event_type=f"quality.automation.{record.check_type}",
-            source="quality",
-            payload={
-                "entity_type": record.entity_type,
-                "entity_id": str(record.entity_id),
-                "check_type": record.check_type,
-                "status": record.status,
-                "summary": result.summary,
-                "metrics": result.metrics,
-                "recommendations": result.recommendations,
-            },
+        self.path = path or (
+            repo_root / "telemetry" / "events" / "quality-automation.jsonl"
         )
+
+    def __call__(
+        self, record: QualityCheck, result: QualityAutomationCheckResult
+    ) -> None:  # pragma: no cover - simple IO
+        payload = {
+            "ts": result.evaluated_at.isoformat().replace("+00:00", "Z"),
+            "entity_type": record.entity_type,
+            "entity_id": str(record.entity_id),
+            "check_type": record.check_type,
+            "status": record.status,
+            "summary": result.summary,
+            "metrics": result.metrics,
+            "recommendations": result.recommendations,
+        }
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        with self.path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
 
 
 class QualityAutomationService:
@@ -138,25 +149,29 @@ class QualityAutomationService:
         self.telemetry_sink = telemetry_sink or _QualityAutomationTelemetry()
         self.cache_manager = get_cache_manager()
 
-    def evaluate(self, db: Session, *, mission: Mission) -> List[QualityAutomationCheckResult]:
-        protocol_data = mission.context if isinstance(mission.context, dict) and "mission_id" in mission.context else {}
-        payload = MissionProtocolDraft.model_validate(protocol_data) if protocol_data else MissionProtocolDraft(
-            mission_id=mission.mission_id or "unknown",
-            title=mission.title,
-        )
+    def evaluate(
+        self, db: Session, *, mission: Mission
+    ) -> list[QualityAutomationCheckResult]:
+        payload = MissionProtocolDraft.model_validate(mission.mission_data)
         if not payload.project_id and mission.project_id:
             payload.project_id = str(mission.project_id)
 
-        documents: List[Document] = (
-            list(db.query(Document).filter(Document.project_id == mission.project_id).all())
+        documents: list[Document] = (
+            list(
+                db.query(Document)
+                .filter(Document.project_id == mission.project_id)
+                .all()
+            )
             if mission.project_id
             else []
         )
 
-        results: List[QualityAutomationCheckResult] = [
+        results: list[QualityAutomationCheckResult] = [
             self.bias_detector.evaluate(payload),
             self.traceability_validator.evaluate(payload, db),
-            self.methodology_checker.evaluate(mission=payload, db=db, documents=documents),
+            self.methodology_checker.evaluate(
+                mission=payload, db=db, documents=documents
+            ),
             self.synthesis_analyzer.evaluate(payload),
         ]
         return results
@@ -167,9 +182,11 @@ class QualityAutomationService:
         mission: Mission,
         *,
         performed_by: str = "quality_automation",
-    ) -> List[QualityCheck]:
+    ) -> list[QualityCheck]:
         results = self.evaluate(db, mission=mission)
-        records = self.repository.create_records(db, mission, results, performed_by=performed_by)
+        records = self.repository.create_records(
+            db, mission, results, performed_by=performed_by
+        )
         for record, result in zip(records, results):
             self.telemetry_sink(record, result)
         if mission.id:
@@ -190,9 +207,13 @@ class QualityAutomationRunner:
         self.session_factory = session_factory
         self.service = service or QualityAutomationService()
         self.async_enabled = async_enabled
-        self._executor: ThreadPoolExecutor | None = ThreadPoolExecutor(max_workers=1) if async_enabled else None
+        self._executor: ThreadPoolExecutor | None = (
+            ThreadPoolExecutor(max_workers=1) if async_enabled else None
+        )
 
-    def schedule(self, mission_id: UUID, *, performed_by: str = "quality_automation") -> None:
+    def schedule(
+        self, mission_id: UUID, *, performed_by: str = "quality_automation"
+    ) -> None:
         if self.async_enabled and self._executor:
             self._executor.submit(self._execute, mission_id, performed_by)
         else:
@@ -201,14 +222,18 @@ class QualityAutomationRunner:
     def _execute(self, mission_id: UUID, performed_by: str) -> None:
         session = self.session_factory()
         try:
-            mission = session.query(Mission).filter(Mission.id == mission_id).one_or_none()
+            mission = (
+                session.query(Mission).filter(Mission.id == mission_id).one_or_none()
+            )
             if not mission:
                 return
             self.service.run_for_mission(session, mission, performed_by=performed_by)
             session.commit()
         except Exception:  # pragma: no cover - defensive logging
             session.rollback()
-            logger.exception("Quality automation runner failed for mission %s", mission_id)
+            logger.exception(
+                "Quality automation runner failed for mission %s", mission_id
+            )
         finally:
             session.close()
 

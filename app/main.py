@@ -1,11 +1,11 @@
 """FastAPI application entry point."""
+
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.api.v1 import (
@@ -14,28 +14,26 @@ from app.api.v1 import (
     cache,
     collections,
     corrections,
-    decision_links,
     deepsearch,
     documents,
     facets,
     health,
-    mission_events,
     missions,
     monitoring,
     pedr_preflight,
     pedr_related,
     pedr_search,
-    qdrant_admin,
-    relationships,
     projects,
+    qdrant_admin,
     quality,
     quality_automated,
     redaction,
+    relationships,
     reports,
     retrieval,
+    saved_searches,
     search,
     search_history,
-    saved_searches,
     synthesize,
     webhooks,
 )
@@ -45,6 +43,7 @@ from app.core.qdrant_client import prewarm_qdrant
 from app.core.security import require_authenticated_user
 from app.onboarding import router as onboarding_router
 from app.services.metrics_aggregator import MetricsAggregator, get_metrics_aggregator
+
 
 class ProxyHeadersMiddleware:
     """Middleware to trust X-Forwarded-Proto header from reverse proxies.
@@ -88,7 +87,9 @@ app = FastAPI(
     version=settings.app_version,
 )
 
-templates = Jinja2Templates(directory=str(Path(__file__).resolve().parent / "templates"))
+templates = Jinja2Templates(
+    directory=str(Path(__file__).resolve().parent / "templates")
+)
 
 cors_origins = settings.cors_origins
 if not cors_origins:
@@ -153,10 +154,30 @@ app.include_router(
     tags=["cache"],
     dependencies=protected_dependencies,
 )
-app.include_router(redaction.router, prefix=f"{settings.api_v1_prefix}/redaction", tags=["redaction"], dependencies=protected_dependencies)
-app.include_router(documents.router, prefix=f"{settings.api_v1_prefix}/documents", tags=["documents"], dependencies=protected_dependencies)
-app.include_router(projects.router, prefix=f"{settings.api_v1_prefix}/projects", tags=["projects"], dependencies=protected_dependencies)
-app.include_router(search.router, prefix=settings.api_v1_prefix, tags=["search"], dependencies=protected_dependencies)
+app.include_router(
+    redaction.router,
+    prefix=f"{settings.api_v1_prefix}/redaction",
+    tags=["redaction"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    documents.router,
+    prefix=f"{settings.api_v1_prefix}/documents",
+    tags=["documents"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    projects.router,
+    prefix=f"{settings.api_v1_prefix}/projects",
+    tags=["projects"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    search.router,
+    prefix=settings.api_v1_prefix,
+    tags=["search"],
+    dependencies=protected_dependencies,
+)
 app.include_router(
     search_history.router,
     prefix=settings.api_v1_prefix,
@@ -175,11 +196,24 @@ app.include_router(
     tags=["collections"],
     dependencies=protected_dependencies,
 )
-app.include_router(facets.router, prefix=settings.api_v1_prefix, tags=["facets"], dependencies=protected_dependencies)
-app.include_router(retrieval.router, prefix=f"{settings.api_v1_prefix}/retrieval", tags=["retrieval"], dependencies=protected_dependencies)
-app.include_router(mission_events.router, prefix=f"{settings.api_v1_prefix}/missions", tags=["mission-events"])
-app.include_router(decision_links.router, prefix=settings.api_v1_prefix, tags=["decision-links"], dependencies=protected_dependencies)
-app.include_router(missions.router, prefix=f"{settings.api_v1_prefix}/missions", tags=["missions"], dependencies=protected_dependencies)
+app.include_router(
+    facets.router,
+    prefix=settings.api_v1_prefix,
+    tags=["facets"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    retrieval.router,
+    prefix=f"{settings.api_v1_prefix}/retrieval",
+    tags=["retrieval"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    missions.router,
+    prefix=f"{settings.api_v1_prefix}/missions",
+    tags=["missions"],
+    dependencies=protected_dependencies,
+)
 app.include_router(
     relationships.router,
     prefix=f"{settings.api_v1_prefix}/missions",
@@ -216,22 +250,41 @@ app.include_router(
     tags=["pedr-related"],
     dependencies=protected_dependencies,
 )
-app.include_router(quality.router, prefix=settings.api_v1_prefix, tags=["quality"], dependencies=protected_dependencies)
+app.include_router(
+    quality.router,
+    prefix=settings.api_v1_prefix,
+    tags=["quality"],
+    dependencies=protected_dependencies,
+)
 app.include_router(
     quality_automated.router,
     prefix=f"{settings.api_v1_prefix}/quality/automated",
     tags=["quality-automation"],
     dependencies=protected_dependencies,
 )
-app.include_router(monitoring.router, prefix=f"{settings.api_v1_prefix}/monitoring", tags=["monitoring"], dependencies=protected_dependencies)
-app.include_router(synthesize.router, prefix=settings.api_v1_prefix, tags=["synthesize"], dependencies=protected_dependencies)
+app.include_router(
+    monitoring.router,
+    prefix=f"{settings.api_v1_prefix}/monitoring",
+    tags=["monitoring"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    synthesize.router,
+    prefix=settings.api_v1_prefix,
+    tags=["synthesize"],
+    dependencies=protected_dependencies,
+)
 app.include_router(
     reports.router,
     prefix=f"{settings.api_v1_prefix}/reports",
     tags=["reports"],
     dependencies=protected_dependencies,
 )
-app.include_router(onboarding_router, prefix=settings.api_v1_prefix, dependencies=protected_dependencies)
+app.include_router(
+    onboarding_router,
+    prefix=settings.api_v1_prefix,
+    dependencies=protected_dependencies,
+)
 app.include_router(auth.router, prefix=f"{settings.api_v1_prefix}/auth", tags=["auth"])
 # Webhooks use signature-based auth, not JWT
 app.include_router(
@@ -247,11 +300,13 @@ async def root():
     return {
         "message": settings.app_name,
         "version": settings.app_version,
-        "status": "running"
+        "status": "running",
     }
 
 
-@app.get("/admin/dashboard", response_class=HTMLResponse, dependencies=protected_dependencies)
+@app.get(
+    "/admin/dashboard", response_class=HTMLResponse, dependencies=protected_dependencies
+)
 def admin_dashboard(
     request: Request,
     aggregator: MetricsAggregator = Depends(get_metrics_aggregator),

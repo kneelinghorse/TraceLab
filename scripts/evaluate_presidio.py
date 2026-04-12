@@ -9,19 +9,22 @@ Usage:
 import argparse
 import sys
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Evaluate Presidio on synthetic corpus")
+    parser = argparse.ArgumentParser(
+        description="Evaluate Presidio on synthetic corpus"
+    )
     parser.add_argument(
         "--corpus-dir",
         type=str,
         default="data/corpus",
-        help="Directory containing corpus files and annotations (default: data/corpus)"
+        help="Directory containing corpus files and annotations (default: data/corpus)",
     )
     parser.add_argument(
         "--output",
         type=str,
         default="cmos/reports/sprint-01/presidio_corpus_baseline.json",
-        help="Output path for evaluation report (default: cmos/reports/sprint-01/presidio_corpus_baseline.json)"
+        help="Output path for evaluation report (default: cmos/reports/sprint-01/presidio_corpus_baseline.json)",
     )
     parser.parse_args()
 

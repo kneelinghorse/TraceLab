@@ -13,13 +13,14 @@ where:
 Reference: Cormack, Clarke & Buettcher (2009) "Reciprocal Rank Fusion outperforms
 Condorcet and individual Rank Learning Methods"
 """
+
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any
 
 from app.services.pedr.score_utils import summarize_scores
-
 
 # Default constant for RRF formula
 RRF_K = 60
@@ -31,7 +32,7 @@ class RRFConfig:
 
     k: int = RRF_K
     # Layer weights for weighted RRF variant
-    layer_weights: Dict[str, float] = field(default_factory=dict)
+    layer_weights: dict[str, float] = field(default_factory=dict)
     # Minimum score threshold for inclusion
     min_score: float = 0.0
     # Whether to include layer-specific scores in output
@@ -43,10 +44,10 @@ class LayerResult:
     """Results from a single search layer."""
 
     layer_name: str
-    results: List[Dict[str, Any]]
+    results: list[dict[str, Any]]
     weight: float = 1.0
     latency_ms: float = 0.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -57,24 +58,24 @@ class FusedResult:
     rrf_score: float
     rank: int
     # Layer contributions
-    layer_ranks: Dict[str, int]  # layer_name -> rank (0 if not present)
-    layer_scores: Dict[str, float]  # layer_name -> original score
+    layer_ranks: dict[str, int]  # layer_name -> rank (0 if not present)
+    layer_scores: dict[str, float]  # layer_name -> original score
     # Original data from best-ranked layer
-    data: Dict[str, Any]
+    data: dict[str, Any]
     # Metadata
-    contributing_layers: List[str]
+    contributing_layers: list[str]
 
 
 @dataclass
 class FusionOutput:
     """Output from RRF fusion."""
 
-    results: List[FusedResult]
+    results: list[FusedResult]
     total_unique: int
-    layers_used: List[str]
+    layers_used: list[str]
     config: RRFConfig
     fusion_latency_ms: float = 0.0
-    telemetry: Dict[str, Any] = field(default_factory=dict)
+    telemetry: dict[str, Any] = field(default_factory=dict)
 
 
 class RRFFusion:
@@ -90,7 +91,7 @@ class RRFFusion:
         self,
         *,
         k: int = RRF_K,
-        layer_weights: Optional[Dict[str, float]] = None,
+        layer_weights: dict[str, float] | None = None,
         min_score: float = 0.0,
         include_layer_scores: bool = True,
     ) -> None:
@@ -114,7 +115,7 @@ class RRFFusion:
         layer_results: Sequence[LayerResult],
         *,
         id_key: str = "chunk_id",
-        limit: Optional[int] = None,
+        limit: int | None = None,
     ) -> FusionOutput:
         """Fuse results from multiple layers using RRF.
 
@@ -131,9 +132,9 @@ class RRFFusion:
         start = time.perf_counter()
 
         # Collect all unique result IDs and their layer contributions
-        result_data: Dict[str, Dict[str, Any]] = {}  # id -> best result data
-        layer_ranks: Dict[str, Dict[str, int]] = {}  # id -> {layer: rank}
-        layer_scores: Dict[str, Dict[str, float]] = {}  # id -> {layer: score}
+        result_data: dict[str, dict[str, Any]] = {}  # id -> best result data
+        layer_ranks: dict[str, dict[str, int]] = {}  # id -> {layer: rank}
+        layer_scores: dict[str, dict[str, float]] = {}  # id -> {layer: score}
 
         for layer in layer_results:
             layer_name = layer.layer_name
@@ -165,7 +166,7 @@ class RRFFusion:
                     result_data[result_id] = dict(result)
 
         # Calculate RRF scores
-        fused_results: List[Tuple[str, float, Dict[str, int], Dict[str, float]]] = []
+        fused_results: list[tuple[str, float, dict[str, int], dict[str, float]]] = []
         layers_used = [lr.layer_name for lr in layer_results]
 
         for result_id in result_data:
@@ -196,7 +197,7 @@ class RRFFusion:
             fused_results = fused_results[:limit]
 
         # Build output
-        output_results: List[FusedResult] = []
+        output_results: list[FusedResult] = []
         for rank, (result_id, rrf_score, ranks, scores) in enumerate(
             fused_results, start=1
         ):
@@ -228,11 +229,11 @@ class RRFFusion:
 
     def fuse_simple(
         self,
-        *layer_dicts: List[Dict[str, Any]],
-        layer_names: Optional[List[str]] = None,
+        *layer_dicts: list[dict[str, Any]],
+        layer_names: list[str] | None = None,
         id_key: str = "chunk_id",
-        limit: Optional[int] = None,
-    ) -> List[Dict[str, Any]]:
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
         """Simplified fusion that returns enriched result dicts directly.
 
         This is a convenience method that wraps fuse() for simpler use cases.
@@ -257,7 +258,7 @@ class RRFFusion:
         output = self.fuse(layer_results, id_key=id_key, limit=limit)
 
         # Convert to enriched dicts
-        enriched: List[Dict[str, Any]] = []
+        enriched: list[dict[str, Any]] = []
         for fused in output.results:
             entry = dict(fused.data)
             entry["rrf_score"] = fused.rrf_score
@@ -274,7 +275,7 @@ class RRFFusion:
         return enriched
 
     @staticmethod
-    def _extract_id(result: Dict[str, Any], id_key: str) -> Optional[str]:
+    def _extract_id(result: dict[str, Any], id_key: str) -> str | None:
         """Extract the unique identifier from a result.
 
         Args:
@@ -297,7 +298,7 @@ class RRFFusion:
 
 
 # Singleton instance
-_rrf_fusion: Optional[RRFFusion] = None
+_rrf_fusion: RRFFusion | None = None
 
 
 def get_rrf_fusion() -> RRFFusion:
@@ -326,9 +327,9 @@ def rrf_score(ranks: Sequence[int], *, k: int = RRF_K) -> float:
 
 
 def _build_fusion_telemetry(
-    fused_results: Sequence[Tuple[str, float, Dict[str, int], Dict[str, float]]],
+    fused_results: Sequence[tuple[str, float, dict[str, int], dict[str, float]]],
     layers_used: Sequence[str],
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     total = len(fused_results)
     if total == 0:
         return {}

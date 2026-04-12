@@ -1,7 +1,9 @@
 """Utilities for translating Pydantic validation errors into API responses."""
+
 from __future__ import annotations
 
-from typing import Any, Dict, List, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 from pydantic import ValidationError
 
@@ -11,9 +13,9 @@ def _format_field_path(path: Sequence[Any]) -> str:
     return ".".join(str(part) for part in path)
 
 
-def extract_validation_errors(error: ValidationError) -> List[Dict[str, Any]]:
+def extract_validation_errors(error: ValidationError) -> list[dict[str, Any]]:
     """Return a serialisable list of validation issues."""
-    details: List[Dict[str, Any]] = []
+    details: list[dict[str, Any]] = []
     for issue in error.errors():
         details.append(
             {
@@ -27,11 +29,8 @@ def extract_validation_errors(error: ValidationError) -> List[Dict[str, Any]]:
 
 
 def transform_validation_error(
-    error: ValidationError,
-    *,
-    summary: str | None = None,
-    next_hint: str | None = None
-) -> Dict[str, Any]:
+    error: ValidationError, *, summary: str | None = None, next_hint: str | None = None
+) -> dict[str, Any]:
     """Produce a structured API payload for validation failures."""
     return {
         "error": "validation_error",
@@ -39,4 +38,3 @@ def transform_validation_error(
         "details": extract_validation_errors(error),
         "next_hint": next_hint,
     }
-

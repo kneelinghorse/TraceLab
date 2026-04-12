@@ -3,11 +3,11 @@
 Provides business logic for mission operations aligned with the DeepSearch-compatible
 Mission model from B16.1.
 """
+
 from __future__ import annotations
 
 import math
 from datetime import datetime
-from typing import List, Optional, Tuple
 from uuid import UUID
 
 from sqlalchemy.orm import Session, joinedload
@@ -42,9 +42,9 @@ class MissionService:
         *,
         page: int = 1,
         page_size: int = DEFAULT_PAGE_SIZE,
-        status: Optional[str] = None,
-        project_id: Optional[UUID] = None,
-    ) -> Tuple[List[Mission], PaginationMeta]:
+        status: str | None = None,
+        project_id: UUID | None = None,
+    ) -> tuple[list[Mission], PaginationMeta]:
         """Return paginated missions with optional filtering.
 
         Args:
@@ -79,9 +79,7 @@ class MissionService:
 
         # Apply pagination
         items = (
-            query.offset((page - 1) * clamped_page_size)
-            .limit(clamped_page_size)
-            .all()
+            query.offset((page - 1) * clamped_page_size).limit(clamped_page_size).all()
         )
 
         total_pages = math.ceil(total / clamped_page_size) if total else 0
@@ -131,7 +129,9 @@ class MissionService:
         """
         mission = db.query(Mission).filter(Mission.mission_id == mission_id_str).first()
         if not mission:
-            raise MissionNotFoundError(f"Mission with mission_id '{mission_id_str}' not found")
+            raise MissionNotFoundError(
+                f"Mission with mission_id '{mission_id_str}' not found"
+            )
         return mission
 
     def create_mission(self, db: Session, data: MissionCreate) -> Mission:
@@ -155,7 +155,8 @@ class MissionService:
             deliverables=data.deliverables or [],
             research_phases=data.research_phases or {},
             tags=data.tags or [],
-            mission_metadata=data.metadata or {},  # Schema uses 'metadata', model uses 'mission_metadata'
+            mission_metadata=data.metadata
+            or {},  # Schema uses 'metadata', model uses 'mission_metadata'
             research_depth=data.research_depth or "baseline",
             status=data.status or "draft",
             created_by=data.created_by,
@@ -264,7 +265,7 @@ class MissionService:
         db: Session,
         mission_id: UUID,
         new_status: str,
-        error_message: Optional[str] = None,
+        error_message: str | None = None,
     ) -> Mission:
         """Transition a mission to a new status with proper timestamp handling.
 

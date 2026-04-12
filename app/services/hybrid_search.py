@@ -1,9 +1,11 @@
 """Hybrid search service combining semantic (Qdrant) and keyword (PostgreSQL) results."""
+
 from __future__ import annotations
 
 import uuid
+from collections.abc import Callable
 from datetime import date
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -12,11 +14,18 @@ from app.core.config import settings
 from app.core.database import SessionLocal
 from app.models.chunk import DocumentChunk
 from app.models.document import Document
-from app.services.faceted_search import FacetFilters, FacetedSearchService
-from app.services.pedr import QualityFilters, QualityScoringService, get_quality_scoring_service
-from app.services.pedr.syntactic import SyntacticFilters, SyntacticService, get_syntactic_service
+from app.services.faceted_search import FacetedSearchService, FacetFilters
+from app.services.pedr import (
+    QualityFilters,
+    QualityScoringService,
+    get_quality_scoring_service,
+)
+from app.services.pedr.syntactic import (
+    SyntacticFilters,
+    SyntacticService,
+    get_syntactic_service,
+)
 from app.services.retrieval_service import RetrievalService, get_retrieval_service
-
 
 SessionFactory = Callable[[], Session]
 
@@ -29,29 +38,45 @@ class HybridSearchService:
     def __init__(
         self,
         *,
-        retrieval_service: Optional[RetrievalService] = None,
+        retrieval_service: RetrievalService | None = None,
         session_factory: SessionFactory = SessionLocal,
-        semantic_weight: Optional[float] = None,
-        keyword_weight: Optional[float] = None,
-        keyword_language: Optional[str] = None,
-        keyword_limit_multiplier: Optional[int] = None,
-        faceted_service: Optional[FacetedSearchService] = None,
-        quality_service: Optional[QualityScoringService] = None,
-        syntactic_service: Optional[SyntacticService] = None,
+        semantic_weight: float | None = None,
+        keyword_weight: float | None = None,
+        keyword_language: str | None = None,
+        keyword_limit_multiplier: int | None = None,
+        faceted_service: FacetedSearchService | None = None,
+        quality_service: QualityScoringService | None = None,
+        syntactic_service: SyntacticService | None = None,
     ) -> None:
         self.retrieval_service = retrieval_service or get_retrieval_service()
         self.session_factory = session_factory
-        semantic_weight = semantic_weight if semantic_weight is not None else settings.hybrid_search_semantic_weight
-        keyword_weight = keyword_weight if keyword_weight is not None else settings.hybrid_search_keyword_weight
+        semantic_weight = (
+            semantic_weight
+            if semantic_weight is not None
+            else settings.hybrid_search_semantic_weight
+        )
+        keyword_weight = (
+            keyword_weight
+            if keyword_weight is not None
+            else settings.hybrid_search_keyword_weight
+        )
         total = semantic_weight + keyword_weight
         if total <= 0:
             raise ValueError("Hybrid search weights must be greater than zero.")
         self.semantic_weight = semantic_weight / total
         self.keyword_weight = keyword_weight / total
-        self.keyword_language = (keyword_language or settings.hybrid_search_keyword_language).lower()
-        multiplier = keyword_limit_multiplier or settings.hybrid_search_result_multiplier
-        self.keyword_limit_multiplier = multiplier if multiplier and multiplier > 0 else 1
-        self.faceted_service = faceted_service or FacetedSearchService(session_factory=session_factory)
+        self.keyword_language = (
+            keyword_language or settings.hybrid_search_keyword_language
+        ).lower()
+        multiplier = (
+            keyword_limit_multiplier or settings.hybrid_search_result_multiplier
+        )
+        self.keyword_limit_multiplier = (
+            multiplier if multiplier and multiplier > 0 else 1
+        )
+        self.faceted_service = faceted_service or FacetedSearchService(
+            session_factory=session_factory
+        )
         self.quality_service = quality_service or get_quality_scoring_service()
         self.syntactic_service = syntactic_service or get_syntactic_service()
 
@@ -61,30 +86,32 @@ class HybridSearchService:
         query: str,
         top_k: int = 5,
         search_mode: str = "semantic",
-        project_id: Optional[str] = None,
-        document_id: Optional[str] = None,
-        source_type: Optional[str] = None,
-        document_types: Optional[List[str]] = None,
-        source_types: Optional[List[str]] = None,
-        date_from: Optional[date] = None,
-        date_to: Optional[date] = None,
-        tags: Optional[List[str]] = None,
-        hnsw_ef: Optional[int] = None,
-        query_embedding: Optional[List[float]] = None,
+        project_id: str | None = None,
+        document_id: str | None = None,
+        source_type: str | None = None,
+        document_types: list[str] | None = None,
+        source_types: list[str] | None = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
+        tags: list[str] | None = None,
+        hnsw_ef: int | None = None,
+        query_embedding: list[float] | None = None,
         include_embeddings: bool = False,
-        min_quality_gates: Optional[int] = None,
-        status_filters: Optional[List[str]] = None,
-        allow_pii: Optional[bool] = None,
-        governance_mode: Optional[str] = None,
-        element_type: Optional[str] = None,
-        element_types: Optional[List[str]] = None,
+        min_quality_gates: int | None = None,
+        status_filters: list[str] | None = None,
+        allow_pii: bool | None = None,
+        governance_mode: str | None = None,
+        element_type: str | None = None,
+        element_types: list[str] | None = None,
         auto_detect_type: bool = True,
         type_boost_enabled: bool = True,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Execute the requested search mode and return ranked chunks."""
         normalized_mode = (search_mode or "semantic").strip().lower()
         if normalized_mode not in self.VALID_MODES:
-            raise ValueError(f"Unsupported search_mode '{search_mode}'. Expected one of {sorted(self.VALID_MODES)}.")
+            raise ValueError(
+                f"Unsupported search_mode '{search_mode}'. Expected one of {sorted(self.VALID_MODES)}."
+            )
 
         limit = max(1, int(top_k))
 
@@ -127,8 +154,12 @@ class HybridSearchService:
                 query_embedding=query_embedding,
                 include_embeddings=include_embeddings,
             )
-            quality_scored = self._apply_quality_scoring(semantic_only, limit=limit, quality_filters=quality_filters)
-            return self._apply_syntactic_processing(quality_scored, limit=limit, syntactic_filters=syntactic_filters)
+            quality_scored = self._apply_quality_scoring(
+                semantic_only, limit=limit, quality_filters=quality_filters
+            )
+            return self._apply_syntactic_processing(
+                quality_scored, limit=limit, syntactic_filters=syntactic_filters
+            )
 
         if normalized_mode == "keyword":
             keyword_results = self._keyword_search(
@@ -140,8 +171,12 @@ class HybridSearchService:
                 limit=limit,
             )
             finalized = self._finalize_keyword_results(keyword_results, limit=limit)
-            quality_scored = self._apply_quality_scoring(finalized, limit=limit, quality_filters=quality_filters)
-            return self._apply_syntactic_processing(quality_scored, limit=limit, syntactic_filters=syntactic_filters)
+            quality_scored = self._apply_quality_scoring(
+                finalized, limit=limit, quality_filters=quality_filters
+            )
+            return self._apply_syntactic_processing(
+                quality_scored, limit=limit, syntactic_filters=syntactic_filters
+            )
 
         semantic_results = self.retrieval_service.search(
             query=query,
@@ -167,26 +202,30 @@ class HybridSearchService:
             limit=limit * self.keyword_limit_multiplier,
         )
         merged = self._merge_results(semantic_results, keyword_results, limit=limit)
-        quality_scored = self._apply_quality_scoring(merged, limit=limit, quality_filters=quality_filters)
-        return self._apply_syntactic_processing(quality_scored, limit=limit, syntactic_filters=syntactic_filters)
+        quality_scored = self._apply_quality_scoring(
+            merged, limit=limit, quality_filters=quality_filters
+        )
+        return self._apply_syntactic_processing(
+            quality_scored, limit=limit, syntactic_filters=syntactic_filters
+        )
 
     def _semantic_only(
         self,
         *,
         query: str,
         top_k: int,
-        project_id: Optional[str],
-        document_id: Optional[str],
-        source_type: Optional[str],
-        document_types: Optional[List[str]],
-        source_types: Optional[List[str]],
-        date_from: Optional[date],
-        date_to: Optional[date],
-        tags: Optional[List[str]],
-        hnsw_ef: Optional[int],
-        query_embedding: Optional[List[float]],
+        project_id: str | None,
+        document_id: str | None,
+        source_type: str | None,
+        document_types: list[str] | None,
+        source_types: list[str] | None,
+        date_from: date | None,
+        date_to: date | None,
+        tags: list[str] | None,
+        hnsw_ef: int | None,
+        query_embedding: list[float] | None,
         include_embeddings: bool,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Delegate to the semantic retriever and annotate payloads."""
         results = self.retrieval_service.search(
             query=query,
@@ -203,7 +242,7 @@ class HybridSearchService:
             query_embedding=query_embedding,
             include_embeddings=include_embeddings,
         )
-        annotated: List[Dict[str, Any]] = []
+        annotated: list[dict[str, Any]] = []
         for result in results:
             payload = dict(result)
             payload.setdefault("semantic_score", float(payload.get("score") or 0.0))
@@ -217,13 +256,13 @@ class HybridSearchService:
         self,
         *,
         query: str,
-        project_id: Optional[str],
-        document_id: Optional[str],
-        source_type: Optional[str],
-        source_origin: Optional[str] = None,
+        project_id: str | None,
+        document_id: str | None,
+        source_type: str | None,
+        source_origin: str | None = None,
         filters: FacetFilters,
         limit: int,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Execute PostgreSQL full-text search via SQLAlchemy."""
         if not query.strip():
             return []
@@ -261,7 +300,7 @@ class HybridSearchService:
                 stmt = stmt.where(Document.source_origin == source_origin)
 
             rows = session.execute(stmt).all()
-            results: List[Dict[str, Any]] = []
+            results: list[dict[str, Any]] = []
             for row in rows:
                 mapping = row._mapping  # SQLAlchemy 1.4+/2.0 row interface
                 results.append(
@@ -269,7 +308,9 @@ class HybridSearchService:
                         "chunk_id": str(mapping["chunk_id"]),
                         "content": mapping["content"],
                         "document_id": str(mapping["document_id"]),
-                        "project_id": str(mapping["project_id"]) if mapping["project_id"] else None,
+                        "project_id": str(mapping["project_id"])
+                        if mapping["project_id"]
+                        else None,
                         "chunk_index": mapping["chunk_index"],
                         "source_type": mapping["source_type"],
                         "score": float(mapping["score"] or 0.0),
@@ -279,10 +320,14 @@ class HybridSearchService:
         finally:
             session.close()
 
-    def _finalize_keyword_results(self, results: List[Dict[str, Any]], *, limit: int) -> List[Dict[str, Any]]:
+    def _finalize_keyword_results(
+        self, results: list[dict[str, Any]], *, limit: int
+    ) -> list[dict[str, Any]]:
         """Normalize keyword-only results for consistent payloads."""
-        normalized = self._normalize_scores(results, score_key="score", target_key="keyword_score")
-        final: List[Dict[str, Any]] = []
+        normalized = self._normalize_scores(
+            results, score_key="score", target_key="keyword_score"
+        )
+        final: list[dict[str, Any]] = []
         for payload in normalized[:limit]:
             entry = dict(payload)
             entry["semantic_score"] = 0.0
@@ -293,16 +338,20 @@ class HybridSearchService:
 
     def _merge_results(
         self,
-        semantic_results: List[Dict[str, Any]],
-        keyword_results: List[Dict[str, Any]],
+        semantic_results: list[dict[str, Any]],
+        keyword_results: list[dict[str, Any]],
         *,
         limit: int,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Normalize and merge results using configured weights."""
-        semantic_norm = self._normalize_scores(semantic_results, score_key="score", target_key="semantic_score")
-        keyword_norm = self._normalize_scores(keyword_results, score_key="score", target_key="keyword_score")
+        semantic_norm = self._normalize_scores(
+            semantic_results, score_key="score", target_key="semantic_score"
+        )
+        keyword_norm = self._normalize_scores(
+            keyword_results, score_key="score", target_key="keyword_score"
+        )
 
-        combined: Dict[str, Dict[str, Any]] = {}
+        combined: dict[str, dict[str, Any]] = {}
         for result in semantic_norm:
             chunk_id = result.get("chunk_id")
             if not chunk_id:
@@ -325,7 +374,9 @@ class HybridSearchService:
                 entry["keyword_score"] = normalized_keyword
                 entry["combined_score"] += normalized_keyword * self.keyword_weight
                 entry["score"] = entry["combined_score"]
-                entry["search_mode"] = "hybrid" if entry.get("semantic_score", 0.0) else "keyword"
+                entry["search_mode"] = (
+                    "hybrid" if entry.get("semantic_score", 0.0) else "keyword"
+                )
                 continue
             entry = dict(result)
             entry["semantic_score"] = 0.0
@@ -343,11 +394,11 @@ class HybridSearchService:
 
     def _apply_quality_scoring(
         self,
-        results: List[Dict[str, Any]],
+        results: list[dict[str, Any]],
         *,
         limit: int,
         quality_filters: QualityFilters,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Annotate and re-rank results with PEDR quality metadata."""
         if not results or self.quality_service is None:
             return results[:limit]
@@ -361,11 +412,11 @@ class HybridSearchService:
 
     def _apply_syntactic_processing(
         self,
-        results: List[Dict[str, Any]],
+        results: list[dict[str, Any]],
         *,
         limit: int,
         syntactic_filters: SyntacticFilters,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Apply PEDR syntactic layer: type detection, filtering, and boosting."""
         if not results or self.syntactic_service is None:
             return results[:limit]
@@ -387,11 +438,11 @@ class HybridSearchService:
 
     @staticmethod
     def _normalize_scores(
-        results: List[Dict[str, Any]],
+        results: list[dict[str, Any]],
         *,
         score_key: str,
         target_key: str,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Apply min-max normalization to the provided score field."""
         if not results:
             return []
@@ -401,7 +452,7 @@ class HybridSearchService:
         maximum = max(scores)
         span = maximum - minimum
 
-        normalized: List[Dict[str, Any]] = []
+        normalized: list[dict[str, Any]] = []
         for result, score in zip(results, scores):
             payload = dict(result)
             if span <= 0:
@@ -412,7 +463,7 @@ class HybridSearchService:
         return normalized
 
     @staticmethod
-    def _coerce_uuid(value: Optional[str]) -> Optional[uuid.UUID]:
+    def _coerce_uuid(value: str | None) -> uuid.UUID | None:
         if value in (None, "", "*"):
             return None
         if isinstance(value, uuid.UUID):
@@ -420,7 +471,7 @@ class HybridSearchService:
         return uuid.UUID(str(value))
 
 
-_hybrid_search_service: Optional[HybridSearchService] = None
+_hybrid_search_service: HybridSearchService | None = None
 
 
 def get_hybrid_search_service() -> HybridSearchService:

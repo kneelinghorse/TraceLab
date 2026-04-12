@@ -1,9 +1,8 @@
 """Tests for DeepSearchClient with mocked responses."""
+
 from __future__ import annotations
 
-import asyncio
-from datetime import datetime, timezone
-from typing import Any, Dict
+from typing import Any
 from unittest.mock import patch
 
 import httpx
@@ -14,14 +13,12 @@ from app.schemas.deepsearch import DeepSearchJobStatus
 from app.services.deepsearch_client import (
     DeepSearchAPIError,
     DeepSearchClient,
-    DeepSearchClientError,
     DeepSearchConfigurationError,
     DeepSearchConnectionError,
     DeepSearchTimeoutError,
     execute_mission,
     get_job_status,
 )
-
 
 # =============================================================================
 # Fixtures
@@ -48,7 +45,7 @@ def client(mock_settings) -> DeepSearchClient:
 
 
 @pytest.fixture
-def execute_response_data() -> Dict[str, Any]:
+def execute_response_data() -> dict[str, Any]:
     """Sample execute response from DeepSearch."""
     return {
         "job_id": "job-abc-123",
@@ -60,7 +57,7 @@ def execute_response_data() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def status_response_pending() -> Dict[str, Any]:
+def status_response_pending() -> dict[str, Any]:
     """Sample pending status response."""
     return {
         "job_id": "job-abc-123",
@@ -77,7 +74,7 @@ def status_response_pending() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def status_response_running() -> Dict[str, Any]:
+def status_response_running() -> dict[str, Any]:
     """Sample running status response."""
     return {
         "job_id": "job-abc-123",
@@ -94,7 +91,7 @@ def status_response_running() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def status_response_completed() -> Dict[str, Any]:
+def status_response_completed() -> dict[str, Any]:
     """Sample completed status response."""
     return {
         "job_id": "job-abc-123",
@@ -111,7 +108,7 @@ def status_response_completed() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def status_response_failed() -> Dict[str, Any]:
+def status_response_failed() -> dict[str, Any]:
     """Sample failed status response."""
     return {
         "job_id": "job-abc-123",
@@ -614,7 +611,11 @@ class TestClientStats:
 
     @pytest.mark.asyncio
     async def test_stats_tracking(
-        self, client, httpx_mock: HTTPXMock, execute_response_data, status_response_completed
+        self,
+        client,
+        httpx_mock: HTTPXMock,
+        execute_response_data,
+        status_response_completed,
     ):
         """Stats correctly track all operations."""
         # Setup responses
@@ -738,6 +739,7 @@ class TestDeepSearchEventEmission:
     @pytest.fixture(autouse=True)
     def _reset_event_bus(self):
         import app.core.mission_events as mod
+
         mod._event_bus = None
         yield
         mod._event_bus = None
@@ -771,9 +773,7 @@ class TestDeepSearchEventEmission:
         assert events[0].status == "in_progress"
 
     @pytest.mark.asyncio
-    async def test_execute_emits_failed_on_error(
-        self, client, httpx_mock: HTTPXMock
-    ):
+    async def test_execute_emits_failed_on_error(self, client, httpx_mock: HTTPXMock):
         """Failed execute_mission emits failed status change."""
         from app.core.mission_events import MissionEventType, get_mission_event_bus
 

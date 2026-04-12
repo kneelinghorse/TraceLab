@@ -53,10 +53,10 @@ class ResearchExportCliTest(unittest.TestCase):
                 "description": "Research export workflow demo",
                 "successCriteria": ["Workflow documented"],
                 "deliverables": ["Sample research report"],
-                "researchQuestions": ["How do we archive research outputs?"]
+                "researchQuestions": ["How do we archive research outputs?"],
             },
             "started_at": "2025-11-01T00:00:00Z",
-            "completed_at": "2025-11-01T01:00:00Z"
+            "completed_at": "2025-11-01T01:00:00Z",
         }
         events = [
             {
@@ -81,7 +81,9 @@ class ResearchExportCliTest(unittest.TestCase):
 
         conn = sqlite3.connect(self.db_path)
         try:
-            conn.execute("DELETE FROM session_events WHERE mission = ?", (self.mission_id,))
+            conn.execute(
+                "DELETE FROM session_events WHERE mission = ?", (self.mission_id,)
+            )
             conn.execute("DELETE FROM missions WHERE id = ?", (self.mission_id,))
             conn.execute(
                 """

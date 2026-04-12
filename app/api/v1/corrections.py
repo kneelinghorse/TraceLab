@@ -1,10 +1,10 @@
 """Corrections status and trigger endpoints for DeepSearch integration."""
+
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
-from uuid import UUID
+from typing import Any
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -79,11 +79,11 @@ def trigger_corrections(
 
 @router.get(
     "/corrections/telemetry",
-    response_model=Dict[str, Any],
+    response_model=dict[str, Any],
     summary="Get correction telemetry summary",
     description="Returns Grafana-ready telemetry summary for dashboards.",
 )
-def get_correction_telemetry() -> Dict[str, Any]:
+def get_correction_telemetry() -> dict[str, Any]:
     """Get Grafana-ready telemetry summary.
 
     Returns aggregated metrics suitable for dashboard visualization:
@@ -97,7 +97,7 @@ def get_correction_telemetry() -> Dict[str, Any]:
 
 @router.post(
     "/corrections/process",
-    response_model=Dict[str, Any],
+    response_model=dict[str, Any],
     summary="Process pending corrections",
     description="Manually trigger processing of pending corrections ready for retry.",
 )
@@ -109,7 +109,7 @@ async def process_corrections(
         description="Maximum number of items to process",
     ),
     db: Session = Depends(get_db),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Manually trigger processing of pending corrections.
 
     This is typically done automatically by background tasks, but can be
@@ -131,11 +131,11 @@ async def process_corrections(
 
 @router.delete(
     "/corrections/completed",
-    response_model=Dict[str, Any],
+    response_model=dict[str, Any],
     summary="Clear completed corrections",
     description="Remove completed and skipped items from the queue.",
 )
-def clear_completed_corrections() -> Dict[str, Any]:
+def clear_completed_corrections() -> dict[str, Any]:
     """Clear completed and skipped items from the correction queue.
 
     This is a housekeeping operation to keep the queue manageable.
@@ -152,7 +152,7 @@ def clear_completed_corrections() -> Dict[str, Any]:
 
 @router.get(
     "/corrections/dead-letter",
-    response_model=Dict[str, Any],
+    response_model=dict[str, Any],
     summary="Get webhook dead letter queue",
     description="Returns failed webhook deliveries for inspection.",
 )
@@ -163,7 +163,7 @@ def get_dead_letter_queue(
         le=200,
         description="Maximum number of items to return",
     ),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Get failed webhook deliveries from the dead letter queue.
 
     These are webhooks that failed to deliver after all retry attempts.
@@ -179,11 +179,11 @@ def get_dead_letter_queue(
 
 @router.delete(
     "/corrections/dead-letter",
-    response_model=Dict[str, Any],
+    response_model=dict[str, Any],
     summary="Clear dead letter queue",
     description="Remove all items from the webhook dead letter queue.",
 )
-def clear_dead_letter_queue() -> Dict[str, Any]:
+def clear_dead_letter_queue() -> dict[str, Any]:
     """Clear the webhook dead letter queue."""
     queue = get_correction_queue()
     cleared = queue._webhook_client.clear_dead_letter_queue()

@@ -1,4 +1,5 @@
 """Integration tests for automated quality gate enforcement."""
+
 from __future__ import annotations
 
 from uuid import uuid4
@@ -8,7 +9,10 @@ import pytest
 from app.models.mission_protocol import MissionProtocolDraft
 from app.schemas.mission import MissionUpdate
 from app.services.evidence_linking import EvidenceLinkingService
-from app.services.mission_protocol_service import MissionProtocolService, MissionProtocolServiceError
+from app.services.mission_protocol_service import (
+    MissionProtocolService,
+    MissionProtocolServiceError,
+)
 from app.services.quality_gate_service import QualityGateService
 
 
@@ -31,7 +35,11 @@ def _payload(with_chunk: bool) -> MissionProtocolDraft:
                 "scope": "API",
             },
             "key_questions": [
-                {"question": "Are gates blocking?", "status": "answered", "answer": "Yes"},
+                {
+                    "question": "Are gates blocking?",
+                    "status": "answered",
+                    "answer": "Yes",
+                },
             ],
             "synthesis": {
                 "key_insights": [

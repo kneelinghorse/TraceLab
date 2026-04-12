@@ -1,8 +1,9 @@
 """Saved search CRUD and execution endpoints."""
+
 from __future__ import annotations
 
 from datetime import date
-from typing import Any, Optional
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
@@ -34,10 +35,16 @@ def list_saved_searches(
     """Return saved searches owned by the authenticated user."""
     entries = service.list_for_owner(current_user.username)
     payload = [SavedSearchResponse.model_validate(entry) for entry in entries]
-    return SavedSearchListResponse(items=payload, limit_per_user=service.max_saved_per_user)
+    return SavedSearchListResponse(
+        items=payload, limit_per_user=service.max_saved_per_user
+    )
 
 
-@router.post("/saved-searches", response_model=SavedSearchResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/saved-searches",
+    response_model=SavedSearchResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 def create_saved_search(
     request: SavedSearchCreateRequest,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
@@ -55,7 +62,9 @@ def create_saved_search(
             top_k=request.top_k,
         )
     except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
+        ) from exc
     return SavedSearchResponse.model_validate(entry)
 
 
@@ -74,14 +83,20 @@ def update_saved_search(
             updates=request.model_dump(exclude_unset=True),
         )
     except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
+        ) from exc
 
     if entry is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Saved search not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Saved search not found."
+        )
     return SavedSearchResponse.model_validate(entry)
 
 
-@router.delete("/saved-searches/{saved_search_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/saved-searches/{saved_search_id}", status_code=status.HTTP_204_NO_CONTENT
+)
 def delete_saved_search(
     saved_search_id: UUID,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
@@ -90,11 +105,16 @@ def delete_saved_search(
     """Delete a saved search record."""
     deleted = service.delete(saved_search_id, owner=current_user.username)
     if not deleted:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Saved search not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Saved search not found."
+        )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.post("/saved-searches/{saved_search_id}/execute", response_model=SavedSearchExecuteResponse)
+@router.post(
+    "/saved-searches/{saved_search_id}/execute",
+    response_model=SavedSearchExecuteResponse,
+)
 def execute_saved_search(
     saved_search_id: UUID,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
@@ -104,7 +124,9 @@ def execute_saved_search(
     """Run a saved search and return fresh semantic + RAG payloads."""
     entry = service.get(saved_search_id, owner=current_user.username)
     if entry is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Saved search not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Saved search not found."
+        )
 
     filters = dict(entry.filters or {})
     rag_response = _run_rag_pipeline(entry, filters)
@@ -137,7 +159,9 @@ def _run_rag_pipeline(entry: SavedSearch, filters: dict[str, Any]) -> RagRespons
     return RagResponse.model_validate(rag_result)
 
 
-def _run_semantic_pipeline(entry: SavedSearch, filters: dict[str, Any]) -> RetrievalResponse:
+def _run_semantic_pipeline(
+    entry: SavedSearch, filters: dict[str, Any]
+) -> RetrievalResponse:
     retrieval_service = get_retrieval_service()
     semantic_results = retrieval_service.search(
         query=entry.query_text,
@@ -151,7 +175,9 @@ def _run_semantic_pipeline(entry: SavedSearch, filters: dict[str, Any]) -> Retri
         date_to=_parse_date(filters.get("date_to")),
         tags=_normalize_sequence(filters.get("tags")) or None,
     )
-    return RetrievalResponse(results=[RetrievedChunk.model_validate(item) for item in semantic_results])
+    return RetrievalResponse(
+        results=[RetrievedChunk.model_validate(item) for item in semantic_results]
+    )
 
 
 def _record_execution(
@@ -171,21 +197,23 @@ def _record_execution(
             duration_ms=rag_response.latency_ms,
             cache_hit=rag_response.cache.hit,
             executed_by=user.username,
-            top_chunks=[chunk.chunk_id for chunk in rag_response.sources[:5] if chunk.chunk_id],
+            top_chunks=[
+                chunk.chunk_id for chunk in rag_response.sources[:5] if chunk.chunk_id
+            ],
             metadata={"saved_search_id": str(entry.id)},
         )
     except Exception:  # pragma: no cover - defensive logging handled by service
         pass
 
 
-def _normalize_string(value: Optional[Any]) -> Optional[str]:
+def _normalize_string(value: Any | None) -> str | None:
     if value is None:
         return None
     text = str(value).strip()
     return text or None
 
 
-def _normalize_sequence(value: Optional[Any]) -> list[str]:
+def _normalize_sequence(value: Any | None) -> list[str]:
     if value is None:
         return []
     if isinstance(value, (list, tuple)):
@@ -194,7 +222,7 @@ def _normalize_sequence(value: Optional[Any]) -> list[str]:
     return [text] if text else []
 
 
-def _parse_date(value: Optional[Any]) -> Optional[date]:
+def _parse_date(value: Any | None) -> date | None:
     if not value:
         return None
     if isinstance(value, date):

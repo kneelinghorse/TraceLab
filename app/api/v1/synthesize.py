@@ -1,9 +1,9 @@
 """Synthesize endpoint for LLM-powered summaries with citations."""
+
 from __future__ import annotations
 
 import hashlib
 import logging
-from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -18,7 +18,10 @@ from app.schemas.synthesis import (
     SynthesizeResponse,
 )
 from app.services.synthesis import SynthesisService, get_synthesis_service
-from app.services.synthesis_cache import SynthesisCacheService, get_synthesis_cache_service
+from app.services.synthesis_cache import (
+    SynthesisCacheService,
+    get_synthesis_cache_service,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -29,12 +32,12 @@ def _create_report_from_synthesis(
     title: str,
     content: str,
     output_format: str,
-    prompt: Optional[str],
+    prompt: str | None,
     tokens_used: int,
     chunk_count: int,
-    collection_id: Optional[UUID],
-    chunk_ids: Optional[list[UUID]],
-    project_id: Optional[UUID],
+    collection_id: UUID | None,
+    chunk_ids: list[UUID] | None,
+    project_id: UUID | None,
 ) -> UUID:
     """Create a Report record from synthesis results.
 
@@ -156,7 +159,7 @@ def synthesize(
     ]
 
     # Optionally save as report
-    report_id: Optional[UUID] = None
+    report_id: UUID | None = None
     if request.save_as_report and request.report_title:
         try:
             report_id = _create_report_from_synthesis(

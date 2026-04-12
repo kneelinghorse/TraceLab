@@ -1,11 +1,12 @@
 """Tests for faceted search filtering and facet aggregation."""
+
 from __future__ import annotations
 
 from datetime import date
 
 from app.models.document import Document
 from app.models.tag import DocumentTag, Tag
-from app.services.faceted_search import FacetFilters, FacetedSearchService
+from app.services.faceted_search import FacetedSearchService, FacetFilters
 
 
 def _seed_documents(db_session, project):

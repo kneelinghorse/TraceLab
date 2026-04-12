@@ -1,12 +1,13 @@
 """Schemas for correction loop endpoints and webhook payloads."""
+
 from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, Field, conint, confloat
+from pydantic import BaseModel, Field, confloat, conint
 
 
 class CorrectionStatus(str, Enum):
@@ -49,23 +50,33 @@ class CorrectionItem(BaseModel):
     mission_uuid: UUID = Field(..., description="Parent mission UUID")
     evidence_id: str = Field(..., description="Original evidence ID from payload")
     status: CorrectionStatus = Field(default=CorrectionStatus.PENDING)
-    error_type: CorrectionErrorType = Field(..., description="Classification of the failure")
-    retry_count: conint(ge=0) = Field(default=0, description="Number of retry attempts made")
-    max_retries: conint(ge=0) = Field(default=2, description="Maximum retry attempts allowed")
-    last_error: Optional[str] = Field(default=None, description="Most recent error message")
-    best_similarity: Optional[confloat(ge=0.0, le=1.0)] = Field(
+    error_type: CorrectionErrorType = Field(
+        ..., description="Classification of the failure"
+    )
+    retry_count: conint(ge=0) = Field(
+        default=0, description="Number of retry attempts made"
+    )
+    max_retries: conint(ge=0) = Field(
+        default=2, description="Maximum retry attempts allowed"
+    )
+    last_error: str | None = Field(
+        default=None, description="Most recent error message"
+    )
+    best_similarity: confloat(ge=0.0, le=1.0) | None = Field(
         default=None, description="Best similarity score achieved"
     )
     similarity_threshold: confloat(ge=0.0, le=1.0) = Field(
         default=0.7, description="Threshold required for linking"
     )
-    chunk_id: Optional[str] = Field(default=None, description="Linked chunk ID if successful")
+    chunk_id: str | None = Field(
+        default=None, description="Linked chunk ID if successful"
+    )
     created_at: datetime = Field(..., description="When correction was queued")
     updated_at: datetime = Field(..., description="Last update timestamp")
-    next_retry_at: Optional[datetime] = Field(
+    next_retry_at: datetime | None = Field(
         default=None, description="Scheduled time for next retry"
     )
-    callback_url: Optional[str] = Field(
+    callback_url: str | None = Field(
         default=None, description="DeepSearch webhook URL for notifications"
     )
 
@@ -74,8 +85,12 @@ class CorrectionQueueStats(BaseModel):
     """Aggregated correction queue statistics."""
 
     pending: conint(ge=0) = Field(default=0, description="Items waiting for retry")
-    in_progress: conint(ge=0) = Field(default=0, description="Items currently processing")
-    completed: conint(ge=0) = Field(default=0, description="Successfully corrected items")
+    in_progress: conint(ge=0) = Field(
+        default=0, description="Items currently processing"
+    )
+    completed: conint(ge=0) = Field(
+        default=0, description="Successfully corrected items"
+    )
     failed: conint(ge=0) = Field(default=0, description="Items that exhausted retries")
     skipped: conint(ge=0) = Field(default=0, description="Non-retryable items")
     total: conint(ge=0) = Field(default=0, description="Total items in queue")
@@ -93,10 +108,10 @@ class CorrectionStatusResponse(BaseModel):
     """Response for GET /api/v1/deepsearch/corrections."""
 
     stats: CorrectionQueueStats = Field(..., description="Queue statistics")
-    error_distribution: Dict[str, int] = Field(
+    error_distribution: dict[str, int] = Field(
         default_factory=dict, description="Count by error type"
     )
-    recent_items: List[CorrectionItem] = Field(
+    recent_items: list[CorrectionItem] = Field(
         default_factory=list, description="Most recent correction items"
     )
     last_updated: datetime = Field(..., description="When stats were computed")
@@ -105,16 +120,16 @@ class CorrectionStatusResponse(BaseModel):
 class CorrectionTriggerRequest(BaseModel):
     """Request to trigger corrections for a mission."""
 
-    mission_uuid: Optional[UUID] = Field(
+    mission_uuid: UUID | None = Field(
         default=None, description="Specific mission to retry (None = all pending)"
     )
-    evidence_ids: Optional[List[str]] = Field(
+    evidence_ids: list[str] | None = Field(
         default=None, description="Specific evidence IDs to retry"
     )
     force_retry: bool = Field(
         default=False, description="Retry even if max attempts exceeded"
     )
-    callback_url: Optional[str] = Field(
+    callback_url: str | None = Field(
         default=None, description="Override webhook URL for notifications"
     )
 
@@ -122,9 +137,13 @@ class CorrectionTriggerRequest(BaseModel):
 class CorrectionTriggerResponse(BaseModel):
     """Response for POST /api/v1/deepsearch/corrections."""
 
-    triggered: conint(ge=0) = Field(default=0, description="Number of items queued for retry")
-    skipped: conint(ge=0) = Field(default=0, description="Items skipped (max retries, etc.)")
-    correction_ids: List[UUID] = Field(
+    triggered: conint(ge=0) = Field(
+        default=0, description="Number of items queued for retry"
+    )
+    skipped: conint(ge=0) = Field(
+        default=0, description="Items skipped (max retries, etc.)"
+    )
+    correction_ids: list[UUID] = Field(
         default_factory=list, description="IDs of triggered corrections"
     )
     message: str = Field(..., description="Summary message")
@@ -147,12 +166,18 @@ class WebhookPayload(BaseModel):
     evidence_id: str = Field(..., description="Evidence item identifier")
     timestamp: datetime = Field(..., description="When notification was generated")
     success: bool = Field(..., description="Whether correction succeeded")
-    chunk_id: Optional[str] = Field(default=None, description="Linked chunk if successful")
-    similarity: Optional[float] = Field(default=None, description="Final similarity score")
-    error_type: Optional[str] = Field(default=None, description="Error type if failed")
-    error_message: Optional[str] = Field(default=None, description="Error details if failed")
-    retry_count: conint(ge=0) = Field(default=0, description="Total retry attempts made")
-    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional context")
+    chunk_id: str | None = Field(default=None, description="Linked chunk if successful")
+    similarity: float | None = Field(default=None, description="Final similarity score")
+    error_type: str | None = Field(default=None, description="Error type if failed")
+    error_message: str | None = Field(
+        default=None, description="Error details if failed"
+    )
+    retry_count: conint(ge=0) = Field(
+        default=0, description="Total retry attempts made"
+    )
+    metadata: dict[str, Any] = Field(
+        default_factory=dict, description="Additional context"
+    )
 
 
 class BatchWebhookPayload(BaseModel):
@@ -167,8 +192,10 @@ class BatchWebhookPayload(BaseModel):
     total_items: conint(ge=0) = Field(..., description="Total evidence items processed")
     successful: conint(ge=0) = Field(..., description="Successfully linked items")
     failed: conint(ge=0) = Field(..., description="Failed items after retries")
-    success_rate: confloat(ge=0.0, le=1.0) = Field(..., description="Overall success rate")
-    items: List[Dict[str, Any]] = Field(
+    success_rate: confloat(ge=0.0, le=1.0) = Field(
+        ..., description="Overall success rate"
+    )
+    items: list[dict[str, Any]] = Field(
         default_factory=list, description="Individual item summaries"
     )
 
@@ -177,12 +204,16 @@ class TelemetryRecord(BaseModel):
     """Grafana-ready telemetry record for dashboards."""
 
     ts: datetime = Field(..., description="Timestamp (ISO 8601)")
-    event: str = Field(..., description="Event type (correction_attempt, correction_success, etc.)")
+    event: str = Field(
+        ..., description="Event type (correction_attempt, correction_success, etc.)"
+    )
     mission_id: str = Field(..., description="Mission identifier")
-    evidence_id: Optional[str] = Field(default=None, description="Evidence identifier")
-    error_type: Optional[str] = Field(default=None, description="Error classification")
+    evidence_id: str | None = Field(default=None, description="Evidence identifier")
+    error_type: str | None = Field(default=None, description="Error classification")
     retry_count: conint(ge=0) = Field(default=0, description="Retry attempt number")
-    similarity: Optional[float] = Field(default=None, description="Similarity score")
+    similarity: float | None = Field(default=None, description="Similarity score")
     success: bool = Field(default=False, description="Whether operation succeeded")
-    duration_ms: Optional[int] = Field(default=None, description="Processing duration")
-    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional fields")
+    duration_ms: int | None = Field(default=None, description="Processing duration")
+    metadata: dict[str, Any] = Field(
+        default_factory=dict, description="Additional fields"
+    )

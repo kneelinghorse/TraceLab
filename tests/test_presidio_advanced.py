@@ -1,4 +1,5 @@
 """Advanced accuracy tests for the Presidio evaluator."""
+
 from __future__ import annotations
 
 from types import SimpleNamespace
@@ -40,10 +41,7 @@ def _build_evaluator(monkeypatch, responses, samples) -> PresidioEvaluator:
 def test_priority_evaluation_reports_precision_and_recall(monkeypatch):
     """Precision/recall metrics should reflect true/false positives and negatives."""
     sample_one_text = "Reach PID-2024-1111 at +1 (415) 555-0100 for PROJ-UX."  # noqa: S105 - synthetic data
-    sample_two_text = (
-        "Participant PARTICIPANT-ALPHA-2222 left a voicemail at 303-777-2222 "
-        "while referencing PID-CONTROL-0000."
-    )
+    sample_two_text = "Participant PARTICIPANT-ALPHA-2222 left a voicemail at 303-777-2222 while referencing PID-CONTROL-0000."
 
     samples = [
         SimpleNamespace(

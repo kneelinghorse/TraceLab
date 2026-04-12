@@ -8,6 +8,7 @@ Validates:
 5. Consistent error response shapes across auth endpoints
 6. API key lookup uses key_prefix index (not O(n) bcrypt)
 """
+
 from __future__ import annotations
 
 import logging
@@ -105,6 +106,7 @@ class TestRateLimiterUnit:
 
         # Same IP behind proxy should be blocked
         from fastapi import HTTPException
+
         with pytest.raises(HTTPException):
             limiter.check(mock_request)
 

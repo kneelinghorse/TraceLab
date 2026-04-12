@@ -1,8 +1,8 @@
 """Tests for the missions CRUD API endpoints (B16.2)."""
+
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
 
 import pytest
 from fastapi.testclient import TestClient
@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.models.mission import Mission
 from app.models.project import Project
-from app.schemas.mission import MissionCreate, MissionUpdate, MissionResponse
+from app.schemas.mission import MissionCreate, MissionUpdate
 
 
 def _create_test_project(db_session) -> Project:
@@ -321,9 +321,18 @@ class TestMissionList:
         client = TestClient(app)
 
         project = _create_test_project(db_session)
-        _create_test_mission(db_session, mission_id="COMBO-001", status="draft", project_id=project.id)
-        _create_test_mission(db_session, mission_id="COMBO-002", status="in_progress", project_id=project.id)
-        _create_test_mission(db_session, mission_id="COMBO-003", status="draft", project_id=None)
+        _create_test_mission(
+            db_session, mission_id="COMBO-001", status="draft", project_id=project.id
+        )
+        _create_test_mission(
+            db_session,
+            mission_id="COMBO-002",
+            status="in_progress",
+            project_id=project.id,
+        )
+        _create_test_mission(
+            db_session, mission_id="COMBO-003", status="draft", project_id=None
+        )
 
         response = client.get(
             f"/api/v1/missions?status=draft&project_id={project.id}",
@@ -471,7 +480,9 @@ class TestMissionUpdate:
         """Update mission status."""
         client = TestClient(app)
 
-        mission = _create_test_mission(db_session, mission_id="STATUS-001", status="draft")
+        mission = _create_test_mission(
+            db_session, mission_id="STATUS-001", status="draft"
+        )
 
         response = client.put(
             f"/api/v1/missions/{mission.id}",
@@ -488,7 +499,9 @@ class TestMissionUpdate:
         """Update mission to completed status."""
         client = TestClient(app)
 
-        mission = _create_test_mission(db_session, mission_id="COMPLETE-001", status="in_progress")
+        mission = _create_test_mission(
+            db_session, mission_id="COMPLETE-001", status="in_progress"
+        )
 
         response = client.put(
             f"/api/v1/missions/{mission.id}",
@@ -664,7 +677,9 @@ class TestMissionStatusTransitions:
         """Transitioning from draft to queued sets queued_at."""
         client = TestClient(app)
 
-        mission = _create_test_mission(db_session, mission_id="TRANS-001", status="draft")
+        mission = _create_test_mission(
+            db_session, mission_id="TRANS-001", status="draft"
+        )
         assert mission.queued_at is None
 
         response = client.put(
@@ -681,7 +696,9 @@ class TestMissionStatusTransitions:
         """Transitioning from queued to in_progress sets started_at."""
         client = TestClient(app)
 
-        mission = _create_test_mission(db_session, mission_id="TRANS-002", status="queued")
+        mission = _create_test_mission(
+            db_session, mission_id="TRANS-002", status="queued"
+        )
 
         response = client.put(
             f"/api/v1/missions/{mission.id}",
@@ -697,7 +714,9 @@ class TestMissionStatusTransitions:
         """Transitioning from in_progress to completed sets completed_at."""
         client = TestClient(app)
 
-        mission = _create_test_mission(db_session, mission_id="TRANS-003", status="in_progress")
+        mission = _create_test_mission(
+            db_session, mission_id="TRANS-003", status="in_progress"
+        )
 
         response = client.put(
             f"/api/v1/missions/{mission.id}",
@@ -712,7 +731,14 @@ class TestMissionStatusTransitions:
     def test_all_valid_statuses(self, auth_headers, db_session):
         """Test all valid status values."""
         client = TestClient(app)
-        valid_statuses = ["draft", "queued", "in_progress", "completed", "blocked", "cancelled"]
+        valid_statuses = [
+            "draft",
+            "queued",
+            "in_progress",
+            "completed",
+            "blocked",
+            "cancelled",
+        ]
 
         for i, status in enumerate(valid_statuses):
             response = client.post(
@@ -759,7 +785,10 @@ class TestMissionSubmit:
         client = TestClient(app)
         project = _create_test_project(db_session)
         mission = _create_test_mission(
-            db_session, mission_id="SUBMIT-HUMAN-001", status="draft", project_id=project.id
+            db_session,
+            mission_id="SUBMIT-HUMAN-001",
+            status="draft",
+            project_id=project.id,
         )
 
         response = client.post(
@@ -825,7 +854,10 @@ class TestMissionSubmit:
         client = TestClient(app)
         project = _create_test_project(db_session)
         mission = _create_test_mission(
-            db_session, mission_id="SUBMIT-003", status="in_progress", project_id=project.id
+            db_session,
+            mission_id="SUBMIT-003",
+            status="in_progress",
+            project_id=project.id,
         )
 
         response = client.post(
@@ -842,7 +874,10 @@ class TestMissionSubmit:
         client = TestClient(app)
         project = _create_test_project(db_session)
         mission = _create_test_mission(
-            db_session, mission_id="SUBMIT-004", status="completed", project_id=project.id
+            db_session,
+            mission_id="SUBMIT-004",
+            status="completed",
+            project_id=project.id,
         )
 
         response = client.post(
@@ -899,7 +934,9 @@ class TestCreateAndSubmitMission:
         assert data["mission_id"] == "CREATE-SUBMIT-001"
         assert "created and" in data["message"].lower()
 
-    def test_create_and_submit_without_project_returns_actionable_error(self, auth_headers):
+    def test_create_and_submit_without_project_returns_actionable_error(
+        self, auth_headers
+    ):
         client = TestClient(app)
 
         response = client.post(

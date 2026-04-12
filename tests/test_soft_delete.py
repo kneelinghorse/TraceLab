@@ -1,19 +1,17 @@
 """Tests for soft delete functionality on projects and documents."""
+
 from __future__ import annotations
 
-import pytest
-from datetime import datetime
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.models.project import Project
 from app.models.document import Document
-from app.services.project_query_service import ProjectQueryService
+from app.models.project import Project
 from app.services.document_query_service import DocumentQueryService
+from app.services.project_query_service import ProjectQueryService
 from app.services.soft_delete_service import DocumentSoftDeleteService
-
 
 client = TestClient(app)
 
@@ -27,8 +25,8 @@ class TestSoftDeleteMixin:
         db_session.add(project)
         db_session.commit()
 
-        assert hasattr(project, 'deleted_at')
-        assert hasattr(project, 'deleted_by')
+        assert hasattr(project, "deleted_at")
+        assert hasattr(project, "deleted_by")
         assert project.deleted_at is None
         assert project.deleted_by is None
 
@@ -38,8 +36,8 @@ class TestSoftDeleteMixin:
         db_session.add(doc)
         db_session.commit()
 
-        assert hasattr(doc, 'deleted_at')
-        assert hasattr(doc, 'deleted_by')
+        assert hasattr(doc, "deleted_at")
+        assert hasattr(doc, "deleted_by")
         assert doc.deleted_at is None
         assert doc.deleted_by is None
 
@@ -334,7 +332,9 @@ class TestDocumentSoftDelete:
         result = service.soft_delete_document(db_session, uuid4())
         assert result is None
 
-    def test_soft_delete_document_returns_false_if_already_deleted(self, db_session, project):
+    def test_soft_delete_document_returns_false_if_already_deleted(
+        self, db_session, project
+    ):
         """soft_delete_document should return False if already deleted."""
         service = DocumentSoftDeleteService()
 
@@ -421,8 +421,7 @@ class TestAPIEndpointsWithSoftDelete:
         project_id = str(project.id)
 
         response = client.delete(
-            f"/api/v1/projects/{project_id}?confirm=true",
-            headers=auth_headers
+            f"/api/v1/projects/{project_id}?confirm=true", headers=auth_headers
         )
 
         assert response.status_code == 200
@@ -442,10 +441,7 @@ class TestAPIEndpointsWithSoftDelete:
         db_session.commit()
         project_id = str(project.id)
 
-        response = client.delete(
-            f"/api/v1/projects/{project_id}",
-            headers=auth_headers
-        )
+        response = client.delete(f"/api/v1/projects/{project_id}", headers=auth_headers)
 
         assert response.status_code == 400
 
@@ -461,8 +457,7 @@ class TestAPIEndpointsWithSoftDelete:
         db_session.commit()
 
         response = client.post(
-            f"/api/v1/projects/{project_id}/restore",
-            headers=auth_headers
+            f"/api/v1/projects/{project_id}/restore", headers=auth_headers
         )
 
         assert response.status_code == 200
@@ -482,8 +477,7 @@ class TestAPIEndpointsWithSoftDelete:
         project_id = str(project.id)
 
         response = client.post(
-            f"/api/v1/projects/{project_id}/restore",
-            headers=auth_headers
+            f"/api/v1/projects/{project_id}/restore", headers=auth_headers
         )
 
         assert response.status_code == 400
@@ -507,13 +501,17 @@ class TestAPIEndpointsWithSoftDelete:
         assert "Deleted API Test" not in names
 
         # With include_deleted
-        response = client.get("/api/v1/projects?include_deleted=true", headers=auth_headers)
+        response = client.get(
+            "/api/v1/projects?include_deleted=true", headers=auth_headers
+        )
         assert response.status_code == 200
         names = [p["name"] for p in response.json()["data"]]
         assert "Active API Test" in names
         assert "Deleted API Test" in names
 
-    def test_delete_document_endpoint_soft_deletes(self, db_session, project, auth_headers):
+    def test_delete_document_endpoint_soft_deletes(
+        self, db_session, project, auth_headers
+    ):
         """DELETE /documents/{id} should soft delete, not hard delete."""
         doc = Document(name="api_delete.txt", project_id=project.id)
         db_session.add(doc)
@@ -521,8 +519,7 @@ class TestAPIEndpointsWithSoftDelete:
         doc_id = str(doc.id)
 
         response = client.delete(
-            f"/api/v1/documents/{doc_id}?confirm=true",
-            headers=auth_headers
+            f"/api/v1/documents/{doc_id}?confirm=true", headers=auth_headers
         )
 
         assert response.status_code == 200
@@ -547,8 +544,7 @@ class TestAPIEndpointsWithSoftDelete:
         db_session.commit()
 
         response = client.post(
-            f"/api/v1/documents/{doc_id}/restore",
-            headers=auth_headers
+            f"/api/v1/documents/{doc_id}/restore", headers=auth_headers
         )
 
         assert response.status_code == 200
@@ -560,7 +556,9 @@ class TestAPIEndpointsWithSoftDelete:
         doc = db_session.query(Document).filter(Document.id == doc_id).first()
         assert doc.is_deleted is False
 
-    def test_list_documents_with_include_deleted(self, db_session, project, auth_headers):
+    def test_list_documents_with_include_deleted(
+        self, db_session, project, auth_headers
+    ):
         """GET /documents?include_deleted=true should return deleted documents."""
         active = Document(name="active_api.txt", project_id=project.id)
         deleted = Document(name="deleted_api.txt", project_id=project.id)
@@ -578,7 +576,9 @@ class TestAPIEndpointsWithSoftDelete:
         assert "deleted_api.txt" not in names
 
         # With include_deleted
-        response = client.get("/api/v1/documents?include_deleted=true", headers=auth_headers)
+        response = client.get(
+            "/api/v1/documents?include_deleted=true", headers=auth_headers
+        )
         assert response.status_code == 200
         names = [d["name"] for d in response.json()["data"]]
         assert "active_api.txt" in names

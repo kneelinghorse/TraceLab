@@ -1,7 +1,8 @@
 """Project CRUD endpoints (list/detail/create/update/stats)."""
+
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -24,12 +25,12 @@ _cache_manager = get_cache_manager()
 # -----------------------------------------------------------------------------
 
 
-@router.post("/{project_id}/restore", response_model=Dict[str, Any])
+@router.post("/{project_id}/restore", response_model=dict[str, Any])
 def restore_project(
     project_id: UUID,
     db: Session = Depends(get_db),
     user: AuthenticatedUser = Depends(require_authenticated_user),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Restore a soft-deleted project.
 
     Requires authentication. Only works on projects that have been soft-deleted.
@@ -56,8 +57,15 @@ def list_projects(
         le=ProjectQueryService.MAX_PAGE_SIZE,
         description="Results per page",
     ),
-    search: Optional[str] = Query(None, min_length=1, max_length=200, description="Case-insensitive substring match"),
-    include_deleted: bool = Query(False, description="Include soft-deleted projects in results"),
+    search: str | None = Query(
+        None,
+        min_length=1,
+        max_length=200,
+        description="Case-insensitive substring match",
+    ),
+    include_deleted: bool = Query(
+        False, description="Include soft-deleted projects in results"
+    ),
     db: Session = Depends(get_db),
 ):
     """Return paginated projects ordered by creation time.
@@ -72,9 +80,13 @@ def list_projects(
         include_deleted=include_deleted,
     )
 
-    def _loader() -> Dict[str, Any]:
+    def _loader() -> dict[str, Any]:
         projects, meta = _service.list_projects(
-            db, page=page, page_size=page_size, search=search, include_deleted=include_deleted
+            db,
+            page=page,
+            page_size=page_size,
+            search=search,
+            include_deleted=include_deleted,
         )
         resources = [ProjectRead.model_validate(project) for project in projects]
         return {"data": resources, "pagination": meta}
@@ -86,12 +98,16 @@ def list_projects(
 @router.get("/{project_id}", response_model=ProjectRead)
 def get_project(project_id: UUID, db: Session = Depends(get_db)) -> ProjectRead:
     """Return a single project record."""
-    cache_key = _cache_manager.project_metadata_key(kind="detail", identifier=str(project_id))
+    cache_key = _cache_manager.project_metadata_key(
+        kind="detail", identifier=str(project_id)
+    )
 
     def _loader() -> ProjectRead:
         project = _service.get_project(db, project_id)
         if not project:
-            raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+            raise HTTPException(
+                status_code=404, detail=f"Project {project_id} not found"
+            )
         return ProjectRead.model_validate(project)
 
     result, _ = _cache_manager.cached_value("project_metadata", cache_key, _loader)
@@ -125,17 +141,18 @@ def update_project(
     return ProjectRead.model_validate(project)
 
 
-@router.delete("/{project_id}", status_code=status.HTTP_200_OK, response_model=Dict[str, Any])
+@router.delete(
+    "/{project_id}", status_code=status.HTTP_200_OK, response_model=dict[str, Any]
+)
 def delete_project(
     project_id: UUID,
     confirm: bool = Query(
         False,
-        description="Must be true to confirm deletion. This soft-deletes the project "
-        "(can be restored later).",
+        description="Must be true to confirm deletion. This soft-deletes the project (can be restored later).",
     ),
     db: Session = Depends(get_db),
     user: AuthenticatedUser = Depends(require_authenticated_user),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Soft-delete a project.
 
     Requires authentication and explicit confirmation via confirm=true query parameter.
@@ -160,7 +177,11 @@ def delete_project(
         )
     # Invalidate caches
     _cache_manager.invalidate_project_metadata(str(project_id))
-    return {"status": "deleted", "id": str(project_id), "message": "Project soft-deleted. Use POST /projects/{id}/restore to recover."}
+    return {
+        "status": "deleted",
+        "id": str(project_id),
+        "message": "Project soft-deleted. Use POST /projects/{id}/restore to recover.",
+    }
 
 
 @router.get("/{project_id}/stats", response_model=ProjectStats)
@@ -169,12 +190,16 @@ def get_project_stats(
     db: Session = Depends(get_db),
 ) -> ProjectStats:
     """Get aggregated statistics for a project."""
-    cache_key = _cache_manager.project_metadata_key(kind="stats", identifier=str(project_id))
+    cache_key = _cache_manager.project_metadata_key(
+        kind="stats", identifier=str(project_id)
+    )
 
     def _loader() -> ProjectStats:
         stats = _service.get_project_stats(db, project_id)
         if not stats:
-            raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+            raise HTTPException(
+                status_code=404, detail=f"Project {project_id} not found"
+            )
         return stats
 
     result, _ = _cache_manager.cached_value("project_metadata", cache_key, _loader)

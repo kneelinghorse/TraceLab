@@ -1,14 +1,12 @@
 """Authentication API endpoints for JWT login, refresh, and API key management."""
-import logging
+
 from datetime import datetime, timedelta
-from typing import List
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.rate_limit import auth_rate_limiter
 from app.core.security import (
     AuthenticatedUser,
     generate_api_key,
@@ -31,8 +29,6 @@ from app.schemas.api_key import (
 )
 from app.schemas.auth import LoginRequest, ProfileResponse, ProfileUpdate, RegisterRequest, TokenResponse
 
-logger = logging.getLogger(__name__)
-
 router = APIRouter(tags=["auth"])
 
 # Maximum API keys per user
@@ -40,19 +36,14 @@ MAX_API_KEYS_PER_USER = 10
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(
-    payload: LoginRequest,
-    request: Request,
-    db: Session = Depends(get_db),
-) -> TokenResponse:
+def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
     """Authenticate a user against the users table and return a signed JWT."""
-    auth_rate_limiter.check(request)
-
     db_user = db.query(User).filter(User.email == payload.email).first()
 
     if not db_user or not verify_password(payload.password, db_user.password_hash):
-        _log_auth_failure(request, payload.email, "invalid_credentials")
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password"
+        )
 
     # Update last_login_at
     db_user.last_login_at = datetime.utcnow()
@@ -62,32 +53,33 @@ def login(
     return TokenResponse(**response_payload)
 
 
-@router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-def register(
-    payload: RegisterRequest,
-    request: Request,
-    db: Session = Depends(get_db),
-) -> TokenResponse:
+@router.post(
+    "/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED
+)
+def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> TokenResponse:
     """Register a new user with a valid invite code and return a signed JWT."""
-    auth_rate_limiter.check(request)
-
     # Check email uniqueness
     existing = db.query(User).filter(User.email == payload.email).first()
     if existing:
-        _log_auth_failure(request, payload.email, "email_already_registered")
         raise HTTPException(status.HTTP_409_CONFLICT, detail="Email already registered")
 
     # Validate invite code
-    invite = db.query(InviteCode).filter(
-        InviteCode.code == payload.invite_code.upper(),
-        InviteCode.used_by.is_(None),
-    ).first()
+    invite = (
+        db.query(InviteCode)
+        .filter(
+            InviteCode.code == payload.invite_code.upper(),
+            InviteCode.used_by.is_(None),
+        )
+        .first()
+    )
     if not invite:
-        _log_auth_failure(request, payload.email, "invalid_invite_code")
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Invalid or already used invite code")
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, detail="Invalid or already used invite code"
+        )
     if invite.expires_at and invite.expires_at < datetime.utcnow():
-        _log_auth_failure(request, payload.email, "expired_invite_code")
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Invite code has expired")
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, detail="Invite code has expired"
+        )
 
     # Create user
     new_user = User(
@@ -171,7 +163,9 @@ def update_me(
 # --- API Key Management Endpoints ---
 
 
-@router.post("/api-keys", response_model=APIKeyResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/api-keys", response_model=APIKeyResponse, status_code=status.HTTP_201_CREATED
+)
 def create_api_key(
     payload: APIKeyCreate,
     user: AuthenticatedUser = Depends(require_authenticated_user),
@@ -224,7 +218,12 @@ def list_api_keys(
     db: Session = Depends(get_db),
 ) -> APIKeyList:
     """List all API keys for the authenticated user (without key values)."""
-    keys = db.query(APIKey).filter(APIKey.user_id == user.user_id).order_by(APIKey.created_at.desc()).all()
+    keys = (
+        db.query(APIKey)
+        .filter(APIKey.user_id == user.user_id)
+        .order_by(APIKey.created_at.desc())
+        .all()
+    )
 
     return APIKeyList(
         keys=[
@@ -249,7 +248,11 @@ def delete_api_key(
     db: Session = Depends(get_db),
 ) -> APIKeyDeleted:
     """Delete an API key by ID."""
-    api_key = db.query(APIKey).filter(APIKey.id == key_id, APIKey.user_id == user.user_id).first()
+    api_key = (
+        db.query(APIKey)
+        .filter(APIKey.id == key_id, APIKey.user_id == user.user_id)
+        .first()
+    )
 
     if not api_key:
         raise HTTPException(
@@ -261,7 +264,9 @@ def delete_api_key(
     db.delete(api_key)
     db.commit()
 
-    return APIKeyDeleted(success=True, message=f"API key '{key_name}' deleted successfully")
+    return APIKeyDeleted(
+        success=True, message=f"API key '{key_name}' deleted successfully"
+    )
 
 
 # --- Invite Code Management Endpoints ---
@@ -296,16 +301,25 @@ def list_invite_codes(
     db: Session = Depends(get_db),
 ) -> dict:
     """List invite codes created by the current user."""
-    codes = db.query(InviteCode).filter(
-        InviteCode.created_by == user.user_id
-    ).order_by(InviteCode.created_at.desc()).all()
+    codes = (
+        db.query(InviteCode)
+        .filter(InviteCode.created_by == user.user_id)
+        .order_by(InviteCode.created_at.desc())
+        .all()
+    )
 
     return {
         "codes": [
             {
                 "id": str(c.id),
                 "code": c.code,
-                "status": "used" if c.used_by else ("expired" if c.expires_at and c.expires_at < datetime.utcnow() else "unused"),
+                "status": "used"
+                if c.used_by
+                else (
+                    "expired"
+                    if c.expires_at and c.expires_at < datetime.utcnow()
+                    else "unused"
+                ),
                 "created_at": c.created_at.isoformat(),
                 "used_at": c.used_at.isoformat() if c.used_at else None,
                 "expires_at": c.expires_at.isoformat() if c.expires_at else None,
@@ -323,44 +337,24 @@ def delete_invite_code(
     db: Session = Depends(get_db),
 ) -> dict:
     """Revoke an unused invite code."""
-    invite = db.query(InviteCode).filter(
-        InviteCode.id == code_id,
-        InviteCode.created_by == user.user_id,
-    ).first()
+    invite = (
+        db.query(InviteCode)
+        .filter(
+            InviteCode.id == code_id,
+            InviteCode.created_by == user.user_id,
+        )
+        .first()
+    )
 
     if not invite:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Invite code not found")
 
     if invite.used_by:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Cannot delete a used invite code")
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, detail="Cannot delete a used invite code"
+        )
 
     db.delete(invite)
     db.commit()
 
     return {"success": True, "message": "Invite code deleted"}
-
-
-# --- Audit Logging ---
-
-
-def _get_client_ip(request: Request) -> str:
-    """Extract client IP, respecting X-Forwarded-For."""
-    forwarded = request.headers.get("x-forwarded-for")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
-    return request.client.host if request.client else "unknown"
-
-
-def _log_auth_failure(request: Request, email: str, reason: str) -> None:
-    """Log a failed authentication attempt with structured context.
-
-    Logs IP and failure reason for security audit. Does NOT log passwords or
-    other sensitive data.
-    """
-    ip = _get_client_ip(request)
-    logger.warning(
-        "auth_failure: ip=%s email=%s reason=%s",
-        ip,
-        email,
-        reason,
-    )

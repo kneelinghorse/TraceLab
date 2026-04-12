@@ -16,6 +16,7 @@ Requires:
     - Qdrant vector database with embeddings
     - OpenAI API key for embedding generation
 """
+
 import argparse
 import json
 import sys
@@ -67,9 +68,9 @@ def run_mode_benchmark(
     from app.services.pedr.hybrid_rerank import get_hybrid_reranker
 
     if verbose:
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"Running {mode.upper()} mode benchmark ({len(queries)} queries)")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
 
     try:
         reranker = get_hybrid_reranker()
@@ -104,29 +105,35 @@ def run_mode_benchmark(
                 )
 
             # Record result details
-            results.append({
-                "query": query,
-                "mode": mode,
-                "latency_ms": result.timings.total_ms,
-                "fts_ms": result.timings.fts_ms,
-                "embedding_ms": result.timings.embedding_ms,
-                "rerank_ms": result.timings.rerank_ms,
-                "result_count": len(result.results),
-                "fts_candidates": result.fts_candidates_count,
-                "fallback_used": result.fallback_used,
-                "chunk_ids": [r.get("chunk_id") for r in result.results],
-            })
+            results.append(
+                {
+                    "query": query,
+                    "mode": mode,
+                    "latency_ms": result.timings.total_ms,
+                    "fts_ms": result.timings.fts_ms,
+                    "embedding_ms": result.timings.embedding_ms,
+                    "rerank_ms": result.timings.rerank_ms,
+                    "result_count": len(result.results),
+                    "fts_candidates": result.fts_candidates_count,
+                    "fallback_used": result.fallback_used,
+                    "chunk_ids": [r.get("chunk_id") for r in result.results],
+                }
+            )
 
             if verbose:
-                print(f"      → {result.timings.total_ms:.1f}ms, {len(result.results)} results")
+                print(
+                    f"      → {result.timings.total_ms:.1f}ms, {len(result.results)} results"
+                )
 
         except Exception as e:
             print(f"    Error: {e}")
-            results.append({
-                "query": query,
-                "mode": mode,
-                "error": str(e),
-            })
+            results.append(
+                {
+                    "query": query,
+                    "mode": mode,
+                    "error": str(e),
+                }
+            )
 
     # Calculate statistics
     stats = _calculate_statistics(latencies)
@@ -138,8 +145,12 @@ def run_mode_benchmark(
             "candidate_pool": candidate_pool if mode == "hybrid" else None,
         },
         "statistics": stats,
-        "fts_statistics": _calculate_statistics(fts_latencies) if fts_latencies else None,
-        "rerank_statistics": _calculate_statistics(rerank_latencies) if rerank_latencies else None,
+        "fts_statistics": _calculate_statistics(fts_latencies)
+        if fts_latencies
+        else None,
+        "rerank_statistics": _calculate_statistics(rerank_latencies)
+        if rerank_latencies
+        else None,
         "results": results,
     }
 
@@ -193,13 +204,15 @@ def calculate_precision_overlap(
         overlap_pct = len(intersection) / len(full_ids) * 100 if full_ids else 0
 
         overlaps.append(overlap_pct)
-        query_comparisons.append({
-            "query": full["query"],
-            "full_count": len(full_ids),
-            "hybrid_count": len(hybrid_ids),
-            "overlap_count": len(intersection),
-            "overlap_pct": overlap_pct,
-        })
+        query_comparisons.append(
+            {
+                "query": full["query"],
+                "full_count": len(full_ids),
+                "hybrid_count": len(hybrid_ids),
+                "overlap_count": len(intersection),
+                "overlap_pct": overlap_pct,
+            }
+        )
 
     if not overlaps:
         return {"error": "No valid comparisons"}
@@ -269,17 +282,23 @@ def run_benchmark(
             "fts_under_100ms": {
                 "target": 100,
                 "actual": fts_stats.get("p50_ms") if fts_stats else None,
-                "pass": (fts_stats.get("p50_ms") or float("inf")) < 100 if fts_stats else False,
+                "pass": (fts_stats.get("p50_ms") or float("inf")) < 100
+                if fts_stats
+                else False,
             },
             "rerank_under_200ms": {
                 "target": 200,
                 "actual": rerank_stats.get("p50_ms") if rerank_stats else None,
-                "pass": (rerank_stats.get("p50_ms") or float("inf")) < 200 if rerank_stats else False,
+                "pass": (rerank_stats.get("p50_ms") or float("inf")) < 200
+                if rerank_stats
+                else False,
             },
             "combined_under_300ms": {
                 "target": 300,
                 "actual": hybrid_stats.get("p50_ms") if hybrid_stats else None,
-                "pass": (hybrid_stats.get("p50_ms") or float("inf")) < 300 if hybrid_stats else False,
+                "pass": (hybrid_stats.get("p50_ms") or float("inf")) < 300
+                if hybrid_stats
+                else False,
             },
             "precision_above_90pct": {
                 "target": 90,
@@ -291,8 +310,11 @@ def run_benchmark(
             "full_p50_ms": full_stats.get("p50_ms"),
             "hybrid_p50_ms": hybrid_stats.get("p50_ms"),
             "speedup_pct": (
-                ((full_stats.get("p50_ms", 0) - hybrid_stats.get("p50_ms", 0)) /
-                 full_stats.get("p50_ms", 1) * 100)
+                (
+                    (full_stats.get("p50_ms", 0) - hybrid_stats.get("p50_ms", 0))
+                    / full_stats.get("p50_ms", 1)
+                    * 100
+                )
                 if full_stats.get("p50_ms")
                 else None
             ),
@@ -353,7 +375,7 @@ def main():
     with open(output_path, "w") as f:
         json.dump(results, f, indent=2)
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Benchmark complete. Results written to {output_path}")
 
     # Print summary

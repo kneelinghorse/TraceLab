@@ -7,39 +7,36 @@ Tests cover:
 - Manifest creation: Full protocol manifests
 - Integration with manifest_transformer.py
 """
+
 from __future__ import annotations
 
 import math
-from typing import Any, Dict, List
 
 import pytest
 
 from app.services.pedr.semantic_protocol import (
+    CONFIDENCE_PRIOR,
+    CRITICALITY_WEIGHTS,
+    PROTOCOL_VERSION,
     URN,
-    URNGenerator,
-    GovernanceMetadata,
-    SemanticFeatures,
-    ElementMetadata,
-    ProtocolManifest,
-    Edge,
     ConfidenceScorer,
     CriticalityCalculator,
-    IntentResolver,
-    SemanticVectorGenerator,
-    SemanticProtocol,
-    get_semantic_protocol,
+    Edge,
     EntityType,
+    GovernanceMetadata,
+    IntentResolver,
     SemanticIntent,
-    PROTOCOL_VERSION,
-    CRITICALITY_WEIGHTS,
-    CONFIDENCE_PRIOR,
+    SemanticProtocol,
+    SemanticVectorGenerator,
+    URNGenerator,
     fnv1a_64_hash,
+    get_semantic_protocol,
 )
-
 
 # ==============================================================================
 # URN Tests
 # ==============================================================================
+
 
 class TestURN:
     """Tests for URN data class and parsing."""
@@ -126,6 +123,7 @@ class TestURNGenerator:
 # ==============================================================================
 # Confidence Scoring Tests
 # ==============================================================================
+
 
 class TestConfidenceScorer:
     """Tests for Bayesian confidence scoring."""
@@ -216,6 +214,7 @@ class TestConfidenceScorer:
 # Criticality Calculation Tests
 # ==============================================================================
 
+
 class TestCriticalityCalculator:
     """Tests for criticality calculation with weighted formula."""
 
@@ -244,7 +243,9 @@ class TestCriticalityCalculator:
         # PII adds 0.3 * 0.3 (pii weight) = 0.3
         assert with_pii - without_pii >= 0.25
 
-    def test_many_dependents_increases_criticality(self, calculator: CriticalityCalculator):
+    def test_many_dependents_increases_criticality(
+        self, calculator: CriticalityCalculator
+    ):
         """Many dependents increase blast radius component."""
         without_deps = calculator.calculate(dependents=[])
         with_deps = calculator.calculate(dependents=[f"dep-{i}" for i in range(10)])
@@ -287,6 +288,7 @@ class TestCriticalityCalculator:
 # ==============================================================================
 # Intent Resolver Tests
 # ==============================================================================
+
 
 class TestIntentResolver:
     """Tests for semantic intent resolution."""
@@ -352,6 +354,7 @@ class TestIntentResolver:
 # Semantic Vector Generator Tests
 # ==============================================================================
 
+
 class TestSemanticVectorGenerator:
     """Tests for semantic vector generation."""
 
@@ -412,6 +415,7 @@ class TestSemanticVectorGenerator:
 # ==============================================================================
 # Semantic Protocol Service Tests
 # ==============================================================================
+
 
 class TestSemanticProtocol:
     """Tests for main SemanticProtocol service."""
@@ -564,7 +568,9 @@ class TestSemanticProtocol:
         """FNV-1a hash output matches JS v3.3.0 reference."""
         assert fnv1a_64_hash({"b": 2, "a": 1}) == "fnv1a64-a0ebc03bdc71de7b"
 
-    def test_manifest_hashes_deterministic_with_ordering(self, protocol: SemanticProtocol):
+    def test_manifest_hashes_deterministic_with_ordering(
+        self, protocol: SemanticProtocol
+    ):
         """Hash outputs are stable across input ordering changes."""
         data_a = {
             "purpose": "Research login patterns",
@@ -685,12 +691,14 @@ class TestSemanticProtocolSingleton:
 # Integration Tests with ManifestTransformer
 # ==============================================================================
 
+
 class TestManifestTransformerIntegration:
     """Tests for integration with manifest_transformer.py."""
 
     def test_import_semantic_protocol(self):
         """Semantic protocol can be imported from manifest_transformer."""
         from app.services.pedr.manifest_transformer import get_semantic_protocol
+
         protocol = get_semantic_protocol()
         assert isinstance(protocol, SemanticProtocol)
 
@@ -736,6 +744,7 @@ class TestManifestTransformerIntegration:
 # ==============================================================================
 # Constants and Configuration Tests
 # ==============================================================================
+
 
 class TestConstants:
     """Tests for protocol constants."""

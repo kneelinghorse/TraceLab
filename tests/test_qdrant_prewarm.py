@@ -3,8 +3,10 @@
 Tests the core pre-warming module at app/core/qdrant_client.py and
 verifies the health check endpoints at app/api/v1/health.py.
 """
-import pytest
+
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 
 class TestQdrantClientModule:
@@ -14,9 +16,10 @@ class TestQdrantClientModule:
         """Test that get_qdrant_client returns the same instance on repeated calls."""
         # Reset singleton state first
         from app.core import qdrant_client as qc_module
+
         qc_module.reset_client()
 
-        with patch.object(qc_module, 'QdrantClient') as mock_client_class:
+        with patch.object(qc_module, "QdrantClient") as mock_client_class:
             mock_instance = MagicMock()
             mock_client_class.return_value = mock_instance
 
@@ -36,9 +39,10 @@ class TestQdrantClientModule:
     def test_get_qdrant_client_validates_url(self):
         """Test that get_qdrant_client raises error when URL not configured."""
         from app.core import qdrant_client as qc_module
+
         qc_module.reset_client()
 
-        with patch('app.core.qdrant_client.settings') as mock_settings:
+        with patch("app.core.qdrant_client.settings") as mock_settings:
             mock_settings.qdrant_url = ""
 
             with pytest.raises(ValueError, match="QDRANT_URL must be configured"):
@@ -49,9 +53,10 @@ class TestQdrantClientModule:
     def test_get_qdrant_client_validates_https_with_api_key(self):
         """Test that HTTPS is required when API key is set."""
         from app.core import qdrant_client as qc_module
+
         qc_module.reset_client()
 
-        with patch('app.core.qdrant_client.settings') as mock_settings:
+        with patch("app.core.qdrant_client.settings") as mock_settings:
             mock_settings.qdrant_url = "http://insecure.example.com"
             mock_settings.qdrant_api_key = "secret-key"
 
@@ -64,6 +69,7 @@ class TestQdrantClientModule:
     async def test_prewarm_qdrant_success(self):
         """Test successful pre-warm operation."""
         from app.core import qdrant_client as qc_module
+
         qc_module.reset_client()
 
         mock_client = MagicMock()
@@ -74,8 +80,8 @@ class TestQdrantClientModule:
         mock_client.get_collections.return_value = mock_collections
         mock_client.search.return_value = []
 
-        with patch.object(qc_module, 'get_qdrant_client', return_value=mock_client):
-            with patch('app.core.qdrant_client.settings') as mock_settings:
+        with patch.object(qc_module, "get_qdrant_client", return_value=mock_client):
+            with patch("app.core.qdrant_client.settings") as mock_settings:
                 mock_settings.qdrant_collection_name = "research_chunks"
                 mock_settings.openai_embedding_dimension = 3072
 
@@ -92,6 +98,7 @@ class TestQdrantClientModule:
     async def test_prewarm_qdrant_missing_collection(self):
         """Test pre-warm when collection doesn't exist yet."""
         from app.core import qdrant_client as qc_module
+
         qc_module.reset_client()
 
         mock_client = MagicMock()
@@ -99,8 +106,8 @@ class TestQdrantClientModule:
         mock_collections.collections = []  # No collections
         mock_client.get_collections.return_value = mock_collections
 
-        with patch.object(qc_module, 'get_qdrant_client', return_value=mock_client):
-            with patch('app.core.qdrant_client.settings') as mock_settings:
+        with patch.object(qc_module, "get_qdrant_client", return_value=mock_client):
+            with patch("app.core.qdrant_client.settings") as mock_settings:
                 mock_settings.qdrant_collection_name = "research_chunks"
 
                 result = await qc_module.prewarm_qdrant()
@@ -116,12 +123,13 @@ class TestQdrantClientModule:
     async def test_prewarm_qdrant_failure(self):
         """Test pre-warm returns False on connection failure."""
         from app.core import qdrant_client as qc_module
+
         qc_module.reset_client()
 
         mock_client = MagicMock()
         mock_client.get_collections.side_effect = Exception("Connection refused")
 
-        with patch.object(qc_module, 'get_qdrant_client', return_value=mock_client):
+        with patch.object(qc_module, "get_qdrant_client", return_value=mock_client):
             result = await qc_module.prewarm_qdrant()
 
         assert result is False
@@ -132,6 +140,7 @@ class TestQdrantClientModule:
     def test_get_qdrant_health_success(self):
         """Test health check returns correct status on success."""
         from app.core import qdrant_client as qc_module
+
         qc_module.reset_client()
 
         mock_client = MagicMock()
@@ -143,8 +152,8 @@ class TestQdrantClientModule:
         mock_collections.collections = [mock_col1, mock_col2]
         mock_client.get_collections.return_value = mock_collections
 
-        with patch.object(qc_module, 'get_qdrant_client', return_value=mock_client):
-            with patch('app.core.qdrant_client.settings') as mock_settings:
+        with patch.object(qc_module, "get_qdrant_client", return_value=mock_client):
+            with patch("app.core.qdrant_client.settings") as mock_settings:
                 mock_settings.qdrant_url = "http://localhost:6333"
 
                 health = qc_module.get_qdrant_health()
@@ -159,10 +168,13 @@ class TestQdrantClientModule:
     def test_get_qdrant_health_failure(self):
         """Test health check returns unhealthy on error."""
         from app.core import qdrant_client as qc_module
+
         qc_module.reset_client()
 
-        with patch.object(qc_module, 'get_qdrant_client', side_effect=Exception("Connection error")):
-            with patch('app.core.qdrant_client.settings') as mock_settings:
+        with patch.object(
+            qc_module, "get_qdrant_client", side_effect=Exception("Connection error")
+        ):
+            with patch("app.core.qdrant_client.settings") as mock_settings:
                 mock_settings.qdrant_url = "http://localhost:6333"
 
                 health = qc_module.get_qdrant_health()
@@ -193,7 +205,8 @@ class TestHealthEndpoints:
     @pytest.mark.asyncio
     async def test_health_endpoint(self):
         """Test basic health endpoint returns healthy."""
-        from httpx import AsyncClient, ASGITransport
+        from httpx import ASGITransport, AsyncClient
+
         from app.main import app
 
         transport = ASGITransport(app=app)
@@ -205,11 +218,12 @@ class TestHealthEndpoints:
     @pytest.mark.asyncio
     async def test_qdrant_health_endpoint_success(self):
         """Test /health/qdrant returns healthy when Qdrant is available."""
-        from httpx import AsyncClient, ASGITransport
+        from httpx import ASGITransport, AsyncClient
+
         from app.main import app
 
         # Patch where the function is imported/used, not where it's defined
-        with patch('app.api.v1.health.get_qdrant_health') as mock_health:
+        with patch("app.api.v1.health.get_qdrant_health") as mock_health:
             mock_health.return_value = {
                 "status": "healthy",
                 "prewarmed": True,
@@ -219,7 +233,9 @@ class TestHealthEndpoints:
             }
 
             transport = ASGITransport(app=app)
-            async with AsyncClient(transport=transport, base_url="http://test") as client:
+            async with AsyncClient(
+                transport=transport, base_url="http://test"
+            ) as client:
                 response = await client.get("/api/v1/health/qdrant")
 
             assert response.status_code == 200
@@ -230,11 +246,12 @@ class TestHealthEndpoints:
     @pytest.mark.asyncio
     async def test_qdrant_health_endpoint_failure(self):
         """Test /health/qdrant returns 503 when Qdrant is unavailable."""
-        from httpx import AsyncClient, ASGITransport
+        from httpx import ASGITransport, AsyncClient
+
         from app.main import app
 
         # Patch where the function is imported/used
-        with patch('app.api.v1.health.get_qdrant_health') as mock_health:
+        with patch("app.api.v1.health.get_qdrant_health") as mock_health:
             mock_health.return_value = {
                 "status": "unhealthy",
                 "prewarmed": False,
@@ -243,7 +260,9 @@ class TestHealthEndpoints:
             }
 
             transport = ASGITransport(app=app)
-            async with AsyncClient(transport=transport, base_url="http://test") as client:
+            async with AsyncClient(
+                transport=transport, base_url="http://test"
+            ) as client:
                 response = await client.get("/api/v1/health/qdrant")
 
             assert response.status_code == 503
@@ -253,9 +272,10 @@ class TestHealthEndpoints:
     @pytest.mark.asyncio
     async def test_readiness_endpoint_all_healthy(self):
         """Test /health/ready returns ready when all services healthy."""
-        from httpx import AsyncClient, ASGITransport
-        from app.main import app
+        from httpx import ASGITransport, AsyncClient
+
         from app.core.database import get_db
+        from app.main import app
 
         # Mock DB session
         class FakeResult:
@@ -276,8 +296,8 @@ class TestHealthEndpoints:
 
         try:
             # Patch where functions are imported/used
-            with patch('app.api.v1.health.get_qdrant_health') as mock_health:
-                with patch('app.api.v1.health.is_qdrant_ready', return_value=True):
+            with patch("app.api.v1.health.get_qdrant_health") as mock_health:
+                with patch("app.api.v1.health.is_qdrant_ready", return_value=True):
                     mock_health.return_value = {
                         "status": "healthy",
                         "prewarmed": True,
@@ -287,7 +307,9 @@ class TestHealthEndpoints:
                     }
 
                     transport = ASGITransport(app=app)
-                    async with AsyncClient(transport=transport, base_url="http://test") as client:
+                    async with AsyncClient(
+                        transport=transport, base_url="http://test"
+                    ) as client:
                         response = await client.get("/api/v1/health/ready")
 
                     assert response.status_code == 200
@@ -302,9 +324,10 @@ class TestHealthEndpoints:
     @pytest.mark.asyncio
     async def test_readiness_endpoint_qdrant_unhealthy(self):
         """Test /health/ready returns 503 when Qdrant is unhealthy."""
-        from httpx import AsyncClient, ASGITransport
-        from app.main import app
+        from httpx import ASGITransport, AsyncClient
+
         from app.core.database import get_db
+        from app.main import app
 
         # Mock DB session
         class FakeResult:
@@ -325,8 +348,8 @@ class TestHealthEndpoints:
 
         try:
             # Patch where functions are imported/used
-            with patch('app.api.v1.health.get_qdrant_health') as mock_health:
-                with patch('app.api.v1.health.is_qdrant_ready', return_value=False):
+            with patch("app.api.v1.health.get_qdrant_health") as mock_health:
+                with patch("app.api.v1.health.is_qdrant_ready", return_value=False):
                     mock_health.return_value = {
                         "status": "unhealthy",
                         "prewarmed": False,
@@ -335,7 +358,9 @@ class TestHealthEndpoints:
                     }
 
                     transport = ASGITransport(app=app)
-                    async with AsyncClient(transport=transport, base_url="http://test") as client:
+                    async with AsyncClient(
+                        transport=transport, base_url="http://test"
+                    ) as client:
                         response = await client.get("/api/v1/health/ready")
 
                     assert response.status_code == 503
@@ -357,8 +382,11 @@ class TestServiceIntegration:
 
         mock_client = MagicMock()
         # Patch where it's imported in the service module
-        with patch('app.services.qdrant_service.get_qdrant_client', return_value=mock_client):
+        with patch(
+            "app.services.qdrant_service.get_qdrant_client", return_value=mock_client
+        ):
             from app.services.qdrant_service import QdrantService
+
             service = QdrantService()
 
         assert service.client is mock_client
@@ -382,14 +410,12 @@ class TestServiceIntegration:
         mock_col.name = "research_chunks"
         mock_client.get_collections.return_value = MagicMock(collections=[mock_col])
         mock_client.get_collection.return_value = MagicMock(
-            config=MagicMock(
-                params=MagicMock(
-                    vectors=MagicMock(size=1536)
-                )
-            )
+            config=MagicMock(params=MagicMock(vectors=MagicMock(size=1536)))
         )
 
-        service = QdrantService(client=mock_client, collection_name="research_chunks", vector_size=3072)
+        service = QdrantService(
+            client=mock_client, collection_name="research_chunks", vector_size=3072
+        )
 
         with pytest.raises(RuntimeError, match="vector_size=1536"):
             service.ensure_collection()
@@ -399,7 +425,9 @@ class TestServiceIntegration:
         from app.services.qdrant_service import QdrantService
 
         mock_client = MagicMock()
-        service = QdrantService(client=mock_client, collection_name="research_chunks", vector_size=3)
+        service = QdrantService(
+            client=mock_client, collection_name="research_chunks", vector_size=3
+        )
         chunks = [
             {
                 "chunk_id": f"c-{idx}",
@@ -428,8 +456,11 @@ class TestServiceIntegration:
         mock_client.get_collections.return_value = mock_collections
 
         # Patch where it's imported in the service module
-        with patch('app.services.semantic_cache.get_qdrant_client', return_value=mock_client):
+        with patch(
+            "app.services.semantic_cache.get_qdrant_client", return_value=mock_client
+        ):
             from app.services.semantic_cache import SemanticCacheService
+
             # Disable to avoid collection creation
             service = SemanticCacheService(enabled=False)
 
@@ -454,16 +485,16 @@ class TestServiceIntegration:
         mock_client = MagicMock()
         cache_collection = MagicMock()
         cache_collection.name = settings.semantic_cache_collection_name
-        mock_client.get_collections.return_value = MagicMock(collections=[cache_collection])
+        mock_client.get_collections.return_value = MagicMock(
+            collections=[cache_collection]
+        )
         mock_client.get_collection.return_value = MagicMock(
-            config=MagicMock(
-                params=MagicMock(
-                    vectors=MagicMock(size=1536)
-                )
-            )
+            config=MagicMock(params=MagicMock(vectors=MagicMock(size=1536)))
         )
 
         SemanticCacheService(client=mock_client, enabled=True)
 
-        mock_client.delete_collection.assert_called_once_with(settings.semantic_cache_collection_name)
+        mock_client.delete_collection.assert_called_once_with(
+            settings.semantic_cache_collection_name
+        )
         mock_client.create_collection.assert_called_once()

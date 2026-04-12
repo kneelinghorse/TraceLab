@@ -4,6 +4,7 @@
 This script evaluates one collection/model pair at a time and is intended for
 embedding migration comparisons such as 1536d -> 3072d upgrades.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -29,7 +30,9 @@ from app.models.chunk import DocumentChunk
 from app.services.qdrant_service import QdrantService
 
 
-def precision_at_k(retrieved_doc_ids: Sequence[str], target_doc_id: str, top_k: int) -> float:
+def precision_at_k(
+    retrieved_doc_ids: Sequence[str], target_doc_id: str, top_k: int
+) -> float:
     if top_k <= 0:
         return 0.0
     relevant = sum(1 for doc_id in retrieved_doc_ids if doc_id == target_doc_id)
@@ -62,7 +65,12 @@ def percentile(values: Sequence[float], pct: float) -> float:
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return (
+        datetime.now(timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
 
 
 def _sample_chunks(sample_size: int, max_query_chars: int) -> List[Dict[str, str]]:
@@ -92,7 +100,9 @@ def _sample_chunks(sample_size: int, max_query_chars: int) -> List[Dict[str, str
     return samples
 
 
-def _embed_queries(client: OpenAI, model: str, queries: Sequence[str], batch_size: int) -> List[List[float]]:
+def _embed_queries(
+    client: OpenAI, model: str, queries: Sequence[str], batch_size: int
+) -> List[List[float]]:
     vectors: List[List[float]] = []
     for start in range(0, len(queries), batch_size):
         batch = list(queries[start : start + batch_size])
@@ -133,9 +143,13 @@ def run_benchmark(
     )
 
     if len(query_vectors) != len(samples):
-        raise RuntimeError("Embedding count mismatch while preparing benchmark queries.")
+        raise RuntimeError(
+            "Embedding count mismatch while preparing benchmark queries."
+        )
 
-    invalid_dims = sorted({len(vector) for vector in query_vectors if len(vector) != embedding_dimension})
+    invalid_dims = sorted(
+        {len(vector) for vector in query_vectors if len(vector) != embedding_dimension}
+    )
     if invalid_dims:
         raise RuntimeError(
             f"Embedding dimension mismatch for model {embedding_model}: {invalid_dims} != {embedding_dimension}"
@@ -156,7 +170,9 @@ def run_benchmark(
         latency_ms = (time.perf_counter() - started) * 1000
         latencies_ms.append(latency_ms)
 
-        retrieved_doc_ids = [str(item.get("document_id")) for item in results if item.get("document_id")]
+        retrieved_doc_ids = [
+            str(item.get("document_id")) for item in results if item.get("document_id")
+        ]
         target_doc_id = sample["document_id"]
         precisions.append(precision_at_k(retrieved_doc_ids, target_doc_id, top_k))
         recalls.append(recall_at_k(retrieved_doc_ids, target_doc_id))
@@ -184,15 +200,41 @@ def run_benchmark(
 
 
 def _parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Benchmark one embedding collection/model pair.")
-    parser.add_argument("--collection", required=True, help="Qdrant collection name to evaluate")
+    parser = argparse.ArgumentParser(
+        description="Benchmark one embedding collection/model pair."
+    )
+    parser.add_argument(
+        "--collection", required=True, help="Qdrant collection name to evaluate"
+    )
     parser.add_argument("--model", required=True, help="OpenAI embedding model name")
-    parser.add_argument("--dimension", type=int, required=True, help="Expected embedding vector dimension")
-    parser.add_argument("--sample-size", type=int, default=150, help="Number of chunk-derived queries to evaluate")
+    parser.add_argument(
+        "--dimension",
+        type=int,
+        required=True,
+        help="Expected embedding vector dimension",
+    )
+    parser.add_argument(
+        "--sample-size",
+        type=int,
+        default=150,
+        help="Number of chunk-derived queries to evaluate",
+    )
     parser.add_argument("--top-k", type=int, default=5, help="Top-k retrieval depth")
-    parser.add_argument("--max-query-chars", type=int, default=280, help="Max chars from chunk content per query")
-    parser.add_argument("--batch-size", type=int, default=50, help="Embedding batch size per OpenAI request")
-    parser.add_argument("--hnsw-ef", type=int, default=None, help="Optional hnsw_ef override for search")
+    parser.add_argument(
+        "--max-query-chars",
+        type=int,
+        default=280,
+        help="Max chars from chunk content per query",
+    )
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=50,
+        help="Embedding batch size per OpenAI request",
+    )
+    parser.add_argument(
+        "--hnsw-ef", type=int, default=None, help="Optional hnsw_ef override for search"
+    )
     parser.add_argument(
         "--output",
         type=Path,

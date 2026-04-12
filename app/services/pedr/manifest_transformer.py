@@ -5,27 +5,27 @@ Reference: cmos/planning/PEDR-docs/tracelab-to-pedr-mapping.md
 This module provides backward-compatible manifest transformation while
 integrating with the new Semantic Protocol for full protocol features.
 """
+
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any
 
 from app.services.pedr.semantic_protocol import (
     Edge,
-    EntityType,
     ProtocolManifest,
-    SemanticProtocol,
     get_semantic_protocol,
 )
 
 # PII detection patterns (simple heuristics)
 PII_PATTERNS = [
-    re.compile(r'\b[A-Z][a-z]+\s+[A-Z][a-z]+\b'),  # Full names
-    re.compile(r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b'),  # Phone numbers
-    re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'),  # Emails
-    re.compile(r'\b\d{3}[-]?\d{2}[-]?\d{4}\b'),  # SSN
+    re.compile(r"\b[A-Z][a-z]+\s+[A-Z][a-z]+\b"),  # Full names
+    re.compile(r"\b\d{3}[-.]?\d{3}[-.]?\d{4}\b"),  # Phone numbers
+    re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"),  # Emails
+    re.compile(r"\b\d{3}[-]?\d{2}[-]?\d{4}\b"),  # SSN
 ]
 
 
@@ -38,7 +38,7 @@ class PEDRManifest:
     """
 
     urn: str
-    manifest: Dict[str, Any]
+    manifest: dict[str, Any]
     purpose: str
     description: str
     context_domain: str
@@ -46,13 +46,13 @@ class PEDRManifest:
     element_intent: str
     governance_pii: bool
     governance_impact: int
-    bindings: Dict[str, Any]
+    bindings: dict[str, Any]
     # New fields from Semantic Protocol
     confidence: float = 0.5
     criticality: float = 0.5
-    semantic_vector: List[Dict[str, Any]] = field(default_factory=list)
+    semantic_vector: list[dict[str, Any]] = field(default_factory=list)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
             "urn": self.urn,
@@ -71,7 +71,9 @@ class PEDRManifest:
         }
 
     @classmethod
-    def from_protocol_manifest(cls, protocol_manifest: ProtocolManifest) -> "PEDRManifest":
+    def from_protocol_manifest(
+        cls, protocol_manifest: ProtocolManifest
+    ) -> PEDRManifest:
         """Create PEDRManifest from a ProtocolManifest.
 
         Args:
@@ -86,7 +88,9 @@ class PEDRManifest:
             purpose=protocol_manifest.semantics.purpose,
             description=protocol_manifest.semantics.description,
             context_domain=protocol_manifest.context.get("domain", "research"),
-            element_type=protocol_manifest.element.element_type.replace("research.", ""),
+            element_type=protocol_manifest.element.element_type.replace(
+                "research.", ""
+            ),
             element_intent=protocol_manifest.element.intent.value,
             governance_pii=protocol_manifest.governance.pii_handling,
             governance_impact=protocol_manifest.governance.business_impact,
@@ -102,9 +106,9 @@ class TransformationResult:
     """Result of a manifest transformation."""
 
     success: bool
-    manifest: Optional[PEDRManifest] = None
-    error: Optional[str] = None
-    warnings: List[str] = field(default_factory=list)
+    manifest: PEDRManifest | None = None
+    error: str | None = None
+    warnings: list[str] = field(default_factory=list)
 
 
 class ManifestTransformer:
@@ -132,9 +136,9 @@ class ManifestTransformer:
     def transform_mission(
         self,
         mission_id: str,
-        mission_data: Dict[str, Any],
-        quality_gates: Optional[Dict[str, Any]] = None,
-        project_id: Optional[str] = None,
+        mission_data: dict[str, Any],
+        quality_gates: dict[str, Any] | None = None,
+        project_id: str | None = None,
         status: str = "unknown",
     ) -> TransformationResult:
         """Transform a mission to PEDR manifest format.
@@ -149,7 +153,7 @@ class ManifestTransformer:
         Returns:
             TransformationResult with manifest or error
         """
-        warnings: List[str] = []
+        warnings: list[str] = []
 
         if not mission_data:
             return TransformationResult(
@@ -158,14 +162,26 @@ class ManifestTransformer:
             )
 
         # Extract mission protocol ID
-        protocol_id = mission_data.get("missionId") or mission_data.get("mission_id") or str(mission_id)
+        protocol_id = (
+            mission_data.get("missionId")
+            or mission_data.get("mission_id")
+            or str(mission_id)
+        )
 
         # Build URN
         urn = f"urn:research:mission:{protocol_id}"
 
         # Extract purpose from research statement
-        research_statement = mission_data.get("researchStatement") or mission_data.get("research_statement") or {}
-        objective = research_statement.get("objective") or research_statement.get("purpose") or ""
+        research_statement = (
+            mission_data.get("researchStatement")
+            or mission_data.get("research_statement")
+            or {}
+        )
+        objective = (
+            research_statement.get("objective")
+            or research_statement.get("purpose")
+            or ""
+        )
         if not objective:
             objective = mission_data.get("objective") or ""
             if not objective:
@@ -173,10 +189,10 @@ class ManifestTransformer:
 
         # Extract description (title)
         title = (
-            mission_data.get("name") or
-            mission_data.get("title") or
-            mission_data.get("metadata", {}).get("name") or
-            protocol_id
+            mission_data.get("name")
+            or mission_data.get("title")
+            or mission_data.get("metadata", {}).get("name")
+            or protocol_id
         )
 
         # Detect PII in synthesis and content
@@ -196,7 +212,8 @@ class ManifestTransformer:
             "status": status,
             "research_statement": research_statement,
             "quality_gates": quality_gates,
-            "created_at": mission_data.get("created_at") or mission_data.get("metadata", {}).get("created"),
+            "created_at": mission_data.get("created_at")
+            or mission_data.get("metadata", {}).get("created"),
             "updated_at": mission_data.get("updated_at"),
             "relationships": self._relationships_from_edges(edges),
         }
@@ -224,14 +241,14 @@ class ManifestTransformer:
         self,
         document_id: str,
         name: str,
-        content: Optional[str] = None,
-        file_type: Optional[str] = None,
-        source_type: Optional[str] = None,
-        project_id: Optional[str] = None,
+        content: str | None = None,
+        file_type: str | None = None,
+        source_type: str | None = None,
+        project_id: str | None = None,
         chunk_count: int = 0,
-        uploaded_at: Optional[datetime] = None,
-        source_report_id: Optional[str] = None,
-        source_mission_id: Optional[str] = None,
+        uploaded_at: datetime | None = None,
+        source_report_id: str | None = None,
+        source_mission_id: str | None = None,
     ) -> TransformationResult:
         """Transform a document to PEDR manifest format."""
         urn = f"urn:research:document:{document_id}"
@@ -274,7 +291,9 @@ class ManifestTransformer:
                 "project_id": str(project_id) if project_id else None,
                 "chunk_count": chunk_count,
                 "source_report_id": str(source_report_id) if source_report_id else None,
-                "source_mission_id": str(source_mission_id) if source_mission_id else None,
+                "source_mission_id": str(source_mission_id)
+                if source_mission_id
+                else None,
             },
         )
 
@@ -285,11 +304,11 @@ class ManifestTransformer:
         insight_id: str,
         title: str,
         content: str,
-        insight_type: Optional[str] = None,
-        created_by: Optional[str] = None,
+        insight_type: str | None = None,
+        created_by: str | None = None,
         validated: bool = False,
-        project_id: Optional[str] = None,
-        source_chunk_ids: Optional[List[str]] = None,
+        project_id: str | None = None,
+        source_chunk_ids: list[str] | None = None,
     ) -> TransformationResult:
         """Transform an insight to PEDR manifest format."""
         urn = f"urn:research:insight:{insight_id}"
@@ -343,10 +362,10 @@ class ManifestTransformer:
         title: str,
         content: str,
         *,
-        project_id: Optional[str] = None,
-        source_chunk_ids: Optional[List[str]] = None,
-        source_collection_ids: Optional[List[str]] = None,
-        status: Optional[str] = None,
+        project_id: str | None = None,
+        source_chunk_ids: list[str] | None = None,
+        source_collection_ids: list[str] | None = None,
+        status: str | None = None,
     ) -> TransformationResult:
         """Transform a report to PEDR manifest format."""
         urn = f"urn:research:report:{report_id}"
@@ -387,7 +406,7 @@ class ManifestTransformer:
 
         return TransformationResult(success=True, manifest=manifest)
 
-    def _detect_pii(self, mission_data: Dict[str, Any]) -> bool:
+    def _detect_pii(self, mission_data: dict[str, Any]) -> bool:
         """Detect PII in mission data."""
         # Check explicit governance flags
         governance = mission_data.get("governance", {})
@@ -423,7 +442,7 @@ class ManifestTransformer:
 
         return False
 
-    def _detect_pii_in_text(self, text: Optional[str]) -> bool:
+    def _detect_pii_in_text(self, text: str | None) -> bool:
         """Detect PII patterns in text content."""
         if not text:
             return False
@@ -438,8 +457,8 @@ class ManifestTransformer:
     def _calculate_impact(
         self,
         status: str,
-        quality_gates: Optional[Dict[str, Any]],
-        mission_data: Dict[str, Any],
+        quality_gates: dict[str, Any] | None,
+        mission_data: dict[str, Any],
     ) -> int:
         """Calculate governance impact score (1-10 range).
 
@@ -483,11 +502,11 @@ class ManifestTransformer:
 
     def _extract_bindings(
         self,
-        mission_data: Dict[str, Any],
-        project_id: Optional[str],
-    ) -> Dict[str, Any]:
+        mission_data: dict[str, Any],
+        project_id: str | None,
+    ) -> dict[str, Any]:
         """Extract relationship bindings from mission data."""
-        bindings: Dict[str, Any] = {}
+        bindings: dict[str, Any] = {}
 
         if project_id:
             bindings["project_id"] = str(project_id)
@@ -528,7 +547,7 @@ class ManifestTransformer:
 
         return bindings
 
-    def _normalize_via(self, value: Optional[str]) -> Optional[str]:
+    def _normalize_via(self, value: str | None) -> str | None:
         if not value:
             return None
         candidate = str(value).strip().lower()
@@ -536,7 +555,7 @@ class ManifestTransformer:
             return candidate
         return None
 
-    def _to_urn(self, entity_type: str, identifier: Optional[str]) -> Optional[str]:
+    def _to_urn(self, entity_type: str, identifier: str | None) -> str | None:
         if not identifier:
             return None
         value = str(identifier)
@@ -550,8 +569,8 @@ class ManifestTransformer:
         from_urn: str,
         to_urn: str,
         *,
-        via: Optional[str] = None,
-    ) -> Optional[Edge]:
+        via: str | None = None,
+    ) -> Edge | None:
         if not from_urn or not to_urn:
             return None
         return Edge(
@@ -561,8 +580,8 @@ class ManifestTransformer:
             via=self._normalize_via(via),
         )
 
-    def _relationships_from_edges(self, edges: Sequence[Edge]) -> Dict[str, Any]:
-        relationships: Dict[str, List[str]] = {}
+    def _relationships_from_edges(self, edges: Sequence[Edge]) -> dict[str, Any]:
+        relationships: dict[str, list[str]] = {}
         for edge in edges:
             if edge.edge_type not in relationships:
                 relationships[edge.edge_type] = []
@@ -571,25 +590,37 @@ class ManifestTransformer:
         relationships["edges"] = [edge.to_dict() for edge in edges]
         return relationships
 
-    def _extract_chunk_binding(self, item: Any) -> tuple[Optional[str], Optional[str]]:
+    def _extract_chunk_binding(self, item: Any) -> tuple[str | None, str | None]:
         if isinstance(item, dict):
             chunk_id = item.get("chunk_id") or item.get("chunkId") or item.get("chunk")
-            via = item.get("via") or item.get("binding") or item.get("source_type") or item.get("source")
+            via = (
+                item.get("via")
+                or item.get("binding")
+                or item.get("source_type")
+                or item.get("source")
+            )
             return (str(chunk_id) if chunk_id else None, self._normalize_via(via))
         if isinstance(item, str):
             return (item, None)
         return (None, None)
 
-    def _extract_insight_binding(self, item: Any) -> tuple[Optional[str], Optional[str]]:
+    def _extract_insight_binding(self, item: Any) -> tuple[str | None, str | None]:
         if isinstance(item, dict):
-            insight_id = item.get("insight_id") or item.get("insightId") or item.get("insight")
-            via = item.get("via") or item.get("binding") or item.get("source_type") or item.get("source")
+            insight_id = (
+                item.get("insight_id") or item.get("insightId") or item.get("insight")
+            )
+            via = (
+                item.get("via")
+                or item.get("binding")
+                or item.get("source_type")
+                or item.get("source")
+            )
             return (str(insight_id) if insight_id else None, self._normalize_via(via))
         if isinstance(item, str):
             return (item, None)
         return (None, None)
 
-    def _extract_document_binding(self, item: Any) -> tuple[Optional[str], Optional[str]]:
+    def _extract_document_binding(self, item: Any) -> tuple[str | None, str | None]:
         if isinstance(item, dict):
             doc_id = (
                 item.get("document_id")
@@ -601,13 +632,18 @@ class ManifestTransformer:
                 or item.get("id")
                 or item.get("document")
             )
-            via = item.get("via") or item.get("binding") or item.get("source_type") or item.get("source")
+            via = (
+                item.get("via")
+                or item.get("binding")
+                or item.get("source_type")
+                or item.get("source")
+            )
             return (str(doc_id) if doc_id else None, self._normalize_via(via))
         if isinstance(item, str):
             return (item, None)
         return (None, None)
 
-    def _extract_mission_binding(self, item: Any) -> tuple[Optional[str], Optional[str]]:
+    def _extract_mission_binding(self, item: Any) -> tuple[str | None, str | None]:
         if isinstance(item, dict):
             mission_id = (
                 item.get("mission_id")
@@ -615,7 +651,12 @@ class ManifestTransformer:
                 or item.get("id")
                 or item.get("mission")
             )
-            via = item.get("via") or item.get("binding") or item.get("source_type") or item.get("source")
+            via = (
+                item.get("via")
+                or item.get("binding")
+                or item.get("source_type")
+                or item.get("source")
+            )
             return (str(mission_id) if mission_id else None, self._normalize_via(via))
         if isinstance(item, str):
             return (item, None)
@@ -624,10 +665,10 @@ class ManifestTransformer:
     def _build_mission_edges(
         self,
         urn: str,
-        mission_data: Dict[str, Any],
-        project_id: Optional[str],
-    ) -> List[Edge]:
-        edges: List[Edge] = []
+        mission_data: dict[str, Any],
+        project_id: str | None,
+    ) -> list[Edge]:
+        edges: list[Edge] = []
 
         if project_id:
             project_urn = self._to_urn("project", project_id)
@@ -650,9 +691,7 @@ class ManifestTransformer:
                     edges.append(edge)
 
         documents = (
-            mission_data.get("documents")
-            or mission_data.get("related_documents")
-            or []
+            mission_data.get("documents") or mission_data.get("related_documents") or []
         )
         if isinstance(documents, list):
             for item in documents:
@@ -662,7 +701,11 @@ class ManifestTransformer:
                 if edge:
                     edges.append(edge)
 
-        related = mission_data.get("related_missions") or mission_data.get("relatedMissions") or []
+        related = (
+            mission_data.get("related_missions")
+            or mission_data.get("relatedMissions")
+            or []
+        )
         if isinstance(related, list):
             for item in related:
                 mission_id, via = self._extract_mission_binding(item)
@@ -684,7 +727,9 @@ class ManifestTransformer:
                 if edge:
                     edges.append(edge)
 
-        result_report_id = mission_data.get("result_report_id") or mission_data.get("resultReportId")
+        result_report_id = mission_data.get("result_report_id") or mission_data.get(
+            "resultReportId"
+        )
         report_urn = self._to_urn("report", result_report_id)
         edge = self._build_edge("references", urn, report_urn)
         if edge:
@@ -696,13 +741,13 @@ class ManifestTransformer:
         self,
         urn: str,
         document_id: str,
-        project_id: Optional[str],
+        project_id: str | None,
         chunk_count: int,
-        source_type: Optional[str],
-        source_report_id: Optional[str] = None,
-        source_mission_id: Optional[str] = None,
-    ) -> List[Edge]:
-        edges: List[Edge] = []
+        source_type: str | None,
+        source_report_id: str | None = None,
+        source_mission_id: str | None = None,
+    ) -> list[Edge]:
+        edges: list[Edge] = []
         via = self._normalize_via(source_type)
 
         if project_id:
@@ -741,10 +786,10 @@ class ManifestTransformer:
     def _build_insight_edges(
         self,
         urn: str,
-        project_id: Optional[str],
-        source_chunk_ids: Optional[List[str]],
-    ) -> List[Edge]:
-        edges: List[Edge] = []
+        project_id: str | None,
+        source_chunk_ids: list[str] | None,
+    ) -> list[Edge]:
+        edges: list[Edge] = []
 
         if project_id:
             project_urn = self._to_urn("project", project_id)
@@ -764,11 +809,11 @@ class ManifestTransformer:
     def _build_report_edges(
         self,
         urn: str,
-        project_id: Optional[str],
-        source_chunk_ids: Optional[List[str]],
-        source_collection_ids: Optional[List[str]] = None,
-    ) -> List[Edge]:
-        edges: List[Edge] = []
+        project_id: str | None,
+        source_chunk_ids: list[str] | None,
+        source_collection_ids: list[str] | None = None,
+    ) -> list[Edge]:
+        edges: list[Edge] = []
 
         if project_id:
             project_urn = self._to_urn("project", project_id)
@@ -793,14 +838,14 @@ class ManifestTransformer:
         return edges
 
     @staticmethod
-    def _truncate(text: Optional[str], max_length: int) -> str:
+    def _truncate(text: str | None, max_length: int) -> str:
         """Truncate text to max length with ellipsis."""
         if not text:
             return ""
         text = str(text).strip()
         if len(text) <= max_length:
             return text
-        return text[:max_length - 3] + "..."
+        return text[: max_length - 3] + "..."
 
     # ------------------------------------------------------------------
     # Semantic Protocol Integration
@@ -809,9 +854,9 @@ class ManifestTransformer:
     def transform_with_protocol(
         self,
         mission_id: str,
-        mission_data: Dict[str, Any],
-        quality_gates: Optional[Dict[str, Any]] = None,
-        project_id: Optional[str] = None,
+        mission_data: dict[str, Any],
+        quality_gates: dict[str, Any] | None = None,
+        project_id: str | None = None,
         status: str = "unknown",
     ) -> TransformationResult:
         """Transform mission using full Semantic Protocol.
@@ -832,7 +877,7 @@ class ManifestTransformer:
         Returns:
             TransformationResult with enhanced PEDRManifest
         """
-        warnings: List[str] = []
+        warnings: list[str] = []
 
         if not mission_data:
             return TransformationResult(
@@ -886,13 +931,13 @@ class ManifestTransformer:
         self,
         document_id: str,
         name: str,
-        content: Optional[str] = None,
-        file_type: Optional[str] = None,
-        source_type: Optional[str] = None,
-        project_id: Optional[str] = None,
+        content: str | None = None,
+        file_type: str | None = None,
+        source_type: str | None = None,
+        project_id: str | None = None,
         chunk_count: int = 0,
-        source_report_id: Optional[str] = None,
-        source_mission_id: Optional[str] = None,
+        source_report_id: str | None = None,
+        source_mission_id: str | None = None,
     ) -> TransformationResult:
         """Transform document using full Semantic Protocol.
 
@@ -941,7 +986,7 @@ class ManifestTransformer:
                 manifest=legacy_manifest,
             )
 
-        except Exception as e:
+        except Exception:
             # Fall back to legacy transformation
             return self.transform_document(
                 document_id=document_id,
@@ -958,11 +1003,11 @@ class ManifestTransformer:
         insight_id: str,
         title: str,
         content: str,
-        insight_type: Optional[str] = None,
-        created_by: Optional[str] = None,
+        insight_type: str | None = None,
+        created_by: str | None = None,
         validated: bool = False,
-        project_id: Optional[str] = None,
-        source_chunk_ids: Optional[List[str]] = None,
+        project_id: str | None = None,
+        source_chunk_ids: list[str] | None = None,
     ) -> TransformationResult:
         """Transform insight using full Semantic Protocol.
 
@@ -1008,7 +1053,7 @@ class ManifestTransformer:
                 manifest=legacy_manifest,
             )
 
-        except Exception as e:
+        except Exception:
             # Fall back to legacy transformation
             return self.transform_insight(
                 insight_id=insight_id,
@@ -1023,7 +1068,7 @@ class ManifestTransformer:
 
 
 # Singleton instance
-_transformer: Optional[ManifestTransformer] = None
+_transformer: ManifestTransformer | None = None
 
 
 def get_manifest_transformer() -> ManifestTransformer:

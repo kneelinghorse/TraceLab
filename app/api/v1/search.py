@@ -1,12 +1,13 @@
 """API endpoints exposing the full RAG search experience."""
+
 import logging
-from typing import Dict, Any
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.schemas.rag import RagQuery, RagResponse
 from app.services.rag_service import get_rag_service
-from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.services.search_history import SearchHistoryService, get_search_history_service
 
 router = APIRouter()
@@ -71,7 +72,7 @@ def _log_search_history(
     history_service: SearchHistoryService,
 ) -> None:
     """Persist search history without impacting the primary request."""
-    filters: Dict[str, Any] = {
+    filters: dict[str, Any] = {
         "project_id": str(payload.project_id) if payload.project_id else None,
         "document_id": str(payload.document_id) if payload.document_id else None,
         "document_types": payload.document_types or [],

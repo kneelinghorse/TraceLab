@@ -24,14 +24,13 @@ Notes:
       - Preflight searches document chunks, not mission records directly
       - Ingested missions need document linkage for preflight discovery
 """
+
 from __future__ import annotations
 
-import json
 import os
 import sys
 from datetime import datetime
-from typing import Any, Dict, Optional
-
+from typing import Any
 
 try:
     import requests
@@ -54,11 +53,11 @@ class E2EProductionTest:
         self.username = username
         self.password = password
         self.verbose = verbose
-        self.token: Optional[str] = None
-        self.project_id: Optional[str] = None
-        self.mission_uuid: Optional[str] = None
-        self.mission_id: Optional[str] = None
-        self.results: Dict[str, Dict[str, Any]] = {}
+        self.token: str | None = None
+        self.project_id: str | None = None
+        self.mission_uuid: str | None = None
+        self.mission_id: str | None = None
+        self.results: dict[str, dict[str, Any]] = {}
 
     def log(self, msg: str) -> None:
         if self.verbose:
@@ -98,7 +97,7 @@ class E2EProductionTest:
 
         return all_passed
 
-    def test_authentication(self) -> Dict[str, Any]:
+    def test_authentication(self) -> dict[str, Any]:
         """Test service account can authenticate."""
         resp = requests.post(
             f"{self.base_url}/api/v1/auth/login",
@@ -121,14 +120,14 @@ class E2EProductionTest:
             "fatal": True,
         }
 
-    def _headers(self) -> Dict[str, str]:
+    def _headers(self) -> dict[str, str]:
         return {
             "Authorization": f"Bearer {self.token}",
             "Content-Type": "application/json",
             "X-Agent-ID": "e2e-production-test",
         }
 
-    def test_preflight_query(self) -> Dict[str, Any]:
+    def test_preflight_query(self) -> dict[str, Any]:
         """Test pre-flight query returns valid response."""
         resp = requests.post(
             f"{self.base_url}/api/v1/pedr/preflight",
@@ -156,7 +155,7 @@ class E2EProductionTest:
             "detail": resp.text[:200],
         }
 
-    def test_get_project(self) -> Dict[str, Any]:
+    def test_get_project(self) -> dict[str, Any]:
         """Get a project ID for mission ingestion."""
         resp = requests.get(
             f"{self.base_url}/api/v1/projects",
@@ -185,7 +184,7 @@ class E2EProductionTest:
             "fatal": True,
         }
 
-    def test_get_chunks_via_search(self) -> Dict[str, Any]:
+    def test_get_chunks_via_search(self) -> dict[str, Any]:
         """Find chunk IDs via search for evidence linking."""
         queries = [
             "software engineering metrics",
@@ -218,7 +217,7 @@ class E2EProductionTest:
             "blocking": len(chunk_ids) < 1,
         }
 
-    def test_ingest_mission(self) -> Dict[str, Any]:
+    def test_ingest_mission(self) -> dict[str, Any]:
         """Test mission ingestion via DeepSearch endpoint."""
         self.mission_id = f"TEST-E2E-{datetime.now().strftime('%Y%m%d%H%M%S')}"
 
@@ -258,16 +257,22 @@ class E2EProductionTest:
                 },
                 "evidence": [
                     {
-                        "evidence_id": f"EV-{i+1:03d}",
-                        "source": f"TraceLab Integration Test {i+1}",
-                        "summary": f"Test evidence item {i+1} for E2E verification",
-                        "chunk_id": self.chunk_ids[i] if hasattr(self, "chunk_ids") else None,
+                        "evidence_id": f"EV-{i + 1:03d}",
+                        "source": f"TraceLab Integration Test {i + 1}",
+                        "summary": f"Test evidence item {i + 1} for E2E verification",
+                        "chunk_id": self.chunk_ids[i]
+                        if hasattr(self, "chunk_ids")
+                        else None,
                         "relevance_score": 0.9 - (i * 0.05),
                     }
                     for i in range(min(3, len(getattr(self, "chunk_ids", []))))
                 ],
                 "quality_checkpoints": [
-                    {"gate": g, "status": "pass", "validated_at": datetime.now().isoformat()}
+                    {
+                        "gate": g,
+                        "status": "pass",
+                        "validated_at": datetime.now().isoformat(),
+                    }
                     for g in [
                         "research_statement",
                         "evidence_links",
@@ -302,7 +307,7 @@ class E2EProductionTest:
             "detail": resp.text[:500],
         }
 
-    def test_verify_persistence(self) -> Dict[str, Any]:
+    def test_verify_persistence(self) -> dict[str, Any]:
         """Verify ingested mission is persisted and retrievable."""
         resp = requests.get(
             f"{self.base_url}/api/v1/missions",
@@ -333,7 +338,7 @@ class E2EProductionTest:
             "message": f"Mission {self.mission_id} not found in missions list",
         }
 
-    def test_preflight_finds_mission(self) -> Dict[str, Any]:
+    def test_preflight_finds_mission(self) -> dict[str, Any]:
         """Test if preflight can find the ingested mission.
 
         NOTE: This is a known limitation. Preflight searches document chunks

@@ -3,20 +3,17 @@
 Handles incoming webhook payloads from DeepSearch and updates mission records.
 Includes signature validation, idempotent processing, and auto-ingestion of results.
 """
+
 from __future__ import annotations
 
 import hashlib
 import hmac
 import logging
-from datetime import datetime
-from typing import Optional, Tuple
 
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.models.document import Document
 from app.models.mission import Mission
-from app.models.report import Report
 from app.schemas.mission import MissionUpdate
 from app.schemas.webhook import DeepSearchWebhookPayload, DeepSearchWebhookStatus
 from app.services.auto_ingest import AutoIngestError, AutoIngestService
@@ -39,9 +36,9 @@ class WebhookHandler:
 
     def __init__(
         self,
-        mission_service: Optional[MissionService] = None,
-        auto_ingest_service: Optional[AutoIngestService] = None,
-        auto_report_service: Optional[AutoReportService] = None,
+        mission_service: MissionService | None = None,
+        auto_ingest_service: AutoIngestService | None = None,
+        auto_report_service: AutoReportService | None = None,
     ):
         self._mission_service = mission_service or MissionService()
         self._auto_ingest_service = auto_ingest_service
@@ -50,8 +47,8 @@ class WebhookHandler:
     def validate_signature(
         self,
         payload_body: bytes,
-        signature: Optional[str],
-        timestamp: Optional[str] = None,
+        signature: str | None,
+        timestamp: str | None = None,
     ) -> bool:
         """Validate webhook signature using HMAC-SHA256.
 
@@ -72,7 +69,9 @@ class WebhookHandler:
 
         # If no secret configured, skip validation (development mode)
         if not secret:
-            logger.warning("Webhook signature validation skipped - no secret configured")
+            logger.warning(
+                "Webhook signature validation skipped - no secret configured"
+            )
             return True
 
         if not signature:
@@ -80,7 +79,9 @@ class WebhookHandler:
 
         # Parse signature format: sha256=<hex>
         if not signature.startswith("sha256="):
-            raise WebhookValidationError("Invalid signature format - expected sha256=<hex>")
+            raise WebhookValidationError(
+                "Invalid signature format - expected sha256=<hex>"
+            )
 
         provided_signature = signature[7:]  # Remove 'sha256=' prefix
 
@@ -107,7 +108,7 @@ class WebhookHandler:
         self,
         db: Session,
         payload: DeepSearchWebhookPayload,
-    ) -> Tuple[Mission, str]:
+    ) -> tuple[Mission, str]:
         """Process a DeepSearch webhook callback.
 
         Updates the mission record based on the webhook payload.
@@ -133,7 +134,9 @@ class WebhookHandler:
 
         # Find mission by human-readable mission_id
         try:
-            mission = self._mission_service.get_mission_by_mission_id(db, payload.mission_id)
+            mission = self._mission_service.get_mission_by_mission_id(
+                db, payload.mission_id
+            )
         except MissionNotFoundError:
             logger.error("Mission not found for webhook: %s", payload.mission_id)
             raise
@@ -175,7 +178,7 @@ class WebhookHandler:
         db: Session,
         mission: Mission,
         payload: DeepSearchWebhookPayload,
-    ) -> Tuple[Mission, str]:
+    ) -> tuple[Mission, str]:
         """Handle successful job completion.
 
         Updates mission with results, marks as completed, and auto-ingests
@@ -184,13 +187,17 @@ class WebhookHandler:
         update_data = MissionUpdate(
             status="completed",
             deepsearch_job_id=payload.job_id,
-            execution_metadata=payload.execution_metadata.model_dump() if payload.execution_metadata else {},
+            execution_metadata=payload.execution_metadata.model_dump()
+            if payload.execution_metadata
+            else {},
             result_markdown=payload.result_markdown,
             result_protocol=payload.result_protocol,
             error_message=None,  # Clear any previous error
         )
 
-        updated_mission = self._mission_service.update_mission(db, mission.id, update_data)
+        updated_mission = self._mission_service.update_mission(
+            db, mission.id, update_data
+        )
 
         logger.info(
             "Mission completed via webhook: %s (job: %s)",
@@ -219,13 +226,15 @@ class WebhookHandler:
                     payload.mission_id,
                     str(exc),
                 )
-            except Exception as exc:
+            except Exception:
                 logger.exception(
                     "Unexpected error during auto-ingest for mission %s",
                     payload.mission_id,
                 )
         elif not payload.result_markdown:
-            logger.debug("No result_markdown to ingest for mission %s", payload.mission_id)
+            logger.debug(
+                "No result_markdown to ingest for mission %s", payload.mission_id
+            )
         elif not updated_mission.project_id:
             logger.debug(
                 "Mission %s has no project_id, skipping auto-ingest",
@@ -255,13 +264,15 @@ class WebhookHandler:
                     payload.mission_id,
                     str(exc),
                 )
-            except Exception as exc:
+            except Exception:
                 logger.exception(
                     "Unexpected error during auto-report creation for mission %s",
                     payload.mission_id,
                 )
         elif not payload.result_protocol:
-            logger.debug("No result_protocol for auto-report for mission %s", payload.mission_id)
+            logger.debug(
+                "No result_protocol for auto-report for mission %s", payload.mission_id
+            )
         elif not updated_mission.project_id:
             logger.debug(
                 "Mission %s has no project_id, skipping auto-report",
@@ -275,7 +286,7 @@ class WebhookHandler:
         db: Session,
         mission: Mission,
         payload: DeepSearchWebhookPayload,
-    ) -> Tuple[Mission, str]:
+    ) -> tuple[Mission, str]:
         """Handle job failure.
 
         Updates mission with error and marks as blocked.
@@ -283,11 +294,16 @@ class WebhookHandler:
         update_data = MissionUpdate(
             status="blocked",
             deepsearch_job_id=payload.job_id,
-            execution_metadata=payload.execution_metadata.model_dump() if payload.execution_metadata else {},
-            error_message=payload.error or "DeepSearch job failed without error message",
+            execution_metadata=payload.execution_metadata.model_dump()
+            if payload.execution_metadata
+            else {},
+            error_message=payload.error
+            or "DeepSearch job failed without error message",
         )
 
-        updated_mission = self._mission_service.update_mission(db, mission.id, update_data)
+        updated_mission = self._mission_service.update_mission(
+            db, mission.id, update_data
+        )
 
         logger.warning(
             "Mission failed via webhook: %s (job: %s, error: %s)",
@@ -303,7 +319,7 @@ class WebhookHandler:
         db: Session,
         mission: Mission,
         payload: DeepSearchWebhookPayload,
-    ) -> Tuple[Mission, str]:
+    ) -> tuple[Mission, str]:
         """Handle job cancellation.
 
         Updates mission status to cancelled.
@@ -311,11 +327,15 @@ class WebhookHandler:
         update_data = MissionUpdate(
             status="cancelled",
             deepsearch_job_id=payload.job_id,
-            execution_metadata=payload.execution_metadata.model_dump() if payload.execution_metadata else {},
+            execution_metadata=payload.execution_metadata.model_dump()
+            if payload.execution_metadata
+            else {},
             error_message=payload.error or "Job was cancelled",
         )
 
-        updated_mission = self._mission_service.update_mission(db, mission.id, update_data)
+        updated_mission = self._mission_service.update_mission(
+            db, mission.id, update_data
+        )
 
         logger.info(
             "Mission cancelled via webhook: %s (job: %s)",
@@ -327,7 +347,7 @@ class WebhookHandler:
 
 
 # Module-level singleton for convenience
-_handler: Optional[WebhookHandler] = None
+_handler: WebhookHandler | None = None
 
 
 def get_webhook_handler() -> WebhookHandler:

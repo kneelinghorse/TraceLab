@@ -31,7 +31,9 @@ def _find_cmos_root() -> Path:
 
     script_dir = Path(__file__).resolve().parent
     candidate = script_dir
-    if (candidate / "db" / "schema.sql").exists() and (candidate / "agents.md").exists():
+    if (candidate / "db" / "schema.sql").exists() and (
+        candidate / "agents.md"
+    ).exists():
         return candidate
     if (Path.cwd() / "cmos" / "db" / "schema.sql").exists():
         return Path.cwd() / "cmos"
@@ -42,7 +44,9 @@ def _find_cmos_root() -> Path:
         if current.parent == current:
             break
         current = current.parent
-    raise RuntimeError("Cannot find cmos/ directory. Please run from project root or supply --root.")
+    raise RuntimeError(
+        "Cannot find cmos/ directory. Please run from project root or supply --root."
+    )
 
 
 DEFAULT_ROOT = _find_cmos_root()
@@ -133,7 +137,7 @@ ANSI_COLORS = {
 }
 
 NO_ACTIVE_SESSION_MESSAGE = (
-    "No active session. Start one with: ./cmos/cli.py session start --type planning --title \"Sprint planning\" "
+    'No active session. Start one with: ./cmos/cli.py session start --type planning --title "Sprint planning" '
     "or pass --session PS-YYYY-MM-DD-### to target an existing one."
 )
 
@@ -195,7 +199,9 @@ def _normalize_status(value: str) -> str:
 
 
 def _ensure_mission_exists(client: SQLiteClient, mission_id: str) -> Dict[str, Any]:
-    row = client.fetchone("SELECT id, metadata FROM missions WHERE id = :id", {"id": mission_id})
+    row = client.fetchone(
+        "SELECT id, metadata FROM missions WHERE id = :id", {"id": mission_id}
+    )
     if not row:
         raise SystemExit(f"Mission {mission_id} does not exist.")
     return row
@@ -397,14 +403,26 @@ def _render_bullet_block(items: List[str], placeholder: str) -> List[str]:
     return [f"- {placeholder}"]
 
 
-def _render_research_report(mission: Dict[str, Any], events: List[Dict[str, Any]]) -> str:
+def _render_research_report(
+    mission: Dict[str, Any], events: List[Dict[str, Any]]
+) -> str:
     metadata_blob = _parse_metadata_blob(mission.get("metadata"))
-    brief = metadata_blob.get("metadata") if isinstance(metadata_blob.get("metadata"), dict) else {}
+    brief = (
+        metadata_blob.get("metadata")
+        if isinstance(metadata_blob.get("metadata"), dict)
+        else {}
+    )
 
     description = brief.get("description") if isinstance(brief, dict) else None
-    success = _extract_string_items(brief.get("successCriteria") if isinstance(brief, dict) else None)
-    deliverables = _extract_string_items(brief.get("deliverables") if isinstance(brief, dict) else None)
-    research_questions = _extract_string_items(brief.get("researchQuestions") if isinstance(brief, dict) else None)
+    success = _extract_string_items(
+        brief.get("successCriteria") if isinstance(brief, dict) else None
+    )
+    deliverables = _extract_string_items(
+        brief.get("deliverables") if isinstance(brief, dict) else None
+    )
+    research_questions = _extract_string_items(
+        brief.get("researchQuestions") if isinstance(brief, dict) else None
+    )
 
     started_at = metadata_blob.get("started_at")
     completed_at = mission.get("completed_at") or metadata_blob.get("completed_at")
@@ -499,7 +517,7 @@ def _mission_status(runtime: MissionRuntime, limit: int) -> None:
                 rowid
          LIMIT :limit
         """,
-        {"limit": limit}
+        {"limit": limit},
     )
     if not rows:
         print("No missions present in the queue.")
@@ -507,7 +525,9 @@ def _mission_status(runtime: MissionRuntime, limit: int) -> None:
     print("Mission queue:")
     for row in rows:
         status = row.get("status") or "unknown"
-        completed = f" (completed {row['completed_at']})" if row.get("completed_at") else ""
+        completed = (
+            f" (completed {row['completed_at']})" if row.get("completed_at") else ""
+        )
         print(f"- {row.get('id')}: {row.get('name')} [{status}]{completed}")
 
 
@@ -564,7 +584,9 @@ def _mission_add(env: Environment, args: argparse.Namespace) -> None:
     client = _open_client(env)
     try:
         _ensure_sprint_exists(client, args.sprint)
-        existing = client.fetchone("SELECT id FROM missions WHERE id = :id", {"id": args.mission_id})
+        existing = client.fetchone(
+            "SELECT id FROM missions WHERE id = :id", {"id": args.mission_id}
+        )
         if existing:
             raise SystemExit(f"Mission {args.mission_id} already exists.")
         metadata = _build_metadata_payload(
@@ -585,7 +607,9 @@ def _mission_add(env: Environment, args: argparse.Namespace) -> None:
                     "name": args.name,
                     "status": _normalize_status(args.status or "Queued"),
                     "notes": args.notes,
-                    "metadata": json.dumps(metadata, ensure_ascii=False) if metadata else None,
+                    "metadata": json.dumps(metadata, ensure_ascii=False)
+                    if metadata
+                    else None,
                 },
             )
     finally:
@@ -612,7 +636,12 @@ def _mission_update(env: Environment, args: argparse.Namespace) -> None:
 
         metadata_requested = any(
             value is not None
-            for value in (args.description, args.success, args.deliverable, args.metadata)
+            for value in (
+                args.description,
+                args.success,
+                args.deliverable,
+                args.metadata,
+            )
         )
         if metadata_requested:
             base: Optional[Dict[str, Any]] = None
@@ -629,7 +658,9 @@ def _mission_update(env: Environment, args: argparse.Namespace) -> None:
                 deliverables=args.deliverable,
                 metadata_json=args.metadata,
             )
-            updates["metadata"] = json.dumps(metadata, ensure_ascii=False) if metadata else None
+            updates["metadata"] = (
+                json.dumps(metadata, ensure_ascii=False) if metadata else None
+            )
 
         if not updates:
             raise SystemExit("Provide at least one field to update.")
@@ -730,8 +761,10 @@ def _mission_status_cmd(env: Environment, args: argparse.Namespace) -> None:
 def _mission_show_cmd(env: Environment, args: argparse.Namespace) -> None:
     """Display full mission specification."""
     if yaml is None:
-        raise SystemExit("PyYAML is required for mission display. Install pyyaml first.")
-    
+        raise SystemExit(
+            "PyYAML is required for mission display. Install pyyaml first."
+        )
+
     client = _open_client(env)
     try:
         row = client.fetchone(
@@ -744,72 +777,74 @@ def _mission_show_cmd(env: Environment, args: argparse.Namespace) -> None:
             LEFT JOIN sprints s ON s.id = m.sprint_id
             WHERE m.id = :id
             """,
-            {"id": args.mission_id}
+            {"id": args.mission_id},
         )
-        
+
         if not row:
             raise SystemExit(f"Mission {args.mission_id} not found.")
-        
+
         if args.format == "compact":
             # Compact format - key info only
             print(f"\nMission: {row['id']}")
             print(f"Name: {row['name']}")
             print(f"Status: {row['status']}")
             print(f"Sprint: {row['sprint_id']} - {row['sprint_title'] or 'N/A'}")
-            if row['completed_at']:
+            if row["completed_at"]:
                 print(f"Completed: {row['completed_at']}")
-            if row['objective']:
+            if row["objective"]:
                 print(f"\nObjective:\n{row['objective']}")
-            if row['notes']:
+            if row["notes"]:
                 print(f"\nNotes:\n{row['notes']}")
         else:
             # Full format - everything
-            print(f"\n{'='*80}")
+            print(f"\n{'=' * 80}")
             print(f"Mission: {row['id']} - {row['name']}")
-            print(f"{'='*80}\n")
-            
+            print(f"{'=' * 80}\n")
+
             print(f"Status: {row['status']}")
             print(f"Sprint: {row['sprint_id']} - {row['sprint_title'] or 'N/A'}")
-            if row['completed_at']:
+            if row["completed_at"]:
                 print(f"Completed: {row['completed_at']}")
-            
-            if row['objective']:
+
+            if row["objective"]:
                 print(f"\n## Objective\n{row['objective']}")
-            
-            if row['context']:
+
+            if row["context"]:
                 print(f"\n## Context\n{row['context']}")
-            
-            if row['success_criteria']:
-                criteria = json.loads(row['success_criteria'])
+
+            if row["success_criteria"]:
+                criteria = json.loads(row["success_criteria"])
                 print(f"\n## Success Criteria")
                 for i, criterion in enumerate(criteria, 1):
                     print(f"  {i}. {criterion}")
-            
-            if row['deliverables']:
-                deliverables = json.loads(row['deliverables'])
+
+            if row["deliverables"]:
+                deliverables = json.loads(row["deliverables"])
                 print(f"\n## Deliverables")
                 for i, item in enumerate(deliverables, 1):
                     print(f"  {i}. {item}")
-            
-            if row['reference_docs']:
-                refs = json.loads(row['reference_docs'])
+
+            if row["reference_docs"]:
+                refs = json.loads(row["reference_docs"])
                 print(f"\n## References")
                 for ref in refs:
                     print(f"  - {ref}")
-            
-            if row['domain_fields']:
-                domain = json.loads(row['domain_fields'])
+
+            if row["domain_fields"]:
+                domain = json.loads(row["domain_fields"])
                 print(f"\n## Domain Fields")
                 print(f"Type: {domain.get('type', 'N/A')}")
-                if domain.get('researchFoundation'):
+                if domain.get("researchFoundation"):
                     print(f"\nResearch Foundation:")
-                    for finding in domain['researchFoundation']:
-                        print(f"  - {finding.get('finding', 'N/A')} (from {finding.get('sourceMission', 'N/A')})")
-            
-            if row['notes']:
+                    for finding in domain["researchFoundation"]:
+                        print(
+                            f"  - {finding.get('finding', 'N/A')} (from {finding.get('sourceMission', 'N/A')})"
+                        )
+
+            if row["notes"]:
                 print(f"\n## Mission Notes\n{row['notes']}")
-            
-            print(f"\n{'='*80}\n")
+
+            print(f"\n{'=' * 80}\n")
     finally:
         client.close()
 
@@ -862,13 +897,16 @@ def _session_onboard(env: Environment, _args: argparse.Namespace) -> None:
     try:
         project_context = client.get_context("project_context") or {}
         master_context = client.get_context("master_context") or {}
-        session_stats = client.fetchone(
-            """
+        session_stats = (
+            client.fetchone(
+                """
             SELECT COUNT(*) AS total_sessions,
                    MAX(COALESCE(completed_at, started_at)) AS last_activity
               FROM sessions
             """
-        ) or {}
+            )
+            or {}
+        )
         recent_sessions = client.fetchall(
             """
             SELECT id, type, title, summary, completed_at, started_at, captures, next_steps
@@ -927,9 +965,15 @@ def _session_onboard(env: Environment, _args: argparse.Namespace) -> None:
     working_memory = project_context.get("working_memory") or {}
     project_identity = master_context.get("project_identity") or {}
     project_name = project_identity.get("name") or "CMOS Project"
-    project_desc = project_identity.get("description") or "Session management initiative"
-    total_sessions = working_memory.get("session_count") or session_stats.get("total_sessions") or 0
-    last_activity = working_memory.get("last_session") or session_stats.get("last_activity")
+    project_desc = (
+        project_identity.get("description") or "Session management initiative"
+    )
+    total_sessions = (
+        working_memory.get("session_count") or session_stats.get("total_sessions") or 0
+    )
+    last_activity = working_memory.get("last_session") or session_stats.get(
+        "last_activity"
+    )
 
     lines: List[str] = []
     lines.append("=== Project Overview ===")
@@ -938,23 +982,42 @@ def _session_onboard(env: Environment, _args: argparse.Namespace) -> None:
         lines.append(f"Description: {project_desc}")
     if sprint:
         lines.append(f"Sprint: {sprint['id']} - {sprint['title']} ({sprint['status']})")
-    lines.append(f"Sessions: {total_sessions} total, last activity { _format_relative_timestamp(last_activity) }")
+    lines.append(
+        f"Sessions: {total_sessions} total, last activity {_format_relative_timestamp(last_activity)}"
+    )
     lines.append("")
 
     lines.append("=== Recent Sessions ===")
     if not recent_sessions:
-        lines.append("No sessions recorded yet. Start one with `./cmos/cli.py session start ...`")
+        lines.append(
+            "No sessions recorded yet. Start one with `./cmos/cli.py session start ...`"
+        )
     else:
         for row in recent_sessions:
             ts = row.get("completed_at") or row.get("started_at")
             title = row.get("title") or row.get("id")
-            lines.append(f"• [{(row.get('type') or 'session').title()}] {title} ({_format_relative_timestamp(ts)})")
+            lines.append(
+                f"• [{(row.get('type') or 'session').title()}] {title} ({_format_relative_timestamp(ts)})"
+            )
             summary = row.get("summary") or "No summary captured."
             lines.append(f"  Summary: {summary}")
             captures = _load_json_array(row.get("captures"))
-            decision = next((c.get("content") for c in captures if c.get("category") == "decision"), None)
-            learning = next((c.get("content") for c in captures if c.get("category") == "learning"), None)
-            next_capture = next((c.get("content") for c in captures if c.get("category") == "next-step"), None)
+            decision = next(
+                (c.get("content") for c in captures if c.get("category") == "decision"),
+                None,
+            )
+            learning = next(
+                (c.get("content") for c in captures if c.get("category") == "learning"),
+                None,
+            )
+            next_capture = next(
+                (
+                    c.get("content")
+                    for c in captures
+                    if c.get("category") == "next-step"
+                ),
+                None,
+            )
             if decision:
                 lines.append(f"  Decision: {decision}")
             if learning:
@@ -987,17 +1050,27 @@ def _session_onboard(env: Environment, _args: argparse.Namespace) -> None:
         for decision in decisions:
             domain = decision.get("project_domain") or "general"
             ts = decision.get("created_at")
-            lines.append(f"• {decision['decision_text']} [{domain}] ({_format_relative_timestamp(ts)})")
+            lines.append(
+                f"• {decision['decision_text']} [{domain}] ({_format_relative_timestamp(ts)})"
+            )
     else:
         lines.append("No strategic decisions recorded yet.")
     lines.append("")
 
     lines.append("=== Quick Start ===")
     lines.append("1. Review backlog: ./cmos/cli.py mission status")
-    lines.append("2. Start build work: ./cmos/cli.py mission start <id> --summary \"Your summary\"")
-    lines.append("3. Capture planning: ./cmos/cli.py session start --type planning --title \"Sprint planning\"")
-    lines.append("4. Log insights: ./cmos/cli.py session capture decision \"Key decision\"")
-    lines.append("5. Finish sessions: ./cmos/cli.py session complete --summary \"Wrap-up\"")
+    lines.append(
+        '2. Start build work: ./cmos/cli.py mission start <id> --summary "Your summary"'
+    )
+    lines.append(
+        '3. Capture planning: ./cmos/cli.py session start --type planning --title "Sprint planning"'
+    )
+    lines.append(
+        '4. Log insights: ./cmos/cli.py session capture decision "Key decision"'
+    )
+    lines.append(
+        '5. Finish sessions: ./cmos/cli.py session complete --summary "Wrap-up"'
+    )
 
     print("\n".join(lines))
 
@@ -1040,7 +1113,9 @@ def _session_list(env: Environment, args: argparse.Namespace) -> None:
         started = row.get("started_at")
         completed = row.get("completed_at")
         summary = row.get("summary") or "No summary captured."
-        duration = _format_duration(started, completed if status == "completed" else None)
+        duration = _format_duration(
+            started, completed if status == "completed" else None
+        )
         captures = _load_json_array(row.get("captures"))
         counts: Dict[str, int] = {}
         for capture in captures:
@@ -1048,7 +1123,10 @@ def _session_list(env: Environment, args: argparse.Namespace) -> None:
             if category:
                 counts[category] = counts.get(category, 0) + 1
 
-        capture_bits = ", ".join(f"{value} {key}" for key, value in counts.items()) or "no captures logged"
+        capture_bits = (
+            ", ".join(f"{value} {key}" for key, value in counts.items())
+            or "no captures logged"
+        )
         print(f"{session_id} [{session_type}] {title} ({status})")
         print(f"  Started: {_format_full_timestamp(started)}, Duration: {duration}")
         print(f"  Summary: {summary}")
@@ -1135,7 +1213,7 @@ def _session_search(env: Environment, args: argparse.Namespace) -> None:
         client.close()
 
     category = (args.category or "").lower()
-    print(f"=== Search Results for \"{args.query}\" ===")
+    print(f'=== Search Results for "{args.query}" ===')
     if not rows:
         print("No sessions matched the search query.")
         return
@@ -1152,7 +1230,11 @@ def _session_search(env: Environment, args: argparse.Namespace) -> None:
             text = f"{content} {capture.get('context') or ''}".lower()
             if category and cat != category:
                 continue
-            if args.query.lower() in text or args.query.lower() in (title or "").lower() or args.query.lower() in snippet.lower():
+            if (
+                args.query.lower() in text
+                or args.query.lower() in (title or "").lower()
+                or args.query.lower() in snippet.lower()
+            ):
                 capture_match = capture
                 break
         if category and capture_match is None:
@@ -1163,10 +1245,14 @@ def _session_search(env: Environment, args: argparse.Namespace) -> None:
         session_type = (row.get("type") or "session").title()
         print(f"{session_id} [{session_type}] {title}")
         if capture_match:
-            print(f"  [{capture_match.get('category', 'entry').title()}] {capture_match.get('content')}")
+            print(
+                f"  [{capture_match.get('category', 'entry').title()}] {capture_match.get('content')}"
+            )
         else:
             print(f"  Summary: {snippet or 'No summary available.'}")
-        print(f"  When: {_format_relative_timestamp(row.get('completed_at') or row.get('started_at'))}")
+        print(
+            f"  When: {_format_relative_timestamp(row.get('completed_at') or row.get('started_at'))}"
+        )
         print("")
 
     if matches == 0:
@@ -1252,7 +1338,9 @@ def _print_backlog(backlog: Dict[str, Any]) -> None:
         print(f"[{sprint_id}] {sprint.get('title') or '(untitled sprint)'}")
         status = sprint.get("status") or "unknown"
         print(f"  status: {status}")
-        window = " - ".join(filter(None, [sprint.get("startDate"), sprint.get("endDate")]))
+        window = " - ".join(
+            filter(None, [sprint.get("startDate"), sprint.get("endDate")])
+        )
         if window:
             print(f"  window: {window}")
         missions = sprint.get("missions") or []
@@ -1289,7 +1377,9 @@ def _show_current(client: SQLiteClient) -> None:
 
     print("Tracked missions in progress:")
     for mission in missions:
-        line = f"- {mission.get('id')}: {mission.get('name')} [{mission.get('status')}]."
+        line = (
+            f"- {mission.get('id')}: {mission.get('name')} [{mission.get('status')}]."
+        )
         if mission.get("completed_at"):
             line += f" completed {mission['completed_at']}"
         print(line)
@@ -1310,13 +1400,19 @@ def _export_contexts(env: Environment, args: argparse.Namespace) -> None:
 
     project_path.parent.mkdir(parents=True, exist_ok=True)
     master_path.parent.mkdir(parents=True, exist_ok=True)
-    project_path.write_text(json.dumps(project, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    master_path.write_text(json.dumps(master, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    project_path.write_text(
+        json.dumps(project, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    master_path.write_text(
+        json.dumps(master, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     print(f"Exported project context to {project_path}")
     print(f"Exported master context to {master_path}")
 
 
-def _export_backlog(env: Environment, output: Optional[Path] = None, *, quiet: bool = False) -> Path:
+def _export_backlog(
+    env: Environment, output: Optional[Path] = None, *, quiet: bool = False
+) -> Path:
     if yaml is None:
         raise SystemExit("PyYAML is required for backlog export. Install pyyaml first.")
     output_path = (output or (env.root / "missions" / "backlog.yaml")).resolve()
@@ -1344,7 +1440,9 @@ def _export_backlog(env: Environment, output: Optional[Path] = None, *, quiet: b
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8") as handle:
-        yaml.safe_dump_all([metadata_doc, {"domainFields": domain_fields}], handle, sort_keys=False)
+        yaml.safe_dump_all(
+            [metadata_doc, {"domainFields": domain_fields}], handle, sort_keys=False
+        )
     if not quiet:
         print(f"Exported backlog to {output_path}")
     return output_path
@@ -1356,11 +1454,13 @@ def _sync_backlog(env: Environment) -> Path:
     return path
 
 
-def _export_mission_yaml(env: Environment, mission_id: str, output_dir: Optional[Path] = None) -> Path:
+def _export_mission_yaml(
+    env: Environment, mission_id: str, output_dir: Optional[Path] = None
+) -> Path:
     """Export a single mission's full YAML specification from database."""
     if yaml is None:
         raise SystemExit("PyYAML is required for mission export. Install pyyaml first.")
-    
+
     client = _open_client(env)
     try:
         row = client.fetchone(
@@ -1369,20 +1469,20 @@ def _export_mission_yaml(env: Environment, mission_id: str, output_dir: Optional
                    success_criteria, deliverables, reference_docs, domain_fields
             FROM missions WHERE id = :id
             """,
-            {"id": mission_id}
+            {"id": mission_id},
         )
         if not row:
             raise SystemExit(f"Mission {mission_id} not found in database.")
     finally:
         client.close()
-    
+
     # Build mission YAML structure
     mission_doc = {
         "missionId": row["id"],
         "objective": row["objective"] or "",
         "context": row["context"] or "",
     }
-    
+
     # Parse JSON fields
     if row["success_criteria"]:
         mission_doc["successCriteria"] = json.loads(row["success_criteria"])
@@ -1392,21 +1492,21 @@ def _export_mission_yaml(env: Environment, mission_id: str, output_dir: Optional
         mission_doc["references"] = json.loads(row["reference_docs"])
     if row["domain_fields"]:
         mission_doc["domainFields"] = json.loads(row["domain_fields"])
-    
+
     # Determine output path
     base_dir = output_dir or (env.root / "missions" / row["sprint_id"])
     base_dir = base_dir.resolve()
     base_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Generate filename from mission name
     safe_name = row["name"].replace(":", "_").replace(" ", "_").replace("/", "-")
     output_path = base_dir / f"{row['id']}_{safe_name}.yaml"
-    
+
     # Write YAML file with comment header
     with output_path.open("w", encoding="utf-8") as f:
         f.write(f"# Mission File: {output_path.name}\n\n")
         yaml.safe_dump(mission_doc, f, sort_keys=False, allow_unicode=True)
-    
+
     return output_path
 
 
@@ -1414,7 +1514,7 @@ def _export_all_missions(env: Environment, output_root: Optional[Path] = None) -
     """Export all missions as YAML files organized by sprint."""
     if yaml is None:
         raise SystemExit("PyYAML is required for mission export. Install pyyaml first.")
-    
+
     base_dir = (output_root or (env.root / "missions")).resolve()
     client = _open_client(env)
     try:
@@ -1427,17 +1527,22 @@ def _export_all_missions(env: Environment, output_root: Optional[Path] = None) -
         )
     finally:
         client.close()
-    
+
     count = 0
     for row in rows:
         sprint_dir = base_dir / row["sprint_id"]
         _export_mission_yaml(env, row["id"], sprint_dir)
         count += 1
-    
+
     return count
 
 
-def _context_snapshot(env: Environment, context_id: str, session_id: Optional[str] = None, source: Optional[str] = None) -> None:
+def _context_snapshot(
+    env: Environment,
+    context_id: str,
+    session_id: Optional[str] = None,
+    source: Optional[str] = None,
+) -> None:
     """Take a snapshot of the specified context."""
     full_context_id = f"{context_id}_context"
     client = _open_client(env)
@@ -1445,14 +1550,11 @@ def _context_snapshot(env: Environment, context_id: str, session_id: Optional[st
         context = client.get_context(full_context_id)
         if not context:
             raise SystemExit(f"Context '{context_id}' not found in database.")
-        
+
         was_added = client.add_context_snapshot(
-            full_context_id,
-            context,
-            session_id=session_id,
-            source=source
+            full_context_id, context, session_id=session_id, source=source
         )
-        
+
         if was_added:
             print(f"Snapshot created for {context_id}_context")
             if source:
@@ -1476,20 +1578,22 @@ def _context_history(env: Environment, context_id: str, limit: int = 10) -> None
             ORDER BY created_at DESC
             LIMIT :limit
             """,
-            {"context_id": full_context_id, "limit": limit}
+            {"context_id": full_context_id, "limit": limit},
         )
-        
+
         if not snapshots:
             print(f"No snapshots found for {context_id}_context")
             return
-        
-        print(f"\nSnapshot History for {context_id}_context ({len(snapshots)} shown):\n")
+
+        print(
+            f"\nSnapshot History for {context_id}_context ({len(snapshots)} shown):\n"
+        )
         for snap in snapshots:
             print(f"ID: {snap['id']}")
             print(f"  Created: {snap['created_at']}")
-            if snap['session_id']:
+            if snap["session_id"]:
                 print(f"  Session: {snap['session_id']}")
-            if snap['source']:
+            if snap["source"]:
                 print(f"  Source: {snap['source']}")
             print(f"  Hash: {snap['content_hash'][:16]}...")
             print()
@@ -1507,21 +1611,21 @@ def _context_view_snapshot(env: Environment, snapshot_id: int) -> None:
             FROM context_snapshots
             WHERE id = :id
             """,
-            {"id": snapshot_id}
+            {"id": snapshot_id},
         )
-        
+
         if not snapshot:
             raise SystemExit(f"Snapshot {snapshot_id} not found.")
-        
+
         print(f"\nSnapshot ID: {snapshot['id']}")
         print(f"Context: {snapshot['context_id']}")
         print(f"Created: {snapshot['created_at']}")
-        if snapshot['session_id']:
+        if snapshot["session_id"]:
             print(f"Session: {snapshot['session_id']}")
-        if snapshot['source']:
+        if snapshot["source"]:
             print(f"Source: {snapshot['source']}")
         print("\n--- Content ---\n")
-        print(snapshot['content'])
+        print(snapshot["content"])
     finally:
         client.close()
 
@@ -1564,34 +1668,38 @@ def _decisions_list(env: Environment, limit: int, domain: Optional[str] = None) 
     try:
         query = "SELECT id, decision_text, created_at, project_domain, sprint_id FROM strategic_decisions"
         params: Dict[str, Any] = {"limit": limit}
-        
+
         if domain:
             query += " WHERE project_domain = :domain"
             params["domain"] = domain
-        
+
         query += " ORDER BY created_at DESC LIMIT :limit"
-        
+
         decisions = client.fetchall(query, params)
-        
+
         if not decisions:
             print("No strategic decisions found.")
             return
-        
+
         print(f"\nStrategic Decisions ({len(decisions)} shown):\n")
         for dec in decisions:
             print(f"ID: {dec['id']}")
             print(f"  Date: {dec['created_at']}")
-            if dec['project_domain']:
+            if dec["project_domain"]:
                 print(f"  Domain: {dec['project_domain']}")
-            if dec['sprint_id']:
+            if dec["sprint_id"]:
                 print(f"  Sprint: {dec['sprint_id']}")
-            print(f"  Decision: {dec['decision_text'][:100]}{'...' if len(dec['decision_text']) > 100 else ''}")
+            print(
+                f"  Decision: {dec['decision_text'][:100]}{'...' if len(dec['decision_text']) > 100 else ''}"
+            )
             print()
     finally:
         client.close()
 
 
-def _decisions_search(env: Environment, keyword: str, domain: Optional[str] = None) -> None:
+def _decisions_search(
+    env: Environment, keyword: str, domain: Optional[str] = None
+) -> None:
     """Search decisions by keyword."""
     client = _open_client(env)
     try:
@@ -1601,23 +1709,23 @@ def _decisions_search(env: Environment, keyword: str, domain: Optional[str] = No
             WHERE decision_text LIKE :keyword
         """
         params: Dict[str, Any] = {"keyword": f"%{keyword}%"}
-        
+
         if domain:
             query += " AND project_domain = :domain"
             params["domain"] = domain
-        
+
         query += " ORDER BY created_at DESC"
-        
+
         decisions = client.fetchall(query, params)
-        
+
         if not decisions:
             print(f"No decisions found matching '{keyword}'.")
             return
-        
+
         print(f"\nFound {len(decisions)} decision(s) matching '{keyword}':\n")
         for dec in decisions:
             print(f"ID: {dec['id']} | {dec['created_at']}")
-            if dec['project_domain']:
+            if dec["project_domain"]:
                 print(f"  Domain: {dec['project_domain']}")
             print(f"  {dec['decision_text']}")
             print()
@@ -1636,17 +1744,17 @@ def _decisions_by_sprint(env: Environment, sprint_id: str) -> None:
             WHERE sprint_id = :sprint_id
             ORDER BY created_at
             """,
-            {"sprint_id": sprint_id}
+            {"sprint_id": sprint_id},
         )
-        
+
         if not decisions:
             print(f"No decisions found for sprint '{sprint_id}'.")
             return
-        
+
         print(f"\nStrategic Decisions for {sprint_id} ({len(decisions)} total):\n")
         for dec in decisions:
             print(f"ID: {dec['id']} | {dec['created_at']}")
-            if dec['project_domain']:
+            if dec["project_domain"]:
                 print(f"  Domain: {dec['project_domain']}")
             print(f"  {dec['decision_text']}")
             print()
@@ -1667,10 +1775,14 @@ def _validate_foundational_refs(env: Environment) -> None:
             continue
         for needle in required:
             if needle not in content:
-                failures.append(f"{relative_path}: missing required reference '{needle}'")
+                failures.append(
+                    f"{relative_path}: missing required reference '{needle}'"
+                )
         for needle in forbidden:
             if needle in content:
-                failures.append(f"{relative_path}: contains forbidden reference '{needle}'")
+                failures.append(
+                    f"{relative_path}: contains forbidden reference '{needle}'"
+                )
 
     if failures:
         print("Foundational reference validation failed:")
@@ -1692,7 +1804,12 @@ def _validate_health(env: Environment) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="CMOS helper CLI")
-    parser.add_argument("--root", type=Path, default=None, help="Path to the cmos/ directory (auto-detected when omitted).")
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=None,
+        help="Path to the cmos/ directory (auto-detected when omitted).",
+    )
     parser.add_argument(
         "--database",
         type=Path,
@@ -1705,68 +1822,147 @@ def build_parser() -> argparse.ArgumentParser:
     mission_parser = subparsers.add_parser("mission", help="Mission lifecycle helpers")
     mission_sub = mission_parser.add_subparsers(dest="mission_command", required=True)
 
-    mission_status = mission_sub.add_parser("status", help="Show queued and active missions")
-    mission_status.add_argument("--limit", type=int, default=5, help="Maximum missions to display")
+    mission_status = mission_sub.add_parser(
+        "status", help="Show queued and active missions"
+    )
+    mission_status.add_argument(
+        "--limit", type=int, default=5, help="Maximum missions to display"
+    )
 
-    mission_show = mission_sub.add_parser("show", help="Display full mission specification")
+    mission_show = mission_sub.add_parser(
+        "show", help="Display full mission specification"
+    )
     mission_show.add_argument("mission_id", help="Mission identifier (e.g. B3.3)")
-    mission_show.add_argument("--format", choices=["full", "compact"], default="full", help="Output format")
+    mission_show.add_argument(
+        "--format", choices=["full", "compact"], default="full", help="Output format"
+    )
 
-    mission_start = mission_sub.add_parser("start", help="Mark a mission as In Progress")
+    mission_start = mission_sub.add_parser(
+        "start", help="Mark a mission as In Progress"
+    )
     mission_start.add_argument("mission_id", help="Mission identifier (e.g. B3.3)")
-    mission_start.add_argument("--summary", required=True, help="Session summary to log")
-    mission_start.add_argument("--agent", default="codex", help="Agent identifier for session logging")
+    mission_start.add_argument(
+        "--summary", required=True, help="Session summary to log"
+    )
+    mission_start.add_argument(
+        "--agent", default="codex", help="Agent identifier for session logging"
+    )
     mission_start.add_argument("--ts", help="ISO timestamp override (UTC)")
 
-    mission_complete = mission_sub.add_parser("complete", help="Mark a mission as Completed")
+    mission_complete = mission_sub.add_parser(
+        "complete", help="Mark a mission as Completed"
+    )
     mission_complete.add_argument("mission_id", help="Mission identifier (e.g. B3.3)")
     mission_complete.add_argument("--summary", required=True, help="Completion summary")
-    mission_complete.add_argument("--notes", required=True, help="Notes to persist in the backlog")
-    mission_complete.add_argument("--agent", default="codex", help="Agent identifier for session logging")
+    mission_complete.add_argument(
+        "--notes", required=True, help="Notes to persist in the backlog"
+    )
+    mission_complete.add_argument(
+        "--agent", default="codex", help="Agent identifier for session logging"
+    )
     mission_complete.add_argument("--ts", help="ISO timestamp override (UTC)")
-    mission_complete.add_argument("--next-hint", help="Optional follow-up hint to include in the session log")
-    mission_complete.add_argument("--no-promote", action="store_true", help="Do not promote the next queued mission")
-    mission_complete.add_argument("--immediate", action="store_true", help="Promote the next mission directly to In Progress")
+    mission_complete.add_argument(
+        "--next-hint", help="Optional follow-up hint to include in the session log"
+    )
+    mission_complete.add_argument(
+        "--no-promote",
+        action="store_true",
+        help="Do not promote the next queued mission",
+    )
+    mission_complete.add_argument(
+        "--immediate",
+        action="store_true",
+        help="Promote the next mission directly to In Progress",
+    )
 
     mission_block = mission_sub.add_parser("block", help="Mark a mission as Blocked")
     mission_block.add_argument("mission_id", help="Mission identifier (e.g. B3.3)")
-    mission_block.add_argument("--summary", required=True, help="Short summary of the blocker")
-    mission_block.add_argument("--reason", required=True, help="Reason stored in mission notes")
-    mission_block.add_argument("--need", action="append", default=[], help="Follow-up need (can be repeated)")
-    mission_block.add_argument("--agent", default="codex", help="Agent identifier for session logging")
+    mission_block.add_argument(
+        "--summary", required=True, help="Short summary of the blocker"
+    )
+    mission_block.add_argument(
+        "--reason", required=True, help="Reason stored in mission notes"
+    )
+    mission_block.add_argument(
+        "--need", action="append", default=[], help="Follow-up need (can be repeated)"
+    )
+    mission_block.add_argument(
+        "--agent", default="codex", help="Agent identifier for session logging"
+    )
     mission_block.add_argument("--ts", help="ISO timestamp override (UTC)")
-    mission_block.add_argument("--next-hint", help="Optional hint to include in the session log")
+    mission_block.add_argument(
+        "--next-hint", help="Optional hint to include in the session log"
+    )
 
-    mission_add = mission_sub.add_parser("add", help="Add a mission to the backlog database")
+    mission_add = mission_sub.add_parser(
+        "add", help="Add a mission to the backlog database"
+    )
     mission_add.add_argument("mission_id", help="Mission identifier (e.g. B4.1)")
     mission_add.add_argument("name", help="Mission display name")
     mission_add.add_argument("--sprint", required=True, help="Sprint identifier")
-    mission_add.add_argument("--status", default="Queued", help="Initial mission status (default: Queued)")
+    mission_add.add_argument(
+        "--status", default="Queued", help="Initial mission status (default: Queued)"
+    )
     mission_add.add_argument("--notes", help="Optional mission notes")
     mission_add.add_argument("--description", help="Description stored in metadata")
-    mission_add.add_argument("--success", action="append", default=None, help="Success criteria entry (repeatable)")
-    mission_add.add_argument("--deliverable", action="append", default=None, help="Deliverable entry (repeatable)")
-    mission_add.add_argument("--metadata", help="Raw JSON merged into metadata (object)")
+    mission_add.add_argument(
+        "--success",
+        action="append",
+        default=None,
+        help="Success criteria entry (repeatable)",
+    )
+    mission_add.add_argument(
+        "--deliverable",
+        action="append",
+        default=None,
+        help="Deliverable entry (repeatable)",
+    )
+    mission_add.add_argument(
+        "--metadata", help="Raw JSON merged into metadata (object)"
+    )
 
-    mission_update = mission_sub.add_parser("update", help="Update mission fields in the backlog")
+    mission_update = mission_sub.add_parser(
+        "update", help="Update mission fields in the backlog"
+    )
     mission_update.add_argument("mission_id", help="Mission identifier to update")
     mission_update.add_argument("--name", help="New mission name")
     mission_update.add_argument("--status", help="New mission status")
     mission_update.add_argument("--sprint", help="Move mission to another sprint")
     mission_update.add_argument("--notes", default=None, help="Replace mission notes")
     mission_update.add_argument("--description", help="Override metadata description")
-    mission_update.add_argument("--success", action="append", default=None, help="Replace success criteria (repeatable)")
-    mission_update.add_argument("--deliverable", action="append", default=None, help="Replace deliverables (repeatable)")
+    mission_update.add_argument(
+        "--success",
+        action="append",
+        default=None,
+        help="Replace success criteria (repeatable)",
+    )
+    mission_update.add_argument(
+        "--deliverable",
+        action="append",
+        default=None,
+        help="Replace deliverables (repeatable)",
+    )
     mission_update.add_argument("--metadata", help="JSON merged into metadata (object)")
 
-    mission_depends = mission_sub.add_parser("depends", help="Add or update mission dependencies")
+    mission_depends = mission_sub.add_parser(
+        "depends", help="Add or update mission dependencies"
+    )
     mission_depends.add_argument("from_id", help="Mission that blocks another")
     mission_depends.add_argument("to_id", help="Mission that is blocked")
-    mission_depends.add_argument("--type", dest="dep_type", default="Blocks", help="Dependency label (default: Blocks)")
+    mission_depends.add_argument(
+        "--type",
+        dest="dep_type",
+        default="Blocks",
+        help="Dependency label (default: Blocks)",
+    )
 
     research_parser = subparsers.add_parser("research", help="Research mission helpers")
-    research_sub = research_parser.add_subparsers(dest="research_command", required=True)
-    research_export = research_sub.add_parser("export", help="Export a mission's research findings to Markdown")
+    research_sub = research_parser.add_subparsers(
+        dest="research_command", required=True
+    )
+    research_export = research_sub.add_parser(
+        "export", help="Export a mission's research findings to Markdown"
+    )
     research_export.add_argument("mission_id", help="Mission identifier to export")
     research_export.add_argument(
         "--output",
@@ -1788,34 +1984,75 @@ def build_parser() -> argparse.ArgumentParser:
     db_sub = db_parser.add_subparsers(dest="db_command", required=True)
 
     db_show = db_sub.add_parser("show", help="Display backlog or current mission state")
-    db_show.add_argument("view", choices=["backlog", "current"], nargs="?", default="backlog", help="Data to display")
+    db_show.add_argument(
+        "view",
+        choices=["backlog", "current"],
+        nargs="?",
+        default="backlog",
+        help="Data to display",
+    )
 
-    db_export = db_sub.add_parser("export", help="Export contexts or backlog from the database")
-    db_export.add_argument("artifact", choices=["backlog", "contexts"], help="Artifact to export")
-    db_export.add_argument("--output", type=Path, help="Backlog export destination (default: cmos/missions/backlog.yaml)")
+    db_export = db_sub.add_parser(
+        "export", help="Export contexts or backlog from the database"
+    )
+    db_export.add_argument(
+        "artifact", choices=["backlog", "contexts"], help="Artifact to export"
+    )
+    db_export.add_argument(
+        "--output",
+        type=Path,
+        help="Backlog export destination (default: cmos/missions/backlog.yaml)",
+    )
     db_export.add_argument(
         "--output-root",
         type=Path,
         help="Root directory for context exports (default: cmos root)",
     )
 
-    db_export_missions = db_sub.add_parser("export-missions", help="Export mission YAML files from database")
-    db_export_missions.add_argument("mission_id", nargs="?", help="Specific mission ID to export (exports all if omitted)")
-    db_export_missions.add_argument("--output-dir", type=Path, help="Output directory for mission YAML files")
+    db_export_missions = db_sub.add_parser(
+        "export-missions", help="Export mission YAML files from database"
+    )
+    db_export_missions.add_argument(
+        "mission_id",
+        nargs="?",
+        help="Specific mission ID to export (exports all if omitted)",
+    )
+    db_export_missions.add_argument(
+        "--output-dir", type=Path, help="Output directory for mission YAML files"
+    )
 
-    context_parser = subparsers.add_parser("context", help="Context management commands")
+    context_parser = subparsers.add_parser(
+        "context", help="Context management commands"
+    )
     context_sub = context_parser.add_subparsers(dest="context_command", required=True)
-    
-    context_snapshot = context_sub.add_parser("snapshot", help="Take a snapshot of a context")
-    context_snapshot.add_argument("context_id", choices=["project", "master"], help="Context to snapshot")
+
+    context_snapshot = context_sub.add_parser(
+        "snapshot", help="Take a snapshot of a context"
+    )
+    context_snapshot.add_argument(
+        "context_id", choices=["project", "master"], help="Context to snapshot"
+    )
     context_snapshot.add_argument("--session", help="Session ID for this snapshot")
-    context_snapshot.add_argument("--source", help="Source description for this snapshot")
-    
-    context_history = context_sub.add_parser("history", help="View snapshot history for a context")
-    context_history.add_argument("context_id", choices=["project", "master"], help="Context to view history for")
-    context_history.add_argument("--limit", type=int, default=10, help="Number of snapshots to show (default: 10)")
-    
-    context_view = context_sub.add_parser("view", help="Render aggregated context or snapshot views")
+    context_snapshot.add_argument(
+        "--source", help="Source description for this snapshot"
+    )
+
+    context_history = context_sub.add_parser(
+        "history", help="View snapshot history for a context"
+    )
+    context_history.add_argument(
+        "context_id", choices=["project", "master"], help="Context to view history for"
+    )
+    context_history.add_argument(
+        "--limit",
+        type=int,
+        default=10,
+        help="Number of snapshots to show (default: 10)",
+    )
+
+    context_view = context_sub.add_parser(
+        "view", help="Render aggregated context or snapshot views"
+    )
     context_view.add_argument(
         "--snapshot",
         type=int,
@@ -1843,19 +2080,40 @@ def build_parser() -> argparse.ArgumentParser:
         help="Number of recent sessions to include (default: 10)",
     )
 
-    decisions_parser = subparsers.add_parser("decisions", help="Query strategic decisions from MASTER_CONTEXT")
-    decisions_sub = decisions_parser.add_subparsers(dest="decisions_command", required=True)
-    
-    decisions_list = decisions_sub.add_parser("list", help="List all strategic decisions")
-    decisions_list.add_argument("--limit", type=int, default=20, help="Number of decisions to show (default: 20)")
-    decisions_list.add_argument("--domain", help="Filter by project domain (e.g., 'ai-studio')")
-    
-    decisions_search = decisions_sub.add_parser("search", help="Search decisions by keyword")
-    decisions_search.add_argument("keyword", help="Keyword to search for in decision text")
+    decisions_parser = subparsers.add_parser(
+        "decisions", help="Query strategic decisions from MASTER_CONTEXT"
+    )
+    decisions_sub = decisions_parser.add_subparsers(
+        dest="decisions_command", required=True
+    )
+
+    decisions_list = decisions_sub.add_parser(
+        "list", help="List all strategic decisions"
+    )
+    decisions_list.add_argument(
+        "--limit",
+        type=int,
+        default=20,
+        help="Number of decisions to show (default: 20)",
+    )
+    decisions_list.add_argument(
+        "--domain", help="Filter by project domain (e.g., 'ai-studio')"
+    )
+
+    decisions_search = decisions_sub.add_parser(
+        "search", help="Search decisions by keyword"
+    )
+    decisions_search.add_argument(
+        "keyword", help="Keyword to search for in decision text"
+    )
     decisions_search.add_argument("--domain", help="Filter by project domain")
-    
-    decisions_by_sprint = decisions_sub.add_parser("by-sprint", help="Show decisions linked to a sprint")
-    decisions_by_sprint.add_argument("sprint_id", help="Sprint ID (e.g., 'Sprint 03', 'sprint-03')")
+
+    decisions_by_sprint = decisions_sub.add_parser(
+        "by-sprint", help="Show decisions linked to a sprint"
+    )
+    decisions_by_sprint.add_argument(
+        "sprint_id", help="Sprint ID (e.g., 'Sprint 03', 'sprint-03')"
+    )
 
     session_parser = subparsers.add_parser(
         "session",
@@ -1884,9 +2142,13 @@ def build_parser() -> argparse.ArgumentParser:
         choices=["onboarding", "planning", "review", "research", "check-in", "custom"],
         help="Session type",
     )
-    session_start.add_argument("--title", required=True, help="Descriptive session title")
+    session_start.add_argument(
+        "--title", required=True, help="Descriptive session title"
+    )
     session_start.add_argument("--sprint", help="Optional sprint identifier")
-    session_start.add_argument("--agent", default="assistant", help="Agent identifier for session logging")
+    session_start.add_argument(
+        "--agent", default="assistant", help="Agent identifier for session logging"
+    )
 
     session_capture = session_sub.add_parser(
         "capture",
@@ -1902,9 +2164,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Capture category",
     )
     session_capture.add_argument("content", help="Insight content to record")
-    session_capture.add_argument("--context", help="Additional context for this capture")
-    session_capture.add_argument("--session", help="Override session ID (default: active session)")
-    session_capture.add_argument("--agent", default="assistant", help="Agent identifier for session logging")
+    session_capture.add_argument(
+        "--context", help="Additional context for this capture"
+    )
+    session_capture.add_argument(
+        "--session", help="Override session ID (default: active session)"
+    )
+    session_capture.add_argument(
+        "--agent", default="assistant", help="Agent identifier for session logging"
+    )
 
     session_complete = session_sub.add_parser(
         "complete",
@@ -1921,16 +2189,35 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Next-step entry (repeatable)",
     )
-    session_complete.add_argument("--session", help="Override session ID (default: active session)")
-    session_complete.add_argument("--agent", default="assistant", help="Agent identifier for session logging")
-    session_onboard = session_sub.add_parser("onboard", help="Show a consolidated onboarding report")
-    session_list = session_sub.add_parser("list", help="List recent sessions with optional filters")
-    session_list.add_argument("--limit", type=int, default=10, help="Number of sessions to display (default: 10)")
+    session_complete.add_argument(
+        "--session", help="Override session ID (default: active session)"
+    )
+    session_complete.add_argument(
+        "--agent", default="assistant", help="Agent identifier for session logging"
+    )
+    session_onboard = session_sub.add_parser(
+        "onboard", help="Show a consolidated onboarding report"
+    )
+    session_list = session_sub.add_parser(
+        "list", help="List recent sessions with optional filters"
+    )
+    session_list.add_argument(
+        "--limit",
+        type=int,
+        default=10,
+        help="Number of sessions to display (default: 10)",
+    )
     session_list.add_argument("--type", help="Filter by session type (e.g., planning)")
-    session_list.add_argument("--status", choices=["active", "completed"], help="Filter by session status")
+    session_list.add_argument(
+        "--status", choices=["active", "completed"], help="Filter by session status"
+    )
 
-    session_show = session_sub.add_parser("show", help="Display detailed information for a session")
-    session_show.add_argument("session_id", help="Session identifier (e.g., PS-2024-11-13-001)")
+    session_show = session_sub.add_parser(
+        "show", help="Display detailed information for a session"
+    )
+    session_show.add_argument(
+        "session_id", help="Session identifier (e.g., PS-2024-11-13-001)"
+    )
 
     session_search = session_sub.add_parser("search", help="Search session history")
     session_search.add_argument("query", help="Search term or phrase")
@@ -1939,10 +2226,16 @@ def build_parser() -> argparse.ArgumentParser:
         choices=["decision", "learning", "constraint", "context", "next-step"],
         help="Limit results to captures in the specified category",
     )
-    session_search.add_argument("--limit", type=int, default=20, help="Maximum results to inspect (default: 20)")
+    session_search.add_argument(
+        "--limit", type=int, default=20, help="Maximum results to inspect (default: 20)"
+    )
 
-    validate_parser = subparsers.add_parser("validate", help="Project validation commands")
-    validate_sub = validate_parser.add_subparsers(dest="validate_command", required=True)
+    validate_parser = subparsers.add_parser(
+        "validate", help="Project validation commands"
+    )
+    validate_sub = validate_parser.add_subparsers(
+        dest="validate_command", required=True
+    )
     validate_sub.add_parser("health", help="Run a database health check")
     validate_sub.add_parser("docs", help="Validate foundational document references")
 
@@ -1999,7 +2292,9 @@ def _handle_db(env: Environment, args: argparse.Namespace) -> None:
             print(f"Exported mission {args.mission_id} to {output_path}")
         else:
             count = _export_all_missions(env, args.output_dir)
-            print(f"Exported {count} mission(s) to {args.output_dir or (env.root / 'missions')}")
+            print(
+                f"Exported {count} mission(s) to {args.output_dir or (env.root / 'missions')}"
+            )
     else:  # pragma: no cover - argparse guards this
         raise SystemExit("Unknown db subcommand")
 

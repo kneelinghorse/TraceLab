@@ -1,9 +1,11 @@
 """Synthesis service for generating LLM-powered summaries with citations."""
+
 from __future__ import annotations
 
 import logging
 import time
-from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, TYPE_CHECKING
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any, Literal
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -19,8 +21,7 @@ if TYPE_CHECKING:
     from app.services.synthesis_cache import SynthesisCacheService
 
 try:
-    from openai import OpenAI
-    from openai import APIError, RateLimitError
+    from openai import APIError, OpenAI, RateLimitError
 except ModuleNotFoundError as exc:
     OpenAI = None  # type: ignore
     APIError = RateLimitError = Exception  # type: ignore
@@ -64,18 +65,17 @@ class SynthesisService:
         self,
         *,
         session_factory: SessionFactory = SessionLocal,
-        client: Optional["OpenAI"] = None,
-        model: Optional[str] = None,
+        client: OpenAI | None = None,
+        model: str | None = None,
         temperature: float = 0.3,
         max_tokens: int = 4096,
-        cost_monitor: Optional[CostMonitor] = None,
-        cache_service: Optional["SynthesisCacheService"] = None,
+        cost_monitor: CostMonitor | None = None,
+        cache_service: SynthesisCacheService | None = None,
         enable_cache: bool = True,
     ) -> None:
         if _openai_import_error is not None:
             raise RuntimeError(
-                "The OpenAI SDK is required for synthesis. "
-                "Install dependencies from requirements.txt."
+                "The OpenAI SDK is required for synthesis. Install dependencies from requirements.txt."
             ) from _openai_import_error
 
         if client is None:
@@ -88,18 +88,21 @@ class SynthesisService:
         self.model = model or settings.openai_chat_model
         self.temperature = temperature
         self.max_tokens = max_tokens
-        self.cost_monitor = cost_monitor if cost_monitor is not None else get_cost_monitor()
+        self.cost_monitor = (
+            cost_monitor if cost_monitor is not None else get_cost_monitor()
+        )
         self.enable_cache = enable_cache
 
         # Lazy-load cache service to avoid circular imports
         self._cache_service = cache_service
 
     @property
-    def cache_service(self) -> Optional["SynthesisCacheService"]:
+    def cache_service(self) -> SynthesisCacheService | None:
         """Get cache service, initializing lazily if needed."""
         if self._cache_service is None and self.enable_cache:
             try:
                 from app.services.synthesis_cache import get_synthesis_cache_service
+
                 self._cache_service = get_synthesis_cache_service()
             except Exception:
                 logger.debug("Cache service unavailable", exc_info=True)
@@ -108,12 +111,12 @@ class SynthesisService:
     def synthesize(
         self,
         *,
-        collection_id: Optional[UUID] = None,
-        chunk_ids: Optional[List[UUID]] = None,
-        prompt: Optional[str] = None,
+        collection_id: UUID | None = None,
+        chunk_ids: list[UUID] | None = None,
+        prompt: str | None = None,
         output_format: Literal["markdown", "summary", "report", "bullets"] = "markdown",
         skip_cache: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate a synthesis from collection or chunk IDs.
 
         Args:
@@ -246,7 +249,7 @@ class SynthesisService:
 
     def _fetch_collection_chunks(
         self, collection_id: UUID
-    ) -> Tuple[List[Dict[str, Any]], bool]:
+    ) -> tuple[list[dict[str, Any]], bool]:
         """Fetch all chunks from a collection."""
         session = self.session_factory()
         try:
@@ -276,7 +279,7 @@ class SynthesisService:
                 if item.chunk and item.chunk.document_id:
                     doc_ids.add(str(item.chunk.document_id))
 
-            documents: Dict[str, Document] = {}
+            documents: dict[str, Document] = {}
             if doc_ids:
                 docs = session.query(Document).filter(Document.id.in_(doc_ids)).all()
                 documents = {str(d.id): d for d in docs}
@@ -286,21 +289,23 @@ class SynthesisService:
             for item in items:
                 if item.chunk:
                     doc = documents.get(str(item.chunk.document_id))
-                    chunks.append({
-                        "chunk_id": str(item.chunk.id),
-                        "document_id": str(item.chunk.document_id),
-                        "document_name": doc.name if doc else None,
-                        "chunk_index": item.chunk.chunk_index,
-                        "content": item.chunk.content or "",
-                    })
+                    chunks.append(
+                        {
+                            "chunk_id": str(item.chunk.id),
+                            "document_id": str(item.chunk.document_id),
+                            "document_name": doc.name if doc else None,
+                            "chunk_index": item.chunk.chunk_index,
+                            "content": item.chunk.content or "",
+                        }
+                    )
 
             return chunks, truncated
         finally:
             session.close()
 
     def _fetch_chunks_by_ids(
-        self, chunk_ids: List[UUID]
-    ) -> Tuple[List[Dict[str, Any]], bool]:
+        self, chunk_ids: list[UUID]
+    ) -> tuple[list[dict[str, Any]], bool]:
         """Fetch specific chunks by their IDs."""
         session = self.session_factory()
         try:
@@ -319,7 +324,7 @@ class SynthesisService:
 
             # Gather document info
             doc_ids = {str(c.document_id) for c in db_chunks if c.document_id}
-            documents: Dict[str, Document] = {}
+            documents: dict[str, Document] = {}
             if doc_ids:
                 docs = session.query(Document).filter(Document.id.in_(doc_ids)).all()
                 documents = {str(d.id): d for d in docs}
@@ -328,28 +333,30 @@ class SynthesisService:
             chunks = []
             for chunk in db_chunks:
                 doc = documents.get(str(chunk.document_id))
-                chunks.append({
-                    "chunk_id": str(chunk.id),
-                    "document_id": str(chunk.document_id),
-                    "document_name": doc.name if doc else None,
-                    "chunk_index": chunk.chunk_index,
-                    "content": chunk.content or "",
-                })
+                chunks.append(
+                    {
+                        "chunk_id": str(chunk.id),
+                        "document_id": str(chunk.document_id),
+                        "document_name": doc.name if doc else None,
+                        "chunk_index": chunk.chunk_index,
+                        "content": chunk.content or "",
+                    }
+                )
 
             return chunks, truncated
         finally:
             session.close()
 
     def _build_context(
-        self, chunks: List[Dict[str, Any]]
-    ) -> Tuple[str, Dict[int, Dict[str, Any]], bool]:
+        self, chunks: list[dict[str, Any]]
+    ) -> tuple[str, dict[int, dict[str, Any]], bool]:
         """Build context string with source markers and truncation handling.
 
         Returns:
             Tuple of (context_text, citation_map, was_truncated)
         """
         context_parts = []
-        citation_map: Dict[int, Dict[str, Any]] = {}
+        citation_map: dict[int, dict[str, Any]] = {}
         total_chars = 0
         truncated = False
 
@@ -379,11 +386,13 @@ class SynthesisService:
         self,
         *,
         context: str,
-        prompt: Optional[str],
+        prompt: str | None,
         output_format: Literal["summary", "report", "bullets"],
-    ) -> List[Dict[str, str]]:
+    ) -> list[dict[str, str]]:
         """Build chat messages for the LLM."""
-        format_instruction = FORMAT_INSTRUCTIONS.get(output_format, FORMAT_INSTRUCTIONS["summary"])
+        format_instruction = FORMAT_INSTRUCTIONS.get(
+            output_format, FORMAT_INSTRUCTIONS["summary"]
+        )
         user_instruction = prompt or "Summarize the following documents."
 
         system_prompt = (
@@ -408,8 +417,8 @@ class SynthesisService:
         ]
 
     def _generate_completion(
-        self, messages: List[Dict[str, str]]
-    ) -> Tuple[str, Optional[Dict[str, int]]]:
+        self, messages: list[dict[str, str]]
+    ) -> tuple[str, dict[str, int] | None]:
         """Call OpenAI API and return content with usage stats."""
         try:
             is_gpt5 = self.model.lower().startswith(("gpt-5.1", "gpt-5.2"))
@@ -437,7 +446,7 @@ class SynthesisService:
             raise
 
     @staticmethod
-    def _extract_usage(response: Any) -> Optional[Dict[str, int]]:
+    def _extract_usage(response: Any) -> dict[str, int] | None:
         """Extract token usage from API response."""
         usage = getattr(response, "usage", None)
         if usage is None:
@@ -450,7 +459,9 @@ class SynthesisService:
         else:
             prompt = getattr(usage, "prompt_tokens", 0) or 0
             completion = getattr(usage, "completion_tokens", 0) or 0
-            total = getattr(usage, "total_tokens", prompt + completion) or (prompt + completion)
+            total = getattr(usage, "total_tokens", prompt + completion) or (
+                prompt + completion
+            )
 
         return {
             "prompt_tokens": int(prompt),
@@ -461,8 +472,8 @@ class SynthesisService:
     def _process_citations(
         self,
         content: str,
-        citation_map: Dict[int, Dict[str, Any]],
-    ) -> Tuple[str, List[Dict[str, Any]]]:
+        citation_map: dict[int, dict[str, Any]],
+    ) -> tuple[str, list[dict[str, Any]]]:
         """Extract used citations and build citation list.
 
         Returns:
@@ -478,18 +489,20 @@ class SynthesisService:
         for marker in sorted(used_markers):
             if marker in citation_map:
                 info = citation_map[marker]
-                citations.append({
-                    "chunk_id": info["chunk_id"],
-                    "document_id": info.get("document_id"),
-                    "excerpt": info.get("excerpt", ""),
-                })
+                citations.append(
+                    {
+                        "chunk_id": info["chunk_id"],
+                        "document_id": info.get("document_id"),
+                        "excerpt": info.get("excerpt", ""),
+                    }
+                )
 
         return content, citations
 
     def _track_cost(
         self,
         *,
-        usage: Optional[Dict[str, int]],
+        usage: dict[str, int] | None,
         latency_ms: float,
         cache_hit: bool = False,
     ) -> None:
@@ -512,7 +525,7 @@ class SynthesisService:
             logger.debug("Cost tracking failed", exc_info=True)
 
 
-_synthesis_service: Optional[SynthesisService] = None
+_synthesis_service: SynthesisService | None = None
 
 
 def get_synthesis_service() -> SynthesisService:

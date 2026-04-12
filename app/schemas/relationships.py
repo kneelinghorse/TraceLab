@@ -1,7 +1,7 @@
 """Pydantic schemas for mission relationship context responses."""
+
 from __future__ import annotations
 
-from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -10,11 +10,13 @@ from pydantic import BaseModel, ConfigDict, Field
 class RelationshipEdgeInfo(BaseModel):
     """Metadata describing how an entity is related to the mission."""
 
-    relationship_type: str = Field(..., description="Type of relationship, e.g. evidence_chunk")
-    evidence_ids: List[str] = Field(default_factory=list)
-    summary: Optional[str] = None
-    source: Optional[str] = None
-    relevance_score: Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    relationship_type: str = Field(
+        ..., description="Type of relationship, e.g. evidence_chunk"
+    )
+    evidence_ids: list[str] = Field(default_factory=list)
+    summary: str | None = None
+    source: str | None = None
+    relevance_score: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
 class RelatedChunk(BaseModel):
@@ -22,9 +24,9 @@ class RelatedChunk(BaseModel):
 
     id: UUID
     document_id: UUID
-    document_name: Optional[str] = None
+    document_name: str | None = None
     chunk_index: int
-    preview: Optional[str] = None
+    preview: str | None = None
     relationship: RelationshipEdgeInfo
 
 
@@ -33,10 +35,10 @@ class RelatedDocument(BaseModel):
 
     id: UUID
     name: str
-    file_type: Optional[str] = None
-    source_type: Optional[str] = None
+    file_type: str | None = None
+    source_type: str | None = None
     evidence_chunks: int = 0
-    chunk_ids: List[UUID] = Field(default_factory=list)
+    chunk_ids: list[UUID] = Field(default_factory=list)
     relationship: RelationshipEdgeInfo
 
 
@@ -45,7 +47,7 @@ class RelatedInsight(BaseModel):
 
     id: UUID
     title: str
-    insight_type: Optional[str] = None
+    insight_type: str | None = None
     validated: bool = False
     relationship: RelationshipEdgeInfo
 
@@ -54,8 +56,8 @@ class RelatedMission(BaseModel):
     """Sibling mission exposed for context."""
 
     id: UUID
-    mission_identifier: Optional[str] = None
-    title: Optional[str] = None
+    mission_identifier: str | None = None
+    title: str | None = None
     status: str
     completion_percentage: int
     shared_documents: int = 0
@@ -67,8 +69,8 @@ class RelatedMission(BaseModel):
 class RelationshipFilters(BaseModel):
     """Normalized filters applied to the relationship request."""
 
-    entity_types: List[str] = Field(default_factory=list)
-    min_relevance: Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    entity_types: list[str] = Field(default_factory=list)
+    min_relevance: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
 class RelationshipTotals(BaseModel):
@@ -84,16 +86,16 @@ class RelationshipContextResponse(BaseModel):
     """Full response payload for relationship lookups."""
 
     mission_id: UUID
-    mission_identifier: Optional[str] = None
+    mission_identifier: str | None = None
     project_id: UUID
     depth: int = Field(..., ge=1, le=2)
     filters: RelationshipFilters
-    documents: List[RelatedDocument] = Field(default_factory=list)
-    insights: List[RelatedInsight] = Field(default_factory=list)
-    chunks: List[RelatedChunk] = Field(default_factory=list)
-    related_missions: List[RelatedMission] = Field(default_factory=list)
+    documents: list[RelatedDocument] = Field(default_factory=list)
+    insights: list[RelatedInsight] = Field(default_factory=list)
+    chunks: list[RelatedChunk] = Field(default_factory=list)
+    related_missions: list[RelatedMission] = Field(default_factory=list)
     totals: RelationshipTotals = Field(default_factory=RelationshipTotals)
-    warnings: List[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
     cached: bool = False
 
     model_config = ConfigDict(populate_by_name=True)

@@ -90,7 +90,10 @@ def compute_tech_debt_resolution(events: Sequence[Dict[str, Any]]) -> MetricResu
     return MetricResult(
         name="Tech debt resolved: Cypress removed, Playwright cost $0/month",
         met=met,
-        actual={"playwright_cost_monthly": monthly_cost, "tests_passing": tests_passing},
+        actual={
+            "playwright_cost_monthly": monthly_cost,
+            "tests_passing": tests_passing,
+        },
         target={"playwright_cost_monthly": 0.0, "tests_passing": tests_migrated},
         details=details,
     )
@@ -129,28 +132,36 @@ def compute_quality_automation(events: Sequence[Dict[str, Any]]) -> MetricResult
     return MetricResult(
         name="Quality automation operational (bias + traceability)",
         met=met,
-        actual={check: summary["pass_rate"] for check, summary in check_summary.items()},
+        actual={
+            check: summary["pass_rate"] for check, summary in check_summary.items()
+        },
         target={"bias_detection": 1.0, "traceability": 1.0},
         details=details,
     )
 
 
-def compute_query_latency(events: Sequence[Dict[str, Any]], target_ms: int = 2000) -> MetricResult:
+def compute_query_latency(
+    events: Sequence[Dict[str, Any]], target_ms: int = 2000
+) -> MetricResult:
     """Ensure P95 latency remains under the 2s target."""
 
-    latency_events = [event for event in events if event.get("type") == "latency_sample"]
+    latency_events = [
+        event for event in events if event.get("type") == "latency_sample"
+    ]
     if not latency_events:
         raise ValueError("Latency telemetry missing.")
 
     worst_p95 = max(event.get("p95_latency_ms", 0) for event in latency_events)
-    avg_cache_hit = (
-        sum(event.get("cache_hit_rate", 0.0) for event in latency_events) / len(latency_events)
-    )
+    avg_cache_hit = sum(
+        event.get("cache_hit_rate", 0.0) for event in latency_events
+    ) / len(latency_events)
     met = worst_p95 < target_ms
     details = {
         "samples": len(latency_events),
         "worst_p95_latency_ms": worst_p95,
-        "p99_latency_ms": max(event.get("p99_latency_ms", 0) for event in latency_events),
+        "p99_latency_ms": max(
+            event.get("p99_latency_ms", 0) for event in latency_events
+        ),
         "pre_optimization_p95_ms": min(
             event.get("pre_optimization_p95_ms", worst_p95) for event in latency_events
         ),
@@ -205,7 +216,9 @@ def compute_cost_compliance(
     )
 
 
-def compute_load_test(events: Sequence[Dict[str, Any]], target_users: int = 100) -> MetricResult:
+def compute_load_test(
+    events: Sequence[Dict[str, Any]], target_users: int = 100
+) -> MetricResult:
     """Confirm system sustains 100 concurrent queries without errors."""
 
     load_events = [event for event in events if event.get("type") == "load_test"]
@@ -234,7 +247,9 @@ def compute_load_test(events: Sequence[Dict[str, Any]], target_users: int = 100)
     )
 
 
-def compute_test_coverage(events: Sequence[Dict[str, Any]], minimum: float = 0.8) -> MetricResult:
+def compute_test_coverage(
+    events: Sequence[Dict[str, Any]], minimum: float = 0.8
+) -> MetricResult:
     """Ensure Python coverage stays above 80%."""
 
     if not events:
@@ -277,7 +292,12 @@ def compute_report_generation_metric() -> MetricResult:
             "summary_exists": summary_exists,
             "metrics_exists": metrics_exists,
         },
-        target={"artifacts": ["cmos/reports/sprint-04/sprint-04-summary.md", "cmos/reports/sprint-04/metrics.json"]},
+        target={
+            "artifacts": [
+                "cmos/reports/sprint-04/sprint-04-summary.md",
+                "cmos/reports/sprint-04/metrics.json",
+            ]
+        },
         details=details,
     )
 
@@ -326,11 +346,15 @@ def write_reports(results: Sequence[MetricResult]) -> None:
         "results": [result.as_dict() for result in results],
     }
     SUMMARY_PATH.write_text(build_summary(results) + "\n", encoding="utf-8")
-    METRICS_PATH.write_text(json.dumps(metrics_payload, indent=2) + "\n", encoding="utf-8")
+    METRICS_PATH.write_text(
+        json.dumps(metrics_payload, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 def _parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Sprint 04 Mission Protocol evaluation runner.")
+    parser = argparse.ArgumentParser(
+        description="Sprint 04 Mission Protocol evaluation runner."
+    )
     parser.add_argument(
         "--format",
         choices=["markdown", "json"],

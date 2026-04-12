@@ -1,4 +1,5 @@
 """Tests for incremental edge materialization triggered by document ingestion (T37.3)."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -14,10 +15,15 @@ from app.services.document_ingestion import DocumentIngestionService
 from app.services.chunking import ChunkingService
 from app.services.processing_status import ProcessingStatusRecorder
 from app.services.coverage_report import CoverageReportGenerator
-from app.services.pedr.edge_materialization import EdgeMaterializationService, MaterializationResult
+from app.services.pedr.edge_materialization import (
+    EdgeMaterializationService,
+    MaterializationResult,
+)
 
 
-SAMPLE_TEXT = ("Graph edge materialization validates implicit FK relationships. " * 30).strip()
+SAMPLE_TEXT = (
+    "Graph edge materialization validates implicit FK relationships. " * 30
+).strip()
 
 
 def _build_txt(path: Path, text: str) -> Path:
@@ -55,13 +61,17 @@ def _create_document(db_session, project, file_path: Path) -> Document:
 class TestIngestionEdgeMaterialization:
     """Verify incremental edge materialization fires after document ingestion."""
 
-    def test_edges_materialized_stage_present_in_result(self, db_session, project, tmp_path):
+    def test_edges_materialized_stage_present_in_result(
+        self, db_session, project, tmp_path
+    ):
         """Ingestion result includes edges_materialized stage."""
         file_path = _build_txt(tmp_path / "test.txt", SAMPLE_TEXT)
         doc = _create_document(db_session, project, file_path)
         service = _make_service()
 
-        result = service.process_document(db=db_session, document_id=doc.id, file_path=file_path)
+        result = service.process_document(
+            db=db_session, document_id=doc.id, file_path=file_path
+        )
 
         assert result["status"] == "completed"
         assert "edges_materialized" in result["stages"]
@@ -78,7 +88,9 @@ class TestIngestionEdgeMaterialization:
         doc = _create_document(db_session, project, file_path)
         service = _make_service()
 
-        result = service.process_document(db=db_session, document_id=doc.id, file_path=file_path)
+        result = service.process_document(
+            db=db_session, document_id=doc.id, file_path=file_path
+        )
 
         assert result["status"] == "completed"
         edges = db_session.query(GraphEdge).all()
@@ -93,19 +105,25 @@ class TestIngestionEdgeMaterialization:
         assert (doc_urn, project_urn, "belongs_to") in edge_pairs
         assert (project_urn, doc_urn, "contains") in edge_pairs
 
-    def test_edge_materialization_duration_in_metrics(self, db_session, project, tmp_path):
+    def test_edge_materialization_duration_in_metrics(
+        self, db_session, project, tmp_path
+    ):
         """Edge materialization duration is recorded in result metrics."""
         file_path = _build_txt(tmp_path / "metrics.txt", SAMPLE_TEXT)
         doc = _create_document(db_session, project, file_path)
         service = _make_service()
 
-        result = service.process_document(db=db_session, document_id=doc.id, file_path=file_path)
+        result = service.process_document(
+            db=db_session, document_id=doc.id, file_path=file_path
+        )
 
         assert "metrics" in result
         assert "edge_materialization_duration_seconds" in result["metrics"]
         assert result["metrics"]["edge_materialization_duration_seconds"] < 2.0
 
-    def test_edge_materialization_failure_does_not_break_ingestion(self, db_session, project, tmp_path):
+    def test_edge_materialization_failure_does_not_break_ingestion(
+        self, db_session, project, tmp_path
+    ):
         """If edge materialization raises, ingestion still completes successfully."""
         file_path = _build_txt(tmp_path / "fail.txt", SAMPLE_TEXT)
         doc = _create_document(db_session, project, file_path)
@@ -116,7 +134,9 @@ class TestIngestionEdgeMaterialization:
             "materialize_implicit_edges",
             side_effect=RuntimeError("DB connection lost"),
         ):
-            result = service.process_document(db=db_session, document_id=doc.id, file_path=file_path)
+            result = service.process_document(
+                db=db_session, document_id=doc.id, file_path=file_path
+            )
 
         # Ingestion itself should still complete
         assert result["status"] == "completed"
@@ -134,13 +154,17 @@ class TestIngestionEdgeMaterialization:
         doc = _create_document(db_session, project, file_path)
         service = _make_service()
 
-        mock_result = MaterializationResult(inserted_count=5, updated_count=0, skipped_count=0)
+        mock_result = MaterializationResult(
+            inserted_count=5, updated_count=0, skipped_count=0
+        )
         with patch.object(
             EdgeMaterializationService,
             "materialize_implicit_edges",
             return_value=mock_result,
         ) as mock_materialize:
-            result = service.process_document(db=db_session, document_id=doc.id, file_path=file_path)
+            result = service.process_document(
+                db=db_session, document_id=doc.id, file_path=file_path
+            )
 
         mock_materialize.assert_called_once()
         call_kwargs = mock_materialize.call_args
@@ -153,31 +177,47 @@ class TestIngestionEdgeMaterialization:
         doc = _create_document(db_session, project, file_path)
         service = _make_service()
 
-        result = service.process_document(db=db_session, document_id=doc.id, file_path=file_path)
+        result = service.process_document(
+            db=db_session, document_id=doc.id, file_path=file_path
+        )
 
         assert result["status"] == "completed"
-        chunks = db_session.query(DocumentChunk).filter(DocumentChunk.document_id == doc.id).all()
-        edges = db_session.query(GraphEdge).filter(GraphEdge.edge_type == "contains").all()
+        chunks = (
+            db_session.query(DocumentChunk)
+            .filter(DocumentChunk.document_id == doc.id)
+            .all()
+        )
+        edges = (
+            db_session.query(GraphEdge).filter(GraphEdge.edge_type == "contains").all()
+        )
 
         doc_urn = f"urn:research:document:{doc.id}"
         # Each chunk should have a "contains" edge from the document
         chunk_contains = [e for e in edges if e.from_urn == doc_urn]
         assert len(chunk_contains) >= len(chunks)
 
-    def test_second_document_incremental_only_adds_new_edges(self, db_session, project, tmp_path):
+    def test_second_document_incremental_only_adds_new_edges(
+        self, db_session, project, tmp_path
+    ):
         """Second document ingestion in incremental mode doesn't duplicate first document's edges."""
         # Ingest first document
         file1 = _build_txt(tmp_path / "doc1.txt", SAMPLE_TEXT)
         doc1 = _create_document(db_session, project, file1)
         service = _make_service()
-        result1 = service.process_document(db=db_session, document_id=doc1.id, file_path=file1)
+        result1 = service.process_document(
+            db=db_session, document_id=doc1.id, file_path=file1
+        )
         assert result1["status"] == "completed"
         edges_after_first = db_session.query(GraphEdge).count()
 
         # Ingest second document
-        file2 = _build_txt(tmp_path / "doc2.txt", "Different content for second document. " * 30)
+        file2 = _build_txt(
+            tmp_path / "doc2.txt", "Different content for second document. " * 30
+        )
         doc2 = _create_document(db_session, project, file2)
-        result2 = service.process_document(db=db_session, document_id=doc2.id, file_path=file2)
+        result2 = service.process_document(
+            db=db_session, document_id=doc2.id, file_path=file2
+        )
         assert result2["status"] == "completed"
         edges_after_second = db_session.query(GraphEdge).count()
 
@@ -191,8 +231,12 @@ class TestIngestionEdgeMaterialization:
         doc = _create_document(db_session, project, file_path)
         service = _make_service()
 
-        result = service.process_document(db=db_session, document_id=doc.id, file_path=file_path)
+        result = service.process_document(
+            db=db_session, document_id=doc.id, file_path=file_path
+        )
 
         assert result["status"] == "completed"
         duration = result["stages"]["edges_materialized"]["duration_seconds"]
-        assert duration < 2.0, f"Edge materialization took {duration}s, exceeding 2s target"
+        assert duration < 2.0, (
+            f"Edge materialization took {duration}s, exceeding 2s target"
+        )

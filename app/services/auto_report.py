@@ -3,12 +3,13 @@
 Automatically creates a Report from result_protocol when a mission completes,
 linking it to the mission and associating sources from ingested document chunks.
 """
+
 from __future__ import annotations
 
 import hashlib
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -24,7 +25,7 @@ class AutoReportError(RuntimeError):
     """Raised when auto-report creation fails."""
 
 
-def format_protocol_to_markdown(protocol: Dict[str, Any], mission_title: str) -> str:
+def format_protocol_to_markdown(protocol: dict[str, Any], mission_title: str) -> str:
     """Format a result_protocol into readable markdown content.
 
     Args:
@@ -34,7 +35,7 @@ def format_protocol_to_markdown(protocol: Dict[str, Any], mission_title: str) ->
     Returns:
         Formatted markdown string
     """
-    lines: List[str] = []
+    lines: list[str] = []
 
     # Header
     lines.append(f"# Research: {mission_title}")
@@ -61,7 +62,9 @@ def format_protocol_to_markdown(protocol: Dict[str, Any], mission_title: str) ->
                     if isinstance(finding, str):
                         lines.append(f"- {finding}")
                     elif isinstance(finding, dict):
-                        lines.append(f"- **{finding.get('title', 'Finding')}**: {finding.get('description', '')}")
+                        lines.append(
+                            f"- **{finding.get('title', 'Finding')}**: {finding.get('description', '')}"
+                        )
                 lines.append("")
 
     # Findings section
@@ -123,18 +126,23 @@ def format_protocol_to_markdown(protocol: Dict[str, Any], mission_title: str) ->
         lines.append("")
         lines.append("```json")
         import json
+
         lines.append(json.dumps(protocol, indent=2))
         lines.append("```")
         lines.append("")
 
     # Metadata footer
     lines.append("---")
-    lines.append(f"*Generated automatically from DeepSearch results at {datetime.utcnow().isoformat()}Z*")
+    lines.append(
+        f"*Generated automatically from DeepSearch results at {datetime.utcnow().isoformat()}Z*"
+    )
 
     return "\n".join(lines)
 
 
-def get_document_chunks(db: Session, document_id: UUID, limit: int = 10) -> List[DocumentChunk]:
+def get_document_chunks(
+    db: Session, document_id: UUID, limit: int = 10
+) -> list[DocumentChunk]:
     """Get chunks from a document for source linking.
 
     Args:
@@ -158,7 +166,7 @@ def get_document_chunks(db: Session, document_id: UUID, limit: int = 10) -> List
 def create_report_from_protocol(
     db: Session,
     mission: Mission,
-    protocol: Dict[str, Any],
+    protocol: dict[str, Any],
 ) -> Report:
     """Create a Report from result_protocol when mission completes.
 
@@ -276,7 +284,7 @@ class AutoReportService:
         self,
         db: Session,
         mission: Mission,
-        protocol: Dict[str, Any],
+        protocol: dict[str, Any],
     ) -> Report:
         """Create a Report from result_protocol.
 
@@ -286,7 +294,7 @@ class AutoReportService:
 
 
 # Module-level singleton
-_service: Optional[AutoReportService] = None
+_service: AutoReportService | None = None
 
 
 def get_auto_report_service() -> AutoReportService:

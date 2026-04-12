@@ -15,7 +15,12 @@ from .db_client import SQLiteClient
 
 
 def utc_now() -> str:
-    return datetime.now(tz=timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return (
+        datetime.now(tz=timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
 
 
 def _parse_metadata(metadata: Optional[str]) -> Dict[str, Any]:
@@ -62,7 +67,9 @@ def _update_inline_line(line: str, updates: Dict[str, Any]) -> str:
         if key not in order:
             order.append(key)
 
-    formatted = ", ".join(f"{key}: {_format_value(mapping[key])}" for key in order if key in mapping)
+    formatted = ", ".join(
+        f"{key}: {_format_value(mapping[key])}" for key in order if key in mapping
+    )
     return f"{indent}- {{ {formatted} }}"
 
 
@@ -83,7 +90,9 @@ DEFAULT_REPO_ROOT: Optional[Path] = None
 def _detect_repo_root() -> Path:
     script_dir = Path(__file__).resolve().parent
     candidate = script_dir.parent
-    if (candidate / "db" / "schema.sql").exists() and (candidate / "agents.md").exists():
+    if (candidate / "db" / "schema.sql").exists() and (
+        candidate / "agents.md"
+    ).exists():
         return candidate
 
     cwd_candidate = Path.cwd() / "cmos"
@@ -98,7 +107,9 @@ def _detect_repo_root() -> Path:
             break
         current = current.parent
 
-    raise MissionRuntimeError("Cannot find cmos/ directory. Please run from project root or set repo_root.")
+    raise MissionRuntimeError(
+        "Cannot find cmos/ directory. Please run from project root or set repo_root."
+    )
 
 
 def _resolve_repo_root(repo_root: Path | str | None = None) -> Path:
@@ -114,14 +125,13 @@ class MissionRuntime:
     """Coordinates mission selection, status transitions, and logging via SQLite."""
 
     def __init__(
-        self,
-        *,
-        repo_root: Path | str | None = None,
-        db_path: Path | str | None = None
+        self, *, repo_root: Path | str | None = None, db_path: Path | str | None = None
     ) -> None:
         self.repo_root = _resolve_repo_root(repo_root)
-        
-        self.db_path = Path(db_path) if db_path else self.repo_root / "db" / "cmos.sqlite"
+
+        self.db_path = (
+            Path(db_path) if db_path else self.repo_root / "db" / "cmos.sqlite"
+        )
         self.schema_path = self.repo_root / "db" / "schema.sql"
         self.telemetry_dir = self.repo_root / "telemetry" / "events"
         self.client = SQLiteClient(self.db_path, schema_path=self.schema_path)
@@ -129,7 +139,9 @@ class MissionRuntime:
     def __enter__(self) -> "MissionRuntime":
         return self
 
-    def __exit__(self, exc_type: Any, exc: Any, tb: Any) -> None:  # pragma: no cover - resource cleanup
+    def __exit__(
+        self, exc_type: Any, exc: Any, tb: Any
+    ) -> None:  # pragma: no cover - resource cleanup
         self.close()
 
     def close(self) -> None:
@@ -164,15 +176,13 @@ class MissionRuntime:
         return new_list
 
     def _update_context_health(
-        self,
-        payload: Dict[str, Any],
-        *,
-        ts: str,
-        increment_sessions: bool = False
+        self, payload: Dict[str, Any], *, ts: str, increment_sessions: bool = False
     ) -> None:
         health = payload.setdefault("context_health", {})
         if increment_sessions:
-            health["sessions_since_reset"] = int(health.get("sessions_since_reset") or 0) + 1
+            health["sessions_since_reset"] = (
+                int(health.get("sessions_since_reset") or 0) + 1
+            )
         health["last_update"] = ts
         serialized = json.dumps(payload, ensure_ascii=False)
         size_kb = len(serialized.encode("utf-8")) / 1024
@@ -188,7 +198,7 @@ class MissionRuntime:
         agent: str,
         summary: str,
         action: str,
-        next_mission: Optional[str] = None
+        next_mission: Optional[str] = None,
     ) -> None:
         working = payload.setdefault("working_memory", {})
         history = self._ensure_list(working, "session_history")
@@ -198,7 +208,7 @@ class MissionRuntime:
             "agent": agent,
             "summary": summary,
             "action": action,
-            "ts": ts
+            "ts": ts,
         }
         history.append(entry)
         if len(history) > 50:
@@ -238,7 +248,11 @@ class MissionRuntime:
         for key in ("important_reminders", "when_we_resume"):
             items = next_session.get(key)
             if isinstance(items, list):
-                updated = [item for item in items if mission_id not in json.dumps(item, ensure_ascii=False)]
+                updated = [
+                    item
+                    for item in items
+                    if mission_id not in json.dumps(item, ensure_ascii=False)
+                ]
                 if updated:
                     next_session[key] = updated
                 else:
@@ -252,7 +266,7 @@ class MissionRuntime:
         ts: str,
         summary: str,
         reason: str,
-        needs: Optional[List[str]]
+        needs: Optional[List[str]],
     ) -> None:
         blockers = self._ensure_list(next_session, "blockers")
         blockers = [item for item in blockers if item.get("mission") != mission_id]
@@ -262,7 +276,7 @@ class MissionRuntime:
                 "recorded_at": ts,
                 "summary": summary,
                 "reason": reason,
-                "needs": needs or []
+                "needs": needs or [],
             }
         )
         next_session["blockers"] = blockers
@@ -279,7 +293,9 @@ class MissionRuntime:
                 if note not in resume:
                     resume.append(note)
 
-    def _persist_contexts(self, project: Dict[str, Any], master: Dict[str, Any], *, session_id: str) -> None:
+    def _persist_contexts(
+        self, project: Dict[str, Any], master: Dict[str, Any], *, session_id: str
+    ) -> None:
         """Save contexts to database with snapshot history. No file mirrors."""
         self.client.set_context(
             "project_context",
@@ -287,7 +303,7 @@ class MissionRuntime:
             source_path="",  # No file mirror
             session_id=session_id,
             snapshot=True,
-            snapshot_source="mission_runtime"
+            snapshot_source="mission_runtime",
         )
         self.client.set_context(
             "master_context",
@@ -295,7 +311,7 @@ class MissionRuntime:
             source_path="",  # No file mirror
             session_id=session_id,
             snapshot=True,
-            snapshot_source="mission_runtime"
+            snapshot_source="mission_runtime",
         )
 
     def fetch_next_candidate(self) -> Optional[Dict[str, Any]]:
@@ -317,17 +333,11 @@ class MissionRuntime:
         return rows[0] if rows else None
 
     def start_mission(
-        self,
-        mission_id: str,
-        *,
-        agent: str,
-        summary: str,
-        ts: Optional[str] = None
+        self, mission_id: str, *, agent: str, summary: str, ts: Optional[str] = None
     ) -> MissionEventResult:
         ts = ts or utc_now()
         row = self.client.fetchone(
-            "SELECT status, metadata FROM missions WHERE id = :id",
-            {"id": mission_id}
+            "SELECT status, metadata FROM missions WHERE id = :id", {"id": mission_id}
         )
         if not row:
             raise MissionRuntimeError(f"Mission {mission_id} not found in database")
@@ -345,7 +355,7 @@ class MissionRuntime:
                 ts=ts,
                 agent=agent,
                 summary=summary,
-                action="start"
+                action="start",
             )
             self._touch_working_memory(
                 master_context,
@@ -353,7 +363,7 @@ class MissionRuntime:
                 ts=ts,
                 agent=agent,
                 summary=summary,
-                action="start"
+                action="start",
             )
 
             next_session = master_context.setdefault("next_session_context", {})
@@ -369,7 +379,7 @@ class MissionRuntime:
                        metadata = :metadata
                  WHERE id = :id
                 """,
-                {"id": mission_id, "metadata": _format_metadata(metadata)}
+                {"id": mission_id, "metadata": _format_metadata(metadata)},
             )
 
             event = {
@@ -378,11 +388,13 @@ class MissionRuntime:
                 "mission": mission_id,
                 "action": "start",
                 "status": "in_progress",
-                "summary": summary
+                "summary": summary,
             }
             raw_event = self._insert_session_event(conn, event)
 
-            self._persist_contexts(project_context, master_context, session_id=mission_id)
+            self._persist_contexts(
+                project_context, master_context, session_id=mission_id
+            )
 
         # Session event logged to database only
         # No file mirrors maintained
@@ -398,12 +410,11 @@ class MissionRuntime:
         ts: Optional[str] = None,
         next_hint: Optional[str] = None,
         promote_next: bool = True,
-        immediate: bool = False
+        immediate: bool = False,
     ) -> MissionEventResult:
         ts = ts or utc_now()
         row = self.client.fetchone(
-            "SELECT metadata FROM missions WHERE id = :id",
-            {"id": mission_id}
+            "SELECT metadata FROM missions WHERE id = :id", {"id": mission_id}
         )
         if not row:
             raise MissionRuntimeError(f"Mission {mission_id} not found in database")
@@ -429,12 +440,14 @@ class MissionRuntime:
                     "id": mission_id,
                     "completed_at": ts,
                     "notes": notes,
-                    "metadata": _format_metadata(metadata)
-                }
+                    "metadata": _format_metadata(metadata),
+                },
             )
 
             if promote_next:
-                next_mission_id = self._promote_next_queued(conn, immediate=immediate, started_at=ts if immediate else None)
+                next_mission_id = self._promote_next_queued(
+                    conn, immediate=immediate, started_at=ts if immediate else None
+                )
                 if next_mission_id and not next_hint:
                     next_status = "In Progress" if immediate else "Current"
                     next_hint = f"{next_mission_id} is now {next_status}"
@@ -447,7 +460,7 @@ class MissionRuntime:
                 agent=agent,
                 summary=summary,
                 action=action,
-                next_mission=next_mission_id if immediate else None
+                next_mission=next_mission_id if immediate else None,
             )
             self._touch_working_memory(
                 master_context,
@@ -456,7 +469,7 @@ class MissionRuntime:
                 agent=agent,
                 summary=summary,
                 action=action,
-                next_mission=next_mission_id if immediate else None
+                next_mission=next_mission_id if immediate else None,
             )
 
             next_session = master_context.setdefault("next_session_context", {})
@@ -478,20 +491,18 @@ class MissionRuntime:
                 "action": "complete",
                 "status": "completed",
                 "summary": summary,
-                "next_hint": next_hint
+                "next_hint": next_hint,
             }
             raw_event = self._insert_session_event(conn, event)
 
-            self._persist_contexts(project_context, master_context, session_id=mission_id)
+            self._persist_contexts(
+                project_context, master_context, session_id=mission_id
+            )
 
         # Session event logged to database only
         # No file mirrors maintained
-        
-        backlog_updates = {
-            "status": "Completed",
-            "completed_at": ts,
-            "notes": notes
-        }
+
+        backlog_updates = {"status": "Completed", "completed_at": ts, "notes": notes}
         self._update_backlog_entry(mission_id, backlog_updates)
         if next_mission_id:
             next_updates = {"status": "In Progress" if immediate else "Current"}
@@ -501,7 +512,9 @@ class MissionRuntime:
                 next_updates["started_at"] = ts
             self._update_backlog_entry(next_mission_id, next_updates)
 
-        return MissionEventResult(raw_event=raw_event, event=event, next_mission=next_mission_id)
+        return MissionEventResult(
+            raw_event=raw_event, event=event, next_mission=next_mission_id
+        )
 
     def block_mission(
         self,
@@ -512,12 +525,11 @@ class MissionRuntime:
         reason: str,
         needs: Optional[List[str]] = None,
         ts: Optional[str] = None,
-        next_hint: Optional[str] = None
+        next_hint: Optional[str] = None,
     ) -> MissionEventResult:
         ts = ts or utc_now()
         row = self.client.fetchone(
-            "SELECT metadata FROM missions WHERE id = :id",
-            {"id": mission_id}
+            "SELECT metadata FROM missions WHERE id = :id", {"id": mission_id}
         )
         if not row:
             raise MissionRuntimeError(f"Mission {mission_id} not found in database")
@@ -545,8 +557,8 @@ class MissionRuntime:
                 {
                     "id": mission_id,
                     "notes": reason,
-                    "metadata": _format_metadata(metadata)
-                }
+                    "metadata": _format_metadata(metadata),
+                },
             )
             event = {
                 "ts": ts,
@@ -557,7 +569,7 @@ class MissionRuntime:
                 "summary": summary,
                 "next_hint": next_hint,
                 "needs": needs or [],
-                "reason": reason
+                "reason": reason,
             }
             raw_event = self._insert_session_event(conn, event)
 
@@ -567,7 +579,7 @@ class MissionRuntime:
                 ts=ts,
                 agent=agent,
                 summary=summary,
-                action="blocked"
+                action="blocked",
             )
             self._touch_working_memory(
                 master_context,
@@ -575,7 +587,7 @@ class MissionRuntime:
                 ts=ts,
                 agent=agent,
                 summary=summary,
-                action="blocked"
+                action="blocked",
             )
 
             next_session = master_context.setdefault("next_session_context", {})
@@ -585,13 +597,15 @@ class MissionRuntime:
                 ts=ts,
                 summary=summary,
                 reason=reason,
-                needs=needs
+                needs=needs,
             )
 
             self._update_context_health(project_context, ts=ts, increment_sessions=True)
             self._update_context_health(master_context, ts=ts, increment_sessions=True)
 
-            self._persist_contexts(project_context, master_context, session_id=mission_id)
+            self._persist_contexts(
+                project_context, master_context, session_id=mission_id
+            )
 
         # Session event logged to database only
         # No file mirrors maintained
@@ -612,8 +626,8 @@ class MissionRuntime:
                 "status": event.get("status"),
                 "summary": event.get("summary"),
                 "next_hint": event.get("next_hint"),
-                "raw_event": raw_event
-            }
+                "raw_event": raw_event,
+            },
         )
         return raw_event
 
@@ -621,11 +635,7 @@ class MissionRuntime:
     # Use db_tools.py export commands to generate files on-demand
 
     def _promote_next_queued(
-        self,
-        connection: Any,
-        *,
-        immediate: bool,
-        started_at: Optional[str]
+        self, connection: Any, *, immediate: bool, started_at: Optional[str]
     ) -> Optional[str]:
         row = connection.execute(
             """
@@ -656,14 +666,14 @@ class MissionRuntime:
             {
                 "id": row["id"],
                 "status": new_status,
-                "metadata": _format_metadata(metadata)
-            }
+                "metadata": _format_metadata(metadata),
+            },
         )
         return row["id"]
 
     def _update_backlog_entry(self, mission_id: str, updates: Dict[str, Any]) -> None:
         """Stub method - no longer updates backlog.yaml file.
-        
+
         Mission updates happen in database transaction (already handled).
         Use db_tools.py export-backlog to generate backlog.yaml on-demand.
         """
@@ -675,7 +685,7 @@ class MissionRuntime:
             "source": "mission_runtime",
             "status": "ok" if status.ok else "error",
             "message": status.message,
-            "details": status.details
+            "details": status.details,
         }
         self.telemetry_dir.mkdir(parents=True, exist_ok=True)
         health_path = self.telemetry_dir / "database-health.jsonl"
@@ -688,7 +698,7 @@ def _runtime_operation(
     operation: Callable[[MissionRuntime], Any],
     *,
     repo_root: Path | str | None = None,
-    db_path: Path | str | None = None
+    db_path: Path | str | None = None,
 ) -> Any:
     runtime = MissionRuntime(repo_root=repo_root, db_path=db_path)
     runtime.ensure_database()
@@ -698,8 +708,14 @@ def _runtime_operation(
         runtime.close()
 
 
-def next_mission(*, repo_root: Path | str | None = None, db_path: Path | str | None = None) -> Optional[Dict[str, Any]]:
-    return _runtime_operation(lambda runtime: runtime.fetch_next_candidate(), repo_root=repo_root, db_path=db_path)
+def next_mission(
+    *, repo_root: Path | str | None = None, db_path: Path | str | None = None
+) -> Optional[Dict[str, Any]]:
+    return _runtime_operation(
+        lambda runtime: runtime.fetch_next_candidate(),
+        repo_root=repo_root,
+        db_path=db_path,
+    )
 
 
 def start(
@@ -709,17 +725,14 @@ def start(
     agent: str = "codex",
     ts: Optional[str] = None,
     repo_root: Path | str | None = None,
-    db_path: Path | str | None = None
+    db_path: Path | str | None = None,
 ) -> MissionEventResult:
     return _runtime_operation(
         lambda runtime: runtime.start_mission(
-            mission_id,
-            agent=agent,
-            summary=summary,
-            ts=ts
+            mission_id, agent=agent, summary=summary, ts=ts
         ),
         repo_root=repo_root,
-        db_path=db_path
+        db_path=db_path,
     )
 
 
@@ -734,7 +747,7 @@ def complete(
     promote_next: bool = True,
     immediate: bool = False,
     repo_root: Path | str | None = None,
-    db_path: Path | str | None = None
+    db_path: Path | str | None = None,
 ) -> MissionEventResult:
     return _runtime_operation(
         lambda runtime: runtime.complete_mission(
@@ -745,10 +758,10 @@ def complete(
             ts=ts,
             next_hint=next_hint,
             promote_next=promote_next,
-            immediate=immediate
+            immediate=immediate,
         ),
         repo_root=repo_root,
-        db_path=db_path
+        db_path=db_path,
     )
 
 
@@ -762,7 +775,7 @@ def block(
     ts: Optional[str] = None,
     next_hint: Optional[str] = None,
     repo_root: Path | str | None = None,
-    db_path: Path | str | None = None
+    db_path: Path | str | None = None,
 ) -> MissionEventResult:
     return _runtime_operation(
         lambda runtime: runtime.block_mission(
@@ -772,10 +785,10 @@ def block(
             reason=reason,
             needs=needs,
             ts=ts,
-            next_hint=next_hint
+            next_hint=next_hint,
         ),
         repo_root=repo_root,
-        db_path=db_path
+        db_path=db_path,
     )
 
 
@@ -787,5 +800,5 @@ __all__ = [
     "next_mission",
     "start",
     "complete",
-    "block"
+    "block",
 ]

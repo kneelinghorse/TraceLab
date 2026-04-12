@@ -1,4 +1,5 @@
 """Expanded tests for Mission Protocol validation helpers."""
+
 from __future__ import annotations
 
 import pytest
@@ -19,7 +20,11 @@ def _complete_payload(**overrides):
             "scope": "Backend",
         },
         "key_questions": [
-            {"question": "Is coverage above 80%?", "status": "answered", "answer": "Yes"}
+            {
+                "question": "Is coverage above 80%?",
+                "status": "answered",
+                "answer": "Yes",
+            }
         ],
         "synthesis": {
             "key_insights": ["Coverage and docs share a single source"],
@@ -56,19 +61,29 @@ def test_parse_mission_yaml_requires_object_payload():
 
 
 def test_validate_mission_payload_enforces_completion_rules():
-    payload = _complete_payload(quality_checkpoints=[{"gate": "research_statement", "status": "fail"}])
+    payload = _complete_payload(
+        quality_checkpoints=[{"gate": "research_statement", "status": "fail"}]
+    )
     with pytest.raises(ValidationError):
         mp_validation.validate_mission_payload(payload, state="complete")
 
-    validated = mp_validation.validate_mission_payload(_complete_payload(), state="complete")
+    validated = mp_validation.validate_mission_payload(
+        _complete_payload(), state="complete"
+    )
     assert validated.title == "Testing & Documentation"
 
 
 def test_sqlite_constraint_includes_structural_guards():
     constraint = mp_validation.build_mission_data_check_constraint(backend="sqlite")
     assert "json_valid" in constraint
-    assert "json_array_length(COALESCE(json_extract(mission_data, '$.quality_checkpoints')" in constraint
-    assert "json_array_length(COALESCE(json_extract(mission_data, '$.key_questions')" in constraint
+    assert (
+        "json_array_length(COALESCE(json_extract(mission_data, '$.quality_checkpoints')"
+        in constraint
+    )
+    assert (
+        "json_array_length(COALESCE(json_extract(mission_data, '$.key_questions')"
+        in constraint
+    )
 
 
 def test_validate_mission_payload_defaults_to_draft_state():

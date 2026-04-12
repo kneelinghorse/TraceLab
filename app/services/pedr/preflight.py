@@ -3,23 +3,24 @@
 Enables DeepSearch to check TraceLab before launching new research missions.
 Returns reuse recommendations based on similarity and quality thresholds.
 """
+
 from __future__ import annotations
 
-import json
 import logging
 import time
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
+from app.models.document import Document
 from app.models.mission import Mission
 from app.models.project import Project
-from app.models.document import Document
 from app.schemas.pedr_preflight import (
     PreflightMatch,
     PreflightMatchInsight,
@@ -54,14 +55,15 @@ class PreflightService:
     def __init__(
         self,
         *,
-        search_service: Optional["HybridSearchService"] = None,
+        search_service: HybridSearchService | None = None,
         session_factory: Callable[[], Session] = SessionLocal,
-        thresholds: Optional[PreflightThresholds] = None,
+        thresholds: PreflightThresholds | None = None,
         telemetry_enabled: bool = True,
     ) -> None:
         if search_service is None:
             # Lazy import to avoid circular dependency
             from app.services.hybrid_search import get_hybrid_search_service
+
             search_service = get_hybrid_search_service()
         self.search_service = search_service
         self.session_factory = session_factory
@@ -124,17 +126,15 @@ class PreflightService:
 
     def _build_matches(
         self,
-        search_results: List[Dict[str, Any]],
+        search_results: list[dict[str, Any]],
         min_similarity: float,
-    ) -> List[PreflightMatch]:
+    ) -> list[PreflightMatch]:
         """Convert search results to PreflightMatch instances."""
         if not search_results:
             return []
 
         document_ids = [
-            r.get("document_id")
-            for r in search_results
-            if r.get("document_id")
+            r.get("document_id") for r in search_results if r.get("document_id")
         ]
         if not document_ids:
             return []
@@ -142,7 +142,7 @@ class PreflightService:
         mission_map = self._load_mission_metadata(document_ids)
 
         seen_missions: set[str] = set()
-        matches: List[PreflightMatch] = []
+        matches: list[PreflightMatch] = []
 
         for result in search_results:
             doc_id = result.get("document_id")
@@ -154,7 +154,9 @@ class PreflightService:
             if not mission_uuid or mission_uuid in seen_missions:
                 continue
 
-            similarity = float(result.get("score") or result.get("combined_score") or 0.0)
+            similarity = float(
+                result.get("score") or result.get("combined_score") or 0.0
+            )
             if similarity < min_similarity:
                 continue
 
@@ -168,22 +170,28 @@ class PreflightService:
 
     def _build_single_match(
         self,
-        metadata: Dict[str, Any],
+        metadata: dict[str, Any],
         similarity: float,
-    ) -> Optional[PreflightMatch]:
+    ) -> PreflightMatch | None:
         """Build a PreflightMatch from mission metadata."""
         mission_data = metadata.get("mission_data") or {}
         research_statement = mission_data.get("research_statement") or {}
         synthesis = mission_data.get("synthesis") or {}
 
-        mission_id = mission_data.get("mission_id") or metadata.get("mission_id") or "unknown"
-        title = mission_data.get("title") or research_statement.get("topic") or "Untitled"
-        objective = research_statement.get("objective") or mission_data.get("objective") or ""
+        mission_id = (
+            mission_data.get("mission_id") or metadata.get("mission_id") or "unknown"
+        )
+        title = (
+            mission_data.get("title") or research_statement.get("topic") or "Untitled"
+        )
+        objective = (
+            research_statement.get("objective") or mission_data.get("objective") or ""
+        )
         if len(objective) > 200:
             objective = objective[:197] + "..."
 
         key_insights_raw = synthesis.get("key_insights") or []
-        key_insights: List[PreflightMatchInsight] = []
+        key_insights: list[PreflightMatchInsight] = []
         for i, insight in enumerate(key_insights_raw[:3]):
             if isinstance(insight, str) and insight.strip():
                 text = insight.strip()
@@ -219,8 +227,8 @@ class PreflightService:
 
     def _load_mission_metadata(
         self,
-        document_ids: List[str],
-    ) -> Dict[str, Dict[str, Any]]:
+        document_ids: list[str],
+    ) -> dict[str, dict[str, Any]]:
         """Load mission metadata for documents."""
         if not document_ids:
             return {}
@@ -252,7 +260,7 @@ class PreflightService:
                 .all()
             )
 
-            result: Dict[str, Dict[str, Any]] = {}
+            result: dict[str, dict[str, Any]] = {}
             for row in rows:
                 payload = row._mapping
                 doc_id = str(payload["document_id"])
@@ -263,13 +271,17 @@ class PreflightService:
 
                 result[doc_id] = {
                     "document_id": doc_id,
-                    "mission_uuid": str(payload["mission_uuid"]) if payload["mission_uuid"] else None,
+                    "mission_uuid": str(payload["mission_uuid"])
+                    if payload["mission_uuid"]
+                    else None,
                     "mission_data": mission_data,
                     "status": payload["status"],
                     "created_at": payload["created_at"],
                     "quality_gates_passed": passed,
                     "quality_gates_total": 5,
-                    "quality_score": self._compute_quality_score(passed, payload["status"]),
+                    "quality_score": self._compute_quality_score(
+                        passed, payload["status"]
+                    ),
                 }
 
             return result
@@ -278,8 +290,8 @@ class PreflightService:
 
     def _count_passed_gates(
         self,
-        quality_gates: Dict[str, Any],
-        mission_data: Dict[str, Any],
+        quality_gates: dict[str, Any],
+        mission_data: dict[str, Any],
     ) -> int:
         """Count passing quality gates from stored metadata."""
         expected_gates = (
@@ -305,38 +317,54 @@ class PreflightService:
                         continue
                     gate_name = str(checkpoint.get("gate") or "").lower()
                     checkpoint_status = str(checkpoint.get("status") or "").lower()
-                    if gate_name in expected_gates and checkpoint_status in ("pass", "passed"):
+                    if gate_name in expected_gates and checkpoint_status in (
+                        "pass",
+                        "passed",
+                    ):
                         if quality_gates.get(gate_name) is None:
                             passed += 1
 
         return min(passed, 5)
 
-    def _compute_quality_score(self, passed_gates: int, status: Optional[str]) -> float:
+    def _compute_quality_score(self, passed_gates: int, status: str | None) -> float:
         """Compute quality multiplier from gates and status."""
-        base = passed_gates / 5.0 if passed_gates > 0 else QualityScoringService.DEFAULT_BASE_SCORE
+        base = (
+            passed_gates / 5.0
+            if passed_gates > 0
+            else QualityScoringService.DEFAULT_BASE_SCORE
+        )
         status_lower = status.lower() if status else "unknown"
         base = QualityScoringService._apply_status_curve(base, status_lower)
         boost = QualityScoringService.STATUS_BOOSTS.get(status_lower, 0.0)
         final = base * (1.0 + boost)
         return round(
-            min(QualityScoringService.MAX_SCORE, max(QualityScoringService.MIN_SCORE, final)),
+            min(
+                QualityScoringService.MAX_SCORE,
+                max(QualityScoringService.MIN_SCORE, final),
+            ),
             4,
         )
 
     def _determine_recommendation(
         self,
-        matches: List[PreflightMatch],
+        matches: list[PreflightMatch],
         query: str,
-    ) -> Tuple[str, str]:
+    ) -> tuple[str, str]:
         """Determine action and summary based on matches."""
         if not matches:
-            return "proceed", f"No relevant existing research found for: '{query[:50]}...'"
+            return (
+                "proceed",
+                f"No relevant existing research found for: '{query[:50]}...'",
+            )
 
         top = matches[0]
         score = top.similarity_score
         gates = top.quality_gates_passed
 
-        if score >= self.thresholds.reuse_similarity and gates >= self.thresholds.reuse_min_gates:
+        if (
+            score >= self.thresholds.reuse_similarity
+            and gates >= self.thresholds.reuse_min_gates
+        ):
             summary = (
                 f"High-quality match found: '{top.title}' "
                 f"(similarity: {score:.0%}, quality gates: {gates}/5). "
@@ -352,7 +380,7 @@ class PreflightService:
             )
             return "review", summary
 
-        summary = f"No sufficiently relevant research found. Proceed with new research."
+        summary = "No sufficiently relevant research found. Proceed with new research."
         return "proceed", summary
 
     def _emit_telemetry(
@@ -361,28 +389,32 @@ class PreflightService:
         agent: str,
     ) -> None:
         """Write telemetry event for pre-flight query."""
-        from app.core.telemetry import emit_telemetry
+        try:
+            telemetry = PreflightTelemetry(
+                timestamp=datetime.now(UTC),
+                query=recommendation.query,
+                action=recommendation.action,
+                top_score=recommendation.top_score,
+                match_count=recommendation.match_count,
+                latency_ms=recommendation.latency_ms,
+                min_quality_gates=recommendation.filters_applied.get(
+                    "min_quality_gates", 4
+                ),
+                status_filters=recommendation.filters_applied.get("status", []),
+                agent=agent,
+            )
 
-        telemetry_path = self.TELEMETRY_DIR / "sprint-11-preflight.jsonl"
+            self.TELEMETRY_DIR.mkdir(parents=True, exist_ok=True)
+            telemetry_path = self.TELEMETRY_DIR / "sprint-11-preflight.jsonl"
 
-        emit_telemetry(
-            path=telemetry_path,
-            event_type="preflight.query.completed",
-            source="tracelab",
-            payload={
-                "query": recommendation.query,
-                "action": recommendation.action,
-                "top_score": recommendation.top_score,
-                "match_count": recommendation.match_count,
-                "latency_ms": recommendation.latency_ms,
-                "min_quality_gates": recommendation.filters_applied.get("min_quality_gates", 4),
-                "status_filters": recommendation.filters_applied.get("status", []),
-                "agent": agent,
-            },
-        )
+            with telemetry_path.open("a", encoding="utf-8") as f:
+                f.write(telemetry.model_dump_json())
+                f.write("\n")
+        except Exception as e:
+            logger.warning("Failed to emit preflight telemetry: %s", e)
 
 
-_preflight_service: Optional[PreflightService] = None
+_preflight_service: PreflightService | None = None
 
 
 def get_preflight_service() -> PreflightService:

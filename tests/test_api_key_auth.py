@@ -1,4 +1,5 @@
 """Tests for API key authentication and management."""
+
 from __future__ import annotations
 
 import pytest
@@ -31,7 +32,11 @@ def client():
 def auth_headers(client: TestClient) -> dict:
     """Get JWT auth headers for creating/managing API keys."""
     # Login with email (seed user email is {auth_username}@tracelab.local)
-    email = settings.auth_username if "@" in settings.auth_username else f"{settings.auth_username}@tracelab.local"
+    email = (
+        settings.auth_username
+        if "@" in settings.auth_username
+        else f"{settings.auth_username}@tracelab.local"
+    )
     response = client.post(
         "/api/v1/auth/login",
         json={"email": email, "password": _configured_password()},
@@ -87,7 +92,9 @@ class TestAPIKeyManagement:
         assert data["created_at"]
         assert data["expires_at"] is None
 
-    def test_create_api_key_with_expiration(self, client: TestClient, auth_headers: dict):
+    def test_create_api_key_with_expiration(
+        self, client: TestClient, auth_headers: dict
+    ):
         response = client.post(
             "/api/v1/auth/api-keys",
             json={"name": "Expiring Key", "expires_in_days": 30},
@@ -156,7 +163,9 @@ class TestAPIKeyManagement:
 class TestAPIKeyAuthentication:
     """Test using API keys to authenticate requests."""
 
-    def test_api_key_authenticates_protected_endpoint(self, client: TestClient, auth_headers: dict):
+    def test_api_key_authenticates_protected_endpoint(
+        self, client: TestClient, auth_headers: dict
+    ):
         # Create an API key
         create_response = client.post(
             "/api/v1/auth/api-keys",
@@ -187,7 +196,9 @@ class TestAPIKeyAuthentication:
         )
         assert response.status_code == 401
 
-    def test_api_key_takes_priority_over_jwt(self, client: TestClient, auth_headers: dict):
+    def test_api_key_takes_priority_over_jwt(
+        self, client: TestClient, auth_headers: dict
+    ):
         # Create an API key
         create_response = client.post(
             "/api/v1/auth/api-keys",

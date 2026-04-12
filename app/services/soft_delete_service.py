@@ -2,10 +2,10 @@
 
 Includes PEDR cache invalidation on document state changes (B19.2).
 """
+
 from __future__ import annotations
 
 import logging
-from typing import Optional, Union
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -24,7 +24,7 @@ class DocumentSoftDeleteService:
         db: Session,
         document_id: UUID,
         deleted_by: str = None,
-    ) -> Optional[bool]:
+    ) -> bool | None:
         """Soft delete a document.
 
         Args:
@@ -61,7 +61,7 @@ class DocumentSoftDeleteService:
         self,
         db: Session,
         document_id: UUID,
-    ) -> Optional[bool]:
+    ) -> bool | None:
         """Restore a soft-deleted document.
 
         Args:

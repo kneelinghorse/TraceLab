@@ -15,13 +15,20 @@ from .db_client import SQLiteClient, SQLiteClientError
 
 
 def _utc_now() -> str:
-    return datetime.now(tz=timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return (
+        datetime.now(tz=timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
 
 
 def _detect_repo_root() -> Path:
     script_dir = Path(__file__).resolve().parent
     candidate = script_dir.parent
-    if (candidate / "db" / "schema.sql").exists() and (candidate / "agents.md").exists():
+    if (candidate / "db" / "schema.sql").exists() and (
+        candidate / "agents.md"
+    ).exists():
         return candidate
 
     cwd_candidate = Path.cwd() / "cmos"
@@ -74,7 +81,9 @@ class SessionCapture:
 class SessionError(Exception):
     """Base class for session-related failures."""
 
-    def __init__(self, message: str, *, hint: str | None = None, suggestion: str | None = None) -> None:
+    def __init__(
+        self, message: str, *, hint: str | None = None, suggestion: str | None = None
+    ) -> None:
         super().__init__(message)
         self.hint = hint
         self.suggestion = suggestion
@@ -103,20 +112,21 @@ class SessionRuntime:
     STALE_SESSION_THRESHOLD_HOURS = 24
 
     def __init__(
-        self,
-        *,
-        repo_root: Path | str | None = None,
-        db_path: Path | str | None = None
+        self, *, repo_root: Path | str | None = None, db_path: Path | str | None = None
     ) -> None:
         self.repo_root = _resolve_repo_root(repo_root)
-        self.db_path = Path(db_path) if db_path else self.repo_root / "db" / "cmos.sqlite"
+        self.db_path = (
+            Path(db_path) if db_path else self.repo_root / "db" / "cmos.sqlite"
+        )
         self.schema_path = self.repo_root / "db" / "schema.sql"
         self.client = SQLiteClient(self.db_path, schema_path=self.schema_path)
 
     def __enter__(self) -> "SessionRuntime":
         return self
 
-    def __exit__(self, exc_type: Any, exc: Any, tb: Any) -> None:  # pragma: no cover - cleanup
+    def __exit__(
+        self, exc_type: Any, exc: Any, tb: Any
+    ) -> None:  # pragma: no cover - cleanup
         self.close()
 
     def close(self) -> None:
@@ -138,10 +148,12 @@ class SessionRuntime:
         *,
         agent: str = "assistant",
         sprint_id: str | None = None,
-        metadata: Dict[str, Any] | None = None
+        metadata: Dict[str, Any] | None = None,
     ) -> str:
         """Start a new planning/onboarding session."""
-        clean_type = self._run_validation(validators.normalize_session_type, session_type)
+        clean_type = self._run_validation(
+            validators.normalize_session_type, session_type
+        )
         clean_title = self._run_validation(validators.normalize_title, title)
 
         self.ensure_database()
@@ -156,24 +168,26 @@ class SessionRuntime:
                 session_id = self._generate_session_id(conn)
                 ts = _utc_now()
                 conn.execute(
-                """
+                    """
                 INSERT INTO sessions (
                     id, type, title, sprint_id, started_at, agent, status, captures, next_steps, metadata
                 ) VALUES (
                     :id, :type, :title, :sprint_id, :started_at, :agent, 'active', :captures, NULL, :metadata
                 )
                 """,
-                {
-                    "id": session_id,
-                    "type": clean_type,
-                    "title": clean_title,
-                    "sprint_id": sprint_id,
-                    "started_at": ts,
-                    "agent": agent,
-                    "captures": "[]",
-                    "metadata": json.dumps(metadata, ensure_ascii=False) if metadata else None,
-                },
-            )
+                    {
+                        "id": session_id,
+                        "type": clean_type,
+                        "title": clean_title,
+                        "sprint_id": sprint_id,
+                        "started_at": ts,
+                        "agent": agent,
+                        "captures": "[]",
+                        "metadata": json.dumps(metadata, ensure_ascii=False)
+                        if metadata
+                        else None,
+                    },
+                )
                 self._insert_session_event(
                     conn,
                     {
@@ -231,7 +245,9 @@ class SessionRuntime:
             validators.normalize_capture_category,
             category,
         )
-        clean_content = self._run_validation(validators.normalize_capture_content, content)
+        clean_content = self._run_validation(
+            validators.normalize_capture_content, content
+        )
         context_text = context.strip() if context else None
 
         clean_evidence = self._validate_evidence(evidence) if evidence else None
@@ -268,7 +284,10 @@ class SessionRuntime:
                 captures.append(capture.to_dict())
                 conn.execute(
                     "UPDATE sessions SET captures = :captures WHERE id = :id",
-                    {"captures": json.dumps(captures, ensure_ascii=False), "id": session_id},
+                    {
+                        "captures": json.dumps(captures, ensure_ascii=False),
+                        "id": session_id,
+                    },
                 )
                 summary = f"[{normalized_category}] {capture.content}"
                 self._insert_session_event(
@@ -312,11 +331,13 @@ class SessionRuntime:
         summary: str,
         *,
         next_steps: Optional[List[str]] = None,
-        agent: str = "assistant"
+        agent: str = "assistant",
     ) -> None:
         """Complete an active session and aggregate captures into master context."""
         clean_summary = self._run_validation(validators.normalize_summary, summary)
-        clean_next_steps = self._run_validation(validators.normalize_next_steps, next_steps)
+        clean_next_steps = self._run_validation(
+            validators.normalize_next_steps, next_steps
+        )
 
         self.ensure_database()
         completed_at = _utc_now()
@@ -370,7 +391,9 @@ class SessionRuntime:
                         "action": "complete",
                         "status": "completed",
                         "summary": clean_summary,
-                        "next_hint": "; ".join(clean_next_steps) if clean_next_steps else None,
+                        "next_hint": "; ".join(clean_next_steps)
+                        if clean_next_steps
+                        else None,
                     },
                 )
         except SQLiteClientError as error:  # pragma: no cover - exercised via CLI tests
@@ -389,7 +412,9 @@ class SessionRuntime:
             summary=clean_summary,
             action="complete",
         )
-        capture_counts = self._apply_captures_to_master(master_context, captures, session_id)
+        capture_counts = self._apply_captures_to_master(
+            master_context, captures, session_id
+        )
         self._append_recent_session(
             project_context,
             row,
@@ -408,10 +433,16 @@ class SessionRuntime:
             limit=10,
         )
         if clean_next_steps:
-            self._record_next_steps(project_context, master_context, session_id, clean_next_steps)
+            self._record_next_steps(
+                project_context, master_context, session_id, clean_next_steps
+            )
 
-        self._update_context_health(project_context, ts=completed_at, increment_sessions=True)
-        self._update_context_health(master_context, ts=completed_at, increment_sessions=True)
+        self._update_context_health(
+            project_context, ts=completed_at, increment_sessions=True
+        )
+        self._update_context_health(
+            master_context, ts=completed_at, increment_sessions=True
+        )
         self._persist_contexts(
             project_context,
             master_context,
@@ -443,20 +474,23 @@ class SessionRuntime:
         container[key] = new_list
         return new_list
 
-    def _get_active_session(self, project_context: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    def _get_active_session(
+        self, project_context: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
         working = project_context.get("working_memory") or {}
         active = working.get("active_session")
         return active if isinstance(active, dict) else None
 
-    def _assert_no_active_session(self, active_session: Optional[Dict[str, Any]]) -> None:
+    def _assert_no_active_session(
+        self, active_session: Optional[Dict[str, Any]]
+    ) -> None:
         if not active_session:
             return
         message, hint, suggestion = self._build_active_session_message(active_session)
         raise ActiveSessionError(message, hint=hint, suggestion=suggestion)
 
     def _build_active_session_message(
-        self,
-        active_session: Dict[str, Any]
+        self, active_session: Dict[str, Any]
     ) -> tuple[str, str | None, str | None]:
         session_id = active_session.get("id") or "(unknown)"
         started_at = active_session.get("started_at")
@@ -475,15 +509,19 @@ class SessionRuntime:
                 f"Active session {session_id} exists. Use 'session resume' to continue or "
                 "'session complete' to finish it before starting another."
             )
-        hint = "Resume capturing with: ./cmos/cli.py session capture decision \"Update\""
-        suggestion = f"Finish it with: ./cmos/cli.py session complete --session {session_id} --summary \"Wrap-up\""
+        hint = 'Resume capturing with: ./cmos/cli.py session capture decision "Update"'
+        suggestion = f'Finish it with: ./cmos/cli.py session complete --session {session_id} --summary "Wrap-up"'
         return message, hint, suggestion
 
-    def _set_active_session(self, project_context: Dict[str, Any], session_info: Dict[str, Any]) -> None:
+    def _set_active_session(
+        self, project_context: Dict[str, Any], session_info: Dict[str, Any]
+    ) -> None:
         working = project_context.setdefault("working_memory", {})
         working["active_session"] = session_info
 
-    def _clear_active_session(self, project_context: Dict[str, Any], session_id: str) -> None:
+    def _clear_active_session(
+        self, project_context: Dict[str, Any], session_id: str
+    ) -> None:
         working = project_context.setdefault("working_memory", {})
         active = working.get("active_session")
         if isinstance(active, dict) and active.get("id") == session_id:
@@ -572,7 +610,9 @@ class SessionRuntime:
             if isinstance(value, int) and value > 0
         }
         capture_count = sum(
-            value for value in capture_summary.values() if isinstance(value, int) and value > 0
+            value
+            for value in capture_summary.values()
+            if isinstance(value, int) and value > 0
         )
         entry = {
             "id": row.get("id"),
@@ -669,7 +709,12 @@ class SessionRuntime:
                 continue
             etype = entry.get("type")
             eid = entry.get("id")
-            if isinstance(etype, str) and isinstance(eid, str) and etype.strip() and eid.strip():
+            if (
+                isinstance(etype, str)
+                and isinstance(eid, str)
+                and etype.strip()
+                and eid.strip()
+            ):
                 valid.append({"type": etype.strip(), "id": eid.strip()})
         return valid or None  # type: ignore[return-value]
 
@@ -682,15 +727,13 @@ class SessionRuntime:
         return False
 
     def _update_context_health(
-        self,
-        payload: Dict[str, Any],
-        *,
-        ts: str,
-        increment_sessions: bool = False
+        self, payload: Dict[str, Any], *, ts: str, increment_sessions: bool = False
     ) -> None:
         health = payload.setdefault("context_health", {})
         if increment_sessions:
-            health["sessions_since_reset"] = int(health.get("sessions_since_reset") or 0) + 1
+            health["sessions_since_reset"] = (
+                int(health.get("sessions_since_reset") or 0) + 1
+            )
         health["last_update"] = ts
         serialized = json.dumps(payload, ensure_ascii=False)
         size_kb = len(serialized.encode("utf-8")) / 1024

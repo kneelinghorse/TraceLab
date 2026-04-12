@@ -1,9 +1,11 @@
 """Semantic cache service backed by Qdrant."""
+
 from __future__ import annotations
 
 import time
 import uuid
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple
+from collections.abc import Iterable, Iterator
+from typing import Any
 
 from app.core.config import settings
 from app.core.qdrant_client import get_qdrant_client
@@ -22,7 +24,9 @@ try:  # pragma: no cover - allow import without qdrant dependency
     )
 except ModuleNotFoundError as exc:  # pragma: no cover
     QdrantClient = None  # type: ignore
-    Distance = FieldCondition = Filter = MatchValue = PayloadSchemaType = PointStruct = VectorParams = None  # type: ignore
+    Distance = FieldCondition = Filter = MatchValue = PayloadSchemaType = (
+        PointStruct
+    ) = VectorParams = None  # type: ignore
     _qdrant_import_error = exc
 else:
     _qdrant_import_error = None
@@ -35,7 +39,9 @@ class SemanticCacheService:
     to eliminate cold-start latency on first cache lookup.
     """
 
-    def __init__(self, client: Optional[QdrantClient] = None, enabled: Optional[bool] = None) -> None:
+    def __init__(
+        self, client: QdrantClient | None = None, enabled: bool | None = None
+    ) -> None:
         """Initialize SemanticCacheService.
 
         Args:
@@ -68,7 +74,7 @@ class SemanticCacheService:
         return self._client
 
     @staticmethod
-    def _extract_vector_size(collection_info: Any) -> Optional[int]:
+    def _extract_vector_size(collection_info: Any) -> int | None:
         """Extract configured vector size from Qdrant collection metadata."""
         config = getattr(collection_info, "config", None)
         params = getattr(config, "params", None) if config else None
@@ -140,8 +146,8 @@ class SemanticCacheService:
                 continue
 
     def check_cache(
-        self, query_embedding: Iterable[float], metadata: Dict[str, Any]
-    ) -> Optional[Dict[str, Any]]:
+        self, query_embedding: Iterable[float], metadata: dict[str, Any]
+    ) -> dict[str, Any] | None:
         """Attempt to satisfy a query from the semantic cache."""
         if not self.enabled:
             return None
@@ -154,13 +160,30 @@ class SemanticCacheService:
 
         filters = []
         if project_id:
-            filters.append(FieldCondition(key="project_id", match=MatchValue(value=str(project_id))))
+            filters.append(
+                FieldCondition(
+                    key="project_id", match=MatchValue(value=str(project_id))
+                )
+            )
         if document_id:
-            filters.append(FieldCondition(key="document_id", match=MatchValue(value=str(document_id))))
+            filters.append(
+                FieldCondition(
+                    key="document_id", match=MatchValue(value=str(document_id))
+                )
+            )
         if source_type:
-            filters.append(FieldCondition(key="source_type", match=MatchValue(value=str(source_type))))
+            filters.append(
+                FieldCondition(
+                    key="source_type", match=MatchValue(value=str(source_type))
+                )
+            )
         if filters_signature:
-            filters.append(FieldCondition(key="filters_signature", match=MatchValue(value=str(filters_signature))))
+            filters.append(
+                FieldCondition(
+                    key="filters_signature",
+                    match=MatchValue(value=str(filters_signature)),
+                )
+            )
         query_filter = Filter(must=filters) if filters else None
 
         try:
@@ -212,7 +235,12 @@ class SemanticCacheService:
             },
         }
 
-    def store_in_cache(self, query_embedding: Iterable[float], result: Dict[str, Any], metadata: Dict[str, Any]) -> None:
+    def store_in_cache(
+        self,
+        query_embedding: Iterable[float],
+        result: dict[str, Any],
+        metadata: dict[str, Any],
+    ) -> None:
         """Persist a query result in the cache."""
         if not self.enabled:
             return
@@ -226,7 +254,7 @@ class SemanticCacheService:
             "project_id": metadata.get("project_id"),
             "document_id": metadata.get("document_id"),
             "source_type": metadata.get("source_type"),
-             "filters_signature": metadata.get("filters_signature"),
+            "filters_signature": metadata.get("filters_signature"),
             "document_types": metadata.get("document_types"),
             "source_types": metadata.get("source_types"),
             "tags": metadata.get("tags"),
@@ -250,7 +278,9 @@ class SemanticCacheService:
         )
 
         try:
-            self.client.upsert(collection_name=self.collection_name, points=[point], wait=True)
+            self.client.upsert(
+                collection_name=self.collection_name, points=[point], wait=True
+            )
             expired = self._evict_expired(now_ts)
             if expired:
                 self.metrics.record_eviction(expired)
@@ -264,7 +294,7 @@ class SemanticCacheService:
         if not self.ttl_seconds:
             return 0
 
-        expired_ids: List[str] = []
+        expired_ids: list[str] = []
         for point in self._iterate_points():
             payload = point.payload or {}
             expires_at = payload.get("expires_at")
@@ -278,7 +308,9 @@ class SemanticCacheService:
         if not self.max_items or self.max_items <= 0:
             return 0
 
-        count_response = self.client.count(collection_name=self.collection_name, exact=True)
+        count_response = self.client.count(
+            collection_name=self.collection_name, exact=True
+        )
         total = getattr(count_response, "count", 0)
         if total <= self.max_items:
             return 0
@@ -294,7 +326,9 @@ class SemanticCacheService:
         ids_list = [str(id_) for id_ in ids if id_]
         if not ids_list:
             return
-        self.client.delete(collection_name=self.collection_name, points_selector=ids_list, wait=True)
+        self.client.delete(
+            collection_name=self.collection_name, points_selector=ids_list, wait=True
+        )
 
     def _iterate_points(self, batch_size: int = 128) -> Iterator[Any]:
         """Yield all points in the cache collection with payloads."""
@@ -314,7 +348,7 @@ class SemanticCacheService:
             offset = next_page_offset
 
 
-_semantic_cache_service: Optional[SemanticCacheService] = None
+_semantic_cache_service: SemanticCacheService | None = None
 
 
 def get_semantic_cache_service() -> SemanticCacheService:

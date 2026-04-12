@@ -1,7 +1,10 @@
 """API Key model for service authentication."""
+
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, ForeignKey, Index
+
+from sqlalchemy import Column, DateTime, ForeignKey, Index, String
+
 from app.core.database import Base
 from app.models.types import GUID
 
@@ -15,7 +18,9 @@ class APIKey(Base):
     user_id = Column(GUID(), ForeignKey("users.id"), nullable=False)
     name = Column(String(255), nullable=False)  # Human label like "MCP Server"
     key_hash = Column(String(255), nullable=False)  # bcrypt hash of full key
-    key_prefix = Column(String(12), nullable=False)  # First 8 chars after prefix for display (tl_a1b2c3d4)
+    key_prefix = Column(
+        String(12), nullable=False
+    )  # First 8 chars after prefix for display (tl_a1b2c3d4)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     last_used_at = Column(DateTime, nullable=True)  # Updated on successful auth
     expires_at = Column(DateTime, nullable=True)  # null = never expires

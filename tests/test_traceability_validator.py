@@ -1,4 +1,5 @@
 """Unit tests for the TraceabilityValidator."""
+
 from __future__ import annotations
 
 from uuid import uuid4
@@ -10,7 +11,9 @@ from app.models.mission_protocol import MissionProtocolDraft
 from app.services.traceability_validator import TraceabilityValidator
 
 
-def test_traceability_validator_detects_missing_chunks_and_low_relevance(db_session, project):
+def test_traceability_validator_detects_missing_chunks_and_low_relevance(
+    db_session, project
+):
     document = Document(project_id=project.id, name="Transcript", content="raw")
     db_session.add(document)
     db_session.flush()
@@ -27,7 +30,9 @@ def test_traceability_validator_detects_missing_chunks_and_low_relevance(db_sess
     db_session.flush()
 
     linked_insight = uuid4()
-    insight_source = InsightSource(insight_id=linked_insight, chunk_id=chunk_id, relevance_score=0.92)
+    insight_source = InsightSource(
+        insight_id=linked_insight, chunk_id=chunk_id, relevance_score=0.92
+    )
     db_session.add(insight_source)
     db_session.commit()
 

@@ -10,6 +10,7 @@ Validates:
 Uses injectable metadata loader to avoid DB dependency while testing
 real scoring logic.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -139,7 +140,9 @@ def _make_preflight_service(
     return service
 
 
-def _make_scoring_service(metadata_map: Dict[str, Dict[str, Any]]) -> QualityScoringService:
+def _make_scoring_service(
+    metadata_map: Dict[str, Dict[str, Any]],
+) -> QualityScoringService:
     """Create a QualityScoringService with injectable metadata loader."""
     return QualityScoringService(
         metadata_loader=lambda doc_ids: {
@@ -165,24 +168,35 @@ class TestPreflightDuplicateQueries:
     ]
 
     @pytest.mark.parametrize("doc_id,score,gates,title", DUPLICATE_SCENARIOS)
-    def test_high_similarity_high_quality_returns_reuse(self, doc_id, score, gates, title):
+    def test_high_similarity_high_quality_returns_reuse(
+        self, doc_id, score, gates, title
+    ):
         results = [_make_search_result(doc_id, score)]
-        metadata = {doc_id: _make_mission_metadata_for_preflight(
-            f"M-{doc_id}", title, "complete", gates
-        )}
+        metadata = {
+            doc_id: _make_mission_metadata_for_preflight(
+                f"M-{doc_id}", title, "complete", gates
+            )
+        }
         service = _make_preflight_service(results, metadata)
 
         rec = service.query(PreflightQuery(query=title))
-        assert rec.action == "reuse", f"Expected 'reuse' for score={score}, gates={gates}"
+        assert rec.action == "reuse", (
+            f"Expected 'reuse' for score={score}, gates={gates}"
+        )
         assert rec.top_score >= 0.85
         assert rec.match_count >= 1
 
     def test_high_similarity_low_quality_returns_review(self):
         """Score >= 0.85 but quality_gates < 4 should be 'review', not 'reuse'."""
         results = [_make_search_result("doc-low-q", 0.90)]
-        metadata = {"doc-low-q": _make_mission_metadata_for_preflight(
-            "M-low-q", "Low quality match", "complete", 2  # Only 2/5 gates
-        )}
+        metadata = {
+            "doc-low-q": _make_mission_metadata_for_preflight(
+                "M-low-q",
+                "Low quality match",
+                "complete",
+                2,  # Only 2/5 gates
+            )
+        }
         service = _make_preflight_service(results, metadata)
 
         rec = service.query(PreflightQuery(query="Low quality match"))
@@ -204,9 +218,11 @@ class TestPreflightNovelQueries:
     @pytest.mark.parametrize("doc_id,score,title", NOVEL_SCENARIOS)
     def test_low_similarity_returns_proceed(self, doc_id, score, title):
         results = [_make_search_result(doc_id, score)]
-        metadata = {doc_id: _make_mission_metadata_for_preflight(
-            f"M-{doc_id}", title, "complete", 5
-        )}
+        metadata = {
+            doc_id: _make_mission_metadata_for_preflight(
+                f"M-{doc_id}", title, "complete", 5
+            )
+        }
         service = _make_preflight_service(results, metadata)
 
         rec = service.query(PreflightQuery(query=title, similarity_threshold=0.70))
@@ -233,13 +249,17 @@ class TestPreflightReviewZone:
     @pytest.mark.parametrize("doc_id,score,gates,title", REVIEW_SCENARIOS)
     def test_mid_similarity_returns_review(self, doc_id, score, gates, title):
         results = [_make_search_result(doc_id, score)]
-        metadata = {doc_id: _make_mission_metadata_for_preflight(
-            f"M-{doc_id}", title, "complete", gates
-        )}
+        metadata = {
+            doc_id: _make_mission_metadata_for_preflight(
+                f"M-{doc_id}", title, "complete", gates
+            )
+        }
         service = _make_preflight_service(results, metadata)
 
         rec = service.query(PreflightQuery(query=title))
-        assert rec.action == "review", f"Expected 'review' for score={score}, gates={gates}"
+        assert rec.action == "review", (
+            f"Expected 'review' for score={score}, gates={gates}"
+        )
 
 
 # ===========================================================================
@@ -253,7 +273,9 @@ class TestQualityGateScoring:
     def test_all_gates_passed_complete_status(self):
         """5/5 gates + complete status → highest score."""
         service = QualityScoringService()
-        score = service._score_metadata(_make_metadata(passed_gates=5, status="complete"))
+        score = service._score_metadata(
+            _make_metadata(passed_gates=5, status="complete")
+        )
         assert score.passed_gates == 5
         assert score.status == "complete"
         # 5/5 = 1.0 base × (1 + 0.12 boost + 0.05 validation) = 1.17
@@ -262,7 +284,9 @@ class TestQualityGateScoring:
     def test_zero_gates_uses_default_base(self):
         """0 gates → DEFAULT_BASE_SCORE (0.60)."""
         service = QualityScoringService()
-        score = service._score_metadata(_make_metadata(passed_gates=0, status="complete"))
+        score = service._score_metadata(
+            _make_metadata(passed_gates=0, status="complete")
+        )
         assert score.passed_gates == 0
         # 0/5 = 0.0 base, but still gets status boost
         assert score.base_score == 0.0  # No curve applied since status is "complete"
@@ -287,7 +311,9 @@ class TestQualityGateScoring:
     def test_in_progress_status_curve(self):
         """4/5 gates + in_progress → x^0.70 curve."""
         service = QualityScoringService()
-        score = service._score_metadata(_make_metadata(passed_gates=4, status="in_progress"))
+        score = service._score_metadata(
+            _make_metadata(passed_gates=4, status="in_progress")
+        )
         # base = 4/5 = 0.8, curved = 0.8^0.70 ≈ 0.858
         assert score.base_score > 0.8
         assert score.boost >= 0.05  # in_progress boost
@@ -295,7 +321,9 @@ class TestQualityGateScoring:
     def test_unknown_status_no_boost_no_curve(self):
         """Unknown status → no curve, no boost."""
         service = QualityScoringService()
-        score = service._score_metadata(_make_metadata(passed_gates=3, status="unknown"))
+        score = service._score_metadata(
+            _make_metadata(passed_gates=3, status="unknown")
+        )
         assert score.base_score == 0.6  # 3/5 = 0.6, no curve
         assert score.boost == 0.0
 
@@ -303,19 +331,23 @@ class TestQualityGateScoring:
         """Score should never exceed MAX_SCORE (1.50) or go below MIN_SCORE (0.10)."""
         service = QualityScoringService()
         # Maximum possible: 5/5 gates + complete + validated = 1.0 × 1.17 = 1.17
-        score_max = service._score_metadata(_make_metadata(passed_gates=5, status="complete"))
+        score_max = service._score_metadata(
+            _make_metadata(passed_gates=5, status="complete")
+        )
         assert score_max.final_score <= QualityScoringService.MAX_SCORE
 
         # Minimum: 0 gates + unknown status
-        score_min = service._score_metadata(_make_metadata(passed_gates=0, status="unknown"))
+        score_min = service._score_metadata(
+            _make_metadata(passed_gates=0, status="unknown")
+        )
         assert score_min.final_score >= QualityScoringService.MIN_SCORE
 
     def test_validation_boost_applied(self):
         """Validated gates should add VALIDATION_BOOST (0.05)."""
         service = QualityScoringService()
-        score = service._score_metadata(_make_metadata(
-            passed_gates=5, status="complete", validated=True
-        ))
+        score = service._score_metadata(
+            _make_metadata(passed_gates=5, status="complete", validated=True)
+        )
         assert score.validated is True
         assert score.boost >= 0.12 + 0.05  # status + validation
 
@@ -526,9 +558,14 @@ class TestEdgeCases:
     def test_preflight_single_low_quality_document(self):
         """Single document with low quality gates → review instead of reuse."""
         results = [_make_search_result("doc-1", 0.90)]
-        metadata = {"doc-1": _make_mission_metadata_for_preflight(
-            "M-1", "Single match", "complete", 2  # Only 2/5 gates
-        )}
+        metadata = {
+            "doc-1": _make_mission_metadata_for_preflight(
+                "M-1",
+                "Single match",
+                "complete",
+                2,  # Only 2/5 gates
+            )
+        }
         service = _make_preflight_service(results, metadata)
 
         rec = service.query(PreflightQuery(query="Single match"))
@@ -558,9 +595,11 @@ class TestThresholdAnalysis:
     def test_boundary_at_reuse_threshold(self):
         """Scores exactly at 0.85 with 4 gates should trigger reuse."""
         results = [_make_search_result("doc-boundary", 0.85)]
-        metadata = {"doc-boundary": _make_mission_metadata_for_preflight(
-            "M-boundary", "Boundary test", "complete", 4
-        )}
+        metadata = {
+            "doc-boundary": _make_mission_metadata_for_preflight(
+                "M-boundary", "Boundary test", "complete", 4
+            )
+        }
         service = _make_preflight_service(results, metadata)
         rec = service.query(PreflightQuery(query="Boundary test"))
         assert rec.action == "reuse"
@@ -568,9 +607,11 @@ class TestThresholdAnalysis:
     def test_boundary_just_below_reuse(self):
         """Score at 0.849 should trigger review, not reuse."""
         results = [_make_search_result("doc-below", 0.849)]
-        metadata = {"doc-below": _make_mission_metadata_for_preflight(
-            "M-below", "Below threshold", "complete", 5
-        )}
+        metadata = {
+            "doc-below": _make_mission_metadata_for_preflight(
+                "M-below", "Below threshold", "complete", 5
+            )
+        }
         service = _make_preflight_service(results, metadata)
         rec = service.query(PreflightQuery(query="Below threshold"))
         assert rec.action == "review"
@@ -578,9 +619,11 @@ class TestThresholdAnalysis:
     def test_boundary_at_review_threshold(self):
         """Score exactly at 0.70 should trigger review."""
         results = [_make_search_result("doc-rev", 0.70)]
-        metadata = {"doc-rev": _make_mission_metadata_for_preflight(
-            "M-rev", "Review boundary", "complete", 5
-        )}
+        metadata = {
+            "doc-rev": _make_mission_metadata_for_preflight(
+                "M-rev", "Review boundary", "complete", 5
+            )
+        }
         service = _make_preflight_service(results, metadata)
         rec = service.query(PreflightQuery(query="Review boundary"))
         assert rec.action == "review"
@@ -588,25 +631,32 @@ class TestThresholdAnalysis:
     def test_boundary_just_below_review(self):
         """Score at 0.699 should trigger proceed."""
         results = [_make_search_result("doc-proceed", 0.699)]
-        metadata = {"doc-proceed": _make_mission_metadata_for_preflight(
-            "M-proceed", "Proceed boundary", "complete", 5
-        )}
+        metadata = {
+            "doc-proceed": _make_mission_metadata_for_preflight(
+                "M-proceed", "Proceed boundary", "complete", 5
+            )
+        }
         service = _make_preflight_service(results, metadata)
-        rec = service.query(PreflightQuery(
-            query="Proceed boundary",
-            similarity_threshold=0.60,  # Lower threshold to allow the match through
-        ))
+        rec = service.query(
+            PreflightQuery(
+                query="Proceed boundary",
+                similarity_threshold=0.60,  # Lower threshold to allow the match through
+            )
+        )
         assert rec.action == "proceed"
 
     def test_custom_thresholds_override_defaults(self):
         """Custom thresholds should change decision boundaries."""
         results = [_make_search_result("doc-custom", 0.80)]
-        metadata = {"doc-custom": _make_mission_metadata_for_preflight(
-            "M-custom", "Custom threshold", "complete", 5
-        )}
+        metadata = {
+            "doc-custom": _make_mission_metadata_for_preflight(
+                "M-custom", "Custom threshold", "complete", 5
+            )
+        }
         # Lower reuse threshold to 0.80
         service = _make_preflight_service(
-            results, metadata,
+            results,
+            metadata,
             thresholds=PreflightThresholds(reuse_similarity=0.80, reuse_min_gates=3),
         )
         rec = service.query(PreflightQuery(query="Custom threshold"))

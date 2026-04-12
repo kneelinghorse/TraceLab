@@ -1,9 +1,10 @@
 """Load testing harness powered by pytest-benchmark."""
+
 from __future__ import annotations
 
-from concurrent.futures import ThreadPoolExecutor
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 

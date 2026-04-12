@@ -1,5 +1,6 @@
 from datetime import date
 
+from app.services.pedr.pragmatic import QueryIntent, get_pragmatic_service
 from scripts.pedr_graph_tuning_baseline import (
     QuerySpec,
     dedupe_specs,
@@ -7,7 +8,6 @@ from scripts.pedr_graph_tuning_baseline import (
     load_queries_from_file,
     select_diverse_queries,
 )
-from app.services.pedr.pragmatic import QueryIntent, get_pragmatic_service
 
 
 def test_dedupe_specs_keeps_project_variants():

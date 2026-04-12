@@ -111,38 +111,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
       - name: Check for version change
         id: version_check
         run: |
-          # Get current version
-          CURRENT=$(python -c "
-          import sys
-          sys.path.insert(0, 'tracelab_schemas')
-          from tracelab_schemas.version import __version__
-          print(__version__)
-          ")
+          VERSION_FILE="tracelab_schemas/tracelab_schemas/version.py"
+
+          # Get current version by parsing the file directly (avoids importing pydantic)
+          CURRENT=$(grep -oP '(?<=__version__ = ")[^"]+' "$VERSION_FILE")
 
           # Get base branch version
           git fetch origin ${{ github.base_ref }} --depth=1
-          git checkout origin/${{ github.base_ref }} -- tracelab_schemas/tracelab_schemas/version.py 2>/dev/null || true
+          BASE_CONTENT=$(git show origin/${{ github.base_ref }}:"$VERSION_FILE" 2>/dev/null || echo "")
 
-          BASE=$(python -c "
-          import sys
-          sys.path.insert(0, 'tracelab_schemas')
-          try:
-              from tracelab_schemas.version import __version__
-              print(__version__)
-          except:
-              print('0.0.0')
-          " 2>/dev/null || echo "0.0.0")
-
-          # Restore current version
-          git checkout HEAD -- tracelab_schemas/tracelab_schemas/version.py 2>/dev/null || true
+          if [ -n "$BASE_CONTENT" ]; then
+            BASE=$(echo "$BASE_CONTENT" | grep -oP '(?<=__version__ = ")[^"]+' || echo "0.0.0")
+          else
+            BASE="0.0.0"
+          fi
 
           echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
           echo "base=$BASE" >> "$GITHUB_OUTPUT"

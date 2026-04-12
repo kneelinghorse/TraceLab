@@ -1,16 +1,16 @@
 """Tests for the collections API endpoints."""
+
 from __future__ import annotations
 
 import uuid
-from typing import Any, Dict, List
 
 from fastapi.testclient import TestClient
 
-from app.main import app
-from app.models.document import Document
-from app.models.chunk import DocumentChunk
-from app.models.project import Project
 from app.core.database import SessionLocal
+from app.main import app
+from app.models.chunk import DocumentChunk
+from app.models.document import Document
+from app.models.project import Project
 
 
 def _create_test_project(db_session) -> Project:
@@ -36,7 +36,12 @@ def _create_test_document(db_session, project_id: uuid.UUID) -> Document:
     return doc
 
 
-def _create_test_chunk(db_session, document_id: uuid.UUID, index: int = 0, content: str = "Test chunk content") -> DocumentChunk:
+def _create_test_chunk(
+    db_session,
+    document_id: uuid.UUID,
+    index: int = 0,
+    content: str = "Test chunk content",
+) -> DocumentChunk:
     """Create a test document chunk."""
     from sqlalchemy import text
 
@@ -99,7 +104,9 @@ def test_collection_crud_flow(auth_headers):
     assert updated["description"] == "New description"
 
     # Delete collection
-    delete_resp = client.delete(f"/api/v1/collections/{collection_id}", headers=auth_headers)
+    delete_resp = client.delete(
+        f"/api/v1/collections/{collection_id}", headers=auth_headers
+    )
     assert delete_resp.status_code == 204
 
     # Verify deleted
@@ -133,8 +140,12 @@ def test_collection_add_remove_chunks(auth_headers, db_session):
     # Create test data
     project = _create_test_project(db_session)
     document = _create_test_document(db_session, project.id)
-    chunk1 = _create_test_chunk(db_session, document.id, 0, "First chunk content for testing")
-    chunk2 = _create_test_chunk(db_session, document.id, 1, "Second chunk content for testing")
+    chunk1 = _create_test_chunk(
+        db_session, document.id, 0, "First chunk content for testing"
+    )
+    chunk2 = _create_test_chunk(
+        db_session, document.id, 1, "Second chunk content for testing"
+    )
 
     # Create collection
     create_resp = client.post(
@@ -166,7 +177,9 @@ def test_collection_add_remove_chunks(auth_headers, db_session):
     assert add_resp2.status_code == 201
 
     # Verify collection has 2 items
-    detail_resp = client.get(f"/api/v1/collections/{collection_id}", headers=auth_headers)
+    detail_resp = client.get(
+        f"/api/v1/collections/{collection_id}", headers=auth_headers
+    )
     assert detail_resp.status_code == 200
     detail = detail_resp.json()
     assert detail["item_count"] == 2
@@ -180,7 +193,9 @@ def test_collection_add_remove_chunks(auth_headers, db_session):
     assert remove_resp.status_code == 204
 
     # Verify collection has 1 item
-    detail_after = client.get(f"/api/v1/collections/{collection_id}", headers=auth_headers)
+    detail_after = client.get(
+        f"/api/v1/collections/{collection_id}", headers=auth_headers
+    )
     assert detail_after.json()["item_count"] == 1
 
 
@@ -304,15 +319,24 @@ def test_collection_cascade_delete_items(auth_headers, db_session):
     )
 
     # Delete collection
-    delete_resp = client.delete(f"/api/v1/collections/{collection_id}", headers=auth_headers)
+    delete_resp = client.delete(
+        f"/api/v1/collections/{collection_id}", headers=auth_headers
+    )
     assert delete_resp.status_code == 204
 
     # Verify chunk still exists (only collection item should be deleted)
     from app.models.chunk import DocumentChunk
+
     session = SessionLocal()
     try:
-        remaining_chunk = session.query(DocumentChunk).filter(DocumentChunk.id == chunk.id).one_or_none()
-        assert remaining_chunk is not None, "Chunk should still exist after collection deletion"
+        remaining_chunk = (
+            session.query(DocumentChunk)
+            .filter(DocumentChunk.id == chunk.id)
+            .one_or_none()
+        )
+        assert remaining_chunk is not None, (
+            "Chunk should still exist after collection deletion"
+        )
     finally:
         session.close()
 
@@ -324,13 +348,26 @@ def test_collection_export_markdown(auth_headers, db_session):
     # Create test data
     project = _create_test_project(db_session)
     document = _create_test_document(db_session, project.id)
-    chunk1 = _create_test_chunk(db_session, document.id, 0, "This is the first chunk content for export testing.")
-    chunk2 = _create_test_chunk(db_session, document.id, 1, "This is the second chunk content for export testing.")
+    chunk1 = _create_test_chunk(
+        db_session,
+        document.id,
+        0,
+        "This is the first chunk content for export testing.",
+    )
+    chunk2 = _create_test_chunk(
+        db_session,
+        document.id,
+        1,
+        "This is the second chunk content for export testing.",
+    )
 
     # Create collection
     create_resp = client.post(
         "/api/v1/collections",
-        json={"name": "Export Test Collection", "description": "Testing markdown export"},
+        json={
+            "name": "Export Test Collection",
+            "description": "Testing markdown export",
+        },
         headers=auth_headers,
     )
     assert create_resp.status_code == 201
@@ -349,11 +386,15 @@ def test_collection_export_markdown(auth_headers, db_session):
     )
 
     # Export collection
-    export_resp = client.get(f"/api/v1/collections/{collection_id}/export", headers=auth_headers)
+    export_resp = client.get(
+        f"/api/v1/collections/{collection_id}/export", headers=auth_headers
+    )
     assert export_resp.status_code == 200
     assert export_resp.headers["content-type"] == "text/markdown; charset=utf-8"
     assert "attachment" in export_resp.headers.get("content-disposition", "")
-    assert "export-test-collection-export.md" in export_resp.headers.get("content-disposition", "")
+    assert "export-test-collection-export.md" in export_resp.headers.get(
+        "content-disposition", ""
+    )
 
     # Verify markdown content
     content = export_resp.text
@@ -382,7 +423,9 @@ def test_collection_export_empty(auth_headers):
     collection_id = create_resp.json()["id"]
 
     # Export empty collection
-    export_resp = client.get(f"/api/v1/collections/{collection_id}/export", headers=auth_headers)
+    export_resp = client.get(
+        f"/api/v1/collections/{collection_id}/export", headers=auth_headers
+    )
     assert export_resp.status_code == 200
     content = export_resp.text
     assert "# Empty Export" in content
@@ -394,5 +437,7 @@ def test_collection_export_not_found(auth_headers):
     client = TestClient(app)
     fake_id = str(uuid.uuid4())
 
-    export_resp = client.get(f"/api/v1/collections/{fake_id}/export", headers=auth_headers)
+    export_resp = client.get(
+        f"/api/v1/collections/{fake_id}/export", headers=auth_headers
+    )
     assert export_resp.status_code == 404

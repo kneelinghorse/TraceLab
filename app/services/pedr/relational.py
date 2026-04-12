@@ -14,13 +14,15 @@ Relationships modeled:
 
 Uses SQL joins for MVP - no separate graph DB required.
 """
+
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import and_, select
@@ -28,16 +30,16 @@ from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
 from app.models import (
-    Project,
     Document,
     DocumentChunk,
     Insight,
     InsightSource,
     Mission,
+    Project,
     Report,
     ReportSource,
 )
-from app.services.pedr.semantic_protocol import URN, get_semantic_protocol
+from app.services.pedr.semantic_protocol import get_semantic_protocol
 
 logger = logging.getLogger(__name__)
 
@@ -45,14 +47,12 @@ logger = logging.getLogger(__name__)
 class RelationType(str, Enum):
     """Types of relationships between entities."""
 
-    BELONGS_TO = "belongs_to"       # entity -> parent
-    CONTAINS = "contains"           # parent -> child
-    REFERENCES = "references"       # entity -> evidence
-    DERIVED_FROM = "derived_from"   # insight -> source chunks
-    SIBLING_OF = "sibling_of"       # same parent
-    RELATED_TO = "related_to"       # general association
-    CO_OCCURS = "co_occurs"         # chunks in same collection (T38.1)
-    TOPIC_SIMILAR = "topic_similar" # high embedding cosine similarity (T38.1)
+    BELONGS_TO = "belongs_to"  # entity -> parent
+    CONTAINS = "contains"  # parent -> child
+    REFERENCES = "references"  # entity -> evidence
+    DERIVED_FROM = "derived_from"  # insight -> source chunks
+    SIBLING_OF = "sibling_of"  # same parent
+    RELATED_TO = "related_to"  # general association
 
 
 class EntityType(str, Enum):
@@ -75,11 +75,11 @@ class RelatedEntity:
     relation_type: RelationType
     relation_direction: str  # "outbound" or "inbound"
     distance: int  # hops from source entity
-    content_preview: Optional[str] = None  # First N chars of content
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    urn: Optional[str] = None
+    content_preview: str | None = None  # First N chars of content
+    metadata: dict[str, Any] = field(default_factory=dict)
+    urn: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "entity_type": self.entity_type.value,
@@ -100,11 +100,11 @@ class GraphExpansionResult:
     source_urn: str
     source_entity_type: EntityType
     source_entity_id: str
-    related_entities: List[RelatedEntity]
+    related_entities: list[RelatedEntity]
     total_found: int
     expansion_depth: int
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for API response."""
         return {
             "source_urn": self.source_urn,
@@ -127,8 +127,8 @@ class RelationalService:
 
     def __init__(
         self,
-        session: Optional[Session] = None,
-        semantic_protocol: Optional[Any] = None,
+        session: Session | None = None,
+        semantic_protocol: Any | None = None,
     ) -> None:
         """Initialize the relational service.
 
@@ -142,7 +142,7 @@ class RelationalService:
     @contextmanager
     def _session_scope(
         self,
-        session: Optional[Session] = None,
+        session: Session | None = None,
     ) -> Iterable[Session]:
         if session is not None:
             yield session
@@ -156,7 +156,7 @@ class RelationalService:
         finally:
             created_session.close()
 
-    def parse_urn(self, urn: str) -> Tuple[EntityType, str]:
+    def parse_urn(self, urn: str) -> tuple[EntityType, str]:
         """Parse a URN into entity type and ID.
 
         URN format: urn:research:{type}:{id}
@@ -200,10 +200,10 @@ class RelationalService:
         *,
         max_depth: int = 2,
         limit: int = 50,
-        include_types: Optional[List[EntityType]] = None,
-        exclude_types: Optional[List[EntityType]] = None,
-        relation_types: Optional[List[RelationType]] = None,
-        session: Optional[Session] = None,
+        include_types: list[EntityType] | None = None,
+        exclude_types: list[EntityType] | None = None,
+        relation_types: list[RelationType] | None = None,
+        session: Session | None = None,
     ) -> GraphExpansionResult:
         """Get entities related to the given URN.
 
@@ -223,8 +223,8 @@ class RelationalService:
         """
         entity_type, entity_id = self.parse_urn(urn)
 
-        related: List[RelatedEntity] = []
-        visited: Set[str] = {f"{entity_type.value}:{entity_id}"}
+        related: list[RelatedEntity] = []
+        visited: set[str] = {f"{entity_type.value}:{entity_id}"}
 
         # BFS traversal
         current_level = [(entity_type, entity_id, 0)]  # (type, id, depth)
@@ -258,7 +258,9 @@ class RelationalService:
                                 break
 
                             # Queue for next level
-                            next_level.append((neighbor.entity_type, neighbor.entity_id, depth + 1))
+                            next_level.append(
+                                (neighbor.entity_type, neighbor.entity_id, depth + 1)
+                            )
 
                     if len(related) >= limit:
                         break
@@ -280,10 +282,10 @@ class RelationalService:
         entity_type: EntityType,
         entity_id: str,
         *,
-        include_types: Optional[List[EntityType]] = None,
-        exclude_types: Optional[List[EntityType]] = None,
-        relation_types: Optional[List[RelationType]] = None,
-    ) -> List[RelatedEntity]:
+        include_types: list[EntityType] | None = None,
+        exclude_types: list[EntityType] | None = None,
+        relation_types: list[RelationType] | None = None,
+    ) -> list[RelatedEntity]:
         """Get direct neighbors of an entity.
 
         Args:
@@ -297,7 +299,7 @@ class RelationalService:
         Returns:
             List of directly related entities.
         """
-        neighbors: List[RelatedEntity] = []
+        neighbors: list[RelatedEntity] = []
 
         # Dispatch to type-specific handlers
         handlers = {
@@ -329,9 +331,9 @@ class RelationalService:
         self,
         session: Session,
         project_id: str,
-    ) -> List[RelatedEntity]:
+    ) -> list[RelatedEntity]:
         """Get neighbors of a project entity."""
-        neighbors: List[RelatedEntity] = []
+        neighbors: list[RelatedEntity] = []
 
         try:
             project_uuid = UUID(project_id)
@@ -339,81 +341,117 @@ class RelationalService:
             return neighbors
 
         # Documents BELONG_TO project (inbound)
-        docs = session.execute(
-            select(Document)
-            .where(Document.project_id == project_uuid)
-            .where(Document.deleted_at.is_(None))
-            .limit(20)
-        ).scalars().all()
+        docs = (
+            session.execute(
+                select(Document)
+                .where(Document.project_id == project_uuid)
+                .where(Document.deleted_at.is_(None))
+                .limit(20)
+            )
+            .scalars()
+            .all()
+        )
 
         for doc in docs:
-            neighbors.append(RelatedEntity(
-                entity_type=EntityType.DOCUMENT,
-                entity_id=str(doc.id),
-                relation_type=RelationType.BELONGS_TO,
-                relation_direction="inbound",
-                distance=1,
-                content_preview=doc.name,
-                metadata={"file_type": doc.file_type, "source_type": doc.source_type},
-                urn=self._semantic_protocol.generate_urn("document", str(doc.id)),
-            ))
+            neighbors.append(
+                RelatedEntity(
+                    entity_type=EntityType.DOCUMENT,
+                    entity_id=str(doc.id),
+                    relation_type=RelationType.BELONGS_TO,
+                    relation_direction="inbound",
+                    distance=1,
+                    content_preview=doc.name,
+                    metadata={
+                        "file_type": doc.file_type,
+                        "source_type": doc.source_type,
+                    },
+                    urn=self._semantic_protocol.generate_urn("document", str(doc.id)),
+                )
+            )
 
         # Missions BELONG_TO project (inbound)
-        missions = session.execute(
-            select(Mission)
-            .where(Mission.project_id == project_uuid)
-            .limit(20)
-        ).scalars().all()
+        missions = (
+            session.execute(
+                select(Mission).where(Mission.project_id == project_uuid).limit(20)
+            )
+            .scalars()
+            .all()
+        )
 
         for mission in missions:
-            neighbors.append(RelatedEntity(
-                entity_type=EntityType.MISSION,
-                entity_id=str(mission.id),
-                relation_type=RelationType.BELONGS_TO,
-                relation_direction="inbound",
-                distance=1,
-                content_preview=mission.title[:self.CONTENT_PREVIEW_LENGTH] if mission.title else None,
-                metadata={"mission_id": mission.mission_id, "status": mission.status},
-                urn=self._semantic_protocol.generate_urn("mission", str(mission.id)),
-            ))
+            neighbors.append(
+                RelatedEntity(
+                    entity_type=EntityType.MISSION,
+                    entity_id=str(mission.id),
+                    relation_type=RelationType.BELONGS_TO,
+                    relation_direction="inbound",
+                    distance=1,
+                    content_preview=mission.title[: self.CONTENT_PREVIEW_LENGTH]
+                    if mission.title
+                    else None,
+                    metadata={
+                        "mission_id": mission.mission_id,
+                        "status": mission.status,
+                    },
+                    urn=self._semantic_protocol.generate_urn(
+                        "mission", str(mission.id)
+                    ),
+                )
+            )
 
         # Reports BELONG_TO project (inbound)
-        reports = session.execute(
-            select(Report)
-            .where(Report.project_id == project_uuid)
-            .limit(20)
-        ).scalars().all()
+        reports = (
+            session.execute(
+                select(Report).where(Report.project_id == project_uuid).limit(20)
+            )
+            .scalars()
+            .all()
+        )
 
         for report in reports:
-            neighbors.append(RelatedEntity(
-                entity_type=EntityType.REPORT,
-                entity_id=str(report.id),
-                relation_type=RelationType.BELONGS_TO,
-                relation_direction="inbound",
-                distance=1,
-                content_preview=report.title,
-                metadata={"report_type": report.report_type, "status": report.status},
-                urn=self._semantic_protocol.generate_urn("report", str(report.id)),
-            ))
+            neighbors.append(
+                RelatedEntity(
+                    entity_type=EntityType.REPORT,
+                    entity_id=str(report.id),
+                    relation_type=RelationType.BELONGS_TO,
+                    relation_direction="inbound",
+                    distance=1,
+                    content_preview=report.title,
+                    metadata={
+                        "report_type": report.report_type,
+                        "status": report.status,
+                    },
+                    urn=self._semantic_protocol.generate_urn("report", str(report.id)),
+                )
+            )
 
         # Insights BELONG_TO project (inbound)
-        insights = session.execute(
-            select(Insight)
-            .where(Insight.project_id == project_uuid)
-            .limit(20)
-        ).scalars().all()
+        insights = (
+            session.execute(
+                select(Insight).where(Insight.project_id == project_uuid).limit(20)
+            )
+            .scalars()
+            .all()
+        )
 
         for insight in insights:
-            neighbors.append(RelatedEntity(
-                entity_type=EntityType.INSIGHT,
-                entity_id=str(insight.id),
-                relation_type=RelationType.BELONGS_TO,
-                relation_direction="inbound",
-                distance=1,
-                content_preview=insight.title,
-                metadata={"insight_type": insight.insight_type, "validated": insight.validated},
-                urn=self._semantic_protocol.generate_urn("insight", str(insight.id)),
-            ))
+            neighbors.append(
+                RelatedEntity(
+                    entity_type=EntityType.INSIGHT,
+                    entity_id=str(insight.id),
+                    relation_type=RelationType.BELONGS_TO,
+                    relation_direction="inbound",
+                    distance=1,
+                    content_preview=insight.title,
+                    metadata={
+                        "insight_type": insight.insight_type,
+                        "validated": insight.validated,
+                    },
+                    urn=self._semantic_protocol.generate_urn(
+                        "insight", str(insight.id)
+                    ),
+                )
+            )
 
         return neighbors
 
@@ -421,9 +459,9 @@ class RelationalService:
         self,
         session: Session,
         document_id: str,
-    ) -> List[RelatedEntity]:
+    ) -> list[RelatedEntity]:
         """Get neighbors of a document entity."""
-        neighbors: List[RelatedEntity] = []
+        neighbors: list[RelatedEntity] = []
 
         try:
             doc_uuid = UUID(document_id)
@@ -445,62 +483,91 @@ class RelationalService:
             ).scalar_one_or_none()
 
             if project:
-                neighbors.append(RelatedEntity(
-                    entity_type=EntityType.PROJECT,
-                    entity_id=str(project.id),
-                    relation_type=RelationType.BELONGS_TO,
-                    relation_direction="outbound",
-                    distance=1,
-                    content_preview=project.name,
-                    metadata={"status": project.status, "research_type": project.research_type},
-                    urn=self._semantic_protocol.generate_urn("project", str(project.id)),
-                ))
+                neighbors.append(
+                    RelatedEntity(
+                        entity_type=EntityType.PROJECT,
+                        entity_id=str(project.id),
+                        relation_type=RelationType.BELONGS_TO,
+                        relation_direction="outbound",
+                        distance=1,
+                        content_preview=project.name,
+                        metadata={
+                            "status": project.status,
+                            "research_type": project.research_type,
+                        },
+                        urn=self._semantic_protocol.generate_urn(
+                            "project", str(project.id)
+                        ),
+                    )
+                )
 
         # Document CONTAINS chunks (outbound)
-        chunks = session.execute(
-            select(DocumentChunk)
-            .where(DocumentChunk.document_id == doc_uuid)
-            .order_by(DocumentChunk.chunk_index)
-            .limit(30)
-        ).scalars().all()
+        chunks = (
+            session.execute(
+                select(DocumentChunk)
+                .where(DocumentChunk.document_id == doc_uuid)
+                .order_by(DocumentChunk.chunk_index)
+                .limit(30)
+            )
+            .scalars()
+            .all()
+        )
 
         for chunk in chunks:
-            neighbors.append(RelatedEntity(
-                entity_type=EntityType.CHUNK,
-                entity_id=str(chunk.id),
-                relation_type=RelationType.CONTAINS,
-                relation_direction="outbound",
-                distance=1,
-                content_preview=chunk.content[:self.CONTENT_PREVIEW_LENGTH] if chunk.content else None,
-                metadata={"chunk_index": chunk.chunk_index, "token_count": chunk.token_count},
-                urn=self._semantic_protocol.generate_urn("chunk", str(chunk.id)),
-            ))
+            neighbors.append(
+                RelatedEntity(
+                    entity_type=EntityType.CHUNK,
+                    entity_id=str(chunk.id),
+                    relation_type=RelationType.CONTAINS,
+                    relation_direction="outbound",
+                    distance=1,
+                    content_preview=chunk.content[: self.CONTENT_PREVIEW_LENGTH]
+                    if chunk.content
+                    else None,
+                    metadata={
+                        "chunk_index": chunk.chunk_index,
+                        "token_count": chunk.token_count,
+                    },
+                    urn=self._semantic_protocol.generate_urn("chunk", str(chunk.id)),
+                )
+            )
 
         # Sibling documents in same project
         if doc.project_id:
-            siblings = session.execute(
-                select(Document)
-                .where(
-                    and_(
-                        Document.project_id == doc.project_id,
-                        Document.id != doc_uuid,
-                        Document.deleted_at.is_(None),
+            siblings = (
+                session.execute(
+                    select(Document)
+                    .where(
+                        and_(
+                            Document.project_id == doc.project_id,
+                            Document.id != doc_uuid,
+                            Document.deleted_at.is_(None),
+                        )
                     )
+                    .limit(10)
                 )
-                .limit(10)
-            ).scalars().all()
+                .scalars()
+                .all()
+            )
 
             for sibling in siblings:
-                neighbors.append(RelatedEntity(
-                    entity_type=EntityType.DOCUMENT,
-                    entity_id=str(sibling.id),
-                    relation_type=RelationType.SIBLING_OF,
-                    relation_direction="outbound",
-                    distance=1,
-                    content_preview=sibling.name,
-                    metadata={"file_type": sibling.file_type, "source_type": sibling.source_type},
-                    urn=self._semantic_protocol.generate_urn("document", str(sibling.id)),
-                ))
+                neighbors.append(
+                    RelatedEntity(
+                        entity_type=EntityType.DOCUMENT,
+                        entity_id=str(sibling.id),
+                        relation_type=RelationType.SIBLING_OF,
+                        relation_direction="outbound",
+                        distance=1,
+                        content_preview=sibling.name,
+                        metadata={
+                            "file_type": sibling.file_type,
+                            "source_type": sibling.source_type,
+                        },
+                        urn=self._semantic_protocol.generate_urn(
+                            "document", str(sibling.id)
+                        ),
+                    )
+                )
 
         return neighbors
 
@@ -508,9 +575,9 @@ class RelationalService:
         self,
         session: Session,
         chunk_id: str,
-    ) -> List[RelatedEntity]:
+    ) -> list[RelatedEntity]:
         """Get neighbors of a chunk entity."""
-        neighbors: List[RelatedEntity] = []
+        neighbors: list[RelatedEntity] = []
 
         try:
             chunk_uuid = UUID(chunk_id)
@@ -532,22 +599,32 @@ class RelationalService:
             ).scalar_one_or_none()
 
             if doc:
-                neighbors.append(RelatedEntity(
-                    entity_type=EntityType.DOCUMENT,
-                    entity_id=str(doc.id),
-                    relation_type=RelationType.BELONGS_TO,
-                    relation_direction="outbound",
-                    distance=1,
-                    content_preview=doc.name,
-                    metadata={"file_type": doc.file_type, "source_type": doc.source_type},
-                    urn=self._semantic_protocol.generate_urn("document", str(doc.id)),
-                ))
+                neighbors.append(
+                    RelatedEntity(
+                        entity_type=EntityType.DOCUMENT,
+                        entity_id=str(doc.id),
+                        relation_type=RelationType.BELONGS_TO,
+                        relation_direction="outbound",
+                        distance=1,
+                        content_preview=doc.name,
+                        metadata={
+                            "file_type": doc.file_type,
+                            "source_type": doc.source_type,
+                        },
+                        urn=self._semantic_protocol.generate_urn(
+                            "document", str(doc.id)
+                        ),
+                    )
+                )
 
         # Insights DERIVED_FROM this chunk (inbound via InsightSource)
-        insight_sources = session.execute(
-            select(InsightSource)
-            .where(InsightSource.chunk_id == chunk_uuid)
-        ).scalars().all()
+        insight_sources = (
+            session.execute(
+                select(InsightSource).where(InsightSource.chunk_id == chunk_uuid)
+            )
+            .scalars()
+            .all()
+        )
 
         for source in insight_sources:
             insight = session.execute(
@@ -555,30 +632,39 @@ class RelationalService:
             ).scalar_one_or_none()
 
             if insight:
-                neighbors.append(RelatedEntity(
-                    entity_type=EntityType.INSIGHT,
-                    entity_id=str(insight.id),
-                    relation_type=RelationType.DERIVED_FROM,
-                    relation_direction="inbound",
-                    distance=1,
-                    content_preview=insight.title,
-                    metadata={
-                        "insight_type": insight.insight_type,
-                        "relevance_score": float(source.relevance_score) if source.relevance_score else None,
-                    },
-                    urn=self._semantic_protocol.generate_urn("insight", str(insight.id)),
-                ))
+                neighbors.append(
+                    RelatedEntity(
+                        entity_type=EntityType.INSIGHT,
+                        entity_id=str(insight.id),
+                        relation_type=RelationType.DERIVED_FROM,
+                        relation_direction="inbound",
+                        distance=1,
+                        content_preview=insight.title,
+                        metadata={
+                            "insight_type": insight.insight_type,
+                            "relevance_score": float(source.relevance_score)
+                            if source.relevance_score
+                            else None,
+                        },
+                        urn=self._semantic_protocol.generate_urn(
+                            "insight", str(insight.id)
+                        ),
+                    )
+                )
 
         # Reports that reference this chunk (inbound via ReportSource)
-        report_sources = session.execute(
-            select(ReportSource)
-            .where(
-                and_(
-                    ReportSource.source_type == "chunk",
-                    ReportSource.source_id == chunk_uuid,
+        report_sources = (
+            session.execute(
+                select(ReportSource).where(
+                    and_(
+                        ReportSource.source_type == "chunk",
+                        ReportSource.source_id == chunk_uuid,
+                    )
                 )
             )
-        ).scalars().all()
+            .scalars()
+            .all()
+        )
 
         for source in report_sources:
             report = session.execute(
@@ -586,42 +672,59 @@ class RelationalService:
             ).scalar_one_or_none()
 
             if report:
-                neighbors.append(RelatedEntity(
-                    entity_type=EntityType.REPORT,
-                    entity_id=str(report.id),
-                    relation_type=RelationType.REFERENCES,
-                    relation_direction="inbound",
-                    distance=1,
-                    content_preview=report.title,
-                    metadata={"report_type": report.report_type, "status": report.status},
-                    urn=self._semantic_protocol.generate_urn("report", str(report.id)),
-                ))
+                neighbors.append(
+                    RelatedEntity(
+                        entity_type=EntityType.REPORT,
+                        entity_id=str(report.id),
+                        relation_type=RelationType.REFERENCES,
+                        relation_direction="inbound",
+                        distance=1,
+                        content_preview=report.title,
+                        metadata={
+                            "report_type": report.report_type,
+                            "status": report.status,
+                        },
+                        urn=self._semantic_protocol.generate_urn(
+                            "report", str(report.id)
+                        ),
+                    )
+                )
 
         # Sibling chunks in same document
         if chunk.document_id:
-            siblings = session.execute(
-                select(DocumentChunk)
-                .where(
-                    and_(
-                        DocumentChunk.document_id == chunk.document_id,
-                        DocumentChunk.id != chunk_uuid,
+            siblings = (
+                session.execute(
+                    select(DocumentChunk)
+                    .where(
+                        and_(
+                            DocumentChunk.document_id == chunk.document_id,
+                            DocumentChunk.id != chunk_uuid,
+                        )
                     )
+                    .order_by(DocumentChunk.chunk_index)
+                    .limit(5)  # Limit sibling chunks
                 )
-                .order_by(DocumentChunk.chunk_index)
-                .limit(5)  # Limit sibling chunks
-            ).scalars().all()
+                .scalars()
+                .all()
+            )
 
             for sibling in siblings:
-                neighbors.append(RelatedEntity(
-                    entity_type=EntityType.CHUNK,
-                    entity_id=str(sibling.id),
-                    relation_type=RelationType.SIBLING_OF,
-                    relation_direction="outbound",
-                    distance=1,
-                    content_preview=sibling.content[:self.CONTENT_PREVIEW_LENGTH] if sibling.content else None,
-                    metadata={"chunk_index": sibling.chunk_index},
-                    urn=self._semantic_protocol.generate_urn("chunk", str(sibling.id)),
-                ))
+                neighbors.append(
+                    RelatedEntity(
+                        entity_type=EntityType.CHUNK,
+                        entity_id=str(sibling.id),
+                        relation_type=RelationType.SIBLING_OF,
+                        relation_direction="outbound",
+                        distance=1,
+                        content_preview=sibling.content[: self.CONTENT_PREVIEW_LENGTH]
+                        if sibling.content
+                        else None,
+                        metadata={"chunk_index": sibling.chunk_index},
+                        urn=self._semantic_protocol.generate_urn(
+                            "chunk", str(sibling.id)
+                        ),
+                    )
+                )
 
         return neighbors
 
@@ -629,9 +732,9 @@ class RelationalService:
         self,
         session: Session,
         mission_id: str,
-    ) -> List[RelatedEntity]:
+    ) -> list[RelatedEntity]:
         """Get neighbors of a mission entity."""
-        neighbors: List[RelatedEntity] = []
+        neighbors: list[RelatedEntity] = []
 
         try:
             mission_uuid = UUID(mission_id)
@@ -653,37 +756,50 @@ class RelationalService:
             ).scalar_one_or_none()
 
             if project:
-                neighbors.append(RelatedEntity(
-                    entity_type=EntityType.PROJECT,
-                    entity_id=str(project.id),
-                    relation_type=RelationType.BELONGS_TO,
-                    relation_direction="outbound",
-                    distance=1,
-                    content_preview=project.name,
-                    metadata={"status": project.status},
-                    urn=self._semantic_protocol.generate_urn("project", str(project.id)),
-                ))
+                neighbors.append(
+                    RelatedEntity(
+                        entity_type=EntityType.PROJECT,
+                        entity_id=str(project.id),
+                        relation_type=RelationType.BELONGS_TO,
+                        relation_direction="outbound",
+                        distance=1,
+                        content_preview=project.name,
+                        metadata={"status": project.status},
+                        urn=self._semantic_protocol.generate_urn(
+                            "project", str(project.id)
+                        ),
+                    )
+                )
 
         # Mission REFERENCES documents via result_document_ids (outbound)
         result_doc_ids = mission.result_document_ids or []
         for doc_id_str in result_doc_ids[:20]:  # Limit
             try:
-                doc_uuid = UUID(doc_id_str) if isinstance(doc_id_str, str) else doc_id_str
+                doc_uuid = (
+                    UUID(doc_id_str) if isinstance(doc_id_str, str) else doc_id_str
+                )
                 doc = session.execute(
                     select(Document).where(Document.id == doc_uuid)
                 ).scalar_one_or_none()
 
                 if doc:
-                    neighbors.append(RelatedEntity(
-                        entity_type=EntityType.DOCUMENT,
-                        entity_id=str(doc.id),
-                        relation_type=RelationType.REFERENCES,
-                        relation_direction="outbound",
-                        distance=1,
-                        content_preview=doc.name,
-                        metadata={"file_type": doc.file_type, "source_type": doc.source_type},
-                        urn=self._semantic_protocol.generate_urn("document", str(doc.id)),
-                    ))
+                    neighbors.append(
+                        RelatedEntity(
+                            entity_type=EntityType.DOCUMENT,
+                            entity_id=str(doc.id),
+                            relation_type=RelationType.REFERENCES,
+                            relation_direction="outbound",
+                            distance=1,
+                            content_preview=doc.name,
+                            metadata={
+                                "file_type": doc.file_type,
+                                "source_type": doc.source_type,
+                            },
+                            urn=self._semantic_protocol.generate_urn(
+                                "document", str(doc.id)
+                            ),
+                        )
+                    )
             except (ValueError, TypeError):
                 continue
 
@@ -694,41 +810,61 @@ class RelationalService:
             ).scalar_one_or_none()
 
             if report:
-                neighbors.append(RelatedEntity(
-                    entity_type=EntityType.REPORT,
-                    entity_id=str(report.id),
-                    relation_type=RelationType.REFERENCES,
-                    relation_direction="outbound",
-                    distance=1,
-                    content_preview=report.title,
-                    metadata={"report_type": report.report_type, "status": report.status},
-                    urn=self._semantic_protocol.generate_urn("report", str(report.id)),
-                ))
+                neighbors.append(
+                    RelatedEntity(
+                        entity_type=EntityType.REPORT,
+                        entity_id=str(report.id),
+                        relation_type=RelationType.REFERENCES,
+                        relation_direction="outbound",
+                        distance=1,
+                        content_preview=report.title,
+                        metadata={
+                            "report_type": report.report_type,
+                            "status": report.status,
+                        },
+                        urn=self._semantic_protocol.generate_urn(
+                            "report", str(report.id)
+                        ),
+                    )
+                )
 
         # Sibling missions in same project
         if mission.project_id:
-            siblings = session.execute(
-                select(Mission)
-                .where(
-                    and_(
-                        Mission.project_id == mission.project_id,
-                        Mission.id != mission_uuid,
+            siblings = (
+                session.execute(
+                    select(Mission)
+                    .where(
+                        and_(
+                            Mission.project_id == mission.project_id,
+                            Mission.id != mission_uuid,
+                        )
                     )
+                    .limit(10)
                 )
-                .limit(10)
-            ).scalars().all()
+                .scalars()
+                .all()
+            )
 
             for sibling in siblings:
-                neighbors.append(RelatedEntity(
-                    entity_type=EntityType.MISSION,
-                    entity_id=str(sibling.id),
-                    relation_type=RelationType.SIBLING_OF,
-                    relation_direction="outbound",
-                    distance=1,
-                    content_preview=sibling.title[:self.CONTENT_PREVIEW_LENGTH] if sibling.title else None,
-                    metadata={"mission_id": sibling.mission_id, "status": sibling.status},
-                    urn=self._semantic_protocol.generate_urn("mission", str(sibling.id)),
-                ))
+                neighbors.append(
+                    RelatedEntity(
+                        entity_type=EntityType.MISSION,
+                        entity_id=str(sibling.id),
+                        relation_type=RelationType.SIBLING_OF,
+                        relation_direction="outbound",
+                        distance=1,
+                        content_preview=sibling.title[: self.CONTENT_PREVIEW_LENGTH]
+                        if sibling.title
+                        else None,
+                        metadata={
+                            "mission_id": sibling.mission_id,
+                            "status": sibling.status,
+                        },
+                        urn=self._semantic_protocol.generate_urn(
+                            "mission", str(sibling.id)
+                        ),
+                    )
+                )
 
         return neighbors
 
@@ -736,9 +872,9 @@ class RelationalService:
         self,
         session: Session,
         insight_id: str,
-    ) -> List[RelatedEntity]:
+    ) -> list[RelatedEntity]:
         """Get neighbors of an insight entity."""
-        neighbors: List[RelatedEntity] = []
+        neighbors: list[RelatedEntity] = []
 
         try:
             insight_uuid = UUID(insight_id)
@@ -760,22 +896,29 @@ class RelationalService:
             ).scalar_one_or_none()
 
             if project:
-                neighbors.append(RelatedEntity(
-                    entity_type=EntityType.PROJECT,
-                    entity_id=str(project.id),
-                    relation_type=RelationType.BELONGS_TO,
-                    relation_direction="outbound",
-                    distance=1,
-                    content_preview=project.name,
-                    metadata={"status": project.status},
-                    urn=self._semantic_protocol.generate_urn("project", str(project.id)),
-                ))
+                neighbors.append(
+                    RelatedEntity(
+                        entity_type=EntityType.PROJECT,
+                        entity_id=str(project.id),
+                        relation_type=RelationType.BELONGS_TO,
+                        relation_direction="outbound",
+                        distance=1,
+                        content_preview=project.name,
+                        metadata={"status": project.status},
+                        urn=self._semantic_protocol.generate_urn(
+                            "project", str(project.id)
+                        ),
+                    )
+                )
 
         # Insight DERIVED_FROM chunks (outbound via InsightSource)
-        sources = session.execute(
-            select(InsightSource)
-            .where(InsightSource.insight_id == insight_uuid)
-        ).scalars().all()
+        sources = (
+            session.execute(
+                select(InsightSource).where(InsightSource.insight_id == insight_uuid)
+            )
+            .scalars()
+            .all()
+        )
 
         for source in sources:
             chunk = session.execute(
@@ -783,44 +926,63 @@ class RelationalService:
             ).scalar_one_or_none()
 
             if chunk:
-                neighbors.append(RelatedEntity(
-                    entity_type=EntityType.CHUNK,
-                    entity_id=str(chunk.id),
-                    relation_type=RelationType.DERIVED_FROM,
-                    relation_direction="outbound",
-                    distance=1,
-                    content_preview=chunk.content[:self.CONTENT_PREVIEW_LENGTH] if chunk.content else None,
-                    metadata={
-                        "chunk_index": chunk.chunk_index,
-                        "relevance_score": float(source.relevance_score) if source.relevance_score else None,
-                    },
-                    urn=self._semantic_protocol.generate_urn("chunk", str(chunk.id)),
-                ))
+                neighbors.append(
+                    RelatedEntity(
+                        entity_type=EntityType.CHUNK,
+                        entity_id=str(chunk.id),
+                        relation_type=RelationType.DERIVED_FROM,
+                        relation_direction="outbound",
+                        distance=1,
+                        content_preview=chunk.content[: self.CONTENT_PREVIEW_LENGTH]
+                        if chunk.content
+                        else None,
+                        metadata={
+                            "chunk_index": chunk.chunk_index,
+                            "relevance_score": float(source.relevance_score)
+                            if source.relevance_score
+                            else None,
+                        },
+                        urn=self._semantic_protocol.generate_urn(
+                            "chunk", str(chunk.id)
+                        ),
+                    )
+                )
 
         # Sibling insights in same project
         if insight.project_id:
-            siblings = session.execute(
-                select(Insight)
-                .where(
-                    and_(
-                        Insight.project_id == insight.project_id,
-                        Insight.id != insight_uuid,
+            siblings = (
+                session.execute(
+                    select(Insight)
+                    .where(
+                        and_(
+                            Insight.project_id == insight.project_id,
+                            Insight.id != insight_uuid,
+                        )
                     )
+                    .limit(10)
                 )
-                .limit(10)
-            ).scalars().all()
+                .scalars()
+                .all()
+            )
 
             for sibling in siblings:
-                neighbors.append(RelatedEntity(
-                    entity_type=EntityType.INSIGHT,
-                    entity_id=str(sibling.id),
-                    relation_type=RelationType.SIBLING_OF,
-                    relation_direction="outbound",
-                    distance=1,
-                    content_preview=sibling.title,
-                    metadata={"insight_type": sibling.insight_type, "validated": sibling.validated},
-                    urn=self._semantic_protocol.generate_urn("insight", str(sibling.id)),
-                ))
+                neighbors.append(
+                    RelatedEntity(
+                        entity_type=EntityType.INSIGHT,
+                        entity_id=str(sibling.id),
+                        relation_type=RelationType.SIBLING_OF,
+                        relation_direction="outbound",
+                        distance=1,
+                        content_preview=sibling.title,
+                        metadata={
+                            "insight_type": sibling.insight_type,
+                            "validated": sibling.validated,
+                        },
+                        urn=self._semantic_protocol.generate_urn(
+                            "insight", str(sibling.id)
+                        ),
+                    )
+                )
 
         return neighbors
 
@@ -828,9 +990,9 @@ class RelationalService:
         self,
         session: Session,
         report_id: str,
-    ) -> List[RelatedEntity]:
+    ) -> list[RelatedEntity]:
         """Get neighbors of a report entity."""
-        neighbors: List[RelatedEntity] = []
+        neighbors: list[RelatedEntity] = []
 
         try:
             report_uuid = UUID(report_id)
@@ -852,22 +1014,29 @@ class RelationalService:
             ).scalar_one_or_none()
 
             if project:
-                neighbors.append(RelatedEntity(
-                    entity_type=EntityType.PROJECT,
-                    entity_id=str(project.id),
-                    relation_type=RelationType.BELONGS_TO,
-                    relation_direction="outbound",
-                    distance=1,
-                    content_preview=project.name,
-                    metadata={"status": project.status},
-                    urn=self._semantic_protocol.generate_urn("project", str(project.id)),
-                ))
+                neighbors.append(
+                    RelatedEntity(
+                        entity_type=EntityType.PROJECT,
+                        entity_id=str(project.id),
+                        relation_type=RelationType.BELONGS_TO,
+                        relation_direction="outbound",
+                        distance=1,
+                        content_preview=project.name,
+                        metadata={"status": project.status},
+                        urn=self._semantic_protocol.generate_urn(
+                            "project", str(project.id)
+                        ),
+                    )
+                )
 
         # Report REFERENCES chunks/collections (outbound via ReportSource)
-        sources = session.execute(
-            select(ReportSource)
-            .where(ReportSource.report_id == report_uuid)
-        ).scalars().all()
+        sources = (
+            session.execute(
+                select(ReportSource).where(ReportSource.report_id == report_uuid)
+            )
+            .scalars()
+            .all()
+        )
 
         for source in sources:
             if source.source_type == "chunk":
@@ -876,16 +1045,22 @@ class RelationalService:
                 ).scalar_one_or_none()
 
                 if chunk:
-                    neighbors.append(RelatedEntity(
-                        entity_type=EntityType.CHUNK,
-                        entity_id=str(chunk.id),
-                        relation_type=RelationType.REFERENCES,
-                        relation_direction="outbound",
-                        distance=1,
-                        content_preview=chunk.content[:self.CONTENT_PREVIEW_LENGTH] if chunk.content else None,
-                        metadata={"chunk_index": chunk.chunk_index},
-                        urn=self._semantic_protocol.generate_urn("chunk", str(chunk.id)),
-                    ))
+                    neighbors.append(
+                        RelatedEntity(
+                            entity_type=EntityType.CHUNK,
+                            entity_id=str(chunk.id),
+                            relation_type=RelationType.REFERENCES,
+                            relation_direction="outbound",
+                            distance=1,
+                            content_preview=chunk.content[: self.CONTENT_PREVIEW_LENGTH]
+                            if chunk.content
+                            else None,
+                            metadata={"chunk_index": chunk.chunk_index},
+                            urn=self._semantic_protocol.generate_urn(
+                                "chunk", str(chunk.id)
+                            ),
+                        )
+                    )
 
         # Report parent relationship
         if report.parent_id:
@@ -894,44 +1069,63 @@ class RelationalService:
             ).scalar_one_or_none()
 
             if parent:
-                neighbors.append(RelatedEntity(
-                    entity_type=EntityType.REPORT,
-                    entity_id=str(parent.id),
-                    relation_type=RelationType.BELONGS_TO,
-                    relation_direction="outbound",
-                    distance=1,
-                    content_preview=parent.title,
-                    metadata={"report_type": parent.report_type, "status": parent.status},
-                    urn=self._semantic_protocol.generate_urn("report", str(parent.id)),
-                ))
+                neighbors.append(
+                    RelatedEntity(
+                        entity_type=EntityType.REPORT,
+                        entity_id=str(parent.id),
+                        relation_type=RelationType.BELONGS_TO,
+                        relation_direction="outbound",
+                        distance=1,
+                        content_preview=parent.title,
+                        metadata={
+                            "report_type": parent.report_type,
+                            "status": parent.status,
+                        },
+                        urn=self._semantic_protocol.generate_urn(
+                            "report", str(parent.id)
+                        ),
+                    )
+                )
 
         # Missions that produced this report (inbound)
-        missions = session.execute(
-            select(Mission)
-            .where(Mission.result_report_id == report_uuid)
-        ).scalars().all()
+        missions = (
+            session.execute(
+                select(Mission).where(Mission.result_report_id == report_uuid)
+            )
+            .scalars()
+            .all()
+        )
 
         for mission in missions:
-            neighbors.append(RelatedEntity(
-                entity_type=EntityType.MISSION,
-                entity_id=str(mission.id),
-                relation_type=RelationType.REFERENCES,
-                relation_direction="inbound",
-                distance=1,
-                content_preview=mission.title[:self.CONTENT_PREVIEW_LENGTH] if mission.title else None,
-                metadata={"mission_id": mission.mission_id, "status": mission.status},
-                urn=self._semantic_protocol.generate_urn("mission", str(mission.id)),
-            ))
+            neighbors.append(
+                RelatedEntity(
+                    entity_type=EntityType.MISSION,
+                    entity_id=str(mission.id),
+                    relation_type=RelationType.REFERENCES,
+                    relation_direction="inbound",
+                    distance=1,
+                    content_preview=mission.title[: self.CONTENT_PREVIEW_LENGTH]
+                    if mission.title
+                    else None,
+                    metadata={
+                        "mission_id": mission.mission_id,
+                        "status": mission.status,
+                    },
+                    urn=self._semantic_protocol.generate_urn(
+                        "mission", str(mission.id)
+                    ),
+                )
+            )
 
         return neighbors
 
     def enrich_search_results(
         self,
-        results: List[Dict[str, Any]],
+        results: list[dict[str, Any]],
         *,
         include_related: bool = True,
         max_related_per_result: int = 5,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Enrich search results with related entities.
 
         Adds a 'related_entities' field to each result containing
@@ -956,7 +1150,9 @@ class RelationalService:
                 # Get URN or construct from chunk_id
                 urn = result.get("urn")
                 if not urn and result.get("chunk_id"):
-                    urn = self._semantic_protocol.generate_urn("chunk", result["chunk_id"])
+                    urn = self._semantic_protocol.generate_urn(
+                        "chunk", result["chunk_id"]
+                    )
 
                 if urn:
                     try:
@@ -981,7 +1177,7 @@ class RelationalService:
 
 
 # Singleton instance
-_relational_service: Optional[RelationalService] = None
+_relational_service: RelationalService | None = None
 
 
 def get_relational_service() -> RelationalService:

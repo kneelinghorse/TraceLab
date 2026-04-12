@@ -33,8 +33,18 @@ def upgrade() -> None:
             ),
             sa.Column("name", sa.String(length=255), nullable=False),
             sa.Column("description", sa.Text(), nullable=True),
-            sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
-            sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
+            sa.Column(
+                "created_at",
+                sa.DateTime(),
+                nullable=False,
+                server_default=sa.func.now(),
+            ),
+            sa.Column(
+                "updated_at",
+                sa.DateTime(),
+                nullable=False,
+                server_default=sa.func.now(),
+            ),
         )
         op.create_index("ix_collections_created_at", "collections", ["created_at"])
 
@@ -61,13 +71,19 @@ def upgrade() -> None:
                 nullable=False,
             ),
             sa.Column("notes", sa.Text(), nullable=True),
-            sa.Column("added_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
+            sa.Column(
+                "added_at", sa.DateTime(), nullable=False, server_default=sa.func.now()
+            ),
             sa.UniqueConstraint(
                 "collection_id", "chunk_id", name="uq_collection_item_collection_chunk"
             ),
         )
-        op.create_index("ix_collection_items_collection_id", "collection_items", ["collection_id"])
-        op.create_index("ix_collection_items_chunk_id", "collection_items", ["chunk_id"])
+        op.create_index(
+            "ix_collection_items_collection_id", "collection_items", ["collection_id"]
+        )
+        op.create_index(
+            "ix_collection_items_chunk_id", "collection_items", ["chunk_id"]
+        )
 
 
 def downgrade() -> None:
@@ -76,7 +92,9 @@ def downgrade() -> None:
 
     if inspector.has_table("collection_items"):
         op.drop_index("ix_collection_items_chunk_id", table_name="collection_items")
-        op.drop_index("ix_collection_items_collection_id", table_name="collection_items")
+        op.drop_index(
+            "ix_collection_items_collection_id", table_name="collection_items"
+        )
         op.drop_table("collection_items")
 
     if inspector.has_table("collections"):

@@ -1,36 +1,36 @@
 """Unit tests for PEDR hybrid reranker behavior."""
+
 from __future__ import annotations
 
 from types import SimpleNamespace
-from typing import Any, Dict, List
+from typing import Any
 
 import pytest
 
 from app.services.pedr.hybrid_rerank import HybridReranker
 
-
 pytestmark = pytest.mark.unit
 
 
 class _EmbeddingStub:
-    def generate_embedding(self, _query: str) -> List[float]:
+    def generate_embedding(self, _query: str) -> list[float]:
         return [1.0, 0.0]
 
 
 class _QdrantClientStub:
-    def __init__(self, points: List[SimpleNamespace]) -> None:
+    def __init__(self, points: list[SimpleNamespace]) -> None:
         self._points = points
 
-    def retrieve(self, **_kwargs: Any) -> List[SimpleNamespace]:
+    def retrieve(self, **_kwargs: Any) -> list[SimpleNamespace]:
         return self._points
 
 
 class _QdrantServiceStub:
-    def __init__(self, points: List[SimpleNamespace]) -> None:
+    def __init__(self, points: list[SimpleNamespace]) -> None:
         self.collection_name = "chunks"
         self.client = _QdrantClientStub(points)
 
-    def search_chunks(self, **_kwargs: Any) -> List[Dict[str, Any]]:
+    def search_chunks(self, **_kwargs: Any) -> list[dict[str, Any]]:
         return []
 
 
@@ -66,7 +66,7 @@ def test_search_forwards_source_origin_to_filters(monkeypatch):
         embedding_service=_EmbeddingStub(),
         qdrant_service=_QdrantServiceStub([]),
     )
-    captured: Dict[str, Any] = {}
+    captured: dict[str, Any] = {}
 
     def _fake_fts_candidates(**kwargs: Any):
         captured["fts_source_origin"] = kwargs.get("source_origin")

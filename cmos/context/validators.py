@@ -86,9 +86,7 @@ def normalize_next_steps(next_steps: Sequence[str] | None) -> List[str]:
 
 
 def detect_stale_session(
-    started_at: Optional[str],
-    *,
-    threshold_hours: int = 24
+    started_at: Optional[str], *, threshold_hours: int = 24
 ) -> Tuple[bool, Optional[int]]:
     if not started_at:
         return False, None

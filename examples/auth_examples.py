@@ -1,4 +1,5 @@
 """End-to-end authentication helpers for TraceLab."""
+
 from __future__ import annotations
 
 import argparse
@@ -55,9 +56,19 @@ def fetch_missions(base_url: str, token: str) -> Dict[str, Any]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="TraceLab auth smoke test helper.")
-    parser.add_argument("--base-url", default="http://localhost:8000", help="FastAPI base URL (default: %(default)s)")
-    parser.add_argument("--username", default="tracelab-admin", help="Auth username (default: %(default)s)")
-    parser.add_argument("--password", default="changeme", help="Auth password (default: %(default)s)")
+    parser.add_argument(
+        "--base-url",
+        default="http://localhost:8000",
+        help="FastAPI base URL (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--username",
+        default="tracelab-admin",
+        help="Auth username (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--password", default="changeme", help="Auth password (default: %(default)s)"
+    )
     args = parser.parse_args(argv)
 
     print(f"[auth] Logging in to {args.base_url} as {args.username}")

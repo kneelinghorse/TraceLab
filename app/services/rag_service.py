@@ -1,34 +1,33 @@
 """RAG service that orchestrates retrieval, compression, and answer generation."""
+
 import logging
 import re
 import time
 from datetime import date
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from app.core.config import settings
 from app.services.cache_manager import get_cache_manager
 from app.services.context_compression import compress_context
-from app.services.embedding_service import EmbeddingService, get_embedding_service
 from app.services.cost_monitor import CostMonitor, get_cost_monitor
+from app.services.embedding_service import EmbeddingService, get_embedding_service
 from app.services.faceted_search import FacetFilters
 from app.services.pedr.graph_rag import GraphRAGHelper
-from app.services.pedr.semantic_protocol import URNGenerator
 from app.services.pedr.search_orchestrator import (
     PEDRSearchOrchestrator,
-    PEDRSearchResponse,
     create_pedr_orchestrator,
+)
+from app.services.pedr.semantic_protocol import URNGenerator
+from app.services.quality_assessment import (
+    QualityAssessmentConfig,
+    QualityAssessmentResult,
+    QualityAssessor,
 )
 from app.services.retrieval_service import RetrievalService, get_retrieval_service
 from app.services.semantic_cache import SemanticCacheService, get_semantic_cache_service
-from app.services.quality_assessment import (
-    QualityAssessor,
-    QualityAssessmentConfig,
-    QualityAssessmentResult,
-)
 
 try:  # pragma: no cover - allow import without OpenAI SDK in some environments
-    from openai import OpenAI
-    from openai import APIError, RateLimitError
+    from openai import APIError, OpenAI, RateLimitError
 except ModuleNotFoundError as exc:  # pragma: no cover
     OpenAI = None  # type: ignore
     APIError = RateLimitError = Exception  # type: ignore
@@ -66,27 +65,28 @@ class RagService:
 
     def __init__(
         self,
-        retrieval_service: Optional[RetrievalService] = None,
-        pedr_orchestrator: Optional[PEDRSearchOrchestrator] = None,
-        embedding_service: Optional[EmbeddingService] = None,
-        cache_service: Optional[SemanticCacheService] = None,
-        client: Optional[OpenAI] = None,  # type: ignore[name-defined]
-        model: Optional[str] = None,
-        escalation_model: Optional[str] = None,
-        default_temperature: Optional[float] = None,
-        quality_assessor: Optional[QualityAssessor] = None,
-        cost_monitor: Optional[CostMonitor] | object = _UNSET,
-        graph_rag_helper: Optional[GraphRAGHelper] = None,
+        retrieval_service: RetrievalService | None = None,
+        pedr_orchestrator: PEDRSearchOrchestrator | None = None,
+        embedding_service: EmbeddingService | None = None,
+        cache_service: SemanticCacheService | None = None,
+        client: OpenAI | None = None,  # type: ignore[name-defined]
+        model: str | None = None,
+        escalation_model: str | None = None,
+        default_temperature: float | None = None,
+        quality_assessor: QualityAssessor | None = None,
+        cost_monitor: CostMonitor | None | object = _UNSET,
+        graph_rag_helper: GraphRAGHelper | None = None,
     ) -> None:
         if _openai_import_error is not None:
             raise RuntimeError(
-                "The OpenAI SDK is required for RAG answer generation. "
-                "Install dependencies from requirements.txt."
+                "The OpenAI SDK is required for RAG answer generation. Install dependencies from requirements.txt."
             ) from _openai_import_error
 
         if client is None:
             if not settings.openai_api_key:
-                raise ValueError("OPENAI_API_KEY must be set for RAG answer generation.")
+                raise ValueError(
+                    "OPENAI_API_KEY must be set for RAG answer generation."
+                )
             client = OpenAI(api_key=settings.openai_api_key)
 
         self.client = client
@@ -102,19 +102,31 @@ class RagService:
         self.cache_service = (
             cache_service
             if cache_service is not None
-            else (get_semantic_cache_service() if settings.semantic_cache_enabled else None)
+            else (
+                get_semantic_cache_service()
+                if settings.semantic_cache_enabled
+                else None
+            )
         )
         self.primary_model = model or settings.openai_chat_model
-        self.model = self.primary_model  # maintain backwards compatibility for callers accessing .model
-        self.escalation_model = escalation_model or getattr(settings, "openai_escalation_model", "gpt-5.2")
+        self.model = (
+            self.primary_model
+        )  # maintain backwards compatibility for callers accessing .model
+        self.escalation_model = escalation_model or getattr(
+            settings, "openai_escalation_model", "gpt-5.2"
+        )
         self.default_temperature = (
-            default_temperature if default_temperature is not None else settings.openai_chat_temperature
+            default_temperature
+            if default_temperature is not None
+            else settings.openai_chat_temperature
         )
         self.default_max_tokens = settings.rag_default_max_tokens
         self.compression_threshold = settings.rag_context_threshold
         if quality_assessor is None:
             quality_config = QualityAssessmentConfig(
-                escalation_threshold=getattr(settings, "tiered_routing_threshold", 0.85),
+                escalation_threshold=getattr(
+                    settings, "tiered_routing_threshold", 0.85
+                ),
                 linguistic_weight=getattr(settings, "tiered_weight_linguistic", 0.35),
                 integrity_weight=getattr(settings, "tiered_weight_integrity", 0.35),
                 provenance_weight=getattr(settings, "tiered_weight_provenance", 0.30),
@@ -122,36 +134,40 @@ class RagService:
             quality_assessor = QualityAssessor(quality_config)
         self.quality_assessor = quality_assessor
         self.routing_metrics = {"total_queries": 0, "escalations": 0}
-        self.cost_monitor = get_cost_monitor() if cost_monitor is _UNSET else cost_monitor
+        self.cost_monitor = (
+            get_cost_monitor() if cost_monitor is _UNSET else cost_monitor
+        )
         self.cache_manager = get_cache_manager()
-        self.graph_rag_helper = graph_rag_helper or GraphRAGHelper(model_name=self.primary_model)
+        self.graph_rag_helper = graph_rag_helper or GraphRAGHelper(
+            model_name=self.primary_model
+        )
 
     def run_query(
         self,
         query: str,
         top_k: int = 5,
-        project_id: Optional[str] = None,
-        document_id: Optional[str] = None,
-        source_type: Optional[str] = None,
-        document_types: Optional[List[str]] = None,
-        source_types: Optional[List[str]] = None,
-        date_from: Optional[date] = None,
-        date_to: Optional[date] = None,
-        tags: Optional[List[str]] = None,
-        hnsw_ef: Optional[int] = None,
-        temperature: Optional[float] = None,
-        max_tokens: Optional[int] = None,
+        project_id: str | None = None,
+        document_id: str | None = None,
+        source_type: str | None = None,
+        document_types: list[str] | None = None,
+        source_types: list[str] | None = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
+        tags: list[str] | None = None,
+        hnsw_ef: int | None = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
         search_mode: str = "semantic",
-        min_quality_gates: Optional[int] = None,
-        status_filters: Optional[List[str]] = None,
-        allow_pii: Optional[bool] = True,
-        governance_mode: Optional[str] = None,
-        element_type: Optional[str] = None,
-        element_types: Optional[List[str]] = None,
+        min_quality_gates: int | None = None,
+        status_filters: list[str] | None = None,
+        allow_pii: bool | None = True,
+        governance_mode: str | None = None,
+        element_type: str | None = None,
+        element_types: list[str] | None = None,
         auto_detect_type: bool = True,
         type_boost_enabled: bool = True,
         include_graph_context: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Execute a full RAG workflow: retrieve context and synthesize an answer.
         """
@@ -185,7 +201,7 @@ class RagService:
         )
         start = time.perf_counter()
 
-        def _loader() -> Dict[str, Any]:
+        def _loader() -> dict[str, Any]:
             return self._execute_rag_pipeline(
                 query=query,
                 top_k=top_k,
@@ -212,7 +228,9 @@ class RagService:
                 include_graph_context=include_graph_context,
             )
 
-        result, hit = self.cache_manager.cached_value("rag_query_results", cache_key, _loader)
+        result, hit = self.cache_manager.cached_value(
+            "rag_query_results", cache_key, _loader
+        )
         cache_info = result.setdefault("cache", {})
         cache_info.setdefault("layer", "ttl")
         cache_info["ttl_seconds"] = self.cache_manager.ttl_seconds("rag_query_results")
@@ -223,7 +241,9 @@ class RagService:
             cache_info["hit"] = True
             cache_info["source"] = "application_ttl"
             result["latency_ms"] = latency_ms
-            self._record_cache_hit_event(query=query, project_id=project_id, latency_ms=latency_ms)
+            self._record_cache_hit_event(
+                query=query, project_id=project_id, latency_ms=latency_ms
+            )
             if self.cache_service is not None:
                 self._record_semantic_cache_hit(project_id)
             return result
@@ -236,28 +256,28 @@ class RagService:
         *,
         query: str,
         top_k: int,
-        project_id: Optional[str],
-        document_id: Optional[str],
-        source_type: Optional[str],
-        document_types: Optional[List[str]],
-        source_types: Optional[List[str]],
-        date_from: Optional[date],
-        date_to: Optional[date],
-        tags: Optional[List[str]],
-        hnsw_ef: Optional[int],
-        temperature: Optional[float],
-        max_tokens: Optional[int],
+        project_id: str | None,
+        document_id: str | None,
+        source_type: str | None,
+        document_types: list[str] | None,
+        source_types: list[str] | None,
+        date_from: date | None,
+        date_to: date | None,
+        tags: list[str] | None,
+        hnsw_ef: int | None,
+        temperature: float | None,
+        max_tokens: int | None,
         search_mode: str,
-        min_quality_gates: Optional[int],
-        status_filters: Optional[List[str]],
-        allow_pii: Optional[bool],
-        governance_mode: Optional[str],
-        element_type: Optional[str] = None,
-        element_types: Optional[List[str]] = None,
+        min_quality_gates: int | None,
+        status_filters: list[str] | None,
+        allow_pii: bool | None,
+        governance_mode: str | None,
+        element_type: str | None = None,
+        element_types: list[str] | None = None,
         auto_detect_type: bool = True,
         type_boost_enabled: bool = True,
         include_graph_context: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         start = time.perf_counter()
         normalized_mode = (search_mode or "semantic").strip().lower()
         query_embedding = self.embedding_service.generate_embedding(query)
@@ -272,8 +292,12 @@ class RagService:
             "date_from": date_from.isoformat() if date_from else None,
             "date_to": date_to.isoformat() if date_to else None,
             "top_k": top_k,
-            "temperature": temperature if temperature is not None else self.default_temperature,
-            "max_tokens": max_tokens if max_tokens is not None else self.default_max_tokens,
+            "temperature": temperature
+            if temperature is not None
+            else self.default_temperature,
+            "max_tokens": max_tokens
+            if max_tokens is not None
+            else self.default_max_tokens,
             "search_mode": normalized_mode,
             "filters_signature": FacetFilters.from_kwargs(
                 project_id=project_id,
@@ -378,8 +402,12 @@ class RagService:
             query=query,
             messages=messages,
             chunks=compressed_chunks,
-            temperature=temperature if temperature is not None else self.default_temperature,
-            max_tokens=max_tokens if max_tokens is not None else self.default_max_tokens,
+            temperature=temperature
+            if temperature is not None
+            else self.default_temperature,
+            max_tokens=max_tokens
+            if max_tokens is not None
+            else self.default_max_tokens,
         )
         latency_ms = (time.perf_counter() - start) * 1000
 
@@ -420,10 +448,10 @@ class RagService:
     @staticmethod
     def _quality_filter_signature(
         *,
-        min_quality_gates: Optional[int],
-        statuses: Optional[List[str]],
-        allow_pii: Optional[bool],
-        governance_mode: Optional[str],
+        min_quality_gates: int | None,
+        statuses: list[str] | None,
+        allow_pii: bool | None,
+        governance_mode: str | None,
     ) -> str:
         """Generate a cache-friendly signature for governance filters."""
         if min_quality_gates is None:
@@ -456,9 +484,9 @@ class RagService:
     def _build_messages(
         self,
         query: str,
-        chunks: List[Dict[str, Any]],
-        graph_context: Optional[str] = None,
-    ) -> List[Dict[str, str]]:
+        chunks: list[dict[str, Any]],
+        graph_context: str | None = None,
+    ) -> list[dict[str, str]]:
         """Compose chat messages incorporating retrieved context."""
         if chunks:
             context_blocks = []
@@ -503,8 +531,8 @@ class RagService:
         self,
         *,
         query: str,
-        chunks: List[Dict[str, Any]],
-    ) -> Optional[str]:
+        chunks: list[dict[str, Any]],
+    ) -> str | None:
         seeds = []
         for chunk in chunks[: self.GRAPH_CONTEXT_SEED_LIMIT]:
             urn = chunk.get("urn")
@@ -546,14 +574,20 @@ class RagService:
         self,
         *,
         query: str,
-        messages: List[Dict[str, str]],
-        chunks: List[Dict[str, Any]],
+        messages: list[dict[str, str]],
+        chunks: list[dict[str, Any]],
         temperature: float,
         max_tokens: int,
-    ) -> tuple[str, List[Dict[str, Any]], Dict[str, Any], Dict[str, Any], List[Optional[Dict[str, int]]]]:
+    ) -> tuple[
+        str,
+        list[dict[str, Any]],
+        dict[str, Any],
+        dict[str, Any],
+        list[dict[str, int] | None],
+    ]:
         """Generate an answer using tiered routing and quality assessment."""
-        attempts: List[Dict[str, Any]] = []
-        attempt_usages: List[Optional[Dict[str, int]]] = []
+        attempts: list[dict[str, Any]] = []
+        attempt_usages: list[dict[str, int] | None] = []
 
         primary_answer, primary_usage = self._generate_answer(
             messages=messages,
@@ -624,8 +658,10 @@ class RagService:
                 final_quality.threshold,
             )
 
-        cost_estimate = sum(MODEL_COST_ESTIMATES.get(attempt["model"], 0.0) for attempt in attempts)
-        quality_report: Dict[str, Any] = {
+        cost_estimate = sum(
+            MODEL_COST_ESTIMATES.get(attempt["model"], 0.0) for attempt in attempts
+        )
+        quality_report: dict[str, Any] = {
             "composite_score": final_quality.composite_score,
             "threshold": final_quality.threshold,
             "pillar_scores": final_quality.pillar_scores,
@@ -636,23 +672,31 @@ class RagService:
             quality_report["pre_escalation_score"] = primary_quality.composite_score
 
         routing_details = {
-            "selected_model": self.escalation_model if escalated else self.primary_model,
+            "selected_model": self.escalation_model
+            if escalated
+            else self.primary_model,
             "escalated": escalated,
             "attempts": attempts,
             "estimated_cost_usd": round(cost_estimate, 6),
             "metrics": dict(self.routing_metrics),
         }
 
-        return final_answer, final_citations, quality_report, routing_details, attempt_usages
+        return (
+            final_answer,
+            final_citations,
+            quality_report,
+            routing_details,
+            attempt_usages,
+        )
 
     def _generate_answer(
         self,
-        messages: List[Dict[str, str]],
+        messages: list[dict[str, str]],
         temperature: float,
         max_tokens: int,
         retry_max: int = 3,
-        model: Optional[str] = None,
-    ) -> tuple[str, Optional[Dict[str, int]]]:
+        model: str | None = None,
+    ) -> tuple[str, dict[str, int] | None]:
         """Call the OpenAI chat completion API with simple exponential backoff."""
         for attempt in range(retry_max):
             try:
@@ -668,19 +712,24 @@ class RagService:
                     # GPT-5.1/5.2 support temperature when reasoning_effort is explicitly none.
                     request["reasoning_effort"] = "none"
                 response = self.client.chat.completions.create(**request)
-                content = response.choices[0].message.content if response.choices else ""
+                content = (
+                    response.choices[0].message.content if response.choices else ""
+                )
                 usage = self._extract_usage(response)
                 return (content or "").strip(), usage
-            except (RateLimitError, APIError) as exc:  # pragma: no cover - requires live API
+            except (
+                RateLimitError,
+                APIError,
+            ) as exc:  # pragma: no cover - requires live API
                 if attempt < retry_max - 1:
-                    wait_time = (2 ** attempt) * 1.5
+                    wait_time = (2**attempt) * 1.5
                     time.sleep(wait_time)
                     continue
                 raise exc
         return "", None
 
     @staticmethod
-    def _extract_usage(response: Any) -> Optional[Dict[str, int]]:
+    def _extract_usage(response: Any) -> dict[str, int] | None:
         usage = getattr(response, "usage", None)
         if usage is None:
             return None
@@ -703,9 +752,11 @@ class RagService:
             "total_tokens": total_int,
         }
 
-    def _extract_citations(self, answer: str, chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _extract_citations(
+        self, answer: str, chunks: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Parse citations in the model output and align them with retrieved chunks."""
-        citations: List[Dict[str, Any]] = []
+        citations: list[dict[str, Any]] = []
         seen: set[tuple[str, str]] = set()
 
         for match in _CITATION_PATTERN.finditer(answer):
@@ -726,7 +777,11 @@ class RagService:
                 self._build_citation(
                     top_chunk,
                     str(top_chunk.get("document_id") or ""),
-                    str(top_chunk.get("chunk_index") if top_chunk.get("chunk_index") is not None else ""),
+                    str(
+                        top_chunk.get("chunk_index")
+                        if top_chunk.get("chunk_index") is not None
+                        else ""
+                    ),
                 )
             )
 
@@ -736,16 +791,24 @@ class RagService:
     def _match_chunk(
         document_label: str,
         chunk_label: str,
-        chunks: List[Dict[str, Any]],
-    ) -> Optional[Dict[str, Any]]:
+        chunks: list[dict[str, Any]],
+    ) -> dict[str, Any] | None:
         """Locate the retrieved chunk that matches the citation labels."""
         normalized_document = document_label.strip()
         normalized_chunk = chunk_label.strip()
 
         for chunk in chunks:
-            document_id = str(chunk.get("document_id")) if chunk.get("document_id") is not None else None
+            document_id = (
+                str(chunk.get("document_id"))
+                if chunk.get("document_id") is not None
+                else None
+            )
             chunk_index = chunk.get("chunk_index")
-            chunk_id = str(chunk.get("chunk_id")) if chunk.get("chunk_id") is not None else None
+            chunk_id = (
+                str(chunk.get("chunk_id"))
+                if chunk.get("chunk_id") is not None
+                else None
+            )
 
             if document_id and document_id == normalized_document:
                 if chunk_index is not None and str(chunk_index) == normalized_chunk:
@@ -757,12 +820,12 @@ class RagService:
 
     @staticmethod
     def _build_citation(
-        chunk: Optional[Dict[str, Any]],
+        chunk: dict[str, Any] | None,
         document_label: str,
         chunk_label: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create a structured citation payload."""
-        chunk_index: Optional[int] = None
+        chunk_index: int | None = None
         if chunk is not None:
             chunk_index = chunk.get("chunk_index")
         else:
@@ -772,21 +835,29 @@ class RagService:
                 chunk_index = None
 
         return {
-            "document_id": (chunk.get("document_id") if chunk is not None else (document_label or None)),
+            "document_id": (
+                chunk.get("document_id")
+                if chunk is not None
+                else (document_label or None)
+            ),
             "chunk_id": chunk.get("chunk_id") if chunk is not None else None,
             "chunk_index": chunk_index,
             "source_type": chunk.get("source_type") if chunk is not None else None,
             "score": chunk.get("score") if chunk is not None else None,
-            "snippet": (chunk.get("content")[:280] if chunk is not None and chunk.get("content") else None),
+            "snippet": (
+                chunk.get("content")[:280]
+                if chunk is not None and chunk.get("content")
+                else None
+            ),
         }
 
     def _record_cost_events(
         self,
         *,
-        attempts: List[Dict[str, Any]],
-        usage_records: List[Optional[Dict[str, int]]],
+        attempts: list[dict[str, Any]],
+        usage_records: list[dict[str, int] | None],
         query: str,
-        project_id: Optional[str],
+        project_id: str | None,
         latency_ms: float,
         cache_hit: bool,
     ) -> float:
@@ -794,10 +865,16 @@ class RagService:
             return 0.0
 
         total_cost = 0.0
-        effective_usage = usage_records or [attempt.get("usage") for attempt in attempts]
+        effective_usage = usage_records or [
+            attempt.get("usage") for attempt in attempts
+        ]
 
         for index, attempt in enumerate(attempts):
-            usage = effective_usage[index] if index < len(effective_usage) else attempt.get("usage")
+            usage = (
+                effective_usage[index]
+                if index < len(effective_usage)
+                else attempt.get("usage")
+            )
             model_name = attempt.get("model", self.primary_model)
             estimated_cost = MODEL_COST_ESTIMATES.get(model_name, 0.0)
 
@@ -805,9 +882,15 @@ class RagService:
                 try:
                     event = self.cost_monitor.track_usage(
                         model=model_name,
-                        prompt_tokens=(usage or {}).get("prompt_tokens") if usage else None,
-                        completion_tokens=(usage or {}).get("completion_tokens") if usage else None,
-                        total_tokens=(usage or {}).get("total_tokens") if usage else None,
+                        prompt_tokens=(usage or {}).get("prompt_tokens")
+                        if usage
+                        else None,
+                        completion_tokens=(usage or {}).get("completion_tokens")
+                        if usage
+                        else None,
+                        total_tokens=(usage or {}).get("total_tokens")
+                        if usage
+                        else None,
                         latency_ms=latency_ms,
                         cache_hit=cache_hit,
                         project_id=project_id,
@@ -834,9 +917,11 @@ class RagService:
 
         return total_cost
 
-    def _record_semantic_cache_hit(self, project_id: Optional[str]) -> None:
+    def _record_semantic_cache_hit(self, project_id: str | None) -> None:
         """Increment semantic cache metrics when TTL cache satisfies a query."""
-        metrics = getattr(self.cache_service, "metrics", None) if self.cache_service else None
+        metrics = (
+            getattr(self.cache_service, "metrics", None) if self.cache_service else None
+        )
         if metrics and hasattr(metrics, "record_hit"):
             try:
                 metrics.record_hit(project_id)
@@ -847,7 +932,7 @@ class RagService:
         self,
         *,
         query: str,
-        project_id: Optional[str],
+        project_id: str | None,
         latency_ms: float,
     ) -> None:
         if self.cost_monitor is None:
@@ -867,8 +952,8 @@ class RagService:
         model: str,
         quality: QualityAssessmentResult,
         citation_count: int,
-        usage: Optional[Dict[str, int]] = None,
-    ) -> Dict[str, Any]:
+        usage: dict[str, int] | None = None,
+    ) -> dict[str, Any]:
         return {
             "model": model,
             "quality_score": quality.composite_score,
@@ -879,7 +964,7 @@ class RagService:
         }
 
 
-_rag_service: Optional[RagService] = None
+_rag_service: RagService | None = None
 
 
 def get_rag_service() -> RagService:
@@ -890,6 +975,6 @@ def get_rag_service() -> RagService:
     return _rag_service
 
 
-def current_rag_service() -> Optional[RagService]:
+def current_rag_service() -> RagService | None:
     """Return the existing RAG service instance without creating a new one."""
     return _rag_service

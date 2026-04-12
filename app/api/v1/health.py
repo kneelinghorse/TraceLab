@@ -1,7 +1,9 @@
 """Health check endpoints."""
+
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
 from sqlalchemy import text
+from sqlalchemy.orm import Session
+
 from app.core.database import get_db
 from app.core.qdrant_client import get_qdrant_health, is_qdrant_ready
 
@@ -21,12 +23,11 @@ async def db_health_check(db: Session = Depends(get_db)):
         # Simple query to verify DB connection
         result = db.execute(text("SELECT 1"))
         result.fetchone()
-        return {
-            "status": "healthy",
-            "database": "connected"
-        }
+        return {"status": "healthy", "database": "connected"}
     except Exception as e:
-        raise HTTPException(status_code=503, detail=f"Database connection failed: {str(e)}")
+        raise HTTPException(
+            status_code=503, detail=f"Database connection failed: {str(e)}"
+        )
 
 
 @router.get("/health/qdrant")
@@ -48,7 +49,7 @@ async def qdrant_health_check():
                 "status": "unhealthy",
                 "prewarmed": health.get("prewarmed", False),
                 "error": health.get("error", "Unknown error"),
-            }
+            },
         )
 
     return health
@@ -90,7 +91,7 @@ async def readiness_check(db: Session = Depends(get_db)):
                 "qdrant": qdrant_status,
                 "qdrant_prewarmed": is_qdrant_ready(),
                 "errors": errors,
-            }
+            },
         )
 
     return {
@@ -113,7 +114,10 @@ def graph_stats(db: Session = Depends(get_db)) -> dict:
     ).scalar() or 0
 
     chunk_count = db.execute(
-        text("SELECT COUNT(*) FROM document_chunks dc JOIN documents d ON dc.document_id = d.id WHERE d.deleted_at IS NULL")
+        text(
+            "SELECT COUNT(*) FROM document_chunks dc "
+            "JOIN documents d ON dc.document_id = d.id WHERE d.deleted_at IS NULL"
+        )
     ).scalar() or 0
 
     edge_counts = {row[0]: row[1] for row in edge_rows}
@@ -125,4 +129,3 @@ def graph_stats(db: Session = Depends(get_db)) -> dict:
         "document_count": int(doc_count),
         "chunk_count": int(chunk_count),
     }
-

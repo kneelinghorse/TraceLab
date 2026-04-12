@@ -1,11 +1,13 @@
 """Synthesis cache service for content-addressable caching of LLM synthesis results."""
+
 from __future__ import annotations
 
 import hashlib
 import json
 import logging
-from datetime import datetime, timezone
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from collections.abc import Callable
+from datetime import UTC, datetime
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import func
@@ -36,8 +38,8 @@ class SynthesisCacheService:
     @staticmethod
     def compute_hash(
         *,
-        chunk_ids: List[UUID],
-        prompt: Optional[str],
+        chunk_ids: list[UUID],
+        prompt: str | None,
         output_format: str,
     ) -> str:
         """Compute deterministic hash for cache lookup.
@@ -60,11 +62,15 @@ class SynthesisCacheService:
         normalized_format = (output_format or "markdown").strip().lower()
 
         # Build canonical JSON representation
-        canonical = json.dumps({
-            "chunk_ids": sorted_ids,
-            "prompt": normalized_prompt,
-            "format": normalized_format,
-        }, sort_keys=True, separators=(",", ":"))
+        canonical = json.dumps(
+            {
+                "chunk_ids": sorted_ids,
+                "prompt": normalized_prompt,
+                "format": normalized_format,
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        )
 
         # Compute SHA-256
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
@@ -72,10 +78,10 @@ class SynthesisCacheService:
     def get(
         self,
         *,
-        chunk_ids: List[UUID],
-        prompt: Optional[str],
+        chunk_ids: list[UUID],
+        prompt: str | None,
         output_format: str,
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Look up cached synthesis result.
 
         If found, increments hit_count and updates last_hit_at.
@@ -108,7 +114,7 @@ class SynthesisCacheService:
 
             # Update hit stats
             cached.hit_count = (cached.hit_count or 0) + 1
-            cached.last_hit_at = datetime.now(timezone.utc)
+            cached.last_hit_at = datetime.now(UTC)
             session.commit()
 
             logger.info(
@@ -134,13 +140,13 @@ class SynthesisCacheService:
     def set(
         self,
         *,
-        chunk_ids: List[UUID],
-        prompt: Optional[str],
+        chunk_ids: list[UUID],
+        prompt: str | None,
         output_format: str,
         content: str,
-        citations: List[Dict[str, Any]],
+        citations: list[dict[str, Any]],
         tokens_used: int,
-        model_used: Optional[str] = None,
+        model_used: str | None = None,
     ) -> str:
         """Store synthesis result in cache.
 
@@ -227,16 +233,20 @@ class SynthesisCacheService:
 
             if cached:
                 cached.hit_count = (cached.hit_count or 0) + 1
-                cached.last_hit_at = datetime.now(timezone.utc)
+                cached.last_hit_at = datetime.now(UTC)
                 session.commit()
-                logger.debug("Recorded cache hit: id=%s count=%d", cache_id[:12], cached.hit_count)
+                logger.debug(
+                    "Recorded cache hit: id=%s count=%d",
+                    cache_id[:12],
+                    cached.hit_count,
+                )
         except Exception:
             session.rollback()
             raise
         finally:
             session.close()
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get cache statistics for monitoring.
 
         Returns:
@@ -249,7 +259,9 @@ class SynthesisCacheService:
                 func.count(SynthesisCache.id).label("total_entries"),
                 func.sum(SynthesisCache.hit_count).label("total_hits"),
                 func.sum(SynthesisCache.tokens_used).label("total_tokens_cached"),
-                func.sum(SynthesisCache.hit_count * SynthesisCache.tokens_used).label("total_tokens_saved"),
+                func.sum(SynthesisCache.hit_count * SynthesisCache.tokens_used).label(
+                    "total_tokens_saved"
+                ),
                 func.max(SynthesisCache.last_hit_at).label("last_hit_at"),
                 func.min(SynthesisCache.created_at).label("oldest_entry"),
             ).one()
@@ -269,8 +281,12 @@ class SynthesisCacheService:
                     "hit_count": entry.hit_count,
                     "tokens_used": entry.tokens_used,
                     "tokens_saved": entry.hit_count * entry.tokens_used,
-                    "created_at": entry.created_at.isoformat() if entry.created_at else None,
-                    "last_hit_at": entry.last_hit_at.isoformat() if entry.last_hit_at else None,
+                    "created_at": entry.created_at.isoformat()
+                    if entry.created_at
+                    else None,
+                    "last_hit_at": entry.last_hit_at.isoformat()
+                    if entry.last_hit_at
+                    else None,
                 }
                 for entry in top_entries
             ]
@@ -280,8 +296,12 @@ class SynthesisCacheService:
                 "total_hits": int(result.total_hits or 0),
                 "total_tokens_cached": int(result.total_tokens_cached or 0),
                 "total_tokens_saved": int(result.total_tokens_saved or 0),
-                "last_hit_at": result.last_hit_at.isoformat() if result.last_hit_at else None,
-                "oldest_entry": result.oldest_entry.isoformat() if result.oldest_entry else None,
+                "last_hit_at": result.last_hit_at.isoformat()
+                if result.last_hit_at
+                else None,
+                "oldest_entry": result.oldest_entry.isoformat()
+                if result.oldest_entry
+                else None,
                 "top_entries": top_hits,
             }
         finally:
@@ -290,8 +310,8 @@ class SynthesisCacheService:
     def invalidate(
         self,
         *,
-        chunk_ids: Optional[List[UUID]] = None,
-        cache_id: Optional[str] = None,
+        chunk_ids: list[UUID] | None = None,
+        cache_id: str | None = None,
     ) -> int:
         """Invalidate cache entries.
 
@@ -332,7 +352,7 @@ class SynthesisCacheService:
 
 
 # Singleton instance
-_synthesis_cache_service: Optional[SynthesisCacheService] = None
+_synthesis_cache_service: SynthesisCacheService | None = None
 
 
 def get_synthesis_cache_service() -> SynthesisCacheService:

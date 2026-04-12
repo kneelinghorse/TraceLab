@@ -16,13 +16,19 @@ from .config import ConfigManager
 class OutputFormatter:
     """Formats CLI output for human or JSON modes."""
 
-    def __init__(self, json_mode: bool = False, quiet: bool = False, no_color: bool = False):
+    def __init__(
+        self, json_mode: bool = False, quiet: bool = False, no_color: bool = False
+    ):
         self.json_mode = json_mode
         self.quiet = quiet
         self.config = ConfigManager()
 
         # Use colors unless explicitly disabled or in JSON mode
-        use_color = not no_color and not json_mode and self.config.get("preferences.color", True)
+        use_color = (
+            not no_color
+            and not json_mode
+            and self.config.get("preferences.color", True)
+        )
         self.console = Console(color_system="auto" if use_color else None)
 
     def success(self, message: str, data: Optional[Dict[str, Any]] = None) -> None:
@@ -33,7 +39,12 @@ class OutputFormatter:
             if not self.quiet:
                 self.console.print(f"✓ {message}", style="green")
 
-    def error(self, message: str, details: Optional[Dict[str, Any]] = None, code: str = "ERROR") -> None:
+    def error(
+        self,
+        message: str,
+        details: Optional[Dict[str, Any]] = None,
+        code: str = "ERROR",
+    ) -> None:
         """Print error message."""
         if self.json_mode:
             self._print_json_error(message, code, details)
@@ -41,9 +52,13 @@ class OutputFormatter:
             self.console.print(f"✗ Error: {message}", style="red", file=sys.stderr)
             if details:
                 if "reason" in details:
-                    self.console.print(f"  Reason: {details['reason']}", file=sys.stderr)
+                    self.console.print(
+                        f"  Reason: {details['reason']}", file=sys.stderr
+                    )
                 if "suggestion" in details:
-                    self.console.print(f"  Suggestion: {details['suggestion']}", file=sys.stderr)
+                    self.console.print(
+                        f"  Suggestion: {details['suggestion']}", file=sys.stderr
+                    )
 
     def info(self, message: str) -> None:
         """Print info message."""
@@ -65,7 +80,9 @@ class OutputFormatter:
             else:
                 self.console.print(data)
 
-    def print_table(self, data: List[Dict[str, Any]], columns: Optional[List[str]] = None) -> None:
+    def print_table(
+        self, data: List[Dict[str, Any]], columns: Optional[List[str]] = None
+    ) -> None:
         """Print data as a table."""
         if self.json_mode:
             self._print_json_success(data)
@@ -116,24 +133,20 @@ class OutputFormatter:
         output = {
             "success": True,
             "data": data,
-            "meta": {
-                "timestamp": datetime.utcnow().isoformat() + "Z"
-            }
+            "meta": {"timestamp": datetime.utcnow().isoformat() + "Z"},
         }
         if message:
             output["message"] = message
 
         print(json.dumps(output, indent=2))
 
-    def _print_json_error(self, message: str, code: str, details: Optional[Dict[str, Any]] = None) -> None:
+    def _print_json_error(
+        self, message: str, code: str, details: Optional[Dict[str, Any]] = None
+    ) -> None:
         """Print error response in JSON format."""
         output = {
             "success": False,
-            "error": {
-                "code": code,
-                "message": message,
-                "details": details or {}
-            }
+            "error": {"code": code, "message": message, "details": details or {}},
         }
         print(json.dumps(output, indent=2), file=sys.stderr)
 
@@ -148,7 +161,7 @@ class OutputFormatter:
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
             console=self.console,
-            transient=True
+            transient=True,
         ) as progress:
             progress.add_task(description=message, total=None)
             yield progress

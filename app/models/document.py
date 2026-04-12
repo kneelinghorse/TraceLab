@@ -1,25 +1,28 @@
 """Document model."""
+
 import uuid
-from datetime import datetime, date
+from datetime import datetime
+
 from sqlalchemy import (
+    JSON,
+    BigInteger,
+    Boolean,
     Column,
+    Date,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    LargeBinary,
+    Numeric,
     String,
     Text,
-    Integer,
-    Boolean,
-    BigInteger,
-    DateTime,
-    Date,
-    JSON,
-    Numeric,
-    ForeignKey,
-    LargeBinary,
-    Index,
 )
 from sqlalchemy.orm import relationship
+
 from app.core.database import Base
-from app.models.types import GUID
 from app.models.mixins import SoftDeleteMixin
+from app.models.types import GUID
 
 
 class Document(Base, SoftDeleteMixin):
@@ -29,38 +32,49 @@ class Document(Base, SoftDeleteMixin):
     deleted but marked with deleted_at timestamp. Use document.soft_delete()
     and document.restore() methods.
     """
+
     __tablename__ = "documents"
-    
+
     id = Column(GUID(), primary_key=True, default=uuid.uuid4)
-    project_id = Column(GUID(), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
+    project_id = Column(
+        GUID(), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False
+    )
     name = Column(String, nullable=False)
     file_path = Column(String)
-    file_type = Column(String)  # 'transcript' | 'survey' | 'notes' | 'report' | 'video' | 'audio'
+    file_type = Column(
+        String
+    )  # 'transcript' | 'survey' | 'notes' | 'report' | 'video' | 'audio'
     content = Column(Text)  # Extracted text content
     raw_content = Column(LargeBinary)  # Original file (optional, for binary)
-    
+
     # Metadata
     uploaded_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
+    updated_at = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True
+    )
     file_size = Column(BigInteger)
     mime_type = Column(String)
-    
+
     # Source attribution
     source_type = Column(String)  # 'interview' | 'survey' | 'observation' | 'analysis'
     participant_count = Column(Integer)
     collection_date = Column(Date)
-    
+
     # Processing status
     processed = Column(Boolean, default=False)
     chunked = Column(Boolean, default=False)
     embedded = Column(Boolean, default=False)
-    
+
     # Quality metadata
     transcription_accuracy = Column(Numeric(3, 2))  # If AI-transcribed
-    validation_status = Column(String, default='pending')  # 'pending' | 'validated' | 'flagged'
+    validation_status = Column(
+        String, default="pending"
+    )  # 'pending' | 'validated' | 'flagged'
 
     # Provenance metadata (for auto-ingested documents)
-    document_metadata = Column(JSON, default=dict, comment="Arbitrary metadata for document provenance")
+    document_metadata = Column(
+        JSON, default=dict, comment="Arbitrary metadata for document provenance"
+    )
 
     # Report promotion provenance
     source_report_id = Column(
@@ -80,15 +94,19 @@ class Document(Base, SoftDeleteMixin):
         default="upload",
         comment="Origin type: upload, synthesized, imported",
     )
-    
+
     # Relationships
-    chunks = relationship("DocumentChunk", back_populates="document", cascade="all, delete-orphan")
-    tags = relationship("DocumentTag", back_populates="document", cascade="all, delete-orphan")
+    chunks = relationship(
+        "DocumentChunk", back_populates="document", cascade="all, delete-orphan"
+    )
+    tags = relationship(
+        "DocumentTag", back_populates="document", cascade="all, delete-orphan"
+    )
     processing_events = relationship(
         "DocumentProcessingStatus",
         back_populates="document",
         cascade="all, delete-orphan",
-        order_by="DocumentProcessingStatus.created_at"
+        order_by="DocumentProcessingStatus.created_at",
     )
 
     __table_args__ = (

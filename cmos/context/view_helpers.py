@@ -58,7 +58,9 @@ def get_context_at_point(
     if not as_of:
         raise ContextViewError("as_of value is required for historical context views.")
     builder = _ContextViewBuilder(client)
-    filters = ContextFilters(as_of=as_of.strip(), domain=_clean(domain), recent_limit=max(1, recent_limit))
+    filters = ContextFilters(
+        as_of=as_of.strip(), domain=_clean(domain), recent_limit=max(1, recent_limit)
+    )
     return builder.build(filters)
 
 
@@ -74,7 +76,9 @@ def get_domain_view(
     if not domain or not domain.strip():
         raise ContextViewError("domain must be provided for domain-specific views.")
     builder = _ContextViewBuilder(client)
-    filters = ContextFilters(as_of=_clean(as_of), domain=domain.strip(), recent_limit=max(1, recent_limit))
+    filters = ContextFilters(
+        as_of=_clean(as_of), domain=domain.strip(), recent_limit=max(1, recent_limit)
+    )
     return builder.build(filters)
 
 
@@ -99,11 +103,17 @@ class _ContextViewBuilder:
     def __init__(self, client: SQLiteClient) -> None:
         self.client = client
 
-    def build(self, filters: ContextFilters, *, session_limit: int = SESSION_FETCH_LIMIT) -> Dict[str, Any]:
-        sessions, resolved_as_of = self._load_sessions(filters, session_limit=session_limit)
+    def build(
+        self, filters: ContextFilters, *, session_limit: int = SESSION_FETCH_LIMIT
+    ) -> Dict[str, Any]:
+        sessions, resolved_as_of = self._load_sessions(
+            filters, session_limit=session_limit
+        )
         base_master = self.client.get_context("master_context") or {}
         project_identity = (base_master.get("project_identity") or {}).copy()
-        project_identity.setdefault("name", project_identity.get("name") or "CMOS Project")
+        project_identity.setdefault(
+            "name", project_identity.get("name") or "CMOS Project"
+        )
 
         aggregates = _aggregate_sessions(sessions)
         metrics = aggregates["metrics"]
@@ -219,7 +229,9 @@ class _ContextViewBuilder:
                 {"session_id": candidate},
             )
             if not row or not row.get("ts"):
-                raise ContextViewError(f"Session {candidate} not found for as_of filter.")
+                raise ContextViewError(
+                    f"Session {candidate} not found for as_of filter."
+                )
             return {
                 "timestamp": _normalize_timestamp(row["ts"]),
                 "session_id": candidate,
@@ -272,7 +284,9 @@ def _aggregate_sessions(sessions: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
             if step_text:
                 next_steps.append(f"{session.get('id')}: {step_text}")
 
-        by_sprint.setdefault(sprint_id, {"sessions": 0, "decisions": 0, "learnings": 0, "constraints": 0})
+        by_sprint.setdefault(
+            sprint_id, {"sessions": 0, "decisions": 0, "learnings": 0, "constraints": 0}
+        )
         by_sprint[sprint_id]["sessions"] += 1
         by_sprint[sprint_id]["decisions"] += capture_counts.get("decision", 0)
         by_sprint[sprint_id]["learnings"] += capture_counts.get("learning", 0)
@@ -297,7 +311,7 @@ def _aggregate_sessions(sessions: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
         "learnings": learnings,
         "constraints": constraints,
         "context_notes": context_notes,
-        "recent_sessions": list(reversed(recent_sessions))[: SESSION_FETCH_LIMIT],
+        "recent_sessions": list(reversed(recent_sessions))[:SESSION_FETCH_LIMIT],
         "next_steps": next_steps[-25:],
         "capture_totals": dict(sorted(capture_totals.items())),
         "by_sprint": {k: v for k, v in sorted(by_sprint.items())},
@@ -348,8 +362,10 @@ def _render_markdown(view: Dict[str, Any]) -> str:
     if view.get("recent_sessions"):
         lines.append("## Recent Sessions")
         for sess in view["recent_sessions"]:
-            detail = f"- {sess.get('id')}: {sess.get('title')}" \
+            detail = (
+                f"- {sess.get('id')}: {sess.get('title')}"
                 f" ({sess.get('session_type')}) — captures: {sess.get('capture_count', 0)}"
+            )
             lines.append(detail)
         lines.append("")
     if view.get("pending_next_steps"):
@@ -363,7 +379,9 @@ def _normalize_timestamp(value: str) -> str:
     try:
         dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError as exc:
-        raise ContextViewError(f"Invalid timestamp '{value}'. Use ISO-8601 or a session ID.") from exc
+        raise ContextViewError(
+            f"Invalid timestamp '{value}'. Use ISO-8601 or a session ID."
+        ) from exc
     dt = dt.astimezone(timezone.utc).replace(tzinfo=timezone.utc, microsecond=0)
     return dt.isoformat().replace("+00:00", "Z")
 

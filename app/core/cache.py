@@ -1,15 +1,16 @@
 """Thread-safe TTL cache utilities shared across the application."""
+
 from __future__ import annotations
 
 import copy
 import threading
 import time
+from collections.abc import Callable, Hashable, Iterable, Mapping
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Hashable, Iterable, Mapping, MutableMapping, Optional, Tuple, TypeVar
+from typing import Any, TypeVar
 
 from cachetools import TTLCache
 from cachetools.keys import hashkey
-
 
 T = TypeVar("T")
 Loader = Callable[[], T]
@@ -68,7 +69,7 @@ class CacheStats:
         total = self.hits + self.misses
         return (self.hits / total) if total else 0.0
 
-    def snapshot(self) -> Dict[str, float]:
+    def snapshot(self) -> dict[str, float]:
         return {
             "hits": float(self.hits),
             "misses": float(self.misses),
@@ -113,7 +114,7 @@ class CacheNamespace:
             self._stats.sets += 1
             self._touch()
 
-    def get_or_set(self, key: Hashable, loader: Loader) -> Tuple[Any, bool]:
+    def get_or_set(self, key: Hashable, loader: Loader) -> tuple[Any, bool]:
         cached = self.get(key, default=_MISSING)
         if cached is not _MISSING:
             return cached, True
@@ -121,7 +122,7 @@ class CacheNamespace:
         self.set(key, value)
         return copy.deepcopy(value), False
 
-    def invalidate(self, predicate: Optional[Callable[[Hashable], bool]] = None) -> int:
+    def invalidate(self, predicate: Callable[[Hashable], bool] | None = None) -> int:
         """Remove entries that match predicate. When predicate is None, clear the entire cache."""
         with self._lock:
             if predicate is None:
@@ -141,7 +142,7 @@ class CacheNamespace:
                 self._touch()
             return removed
 
-    def snapshot(self) -> Dict[str, Any]:
+    def snapshot(self) -> dict[str, Any]:
         with self._lock:
             stats = self._stats.snapshot()
             return {
@@ -158,7 +159,7 @@ class CacheRegistry:
 
     def __init__(self) -> None:
         self._lock = threading.RLock()
-        self._namespaces: Dict[str, CacheNamespace] = {}
+        self._namespaces: dict[str, CacheNamespace] = {}
 
     def namespace(self, config: CacheConfig) -> CacheNamespace:
         with self._lock:
@@ -169,7 +170,7 @@ class CacheRegistry:
             self._namespaces[config.name] = namespace
             return namespace
 
-    def get(self, name: str) -> Optional[CacheNamespace]:
+    def get(self, name: str) -> CacheNamespace | None:
         with self._lock:
             return self._namespaces.get(name)
 
@@ -178,9 +179,12 @@ class CacheRegistry:
             for namespace in self._namespaces.values():
                 namespace.invalidate()
 
-    def snapshot(self) -> Dict[str, Dict[str, Any]]:
+    def snapshot(self) -> dict[str, dict[str, Any]]:
         with self._lock:
-            return {name: namespace.snapshot() for name, namespace in self._namespaces.items()}
+            return {
+                name: namespace.snapshot()
+                for name, namespace in self._namespaces.items()
+            }
 
 
 DEFAULT_CACHE_REGISTRY = CacheRegistry()
@@ -191,14 +195,16 @@ def ttl_cache(
     *,
     ttl_seconds: float,
     maxsize: int = 128,
-    key_builder: Optional[KeyBuilder] = None,
+    key_builder: KeyBuilder | None = None,
     registry: CacheRegistry | None = None,
 ) -> Callable[[Callable[..., T]], Callable[..., T]]:
     """Decorator that memoizes function results using a shared TTL cache namespace."""
 
     def decorator(func: Callable[..., T]) -> Callable[..., T]:
         cache_registry = registry or DEFAULT_CACHE_REGISTRY
-        namespace = cache_registry.namespace(CacheConfig(name=name, ttl_seconds=ttl_seconds, maxsize=maxsize))
+        namespace = cache_registry.namespace(
+            CacheConfig(name=name, ttl_seconds=ttl_seconds, maxsize=maxsize)
+        )
 
         def _key(*args: Any, **kwargs: Any) -> Hashable:
             if key_builder:

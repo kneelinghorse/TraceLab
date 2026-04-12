@@ -1,9 +1,11 @@
 """Faceted search helpers for filtering and facet aggregation."""
+
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from datetime import date
-from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import func, select
@@ -14,11 +16,10 @@ from app.models.document import Document
 from app.models.project import Project
 from app.models.tag import DocumentTag, Tag
 
-
 SessionFactory = Callable[[], Session]
 
 
-def _normalize_sequence(values: Optional[Sequence[str]]) -> Tuple[str, ...]:
+def _normalize_sequence(values: Sequence[str] | None) -> tuple[str, ...]:
     if not values:
         return ()
     normalized = []
@@ -36,25 +37,25 @@ def _normalize_sequence(values: Optional[Sequence[str]]) -> Tuple[str, ...]:
 class FacetFilters:
     """Normalized filter inputs shared across faceted search helpers."""
 
-    project_id: Optional[str] = None
-    document_types: Tuple[str, ...] = ()
-    source_types: Tuple[str, ...] = ()
-    tags: Tuple[str, ...] = ()
-    date_from: Optional[date] = None
-    date_to: Optional[date] = None
+    project_id: str | None = None
+    document_types: tuple[str, ...] = ()
+    source_types: tuple[str, ...] = ()
+    tags: tuple[str, ...] = ()
+    date_from: date | None = None
+    date_to: date | None = None
 
     @classmethod
     def from_kwargs(
         cls,
         *,
-        project_id: Optional[str] = None,
-        document_types: Optional[Sequence[str]] = None,
-        source_types: Optional[Sequence[str]] = None,
-        source_type: Optional[str] = None,
-        tags: Optional[Sequence[str]] = None,
-        date_from: Optional[date] = None,
-        date_to: Optional[date] = None,
-    ) -> "FacetFilters":
+        project_id: str | None = None,
+        document_types: Sequence[str] | None = None,
+        source_types: Sequence[str] | None = None,
+        source_type: str | None = None,
+        tags: Sequence[str] | None = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
+    ) -> FacetFilters:
         """Build filters from mixed singular/list inputs."""
         normalized_sources = list(_normalize_sequence(source_types))
         if source_type:
@@ -117,20 +118,28 @@ class FacetedSearchService:
             return stmt
         return stmt.filter(*conditions)
 
-    def filter_chunks(self, chunks: List[Dict[str, Any]], filters: FacetFilters) -> List[Dict[str, Any]]:
+    def filter_chunks(
+        self, chunks: list[dict[str, Any]], filters: FacetFilters
+    ) -> list[dict[str, Any]]:
         """Filter semantic or keyword chunks by document metadata."""
         if not chunks:
             return []
 
-        doc_ids = {chunk.get("document_id") for chunk in chunks if chunk.get("document_id")}
+        doc_ids = {
+            chunk.get("document_id") for chunk in chunks if chunk.get("document_id")
+        }
         if not doc_ids:
-            return [] if filters.requires_metadata() else [dict(chunk) for chunk in chunks]
+            return (
+                [] if filters.requires_metadata() else [dict(chunk) for chunk in chunks]
+            )
 
         metadata = self._load_document_metadata(doc_ids)
         if not metadata:
-            return [] if filters.requires_metadata() else [dict(chunk) for chunk in chunks]
+            return (
+                [] if filters.requires_metadata() else [dict(chunk) for chunk in chunks]
+            )
 
-        filtered: List[Dict[str, Any]] = []
+        filtered: list[dict[str, Any]] = []
         for chunk in chunks:
             document_id = chunk.get("document_id")
             info = metadata.get(document_id)
@@ -154,16 +163,17 @@ class FacetedSearchService:
     # ------------------------------------------------------------------
     # Facet aggregation
     # ------------------------------------------------------------------
-    def get_facets(self, filters: FacetFilters) -> Dict[str, Any]:
+    def get_facets(self, filters: FacetFilters) -> dict[str, Any]:
         """Return facet counts for projects, document/source types, tags, and date ranges."""
         session = self.session_factory()
         try:
-            project_rows = (
-                session.query(Project.id, Project.name, func.count(Document.id))
-                .join(Document, Document.project_id == Project.id)
-            )
+            project_rows = session.query(
+                Project.id, Project.name, func.count(Document.id)
+            ).join(Document, Document.project_id == Project.id)
             project_rows = self._apply_query_filters(project_rows, filters)
-            project_rows = project_rows.group_by(Project.id, Project.name).order_by(Project.name)
+            project_rows = project_rows.group_by(Project.id, Project.name).order_by(
+                Project.name
+            )
             projects = [
                 {
                     "value": str(project_id),
@@ -175,7 +185,9 @@ class FacetedSearchService:
 
             document_rows = session.query(Document.file_type, func.count(Document.id))
             document_rows = self._apply_query_filters(document_rows, filters)
-            document_rows = document_rows.group_by(Document.file_type).order_by(Document.file_type)
+            document_rows = document_rows.group_by(Document.file_type).order_by(
+                Document.file_type
+            )
             document_types = [
                 {"value": value, "label": value or "unknown", "count": int(total or 0)}
                 for value, total in document_rows
@@ -184,7 +196,9 @@ class FacetedSearchService:
 
             source_rows = session.query(Document.source_type, func.count(Document.id))
             source_rows = self._apply_query_filters(source_rows, filters)
-            source_rows = source_rows.group_by(Document.source_type).order_by(Document.source_type)
+            source_rows = source_rows.group_by(Document.source_type).order_by(
+                Document.source_type
+            )
             source_types = [
                 {"value": value, "label": value or "unknown", "count": int(total or 0)}
                 for value, total in source_rows
@@ -240,9 +254,13 @@ class FacetedSearchService:
         if project_uuid:
             conditions.append(Document.project_id == project_uuid)
         if filters.document_types:
-            conditions.append(func.lower(Document.file_type).in_(filters.document_types))
+            conditions.append(
+                func.lower(Document.file_type).in_(filters.document_types)
+            )
         if filters.source_types:
-            conditions.append(func.lower(Document.source_type).in_(filters.source_types))
+            conditions.append(
+                func.lower(Document.source_type).in_(filters.source_types)
+            )
         if filters.date_from:
             conditions.append(Document.collection_date >= filters.date_from)
         if filters.date_to:
@@ -258,9 +276,11 @@ class FacetedSearchService:
             conditions.append(tag_exists)
         return conditions
 
-    def _load_document_metadata(self, doc_ids: Iterable[str]) -> Dict[str, Dict[str, Any]]:
-        uuid_values: List[UUID] = []
-        id_map: Dict[str, str] = {}
+    def _load_document_metadata(
+        self, doc_ids: Iterable[str]
+    ) -> dict[str, dict[str, Any]]:
+        uuid_values: list[UUID] = []
+        id_map: dict[str, str] = {}
         for raw_id in doc_ids:
             try:
                 parsed = UUID(str(raw_id))
@@ -273,7 +293,7 @@ class FacetedSearchService:
             return {}
 
         session = self.session_factory()
-        metadata: Dict[str, Dict[str, any]] = {}
+        metadata: dict[str, dict[str, any]] = {}
         try:
             rows = (
                 session.query(
@@ -293,7 +313,9 @@ class FacetedSearchService:
                     "source_type": row.source_type,
                     "source_type_norm": (row.source_type or "").strip().lower() or None,
                     "collection_date": row.collection_date,
-                    "collection_date_iso": row.collection_date.isoformat() if row.collection_date else None,
+                    "collection_date_iso": row.collection_date.isoformat()
+                    if row.collection_date
+                    else None,
                     "tags": [],
                     "tag_terms": set(),
                 }
@@ -316,10 +338,16 @@ class FacetedSearchService:
             session.close()
         return metadata
 
-    def _matches_filters(self, info: Dict[str, Any], filters: FacetFilters) -> bool:
-        if filters.document_types and info.get("document_type_norm") not in filters.document_types:
+    def _matches_filters(self, info: dict[str, Any], filters: FacetFilters) -> bool:
+        if (
+            filters.document_types
+            and info.get("document_type_norm") not in filters.document_types
+        ):
             return False
-        if filters.source_types and info.get("source_type_norm") not in filters.source_types:
+        if (
+            filters.source_types
+            and info.get("source_type_norm") not in filters.source_types
+        ):
             return False
         if filters.date_from:
             collection_date = info.get("collection_date")
@@ -336,7 +364,7 @@ class FacetedSearchService:
         return True
 
     @staticmethod
-    def _parse_uuid(value: Optional[str]) -> Optional[UUID]:
+    def _parse_uuid(value: str | None) -> UUID | None:
         if value is None:
             return None
         try:

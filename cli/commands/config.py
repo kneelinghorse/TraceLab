@@ -47,6 +47,7 @@ def set(ctx, key, value):
 
         # Try to parse value as JSON for complex types
         import json
+
         try:
             value = json.loads(value)
         except:
@@ -55,7 +56,9 @@ def set(ctx, key, value):
         config_mgr.set(key, value)
 
         if ctx.json_mode:
-            ctx.output.success("Configuration updated", data={"key": key, "value": value})
+            ctx.output.success(
+                "Configuration updated", data={"key": key, "value": value}
+            )
         else:
             ctx.output.success(f"Set {key} = {value}")
 
@@ -118,4 +121,3 @@ def reset(ctx, confirm):
         else:
             print(format_error_human(e), file=sys.stderr)
         sys.exit(e.exit_code)
-

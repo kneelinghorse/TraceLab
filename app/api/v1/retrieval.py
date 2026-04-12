@@ -1,4 +1,5 @@
 """FastAPI routes providing semantic retrieval over embedded chunks."""
+
 from fastapi import APIRouter, HTTPException
 
 from app.schemas.retrieval import RetrievalQuery, RetrievalResponse, RetrievedChunk
@@ -11,12 +12,12 @@ router = APIRouter()
 async def search_chunks(payload: RetrievalQuery) -> RetrievalResponse:
     """
     Execute a semantic search across embedded chunks.
-    
+
     Returns ranked chunks with metadata, applying optional project/document filters.
     """
     if not payload.query.strip():
         raise HTTPException(status_code=400, detail="Query text must not be empty.")
-    
+
     service = get_retrieval_service()
     results = service.search(
         query=payload.query,

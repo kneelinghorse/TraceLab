@@ -1,7 +1,8 @@
 """Tests for PEDR quality-aware search scoring."""
+
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
 import pytest
 
@@ -9,18 +10,24 @@ from app.services.pedr import QualityFilters, QualityScoringService
 
 
 class _RecordingLoader:
-    def __init__(self, mapping: Dict[str, Dict[str, Any]]):
+    def __init__(self, mapping: dict[str, dict[str, Any]]):
         self.mapping = mapping
-        self.calls: List[List[str]] = []
+        self.calls: list[list[str]] = []
 
     def __call__(self, document_ids):
         normalized = [str(doc_id) for doc_id in document_ids]
         self.calls.append(normalized)
-        return {doc_id: self.mapping[doc_id] for doc_id in normalized if doc_id in self.mapping}
+        return {
+            doc_id: self.mapping[doc_id]
+            for doc_id in normalized
+            if doc_id in self.mapping
+        }
 
 
-def _metadata(*, status: str, passed_gates: int, validated: bool = False, pii: bool = False) -> Dict[str, Any]:
-    gates: Dict[str, Dict[str, Any]] = {}
+def _metadata(
+    *, status: str, passed_gates: int, validated: bool = False, pii: bool = False
+) -> dict[str, Any]:
+    gates: dict[str, dict[str, Any]] = {}
     for index, gate in enumerate(QualityScoringService.EXPECTED_GATES):
         gates[gate] = {
             "status": "pass" if index < passed_gates else "pending",
@@ -40,7 +47,9 @@ def _metadata(*, status: str, passed_gates: int, validated: bool = False, pii: b
 def test_complete_mission_scores_higher_than_draft():
     loader = _RecordingLoader(
         {
-            "doc-complete": _metadata(status="complete", passed_gates=5, validated=True),
+            "doc-complete": _metadata(
+                status="complete", passed_gates=5, validated=True
+            ),
             "doc-draft": _metadata(status="draft", passed_gates=2),
         }
     )
@@ -83,7 +92,9 @@ def test_default_score_used_when_metadata_missing():
         filters=QualityFilters(),
     )[0]
 
-    assert result["quality_score"] == pytest.approx(QualityScoringService.DEFAULT_BASE_SCORE, rel=1e-3)
+    assert result["quality_score"] == pytest.approx(
+        QualityScoringService.DEFAULT_BASE_SCORE, rel=1e-3
+    )
 
 
 def test_min_quality_gates_filter():
@@ -150,7 +161,9 @@ def test_allow_pii_filter():
 
 
 def test_soft_governance_penalty_keeps_pii():
-    loader = _RecordingLoader({"doc-pii": _metadata(status="complete", passed_gates=5, pii=True)})
+    loader = _RecordingLoader(
+        {"doc-pii": _metadata(status="complete", passed_gates=5, pii=True)}
+    )
     service = QualityScoringService(metadata_loader=loader)
 
     result = service.apply(
@@ -169,7 +182,9 @@ def test_soft_governance_penalty_keeps_pii():
 
 
 def test_warn_governance_keeps_pii_without_penalty():
-    loader = _RecordingLoader({"doc-pii": _metadata(status="complete", passed_gates=5, pii=True)})
+    loader = _RecordingLoader(
+        {"doc-pii": _metadata(status="complete", passed_gates=5, pii=True)}
+    )
     service = QualityScoringService(metadata_loader=loader)
 
     result = service.apply(
@@ -185,7 +200,9 @@ def test_warn_governance_keeps_pii_without_penalty():
 
 
 def test_combined_score_scaled_by_quality():
-    loader = _RecordingLoader({"doc-scale": _metadata(status="complete", passed_gates=5)})
+    loader = _RecordingLoader(
+        {"doc-scale": _metadata(status="complete", passed_gates=5)}
+    )
     service = QualityScoringService(metadata_loader=loader)
 
     result = service.apply(
@@ -206,7 +223,9 @@ def test_documents_without_id_preserve_default_quality():
         filters=QualityFilters(),
     )[0]
 
-    assert result["quality_score"] == pytest.approx(QualityScoringService.DEFAULT_BASE_SCORE, rel=1e-3)
+    assert result["quality_score"] == pytest.approx(
+        QualityScoringService.DEFAULT_BASE_SCORE, rel=1e-3
+    )
 
 
 def test_metadata_loader_receives_document_ids():
@@ -222,7 +241,9 @@ def test_metadata_loader_receives_document_ids():
 
 
 def test_in_progress_status_receives_small_boost():
-    loader = _RecordingLoader({"doc-progress": _metadata(status="in_progress", passed_gates=3)})
+    loader = _RecordingLoader(
+        {"doc-progress": _metadata(status="in_progress", passed_gates=3)}
+    )
     service = QualityScoringService(metadata_loader=loader)
 
     result = service.apply(
@@ -254,9 +275,15 @@ def test_mid_quality_curve_softens_penalties():
     review = next(item for item in results if item["document_id"] == "doc-review")
     total_gates = len(QualityScoringService.EXPECTED_GATES)
 
-    progress_base = (2 / total_gates) ** QualityScoringService.STATUS_CURVE_EXPONENTS["in_progress"]
-    review_base = (3 / total_gates) ** QualityScoringService.STATUS_CURVE_EXPONENTS["review"]
-    progress_expected = progress_base * (1 + QualityScoringService.STATUS_BOOSTS["in_progress"])
+    progress_base = (2 / total_gates) ** QualityScoringService.STATUS_CURVE_EXPONENTS[
+        "in_progress"
+    ]
+    review_base = (3 / total_gates) ** QualityScoringService.STATUS_CURVE_EXPONENTS[
+        "review"
+    ]
+    progress_expected = progress_base * (
+        1 + QualityScoringService.STATUS_BOOSTS["in_progress"]
+    )
     review_expected = review_base * (1 + QualityScoringService.STATUS_BOOSTS["review"])
 
     assert progress["quality_base_score"] == pytest.approx(progress_base, rel=1e-3)
@@ -275,7 +302,9 @@ def test_draft_curve_relaxes_penalty():
     )[0]
 
     total_gates = len(QualityScoringService.EXPECTED_GATES)
-    draft_base = (3 / total_gates) ** QualityScoringService.STATUS_CURVE_EXPONENTS["draft"]
+    draft_base = (3 / total_gates) ** QualityScoringService.STATUS_CURVE_EXPONENTS[
+        "draft"
+    ]
     expected = draft_base * (1 + QualityScoringService.STATUS_BOOSTS["draft"])
 
     assert result["quality_base_score"] == pytest.approx(draft_base, rel=1e-3)
@@ -292,4 +321,6 @@ def test_zero_quality_gates_preserve_zero_base_score():
     )[0]
 
     assert result["quality_base_score"] == 0.0
-    assert result["quality_score"] == pytest.approx(QualityScoringService.MIN_SCORE, rel=1e-3)
+    assert result["quality_score"] == pytest.approx(
+        QualityScoringService.MIN_SCORE, rel=1e-3
+    )

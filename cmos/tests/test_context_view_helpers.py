@@ -31,7 +31,9 @@ class ContextViewHelpersTest(unittest.TestCase):
         shutil.copy2(self.repo_root / "db" / "cmos.sqlite", self.db_path)
         self.runtime = SessionRuntime(repo_root=self.repo_root, db_path=self.db_path)
         self.runtime.ensure_database()
-        self.client = SQLiteClient(self.db_path, schema_path=self.repo_root / "db" / "schema.sql")
+        self.client = SQLiteClient(
+            self.db_path, schema_path=self.repo_root / "db" / "schema.sql"
+        )
         self._reset_context_state()
         self.session_alpha = self._seed_session(
             domain="alpha",
@@ -60,8 +62,15 @@ class ContextViewHelpersTest(unittest.TestCase):
         conn.execute("DELETE FROM strategic_decisions")
         project_context = {"working_memory": {}}
         master_context = {"project_identity": {"name": "CMOS"}}
-        self.client.set_context("project_context", project_context, source_path="tests/reset", snapshot=False)
-        self.client.set_context("master_context", master_context, source_path="tests/reset", snapshot=False)
+        self.client.set_context(
+            "project_context",
+            project_context,
+            source_path="tests/reset",
+            snapshot=False,
+        )
+        self.client.set_context(
+            "master_context", master_context, source_path="tests/reset", snapshot=False
+        )
 
     def _seed_session(
         self,
@@ -102,17 +111,26 @@ class ContextViewHelpersTest(unittest.TestCase):
         self.assertEqual(view["project_identity"]["session_count"], 2)
         self.assertEqual(view["aggregated_insights"]["total_decisions"], 2)
         self.assertEqual(len(view["recent_sessions"]), 2)
-        self.assertTrue(any("alpha" in entry.lower() for entry in view["decisions_made"]))
+        self.assertTrue(
+            any("alpha" in entry.lower() for entry in view["decisions_made"])
+        )
         self.assertTrue(view["pending_next_steps"], "Next steps should be present")
 
     def test_domain_view_filters_sessions(self) -> None:
         view = get_domain_view(self.client, "alpha", recent_limit=5)
         self.assertEqual(view["project_identity"]["session_count"], 1)
         self.assertEqual(len(view["recent_sessions"]), 1)
-        self.assertTrue(all("alpha" in sess.get("id", "").lower() or sess.get("domain") == "alpha" for sess in view["recent_sessions"]))
+        self.assertTrue(
+            all(
+                "alpha" in sess.get("id", "").lower() or sess.get("domain") == "alpha"
+                for sess in view["recent_sessions"]
+            )
+        )
 
     def test_context_at_point_limits_history(self) -> None:
-        view = get_context_at_point(self.client, as_of=self.session_alpha, recent_limit=5)
+        view = get_context_at_point(
+            self.client, as_of=self.session_alpha, recent_limit=5
+        )
         self.assertEqual(view["project_identity"]["session_count"], 1)
         self.assertEqual(view["aggregated_insights"]["total_decisions"], 1)
 

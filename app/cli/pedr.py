@@ -6,14 +6,12 @@ Usage:
     python -m app.cli.pedr status
     python -m app.cli.pedr parity [--entity-type mission|document]
 """
+
 from __future__ import annotations
 
 import argparse
-import json
 import sys
-from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -50,9 +48,13 @@ def cmd_sync(args: argparse.Namespace) -> int:
         print(f"\nSyncing {entity_type}s...")
 
         if entity_type == "mission":
-            result = service.sync_missions(mode, project_id=args.project, dry_run=dry_run)
+            result = service.sync_missions(
+                mode, project_id=args.project, dry_run=dry_run
+            )
         elif entity_type == "document":
-            result = service.sync_documents(mode, project_id=args.project, dry_run=dry_run)
+            result = service.sync_documents(
+                mode, project_id=args.project, dry_run=dry_run
+            )
         else:
             print(f"  Unknown entity type: {entity_type}")
             continue
@@ -110,7 +112,9 @@ def cmd_parity(args: argparse.Namespace) -> int:
     """Check parity between local and PEDR."""
     service = get_delta_sync_service()
 
-    entity_types = [EntityType(args.entity_type)] if args.entity_type else list(EntityType)
+    entity_types = (
+        [EntityType(args.entity_type)] if args.entity_type else list(EntityType)
+    )
 
     print("PEDR Parity Check")
     print("-" * 50)

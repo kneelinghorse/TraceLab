@@ -24,7 +24,11 @@ def load_yaml(path: Path) -> Dict[str, Any]:
     with open(path, "r", encoding="utf-8") as f:
         docs = list(yaml.safe_load_all(f))
         for doc in docs:
-            if doc and isinstance(doc, dict) and ("missionId" in doc or "domainFields" in doc):
+            if (
+                doc
+                and isinstance(doc, dict)
+                and ("missionId" in doc or "domainFields" in doc)
+            ):
                 return doc
         return docs[-1] if docs else {}
 
@@ -37,7 +41,9 @@ def load_json(path: Path) -> Optional[Dict[str, Any]]:
         return json.load(f)
 
 
-def extract_sprint_missions(backlog: Dict[str, Any], sprint_id: str) -> List[Dict[str, Any]]:
+def extract_sprint_missions(
+    backlog: Dict[str, Any], sprint_id: str
+) -> List[Dict[str, Any]]:
     """Extract missions for a specific sprint."""
     for sprint in backlog.get("domainFields", {}).get("sprints", []):
         if sprint.get("sprintId") == sprint_id:
@@ -57,7 +63,13 @@ def evaluate_presidio_metric(
     if not tuned:
         return False, "presidio_tuned_results.json missing", {}
 
-    priority_entities = ["PARTICIPANT_ID", "PROJECT_ID", "EMAIL_ADDRESS", "PHONE_NUMBER", "PERSON"]
+    priority_entities = [
+        "PARTICIPANT_ID",
+        "PROJECT_ID",
+        "EMAIL_ADDRESS",
+        "PHONE_NUMBER",
+        "PERSON",
+    ]
     per_entity = tuned.get("per_entity_metrics", {})
 
     results = {}
@@ -69,7 +81,11 @@ def evaluate_presidio_metric(
             results[entity] = {"recall": recall, "met": recall >= 0.95}
             min_recall = min(min_recall, recall)
         else:
-            results[entity] = {"recall": None, "met": False, "note": "Entity not found in metrics"}
+            results[entity] = {
+                "recall": None,
+                "met": False,
+                "note": "Entity not found in metrics",
+            }
             min_recall = 0.0
 
     met = min_recall >= 0.95
@@ -77,13 +93,17 @@ def evaluate_presidio_metric(
         "min_recall": min_recall,
         "target": 0.95,
         "per_entity": results,
-        "overall_recall": tuned.get("tuned_metrics", {}).get("overall", {}).get("recall", 0.0),
+        "overall_recall": tuned.get("tuned_metrics", {})
+        .get("overall", {})
+        .get("recall", 0.0),
     }
 
     return met, f"Min priority entity recall: {min_recall:.4f} (target: ≥0.95)", details
 
 
-def evaluate_ingestion_metric(coverage: Optional[Dict[str, Any]]) -> Tuple[bool, str, Dict[str, Any]]:
+def evaluate_ingestion_metric(
+    coverage: Optional[Dict[str, Any]],
+) -> Tuple[bool, str, Dict[str, Any]]:
     """
     Evaluate: Five priority formats ingested end-to-end with sanitized chunks in PostgreSQL.
 
@@ -118,10 +138,16 @@ def evaluate_ingestion_metric(coverage: Optional[Dict[str, Any]]) -> Tuple[bool,
     met = success_count >= 5
     details = {"formats_met": success_count, "target": 5, "per_format": results}
 
-    return met, f"{success_count}/5 priority formats successfully ingested and chunked", details
+    return (
+        met,
+        f"{success_count}/5 priority formats successfully ingested and chunked",
+        details,
+    )
 
 
-def evaluate_qdrant_metric(performance: Optional[Dict[str, Any]]) -> Tuple[bool, str, Dict[str, Any]]:
+def evaluate_qdrant_metric(
+    performance: Optional[Dict[str, Any]],
+) -> Tuple[bool, str, Dict[str, Any]]:
     """Evaluate: Embedding pipeline stores ≥1 sample project in Qdrant with <10ms p99 query latency (local)."""
     if not performance:
         return False, "qdrant_performance.json missing", {}
@@ -159,7 +185,9 @@ def evaluate_qdrant_metric(performance: Optional[Dict[str, Any]]) -> Tuple[bool,
     elif not latency_met:
         status_parts.append(f"Max latency: {p99_latency:.2f}ms (target: <10ms)")
     else:
-        status_parts.append(f"✓ {points_count} points stored, max latency {p99_latency:.2f}ms")
+        status_parts.append(
+            f"✓ {points_count} points stored, max latency {p99_latency:.2f}ms"
+        )
 
     return met, " | ".join(status_parts), details
 
@@ -169,7 +197,9 @@ def evaluate_script_metric() -> Tuple[bool, str, Dict[str, Any]]:
     return True, "Script executed successfully", {}
 
 
-def evaluate_rag_query_metric(metrics: Optional[Dict[str, Any]]) -> Tuple[bool, str, Dict[str, Any]]:
+def evaluate_rag_query_metric(
+    metrics: Optional[Dict[str, Any]],
+) -> Tuple[bool, str, Dict[str, Any]]:
     """Evaluate Sprint 02 RAG query accuracy and citation coverage."""
     if not metrics:
         return False, "rag_query_metrics.json missing", {}
@@ -199,7 +229,9 @@ def evaluate_rag_query_metric(metrics: Optional[Dict[str, Any]]) -> Tuple[bool, 
     return met, status, details
 
 
-def evaluate_context_compression_metric(metrics: Optional[Dict[str, Any]]) -> Tuple[bool, str, Dict[str, Any]]:
+def evaluate_context_compression_metric(
+    metrics: Optional[Dict[str, Any]],
+) -> Tuple[bool, str, Dict[str, Any]]:
     """Evaluate Sprint 02 context compression reduction targets."""
     if not metrics:
         return False, "context_compression_metrics.json missing", {}
@@ -230,7 +262,9 @@ def evaluate_context_compression_metric(metrics: Optional[Dict[str, Any]]) -> Tu
     return within_range, status, details
 
 
-def evaluate_semantic_cache_metric(metrics: Optional[Dict[str, Any]]) -> Tuple[bool, str, Dict[str, Any]]:
+def evaluate_semantic_cache_metric(
+    metrics: Optional[Dict[str, Any]],
+) -> Tuple[bool, str, Dict[str, Any]]:
     """Evaluate Sprint 02 semantic cache hit rate target."""
     if not metrics:
         return False, "semantic_cache_metrics.json missing", {}
@@ -251,7 +285,9 @@ def evaluate_semantic_cache_metric(metrics: Optional[Dict[str, Any]]) -> Tuple[b
     return met, status, details
 
 
-def evaluate_tiered_routing_metric(metrics: Optional[Dict[str, Any]]) -> Tuple[bool, str, Dict[str, Any]]:
+def evaluate_tiered_routing_metric(
+    metrics: Optional[Dict[str, Any]],
+) -> Tuple[bool, str, Dict[str, Any]]:
     """Evaluate Sprint 02 tiered routing escalation rate."""
     if not metrics:
         return False, "tiered_routing_metrics.json missing", {}
@@ -271,7 +307,9 @@ def evaluate_tiered_routing_metric(metrics: Optional[Dict[str, Any]]) -> Tuple[b
     return met, status, details
 
 
-def evaluate_cost_metric(metrics: Optional[Dict[str, Any]]) -> Tuple[bool, str, Dict[str, Any]]:
+def evaluate_cost_metric(
+    metrics: Optional[Dict[str, Any]],
+) -> Tuple[bool, str, Dict[str, Any]]:
     """Evaluate Sprint 02 cost per query target."""
     if not metrics:
         return False, "cost_metrics.json missing", {}
@@ -290,7 +328,9 @@ def evaluate_cost_metric(metrics: Optional[Dict[str, Any]]) -> Tuple[bool, str, 
     return met, status, details
 
 
-def evaluate_latency_metric(metrics: Optional[Dict[str, Any]]) -> Tuple[bool, str, Dict[str, Any]]:
+def evaluate_latency_metric(
+    metrics: Optional[Dict[str, Any]],
+) -> Tuple[bool, str, Dict[str, Any]]:
     """Evaluate Sprint 02 RAG query latency targets."""
     if not metrics:
         return False, "query_latency_metrics.json missing", {}
@@ -376,7 +416,11 @@ def generate_report(
 
     lines.extend(["## Recommendations", ""])
 
-    unmet = [(metric, status, details) for metric, met, status, details in evaluations if not met]
+    unmet = [
+        (metric, status, details)
+        for metric, met, status, details in evaluations
+        if not met
+    ]
 
     if not unmet:
         lines.append("- ✅ All success criteria met. Sprint objectives achieved.")
@@ -387,13 +431,21 @@ def generate_report(
             lines.append(f"  - Status: {status}")
             if details:
                 if "recall" in str(details):
-                    lines.append("  - Tune recognizers or adjust thresholds for better recall")
+                    lines.append(
+                        "  - Tune recognizers or adjust thresholds for better recall"
+                    )
                 if "formats" in str(details):
-                    lines.append("  - Ensure all priority formats have ingestion coverage")
+                    lines.append(
+                        "  - Ensure all priority formats have ingestion coverage"
+                    )
                 if "latency" in str(details):
-                    lines.append("  - Review latency contributors (cache, routing, embeddings)")
+                    lines.append(
+                        "  - Review latency contributors (cache, routing, embeddings)"
+                    )
                 if "cost" in str(details):
-                    lines.append("  - Investigate high-cost components and optimize usage")
+                    lines.append(
+                        "  - Investigate high-cost components and optimize usage"
+                    )
 
     lines.append("")
 
@@ -431,10 +483,26 @@ SPRINT_CONFIG = {
         "reports_dir": REPO_ROOT / "cmos" / "reports" / "sprint-01",
         "missions_dir": REPO_ROOT / "cmos" / "missions" / "sprint-01",
         "telemetry_paths": {
-            "presidio_baseline": REPO_ROOT / "cmos" / "reports" / "sprint-01" / "presidio_corpus_baseline.json",
-            "presidio_tuned": REPO_ROOT / "cmos" / "reports" / "sprint-01" / "presidio_tuned_results.json",
-            "ingestion_coverage": REPO_ROOT / "cmos" / "reports" / "sprint-01" / "ingestion_format_coverage.json",
-            "qdrant_performance": REPO_ROOT / "cmos" / "reports" / "sprint-01" / "qdrant_performance.json",
+            "presidio_baseline": REPO_ROOT
+            / "cmos"
+            / "reports"
+            / "sprint-01"
+            / "presidio_corpus_baseline.json",
+            "presidio_tuned": REPO_ROOT
+            / "cmos"
+            / "reports"
+            / "sprint-01"
+            / "presidio_tuned_results.json",
+            "ingestion_coverage": REPO_ROOT
+            / "cmos"
+            / "reports"
+            / "sprint-01"
+            / "ingestion_format_coverage.json",
+            "qdrant_performance": REPO_ROOT
+            / "cmos"
+            / "reports"
+            / "sprint-01"
+            / "qdrant_performance.json",
         },
         "evaluations": [
             {
@@ -463,12 +531,36 @@ SPRINT_CONFIG = {
         "reports_dir": REPO_ROOT / "cmos" / "reports" / "sprint-02",
         "missions_dir": REPO_ROOT / "cmos" / "missions" / "sprint-02",
         "telemetry_paths": {
-            "rag_query_metrics": REPO_ROOT / "cmos" / "reports" / "sprint-02" / "rag_query_metrics.json",
-            "context_compression_metrics": REPO_ROOT / "cmos" / "reports" / "sprint-02" / "context_compression_metrics.json",
-            "semantic_cache_metrics": REPO_ROOT / "cmos" / "reports" / "sprint-02" / "semantic_cache_metrics.json",
-            "tiered_routing_metrics": REPO_ROOT / "cmos" / "reports" / "sprint-02" / "tiered_routing_metrics.json",
-            "cost_metrics": REPO_ROOT / "cmos" / "reports" / "sprint-02" / "cost_metrics.json",
-            "query_latency_metrics": REPO_ROOT / "cmos" / "reports" / "sprint-02" / "query_latency_metrics.json",
+            "rag_query_metrics": REPO_ROOT
+            / "cmos"
+            / "reports"
+            / "sprint-02"
+            / "rag_query_metrics.json",
+            "context_compression_metrics": REPO_ROOT
+            / "cmos"
+            / "reports"
+            / "sprint-02"
+            / "context_compression_metrics.json",
+            "semantic_cache_metrics": REPO_ROOT
+            / "cmos"
+            / "reports"
+            / "sprint-02"
+            / "semantic_cache_metrics.json",
+            "tiered_routing_metrics": REPO_ROOT
+            / "cmos"
+            / "reports"
+            / "sprint-02"
+            / "tiered_routing_metrics.json",
+            "cost_metrics": REPO_ROOT
+            / "cmos"
+            / "reports"
+            / "sprint-02"
+            / "cost_metrics.json",
+            "query_latency_metrics": REPO_ROOT
+            / "cmos"
+            / "reports"
+            / "sprint-02"
+            / "query_latency_metrics.json",
         },
         "evaluations": [
             {
@@ -515,8 +607,12 @@ def main() -> None:
     """Main evaluation workflow."""
     import argparse
 
-    parser = argparse.ArgumentParser(description="Evaluate sprint missions against success criteria")
-    parser.add_argument("--sprint", type=int, default=1, help="Sprint number to evaluate (default: 1)")
+    parser = argparse.ArgumentParser(
+        description="Evaluate sprint missions against success criteria"
+    )
+    parser.add_argument(
+        "--sprint", type=int, default=1, help="Sprint number to evaluate (default: 1)"
+    )
     parser.add_argument(
         "--format",
         choices=["markdown", "json"],
@@ -529,7 +625,9 @@ def main() -> None:
 
     if sprint_id not in SPRINT_CONFIG:
         available = ", ".join(sorted(SPRINT_CONFIG))
-        raise SystemExit(f"Unsupported sprint '{sprint_id}'. Supported sprints: {available}")
+        raise SystemExit(
+            f"Unsupported sprint '{sprint_id}'. Supported sprints: {available}"
+        )
 
     config = SPRINT_CONFIG[sprint_id]
 
@@ -572,14 +670,20 @@ def main() -> None:
             ],
             "mission_summary": {
                 "total": len(missions),
-                "completed": len([m for m in missions if m.get("status") == "Completed"]),
-                "in_progress": len([m for m in missions if m.get("status") == "In Progress"]),
+                "completed": len(
+                    [m for m in missions if m.get("status") == "Completed"]
+                ),
+                "in_progress": len(
+                    [m for m in missions if m.get("status") == "In Progress"]
+                ),
                 "current": len([m for m in missions if m.get("status") == "Current"]),
                 "queued": len([m for m in missions if m.get("status") == "Queued"]),
             },
         }
         reports_dir.mkdir(parents=True, exist_ok=True)
-        report_path = reports_dir / f"{sprint_id.lower().replace(' ', '-')}-summary.json"
+        report_path = (
+            reports_dir / f"{sprint_id.lower().replace(' ', '-')}-summary.json"
+        )
         with open(report_path, "w", encoding="utf-8") as f:
             json.dump(report_data, f, indent=2)
         print(f"\n✅ Report generated: {report_path}")
@@ -597,4 +701,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

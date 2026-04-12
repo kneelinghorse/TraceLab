@@ -34,19 +34,41 @@ def upgrade() -> None:
             sa.Column("name", sa.String(length=255), nullable=False),
             sa.Column("description", sa.Text(), nullable=True),
             sa.Column("query_text", sa.Text(), nullable=False),
-            sa.Column("search_mode", sa.String(length=32), nullable=False, server_default="semantic"),
-            sa.Column("filters", sa.JSON(), nullable=False, server_default=sa.text("'{}'::jsonb")),
+            sa.Column(
+                "search_mode",
+                sa.String(length=32),
+                nullable=False,
+                server_default="semantic",
+            ),
+            sa.Column(
+                "filters",
+                sa.JSON(),
+                nullable=False,
+                server_default=sa.text("'{}'::jsonb"),
+            ),
             sa.Column("top_k", sa.Integer(), nullable=False, server_default="5"),
             sa.Column("owner", sa.String(length=128), nullable=False),
             sa.Column("use_count", sa.Integer(), nullable=False, server_default="0"),
             sa.Column("last_used_at", sa.DateTime(), nullable=True),
-            sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
-            sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
+            sa.Column(
+                "created_at",
+                sa.DateTime(),
+                nullable=False,
+                server_default=sa.func.now(),
+            ),
+            sa.Column(
+                "updated_at",
+                sa.DateTime(),
+                nullable=False,
+                server_default=sa.func.now(),
+            ),
             sa.UniqueConstraint("owner", "name", name="uq_saved_search_owner_name"),
         )
         existing_indexes: set[str] = set()
     else:
-        existing_indexes = {index["name"] for index in inspector.get_indexes("saved_searches")}
+        existing_indexes = {
+            index["name"] for index in inspector.get_indexes("saved_searches")
+        }
 
     if "ix_saved_searches_owner_created_at" not in existing_indexes:
         op.create_index(
@@ -62,7 +84,9 @@ def downgrade() -> None:
     if not inspector.has_table("saved_searches"):
         return
 
-    existing_indexes = {index["name"] for index in inspector.get_indexes("saved_searches")}
+    existing_indexes = {
+        index["name"] for index in inspector.get_indexes("saved_searches")
+    }
     if "ix_saved_searches_owner_created_at" in existing_indexes:
         op.drop_index("ix_saved_searches_owner_created_at", table_name="saved_searches")
     op.drop_table("saved_searches")

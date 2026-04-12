@@ -1,13 +1,14 @@
 """Webhook client for DeepSearch callback notifications."""
+
 from __future__ import annotations
 
 import asyncio
 import json
 import logging
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import UUID
 
 import httpx
@@ -26,9 +27,9 @@ class WebhookDeliveryResult:
     """Result of a webhook delivery attempt."""
 
     success: bool
-    status_code: Optional[int] = None
-    response_body: Optional[str] = None
-    error_message: Optional[str] = None
+    status_code: int | None = None
+    response_body: str | None = None
+    error_message: str | None = None
     duration_ms: int = 0
     attempt: int = 1
 
@@ -65,15 +66,17 @@ class WebhookClient:
         *,
         timeout: float = DEFAULT_TIMEOUT,
         max_retries: int = MAX_RETRIES,
-        telemetry_path: Optional[Path] = None,
+        telemetry_path: Path | None = None,
     ) -> None:
         self.timeout = timeout
         self.max_retries = max_retries
         self.stats = WebhookDeliveryStats()
         repo_root = Path(__file__).resolve().parents[2]
-        default_path = repo_root / "cmos" / "telemetry" / "events" / "sprint-11-corrections.jsonl"
+        default_path = (
+            repo_root / "cmos" / "telemetry" / "events" / "sprint-11-corrections.jsonl"
+        )
         self.telemetry_path = telemetry_path or default_path
-        self._dead_letter_queue: List[Dict[str, Any]] = []
+        self._dead_letter_queue: list[dict[str, Any]] = []
 
     async def send_correction_notification(
         self,
@@ -84,7 +87,10 @@ class WebhookClient:
         return await self._send_with_retry(
             callback_url,
             payload.model_dump(mode="json"),
-            context={"mission_uuid": str(payload.mission_uuid), "evidence_id": payload.evidence_id},
+            context={
+                "mission_uuid": str(payload.mission_uuid),
+                "evidence_id": payload.evidence_id,
+            },
         )
 
     async def send_batch_notification(
@@ -102,16 +108,16 @@ class WebhookClient:
     async def _send_with_retry(
         self,
         url: str,
-        payload: Dict[str, Any],
-        context: Optional[Dict[str, str]] = None,
+        payload: dict[str, Any],
+        context: dict[str, str] | None = None,
     ) -> WebhookDeliveryResult:
         """Send webhook with exponential backoff retry."""
         self.stats.total_sent += 1
         backoff = self.INITIAL_BACKOFF
-        last_result: Optional[WebhookDeliveryResult] = None
+        last_result: WebhookDeliveryResult | None = None
 
         for attempt in range(1, self.max_retries + 1):
-            start = datetime.now(timezone.utc)
+            start = datetime.now(UTC)
             try:
                 async with httpx.AsyncClient(timeout=self.timeout) as client:
                     response = await client.post(
@@ -120,11 +126,13 @@ class WebhookClient:
                         headers={
                             "Content-Type": "application/json",
                             "User-Agent": "TraceLab-Webhook-Client/1.0",
-                            "X-TraceLab-Event": payload.get("notification_type", "unknown"),
+                            "X-TraceLab-Event": payload.get(
+                                "notification_type", "unknown"
+                            ),
                         },
                     )
 
-                duration_ms = int((datetime.now(timezone.utc) - start).total_seconds() * 1000)
+                duration_ms = int((datetime.now(UTC) - start).total_seconds() * 1000)
 
                 if response.is_success:
                     self.stats.successful += 1
@@ -149,7 +157,7 @@ class WebhookClient:
                 )
 
             except httpx.TimeoutException as e:
-                duration_ms = int((datetime.now(timezone.utc) - start).total_seconds() * 1000)
+                duration_ms = int((datetime.now(UTC) - start).total_seconds() * 1000)
                 last_result = WebhookDeliveryResult(
                     success=False,
                     error_message=f"Timeout: {e}",
@@ -158,7 +166,7 @@ class WebhookClient:
                 )
 
             except httpx.RequestError as e:
-                duration_ms = int((datetime.now(timezone.utc) - start).total_seconds() * 1000)
+                duration_ms = int((datetime.now(UTC) - start).total_seconds() * 1000)
                 last_result = WebhookDeliveryResult(
                     success=False,
                     error_message=f"Request error: {e}",
@@ -193,25 +201,27 @@ class WebhookClient:
     def _add_to_dead_letter(
         self,
         url: str,
-        payload: Dict[str, Any],
+        payload: dict[str, Any],
         result: WebhookDeliveryResult,
-        context: Optional[Dict[str, str]],
+        context: dict[str, str] | None,
     ) -> None:
         """Add failed webhook to dead letter queue for later inspection."""
-        self._dead_letter_queue.append({
-            "url": url,
-            "payload": payload,
-            "error": result.error_message,
-            "status_code": result.status_code,
-            "attempts": result.attempt,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "context": context or {},
-        })
+        self._dead_letter_queue.append(
+            {
+                "url": url,
+                "payload": payload,
+                "error": result.error_message,
+                "status_code": result.status_code,
+                "attempts": result.attempt,
+                "timestamp": datetime.now(UTC).isoformat(),
+                "context": context or {},
+            }
+        )
         # Keep queue bounded
         if len(self._dead_letter_queue) > 1000:
             self._dead_letter_queue = self._dead_letter_queue[-1000:]
 
-    def get_dead_letter_queue(self) -> List[Dict[str, Any]]:
+    def get_dead_letter_queue(self) -> list[dict[str, Any]]:
         """Return failed webhook deliveries for inspection."""
         return list(self._dead_letter_queue)
 
@@ -224,31 +234,32 @@ class WebhookClient:
     def _log_telemetry(
         self,
         event: str,
-        payload: Dict[str, Any],
+        payload: dict[str, Any],
         result: WebhookDeliveryResult,
-        context: Optional[Dict[str, str]],
+        context: dict[str, str] | None,
     ) -> None:
         """Write telemetry record for Grafana dashboards."""
-        from app.core.telemetry import emit_telemetry
+        record = {
+            "ts": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+            "event": event,
+            "mission_id": payload.get("mission_id", ""),
+            "evidence_id": payload.get("evidence_id"),
+            "notification_type": payload.get("notification_type"),
+            "success": result.success,
+            "status_code": result.status_code,
+            "duration_ms": result.duration_ms,
+            "attempt": result.attempt,
+            "error": result.error_message,
+            "context": context or {},
+        }
+        try:
+            self.telemetry_path.parent.mkdir(parents=True, exist_ok=True)
+            with self.telemetry_path.open("a", encoding="utf-8") as f:
+                f.write(json.dumps(record, ensure_ascii=False) + "\n")
+        except OSError as e:
+            logger.warning("Failed to write webhook telemetry: %s", e)
 
-        emit_telemetry(
-            path=self.telemetry_path,
-            event_type=f"webhook.{event}",
-            source="tracelab",
-            payload={
-                "mission_id": payload.get("mission_id", ""),
-                "evidence_id": payload.get("evidence_id"),
-                "notification_type": payload.get("notification_type"),
-                "success": result.success,
-                "status_code": result.status_code,
-                "duration_ms": result.duration_ms,
-                "attempt": result.attempt,
-                "error": result.error_message,
-                "context": context or {},
-            },
-        )
-
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Return current delivery statistics."""
         return {
             "total_sent": self.stats.total_sent,
@@ -286,7 +297,7 @@ def create_success_payload(
         mission_uuid=mission_uuid,
         mission_id=mission_id,
         evidence_id=evidence_id,
-        timestamp=datetime.now(timezone.utc),
+        timestamp=datetime.now(UTC),
         success=True,
         chunk_id=chunk_id,
         similarity=similarity,
@@ -301,7 +312,7 @@ def create_failure_payload(
     error_type: str,
     error_message: str,
     retry_count: int = 0,
-    best_similarity: Optional[float] = None,
+    best_similarity: float | None = None,
 ) -> WebhookPayload:
     """Create a failure notification payload."""
     return WebhookPayload(
@@ -309,7 +320,7 @@ def create_failure_payload(
         mission_uuid=mission_uuid,
         mission_id=mission_id,
         evidence_id=evidence_id,
-        timestamp=datetime.now(timezone.utc),
+        timestamp=datetime.now(UTC),
         success=False,
         error_type=error_type,
         error_message=error_message,

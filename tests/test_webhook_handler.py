@@ -11,13 +11,12 @@ Note: Some tests require a running PostgreSQL database due to PostgreSQL-specifi
 columns in the schema (content_tsv in document_chunks). Run with:
     DATABASE_URL=postgresql://... pytest tests/test_webhook_handler.py -v
 """
+
 from __future__ import annotations
 
 import hashlib
 import hmac
 import json
-import uuid
-from datetime import datetime
 from unittest.mock import patch
 
 import pytest
@@ -27,21 +26,23 @@ from app.schemas.webhook import (
     DeepSearchWebhookPayload,
     DeepSearchWebhookStatus,
     ExecutionMetadata,
-    WebhookResponse,
 )
 from app.services.webhook_handler import (
     WebhookHandler,
     WebhookValidationError,
-    get_webhook_handler,
 )
+
 
 # Lazy import of Mission model to allow schema tests to run without DB
 def _get_mission_model():
     from app.models.mission import Mission
+
     return Mission
+
 
 def _get_app():
     from app.main import app
+
     return app
 
 
@@ -175,7 +176,9 @@ class TestWebhookSignatureValidation:
         handler = WebhookHandler()
         with patch("app.services.webhook_handler.settings") as mock_settings:
             mock_settings.deepsearch_webhook_secret = "test-secret"
-            with pytest.raises(WebhookValidationError, match="Missing X-DeepSearch-Signature"):
+            with pytest.raises(
+                WebhookValidationError, match="Missing X-DeepSearch-Signature"
+            ):
                 handler.validate_signature(b'{"test": "data"}', None)
 
     def test_validate_signature_invalid_format(self):
@@ -183,7 +186,9 @@ class TestWebhookSignatureValidation:
         handler = WebhookHandler()
         with patch("app.services.webhook_handler.settings") as mock_settings:
             mock_settings.deepsearch_webhook_secret = "test-secret"
-            with pytest.raises(WebhookValidationError, match="Invalid signature format"):
+            with pytest.raises(
+                WebhookValidationError, match="Invalid signature format"
+            ):
                 handler.validate_signature(b'{"test": "data"}', "md5=abc123")
 
     def test_validate_signature_invalid_signature(self):
@@ -191,7 +196,9 @@ class TestWebhookSignatureValidation:
         handler = WebhookHandler()
         with patch("app.services.webhook_handler.settings") as mock_settings:
             mock_settings.deepsearch_webhook_secret = "test-secret"
-            with pytest.raises(WebhookValidationError, match="Invalid webhook signature"):
+            with pytest.raises(
+                WebhookValidationError, match="Invalid webhook signature"
+            ):
                 handler.validate_signature(b'{"test": "data"}', "sha256=wrongsignature")
 
     def test_validate_signature_valid(self):
@@ -236,7 +243,9 @@ class TestWebhookProcessing:
 
     def test_process_complete_webhook(self, db_session):
         """Process successful job completion webhook."""
-        mission = _create_test_mission(db_session, mission_id="COMPLETE-001", status="in_progress")
+        mission = _create_test_mission(
+            db_session, mission_id="COMPLETE-001", status="in_progress"
+        )
 
         handler = WebhookHandler()
         payload = DeepSearchWebhookPayload(
@@ -252,7 +261,9 @@ class TestWebhookProcessing:
             result_protocol={"summary": "Completed successfully"},
         )
 
-        updated_mission, status_msg = handler.process_deepsearch_webhook(db_session, payload)
+        updated_mission, status_msg = handler.process_deepsearch_webhook(
+            db_session, payload
+        )
 
         assert updated_mission.status == "completed"
         assert updated_mission.deepsearch_job_id == "ds-job-complete"
@@ -266,7 +277,9 @@ class TestWebhookProcessing:
 
     def test_process_failed_webhook(self, db_session):
         """Process failed job webhook."""
-        mission = _create_test_mission(db_session, mission_id="FAILED-001", status="in_progress")
+        mission = _create_test_mission(
+            db_session, mission_id="FAILED-001", status="in_progress"
+        )
 
         handler = WebhookHandler()
         payload = DeepSearchWebhookPayload(
@@ -280,7 +293,9 @@ class TestWebhookProcessing:
             error="API rate limit exceeded",
         )
 
-        updated_mission, status_msg = handler.process_deepsearch_webhook(db_session, payload)
+        updated_mission, status_msg = handler.process_deepsearch_webhook(
+            db_session, payload
+        )
 
         assert updated_mission.status == "blocked"
         assert updated_mission.deepsearch_job_id == "ds-job-failed"
@@ -290,7 +305,9 @@ class TestWebhookProcessing:
 
     def test_process_cancelled_webhook(self, db_session):
         """Process cancelled job webhook."""
-        mission = _create_test_mission(db_session, mission_id="CANCEL-001", status="in_progress")
+        mission = _create_test_mission(
+            db_session, mission_id="CANCEL-001", status="in_progress"
+        )
 
         handler = WebhookHandler()
         payload = DeepSearchWebhookPayload(
@@ -300,7 +317,9 @@ class TestWebhookProcessing:
             error="User requested cancellation",
         )
 
-        updated_mission, status_msg = handler.process_deepsearch_webhook(db_session, payload)
+        updated_mission, status_msg = handler.process_deepsearch_webhook(
+            db_session, payload
+        )
 
         assert updated_mission.status == "cancelled"
         assert updated_mission.deepsearch_job_id == "ds-job-cancelled"
@@ -338,7 +357,9 @@ class TestWebhookProcessing:
             result_markdown="New content that should NOT be saved",
         )
 
-        updated_mission, status_msg = handler.process_deepsearch_webhook(db_session, payload)
+        updated_mission, status_msg = handler.process_deepsearch_webhook(
+            db_session, payload
+        )
 
         assert status_msg == "already_processed"
         # Content should not be updated
@@ -360,14 +381,18 @@ class TestWebhookProcessing:
             status=DeepSearchWebhookStatus.COMPLETE,
         )
 
-        updated_mission, status_msg = handler.process_deepsearch_webhook(db_session, payload)
+        updated_mission, status_msg = handler.process_deepsearch_webhook(
+            db_session, payload
+        )
 
         assert status_msg == "already_processed"
         assert updated_mission.status == "cancelled"
 
     def test_process_webhook_clears_previous_error(self, db_session):
         """Successful webhook clears previous error message."""
-        mission = _create_test_mission(db_session, mission_id="CLEAR-ERROR-001", status="blocked")
+        mission = _create_test_mission(
+            db_session, mission_id="CLEAR-ERROR-001", status="blocked"
+        )
         mission.error_message = "Previous error"
         db_session.commit()
 
@@ -379,7 +404,9 @@ class TestWebhookProcessing:
             result_markdown="# Success",
         )
 
-        updated_mission, status_msg = handler.process_deepsearch_webhook(db_session, payload)
+        updated_mission, status_msg = handler.process_deepsearch_webhook(
+            db_session, payload
+        )
 
         assert updated_mission.status == "completed"
         assert updated_mission.error_message is None
@@ -533,7 +560,9 @@ class TestWebhookFailedStatus:
 
     def test_failed_without_error_message(self, db_session):
         """Failed webhook without error uses default message."""
-        mission = _create_test_mission(db_session, mission_id="FAIL-NO-MSG", status="in_progress")
+        mission = _create_test_mission(
+            db_session, mission_id="FAIL-NO-MSG", status="in_progress"
+        )
 
         handler = WebhookHandler()
         payload = DeepSearchWebhookPayload(
@@ -550,7 +579,9 @@ class TestWebhookFailedStatus:
 
     def test_failed_preserves_partial_results(self, db_session):
         """Failed webhook can still have partial execution_metadata."""
-        mission = _create_test_mission(db_session, mission_id="FAIL-PARTIAL", status="in_progress")
+        mission = _create_test_mission(
+            db_session, mission_id="FAIL-PARTIAL", status="in_progress"
+        )
 
         handler = WebhookHandler()
         payload = DeepSearchWebhookPayload(
@@ -576,7 +607,9 @@ class TestWebhookEdgeCases:
 
     def test_empty_execution_metadata(self, db_session):
         """Webhook with no execution_metadata uses empty dict."""
-        mission = _create_test_mission(db_session, mission_id="EMPTY-META", status="in_progress")
+        mission = _create_test_mission(
+            db_session, mission_id="EMPTY-META", status="in_progress"
+        )
 
         handler = WebhookHandler()
         payload = DeepSearchWebhookPayload(
@@ -593,7 +626,9 @@ class TestWebhookEdgeCases:
 
     def test_large_result_markdown(self, db_session):
         """Webhook with large markdown content is stored correctly."""
-        mission = _create_test_mission(db_session, mission_id="LARGE-MD", status="in_progress")
+        mission = _create_test_mission(
+            db_session, mission_id="LARGE-MD", status="in_progress"
+        )
 
         large_markdown = "# Results\n\n" + ("Lorem ipsum dolor sit amet. " * 1000)
 
@@ -612,7 +647,9 @@ class TestWebhookEdgeCases:
 
     def test_complex_result_protocol(self, db_session):
         """Webhook with complex nested result_protocol."""
-        mission = _create_test_mission(db_session, mission_id="COMPLEX-PROTO", status="in_progress")
+        mission = _create_test_mission(
+            db_session, mission_id="COMPLEX-PROTO", status="in_progress"
+        )
 
         complex_protocol = {
             "findings": [
@@ -639,4 +676,7 @@ class TestWebhookEdgeCases:
         updated_mission, _ = handler.process_deepsearch_webhook(db_session, payload)
 
         assert updated_mission.result_protocol["findings"][0]["confidence"] == 0.95
-        assert updated_mission.result_protocol["metadata"]["nested"]["deeply"]["nested"] == "value"
+        assert (
+            updated_mission.result_protocol["metadata"]["nested"]["deeply"]["nested"]
+            == "value"
+        )

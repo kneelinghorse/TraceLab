@@ -7,6 +7,7 @@ Validates:
 4. Mission status change events emitted correctly
 5. Event serialization to SSE format
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -33,6 +34,7 @@ from app.main import app
 def _reset_event_bus():
     """Reset the singleton event bus between tests."""
     import app.core.mission_events as mod
+
     mod._event_bus = None
     yield
     mod._event_bus = None
@@ -73,11 +75,13 @@ class TestMissionEventBus:
     def test_history_respects_max_size(self):
         bus = MissionEventBus(max_history=3)
         for i in range(5):
-            bus.emit(MissionEvent(
-                event_type=MissionEventType.MISSION_QUEUED.value,
-                timestamp=f"2026-03-12T00:00:0{i}Z",
-                mission_id=f"test-{i}",
-            ))
+            bus.emit(
+                MissionEvent(
+                    event_type=MissionEventType.MISSION_QUEUED.value,
+                    timestamp=f"2026-03-12T00:00:0{i}Z",
+                    mission_id=f"test-{i}",
+                )
+            )
         events = bus.get_recent_events()
         assert len(events) == 3
         assert events[0].mission_id == "test-2"
@@ -85,11 +89,13 @@ class TestMissionEventBus:
     def test_get_recent_events_limit(self):
         bus = MissionEventBus()
         for i in range(10):
-            bus.emit(MissionEvent(
-                event_type=MissionEventType.MISSION_QUEUED.value,
-                timestamp=f"2026-03-12T00:00:{i:02d}Z",
-                mission_id=f"test-{i}",
-            ))
+            bus.emit(
+                MissionEvent(
+                    event_type=MissionEventType.MISSION_QUEUED.value,
+                    timestamp=f"2026-03-12T00:00:{i:02d}Z",
+                    mission_id=f"test-{i}",
+                )
+            )
         events = bus.get_recent_events(limit=3)
         assert len(events) == 3
         assert events[-1].mission_id == "test-9"
@@ -241,7 +247,9 @@ class TestSSEEndpoint:
 
         # Build a mock credentials=None (simulating EventSource — no header)
         user = asyncio.get_event_loop().run_until_complete(
-            require_authenticated_user_sse(credentials=None, x_api_key=None, token=auth_token)
+            require_authenticated_user_sse(
+                credentials=None, x_api_key=None, token=auth_token
+            )
         )
         assert user is not None
         assert user.display_name is not None
@@ -255,7 +263,9 @@ class TestSSEEndpoint:
     def test_sse_stream_rejects_invalid_token(self):
         """SSE stream should reject an invalid JWT query param."""
         with TestClient(app, raise_server_exceptions=False) as c:
-            with c.stream("GET", "/api/v1/missions/events/stream?token=bogus.jwt.token") as resp:
+            with c.stream(
+                "GET", "/api/v1/missions/events/stream?token=bogus.jwt.token"
+            ) as resp:
                 assert resp.status_code == 401
 
     def test_recent_events_rejects_missing_auth(self):

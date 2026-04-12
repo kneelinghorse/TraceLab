@@ -1,7 +1,6 @@
 """Coverage for the project/document read APIs."""
-from __future__ import annotations
 
-from typing import List
+from __future__ import annotations
 
 import pytest
 from fastapi.testclient import TestClient
@@ -19,8 +18,8 @@ def client():
         yield test_client
 
 
-def _create_projects(db_session, names: List[str]) -> List[Project]:
-    projects: List[Project] = []
+def _create_projects(db_session, names: list[str]) -> list[Project]:
+    projects: list[Project] = []
     for name in names:
         project = Project(name=name)
         db_session.add(project)
@@ -48,7 +47,9 @@ def _create_document(db_session, project_id, name, *, processed=False):
 
 
 def test_projects_list_and_detail(client: TestClient, db_session, auth_headers):
-    projects = _create_projects(db_session, ["Deep Dive", "Field Study", "Quant Sprint"])
+    projects = _create_projects(
+        db_session, ["Deep Dive", "Field Study", "Quant Sprint"]
+    )
 
     first_page = client.get("/api/v1/projects?page=1&page_size=2", headers=auth_headers)
     assert first_page.status_code == 200
@@ -74,13 +75,19 @@ def test_documents_list_filters(client: TestClient, db_session, auth_headers):
     _create_document(db_session, project_a.id, "Discovery Notes", processed=False)
     _create_document(db_session, project_b.id, "Competitive Matrix", processed=True)
 
-    project_filtered = client.get(f"/api/v1/documents?project_id={project_a.id}", headers=auth_headers)
+    project_filtered = client.get(
+        f"/api/v1/documents?project_id={project_a.id}", headers=auth_headers
+    )
     assert project_filtered.status_code == 200
     project_payload = project_filtered.json()
     assert project_payload["pagination"]["total"] == 2
-    assert all(entry["project_id"] == str(project_a.id) for entry in project_payload["data"])
+    assert all(
+        entry["project_id"] == str(project_a.id) for entry in project_payload["data"]
+    )
 
-    processed_only = client.get("/api/v1/documents?processed=true", headers=auth_headers)
+    processed_only = client.get(
+        "/api/v1/documents?processed=true", headers=auth_headers
+    )
     assert processed_only.status_code == 200
     processed_payload = processed_only.json()
     assert processed_payload["pagination"]["total"] == 2

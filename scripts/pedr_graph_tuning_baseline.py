@@ -5,6 +5,7 @@ This script samples recent search history entries, runs them through the PEDR
 orchestrator with graph telemetry enabled, and writes events to a JSONL file
 for tuning analysis.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -135,7 +136,9 @@ def load_queries_from_history(
         session.close()
 
 
-def bucket_specs_by_intent(specs: Sequence[QuerySpec]) -> Dict[QueryIntent, List[QuerySpec]]:
+def bucket_specs_by_intent(
+    specs: Sequence[QuerySpec],
+) -> Dict[QueryIntent, List[QuerySpec]]:
     pragmatic = get_pragmatic_service()
     buckets: Dict[QueryIntent, List[QuerySpec]] = {intent: [] for intent in QueryIntent}
     for spec in specs:
@@ -391,7 +394,11 @@ def main() -> int:
         query_text = normalize_query(spec.query)
         if len(query_text) < args.min_length:
             continue
-        filtered.append(QuerySpec(query=query_text, filters=spec.filters, search_mode=spec.search_mode))
+        filtered.append(
+            QuerySpec(
+                query=query_text, filters=spec.filters, search_mode=spec.search_mode
+            )
+        )
 
     if not args.no_dedupe:
         filtered = dedupe_specs(filtered)

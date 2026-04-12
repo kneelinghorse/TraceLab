@@ -1,8 +1,9 @@
 """Search history endpoints for listing and replaying queries."""
+
 from __future__ import annotations
 
 from datetime import date
-from typing import Any, Optional
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -11,7 +12,11 @@ from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.search_history import SearchHistory
 from app.schemas.rag import RagResponse
 from app.schemas.retrieval import RetrievalResponse, RetrievedChunk
-from app.schemas.search_history import SearchHistoryEntry, SearchHistoryListResponse, SearchReplayResponse
+from app.schemas.search_history import (
+    SearchHistoryEntry,
+    SearchHistoryListResponse,
+    SearchReplayResponse,
+)
 from app.services.rag_service import get_rag_service
 from app.services.retrieval_service import get_retrieval_service
 from app.services.search_history import SearchHistoryService, get_search_history_service
@@ -27,7 +32,9 @@ def list_search_history(
 ) -> SearchHistoryListResponse:
     """Return the most recent search entries plus retention metadata."""
     entries = [_serialize_entry(item) for item in service.list_history(limit=limit)]
-    return SearchHistoryListResponse(entries=entries, retention=service.retention_policy())
+    return SearchHistoryListResponse(
+        entries=entries, retention=service.retention_policy()
+    )
 
 
 @router.delete("/search/history")
@@ -90,7 +97,9 @@ async def replay_search(
         date_to=date_to,
         tags=tags,
     )
-    semantic_payload = RetrievalResponse(results=[RetrievedChunk.model_validate(item) for item in semantic_results])
+    semantic_payload = RetrievalResponse(
+        results=[RetrievedChunk.model_validate(item) for item in semantic_results]
+    )
 
     metadata = dict(entry.metadata_payload or {})
     metadata["replay_of"] = str(entry.id)
@@ -103,7 +112,9 @@ async def replay_search(
         duration_ms=rag_payload.latency_ms,
         cache_hit=rag_payload.cache.hit,
         executed_by=current_user.username,
-        top_chunks=[chunk.chunk_id for chunk in rag_payload.sources[:5] if chunk.chunk_id],
+        top_chunks=[
+            chunk.chunk_id for chunk in rag_payload.sources[:5] if chunk.chunk_id
+        ],
         metadata=metadata,
     )
 
@@ -132,14 +143,14 @@ def _serialize_entry(entry: SearchHistory) -> SearchHistoryEntry:
     )
 
 
-def _normalize_string(value: Optional[Any]) -> Optional[str]:
+def _normalize_string(value: Any | None) -> str | None:
     if value is None:
         return None
     text = str(value).strip()
     return text or None
 
 
-def _normalize_sequence(value: Optional[Any]) -> list[str]:
+def _normalize_sequence(value: Any | None) -> list[str]:
     if value is None:
         return []
     if isinstance(value, (list, tuple)):
@@ -148,7 +159,7 @@ def _normalize_sequence(value: Optional[Any]) -> list[str]:
     return [text] if text else []
 
 
-def _parse_date(value: Optional[Any]) -> Optional[date]:
+def _parse_date(value: Any | None) -> date | None:
     if not value:
         return None
     if isinstance(value, date):

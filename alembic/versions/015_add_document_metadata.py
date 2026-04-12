@@ -7,6 +7,7 @@ Create Date: 2024-12-06
 Adds a JSON column for storing arbitrary metadata like mission_id,
 deepsearch_job_id for auto-ingested documents.
 """
+
 from alembic import op
 import sqlalchemy as sa
 

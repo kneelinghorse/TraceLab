@@ -24,6 +24,7 @@ Usage:
     # Adjust runs per query for statistical significance
     python scripts/pedr_latency_benchmark.py --runs 5
 """
+
 from __future__ import annotations
 
 import argparse
@@ -63,6 +64,7 @@ DEFAULT_TOP_K = 10
 @dataclass
 class LayerTimings:
     """Per-query layer timing breakdown."""
+
     lexical_ms: float = 0.0
     semantic_ms: float = 0.0
     syntactic_ms: float = 0.0
@@ -76,6 +78,7 @@ class LayerTimings:
 @dataclass
 class QueryResult:
     """Single query benchmark result."""
+
     query: str
     runs: int
     latencies_ms: List[float] = field(default_factory=list)
@@ -94,6 +97,7 @@ class QueryResult:
 @dataclass
 class BenchmarkResult:
     """Complete benchmark results."""
+
     timestamp: str
     sprint: str
     benchmark_type: str
@@ -273,7 +277,9 @@ def run_benchmark(
                         relational_ms=timings.get("relational_ms", 0.0),
                         total_ms=timings.get("total_ms", 0.0),
                     )
-                    query_result.result_count = metadata.get("result_count", len(last_response.get("results", [])))
+                    query_result.result_count = metadata.get(
+                        "result_count", len(last_response.get("results", []))
+                    )
                     query_result.intent = metadata.get("intent")
                     query_result.detected_type = metadata.get("detected_type")
 
@@ -424,7 +430,9 @@ def compare_to_baseline(
 
     # Extract baseline P50 - handle both old and new format
     baseline_summary = baseline.get("summary", baseline.get("aggregate", {}))
-    baseline_p50 = baseline_summary.get("latency_p50_ms") or baseline_summary.get("p50_ms") or 0
+    baseline_p50 = (
+        baseline_summary.get("latency_p50_ms") or baseline_summary.get("p50_ms") or 0
+    )
 
     current_p50 = current.aggregate.get("p50_ms", 0)
     current_p95 = current.aggregate.get("p95_ms", 0)
@@ -444,7 +452,9 @@ def compare_to_baseline(
         "baseline_source": baseline_path,
         "baseline_timestamp": baseline_summary.get("capture_timestamp", "unknown"),
         "baseline_p50_ms": baseline_p50,
-        "baseline_mean_ms": baseline_summary.get("latency_mean_ms") or baseline_summary.get("mean_ms") or 0,
+        "baseline_mean_ms": baseline_summary.get("latency_mean_ms")
+        or baseline_summary.get("mean_ms")
+        or 0,
         "current_p50_ms": current_p50,
         "current_p95_ms": current_p95,
         "current_mean_ms": current.aggregate.get("mean_ms", 0),
@@ -457,7 +467,8 @@ def compare_to_baseline(
             "p95_target_met": current_p95 < target_p95,
             "improvement_target_met": improvement_pct >= target_improvement,
         },
-        "regression_alert": current_p50 > baseline_p50 * 1.1,  # 10% regression threshold
+        "regression_alert": current_p50
+        > baseline_p50 * 1.1,  # 10% regression threshold
     }
 
 
@@ -503,21 +514,25 @@ def main() -> int:
         epilog=__doc__,
     )
     parser.add_argument(
-        "--output", "-o",
+        "--output",
+        "-o",
         help="Output JSON file path for results",
     )
     parser.add_argument(
-        "--compare", "-c",
+        "--compare",
+        "-c",
         help="Baseline JSON file to compare against",
     )
     parser.add_argument(
-        "--runs", "-r",
+        "--runs",
+        "-r",
         type=int,
         default=3,
         help="Number of runs per query (default: 3)",
     )
     parser.add_argument(
-        "--mode", "-m",
+        "--mode",
+        "-m",
         choices=["full", "hybrid"],
         default="full",
         help="PEDR rerank mode: full (5-layer) or hybrid (FTS+semantic)",
@@ -540,7 +555,8 @@ def main() -> int:
         help="HNSW ef parameter for Qdrant (default: 128)",
     )
     parser.add_argument(
-        "--quiet", "-q",
+        "--quiet",
+        "-q",
         action="store_true",
         help="Suppress progress output",
     )
@@ -590,11 +606,15 @@ def main() -> int:
             status = "PASS" if targets["p95_target_met"] else "FAIL"
             print(f"    P95 < {targets['p95_target_ms']}ms:       [{status}]")
             status = "PASS" if targets["improvement_target_met"] else "FAIL"
-            print(f"    Improvement >= {targets['improvement_target_pct']}%:  [{status}]")
+            print(
+                f"    Improvement >= {targets['improvement_target_pct']}%:  [{status}]"
+            )
 
             if comparison["regression_alert"]:
                 print()
-                print("  WARNING: Regression detected! Current P50 is >10% worse than baseline.")
+                print(
+                    "  WARNING: Regression detected! Current P50 is >10% worse than baseline."
+                )
         elif not args.quiet and "error" in comparison:
             print(f"  Comparison error: {comparison['error']}")
 

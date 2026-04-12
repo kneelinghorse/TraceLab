@@ -1,8 +1,9 @@
 """Utilities for Mission Protocol YAML import/export workflows."""
+
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import yaml
 
@@ -36,7 +37,9 @@ def load_mission_yaml_file(
     return load_mission_yaml(text, promote=promote)
 
 
-def dump_mission_yaml(payload: MissionProtocolDraft | MissionProtocolComplete | Dict[str, Any]) -> str:
+def dump_mission_yaml(
+    payload: MissionProtocolDraft | MissionProtocolComplete | dict[str, Any],
+) -> str:
     """Serialise a Mission Protocol payload into YAML text."""
 
     if isinstance(payload, (MissionProtocolDraft, MissionProtocolComplete)):
@@ -47,7 +50,7 @@ def dump_mission_yaml(payload: MissionProtocolDraft | MissionProtocolComplete | 
 
 
 def dump_mission_yaml_file(
-    payload: MissionProtocolDraft | MissionProtocolComplete | Dict[str, Any],
+    payload: MissionProtocolDraft | MissionProtocolComplete | dict[str, Any],
     path: Path,
     *,
     encoding: str = "utf-8",
@@ -55,4 +58,3 @@ def dump_mission_yaml_file(
     """Write Mission Protocol payload to a YAML file on disk."""
 
     path.write_text(dump_mission_yaml(payload), encoding=encoding)
-

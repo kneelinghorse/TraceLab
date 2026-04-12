@@ -3,10 +3,10 @@
 Handles incoming webhooks from DeepSearch and other services.
 These endpoints use signature-based authentication rather than JWT.
 """
+
 from __future__ import annotations
 
 import logging
-from typing import Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from fastapi import status as http_status
@@ -65,8 +65,8 @@ async def receive_deepsearch_webhook(
     request: Request,
     payload: DeepSearchWebhookPayload,
     db: Session = Depends(get_db),
-    x_deepsearch_signature: Optional[str] = Header(None),
-    x_deepsearch_timestamp: Optional[str] = Header(None),
+    x_deepsearch_signature: str | None = Header(None),
+    x_deepsearch_timestamp: str | None = Header(None),
     handler: WebhookHandler = Depends(get_webhook_handler),
 ) -> WebhookResponse:
     """Process incoming DeepSearch webhook.
@@ -99,7 +99,9 @@ async def receive_deepsearch_webhook(
             received=True,
             mission_id=mission.mission_id,
             status=mission.status,
-            message=f"Mission {status_message}" if status_message != "already_processed" else "Webhook already processed (idempotent)",
+            message=f"Mission {status_message}"
+            if status_message != "already_processed"
+            else "Webhook already processed (idempotent)",
         )
 
     except MissionNotFoundError as exc:

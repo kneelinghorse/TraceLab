@@ -16,7 +16,9 @@ def projects():
 
 @projects.command()
 @click.option("--page", default=1, show_default=True, type=int, help="Page number")
-@click.option("--page-size", default=20, show_default=True, type=int, help="Results per page")
+@click.option(
+    "--page-size", default=20, show_default=True, type=int, help="Results per page"
+)
 @click.option("--search", help="Filter by project name")
 @click.pass_obj
 def list(ctx, page, page_size, search):
@@ -77,7 +79,11 @@ def get(ctx, project_id):
 @projects.command()
 @click.option("--name", required=True, help="Project name")
 @click.option("--description", help="Project description")
-@click.option("--research-type", type=click.Choice(["strategic", "tactical", "generative", "evaluative"]), help="Research type")
+@click.option(
+    "--research-type",
+    type=click.Choice(["strategic", "tactical", "generative", "evaluative"]),
+    help="Research type",
+)
 @click.pass_obj
 def create(ctx, name, description, research_type):
     """Create a new project."""
@@ -149,7 +155,9 @@ def delete(ctx, project_id, confirm):
     """Delete a project."""
     try:
         if not confirm and not ctx.json_mode:
-            click.confirm(f"Are you sure you want to delete project {project_id}?", abort=True)
+            click.confirm(
+                f"Are you sure you want to delete project {project_id}?", abort=True
+            )
 
         client = APIClient(base_url=ctx.api_url, token=ctx.token)
         client.delete(f"/api/v1/projects/{project_id}")

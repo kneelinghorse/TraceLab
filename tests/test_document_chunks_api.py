@@ -1,12 +1,13 @@
 """Tests for the document chunks API endpoint."""
+
 from __future__ import annotations
 
 import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.models.document import Document
 from app.models.chunk import DocumentChunk
+from app.models.document import Document
 from app.models.project import Project
 
 
@@ -41,7 +42,9 @@ def _create_document(db_session, project_id, name, *, processed=True, chunked=Tr
     return document
 
 
-def _create_chunk(db_session, document_id, chunk_index: int, content: str, token_count: int = 50):
+def _create_chunk(
+    db_session, document_id, chunk_index: int, content: str, token_count: int = 50
+):
     chunk = DocumentChunk(
         document_id=document_id,
         chunk_index=chunk_index,
@@ -62,14 +65,18 @@ def test_list_document_chunks_empty(client: TestClient, db_session, auth_headers
     project = _create_project(db_session, "Test Project")
     document = _create_document(db_session, project.id, "Empty Doc", chunked=False)
 
-    response = client.get(f"/api/v1/documents/{document.id}/chunks", headers=auth_headers)
+    response = client.get(
+        f"/api/v1/documents/{document.id}/chunks", headers=auth_headers
+    )
     assert response.status_code == 200
     payload = response.json()
     assert payload["pagination"]["total"] == 0
     assert payload["data"] == []
 
 
-def test_list_document_chunks_with_content(client: TestClient, db_session, auth_headers):
+def test_list_document_chunks_with_content(
+    client: TestClient, db_session, auth_headers
+):
     """Test listing chunks for a document with chunks."""
     project = _create_project(db_session, "Test Project")
     document = _create_document(db_session, project.id, "Chunked Doc")
@@ -78,7 +85,9 @@ def test_list_document_chunks_with_content(client: TestClient, db_session, auth_
     _create_chunk(db_session, document.id, 1, "Second chunk content", 52)
     _create_chunk(db_session, document.id, 2, "Third chunk content", 48)
 
-    response = client.get(f"/api/v1/documents/{document.id}/chunks", headers=auth_headers)
+    response = client.get(
+        f"/api/v1/documents/{document.id}/chunks", headers=auth_headers
+    )
     assert response.status_code == 200
     payload = response.json()
 
@@ -143,19 +152,24 @@ def test_list_document_chunks_pagination(client: TestClient, db_session, auth_he
 def test_list_document_chunks_not_found(client: TestClient, db_session, auth_headers):
     """Test 404 for non-existent document."""
     import uuid
+
     fake_id = uuid.uuid4()
     response = client.get(f"/api/v1/documents/{fake_id}/chunks", headers=auth_headers)
     assert response.status_code == 404
     assert "not found" in response.json()["detail"]
 
 
-def test_list_document_chunks_includes_metadata(client: TestClient, db_session, auth_headers):
+def test_list_document_chunks_includes_metadata(
+    client: TestClient, db_session, auth_headers
+):
     """Test that chunk response includes all expected fields."""
     project = _create_project(db_session, "Test Project")
     document = _create_document(db_session, project.id, "Metadata Test Doc")
     chunk = _create_chunk(db_session, document.id, 0, "Test content", 60)
 
-    response = client.get(f"/api/v1/documents/{document.id}/chunks", headers=auth_headers)
+    response = client.get(
+        f"/api/v1/documents/{document.id}/chunks", headers=auth_headers
+    )
     assert response.status_code == 200
     payload = response.json()
 

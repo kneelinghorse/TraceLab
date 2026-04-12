@@ -4,12 +4,12 @@ These tests verify the MCP tool definitions and handlers without requiring
 database access. For integration tests that require the database, see
 test_mcp_missions.py.
 """
+
 from __future__ import annotations
 
 import asyncio
-import json
-from unittest.mock import MagicMock, patch
 from datetime import datetime
+from unittest.mock import MagicMock
 
 
 class TestMissionToolDefinitions:
@@ -39,7 +39,12 @@ class TestMissionToolDefinitions:
         assert "title" in schema["properties"]
         assert "objective" in schema["properties"]
         assert "success_criteria" in schema["properties"]
-        assert schema["required"] == ["mission_id", "title", "objective", "success_criteria"]
+        assert schema["required"] == [
+            "mission_id",
+            "title",
+            "objective",
+            "success_criteria",
+        ]
 
     def test_list_missions_tool_schema(self):
         """list_missions tool has correct schema."""
@@ -148,6 +153,7 @@ class TestMCPServerIntegration:
     def test_register_mission_tools(self):
         """Mission tools can be registered with server."""
         from mcp.server import Server
+
         from app.mcp_server.tools.missions import register_mission_tools
 
         server = Server("test-server")
@@ -160,7 +166,7 @@ class TestToolHandlerDispatch:
 
     def test_tool_handlers_exist(self):
         """All tools have corresponding handlers."""
-        from app.mcp_server.tools.missions import TOOL_HANDLERS, MISSION_TOOLS
+        from app.mcp_server.tools.missions import MISSION_TOOLS, TOOL_HANDLERS
 
         tool_names = [t.name for t in MISSION_TOOLS]
         for name in tool_names:
@@ -175,7 +181,7 @@ class TestToolHandlerDispatch:
 
     def test_handler_count_matches_tools(self):
         """Number of handlers matches number of tools."""
-        from app.mcp_server.tools.missions import TOOL_HANDLERS, MISSION_TOOLS
+        from app.mcp_server.tools.missions import MISSION_TOOLS, TOOL_HANDLERS
 
         assert len(TOOL_HANDLERS) == len(MISSION_TOOLS)
 
@@ -224,8 +230,9 @@ class TestSerializeMission:
 
     def test_serialize_mission_with_results(self):
         """Serialize mission with results."""
-        from app.mcp_server.tools.missions import _serialize_mission
         import uuid
+
+        from app.mcp_server.tools.missions import _serialize_mission
 
         doc_id = str(uuid.uuid4())
         report_id = str(uuid.uuid4())
@@ -311,13 +318,15 @@ class TestMCPModuleExports:
     def test_mcp_init_exports(self):
         """MCP __init__ exports create_mcp_server."""
         from app.mcp_server import create_mcp_server
+
         assert callable(create_mcp_server)
 
     def test_tools_init_exports(self):
         """Tools __init__ exports missions module."""
         from app.mcp_server.tools import missions
-        assert hasattr(missions, 'MISSION_TOOLS')
-        assert hasattr(missions, 'TOOL_HANDLERS')
+
+        assert hasattr(missions, "MISSION_TOOLS")
+        assert hasattr(missions, "TOOL_HANDLERS")
 
 
 class TestToolSchemaConstraints:

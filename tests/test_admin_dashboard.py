@@ -1,11 +1,11 @@
 """Tests for the admin dashboard metrics endpoints and aggregator."""
+
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
-import json
-from datetime import datetime, timezone, timedelta
 import pytest
 from fastapi.testclient import TestClient
 
@@ -75,7 +75,10 @@ class _FakeQdrantClient:
         return SimpleNamespace(collections=[SimpleNamespace(name="research_chunks")])
 
     def get_collection(self, name: str):
-        return SimpleNamespace(vectors_count=128, payload_schema={"project_id": {}, "document_id": {}, "source_type": {}})
+        return SimpleNamespace(
+            vectors_count=128,
+            payload_schema={"project_id": {}, "document_id": {}, "source_type": {}},
+        )
 
 
 class _FakeQdrantService:
@@ -86,10 +89,9 @@ class _FakeQdrantService:
 
 
 def _write_events(path: Path) -> None:
-    now = datetime.now(timezone.utc)
     rows = [
         {
-            "ts": (now - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "ts": "2025-11-15T12:00:00Z",
             "model": "gpt-5.2",
             "route": "primary",
             "cost_usd": 0.4,
@@ -98,7 +100,7 @@ def _write_events(path: Path) -> None:
             "project_id": "demo",
         },
         {
-            "ts": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "ts": "2025-11-15T13:00:00Z",
             "model": "text-embedding-3-large",
             "route": "embedding",
             "cost_usd": 0.05,
@@ -128,7 +130,10 @@ def test_metrics_aggregator_generates_sections(tmp_path):
     assert payload["cost_overview"]["periods"]["today"] == pytest.approx(0.45)
     assert payload["cache_performance"]["aggregate"]["ttl_cache_count"] == 2
     assert payload["query_performance"]["p50_latency_ms"] > 0
-    assert payload["system_health"]["qdrant"]["status"] in {"healthy", "collection_missing"}
+    assert payload["system_health"]["qdrant"]["status"] in {
+        "healthy",
+        "collection_missing",
+    }
     assert payload["export_rows"]
 
 
@@ -161,11 +166,20 @@ class _StubAggregator:
             "system_health": {
                 "database": {"status": "healthy", "tables": 1, "indexes": 0},
                 "qdrant": {"status": "healthy", "vectors_count": 10},
-                "telemetry": {"events_available": 2, "last_event": "2025-11-15T12:00:00Z"},
+                "telemetry": {
+                    "events_available": 2,
+                    "last_event": "2025-11-15T12:00:00Z",
+                },
                 "cache": {"semantic_cache_hit_rate": 0.5, "ttl_cache_count": 1},
             },
             "export_rows": [
-                {"category": "costs", "metric": "today_cost_usd", "value": 1.0, "unit": "USD", "notes": None}
+                {
+                    "category": "costs",
+                    "metric": "today_cost_usd",
+                    "value": 1.0,
+                    "unit": "USD",
+                    "notes": None,
+                }
             ],
         }
 
@@ -191,16 +205,22 @@ def override_dashboard():
 
 def _auth_headers(client: TestClient) -> dict:
     from tests.conftest import get_seed_user_email
+
     response = client.post(
         "/api/v1/auth/login",
-        json={"email": get_seed_user_email(), "password": settings.auth_password or "changeme"},
+        json={
+            "email": get_seed_user_email(),
+            "password": settings.auth_password or "changeme",
+        },
     )
     assert response.status_code == 200, response.text
     token = response.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
 
 
-def test_dashboard_data_endpoint_returns_stub_payload(client: TestClient, override_dashboard):
+def test_dashboard_data_endpoint_returns_stub_payload(
+    client: TestClient, override_dashboard
+):
     headers = _auth_headers(client)
     response = client.get("/api/v1/admin/dashboard/data", headers=headers)
     assert response.status_code == 200

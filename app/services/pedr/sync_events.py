@@ -3,17 +3,18 @@
 Emits sync events when entities change status, enabling <30s latency from
 mission completion to PEDR availability.
 """
+
 from __future__ import annotations
 
 import asyncio
 import json
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set
-from weakref import WeakSet
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -38,11 +39,11 @@ class SyncEvent:
     event_type: SyncEventType
     entity_id: str
     entity_type: str  # mission | document | insight
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
+    metadata: dict[str, Any] = field(default_factory=dict)
     priority: int = 1  # 1 = normal, 0 = high priority
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
             "event_type": self.event_type.value,
@@ -70,11 +71,11 @@ class SyncEventEmitter:
         self,
         *,
         max_queue_size: int = 1000,
-        telemetry_path: Optional[Path] = None,
+        telemetry_path: Path | None = None,
     ) -> None:
-        self._handlers: Dict[SyncEventType, Set[SyncEventHandler]] = {}
-        self._async_handlers: Dict[SyncEventType, Set[AsyncSyncEventHandler]] = {}
-        self._event_queue: List[SyncEvent] = []
+        self._handlers: dict[SyncEventType, set[SyncEventHandler]] = {}
+        self._async_handlers: dict[SyncEventType, set[AsyncSyncEventHandler]] = {}
+        self._event_queue: list[SyncEvent] = []
         self._max_queue_size = max_queue_size
         self._telemetry_path = telemetry_path
         self._processing = False
@@ -182,7 +183,7 @@ class SyncEventEmitter:
         self._event_queue.sort(key=lambda e: e.priority)
         return True
 
-    def process_queue(self, max_events: Optional[int] = None) -> int:
+    def process_queue(self, max_events: int | None = None) -> int:
         """Process queued events synchronously.
 
         Args:
@@ -210,7 +211,7 @@ class SyncEventEmitter:
 
         return processed
 
-    async def process_queue_async(self, max_events: Optional[int] = None) -> int:
+    async def process_queue_async(self, max_events: int | None = None) -> int:
         """Process queued events asynchronously."""
         if self._processing:
             return 0
@@ -240,7 +241,9 @@ class SyncEventEmitter:
         """Log event to telemetry."""
         from app.core.telemetry import emit_telemetry
 
-        logger.info(f"Sync event: {event.event_type.value} for {event.entity_type}:{event.entity_id}")
+        logger.info(
+            f"Sync event: {event.event_type.value} for {event.entity_type}:{event.entity_id}"
+        )
 
         if not self._telemetry_path:
             return
@@ -266,7 +269,7 @@ def emit_mission_completed(
     emitter: SyncEventEmitter,
     mission_id: str,
     *,
-    project_id: Optional[str] = None,
+    project_id: str | None = None,
     status: str = "complete",
 ) -> None:
     """Emit a mission completed event."""
@@ -287,8 +290,8 @@ def emit_mission_updated(
     emitter: SyncEventEmitter,
     mission_id: str,
     *,
-    project_id: Optional[str] = None,
-    changes: Optional[Dict[str, Any]] = None,
+    project_id: str | None = None,
+    changes: dict[str, Any] | None = None,
 ) -> None:
     """Emit a mission updated event."""
     event = SyncEvent(
@@ -307,7 +310,7 @@ def emit_document_processed(
     emitter: SyncEventEmitter,
     document_id: str,
     *,
-    project_id: Optional[str] = None,
+    project_id: str | None = None,
     chunk_count: int = 0,
 ) -> None:
     """Emit a document processed event."""
@@ -326,7 +329,7 @@ def emit_document_processed(
 def emit_batch_sync_requested(
     emitter: SyncEventEmitter,
     *,
-    entity_types: Optional[List[str]] = None,
+    entity_types: list[str] | None = None,
     mode: str = "delta",
 ) -> None:
     """Emit a batch sync request event."""
@@ -343,17 +346,18 @@ def emit_batch_sync_requested(
 
 
 # Singleton instance
-_sync_event_emitter: Optional[SyncEventEmitter] = None
+_sync_event_emitter: SyncEventEmitter | None = None
 
 
 def get_sync_event_emitter(
-    telemetry_path: Optional[Path] = None,
+    telemetry_path: Path | None = None,
 ) -> SyncEventEmitter:
     """Return singleton sync event emitter."""
     global _sync_event_emitter
     if _sync_event_emitter is None:
         _sync_event_emitter = SyncEventEmitter(
-            telemetry_path=telemetry_path or Path("cmos/telemetry/events/sprint-11-pedr-sync.jsonl"),
+            telemetry_path=telemetry_path
+            or Path("cmos/telemetry/events/sprint-11-pedr-sync.jsonl"),
         )
     return _sync_event_emitter
 

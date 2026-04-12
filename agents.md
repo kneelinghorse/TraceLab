@@ -9,9 +9,9 @@
 ## Build & Development Commands
 ### Core FastAPI Service
 ```bash
-# Install Python deps
-python3.11 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
+# Install Python deps (uses pyproject.toml via editable install)
+python3.11 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev,test]"
 
 # Run locally
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
@@ -22,6 +22,48 @@ alembic upgrade head
 # Compose workflow
 docker-compose up -d
 docker-compose exec app alembic upgrade head
+```
+
+### Dev Container (Recommended)
+```bash
+# Open in VS Code with Dev Containers extension — auto-builds from .devcontainer/
+# Or manually:
+docker compose -f docker-compose.dev.yml -f .devcontainer/docker-compose.devcontainer.yml up
+```
+
+### Quality Tooling
+```bash
+# Lint + format
+ruff check app/ tests/
+ruff format app/ tests/
+
+# Type checking
+mypy app/ --config-file pyproject.toml
+
+# Pre-commit hooks (install once)
+pre-commit install
+```
+
+### Frontend Dependency Management
+- After adding or updating frontend dependencies, always run `npm install` inside `frontend/` and commit the updated `package-lock.json` alongside any `package.json` changes.
+- Railway (Nixpacks) runs `npm ci` during its install phase, which requires the lock file to be in sync. A stale lock file will fail the build before `buildCommand` even runs.
+
+### Testing
+```bash
+# Unit tests (no database required)
+pytest -m unit -v
+
+# Integration tests (requires Docker for testcontainers)
+pytest -m integration -v
+
+# All tests
+pytest -v
+
+# Frontend unit tests
+cd frontend && npm run test:unit
+
+# Frontend E2E
+cd frontend && npx playwright test
 ```
 
 ### Mission Protocol / CMOS Operations
@@ -43,7 +85,9 @@ node cmos/context/integration_test_runner.js --output telemetry/events/testing-s
 ```
 
 ## Coding Standards & Style
-- **Python**: follow PEP 8 with type hints, pytest fixtures, and lint via `flake8`; keep FastAPI routers thin and push logic into `app/services`.
+- **Python**: follow PEP 8 with type hints, pytest fixtures, and lint via `ruff`; keep FastAPI routers thin and push logic into `app/services`.
+- **Linting**: `ruff check` enforces E/F/W/I/UP/B/SIM/S rules. Config in `pyproject.toml`.
+- **Type checking**: `mypy` with strict mode on `app/core/` and `app/ports/`.
 - **TypeScript/Node utilities** (under `cmos/` or tooling scripts): use ES2020 modules, strict TS configs, and JSDoc for exported helpers.
 - Keep mission documentation single-sourced: updates to `docs/`, `foundational-docs/`, or `cmos/docs/` must reference the guiding template rather than duplicating content.
 - Reference `cmos/docs/AI-coding-assistant-workflows.md` for orchestration expectations and align commit notes with backlog mission IDs.
@@ -55,6 +99,31 @@ node cmos/context/integration_test_runner.js --output telemetry/events/testing-s
 - Record blockers or deviations inside `cmos/context/MASTER_CONTEXT.json` via the SQLite client (`context/db_client.py`) rather than hand-editing JSON mirrors.
 
 ## Architecture Patterns
+
+### Hexagonal Architecture (Ports & Adapters)
+- **Ports** (`app/ports/`): `typing.Protocol` interfaces defining contracts for repositories and external services. New code should depend on ports, not concrete implementations.
+- **Adapters** (`app/adapters/`): Thin wrappers delegating to existing services. Repository adapters in `app/adapters/repositories/`, external service adapters in `app/adapters/external/`.
+- **Composition root** (`app/dependencies.py`): Factory functions wiring ports to adapters via `FastAPI Depends()`. Override in tests with `app.dependency_overrides`.
+- See `docs/adr/001-005` for architecture decision records.
+
+### Dependency Injection Pattern
+```python
+# In a router:
+from app.dependencies import get_document_repository
+from app.ports.repositories import DocumentRepository
+
+@router.get("/documents/{doc_id}")
+def get_doc(doc_id: UUID, repo: DocumentRepository = Depends(get_document_repository), db: Session = Depends(get_db)):
+    return repo.get_document(db, doc_id)
+```
+
+### Test Organization
+- `tests/unit/` — Mock-based, no DB. Mark with `@pytest.mark.unit`.
+- `tests/integration/` — Real PostgreSQL via testcontainers. Mark with `@pytest.mark.integration`.
+- `tests/e2e/` — Full-stack browser/API tests.
+- TDD workflow: write failing test → confirm fail → minimal code → confirm pass → refactor.
+
+### Core Service Layer
 - **Core service**: FastAPI app backed by PostgreSQL 15, Alembic migrations, and ingestion pipelines under `app/services` plus document processing scripts in `scripts/`.
 - **Mission orchestration**: SQLite database (`cmos/db/cmos.sqlite`) drives mission backlog, contexts, and telemetry; helpers in `cmos/context/` (mission runtime, SQLite client, integration runner) must be used for reads/writes.
 - **RAG assets**: Generated corpora and embeddings live under `data/` and `artifacts/`; keep synthetic data generation reproducible via the scripts in `scripts/`.
@@ -89,6 +158,6 @@ node cmos/context/integration_test_runner.js --output telemetry/events/testing-s
 - `foundational-docs/tech_arch_template.md` – authoritative technical architecture template for Mission Protocol deliverables.
 
 ---
-Last Updated: 2025-12-21
-Version: 1.1.0
+Last Updated: 2026-03-16
+Version: 2.0.0
 Maintained by: TraceLab Platform Team

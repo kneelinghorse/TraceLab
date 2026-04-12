@@ -1,7 +1,7 @@
 """Report CRUD and synthesis endpoints."""
+
 from __future__ import annotations
 
-from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
@@ -116,8 +116,8 @@ def create_report(
 
 @router.get("", response_model=ReportListResponse)
 def list_reports(
-    project_id: Optional[UUID] = Query(default=None, description="Filter by project"),
-    report_status: Optional[str] = Query(
+    project_id: UUID | None = Query(default=None, description="Filter by project"),
+    report_status: str | None = Query(
         default=None,
         alias="status",
         description="Filter by status (draft, final)",

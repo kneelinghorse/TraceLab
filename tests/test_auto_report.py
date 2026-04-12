@@ -15,12 +15,11 @@ columns in the schema (content_tsv in document_chunks). Run with:
 Unit tests (TestFormatProtocolToMarkdown, TestAutoReportService::test_service_singleton)
 can run without PostgreSQL.
 """
+
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
-from typing import Any, Dict
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -44,9 +43,7 @@ class TestFormatProtocolToMarkdown:
 
     def test_format_basic_synthesis(self):
         """Format protocol with basic synthesis string."""
-        protocol = {
-            "synthesis": "This is a summary of findings."
-        }
+        protocol = {"synthesis": "This is a summary of findings."}
         result = format_protocol_to_markdown(protocol, "Test Mission")
 
         assert "# Research: Test Mission" in result
@@ -61,7 +58,7 @@ class TestFormatProtocolToMarkdown:
                 "key_findings": [
                     "First important finding",
                     {"title": "Second Finding", "description": "Details here"},
-                ]
+                ],
             }
         }
         result = format_protocol_to_markdown(protocol, "Research Mission")
@@ -78,7 +75,11 @@ class TestFormatProtocolToMarkdown:
         protocol = {
             "findings": [
                 "Simple finding",
-                {"title": "Complex Finding", "description": "With details", "confidence": 0.95},
+                {
+                    "title": "Complex Finding",
+                    "description": "With details",
+                    "confidence": 0.95,
+                },
             ]
         }
         result = format_protocol_to_markdown(protocol, "Findings Mission")
@@ -94,7 +95,11 @@ class TestFormatProtocolToMarkdown:
         protocol = {
             "sources": [
                 "https://example.com/doc1",
-                {"url": "https://example.com/doc2", "title": "Example Doc", "relevance": 0.87},
+                {
+                    "url": "https://example.com/doc2",
+                    "title": "Example Doc",
+                    "relevance": 0.87,
+                },
             ]
         }
         result = format_protocol_to_markdown(protocol, "Sourced Mission")
@@ -143,11 +148,13 @@ class TestFormatProtocolToMarkdown:
                 {"title": "Main Finding", "description": "Details", "confidence": 0.9}
             ],
             "sources": [
-                {"url": "https://source.com", "title": "Primary Source", "relevance": 0.95}
+                {
+                    "url": "https://source.com",
+                    "title": "Primary Source",
+                    "relevance": 0.95,
+                }
             ],
-            "quality_checkpoints": [
-                {"name": "Sources verified", "status": "passed"}
-            ],
+            "quality_checkpoints": [{"name": "Sources verified", "status": "passed"}],
         }
         result = format_protocol_to_markdown(protocol, "Complete Mission")
 
@@ -355,9 +362,11 @@ class TestCreateReportFromProtocol:
         report = create_report_from_protocol(db_session, mission, protocol)
 
         assert report.chunk_count == 3
-        sources = db_session.query(ReportSource).filter(
-            ReportSource.report_id == report.id
-        ).all()
+        sources = (
+            db_session.query(ReportSource)
+            .filter(ReportSource.report_id == report.id)
+            .all()
+        )
         assert len(sources) == 3
         assert all(s.source_type == "chunk" for s in sources)
 
@@ -447,7 +456,10 @@ class TestAutoReportIntegration:
 
     def test_webhook_handler_calls_auto_report(self, db_session):
         """Webhook handler invokes auto-report on success with protocol."""
-        from app.schemas.webhook import DeepSearchWebhookPayload, DeepSearchWebhookStatus
+        from app.schemas.webhook import (
+            DeepSearchWebhookPayload,
+            DeepSearchWebhookStatus,
+        )
         from app.services.webhook_handler import WebhookHandler
 
         # Create project and mission
@@ -482,21 +494,28 @@ class TestAutoReportIntegration:
             result_protocol={"synthesis": "Webhook integration test."},
         )
 
-        updated_mission, status_msg = handler.process_deepsearch_webhook(db_session, payload)
+        updated_mission, status_msg = handler.process_deepsearch_webhook(
+            db_session, payload
+        )
 
         assert status_msg == "completed"
         db_session.refresh(updated_mission)
         assert updated_mission.result_report_id is not None
 
         # Verify report was created
-        report = db_session.query(Report).filter(
-            Report.id == updated_mission.result_report_id
-        ).one()
+        report = (
+            db_session.query(Report)
+            .filter(Report.id == updated_mission.result_report_id)
+            .one()
+        )
         assert "Webhook integration test." in report.content
 
     def test_webhook_handler_skips_without_protocol(self, db_session):
         """Webhook handler skips auto-report when no protocol."""
-        from app.schemas.webhook import DeepSearchWebhookPayload, DeepSearchWebhookStatus
+        from app.schemas.webhook import (
+            DeepSearchWebhookPayload,
+            DeepSearchWebhookStatus,
+        )
         from app.services.webhook_handler import WebhookHandler
 
         project = Project(name="No Protocol Project")
@@ -524,7 +543,9 @@ class TestAutoReportIntegration:
             result_protocol=None,  # No protocol
         )
 
-        updated_mission, status_msg = handler.process_deepsearch_webhook(db_session, payload)
+        updated_mission, status_msg = handler.process_deepsearch_webhook(
+            db_session, payload
+        )
 
         assert status_msg == "completed"
         db_session.refresh(updated_mission)
@@ -532,7 +553,10 @@ class TestAutoReportIntegration:
 
     def test_webhook_handler_continues_on_report_error(self, db_session):
         """Webhook handler logs but doesn't fail on auto-report error."""
-        from app.schemas.webhook import DeepSearchWebhookPayload, DeepSearchWebhookStatus
+        from app.schemas.webhook import (
+            DeepSearchWebhookPayload,
+            DeepSearchWebhookStatus,
+        )
         from app.services.webhook_handler import WebhookHandler
 
         project = Project(name="Error Test Project")
@@ -552,7 +576,9 @@ class TestAutoReportIntegration:
 
         # Mock auto-report to raise error
         mock_auto_report = MagicMock()
-        mock_auto_report.create_report_from_protocol.side_effect = AutoReportError("Test error")
+        mock_auto_report.create_report_from_protocol.side_effect = AutoReportError(
+            "Test error"
+        )
 
         handler = WebhookHandler(auto_report_service=mock_auto_report)
 
@@ -564,7 +590,9 @@ class TestAutoReportIntegration:
         )
 
         # Should not raise - logs warning instead
-        updated_mission, status_msg = handler.process_deepsearch_webhook(db_session, payload)
+        updated_mission, status_msg = handler.process_deepsearch_webhook(
+            db_session, payload
+        )
 
         assert status_msg == "completed"
         assert updated_mission.status == "completed"
@@ -656,7 +684,11 @@ class TestEdgeCases:
             "synthesis": {
                 "summary": "Nested summary",
                 "key_findings": [
-                    {"title": "F1", "description": "Desc", "metadata": {"nested": {"deep": True}}}
+                    {
+                        "title": "F1",
+                        "description": "Desc",
+                        "metadata": {"nested": {"deep": True}},
+                    }
                 ],
             },
             "metadata": {

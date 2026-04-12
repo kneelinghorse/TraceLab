@@ -1,4 +1,5 @@
 """Tests for onboarding API workflows."""
+
 from __future__ import annotations
 
 import time
@@ -6,8 +7,8 @@ import time
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
 import app.api.v1.documents as documents_api
+from app.main import app
 from app.services.chunking import ChunkingService
 from app.services.coverage_report import CoverageReportGenerator
 from app.services.document_ingestion import DocumentIngestionService
@@ -17,7 +18,9 @@ from app.services.processing_status import ProcessingStatusRecorder
 class _StubRedactionService:
     """Deterministic redaction for tests."""
 
-    def redact_document(self, text: str, document_id: str, metadata=None, use_pseudonymization=True):
+    def redact_document(
+        self, text: str, document_id: str, metadata=None, use_pseudonymization=True
+    ):
         return {
             "redacted_text": text,
             "entities": [],
@@ -32,7 +35,9 @@ def client():
         yield app_client
 
 
-@pytest.mark.skip(reason="Onboarding POST /projects route shadowed by projects router registered first in main.py — needs route prefix refactor")
+@pytest.mark.skip(
+    reason="Onboarding POST /projects route shadowed by projects router registered first in main.py — needs route prefix refactor"
+)
 def test_project_creation_is_idempotent(client: TestClient, auth_headers):
     """Ensure POST /projects caches responses via Idempotency-Key header."""
     payload = {
@@ -56,7 +61,9 @@ def test_project_creation_is_idempotent(client: TestClient, auth_headers):
     assert conflict.status_code == 409
 
 
-def test_document_registration_and_job_flow(client: TestClient, project, tmp_path, monkeypatch, auth_headers):
+def test_document_registration_and_job_flow(
+    client: TestClient, project, tmp_path, monkeypatch, auth_headers
+):
     """Register document, enqueue ingestion job, and observe completion."""
     # Ensure ingestion service uses deterministic stubbed dependencies
     stub_service = DocumentIngestionService(
@@ -80,14 +87,18 @@ def test_document_registration_and_job_flow(client: TestClient, project, tmp_pat
         "validation_status": "pending",
     }
     doc_headers = {**auth_headers, "Idempotency-Key": "document-key-001"}
-    document_response = client.post("/api/v1/documents", json=document_payload, headers=doc_headers)
+    document_response = client.post(
+        "/api/v1/documents", json=document_payload, headers=doc_headers
+    )
     assert document_response.status_code == 201, document_response.json()
     document_data = document_response.json()
     document_id = document_data["id"]
     assert document_data["file_path"] == str(file_path)
 
     job_headers = {**auth_headers, "Idempotency-Key": "job-key-001"}
-    job_response = client.post(f"/api/v1/jobs?document_id={document_id}", headers=job_headers)
+    job_response = client.post(
+        f"/api/v1/jobs?document_id={document_id}", headers=job_headers
+    )
     assert job_response.status_code == 202, job_response.json()
     job_data = job_response.json()
     job_id = job_data["id"]

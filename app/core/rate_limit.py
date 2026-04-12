@@ -3,6 +3,7 @@
 Tracks request counts per IP with a configurable window and limit.
 No external dependency required — uses a simple dict + TTL pruning.
 """
+
 from __future__ import annotations
 
 import time
@@ -40,9 +41,7 @@ class RateLimiter:
     def _prune(self, key: str, now: float) -> None:
         """Remove timestamps outside the current window."""
         cutoff = now - self.config.window_seconds
-        self._requests[key] = [
-            ts for ts in self._requests[key] if ts > cutoff
-        ]
+        self._requests[key] = [ts for ts in self._requests[key] if ts > cutoff]
 
     def check(self, request: Request) -> None:
         """Check rate limit for the request. Raises HTTP 429 if exceeded."""

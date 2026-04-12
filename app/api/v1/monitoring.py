@@ -1,4 +1,5 @@
 """Monitoring API endpoints for cost and performance telemetry."""
+
 from __future__ import annotations
 
 from fastapi import APIRouter
@@ -7,7 +8,6 @@ from app.services.cache_manager import get_cache_manager
 from app.services.cache_metrics import cache_metrics
 from app.services.cost_monitor import get_cost_monitor
 from app.services.rag_service import current_rag_service
-
 
 router = APIRouter()
 _cache_manager = get_cache_manager()
@@ -19,7 +19,9 @@ def read_costs() -> dict:
     return monitor.summary()
 
 
-@router.get("/performance", summary="Return cache, routing, and cost telemetry snapshot")
+@router.get(
+    "/performance", summary="Return cache, routing, and cost telemetry snapshot"
+)
 def read_performance() -> dict:
     monitor = get_cost_monitor()
     return {

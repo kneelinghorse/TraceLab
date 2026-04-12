@@ -1,18 +1,17 @@
 """Security helpers for password hashing, JWT handling, and API key authentication."""
+
 from __future__ import annotations
 
 import secrets
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
 from functools import lru_cache
-from typing import Optional
 from uuid import UUID
 
 from fastapi import Depends, Header, HTTPException, Query, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.database import SessionLocal
@@ -77,14 +76,12 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return _pwd_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(
-    *, subject: str, expires_delta: Optional[timedelta] = None
-) -> str:
+def create_access_token(*, subject: str, expires_delta: timedelta | None = None) -> str:
     """Create a signed JWT for the given subject (user UUID as string)."""
     if not settings.secret_key:
         raise RuntimeError("SECRET_KEY must be configured to issue JWTs.")
 
-    expire = datetime.now(timezone.utc) + (
+    expire = datetime.now(UTC) + (
         expires_delta or timedelta(minutes=settings.access_token_expire_minutes)
     )
     payload = {"sub": subject, "exp": expire}
@@ -96,17 +93,23 @@ def _decode_access_token(token: str) -> str:
     if not settings.secret_key:
         raise RuntimeError("SECRET_KEY must be configured to validate JWTs.")
     try:
-        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.jwt_algorithm])
+        payload = jwt.decode(
+            token, settings.secret_key, algorithms=[settings.jwt_algorithm]
+        )
     except JWTError as exc:  # pragma: no cover - jose already unit tested
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token") from exc
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token"
+        ) from exc
 
     subject = payload.get("sub")
     if not subject:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Token subject missing")
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED, detail="Token subject missing"
+        )
     return subject
 
 
-def issue_token_response(user, *, expires_in_seconds: Optional[int] = None) -> dict:
+def issue_token_response(user, *, expires_in_seconds: int | None = None) -> dict:
     """Helper to construct a JWT response payload.
 
     Accepts either an AuthCredentials (legacy) or a User model instance.
@@ -166,7 +169,7 @@ def get_key_prefix(key: str) -> str:
     return key[:12]
 
 
-def _validate_api_key(api_key: str) -> Optional[AuthenticatedUser]:
+def _validate_api_key(api_key: str) -> AuthenticatedUser | None:
     """Validate an API key and return the authenticated user if valid."""
     from app.models.api_key import APIKey
     from app.models.user import User
@@ -239,14 +242,16 @@ def _resolve_user_from_jwt(subject: str) -> AuthenticatedUser:
                 display_name=db_user.display_name,
             )
 
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Token subject is not recognized")
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED, detail="Token subject is not recognized"
+        )
     finally:
         db.close()
 
 
 async def require_authenticated_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme),
-    x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer_scheme),
+    x_api_key: str | None = Header(default=None, alias="X-API-Key"),
 ) -> AuthenticatedUser:
     """FastAPI dependency that ensures requests include a valid bearer token or API key.
 
@@ -259,7 +264,9 @@ async def require_authenticated_user(
         user = _validate_api_key(x_api_key)
         if user:
             return user
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired API key")
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired API key"
+        )
 
     # Fall back to JWT
     if credentials is None:
@@ -289,4 +296,6 @@ async def require_authenticated_user_sse(
         return _resolve_user_from_jwt(subject)
 
     # Fall through to standard auth
-    return await require_authenticated_user(credentials=credentials, x_api_key=x_api_key)
+    return await require_authenticated_user(
+        credentials=credentials, x_api_key=x_api_key
+    )

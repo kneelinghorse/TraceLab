@@ -1,5 +1,4 @@
 """Application configuration and settings management."""
-from typing import List, Optional
 
 from pydantic import Field
 from pydantic_settings import BaseSettings
@@ -7,19 +6,19 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     """Application settings with environment variable support."""
-    
+
     # App config
     app_name: str = "TraceLab Research Repository"
     app_version: str = "1.0.0"
     environment: str = "development"
     debug: bool = False
-    
+
     # Database
     database_url: str = "postgresql://postgres:postgres@localhost:5432/tracelab"
-    
+
     # Vector Database (Qdrant)
     qdrant_url: str = "http://localhost:6333"
-    qdrant_api_key: Optional[str] = None
+    qdrant_api_key: str | None = None
     qdrant_collection_name: str = "research_chunks"
     qdrant_prefer_grpc: bool = False
     qdrant_timeout_seconds: float = 10.0
@@ -28,11 +27,13 @@ class Settings(BaseSettings):
     # Higher dimensions need higher m for graph quality; ef_construct raised for index quality.
     # ef_search=64 retained — Sprint 19 showed 100% recall at current corpus.
     qdrant_hnsw_m: int = 24  # Graph degree (was 16 for 1536d)
-    qdrant_hnsw_ef_construct: int = 128  # Index construction quality (was 100 for 1536d)
+    qdrant_hnsw_ef_construct: int = (
+        128  # Index construction quality (was 100 for 1536d)
+    )
     qdrant_hnsw_ef_default: int = 64  # Query-time ef (100% recall at 7K corpus)
-    
+
     # OpenAI
-    openai_api_key: Optional[str] = None
+    openai_api_key: str | None = None
     openai_embedding_model: str = "text-embedding-3-large"
     openai_embedding_dimension: int = 3072
     openai_chat_model: str = "gpt-5.1"
@@ -44,7 +45,7 @@ class Settings(BaseSettings):
     tiered_weight_linguistic: float = 0.35
     tiered_weight_integrity: float = 0.35
     tiered_weight_provenance: float = 0.30
-    
+
     # Semantic cache
     semantic_cache_enabled: bool = True
     semantic_cache_collection_name: str = "semantic_cache"
@@ -57,23 +58,27 @@ class Settings(BaseSettings):
     hybrid_search_keyword_weight: float = 0.3
     hybrid_search_keyword_language: str = "english"
     hybrid_search_result_multiplier: int = 2
-    
+
     # API
     api_v1_prefix: str = "/api/v1"
-    
+
     # Security & authentication
     secret_key: str = "change-me"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 10080  # 7 days
     auth_username: str = "tracelab-admin"
-    auth_password: Optional[str] = "changeme"
-    auth_password_hash: Optional[str] = None
-    cors_allowed_origins_dev: List[str] = Field(default_factory=lambda: ["http://localhost:3000"])
-    cors_allowed_origins_prod: List[str] = Field(default_factory=list)
-    cors_allowed_methods: List[str] = Field(
+    auth_password: str | None = "changeme"
+    auth_password_hash: str | None = None
+    cors_allowed_origins_dev: list[str] = Field(
+        default_factory=lambda: ["http://localhost:3000"]
+    )
+    cors_allowed_origins_prod: list[str] = Field(default_factory=list)
+    cors_allowed_methods: list[str] = Field(
         default_factory=lambda: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
     )
-    cors_allowed_headers: List[str] = Field(default_factory=lambda: ["Authorization", "Content-Type"])
+    cors_allowed_headers: list[str] = Field(
+        default_factory=lambda: ["Authorization", "Content-Type"]
+    )
     cors_allow_credentials: bool = True
 
     # PEDR cache settings
@@ -85,13 +90,13 @@ class Settings(BaseSettings):
     # DeepSearch integration
     # Mode: "worker" (DB polling, Railway prod) or "http" (API calls, local dev)
     deepsearch_mode: str = "worker"
-    deepsearch_api_url: Optional[str] = None
-    deepsearch_api_key: Optional[str] = None
+    deepsearch_api_url: str | None = None
+    deepsearch_api_key: str | None = None
     deepsearch_timeout: float = 30.0
     deepsearch_retries: int = 3
     deepsearch_backoff_multiplier: float = 2.0
     deepsearch_initial_backoff: float = 1.0
-    deepsearch_webhook_secret: Optional[str] = None
+    deepsearch_webhook_secret: str | None = None
     # DeepSearch worker health endpoint (for console monitoring)
     deepsearch_worker_health_url: str = "http://localhost:8080/health"
 
@@ -106,7 +111,7 @@ class Settings(BaseSettings):
         extra = "allow"
 
     @property
-    def cors_origins(self) -> List[str]:
+    def cors_origins(self) -> list[str]:
         """Return CORS origins based on deployment environment."""
         if self.environment.lower() in {"production", "prod"}:
             return self.cors_allowed_origins_prod or []

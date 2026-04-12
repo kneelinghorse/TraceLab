@@ -1,11 +1,13 @@
 """Quality gate orchestration and telemetry logging."""
+
 from __future__ import annotations
 
 import json
+from collections.abc import Callable, Mapping, MutableMapping
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Mapping, MutableMapping, Optional
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import func
@@ -20,8 +22,7 @@ from app.models.mission_protocol import (
 from app.services import quality_gates
 from app.services.quality_gates import QualityGateResult
 
-
-TelemetrySink = Callable[[Dict[str, Any]], None]
+TelemetrySink = Callable[[dict[str, Any]], None]
 
 
 @dataclass(slots=True)
@@ -29,21 +30,21 @@ class QualityGateReport:
     """Aggregate results for all quality gates."""
 
     protocol_mission_id: str
-    mission_uuid: Optional[UUID]
+    mission_uuid: UUID | None
     evaluated_at: datetime
     results: MutableMapping[str, QualityGateResult] = field(default_factory=dict)
 
     def all_passed(self) -> bool:
         return all(result.passed for result in self.results.values())
 
-    def failing_gates(self) -> List[str]:
+    def failing_gates(self) -> list[str]:
         return [name for name, result in self.results.items() if not result.passed]
 
-    def as_dict(self) -> Dict[str, Dict[str, Any]]:
+    def as_dict(self) -> dict[str, dict[str, Any]]:
         return {name: result.to_dict() for name, result in self.results.items()}
 
-    def to_quality_checkpoints(self) -> List[QualityCheckpoint]:
-        checkpoints: List[QualityCheckpoint] = []
+    def to_quality_checkpoints(self) -> list[QualityCheckpoint]:
+        checkpoints: list[QualityCheckpoint] = []
         for result in self.results.values():
             checkpoint = QualityCheckpoint(
                 gate=result.gate,
@@ -57,22 +58,16 @@ class QualityGateReport:
 
 
 class _FileTelemetrySink:
-    """Append telemetry events to telemetry/events/quality-gates.jsonl via TelemetryEnvelope."""
+    """Append telemetry events to telemetry/events/quality-gates.jsonl."""
 
     def __init__(self, path: Path | None = None) -> None:
         repo_root = Path(__file__).resolve().parents[2]
         self.path = path or (repo_root / "telemetry" / "events" / "quality-gates.jsonl")
 
-    def __call__(self, payload: Dict[str, Any]) -> None:  # pragma: no cover - simple IO
-        from app.core.telemetry import emit_telemetry
-        event_payload = dict(payload)
-        event_payload.pop("ts", None)
-        emit_telemetry(
-            path=self.path,
-            event_type="quality.gate.evaluated",
-            source="quality",
-            payload=event_payload,
-        )
+    def __call__(self, payload: dict[str, Any]) -> None:  # pragma: no cover - simple IO
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        with self.path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
 
 
 class QualityGateService:
@@ -89,7 +84,7 @@ class QualityGateService:
 
     def evaluate(
         self,
-        payload: MissionProtocolDraft | MissionProtocolComplete | Dict[str, Any],
+        payload: MissionProtocolDraft | MissionProtocolComplete | dict[str, Any],
         *,
         db: Session | None = None,
         mission_uuid: UUID | None = None,
@@ -97,13 +92,17 @@ class QualityGateService:
         mission = self._coerce_payload(payload)
         traceability_counts = self._load_traceability_counts(db, mission)
 
-        results: Dict[str, QualityGateResult] = {}
-        results["research_statement"] = quality_gates.check_research_statement_completeness(mission)
+        results: dict[str, QualityGateResult] = {}
+        results["research_statement"] = (
+            quality_gates.check_research_statement_completeness(mission)
+        )
         results["evidence_links"] = quality_gates.check_evidence_links(
             mission,
             min_sources_per_insight=self.evidence_threshold,
         )
-        results["contradictions_resolved"] = quality_gates.check_contradictions_resolved(mission)
+        results["contradictions_resolved"] = (
+            quality_gates.check_contradictions_resolved(mission)
+        )
         results["synthesis_quality"] = quality_gates.check_synthesis_quality(mission)
         results["traceability"] = quality_gates.check_source_traceability(
             mission,
@@ -113,7 +112,7 @@ class QualityGateService:
         report = QualityGateReport(
             protocol_mission_id=mission.mission_id,
             mission_uuid=mission_uuid,
-            evaluated_at=datetime.now(timezone.utc),
+            evaluated_at=datetime.now(UTC),
             results=results,
         )
 
@@ -126,7 +125,9 @@ class QualityGateService:
             payload = {
                 "ts": result.evaluated_at.isoformat().replace("+00:00", "Z"),
                 "mission_id": report.protocol_mission_id,
-                "mission_uuid": str(report.mission_uuid) if report.mission_uuid else None,
+                "mission_uuid": str(report.mission_uuid)
+                if report.mission_uuid
+                else None,
                 "gate": name,
                 "status": result.status,
                 "details": result.details,
@@ -152,7 +153,7 @@ class QualityGateService:
         if db is None:
             return None
 
-        insight_ids: List[UUID] = []
+        insight_ids: list[UUID] = []
         evidence = mission.evidence or []
         for item in evidence:
             if not item.insight_id:
@@ -171,7 +172,7 @@ class QualityGateService:
             .group_by(InsightSource.insight_id)
             .all()
         )
-        counts: Dict[str, int] = {str(row[0]): int(row[1]) for row in rows}
+        counts: dict[str, int] = {str(row[0]): int(row[1]) for row in rows}
         for insight_id in {str(value) for value in insight_ids}:
             counts.setdefault(insight_id, 0)
         return counts

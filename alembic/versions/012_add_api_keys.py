@@ -31,11 +31,21 @@ def upgrade() -> None:
                 primary_key=True,
                 server_default=sa.text("gen_random_uuid()"),
             ),
-            sa.Column("user_id", sa.String(length=255), nullable=False, server_default="default"),
+            sa.Column(
+                "user_id",
+                sa.String(length=255),
+                nullable=False,
+                server_default="default",
+            ),
             sa.Column("name", sa.String(length=255), nullable=False),
             sa.Column("key_hash", sa.String(length=255), nullable=False),
             sa.Column("key_prefix", sa.String(length=12), nullable=False),
-            sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.func.now()),
+            sa.Column(
+                "created_at",
+                sa.DateTime(),
+                nullable=False,
+                server_default=sa.func.now(),
+            ),
             sa.Column("last_used_at", sa.DateTime(), nullable=True),
             sa.Column("expires_at", sa.DateTime(), nullable=True),
         )

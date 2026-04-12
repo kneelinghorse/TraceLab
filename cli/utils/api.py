@@ -7,17 +7,29 @@ import httpx
 
 from .auth import TokenManager
 from .config import ConfigManager
-from .errors import APIError, AuthenticationError, PermissionDeniedError, ResourceNotFoundError
+from .errors import (
+    APIError,
+    AuthenticationError,
+    PermissionDeniedError,
+    ResourceNotFoundError,
+)
 
 
 class APIClient:
     """HTTP client for TraceLab API."""
 
-    def __init__(self, base_url: Optional[str] = None, token: Optional[str] = None, timeout: int = 30):
+    def __init__(
+        self,
+        base_url: Optional[str] = None,
+        token: Optional[str] = None,
+        timeout: int = 30,
+    ):
         self.config = ConfigManager()
         self.token_manager = TokenManager()
 
-        self.base_url = (base_url or self.config.get("api.base_url", "http://localhost:8000")).rstrip("/")
+        self.base_url = (
+            base_url or self.config.get("api.base_url", "http://localhost:8000")
+        ).rstrip("/")
         self.timeout = timeout
         self._token = token
 
@@ -31,10 +43,7 @@ class APIClient:
     @property
     def headers(self) -> Dict[str, str]:
         """Get request headers."""
-        headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        }
+        headers = {"Content-Type": "application/json", "Accept": "application/json"}
 
         if self.token:
             headers["Authorization"] = f"Bearer {self.token}"
@@ -62,19 +71,18 @@ class APIClient:
                     message="Authentication failed",
                     details={
                         "reason": message,
-                        "suggestion": "Run 'tracelab auth login' to authenticate"
-                    }
+                        "suggestion": "Run 'tracelab auth login' to authenticate",
+                    },
                 )
             elif status_code == 403:
                 raise PermissionDeniedError(
-                    message="Permission denied",
-                    details={"reason": message}
+                    message="Permission denied", details={"reason": message}
                 )
             elif status_code == 404:
                 raise ResourceNotFoundError(
                     resource="Resource",
                     resource_id="unknown",
-                    details={"reason": message}
+                    details={"reason": message},
                 )
             else:
                 raise APIError(message=message, status_code=status_code)
@@ -86,7 +94,9 @@ class APIClient:
             response = client.get(url, headers=self.headers, params=params)
             return self._handle_response(response)
 
-    def get_binary(self, path: str, params: Optional[Dict[str, Any]] = None) -> httpx.Response:
+    def get_binary(
+        self, path: str, params: Optional[Dict[str, Any]] = None
+    ) -> httpx.Response:
         """Make GET request that returns the raw response (for file downloads)."""
         url = f"{self.base_url}{path}"
         headers = dict(self.headers)
@@ -101,7 +111,7 @@ class APIClient:
         path: str,
         data: Optional[Dict[str, Any]] = None,
         files: Optional[Dict[str, Any]] = None,
-        params: Optional[Dict[str, Any]] = None
+        params: Optional[Dict[str, Any]] = None,
     ) -> Any:
         """Make POST request."""
         url = f"{self.base_url}{path}"
@@ -109,19 +119,27 @@ class APIClient:
             if files:
                 # For file uploads, don't set Content-Type (let httpx handle it)
                 headers = {k: v for k, v in self.headers.items() if k != "Content-Type"}
-                response = client.post(url, headers=headers, data=data, files=files, params=params)
+                response = client.post(
+                    url, headers=headers, data=data, files=files, params=params
+                )
             else:
-                response = client.post(url, headers=self.headers, json=data, params=params)
+                response = client.post(
+                    url, headers=self.headers, json=data, params=params
+                )
             return self._handle_response(response)
 
-    def put(self, path: str, data: Dict[str, Any], params: Optional[Dict[str, Any]] = None) -> Any:
+    def put(
+        self, path: str, data: Dict[str, Any], params: Optional[Dict[str, Any]] = None
+    ) -> Any:
         """Make PUT request."""
         url = f"{self.base_url}{path}"
         with httpx.Client(timeout=self.timeout) as client:
             response = client.put(url, headers=self.headers, json=data, params=params)
             return self._handle_response(response)
 
-    def delete(self, path: str, params: Optional[Dict[str, Any]] = None) -> Optional[Any]:
+    def delete(
+        self, path: str, params: Optional[Dict[str, Any]] = None
+    ) -> Optional[Any]:
         """Make DELETE request."""
         url = f"{self.base_url}{path}"
         with httpx.Client(timeout=self.timeout) as client:
@@ -134,14 +152,11 @@ class APIClient:
     def login(self, username: str, password: str) -> Dict[str, Any]:
         """Authenticate and store token."""
         # Form data for OAuth2 password flow
-        data = {
-            "username": username,
-            "password": password
-        }
+        data = {"username": username, "password": password}
 
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
-            "Accept": "application/json"
+            "Accept": "application/json",
         }
 
         url = f"{self.base_url}/api/v1/auth/login"
@@ -155,7 +170,7 @@ class APIClient:
                 self.token_manager.save_token(
                     access_token=token_data["access_token"],
                     token_type=token_data.get("token_type", "bearer"),
-                    expires_in=token_data.get("expires_in")
+                    expires_in=token_data.get("expires_in"),
                 )
                 return token_data
             else:
@@ -166,6 +181,5 @@ class APIClient:
                     message = "Authentication failed"
 
                 raise AuthenticationError(
-                    message=message,
-                    details={"status_code": response.status_code}
+                    message=message, details={"status_code": response.status_code}
                 )

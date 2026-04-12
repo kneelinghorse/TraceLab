@@ -3,11 +3,11 @@
 Automatically ingests result_markdown from completed missions as documents,
 linking them back to the mission and running through the chunking/embedding pipeline.
 """
+
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Optional
-from uuid import UUID
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -28,8 +28,8 @@ class AutoIngestService:
 
     def __init__(
         self,
-        ingestion_service: Optional[DocumentIngestionService] = None,
-        status_recorder: Optional[ProcessingStatusRecorder] = None,
+        ingestion_service: DocumentIngestionService | None = None,
+        status_recorder: ProcessingStatusRecorder | None = None,
     ):
         self._ingestion_service = ingestion_service
         self._status_recorder = status_recorder or ProcessingStatusRecorder()
@@ -83,7 +83,7 @@ class AutoIngestService:
         )
 
         # Build metadata
-        metadata: Dict[str, Any] = {
+        metadata: dict[str, Any] = {
             "mission_id": mission.mission_id,
             "auto_generated": True,
         }
@@ -176,7 +176,7 @@ class AutoIngestService:
 
 
 # Module-level singleton
-_service: Optional[AutoIngestService] = None
+_service: AutoIngestService | None = None
 
 
 def get_auto_ingest_service() -> AutoIngestService:

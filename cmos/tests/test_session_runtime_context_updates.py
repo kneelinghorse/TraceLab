@@ -35,8 +35,12 @@ class SessionRuntimeContextUpdatesTest(unittest.TestCase):
         client = self.runtime.client
         client.execute("DELETE FROM sessions")
         client.execute("DELETE FROM session_events")
-        client.execute("DELETE FROM context_snapshots WHERE context_id IN ('project_context', 'master_context')")
-        client.execute("DELETE FROM strategic_decisions WHERE context_id = 'master_context'")
+        client.execute(
+            "DELETE FROM context_snapshots WHERE context_id IN ('project_context', 'master_context')"
+        )
+        client.execute(
+            "DELETE FROM strategic_decisions WHERE context_id = 'master_context'"
+        )
         project_context = {"working_memory": {}}
         master_context = {
             "project_identity": {},
@@ -66,11 +70,21 @@ class SessionRuntimeContextUpdatesTest(unittest.TestCase):
             "Automated context validation",
             agent="unittest",
         )
-        self.runtime.capture_insight(session_id, "decision", "Adopt automated context syncing")
-        self.runtime.capture_insight(session_id, "learning", "Session flow needs better prompts")
-        self.runtime.capture_insight(session_id, "constraint", "Deploy updates in under 5 minutes")
-        self.runtime.capture_insight(session_id, "constraint", "Deploy updates in under 5 minutes")
-        self.runtime.capture_insight(session_id, "context", "Scoped expected master context structure")
+        self.runtime.capture_insight(
+            session_id, "decision", "Adopt automated context syncing"
+        )
+        self.runtime.capture_insight(
+            session_id, "learning", "Session flow needs better prompts"
+        )
+        self.runtime.capture_insight(
+            session_id, "constraint", "Deploy updates in under 5 minutes"
+        )
+        self.runtime.capture_insight(
+            session_id, "constraint", "Deploy updates in under 5 minutes"
+        )
+        self.runtime.capture_insight(
+            session_id, "context", "Scoped expected master context structure"
+        )
         self.runtime.capture_insight(session_id, "next-step", "Draft CLI delta summary")
 
         self.runtime.complete_session(
@@ -85,15 +99,15 @@ class SessionRuntimeContextUpdatesTest(unittest.TestCase):
         learnings = master.get("learnings") or []
         constraints = master.get("constraints") or []
         recent_sessions = master.get("recent_sessions") or []
-        next_resume = (
-            master.get("next_session_context", {}).get("when_we_resume") or []
-        )
+        next_resume = master.get("next_session_context", {}).get("when_we_resume") or []
 
         self.assertTrue(decisions, "Decisions array not updated")
         self.assertIn(session_id, decisions[-1])
         self.assertTrue(learnings, "Learnings array not updated")
         self.assertIn(session_id, learnings[-1])
-        self.assertEqual(len(constraints), 1, "Constraints should dedupe identical entries")
+        self.assertEqual(
+            len(constraints), 1, "Constraints should dedupe identical entries"
+        )
         self.assertEqual(constraints[0], "Deploy updates in under 5 minutes")
         self.assertTrue(recent_sessions, "Recent sessions missing")
         latest = recent_sessions[-1]

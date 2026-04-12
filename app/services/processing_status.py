@@ -4,7 +4,7 @@ Utility to record document processing status events.
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -22,8 +22,8 @@ class ProcessingStatusRecorder:
         stage: str,
         status: str,
         *,
-        message: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
+        message: str | None = None,
+        details: dict[str, Any] | None = None,
         commit: bool = True,
     ) -> DocumentProcessingStatus:
         """

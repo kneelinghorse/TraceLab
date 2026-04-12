@@ -1,11 +1,11 @@
 """Collection CRUD and item management endpoints."""
+
 from __future__ import annotations
 
 import re
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
-from fastapi.responses import PlainTextResponse
 
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.schemas.collection import (
@@ -22,7 +22,9 @@ from app.services.collection import CollectionService, get_collection_service
 router = APIRouter()
 
 
-def _build_collection_response(collection, service: CollectionService) -> CollectionResponse:
+def _build_collection_response(
+    collection, service: CollectionService
+) -> CollectionResponse:
     """Build a CollectionResponse with item count."""
     return CollectionResponse(
         id=collection.id,
@@ -77,7 +79,9 @@ def create_collection(
             description=request.description,
         )
     except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
+        ) from exc
     return _build_collection_response(entry, service)
 
 
@@ -90,7 +94,9 @@ def get_collection(
     """Get a collection with all its items."""
     entry = service.get(collection_id)
     if entry is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found."
+        )
 
     items = service.get_items(collection_id)
     item_responses = [_build_item_response(item) for item in items]
@@ -119,14 +125,18 @@ def export_collection(
     """
     markdown = service.export_markdown(collection_id)
     if markdown is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found."
+        )
 
     # Fetch collection name for filename
     entry = service.get(collection_id)
     filename = "collection-export.md"
     if entry:
         # Sanitize name for filename
-        safe_name = re.sub(r"[^\w\s-]", "", entry.name).strip().replace(" ", "-").lower()
+        safe_name = (
+            re.sub(r"[^\w\s-]", "", entry.name).strip().replace(" ", "-").lower()
+        )
         filename = f"{safe_name}-export.md" if safe_name else "collection-export.md"
 
     return Response(
@@ -152,10 +162,14 @@ def update_collection(
             updates=request.model_dump(exclude_unset=True),
         )
     except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
+        ) from exc
 
     if entry is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found."
+        )
     return _build_collection_response(entry, service)
 
 
@@ -168,11 +182,17 @@ def delete_collection(
     """Delete a collection and all its items."""
     deleted = service.delete(collection_id)
     if not deleted:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found."
+        )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.post("/{collection_id}/chunks", response_model=CollectionItemResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/{collection_id}/chunks",
+    response_model=CollectionItemResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 def add_chunk_to_collection(
     collection_id: UUID,
     request: CollectionItemCreate,
@@ -187,11 +207,15 @@ def add_chunk_to_collection(
             notes=request.notes,
         )
     except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
+        ) from exc
     return _build_item_response(item)
 
 
-@router.delete("/{collection_id}/chunks/{chunk_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{collection_id}/chunks/{chunk_id}", status_code=status.HTTP_204_NO_CONTENT
+)
 def remove_chunk_from_collection(
     collection_id: UUID,
     chunk_id: UUID,

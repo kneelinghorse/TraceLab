@@ -23,7 +23,12 @@ from pathlib import Path
 
 def compute_content_hash(text: str, domain: str) -> str:
     """Compute SHA-256 content hash matching cmos-mcp computeContentHash()."""
-    canonical = json.dumps({"d": domain, "t": text}, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    canonical = json.dumps(
+        {"d": domain, "t": text},
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
@@ -38,19 +43,28 @@ def migrate(db_path: str, dry_run: bool = False) -> dict:
     """Run the content_hash migration. Returns stats."""
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
-    stats = {"columns_added": [], "decisions_hashed": 0, "learnings_hashed": 0, "duplicates_found": 0}
+    stats = {
+        "columns_added": [],
+        "decisions_hashed": 0,
+        "learnings_hashed": 0,
+        "duplicates_found": 0,
+    }
 
     try:
         # 1. Add content_hash column to strategic_decisions if missing
         if not has_column(conn, "strategic_decisions", "content_hash"):
             if not dry_run:
-                conn.execute("ALTER TABLE strategic_decisions ADD COLUMN content_hash TEXT")
+                conn.execute(
+                    "ALTER TABLE strategic_decisions ADD COLUMN content_hash TEXT"
+                )
                 conn.execute(
                     "CREATE INDEX IF NOT EXISTS idx_strategic_decisions_hash "
                     "ON strategic_decisions (content_hash)"
                 )
             stats["columns_added"].append("strategic_decisions.content_hash")
-            print(f"{'[DRY RUN] Would add' if dry_run else 'Added'} content_hash to strategic_decisions")
+            print(
+                f"{'[DRY RUN] Would add' if dry_run else 'Added'} content_hash to strategic_decisions"
+            )
         else:
             print("strategic_decisions.content_hash already exists")
 
@@ -62,7 +76,9 @@ def migrate(db_path: str, dry_run: bool = False) -> dict:
                     "CREATE INDEX IF NOT EXISTS idx_learnings_hash ON learnings (content_hash)"
                 )
             stats["columns_added"].append("learnings.content_hash")
-            print(f"{'[DRY RUN] Would add' if dry_run else 'Added'} content_hash to learnings")
+            print(
+                f"{'[DRY RUN] Would add' if dry_run else 'Added'} content_hash to learnings"
+            )
         else:
             print("learnings.content_hash already exists")
 
@@ -93,7 +109,9 @@ def migrate(db_path: str, dry_run: bool = False) -> dict:
 
             if content_hash in seen_hashes:
                 stats["duplicates_found"] += 1
-                print(f"  Duplicate decision id={row['id']}: hash {content_hash[:12]}... already exists")
+                print(
+                    f"  Duplicate decision id={row['id']}: hash {content_hash[:12]}... already exists"
+                )
 
             seen_hashes.add(content_hash)
 
@@ -104,7 +122,9 @@ def migrate(db_path: str, dry_run: bool = False) -> dict:
                 )
             stats["decisions_hashed"] += 1
 
-        print(f"{'[DRY RUN] Would hash' if dry_run else 'Hashed'} {stats['decisions_hashed']} decisions")
+        print(
+            f"{'[DRY RUN] Would hash' if dry_run else 'Hashed'} {stats['decisions_hashed']} decisions"
+        )
 
         # 4. Compute hashes for learnings without content_hash
         has_learning_hash_col = has_column(conn, "learnings", "content_hash")
@@ -113,9 +133,7 @@ def migrate(db_path: str, dry_run: bool = False) -> dict:
                 "SELECT id, content, category FROM learnings WHERE content_hash IS NULL"
             )
         else:
-            cursor = conn.execute(
-                "SELECT id, content, category FROM learnings"
-            )
+            cursor = conn.execute("SELECT id, content, category FROM learnings")
         learnings = cursor.fetchall()
         seen_learning_hashes: set[str] = set()
 
@@ -132,7 +150,9 @@ def migrate(db_path: str, dry_run: bool = False) -> dict:
 
             if content_hash in seen_learning_hashes:
                 stats["duplicates_found"] += 1
-                print(f"  Duplicate learning id={row['id']}: hash {content_hash[:12]}... already exists")
+                print(
+                    f"  Duplicate learning id={row['id']}: hash {content_hash[:12]}... already exists"
+                )
 
             seen_learning_hashes.add(content_hash)
 
@@ -143,18 +163,24 @@ def migrate(db_path: str, dry_run: bool = False) -> dict:
                 )
             stats["learnings_hashed"] += 1
 
-        print(f"{'[DRY RUN] Would hash' if dry_run else 'Hashed'} {stats['learnings_hashed']} learnings")
+        print(
+            f"{'[DRY RUN] Would hash' if dry_run else 'Hashed'} {stats['learnings_hashed']} learnings"
+        )
 
         if not dry_run:
             conn.commit()
 
         if stats["duplicates_found"] > 0:
-            print(f"\nWarning: {stats['duplicates_found']} duplicate(s) detected by content hash")
+            print(
+                f"\nWarning: {stats['duplicates_found']} duplicate(s) detected by content hash"
+            )
 
-        print(f"\nMigration {'preview' if dry_run else 'complete'}: "
-              f"{stats['decisions_hashed']} decisions, "
-              f"{stats['learnings_hashed']} learnings, "
-              f"{stats['duplicates_found']} duplicates found")
+        print(
+            f"\nMigration {'preview' if dry_run else 'complete'}: "
+            f"{stats['decisions_hashed']} decisions, "
+            f"{stats['learnings_hashed']} learnings, "
+            f"{stats['duplicates_found']} duplicates found"
+        )
 
     finally:
         conn.close()
@@ -163,7 +189,9 @@ def migrate(db_path: str, dry_run: bool = False) -> dict:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Migrate content_hash columns for dedup")
+    parser = argparse.ArgumentParser(
+        description="Migrate content_hash columns for dedup"
+    )
     parser.add_argument(
         "--db-path",
         default="cmos/db/cmos.sqlite",

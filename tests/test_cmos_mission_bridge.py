@@ -7,6 +7,7 @@ Covers:
 - SSE format correctness
 - HTTP endpoint (POST /events/cmos)
 """
+
 from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
@@ -49,7 +50,10 @@ class TestCmosEventTypes:
         assert MissionEventType.CMOS_MISSION_UNBLOCKED.value == "cmos.mission.unblocked"
 
     def test_cmos_status_changed_type(self):
-        assert MissionEventType.CMOS_MISSION_STATUS_CHANGED.value == "cmos.mission.status_changed"
+        assert (
+            MissionEventType.CMOS_MISSION_STATUS_CHANGED.value
+            == "cmos.mission.status_changed"
+        )
 
 
 class TestEmitCmosMissionEvent:

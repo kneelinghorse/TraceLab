@@ -80,17 +80,7 @@ class ConfigManager:
         """Return default configuration."""
         return {
             "version": "1.0.0",
-            "api": {
-                "base_url": "http://localhost:8000",
-                "timeout": 30
-            },
-            "defaults": {
-                "project_id": None,
-                "output_format": "human"
-            },
-            "preferences": {
-                "color": True,
-                "progress": True
-            }
+            "api": {"base_url": "http://localhost:8000", "timeout": 30},
+            "defaults": {"project_id": None, "output_format": "human"},
+            "preferences": {"color": True, "progress": True},
         }
-

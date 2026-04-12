@@ -12,7 +12,6 @@ import importlib
 import sys
 from pathlib import Path
 from types import ModuleType
-from typing import List
 
 PACKAGE_NAME = "tracelab_schemas"
 
@@ -51,7 +50,7 @@ ResearchStatement = _schema_pkg.ResearchStatement
 Synthesis = _schema_pkg.Synthesis
 __version__ = getattr(_schema_pkg, "__version__", "0.0.0")
 
-__all__: List[str] = [
+__all__: list[str] = [
     "__version__",
     "Evidence",
     "KeyQuestion",

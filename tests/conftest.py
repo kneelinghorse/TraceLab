@@ -1,4 +1,5 @@
 """Shared pytest fixtures for ingestion pipeline tests."""
+
 from __future__ import annotations
 
 import importlib.util
@@ -14,7 +15,7 @@ if str(REPO_ROOT) not in sys.path:
 
 # CRITICAL: Force test database to prevent accidental production wipes
 # setdefault doesn't override .env values, so we MUST force this
-_TEST_DB_URL = "sqlite://"
+_TEST_DB_URL = "sqlite:///./tests/test_ingestion.db"
 _current_db = os.environ.get("DATABASE_URL", "")
 
 # Safety check: refuse to run tests against production databases
@@ -31,21 +32,25 @@ os.environ.setdefault("AUTH_PASSWORD", "changeme")
 
 from sqlalchemy import event
 
-from app.core.database import Base, engine, SessionLocal
-from app.core.rate_limit import auth_rate_limiter
+from app.core.database import Base, SessionLocal, engine
 from app.core.security import get_configured_credentials, issue_token_response
 from app.models.project import Project
 from app.models.user import User
 
+
 # Register PostgreSQL-only functions for SQLite test compatibility
 def _sqlite_jsonb_array_length(v):
     import json
+
     return len(json.loads(v)) if v else 0
 
+
 if "sqlite" in str(engine.url):
+
     @event.listens_for(engine, "connect")
     def _register_sqlite_functions(dbapi_conn, connection_record):
         dbapi_conn.create_function("jsonb_array_length", 1, _sqlite_jsonb_array_length)
+
 
 pytest_plugins: tuple[str, ...] = ()
 
@@ -53,7 +58,9 @@ _TELEMETRY_PLUGIN_NAME = "cmos_pytest_telemetry_plugin"
 _TELEMETRY_PLUGIN_PATH = REPO_ROOT / "cmos" / "scripts" / "pytest_telemetry_plugin.py"
 
 if _TELEMETRY_PLUGIN_PATH.exists():
-    _spec = importlib.util.spec_from_file_location(_TELEMETRY_PLUGIN_NAME, _TELEMETRY_PLUGIN_PATH)
+    _spec = importlib.util.spec_from_file_location(
+        _TELEMETRY_PLUGIN_NAME, _TELEMETRY_PLUGIN_PATH
+    )
     if _spec and _spec.loader:
         _module = importlib.util.module_from_spec(_spec)
         sys.modules[_TELEMETRY_PLUGIN_NAME] = _module
@@ -68,7 +75,7 @@ def _create_all_sqlite_safe(eng):
     if "sqlite" not in str(eng.url):
         Base.metadata.create_all(bind=eng)
         return
-    # Reset pool so create_all gets a fresh connection with clean schema caches
+    # Ensure jsonb_array_length is available on all pooled connections
     eng.dispose()
     # Temporarily neutralize Computed columns (SQLite can't handle Postgres syntax)
     _originals = {}
@@ -95,43 +102,44 @@ def reset_database_and_reports(request):
     # Also skip for tests that rely on existing schema (created via Alembic)
     test_path = str(request.fspath)
     skip_patterns = [
-        'mcp',
-        'tests/unit',
-        'test_deepsearch_client',
-        'test_auto_ingest',
-        'test_auto_report',
-        'test_reprocess_embeddings',
-        'test_pedr_relational',
-        'test_qdrant_prewarm',
-        'test_pedr_enhancements',
-        'test_pedr_unified_search',
-        'test_rag_service',
-        'test_pedr_semantic_protocol',
-        'test_pedr_manifest_transformer',
-        'test_pedr_search_api',
-        'test_edge_materialization',
-        'test_graph_layer',
-        'test_graph_search',
-        'test_graph_rag',
-        'test_evidence_auto_linking',
+        "mcp",
+        "tests/unit",
+        "test_deepsearch_client",
+        "test_auto_ingest",
+        "test_auto_report",
+        "test_reprocess_embeddings",
+        "test_pedr_relational",
+        "test_qdrant_prewarm",
+        "test_pedr_enhancements",
+        "test_pedr_unified_search",
+        "test_rag_service",
+        "test_pedr_semantic_protocol",
+        "test_pedr_manifest_transformer",
+        "test_pedr_search_api",
+        "test_edge_materialization",
+        "test_graph_layer",
+        "test_graph_search",
+        "test_graph_rag",
+        "test_evidence_auto_linking",
     ]
     if any(pattern in test_path for pattern in skip_patterns):
         yield
         return
 
-    auth_rate_limiter.reset()
     Base.metadata.drop_all(bind=engine)
     _create_all_sqlite_safe(engine)
     # Seed a test user so API key operations can resolve user UUID
     _seed_session = SessionLocal()
     try:
         creds = get_configured_credentials()
-        _seed_session.add(User(
-            email=f"{creds.username}@tracelab.local",
-            display_name=creds.username,
-            password_hash=creds.password_hash,
-            role="admin",
-        ))
+        _seed_session.add(
+            User(
+                email=f"{creds.username}@tracelab.local",
+                display_name=creds.username,
+                password_hash=creds.password_hash,
+                role="admin",
+            )
+        )
         _seed_session.commit()
     finally:
         _seed_session.close()

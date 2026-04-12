@@ -1,22 +1,23 @@
 """Qdrant vector database service with optimized configuration."""
-from typing import List, Dict, Any, Optional
+
+from typing import Any
 
 try:  # pragma: no cover - allow importing module without qdrant dependency
     from qdrant_client import QdrantClient
     from qdrant_client.models import (
         Distance,
-        VectorParams,
-        PointStruct,
+        FieldCondition,
+        Filter,
         HnswConfig,
         HnswConfigDiff,
+        MatchValue,
+        OptimizersConfigDiff,
+        PayloadSchemaType,
+        PointStruct,
         ScalarQuantization,
         ScalarQuantizationConfig,
         ScalarType,
-        Filter,
-        FieldCondition,
-        MatchValue,
-        PayloadSchemaType,
-        OptimizersConfigDiff
+        VectorParams,
     )
 except ModuleNotFoundError as exc:  # pragma: no cover
     QdrantClient = None  # type: ignore
@@ -41,9 +42,9 @@ class QdrantService:
 
     def __init__(
         self,
-        client: Optional[QdrantClient] = None,
-        collection_name: Optional[str] = None,
-        vector_size: Optional[int] = None,
+        client: QdrantClient | None = None,
+        collection_name: str | None = None,
+        vector_size: int | None = None,
     ):
         """Initialize QdrantService.
 
@@ -65,7 +66,7 @@ class QdrantService:
         self.vector_size = vector_size or settings.openai_embedding_dimension
 
     @staticmethod
-    def _extract_vector_size(collection_info: Any) -> Optional[int]:
+    def _extract_vector_size(collection_info: Any) -> int | None:
         """Extract configured vector size from Qdrant collection metadata."""
         config = getattr(collection_info, "config", None)
         params = getattr(config, "params", None) if config else None
@@ -157,17 +158,17 @@ class QdrantService:
                 "Create and migrate to a new collection (for example, research_chunks_v2_3072d) "
                 "before ingesting embeddings."
             )
-        
+
     def ensure_collection(self, write_optimized: bool = False) -> None:
         """
         Create collection if it doesn't exist with optimized configuration.
-        
+
         Args:
             write_optimized: If True, create collection with indexing disabled for bulk import
         """
         collections = self.client.get_collections().collections
         collection_names = [c.name for c in collections]
-        
+
         if self.collection_name not in collection_names:
             self._create_collection(write_optimized=write_optimized)
             self._create_payload_indexes()
@@ -182,23 +183,19 @@ class QdrantService:
             self.client.update_collection(
                 collection_name=self.collection_name,
                 hnsw_config=HnswConfigDiff(
-                    m=16,
-                    ef_construct=32,
-                    full_scan_threshold=1_000_000
+                    m=16, ef_construct=32, full_scan_threshold=1_000_000
                 ),
-                optimizers_config=OptimizersConfigDiff(
-                    indexing_threshold=1_000_000
-                ),
-                quantization_config=None
+                optimizers_config=OptimizersConfigDiff(indexing_threshold=1_000_000),
+                quantization_config=None,
             )
-    
+
     def _create_payload_indexes(self) -> None:
         """Create payload indexes for project_id, document_id, source_type, and source_origin."""
         try:
             self.client.create_payload_index(
                 collection_name=self.collection_name,
                 field_name="project_id",
-                field_schema=PayloadSchemaType.KEYWORD
+                field_schema=PayloadSchemaType.KEYWORD,
             )
         except Exception:
             pass  # Index may already exist
@@ -207,7 +204,7 @@ class QdrantService:
             self.client.create_payload_index(
                 collection_name=self.collection_name,
                 field_name="document_id",
-                field_schema=PayloadSchemaType.KEYWORD
+                field_schema=PayloadSchemaType.KEYWORD,
             )
         except Exception:
             pass
@@ -216,7 +213,7 @@ class QdrantService:
             self.client.create_payload_index(
                 collection_name=self.collection_name,
                 field_name="source_type",
-                field_schema=PayloadSchemaType.KEYWORD
+                field_schema=PayloadSchemaType.KEYWORD,
             )
         except Exception:
             pass
@@ -225,11 +222,11 @@ class QdrantService:
             self.client.create_payload_index(
                 collection_name=self.collection_name,
                 field_name="source_origin",
-                field_schema=PayloadSchemaType.KEYWORD
+                field_schema=PayloadSchemaType.KEYWORD,
             )
         except Exception:
             pass
-    
+
     def enable_indexing_and_quantization(self) -> None:
         """
         Enable HNSW indexing and scalar quantization after bulk import.
@@ -238,27 +235,20 @@ class QdrantService:
         self.client.update_collection(
             collection_name=self.collection_name,
             hnsw_config=HnswConfigDiff(
-                m=16,
-                ef_construct=100,
-                full_scan_threshold=20000
+                m=16, ef_construct=100, full_scan_threshold=20000
             ),
-            optimizers_config=OptimizersConfigDiff(
-                indexing_threshold=20000
-            ),
+            optimizers_config=OptimizersConfigDiff(indexing_threshold=20000),
             quantization_config=ScalarQuantization(
                 scalar=ScalarQuantizationConfig(
                     type=ScalarType.INT8,
                     quantile=0.99,
-                    always_ram=True  # Keep quantized vectors in RAM
+                    always_ram=True,  # Keep quantized vectors in RAM
                 )
-            )
+            ),
         )
-    
+
     def upsert_chunks(
-        self,
-        chunks: List[Dict[str, Any]],
-        batch_size: int = 100,
-        parallel: int = 2
+        self, chunks: list[dict[str, Any]], batch_size: int = 100, parallel: int = 2
     ) -> None:
         """
         Store document chunks as vectors in Qdrant.
@@ -283,18 +273,14 @@ class QdrantService:
                 "content": chunk["content"],
                 "document_id": str(chunk["document_id"]),
                 "project_id": str(chunk["project_id"]),
-                "chunk_index": chunk["chunk_index"]
+                "chunk_index": chunk["chunk_index"],
             }
             if "source_type" in chunk:
                 payload["source_type"] = chunk["source_type"]
             if "source_origin" in chunk:
                 payload["source_origin"] = chunk["source_origin"]
 
-            point = PointStruct(
-                id=point_id,
-                vector=chunk["embedding"],
-                payload=payload
-            )
+            point = PointStruct(id=point_id, vector=chunk["embedding"], payload=payload)
             points.append(point)
 
         # Respect batch_size to avoid oversize payloads on large corpora.
@@ -303,22 +289,20 @@ class QdrantService:
         for start in range(0, len(points), batch_size):
             batch = points[start : start + batch_size]
             self.client.upsert(
-                collection_name=self.collection_name,
-                points=batch,
-                wait=True
+                collection_name=self.collection_name, points=batch, wait=True
             )
-    
+
     def search_chunks(
         self,
-        query_vector: List[float],
+        query_vector: list[float],
         top_k: int = 5,
-        project_id: Optional[str] = None,
-        document_id: Optional[str] = None,
-        source_type: Optional[str] = None,
-        source_origin: Optional[str] = None,
-        hnsw_ef: Optional[int] = None,
-        with_vectors: bool = False
-    ) -> List[Dict[str, Any]]:
+        project_id: str | None = None,
+        document_id: str | None = None,
+        source_type: str | None = None,
+        source_origin: str | None = None,
+        hnsw_ef: int | None = None,
+        with_vectors: bool = False,
+    ) -> list[dict[str, Any]]:
         """
         Search for similar chunks using vector similarity.
 
@@ -343,29 +327,39 @@ class QdrantService:
                 - source_origin: Document origin type
         """
         # Use configured default if not specified
-        effective_hnsw_ef = hnsw_ef if hnsw_ef is not None else settings.qdrant_hnsw_ef_default
+        effective_hnsw_ef = (
+            hnsw_ef if hnsw_ef is not None else settings.qdrant_hnsw_ef_default
+        )
 
         # Build filter
         filter_conditions = []
         if project_id:
             filter_conditions.append(
-                FieldCondition(key="project_id", match=MatchValue(value=str(project_id)))
+                FieldCondition(
+                    key="project_id", match=MatchValue(value=str(project_id))
+                )
             )
         if document_id:
             filter_conditions.append(
-                FieldCondition(key="document_id", match=MatchValue(value=str(document_id)))
+                FieldCondition(
+                    key="document_id", match=MatchValue(value=str(document_id))
+                )
             )
         if source_type:
             filter_conditions.append(
-                FieldCondition(key="source_type", match=MatchValue(value=str(source_type)))
+                FieldCondition(
+                    key="source_type", match=MatchValue(value=str(source_type))
+                )
             )
         if source_origin:
             filter_conditions.append(
-                FieldCondition(key="source_origin", match=MatchValue(value=str(source_origin)))
+                FieldCondition(
+                    key="source_origin", match=MatchValue(value=str(source_origin))
+                )
             )
-        
+
         query_filter = Filter(must=filter_conditions) if filter_conditions else None
-        
+
         results = self.client.search(
             collection_name=self.collection_name,
             query_vector=query_vector,
@@ -373,10 +367,10 @@ class QdrantService:
             query_filter=query_filter,
             with_payload=True,
             search_params={"hnsw_ef": effective_hnsw_ef},
-            with_vectors=with_vectors
+            with_vectors=with_vectors,
         )
 
-        chunk_results: List[Dict[str, Any]] = []
+        chunk_results: list[dict[str, Any]] = []
         for result in results:
             chunk_payload = {
                 "chunk_id": str(result.id),
@@ -386,7 +380,7 @@ class QdrantService:
                 "chunk_index": result.payload.get("chunk_index"),
                 "source_type": result.payload.get("source_type"),
                 "source_origin": result.payload.get("source_origin"),
-                "score": result.score
+                "score": result.score,
             }
             if with_vectors:
                 vector = getattr(result, "vector", None)
@@ -398,10 +392,10 @@ class QdrantService:
 
         return chunk_results
 
-    def get_collection_diagnostics(self) -> Dict[str, Any]:
+    def get_collection_diagnostics(self) -> dict[str, Any]:
         """Return collection stats plus inferred memory/quantization health."""
 
-        diagnostics: Dict[str, Any] = {
+        diagnostics: dict[str, Any] = {
             "collection": self.collection_name,
             "collection_exists": False,
             "points_count": 0,
@@ -424,12 +418,13 @@ class QdrantService:
 
         diagnostics["collection_exists"] = True
         diagnostics["points_count"] = int(getattr(info, "points_count", 0) or 0)
-        diagnostics["vectors_count"] = int(getattr(info, "vectors_count", diagnostics["points_count"]) or 0)
+        diagnostics["vectors_count"] = int(
+            getattr(info, "vectors_count", diagnostics["points_count"]) or 0
+        )
 
         payload_schema = getattr(info, "payload_schema", {}) or {}
         diagnostics["payload_indexes"] = [
-            {"field": field, "present": True}
-            for field in sorted(payload_schema.keys())
+            {"field": field, "present": True} for field in sorted(payload_schema.keys())
         ]
 
         config = getattr(info, "config", None)
@@ -447,13 +442,23 @@ class QdrantService:
         if optimizer_config is None and config is not None:
             optimizer_config = getattr(config, "optimizers_config", None)
         diagnostics["optimizer"] = (
-            {"indexing_threshold": getattr(optimizer_config, "indexing_threshold", None)}
+            {
+                "indexing_threshold": getattr(
+                    optimizer_config, "indexing_threshold", None
+                )
+            }
             if optimizer_config
             else {}
         )
 
-        quantization_config = getattr(config, "quantization_config", None) if config else None
-        scalar_config = getattr(quantization_config, "scalar", None) if quantization_config else None
+        quantization_config = (
+            getattr(config, "quantization_config", None) if config else None
+        )
+        scalar_config = (
+            getattr(quantization_config, "scalar", None)
+            if quantization_config
+            else None
+        )
         quantization_type = None
         if scalar_config is not None:
             quantization_type = getattr(scalar_config, "type", None)
@@ -463,17 +468,23 @@ class QdrantService:
         diagnostics["quantization"] = {
             "enabled": quantization_config is not None,
             "type": str(quantization_type) if quantization_type else None,
-            "always_ram": getattr(scalar_config, "always_ram", None) if scalar_config else None,
-            "quantile": getattr(scalar_config, "quantile", None) if scalar_config else None,
+            "always_ram": getattr(scalar_config, "always_ram", None)
+            if scalar_config
+            else None,
+            "quantile": getattr(scalar_config, "quantile", None)
+            if scalar_config
+            else None,
         }
 
         quantized = diagnostics["quantization"]["enabled"]
         vector_bytes = self.vector_size * (1 if quantized else 4)
         vector_memory_bytes = vector_bytes * diagnostics["vectors_count"]
-        payload_overhead = diagnostics["points_count"] * 256  # heuristic payload footprint
+        payload_overhead = (
+            diagnostics["points_count"] * 256
+        )  # heuristic payload footprint
         total_bytes = vector_memory_bytes + payload_overhead
         diagnostics["memory_estimate_bytes"] = total_bytes
-        diagnostics["memory_estimate_gb"] = round(total_bytes / (1024 ** 3), 3)
+        diagnostics["memory_estimate_gb"] = round(total_bytes / (1024**3), 3)
         return diagnostics
 
     def apply_hnsw_settings(
@@ -483,7 +494,7 @@ class QdrantService:
         ef_construct: int,
         full_scan_threshold: int,
         on_disk: bool = False,
-        optimizer_threshold: Optional[int] = 20000,
+        optimizer_threshold: int | None = 20000,
         enable_quantization: bool = True,
         quantile: float = 0.99,
         always_ram: bool = True,
@@ -520,7 +531,7 @@ class QdrantService:
 
 
 # Singleton instance (lazy initialization)
-_qdrant_service: Optional[QdrantService] = None
+_qdrant_service: QdrantService | None = None
 
 
 def get_qdrant_service() -> QdrantService:

@@ -6,19 +6,18 @@ These tests verify:
 3. Embedding vectors are returned when include_embeddings=True
 4. Results include source_origin metadata from Qdrant payload
 """
-import pytest
-from unittest.mock import MagicMock, patch
-from datetime import date
 
+from unittest.mock import patch
+
+from app.schemas.pedr_search import (
+    PEDRSearchRequest,
+)
+from app.schemas.pedr_search import (
+    PEDRSearchResult as PEDRSearchResultSchema,
+)
 from app.services.pedr.search_orchestrator import (
     PEDRSearchOrchestrator,
     PEDRSearchResult,
-    PEDRSearchResponse,
-    create_pedr_orchestrator,
-)
-from app.schemas.pedr_search import (
-    PEDRSearchRequest,
-    PEDRSearchResult as PEDRSearchResultSchema,
 )
 
 
@@ -171,6 +170,7 @@ class TestPEDRSearchOrchestratorParameters:
         # Should not raise - just testing parameter acceptance
         # We're not executing the full search since services aren't wired up
         import inspect
+
         sig = inspect.signature(orchestrator.search)
         params = list(sig.parameters.keys())
         assert "source_origin" in params
@@ -179,6 +179,7 @@ class TestPEDRSearchOrchestratorParameters:
         """search() accepts include_embeddings parameter."""
         orchestrator = PEDRSearchOrchestrator()
         import inspect
+
         sig = inspect.signature(orchestrator.search)
         params = list(sig.parameters.keys())
         assert "include_embeddings" in params
@@ -337,7 +338,9 @@ class TestCacheKeyIncludesNewParams:
         # by checking the cache_filters dict in the search method
         captured_cache_filters = {}
 
-        with patch("app.services.pedr.search_orchestrator.get_pedr_cache") as mock_cache:
+        with patch(
+            "app.services.pedr.search_orchestrator.get_pedr_cache"
+        ) as mock_cache:
             # Set up mock to capture the filters passed to cache.get()
             def capture_get(query, top_k, filters, *args, **kwargs):
                 captured_cache_filters.update(filters)

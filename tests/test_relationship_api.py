@@ -1,7 +1,6 @@
 """Tests for the mission relationship context API."""
-from __future__ import annotations
 
-from typing import Dict
+from __future__ import annotations
 
 import pytest
 from fastapi.testclient import TestClient
@@ -10,7 +9,11 @@ from app.main import app
 from app.models.chunk import DocumentChunk
 from app.models.document import Document
 from app.models.insight import Insight
-from app.models.mission_protocol import Evidence, MissionProtocolDraft, ResearchStatement
+from app.models.mission_protocol import (
+    Evidence,
+    MissionProtocolDraft,
+    ResearchStatement,
+)
 from app.services.cache_manager import get_cache_manager
 from app.services.mission_protocol_service import MissionProtocolService
 
@@ -30,7 +33,7 @@ def client() -> TestClient:
 
 
 @pytest.fixture
-def relationship_data(db_session, project) -> Dict[str, str]:
+def relationship_data(db_session, project) -> dict[str, str]:
     document = Document(
         project_id=project.id,
         name="Interview A",
@@ -70,7 +73,9 @@ def relationship_data(db_session, project) -> Dict[str, str]:
         mission_id="REL-PRIMARY",
         title="Relationship Mission",
         project_id=str(project.id),
-        research_statement=ResearchStatement(topic="Ops", objective="Diagnose friction", scope="Finance"),
+        research_statement=ResearchStatement(
+            topic="Ops", objective="Diagnose friction", scope="Finance"
+        ),
         evidence=[
             Evidence(
                 evidence_id="EV-1",
@@ -82,13 +87,17 @@ def relationship_data(db_session, project) -> Dict[str, str]:
             )
         ],
     )
-    mission = service.create_mission_from_draft(db_session, project_id=project.id, draft=draft)
+    mission = service.create_mission_from_draft(
+        db_session, project_id=project.id, draft=draft
+    )
 
     peer_draft = MissionProtocolDraft(
         mission_id="REL-PEER",
         title="Peer Mission",
         project_id=str(project.id),
-        research_statement=ResearchStatement(topic="Ops", objective="Map peers", scope="Finance"),
+        research_statement=ResearchStatement(
+            topic="Ops", objective="Map peers", scope="Finance"
+        ),
         evidence=[
             Evidence(
                 evidence_id="EV-2",
@@ -99,7 +108,9 @@ def relationship_data(db_session, project) -> Dict[str, str]:
             )
         ],
     )
-    peer_mission = service.create_mission_from_draft(db_session, project_id=project.id, draft=peer_draft)
+    peer_mission = service.create_mission_from_draft(
+        db_session, project_id=project.id, draft=peer_draft
+    )
 
     return {
         "mission_id": str(mission.id),
@@ -110,7 +121,9 @@ def relationship_data(db_session, project) -> Dict[str, str]:
     }
 
 
-def test_relationship_endpoint_returns_related_entities(client: TestClient, auth_headers, relationship_data):
+def test_relationship_endpoint_returns_related_entities(
+    client: TestClient, auth_headers, relationship_data
+):
     response = client.get(
         f"/api/v1/missions/{relationship_data['mission_id']}/related",
         headers=auth_headers,
@@ -130,7 +143,9 @@ def test_relationship_endpoint_returns_related_entities(client: TestClient, auth
     assert payload["related_missions"][0]["mission_identifier"] == "REL-PEER"
 
 
-def test_relationship_endpoint_supports_depth_and_filters(client: TestClient, auth_headers, relationship_data):
+def test_relationship_endpoint_supports_depth_and_filters(
+    client: TestClient, auth_headers, relationship_data
+):
     response = client.get(
         f"/api/v1/missions/{relationship_data['mission_id']}/related",
         params={
@@ -150,7 +165,9 @@ def test_relationship_endpoint_supports_depth_and_filters(client: TestClient, au
     assert payload["chunks"][0]["preview"].startswith("Participants highlight")
 
 
-def test_relationship_endpoint_respects_min_relevance_and_cache(client: TestClient, auth_headers, relationship_data):
+def test_relationship_endpoint_respects_min_relevance_and_cache(
+    client: TestClient, auth_headers, relationship_data
+):
     first = client.get(
         f"/api/v1/missions/{relationship_data['mission_id']}/related",
         params={"min_relevance": 0.9},

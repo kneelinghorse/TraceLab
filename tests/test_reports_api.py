@@ -1,20 +1,19 @@
 """Tests for the reports API endpoints."""
+
 from __future__ import annotations
 
 import uuid
-from typing import Any, Dict
-from unittest.mock import MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
 
+from app.core.database import SessionLocal
 from app.main import app
-from app.models.document import Document
 from app.models.chunk import DocumentChunk
 from app.models.collection import Collection, CollectionItem
+from app.models.document import Document
 from app.models.project import Project
 from app.models.report import Report, ReportSource
-from app.core.database import SessionLocal
 
 
 def _create_test_project(db_session) -> Project:
@@ -41,7 +40,10 @@ def _create_test_document(db_session, project_id: uuid.UUID) -> Document:
 
 
 def _create_test_chunk(
-    db_session, document_id: uuid.UUID, index: int = 0, content: str = "Test chunk content"
+    db_session,
+    document_id: uuid.UUID,
+    index: int = 0,
+    content: str = "Test chunk content",
 ) -> DocumentChunk:
     """Create a test document chunk."""
     from sqlalchemy import text
@@ -612,9 +614,11 @@ class TestReportDelete:
         # Verify sources also deleted
         session = SessionLocal()
         try:
-            remaining = session.query(ReportSource).filter(
-                ReportSource.report_id == report_id
-            ).all()
+            remaining = (
+                session.query(ReportSource)
+                .filter(ReportSource.report_id == report_id)
+                .all()
+            )
             assert len(remaining) == 0
         finally:
             session.close()
@@ -635,7 +639,9 @@ class TestReportDelete:
 class TestReportFormats:
     """Tests for different output formats."""
 
-    @pytest.mark.parametrize("format_type", ["summary", "report", "bullets", "markdown"])
+    @pytest.mark.parametrize(
+        "format_type", ["summary", "report", "bullets", "markdown"]
+    )
     def test_create_report_all_formats(self, auth_headers, db_session, format_type):
         """Test creating reports with all format types."""
         from app.services.report_service import ReportService, get_report_service

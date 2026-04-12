@@ -1,7 +1,9 @@
 """Shared PEDR score helpers."""
+
 from __future__ import annotations
 
-from typing import Any, Dict, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 BASE_SCORE_KEY = "pedr_base_score"
 
@@ -13,20 +15,22 @@ def _to_float(value: Any, default: float = 0.0) -> float:
         return default
 
 
-def ensure_base_score(payload: Dict[str, Any]) -> float:
+def ensure_base_score(payload: dict[str, Any]) -> float:
     """Persist and return the canonical pre-boost score for a payload."""
     if BASE_SCORE_KEY in payload:
         base_score = _to_float(payload.get(BASE_SCORE_KEY), 0.0)
     else:
         base_score = _to_float(
-            payload.get("rrf_score", payload.get("combined_score", payload.get("score", 0.0))),
+            payload.get(
+                "rrf_score", payload.get("combined_score", payload.get("score", 0.0))
+            ),
             0.0,
         )
         payload[BASE_SCORE_KEY] = base_score
     return base_score
 
 
-def fuse_independent_adjustments(payload: Dict[str, Any]) -> float:
+def fuse_independent_adjustments(payload: dict[str, Any]) -> float:
     """Fuse syntactic/pragmatic boosts + quality multiplier against base score."""
     base_score = ensure_base_score(payload)
     type_boost = _to_float(payload.get("type_boost"), 0.0)
@@ -50,7 +54,7 @@ def fuse_independent_adjustments(payload: Dict[str, Any]) -> float:
     return fused_score
 
 
-def summarize_scores(scores: Sequence[float]) -> Dict[str, float]:
+def summarize_scores(scores: Sequence[float]) -> dict[str, float]:
     values = [float(value) for value in scores if value is not None]
     if not values:
         return {}
