@@ -27,7 +27,7 @@ from app.schemas.api_key import (
     APIKeyList,
     APIKeyResponse,
 )
-from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse
+from app.schemas.auth import LoginRequest, ProfileResponse, ProfileUpdate, RegisterRequest, TokenResponse
 
 router = APIRouter(tags=["auth"])
 
@@ -114,6 +114,50 @@ def refresh_token(
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="User not found")
     response_payload = issue_token_response(db_user)
     return TokenResponse(**response_payload)
+
+
+# --- Profile Management Endpoints ---
+
+
+@router.get("/me", response_model=ProfileResponse)
+def get_me(
+    user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+) -> ProfileResponse:
+    """Return the authenticated user's profile."""
+    db_user = db.query(User).filter(User.id == user.user_id).first()
+    if not db_user:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
+    return ProfileResponse(user_id=db_user.id, email=db_user.email, display_name=db_user.display_name)
+
+
+@router.patch("/me", response_model=ProfileResponse)
+def update_me(
+    payload: ProfileUpdate,
+    user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+) -> ProfileResponse:
+    """Update the authenticated user's display name and/or password."""
+    db_user = db.query(User).filter(User.id == user.user_id).first()
+    if not db_user:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    if payload.display_name is not None:
+        db_user.display_name = payload.display_name
+
+    if payload.new_password is not None:
+        if not payload.current_password:
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                detail="current_password is required to set a new password",
+            )
+        if not verify_password(payload.current_password, db_user.password_hash):
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Current password is incorrect")
+        db_user.password_hash = hash_password(payload.new_password)
+
+    db.commit()
+    db.refresh(db_user)
+    return ProfileResponse(user_id=db_user.id, email=db_user.email, display_name=db_user.display_name)
 
 
 # --- API Key Management Endpoints ---

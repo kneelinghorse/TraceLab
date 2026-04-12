@@ -141,6 +141,16 @@ export const httpClient = {
     });
   },
 
+  patch<T>(path: string, body?: unknown, config: HttpClientRequestConfig = {}): Promise<T> {
+    return apiRequest<T>(path, {
+      method: "PATCH",
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+      skipAuth: config.skipAuth,
+      headers: config.headers,
+      params: config.params,
+    });
+  },
+
   delete<T>(path: string, config: HttpClientRequestConfig = {}): Promise<T> {
     return apiRequest<T>(path, { method: "DELETE", skipAuth: config.skipAuth, headers: config.headers, params: config.params });
   },

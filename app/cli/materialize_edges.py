@@ -39,6 +39,11 @@ def main() -> int:
         "--project",
         help="Optional project UUID to scope materialization",
     )
+    parser.add_argument(
+        "--skip-topic-similar",
+        action="store_true",
+        help="Skip topic_similar edge materialization (Qdrant-dependent, expensive)",
+    )
 
     args = parser.parse_args()
 
@@ -55,16 +60,31 @@ def main() -> int:
     )
 
     print("-" * 50)
-    print(f"Inserted: {result.inserted_count}")
-    print(f"Updated: {result.updated_count}")
-    print(f"Skipped: {result.skipped_count}")
-    print(f"Total: {result.total}")
+    print(f"Implicit edges — Inserted: {result.inserted_count}, Updated: {result.updated_count}, Skipped: {result.skipped_count}")
 
     if result.errors:
         print("Errors:")
         for error in result.errors:
             print(f"  - {error}")
         return 1
+
+    # For full runs, also materialize topic_similar edges (requires Qdrant)
+    if mode == "full" and not args.skip_topic_similar:
+        print("\nMaterializing topic_similar edges (Qdrant embedding similarity)...")
+        try:
+            ts_result = service.materialize_topic_similarity_edges(
+                project_id=args.project,
+            )
+            print(f"topic_similar — Inserted: {ts_result.inserted_count}, Updated: {ts_result.updated_count}, Skipped: {ts_result.skipped_count}")
+            if ts_result.errors:
+                print("topic_similar errors:")
+                for error in ts_result.errors:
+                    print(f"  - {error}")
+        except Exception as exc:
+            print(f"topic_similar materialization failed (non-fatal): {exc}")
+
+    total = result.total + (ts_result.total if mode == "full" and not args.skip_topic_similar else 0)
+    print(f"\nTotal edges processed: {total}")
 
     return 0
 
