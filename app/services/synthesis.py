@@ -67,7 +67,7 @@ class SynthesisService:
         client: Optional["OpenAI"] = None,
         model: Optional[str] = None,
         temperature: float = 0.3,
-        max_tokens: int = 2000,
+        max_tokens: int = 4096,
         cost_monitor: Optional[CostMonitor] = None,
         cache_service: Optional["SynthesisCacheService"] = None,
         enable_cache: bool = True,
@@ -423,9 +423,15 @@ class SynthesisService:
                 # GPT-5.1/5.2 support temperature when reasoning_effort is explicitly none.
                 request["reasoning_effort"] = "none"
             response = self.client.chat.completions.create(**request)
-            content = response.choices[0].message.content if response.choices else ""
+            content = response.choices[0].message.content if response.choices else None
             usage = self._extract_usage(response)
-            return (content or "").strip(), usage
+            if not content:
+                raise ValueError(
+                    f"Model {self.model!r} returned empty content. "
+                    "This may indicate a max_completion_tokens limit was hit or the model "
+                    "refused the request. Check model parameters and prompt."
+                )
+            return content.strip(), usage
         except (RateLimitError, APIError) as exc:
             logger.error("OpenAI API error during synthesis: %s", exc)
             raise
