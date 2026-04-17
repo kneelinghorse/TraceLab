@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { formatDistanceToNow } from "date-fns";
@@ -708,7 +708,124 @@ function MissionDetailContent() {
               </div>
             )}
           </Section>
+
+          {/* Runner logs */}
+          {missionId && <MissionLogTail missionId={missionId} status={mission?.status} />}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Log tail component — polls while mission is active, shows last N lines
+// ---------------------------------------------------------------------------
+
+type LogEntry = {
+  id: string;
+  level: string;
+  message: string;
+  source: string | null;
+  logged_at: string;
+};
+
+const ACTIVE_STATUSES = new Set(["queued", "in_progress"]);
+const POLL_INTERVAL_MS = 5000;
+const LOG_LEVEL_COLORS: Record<string, string> = {
+  ERROR: "text-red-500 dark:text-red-400",
+  WARNING: "text-yellow-500 dark:text-yellow-400",
+  WARN: "text-yellow-500 dark:text-yellow-400",
+  INFO: "text-gray-600 dark:text-gray-400",
+  DEBUG: "text-gray-400 dark:text-gray-500",
+};
+
+function MissionLogTail({ missionId, status }: { missionId: string; status: MissionStatus | undefined }) {
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [hasLogs, setHasLogs] = useState<boolean | null>(null); // null = not yet checked
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const isActive = status ? ACTIVE_STATUSES.has(status) : false;
+
+  const fetchLogs = useCallback(async () => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000"}/api/v1/missions/${missionId}/logs?limit=100`,
+        {
+          headers: {
+            Authorization: `Bearer ${typeof window !== "undefined" ? JSON.parse(localStorage.getItem("tracelab_auth") ?? "{}").token ?? "" : ""}`,
+          },
+        }
+      );
+      if (!res.ok) return;
+      const data: LogEntry[] = await res.json();
+      setLogs(data);
+      if (hasLogs === null) setHasLogs(data.length > 0);
+    } catch {
+      // non-fatal
+    }
+  }, [missionId, hasLogs]);
+
+  useEffect(() => {
+    fetchLogs();
+  }, [fetchLogs]);
+
+  useEffect(() => {
+    if (!isActive) return;
+    const id = setInterval(fetchLogs, POLL_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [isActive, fetchLogs]);
+
+  // Auto-scroll to bottom when new logs arrive while active
+  useEffect(() => {
+    if (isActive && bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [logs, isActive]);
+
+  // Don't render if we've confirmed there are no logs
+  if (hasLogs === false && !isActive) return null;
+
+  return (
+    <div className="border-t border-gray-200 dark:border-gray-700 mt-0">
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Runner Logs
+          </h2>
+          {isActive && (
+            <span className="flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400">
+              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+              Live
+            </span>
+          )}
+        </div>
+
+        {logs.length === 0 ? (
+          <p className="text-sm text-gray-400 dark:text-gray-500 font-mono">
+            {isActive ? "Waiting for logs..." : "No logs recorded."}
+          </p>
+        ) : (
+          <div className="bg-gray-950 dark:bg-gray-900 rounded-lg p-4 overflow-y-auto max-h-96 font-mono text-xs space-y-0.5">
+            {logs.map((log) => (
+              <div key={log.id} className="flex gap-3 leading-5">
+                <span className="shrink-0 text-gray-500 dark:text-gray-600 w-[180px]">
+                  {new Date(log.logged_at).toISOString().replace("T", " ").slice(0, 19)}
+                </span>
+                <span className={`shrink-0 w-14 ${LOG_LEVEL_COLORS[log.level] ?? LOG_LEVEL_COLORS.INFO}`}>
+                  {log.level}
+                </span>
+                {log.source && (
+                  <span className="shrink-0 text-gray-500 dark:text-gray-600 max-w-[120px] truncate">
+                    {log.source}
+                  </span>
+                )}
+                <span className="text-gray-200 dark:text-gray-100 break-words min-w-0">
+                  {log.message}
+                </span>
+              </div>
+            ))}
+            <div ref={bottomRef} />
+          </div>
+        )}
       </div>
     </div>
   );

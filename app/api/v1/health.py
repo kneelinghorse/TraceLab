@@ -100,3 +100,32 @@ async def readiness_check(db: Session = Depends(get_db)):
         "qdrant": qdrant_status,
         "qdrant_prewarmed": is_qdrant_ready(),
     }
+
+
+@router.get("/graph/stats")
+def graph_stats(db: Session = Depends(get_db)) -> dict:
+    """Return graph edge counts by type and corpus size."""
+    edge_rows = db.execute(
+        text("SELECT edge_type, COUNT(*) as count FROM graph_edges GROUP BY edge_type ORDER BY count DESC")
+    ).fetchall()
+
+    doc_count = db.execute(
+        text("SELECT COUNT(*) FROM documents WHERE deleted_at IS NULL")
+    ).scalar() or 0
+
+    chunk_count = db.execute(
+        text(
+            "SELECT COUNT(*) FROM document_chunks dc "
+            "JOIN documents d ON dc.document_id = d.id WHERE d.deleted_at IS NULL"
+        )
+    ).scalar() or 0
+
+    edge_counts = {row[0]: row[1] for row in edge_rows}
+    total = sum(edge_counts.values())
+
+    return {
+        "edge_counts": edge_counts,
+        "total_edges": total,
+        "document_count": int(doc_count),
+        "chunk_count": int(chunk_count),
+    }

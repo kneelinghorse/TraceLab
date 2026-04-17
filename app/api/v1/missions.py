@@ -9,7 +9,7 @@ Provides full CRUD operations for missions with:
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
@@ -741,3 +741,106 @@ def promote_mission_report(
             status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error promoting report: {str(exc)[:200]}",
         ) from exc
+
+
+# ---------------------------------------------------------------------------
+# Mission log ingestion + retrieval (T39.3)
+# ---------------------------------------------------------------------------
+
+from datetime import datetime
+from pydantic import BaseModel
+
+
+class LogEntry(BaseModel):
+    level: str = "INFO"
+    message: str
+    source: str | None = None
+    logged_at: datetime | None = None
+
+
+class LogBatchRequest(BaseModel):
+    logs: List[LogEntry]
+
+
+class LogEntryResponse(BaseModel):
+    id: str
+    level: str
+    message: str
+    source: str | None
+    logged_at: datetime
+    created_at: datetime
+
+
+@router.post(
+    "/{mission_id}/logs",
+    status_code=http_status.HTTP_201_CREATED,
+    summary="Ingest a batch of log records for a mission",
+)
+def ingest_mission_logs(
+    mission_id: UUID,
+    payload: LogBatchRequest,
+    db: Session = Depends(get_db),
+) -> dict:
+    """Accept a batch of log lines from the DeepSearch runner.
+
+    Intended to be called by TracelabLogHandler from the DeepSearch service.
+    Requires no auth token so the runner can call it with just an API key
+    in future, but for now it's open (same as other mission endpoints).
+    """
+    from app.models.mission_log import MissionLog
+
+    mission = _service.get_mission(db, mission_id)
+
+    now = datetime.utcnow()
+    records = [
+        MissionLog(
+            mission_id=mission.id,
+            level=(entry.level or "INFO").upper()[:20],
+            message=entry.message,
+            source=entry.source,
+            logged_at=entry.logged_at or now,
+            created_at=now,
+        )
+        for entry in payload.logs
+    ]
+
+    db.add_all(records)
+    db.commit()
+
+    return {"accepted": len(records)}
+
+
+@router.get(
+    "/{mission_id}/logs",
+    response_model=List[LogEntryResponse],
+    summary="Retrieve recent log records for a mission",
+)
+def get_mission_logs(
+    mission_id: UUID,
+    limit: int = Query(default=100, ge=1, le=500, description="Max log lines to return"),
+    db: Session = Depends(get_db),
+) -> List[LogEntryResponse]:
+    """Return the most recent log lines for a mission, newest last."""
+    from app.models.mission_log import MissionLog
+
+    mission = _service.get_mission(db, mission_id)
+
+    logs = (
+        db.query(MissionLog)
+        .filter(MissionLog.mission_id == mission.id)
+        .order_by(MissionLog.logged_at.asc())
+        .limit(limit)
+        .all()
+    )
+
+    return [
+        LogEntryResponse(
+            id=str(log.id),
+            level=log.level,
+            message=log.message,
+            source=log.source,
+            logged_at=log.logged_at,
+            created_at=log.created_at,
+        )
+        for log in logs
+    ]

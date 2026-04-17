@@ -40,6 +40,31 @@ class LoginRequest(BaseModel):
         return v.strip().lower()
 
 
+class ProfileUpdate(BaseModel):
+    """Payload for updating the authenticated user's profile."""
+
+    display_name: Optional[str] = Field(None, max_length=100, description="New display name")
+    current_password: Optional[str] = Field(None, description="Required when changing password")
+    new_password: Optional[str] = Field(None, min_length=8, description="New password (minimum 8 characters)")
+
+    @field_validator("display_name")
+    @classmethod
+    def validate_display_name(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None:
+            v = v.strip()
+            if not v:
+                raise ValueError("display_name cannot be blank")
+        return v
+
+
+class ProfileResponse(BaseModel):
+    """Response after a profile update."""
+
+    user_id: UUID
+    email: str
+    display_name: str
+
+
 class RegisterRequest(BaseModel):
     """Payload for user registration."""
 

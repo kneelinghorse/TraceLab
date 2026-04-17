@@ -10,7 +10,6 @@ import { AuthGate } from "@/components/AuthGate";
 import { StatCard, StatGrid } from "@/components/console/StatCard";
 import { CorrectionStatusCard } from "@/components/console/CorrectionStatusCard";
 import { WorkerHealthCard } from "@/components/console/WorkerHealthCard";
-import { MissionActivityFeed } from "@/components/console/MissionActivityFeed";
 import {
   getConsoleMissions,
   getCorrectionStatus,
@@ -145,10 +144,10 @@ function ConsoleDashboard() {
               </StatGrid>
             </section>
 
-            {/* Live Activity Feed + Worker Health side by side */}
+            {/* System health */}
             <section className="mb-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
-                <MissionActivityFeed maxDisplay={30} />
+                <GraphHealthPanel />
               </div>
               <div>
                 <WorkerHealthCard refreshInterval={30000} />
@@ -265,6 +264,105 @@ function ConsoleDashboard() {
         )}
       </div>
     </main>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Graph health panel — corpus + graph layer stats
+// ---------------------------------------------------------------------------
+
+type GraphStats = {
+  edge_counts: Record<string, number>;
+  total_edges: number;
+  document_count: number;
+  chunk_count: number;
+};
+
+function GraphHealthPanel() {
+  const [stats, setStats] = useState<GraphStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+    const token = typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("tracelab_auth") ?? "{}").token ?? ""
+      : "";
+
+    Promise.all([
+      fetch(`${apiBase}/api/v1/graph/stats`, { headers: { Authorization: `Bearer ${token}` } })
+        .then((r) => r.ok ? r.json() : null)
+        .catch(() => null),
+    ]).then(([graphData]) => {
+      setStats(graphData);
+      setIsLoading(false);
+    });
+  }, []);
+
+  const EDGE_COLORS: Record<string, string> = {
+    topic_similar: "bg-violet-500",
+    contains: "bg-blue-500",
+    part_of: "bg-sky-500",
+    co_occurs: "bg-teal-500",
+    belongs_to: "bg-green-500",
+    references: "bg-yellow-500",
+    derived_from: "bg-orange-500",
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Graph Layer</h2>
+
+      {isLoading ? (
+        <p className="text-sm text-gray-400 dark:text-gray-500">Loading...</p>
+      ) : !stats ? (
+        <p className="text-sm text-gray-400 dark:text-gray-500">Graph stats unavailable</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {stats.total_edges?.toLocaleString() ?? "—"}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Total edges</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {stats.document_count?.toLocaleString() ?? "—"}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Documents</p>
+            </div>
+            <div className="text-center">
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {stats.chunk_count?.toLocaleString() ?? "—"}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Chunks</p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            {Object.entries(stats.edge_counts ?? {})
+              .sort(([, a], [, b]) => b - a)
+              .map(([type, count]) => {
+                const pct = stats.total_edges > 0 ? (count / stats.total_edges) * 100 : 0;
+                return (
+                  <div key={type}>
+                    <div className="flex items-center justify-between text-xs mb-1">
+                      <span className="text-gray-600 dark:text-gray-400">{type}</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{count.toLocaleString()}</span>
+                    </div>
+                    <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5">
+                      <div
+                        className={`h-1.5 rounded-full ${EDGE_COLORS[type] ?? "bg-gray-400"}`}
+                        style={{ width: `${Math.max(pct, 0.5)}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        </>
+      )}
+    </div>
   );
 }
 

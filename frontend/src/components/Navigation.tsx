@@ -98,24 +98,21 @@ export function Navigation() {
               >
                 Console
               </Link>
+            </div>
+          </div>
+
+          {user && (
+            <div className="flex items-center gap-3">
               <Link
-                href="/invites"
+                href="/settings"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive("/invites")
+                  isActive("/settings")
                     ? "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
                     : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
                 }`}
               >
-                Invites
-              </Link>
-            </div>
-          </div>
-          
-          {user && (
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
                 {user.display_name || user.email}
-              </span>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
