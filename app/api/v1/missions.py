@@ -188,7 +188,7 @@ def list_missions(
     ),
     status: str | None = Query(
         None,
-        description="Filter by mission status (draft, queued, in_progress, completed, blocked, cancelled)",
+        description="Filter by mission status (draft, queued, in_progress, completed, blocked, cancelled, validation_failed)",
     ),
     project_id: UUID | None = Query(
         None,

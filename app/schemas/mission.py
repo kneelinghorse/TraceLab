@@ -15,7 +15,8 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 # Valid mission statuses
 MissionStatus = Literal[
-    "draft", "queued", "in_progress", "completed", "blocked", "cancelled"
+    "draft", "queued", "in_progress", "completed",
+    "blocked", "cancelled", "validation_failed",
 ]
 
 # Valid research depth tiers

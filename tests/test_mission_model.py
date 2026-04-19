@@ -38,6 +38,7 @@ class TestMissionStatuses:
             "completed",
             "blocked",
             "cancelled",
+            "validation_failed",
         }
         assert expected == MISSION_STATUSES
 
