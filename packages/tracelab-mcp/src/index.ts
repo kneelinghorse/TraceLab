@@ -551,8 +551,8 @@ const TOOLS: Tool[] = [
       properties: {
         status: {
           type: 'string',
-          enum: ['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled'],
-          description: 'Filter by execution status. draft: Not yet submitted. queued: Waiting for execution. in_progress: Currently executing. completed: Finished successfully. blocked: Awaiting resolution. cancelled: Terminated.',
+          enum: ['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled', 'validation_failed'],
+          description: 'Filter by execution status. draft: Not yet submitted. queued: Waiting for execution. in_progress: Currently executing. completed: Finished successfully. blocked: Awaiting resolution. cancelled: Terminated. validation_failed: Synthesized output but failed coverage/structural gates (reviewable artifact, distinct from blocked).',
         },
         project_id: {
           type: 'string',
@@ -804,7 +804,7 @@ const CreateMissionInput = z.object({
 });
 
 const ListMissionsInput = z.object({
-  status: z.enum(['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled']).optional(),
+  status: z.enum(['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled', 'validation_failed']).optional(),
   project_id: z.string().uuid().optional(),
   page: z.number().min(1).optional().default(1),
   page_size: z.number().min(1).max(100).optional().default(20),

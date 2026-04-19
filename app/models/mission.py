@@ -28,6 +28,9 @@ from app.core.database import Base
 from app.models.types import GUID, CrossDBJSON
 
 # Valid mission statuses
+# 'validation_failed' is a terminal fail-closed outcome distinct from 'blocked':
+# the mission synthesized output but failed coverage/structural gates. Reviewers
+# treat these as reviewable artifacts, not infra failures.
 MISSION_STATUSES = frozenset(
     {
         "draft",
@@ -36,6 +39,7 @@ MISSION_STATUSES = frozenset(
         "completed",
         "blocked",
         "cancelled",
+        "validation_failed",
     }
 )
 
@@ -212,7 +216,8 @@ class Mission(Base):
         ),
         # Valid status values
         CheckConstraint(
-            "status IN ('draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled')",
+            "status IN ('draft', 'queued', 'in_progress', 'completed', "
+            "'blocked', 'cancelled', 'validation_failed')",
             name="valid_mission_status",
         ),
         # Valid research_depth values (nullable allowed)

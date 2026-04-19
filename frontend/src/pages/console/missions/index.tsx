@@ -175,6 +175,7 @@ function MissionListContent() {
                 <option value="in_progress">In Progress ({statusCounts.in_progress ?? 0})</option>
                 <option value="completed">Completed ({statusCounts.completed ?? 0})</option>
                 <option value="blocked">Blocked ({statusCounts.blocked ?? 0})</option>
+                <option value="validation_failed">Validation Failed ({statusCounts.validation_failed ?? 0})</option>
               </select>
             </div>
           </div>

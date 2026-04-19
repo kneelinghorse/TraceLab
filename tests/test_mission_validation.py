@@ -298,7 +298,10 @@ class TestStatusValidation:
 
     @pytest.mark.parametrize(
         "status",
-        ["draft", "queued", "in_progress", "completed", "blocked", "cancelled"],
+        [
+            "draft", "queued", "in_progress", "completed",
+            "blocked", "cancelled", "validation_failed",
+        ],
     )
     def test_valid_statuses(self, status: str):
         """All valid status values should pass."""

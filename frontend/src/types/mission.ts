@@ -2,7 +2,7 @@
 export type MissionProtocolStatus = "draft" | "in_progress" | "review" | "complete";
 
 // New mission status aligned with backend API
-export type MissionStatus = "draft" | "queued" | "in_progress" | "completed" | "blocked" | "cancelled";
+export type MissionStatus = "draft" | "queued" | "in_progress" | "completed" | "blocked" | "cancelled" | "validation_failed";
 
 export type QualityGateName =
   | "research_statement"
