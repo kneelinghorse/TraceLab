@@ -108,6 +108,57 @@ class MissionCreate(MissionBase):
         "baseline",
         description="Research depth tier. BASELINE (8-12 min, 50-60 sources): standard thorough research — use as default. DEEP (20-25 min, 30-40 vetted sources): stricter quality gates, min 5 loops. ALPHA (1+ hour, ~20 scrutinized sources): may reject if evidence insufficient.",
     )
+    # Mission-authoring fields consumed by DeepSearch contract compiler (T40.1).
+    background: str | None = Field(
+        None,
+        description="Free-form background prose orienting the research.",
+    )
+    focus: str | None = Field(
+        None,
+        description="Narrow framing for the research question.",
+    )
+    references: list[dict[str, Any]] | None = Field(
+        None,
+        description="Array of reference objects, each at minimum {title}.",
+    )
+    required_entities: list[str] | None = Field(
+        None,
+        description="Entities that MUST appear in the synthesized output.",
+    )
+    excluded_entities: list[str] | None = Field(
+        None,
+        description="Entities that MUST NOT appear in the synthesized output.",
+    )
+    expected_output_schema: dict[str, Any] | None = Field(
+        None,
+        description="DeepSearch OutputSchema describing the deliverable shape.",
+    )
+    coverage_thresholds: dict[str, Any] | None = Field(
+        None,
+        description="Dict of coverage gate thresholds applied during synthesis.",
+    )
+    validation_thresholds: dict[str, Any] | None = Field(
+        None,
+        description="Dict of validation gate thresholds applied during synthesis.",
+    )
+    deliverable_format: str | None = Field(
+        None,
+        description="Output rendering format hint (e.g. 'markdown report', 'comparison table').",
+    )
+    max_loops: int | None = Field(
+        None,
+        ge=1,
+        description="Upper bound on DeepSearch research loop count.",
+    )
+    min_loops: int | None = Field(
+        None,
+        ge=1,
+        description="Lower bound on DeepSearch research loop count.",
+    )
+    constraints: list[str] | None = Field(
+        None,
+        description="Constraint strings. Promoted from context['constraints'] in T40.1.",
+    )
     status: MissionStatus | None = Field(
         "draft",
         description="Initial mission status",
@@ -164,6 +215,57 @@ class MissionUpdate(BaseModel):
     research_depth: ResearchDepth | None = Field(
         None,
         description="Research depth tier. BASELINE (8-12 min, 50-60 sources): standard thorough research. DEEP (20-25 min, 30-40 vetted sources): stricter quality gates. ALPHA (1+ hour, ~20 scrutinized sources): may reject if evidence insufficient.",
+    )
+    # Mission-authoring fields (T40.1) — all optional on update.
+    background: str | None = Field(
+        None,
+        description="Free-form background prose orienting the research.",
+    )
+    focus: str | None = Field(
+        None,
+        description="Narrow framing for the research question.",
+    )
+    references: list[dict[str, Any]] | None = Field(
+        None,
+        description="Array of reference objects, each at minimum {title}.",
+    )
+    required_entities: list[str] | None = Field(
+        None,
+        description="Entities that MUST appear in the synthesized output.",
+    )
+    excluded_entities: list[str] | None = Field(
+        None,
+        description="Entities that MUST NOT appear in the synthesized output.",
+    )
+    expected_output_schema: dict[str, Any] | None = Field(
+        None,
+        description="DeepSearch OutputSchema describing the deliverable shape.",
+    )
+    coverage_thresholds: dict[str, Any] | None = Field(
+        None,
+        description="Dict of coverage gate thresholds applied during synthesis.",
+    )
+    validation_thresholds: dict[str, Any] | None = Field(
+        None,
+        description="Dict of validation gate thresholds applied during synthesis.",
+    )
+    deliverable_format: str | None = Field(
+        None,
+        description="Output rendering format hint (e.g. 'markdown report').",
+    )
+    max_loops: int | None = Field(
+        None,
+        ge=1,
+        description="Upper bound on DeepSearch research loop count.",
+    )
+    min_loops: int | None = Field(
+        None,
+        ge=1,
+        description="Lower bound on DeepSearch research loop count.",
+    )
+    constraints: list[str] | None = Field(
+        None,
+        description="Constraint strings. Promoted from context['constraints'] in T40.1.",
     )
     status: MissionStatus | None = Field(
         None,
@@ -232,6 +334,19 @@ class MissionResponse(MissionBase):
         "baseline",
         description="Research depth tier. BASELINE (8-12 min, 50-60 sources): standard thorough research. DEEP (20-25 min, 30-40 vetted sources): stricter quality gates. ALPHA (1+ hour, ~20 scrutinized sources): may reject if evidence insufficient.",
     )
+    # Mission-authoring fields (T40.1).
+    background: str | None = None
+    focus: str | None = None
+    references: list[dict[str, Any]] | None = None
+    required_entities: list[str] | None = None
+    excluded_entities: list[str] | None = None
+    expected_output_schema: dict[str, Any] | None = None
+    coverage_thresholds: dict[str, Any] | None = None
+    validation_thresholds: dict[str, Any] | None = None
+    deliverable_format: str | None = None
+    max_loops: int | None = None
+    min_loops: int | None = None
+    constraints: list[str] | None = None
     status: MissionStatus
     queued_at: datetime | None = None
     started_at: datetime | None = None
@@ -269,6 +384,28 @@ class MissionResponse(MissionBase):
         if isinstance(v, list):
             return [UUID(str(x)) if not isinstance(x, UUID) else x for x in v]
         return []
+
+    @field_validator("constraints", mode="before")
+    @classmethod
+    def fallback_constraints_from_context(
+        cls, v: Any, info
+    ) -> list[str] | None:
+        """Fallback to context['constraints'] when the column is null.
+
+        T40.1 promoted `constraints` out of `context` into its own column.
+        Missions authored before the migration only have it inside `context`;
+        this keeps DeepSearch's existing reader working through the transition.
+        An empty list is treated as an explicit author choice and preserved.
+        """
+        if v is not None:
+            return v
+        data = info.data if hasattr(info, "data") else {}
+        ctx = data.get("context") if isinstance(data, dict) else None
+        if isinstance(ctx, dict):
+            legacy = ctx.get("constraints")
+            if legacy:
+                return legacy
+        return v
 
 
 # Alias for backwards compatibility

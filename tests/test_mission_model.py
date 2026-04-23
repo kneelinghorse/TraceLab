@@ -351,6 +351,19 @@ class TestMissionTableDefinition:
             "created_at",
             "updated_at",
             "created_by",
+            # T40.1 authoring fields
+            "background",
+            "focus",
+            "references",
+            "required_entities",
+            "excluded_entities",
+            "expected_output_schema",
+            "coverage_thresholds",
+            "validation_thresholds",
+            "deliverable_format",
+            "max_loops",
+            "min_loops",
+            "constraints",
         }
         assert required.issubset(columns), f"Missing columns: {required - columns}"
 
@@ -377,3 +390,125 @@ class TestMissionTableDefinition:
         assert expected.issubset(constraint_names), (
             f"Missing constraints: {expected - constraint_names}"
         )
+
+
+class TestMissionAuthoringFields:
+    """T40.1 — authoring fields consumed by DeepSearch contract compiler."""
+
+    def _full_authoring_kwargs(self) -> dict:
+        return {
+            "background": "Background prose for the mission.",
+            "focus": "Narrow framing for the research question.",
+            "references": [{"title": "Ref A"}, {"title": "Ref B"}],
+            "required_entities": ["Contrast-Consistent Search", "CCS"],
+            "excluded_entities": ["unrelated acronym"],
+            "expected_output_schema": {
+                "type": "object",
+                "properties": {"summary": {"type": "string"}},
+            },
+            "coverage_thresholds": {"min_sources": 5, "min_per_entity": 2},
+            "validation_thresholds": {"structural": 0.85, "coverage": 0.70},
+            "deliverable_format": "markdown report",
+            "max_loops": 6,
+            "min_loops": 3,
+            "constraints": ["no paywalled sources", "prefer peer-reviewed"],
+        }
+
+    def test_instantiation_with_all_authoring_fields(self):
+        mission = Mission(
+            mission_id="AUTH-1",
+            title="Authoring Test",
+            objective="Exercise every authoring field",
+            success_criteria=["Round-trip works"],
+            **self._full_authoring_kwargs(),
+        )
+
+        for field, value in self._full_authoring_kwargs().items():
+            assert getattr(mission, field) == value, f"mismatch on {field}"
+
+    def test_to_dict_includes_authoring_fields(self):
+        mission = Mission(
+            mission_id="AUTH-2",
+            title="Dict Round Trip",
+            objective="All authoring fields emit in to_dict",
+            success_criteria=["Round-trip works"],
+            **self._full_authoring_kwargs(),
+        )
+        mission.id = uuid.uuid4()
+        mission.created_at = datetime.utcnow()
+        mission.updated_at = datetime.utcnow()
+
+        result = mission.to_dict()
+
+        for field, value in self._full_authoring_kwargs().items():
+            assert result[field] == value, f"to_dict missing {field}"
+
+    def test_to_mission_protocol_includes_authoring_fields(self):
+        mission = Mission(
+            mission_id="AUTH-3",
+            title="Protocol Round Trip",
+            objective="All authoring fields emit in protocol form",
+            success_criteria=["Round-trip works"],
+            **self._full_authoring_kwargs(),
+        )
+
+        proto = mission.to_mission_protocol()
+
+        for field, value in self._full_authoring_kwargs().items():
+            assert proto[field] == value, f"to_mission_protocol missing {field}"
+
+    def test_from_mission_protocol_round_trip(self):
+        protocol = {
+            "mission_id": "AUTH-4",
+            "title": "From Protocol Authoring",
+            "objective": "Instantiate via from_mission_protocol",
+            "success_criteria": ["Round-trip works"],
+            **self._full_authoring_kwargs(),
+        }
+
+        mission = Mission.from_mission_protocol(protocol)
+
+        for field, value in self._full_authoring_kwargs().items():
+            assert getattr(mission, field) == value, f"mismatch on {field}"
+
+    def test_constraints_fallback_to_context(self):
+        """Legacy missions stored constraints inside `context`; fallback exposes them."""
+        mission = Mission(
+            mission_id="AUTH-5",
+            title="Fallback Constraints",
+            objective="constraints column null, context has legacy data",
+            success_criteria=["Fallback works"],
+            context={"constraints": ["legacy constraint"]},
+        )
+
+        result = mission.to_dict()
+        assert result["constraints"] == ["legacy constraint"]
+
+        proto = mission.to_mission_protocol()
+        assert proto["constraints"] == ["legacy constraint"]
+
+    def test_constraints_column_wins_over_context(self):
+        """When both are populated, the promoted column is authoritative."""
+        mission = Mission(
+            mission_id="AUTH-6",
+            title="Column Wins",
+            objective="constraints column takes precedence",
+            success_criteria=["Precedence works"],
+            context={"constraints": ["legacy"]},
+            constraints=["new column"],
+        )
+
+        result = mission.to_dict()
+        assert result["constraints"] == ["new column"]
+
+    def test_authoring_fields_optional(self):
+        """Every authoring field is nullable — default instantiation succeeds."""
+        mission = Mission(
+            mission_id="AUTH-7",
+            title="Optional Defaults",
+            objective="None for every authoring field is allowed",
+            success_criteria=["Nulls OK"],
+        )
+
+        for field in self._full_authoring_kwargs():
+            assert getattr(mission, field) is None, f"{field} should default to None"
