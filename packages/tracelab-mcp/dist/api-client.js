@@ -280,5 +280,12 @@ export class TraceLabClient {
             progress: mission.execution_metadata?.progress_percent,
         };
     }
+    /**
+     * Fetch the compiled DeepSearch contract preview for a mission (T40.4).
+     * Read-only — does not change mission state.
+     */
+    async previewMissionContract(missionId) {
+        return this.request('GET', `/api/v1/missions/${missionId}/contract-preview`);
+    }
 }
 //# sourceMappingURL=api-client.js.map

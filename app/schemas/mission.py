@@ -495,3 +495,43 @@ class ReportPromotionResponse(BaseModel):
     status: str = Field(..., description="Processing status (processing or completed)")
     message: str = Field(..., description="Status message")
     chunk_count: int | None = Field(None, description="Number of chunks created")
+
+
+class MissionContractPreviewResponse(BaseModel):
+    """Compiled DeepSearch contract returned by GET /missions/{id}/contract-preview (T40.4).
+
+    Shape mirrors DeepSearch's ``MissionContractPreviewResponse`` at the
+    pinned commit recorded in ``schemas/VERSIONS.md``.
+    """
+
+    mission_id: str = Field(..., description="Human-readable mission ID")
+    mission_uuid: UUID = Field(..., description="Mission UUID")
+    project_id: UUID | None = Field(None, description="Associated project UUID")
+    named_entities: list[str] = Field(
+        default_factory=list,
+        description="Entities the compiler recognized from the mission_context.",
+    )
+    objectives: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description="Compiled mission objectives.",
+    )
+    evidence_slots: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description="Evidence slots DeepSearch plans to populate during research.",
+    )
+    acceptance_checks: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description="Acceptance checks the compiler derived from success_criteria.",
+    )
+    deliverable_schemas: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description="Deliverable schemas the compiler produced from expected_output_schema.",
+    )
+    coverage_thresholds: dict[str, float] = Field(
+        default_factory=dict,
+        description="Effective coverage thresholds after compilation.",
+    )
+    validation_thresholds: dict[str, float] = Field(
+        default_factory=dict,
+        description="Effective validation thresholds after compilation.",
+    )

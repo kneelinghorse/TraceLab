@@ -20,6 +20,7 @@ from app.core.config import settings
 from app.core.database import get_db
 from app.core.mission_events import emit_mission_status_change
 from app.schemas.mission import (
+    MissionContractPreviewResponse,
     MissionCreate,
     MissionErrorResponse,
     MissionLintErrorDetail,
@@ -29,6 +30,10 @@ from app.schemas.mission import (
     ReportPromotionResponse,
 )
 from app.schemas.pagination import PaginatedResponse
+from app.services.deepsearch_preview_client import (
+    ContractPreviewError,
+    preview_mission_contract as _call_deepsearch_preview,
+)
 from app.services.mission_linter import lint_mission_for_submit
 from app.services.mission_service import (
     MissionNotFoundError,
@@ -654,6 +659,70 @@ def submit_mission(
             status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error submitting mission: {str(exc)[:200]}",
         ) from exc
+
+
+@router.get(
+    "/{mission_id}/contract-preview",
+    response_model=MissionContractPreviewResponse,
+    summary="Preview the compiled DeepSearch contract for a mission (T40.4)",
+    responses={
+        404: {"description": "Mission not found", "model": MissionErrorResponse},
+        502: {"description": "Upstream DeepSearch preview call failed"},
+    },
+)
+def contract_preview(
+    mission_id: str,
+    db: Session = Depends(get_db),
+) -> MissionContractPreviewResponse:
+    """Proxy the mission's authoring fields to DeepSearch's preview endpoint.
+
+    Signs the outbound request with the shared HMAC secret, returns the
+    compiled contract so authors can see what DeepSearch will actually
+    execute before they hit submit. No mission-state change — purely a
+    read-side view.
+    """
+    try:
+        mission = _get_mission_by_id_or_mission_id(db, mission_id)
+    except MissionNotFoundError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_404_NOT_FOUND,
+            detail=_build_actionable_detail(
+                message=str(exc),
+                suggestion="Check the mission_id spelling or list missions via GET /api/v1/missions.",
+            ),
+        ) from exc
+
+    try:
+        preview = _call_deepsearch_preview(mission)
+    except ContractPreviewError as exc:
+        # Upstream HTTP errors (4xx from DeepSearch) surface with the same
+        # status so authors see the compiler's own validation feedback.
+        if exc.status_code and 400 <= exc.status_code < 500:
+            raise HTTPException(
+                status_code=exc.status_code,
+                detail={
+                    "message": "DeepSearch preview rejected the mission.",
+                    "upstream_status": exc.status_code,
+                    "upstream_detail": exc.detail,
+                },
+            ) from exc
+        # Everything else = transport / config / server-side upstream issue.
+        logger.exception("Contract preview failed for mission %s", mission_id)
+        raise HTTPException(
+            status_code=http_status.HTTP_502_BAD_GATEWAY,
+            detail={
+                "message": str(exc),
+                "upstream_status": exc.status_code,
+                "upstream_detail": exc.detail,
+            },
+        ) from exc
+
+    return MissionContractPreviewResponse(
+        mission_id=mission.mission_id,
+        mission_uuid=mission.id,
+        project_id=mission.project_id,
+        **preview.to_dict(),
+    )
 
 
 @router.post("/{mission_id}/promote-report", response_model=ReportPromotionResponse)

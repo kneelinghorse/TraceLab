@@ -5,7 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 
 import { AuthGate } from "@/components/AuthGate";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
-import { ExecutionTimeline, ResearchPhases, ResultLinks } from "@/components/missions";
+import { ContractPreviewPanel, ExecutionTimeline, ResearchPhases, ResultLinks } from "@/components/missions";
 import { downloadFile } from "@/lib/api/console";
 import { missionsApi } from "@/lib/api/missions";
 import { useApiMission } from "@/lib/hooks/useMissions";
@@ -872,6 +872,13 @@ function MissionDetailContent() {
                 <MarkdownRenderer content={mission.result_markdown} />
               </div>
             </Section>
+          )}
+
+          {/* Contract Preview Panel (T40.4) */}
+          {missionId && (
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <ContractPreviewPanel missionId={missionId} />
+            </div>
           )}
 
           {/* Result Links Section */}

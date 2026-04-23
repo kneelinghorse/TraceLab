@@ -777,6 +777,21 @@ const TOOLS: Tool[] = [
       required: ['mission_id'],
     },
   },
+  {
+    name: 'preview_mission_contract',
+    description:
+      'Preview the DeepSearch contract that would be compiled from this mission without submitting it. Returns named_entities, objectives, evidence_slots, acceptance_checks, deliverable_schemas, coverage_thresholds, and validation_thresholds — useful for iterating on authoring fields (background, focus, required_entities, expected_output_schema, thresholds) before spending a paid research loop. Related tools: update_mission, submit_mission.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        mission_id: {
+          type: 'string',
+          description: 'UUID of the mission to preview. Mission may be in any status — preview is read-only.',
+        },
+      },
+      required: ['mission_id'],
+    },
+  },
 ];
 
 // Input validation schemas
@@ -961,6 +976,10 @@ const SubmitMissionInput = z.object({
 });
 
 const GetMissionStatusInput = z.object({
+  mission_id: z.string().uuid(),
+});
+
+const PreviewMissionContractInput = z.object({
   mission_id: z.string().uuid(),
 });
 
@@ -1789,6 +1808,38 @@ async function handleUpdateMission(args: unknown) {
   };
 }
 
+async function handlePreviewMissionContract(args: unknown) {
+  const input = PreviewMissionContractInput.parse(args);
+  const preview = await client.previewMissionContract(input.mission_id);
+  return {
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(
+          {
+            message: `Contract preview for mission "${preview.mission_id}"`,
+            preview: {
+              mission_id: preview.mission_id,
+              mission_uuid: preview.mission_uuid,
+              project_id: preview.project_id ?? null,
+              named_entities: preview.named_entities,
+              objectives_count: preview.objectives.length,
+              evidence_slots_count: preview.evidence_slots.length,
+              acceptance_checks_count: preview.acceptance_checks.length,
+              deliverable_schemas_count: preview.deliverable_schemas.length,
+              coverage_thresholds: preview.coverage_thresholds,
+              validation_thresholds: preview.validation_thresholds,
+            },
+            full: preview,
+          },
+          null,
+          2
+        ),
+      },
+    ],
+  };
+}
+
 async function handleSubmitMission(args: unknown) {
   const input = SubmitMissionInput.parse(args);
 
@@ -1916,6 +1967,8 @@ async function main() {
           return await handleSubmitMission(args);
         case 'get_mission_status':
           return await handleGetMissionStatus(args);
+        case 'preview_mission_contract':
+          return await handlePreviewMissionContract(args);
         default:
           return {
             content: [

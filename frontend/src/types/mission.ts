@@ -241,3 +241,17 @@ export interface ReportPromotionResponse {
   message: string;
   chunk_count: number | null;
 }
+
+/** Compiled DeepSearch contract preview (T40.4). */
+export interface MissionContractPreview {
+  mission_id: string;
+  mission_uuid: string;
+  project_id?: string | null;
+  named_entities: string[];
+  objectives: Array<Record<string, unknown>>;
+  evidence_slots: Array<Record<string, unknown>>;
+  acceptance_checks: Array<Record<string, unknown>>;
+  deliverable_schemas: Array<Record<string, unknown>>;
+  coverage_thresholds: Record<string, number>;
+  validation_thresholds: Record<string, number>;
+}
