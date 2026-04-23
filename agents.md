@@ -48,6 +48,12 @@ pre-commit install
 - After adding or updating frontend dependencies, always run `npm install` inside `frontend/` and commit the updated `package-lock.json` alongside any `package.json` changes.
 - Railway (Nixpacks) runs `npm ci` during its install phase, which requires the lock file to be in sync. A stale lock file will fail the build before `buildCommand` even runs.
 
+### MCP Package (`packages/tracelab-mcp/`)
+- `packages/*/dist/` is gitignored — build outputs are never committed. A pre-commit hook (`scripts/check_no_mcp_dist.sh`) rejects accidentally-staged dist files.
+- After editing `packages/tracelab-mcp/src/`, rebuild before testing locally: `cd packages/tracelab-mcp && npm run build`. The `bin` entry (`dist/index.js`) won't exist on a fresh clone until you build.
+- `npm publish` automatically runs `prepublishOnly` → `npm run build`, so the published tarball is always built from current src — no manual step needed at publish time.
+- If the MCP appears stale in Claude Desktop, run `npm run build` and restart the client; do not re-add `dist/` to git.
+
 ### Testing
 ```bash
 # Unit tests (no database required)

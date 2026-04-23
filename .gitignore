@@ -41,6 +41,9 @@ test-results/
 frontend/playwright-report/
 frontend/test-results/
 
+# MCP package build outputs (regenerated via `npm run build`; never committed)
+packages/*/dist/
+
 # Testing
 .pytest_cache/
 .coverage
