@@ -458,7 +458,7 @@ class TestMissionGet:
 
 
 class TestMissionUpdate:
-    """Tests for PUT /api/v1/missions/{id} endpoint."""
+    """Tests for PATCH /api/v1/missions/{id} endpoint."""
 
     def test_update_mission_title(self, auth_headers, db_session):
         """Update mission title."""
@@ -466,7 +466,7 @@ class TestMissionUpdate:
 
         mission = _create_test_mission(db_session, mission_id="UPDATE-001")
 
-        response = client.put(
+        response = client.patch(
             f"/api/v1/missions/{mission.id}",
             json={"title": "Updated Title"},
             headers=auth_headers,
@@ -484,7 +484,7 @@ class TestMissionUpdate:
             db_session, mission_id="STATUS-001", status="draft"
         )
 
-        response = client.put(
+        response = client.patch(
             f"/api/v1/missions/{mission.id}",
             json={"status": "in_progress"},
             headers=auth_headers,
@@ -503,7 +503,7 @@ class TestMissionUpdate:
             db_session, mission_id="COMPLETE-001", status="in_progress"
         )
 
-        response = client.put(
+        response = client.patch(
             f"/api/v1/missions/{mission.id}",
             json={"status": "completed"},
             headers=auth_headers,
@@ -520,7 +520,7 @@ class TestMissionUpdate:
 
         mission = _create_test_mission(db_session, mission_id="MULTI-001")
 
-        response = client.put(
+        response = client.patch(
             f"/api/v1/missions/{mission.id}",
             json={
                 "title": "New Title",
@@ -544,7 +544,7 @@ class TestMissionUpdate:
 
         mission = _create_test_mission(db_session, mission_id="INVALID-001")
 
-        response = client.put(
+        response = client.patch(
             f"/api/v1/missions/{mission.id}",
             json={"status": "not_a_status"},
             headers=auth_headers,
@@ -557,7 +557,7 @@ class TestMissionUpdate:
         client = TestClient(app)
         fake_id = str(uuid.uuid4())
 
-        response = client.put(
+        response = client.patch(
             f"/api/v1/missions/{fake_id}",
             json={"title": "New Title"},
             headers=auth_headers,
@@ -572,7 +572,7 @@ class TestMissionUpdate:
         mission = _create_test_mission(db_session, mission_id="RESULTS-001")
         doc_id = str(uuid.uuid4())
 
-        response = client.put(
+        response = client.patch(
             f"/api/v1/missions/{mission.id}",
             json={
                 "result_markdown": "# Results\n\nMission completed successfully.",
@@ -586,6 +586,62 @@ class TestMissionUpdate:
         data = response.json()
         assert "# Results" in data["result_markdown"]
         assert doc_id in data["result_document_ids"]
+
+
+class TestMissionVerbContract:
+    """Regression guards for the MCP↔API verb contract.
+
+    Sprint 40 T40.0: MCP sent PATCH while the API handler was PUT, producing
+    405s in every environment. These tests lock the contract so a future
+    refactor cannot silently break `update_mission` or `submit_mission`.
+    """
+
+    def test_patch_update_mission_returns_200(self, auth_headers, db_session):
+        """PATCH is the canonical verb for partial mission updates."""
+        client = TestClient(app)
+        mission = _create_test_mission(db_session, mission_id="VERB-PATCH-001")
+
+        response = client.patch(
+            f"/api/v1/missions/{mission.id}",
+            json={"title": "PATCH works"},
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        assert response.json()["title"] == "PATCH works"
+
+    def test_put_update_mission_returns_405(self, auth_headers, db_session):
+        """PUT must not be registered — the MCP client uses PATCH."""
+        client = TestClient(app)
+        mission = _create_test_mission(db_session, mission_id="VERB-PUT-001")
+
+        response = client.put(
+            f"/api/v1/missions/{mission.id}",
+            json={"title": "PUT should fail"},
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 405
+
+    def test_post_submit_mission_route_exists(self, auth_headers, db_session):
+        """POST /{id}/submit must exist (not 405/404) — regression for main-branch staleness."""
+        client = TestClient(app)
+        project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session,
+            mission_id="VERB-SUBMIT-001",
+            status="draft",
+            project_id=project.id,
+        )
+
+        response = client.post(
+            f"/api/v1/missions/{mission.id}/submit",
+            headers=auth_headers,
+        )
+
+        assert response.status_code not in (404, 405), (
+            f"submit route missing in deployed code: got {response.status_code}"
+        )
 
 
 class TestMissionDelete:
@@ -657,7 +713,7 @@ class TestMissionAuthentication:
     def test_update_mission_requires_auth(self):
         """Update mission requires authentication."""
         client = TestClient(app)
-        response = client.put(
+        response = client.patch(
             f"/api/v1/missions/{uuid.uuid4()}",
             json={"title": "Test"},
         )
@@ -682,7 +738,7 @@ class TestMissionStatusTransitions:
         )
         assert mission.queued_at is None
 
-        response = client.put(
+        response = client.patch(
             f"/api/v1/missions/{mission.id}",
             json={"status": "queued"},
             headers=auth_headers,
@@ -700,7 +756,7 @@ class TestMissionStatusTransitions:
             db_session, mission_id="TRANS-002", status="queued"
         )
 
-        response = client.put(
+        response = client.patch(
             f"/api/v1/missions/{mission.id}",
             json={"status": "in_progress"},
             headers=auth_headers,
@@ -718,7 +774,7 @@ class TestMissionStatusTransitions:
             db_session, mission_id="TRANS-003", status="in_progress"
         )
 
-        response = client.put(
+        response = client.patch(
             f"/api/v1/missions/{mission.id}",
             json={"status": "completed"},
             headers=auth_headers,
