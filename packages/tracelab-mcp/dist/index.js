@@ -503,6 +503,60 @@ const TOOLS = [
                     description: 'Controls research thoroughness and duration. BASELINE (8-12 min): Thorough reports with 50-60 sources across multiple loops — the standard tier for most research. DEEP (20-25 min): Higher-rigor research with 30-40 carefully vetted sources, stricter quality gates, minimum 5 loops — use when you need higher confidence. ALPHA (1+ hour): Maximum-rigor with ~20 highly scrutinized sources, very strict quality gates that may reject research if evidence is insufficient — use only when precision and source authority are critical. Default: baseline. Can be changed later via update_mission or at submission via submit_mission.',
                     default: 'baseline',
                 },
+                background: {
+                    type: 'string',
+                    description: 'Free-form prose orienting the research. Consumed by the DeepSearch contract compiler as high-level framing. Example: "Internal teams keep conflating Contrast-Consistent Search (CCS) with CCS-style probing..."',
+                },
+                focus: {
+                    type: 'string',
+                    description: 'Narrow framing for the research question. Sharpens what counts as on-topic vs. off-topic. Example: "Only papers that benchmark CCS against at least one supervised probing baseline."',
+                },
+                references: {
+                    type: 'array',
+                    items: { type: 'object', properties: { title: { type: 'string' } }, required: ['title'] },
+                    description: 'Seed references the author already trusts. Each entry at minimum {title}; optional URL/author/year fields are preserved. Example: [{"title": "Contrast-Consistent Search (Burns et al. 2022)"}]',
+                },
+                required_entities: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Entities that MUST appear in the synthesized output. Feeds DeepSearch\'s coverage gate. Example: ["Contrast-Consistent Search", "CCS", "latent truth"]',
+                },
+                excluded_entities: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Entities that MUST NOT appear — use to rule out unrelated homonyms or adjacent-but-distinct concepts. Example: ["Amazon CloudFront", "CCS Insurance"]',
+                },
+                expected_output_schema: {
+                    type: 'object',
+                    description: 'DeepSearch OutputSchema describing the deliverable shape. Used by the contract compiler to steer synthesis. Example: {"type": "object", "properties": {"executive_summary": {"type": "string"}, "comparison_table": {"type": "array"}}}',
+                },
+                coverage_thresholds: {
+                    type: 'object',
+                    description: 'Coverage gate thresholds applied during synthesis. Example: {"min_sources": 12, "min_per_required_entity": 2}',
+                },
+                validation_thresholds: {
+                    type: 'object',
+                    description: 'Validation gate thresholds applied during synthesis. Example: {"structural": 0.85, "coverage": 0.70}',
+                },
+                deliverable_format: {
+                    type: 'string',
+                    description: 'Output rendering hint DeepSearch uses when formatting the deliverable. Example: "executive summary with comparison table", "markdown report", "evidence matrix".',
+                },
+                max_loops: {
+                    type: 'integer',
+                    minimum: 1,
+                    description: 'Upper bound on DeepSearch research loop count. Guards against runaway deep-depth missions.',
+                },
+                min_loops: {
+                    type: 'integer',
+                    minimum: 1,
+                    description: 'Lower bound on DeepSearch research loop count. Forces a minimum number of evidence-gathering passes.',
+                },
+                constraints: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Author-level constraints DeepSearch must respect. Example: ["no paywalled sources", "prefer peer-reviewed", "published 2020 or later"]',
+                },
             },
             required: ['mission_id', 'title', 'objective', 'success_criteria'],
         },
@@ -552,7 +606,7 @@ const TOOLS = [
     },
     {
         name: 'update_mission',
-        description: 'Modify an existing mission before submission. Change research_depth to control thoroughness, refine objectives, or update success criteria. Only draft missions can be modified. Related tools: create_mission, get_mission, submit_mission.',
+        description: 'Modify an existing mission before submission. Change research_depth to control thoroughness, refine the contract-authoring fields (background/focus/references/entities/schemas/thresholds/constraints), or update the objective and success criteria. Only draft missions can be modified. Related tools: create_mission, get_mission, submit_mission.',
         inputSchema: {
             type: 'object',
             properties: {
@@ -590,7 +644,61 @@ const TOOLS = [
                 },
                 context: {
                     type: 'object',
-                    description: 'Additional context metadata as key-value pairs.',
+                    description: 'DEPRECATED: kept for back-compat. Prefer the explicit authoring fields (background, focus, references, required_entities, excluded_entities, expected_output_schema, coverage_thresholds, validation_thresholds, deliverable_format, max_loops, min_loops, constraints). Authors who still write to context["constraints"] will keep working during the transition.',
+                },
+                background: {
+                    type: 'string',
+                    description: 'Replace the mission\'s background prose. See create_mission for full semantics.',
+                },
+                focus: {
+                    type: 'string',
+                    description: 'Replace the narrow focus framing. See create_mission for full semantics.',
+                },
+                references: {
+                    type: 'array',
+                    items: { type: 'object', properties: { title: { type: 'string' } }, required: ['title'] },
+                    description: 'Replace the seed reference list. Each entry at minimum {title}.',
+                },
+                required_entities: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Replace the list of entities that MUST appear in synthesis.',
+                },
+                excluded_entities: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Replace the list of entities that MUST NOT appear in synthesis.',
+                },
+                expected_output_schema: {
+                    type: 'object',
+                    description: 'Replace the DeepSearch OutputSchema describing the deliverable shape.',
+                },
+                coverage_thresholds: {
+                    type: 'object',
+                    description: 'Replace coverage gate thresholds. Example: {"min_sources": 12}',
+                },
+                validation_thresholds: {
+                    type: 'object',
+                    description: 'Replace validation gate thresholds. Example: {"structural": 0.85}',
+                },
+                deliverable_format: {
+                    type: 'string',
+                    description: 'Replace the output rendering hint.',
+                },
+                max_loops: {
+                    type: 'integer',
+                    minimum: 1,
+                    description: 'Replace the upper bound on DeepSearch research loop count.',
+                },
+                min_loops: {
+                    type: 'integer',
+                    minimum: 1,
+                    description: 'Replace the lower bound on DeepSearch research loop count.',
+                },
+                constraints: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Replace the author-level constraints list.',
                 },
             },
             required: ['mission_id'],
@@ -732,6 +840,24 @@ const GetDocumentContentInput = z.object({
     include_metadata: z.boolean().optional().default(true),
 });
 // Mission input schemas
+// Mission-authoring fields (T40.1/T40.2). All optional; consumed by
+// DeepSearch's contract compiler at submit/preview time.
+const MissionAuthoringFieldsSchema = {
+    background: z.string().optional(),
+    focus: z.string().optional(),
+    references: z
+        .array(z.object({ title: z.string() }).passthrough())
+        .optional(),
+    required_entities: z.array(z.string()).optional(),
+    excluded_entities: z.array(z.string()).optional(),
+    expected_output_schema: z.record(z.unknown()).optional(),
+    coverage_thresholds: z.record(z.unknown()).optional(),
+    validation_thresholds: z.record(z.unknown()).optional(),
+    deliverable_format: z.string().optional(),
+    max_loops: z.number().int().min(1).optional(),
+    min_loops: z.number().int().min(1).optional(),
+    constraints: z.array(z.string()).optional(),
+};
 const CreateMissionInput = z.object({
     mission_id: z.string().min(1),
     title: z.string().min(1),
@@ -741,6 +867,7 @@ const CreateMissionInput = z.object({
     deliverables: z.array(z.string()).optional(),
     tags: z.array(z.string()).optional(),
     research_depth: z.enum(['baseline', 'deep', 'alpha']).optional().default('baseline'),
+    ...MissionAuthoringFieldsSchema,
 });
 const ListMissionsInput = z.object({
     status: z.enum(['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled', 'validation_failed']).optional(),
@@ -759,7 +886,9 @@ const UpdateMissionInput = z.object({
     research_depth: z.enum(['baseline', 'deep', 'alpha']).optional(),
     deliverables: z.array(z.string()).optional(),
     tags: z.array(z.string()).optional(),
+    // DEPRECATED: prefer explicit authoring fields below. Kept for back-compat.
     context: z.record(z.unknown()).optional(),
+    ...MissionAuthoringFieldsSchema,
 });
 const SubmitMissionInput = z.object({
     mission_id: z.string().uuid(),
@@ -1281,6 +1410,29 @@ async function handleGetDocumentContent(args) {
         ],
     };
 }
+// Mission-authoring field names — kept in one place so create/update stay in sync.
+const MISSION_AUTHORING_FIELD_NAMES = [
+    'background',
+    'focus',
+    'references',
+    'required_entities',
+    'excluded_entities',
+    'expected_output_schema',
+    'coverage_thresholds',
+    'validation_thresholds',
+    'deliverable_format',
+    'max_loops',
+    'min_loops',
+    'constraints',
+];
+function pickAuthoringFields(input) {
+    const picked = {};
+    for (const key of MISSION_AUTHORING_FIELD_NAMES) {
+        if (input[key] !== undefined)
+            picked[key] = input[key];
+    }
+    return picked;
+}
 // Mission handlers
 async function handleCreateMission(args) {
     const input = CreateMissionInput.parse(args);
@@ -1293,6 +1445,7 @@ async function handleCreateMission(args) {
         deliverables: input.deliverables,
         tags: input.tags,
         research_depth: input.research_depth,
+        ...pickAuthoringFields(input),
     });
     return {
         content: [
@@ -1387,6 +1540,7 @@ async function handleUpdateMission(args) {
         updateData.tags = input.tags;
     if (input.context !== undefined)
         updateData.context = input.context;
+    Object.assign(updateData, pickAuthoringFields(input));
     const result = await client.updateMission(input.mission_id, updateData);
     return {
         content: [

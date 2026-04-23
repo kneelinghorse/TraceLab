@@ -22,12 +22,14 @@ from app.core.mission_events import emit_mission_status_change
 from app.schemas.mission import (
     MissionCreate,
     MissionErrorResponse,
+    MissionLintErrorDetail,
     MissionResponse,
     MissionSubmitResponse,
     MissionUpdate,
     ReportPromotionResponse,
 )
 from app.schemas.pagination import PaginatedResponse
+from app.services.mission_linter import lint_mission_for_submit
 from app.services.mission_service import (
     MissionNotFoundError,
     MissionService,
@@ -50,6 +52,16 @@ def _to_response(mission) -> MissionResponse:
     if mission.project_id and mission.project:
         project_name = mission.project.name
 
+    # constraints fallback: old missions stored constraints inside context.
+    # MissionResponse has its own field_validator for this, but it only fires
+    # with from_attributes mode — since we're constructing MissionResponse
+    # explicitly here, resolve the fallback up-front.
+    resolved_constraints = mission.constraints
+    if not resolved_constraints and isinstance(mission.context, dict):
+        legacy = mission.context.get("constraints")
+        if legacy:
+            resolved_constraints = legacy
+
     return MissionResponse(
         id=mission.id,
         project_id=mission.project_id,
@@ -64,6 +76,19 @@ def _to_response(mission) -> MissionResponse:
         tags=mission.tags or [],
         metadata=mission.mission_metadata or {},  # Map mission_metadata -> metadata
         research_depth=mission.research_depth or "baseline",
+        # Mission-authoring fields (T40.1/T40.2).
+        background=mission.background,
+        focus=mission.focus,
+        references=mission.references,
+        required_entities=mission.required_entities,
+        excluded_entities=mission.excluded_entities,
+        expected_output_schema=mission.expected_output_schema,
+        coverage_thresholds=mission.coverage_thresholds,
+        validation_thresholds=mission.validation_thresholds,
+        deliverable_format=mission.deliverable_format,
+        max_loops=mission.max_loops,
+        min_loops=mission.min_loops,
+        constraints=resolved_constraints,
         status=mission.status,
         queued_at=mission.queued_at,
         started_at=mission.started_at,
@@ -144,6 +169,18 @@ def _submit_existing_mission(
             ),
         )
 
+    # Submit-time lint gate (T40.3). Hard errors block submit with 422;
+    # warnings ride along with the success response so authors can triage.
+    lint_result = lint_mission_for_submit(mission)
+    if lint_result.has_errors:
+        raise HTTPException(
+            status_code=http_status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=MissionLintErrorDetail(
+                errors=[v.to_dict() for v in lint_result.errors],  # type: ignore[arg-type]
+                warnings=[v.to_dict() for v in lint_result.warnings],  # type: ignore[arg-type]
+            ).model_dump(),
+        )
+
     deepsearch_mode = getattr(settings, "deepsearch_mode", "worker").lower()
     update_data = MissionUpdate(status="queued")
     updated_mission = _service.update_mission(db, mission.id, update_data)
@@ -174,6 +211,7 @@ def _submit_existing_mission(
         uuid=updated_mission.id,
         message=message,
         job_id=updated_mission.deepsearch_job_id,
+        warnings=[v.to_dict() for v in lint_result.warnings],  # type: ignore[arg-type]
     )
 
 

@@ -23,6 +23,44 @@ interface MissionFormProps {
   onCancel?: () => void;
 }
 
+type JsonFieldName =
+  | "expected_output_schema"
+  | "coverage_thresholds"
+  | "validation_thresholds";
+
+type JsonFieldState = Record<JsonFieldName, string>;
+type JsonFieldErrors = Partial<Record<JsonFieldName, string>>;
+
+const JSON_FIELD_LABELS: Record<JsonFieldName, string> = {
+  expected_output_schema: "Expected output schema",
+  coverage_thresholds: "Coverage thresholds",
+  validation_thresholds: "Validation thresholds",
+};
+
+const JSON_FIELD_PLACEHOLDERS: Record<JsonFieldName, string> = {
+  expected_output_schema:
+    '{\n  "type": "object",\n  "properties": {\n    "summary": {"type": "string"}\n  }\n}',
+  coverage_thresholds: '{\n  "min_sources": 12,\n  "min_per_required_entity": 2\n}',
+  validation_thresholds: '{\n  "structural": 0.85,\n  "coverage": 0.70\n}',
+};
+
+/** Parse a JSON-textarea value. Returns undefined for empty, parsed object, or an error message. */
+function parseJsonField(
+  raw: string
+): { value: Record<string, unknown> | undefined; error?: string } {
+  const trimmed = raw.trim();
+  if (!trimmed) return { value: undefined };
+  try {
+    const parsed = JSON.parse(trimmed);
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+      return { value: undefined, error: "Must be a JSON object." };
+    }
+    return { value: parsed as Record<string, unknown> };
+  } catch (err) {
+    return { value: undefined, error: `Invalid JSON: ${(err as Error).message}` };
+  }
+}
+
 /**
  * Form for creating a new DeepSearch mission.
  * Supports "Save as Draft" and "Submit Immediately" actions.
@@ -30,6 +68,12 @@ interface MissionFormProps {
 export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showProjectRequiredTooltip, setShowProjectRequiredTooltip] = useState(false);
+  const [jsonFields, setJsonFields] = useState<JsonFieldState>({
+    expected_output_schema: "",
+    coverage_thresholds: "",
+    validation_thresholds: "",
+  });
+  const [jsonErrors, setJsonErrors] = useState<JsonFieldErrors>({});
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   // Fetch projects for dropdown
@@ -77,6 +121,24 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
   ) => {
     setSubmitError(null);
 
+    // Validate the three JSON textareas up-front; block submit if any is malformed.
+    const parsedJson: Partial<Record<JsonFieldName, Record<string, unknown>>> = {};
+    const nextJsonErrors: JsonFieldErrors = {};
+    (Object.keys(jsonFields) as JsonFieldName[]).forEach((key) => {
+      const { value, error } = parseJsonField(jsonFields[key]);
+      if (error) nextJsonErrors[key] = error;
+      if (value !== undefined) parsedJson[key] = value;
+    });
+    setJsonErrors(nextJsonErrors);
+    if (Object.keys(nextJsonErrors).length > 0) {
+      setSubmitError("Fix JSON errors in the Research Contract section before submitting.");
+      return;
+    }
+
+    const references = (values.references ?? [])
+      .map((ref) => (typeof ref === "string" ? { title: ref } : ref))
+      .filter((ref) => ref && typeof ref.title === "string" && ref.title.trim() !== "");
+
     try {
       const payload: ApiMissionCreate = {
         mission_id: values.mission_id,
@@ -84,19 +146,36 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
         objective: values.objective,
         success_criteria: values.success_criteria.filter((c) => c.trim() !== ""),
         project_id: values.project_id || undefined,
-        context: {
-          background: values.context?.background || undefined,
-          constraints: values.context?.constraints?.filter((c) => c.trim() !== "") || [],
-        },
         deliverables: values.deliverables?.filter((d) => d.trim() !== "") || [],
         tags: values.tags?.filter((t) => t.trim() !== "") || [],
         metadata: {
           priority: values.priority,
-          max_loops: values.max_loops,
           ...values.metadata,
         },
         research_depth: values.research_depth || "baseline",
         status: submitStatus,
+        // Authoring fields — send only those the author actually filled in.
+        background: values.background?.trim() || undefined,
+        focus: values.focus?.trim() || undefined,
+        references: references.length > 0 ? references : undefined,
+        required_entities:
+          values.required_entities && values.required_entities.filter((x) => x.trim() !== "").length > 0
+            ? values.required_entities.filter((x) => x.trim() !== "")
+            : undefined,
+        excluded_entities:
+          values.excluded_entities && values.excluded_entities.filter((x) => x.trim() !== "").length > 0
+            ? values.excluded_entities.filter((x) => x.trim() !== "")
+            : undefined,
+        constraints:
+          values.constraints && values.constraints.filter((x) => x.trim() !== "").length > 0
+            ? values.constraints.filter((x) => x.trim() !== "")
+            : undefined,
+        deliverable_format: values.deliverable_format?.trim() || undefined,
+        max_loops: values.max_loops,
+        min_loops: values.min_loops,
+        expected_output_schema: parsedJson.expected_output_schema,
+        coverage_thresholds: parsedJson.coverage_thresholds,
+        validation_thresholds: parsedJson.validation_thresholds,
       };
 
       const mission = await missionsApi.create(payload);
@@ -229,23 +308,136 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="form-label">Priority</label>
-            <select {...register("priority")} className="form-input">
-              <option value="low">Low</option>
-              <option value="normal">Normal</option>
-              <option value="high">High</option>
-            </select>
-          </div>
+        <div>
+          <label className="form-label">Priority</label>
+          <select {...register("priority")} className="form-input">
+            <option value="low">Low</option>
+            <option value="normal">Normal</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+      </section>
 
+      {/* Research Contract — authoring fields consumed by DeepSearch */}
+      <section className={`${SECTION_CLASS} space-y-4`}>
+        <header>
+          <p className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400">
+            Authoring Contract
+          </p>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            Research Contract
+          </h2>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Optional fields the DeepSearch contract compiler reads when shaping
+            retrieval and synthesis. Skip any that don't apply.
+          </p>
+        </header>
+
+        <div>
+          <label className="form-label">Background</label>
+          <textarea
+            {...register("background")}
+            placeholder="Free-form prose orienting the research (e.g., what prior work is this building on?)"
+            className="form-input min-h-[80px]"
+          />
+        </div>
+
+        <div>
+          <label className="form-label">Focus</label>
+          <textarea
+            {...register("focus")}
+            placeholder="Narrow framing for the research question"
+            className="form-input min-h-[60px]"
+          />
+        </div>
+
+        <Controller
+          control={control}
+          name="references"
+          render={({ field }) => (
+            <DynamicListInput
+              label="References"
+              items={(field.value ?? []).map((r) =>
+                typeof r === "string" ? r : (r?.title ?? "")
+              )}
+              onChange={(items) => field.onChange(items.map((title) => ({ title })))}
+              placeholder="Seed reference title (e.g. 'Burns et al. 2022')"
+              minItems={0}
+            />
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="required_entities"
+          render={({ field }) => (
+            <DynamicListInput
+              label="Required entities"
+              items={field.value ?? []}
+              onChange={field.onChange}
+              placeholder="Entity that MUST appear in results..."
+              minItems={0}
+            />
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="excluded_entities"
+          render={({ field }) => (
+            <DynamicListInput
+              label="Excluded entities"
+              items={field.value ?? []}
+              onChange={field.onChange}
+              placeholder="Entity that MUST NOT appear in results..."
+              minItems={0}
+            />
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="constraints"
+          render={({ field }) => (
+            <DynamicListInput
+              label="Constraints"
+              items={field.value ?? []}
+              onChange={field.onChange}
+              placeholder="Add a constraint (e.g. 'no paywalled sources')..."
+              minItems={0}
+            />
+          )}
+        />
+
+        <div className="grid gap-4 md:grid-cols-3">
           <div>
-            <label className="form-label">Max Loops</label>
+            <label className="form-label">Deliverable format</label>
+            <input
+              {...register("deliverable_format")}
+              placeholder="e.g. markdown report, comparison table"
+              className="form-input"
+            />
+          </div>
+          <div>
+            <label className="form-label">Min loops</label>
             <input
               type="number"
-              {...register("max_loops", { valueAsNumber: true })}
               min={1}
-              max={10}
+              max={50}
+              {...register("min_loops", { valueAsNumber: true })}
+              className="form-input"
+            />
+            {errors.min_loops && (
+              <p className="form-error">{errors.min_loops.message}</p>
+            )}
+          </div>
+          <div>
+            <label className="form-label">Max loops</label>
+            <input
+              type="number"
+              min={1}
+              max={50}
+              {...register("max_loops", { valueAsNumber: true })}
               className="form-input"
             />
             {errors.max_loops && (
@@ -253,41 +445,31 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
             )}
           </div>
         </div>
-      </section>
 
-      {/* Context */}
-      <section className={`${SECTION_CLASS} space-y-4`}>
-        <header>
-          <p className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400">
-            Optional
-          </p>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Context
-          </h2>
-        </header>
-
-        <div>
-          <label className="form-label">Background</label>
-          <textarea
-            {...register("context.background")}
-            placeholder="Provide additional context or background information..."
-            className="form-input min-h-[80px]"
-          />
-        </div>
-
-        <Controller
-          control={control}
-          name="context.constraints"
-          render={({ field }) => (
-            <DynamicListInput
-              label="Constraints"
-              items={field.value ?? []}
-              onChange={field.onChange}
-              placeholder="Add a constraint or limitation..."
-              minItems={0}
+        {/* JSON-shaped fields */}
+        {(Object.keys(JSON_FIELD_LABELS) as JsonFieldName[]).map((key) => (
+          <div key={key}>
+            <label className="form-label">{JSON_FIELD_LABELS[key]}</label>
+            <textarea
+              value={jsonFields[key]}
+              onChange={(e) => {
+                setJsonFields((prev) => ({ ...prev, [key]: e.target.value }));
+                if (jsonErrors[key]) {
+                  setJsonErrors((prev) => {
+                    const next = { ...prev };
+                    delete next[key];
+                    return next;
+                  });
+                }
+              }}
+              placeholder={JSON_FIELD_PLACEHOLDERS[key]}
+              className="form-input min-h-[100px] font-mono text-sm"
             />
-          )}
-        />
+            {jsonErrors[key] && (
+              <p className="form-error">{jsonErrors[key]}</p>
+            )}
+          </div>
+        ))}
       </section>
 
       {/* Deliverables & Tags */}

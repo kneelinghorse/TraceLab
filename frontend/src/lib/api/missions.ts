@@ -49,10 +49,10 @@ export const missionsApi = {
   },
 
   /**
-   * Update an existing mission.
+   * Update an existing mission (PATCH — partial update).
    */
   update(missionId: string, data: ApiMissionUpdate): Promise<ApiMission> {
-    return httpClient.put<ApiMission>(`${MISSIONS_PATH}/${missionId}`, data);
+    return httpClient.patch<ApiMission>(`${MISSIONS_PATH}/${missionId}`, data);
   },
 
   /**

@@ -242,7 +242,25 @@ export interface DocumentChunksResponse {
         pages: number;
     };
 }
-export interface Mission {
+export interface MissionReference {
+    title: string;
+    [key: string]: unknown;
+}
+export interface MissionAuthoringFields {
+    background?: string | null;
+    focus?: string | null;
+    references?: MissionReference[] | null;
+    required_entities?: string[] | null;
+    excluded_entities?: string[] | null;
+    expected_output_schema?: Record<string, unknown> | null;
+    coverage_thresholds?: Record<string, unknown> | null;
+    validation_thresholds?: Record<string, unknown> | null;
+    deliverable_format?: string | null;
+    max_loops?: number | null;
+    min_loops?: number | null;
+    constraints?: string[] | null;
+}
+export interface Mission extends MissionAuthoringFields {
     id: string;
     mission_id: string;
     title: string;
@@ -270,7 +288,7 @@ export interface Mission {
     updated_at: string;
     created_by?: string;
 }
-export interface MissionCreate {
+export interface MissionCreate extends MissionAuthoringFields {
     mission_id: string;
     title: string;
     objective: string;
@@ -284,7 +302,7 @@ export interface MissionCreate {
     research_depth?: 'baseline' | 'deep' | 'alpha';
     status?: string;
 }
-export interface MissionUpdate {
+export interface MissionUpdate extends MissionAuthoringFields {
     title?: string;
     objective?: string;
     success_criteria?: string[];

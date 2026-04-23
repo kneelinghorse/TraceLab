@@ -627,3 +627,106 @@ class TestEdgeCases:
             ],
         )
         assert len(data.success_criteria) == 3
+
+
+# ============================================================================
+# T40.1 — Authoring Fields Validation Tests
+# ============================================================================
+
+
+class TestAuthoringFieldsOnCreate:
+    """MissionCreate accepts all 11 authoring fields + constraints."""
+
+    def _base_kwargs(self) -> dict:
+        return {
+            "mission_id": "AUTH-C-1",
+            "title": "Authoring Create",
+            "objective": "Exercise authoring fields on create payload",
+            "success_criteria": ["Validation passes"],
+        }
+
+    def test_all_authoring_fields_round_trip(self):
+        data = MissionCreate(
+            **self._base_kwargs(),
+            background="Background prose.",
+            focus="Narrow focus.",
+            references=[{"title": "Ref A"}],
+            required_entities=["Entity A"],
+            excluded_entities=["Entity B"],
+            expected_output_schema={"type": "object"},
+            coverage_thresholds={"min_sources": 5},
+            validation_thresholds={"structural": 0.85},
+            deliverable_format="markdown report",
+            max_loops=6,
+            min_loops=3,
+            constraints=["no paywalled sources"],
+        )
+
+        assert data.background == "Background prose."
+        assert data.focus == "Narrow focus."
+        assert data.references == [{"title": "Ref A"}]
+        assert data.required_entities == ["Entity A"]
+        assert data.excluded_entities == ["Entity B"]
+        assert data.expected_output_schema == {"type": "object"}
+        assert data.coverage_thresholds == {"min_sources": 5}
+        assert data.validation_thresholds == {"structural": 0.85}
+        assert data.deliverable_format == "markdown report"
+        assert data.max_loops == 6
+        assert data.min_loops == 3
+        assert data.constraints == ["no paywalled sources"]
+
+    def test_all_authoring_fields_optional(self):
+        """None/absent authoring fields don't break create."""
+        data = MissionCreate(**self._base_kwargs())
+        assert data.background is None
+        assert data.max_loops is None
+        assert data.constraints is None
+
+    @pytest.mark.parametrize("bound", ["max_loops", "min_loops"])
+    def test_loop_bounds_reject_zero_and_negative(self, bound: str):
+        with pytest.raises(ValidationError):
+            MissionCreate(**self._base_kwargs(), **{bound: 0})
+        with pytest.raises(ValidationError):
+            MissionCreate(**self._base_kwargs(), **{bound: -1})
+
+
+class TestAuthoringFieldsOnUpdate:
+    """MissionUpdate accepts authoring fields as optional partial updates."""
+
+    def test_partial_update_single_field(self):
+        data = MissionUpdate(focus="Refined focus.")
+        assert data.focus == "Refined focus."
+        assert data.background is None
+        assert data.max_loops is None
+
+    def test_partial_update_all_authoring_fields(self):
+        data = MissionUpdate(
+            background="B",
+            focus="F",
+            references=[{"title": "R"}],
+            required_entities=["E1"],
+            excluded_entities=["E2"],
+            expected_output_schema={"type": "object"},
+            coverage_thresholds={"c": 1},
+            validation_thresholds={"v": 1},
+            deliverable_format="text",
+            max_loops=5,
+            min_loops=2,
+            constraints=["c1"],
+        )
+        assert data.background == "B"
+        assert data.focus == "F"
+        assert data.max_loops == 5
+        assert data.constraints == ["c1"]
+
+    def test_empty_update_allowed(self):
+        """An empty update is valid — all fields optional."""
+        data = MissionUpdate()
+        assert data.model_dump(exclude_unset=True) == {}
+
+    @pytest.mark.parametrize("bound", ["max_loops", "min_loops"])
+    def test_loop_bounds_reject_zero_and_negative(self, bound: str):
+        with pytest.raises(ValidationError):
+            MissionUpdate(**{bound: 0})
+        with pytest.raises(ValidationError):
+            MissionUpdate(**{bound: -1})

@@ -19,6 +19,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Index,
+    Integer,
     String,
     Text,
 )
@@ -119,6 +120,69 @@ class Mission(Base):
         nullable=True,
         default="baseline",
         comment="Research depth tier: baseline, deep, or alpha",
+    )
+
+    # Mission-authoring fields consumed by DeepSearch contract compiler (T40.1).
+    # All nullable; see alembic/versions/027_add_mission_authoring_fields.py.
+    background = Column(
+        Text,
+        nullable=True,
+        comment="Free-form background prose for the mission",
+    )
+    focus = Column(
+        Text,
+        nullable=True,
+        comment="Narrow framing for the research question",
+    )
+    references = Column(
+        CrossDBJSON,
+        nullable=True,
+        comment="Array of {title} reference objects",
+    )
+    required_entities = Column(
+        CrossDBJSON,
+        nullable=True,
+        comment="Array of entity strings that must appear in results",
+    )
+    excluded_entities = Column(
+        CrossDBJSON,
+        nullable=True,
+        comment="Array of entity strings that must not appear in results",
+    )
+    expected_output_schema = Column(
+        CrossDBJSON,
+        nullable=True,
+        comment="DeepSearch OutputSchema describing the expected deliverable shape",
+    )
+    coverage_thresholds = Column(
+        CrossDBJSON,
+        nullable=True,
+        comment="Dict of coverage gate thresholds",
+    )
+    validation_thresholds = Column(
+        CrossDBJSON,
+        nullable=True,
+        comment="Dict of validation gate thresholds",
+    )
+    deliverable_format = Column(
+        Text,
+        nullable=True,
+        comment="Output rendering format hint (e.g. 'markdown report', 'comparison table')",
+    )
+    max_loops = Column(
+        Integer,
+        nullable=True,
+        comment="Upper bound on DeepSearch research loop count",
+    )
+    min_loops = Column(
+        Integer,
+        nullable=True,
+        comment="Lower bound on DeepSearch research loop count",
+    )
+    constraints = Column(
+        CrossDBJSON,
+        nullable=True,
+        comment="Array of constraint strings (promoted from context['constraints'])",
     )
 
     # Execution Tracking
@@ -247,6 +311,18 @@ class Mission(Base):
             "tags": self.tags or [],
             "metadata": self.mission_metadata or {},
             "research_depth": self.research_depth,
+            "background": self.background,
+            "focus": self.focus,
+            "references": self.references,
+            "required_entities": self.required_entities,
+            "excluded_entities": self.excluded_entities,
+            "expected_output_schema": self.expected_output_schema,
+            "coverage_thresholds": self.coverage_thresholds,
+            "validation_thresholds": self.validation_thresholds,
+            "deliverable_format": self.deliverable_format,
+            "max_loops": self.max_loops,
+            "min_loops": self.min_loops,
+            "constraints": self._resolved_constraints(),
             "status": self.status,
             "queued_at": self.queued_at.isoformat() if self.queued_at else None,
             "started_at": self.started_at.isoformat() if self.started_at else None,
@@ -267,6 +343,22 @@ class Mission(Base):
             "created_by": self.created_by,
         }
 
+    def _resolved_constraints(self) -> list[Any] | None:
+        """Constraints column with fallback to context['constraints'].
+
+        Old missions stored constraints inside `context`; T40.1 promoted it to a
+        first-class column. During the transition the serializer falls back so
+        DeepSearch's existing reader keeps seeing constraints regardless of
+        which side the author wrote to.
+        """
+        if self.constraints:
+            return self.constraints
+        if isinstance(self.context, dict):
+            legacy = self.context.get("constraints")
+            if legacy:
+                return legacy
+        return self.constraints
+
     def to_mission_protocol(self) -> dict[str, Any]:
         """Convert to Mission Protocol format for DeepSearch submission."""
         return {
@@ -280,6 +372,18 @@ class Mission(Base):
             "tags": self.tags or [],
             "metadata": self.mission_metadata or {},
             "research_depth": self.research_depth or "baseline",
+            "background": self.background,
+            "focus": self.focus,
+            "references": self.references,
+            "required_entities": self.required_entities,
+            "excluded_entities": self.excluded_entities,
+            "expected_output_schema": self.expected_output_schema,
+            "coverage_thresholds": self.coverage_thresholds,
+            "validation_thresholds": self.validation_thresholds,
+            "deliverable_format": self.deliverable_format,
+            "max_loops": self.max_loops,
+            "min_loops": self.min_loops,
+            "constraints": self._resolved_constraints(),
         }
 
     @classmethod
@@ -302,5 +406,17 @@ class Mission(Base):
             tags=protocol.get("tags", []),
             mission_metadata=protocol.get("metadata", {}),
             research_depth=protocol.get("research_depth", "baseline"),
+            background=protocol.get("background"),
+            focus=protocol.get("focus"),
+            references=protocol.get("references"),
+            required_entities=protocol.get("required_entities"),
+            excluded_entities=protocol.get("excluded_entities"),
+            expected_output_schema=protocol.get("expected_output_schema"),
+            coverage_thresholds=protocol.get("coverage_thresholds"),
+            validation_thresholds=protocol.get("validation_thresholds"),
+            deliverable_format=protocol.get("deliverable_format"),
+            max_loops=protocol.get("max_loops"),
+            min_loops=protocol.get("min_loops"),
+            constraints=protocol.get("constraints"),
             created_by=created_by,
         )
