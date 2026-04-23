@@ -418,7 +418,7 @@ async def handle_submit_mission(arguments: dict[str, Any]) -> list[TextContent]:
                                 "message": "Mission must have project_id set before submission.",
                                 "mission_id": mission.mission_id,
                                 "uuid": str(mission.id),
-                                "suggestion": f"Use PUT /api/v1/missions/{mission.id} to set project_id first.",
+                                "suggestion": f"Use PATCH /api/v1/missions/{mission.id} to set project_id first.",
                             }
                         ),
                     )
@@ -434,7 +434,7 @@ async def handle_submit_mission(arguments: dict[str, Any]) -> list[TextContent]:
                                 "message": "Mission must have at least one success criterion before submission.",
                                 "mission_id": mission.mission_id,
                                 "uuid": str(mission.id),
-                                "suggestion": f"Use PUT /api/v1/missions/{mission.id} to add success_criteria.",
+                                "suggestion": f"Use PATCH /api/v1/missions/{mission.id} to add success_criteria.",
                             }
                         ),
                     )

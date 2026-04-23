@@ -120,7 +120,7 @@ def _submit_existing_mission(
             detail=_build_actionable_detail(
                 message="Mission must have project_id set before submission.",
                 mission=mission,
-                suggestion=f"Use PUT /api/v1/missions/{mission.id} to set project_id first.",
+                suggestion=f"Use PATCH /api/v1/missions/{mission.id} to set project_id first.",
             ),
         )
 
@@ -130,7 +130,7 @@ def _submit_existing_mission(
             detail=_build_actionable_detail(
                 message="Mission must have at least one success criterion before submission.",
                 mission=mission,
-                suggestion=f"Use PUT /api/v1/missions/{mission.id} to add success_criteria.",
+                suggestion=f"Use PATCH /api/v1/missions/{mission.id} to add success_criteria.",
             ),
         )
 
@@ -374,7 +374,7 @@ def create_and_submit_mission(
         ) from exc
 
 
-@router.put("/{mission_id}", response_model=MissionResponse)
+@router.patch("/{mission_id}", response_model=MissionResponse)
 def update_mission(
     mission_id: UUID,
     data: MissionUpdate,

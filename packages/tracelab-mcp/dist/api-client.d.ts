@@ -255,7 +255,7 @@ export interface Mission {
     tags?: string[];
     metadata?: Record<string, unknown>;
     research_depth?: 'baseline' | 'deep' | 'alpha';
-    status: 'draft' | 'queued' | 'in_progress' | 'completed' | 'blocked' | 'cancelled';
+    status: 'draft' | 'queued' | 'in_progress' | 'completed' | 'blocked' | 'cancelled' | 'validation_failed';
     queued_at?: string;
     started_at?: string;
     completed_at?: string;

@@ -1,0 +1,9 @@
+Script written, executable, syntax-clean, help works. Lives at scripts/rebuild-mcp.sh.
+
+How to use (from any cwd)
+
+~/portfolio/Aquex-mcp/scripts/rebuild-mcp.sh stage1     # after stage1 source edit
+~/portfolio/Aquex-mcp/scripts/rebuild-mcp.sh oods       # after oods edit
+~/portfolio/Aquex-mcp/scripts/rebuild-mcp.sh tracelab   # after tracelab edit
+~/portfolio/Aquex-mcp/scripts/rebuild-mcp.sh all        # nuclear option
+If you want it one-word, add alias rebuild-mcp=~/portfolio/Aquex-mcp/scripts/rebuild-mcp.sh to your .zshrc. Or symlink into /usr/local/bin — but alias is fine.
