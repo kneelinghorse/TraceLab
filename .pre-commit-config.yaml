@@ -16,3 +16,12 @@ repos:
       - id: ruff
         args: ["--fix"]
       - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: no-mcp-dist
+        name: Reject staged MCP package dist/ files
+        entry: scripts/check_no_mcp_dist.sh
+        language: script
+        pass_filenames: true
+        files: ^packages/[^/]+/dist/
