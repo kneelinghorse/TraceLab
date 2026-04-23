@@ -65,7 +65,9 @@ class WebhookHandler:
         Raises:
             WebhookValidationError: If signature is missing or invalid
         """
-        secret = settings.deepsearch_webhook_secret
+        # T40.4: prefer the renamed shared secret; fall back to the legacy
+        # deepsearch_webhook_secret for back-compat during the transition.
+        secret = settings.effective_deepsearch_service_secret
 
         # If no secret configured, skip validation (development mode)
         if not secret:

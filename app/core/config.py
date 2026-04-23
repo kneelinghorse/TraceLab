@@ -97,8 +97,18 @@ class Settings(BaseSettings):
     deepsearch_backoff_multiplier: float = 2.0
     deepsearch_initial_backoff: float = 1.0
     deepsearch_webhook_secret: str | None = None
+    # T40.4: renamed shared secret that both TraceLab and DeepSearch use for
+    # HMAC signing/verification across all service-to-service calls (inbound
+    # webhooks + outbound preview proxy). The old deepsearch_webhook_secret
+    # env var continues to work as a transitional fallback; deepsearch_secret
+    # takes precedence when both are set.
+    deepsearch_tracelab_service_secret: str | None = None
     # DeepSearch worker health endpoint (for console monitoring)
     deepsearch_worker_health_url: str = "http://localhost:8080/health"
+    # Where to POST the contract-preview request (T40.4). Falls back to
+    # deepsearch_api_url when unset — useful when preview lives alongside the
+    # main API.
+    deepsearch_preview_url: str | None = None
 
     # Evidence auto-linking (T29.6: difflib → embeddings)
     auto_link_similarity_threshold: float = 0.78
@@ -116,6 +126,21 @@ class Settings(BaseSettings):
         if self.environment.lower() in {"production", "prod"}:
             return self.cors_allowed_origins_prod or []
         return self.cors_allowed_origins_dev or []
+
+    @property
+    def effective_deepsearch_service_secret(self) -> str | None:
+        """Resolve the shared service secret (T40.4).
+
+        Prefers ``deepsearch_tracelab_service_secret``; falls back to the
+        legacy ``deepsearch_webhook_secret`` so existing deployments keep
+        working during the rename. Returns None if neither is set, in which
+        case HMAC validation is skipped (dev-only mode — prod must have one).
+        """
+        return (
+            self.deepsearch_tracelab_service_secret
+            or self.deepsearch_webhook_secret
+            or None
+        )
 
 
 settings = Settings()

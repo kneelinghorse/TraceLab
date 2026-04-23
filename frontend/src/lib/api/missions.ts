@@ -4,6 +4,7 @@ import type {
   ApiMissionCreate,
   ApiMissionUpdate,
   Mission,
+  MissionContractPreview,
   MissionCreatePayload,
   MissionListParams,
   MissionSubmitResponse,
@@ -68,6 +69,16 @@ export const missionsApi = {
   submitToDeepSearch(missionId: string): Promise<MissionSubmitResponse> {
     return httpClient.post<MissionSubmitResponse>(
       `${MISSIONS_PATH}/${missionId}/submit`
+    );
+  },
+
+  /**
+   * Preview the DeepSearch contract for a mission (T40.4).
+   * Read-only — mission state is unchanged.
+   */
+  previewContract(missionId: string): Promise<MissionContractPreview> {
+    return httpClient.get<MissionContractPreview>(
+      `${MISSIONS_PATH}/${missionId}/contract-preview`
     );
   },
 

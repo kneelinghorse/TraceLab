@@ -753,4 +753,28 @@ export class TraceLabClient {
       progress: mission.execution_metadata?.progress_percent as number | undefined,
     };
   }
+
+  /**
+   * Fetch the compiled DeepSearch contract preview for a mission (T40.4).
+   * Read-only — does not change mission state.
+   */
+  async previewMissionContract(missionId: string): Promise<MissionContractPreview> {
+    return this.request<MissionContractPreview>(
+      'GET',
+      `/api/v1/missions/${missionId}/contract-preview`
+    );
+  }
+}
+
+export interface MissionContractPreview {
+  mission_id: string;
+  mission_uuid: string;
+  project_id?: string | null;
+  named_entities: string[];
+  objectives: Array<Record<string, unknown>>;
+  evidence_slots: Array<Record<string, unknown>>;
+  acceptance_checks: Array<Record<string, unknown>>;
+  deliverable_schemas: Array<Record<string, unknown>>;
+  coverage_thresholds: Record<string, number>;
+  validation_thresholds: Record<string, number>;
 }
