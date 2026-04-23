@@ -588,6 +588,115 @@ class TestMissionUpdate:
         assert doc_id in data["result_document_ids"]
 
 
+class TestMissionAuthoringFieldsRoundTrip:
+    """T40.2 smoke: POST /missions with all authoring fields then GET them back."""
+
+    def _full_authoring_payload(self) -> dict:
+        return {
+            "background": "Teams keep conflating Contrast-Consistent Search with CCS-style probing.",
+            "focus": "Only papers benchmarking CCS against supervised probing baselines.",
+            "references": [
+                {"title": "Contrast-Consistent Search (Burns et al. 2022)"},
+                {"title": "Linear probing limitations (Alain & Bengio 2016)"},
+            ],
+            "required_entities": ["Contrast-Consistent Search", "CCS", "latent truth"],
+            "excluded_entities": ["Amazon CloudFront", "CCS Insurance"],
+            "expected_output_schema": {
+                "type": "object",
+                "properties": {
+                    "executive_summary": {"type": "string"},
+                    "comparison_table": {"type": "array"},
+                },
+            },
+            "coverage_thresholds": {"min_sources": 12, "min_per_required_entity": 2},
+            "validation_thresholds": {"structural": 0.85, "coverage": 0.70},
+            "deliverable_format": "executive summary with comparison table",
+            "max_loops": 6,
+            "min_loops": 3,
+            "constraints": ["no paywalled sources", "prefer peer-reviewed"],
+        }
+
+    def test_create_and_get_round_trips_every_authoring_field(
+        self, auth_headers, db_session
+    ):
+        client = TestClient(app)
+        project = _create_test_project(db_session)
+        payload = {
+            "mission_id": "AUTH-ROUND-1",
+            "title": "Authoring round-trip",
+            "objective": "Verify every authoring field survives POST then GET.",
+            "success_criteria": ["Every field round-trips"],
+            "project_id": str(project.id),
+            **self._full_authoring_payload(),
+        }
+
+        create = client.post("/api/v1/missions", json=payload, headers=auth_headers)
+        assert create.status_code == 201, create.text
+        created_body = create.json()
+        mission_uuid = created_body["id"]
+
+        # First: the create response itself should already expose the fields.
+        for field, value in self._full_authoring_payload().items():
+            assert created_body.get(field) == value, (
+                f"CREATE: field {field} not in response: got "
+                f"{created_body.get(field)!r}, full body keys: {list(created_body.keys())}"
+            )
+
+        get = client.get(f"/api/v1/missions/{mission_uuid}", headers=auth_headers)
+        assert get.status_code == 200, get.text
+        body = get.json()
+
+        for field, value in self._full_authoring_payload().items():
+            assert body[field] == value, f"field {field} did not round-trip: {body.get(field)!r}"
+
+    def test_patch_updates_authoring_fields(self, auth_headers, db_session):
+        client = TestClient(app)
+        project = _create_test_project(db_session)
+        create = client.post(
+            "/api/v1/missions",
+            json={
+                "mission_id": "AUTH-ROUND-2",
+                "title": "PATCH round-trip",
+                "objective": "Verify PATCH touches every authoring field.",
+                "success_criteria": ["Every field round-trips"],
+                "project_id": str(project.id),
+            },
+            headers=auth_headers,
+        )
+        assert create.status_code == 201, create.text
+        mission_uuid = create.json()["id"]
+
+        patch = client.patch(
+            f"/api/v1/missions/{mission_uuid}",
+            json=self._full_authoring_payload(),
+            headers=auth_headers,
+        )
+        assert patch.status_code == 200, patch.text
+        body = patch.json()
+        for field, value in self._full_authoring_payload().items():
+            assert body[field] == value, f"PATCH did not persist {field}"
+
+    def test_constraints_fallback_via_context(self, auth_headers, db_session):
+        """Legacy missions with constraints in context still surface them in the API response."""
+        client = TestClient(app)
+        project = _create_test_project(db_session)
+        create = client.post(
+            "/api/v1/missions",
+            json={
+                "mission_id": "AUTH-FALLBACK-1",
+                "title": "Legacy constraints",
+                "objective": "Mission with constraints only in context.",
+                "success_criteria": ["Fallback works"],
+                "project_id": str(project.id),
+                "context": {"constraints": ["legacy constraint"]},
+            },
+            headers=auth_headers,
+        )
+        assert create.status_code == 201, create.text
+        body = create.json()
+        assert body["constraints"] == ["legacy constraint"]
+
+
 class TestMissionVerbContract:
     """Regression guards for the MCP↔API verb contract.
 

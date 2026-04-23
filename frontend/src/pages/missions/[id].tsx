@@ -62,6 +62,27 @@ function MissionDetailContent() {
   const [editError, setEditError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Authoring fields (T40.2) — string-form for prose/ints, arrays for lists, raw
+  // JSON strings for the three structured fields so mid-edit invalid JSON
+  // doesn't wipe the draft.
+  const [editBackground, setEditBackground] = useState("");
+  const [editFocus, setEditFocus] = useState("");
+  const [editReferences, setEditReferences] = useState<string[]>([]);
+  const [editRequiredEntities, setEditRequiredEntities] = useState<string[]>([]);
+  const [editExcludedEntities, setEditExcludedEntities] = useState<string[]>([]);
+  const [editConstraints, setEditConstraints] = useState<string[]>([]);
+  const [editDeliverableFormat, setEditDeliverableFormat] = useState("");
+  const [editMaxLoops, setEditMaxLoops] = useState<string>("");
+  const [editMinLoops, setEditMinLoops] = useState<string>("");
+  const [editExpectedOutputSchema, setEditExpectedOutputSchema] = useState("");
+  const [editCoverageThresholds, setEditCoverageThresholds] = useState("");
+  const [editValidationThresholds, setEditValidationThresholds] = useState("");
+  const [editJsonErrors, setEditJsonErrors] = useState<{
+    expected_output_schema?: string;
+    coverage_thresholds?: string;
+    validation_thresholds?: string;
+  }>({});
+
   const { mission, isLoading, error, refresh } = useApiMission(missionId);
 
   const handleSubmitToDeepSearch = async () => {
@@ -126,6 +147,26 @@ function MissionDetailContent() {
     setEditTags([...mission.tags]);
     setEditResearchDepth(mission.research_depth);
     setEditError(null);
+    // Hydrate authoring fields from the current mission.
+    setEditBackground(mission.background ?? "");
+    setEditFocus(mission.focus ?? "");
+    setEditReferences((mission.references ?? []).map((r) => r?.title ?? ""));
+    setEditRequiredEntities([...(mission.required_entities ?? [])]);
+    setEditExcludedEntities([...(mission.excluded_entities ?? [])]);
+    setEditConstraints([...(mission.constraints ?? [])]);
+    setEditDeliverableFormat(mission.deliverable_format ?? "");
+    setEditMaxLoops(mission.max_loops != null ? String(mission.max_loops) : "");
+    setEditMinLoops(mission.min_loops != null ? String(mission.min_loops) : "");
+    setEditExpectedOutputSchema(
+      mission.expected_output_schema ? JSON.stringify(mission.expected_output_schema, null, 2) : ""
+    );
+    setEditCoverageThresholds(
+      mission.coverage_thresholds ? JSON.stringify(mission.coverage_thresholds, null, 2) : ""
+    );
+    setEditValidationThresholds(
+      mission.validation_thresholds ? JSON.stringify(mission.validation_thresholds, null, 2) : ""
+    );
+    setEditJsonErrors({});
     setIsEditing(true);
   };
 
@@ -147,9 +188,52 @@ function MissionDetailContent() {
     }
 
     setEditError(null);
+
+    // Parse the three JSON authoring fields. Invalid JSON blocks the save and
+    // surfaces inline errors without losing the user's draft.
+    const parseJson = (raw: string): { value?: Record<string, unknown>; error?: string } => {
+      const trimmed = raw.trim();
+      if (!trimmed) return {};
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+          return { error: "Must be a JSON object." };
+        }
+        return { value: parsed as Record<string, unknown> };
+      } catch (err) {
+        return { error: `Invalid JSON: ${(err as Error).message}` };
+      }
+    };
+
+    const schemaParse = parseJson(editExpectedOutputSchema);
+    const coverageParse = parseJson(editCoverageThresholds);
+    const validationParse = parseJson(editValidationThresholds);
+
+    const jsonErrs: typeof editJsonErrors = {};
+    if (schemaParse.error) jsonErrs.expected_output_schema = schemaParse.error;
+    if (coverageParse.error) jsonErrs.coverage_thresholds = coverageParse.error;
+    if (validationParse.error) jsonErrs.validation_thresholds = validationParse.error;
+    setEditJsonErrors(jsonErrs);
+    if (Object.keys(jsonErrs).length > 0) {
+      setEditError("Fix JSON errors below before saving.");
+      return;
+    }
+
+    const parseLoopBound = (raw: string): number | undefined => {
+      const trimmed = raw.trim();
+      if (!trimmed) return undefined;
+      const n = Number(trimmed);
+      return Number.isInteger(n) && n >= 1 ? n : undefined;
+    };
+
     setIsSaving(true);
 
     try {
+      const references = editReferences
+        .map((title) => title.trim())
+        .filter((title) => title !== "")
+        .map((title) => ({ title }));
+
       const updateData: ApiMissionUpdate = {
         title: editTitle.trim(),
         objective: editObjective.trim(),
@@ -157,6 +241,27 @@ function MissionDetailContent() {
         deliverables: editDeliverables.filter(d => d.trim() !== ""),
         tags: editTags.filter(t => t.trim() !== ""),
         research_depth: editResearchDepth,
+        background: editBackground.trim() || null,
+        focus: editFocus.trim() || null,
+        references: references.length > 0 ? references : null,
+        required_entities:
+          editRequiredEntities.filter((x) => x.trim() !== "").length > 0
+            ? editRequiredEntities.filter((x) => x.trim() !== "")
+            : null,
+        excluded_entities:
+          editExcludedEntities.filter((x) => x.trim() !== "").length > 0
+            ? editExcludedEntities.filter((x) => x.trim() !== "")
+            : null,
+        constraints:
+          editConstraints.filter((x) => x.trim() !== "").length > 0
+            ? editConstraints.filter((x) => x.trim() !== "")
+            : null,
+        deliverable_format: editDeliverableFormat.trim() || null,
+        max_loops: parseLoopBound(editMaxLoops) ?? null,
+        min_loops: parseLoopBound(editMinLoops) ?? null,
+        expected_output_schema: schemaParse.value ?? null,
+        coverage_thresholds: coverageParse.value ?? null,
+        validation_thresholds: validationParse.value ?? null,
       };
 
       await missionsApi.update(missionId, updateData);
@@ -435,6 +540,108 @@ function MissionDetailContent() {
                     Controls research thoroughness. Baseline is the standard tier for most research. Deep for higher confidence. Alpha for critical decisions (may reject if evidence insufficient).
                   </p>
                 </div>
+
+                {/* Research Contract — authoring fields (T40.2) */}
+                <details className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
+                  <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-gray-800 dark:text-gray-200">
+                    Research Contract (optional — DeepSearch authoring fields)
+                  </summary>
+                  <div className="p-4 space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Background</label>
+                      <textarea
+                        value={editBackground}
+                        onChange={(e) => setEditBackground(e.target.value)}
+                        className="w-full px-3 py-2 min-h-[70px] border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        placeholder="Free-form prose orienting the research"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Focus</label>
+                      <textarea
+                        value={editFocus}
+                        onChange={(e) => setEditFocus(e.target.value)}
+                        className="w-full px-3 py-2 min-h-[60px] border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        placeholder="Narrow framing for the research question"
+                      />
+                    </div>
+                    {([
+                      { label: "References (one title per line)", value: editReferences, setter: setEditReferences, placeholder: "Reference title..." },
+                      { label: "Required entities", value: editRequiredEntities, setter: setEditRequiredEntities, placeholder: "Entity that MUST appear..." },
+                      { label: "Excluded entities", value: editExcludedEntities, setter: setEditExcludedEntities, placeholder: "Entity that MUST NOT appear..." },
+                      { label: "Constraints", value: editConstraints, setter: setEditConstraints, placeholder: "Constraint (e.g. 'no paywalled sources')..." },
+                    ] as const).map(({ label, value, setter, placeholder }) => (
+                      <div key={label}>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</label>
+                        <textarea
+                          value={value.join("\n")}
+                          onChange={(e) => setter(e.target.value.split("\n"))}
+                          className="w-full px-3 py-2 min-h-[70px] border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-xs"
+                          placeholder={placeholder}
+                        />
+                      </div>
+                    ))}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Deliverable format</label>
+                        <input
+                          type="text"
+                          value={editDeliverableFormat}
+                          onChange={(e) => setEditDeliverableFormat(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                          placeholder="e.g. markdown report"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Min loops</label>
+                        <input
+                          type="number"
+                          min={1}
+                          value={editMinLoops}
+                          onChange={(e) => setEditMinLoops(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Max loops</label>
+                        <input
+                          type="number"
+                          min={1}
+                          value={editMaxLoops}
+                          onChange={(e) => setEditMaxLoops(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        />
+                      </div>
+                    </div>
+                    {([
+                      { key: "expected_output_schema" as const, label: "Expected output schema (JSON object)", value: editExpectedOutputSchema, setter: setEditExpectedOutputSchema },
+                      { key: "coverage_thresholds" as const, label: "Coverage thresholds (JSON object)", value: editCoverageThresholds, setter: setEditCoverageThresholds },
+                      { key: "validation_thresholds" as const, label: "Validation thresholds (JSON object)", value: editValidationThresholds, setter: setEditValidationThresholds },
+                    ]).map(({ key, label, value, setter }) => (
+                      <div key={key}>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{label}</label>
+                        <textarea
+                          value={value}
+                          onChange={(e) => {
+                            setter(e.target.value);
+                            if (editJsonErrors[key]) {
+                              setEditJsonErrors((prev) => {
+                                const next = { ...prev };
+                                delete next[key];
+                                return next;
+                              });
+                            }
+                          }}
+                          className="w-full px-3 py-2 min-h-[100px] border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-xs"
+                          placeholder='{"key": "value"}'
+                        />
+                        {editJsonErrors[key] && (
+                          <p className="mt-1 text-xs text-red-600 dark:text-red-400">{editJsonErrors[key]}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </details>
 
                 {/* Error Display */}
                 {editError && (

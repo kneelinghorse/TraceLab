@@ -412,6 +412,35 @@ class MissionResponse(MissionBase):
 MissionRead = MissionResponse
 
 
+class MissionLintViolation(BaseModel):
+    """A single submit-time lint finding (T40.3)."""
+
+    rule: str = Field(..., description="Rule identifier that fired.")
+    field: str = Field(..., description="Mission field implicated by the finding.")
+    message: str = Field(..., description="Human-readable description of the finding.")
+    suggestion: str | None = Field(
+        None,
+        description="Concrete authoring action that would resolve the finding.",
+    )
+
+
+class MissionLintErrorDetail(BaseModel):
+    """422 response body when submit-time lint produces hard errors (T40.3)."""
+
+    message: str = Field(
+        "Mission failed submit-time lint gate.",
+        description="Top-level explanation shown to the author.",
+    )
+    errors: list[MissionLintViolation] = Field(
+        ...,
+        description="Hard-fail findings — every item must be resolved before submit.",
+    )
+    warnings: list[MissionLintViolation] = Field(
+        default_factory=list,
+        description="Soft findings surfaced alongside errors for context.",
+    )
+
+
 class MissionSubmitResponse(BaseModel):
     """Response from submitting a mission for execution."""
 
@@ -421,6 +450,13 @@ class MissionSubmitResponse(BaseModel):
     uuid: UUID = Field(..., description="Mission UUID")
     message: str = Field(..., description="Status message")
     job_id: str | None = Field(None, description="DeepSearch job ID (http mode only)")
+    warnings: list[MissionLintViolation] = Field(
+        default_factory=list,
+        description=(
+            "Soft-warning findings from the submit-time lint gate. Non-blocking; "
+            "surfaced so the author can revisit thin authoring choices."
+        ),
+    )
 
 
 class MissionActionableError(BaseModel):

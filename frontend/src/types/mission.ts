@@ -131,7 +131,28 @@ export interface EvidenceLinkPayload {
  */
 export type ResearchDepth = "baseline" | "deep" | "alpha";
 
-export interface ApiMission {
+export interface MissionReference {
+  title: string;
+  [key: string]: unknown;
+}
+
+/** Mission-authoring fields consumed by DeepSearch's contract compiler (T40.1/T40.2). */
+export interface MissionAuthoringFields {
+  background?: string | null;
+  focus?: string | null;
+  references?: MissionReference[] | null;
+  required_entities?: string[] | null;
+  excluded_entities?: string[] | null;
+  expected_output_schema?: Record<string, unknown> | null;
+  coverage_thresholds?: Record<string, unknown> | null;
+  validation_thresholds?: Record<string, unknown> | null;
+  deliverable_format?: string | null;
+  max_loops?: number | null;
+  min_loops?: number | null;
+  constraints?: string[] | null;
+}
+
+export interface ApiMission extends MissionAuthoringFields {
   id: string;
   project_id: string | null;
   project_name: string | null;
@@ -161,7 +182,7 @@ export interface ApiMission {
   created_by: string | null;
 }
 
-export interface ApiMissionCreate {
+export interface ApiMissionCreate extends MissionAuthoringFields {
   mission_id: string;
   title: string;
   objective: string;
@@ -177,7 +198,7 @@ export interface ApiMissionCreate {
   created_by?: string;
 }
 
-export interface ApiMissionUpdate {
+export interface ApiMissionUpdate extends MissionAuthoringFields {
   title?: string;
   objective?: string;
   success_criteria?: string[];

@@ -160,6 +160,19 @@ class MissionService:
             research_depth=data.research_depth or "baseline",
             status=data.status or "draft",
             created_by=data.created_by,
+            # Authoring fields (T40.1/T40.2) — nullable; pass through as-is.
+            background=data.background,
+            focus=data.focus,
+            references=data.references,
+            required_entities=data.required_entities,
+            excluded_entities=data.excluded_entities,
+            expected_output_schema=data.expected_output_schema,
+            coverage_thresholds=data.coverage_thresholds,
+            validation_thresholds=data.validation_thresholds,
+            deliverable_format=data.deliverable_format,
+            max_loops=data.max_loops,
+            min_loops=data.min_loops,
+            constraints=data.constraints,
         )
 
         # Set queued_at if status is queued
