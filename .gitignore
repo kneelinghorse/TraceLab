@@ -61,6 +61,9 @@ data/uploads/
 artifacts/
 artifacts/**/*
 
+# Stage1 design-scan output (research evidence; large JSON artifacts)
+out/
+
 # Telemetry build artifacts
 telemetry/events/.artifacts/
 
