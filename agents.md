@@ -53,6 +53,7 @@ pre-commit install
 - After editing `packages/tracelab-mcp/src/`, rebuild before testing locally: `cd packages/tracelab-mcp && npm run build`. The `bin` entry (`dist/index.js`) won't exist on a fresh clone until you build.
 - `npm publish` automatically runs `prepublishOnly` → `npm run build`, so the published tarball is always built from current src — no manual step needed at publish time.
 - If the MCP appears stale in Claude Desktop, run `npm run build` and restart the client; do not re-add `dist/` to git.
+- **MCP tool surface (T41.7 — sprint-41):** 7 action-clustered tools, not the prior ~24 flat ones. Each cluster takes an `action` param plus action-specific keys: `tracelab_search` (knowledge), `tracelab_project` (list/create/update/stats), `tracelab_collection` (list/get/export/create/add/synthesize), `tracelab_report` (create/list/get/export), `tracelab_document` (upload/get_content), `tracelab_mission` (create/list/get/update — CRUD), `tracelab_mission_execution` (submit/status/preview — DS lifecycle). Legacy tool-name calls return a friendly migration error pointing at the new cluster+action. Mapping table and migration error live in `packages/tracelab-mcp/src/index.ts::LEGACY_TO_CLUSTER`.
 
 ### Testing
 ```bash
@@ -103,6 +104,46 @@ node cmos/context/integration_test_runner.js --output telemetry/events/testing-s
 - Before concluding any mission that touches runtime code, execute `python cmos/scripts/validate_foundational_refs.py` for documentation links and rerun relevant pytest suites (`pytest tests/` or targeted folders).
 - Use the tiered validation checklist from `cmos/docs/cmos_Playbook.md`: session events logged, backlog status updated, parity verified, telemetry reviewed.
 - Record blockers or deviations inside `cmos/context/MASTER_CONTEXT.json` via the SQLite client (`context/db_client.py`) rather than hand-editing JSON mirrors.
+
+## MCP Contract Guard (sprint-41 codification)
+
+**Any MCP surface change requires a regression test that hits the deployed
+verb via the MCP client, not just the server route directly.**
+
+Origin: T40.0 PUT/PATCH 405 incident (sprint-40). Tests with
+`client.put` against the FastAPI server passed locally, but DeepSearch's
+paid smoke caught the verb mismatch in production because the actual MCP
+client was sending PATCH while the route was registered as PUT. Pattern
+to mirror: `TestMissionVerbContract` in `tests/test_missions_api.py`.
+
+Apply this rule when changing:
+- MCP tool input schema (Python `MISSION_TOOLS` or TS `inputSchema`)
+- MCP tool handler dispatch (`handle_*` in `app/mcp_server/tools/` or
+  `handle*` in `packages/tracelab-mcp/src/index.ts`)
+- The HTTP verb the MCP client uses to talk to FastAPI
+- The MCP-emitted response shape (`_serialize_mission`,
+  `handleGetMission`, etc.) — see T41.2 incident where the Python
+  serializer was fixed but the parallel TS serializer kept stripping
+  the same 12 fields.
+
+For the parallel-serializers gap specifically, see the **two MCP
+serialization surfaces** note in
+[cmos/contracts/mission-authoring-contract.md](cmos/contracts/mission-authoring-contract.md).
+
+## Mission-Authoring Boundary Contract
+
+When changing any mission-authoring field (anything that flows from
+`create_mission` / `update_mission` through the contract compiler to
+the DeepSearch worker), update
+[cmos/contracts/mission-authoring-contract.md](cmos/contracts/mission-authoring-contract.md)
+in the same commit. That doc is the single source of truth for the
+MCP param ↔ Pydantic field ↔ DB column ↔ REST response field ↔ DS
+worker SELECT mapping. Origin: DeepSearch ask in message
+`3cf143ee` (T41.3 deliverable).
+
+Related: [cmos/contracts/deepsearch-compiler-vendor.md](cmos/contracts/deepsearch-compiler-vendor.md)
+documents the resync ritual for the vendored DS contract compiler at
+`app/services/contract_compiler/`.
 
 ## Architecture Patterns
 
@@ -162,8 +203,10 @@ def get_doc(doc_id: UUID, repo: DocumentRepository = Depends(get_document_reposi
 - `cmos/docs/integration-testing-guide.md`, `cmos/docs/packaging-guide.md`, `cmos/docs/sqlite-*` – test, packaging, and database procedures.
 - `foundational-docs/roadmap_template.md` – canonical backlog + milestone template used for every sprint.
 - `foundational-docs/tech_arch_template.md` – authoritative technical architecture template for Mission Protocol deliverables.
+- `cmos/contracts/mission-authoring-contract.md` – single source of truth for the MCP param ↔ DB column ↔ REST ↔ DS worker mapping (T41.3).
+- `cmos/contracts/deepsearch-compiler-vendor.md` – resync ritual for the vendored DeepSearch contract compiler at `app/services/contract_compiler/` (T41.1).
 
 ---
-Last Updated: 2026-03-16
-Version: 2.0.0
+Last Updated: 2026-04-27
+Version: 2.1.0
 Maintained by: TraceLab Platform Team
