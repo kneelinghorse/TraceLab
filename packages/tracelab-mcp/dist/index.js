@@ -462,7 +462,7 @@ const TOOLS = [
     // Mission tools
     {
         name: 'create_mission',
-        description: 'Create a new research mission for DeepSearch execution. After creation, use update_mission to modify details or submit_mission to queue for execution. Related tools: update_mission, submit_mission, get_mission, list_missions.',
+        description: 'Create a new research mission for DeepSearch execution. project_id is required as of T41.6 (sprint-41) — orphan missions cannot be created. Use list_projects to find a valid project_id or create_project first if you don\'t have one. After creation, use update_mission to modify details or submit_mission to queue for execution. Related tools: list_projects, create_project, update_mission, submit_mission, get_mission, list_missions.',
         inputSchema: {
             type: 'object',
             properties: {
@@ -485,7 +485,7 @@ const TOOLS = [
                 },
                 project_id: {
                     type: 'string',
-                    description: 'UUID of project to associate with. Links mission results to project knowledge base.',
+                    description: 'UUID of project to associate with. REQUIRED as of T41.6 — missions cannot be created without a project. Use list_projects to find a valid project_id, or create_project first.',
                 },
                 deliverables: {
                     type: 'array',
@@ -558,7 +558,7 @@ const TOOLS = [
                     description: 'Author-level constraints DeepSearch must respect. Example: ["no paywalled sources", "prefer peer-reviewed", "published 2020 or later"]',
                 },
             },
-            required: ['mission_id', 'title', 'objective', 'success_criteria'],
+            required: ['mission_id', 'title', 'objective', 'success_criteria', 'project_id'],
         },
     },
     {
@@ -618,6 +618,10 @@ const TOOLS = [
                 mission_id: {
                     type: 'string',
                     description: 'UUID of the mission to update. Get from list_missions or create_mission response.',
+                },
+                project_id: {
+                    type: 'string',
+                    description: 'Re-parent this mission to a different project. UUID of the target project. T41.5 (sprint-41) — pre-T41.5, project_id was immutable after create. Validated: 404 if target project doesn\'t exist. Use list_projects to find a valid project_id.',
                 },
                 title: {
                     type: 'string',
@@ -882,7 +886,9 @@ const CreateMissionInput = z.object({
     title: z.string().min(1),
     objective: z.string().min(1),
     success_criteria: z.array(z.string()).min(1),
-    project_id: z.string().uuid().optional(),
+    // T41.6: project_id required at create. Pre-T41.6 the field was optional
+    // and orphan missions accumulated (1.3% of stock at sprint-41 cutover).
+    project_id: z.string().uuid(),
     deliverables: z.array(z.string()).optional(),
     tags: z.array(z.string()).optional(),
     research_depth: z.enum(['baseline', 'deep', 'alpha']).optional().default('baseline'),
@@ -900,6 +906,10 @@ const GetMissionInput = z.object({
 });
 const UpdateMissionInput = z.object({
     mission_id: z.string().uuid(),
+    // T41.5 (sprint-41): project_id is now mutable on existing missions.
+    // Pre-T41.5 missions were stuck with their original project assignment.
+    // Server validates: 404 if the target project doesn't exist.
+    project_id: z.string().uuid().optional(),
     title: z.string().min(1).optional(),
     objective: z.string().min(1).optional(),
     success_criteria: z.array(z.string()).optional(),
@@ -1640,6 +1650,10 @@ async function handleUpdateMission(args) {
     const input = UpdateMissionInput.parse(args);
     // Build update payload with only provided fields
     const updateData = {};
+    // T41.5: project_id can now be re-parented via update_mission. Server
+    // returns 404 if the target project doesn't exist.
+    if (input.project_id !== undefined)
+        updateData.project_id = input.project_id;
     if (input.title !== undefined)
         updateData.title = input.title;
     if (input.objective !== undefined)

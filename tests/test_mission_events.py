@@ -29,6 +29,13 @@ from app.core.mission_events import (
 from app.core.security import get_configured_credentials, issue_token_response
 from app.main import app
 
+# T41.6 (sprint-41): MissionCreate.project_id is required as of this sprint.
+# Tests construct MissionCreate to test OTHER validators (mission_id format,
+# title length, etc.) — they need a stable project_id supplied so the
+# under-test field validation runs instead of failing on missing project_id.
+import uuid as _uuid_t41_6
+_TEST_PROJECT_ID = _uuid_t41_6.uuid4()
+
 
 @pytest.fixture(autouse=True)
 def _reset_event_bus():

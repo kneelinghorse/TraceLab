@@ -303,6 +303,7 @@ export interface MissionCreate extends MissionAuthoringFields {
     status?: string;
 }
 export interface MissionUpdate extends MissionAuthoringFields {
+    project_id?: string;
     title?: string;
     objective?: string;
     success_criteria?: string[];

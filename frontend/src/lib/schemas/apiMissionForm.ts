@@ -31,8 +31,13 @@ export const apiMissionFormSchema = z.object({
     .array(z.string().min(1, "Criterion cannot be empty"))
     .min(1, "At least one success criterion is required"),
 
-  // Optional fields
-  project_id: z.string().optional(),
+  // T41.6: project_id is required at create. Pre-T41.6 the form allowed
+  // saving as draft without a project; that path is now blocked at the
+  // schema layer so the same rule the API enforces shows up as a form
+  // error before the user submits.
+  project_id: z
+    .string()
+    .uuid("Project is required — pick one from the dropdown above"),
   context: z.record(z.string(), z.unknown()).optional(),
   deliverables: z.array(z.string()).optional(),
   research_phases: z.record(z.string(), z.unknown()).optional(),

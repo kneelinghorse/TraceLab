@@ -19,6 +19,13 @@ from pydantic import ValidationError
 from app.schemas.mission import MISSION_ID_PATTERN, MissionCreate, MissionUpdate
 from app.services.mission_validator import MissionValidator
 
+# T41.6 (sprint-41): MissionCreate.project_id is required as of this sprint.
+# Tests construct MissionCreate to test OTHER validators (mission_id format,
+# title length, etc.) — they need a stable project_id supplied so the
+# under-test field validation runs instead of failing on missing project_id.
+import uuid as _uuid_t41_6
+_TEST_PROJECT_ID = _uuid_t41_6.uuid4()
+
 # ============================================================================
 # mission_id Validation Tests
 # ============================================================================
@@ -47,6 +54,7 @@ class TestMissionIdValidation:
 
         # Also test via schema
         data = MissionCreate(
+            project_id=_TEST_PROJECT_ID,
             mission_id=mission_id,
             title="Test Mission",
             objective="This is a test objective with at least 10 chars",
@@ -77,6 +85,7 @@ class TestMissionIdValidation:
         # Test via schema
         with pytest.raises(ValidationError) as excinfo:
             MissionCreate(
+                project_id=_TEST_PROJECT_ID,
                 mission_id=mission_id,
                 title="Test Mission",
                 objective="This is a test objective with at least 10 chars",
@@ -92,6 +101,7 @@ class TestMissionIdValidation:
         long_id = "A" * 51  # Max is 50
         with pytest.raises(ValidationError) as excinfo:
             MissionCreate(
+                project_id=_TEST_PROJECT_ID,
                 mission_id=long_id,
                 title="Test Mission",
                 objective="This is a test objective with at least 10 chars",
@@ -112,6 +122,7 @@ class TestTitleValidation:
     def test_valid_title_min_length(self):
         """Title with exactly 3 characters should pass."""
         data = MissionCreate(
+            project_id=_TEST_PROJECT_ID,
             mission_id="B16.1",
             title="ABC",  # Exactly 3 chars
             objective="This is a test objective with at least 10 chars",
@@ -123,6 +134,7 @@ class TestTitleValidation:
         """Title with less than 3 characters should fail."""
         with pytest.raises(ValidationError) as excinfo:
             MissionCreate(
+                project_id=_TEST_PROJECT_ID,
                 mission_id="B16.1",
                 title="AB",  # 2 chars, too short
                 objective="This is a test objective with at least 10 chars",
@@ -135,6 +147,7 @@ class TestTitleValidation:
         """Title with exactly 255 characters should pass."""
         long_title = "A" * 255
         data = MissionCreate(
+            project_id=_TEST_PROJECT_ID,
             mission_id="B16.1",
             title=long_title,
             objective="This is a test objective with at least 10 chars",
@@ -147,6 +160,7 @@ class TestTitleValidation:
         long_title = "A" * 256
         with pytest.raises(ValidationError) as excinfo:
             MissionCreate(
+                project_id=_TEST_PROJECT_ID,
                 mission_id="B16.1",
                 title=long_title,
                 objective="This is a test objective with at least 10 chars",
@@ -159,6 +173,7 @@ class TestTitleValidation:
         """Empty title should fail validation."""
         with pytest.raises(ValidationError) as excinfo:
             MissionCreate(
+                project_id=_TEST_PROJECT_ID,
                 mission_id="B16.1",
                 title="",
                 objective="This is a test objective with at least 10 chars",
@@ -179,6 +194,7 @@ class TestObjectiveValidation:
     def test_valid_objective_min_length(self):
         """Objective with exactly 10 characters should pass."""
         data = MissionCreate(
+            project_id=_TEST_PROJECT_ID,
             mission_id="B16.1",
             title="Test Mission",
             objective="1234567890",  # Exactly 10 chars
@@ -190,6 +206,7 @@ class TestObjectiveValidation:
         """Objective with less than 10 characters should fail."""
         with pytest.raises(ValidationError) as excinfo:
             MissionCreate(
+                project_id=_TEST_PROJECT_ID,
                 mission_id="B16.1",
                 title="Test Mission",
                 objective="123456789",  # 9 chars, too short
@@ -202,6 +219,7 @@ class TestObjectiveValidation:
         """Empty objective should fail validation."""
         with pytest.raises(ValidationError) as excinfo:
             MissionCreate(
+                project_id=_TEST_PROJECT_ID,
                 mission_id="B16.1",
                 title="Test Mission",
                 objective="",
@@ -214,6 +232,7 @@ class TestObjectiveValidation:
         """Long objectives should be allowed."""
         long_objective = "A" * 10000
         data = MissionCreate(
+            project_id=_TEST_PROJECT_ID,
             mission_id="B16.1",
             title="Test Mission",
             objective=long_objective,
@@ -233,6 +252,7 @@ class TestSuccessCriteriaValidation:
     def test_valid_single_criterion(self):
         """Single non-empty string criterion should pass."""
         data = MissionCreate(
+            project_id=_TEST_PROJECT_ID,
             mission_id="B16.1",
             title="Test Mission",
             objective="This is a valid objective",
@@ -243,6 +263,7 @@ class TestSuccessCriteriaValidation:
     def test_valid_multiple_criteria(self):
         """Multiple non-empty string criteria should pass."""
         data = MissionCreate(
+            project_id=_TEST_PROJECT_ID,
             mission_id="B16.1",
             title="Test Mission",
             objective="This is a valid objective",
@@ -254,6 +275,7 @@ class TestSuccessCriteriaValidation:
         """Empty success_criteria array should fail."""
         with pytest.raises(ValidationError) as excinfo:
             MissionCreate(
+                project_id=_TEST_PROJECT_ID,
                 mission_id="B16.1",
                 title="Test Mission",
                 objective="This is a valid objective",
@@ -266,6 +288,7 @@ class TestSuccessCriteriaValidation:
         """Empty string in success_criteria should fail."""
         with pytest.raises(ValidationError) as excinfo:
             MissionCreate(
+                project_id=_TEST_PROJECT_ID,
                 mission_id="B16.1",
                 title="Test Mission",
                 objective="This is a valid objective",
@@ -279,6 +302,7 @@ class TestSuccessCriteriaValidation:
         """Whitespace-only string in success_criteria should fail."""
         with pytest.raises(ValidationError) as excinfo:
             MissionCreate(
+                project_id=_TEST_PROJECT_ID,
                 mission_id="B16.1",
                 title="Test Mission",
                 objective="This is a valid objective",
@@ -306,6 +330,7 @@ class TestStatusValidation:
     def test_valid_statuses(self, status: str):
         """All valid status values should pass."""
         data = MissionCreate(
+            project_id=_TEST_PROJECT_ID,
             mission_id="B16.1",
             title="Test Mission",
             objective="This is a valid objective",
@@ -318,6 +343,7 @@ class TestStatusValidation:
         """Invalid status value should fail."""
         with pytest.raises(ValidationError) as excinfo:
             MissionCreate(
+                project_id=_TEST_PROJECT_ID,
                 mission_id="B16.1",
                 title="Test Mission",
                 objective="This is a valid objective",
@@ -330,6 +356,7 @@ class TestStatusValidation:
     def test_default_status_is_draft(self):
         """Default status should be 'draft'."""
         data = MissionCreate(
+            project_id=_TEST_PROJECT_ID,
             mission_id="B16.1",
             title="Test Mission",
             objective="This is a valid objective",
@@ -553,6 +580,7 @@ class TestValidationErrorMessages:
         """mission_id pattern error should explain the requirement."""
         with pytest.raises(ValidationError) as excinfo:
             MissionCreate(
+                project_id=_TEST_PROJECT_ID,
                 mission_id="-bad",
                 title="Test Mission",
                 objective="Valid objective here",
@@ -570,6 +598,7 @@ class TestValidationErrorMessages:
         """success_criteria item error should identify which item failed."""
         with pytest.raises(ValidationError) as excinfo:
             MissionCreate(
+                project_id=_TEST_PROJECT_ID,
                 mission_id="B16.1",
                 title="Test Mission",
                 objective="Valid objective here",
@@ -588,6 +617,7 @@ class TestEdgeCases:
         """Unicode characters in mission_id should fail."""
         with pytest.raises(ValidationError):
             MissionCreate(
+                project_id=_TEST_PROJECT_ID,
                 mission_id="B16.1\u2019",  # Curly apostrophe
                 title="Test Mission",
                 objective="Valid objective here",
@@ -597,6 +627,7 @@ class TestEdgeCases:
     def test_unicode_in_title_allowed(self):
         """Unicode characters in title should be allowed."""
         data = MissionCreate(
+            project_id=_TEST_PROJECT_ID,
             mission_id="B16.1",
             title="Test Mission \u2014 Unicode",  # Em dash
             objective="Valid objective here",
@@ -607,6 +638,7 @@ class TestEdgeCases:
     def test_newlines_in_objective_allowed(self):
         """Newlines in objective should be allowed."""
         data = MissionCreate(
+            project_id=_TEST_PROJECT_ID,
             mission_id="B16.1",
             title="Test Mission",
             objective="Line 1\nLine 2\nLine 3",
@@ -617,6 +649,7 @@ class TestEdgeCases:
     def test_special_chars_in_success_criteria_allowed(self):
         """Special characters in success_criteria items should be allowed."""
         data = MissionCreate(
+            project_id=_TEST_PROJECT_ID,
             mission_id="B16.1",
             title="Test Mission",
             objective="Valid objective here",
@@ -647,6 +680,7 @@ class TestAuthoringFieldsOnCreate:
 
     def test_all_authoring_fields_round_trip(self):
         data = MissionCreate(
+            project_id=_TEST_PROJECT_ID,
             **self._base_kwargs(),
             background="Background prose.",
             focus="Narrow focus.",
@@ -677,7 +711,7 @@ class TestAuthoringFieldsOnCreate:
 
     def test_all_authoring_fields_optional(self):
         """None/absent authoring fields don't break create."""
-        data = MissionCreate(**self._base_kwargs())
+        data = MissionCreate(project_id=_TEST_PROJECT_ID, **self._base_kwargs())
         assert data.background is None
         assert data.max_loops is None
         assert data.constraints is None
@@ -685,9 +719,9 @@ class TestAuthoringFieldsOnCreate:
     @pytest.mark.parametrize("bound", ["max_loops", "min_loops"])
     def test_loop_bounds_reject_zero_and_negative(self, bound: str):
         with pytest.raises(ValidationError):
-            MissionCreate(**self._base_kwargs(), **{bound: 0})
+            MissionCreate(project_id=_TEST_PROJECT_ID, **self._base_kwargs(), **{bound: 0})
         with pytest.raises(ValidationError):
-            MissionCreate(**self._base_kwargs(), **{bound: -1})
+            MissionCreate(project_id=_TEST_PROJECT_ID, **self._base_kwargs(), **{bound: -1})
 
 
 class TestAuthoringFieldsOnUpdate:

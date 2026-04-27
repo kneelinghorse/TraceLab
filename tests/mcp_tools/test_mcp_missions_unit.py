@@ -67,6 +67,46 @@ def _make_mission_mock(**overrides):
     return mission
 
 
+class TestT41_6CreateMissionRequiresProjectId:
+    """T41.6: project_id is now required on the create_mission MCP tool.
+
+    Pre-T41.6 the tool input schema marked project_id optional and orphan
+    missions accumulated (1.3% of stock at sprint cutover). Both the JSON
+    schema (for MCP clients) and the runtime handler (for actionable
+    error messaging) enforce the rule.
+    """
+
+    def test_create_mission_tool_marks_project_id_required(self):
+        from app.mcp_server.tools.missions import MISSION_TOOLS
+
+        tool = next(t for t in MISSION_TOOLS if t.name == "create_mission")
+        assert "project_id" in tool.inputSchema["required"]
+
+    def test_create_mission_handler_returns_actionable_error_when_missing(self):
+        import asyncio
+        import json
+
+        from app.mcp_server.tools.missions import handle_create_mission
+
+        result = asyncio.run(
+            handle_create_mission(
+                {
+                    "mission_id": "TEST-NOPROJ",
+                    "title": "Orphan attempt",
+                    "objective": "Should fail before reaching the DB",
+                    "success_criteria": ["any"],
+                    # project_id deliberately omitted
+                }
+            )
+        )
+
+        body = json.loads(result[0].text)
+        assert body.get("error") == "project_id is required"
+        assert "list_projects" in body.get("message", ""), (
+            f"Error message should reference list_projects for actionability, got: {body}"
+        )
+
+
 class TestMissionToolDefinitions:
     """Tests for MCP tool definitions - no database required."""
 
@@ -99,6 +139,7 @@ class TestMissionToolDefinitions:
             "title",
             "objective",
             "success_criteria",
+            "project_id",  # T41.6 added
         ]
 
     def test_list_missions_tool_schema(self):

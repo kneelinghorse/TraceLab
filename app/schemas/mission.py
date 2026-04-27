@@ -80,9 +80,13 @@ class MissionBase(BaseModel):
 class MissionCreate(MissionBase):
     """Payload for creating a mission."""
 
-    project_id: UUID | None = Field(
-        None,
-        description="Project to associate this mission with",
+    project_id: UUID = Field(
+        ...,
+        description=(
+            "Project to associate this mission with. Required as of T41.6 "
+            "(sprint-41) — pre-existing orphan missions remain readable via "
+            "GET, but new missions cannot be created without a project."
+        ),
     )
     context: dict[str, Any] | None = Field(
         default_factory=dict,
@@ -176,6 +180,15 @@ class MissionUpdate(BaseModel):
     All fields are optional - only provided fields will be updated.
     """
 
+    project_id: UUID | None = Field(
+        None,
+        description=(
+            "Re-parent the mission to a different project. Validated against "
+            "existing projects at the route layer (404 if target doesn't exist). "
+            "Added in T41.6/T41.5 (sprint-41) — pre-T41.5 missions were stuck "
+            "with their original project assignment forever."
+        ),
+    )
     title: str | None = Field(
         None,
         min_length=3,

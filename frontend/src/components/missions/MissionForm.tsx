@@ -110,9 +110,12 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // T41.6: project_id is required at create for BOTH draft and queued.
+  // Pre-T41.6 the draft path silently saved orphans (1.3% of stock at
+  // sprint cutover); both buttons now share the same project gate.
   const handleDisabledSubmitClick = () => {
     setShowProjectRequiredTooltip(true);
-    setSubmitError("A project must be selected to submit to DeepSearch. Select a project above or save as draft.");
+    setSubmitError("A project must be selected before saving or submitting. Pick one from the dropdown above.");
   };
 
   const handleFormSubmit = async (
@@ -275,7 +278,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="form-label">
-              Project {!isProjectSelected && <span className="text-red-500">*</span>}
+              Project <span className="text-red-500">*</span>
             </label>
             <select {...register("project_id")} className="form-input">
               <option value="">Select a project</option>
@@ -287,7 +290,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
             </select>
             {!isProjectSelected && (
               <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
-                Required for DeepSearch submission
+                Required — missions must belong to a project
               </p>
             )}
             {errors.project_id && (
@@ -535,9 +538,14 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
           <div className="flex gap-3 sm:ml-auto">
             <button
               type="button"
-              onClick={onSubmitDraft}
+              onClick={isProjectSelected ? onSubmitDraft : handleDisabledSubmitClick}
               disabled={isSubmitting}
-              className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50"
+              className={`px-4 py-2.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 ${
+                isProjectSelected
+                  ? "text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  : "text-gray-400 bg-gray-200 dark:bg-gray-700 cursor-not-allowed"
+              }`}
+              title={isProjectSelected ? undefined : "Select a project to save"}
             >
               {isSubmitting ? "Saving..." : "Save as Draft"}
             </button>
