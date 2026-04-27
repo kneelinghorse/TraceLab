@@ -629,13 +629,19 @@ const TOOLS: Tool[] = [
   {
     name: 'get_mission',
     description:
-      'Retrieve full mission details including objective, success criteria, research_depth, execution status, and results. Use this to check mission progress or access completed research outputs. Related tools: list_missions, update_mission, submit_mission.',
+      'Retrieve full mission details including objective, success criteria, research_depth, execution status, and results. By default heavy execution-time blobs (execution_metadata, result_protocol, result_markdown) over ~5KB are summarized to keep the response under MCP transport limits — pass include_execution_metadata=true to fetch the full payload. Use this to check mission progress or access completed research outputs. Related tools: list_missions, update_mission, submit_mission.',
     inputSchema: {
       type: 'object',
       properties: {
         mission_id: {
           type: 'string',
           description: 'UUID of the mission to retrieve. Get mission UUIDs from list_missions or create_mission response.',
+        },
+        include_execution_metadata: {
+          type: 'boolean',
+          default: false,
+          description:
+            'When true, return the full execution_metadata, result_protocol, and result_markdown values without size-based summarization. Use sparingly — completed missions can carry tens of KB of execution telemetry. Default: false (slim).',
         },
       },
       required: ['mission_id'],
@@ -955,6 +961,7 @@ const ListMissionsInput = z.object({
 
 const GetMissionInput = z.object({
   mission_id: z.string().uuid(),
+  include_execution_metadata: z.boolean().optional(),
 });
 
 const UpdateMissionInput = z.object({
@@ -1691,6 +1698,57 @@ async function handleCreateMission(args: unknown) {
   };
 }
 
+// T41.4 — bytes above which heavy-blob fields are summarized in slim mode.
+// Matches the Python serializer's _LARGE_BLOB_THRESHOLD_BYTES so REST and
+// MCP responses agree on what counts as "too big to inline".
+const LARGE_BLOB_THRESHOLD_BYTES = 5_000;
+
+interface TrimSummary {
+  _trimmed: true;
+  field: string;
+  byte_size: number;
+  hint: string;
+  preview?: string;
+}
+
+function summarizeBlob(value: unknown, fieldName: string): TrimSummary {
+  const serialized = JSON.stringify(value) ?? '';
+  return {
+    _trimmed: true,
+    field: fieldName,
+    byte_size: Buffer.byteLength(serialized, 'utf8'),
+    hint: 'Pass include_execution_metadata=true to get_mission to fetch the full payload.',
+  };
+}
+
+function maybeSummarizeBlob<T>(
+  value: T | null | undefined,
+  fieldName: string
+): T | TrimSummary | null | undefined {
+  if (value === null || value === undefined) return value;
+  if (typeof value === 'string' && value.length === 0) return value;
+  if (typeof value === 'object' && value !== null && Object.keys(value).length === 0)
+    return value;
+  const serialized = JSON.stringify(value) ?? '';
+  if (Buffer.byteLength(serialized, 'utf8') <= LARGE_BLOB_THRESHOLD_BYTES) return value;
+  return summarizeBlob(value, fieldName);
+}
+
+function maybeSummarizeMarkdown(
+  value: string | null | undefined
+): string | TrimSummary | null | undefined {
+  if (value === null || value === undefined || value === '') return value;
+  if (Buffer.byteLength(value, 'utf8') <= LARGE_BLOB_THRESHOLD_BYTES) return value;
+  const preview = value.slice(0, 500) + (value.length > 500 ? '...' : '');
+  return {
+    _trimmed: true,
+    field: 'result_markdown',
+    byte_size: Buffer.byteLength(value, 'utf8'),
+    preview,
+    hint: 'Pass include_execution_metadata=true to get_mission to fetch the full markdown.',
+  };
+}
+
 export async function handleListMissions(args: unknown) {
   const input = ListMissionsInput.parse(args);
   const result = await client.listMissions(
@@ -1700,6 +1758,11 @@ export async function handleListMissions(args: unknown) {
     input.project_id
   );
 
+  // T41.4: list responses are always slim — N×full was the original payload
+  // bomb. Agents who need full per-mission detail call get_mission with
+  // include_execution_metadata=true. The api-client list shape doesn't
+  // surface execution_metadata/result_protocol/result_markdown anyway, so
+  // the field set here is implicitly trim already.
   return {
     content: [
       {
@@ -1713,9 +1776,9 @@ export async function handleListMissions(args: unknown) {
               status: m.status,
               project_id: m.project_id,
               created_at: m.created_at,
-              // Mission-authoring fields (T40.1/T41.2). Included so agents can
-              // inspect contract-authoring state without a follow-up
-              // get_mission call. T41.4 will add a slim/full toggle.
+              // Mission-authoring fields (T40.1/T41.2) — small enough to
+              // always include so agents can inspect contract-authoring
+              // state without a follow-up get_mission call.
               background: m.background,
               focus: m.focus,
               references: m.references,
@@ -1742,6 +1805,21 @@ export async function handleListMissions(args: unknown) {
 export async function handleGetMission(args: unknown) {
   const input = GetMissionInput.parse(args);
   const result = await client.getMission(input.mission_id);
+
+  // T41.4: slim by default; opt into the full payload via the explicit flag.
+  const slim = !input.include_execution_metadata;
+  const executionMetadata = slim
+    ? maybeSummarizeBlob(result.execution_metadata, 'execution_metadata')
+    : result.execution_metadata;
+  const resultProtocol = slim
+    ? maybeSummarizeBlob(
+        result.result_protocol as Record<string, unknown> | null | undefined,
+        'result_protocol'
+      )
+    : result.result_protocol;
+  const resultMarkdown = slim
+    ? maybeSummarizeMarkdown(result.result_markdown)
+    : result.result_markdown;
 
   return {
     content: [
@@ -1781,9 +1859,12 @@ export async function handleGetMission(args: unknown) {
             started_at: result.started_at,
             completed_at: result.completed_at,
             deepsearch_job_id: result.deepsearch_job_id,
-            execution_metadata: result.execution_metadata,
+            // Heavy blobs go through the T41.4 trim path above.
+            execution_metadata: executionMetadata,
             result_document_ids: result.result_document_ids,
             result_report_id: result.result_report_id,
+            result_markdown: resultMarkdown,
+            result_protocol: resultProtocol,
             error_message: result.error_message,
             created_at: result.created_at,
             updated_at: result.updated_at,

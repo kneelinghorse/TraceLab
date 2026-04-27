@@ -6,6 +6,7 @@ status of missions in TraceLab.
 
 from __future__ import annotations
 
+import json
 import logging
 from typing import Any
 from uuid import UUID
@@ -33,12 +34,44 @@ logger = logging.getLogger(__name__)
 _mission_service = MissionService()
 
 
-def _serialize_mission(mission) -> dict[str, Any]:
+# T41.4 — bytes above which `_serialize_mission` will summarize (rather than
+# emit) the heavy blob fields in slim mode. The OODS-FIGMA-HOST-01 trigger
+# mission's execution_metadata weighs ~16KB on its own; that's well past
+# transports tuned for short MCP responses, hence the trim.
+_LARGE_BLOB_THRESHOLD_BYTES = 5_000
+
+
+def _summarize_blob(value: Any, *, field_name: str) -> dict[str, Any]:
+    """Build the stub a trimmed heavy-blob field is replaced with.
+
+    Carries enough metadata for the agent to (a) know the blob exists,
+    (b) see roughly how big it is, and (c) know how to fetch the full
+    value, without forcing the agent to guess at the schema.
+    """
+    serialized = json.dumps(value, default=str)
+    return {
+        "_trimmed": True,
+        "field": field_name,
+        "byte_size": len(serialized.encode("utf-8")),
+        "hint": "Pass include_execution_metadata=true to get_mission to fetch the full payload.",
+    }
+
+
+def _serialize_mission(mission, *, slim: bool = True) -> dict[str, Any]:
     """Serialize a Mission ORM object to a dictionary.
 
     Mirrors app/api/v1/missions.py::_to_response so MCP clients see the same
     field set as REST clients. Handles UUID and datetime serialization for
     JSON output.
+
+    Args:
+        mission: Mission ORM instance.
+        slim: When True (default), heavy-blob fields (`execution_metadata`,
+            `result_protocol`, `result_markdown`) larger than
+            `_LARGE_BLOB_THRESHOLD_BYTES` are replaced with summary stubs to
+            keep the response under MCP transport limits. When False, the
+            full payload is returned unchanged. T41.4 default-slim with
+            opt-in full via the `include_execution_metadata` tool param.
     """
     # constraints fallback: T40.1 promoted constraints out of context into its
     # own column. Old missions only have it inside context; mirror the REST
@@ -48,6 +81,37 @@ def _serialize_mission(mission) -> dict[str, Any]:
         legacy = mission.context.get("constraints")
         if legacy:
             resolved_constraints = legacy
+
+    execution_metadata = mission.execution_metadata or {}
+    result_protocol = mission.result_protocol
+    result_markdown = mission.result_markdown
+
+    if slim:
+        if execution_metadata:
+            serialized = json.dumps(execution_metadata, default=str)
+            if len(serialized.encode("utf-8")) > _LARGE_BLOB_THRESHOLD_BYTES:
+                execution_metadata = _summarize_blob(
+                    mission.execution_metadata, field_name="execution_metadata"
+                )
+
+        if result_protocol:
+            serialized = json.dumps(result_protocol, default=str)
+            if len(serialized.encode("utf-8")) > _LARGE_BLOB_THRESHOLD_BYTES:
+                result_protocol = _summarize_blob(
+                    mission.result_protocol, field_name="result_protocol"
+                )
+
+        if result_markdown and len(
+            result_markdown.encode("utf-8")
+        ) > _LARGE_BLOB_THRESHOLD_BYTES:
+            preview = result_markdown[:500]
+            result_markdown = {
+                "_trimmed": True,
+                "field": "result_markdown",
+                "byte_size": len(mission.result_markdown.encode("utf-8")),
+                "preview": preview + ("..." if len(mission.result_markdown) > 500 else ""),
+                "hint": "Pass include_execution_metadata=true to get_mission to fetch the full markdown.",
+            }
 
     return {
         "id": str(mission.id) if mission.id else None,
@@ -86,13 +150,15 @@ def _serialize_mission(mission) -> dict[str, Any]:
         if mission.completed_at
         else None,
         "deepsearch_job_id": mission.deepsearch_job_id,
-        "execution_metadata": mission.execution_metadata or {},
+        # Heavy-blob fields go through the slim-mode trim above; emit the
+        # locally-computed values rather than the raw mission attrs.
+        "execution_metadata": execution_metadata,
         "result_document_ids": [str(d) for d in (mission.result_document_ids or [])],
         "result_report_id": str(mission.result_report_id)
         if mission.result_report_id
         else None,
-        "result_markdown": mission.result_markdown,
-        "result_protocol": mission.result_protocol,
+        "result_markdown": result_markdown,
+        "result_protocol": result_protocol,
         "error_message": mission.error_message,
         "created_at": mission.created_at.isoformat() if mission.created_at else None,
         "updated_at": mission.updated_at.isoformat() if mission.updated_at else None,
@@ -178,7 +244,12 @@ MISSION_TOOLS: list[Tool] = [
     ),
     Tool(
         name="list_missions",
-        description="List missions with optional filtering by project and status. Returns paginated results.",
+        description=(
+            "List missions with optional filtering by project and status. Returns "
+            "paginated results in slim form — heavy execution blobs are always "
+            "summarized for list responses regardless of mission size. Use "
+            "get_mission(include_execution_metadata=true) for full per-mission detail."
+        ),
         inputSchema={
             "type": "object",
             "properties": {
@@ -216,13 +287,29 @@ MISSION_TOOLS: list[Tool] = [
     ),
     Tool(
         name="get_mission",
-        description="Get full details of a specific mission including results if available.",
+        description=(
+            "Get full details of a specific mission including results if available. "
+            "By default heavy execution-time blobs (execution_metadata, "
+            "result_protocol, result_markdown) over ~5KB are summarized to keep "
+            "the response under MCP transport limits — pass "
+            "include_execution_metadata=true to fetch the full payload."
+        ),
         inputSchema={
             "type": "object",
             "properties": {
                 "mission_id": {
                     "type": "string",
                     "description": "The mission's human-readable ID (e.g., 'B16.1') or UUID",
+                },
+                "include_execution_metadata": {
+                    "type": "boolean",
+                    "default": False,
+                    "description": (
+                        "When true, return the full execution_metadata, result_protocol, "
+                        "and result_markdown values without size-based summarization. "
+                        "Use sparingly — completed missions can carry tens of KB of "
+                        "execution telemetry. Default: false (slim)."
+                    ),
                 },
             },
             "required": ["mission_id"],
@@ -279,8 +366,6 @@ def _get_mission_by_id_or_mission_id(db, mission_id_str: str):
 
 async def handle_create_mission(arguments: dict[str, Any]) -> list[TextContent]:
     """Handle the create_mission tool call."""
-    import json
-
     try:
         # Parse project_id if provided
         project_id = None
@@ -334,7 +419,6 @@ async def handle_create_mission(arguments: dict[str, Any]) -> list[TextContent]:
 
 async def handle_list_missions(arguments: dict[str, Any]) -> list[TextContent]:
     """Handle the list_missions tool call."""
-    import json
 
     try:
         project_id = None
@@ -355,8 +439,11 @@ async def handle_list_missions(arguments: dict[str, Any]) -> list[TextContent]:
                 project_id=project_id,
             )
 
+            # T41.4: list is always slim — N×full was the original payload-bomb
+            # case. Agents who need full detail per mission call get_mission
+            # individually with include_execution_metadata=true.
             result = {
-                "data": [_serialize_mission(m) for m in missions],
+                "data": [_serialize_mission(m, slim=True) for m in missions],
                 "pagination": {
                     "page": pagination.page,
                     "page_size": pagination.page_size,
@@ -382,15 +469,16 @@ async def handle_list_missions(arguments: dict[str, Any]) -> list[TextContent]:
 
 async def handle_get_mission(arguments: dict[str, Any]) -> list[TextContent]:
     """Handle the get_mission tool call."""
-    import json
 
     try:
         mission_id = arguments["mission_id"]
+        # T41.4: slim by default; opt into full payload via the explicit flag.
+        slim = not bool(arguments.get("include_execution_metadata", False))
 
         db = next(get_db())
         try:
             mission = _get_mission_by_id_or_mission_id(db, mission_id)
-            result = _serialize_mission(mission)
+            result = _serialize_mission(mission, slim=slim)
             return [TextContent(type="text", text=json.dumps(result, indent=2))]
         finally:
             db.close()
@@ -423,8 +511,6 @@ async def handle_submit_mission(arguments: dict[str, Any]) -> list[TextContent]:
        HTTP mode: POSTs to DeepSearch /missions/execute
     6. Returns job info
     """
-    import json
-
     try:
         mission_id = arguments["mission_id"]
 
@@ -603,8 +689,6 @@ async def handle_get_mission_status(arguments: dict[str, Any]) -> list[TextConte
     - progress: Execution progress information
     - results: If completed, includes document IDs, report ID, and markdown
     """
-    import json
-
     try:
         mission_id = arguments["mission_id"]
 

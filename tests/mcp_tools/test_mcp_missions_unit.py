@@ -434,6 +434,168 @@ class TestSerializeMission:
         assert result["constraints"] == ["from-column"]
 
 
+class TestSerializeMissionSlimFullSplit:
+    """T41.4: heavy-blob trimming behavior on _serialize_mission.
+
+    The OODS-FIGMA-HOST-01 trigger mission's execution_metadata is ~16KB —
+    well past MCP transport limits in some clients. Default `slim=True`
+    summarizes large blobs; `slim=False` is for the explicit opt-in path.
+    """
+
+    def _make_large_metadata(self, target_bytes: int = 8000) -> dict:
+        """Build an execution_metadata-shaped dict that serializes above
+        the trim threshold so the trim branch fires."""
+        # Repeating a long string produces predictable byte size.
+        chunk = "x" * 100
+        items = max(1, target_bytes // len(chunk))
+        return {
+            "duration_ms": 663620,
+            "loops_executed": 3,
+            "trace": [chunk for _ in range(items)],
+        }
+
+    def test_slim_default_summarizes_large_execution_metadata(self):
+        from app.mcp_server.tools.missions import _serialize_mission
+
+        large_meta = self._make_large_metadata()
+        mission = _make_mission_mock(
+            id="big-meta-uuid",
+            mission_id="BIG-META-001",
+            execution_metadata=large_meta,
+        )
+
+        result = _serialize_mission(mission)  # slim=True is default
+
+        assert isinstance(result["execution_metadata"], dict)
+        assert result["execution_metadata"]["_trimmed"] is True
+        assert result["execution_metadata"]["field"] == "execution_metadata"
+        assert result["execution_metadata"]["byte_size"] > 5_000
+        assert "include_execution_metadata" in result["execution_metadata"]["hint"]
+
+    def test_full_mode_returns_untrimmed_execution_metadata(self):
+        from app.mcp_server.tools.missions import _serialize_mission
+
+        large_meta = self._make_large_metadata()
+        mission = _make_mission_mock(
+            id="big-meta-uuid-2",
+            mission_id="BIG-META-002",
+            execution_metadata=large_meta,
+        )
+
+        result = _serialize_mission(mission, slim=False)
+
+        assert result["execution_metadata"] == large_meta
+        assert "_trimmed" not in result["execution_metadata"]
+
+    def test_slim_leaves_small_execution_metadata_alone(self):
+        from app.mcp_server.tools.missions import _serialize_mission
+
+        small_meta = {"duration_ms": 5000, "loops": 3}
+        mission = _make_mission_mock(
+            id="small-meta-uuid",
+            mission_id="SMALL-META-001",
+            execution_metadata=small_meta,
+        )
+
+        result = _serialize_mission(mission)
+
+        assert result["execution_metadata"] == small_meta
+        # No trim stub — the field is small enough to send raw.
+        assert "_trimmed" not in str(result["execution_metadata"])
+
+    def test_slim_summarizes_large_result_protocol(self):
+        from app.mcp_server.tools.missions import _serialize_mission
+
+        protocol = {"version": "1.0", "items": ["x" * 100 for _ in range(100)]}
+        mission = _make_mission_mock(
+            id="big-proto-uuid",
+            mission_id="BIG-PROTO-001",
+            result_protocol=protocol,
+        )
+
+        result = _serialize_mission(mission)
+
+        assert isinstance(result["result_protocol"], dict)
+        assert result["result_protocol"]["_trimmed"] is True
+        assert result["result_protocol"]["field"] == "result_protocol"
+
+    def test_slim_summarizes_large_result_markdown_with_preview(self):
+        from app.mcp_server.tools.missions import _serialize_mission
+
+        markdown = "# Title\n" + ("Body paragraph. " * 1000)
+        assert len(markdown.encode("utf-8")) > 5_000
+        mission = _make_mission_mock(
+            id="big-md-uuid",
+            mission_id="BIG-MD-001",
+            result_markdown=markdown,
+        )
+
+        result = _serialize_mission(mission)
+
+        assert isinstance(result["result_markdown"], dict)
+        assert result["result_markdown"]["_trimmed"] is True
+        assert result["result_markdown"]["field"] == "result_markdown"
+        assert result["result_markdown"]["byte_size"] == len(markdown.encode("utf-8"))
+        assert result["result_markdown"]["preview"].startswith("# Title")
+        assert result["result_markdown"]["preview"].endswith("...")
+
+    def test_slim_leaves_small_result_markdown_alone(self):
+        from app.mcp_server.tools.missions import _serialize_mission
+
+        markdown = "# Short report\n\nBrief findings."
+        mission = _make_mission_mock(
+            id="small-md-uuid",
+            mission_id="SMALL-MD-001",
+            result_markdown=markdown,
+        )
+
+        result = _serialize_mission(mission)
+        assert result["result_markdown"] == markdown
+
+    def test_slim_payload_under_8kb_for_realistic_completed_mission(self):
+        """End-to-end size guarantee — the documented 8KB cap holds for the
+        kind of completed mission that triggered T41.4 in the first place."""
+        import json
+
+        from app.mcp_server.tools.missions import _serialize_mission
+
+        mission = _make_mission_mock(
+            id="realistic-uuid",
+            mission_id="OODS-FIGMA-HOST-01",
+            title="Backend Hosting Architecture for OODS-for-Figma V1.5 Drift Workloads",
+            objective=(
+                "Compare backend hosting platforms for a Figma plugin backend "
+                "that runs multi-minute pipeline workloads."
+            ),
+            success_criteria=[
+                "Recommendation grounded in vendor docs and independent benchmarks",
+                "Distinguish platforms with native browser-automation",
+                "Document timeout ceilings and architectural patterns",
+                "Pricing model captured for burst-and-idle profile",
+            ],
+            background="OODS-for-Figma V1.5 introduces a hosted backend...",
+            required_entities=[
+                "AWS Lambda",
+                "Google Cloud Run",
+                "Vercel Functions",
+                "Fly.io",
+                "Railway",
+            ],
+            excluded_entities=["Heroku", "Netlify Functions", "Azure Functions"],
+            max_loops=3,
+            status="completed",
+            execution_metadata=self._make_large_metadata(target_bytes=16_000),
+            result_markdown="# Hosting Comparison Matrix\n" + ("x " * 5000),
+        )
+
+        result = _serialize_mission(mission)
+        size = len(json.dumps(result, indent=2, default=str).encode("utf-8"))
+        assert size < 8_000, (
+            f"slim payload was {size} bytes — exceeds documented 8KB cap. "
+            f"Trimming logic must be reviewed."
+        )
+
+
 class TestMCPModuleExports:
     """Tests for MCP module exports."""
 
