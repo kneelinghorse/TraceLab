@@ -702,3 +702,188 @@ describe('MCP handlers — T40.1 mission-authoring fields surface through MCP', 
     expect(m.required_entities).toContain('AWS Lambda');
   });
 });
+
+/**
+ * T41.4 contract-guard tests for slim/full payload split on get_mission.
+ *
+ * Same harness as T41.2 — mock fetch at the api-client boundary, invoke
+ * the handler, assert on the trimmed shape. The OODS-FIGMA-HOST-01 trigger
+ * mission's execution_metadata is ~16KB on its own; default-slim keeps the
+ * full response under MCP transport limits, opt-in flag returns full.
+ */
+describe('MCP handlers — T41.4 slim/full payload split for get_mission', () => {
+  const TEST_UUID = '585f20f1-10ec-4808-9ac1-b066b59e7648';
+
+  // Build an execution_metadata-shaped object whose JSON serializes well
+  // above the 5KB trim threshold so the trim branch fires deterministically.
+  const buildLargeMetadata = (targetBytes = 8000) => {
+    const chunk = 'x'.repeat(100);
+    const items = Math.max(1, Math.floor(targetBytes / chunk.length));
+    return {
+      duration_ms: 663620,
+      loops_executed: 3,
+      trace: Array.from({ length: items }, () => chunk),
+    };
+  };
+
+  const fixtureWithLargeBlobs = () => ({
+    id: TEST_UUID,
+    mission_id: 'OODS-FIGMA-HOST-01-S59-RUN-01',
+    title: 'Backend hosting comparison',
+    objective: 'Compare hosted code-execution platforms',
+    success_criteria: ['compile contract correctly'],
+    status: 'completed',
+    research_depth: 'baseline',
+    project_id: 'fbd3bd03-5ddc-49ee-8013-529163a99290',
+    context: {},
+    deliverables: ['comparison.md'],
+    research_phases: {},
+    tags: [],
+    metadata: {},
+    background: 'Hosted code-execution platforms.',
+    focus: null,
+    references: null,
+    required_entities: ['AWS Lambda', 'Google Cloud Run'],
+    excluded_entities: null,
+    expected_output_schema: null,
+    coverage_thresholds: null,
+    validation_thresholds: null,
+    deliverable_format: null,
+    max_loops: 3,
+    min_loops: null,
+    constraints: null,
+    queued_at: null,
+    started_at: null,
+    completed_at: '2026-04-27T04:55:55Z',
+    deepsearch_job_id: null,
+    execution_metadata: buildLargeMetadata(16_000),
+    result_document_ids: [],
+    result_report_id: null,
+    result_markdown:
+      '# Hosting Comparison\n\n' + 'Body paragraph. '.repeat(1000),
+    result_protocol: { version: '1.0', items: Array.from({ length: 100 }, () => 'x'.repeat(100)) },
+    error_message: null,
+    created_at: '2026-04-27T04:44:13Z',
+    updated_at: '2026-04-27T04:55:55Z',
+  });
+
+  beforeEach(() => {
+    mockFetch.mockReset();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('default slim mode summarizes large execution_metadata', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: () => Promise.resolve(fixtureWithLargeBlobs()),
+    });
+
+    const { handleGetMission } = await import('./index.js');
+    const response = await handleGetMission({ mission_id: TEST_UUID });
+    const payload = JSON.parse(response.content[0].text);
+
+    expect(payload.execution_metadata).toBeTypeOf('object');
+    expect(payload.execution_metadata._trimmed).toBe(true);
+    expect(payload.execution_metadata.field).toBe('execution_metadata');
+    expect(payload.execution_metadata.byte_size).toBeGreaterThan(5_000);
+    expect(payload.execution_metadata.hint).toContain(
+      'include_execution_metadata=true'
+    );
+  });
+
+  it('include_execution_metadata=true returns full execution_metadata', async () => {
+    const fixture = fixtureWithLargeBlobs();
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: () => Promise.resolve(fixture),
+    });
+
+    const { handleGetMission } = await import('./index.js');
+    const response = await handleGetMission({
+      mission_id: TEST_UUID,
+      include_execution_metadata: true,
+    });
+    const payload = JSON.parse(response.content[0].text);
+
+    expect(payload.execution_metadata).toEqual(fixture.execution_metadata);
+    expect(payload.execution_metadata._trimmed).toBeUndefined();
+  });
+
+  it('default slim mode summarizes large result_markdown with preview', async () => {
+    const fixture = fixtureWithLargeBlobs();
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: () => Promise.resolve(fixture),
+    });
+
+    const { handleGetMission } = await import('./index.js');
+    const response = await handleGetMission({ mission_id: TEST_UUID });
+    const payload = JSON.parse(response.content[0].text);
+
+    expect(payload.result_markdown).toBeTypeOf('object');
+    expect(payload.result_markdown._trimmed).toBe(true);
+    expect(payload.result_markdown.field).toBe('result_markdown');
+    expect(payload.result_markdown.preview).toMatch(/^# Hosting Comparison/);
+    expect(payload.result_markdown.preview.endsWith('...')).toBe(true);
+    expect(payload.result_markdown.byte_size).toBe(
+      Buffer.byteLength(fixture.result_markdown, 'utf8')
+    );
+  });
+
+  it('default slim mode summarizes large result_protocol', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: () => Promise.resolve(fixtureWithLargeBlobs()),
+    });
+
+    const { handleGetMission } = await import('./index.js');
+    const response = await handleGetMission({ mission_id: TEST_UUID });
+    const payload = JSON.parse(response.content[0].text);
+
+    expect(payload.result_protocol).toBeTypeOf('object');
+    expect(payload.result_protocol._trimmed).toBe(true);
+    expect(payload.result_protocol.field).toBe('result_protocol');
+  });
+
+  it('slim mode leaves small blobs alone', async () => {
+    const smallFixture = {
+      ...fixtureWithLargeBlobs(),
+      execution_metadata: { duration_ms: 5000, loops: 3 },
+      result_protocol: { version: '1.0' },
+      result_markdown: '# Short report\n\nBrief findings.',
+    };
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: () => Promise.resolve(smallFixture),
+    });
+
+    const { handleGetMission } = await import('./index.js');
+    const response = await handleGetMission({ mission_id: TEST_UUID });
+    const payload = JSON.parse(response.content[0].text);
+
+    expect(payload.execution_metadata).toEqual({ duration_ms: 5000, loops: 3 });
+    expect(payload.result_protocol).toEqual({ version: '1.0' });
+    expect(payload.result_markdown).toBe('# Short report\n\nBrief findings.');
+  });
+
+  it('slim payload stays under 8KB for a realistic completed mission', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: () => Promise.resolve(fixtureWithLargeBlobs()),
+    });
+
+    const { handleGetMission } = await import('./index.js');
+    const response = await handleGetMission({ mission_id: TEST_UUID });
+    const size = Buffer.byteLength(response.content[0].text, 'utf8');
+    expect(size).toBeLessThan(8_000);
+  });
+});
