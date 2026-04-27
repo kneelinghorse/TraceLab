@@ -568,3 +568,137 @@ describe('Authentication', () => {
     );
   });
 });
+
+/**
+ * T41.2 contract-guard tests for the MCP handler dispatch path.
+ *
+ * Mirrors the T40.0 codification rule: MCP surface changes need a regression
+ * test that exercises the handler-emitted response shape, not just the
+ * api-client. Discovered 2026-04-27 — the api-client returned all T40.1
+ * fields but handleGetMission's hand-rolled JSON.stringify({...}) dropped
+ * 12 of them, leaving DeepSearch unable to read mission-authoring state via
+ * MCP get_mission for OODS-FIGMA-HOST-01.
+ */
+describe('MCP handlers — T40.1 mission-authoring fields surface through MCP', () => {
+  const T40_1_FIELDS = [
+    'background',
+    'focus',
+    'references',
+    'required_entities',
+    'excluded_entities',
+    'expected_output_schema',
+    'coverage_thresholds',
+    'validation_thresholds',
+    'deliverable_format',
+    'max_loops',
+    'min_loops',
+    'constraints',
+  ] as const;
+
+  const TEST_UUID = '2a781109-6122-4576-b5c2-052e5450d22e';
+  const fullMissionFixture = {
+    id: TEST_UUID,
+    mission_id: 'OODS-FIGMA-HOST-01',
+    title: 'Hosted code-execution platforms',
+    objective: 'Compare serverless container platforms for OODS evaluation',
+    success_criteria: ['all 12 fields surface'],
+    status: 'draft',
+    research_depth: 'baseline',
+    project_id: 'project-1',
+    context: {},
+    deliverables: ['comparison.md'],
+    research_phases: {},
+    tags: ['ds', 'figma'],
+    metadata: {},
+    background: 'Hosted code-execution platforms for OODS evaluation.',
+    focus: 'Serverless containerized execution with sub-second cold starts.',
+    references: [{ title: 'AWS Lambda docs' }],
+    required_entities: [
+      'AWS Lambda',
+      'Google Cloud Run',
+      'Vercel Functions',
+      'Fly.io',
+      'Railway',
+    ],
+    excluded_entities: ['AWS EC2'],
+    expected_output_schema: { type: 'comparison_matrix' },
+    coverage_thresholds: { min_sources: 50 },
+    validation_thresholds: { min_score: 7.0 },
+    deliverable_format: 'comparison table',
+    max_loops: 8,
+    min_loops: 3,
+    constraints: ['No AWS-only solutions'],
+    queued_at: null,
+    started_at: null,
+    completed_at: null,
+    deepsearch_job_id: null,
+    execution_metadata: {},
+    result_document_ids: [],
+    result_report_id: null,
+    result_markdown: null,
+    result_protocol: null,
+    error_message: null,
+    created_at: '2026-04-27T06:00:00Z',
+    updated_at: '2026-04-27T06:00:00Z',
+    created_by: 'test',
+  };
+
+  beforeEach(() => {
+    mockFetch.mockReset();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('handleGetMission emits all 12 T40.1 mission-authoring fields', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: () => Promise.resolve(fullMissionFixture),
+    });
+
+    const { handleGetMission } = await import('./index.js');
+    const response = await handleGetMission({ mission_id: TEST_UUID });
+
+    const payload = JSON.parse(response.content[0].text);
+    for (const field of T40_1_FIELDS) {
+      expect(payload).toHaveProperty(field);
+    }
+    expect(payload.required_entities).toEqual([
+      'AWS Lambda',
+      'Google Cloud Run',
+      'Vercel Functions',
+      'Fly.io',
+      'Railway',
+    ]);
+    expect(payload.constraints).toEqual(['No AWS-only solutions']);
+    expect(payload.max_loops).toBe(8);
+    expect(payload.background).toBe(
+      'Hosted code-execution platforms for OODS evaluation.'
+    );
+  });
+
+  it('handleListMissions emits T40.1 fields for each mission summary', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: () =>
+        Promise.resolve({
+          data: [fullMissionFixture],
+          pagination: { page: 1, page_size: 20, total: 1, pages: 1 },
+        }),
+    });
+
+    const { handleListMissions } = await import('./index.js');
+    const response = await handleListMissions({});
+
+    const payload = JSON.parse(response.content[0].text);
+    expect(payload.missions).toHaveLength(1);
+    const m = payload.missions[0];
+    for (const field of T40_1_FIELDS) {
+      expect(m).toHaveProperty(field);
+    }
+    expect(m.required_entities).toContain('AWS Lambda');
+  });
+});
