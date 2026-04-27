@@ -1,34 +1,51 @@
-"""Client for DeepSearch's POST /api/v1/missions/preview endpoint (T40.4).
+"""Local mission-contract preview backed by the vendored DeepSearch compiler.
 
-Signs the outbound body with the shared HMAC secret and normalizes transport
-errors into a single :class:`ContractPreviewError` so callers (the FastAPI
-route, the MCP tool) don't have to sniff httpx internals.
+Originally (T40.4) this signed a request and proxied it to DeepSearch's
+`POST /api/v1/missions/preview` HTTP endpoint. That endpoint never existed
+in production — DeepSearch runs only as a worker (DB-polling, no HTTP API),
+so the proxy hung and Cloudflare returned 502, breaking
+`preview_mission_contract` end-to-end and blocking DS from disambiguating
+mission-quality regressions.
+
+T41.1 swaps the HTTP round-trip for a local call into the vendored compiler
+at `app/services/contract_compiler/`. The public surface (function name,
+:class:`ContractPreview` shape, :class:`ContractPreviewError` raises) is
+unchanged so callers — the FastAPI route at
+``app/api/v1/missions.py::contract_preview`` and any future MCP wrapper —
+keep working without modification. The ``client`` keyword argument is kept
+on `preview_mission_contract` for backwards source compatibility but is
+ignored; nothing makes outbound HTTP calls anymore.
+
+See ``cmos/contracts/deepsearch-compiler-vendor.md`` for the pinned commit
+hash and the resync ritual that keeps the vendored compiler in step with
+DeepSearch's evolution.
 """
 from __future__ import annotations
 
-import json
 import logging
 from dataclasses import dataclass
 from typing import Any
 
-import httpx
-
-from app.core.config import settings
-from app.services.deepsearch_hmac_signer import HmacSigningError, sign_payload
+from app.services.contract_compiler import (
+    MissionContract,
+    compile_contract_from_state,
+)
 
 logger = logging.getLogger(__name__)
 
 
 class ContractPreviewError(RuntimeError):
-    """Raised when the preview call cannot complete.
+    """Raised when the local preview compilation fails.
 
-    ``status_code`` is set when the upstream returned an HTTP status we want
-    to surface to the caller (e.g. 422 from the compiler); ``None`` means
-    the call never reached or understood DeepSearch (timeout, DNS failure,
-    auth not configured).
+    ``status_code`` mirrors what the upstream HTTP boundary used to surface
+    (422 for compiler validation rejections, ``None`` for everything else)
+    so the FastAPI route's existing ``raise HTTPException`` mapping keeps
+    working untouched.
     """
 
-    def __init__(self, message: str, *, status_code: int | None = None, detail: Any = None):
+    def __init__(
+        self, message: str, *, status_code: int | None = None, detail: Any = None
+    ):
         super().__init__(message)
         self.status_code = status_code
         self.detail = detail
@@ -36,7 +53,7 @@ class ContractPreviewError(RuntimeError):
 
 @dataclass(frozen=True)
 class ContractPreview:
-    """Compiled-contract view returned by DeepSearch's preview endpoint."""
+    """Compiled-contract view returned to API/MCP callers."""
 
     named_entities: list[str]
     objectives: list[dict[str, Any]]
@@ -58,34 +75,30 @@ class ContractPreview:
         }
 
 
-def _resolve_preview_url() -> str:
-    """Return the fully-qualified URL of DeepSearch's preview endpoint.
-
-    Prefers the explicit :attr:`settings.deepsearch_preview_url`; otherwise
-    derives ``<deepsearch_api_url>/api/v1/missions/preview``. Raises when
-    neither is set so misconfiguration surfaces early instead of becoming a
-    cryptic 404.
-    """
-    explicit = getattr(settings, "deepsearch_preview_url", None)
-    if explicit:
-        return explicit.rstrip("/")
-
-    base = getattr(settings, "deepsearch_api_url", None)
-    if not base:
-        raise ContractPreviewError(
-            "DeepSearch preview URL is not configured. Set "
-            "DEEPSEARCH_PREVIEW_URL or DEEPSEARCH_API_URL."
-        )
-    return f"{base.rstrip('/')}/api/v1/missions/preview"
+# Authoring fields that are forwarded to the compiler when present. Lifted
+# verbatim from the prior outbound payload so the compiler sees an
+# identical mission_context shape.
+_OPTIONAL_AUTHORING_FIELDS = (
+    "background",
+    "focus",
+    "references",
+    "required_entities",
+    "excluded_entities",
+    "expected_output_schema",
+    "coverage_thresholds",
+    "validation_thresholds",
+    "deliverable_format",
+    "max_loops",
+    "min_loops",
+)
 
 
 def build_mission_context_from_mission(mission) -> dict[str, Any]:
-    """Assemble the mission_context payload DeepSearch's preview endpoint expects.
+    """Assemble the mission_context payload the compiler expects.
 
-    Mirrors :class:`MissionContractPreviewRequest` in DeepSearch.alpha at the
-    pinned commit (see ``schemas/VERSIONS.md``). Fields the author didn't
-    populate are omitted so DeepSearch's ``exclude_none`` normalization sees
-    a clean payload.
+    Same shape the previous HTTP body produced — kept stable so any caller
+    that constructed payloads independently (tests, future tools) doesn't
+    need to change.
     """
     payload: dict[str, Any] = {
         "mission_id": mission.mission_id,
@@ -95,29 +108,15 @@ def build_mission_context_from_mission(mission) -> dict[str, Any]:
         "deliverables": list(mission.deliverables or []),
     }
 
-    # Authoring fields — skip None/empty so the upstream compiler applies its
-    # own defaults rather than receiving a bag of nulls.
-    optional_fields = (
-        "background",
-        "focus",
-        "references",
-        "required_entities",
-        "excluded_entities",
-        "expected_output_schema",
-        "coverage_thresholds",
-        "validation_thresholds",
-        "deliverable_format",
-        "max_loops",
-        "min_loops",
-    )
-    for field in optional_fields:
+    for field in _OPTIONAL_AUTHORING_FIELDS:
         value = getattr(mission, field, None)
         if value in (None, "", [], {}):
             continue
         payload[field] = value
 
-    # Constraints has the transitional fallback: if the column is empty but
-    # the legacy context['constraints'] is populated, thread it through.
+    # Constraints fallback: if the column is empty but legacy
+    # context['constraints'] is populated, thread it through. Mirrors the
+    # REST `_to_response` resolver and the prior client behavior.
     constraints = getattr(mission, "constraints", None)
     if not constraints and isinstance(getattr(mission, "context", None), dict):
         legacy = mission.context.get("constraints")
@@ -133,95 +132,108 @@ def build_mission_context_from_mission(mission) -> dict[str, Any]:
     return payload
 
 
+def _build_preview_state(mission_context: dict[str, Any]) -> dict[str, Any]:
+    """Wrap mission_context in the AgentState-shaped dict the compiler reads.
+
+    Mirrors DeepSearch's `_build_preview_state` adapter — see DS pinned
+    commit, ``deepsearch/api/routes/missions.py::_build_preview_state``.
+    Replicating the shape locally rather than importing it keeps TraceLab
+    isolated from DS's HTTP-layer module organization.
+    """
+    mission_id = str(mission_context.get("mission_id") or "preview-mission").strip()
+    objective = str(mission_context.get("objective") or "").strip()
+    success_criteria = [
+        str(item).strip()
+        for item in mission_context.get("success_criteria") or []
+        if str(item).strip()
+    ]
+    mission_objectives = success_criteria or ([objective] if objective else [])
+
+    return {
+        "mission_id": mission_id or "preview-mission",
+        "mission_context": mission_context,
+        "mission_objectives": mission_objectives,
+        "deliverable_format": str(
+            mission_context.get("deliverable_format") or "markdown"
+        ),
+        "research_depth": str(mission_context.get("research_depth") or "baseline"),
+        "max_loops": mission_context.get("max_loops") or 3,
+        "min_loops": mission_context.get("min_loops") or 0,
+        "depth_config": {},
+    }
+
+
+def _shape_contract(contract: MissionContract) -> ContractPreview:
+    """Render a compiled MissionContract into the public ContractPreview view.
+
+    Uses the same per-field JSON-mode dump DeepSearch applied at its HTTP
+    boundary so wire-format-shaped consumers (the route response_model,
+    cached snapshots) see byte-identical structure.
+    """
+    return ContractPreview(
+        named_entities=list(contract.named_entities),
+        objectives=[item.model_dump(mode="json") for item in contract.objectives],
+        evidence_slots=[item.model_dump(mode="json") for item in contract.evidence_slots],
+        acceptance_checks=[
+            item.model_dump(mode="json") for item in contract.acceptance_checks
+        ],
+        deliverable_schemas=[
+            item.model_dump(mode="json") for item in contract.deliverable_schemas
+        ],
+        coverage_thresholds=dict(contract.coverage_thresholds),
+        validation_thresholds=dict(contract.validation_thresholds),
+    )
+
+
 def preview_mission_contract(
     mission,
     *,
-    client: httpx.Client | None = None,
+    client: Any = None,  # retained for source-level back-compat; ignored
 ) -> ContractPreview:
-    """Sign and proxy the mission to DeepSearch's preview endpoint.
+    """Compile a mission into a preview contract using the vendored compiler.
 
     Args:
-        mission: A :class:`Mission` ORM instance (duck-typed — any object
-            with the documented attributes works, which is what the tests
-            rely on).
-        client: Optional injected httpx client — tests pass a mock/transport;
-            production lets the function manage its own client.
+        mission: A :class:`Mission` ORM instance (duck-typed; any object
+            exposing the documented attributes works, which is what the
+            tests rely on).
+        client: Ignored. Kept so existing call sites don't have to change
+            during the HTTP→local cutover. Will be removed once the
+            integration tests migrate fully (T41.3 boundary doc tracks this).
 
     Returns:
         :class:`ContractPreview` describing the compiled contract.
 
     Raises:
-        ContractPreviewError: on network, signing, or upstream failures.
+        ContractPreviewError: when the compiler rejects the input
+            (`status_code=422`) or fails unexpectedly (`status_code=None`).
     """
-    url = _resolve_preview_url()
-    payload = build_mission_context_from_mission(mission)
-    body = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
-
-    try:
-        signed = sign_payload(body)
-    except HmacSigningError as exc:
-        raise ContractPreviewError(
-            f"Cannot sign preview request: {exc}"
-        ) from exc
-
-    headers = {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        **signed.headers,
-    }
-
-    timeout = getattr(settings, "deepsearch_timeout", 30.0)
-
-    owns_client = client is None
-    http_client = client or httpx.Client(timeout=timeout)
-    try:
-        try:
-            response = http_client.post(url, content=signed.body, headers=headers)
-        except httpx.TimeoutException as exc:
-            raise ContractPreviewError(
-                f"Preview request timed out after {timeout}s",
-            ) from exc
-        except httpx.RequestError as exc:
-            raise ContractPreviewError(
-                f"Preview request failed: {exc}",
-            ) from exc
-    finally:
-        if owns_client:
-            http_client.close()
-
-    if response.status_code >= 400:
-        try:
-            detail = response.json()
-        except ValueError:
-            detail = response.text
-        raise ContractPreviewError(
-            f"DeepSearch preview returned {response.status_code}",
-            status_code=response.status_code,
-            detail=detail,
+    if client is not None:
+        logger.debug(
+            "preview_mission_contract received a `client` argument; ignored "
+            "since T41.1 — preview is now local."
         )
 
+    mission_context = build_mission_context_from_mission(mission)
+    state = _build_preview_state(mission_context)
+
     try:
-        data = response.json()
+        contract = compile_contract_from_state(state, origin="api_preview")
     except ValueError as exc:
+        # Mirrors DS's HTTP layer mapping: ValueError → 422 compiler reject.
         raise ContractPreviewError(
-            "DeepSearch preview returned a non-JSON body.",
-            status_code=response.status_code,
-            detail=response.text,
+            str(exc) or "Mission contract preview failed",
+            status_code=422,
+            detail={"message": str(exc)},
+        ) from exc
+    except Exception as exc:
+        logger.exception(
+            "Unexpected failure compiling mission %s preview",
+            getattr(mission, "mission_id", "<unknown>"),
+        )
+        raise ContractPreviewError(
+            f"Mission contract preview failed: {exc}",
+            status_code=None,
+            detail=None,
         ) from exc
 
-    try:
-        return ContractPreview(
-            named_entities=list(data.get("named_entities", [])),
-            objectives=list(data.get("objectives", [])),
-            evidence_slots=list(data.get("evidence_slots", [])),
-            acceptance_checks=list(data.get("acceptance_checks", [])),
-            deliverable_schemas=list(data.get("deliverable_schemas", [])),
-            coverage_thresholds=dict(data.get("coverage_thresholds", {})),
-            validation_thresholds=dict(data.get("validation_thresholds", {})),
-        )
-    except (TypeError, ValueError) as exc:
-        raise ContractPreviewError(
-            "DeepSearch preview returned an unexpected response shape.",
-            status_code=response.status_code,
-            detail=data,
-        ) from exc
+    return _shape_contract(contract)
