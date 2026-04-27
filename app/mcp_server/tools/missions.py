@@ -199,7 +199,12 @@ MISSION_TOOLS: list[Tool] = [
                 },
                 "project_id": {
                     "type": "string",
-                    "description": "UUID of the project to associate this mission with (optional)",
+                    "description": (
+                        "UUID of the project to associate this mission with. "
+                        "Required as of T41.6 (sprint-41) — orphan missions "
+                        "(no project) cannot be created. Use list_projects to "
+                        "find a valid project_id if you don't have one."
+                    ),
                 },
                 "context": {
                     "type": "object",
@@ -239,7 +244,13 @@ MISSION_TOOLS: list[Tool] = [
                     "description": "Research depth tier. BASELINE (8-12 min): Thorough reports with 50-60 sources across multiple loops — the standard tier for most research. DEEP (20-25 min): Higher-rigor research with 30-40 carefully vetted sources, stricter quality gates, minimum 5 loops — use when you need higher confidence. ALPHA (1+ hour): Maximum-rigor with ~20 highly scrutinized sources, very strict quality gates that may reject research if evidence is insufficient — use only when precision and source authority are critical.",
                 },
             },
-            "required": ["mission_id", "title", "objective", "success_criteria"],
+            "required": [
+                "mission_id",
+                "title",
+                "objective",
+                "success_criteria",
+                "project_id",
+            ],
         },
     ),
     Tool(
@@ -367,10 +378,27 @@ def _get_mission_by_id_or_mission_id(db, mission_id_str: str):
 async def handle_create_mission(arguments: dict[str, Any]) -> list[TextContent]:
     """Handle the create_mission tool call."""
     try:
-        # Parse project_id if provided
-        project_id = None
-        if arguments.get("project_id"):
-            project_id = UUID(arguments["project_id"])
+        # T41.6: project_id is required at create. Fail fast with an
+        # actionable error message before Pydantic raises a structured
+        # field-validation error (which is harder for agents to act on).
+        raw_project_id = arguments.get("project_id")
+        if not raw_project_id:
+            return [
+                TextContent(
+                    type="text",
+                    text=json.dumps(
+                        {
+                            "error": "project_id is required",
+                            "message": (
+                                "Mission cannot be created without a project. "
+                                "Use list_projects to find a valid project_id "
+                                "or create_project to add a new one first."
+                            ),
+                        }
+                    ),
+                )
+            ]
+        project_id = UUID(raw_project_id)
 
         # Build metadata with priority and max_loops
         metadata = {}

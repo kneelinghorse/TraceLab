@@ -12,6 +12,12 @@ from app.models.mission import Mission
 from app.models.project import Project
 from app.schemas.mission import MissionCreate, MissionUpdate
 
+# T41.6 (sprint-41): MissionCreate.project_id is required as of this sprint.
+# Tests construct MissionCreate to test OTHER validators (mission_id format,
+# title length, etc.) — they need a stable project_id supplied so the
+# under-test field validation runs instead of failing on missing project_id.
+_TEST_PROJECT_ID = uuid.uuid4()
+
 
 def _create_test_project(db_session) -> Project:
     """Create a test project."""
@@ -53,6 +59,7 @@ class TestMissionSchemas:
     def test_mission_create_minimal(self):
         """Test MissionCreate with minimal required fields."""
         data = MissionCreate(
+            project_id=_TEST_PROJECT_ID,
             mission_id="B16.1",
             title="Test Mission",
             objective="Test objective",
@@ -86,6 +93,7 @@ class TestMissionSchemas:
         """Test that empty success_criteria fails validation."""
         with pytest.raises(ValueError, match="too_short|success_criteria must contain"):
             MissionCreate(
+                project_id=_TEST_PROJECT_ID,
                 mission_id="B16.1",
                 title="Test Mission",
                 objective="Test objective for validation",
@@ -96,6 +104,7 @@ class TestMissionSchemas:
         """Test that short title fails validation."""
         with pytest.raises(ValueError):
             MissionCreate(
+                project_id=_TEST_PROJECT_ID,
                 mission_id="B16.1",
                 title="AB",  # Too short
                 objective="Test",
@@ -140,8 +149,14 @@ class TestMissionCreate:
     """Tests for POST /api/v1/missions endpoint."""
 
     def test_create_mission_minimal(self, auth_headers, db_session):
-        """Create mission with minimal required fields."""
+        """Create mission with minimal required fields.
+
+        T41.6: project_id is required at create time. Pre-T41.6 missions
+        could be created without it (saved as orphan drafts) — that path
+        is now blocked.
+        """
         client = TestClient(app)
+        project = _create_test_project(db_session)
 
         response = client.post(
             "/api/v1/missions",
@@ -150,6 +165,7 @@ class TestMissionCreate:
                 "title": "Test Mission",
                 "objective": "Test objective",
                 "success_criteria": ["Criterion 1"],
+                "project_id": str(project.id),
             },
             headers=auth_headers,
         )
@@ -159,8 +175,41 @@ class TestMissionCreate:
         assert data["mission_id"] == "B16.TEST"
         assert data["title"] == "Test Mission"
         assert data["status"] == "draft"
+        assert data["project_id"] == str(project.id)
         assert "id" in data
         assert "created_at" in data
+
+    def test_create_mission_without_project_id_returns_422(
+        self, auth_headers, db_session
+    ):
+        """T41.6: missing project_id at create returns 422 with actionable error.
+
+        Origin: sprint-41 user feedback that orphan missions were hard to
+        find. Validation now blocks the orphan-creation path before any
+        DB write. Pre-T41.6 there were 5 such orphans across 375 missions
+        (1.3%) — they remain readable via GET.
+        """
+        client = TestClient(app)
+        response = client.post(
+            "/api/v1/missions",
+            json={
+                "mission_id": "B16.NOPROJ",
+                "title": "Orphan Mission",
+                "objective": "Should fail without project_id",
+                "success_criteria": ["any"],
+            },
+            headers=auth_headers,
+        )
+        assert response.status_code == 422
+        body = response.json()
+        # Pydantic field-required error surfaces in detail[].loc
+        detail = body.get("detail")
+        assert isinstance(detail, list)
+        assert any(
+            err.get("loc") == ["body", "project_id"]
+            and err.get("type") == "missing"
+            for err in detail
+        ), f"Expected missing-project_id field error, got {detail}"
 
     def test_create_mission_full(self, auth_headers, db_session):
         """Create mission with all optional fields."""
@@ -198,9 +247,12 @@ class TestMissionCreate:
     def test_create_mission_duplicate_fails(self, auth_headers, db_session):
         """Creating mission with duplicate mission_id fails."""
         client = TestClient(app)
+        project = _create_test_project(db_session)
 
         # Create first mission
-        _create_test_mission(db_session, mission_id="DUPLICATE-001")
+        _create_test_mission(
+            db_session, mission_id="DUPLICATE-001", project_id=project.id
+        )
 
         # Try to create duplicate
         response = client.post(
@@ -210,6 +262,7 @@ class TestMissionCreate:
                 "title": "Duplicate Mission",
                 "objective": "Test duplicate detection",
                 "success_criteria": ["Test criterion"],
+                "project_id": str(project.id),
             },
             headers=auth_headers,
         )
@@ -588,6 +641,130 @@ class TestMissionUpdate:
         assert doc_id in data["result_document_ids"]
 
 
+class TestT41_5UpdateProjectId:
+    """T41.5: project_id is mutable on existing missions via PATCH.
+
+    Pre-T41.5 missions were stuck with their original project assignment
+    forever. Re-parenting requires the target project to exist (404 if not)
+    and otherwise behaves like any other field update — works on any
+    status, doesn't touch other immutable fields (id, mission_id,
+    created_at).
+    """
+
+    def test_reparent_mission_to_existing_project(self, auth_headers, db_session):
+        client = TestClient(app)
+        original_project = _create_test_project(db_session)
+        new_project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session,
+            mission_id="REPARENT-001",
+            project_id=original_project.id,
+        )
+
+        response = client.patch(
+            f"/api/v1/missions/{mission.id}",
+            json={"project_id": str(new_project.id)},
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200, response.text
+        data = response.json()
+        assert data["project_id"] == str(new_project.id)
+        assert data["project_id"] != str(original_project.id)
+
+    def test_reparent_to_nonexistent_project_returns_404(
+        self, auth_headers, db_session
+    ):
+        client = TestClient(app)
+        mission = _create_test_mission(db_session, mission_id="REPARENT-002")
+        bogus_project_id = uuid.uuid4()
+
+        response = client.patch(
+            f"/api/v1/missions/{mission.id}",
+            json={"project_id": str(bogus_project_id)},
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 404, response.text
+        detail = response.json()["detail"]
+        assert "does not exist" in detail["message"]
+        assert "suggestion" in detail
+        assert str(bogus_project_id) in detail["message"]
+
+    def test_reparent_works_on_completed_mission(self, auth_headers, db_session):
+        """Re-parent allowed regardless of mission status — useful for
+        misfiled completed research."""
+        client = TestClient(app)
+        original = _create_test_project(db_session)
+        new_project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session,
+            mission_id="REPARENT-003",
+            project_id=original.id,
+            status="completed",
+        )
+
+        response = client.patch(
+            f"/api/v1/missions/{mission.id}",
+            json={"project_id": str(new_project.id)},
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200, response.text
+        assert response.json()["project_id"] == str(new_project.id)
+
+    def test_immutable_fields_remain_immutable(self, auth_headers, db_session):
+        """Re-parent must not allow mission_id, id, or created_at to change."""
+        client = TestClient(app)
+        project = _create_test_project(db_session)
+        new_project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session, mission_id="REPARENT-004", project_id=project.id
+        )
+        original_uuid = str(mission.id)
+        original_mission_id = mission.mission_id
+        original_created_at = mission.created_at.isoformat()
+
+        # Attempt to update project_id AND immutable fields in same call.
+        # Pydantic rejects unknown fields silently; we just want to confirm
+        # nothing here mutates them.
+        response = client.patch(
+            f"/api/v1/missions/{mission.id}",
+            json={
+                "project_id": str(new_project.id),
+                "mission_id": "TRY-TO-CHANGE-ME",  # silently dropped
+                "id": str(uuid.uuid4()),  # silently dropped
+            },
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["id"] == original_uuid
+        assert data["mission_id"] == original_mission_id
+        assert data["created_at"].startswith(original_created_at[:19])
+        assert data["project_id"] == str(new_project.id)
+
+    def test_update_without_project_id_leaves_existing_value(
+        self, auth_headers, db_session
+    ):
+        """Updates that omit project_id must NOT clear the existing value."""
+        client = TestClient(app)
+        project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session, mission_id="REPARENT-005", project_id=project.id
+        )
+
+        response = client.patch(
+            f"/api/v1/missions/{mission.id}",
+            json={"title": "Renamed"},
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        assert response.json()["project_id"] == str(project.id)
+
+
 class TestMissionAuthoringFieldsRoundTrip:
     """T40.2 smoke: POST /missions with all authoring fields then GET them back."""
 
@@ -896,6 +1073,7 @@ class TestMissionStatusTransitions:
     def test_all_valid_statuses(self, auth_headers, db_session):
         """Test all valid status values."""
         client = TestClient(app)
+        project = _create_test_project(db_session)
         valid_statuses = [
             "draft",
             "queued",
@@ -914,6 +1092,7 @@ class TestMissionStatusTransitions:
                     "objective": "Test status transitions for validation",
                     "success_criteria": ["Test criterion"],
                     "status": status,
+                    "project_id": str(project.id),
                 },
                 headers=auth_headers,
             )
@@ -1099,9 +1278,12 @@ class TestCreateAndSubmitMission:
         assert data["mission_id"] == "CREATE-SUBMIT-001"
         assert "created and" in data["message"].lower()
 
-    def test_create_and_submit_without_project_returns_actionable_error(
-        self, auth_headers
-    ):
+    def test_create_and_submit_without_project_returns_422(self, auth_headers):
+        """T41.6: project_id is required at create — request never reaches the
+        submit-side actionable-error branch (which used to live in
+        `_submit_existing_mission`). The Pydantic-level rejection happens
+        first and gives a structured field error instead of the prior
+        prose suggestion."""
         client = TestClient(app)
 
         response = client.post(
@@ -1109,13 +1291,17 @@ class TestCreateAndSubmitMission:
             json={
                 "mission_id": "CREATE-SUBMIT-002",
                 "title": "Create and submit without project",
-                "objective": "This should fail with an actionable project assignment suggestion.",
+                "objective": "This should fail at the create-time gate.",
                 "success_criteria": ["Should fail"],
             },
             headers=auth_headers,
         )
 
-        assert response.status_code == 400
+        assert response.status_code == 422
         detail = response.json()["detail"]
-        assert "project_id" in detail["message"]
-        assert "suggestion" in detail
+        assert isinstance(detail, list)
+        assert any(
+            err.get("loc") == ["body", "project_id"]
+            and err.get("type") == "missing"
+            for err in detail
+        ), f"Expected missing-project_id field error, got {detail}"

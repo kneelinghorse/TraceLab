@@ -342,6 +342,8 @@ export interface MissionCreate extends MissionAuthoringFields {
 }
 
 export interface MissionUpdate extends MissionAuthoringFields {
+  // T41.5: project_id is mutable post-create. Server validates target exists.
+  project_id?: string;
   title?: string;
   objective?: string;
   success_criteria?: string[];

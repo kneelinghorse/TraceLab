@@ -437,6 +437,24 @@ def update_mission(
         old_status = old_mission.status
         old_has_report = old_mission.result_report_id is not None
 
+        # T41.5: re-parenting requires the target project to exist. Validate
+        # here so we can return a clean 404 instead of a FK-violation 500.
+        if data.project_id is not None and data.project_id != old_mission.project_id:
+            from app.models.project import Project
+
+            target = db.query(Project).filter(Project.id == data.project_id).first()
+            if target is None:
+                raise HTTPException(
+                    status_code=http_status.HTTP_404_NOT_FOUND,
+                    detail=_build_actionable_detail(
+                        message=(
+                            f"Cannot re-parent mission to project {data.project_id} "
+                            "— project does not exist."
+                        ),
+                        suggestion="List existing projects via GET /api/v1/projects to find a valid project_id.",
+                    ),
+                )
+
         mission = _service.update_mission(db, mission_id, data)
 
         # Emit status change event
@@ -493,6 +511,11 @@ def update_mission(
             status_code=http_status.HTTP_400_BAD_REQUEST,
             detail=str(exc),
         ) from exc
+    except HTTPException:
+        # T41.5: re-parent target-project-not-found raises HTTPException(404)
+        # inside the try; bubble it up cleanly instead of letting the generic
+        # handler below wrap it as 500.
+        raise
     except Exception as exc:
         logger.exception("Error updating mission")
         raise HTTPException(
