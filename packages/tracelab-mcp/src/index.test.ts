@@ -887,3 +887,233 @@ describe('MCP handlers — T41.4 slim/full payload split for get_mission', () =>
     expect(size).toBeLessThan(8_000);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────
+// T41.7 — Tool-grouping refactor: cluster surface + parity
+//
+// Surface invariants:
+//   1. Exactly 7 visible MCP tools, all named tracelab_*
+//   2. Every legacy tool name maps to a (cluster, action) pair where
+//      action is in the cluster's action enum
+//   3. Each cluster dispatches to the correct per-action handler
+// ─────────────────────────────────────────────────────────────────────────
+
+describe('T41.7 — cluster surface', () => {
+  it('exposes exactly 7 tracelab_* tools', async () => {
+    const indexSource = await import('./index.js');
+    const { CLUSTER_ACTIONS } = indexSource as unknown as {
+      CLUSTER_ACTIONS: Record<string, readonly string[]>;
+    };
+    const toolNames = Object.keys(CLUSTER_ACTIONS);
+    expect(toolNames).toHaveLength(7);
+    expect(toolNames.sort()).toEqual([
+      'tracelab_collection',
+      'tracelab_document',
+      'tracelab_mission',
+      'tracelab_mission_execution',
+      'tracelab_project',
+      'tracelab_report',
+      'tracelab_search',
+    ]);
+  });
+
+  it('every legacy tool maps to a valid (cluster, action) pair', async () => {
+    const { LEGACY_TO_CLUSTER, CLUSTER_ACTIONS } = (await import(
+      './index.js'
+    )) as unknown as {
+      LEGACY_TO_CLUSTER: Record<string, { tool: string; action: string }>;
+      CLUSTER_ACTIONS: Record<string, readonly string[]>;
+    };
+
+    // Every pre-T41.7 tool name has a migration target.
+    const legacyTools = Object.keys(LEGACY_TO_CLUSTER).sort();
+    expect(legacyTools).toEqual(
+      [
+        'add_to_collection',
+        'create_collection',
+        'create_mission',
+        'create_project',
+        'create_report',
+        'export_collection',
+        'export_report',
+        'get_collection',
+        'get_document_content',
+        'get_mission',
+        'get_mission_status',
+        'get_project_stats',
+        'get_report',
+        'list_collections',
+        'list_missions',
+        'list_projects',
+        'list_reports',
+        'preview_mission_contract',
+        'search_knowledge',
+        'submit_mission',
+        'synthesize',
+        'update_mission',
+        'update_project',
+        'upload_document',
+      ].sort()
+    );
+
+    // And every target lands in a valid (cluster, action) pair.
+    for (const [legacy, { tool, action }] of Object.entries(LEGACY_TO_CLUSTER)) {
+      expect(CLUSTER_ACTIONS[tool], `${legacy} → ${tool} must be a known cluster`).toBeDefined();
+      expect(
+        CLUSTER_ACTIONS[tool].includes(action),
+        `${legacy} → ${tool}(action="${action}") action must be in cluster enum [${CLUSTER_ACTIONS[tool].join(', ')}]`
+      ).toBe(true);
+    }
+  });
+});
+
+describe('T41.7 — cluster dispatch (per-cluster smoke)', () => {
+  beforeEach(() => {
+    mockFetch.mockReset();
+  });
+
+  // A minimal API response that the relevant handler will accept. The
+  // dispatcher's job is just to route to the right handler — we do not
+  // re-test handler bodies here (those have their own coverage above).
+  const okJson = (body: unknown) => ({
+    ok: true,
+    headers: new Headers({ 'content-type': 'application/json' }),
+    json: () => Promise.resolve(body),
+  });
+
+  it('tracelab_search routes action="knowledge" to handleSearchKnowledge', async () => {
+    mockFetch.mockResolvedValueOnce(okJson({ results: [] }));
+    const { handleTracelabSearch } = (await import('./index.js')) as unknown as {
+      handleTracelabSearch: (args: unknown) => Promise<{ content: { text: string }[] }>;
+    };
+    const res = await handleTracelabSearch({ action: 'knowledge', query: 'test' });
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(res.content[0].text).toContain('total_results');
+  });
+
+  it('tracelab_project routes action="list" to handleListProjects', async () => {
+    mockFetch.mockResolvedValueOnce(
+      okJson({ data: [], pagination: { page: 1, page_size: 20, total: 0, pages: 0 } })
+    );
+    const { handleTracelabProject } = (await import('./index.js')) as unknown as {
+      handleTracelabProject: (args: unknown) => Promise<{ content: { text: string }[] }>;
+    };
+    const res = await handleTracelabProject({ action: 'list' });
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(res.content[0].text).toContain('projects');
+  });
+
+  it('tracelab_collection routes action="list" to handleListCollections', async () => {
+    mockFetch.mockResolvedValueOnce(okJson({ data: [], total: 0 }));
+    const { handleTracelabCollection } = (await import('./index.js')) as unknown as {
+      handleTracelabCollection: (args: unknown) => Promise<{ content: { text: string }[] }>;
+    };
+    const res = await handleTracelabCollection({ action: 'list' });
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(res.content[0].text).toContain('collections');
+  });
+
+  it('tracelab_report routes action="list" to handleListReports', async () => {
+    mockFetch.mockResolvedValueOnce(
+      okJson({ items: [], page: 1, page_size: 20, total: 0 })
+    );
+    const { handleTracelabReport } = (await import('./index.js')) as unknown as {
+      handleTracelabReport: (args: unknown) => Promise<{ content: { text: string }[] }>;
+    };
+    const res = await handleTracelabReport({ action: 'list' });
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(res.content[0].text).toContain('reports');
+  });
+
+  it('tracelab_document routes action="get_content" to handleGetDocumentContent', async () => {
+    // get_content with include_metadata=false skips the document fetch and
+    // only requests chunks.
+    mockFetch.mockResolvedValueOnce(
+      okJson({
+        data: [],
+        pagination: { page: 1, page_size: 20, total: 0, pages: 0 },
+      })
+    );
+    const { handleTracelabDocument } = (await import('./index.js')) as unknown as {
+      handleTracelabDocument: (args: unknown) => Promise<{ content: { text: string }[] }>;
+    };
+    const res = await handleTracelabDocument({
+      action: 'get_content',
+      document_id: '00000000-0000-0000-0000-000000000001',
+      include_metadata: false,
+    });
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(res.content[0].text).toContain('document_id');
+  });
+
+  it('tracelab_mission routes action="list" to handleListMissions', async () => {
+    mockFetch.mockResolvedValueOnce(
+      okJson({ data: [], pagination: { page: 1, page_size: 20, total: 0, pages: 0 } })
+    );
+    const { handleTracelabMission } = (await import('./index.js')) as unknown as {
+      handleTracelabMission: (args: unknown) => Promise<{ content: { text: string }[] }>;
+    };
+    const res = await handleTracelabMission({ action: 'list' });
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(res.content[0].text).toContain('missions');
+  });
+
+  it('tracelab_mission routes action="get" with include_execution_metadata flag', async () => {
+    // T41.4 flag must survive the cluster dispatch — Zod default-strip drops
+    // the extra `action` key, but include_execution_metadata stays.
+    mockFetch.mockResolvedValueOnce(
+      okJson({
+        id: '00000000-0000-0000-0000-000000000001',
+        mission_id: 'M001',
+        title: 'Test',
+        objective: 'Test',
+        success_criteria: ['x'],
+        status: 'draft',
+        research_depth: 'baseline',
+        project_id: null,
+        deliverables: [],
+        tags: [],
+        created_at: '2026-04-27T00:00:00Z',
+        updated_at: '2026-04-27T00:00:00Z',
+      })
+    );
+    const { handleTracelabMission } = (await import('./index.js')) as unknown as {
+      handleTracelabMission: (args: unknown) => Promise<{ content: { text: string }[] }>;
+    };
+    const res = await handleTracelabMission({
+      action: 'get',
+      mission_id: '00000000-0000-0000-0000-000000000001',
+      include_execution_metadata: true,
+    });
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(res.content[0].text).toContain('"mission_id": "M001"');
+  });
+
+  it('tracelab_mission_execution routes action="status" to handleGetMissionStatus', async () => {
+    mockFetch.mockResolvedValueOnce(okJson({ status: 'queued', progress: 0 }));
+    const { handleTracelabMissionExecution } = (await import('./index.js')) as unknown as {
+      handleTracelabMissionExecution: (args: unknown) => Promise<{ content: { text: string }[] }>;
+    };
+    const res = await handleTracelabMissionExecution({
+      action: 'status',
+      mission_id: '00000000-0000-0000-0000-000000000001',
+    });
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(res.content[0].text).toContain('"status": "queued"');
+  });
+
+  it('cluster returns a clean error for an unknown action', async () => {
+    const { handleTracelabMission } = (await import('./index.js')) as unknown as {
+      handleTracelabMission: (
+        args: unknown
+      ) => Promise<{ content: { text: string }[]; isError?: boolean }>;
+    };
+    const res = await handleTracelabMission({ action: 'frobnicate' });
+    expect(res.isError).toBe(true);
+    expect(res.content[0].text).toContain('tracelab_mission');
+    expect(res.content[0].text).toContain('frobnicate');
+    // The error should enumerate the valid actions.
+    expect(res.content[0].text).toContain('create');
+    expect(res.content[0].text).toContain('update');
+  });
+});
