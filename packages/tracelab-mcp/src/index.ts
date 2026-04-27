@@ -1691,7 +1691,7 @@ async function handleCreateMission(args: unknown) {
   };
 }
 
-async function handleListMissions(args: unknown) {
+export async function handleListMissions(args: unknown) {
   const input = ListMissionsInput.parse(args);
   const result = await client.listMissions(
     input.page,
@@ -1713,6 +1713,21 @@ async function handleListMissions(args: unknown) {
               status: m.status,
               project_id: m.project_id,
               created_at: m.created_at,
+              // Mission-authoring fields (T40.1/T41.2). Included so agents can
+              // inspect contract-authoring state without a follow-up
+              // get_mission call. T41.4 will add a slim/full toggle.
+              background: m.background,
+              focus: m.focus,
+              references: m.references,
+              required_entities: m.required_entities,
+              excluded_entities: m.excluded_entities,
+              expected_output_schema: m.expected_output_schema,
+              coverage_thresholds: m.coverage_thresholds,
+              validation_thresholds: m.validation_thresholds,
+              deliverable_format: m.deliverable_format,
+              max_loops: m.max_loops,
+              min_loops: m.min_loops,
+              constraints: m.constraints,
             })),
             pagination: result.pagination,
           },
@@ -1724,7 +1739,7 @@ async function handleListMissions(args: unknown) {
   };
 }
 
-async function handleGetMission(args: unknown) {
+export async function handleGetMission(args: unknown) {
   const input = GetMissionInput.parse(args);
   const result = await client.getMission(input.mission_id);
 
@@ -1742,8 +1757,26 @@ async function handleGetMission(args: unknown) {
             status: result.status,
             research_depth: result.research_depth,
             project_id: result.project_id,
+            context: result.context,
             deliverables: result.deliverables,
+            research_phases: result.research_phases,
             tags: result.tags,
+            metadata: result.metadata,
+            // Mission-authoring fields (T40.1/T41.2). REST returns these but
+            // the previous hand-rolled response shape stripped them, leaving
+            // MCP agents with no visibility into contract-authoring state.
+            background: result.background,
+            focus: result.focus,
+            references: result.references,
+            required_entities: result.required_entities,
+            excluded_entities: result.excluded_entities,
+            expected_output_schema: result.expected_output_schema,
+            coverage_thresholds: result.coverage_thresholds,
+            validation_thresholds: result.validation_thresholds,
+            deliverable_format: result.deliverable_format,
+            max_loops: result.max_loops,
+            min_loops: result.min_loops,
+            constraints: result.constraints,
             queued_at: result.queued_at,
             started_at: result.started_at,
             completed_at: result.completed_at,

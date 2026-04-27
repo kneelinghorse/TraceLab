@@ -12,6 +12,61 @@ from datetime import datetime
 from unittest.mock import MagicMock
 
 
+def _make_mission_mock(**overrides):
+    """Build a Mission mock with safe defaults for every attribute the
+    MCP serializer reads.
+
+    MagicMock returns a child MagicMock for any unset attribute, which
+    poisons JSON serialization and the truthiness check in the constraints
+    fallback. Centralize the defaults here so individual tests only set the
+    fields they care about.
+    """
+    mission = MagicMock()
+    mission.id = overrides.pop("id", "test-uuid")
+    mission.project_id = overrides.pop("project_id", None)
+    mission.project = overrides.pop("project", None)
+    mission.mission_id = overrides.pop("mission_id", "MCP-TEST")
+    mission.title = overrides.pop("title", "Test")
+    mission.objective = overrides.pop("objective", "Test objective")
+    mission.success_criteria = overrides.pop("success_criteria", ["c1"])
+    mission.context = overrides.pop("context", {})
+    mission.deliverables = overrides.pop("deliverables", [])
+    mission.research_phases = overrides.pop("research_phases", {})
+    mission.tags = overrides.pop("tags", [])
+    mission.mission_metadata = overrides.pop("mission_metadata", {})
+    mission.research_depth = overrides.pop("research_depth", "baseline")
+    # Mission-authoring fields (T40.1).
+    mission.background = overrides.pop("background", None)
+    mission.focus = overrides.pop("focus", None)
+    mission.references = overrides.pop("references", None)
+    mission.required_entities = overrides.pop("required_entities", None)
+    mission.excluded_entities = overrides.pop("excluded_entities", None)
+    mission.expected_output_schema = overrides.pop("expected_output_schema", None)
+    mission.coverage_thresholds = overrides.pop("coverage_thresholds", None)
+    mission.validation_thresholds = overrides.pop("validation_thresholds", None)
+    mission.deliverable_format = overrides.pop("deliverable_format", None)
+    mission.max_loops = overrides.pop("max_loops", None)
+    mission.min_loops = overrides.pop("min_loops", None)
+    mission.constraints = overrides.pop("constraints", None)
+    mission.status = overrides.pop("status", "draft")
+    mission.queued_at = overrides.pop("queued_at", None)
+    mission.started_at = overrides.pop("started_at", None)
+    mission.completed_at = overrides.pop("completed_at", None)
+    mission.deepsearch_job_id = overrides.pop("deepsearch_job_id", None)
+    mission.execution_metadata = overrides.pop("execution_metadata", {})
+    mission.result_document_ids = overrides.pop("result_document_ids", [])
+    mission.result_report_id = overrides.pop("result_report_id", None)
+    mission.result_markdown = overrides.pop("result_markdown", None)
+    mission.result_protocol = overrides.pop("result_protocol", None)
+    mission.error_message = overrides.pop("error_message", None)
+    mission.created_at = overrides.pop("created_at", datetime.utcnow())
+    mission.updated_at = overrides.pop("updated_at", datetime.utcnow())
+    mission.created_by = overrides.pop("created_by", None)
+    if overrides:
+        raise TypeError(f"Unknown mission attrs: {sorted(overrides)}")
+    return mission
+
+
 class TestMissionToolDefinitions:
     """Tests for MCP tool definitions - no database required."""
 
@@ -194,32 +249,18 @@ class TestSerializeMission:
         from app.mcp_server.tools.missions import _serialize_mission
 
         # Create a mock mission
-        mission = MagicMock()
-        mission.id = "test-uuid"
-        mission.project_id = None
-        mission.mission_id = "MCP-TEST-001"
-        mission.title = "Test Mission"
-        mission.objective = "Test objective"
-        mission.success_criteria = ["Criterion 1"]
-        mission.context = {"key": "value"}
-        mission.deliverables = ["file.py"]
-        mission.research_phases = {}
-        mission.tags = ["test"]
-        mission.mission_metadata = {"priority": "normal"}
-        mission.status = "draft"
-        mission.queued_at = None
-        mission.started_at = None
-        mission.completed_at = None
-        mission.deepsearch_job_id = None
-        mission.execution_metadata = {}
-        mission.result_document_ids = []
-        mission.result_report_id = None
-        mission.result_markdown = None
-        mission.result_protocol = None
-        mission.error_message = None
-        mission.created_at = datetime.utcnow()
-        mission.updated_at = datetime.utcnow()
-        mission.created_by = "test"
+        mission = _make_mission_mock(
+            id="test-uuid",
+            mission_id="MCP-TEST-001",
+            title="Test Mission",
+            objective="Test objective",
+            success_criteria=["Criterion 1"],
+            context={"key": "value"},
+            deliverables=["file.py"],
+            tags=["test"],
+            mission_metadata={"priority": "normal"},
+            created_by="test",
+        )
 
         result = _serialize_mission(mission)
 
@@ -237,32 +278,26 @@ class TestSerializeMission:
         doc_id = str(uuid.uuid4())
         report_id = str(uuid.uuid4())
 
-        mission = MagicMock()
-        mission.id = "test-uuid-2"
-        mission.project_id = "project-uuid"
-        mission.mission_id = "MCP-TEST-002"
-        mission.title = "Completed Mission"
-        mission.objective = "Test completed"
-        mission.success_criteria = ["Done"]
-        mission.context = {}
-        mission.deliverables = []
-        mission.research_phases = {}
-        mission.tags = []
-        mission.mission_metadata = {}
-        mission.status = "completed"
-        mission.queued_at = datetime.utcnow()
-        mission.started_at = datetime.utcnow()
-        mission.completed_at = datetime.utcnow()
-        mission.deepsearch_job_id = "ds-job-123"
-        mission.execution_metadata = {"duration_ms": 5000}
-        mission.result_document_ids = [doc_id]
-        mission.result_report_id = report_id
-        mission.result_markdown = "# Results"
-        mission.result_protocol = {"version": "1.0"}
-        mission.error_message = None
-        mission.created_at = datetime.utcnow()
-        mission.updated_at = datetime.utcnow()
-        mission.created_by = "mcp-tool"
+        completed = datetime.utcnow()
+        mission = _make_mission_mock(
+            id="test-uuid-2",
+            project_id="project-uuid",
+            mission_id="MCP-TEST-002",
+            title="Completed Mission",
+            objective="Test completed",
+            success_criteria=["Done"],
+            status="completed",
+            queued_at=completed,
+            started_at=completed,
+            completed_at=completed,
+            deepsearch_job_id="ds-job-123",
+            execution_metadata={"duration_ms": 5000},
+            result_document_ids=[doc_id],
+            result_report_id=report_id,
+            result_markdown="# Results",
+            result_protocol={"version": "1.0"},
+            created_by="mcp-tool",
+        )
 
         result = _serialize_mission(mission)
 
@@ -277,32 +312,20 @@ class TestSerializeMission:
         """Serialize mission with null optional fields."""
         from app.mcp_server.tools.missions import _serialize_mission
 
-        mission = MagicMock()
-        mission.id = "test-uuid-3"
-        mission.project_id = None
-        mission.mission_id = "MCP-TEST-003"
-        mission.title = "Minimal"
-        mission.objective = "Minimal mission"
-        mission.success_criteria = ["Test"]
-        mission.context = None
-        mission.deliverables = None
-        mission.research_phases = None
-        mission.tags = None
-        mission.mission_metadata = None
-        mission.status = "draft"
-        mission.queued_at = None
-        mission.started_at = None
-        mission.completed_at = None
-        mission.deepsearch_job_id = None
-        mission.execution_metadata = None
-        mission.result_document_ids = None
-        mission.result_report_id = None
-        mission.result_markdown = None
-        mission.result_protocol = None
-        mission.error_message = None
-        mission.created_at = datetime.utcnow()
-        mission.updated_at = datetime.utcnow()
-        mission.created_by = None
+        mission = _make_mission_mock(
+            id="test-uuid-3",
+            mission_id="MCP-TEST-003",
+            title="Minimal",
+            objective="Minimal mission",
+            success_criteria=["Test"],
+            context=None,
+            deliverables=None,
+            research_phases=None,
+            tags=None,
+            mission_metadata=None,
+            execution_metadata=None,
+            result_document_ids=None,
+        )
 
         result = _serialize_mission(mission)
 
@@ -310,6 +333,105 @@ class TestSerializeMission:
         assert result["context"] == {}
         assert result["deliverables"] == []
         assert result["result_markdown"] is None
+
+    def test_serialize_mission_includes_t40_1_fields(self):
+        """T41.2: serializer must surface all 12 T40.1 mission-authoring fields.
+
+        Mirrors REST behavior at app/api/v1/missions.py:84-96. Discovered
+        2026-04-27 during DeepSearch triage when MCP get_mission returned 11
+        of 23 fields for OODS-FIGMA-HOST-01 (UUID 2a781109-...d22e).
+        """
+        from app.mcp_server.tools.missions import _serialize_mission
+
+        references = [{"title": "AWS Lambda docs"}]
+        required_entities = [
+            "AWS Lambda",
+            "Google Cloud Run",
+            "Vercel Functions",
+            "Fly.io",
+            "Railway",
+        ]
+        excluded_entities = ["AWS EC2"]
+        expected_output_schema = {"type": "comparison_matrix"}
+        coverage_thresholds = {"min_sources": 50}
+        validation_thresholds = {"min_score": 7.0}
+        constraints = ["No AWS-only solutions"]
+
+        mission = _make_mission_mock(
+            id="t41-2-uuid",
+            mission_id="OODS-FIGMA-HOST-01",
+            title="Mission-authoring fields round-trip",
+            objective="Surface T40.1 fields through MCP",
+            success_criteria=["all 12 fields present"],
+            background="Hosted code-execution platforms for OODS evaluation.",
+            focus="Serverless containerized execution with sub-second cold starts.",
+            references=references,
+            required_entities=required_entities,
+            excluded_entities=excluded_entities,
+            expected_output_schema=expected_output_schema,
+            coverage_thresholds=coverage_thresholds,
+            validation_thresholds=validation_thresholds,
+            deliverable_format="comparison table",
+            max_loops=8,
+            min_loops=3,
+            constraints=constraints,
+        )
+
+        result = _serialize_mission(mission)
+
+        assert result["background"] == mission.background
+        assert result["focus"] == mission.focus
+        assert result["references"] == references
+        assert result["required_entities"] == required_entities
+        assert result["excluded_entities"] == excluded_entities
+        assert result["expected_output_schema"] == expected_output_schema
+        assert result["coverage_thresholds"] == coverage_thresholds
+        assert result["validation_thresholds"] == validation_thresholds
+        assert result["deliverable_format"] == "comparison table"
+        assert result["max_loops"] == 8
+        assert result["min_loops"] == 3
+        assert result["constraints"] == constraints
+
+    def test_serialize_mission_constraints_fallback_from_context(self):
+        """Legacy missions store constraints inside context; MCP must surface them.
+
+        Mirrors REST fallback at app/api/v1/missions.py:64-68 so DS readers see
+        the same value through either surface for pre-T40.1 missions.
+        """
+        from app.mcp_server.tools.missions import _serialize_mission
+
+        legacy_constraints = ["legacy: stored in context"]
+        mission = _make_mission_mock(
+            id="legacy-uuid",
+            mission_id="LEGACY-001",
+            title="Legacy mission",
+            objective="Pre-T40.1 mission with constraints in context",
+            success_criteria=["fallback works"],
+            context={"constraints": legacy_constraints, "other": "data"},
+            constraints=None,  # column is null
+        )
+
+        result = _serialize_mission(mission)
+
+        assert result["constraints"] == legacy_constraints
+
+    def test_serialize_mission_constraints_column_wins_over_context(self):
+        """When the constraints column is populated, prefer it over context."""
+        from app.mcp_server.tools.missions import _serialize_mission
+
+        mission = _make_mission_mock(
+            id="modern-uuid",
+            mission_id="MODERN-001",
+            title="Modern mission",
+            objective="Post-T40.1 mission with both column and context",
+            success_criteria=["column wins"],
+            context={"constraints": ["context-only"]},
+            constraints=["from-column"],
+        )
+
+        result = _serialize_mission(mission)
+
+        assert result["constraints"] == ["from-column"]
 
 
 class TestMCPModuleExports:

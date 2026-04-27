@@ -36,8 +36,19 @@ _mission_service = MissionService()
 def _serialize_mission(mission) -> dict[str, Any]:
     """Serialize a Mission ORM object to a dictionary.
 
-    Handles UUID and datetime serialization for JSON output.
+    Mirrors app/api/v1/missions.py::_to_response so MCP clients see the same
+    field set as REST clients. Handles UUID and datetime serialization for
+    JSON output.
     """
+    # constraints fallback: T40.1 promoted constraints out of context into its
+    # own column. Old missions only have it inside context; mirror the REST
+    # behavior at app/api/v1/missions.py:64-68 so DS readers stay consistent.
+    resolved_constraints = mission.constraints
+    if not resolved_constraints and isinstance(mission.context, dict):
+        legacy = mission.context.get("constraints")
+        if legacy:
+            resolved_constraints = legacy
+
     return {
         "id": str(mission.id) if mission.id else None,
         "project_id": str(mission.project_id) if mission.project_id else None,
@@ -54,6 +65,20 @@ def _serialize_mission(mission) -> dict[str, Any]:
         "tags": mission.tags or [],
         "metadata": mission.mission_metadata or {},
         "research_depth": mission.research_depth or "baseline",
+        # Mission-authoring fields (T40.1/T40.2). Mirror MissionResponse so
+        # MCP agents can see the full mission shape REST already returns.
+        "background": mission.background,
+        "focus": mission.focus,
+        "references": mission.references,
+        "required_entities": mission.required_entities,
+        "excluded_entities": mission.excluded_entities,
+        "expected_output_schema": mission.expected_output_schema,
+        "coverage_thresholds": mission.coverage_thresholds,
+        "validation_thresholds": mission.validation_thresholds,
+        "deliverable_format": mission.deliverable_format,
+        "max_loops": mission.max_loops,
+        "min_loops": mission.min_loops,
+        "constraints": resolved_constraints,
         "status": mission.status,
         "queued_at": mission.queued_at.isoformat() if mission.queued_at else None,
         "started_at": mission.started_at.isoformat() if mission.started_at else None,

@@ -30,5 +30,16 @@
  * 22. submit_mission - Submit mission for DeepSearch execution
  * 23. get_mission_status - Get current mission status
  */
-export {};
+export declare function handleListMissions(args: unknown): Promise<{
+    content: {
+        type: string;
+        text: string;
+    }[];
+}>;
+export declare function handleGetMission(args: unknown): Promise<{
+    content: {
+        type: string;
+        text: string;
+    }[];
+}>;
 //# sourceMappingURL=index.d.ts.map
