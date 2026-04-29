@@ -1,11 +1,23 @@
 import { formatDistanceToNow, format } from "date-fns";
 
+import type { MissionReportMetadata } from "@/types/mission";
+
 interface ExecutionTimelineProps {
   createdAt: string | null;
   queuedAt: string | null;
   startedAt: string | null;
   completedAt: string | null;
-  executionMetadata: Record<string, unknown>;
+  /**
+   * `result_protocol.report_metadata` from a completed mission. T42.3
+   * (sprint-42) swapped this surface from the lying `execution_metadata`
+   * blob — `sources_count`, `loops_executed`, `coverage`,
+   * `quality_gates_passed` kept emitting after DS's S64 entry-point flip
+   * but no longer reflected the run. The truthful values live here, in
+   * the writer.py-emitted block. Per DS message 27395546 the contract is
+   * live: no fall-back to legacy fields, just an empty Execution Details
+   * panel for missions that haven't finished yet.
+   */
+  reportMetadata: MissionReportMetadata | null | undefined;
 }
 
 interface TimelineEvent {
@@ -45,13 +57,23 @@ function TimelineItem({ event, isLast }: { event: TimelineEvent; isLast: boolean
   );
 }
 
-function MetadataCard({ label, value }: { label: string; value: string | number }) {
+function MetadataCard({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
   return (
     <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{label}</p>
       <p className="font-medium text-gray-900 dark:text-white">{String(value)}</p>
+      {hint && <p className="mt-1 text-[11px] text-gray-400 dark:text-gray-500">{hint}</p>}
     </div>
   );
+}
+
+function formatRuntime(seconds: number): string {
+  if (seconds < 60) return `${Math.round(seconds)}s`;
+  const minutes = Math.floor(seconds / 60);
+  const remSec = Math.round(seconds % 60);
+  if (minutes < 60) return `${minutes}m ${remSec}s`;
+  const hours = Math.floor(minutes / 60);
+  return `${hours}h ${minutes % 60}m`;
 }
 
 export function ExecutionTimeline({
@@ -59,7 +81,7 @@ export function ExecutionTimeline({
   queuedAt,
   startedAt,
   completedAt,
-  executionMetadata,
+  reportMetadata,
 }: ExecutionTimelineProps) {
   const events: TimelineEvent[] = [];
 
@@ -76,13 +98,26 @@ export function ExecutionTimeline({
     events.push({ label: "Execution Completed", timestamp: completedAt, icon: "complete" });
   }
 
-  const loops = executionMetadata.loops as number | undefined;
-  const duration = executionMetadata.duration as string | undefined;
-  const sources = executionMetadata.sources as number | undefined;
-  const model = executionMetadata.model as string | undefined;
-  const tokensUsed = executionMetadata.tokens_used as number | undefined;
+  const sources = reportMetadata?.sources_collected;
+  const references = reportMetadata?.references;
+  const stepsUsed = reportMetadata?.agent_steps_used;
+  const stepsMax = reportMetadata?.agent_steps_max;
+  const runtimeSeconds = reportMetadata?.runtime_seconds;
+  const forensic = reportMetadata?.forensic;
+  const buildHash = forensic?.build_hash;
+  const schemaVersion = forensic?.schema_version;
+  const distinctDomains = forensic?.distinct_domains;
+  const distinctUrls = forensic?.distinct_urls_cited;
 
-  const hasMetadata = loops !== undefined || duration || sources !== undefined || model;
+  const hasMetadata =
+    sources != null ||
+    references != null ||
+    stepsUsed != null ||
+    runtimeSeconds != null ||
+    buildHash != null ||
+    schemaVersion != null ||
+    distinctDomains != null ||
+    distinctUrls != null;
 
   return (
     <div className="space-y-6">
@@ -105,11 +140,34 @@ export function ExecutionTimeline({
             Execution Details
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {loops !== undefined && <MetadataCard label="Loops" value={loops} />}
-            {duration && <MetadataCard label="Duration" value={duration} />}
-            {sources !== undefined && <MetadataCard label="Sources" value={sources} />}
-            {model && <MetadataCard label="Model" value={model} />}
-            {tokensUsed !== undefined && <MetadataCard label="Tokens Used" value={tokensUsed.toLocaleString()} />}
+            {sources != null && (
+              <MetadataCard label="Sources collected" value={sources} />
+            )}
+            {references != null && (
+              <MetadataCard label="References" value={references} />
+            )}
+            {stepsUsed != null && (
+              <MetadataCard
+                label="Agent steps"
+                value={stepsMax != null ? `${stepsUsed} / ${stepsMax}` : stepsUsed}
+              />
+            )}
+            {runtimeSeconds != null && (
+              <MetadataCard label="Runtime" value={formatRuntime(runtimeSeconds)} />
+            )}
+            {distinctDomains != null && (
+              <MetadataCard label="Distinct domains" value={distinctDomains} />
+            )}
+            {distinctUrls != null && (
+              <MetadataCard label="URLs cited" value={distinctUrls} />
+            )}
+            {buildHash && (
+              <MetadataCard
+                label="Build"
+                value={buildHash.slice(0, 12)}
+                hint={schemaVersion ? `schema ${schemaVersion}` : undefined}
+              />
+            )}
           </div>
         </div>
       )}

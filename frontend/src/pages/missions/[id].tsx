@@ -860,7 +860,7 @@ function MissionDetailContent() {
               queuedAt={mission.queued_at}
               startedAt={mission.started_at}
               completedAt={mission.completed_at}
-              executionMetadata={mission.execution_metadata}
+              reportMetadata={mission.result_protocol?.report_metadata}
             />
 
             {mission.deepsearch_job_id && (
