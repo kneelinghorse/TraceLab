@@ -129,10 +129,65 @@ export interface EvidenceLinkPayload {
 /**
  * Mission entity from the API (B16.1+ schema)
  */
-export type ResearchDepth = "baseline" | "deep" | "alpha";
-
 export interface MissionReference {
   title: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Forensic telemetry block emitted inside `report_metadata` by DeepSearch's
+ * writer.py. Surfaces build/schema provenance and post-completion source
+ * counts so reviewers can audit the run without reading raw worker output.
+ *
+ * Sub-blocks (`citation_telemetry`, `liveness_telemetry`) are kept loose
+ * because their shape evolves per-DS-sprint (S67/S68 added them; later
+ * sprints extend keys). When the frontend starts reading specific keys,
+ * tighten the inner type alongside that read.
+ */
+export interface MissionForensicTelemetry {
+  build_hash?: string | null;
+  schema_version?: string | null;
+  citation_telemetry?: Record<string, unknown> | null;
+  liveness_telemetry?: Record<string, unknown> | null;
+  distinct_domains?: number | null;
+  distinct_urls_cited?: number | null;
+  [key: string]: unknown;
+}
+
+/**
+ * Truthful post-completion metrics emitted into `result_protocol.report_metadata`
+ * by DeepSearch's writer.py (canonical readers per DS message 27395546). These
+ * supersede `execution_metadata.{sources_count, loops_executed, coverage,
+ * quality_gates_passed}` — those fields kept emitting since DS's S64 entry-
+ * point flip but no longer reflect the actual run, hence the T42.3 swap.
+ */
+export interface MissionReportMetadata {
+  sources_collected?: number | null;
+  references?: number | null;
+  agent_steps_used?: number | null;
+  agent_steps_max?: number | null;
+  runtime_seconds?: number | null;
+  forensic?: MissionForensicTelemetry | null;
+  [key: string]: unknown;
+}
+
+/**
+ * Per-source artifact in `result_protocol.sources_collected`. `body` is the
+ * full source_fetch text (post-S69) and `body_source` distinguishes between
+ * the full-fetch and snippet-only paths so the UI can flag thinly-sourced
+ * runs.
+ */
+export interface MissionSourceCollected {
+  body?: string | null;
+  body_source?: "full" | "snippet" | null;
+  [key: string]: unknown;
+}
+
+/** Mission Protocol result shape returned in `mission.result_protocol`. */
+export interface MissionResultProtocol {
+  report_metadata?: MissionReportMetadata | null;
+  sources_collected?: MissionSourceCollected[] | null;
+  citations?: Array<Record<string, unknown>> | null;
   [key: string]: unknown;
 }
 
@@ -165,7 +220,6 @@ export interface ApiMission extends MissionAuthoringFields {
   research_phases: Record<string, unknown>;
   tags: string[];
   metadata: Record<string, unknown>;
-  research_depth: ResearchDepth;
   status: MissionStatus;
   queued_at: string | null;
   started_at: string | null;
@@ -175,7 +229,7 @@ export interface ApiMission extends MissionAuthoringFields {
   result_document_ids: string[];
   result_report_id: string | null;
   result_markdown: string | null;
-  result_protocol: Record<string, unknown> | null;
+  result_protocol: MissionResultProtocol | null;
   error_message: string | null;
   created_at: string;
   updated_at: string;
@@ -193,7 +247,6 @@ export interface ApiMissionCreate extends MissionAuthoringFields {
   research_phases?: Record<string, unknown>;
   tags?: string[];
   metadata?: Record<string, unknown>;
-  research_depth?: ResearchDepth;
   status?: MissionStatus;
   created_by?: string;
 }
@@ -207,7 +260,6 @@ export interface ApiMissionUpdate extends MissionAuthoringFields {
   research_phases?: Record<string, unknown>;
   tags?: string[];
   metadata?: Record<string, unknown>;
-  research_depth?: ResearchDepth;
   status?: MissionStatus;
   deepsearch_job_id?: string;
   result_document_ids?: string[];

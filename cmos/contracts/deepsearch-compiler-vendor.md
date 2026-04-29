@@ -141,9 +141,15 @@ Required keys: `mission_id`, `title`, `objective`, `success_criteria`,
 Optional keys (forwarded only when the mission has them set): `background`,
 `focus`, `references`, `required_entities`, `excluded_entities`,
 `expected_output_schema`, `coverage_thresholds`, `validation_thresholds`,
-`deliverable_format`, `max_loops`, `min_loops`, `constraints`,
-`research_depth`. The `constraints` slot has a fallback to legacy
-`context['constraints']` for pre-T40.1 missions.
+`deliverable_format`, `max_loops`, `min_loops`, `constraints`. The
+`constraints` slot has a fallback to legacy `context['constraints']`
+for pre-T40.1 missions.
+
+`research_depth` is NOT forwarded as of T42.2 (sprint-42). The vendored
+compiler still keys `depth_config` off the field internally, so
+TraceLab's `_build_preview_state` pins it to `"baseline"` inline. If a
+future resync exposes depth tiering through TraceLab again, restore the
+authoring path *and* add the field back to `_OPTIONAL_AUTHORING_FIELDS`.
 
 If DS's compiler starts reading a column TraceLab doesn't yet forward,
 add it to `_OPTIONAL_AUTHORING_FIELDS` during the resync (and mention

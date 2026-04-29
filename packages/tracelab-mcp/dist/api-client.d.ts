@@ -272,7 +272,6 @@ export interface Mission extends MissionAuthoringFields {
     research_phases?: Record<string, unknown>;
     tags?: string[];
     metadata?: Record<string, unknown>;
-    research_depth?: 'baseline' | 'deep' | 'alpha';
     status: 'draft' | 'queued' | 'in_progress' | 'completed' | 'blocked' | 'cancelled' | 'validation_failed';
     queued_at?: string;
     started_at?: string;
@@ -299,7 +298,6 @@ export interface MissionCreate extends MissionAuthoringFields {
     research_phases?: Record<string, unknown>;
     tags?: string[];
     metadata?: Record<string, unknown>;
-    research_depth?: 'baseline' | 'deep' | 'alpha';
     status?: string;
 }
 export interface MissionUpdate extends MissionAuthoringFields {
@@ -312,7 +310,6 @@ export interface MissionUpdate extends MissionAuthoringFields {
     research_phases?: Record<string, unknown>;
     tags?: string[];
     metadata?: Record<string, unknown>;
-    research_depth?: 'baseline' | 'deep' | 'alpha';
     status?: string;
 }
 export interface MissionListResponse {

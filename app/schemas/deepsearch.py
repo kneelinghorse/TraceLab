@@ -48,10 +48,6 @@ class DeepSearchExecuteRequest(BaseModel):
     metadata: dict[str, Any] | None = Field(
         default=None, description="Additional metadata"
     )
-    research_depth: str | None = Field(
-        default="baseline",
-        description="Research depth tier. BASELINE (8-12 min, 50-60 sources): standard thorough research — use as default. DEEP (20-25 min, 30-40 vetted sources): stricter quality gates, min 5 loops. ALPHA (1+ hour, ~20 scrutinized sources): may reject if evidence insufficient.",
-    )
 
 
 class DeepSearchExecuteResponse(BaseModel):

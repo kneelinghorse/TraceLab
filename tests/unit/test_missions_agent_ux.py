@@ -31,7 +31,6 @@ def _mission_stub(
         research_phases={},
         tags=[],
         mission_metadata={},
-        research_depth="baseline",
         status=status,
         queued_at=None,
         started_at=None,

@@ -11,6 +11,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 from app.api.v1 import (
     admin,
     auth,
+    auth_device,
     cache,
     collections,
     corrections,
@@ -286,6 +287,15 @@ app.include_router(
     dependencies=protected_dependencies,
 )
 app.include_router(auth.router, prefix=f"{settings.api_v1_prefix}/auth", tags=["auth"])
+# T42.4: device-code endpoints. /code + /token are unauthenticated by design
+# (the device_code itself is the bearer secret); /approve, /deny, and
+# /grants/{code} require an authenticated web user via the per-route
+# Depends(require_authenticated_user).
+app.include_router(
+    auth_device.router,
+    prefix=f"{settings.api_v1_prefix}/auth/device",
+    tags=["auth-device"],
+)
 # Webhooks use signature-based auth, not JWT
 app.include_router(
     webhooks.router,

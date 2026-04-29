@@ -125,10 +125,6 @@ def build_mission_context_from_mission(mission) -> dict[str, Any]:
     if constraints:
         payload["constraints"] = constraints
 
-    research_depth = getattr(mission, "research_depth", None)
-    if research_depth:
-        payload["research_depth"] = research_depth
-
     return payload
 
 
@@ -156,7 +152,11 @@ def _build_preview_state(mission_context: dict[str, Any]) -> dict[str, Any]:
         "deliverable_format": str(
             mission_context.get("deliverable_format") or "markdown"
         ),
-        "research_depth": str(mission_context.get("research_depth") or "baseline"),
+        # T42.2 (sprint-42): research_depth was removed from the authoring
+        # surface. The vendored compiler still keys depth_config off this
+        # field, so the preview path pins it to "baseline" — the only tier
+        # that was ever the default.
+        "research_depth": "baseline",
         "max_loops": mission_context.get("max_loops") or 3,
         "min_loops": mission_context.get("min_loops") or 0,
         "depth_config": {},

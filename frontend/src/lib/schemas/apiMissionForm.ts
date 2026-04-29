@@ -45,7 +45,6 @@ export const apiMissionFormSchema = z.object({
   metadata: z.record(z.string(), z.unknown()).optional(),
   status: z.enum(["draft", "queued"]).optional(),
   priority: z.enum(["low", "normal", "high"]).optional(),
-  research_depth: z.enum(["baseline", "deep", "alpha"]).optional(),
 
   // Authoring fields (T40.2) — all optional.
   background: z.string().optional(),
@@ -78,7 +77,6 @@ export const defaultApiMissionFormValues: ApiMissionFormValues = {
   metadata: {},
   status: "draft",
   priority: "normal",
-  research_depth: "baseline",
   // Authoring fields default to undefined / empty so the form starts clean.
   background: "",
   focus: "",

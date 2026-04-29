@@ -31,15 +31,32 @@ import {
   TraceLabAPIError,
   type TraceLabConfig,
 } from './api-client.js';
+import { CredentialStore, type StoredCredential } from './auth/credential-store.js';
+import {
+  DeviceCodeError,
+  runDeviceCodeFlow,
+  readPackageVersion,
+} from './auth/device-code.js';
 
-// Environment configuration
-const config: TraceLabConfig = {
-  baseUrl: process.env.TRACELAB_API_URL || 'http://localhost:8000',
+// Module-load: construct the client with whatever env credentials the
+// shell already exposes. main() replaces this client (with one carrying a
+// fresh device-flow-minted key) when neither env path provides one.
+//
+// Why two-phase: the existing test suite dynamic-imports this module to
+// reach handler exports that close over `client`. Constructing here keeps
+// those tests working without touching their fetch mocks. The module-load
+// client also covers the CI / scripted-automation path where env vars
+// supply credentials and the device-code flow never runs.
+const baseUrl = (process.env.TRACELAB_API_URL || 'http://localhost:8000').replace(
+  /\/+$/,
+  ''
+);
+
+let client: TraceLabClient = new TraceLabClient({
+  baseUrl,
   token: process.env.TRACELAB_TOKEN,
   apiKey: process.env.TRACELAB_API_KEY,
-};
-
-const client = new TraceLabClient(config);
+});
 
 // Tool definitions
 // T41.7 (sprint-41): Tool surface refactored from ~24 flat tools into 7
@@ -398,12 +415,6 @@ const TOOLS: Tool[] = [
           items: { type: 'string' },
           description: 'Categorization tags. Example: ["market-research", "competitive", "q4-2024"]',
         },
-        research_depth: {
-          type: 'string',
-          enum: ['baseline', 'deep', 'alpha'],
-          description: 'Controls research thoroughness and duration. BASELINE (8-12 min): Thorough reports with 50-60 sources across multiple loops — the standard tier for most research. DEEP (20-25 min): Higher-rigor research with 30-40 carefully vetted sources, stricter quality gates, minimum 5 loops — use when you need higher confidence. ALPHA (1+ hour): Maximum-rigor with ~20 highly scrutinized sources, very strict quality gates that may reject research if evidence is insufficient — use only when precision and source authority are critical. Default: baseline. Can be changed via action="update" or via tracelab_mission_execution(action="submit").',
-          default: 'baseline',
-        },
         // T41.4 slim/full toggle (action="get" only)
         include_execution_metadata: {
           type: 'boolean',
@@ -499,7 +510,7 @@ const TOOLS: Tool[] = [
   {
     name: 'tracelab_mission_execution',
     description:
-      'Mission execution lifecycle (DeepSearch-bound). Use tracelab_mission for create/list/get/update. Actions: submit (queue for execution; optional research_depth override), status (lightweight progress poll), preview (compile DS contract without spending a paid loop — returns named_entities, objectives, evidence_slots, acceptance_checks, deliverable_schemas, coverage/validation thresholds; useful for iterating on authoring fields). All actions require mission_id. Related cluster: tracelab_mission.',
+      'Mission execution lifecycle (DeepSearch-bound). Use tracelab_mission for create/list/get/update. Actions: submit (queue for execution), status (lightweight progress poll), preview (compile DS contract without spending a paid loop — returns named_entities, objectives, evidence_slots, acceptance_checks, deliverable_schemas, coverage/validation thresholds; useful for iterating on authoring fields). All actions require mission_id. Related cluster: tracelab_mission.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -511,11 +522,6 @@ const TOOLS: Tool[] = [
         mission_id: {
           type: 'string',
           description: 'UUID of the mission. Required for all actions.',
-        },
-        research_depth: {
-          type: 'string',
-          enum: ['baseline', 'deep', 'alpha'],
-          description: 'For action="submit" only: override mission research_depth at submission. BASELINE (8-12 min): Thorough reports with 50-60 sources — standard default. DEEP (20-25 min): 30-40 vetted sources, stricter quality gates, min 5 loops. ALPHA (1+ hour): ~20 scrutinized sources, may reject if evidence insufficient. If not provided, uses the depth set on the mission.',
         },
       },
       required: ['action', 'mission_id'],
@@ -705,7 +711,6 @@ const CreateMissionInput = z.object({
   project_id: z.string().uuid(),
   deliverables: z.array(z.string()).optional(),
   tags: z.array(z.string()).optional(),
-  research_depth: z.enum(['baseline', 'deep', 'alpha']).optional().default('baseline'),
   ...MissionAuthoringFieldsSchema,
 });
 
@@ -730,7 +735,6 @@ const UpdateMissionInput = z.object({
   title: z.string().min(1).optional(),
   objective: z.string().min(1).optional(),
   success_criteria: z.array(z.string()).optional(),
-  research_depth: z.enum(['baseline', 'deep', 'alpha']).optional(),
   deliverables: z.array(z.string()).optional(),
   tags: z.array(z.string()).optional(),
   // DEPRECATED: prefer explicit authoring fields below. Kept for back-compat.
@@ -740,7 +744,6 @@ const UpdateMissionInput = z.object({
 
 const SubmitMissionInput = z.object({
   mission_id: z.string().uuid(),
-  research_depth: z.enum(['baseline', 'deep', 'alpha']).optional(),
 });
 
 const GetMissionStatusInput = z.object({
@@ -1430,7 +1433,6 @@ async function handleCreateMission(args: unknown) {
     project_id: input.project_id,
     deliverables: input.deliverables,
     tags: input.tags,
-    research_depth: input.research_depth,
     ...pickAuthoringFields(input),
   });
 
@@ -1447,7 +1449,6 @@ async function handleCreateMission(args: unknown) {
               title: result.title,
               objective: result.objective,
               status: result.status,
-              research_depth: result.research_depth,
               created_at: result.created_at,
             },
           },
@@ -1594,7 +1595,6 @@ export async function handleGetMission(args: unknown) {
             objective: result.objective,
             success_criteria: result.success_criteria,
             status: result.status,
-            research_depth: result.research_depth,
             project_id: result.project_id,
             context: result.context,
             deliverables: result.deliverables,
@@ -1649,7 +1649,6 @@ async function handleUpdateMission(args: unknown) {
   if (input.title !== undefined) updateData.title = input.title;
   if (input.objective !== undefined) updateData.objective = input.objective;
   if (input.success_criteria !== undefined) updateData.success_criteria = input.success_criteria;
-  if (input.research_depth !== undefined) updateData.research_depth = input.research_depth;
   if (input.deliverables !== undefined) updateData.deliverables = input.deliverables;
   if (input.tags !== undefined) updateData.tags = input.tags;
   if (input.context !== undefined) updateData.context = input.context;
@@ -1671,7 +1670,6 @@ async function handleUpdateMission(args: unknown) {
               objective: result.objective,
               success_criteria: result.success_criteria,
               status: result.status,
-              research_depth: result.research_depth,
               project_id: result.project_id,
               deliverables: result.deliverables,
               tags: result.tags,
@@ -1721,13 +1719,6 @@ async function handlePreviewMissionContract(args: unknown) {
 async function handleSubmitMission(args: unknown) {
   const input = SubmitMissionInput.parse(args);
 
-  // If research_depth override is provided, update the mission first
-  if (input.research_depth) {
-    await client.updateMission(input.mission_id, {
-      research_depth: input.research_depth,
-    });
-  }
-
   const result = await client.submitMission(input.mission_id);
 
   return {
@@ -1742,7 +1733,6 @@ async function handleSubmitMission(args: unknown) {
             mission_id: result.mission_id,
             uuid: result.uuid,
             job_id: result.job_id,
-            research_depth: input.research_depth || 'unchanged',
           },
           null,
           2
@@ -1945,8 +1935,76 @@ export const CLUSTER_ACTIONS = {
   tracelab_mission_execution: MISSION_EXECUTION_ACTIONS,
 } as const;
 
+/**
+ * Resolve the auth credential the MCP client will use against TraceLab.
+ *
+ * Order of precedence (highest first):
+ *   1. `TRACELAB_TOKEN` env var (JWT, kept for CI / scripted automation).
+ *   2. `TRACELAB_API_KEY` env var (legacy `tl_*` API key, also CI/automation).
+ *   3. Stored credential at `~/.config/tracelab-mcp/credentials.json`,
+ *      provided its `apiBaseUrl` matches the effective base URL.
+ *   4. Interactive device-code flow (T42.4) — prints a URL + short code to
+ *      stderr, polls until the human approves on the web /device page,
+ *      stores the minted key in the credential store for next launch.
+ *
+ * Step 4 is what makes a fresh `npx @aquex/tracelab-mcp` install work
+ * without the user pasting any key into env first.
+ */
+async function resolveAuthConfig(
+  store: CredentialStore = new CredentialStore()
+): Promise<TraceLabConfig> {
+  if (process.env.TRACELAB_TOKEN) {
+    return { baseUrl, token: process.env.TRACELAB_TOKEN };
+  }
+  if (process.env.TRACELAB_API_KEY) {
+    return { baseUrl, apiKey: process.env.TRACELAB_API_KEY };
+  }
+
+  const stored = await store.read();
+  if (stored && stored.apiBaseUrl === baseUrl) {
+    return { baseUrl, apiKey: stored.key };
+  }
+  if (stored) {
+    console.error(
+      `[tracelab-mcp] Stored credential targets ${stored.apiBaseUrl}, ` +
+        `but TRACELAB_API_URL is ${baseUrl}. Re-running device login.`
+    );
+  }
+
+  const version = await readPackageVersion();
+  let token: { accessToken: string; keyId: string; label: string };
+  try {
+    token = await runDeviceCodeFlow({ baseUrl, version });
+  } catch (err) {
+    if (err instanceof DeviceCodeError) {
+      console.error(
+        `[tracelab-mcp] Device login failed (${err.code}): ${err.message}`
+      );
+    } else {
+      console.error('[tracelab-mcp] Device login failed:', err);
+    }
+    throw err;
+  }
+
+  const record: StoredCredential = {
+    apiBaseUrl: baseUrl,
+    key: token.accessToken,
+    keyId: token.keyId,
+    label: token.label,
+    issuedAt: new Date().toISOString(),
+  };
+  await store.write(record);
+  console.error(
+    `[tracelab-mcp] Logged in as "${token.label}". Credential saved to ${store.path}.`
+  );
+  return { baseUrl, apiKey: token.accessToken };
+}
+
 // Create and run the server
 async function main() {
+  const config = await resolveAuthConfig();
+  client = new TraceLabClient(config);
+
   const server = new Server(
     {
       name: 'tracelab-mcp',
@@ -2064,13 +2122,24 @@ async function main() {
 
   // Log startup to stderr (stdout is for MCP protocol)
   console.error('TraceLab MCP server started');
-  console.error(`API URL: ${config.baseUrl}`);
+  console.error(`API URL: ${baseUrl}`);
   console.error(
-    `Auth: ${config.token ? 'JWT Token' : config.apiKey ? 'API Key' : 'None (unauthenticated)'}`
+    `Auth: ${
+      process.env.TRACELAB_TOKEN
+        ? 'JWT Token (env)'
+        : process.env.TRACELAB_API_KEY
+          ? 'API Key (env)'
+          : 'API Key (device-login credential store)'
+    }`
   );
 }
 
-main().catch((error) => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
-});
+// Only kick the server when this module is invoked as the bin entry. Vitest
+// imports the module to test handler exports — auto-running main() there
+// would hang on the device-code flow with no env credentials configured.
+if (!process.env.VITEST) {
+  main().catch((error) => {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  });
+}

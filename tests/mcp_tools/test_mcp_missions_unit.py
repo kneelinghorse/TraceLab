@@ -34,7 +34,6 @@ def _make_mission_mock(**overrides):
     mission.research_phases = overrides.pop("research_phases", {})
     mission.tags = overrides.pop("tags", [])
     mission.mission_metadata = overrides.pop("mission_metadata", {})
-    mission.research_depth = overrides.pop("research_depth", "baseline")
     # Mission-authoring fields (T40.1).
     mission.background = overrides.pop("background", None)
     mission.focus = overrides.pop("focus", None)

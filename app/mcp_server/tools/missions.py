@@ -138,7 +138,6 @@ def _serialize_mission(mission, *, slim: bool = True) -> dict[str, Any]:
         "research_phases": mission.research_phases or {},
         "tags": mission.tags or [],
         "metadata": mission.mission_metadata or {},
-        "research_depth": mission.research_depth or "baseline",
         # Mission-authoring fields (T40.1/T40.2). Mirror MissionResponse so
         # MCP agents can see the full mission shape REST already returns.
         "background": mission.background,
@@ -247,12 +246,6 @@ MISSION_TOOLS: list[Tool] = [
                     "maximum": 10,
                     "description": "Maximum DeepSearch iteration loops (optional)",
                 },
-                "research_depth": {
-                    "type": "string",
-                    "enum": ["baseline", "deep", "alpha"],
-                    "default": "baseline",
-                    "description": "Research depth tier. BASELINE (8-12 min): Thorough reports with 50-60 sources across multiple loops — the standard tier for most research. DEEP (20-25 min): Higher-rigor research with 30-40 carefully vetted sources, stricter quality gates, minimum 5 loops — use when you need higher confidence. ALPHA (1+ hour): Maximum-rigor with ~20 highly scrutinized sources, very strict quality gates that may reject research if evidence is insufficient — use only when precision and source authority are critical.",
-                },
             },
             "required": [
                 "mission_id",
@@ -346,11 +339,6 @@ MISSION_TOOLS: list[Tool] = [
                     "type": "string",
                     "description": "The mission's human-readable ID (e.g., 'B16.1') or UUID",
                 },
-                "research_depth": {
-                    "type": "string",
-                    "enum": ["baseline", "deep", "alpha"],
-                    "description": "Override research depth at submission time. If not provided, uses the depth set at creation (default: baseline)",
-                },
             },
             "required": ["mission_id"],
         },
@@ -429,7 +417,6 @@ async def handle_create_mission(arguments: dict[str, Any]) -> list[TextContent]:
             research_phases=arguments.get("research_phases", {}),
             tags=arguments.get("tags", []),
             metadata=metadata,
-            research_depth=arguments.get("research_depth", "baseline"),
             status="draft",
             created_by="mcp-tool",
         )
@@ -616,13 +603,6 @@ async def handle_submit_mission(arguments: dict[str, Any]) -> list[TextContent]:
                 )
                 callback_url = f"{base_url}/api/v1/webhooks/deepsearch"
 
-                # Use override research_depth if provided, else mission's depth
-                effective_depth = (
-                    arguments.get("research_depth")
-                    or mission.research_depth
-                    or "baseline"
-                )
-
                 try:
                     client = DeepSearchClient()
                     response = await client.execute_mission(
@@ -635,7 +615,6 @@ async def handle_submit_mission(arguments: dict[str, Any]) -> list[TextContent]:
                         deliverables=mission.deliverables or [],
                         research_phases=mission.research_phases or {},
                         metadata=mission.mission_metadata or {},
-                        research_depth=effective_depth,
                     )
                     job_id = response.job_id
                     logger.info(

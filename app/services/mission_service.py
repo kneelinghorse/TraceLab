@@ -157,7 +157,6 @@ class MissionService:
             tags=data.tags or [],
             mission_metadata=data.metadata
             or {},  # Schema uses 'metadata', model uses 'mission_metadata'
-            research_depth=data.research_depth or "baseline",
             status=data.status or "draft",
             created_by=data.created_by,
             # Authoring fields (T40.1/T40.2) — nullable; pass through as-is.
