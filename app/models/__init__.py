@@ -4,6 +4,7 @@ from app.core.database import Base
 from app.models.api_key import APIKey
 from app.models.chunk import DocumentChunk
 from app.models.collection import Collection, CollectionItem
+from app.models.device_authorization import DeviceAuthorizationGrant
 from app.models.document import Document
 from app.models.graph_edge import GraphEdge
 from app.models.idempotency import IdempotencyRecord
@@ -48,4 +49,5 @@ __all__ = [
     "GraphEdge",
     "User",
     "InviteCode",
+    "DeviceAuthorizationGrant",
 ]

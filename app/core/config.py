@@ -81,6 +81,11 @@ class Settings(BaseSettings):
     )
     cors_allow_credentials: bool = True
 
+    # Frontend URL — used to build the device-code verification_uri (T42.4)
+    # the MCP client prints to its terminal. Dev defaults to localhost; prod
+    # deployments override via env var.
+    frontend_url: str = "http://localhost:3000"
+
     # PEDR cache settings
     pedr_cache_max_size: int = 1000  # Max cached queries
     pedr_cache_ttl_seconds: int = 300  # 5 minutes TTL

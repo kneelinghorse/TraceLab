@@ -31,15 +31,32 @@ import {
   TraceLabAPIError,
   type TraceLabConfig,
 } from './api-client.js';
+import { CredentialStore, type StoredCredential } from './auth/credential-store.js';
+import {
+  DeviceCodeError,
+  runDeviceCodeFlow,
+  readPackageVersion,
+} from './auth/device-code.js';
 
-// Environment configuration
-const config: TraceLabConfig = {
-  baseUrl: process.env.TRACELAB_API_URL || 'http://localhost:8000',
+// Module-load: construct the client with whatever env credentials the
+// shell already exposes. main() replaces this client (with one carrying a
+// fresh device-flow-minted key) when neither env path provides one.
+//
+// Why two-phase: the existing test suite dynamic-imports this module to
+// reach handler exports that close over `client`. Constructing here keeps
+// those tests working without touching their fetch mocks. The module-load
+// client also covers the CI / scripted-automation path where env vars
+// supply credentials and the device-code flow never runs.
+const baseUrl = (process.env.TRACELAB_API_URL || 'http://localhost:8000').replace(
+  /\/+$/,
+  ''
+);
+
+let client: TraceLabClient = new TraceLabClient({
+  baseUrl,
   token: process.env.TRACELAB_TOKEN,
   apiKey: process.env.TRACELAB_API_KEY,
-};
-
-const client = new TraceLabClient(config);
+});
 
 // Tool definitions
 // T41.7 (sprint-41): Tool surface refactored from ~24 flat tools into 7
@@ -1918,8 +1935,76 @@ export const CLUSTER_ACTIONS = {
   tracelab_mission_execution: MISSION_EXECUTION_ACTIONS,
 } as const;
 
+/**
+ * Resolve the auth credential the MCP client will use against TraceLab.
+ *
+ * Order of precedence (highest first):
+ *   1. `TRACELAB_TOKEN` env var (JWT, kept for CI / scripted automation).
+ *   2. `TRACELAB_API_KEY` env var (legacy `tl_*` API key, also CI/automation).
+ *   3. Stored credential at `~/.config/tracelab-mcp/credentials.json`,
+ *      provided its `apiBaseUrl` matches the effective base URL.
+ *   4. Interactive device-code flow (T42.4) — prints a URL + short code to
+ *      stderr, polls until the human approves on the web /device page,
+ *      stores the minted key in the credential store for next launch.
+ *
+ * Step 4 is what makes a fresh `npx @aquex/tracelab-mcp` install work
+ * without the user pasting any key into env first.
+ */
+async function resolveAuthConfig(
+  store: CredentialStore = new CredentialStore()
+): Promise<TraceLabConfig> {
+  if (process.env.TRACELAB_TOKEN) {
+    return { baseUrl, token: process.env.TRACELAB_TOKEN };
+  }
+  if (process.env.TRACELAB_API_KEY) {
+    return { baseUrl, apiKey: process.env.TRACELAB_API_KEY };
+  }
+
+  const stored = await store.read();
+  if (stored && stored.apiBaseUrl === baseUrl) {
+    return { baseUrl, apiKey: stored.key };
+  }
+  if (stored) {
+    console.error(
+      `[tracelab-mcp] Stored credential targets ${stored.apiBaseUrl}, ` +
+        `but TRACELAB_API_URL is ${baseUrl}. Re-running device login.`
+    );
+  }
+
+  const version = await readPackageVersion();
+  let token: { accessToken: string; keyId: string; label: string };
+  try {
+    token = await runDeviceCodeFlow({ baseUrl, version });
+  } catch (err) {
+    if (err instanceof DeviceCodeError) {
+      console.error(
+        `[tracelab-mcp] Device login failed (${err.code}): ${err.message}`
+      );
+    } else {
+      console.error('[tracelab-mcp] Device login failed:', err);
+    }
+    throw err;
+  }
+
+  const record: StoredCredential = {
+    apiBaseUrl: baseUrl,
+    key: token.accessToken,
+    keyId: token.keyId,
+    label: token.label,
+    issuedAt: new Date().toISOString(),
+  };
+  await store.write(record);
+  console.error(
+    `[tracelab-mcp] Logged in as "${token.label}". Credential saved to ${store.path}.`
+  );
+  return { baseUrl, apiKey: token.accessToken };
+}
+
 // Create and run the server
 async function main() {
+  const config = await resolveAuthConfig();
+  client = new TraceLabClient(config);
+
   const server = new Server(
     {
       name: 'tracelab-mcp',
@@ -2037,13 +2122,24 @@ async function main() {
 
   // Log startup to stderr (stdout is for MCP protocol)
   console.error('TraceLab MCP server started');
-  console.error(`API URL: ${config.baseUrl}`);
+  console.error(`API URL: ${baseUrl}`);
   console.error(
-    `Auth: ${config.token ? 'JWT Token' : config.apiKey ? 'API Key' : 'None (unauthenticated)'}`
+    `Auth: ${
+      process.env.TRACELAB_TOKEN
+        ? 'JWT Token (env)'
+        : process.env.TRACELAB_API_KEY
+          ? 'API Key (env)'
+          : 'API Key (device-login credential store)'
+    }`
   );
 }
 
-main().catch((error) => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
-});
+// Only kick the server when this module is invoked as the bin entry. Vitest
+// imports the module to test handler exports — auto-running main() there
+// would hang on the device-code flow with no env credentials configured.
+if (!process.env.VITEST) {
+  main().catch((error) => {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  });
+}
