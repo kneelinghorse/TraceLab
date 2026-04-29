@@ -1,7 +1,7 @@
 {
-  "name": "@tracelab/mcp-server",
+  "name": "@aquex/tracelab-mcp",
   "version": "1.0.0",
-  "description": "MCP server for TraceLab - enables AI agents to perform research-to-output loops",
+  "description": "MCP server for TraceLab — gives AI agents research-to-output loops against a TraceLab knowledge base. Seven action-clustered tools (search, project, collection, report, document, mission, mission-execution) and an RFC 8628 device-code login so installers don't hand-paste API keys.",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
@@ -20,12 +20,29 @@
     "mcp",
     "model-context-protocol",
     "tracelab",
+    "aquex",
     "ai-agent",
     "research",
-    "knowledge-base"
+    "knowledge-base",
+    "claude",
+    "claude-desktop",
+    "claude-code",
+    "rag"
   ],
-  "author": "TraceLab",
+  "author": "Aquex",
   "license": "MIT",
+  "homepage": "https://github.com/kneelinghorse/TraceLab/tree/main/packages/tracelab-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kneelinghorse/TraceLab.git",
+    "directory": "packages/tracelab-mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/kneelinghorse/TraceLab/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "zod": "^3.23.8"
@@ -40,6 +57,7 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ]
 }
