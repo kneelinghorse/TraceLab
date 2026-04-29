@@ -129,8 +129,6 @@ export interface EvidenceLinkPayload {
 /**
  * Mission entity from the API (B16.1+ schema)
  */
-export type ResearchDepth = "baseline" | "deep" | "alpha";
-
 export interface MissionReference {
   title: string;
   [key: string]: unknown;
@@ -165,7 +163,6 @@ export interface ApiMission extends MissionAuthoringFields {
   research_phases: Record<string, unknown>;
   tags: string[];
   metadata: Record<string, unknown>;
-  research_depth: ResearchDepth;
   status: MissionStatus;
   queued_at: string | null;
   started_at: string | null;
@@ -193,7 +190,6 @@ export interface ApiMissionCreate extends MissionAuthoringFields {
   research_phases?: Record<string, unknown>;
   tags?: string[];
   metadata?: Record<string, unknown>;
-  research_depth?: ResearchDepth;
   status?: MissionStatus;
   created_by?: string;
 }
@@ -207,7 +203,6 @@ export interface ApiMissionUpdate extends MissionAuthoringFields {
   research_phases?: Record<string, unknown>;
   tags?: string[];
   metadata?: Record<string, unknown>;
-  research_depth?: ResearchDepth;
   status?: MissionStatus;
   deepsearch_job_id?: string;
   result_document_ids?: string[];

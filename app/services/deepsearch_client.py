@@ -175,7 +175,6 @@ class DeepSearchClient:
         deliverables: list[str] | None = None,
         research_phases: dict[str, Any] | None = None,
         metadata: dict[str, Any] | None = None,
-        research_depth: str | None = "baseline",
     ) -> DeepSearchExecuteResponse:
         """Submit a mission for execution on DeepSearch.
 
@@ -189,7 +188,6 @@ class DeepSearchClient:
             deliverables: Expected deliverables.
             research_phases: Research phase configuration.
             metadata: Additional metadata.
-            research_depth: Research depth tier (baseline, deep, or alpha).
 
         Returns:
             DeepSearchExecuteResponse with job_id for tracking.
@@ -212,7 +210,6 @@ class DeepSearchClient:
             deliverables=deliverables,
             research_phases=research_phases,
             metadata=metadata,
-            research_depth=research_depth,
         )
 
         try:

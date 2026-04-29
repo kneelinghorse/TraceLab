@@ -19,9 +19,6 @@ MissionStatus = Literal[
     "blocked", "cancelled", "validation_failed",
 ]
 
-# Valid research depth tiers
-ResearchDepth = Literal["baseline", "deep", "alpha"]
-
 # Mission ID pattern: starts with alphanumeric, can contain dots, dashes, underscores
 MISSION_ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
@@ -107,10 +104,6 @@ class MissionCreate(MissionBase):
     metadata: dict[str, Any] | None = Field(
         default_factory=dict,
         description="Arbitrary metadata object",
-    )
-    research_depth: ResearchDepth | None = Field(
-        "baseline",
-        description="Research depth tier. BASELINE (8-12 min, 50-60 sources): standard thorough research — use as default. DEEP (20-25 min, 30-40 vetted sources): stricter quality gates, min 5 loops. ALPHA (1+ hour, ~20 scrutinized sources): may reject if evidence insufficient.",
     )
     # Mission-authoring fields consumed by DeepSearch contract compiler (T40.1).
     background: str | None = Field(
@@ -224,10 +217,6 @@ class MissionUpdate(BaseModel):
     metadata: dict[str, Any] | None = Field(
         None,
         description="Arbitrary metadata object",
-    )
-    research_depth: ResearchDepth | None = Field(
-        None,
-        description="Research depth tier. BASELINE (8-12 min, 50-60 sources): standard thorough research. DEEP (20-25 min, 30-40 vetted sources): stricter quality gates. ALPHA (1+ hour, ~20 scrutinized sources): may reject if evidence insufficient.",
     )
     # Mission-authoring fields (T40.1) — all optional on update.
     background: str | None = Field(
@@ -343,10 +332,6 @@ class MissionResponse(MissionBase):
     research_phases: dict[str, Any] = Field(default_factory=dict)
     tags: list[str] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(default_factory=dict)
-    research_depth: ResearchDepth | None = Field(
-        "baseline",
-        description="Research depth tier. BASELINE (8-12 min, 50-60 sources): standard thorough research. DEEP (20-25 min, 30-40 vetted sources): stricter quality gates. ALPHA (1+ hour, ~20 scrutinized sources): may reject if evidence insufficient.",
-    )
     # Mission-authoring fields (T40.1).
     background: str | None = None
     focus: str | None = None

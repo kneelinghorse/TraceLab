@@ -14,8 +14,8 @@ this stops being something we discover via paid smoke regressions."*
 
 | Project | Commit | Branch | Date |
 | --- | --- | --- | --- |
-| TraceLab | sprint-41 T41.7 (cluster refactor) | `sprint-40` | 2026-04-27 |
-| DeepSearch.alpha | `aca902f` | `contract-driven-pipeline` | 2026-04-27 |
+| TraceLab | sprint-42 T42.2 (research_depth data-layer drop) | `domain-cutover+cleanup` | 2026-04-29 |
+| DeepSearch.alpha | `aca902f` (DS poller.py:133 + :249-254 land in lockstep) | `contract-driven-pipeline` | 2026-04-27 |
 
 The vendored DS contract compiler at `app/services/contract_compiler/` is
 pinned separately to DS commit `24e8810`; see

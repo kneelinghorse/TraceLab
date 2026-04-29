@@ -115,13 +115,6 @@ class Mission(Base):
         default=dict,
         comment="Arbitrary metadata object",
     )
-    research_depth = Column(
-        String(20),
-        nullable=True,
-        default="baseline",
-        comment="Research depth tier: baseline, deep, or alpha",
-    )
-
     # Mission-authoring fields consumed by DeepSearch contract compiler (T40.1).
     # All nullable; see alembic/versions/027_add_mission_authoring_fields.py.
     background = Column(
@@ -284,11 +277,6 @@ class Mission(Base):
             "'blocked', 'cancelled', 'validation_failed')",
             name="valid_mission_status",
         ),
-        # Valid research_depth values (nullable allowed)
-        CheckConstraint(
-            "research_depth IS NULL OR research_depth IN ('baseline', 'deep', 'alpha')",
-            name="valid_research_depth",
-        ),
         # Composite index for project + status queries
         Index("idx_missions_project_status", "project_id", "status"),
         # Index for mission_id lookups
@@ -310,7 +298,6 @@ class Mission(Base):
             "research_phases": self.research_phases or {},
             "tags": self.tags or [],
             "metadata": self.mission_metadata or {},
-            "research_depth": self.research_depth,
             "background": self.background,
             "focus": self.focus,
             "references": self.references,
@@ -371,7 +358,6 @@ class Mission(Base):
             "research_phases": self.research_phases or {},
             "tags": self.tags or [],
             "metadata": self.mission_metadata or {},
-            "research_depth": self.research_depth or "baseline",
             "background": self.background,
             "focus": self.focus,
             "references": self.references,
@@ -405,7 +391,6 @@ class Mission(Base):
             research_phases=protocol.get("research_phases", {}),
             tags=protocol.get("tags", []),
             mission_metadata=protocol.get("metadata", {}),
-            research_depth=protocol.get("research_depth", "baseline"),
             background=protocol.get("background"),
             focus=protocol.get("focus"),
             references=protocol.get("references"),

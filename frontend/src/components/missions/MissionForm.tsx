@@ -155,7 +155,6 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
           priority: values.priority,
           ...values.metadata,
         },
-        research_depth: values.research_depth || "baseline",
         status: submitStatus,
         // Authoring fields — send only those the author actually filled in.
         background: values.background?.trim() || undefined,
@@ -275,40 +274,26 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
           </h2>
         </header>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="form-label">
-              Project <span className="text-red-500">*</span>
-            </label>
-            <select {...register("project_id")} className="form-input">
-              <option value="">Select a project</option>
-              {projects.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-            {!isProjectSelected && (
-              <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
-                Required — missions must belong to a project
-              </p>
-            )}
-            {errors.project_id && (
-              <p className="form-error">{errors.project_id.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="form-label">Research Depth</label>
-            <select {...register("research_depth")} className="form-input">
-              <option value="baseline">Baseline - Standard (8-12 min, 50-60 sources)</option>
-              <option value="deep">Deep - Higher Rigor (20-25 min, 30-40 sources)</option>
-              <option value="alpha">Alpha - Maximum Rigor (1+ hour, ~20 sources)</option>
-            </select>
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Controls research thoroughness and source depth
+        <div>
+          <label className="form-label">
+            Project <span className="text-red-500">*</span>
+          </label>
+          <select {...register("project_id")} className="form-input">
+            <option value="">Select a project</option>
+            {projects.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+          {!isProjectSelected && (
+            <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+              Required — missions must belong to a project
             </p>
-          </div>
+          )}
+          {errors.project_id && (
+            <p className="form-error">{errors.project_id.message}</p>
+          )}
         </div>
 
         <div>

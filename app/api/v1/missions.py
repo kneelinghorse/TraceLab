@@ -80,7 +80,6 @@ def _to_response(mission) -> MissionResponse:
         research_phases=mission.research_phases or {},
         tags=mission.tags or [],
         metadata=mission.mission_metadata or {},  # Map mission_metadata -> metadata
-        research_depth=mission.research_depth or "baseline",
         # Mission-authoring fields (T40.1/T40.2).
         background=mission.background,
         focus=mission.focus,
