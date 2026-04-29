@@ -398,12 +398,6 @@ const TOOLS: Tool[] = [
           items: { type: 'string' },
           description: 'Categorization tags. Example: ["market-research", "competitive", "q4-2024"]',
         },
-        research_depth: {
-          type: 'string',
-          enum: ['baseline', 'deep', 'alpha'],
-          description: 'Controls research thoroughness and duration. BASELINE (8-12 min): Thorough reports with 50-60 sources across multiple loops — the standard tier for most research. DEEP (20-25 min): Higher-rigor research with 30-40 carefully vetted sources, stricter quality gates, minimum 5 loops — use when you need higher confidence. ALPHA (1+ hour): Maximum-rigor with ~20 highly scrutinized sources, very strict quality gates that may reject research if evidence is insufficient — use only when precision and source authority are critical. Default: baseline. Can be changed via action="update" or via tracelab_mission_execution(action="submit").',
-          default: 'baseline',
-        },
         // T41.4 slim/full toggle (action="get" only)
         include_execution_metadata: {
           type: 'boolean',
@@ -499,7 +493,7 @@ const TOOLS: Tool[] = [
   {
     name: 'tracelab_mission_execution',
     description:
-      'Mission execution lifecycle (DeepSearch-bound). Use tracelab_mission for create/list/get/update. Actions: submit (queue for execution; optional research_depth override), status (lightweight progress poll), preview (compile DS contract without spending a paid loop — returns named_entities, objectives, evidence_slots, acceptance_checks, deliverable_schemas, coverage/validation thresholds; useful for iterating on authoring fields). All actions require mission_id. Related cluster: tracelab_mission.',
+      'Mission execution lifecycle (DeepSearch-bound). Use tracelab_mission for create/list/get/update. Actions: submit (queue for execution), status (lightweight progress poll), preview (compile DS contract without spending a paid loop — returns named_entities, objectives, evidence_slots, acceptance_checks, deliverable_schemas, coverage/validation thresholds; useful for iterating on authoring fields). All actions require mission_id. Related cluster: tracelab_mission.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -511,11 +505,6 @@ const TOOLS: Tool[] = [
         mission_id: {
           type: 'string',
           description: 'UUID of the mission. Required for all actions.',
-        },
-        research_depth: {
-          type: 'string',
-          enum: ['baseline', 'deep', 'alpha'],
-          description: 'For action="submit" only: override mission research_depth at submission. BASELINE (8-12 min): Thorough reports with 50-60 sources — standard default. DEEP (20-25 min): 30-40 vetted sources, stricter quality gates, min 5 loops. ALPHA (1+ hour): ~20 scrutinized sources, may reject if evidence insufficient. If not provided, uses the depth set on the mission.',
         },
       },
       required: ['action', 'mission_id'],
@@ -705,7 +694,6 @@ const CreateMissionInput = z.object({
   project_id: z.string().uuid(),
   deliverables: z.array(z.string()).optional(),
   tags: z.array(z.string()).optional(),
-  research_depth: z.enum(['baseline', 'deep', 'alpha']).optional().default('baseline'),
   ...MissionAuthoringFieldsSchema,
 });
 
@@ -730,7 +718,6 @@ const UpdateMissionInput = z.object({
   title: z.string().min(1).optional(),
   objective: z.string().min(1).optional(),
   success_criteria: z.array(z.string()).optional(),
-  research_depth: z.enum(['baseline', 'deep', 'alpha']).optional(),
   deliverables: z.array(z.string()).optional(),
   tags: z.array(z.string()).optional(),
   // DEPRECATED: prefer explicit authoring fields below. Kept for back-compat.
@@ -740,7 +727,6 @@ const UpdateMissionInput = z.object({
 
 const SubmitMissionInput = z.object({
   mission_id: z.string().uuid(),
-  research_depth: z.enum(['baseline', 'deep', 'alpha']).optional(),
 });
 
 const GetMissionStatusInput = z.object({
@@ -1430,7 +1416,6 @@ async function handleCreateMission(args: unknown) {
     project_id: input.project_id,
     deliverables: input.deliverables,
     tags: input.tags,
-    research_depth: input.research_depth,
     ...pickAuthoringFields(input),
   });
 
@@ -1447,7 +1432,6 @@ async function handleCreateMission(args: unknown) {
               title: result.title,
               objective: result.objective,
               status: result.status,
-              research_depth: result.research_depth,
               created_at: result.created_at,
             },
           },
@@ -1594,7 +1578,6 @@ export async function handleGetMission(args: unknown) {
             objective: result.objective,
             success_criteria: result.success_criteria,
             status: result.status,
-            research_depth: result.research_depth,
             project_id: result.project_id,
             context: result.context,
             deliverables: result.deliverables,
@@ -1649,7 +1632,6 @@ async function handleUpdateMission(args: unknown) {
   if (input.title !== undefined) updateData.title = input.title;
   if (input.objective !== undefined) updateData.objective = input.objective;
   if (input.success_criteria !== undefined) updateData.success_criteria = input.success_criteria;
-  if (input.research_depth !== undefined) updateData.research_depth = input.research_depth;
   if (input.deliverables !== undefined) updateData.deliverables = input.deliverables;
   if (input.tags !== undefined) updateData.tags = input.tags;
   if (input.context !== undefined) updateData.context = input.context;
@@ -1671,7 +1653,6 @@ async function handleUpdateMission(args: unknown) {
               objective: result.objective,
               success_criteria: result.success_criteria,
               status: result.status,
-              research_depth: result.research_depth,
               project_id: result.project_id,
               deliverables: result.deliverables,
               tags: result.tags,
@@ -1721,13 +1702,6 @@ async function handlePreviewMissionContract(args: unknown) {
 async function handleSubmitMission(args: unknown) {
   const input = SubmitMissionInput.parse(args);
 
-  // If research_depth override is provided, update the mission first
-  if (input.research_depth) {
-    await client.updateMission(input.mission_id, {
-      research_depth: input.research_depth,
-    });
-  }
-
   const result = await client.submitMission(input.mission_id);
 
   return {
@@ -1742,7 +1716,6 @@ async function handleSubmitMission(args: unknown) {
             mission_id: result.mission_id,
             uuid: result.uuid,
             job_id: result.job_id,
-            research_depth: input.research_depth || 'unchanged',
           },
           null,
           2

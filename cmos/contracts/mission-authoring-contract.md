@@ -106,7 +106,6 @@ inside `context['constraints']`. The REST `_to_response`, MCP
 | `research_phases` | `MissionCreate.research_phases` | `research_phases` | ✓ |
 | `tags` | `MissionCreate.tags` | `tags` | ✗ |
 | `metadata` (column: `mission_metadata`) | `MissionCreate.metadata` | `mission_metadata` | ✗ |
-| `research_depth` | `MissionCreate.research_depth` | `research_depth` | ✓ |
 | `status` | `MissionCreate.status` | `status` | ✓ (filter only) |
 | `created_by` | `MissionCreate.created_by` | `created_by` | ✗ |
 
