@@ -5,6 +5,27 @@ All notable changes to `@aquex/tracelab-mcp` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] — 2026-04-30
+
+Hotfix release. The 1.0.0 build crashed on startup for every fresh
+install. Anyone who ran `npx -y @aquex/tracelab-mcp` or
+`npm install -g @aquex/tracelab-mcp` against the 1.0.0 tarball got an
+immediate `ReferenceError: __dirname is not defined` before any
+device-code prompt could appear.
+
+### Fixed
+
+- **ESM/CJS mismatch in `auth/device-code.ts`.** The package ships as
+  ESM (`"type": "module"`) but `readPackageVersion()` referenced the
+  CommonJS-only `__dirname` global. Replaced with the standard ESM
+  derivation (`fileURLToPath(import.meta.url)`). The User-Agent string
+  sent to `/api/v1/auth/device/code` once again carries the correct
+  package version.
+
+Local smoke test against `https://api.namozine.com` confirmed the full
+device-code flow now completes: prompt prints → user approves → key
+mints → MCP server starts → authenticated `/missions` call returns.
+
 ## [1.0.0] — 2026-04-29
 
 First public release on npm. The package shipped previously inside the

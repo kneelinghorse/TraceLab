@@ -27,6 +27,9 @@
 import os from 'os';
 import path from 'path';
 import { promises as fs } from 'fs';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** Response from `POST /api/v1/auth/device/code`. */
 export interface DeviceCodeResponse {
