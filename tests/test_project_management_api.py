@@ -6,7 +6,7 @@ from uuid import uuid4
 
 import pytest
 
-from app.schemas.project import ProjectCreate, ProjectStats, ProjectUpdate
+from app.schemas.project import ProjectCreate, ProjectRead, ProjectStats, ProjectUpdate
 
 
 @pytest.fixture
@@ -134,3 +134,52 @@ class TestProjectQueryService:
         params = list(sig.parameters.keys())
         assert "db" in params
         assert "project_id" in params
+
+
+class TestProjectSchemaOwnership:
+    """T43.4: user_id is no longer a client-settable input field."""
+
+    def test_project_create_no_longer_accepts_user_id(self):
+        assert "user_id" not in ProjectCreate.model_fields
+        # An extra user_id in the payload is silently ignored, never recorded.
+        data = ProjectCreate(name="x", user_id=str(uuid4()))
+        assert "user_id" not in data.model_dump()
+
+    def test_project_update_no_longer_accepts_user_id(self):
+        assert "user_id" not in ProjectUpdate.model_fields
+        data = ProjectUpdate(name="y", user_id=str(uuid4()))
+        assert "user_id" not in data.model_dump(exclude_unset=True)
+
+    def test_project_read_still_exposes_user_id_for_backward_compat(self):
+        # Response contract is preserved (option B); the value is null for projects
+        # created after T43.4. owner_id is the authoritative owner (surfaced later).
+        assert "user_id" in ProjectRead.model_fields
+
+
+class TestProjectOwnershipWritePath:
+    """T43.4: owner_id is derived from the authenticated caller, not the body."""
+
+    def test_create_records_owner_from_caller_and_ignores_body_user_id(self, db_session, auth_headers):
+        from fastapi.testclient import TestClient
+
+        from app.main import app
+        from app.models.project import Project
+        from app.models.user import User
+        from app.services.ownership import bootstrap_owner_email
+
+        seed = db_session.query(User).filter(User.email == bootstrap_owner_email()).first()
+        assert seed is not None, "autouse fixture should seed the bootstrap admin"
+
+        with TestClient(app) as client:
+            resp = client.post(
+                "/api/v1/projects",
+                # bogus self-asserted owner in the body — must be ignored
+                json={"name": "Owned Project", "user_id": str(uuid4())},
+                headers=auth_headers,
+            )
+        assert resp.status_code == 201, resp.text
+        project_id = resp.json()["id"]
+
+        project = db_session.query(Project).filter(Project.id == project_id).first()
+        assert str(project.owner_id) == str(seed.id), "owner_id must be the authenticated caller"
+        assert project.user_id is None, "client-supplied user_id must be ignored"

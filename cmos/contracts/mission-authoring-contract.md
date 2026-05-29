@@ -116,6 +116,14 @@ inside `context['constraints']`. The REST `_to_response`, MCP
 response and MCP serializers but not in `create_mission`/`update_mission`
 input.
 
+`owner_id` and `workspace_id` (added to the `missions` table in Alembic
+migration `030_add_owner_workspace_columns`, Sprint 43 T43.2) are internal
+ownership/tenancy columns: nullable, server-set, never accepted as
+`create_mission`/`update_mission` input, absent from the MCP/REST authoring
+surface, and NOT in the DS worker SELECT. As of Sprint 43 nothing reads them
+(zero enforcement); they back the RBAC ownership model wired up in later
+sprints.
+
 ### Update-only fields
 
 | MCP param | Pydantic field | Notes |

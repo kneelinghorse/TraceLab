@@ -10,6 +10,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.api.v1 import (
     admin,
+    admin_users,
     auth,
     auth_device,
     cache,
@@ -39,11 +40,12 @@ from app.api.v1 import (
     webhooks,
 )
 from app.core.config import settings
-from app.core.database import Base, engine
+from app.core.database import Base, SessionLocal, engine
 from app.core.qdrant_client import prewarm_qdrant
-from app.core.security import require_authenticated_user
+from app.core.security import require_admin, require_authenticated_user
 from app.onboarding import router as onboarding_router
 from app.services.metrics_aggregator import MetricsAggregator, get_metrics_aggregator
+from app.services.ownership import ensure_owner_bootstrap
 
 
 class ProxyHeadersMiddleware:
@@ -132,6 +134,20 @@ async def startup_event():
             "Check QDRANT_URL configuration and Qdrant service availability."
         )
 
+    # Owner-bootstrap safety net (Sprint 43 T43.3): guarantee an owner always
+    # exists. The authoritative promotion is migration 031; this is the defensive
+    # net for fresh/edge databases. Skipped under tests so the seeded admin's role
+    # is left untouched. Must never raise — startup resilience contract.
+    if settings.environment != "test":
+        try:
+            db = SessionLocal()
+            try:
+                ensure_owner_bootstrap(db)
+            finally:
+                db.close()
+        except Exception:
+            logger.warning("Owner-bootstrap safety net failed", exc_info=True)
+
 
 protected_dependencies = [Depends(require_authenticated_user)]
 
@@ -142,6 +158,12 @@ app.include_router(
     prefix=f"{settings.api_v1_prefix}/admin",
     tags=["admin"],
     dependencies=protected_dependencies,
+)
+app.include_router(
+    admin_users.router,
+    prefix=f"{settings.api_v1_prefix}/admin/users",
+    tags=["admin-users"],
+    dependencies=[Depends(require_admin)],
 )
 app.include_router(
     qdrant_admin.router,

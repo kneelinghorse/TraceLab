@@ -255,6 +255,10 @@ class Mission(Base):
         comment="Agent or user who created this mission",
     )
 
+    # Ownership + tenancy (Sprint 43 RBAC foundation; additive, nullable, unread until Sprint C)
+    owner_id = Column(GUID(), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    workspace_id = Column(GUID(), ForeignKey("workspaces.id", ondelete="SET NULL"), nullable=True)
+
     # Relationships
     project = relationship("Project", backref="missions")
     result_report = relationship("Report", lazy="joined")
@@ -281,6 +285,7 @@ class Mission(Base):
         Index("idx_missions_project_status", "project_id", "status"),
         # Index for mission_id lookups
         Index("idx_missions_mission_id", "mission_id"),
+        Index("ix_missions_workspace_owner_created_at", "workspace_id", "owner_id", "created_at"),
         {"extend_existing": True},
     )
 

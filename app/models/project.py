@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, Column, DateTime, Integer, String, Text
+from sqlalchemy import CheckConstraint, Column, DateTime, ForeignKey, Index, Integer, String, Text
 
 from app.core.database import Base
 from app.models.mixins import SoftDeleteMixin
@@ -26,6 +26,10 @@ class Project(Base, SoftDeleteMixin):
     user_id = Column(GUID())  # Placeholder for auth
     mission_protocol_id = Column(GUID())  # References missions table
 
+    # Ownership + tenancy (Sprint 43 RBAC foundation; additive, nullable, unread until Sprint C)
+    owner_id = Column(GUID(), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    workspace_id = Column(GUID(), ForeignKey("workspaces.id", ondelete="SET NULL"), nullable=True)
+
     # Metadata
     research_type = Column(
         String
@@ -46,4 +50,5 @@ class Project(Base, SoftDeleteMixin):
             "research_type IS NULL OR research_type IN ('strategic', 'tactical', 'generative', 'evaluative')",
             name="valid_research_type",
         ),
+        Index("ix_projects_workspace_owner_created_at", "workspace_id", "owner_id", "created_at"),
     )

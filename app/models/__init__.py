@@ -22,6 +22,7 @@ from app.models.sync_state import SyncState
 from app.models.synthesis_cache import SynthesisCache
 from app.models.tag import DocumentTag, Tag
 from app.models.user import User
+from app.models.workspace import Workspace
 
 __all__ = [
     "Base",
@@ -50,4 +51,5 @@ __all__ = [
     "User",
     "InviteCode",
     "DeviceAuthorizationGrant",
+    "Workspace",
 ]

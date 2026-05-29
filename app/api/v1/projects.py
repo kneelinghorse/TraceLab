@@ -63,9 +63,7 @@ def list_projects(
         max_length=200,
         description="Case-insensitive substring match",
     ),
-    include_deleted: bool = Query(
-        False, description="Include soft-deleted projects in results"
-    ),
+    include_deleted: bool = Query(False, description="Include soft-deleted projects in results"),
     db: Session = Depends(get_db),
 ):
     """Return paginated projects ordered by creation time.
@@ -98,16 +96,12 @@ def list_projects(
 @router.get("/{project_id}", response_model=ProjectRead)
 def get_project(project_id: UUID, db: Session = Depends(get_db)) -> ProjectRead:
     """Return a single project record."""
-    cache_key = _cache_manager.project_metadata_key(
-        kind="detail", identifier=str(project_id)
-    )
+    cache_key = _cache_manager.project_metadata_key(kind="detail", identifier=str(project_id))
 
     def _loader() -> ProjectRead:
         project = _service.get_project(db, project_id)
         if not project:
-            raise HTTPException(
-                status_code=404, detail=f"Project {project_id} not found"
-            )
+            raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
         return ProjectRead.model_validate(project)
 
     result, _ = _cache_manager.cached_value("project_metadata", cache_key, _loader)
@@ -117,10 +111,11 @@ def get_project(project_id: UUID, db: Session = Depends(get_db)) -> ProjectRead:
 @router.post("", response_model=ProjectRead, status_code=status.HTTP_201_CREATED)
 def create_project(
     data: ProjectCreate,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
     db: Session = Depends(get_db),
 ) -> ProjectRead:
-    """Create a new project."""
-    project = _service.create_project(db, data)
+    """Create a new project owned by the authenticated caller."""
+    project = _service.create_project(db, data, owner_id=current_user.user_id)
     # Invalidate list cache
     _cache_manager.invalidate_project_metadata()
     return ProjectRead.model_validate(project)
@@ -141,9 +136,7 @@ def update_project(
     return ProjectRead.model_validate(project)
 
 
-@router.delete(
-    "/{project_id}", status_code=status.HTTP_200_OK, response_model=dict[str, Any]
-)
+@router.delete("/{project_id}", status_code=status.HTTP_200_OK, response_model=dict[str, Any])
 def delete_project(
     project_id: UUID,
     confirm: bool = Query(
@@ -190,16 +183,12 @@ def get_project_stats(
     db: Session = Depends(get_db),
 ) -> ProjectStats:
     """Get aggregated statistics for a project."""
-    cache_key = _cache_manager.project_metadata_key(
-        kind="stats", identifier=str(project_id)
-    )
+    cache_key = _cache_manager.project_metadata_key(kind="stats", identifier=str(project_id))
 
     def _loader() -> ProjectStats:
         stats = _service.get_project_stats(db, project_id)
         if not stats:
-            raise HTTPException(
-                status_code=404, detail=f"Project {project_id} not found"
-            )
+            raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
         return stats
 
     result, _ = _cache_manager.cached_value("project_metadata", cache_key, _loader)

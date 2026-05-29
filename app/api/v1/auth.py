@@ -14,6 +14,7 @@ from app.core.security import (
     hash_api_key,
     hash_password,
     issue_token_response,
+    require_admin,
     require_authenticated_user,
     verify_password,
 )
@@ -274,10 +275,10 @@ def delete_api_key(
 
 @router.post("/invite-codes", status_code=status.HTTP_201_CREATED)
 def create_invite_code(
-    user: AuthenticatedUser = Depends(require_authenticated_user),
+    user: AuthenticatedUser = Depends(require_admin),
     db: Session = Depends(get_db),
 ) -> dict:
-    """Generate a new single-use invite code."""
+    """Generate a new single-use invite code (admin only, T43.5)."""
     code = generate_invite_code()
     invite = InviteCode(
         code=code,
