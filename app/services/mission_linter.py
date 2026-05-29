@@ -13,8 +13,9 @@ into errors (hard-fail, 422) and warnings (soft, 200 with surfaced list).
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable, Protocol
+from typing import Protocol
 
 # ---------------------------------------------------------------------------
 # Regex mirrors (align with DeepSearch's _is_structural_success_criterion).

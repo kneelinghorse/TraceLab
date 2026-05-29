@@ -8,9 +8,12 @@ from collections.abc import Callable, Hashable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from app.core.cache import DEFAULT_CACHE_REGISTRY, CacheConfig, CacheRegistry
+
+if TYPE_CHECKING:
+    from app.core.cache import CacheNamespace
 
 
 def _repo_root() -> Path:

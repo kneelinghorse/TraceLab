@@ -28,10 +28,10 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ VALID_SOURCES = frozenset({"tracelab", "cmos", "pedr", "quality", "script"})
 
 def _utc_now() -> str:
     """Return ISO-8601 timestamp in UTC."""
-    return datetime.now(tz=timezone.utc).isoformat()
+    return datetime.now(tz=UTC).isoformat()
 
 
 @dataclass
@@ -56,11 +56,11 @@ class TelemetryEnvelope:
     ts: str
     event_type: str
     source: str
-    payload: Dict[str, Any] = field(default_factory=dict)
-    sprint_id: Optional[str] = None
+    payload: dict[str, Any] = field(default_factory=dict)
+    sprint_id: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
-        d: Dict[str, Any] = {
+    def to_dict(self) -> dict[str, Any]:
+        d: dict[str, Any] = {
             "ts": self.ts,
             "event_type": self.event_type,
             "source": self.source,
@@ -78,11 +78,11 @@ class TelemetryEnvelope:
         cls,
         event_type: str,
         source: str,
-        payload: Dict[str, Any],
+        payload: dict[str, Any],
         *,
         ts: str | None = None,
         sprint_id: str | None = None,
-    ) -> "TelemetryEnvelope":
+    ) -> TelemetryEnvelope:
         """Create an envelope wrapping an existing payload."""
         return cls(
             ts=ts or _utc_now(),
@@ -95,11 +95,11 @@ class TelemetryEnvelope:
     @classmethod
     def from_legacy(
         cls,
-        raw: Dict[str, Any],
+        raw: dict[str, Any],
         *,
         event_type: str | None = None,
         source: str = "tracelab",
-    ) -> "TelemetryEnvelope":
+    ) -> TelemetryEnvelope:
         """Wrap a legacy (pre-standardization) event in the envelope.
 
         Extracts ``ts`` and ``event_type`` from the raw event if present,
@@ -129,7 +129,7 @@ def emit_telemetry(
     path: Path,
     event_type: str,
     source: str,
-    payload: Dict[str, Any],
+    payload: dict[str, Any],
     sprint_id: str | None = None,
 ) -> bool:
     """Write a telemetry event in the unified envelope format.
@@ -154,13 +154,13 @@ def emit_telemetry(
         return False
 
 
-def is_envelope_format(event: Dict[str, Any]) -> bool:
+def is_envelope_format(event: dict[str, Any]) -> bool:
     """Check if an event dict conforms to the unified envelope schema."""
     required = {"ts", "event_type", "source", "payload"}
     return required.issubset(event.keys()) and isinstance(event.get("payload"), dict)
 
 
-def validate_jsonl_file(path: Path) -> Dict[str, Any]:
+def validate_jsonl_file(path: Path) -> dict[str, Any]:
     """Validate a JSONL file for envelope conformance.
 
     Returns a summary dict with total lines, conforming count, and
@@ -168,7 +168,7 @@ def validate_jsonl_file(path: Path) -> Dict[str, Any]:
     """
     total = 0
     conforming = 0
-    violations: List[Dict[str, Any]] = []
+    violations: list[dict[str, Any]] = []
 
     if not path.exists():
         return {"path": str(path), "exists": False, "total": 0}

@@ -79,6 +79,24 @@ Don't pad with restatements or closing sentences that repeat what was just said.
 
 ---
 
+## Definition-of-Done Checklists
+
+Work-type-specific gates. A mission of the matching type is NOT done until its box is checked. Each rule exists because it was learned the hard way — the incident is named so the gate isn't dropped as ceremony.
+
+### DoD-1 — Published-artifact smoke test (MCP / npm / any installable package)
+
+Before declaring a package mission done, install the *published* artifact in a clean environment and run it end-to-end — not just the local source. Source that passes tests can still crash on a fresh install.
+- _Why:_ `@aquex/tracelab-mcp` v1.0.0 shipped a `__dirname` (CJS global) reference that crashed on every fresh ESM install; local runs never hit it. Caught only post-release, forcing the v1.0.1 hotfix.
+- _Check:_ `npm pack` → install the tarball in a throwaway dir → run the actual entrypoint/verb once. Grep `src/` for CJS globals (`__dirname`, `__filename`, `require(`) in ESM packages.
+
+### DoD-2 — Env-var deploy verification (any feature reading a new server env var)
+
+Any feature that reads a new environment variable is NOT done until that var is confirmed set in the *deploy* environment AND the live flow is exercised there. A correct dev default silently masks a missing prod value.
+- _Why:_ Device-code login (T42.4) shipped without `FRONTEND_URL` set on Railway, so production told users to open `http://localhost:3000/device` — an unusable URL. The dev default was correct; prod just needed the override. Silent because no one ran the full prod login flow.
+- _Check:_ Confirm the var is present in the target deploy config (Railway/compose) and run the real flow against the deployed service — not just a local TestClient.
+
+---
+
 ## Project Overview
 - TraceLab ships a FastAPI + PostgreSQL research platform with RAG pipelines plus the CMOS Mission Protocol workspace under `cmos/` for backlog, telemetry, and agent orchestration.
 - The canonical runtime artifacts live at repository root (`app/`, `docs/`, `db/`, `scripts/`, `tests/`, etc.); treat `cmos/` as an internal planning workbench per `cmos/agents.md`.

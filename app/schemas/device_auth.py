@@ -11,7 +11,6 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-
 # ---------------------------------------------------------------------------
 # Public (unauthenticated) endpoints — MCP client side
 # ---------------------------------------------------------------------------

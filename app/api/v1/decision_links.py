@@ -16,7 +16,7 @@ import json
 import logging
 import sqlite3
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-_CMOS_DB_PATH: Optional[Path] = None
+_CMOS_DB_PATH: Path | None = None
 
 
 def _find_cmos_db() -> Path:
@@ -48,7 +48,7 @@ def _find_cmos_db() -> Path:
     raise FileNotFoundError("CMOS database not found")
 
 
-def _query_cmos(sql: str, params: dict | None = None) -> List[Dict[str, Any]]:
+def _query_cmos(sql: str, params: dict | None = None) -> list[dict[str, Any]]:
     """Execute a read-only query against the CMOS SQLite database."""
     db_path = _find_cmos_db()
     conn = sqlite3.connect(str(db_path))
@@ -91,28 +91,28 @@ class LinkedDecision(BaseModel):
     id: int
     decision_text: str
     created_at: str
-    sprint_id: Optional[str] = None
-    mission_id: Optional[str] = None
-    project_domain: Optional[str] = None
-    evidence: List[EvidenceRef] = Field(default_factory=list)
+    sprint_id: str | None = None
+    mission_id: str | None = None
+    project_domain: str | None = None
+    evidence: list[EvidenceRef] = Field(default_factory=list)
 
 
 class AddEvidenceRequest(BaseModel):
     """Payload for adding evidence to a decision."""
 
-    evidence: List[EvidenceRef] = Field(
+    evidence: list[EvidenceRef] = Field(
         ..., min_length=1, description="Evidence references to add"
     )
-    mission_id: Optional[str] = Field(None, description="CMOS mission ID to associate")
+    mission_id: str | None = Field(None, description="CMOS mission ID to associate")
 
 
 # --- Endpoints ---
 
 
-@router.get("/decisions/linked", response_model=List[LinkedDecision])
+@router.get("/decisions/linked", response_model=list[LinkedDecision])
 def list_linked_decisions(
-    mission_id: Optional[str] = Query(None, description="Filter by CMOS mission ID"),
-    sprint_id: Optional[str] = Query(None, description="Filter by sprint ID"),
+    mission_id: str | None = Query(None, description="Filter by CMOS mission ID"),
+    sprint_id: str | None = Query(None, description="Filter by sprint ID"),
     has_evidence: bool = Query(
         False, description="Only return decisions with evidence links"
     ),
@@ -122,7 +122,7 @@ def list_linked_decisions(
     """List CMOS strategic decisions with their TraceLab evidence links."""
     try:
         conditions = ["1=1"]
-        params: Dict[str, Any] = {}
+        params: dict[str, Any] = {}
 
         if mission_id:
             conditions.append("mission_id = :mission_id")
@@ -255,7 +255,7 @@ def add_evidence_to_decision(
 # --- Helpers ---
 
 
-def _parse_evidence(raw: Any) -> List[Dict[str, str]]:
+def _parse_evidence(raw: Any) -> list[dict[str, str]]:
     """Parse evidence JSON from database column."""
     if not raw:
         return []
@@ -268,7 +268,7 @@ def _parse_evidence(raw: Any) -> List[Dict[str, str]]:
         return []
 
 
-def _row_to_linked_decision(row: Dict[str, Any]) -> LinkedDecision:
+def _row_to_linked_decision(row: dict[str, Any]) -> LinkedDecision:
     """Convert a database row to a LinkedDecision model."""
     evidence_data = _parse_evidence(row.get("evidence"))
     evidence_refs = [

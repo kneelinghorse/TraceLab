@@ -13,12 +13,12 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import time
 from collections import deque
-from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from collections.abc import AsyncGenerator
+from dataclasses import asdict, dataclass
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, AsyncGenerator, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -61,15 +61,15 @@ class MissionEvent:
 
     event_type: str
     timestamp: str
-    mission_id: Optional[str] = None
-    mission_title: Optional[str] = None
-    layer: Optional[str] = None
-    duration_ms: Optional[float] = None
-    result_count: Optional[int] = None
-    status: Optional[str] = None
-    previous_status: Optional[str] = None
-    error: Optional[str] = None
-    details: Optional[Dict[str, Any]] = None
+    mission_id: str | None = None
+    mission_title: str | None = None
+    layer: str | None = None
+    duration_ms: float | None = None
+    result_count: int | None = None
+    status: str | None = None
+    previous_status: str | None = None
+    error: str | None = None
+    details: dict[str, Any] | None = None
 
     def to_sse(self) -> str:
         """Format as Server-Sent Event."""
@@ -86,14 +86,14 @@ class MissionEventBus:
 
     def __init__(self, max_history: int = 100) -> None:
         self._history: deque[MissionEvent] = deque(maxlen=max_history)
-        self._subscribers: List[asyncio.Queue[MissionEvent]] = []
+        self._subscribers: list[asyncio.Queue[MissionEvent]] = []
         self._lock = asyncio.Lock()
 
     def emit(self, event: MissionEvent) -> None:
         """Publish an event to all subscribers and history buffer."""
         self._history.append(event)
         # Fan out to all subscriber queues (non-blocking)
-        stale: List[asyncio.Queue] = []
+        stale: list[asyncio.Queue] = []
         for queue in self._subscribers:
             try:
                 queue.put_nowait(event)
@@ -132,17 +132,17 @@ class MissionEventBus:
                         queue.get(), timeout=heartbeat_seconds
                     )
                     yield event
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     # Send heartbeat to keep connection alive
                     yield MissionEvent(
                         event_type=MissionEventType.HEARTBEAT.value,
-                        timestamp=datetime.now(timezone.utc).isoformat(),
+                        timestamp=datetime.now(UTC).isoformat(),
                     )
         finally:
             if queue in self._subscribers:
                 self._subscribers.remove(queue)
 
-    def get_recent_events(self, limit: int = 50) -> List[MissionEvent]:
+    def get_recent_events(self, limit: int = 50) -> list[MissionEvent]:
         """Get recent events from history buffer."""
         events = list(self._history)
         return events[-limit:] if len(events) > limit else events
@@ -154,7 +154,7 @@ class MissionEventBus:
 
 # ─── Singleton ───────────────────────────────────────────────────────────────
 
-_event_bus: Optional[MissionEventBus] = None
+_event_bus: MissionEventBus | None = None
 
 
 def get_mission_event_bus() -> MissionEventBus:
@@ -169,14 +169,14 @@ def get_mission_event_bus() -> MissionEventBus:
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def emit_mission_status_change(
     mission_id: str,
     title: str,
     new_status: str,
-    previous_status: Optional[str] = None,
+    previous_status: str | None = None,
 ) -> None:
     """Emit a mission status change event."""
     bus = get_mission_event_bus()
@@ -206,11 +206,11 @@ def emit_pedr_layer_event(
     *,
     event_type: MissionEventType,
     layer: str,
-    mission_id: Optional[str] = None,
-    duration_ms: Optional[float] = None,
-    result_count: Optional[int] = None,
-    error: Optional[str] = None,
-    details: Optional[Dict[str, Any]] = None,
+    mission_id: str | None = None,
+    duration_ms: float | None = None,
+    result_count: int | None = None,
+    error: str | None = None,
+    details: dict[str, Any] | None = None,
 ) -> None:
     """Emit a PEDR search layer progress event."""
     bus = get_mission_event_bus()
@@ -253,7 +253,7 @@ def emit_quality_gates(
 # ─── CMOS bridge emitter ────────────────────────────────────────────────────
 
 # Maps CMOS transition statuses to event types.
-_CMOS_STATUS_MAP: Dict[str, MissionEventType] = {
+_CMOS_STATUS_MAP: dict[str, MissionEventType] = {
     "in progress": MissionEventType.CMOS_MISSION_STARTED,
     "completed": MissionEventType.CMOS_MISSION_COMPLETED,
     "blocked": MissionEventType.CMOS_MISSION_BLOCKED,
@@ -266,10 +266,10 @@ def emit_cmos_mission_event(
     mission_id: str,
     name: str,
     new_status: str,
-    previous_status: Optional[str] = None,
-    notes: Optional[str] = None,
-    reason: Optional[str] = None,
-    sprint_id: Optional[str] = None,
+    previous_status: str | None = None,
+    notes: str | None = None,
+    reason: str | None = None,
+    sprint_id: str | None = None,
 ) -> bool:
     """Emit a TraceLab SSE event for a CMOS mission transition.
 
@@ -281,7 +281,7 @@ def emit_cmos_mission_event(
             status_key, MissionEventType.CMOS_MISSION_STATUS_CHANGED
         )
 
-        details: Dict[str, Any] = {"source": "cmos"}
+        details: dict[str, Any] = {"source": "cmos"}
         if notes:
             details["notes"] = notes
         if reason:

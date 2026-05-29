@@ -305,9 +305,9 @@ async def require_authenticated_user(
 
 
 async def require_authenticated_user_sse(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme),
-    x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),
-    token: Optional[str] = Query(default=None),
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer_scheme),
+    x_api_key: str | None = Header(default=None, alias="X-API-Key"),
+    token: str | None = Query(default=None),
 ) -> AuthenticatedUser:
     """Auth dependency for SSE endpoints that also accepts a JWT via query parameter.
 

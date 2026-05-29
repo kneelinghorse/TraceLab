@@ -6,7 +6,7 @@ with RRF fusion.
 """
 
 from datetime import date
-from typing import Any, List, Literal, Optional
+from typing import Any, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator
@@ -280,10 +280,10 @@ class PEDRLayerDiagnostic(BaseModel):
     result_count: int = Field(
         default=0, ge=0, description="Number of results produced by this layer"
     )
-    error: Optional[str] = Field(
+    error: str | None = Field(
         default=None, description="Error message if status is 'error'"
     )
-    error_type: Optional[str] = Field(
+    error_type: str | None = Field(
         default=None, description="Exception class name if status is 'error'"
     )
 
@@ -307,7 +307,7 @@ class PEDRSearchMetadata(BaseModel):
     )
     layer_weights: dict[str, float] = Field(description="Effective layer weights used")
     timings: PEDRLayerTimings = Field(description="Per-layer timing information")
-    layer_diagnostics: List[PEDRLayerDiagnostic] = Field(
+    layer_diagnostics: list[PEDRLayerDiagnostic] = Field(
         default_factory=list,
         description="Per-layer execution diagnostics (timing, status, result count, errors)",
     )

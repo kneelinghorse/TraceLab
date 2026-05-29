@@ -42,13 +42,13 @@ class LoginRequest(BaseModel):
 class ProfileUpdate(BaseModel):
     """Payload for updating the authenticated user's profile."""
 
-    display_name: Optional[str] = Field(None, max_length=100, description="New display name")
-    current_password: Optional[str] = Field(None, description="Required when changing password")
-    new_password: Optional[str] = Field(None, min_length=8, description="New password (minimum 8 characters)")
+    display_name: str | None = Field(None, max_length=100, description="New display name")
+    current_password: str | None = Field(None, description="Required when changing password")
+    new_password: str | None = Field(None, min_length=8, description="New password (minimum 8 characters)")
 
     @field_validator("display_name")
     @classmethod
-    def validate_display_name(cls, v: Optional[str]) -> Optional[str]:
+    def validate_display_name(cls, v: str | None) -> str | None:
         if v is not None:
             v = v.strip()
             if not v:

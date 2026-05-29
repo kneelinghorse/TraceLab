@@ -35,11 +35,13 @@ def client():
         yield app_client
 
 
-@pytest.mark.skip(
-    reason="Onboarding POST /projects route shadowed by projects router registered first in main.py — needs route prefix refactor"
-)
 def test_project_creation_is_idempotent(client: TestClient, auth_headers):
-    """Ensure POST /projects caches responses via Idempotency-Key header."""
+    """POST /api/v1/projects caches responses via the Idempotency-Key header.
+
+    The dead-shadowed onboarding copy of this route was removed in the Sprint 43
+    review follow-up and its idempotency support ported to the canonical projects
+    handler (app/api/v1/projects.py), so this now exercises that handler.
+    """
     payload = {
         "name": "Onboarding Test Project",
         "description": "Verifies idempotent project creation",

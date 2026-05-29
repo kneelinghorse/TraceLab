@@ -5,6 +5,7 @@ from pathlib import Path
 from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from fastapi.routing import APIRoute
 from fastapi.templating import Jinja2Templates
 from starlette.types import ASGIApp, Receive, Scope, Send
 
@@ -351,3 +352,42 @@ def admin_dashboard(
         "admin/dashboard.html",
         {"request": request, "metrics": metrics, "auth_header": auth_header},
     )
+
+
+def _assert_no_duplicate_routes(application: FastAPI) -> None:
+    """Fail fast on duplicate (HTTP method, path) route registrations.
+
+    FastAPI resolves routes first-match-wins across included routers, so two
+    routes resolving to the same (method, path) silently shadow each other — the
+    later registration becomes unreachable dead code. The Sprint 43 review caught
+    onboarding's POST /projects (and GET /documents/{id}) being dead-shadowed by
+    the projects/documents routers, silently dropping Idempotency-Key support and
+    the owner_id write-path. This guard turns that whole bug class into a startup
+    failure instead of a silent shadow.
+    """
+    seen: dict[tuple[str, str], str] = {}
+    duplicates: list[str] = []
+    for route in application.routes:
+        if not isinstance(route, APIRoute):
+            continue
+        endpoint = f"{route.endpoint.__module__}.{route.endpoint.__name__}"
+        for method in sorted(route.methods or ()):
+            if method in {"HEAD", "OPTIONS"}:
+                continue
+            signature = (method, route.path)
+            if signature in seen:
+                duplicates.append(
+                    f"{method} {route.path} ({endpoint} shadows {seen[signature]})"
+                )
+            else:
+                seen[signature] = endpoint
+    if duplicates:
+        raise RuntimeError(
+            "Duplicate route registrations detected — first-match-wins shadowing:\n  "
+            + "\n  ".join(duplicates)
+        )
+
+
+# Run at import time so any shadowing fails the app build (and the test suite)
+# immediately, rather than silently dead-routing in production.
+_assert_no_duplicate_routes(app)

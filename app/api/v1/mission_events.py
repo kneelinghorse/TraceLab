@@ -13,14 +13,12 @@ POST /api/v1/missions/events/cmos
 from __future__ import annotations
 
 import logging
-from typing import List, Optional
 
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from app.core.mission_events import (
-    MissionEvent,
     emit_cmos_mission_event,
     get_mission_event_bus,
 )
@@ -86,12 +84,12 @@ class CmosMissionEventRequest(BaseModel):
     new_status: str = Field(
         ..., description="Target status (e.g. In Progress, Completed, Blocked)"
     )
-    previous_status: Optional[str] = Field(None, description="Previous status")
-    notes: Optional[str] = Field(None, description="Transition notes")
-    reason: Optional[str] = Field(
+    previous_status: str | None = Field(None, description="Previous status")
+    notes: str | None = Field(None, description="Transition notes")
+    reason: str | None = Field(
         None, description="Block reason (for blocked transitions)"
     )
-    sprint_id: Optional[str] = Field(None, description="Sprint ID (e.g. sprint-35)")
+    sprint_id: str | None = Field(None, description="Sprint ID (e.g. sprint-35)")
 
 
 @router.post("/events/cmos")
@@ -124,7 +122,7 @@ def ingest_cmos_mission_event(
     }
 
 
-@router.get("/events/recent", response_model=List[dict])
+@router.get("/events/recent", response_model=list[dict])
 def get_recent_events(
     limit: int = Query(50, ge=1, le=200, description="Number of recent events"),
     _user: AuthenticatedUser = Depends(require_authenticated_user),
