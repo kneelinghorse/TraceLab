@@ -13,7 +13,6 @@ class ProjectBase(BaseModel):
 
     name: str
     description: str | None = None
-    user_id: UUID | None = None
     mission_protocol_id: UUID | None = None
     research_type: str | None = None
     methodology: str | None = None
@@ -33,7 +32,6 @@ class ProjectUpdate(BaseModel):
 
     name: str | None = None
     description: str | None = None
-    user_id: UUID | None = None
     mission_protocol_id: UUID | None = None
     research_type: str | None = None
     methodology: str | None = None
@@ -48,6 +46,10 @@ class ProjectRead(ProjectBase):
     id: UUID
     created_at: datetime
     updated_at: datetime
+    # Legacy self-asserted field, retained in the response for backward compat.
+    # No longer client-settable (T43.4); null for projects created after T43.4.
+    # The authoritative owner is owner_id (surfaced read-side in a later sprint).
+    user_id: UUID | None = None
 
     model_config = ConfigDict(from_attributes=True)
 

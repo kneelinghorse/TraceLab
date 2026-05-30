@@ -9,7 +9,7 @@ Provides full CRUD operations for missions with:
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
@@ -32,6 +32,8 @@ from app.schemas.mission import (
 from app.schemas.pagination import PaginatedResponse
 from app.services.deepsearch_preview_client import (
     ContractPreviewError,
+)
+from app.services.deepsearch_preview_client import (
     preview_mission_contract as _call_deepsearch_preview,
 )
 from app.services.mission_linter import lint_mission_for_submit
@@ -556,6 +558,7 @@ def export_mission(
 ):
     """Export a mission in the requested format."""
     from fastapi.responses import PlainTextResponse
+
     from app.services.mission_protocol_service import MissionProtocolService
 
     try:
@@ -597,7 +600,7 @@ def export_mission(
     summary="Import mission from YAML",
 )
 def import_mission(
-    payload: Dict[str, Any],
+    payload: dict[str, Any],
     db: Session = Depends(get_db),
 ):
     """Import a mission from a YAML payload."""
@@ -877,6 +880,7 @@ def promote_mission_report(
 # ---------------------------------------------------------------------------
 
 from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -888,7 +892,7 @@ class LogEntry(BaseModel):
 
 
 class LogBatchRequest(BaseModel):
-    logs: List[LogEntry]
+    logs: list[LogEntry]
 
 
 class LogEntryResponse(BaseModel):
@@ -941,14 +945,14 @@ def ingest_mission_logs(
 
 @router.get(
     "/{mission_id}/logs",
-    response_model=List[LogEntryResponse],
+    response_model=list[LogEntryResponse],
     summary="Retrieve recent log records for a mission",
 )
 def get_mission_logs(
     mission_id: UUID,
     limit: int = Query(default=100, ge=1, le=500, description="Max log lines to return"),
     db: Session = Depends(get_db),
-) -> List[LogEntryResponse]:
+) -> list[LogEntryResponse]:
     """Return the most recent log lines for a mission, newest last."""
     from app.models.mission_log import MissionLog
 

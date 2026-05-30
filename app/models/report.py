@@ -41,6 +41,10 @@ class Report(Base):
         String(100), nullable=True, comment="Agent or user who created this report"
     )
 
+    # Ownership + tenancy (Sprint 43 RBAC foundation; additive, nullable, unread until Sprint C)
+    owner_id = Column(GUID(), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    workspace_id = Column(GUID(), ForeignKey("workspaces.id", ondelete="SET NULL"), nullable=True)
+
     # Relationships
     project = relationship("Project", lazy="joined")
     parent = relationship("Report", remote_side=[id], lazy="select")
@@ -55,6 +59,7 @@ class Report(Base):
         Index("ix_reports_project_id", "project_id"),
         Index("ix_reports_status", "status"),
         Index("ix_reports_created_at", "created_at"),
+        Index("ix_reports_workspace_owner_created_at", "workspace_id", "owner_id", "created_at"),
         {"extend_existing": True},
     )
 

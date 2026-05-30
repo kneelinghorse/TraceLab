@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class TokenUser(BaseModel):
@@ -20,9 +21,7 @@ class TokenUser(BaseModel):
 class TokenResponse(BaseModel):
     """Response payload for login and refresh endpoints."""
 
-    access_token: str = Field(
-        ..., description="JWT access token to use in Authorization header"
-    )
+    access_token: str = Field(..., description="JWT access token to use in Authorization header")
     token_type: Literal["bearer"] = Field(default="bearer")
     expires_in: int = Field(..., description="Token lifetime in seconds")
     user: TokenUser
@@ -43,13 +42,13 @@ class LoginRequest(BaseModel):
 class ProfileUpdate(BaseModel):
     """Payload for updating the authenticated user's profile."""
 
-    display_name: Optional[str] = Field(None, max_length=100, description="New display name")
-    current_password: Optional[str] = Field(None, description="Required when changing password")
-    new_password: Optional[str] = Field(None, min_length=8, description="New password (minimum 8 characters)")
+    display_name: str | None = Field(None, max_length=100, description="New display name")
+    current_password: str | None = Field(None, description="Required when changing password")
+    new_password: str | None = Field(None, min_length=8, description="New password (minimum 8 characters)")
 
     @field_validator("display_name")
     @classmethod
-    def validate_display_name(cls, v: Optional[str]) -> Optional[str]:
+    def validate_display_name(cls, v: str | None) -> str | None:
         if v is not None:
             v = v.strip()
             if not v:
@@ -65,17 +64,27 @@ class ProfileResponse(BaseModel):
     display_name: str
 
 
+class AdminUserResponse(BaseModel):
+    """User representation for the admin user-management API (T43.5)."""
+
+    id: UUID
+    email: str
+    display_name: str
+    role: str
+    is_active: bool
+    created_at: datetime
+    last_login_at: datetime | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class RegisterRequest(BaseModel):
     """Payload for user registration."""
 
     email: str = Field(..., min_length=3, description="Email address")
-    password: str = Field(
-        ..., min_length=8, description="Password (minimum 8 characters)"
-    )
+    password: str = Field(..., min_length=8, description="Password (minimum 8 characters)")
     display_name: str = Field(..., max_length=100, description="Display name")
-    invite_code: str = Field(
-        ..., min_length=8, max_length=8, description="8-character invite code"
-    )
+    invite_code: str = Field(..., min_length=8, max_length=8, description="8-character invite code")
 
     @field_validator("email")
     @classmethod

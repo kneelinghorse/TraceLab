@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import secrets
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from functools import lru_cache
@@ -32,17 +33,38 @@ class AuthCredentials:
     password_hash: str
 
 
+# Role hierarchy (Sprint 43 RBAC foundation; architecture locked 2026-05-28).
+# Linear and cumulative — a higher role has every privilege of the ones below it
+# (owner ⊇ admin ⊇ member ⊇ viewer). The require_role/require_admin dependencies
+# below check "at least this role" against this ranking. These helpers are defined
+# but NOT applied to any route in Sprint 43; enforcement is wired up in Sprint C.
+ROLE_OWNER = "owner"
+ROLE_ADMIN = "admin"
+ROLE_MEMBER = "member"
+ROLE_VIEWER = "viewer"
+
+# Ascending privilege rank. Unknown roles default to rank -1 (below viewer) so any
+# future role check fails closed rather than silently granting access.
+_ROLE_RANK: dict[str, int] = {
+    ROLE_VIEWER: 0,
+    ROLE_MEMBER: 1,
+    ROLE_ADMIN: 2,
+    ROLE_OWNER: 3,
+}
+
+
 @dataclass(frozen=True)
 class AuthenticatedUser:
     """Represents an authenticated principal for downstream dependencies.
 
-    Carries user_id (UUID), email, and display_name from the users table.
+    Carries user_id (UUID), email, display_name, and role from the users table.
     The 'username' property is kept for backward compatibility.
     """
 
     user_id: UUID
     email: str
     display_name: str
+    role: str
 
     @property
     def username(self) -> str:
@@ -203,6 +225,7 @@ def _validate_api_key(api_key: str) -> AuthenticatedUser | None:
                         user_id=db_user.id,
                         email=db_user.email,
                         display_name=db_user.display_name,
+                        role=db_user.role,
                     )
                 return None
 
@@ -229,6 +252,7 @@ def _resolve_user_from_jwt(subject: str) -> AuthenticatedUser:
                     user_id=db_user.id,
                     email=db_user.email,
                     display_name=db_user.display_name,
+                    role=db_user.role,
                 )
         except (ValueError, AttributeError):
             pass
@@ -240,6 +264,7 @@ def _resolve_user_from_jwt(subject: str) -> AuthenticatedUser:
                 user_id=db_user.id,
                 email=db_user.email,
                 display_name=db_user.display_name,
+                role=db_user.role,
             )
 
         raise HTTPException(
@@ -280,9 +305,9 @@ async def require_authenticated_user(
 
 
 async def require_authenticated_user_sse(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(_bearer_scheme),
-    x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),
-    token: Optional[str] = Query(default=None),
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer_scheme),
+    x_api_key: str | None = Header(default=None, alias="X-API-Key"),
+    token: str | None = Query(default=None),
 ) -> AuthenticatedUser:
     """Auth dependency for SSE endpoints that also accepts a JWT via query parameter.
 
@@ -299,3 +324,48 @@ async def require_authenticated_user_sse(
     return await require_authenticated_user(
         credentials=credentials, x_api_key=x_api_key
     )
+
+
+def require_admin(
+    user: AuthenticatedUser = Depends(require_authenticated_user),
+) -> AuthenticatedUser:
+    """FastAPI dependency requiring the caller to be admin or owner.
+
+    Convenience gate equivalent to ``require_role(ROLE_ADMIN)``: returns the
+    principal on success, raises 403 otherwise. Applied (T43.5) to the admin
+    user-management API and invite-code generation; route-level resource
+    enforcement remains a Sprint C concern.
+    """
+    if _ROLE_RANK.get(user.role, -1) < _ROLE_RANK[ROLE_ADMIN]:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Admin role required")
+    return user
+
+
+def require_role(
+    minimum_role: str,
+) -> Callable[[AuthenticatedUser], AuthenticatedUser]:
+    """Build a FastAPI dependency requiring at least ``minimum_role``.
+
+    Roles form a linear, cumulative hierarchy (viewer < member < admin < owner),
+    so a higher role satisfies a requirement for any lower one. A principal whose
+    role is unknown ranks below viewer and is always denied (fail closed).
+
+    NOT applied to any route in Sprint 43 (RBAC foundation, zero enforcement) —
+    intended for Sprint C, when enforcement is flipped on.
+
+    Raises KeyError at wiring time if ``minimum_role`` is not a known role, so a
+    typo surfaces immediately rather than silently never matching.
+    """
+    required_rank = _ROLE_RANK[minimum_role]
+
+    def _require_role(
+        user: AuthenticatedUser = Depends(require_authenticated_user),
+    ) -> AuthenticatedUser:
+        if _ROLE_RANK.get(user.role, -1) < required_rank:
+            raise HTTPException(
+                status.HTTP_403_FORBIDDEN,
+                detail=f"Requires '{minimum_role}' role or higher",
+            )
+        return user
+
+    return _require_role

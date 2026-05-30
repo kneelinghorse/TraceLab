@@ -3,7 +3,8 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, Column, DateTime, Integer, String, Text
+from sqlalchemy import CheckConstraint, Column, DateTime, ForeignKey, Index, Integer, String, Text
+from sqlalchemy.orm import relationship
 
 from app.core.database import Base
 from app.models.mixins import SoftDeleteMixin
@@ -26,6 +27,10 @@ class Project(Base, SoftDeleteMixin):
     user_id = Column(GUID())  # Placeholder for auth
     mission_protocol_id = Column(GUID())  # References missions table
 
+    # Ownership + tenancy (Sprint 43 RBAC foundation; additive, nullable, unread until Sprint C)
+    owner_id = Column(GUID(), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    workspace_id = Column(GUID(), ForeignKey("workspaces.id", ondelete="SET NULL"), nullable=True)
+
     # Metadata
     research_type = Column(
         String
@@ -41,9 +46,17 @@ class Project(Base, SoftDeleteMixin):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    # Cross-cutting themes (Sprint 44 T44.2; additive, dormant). Default lazy
+    # loading -> zero extra queries on existing project loads (byte-identical
+    # day-one); the rows are unread until later sprints.
+    tags = relationship(
+        "ProjectTag", back_populates="project", cascade="all, delete-orphan"
+    )
+
     __table_args__ = (
         CheckConstraint(
             "research_type IS NULL OR research_type IN ('strategic', 'tactical', 'generative', 'evaluative')",
             name="valid_research_type",
         ),
+        Index("ix_projects_workspace_owner_created_at", "workspace_id", "owner_id", "created_at"),
     )

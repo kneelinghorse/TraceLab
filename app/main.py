@@ -5,11 +5,13 @@ from pathlib import Path
 from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from fastapi.routing import APIRoute
 from fastapi.templating import Jinja2Templates
 from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.api.v1 import (
     admin,
+    admin_users,
     auth,
     auth_device,
     cache,
@@ -24,6 +26,7 @@ from app.api.v1 import (
     pedr_preflight,
     pedr_related,
     pedr_search,
+    project_admin,
     projects,
     qdrant_admin,
     quality,
@@ -35,15 +38,17 @@ from app.api.v1 import (
     saved_searches,
     search,
     search_history,
+    spaces,
     synthesize,
     webhooks,
 )
 from app.core.config import settings
-from app.core.database import Base, engine
+from app.core.database import Base, SessionLocal, engine
 from app.core.qdrant_client import prewarm_qdrant
-from app.core.security import require_authenticated_user
+from app.core.security import require_admin, require_authenticated_user
 from app.onboarding import router as onboarding_router
 from app.services.metrics_aggregator import MetricsAggregator, get_metrics_aggregator
+from app.services.ownership import ensure_owner_bootstrap
 
 
 class ProxyHeadersMiddleware:
@@ -132,6 +137,20 @@ async def startup_event():
             "Check QDRANT_URL configuration and Qdrant service availability."
         )
 
+    # Owner-bootstrap safety net (Sprint 43 T43.3): guarantee an owner always
+    # exists. The authoritative promotion is migration 031; this is the defensive
+    # net for fresh/edge databases. Skipped under tests so the seeded admin's role
+    # is left untouched. Must never raise — startup resilience contract.
+    if settings.environment != "test":
+        try:
+            db = SessionLocal()
+            try:
+                ensure_owner_bootstrap(db)
+            finally:
+                db.close()
+        except Exception:
+            logger.warning("Owner-bootstrap safety net failed", exc_info=True)
+
 
 protected_dependencies = [Depends(require_authenticated_user)]
 
@@ -142,6 +161,24 @@ app.include_router(
     prefix=f"{settings.api_v1_prefix}/admin",
     tags=["admin"],
     dependencies=protected_dependencies,
+)
+app.include_router(
+    admin_users.router,
+    prefix=f"{settings.api_v1_prefix}/admin/users",
+    tags=["admin-users"],
+    dependencies=[Depends(require_admin)],
+)
+app.include_router(
+    spaces.router,
+    prefix=f"{settings.api_v1_prefix}/admin/spaces",
+    tags=["admin-spaces"],
+    dependencies=[Depends(require_admin)],
+)
+app.include_router(
+    project_admin.router,
+    prefix=f"{settings.api_v1_prefix}/admin/projects",
+    tags=["admin-project-grouping"],
+    dependencies=[Depends(require_admin)],
 )
 app.include_router(
     qdrant_admin.router,
@@ -329,3 +366,42 @@ def admin_dashboard(
         "admin/dashboard.html",
         {"request": request, "metrics": metrics, "auth_header": auth_header},
     )
+
+
+def _assert_no_duplicate_routes(application: FastAPI) -> None:
+    """Fail fast on duplicate (HTTP method, path) route registrations.
+
+    FastAPI resolves routes first-match-wins across included routers, so two
+    routes resolving to the same (method, path) silently shadow each other — the
+    later registration becomes unreachable dead code. The Sprint 43 review caught
+    onboarding's POST /projects (and GET /documents/{id}) being dead-shadowed by
+    the projects/documents routers, silently dropping Idempotency-Key support and
+    the owner_id write-path. This guard turns that whole bug class into a startup
+    failure instead of a silent shadow.
+    """
+    seen: dict[tuple[str, str], str] = {}
+    duplicates: list[str] = []
+    for route in application.routes:
+        if not isinstance(route, APIRoute):
+            continue
+        endpoint = f"{route.endpoint.__module__}.{route.endpoint.__name__}"
+        for method in sorted(route.methods or ()):
+            if method in {"HEAD", "OPTIONS"}:
+                continue
+            signature = (method, route.path)
+            if signature in seen:
+                duplicates.append(
+                    f"{method} {route.path} ({endpoint} shadows {seen[signature]})"
+                )
+            else:
+                seen[signature] = endpoint
+    if duplicates:
+        raise RuntimeError(
+            "Duplicate route registrations detected — first-match-wins shadowing:\n  "
+            + "\n  ".join(duplicates)
+        )
+
+
+# Run at import time so any shadowing fails the app build (and the test suite)
+# immediately, rather than silently dead-routing in production.
+_assert_no_duplicate_routes(app)

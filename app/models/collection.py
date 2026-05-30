@@ -33,6 +33,10 @@ class Collection(Base):
         DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow
     )
 
+    # Ownership + tenancy (Sprint 43 RBAC foundation; additive, nullable, unread until Sprint C)
+    owner_id = Column(GUID(), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    workspace_id = Column(GUID(), ForeignKey("workspaces.id", ondelete="SET NULL"), nullable=True)
+
     # Relationships
     items = relationship(
         "CollectionItem",
@@ -43,6 +47,7 @@ class Collection(Base):
 
     __table_args__ = (
         Index("ix_collections_created_at", "created_at"),
+        Index("ix_collections_workspace_owner_created_at", "workspace_id", "owner_id", "created_at"),
         {"extend_existing": True},
     )
 

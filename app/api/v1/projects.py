@@ -5,11 +5,13 @@ from __future__ import annotations
 from typing import Any
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, Response, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
+from app.onboarding.idempotency import IdempotencyService
 from app.schemas.pagination import PaginatedResponse
 from app.schemas.project import ProjectCreate, ProjectRead, ProjectStats, ProjectUpdate
 from app.services.cache_manager import get_cache_manager
@@ -63,9 +65,7 @@ def list_projects(
         max_length=200,
         description="Case-insensitive substring match",
     ),
-    include_deleted: bool = Query(
-        False, description="Include soft-deleted projects in results"
-    ),
+    include_deleted: bool = Query(False, description="Include soft-deleted projects in results"),
     db: Session = Depends(get_db),
 ):
     """Return paginated projects ordered by creation time.
@@ -98,16 +98,12 @@ def list_projects(
 @router.get("/{project_id}", response_model=ProjectRead)
 def get_project(project_id: UUID, db: Session = Depends(get_db)) -> ProjectRead:
     """Return a single project record."""
-    cache_key = _cache_manager.project_metadata_key(
-        kind="detail", identifier=str(project_id)
-    )
+    cache_key = _cache_manager.project_metadata_key(kind="detail", identifier=str(project_id))
 
     def _loader() -> ProjectRead:
         project = _service.get_project(db, project_id)
         if not project:
-            raise HTTPException(
-                status_code=404, detail=f"Project {project_id} not found"
-            )
+            raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
         return ProjectRead.model_validate(project)
 
     result, _ = _cache_manager.cached_value("project_metadata", cache_key, _loader)
@@ -117,13 +113,38 @@ def get_project(project_id: UUID, db: Session = Depends(get_db)) -> ProjectRead:
 @router.post("", response_model=ProjectRead, status_code=status.HTTP_201_CREATED)
 def create_project(
     data: ProjectCreate,
+    request: Request,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
     db: Session = Depends(get_db),
-) -> ProjectRead:
-    """Create a new project."""
-    project = _service.create_project(db, data)
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+) -> Response:
+    """Create a new project owned by the authenticated caller.
+
+    Supports idempotent retries via the optional Idempotency-Key header: replaying
+    the same key with an identical body returns the original response; the same key
+    with a different body returns 409. (Ported here from the onboarding router,
+    whose POST /projects was dead-shadowed by this route — Sprint 43 review.)
+    """
+    idempotency = IdempotencyService(
+        db, method=request.method, path=request.url.path, key=idempotency_key
+    )
+    cached = idempotency.check_replay(data.model_dump())
+    if cached:
+        return JSONResponse(content=cached.data, status_code=cached.status_code)
+
+    project = _service.create_project(db, data, owner_id=current_user.user_id)
+    resource = ProjectRead.model_validate(project)
+    response_body = resource.model_dump(mode="json")
+
+    idempotency.save_response(
+        request_payload=data.model_dump(),
+        response_payload=response_body,
+        status_code=status.HTTP_201_CREATED,
+    )
+    db.commit()
     # Invalidate list cache
     _cache_manager.invalidate_project_metadata()
-    return ProjectRead.model_validate(project)
+    return JSONResponse(content=response_body, status_code=status.HTTP_201_CREATED)
 
 
 @router.put("/{project_id}", response_model=ProjectRead)
@@ -141,9 +162,7 @@ def update_project(
     return ProjectRead.model_validate(project)
 
 
-@router.delete(
-    "/{project_id}", status_code=status.HTTP_200_OK, response_model=dict[str, Any]
-)
+@router.delete("/{project_id}", status_code=status.HTTP_200_OK, response_model=dict[str, Any])
 def delete_project(
     project_id: UUID,
     confirm: bool = Query(
@@ -190,16 +209,12 @@ def get_project_stats(
     db: Session = Depends(get_db),
 ) -> ProjectStats:
     """Get aggregated statistics for a project."""
-    cache_key = _cache_manager.project_metadata_key(
-        kind="stats", identifier=str(project_id)
-    )
+    cache_key = _cache_manager.project_metadata_key(kind="stats", identifier=str(project_id))
 
     def _loader() -> ProjectStats:
         stats = _service.get_project_stats(db, project_id)
         if not stats:
-            raise HTTPException(
-                status_code=404, detail=f"Project {project_id} not found"
-            )
+            raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
         return stats
 
     result, _ = _cache_manager.cached_value("project_metadata", cache_key, _loader)

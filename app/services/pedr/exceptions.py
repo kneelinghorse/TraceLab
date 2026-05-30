@@ -6,13 +6,11 @@ can be diagnosed precisely rather than caught as generic Exception.
 
 from __future__ import annotations
 
-from typing import Optional
-
 
 class PEDRError(Exception):
     """Base exception for all PEDR pipeline errors."""
 
-    def __init__(self, message: str, *, layer: Optional[str] = None) -> None:
+    def __init__(self, message: str, *, layer: str | None = None) -> None:
         self.layer = layer
         super().__init__(message)
 

@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
 from app.models import (
+    Collection,
     CollectionItem,
     Document,
     DocumentChunk,
@@ -671,8 +672,8 @@ class EdgeMaterializationService:
         self,
         session: Session,
         *,
-        project_id: Optional[str],
-        since: Optional[datetime],
+        project_id: str | None,
+        since: datetime | None,
     ) -> Iterable[EdgeSpec]:
         """Create co_occurs edges between chunks in the same collection.
 
@@ -695,7 +696,7 @@ class EdgeMaterializationService:
             query = query.filter(CollectionItem.added_at >= since)
 
         # Group chunk IDs by collection
-        collection_chunks: Dict[str, List[str]] = {}
+        collection_chunks: dict[str, list[str]] = {}
         for collection_id, chunk_id in query.all():
             cid = str(collection_id)
             collection_chunks.setdefault(cid, []).append(str(chunk_id))
@@ -736,13 +737,13 @@ class EdgeMaterializationService:
 
     def materialize_topic_similarity_edges(
         self,
-        session: Optional[Session] = None,
+        session: Session | None = None,
         *,
-        project_id: Optional[str] = None,
+        project_id: str | None = None,
         similarity_threshold: float = DEFAULT_SIMILARITY_THRESHOLD,
         top_k: int = DEFAULT_SIMILARITY_TOP_K,
-        qdrant_client: Optional[Any] = None,
-        collection_name: Optional[str] = None,
+        qdrant_client: Any | None = None,
+        collection_name: str | None = None,
     ) -> MaterializationResult:
         """Materialize topic_similar edges using Qdrant embedding similarity.
 
@@ -781,11 +782,11 @@ class EdgeMaterializationService:
         self,
         session: Session,
         *,
-        project_id: Optional[str],
+        project_id: str | None,
         similarity_threshold: float,
         top_k: int,
-        qdrant_client: Optional[Any],
-        collection_name: Optional[str],
+        qdrant_client: Any | None,
+        collection_name: str | None,
     ) -> Iterable[EdgeSpec]:
         """Yield topic_similar edges by querying Qdrant for embedding neighbors."""
         import logging
@@ -827,7 +828,7 @@ class EdgeMaterializationService:
             return
 
         # Build chunk_id -> URN mapping
-        chunk_urn_map: Dict[str, str] = {}
+        chunk_urn_map: dict[str, str] = {}
         for chunk_id, doc_id, chunk_index in chunks:
             chunk_urn_map[str(chunk_id)] = str(
                 URNGenerator.for_chunk(str(doc_id), int(chunk_index))
@@ -835,7 +836,7 @@ class EdgeMaterializationService:
 
         # Query Qdrant for similar chunks per point
         try:
-            from qdrant_client.models import Filter, FieldCondition, MatchValue
+            from qdrant_client.models import FieldCondition, Filter, MatchValue
         except ImportError:
             logger.warning("qdrant_client.models not available")
             return

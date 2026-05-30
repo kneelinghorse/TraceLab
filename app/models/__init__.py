@@ -14,14 +14,17 @@ from app.models.invite_code import InviteCode
 from app.models.mission import Mission
 from app.models.processing_status import DocumentProcessingStatus
 from app.models.project import Project
+from app.models.project_tag import ProjectTag
 from app.models.quality import QualityCheck
 from app.models.report import Report, ReportSource
 from app.models.saved_search import SavedSearch
 from app.models.search_history import SearchHistory
+from app.models.space_member import SpaceMember
 from app.models.sync_state import SyncState
 from app.models.synthesis_cache import SynthesisCache
 from app.models.tag import DocumentTag, Tag
 from app.models.user import User
+from app.models.workspace import Workspace
 
 __all__ = [
     "Base",
@@ -50,4 +53,7 @@ __all__ = [
     "User",
     "InviteCode",
     "DeviceAuthorizationGrant",
+    "Workspace",
+    "SpaceMember",
+    "ProjectTag",
 ]

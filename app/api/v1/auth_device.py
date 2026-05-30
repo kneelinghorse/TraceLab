@@ -20,7 +20,6 @@ already-tested device-code module can be ported with a base-URL swap.
 from __future__ import annotations
 
 import secrets
-import string
 from datetime import datetime, timedelta
 from uuid import UUID
 

@@ -95,6 +95,10 @@ class Document(Base, SoftDeleteMixin):
         comment="Origin type: upload, synthesized, imported",
     )
 
+    # Ownership + tenancy (Sprint 43 RBAC foundation; additive, nullable, unread until Sprint C)
+    owner_id = Column(GUID(), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    workspace_id = Column(GUID(), ForeignKey("workspaces.id", ondelete="SET NULL"), nullable=True)
+
     # Relationships
     chunks = relationship(
         "DocumentChunk", back_populates="document", cascade="all, delete-orphan"
@@ -115,4 +119,5 @@ class Document(Base, SoftDeleteMixin):
         Index("ix_documents_source_type", "source_type"),
         Index("ix_documents_collection_date", "collection_date"),
         Index("idx_documents_source_origin", "source_origin"),
+        Index("ix_documents_workspace_owner_uploaded_at", "workspace_id", "owner_id", "uploaded_at"),
     )

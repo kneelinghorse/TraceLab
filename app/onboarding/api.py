@@ -27,7 +27,7 @@ from app.onboarding.idempotency import IdempotencyService
 from app.onboarding.jobs import create_job, process_job
 from app.onboarding.schemas import JobRead
 from app.schemas.document import DocumentCreate, DocumentRead, DocumentUpdate
-from app.schemas.project import ProjectCreate, ProjectRead, ProjectUpdate
+from app.schemas.project import ProjectRead, ProjectUpdate
 from app.services.cache_manager import get_cache_manager
 from app.services.processing_status import ProcessingStatusRecorder
 
@@ -51,39 +51,12 @@ def _idempotency(
     )
 
 
-@router.post(
-    "/projects",
-    response_model=ProjectRead,
-    status_code=status.HTTP_201_CREATED,
-)
-def create_project(
-    payload: ProjectCreate,
-    request: Request,
-    db: Session = Depends(get_db),
-    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
-) -> Response:
-    """Create a new project record with idempotent semantics."""
-    idempotency = _idempotency(request=request, key=idempotency_key, db=db)
-    cached = idempotency.check_replay(payload.model_dump())
-    if cached:
-        return JSONResponse(content=cached.data, status_code=cached.status_code)
-
-    project = Project(**payload.model_dump(exclude_none=True))
-    db.add(project)
-    db.flush()
-    db.refresh(project)
-
-    resource = ProjectRead.model_validate(project)
-    response_body = resource.model_dump(mode="json")
-
-    idempotency.save_response(
-        request_payload=payload.model_dump(),
-        response_payload=response_body,
-        status_code=status.HTTP_201_CREATED,
-    )
-    db.commit()
-    _cache_manager.invalidate_project_metadata(str(project.id))
-    return JSONResponse(content=response_body, status_code=status.HTTP_201_CREATED)
+# NOTE: POST /projects intentionally lives ONLY on the projects router
+# (app/api/v1/projects.py). It was previously duplicated here but dead-shadowed by
+# first-match-wins router resolution — and this copy did not record owner_id from the
+# caller (predated T43.4). Removed in the Sprint 43 review follow-up; the idempotency
+# support was ported to the canonical handler. The duplicate-route guard in main.py
+# now prevents this shadowing class from recurring.
 
 
 @router.patch("/projects/{project_id}", response_model=ProjectRead)
@@ -229,13 +202,10 @@ def update_document(
     return JSONResponse(content=response_body, status_code=status.HTTP_200_OK)
 
 
-@router.get("/documents/{document_id}", response_model=DocumentRead)
-def get_document(document_id: UUID, db: Session = Depends(get_db)) -> DocumentRead:
-    """Retrieve document details."""
-    document = db.query(Document).filter(Document.id == document_id).first()
-    if not document:
-        raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
-    return DocumentRead.model_validate(document)
+# NOTE: GET /documents/{document_id} intentionally lives ONLY on the documents router
+# (app/api/v1/documents.py), whose handler is a superset (stats + content preview). The
+# copy here was dead-shadowed by first-match-wins resolution; removed in the Sprint 43
+# review follow-up. The duplicate-route guard in main.py prevents recurrence.
 
 
 @router.post(

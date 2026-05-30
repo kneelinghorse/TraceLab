@@ -14,6 +14,7 @@ from app.models.project import Project
 from app.models.report import Report
 from app.schemas.pagination import PaginationMeta
 from app.schemas.project import ProjectCreate, ProjectStats, ProjectUpdate
+from app.services.ownership import default_workspace_id
 
 
 class ProjectQueryService:
@@ -54,9 +55,7 @@ class ProjectQueryService:
 
         query = query.order_by(Project.created_at.desc())
         total = query.count()
-        items = (
-            query.offset((page - 1) * clamped_page_size).limit(clamped_page_size).all()
-        )
+        items = query.offset((page - 1) * clamped_page_size).limit(clamped_page_size).all()
 
         total_pages = math.ceil(total / clamped_page_size) if total else 0
         meta = PaginationMeta(
@@ -85,12 +84,20 @@ class ProjectQueryService:
             query = query.filter(Project.deleted_at.is_(None))
         return query.first()
 
-    def create_project(self, db: Session, data: ProjectCreate) -> Project:
-        """Create a new project."""
+    def create_project(self, db: Session, data: ProjectCreate, owner_id: UUID | None = None) -> Project:
+        """Create a new project.
+
+        owner_id is derived from the authenticated caller by the route (T43.4) and
+        recorded as the trustworthy owner; the legacy self-asserted user_id is no
+        longer accepted from the request body. workspace_id (the project's Space) is
+        likewise derived server-side via ``default_workspace_id`` (T44.4), never
+        from the body.
+        """
         project = Project(
             name=data.name,
             description=data.description,
-            user_id=data.user_id,
+            owner_id=owner_id,
+            workspace_id=default_workspace_id(db),
             mission_protocol_id=data.mission_protocol_id,
             research_type=data.research_type,
             methodology=data.methodology,
@@ -103,9 +110,7 @@ class ProjectQueryService:
         db.refresh(project)
         return project
 
-    def update_project(
-        self, db: Session, project_id: UUID, data: ProjectUpdate
-    ) -> Project | None:
+    def update_project(self, db: Session, project_id: UUID, data: ProjectUpdate) -> Project | None:
         """Update an existing project."""
         project = db.query(Project).filter(Project.id == project_id).first()
         if not project:
@@ -220,12 +225,7 @@ class ProjectQueryService:
         total_tokens = chunk_stats.total_tokens if chunk_stats else 0
 
         # Count reports
-        report_count = (
-            db.query(func.count(Report.id))
-            .filter(Report.project_id == project_id)
-            .scalar()
-            or 0
-        )
+        report_count = db.query(func.count(Report.id)).filter(Report.project_id == project_id).scalar() or 0
 
         # Get last updated timestamp (most recent non-deleted document or report)
         last_doc_update = (
@@ -234,11 +234,7 @@ class ProjectQueryService:
             .filter(Document.deleted_at.is_(None))
             .scalar()
         )
-        last_report_update = (
-            db.query(func.max(Report.updated_at))
-            .filter(Report.project_id == project_id)
-            .scalar()
-        )
+        last_report_update = db.query(func.max(Report.updated_at)).filter(Report.project_id == project_id).scalar()
         last_updated = max(
             filter(None, [project.updated_at, last_doc_update, last_report_update]),
             default=project.updated_at,

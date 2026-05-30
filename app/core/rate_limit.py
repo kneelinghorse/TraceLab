@@ -8,9 +8,8 @@ from __future__ import annotations
 
 import time
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from threading import Lock
-from typing import Dict, List, Tuple
 
 from fastapi import HTTPException, Request, status
 
@@ -28,7 +27,7 @@ class RateLimiter:
 
     def __init__(self, config: RateLimitConfig | None = None) -> None:
         self.config = config or RateLimitConfig()
-        self._requests: Dict[str, List[float]] = defaultdict(list)
+        self._requests: dict[str, list[float]] = defaultdict(list)
         self._lock = Lock()
 
     def _get_client_ip(self, request: Request) -> str:

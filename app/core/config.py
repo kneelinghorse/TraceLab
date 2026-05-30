@@ -69,6 +69,10 @@ class Settings(BaseSettings):
     auth_username: str = "tracelab-admin"
     auth_password: str | None = "changeme"
     auth_password_hash: str | None = None
+    # RBAC enforcement master switch (Sprint 43 T43.6). Default OFF: authorize() is a
+    # pass-through no-op and day-one behavior is byte-identical. Sprint C flips this ON
+    # to activate the deny-by-default policy (after the owner is bootstrapped).
+    rbac_enabled: bool = False
     cors_allowed_origins_dev: list[str] = Field(
         default_factory=lambda: ["http://localhost:3000"]
     )
