@@ -96,8 +96,11 @@ class TestAuthorizeFlagOn:
         # No owner_id attribute -> a non-admin/non-owner is denied (fail closed).
         assert authorization.authorize(_user(ROLE_MEMBER), "read", SimpleNamespace()) is False
 
-    def test_space_membership_is_stubbed_denied(self, rbac_on):
-        # Spaces arrive in Sprint B; the stub denies, so a member without ownership
-        # gets no access via the (not-yet-implemented) Space branch.
+    def test_space_membership_denied_without_session(self, rbac_on):
+        # The Space-membership allow path (T44.3) needs a DB session to resolve the
+        # Space and read space_members. Called without one, a member who does not
+        # own the resource gets no access via that branch -> fail closed (deny).
+        # The membership lookup itself is exercised against a real session in
+        # tests/unit/test_space_membership.py.
         resource = SimpleNamespace(owner_id=uuid4())
         assert authorization.authorize(_user(ROLE_MEMBER), "read", resource) is False

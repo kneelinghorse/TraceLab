@@ -24,8 +24,27 @@ from sqlalchemy.orm import Session
 
 from app.core.security import ROLE_OWNER
 from app.models.user import User
+from app.models.workspace import DEFAULT_WORKSPACE_ID, Workspace
 
 logger = logging.getLogger(__name__)
+
+
+def default_workspace_id(db: Session) -> UUID | None:
+    """Resolve the Space (workspace_id) a newly created resource should belong to.
+
+    T44.4: new projects must not be left space-less (workspace_id NULL), otherwise
+    T44.3's membership/inheritance has no Space to resolve. The Space is derived
+    server-side here and never trusted from a request body.
+
+    This is the single point where a per-user "default Space" will slot in later;
+    for now every new project goes to the seeded Default Workspace (user-confirmed
+    2026-05-29). Returns the Default Workspace's id when that row exists (migration
+    030 guarantees it in any migrated environment), or None when it is absent —
+    degrading gracefully to a NULL Space (tolerated by the NULL-safe membership
+    path) instead of failing the FK on insert.
+    """
+    default = db.query(Workspace).filter(Workspace.id == DEFAULT_WORKSPACE_ID).first()
+    return default.id if default is not None else None
 
 
 class LastOwnerError(Exception):

@@ -151,3 +151,27 @@ def test_ingest_endpoint_returns_quality_gate_failure(
     body = json.loads(response.body.decode("utf-8"))
     assert body["error"]["code"] == "QUALITY_GATE_FAILURE"
     assert "evidence_links" in body["error"]["details"]["failing_gates"]
+
+
+def test_resolve_project_auto_create_assigns_default_workspace(db_session):
+    """T44.4: the DeepSearch auto-create path also assigns the default Space, so
+    DeepSearch-created projects are not left space-less. _resolve_project only
+    reads project_id/auto_create_project/project_name, so a lightweight stand-in
+    avoids building a full MissionProtocolComplete payload."""
+    from types import SimpleNamespace
+
+    from app.api.v1 import deepsearch as deepsearch_module
+    from app.models.workspace import DEFAULT_WORKSPACE_ID, Workspace
+
+    # Seed the Default Workspace (FK target; the create_all'd test DB starts empty).
+    db_session.add(Workspace(id=DEFAULT_WORKSPACE_ID, name="Default Workspace"))
+    db_session.commit()
+
+    payload = SimpleNamespace(
+        project_id=None, auto_create_project=True, project_name="DS Auto Project"
+    )
+    project = deepsearch_module._resolve_project(db_session, payload)
+
+    assert str(project.workspace_id) == DEFAULT_WORKSPACE_ID, (
+        "DeepSearch auto-created project must get the default Space, not NULL"
+    )

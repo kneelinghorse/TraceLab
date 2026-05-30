@@ -14,6 +14,7 @@ from app.models.project import Project
 from app.models.report import Report
 from app.schemas.pagination import PaginationMeta
 from app.schemas.project import ProjectCreate, ProjectStats, ProjectUpdate
+from app.services.ownership import default_workspace_id
 
 
 class ProjectQueryService:
@@ -88,12 +89,15 @@ class ProjectQueryService:
 
         owner_id is derived from the authenticated caller by the route (T43.4) and
         recorded as the trustworthy owner; the legacy self-asserted user_id is no
-        longer accepted from the request body.
+        longer accepted from the request body. workspace_id (the project's Space) is
+        likewise derived server-side via ``default_workspace_id`` (T44.4), never
+        from the body.
         """
         project = Project(
             name=data.name,
             description=data.description,
             owner_id=owner_id,
+            workspace_id=default_workspace_id(db),
             mission_protocol_id=data.mission_protocol_id,
             research_type=data.research_type,
             methodology=data.methodology,

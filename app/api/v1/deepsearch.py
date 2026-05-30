@@ -27,6 +27,7 @@ from app.services.mission_protocol_service import (
     MissionProtocolService,
     MissionProtocolServiceError,
 )
+from app.services.ownership import default_workspace_id
 from app.services.quality_gate_service import QualityGateReport, QualityGateService
 
 logger = logging.getLogger(__name__)
@@ -144,6 +145,9 @@ def _resolve_project(db: Session, payload: DeepSearchIngestRequest) -> Project:
             name=project_name,
             description="DeepSearch auto-created project",
             status="active",
+            # Same server-side default-Space assignment as the project CRUD path
+            # (T44.4) so DeepSearch-created projects are not left space-less.
+            workspace_id=default_workspace_id(db),
         )
         db.add(project)
         db.flush()

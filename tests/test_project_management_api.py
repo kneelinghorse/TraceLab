@@ -183,3 +183,80 @@ class TestProjectOwnershipWritePath:
         project = db_session.query(Project).filter(Project.id == project_id).first()
         assert str(project.owner_id) == str(seed.id), "owner_id must be the authenticated caller"
         assert project.user_id is None, "client-supplied user_id must be ignored"
+
+
+class TestProjectDefaultSpaceWritePath:
+    """T44.4: new projects get a default Space (workspace_id) derived server-side."""
+
+    @staticmethod
+    def _seed_default_workspace(db_session):
+        from app.models.workspace import DEFAULT_WORKSPACE_ID, Workspace
+
+        # Prod seeds this via migration 030; the test DB is create_all'd and starts
+        # empty, so the FK target must be created for the happy path.
+        if (
+            db_session.query(Workspace)
+            .filter(Workspace.id == DEFAULT_WORKSPACE_ID)
+            .first()
+            is None
+        ):
+            db_session.add(Workspace(id=DEFAULT_WORKSPACE_ID, name="Default Workspace"))
+            db_session.commit()
+
+    def test_create_assigns_default_workspace(self, db_session, auth_headers):
+        from fastapi.testclient import TestClient
+
+        from app.main import app
+        from app.models.project import Project
+        from app.models.workspace import DEFAULT_WORKSPACE_ID
+
+        self._seed_default_workspace(db_session)
+
+        with TestClient(app) as client:
+            resp = client.post(
+                "/api/v1/projects",
+                json={"name": "Spaced Project"},
+                headers=auth_headers,
+            )
+        assert resp.status_code == 201, resp.text
+        project_id = resp.json()["id"]
+
+        project = db_session.query(Project).filter(Project.id == project_id).first()
+        assert str(project.workspace_id) == DEFAULT_WORKSPACE_ID, (
+            "new project must be assigned the Default Workspace, not left NULL"
+        )
+
+    def test_create_ignores_client_supplied_workspace_id(self, db_session, auth_headers):
+        from fastapi.testclient import TestClient
+
+        from app.main import app
+        from app.models.project import Project
+        from app.models.workspace import DEFAULT_WORKSPACE_ID
+
+        self._seed_default_workspace(db_session)
+        bogus = str(uuid4())
+
+        with TestClient(app) as client:
+            resp = client.post(
+                "/api/v1/projects",
+                # a self-asserted workspace_id in the body must NEVER be honored
+                json={"name": "Hijack Attempt", "workspace_id": bogus},
+                headers=auth_headers,
+            )
+        assert resp.status_code == 201, resp.text
+        project = db_session.query(Project).filter(Project.id == resp.json()["id"]).first()
+        assert str(project.workspace_id) == DEFAULT_WORKSPACE_ID
+        assert str(project.workspace_id) != bogus, "client workspace_id must be ignored"
+
+    def test_create_degrades_to_null_when_default_workspace_absent(self, db_session):
+        """No Default Workspace row -> graceful NULL Space, no FK crash (legacy
+        NULL-space rows remain tolerated by the membership/inheritance path)."""
+        from app.models.project import Project
+        from app.services.project_query_service import ProjectQueryService
+
+        # db_session starts empty (create_all, no seed) -> no Default Workspace.
+        project = ProjectQueryService().create_project(
+            db_session, ProjectCreate(name="Orphan Space"), owner_id=None
+        )
+        fetched = db_session.query(Project).filter(Project.id == project.id).first()
+        assert fetched.workspace_id is None, "must degrade to NULL when no Default Workspace"

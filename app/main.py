@@ -26,6 +26,7 @@ from app.api.v1 import (
     pedr_preflight,
     pedr_related,
     pedr_search,
+    project_admin,
     projects,
     qdrant_admin,
     quality,
@@ -37,6 +38,7 @@ from app.api.v1 import (
     saved_searches,
     search,
     search_history,
+    spaces,
     synthesize,
     webhooks,
 )
@@ -164,6 +166,18 @@ app.include_router(
     admin_users.router,
     prefix=f"{settings.api_v1_prefix}/admin/users",
     tags=["admin-users"],
+    dependencies=[Depends(require_admin)],
+)
+app.include_router(
+    spaces.router,
+    prefix=f"{settings.api_v1_prefix}/admin/spaces",
+    tags=["admin-spaces"],
+    dependencies=[Depends(require_admin)],
+)
+app.include_router(
+    project_admin.router,
+    prefix=f"{settings.api_v1_prefix}/admin/projects",
+    tags=["admin-project-grouping"],
     dependencies=[Depends(require_admin)],
 )
 app.include_router(

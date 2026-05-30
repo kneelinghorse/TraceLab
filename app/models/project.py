@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import CheckConstraint, Column, DateTime, ForeignKey, Index, Integer, String, Text
+from sqlalchemy.orm import relationship
 
 from app.core.database import Base
 from app.models.mixins import SoftDeleteMixin
@@ -44,6 +45,13 @@ class Project(Base, SoftDeleteMixin):
     # Timestamps
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Cross-cutting themes (Sprint 44 T44.2; additive, dormant). Default lazy
+    # loading -> zero extra queries on existing project loads (byte-identical
+    # day-one); the rows are unread until later sprints.
+    tags = relationship(
+        "ProjectTag", back_populates="project", cascade="all, delete-orphan"
+    )
 
     __table_args__ = (
         CheckConstraint(
