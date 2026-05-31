@@ -42,13 +42,35 @@ BOLA/IDOR surface without locking out the owner or existing users.
   `tests/test_auth_hardening.py` (proven pre-existing via git-stash A/B). This is
   auth-hardening, independent of the authz flip; recommend a dedicated follow-up.
 
-## T46.6 — the flip (NOT done here)
+## T46.6 — the flip: rollout & rollback
 
-1. Bootstrap the owner FIRST (`ensure_owner_bootstrap` runs at startup; migration 031 already backfilled prod).
-2. Set `rbac_enabled=true` (default and/or target deploy env per the rollout plan).
-3. Full regression: owner never locked out, existing access preserved via Space membership, cross-user 403, orphan fail-closed, disabled-user blocked, MCP/webhook/runner unaffected.
-4. Rollback: flipping back to `false` is a clean no-op (the policy short-circuits at the flag).
+**Mechanism.** `rbac_enabled` is a pydantic `Settings` field, so it is overridable by
+the **`RBAC_ENABLED`** environment variable. The code default stays `False`
+(reversible; dev/CI/local stay byte-identical). The flip is therefore an **ops
+action in the deploy env**, not a code-default change — nothing to merge to turn it
+on, nothing to revert to turn it off.
 
-**Env parity requirement (gate 6):** the deploy environment MUST set the SAME
-`AUTH_USERNAME` at migration time and runtime, or bootstrap/backfill resolve different
-owner identities. Confirm on the target service before flipping.
+**Regression (shipped, green).** `tests/test_rbac_flip_regression.py` proves the
+flip is safe: owner never locked out (incl. a bootstrapped owner), admin tier
+unaffected, existing users keep access via Space membership, cross-user 403, orphan
+fail-closed, disabled-user blocked, MCP+webhook trusted-origin paths cannot be gated
+by the flag (zero `authorize()` call sites — asserted structurally), and flip-back is
+a clean no-op (same request: 403 ON → 200 OFF).
+
+**Rollout (operator, on the target service — e.g. Railway):**
+1. **Verify owner exists FIRST** — `SELECT email, role FROM users WHERE role='owner';`
+   must return ≥1 row. (`ensure_owner_bootstrap` runs at startup; migration 031
+   backfilled prod. Zero rows ⇒ do NOT flip — you would lock out owner admin.)
+2. **Confirm `AUTH_USERNAME` parity** (gate 6) — the value set at migration time must
+   equal the runtime value, or bootstrap/backfill resolve different owner identities.
+3. **Set `RBAC_ENABLED=true`** on the service and let it redeploy.
+4. **Exercise the live flow** (DoD-2): authenticate as a non-owner and confirm a
+   cross-user resource fetch returns 403, and the owner/admin retains access.
+
+**Rollback (instant, no deploy of code):** unset `RBAC_ENABLED` (or set `false`) and
+redeploy. `authorize()` short-circuits to allow-all at the flag — byte-identical to
+pre-Sprint-C. No data migration is involved either direction.
+
+> The steps above are operator actions requiring production access; they are NOT
+> performed in this repo/session. Everything code-side (the flip mechanism + the
+> safety regression) is done and green.
