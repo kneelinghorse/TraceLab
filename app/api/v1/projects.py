@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, R
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
+from app.core.authorization import authorize_or_403
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.onboarding.idempotency import IdempotencyService
@@ -37,6 +38,10 @@ def restore_project(
 
     Requires authentication. Only works on projects that have been soft-deleted.
     """
+    existing = _service.get_project(db, project_id, include_deleted=True)
+    if existing is None:
+        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+    authorize_or_403(user, "restore", existing, db)
     result = _service.restore_project(db, project_id)
     if result is None:
         raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
@@ -96,8 +101,17 @@ def list_projects(
 
 
 @router.get("/{project_id}", response_model=ProjectRead)
-def get_project(project_id: UUID, db: Session = Depends(get_db)) -> ProjectRead:
+def get_project(
+    project_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
+) -> ProjectRead:
     """Return a single project record."""
+    project = _service.get_project(db, project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+    authorize_or_403(user, "read", project, db)
+
     cache_key = _cache_manager.project_metadata_key(kind="detail", identifier=str(project_id))
 
     def _loader() -> ProjectRead:
@@ -152,8 +166,13 @@ def update_project(
     project_id: UUID,
     data: ProjectUpdate,
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> ProjectRead:
     """Update an existing project."""
+    existing = _service.get_project(db, project_id)
+    if not existing:
+        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+    authorize_or_403(user, "update", existing, db)
     project = _service.update_project(db, project_id, data)
     if not project:
         raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
@@ -186,6 +205,10 @@ def delete_project(
             detail="Project deletion requires confirm=true query parameter. "
             "This will soft-delete the project (can be restored later).",
         )
+    existing = _service.get_project(db, project_id, include_deleted=True)
+    if existing is None:
+        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+    authorize_or_403(user, "delete", existing, db)
     result = _service.soft_delete_project(db, project_id, deleted_by=user.username)
     if result is None:
         raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
@@ -207,8 +230,14 @@ def delete_project(
 def get_project_stats(
     project_id: UUID,
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> ProjectStats:
     """Get aggregated statistics for a project."""
+    project = _service.get_project(db, project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+    authorize_or_403(user, "read", project, db)
+
     cache_key = _cache_manager.project_metadata_key(kind="stats", identifier=str(project_id))
 
     def _loader() -> ProjectStats:

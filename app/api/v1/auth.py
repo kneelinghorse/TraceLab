@@ -46,6 +46,14 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse
             status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password"
         )
 
+    # Sprint C (T46.3): a soft-disabled user must not be able to obtain a token,
+    # even with correct credentials. 403 (not 401) — the credentials were valid;
+    # the account is administratively disabled.
+    if not db_user.is_active:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, detail="Account is disabled"
+        )
+
     # Update last_login_at
     db_user.last_login_at = datetime.utcnow()
     db.commit()

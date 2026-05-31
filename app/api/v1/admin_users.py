@@ -2,9 +2,10 @@
 
 Backend endpoints (no UI) for the owner/admin tier: list users, change a user's
 role, and enable/disable a user. The whole router is gated by require_admin (wired
-in app/main.py). The last owner can never be demoted or disabled
-(LastOwnerError -> 409 Conflict). is_active is recorded here; login-enforcement of
-disabled users is deferred to Sprint C (this is a zero-enforcement sprint).
+in app/main.py). The last ACTIVE owner can never be demoted or disabled (LastOwnerError -> 409
+Conflict). Disabling (is_active=False) is enforced at every auth path as of
+Sprint C (T46.3): a disabled user can no longer log in or be resolved as a
+principal.
 """
 
 from __future__ import annotations
@@ -66,9 +67,10 @@ def set_user_active(
     is_active: bool = Body(..., embed=True),
     db: Session = Depends(get_db),
 ) -> User:
-    """Enable or disable a user (admin only). The last owner cannot be disabled.
+    """Enable or disable a user (admin only). The last active owner cannot be disabled.
 
-    is_active is recorded now; login-enforcement of disabled users is Sprint C.
+    As of Sprint C (T46.3), is_active is enforced: a disabled user is rejected at
+    login and on every per-request auth path (JWT + API key).
     """
     user = _get_user_or_404(db, user_id)
     # Disabling the final owner would lock out owner administration (once enforced).

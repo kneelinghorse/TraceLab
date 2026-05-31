@@ -18,8 +18,10 @@ from fastapi import (
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
+from app.core.authorization import authorize_or_403
 from app.core.config import settings
 from app.core.database import get_db
+from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.document import Document
 from app.models.ingestion_job import IngestionJob
 from app.models.project import Project
@@ -65,6 +67,7 @@ def update_project(
     payload: ProjectUpdate,
     request: Request,
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> Response:
     """Update project metadata with idempotent replay support."""
@@ -77,6 +80,7 @@ def update_project(
     project = db.query(Project).filter(Project.id == project_id).first()
     if not project:
         raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+    authorize_or_403(user, "update", project, db)
 
     for field, value in payload_dict.items():
         setattr(project, field, value)
@@ -171,6 +175,7 @@ def update_document(
     payload: DocumentUpdate,
     request: Request,
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> Response:
     """Update document metadata."""
@@ -183,6 +188,7 @@ def update_document(
     document = db.query(Document).filter(Document.id == document_id).first()
     if not document:
         raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+    authorize_or_403(user, "update", document, db)
 
     for field, value in payload_dict.items():
         setattr(document, field, value)

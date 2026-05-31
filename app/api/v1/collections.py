@@ -6,7 +6,10 @@ import re
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
+from sqlalchemy.orm import Session
 
+from app.core.authorization import authorize_or_403
+from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.schemas.collection import (
     CollectionCreate,
@@ -90,6 +93,7 @@ def get_collection(
     collection_id: UUID,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
     service: CollectionService = Depends(get_collection_service),
+    db: Session = Depends(get_db),
 ) -> CollectionDetailResponse:
     """Get a collection with all its items."""
     entry = service.get(collection_id)
@@ -97,6 +101,7 @@ def get_collection(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found."
         )
+    authorize_or_403(current_user, "read", entry, db)
 
     items = service.get_items(collection_id)
     item_responses = [_build_item_response(item) for item in items]
@@ -117,12 +122,20 @@ def export_collection(
     collection_id: UUID,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
     service: CollectionService = Depends(get_collection_service),
+    db: Session = Depends(get_db),
 ) -> Response:
     """Export collection as markdown bundle for agent synthesis.
 
     Returns a markdown file containing all chunks with metadata,
     suitable for feeding to AI agents for report generation.
     """
+    entry = service.get(collection_id)
+    if entry is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found."
+        )
+    authorize_or_403(current_user, "read", entry, db)
+
     markdown = service.export_markdown(collection_id)
     if markdown is None:
         raise HTTPException(
@@ -130,7 +143,6 @@ def export_collection(
         )
 
     # Fetch collection name for filename
-    entry = service.get(collection_id)
     filename = "collection-export.md"
     if entry:
         # Sanitize name for filename
@@ -154,8 +166,15 @@ def update_collection(
     request: CollectionUpdate,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
     service: CollectionService = Depends(get_collection_service),
+    db: Session = Depends(get_db),
 ) -> CollectionResponse:
     """Update collection metadata."""
+    existing = service.get(collection_id)
+    if existing is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found."
+        )
+    authorize_or_403(current_user, "update", existing, db)
     try:
         entry = service.update(
             collection_id,
@@ -178,8 +197,15 @@ def delete_collection(
     collection_id: UUID,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
     service: CollectionService = Depends(get_collection_service),
+    db: Session = Depends(get_db),
 ) -> Response:
     """Delete a collection and all its items."""
+    existing = service.get(collection_id)
+    if existing is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found."
+        )
+    authorize_or_403(current_user, "delete", existing, db)
     deleted = service.delete(collection_id)
     if not deleted:
         raise HTTPException(
@@ -198,8 +224,15 @@ def add_chunk_to_collection(
     request: CollectionItemCreate,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
     service: CollectionService = Depends(get_collection_service),
+    db: Session = Depends(get_db),
 ) -> CollectionItemResponse:
     """Add a chunk to a collection."""
+    existing = service.get(collection_id)
+    if existing is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found."
+        )
+    authorize_or_403(current_user, "update", existing, db)
     try:
         item = service.add_chunk(
             collection_id,
@@ -221,8 +254,15 @@ def remove_chunk_from_collection(
     chunk_id: UUID,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
     service: CollectionService = Depends(get_collection_service),
+    db: Session = Depends(get_db),
 ) -> Response:
     """Remove a chunk from a collection."""
+    existing = service.get(collection_id)
+    if existing is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found."
+        )
+    authorize_or_403(current_user, "update", existing, db)
     deleted = service.remove_chunk(collection_id, chunk_id)
     if not deleted:
         raise HTTPException(

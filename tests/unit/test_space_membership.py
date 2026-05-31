@@ -226,3 +226,60 @@ def test_no_session_denied(db, rbac_on):
 def test_none_resource_denied(db, rbac_on):
     """A None resource resolves to no Space -> deny (None-guarded)."""
     assert authorization.authorize(_member(uuid.uuid4()), "read", None, db) is False
+
+
+# --- T46.1: orphan (project_id column present but NULL) vs top-level ---------
+# Sentinel regression (decision #260b). getattr(resource, "project_id", None)
+# collapses "no project_id column" and "project_id IS NULL" to the same None;
+# they require OPPOSITE handling. These tests pin both halves.
+
+
+def test_orphan_child_null_project_id_fails_closed(db, rbac_on):
+    """KEY regression: an orphan child (has a project_id column, value NULL) must
+    fail closed even when the caller IS a member of the child's OWN workspace.
+
+    The reverted-then-restored sentinel distinguishes this from a top-level
+    resource: an orphan has no owning project to inherit from, so it resolves to
+    no Space (deny) and must NOT fall back to its denormalized workspace_id.
+    Before the fix this returned the child's own Space -> ALLOW (the #260b bug).
+    """
+    space_id = _seed_space(db)
+    uid = _seed_user(db)
+    _grant(db, space_id, uid)  # caller IS a member of the orphan's own Space
+    orphan = SimpleNamespace(
+        owner_id=uuid.uuid4(), project_id=None, workspace_id=space_id
+    )
+    assert authorization.authorize(_member(uid), "read", orphan, db) is False
+
+
+def test_orphan_child_owner_still_allowed(db, rbac_on):
+    """An orphan is not bricked for its OWNER: the owner_id allow-path fires
+    before Space resolution, so the orphan's owner keeps access."""
+    space_id = _seed_space(db)
+    uid = _seed_user(db)
+    orphan = SimpleNamespace(owner_id=uid, project_id=None, workspace_id=space_id)
+    assert authorization.authorize(_member(uid), "read", orphan, db) is True
+
+
+def test_real_project_resource_governed_by_own_space(db, rbac_on):
+    """A real top-level Project (no project_id column at all) resolves via its own
+    workspace_id. Guards the sentinel against a Project ever gaining a project_id
+    column: it must take the _NO_PROJECT_FK branch, not the orphan branch."""
+    space_id = _seed_space(db)
+    uid = _seed_user(db)
+    _grant(db, space_id, uid)
+    pid = _seed_project(db, space_id)
+    project = db.query(Project).filter(Project.id == pid).first()
+    assert authorization.authorize(_member(uid), "read", project, db) is True
+
+
+def test_collection_like_top_level_uses_own_space(db, rbac_on):
+    """A Collection-shaped resource (no project_id attribute) is governed by its
+    own workspace_id: member of that Space allowed, non-member denied."""
+    space_id = _seed_space(db)
+    member_uid = _seed_user(db)
+    outsider_uid = _seed_user(db)
+    _grant(db, space_id, member_uid)
+    collection = SimpleNamespace(owner_id=uuid.uuid4(), workspace_id=space_id)
+    assert authorization.authorize(_member(member_uid), "read", collection, db) is True
+    assert authorization.authorize(_member(outsider_uid), "read", collection, db) is False

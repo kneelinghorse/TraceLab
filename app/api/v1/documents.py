@@ -22,6 +22,7 @@ from fastapi import (
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
+from app.core.authorization import authorize_or_403
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.document import Document
@@ -235,7 +236,10 @@ async def upload_document(
 
 @router.post("/{document_id}/process")
 async def process_document(
-    document_id: UUID, background_tasks: BackgroundTasks, db: Session = Depends(get_db)
+    document_id: UUID,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> dict[str, Any]:
     """
     Process a document through the ingestion pipeline.
@@ -251,6 +255,7 @@ async def process_document(
     document = db.query(Document).filter(Document.id == document_id).first()
     if not document:
         raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+    authorize_or_403(user, "process", document, db)
 
     # Get file path
     if not document.file_path:
@@ -290,12 +295,15 @@ async def process_document(
 
 @router.get("/{document_id}", response_model=DocumentRead)
 async def get_document(
-    document_id: UUID, db: Session = Depends(get_db)
+    document_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> DocumentRead:
     """Get a document by ID with stats and content preview."""
     document = _document_query_service.get_document(db, document_id)
     if not document:
         raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+    authorize_or_403(user, "read", document, db)
     _ = document.processing_events
 
     # Compute stats from chunks
@@ -351,7 +359,9 @@ async def get_document(
 
 @router.get("/{document_id}/download")
 async def download_document(
-    document_id: UUID, db: Session = Depends(get_db)
+    document_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> FileResponse:
     """
     Download the original uploaded document file.
@@ -361,6 +371,7 @@ async def download_document(
     document = db.query(Document).filter(Document.id == document_id).first()
     if not document:
         raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+    authorize_or_403(user, "read", document, db)
 
     if not document.file_path:
         raise HTTPException(status_code=400, detail="Document has no associated file")
@@ -389,11 +400,13 @@ async def list_document_chunks(
         description="Results per page",
     ),
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ):
     """Return paginated chunks for a document, ordered by chunk index."""
     document = _document_query_service.get_document(db, document_id)
     if not document:
         raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+    authorize_or_403(user, "read", document, db)
 
     chunks, meta = _document_query_service.list_chunks_by_document(
         db,
@@ -430,6 +443,13 @@ async def delete_document(
             "This will soft-delete the document (can be restored later).",
         )
 
+    existing = _document_query_service.get_document(
+        db, document_id, include_deleted=True
+    )
+    if existing is None:
+        raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+    authorize_or_403(user, "delete", existing, db)
+
     result = _soft_delete_service.soft_delete_document(
         db, document_id, deleted_by=user.username
     )
@@ -463,6 +483,13 @@ async def restore_document(
 
     Requires authentication. Only works on documents that have been soft-deleted.
     """
+    existing = _document_query_service.get_document(
+        db, document_id, include_deleted=True
+    )
+    if existing is None:
+        raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+    authorize_or_403(user, "restore", existing, db)
+
     result = _soft_delete_service.restore_document(db, document_id)
     if result is None:
         raise HTTPException(status_code=404, detail=f"Document {document_id} not found")

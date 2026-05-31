@@ -7,7 +7,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
+from app.core.authorization import authorize_or_403
 from app.core.database import get_db
+from app.core.security import AuthenticatedUser, require_authenticated_user
+from app.models.mission import Mission
 from app.schemas.relationships import RelationshipContextResponse
 from app.services.relationship_service import (
     MissionRelationshipNotFound,
@@ -34,8 +37,17 @@ def get_relationship_context(
         description="Filter out relationships below this relevance score",
     ),
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> RelationshipContextResponse:
     """Return relationship context for the specified mission."""
+
+    mission = db.get(Mission, mission_id)
+    if mission is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Mission {mission_id} not found",
+        )
+    authorize_or_403(user, "read", mission, db)
 
     try:
         return _service.get_relationship_context(

@@ -191,6 +191,25 @@ def get_key_prefix(key: str) -> str:
     return key[:12]
 
 
+def _to_authenticated_user(db_user) -> AuthenticatedUser:
+    """Build the request principal from a users row, enforcing the is_active gate.
+
+    Sprint C (T46.3): a soft-disabled user (is_active=False) is rejected at EVERY
+    principal-resolution point — JWT and API key — so a disable/demote takes effect
+    on the user's very next request without waiting for token expiry (standing rule,
+    decision #226: role/identity is resolved live from the DB per request, never
+    cached in the token).
+    """
+    if not db_user.is_active:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Account is disabled")
+    return AuthenticatedUser(
+        user_id=db_user.id,
+        email=db_user.email,
+        display_name=db_user.display_name,
+        role=db_user.role,
+    )
+
+
 def _validate_api_key(api_key: str) -> AuthenticatedUser | None:
     """Validate an API key and return the authenticated user if valid."""
     from app.models.api_key import APIKey
@@ -221,12 +240,7 @@ def _validate_api_key(api_key: str) -> AuthenticatedUser | None:
                 # Look up user from UUID
                 db_user = db.query(User).filter(User.id == candidate.user_id).first()
                 if db_user:
-                    return AuthenticatedUser(
-                        user_id=db_user.id,
-                        email=db_user.email,
-                        display_name=db_user.display_name,
-                        role=db_user.role,
-                    )
+                    return _to_authenticated_user(db_user)
                 return None
 
         return None
@@ -248,24 +262,14 @@ def _resolve_user_from_jwt(subject: str) -> AuthenticatedUser:
             user_uuid = UUID(subject)
             db_user = db.query(User).filter(User.id == user_uuid).first()
             if db_user:
-                return AuthenticatedUser(
-                    user_id=db_user.id,
-                    email=db_user.email,
-                    display_name=db_user.display_name,
-                    role=db_user.role,
-                )
+                return _to_authenticated_user(db_user)
         except (ValueError, AttributeError):
             pass
 
         # Fallback: subject is a username/display_name (legacy tokens)
         db_user = db.query(User).filter(User.display_name == subject).first()
         if db_user:
-            return AuthenticatedUser(
-                user_id=db_user.id,
-                email=db_user.email,
-                display_name=db_user.display_name,
-                role=db_user.role,
-            )
+            return _to_authenticated_user(db_user)
 
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED, detail="Token subject is not recognized"
