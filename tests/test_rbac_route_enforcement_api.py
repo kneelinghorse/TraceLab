@@ -36,6 +36,7 @@ from app.core.security import ROLE_MEMBER, create_access_token
 from app.main import app
 from app.models.collection import Collection
 from app.models.document import Document
+from app.models.ingestion_job import IngestionJob
 from app.models.mission import Mission
 from app.models.project import Project
 from app.models.report import Report
@@ -192,6 +193,12 @@ PER_ID_ROUTES = [
     # fail-open audit and wired to close the mission BOLA surface fully.
     ("get", f"{API}/missions/{_RID}/related"),
     ("get", f"{API}/missions/{_RID}/quality"),
+    # T46.5: human-facing mission log read + ingestion jobs (governed via parent
+    # Document). POST /missions/{id}/logs is the runner trusted-origin carve-out
+    # (authn-only, not per-user authorized) so it is intentionally excluded here.
+    ("get", f"{API}/missions/{_RID}/logs"),
+    ("post", f"{API}/jobs?document_id={_RID}"),
+    ("get", f"{API}/jobs/{_RID}"),
 ]
 
 
@@ -380,6 +387,48 @@ class TestAdjacentMissionReadRoutes:
         mission = _make_mission(db_session, owner_id=owner.id, project_id=None)
         resp = client.get(f"{API}/missions/{mission.id}/quality", headers=_bearer(owner))
         assert resp.status_code == 200, resp.text
+
+
+class TestAuditSurfacedRoutes:
+    """Routes the T46.2 fail-open audit surfaced, wired in T46.5 per the established
+    patterns: GET mission logs (human read of a mission resource) and ingestion jobs
+    (governed via their parent Document, since IngestionJob has no owner_id)."""
+
+    def test_mission_logs_read_forbidden_for_outsider(self, client, db_session, rbac_on):
+        outsider = _make_user(db_session, "out-logs@x.io")
+        mission = _make_mission(db_session, owner_id=uuid4(), project_id=None)
+        resp = client.get(f"{API}/missions/{mission.id}/logs", headers=_bearer(outsider))
+        assert resp.status_code == 403, resp.text
+
+    def test_mission_logs_read_ok_for_owner(self, client, db_session, rbac_on):
+        owner = _make_user(db_session, "own-logs@x.io")
+        mission = _make_mission(db_session, owner_id=owner.id, project_id=None)
+        resp = client.get(f"{API}/missions/{mission.id}/logs", headers=_bearer(owner))
+        assert resp.status_code == 200, resp.text
+
+    def test_enqueue_job_forbidden_for_outsider(self, client, db_session, rbac_on):
+        # authorize('process') on the parent Document must deny before any job is made.
+        outsider = _make_user(db_session, "out-job@x.io")
+        project = _make_project(db_session, owner_id=uuid4(), workspace_id=None)
+        doc = _make_document(
+            db_session, owner_id=uuid4(), workspace_id=None, project_id=project.id
+        )
+        resp = client.post(f"{API}/jobs?document_id={doc.id}", headers=_bearer(outsider))
+        assert resp.status_code == 403, resp.text
+
+    def test_get_job_governed_by_parent_document(self, client, db_session, rbac_on):
+        owner = _make_user(db_session, "own-job@x.io")
+        outsider = _make_user(db_session, "out-job2@x.io")
+        project = _make_project(db_session, owner_id=uuid4(), workspace_id=None)
+        doc = _make_document(
+            db_session, owner_id=owner.id, workspace_id=None, project_id=project.id
+        )
+        job = IngestionJob(project_id=project.id, document_id=doc.id, status="PENDING")
+        db_session.add(job)
+        db_session.commit()
+        db_session.refresh(job)
+        assert client.get(f"{API}/jobs/{job.id}", headers=_bearer(outsider)).status_code == 403
+        assert client.get(f"{API}/jobs/{job.id}", headers=_bearer(owner)).status_code == 200
 
 
 class TestFlagOffNoOp:

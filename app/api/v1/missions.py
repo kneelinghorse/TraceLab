@@ -940,9 +940,13 @@ def ingest_mission_logs(
 ) -> dict:
     """Accept a batch of log lines from the DeepSearch runner.
 
-    Intended to be called by TracelabLogHandler from the DeepSearch service.
-    Requires no auth token so the runner can call it with just an API key
-    in future, but for now it's open (same as other mission endpoints).
+    Called by TracelabLogHandler in the DeepSearch service. This is a
+    service-to-service WRITE, so it is a deliberate TRUSTED-ORIGIN CARVE-OUT from
+    per-user authorize() (decision #260(3), the same class as MCP/webhook origins;
+    a formal service-role tier is deferred). Authentication still applies at the
+    router level; only the per-resource authorize() is intentionally omitted —
+    the runner is not a per-user principal with Space membership. The human-facing
+    READ side (GET .../logs) IS authorize()-gated below.
     """
     from app.models.mission_log import MissionLog
 
@@ -976,11 +980,13 @@ def get_mission_logs(
     mission_id: UUID,
     limit: int = Query(default=100, ge=1, le=500, description="Max log lines to return"),
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> list[LogEntryResponse]:
     """Return the most recent log lines for a mission, newest last."""
     from app.models.mission_log import MissionLog
 
     mission = _service.get_mission(db, mission_id)
+    authorize_or_403(user, "read", mission, db)
 
     logs = (
         db.query(MissionLog)

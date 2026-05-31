@@ -16,7 +16,14 @@ from fastapi import APIRouter, Body, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.security import ROLE_ADMIN, ROLE_MEMBER, ROLE_OWNER, ROLE_VIEWER
+from app.core.security import (
+    ROLE_ADMIN,
+    ROLE_MEMBER,
+    ROLE_OWNER,
+    ROLE_VIEWER,
+    AuthenticatedUser,
+    require_admin,
+)
 from app.models.user import User
 from app.schemas.auth import AdminUserResponse
 from app.services.ownership import LastOwnerError, assert_not_last_owner
@@ -44,10 +51,20 @@ def set_user_role(
     user_id: UUID,
     role: str = Body(..., embed=True),
     db: Session = Depends(get_db),
+    caller: AuthenticatedUser = Depends(require_admin),
 ) -> User:
-    """Change a user's role (admin only). The last owner cannot be demoted."""
+    """Change a user's role. Admins may assign any NON-owner role; granting
+    ROLE_OWNER requires the caller to be an owner (closes the admin→owner
+    privilege-escalation path, T46.4). The last active owner cannot be demoted."""
     if role not in _VALID_ROLES:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=f"Invalid role: {role!r}")
+    # Only an owner can mint another owner; a mere admin cannot self-promote or
+    # escalate anyone to owner via this endpoint.
+    if role == ROLE_OWNER and caller.role != ROLE_OWNER:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail="Only an owner can grant the owner role",
+        )
     user = _get_user_or_404(db, user_id)
     # Demoting an owner away from 'owner' must not remove the final owner.
     if user.role == ROLE_OWNER and role != ROLE_OWNER:

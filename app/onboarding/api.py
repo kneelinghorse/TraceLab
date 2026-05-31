@@ -225,6 +225,7 @@ def enqueue_ingestion_job(
     background_tasks: BackgroundTasks,
     request: Request,
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> Response:
     """Create an ingestion job and dispatch it to the background runner."""
@@ -241,6 +242,9 @@ def enqueue_ingestion_job(
     document = db.query(Document).filter(Document.id == document_id).first()
     if not document:
         raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+    # IngestionJob has no owner_id/workspace_id; it is governed via its parent
+    # Document — enqueueing processing is a write against that document (T46.4).
+    authorize_or_403(user, "process", document, db)
     if not document.file_path:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -270,11 +274,21 @@ def enqueue_ingestion_job(
 
 
 @router.get("/jobs/{job_id}", response_model=JobRead)
-def get_job(job_id: UUID, db: Session = Depends(get_db)) -> JobRead:
+def get_job(
+    job_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
+) -> JobRead:
     """Return ingestion job status."""
     job = db.query(IngestionJob).filter(IngestionJob.id == job_id).first()
     if not job:
         raise HTTPException(status_code=404, detail=f"Job {job_id} not found")
+    # Governed via the parent Document (the job carries no owner_id/workspace_id).
+    # Fail closed if the parent is gone (NOT NULL FK + CASCADE makes this unlikely).
+    document = db.query(Document).filter(Document.id == job.document_id).first()
+    if document is None:
+        raise HTTPException(status_code=404, detail=f"Job {job_id} not found")
+    authorize_or_403(user, "read", document, db)
     return JobRead.model_validate(job)
 
 
