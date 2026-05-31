@@ -43,7 +43,7 @@ from app.api.v1 import (
     webhooks,
 )
 from app.core.config import settings
-from app.core.database import Base, SessionLocal, engine
+from app.core.database import SessionLocal
 from app.core.qdrant_client import prewarm_qdrant
 from app.core.security import require_admin, require_authenticated_user
 from app.onboarding import router as onboarding_router
@@ -83,9 +83,11 @@ class ProxyHeadersMiddleware:
         await self.app(scope, receive, send)
 
 
-# Create tables in development (use migrations in production)
-if settings.environment == "development":
-    Base.metadata.create_all(bind=engine)
+# Schema is owned exclusively by Alembic migrations (`alembic upgrade head`),
+# which railway.json runs before boot. The dev-gated Base.metadata.create_all was
+# removed in T45.2 (sprint-45): it created a second, drifting schema authority that
+# crash-looped prod when create_all-era tables collided with migrations (learning
+# #90). Tests still provision their schema via create_all in tests/conftest.py.
 
 app = FastAPI(
     title=settings.app_name,

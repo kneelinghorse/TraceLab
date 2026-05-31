@@ -239,6 +239,36 @@ See `cmos/docs/mcp-reference.md` for complete parameter documentation.
 - **Packaging**: Create distribution with `./cmos/scripts/package_starter.sh` (outputs to `cmos/dist/`)
 - **Reset for distribution**: Use `./cmos/scripts/reset_starter.sh` to clear runtime data before packaging
 
+### Sprint-Boundary Identity Sync (Runbook)
+
+`project_identity.status` and `master_context.project_identity.status` do **not** auto-update when a sprint opens or closes — `cmos_sprint(action="complete")` and sprint creation only touch the sprint record. Left unsynced, `cmos_review` reports a stale sprint (e.g. project shows `sprint-44-complete` while `sprint-45` is already Active). Run this runbook at **every sprint open and every sprint close** until the sync is automated server-side (see Durable fix below).
+
+**Status-string convention** (`project_identity.status` / `master_context.project_identity.status`):
+
+- Active sprint: `sprint-<N>-active`
+- Closed sprint: `sprint-<N>-complete`
+
+**Pointers that must agree on the current sprint** (four denormalized copies + the authoritative sprint record):
+
+| Store | Path | Sync target |
+| --- | --- | --- |
+| project_identity (Layer 0) | `status` | `sprint-<N>-active` / `-complete` |
+| master_context | `project_identity.status` | same as above |
+| master_context | `metadata.current_sprint` / `metadata.sprint_status` | `sprint-<N>` / `Active`\|`Completed` |
+| master_context | `current_sprint.{id,name,status,focus}` | the active sprint's fields |
+| sprint record | `cmos_sprint(action="show", sprintId="sprint-<N>")` | authoritative — read-only source of truth |
+
+**Procedure** (MCP tools; `<N>` = the new current sprint):
+
+1. Read the source of truth: `cmos_sprint(action="list")` → note the single sprint with `status:"Active"`.
+2. Sync Layer-0 identity: `cmos_context(action="update", contextType="project_identity", mode="manual", fieldUpdates=[{path:"status", value:"sprint-<N>-active"}])`
+3. Sync master_context in one call: `cmos_context(action="update", contextType="master_context", mode="manual", fieldUpdates=[{path:"project_identity.status", value:"sprint-<N>-active"}, {path:"metadata.current_sprint", value:"sprint-<N>"}, {path:"metadata.sprint_status", value:"Active"}, {path:"current_sprint", value:{id:"sprint-<N>", name:"<title>", status:"Active", focus:"<one-line focus>"}}])`
+4. Verify: `cmos_review()` → `project.status` reads `sprint-<N>-active` and `sprint.id` = `sprint-<N>`. The full `master_context` view is large; extract just these fields with `jq` rather than reading the whole blob.
+
+On **sprint close** with no immediately-following open, use the `-complete` variant and `metadata.sprint_status:"Completed"`.
+
+**Durable fix (cross-project):** the permanent automation belongs in `cmos-mcp-pro`'s sprint-open and `cmos_sprint complete` handlers, which should write these identity pointers whenever a sprint's status changes. Until that lands, this runbook is the mechanism — keep it in the build-session closeout checklist.
+
 ### Incident Response
 - For blocked missions: Document unblock criteria and required actions in database
 - For fallback scenarios: Review telemetry, document root cause, update patterns if needed
@@ -260,6 +290,6 @@ See `cmos/docs/mcp-reference.md` for complete parameter documentation.
 
 ---
 
-**Last Updated**: 2025-12-10
+**Last Updated**: 2026-05-30
 **CMOS Version**: 2.1 (MCP-enabled)
 **Replaces**: `AI-coding-assistant-workflows.md`, `cmos_Playbook.md`, `packaging-guide.md`, `integration-testing-guide.md`
