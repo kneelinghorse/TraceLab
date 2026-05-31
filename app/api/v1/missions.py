@@ -16,9 +16,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi import status as http_status
 from sqlalchemy.orm import Session
 
+from app.core.authorization import authorize_or_403
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.mission_events import emit_mission_status_change
+from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.schemas.mission import (
     MissionContractPreviewResponse,
     MissionCreate,
@@ -286,6 +288,7 @@ def list_missions(
 def get_mission(
     mission_id: str,
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> MissionResponse:
     """Get a mission by UUID or human-readable mission_id.
 
@@ -293,6 +296,7 @@ def get_mission(
     """
     try:
         mission = _get_mission_by_id_or_mission_id(db, mission_id)
+        authorize_or_403(user, "read", mission, db)
         return _to_response(mission)
     except MissionNotFoundError as exc:
         raise HTTPException(
@@ -302,6 +306,10 @@ def get_mission(
                 suggestion="Check mission_id spelling or query GET /api/v1/missions to list available missions.",
             ),
         ) from exc
+    except HTTPException:
+        # authorize_or_403's 403 (and any other HTTP error) must propagate
+        # unchanged, not be re-wrapped as 500 by the catch-all below.
+        raise
     except Exception as exc:
         logger.exception("Error getting mission")
         raise HTTPException(
@@ -423,6 +431,7 @@ def update_mission(
     mission_id: UUID,
     data: MissionUpdate,
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> MissionResponse:
     """Update an existing mission.
 
@@ -435,6 +444,7 @@ def update_mission(
     try:
         # Get current mission state before update
         old_mission = _service.get_mission(db, mission_id)
+        authorize_or_403(user, "update", old_mission, db)
         old_status = old_mission.status
         old_has_report = old_mission.result_report_id is not None
 
@@ -529,12 +539,15 @@ def update_mission(
 def delete_mission(
     mission_id: UUID,
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> Response:
     """Delete a mission.
 
     - **mission_id**: The mission's UUID (not the human-readable mission_id)
     """
     try:
+        mission = _service.get_mission(db, mission_id)
+        authorize_or_403(user, "delete", mission, db)
         _service.delete_mission(db, mission_id)
         return Response(status_code=http_status.HTTP_204_NO_CONTENT)
     except MissionNotFoundError as exc:
@@ -542,6 +555,9 @@ def delete_mission(
             status_code=http_status.HTTP_404_NOT_FOUND,
             detail=str(exc),
         ) from exc
+    except HTTPException:
+        # authorize_or_403's 403 must propagate, not be re-wrapped as 500.
+        raise
     except Exception as exc:
         logger.exception("Error deleting mission")
         raise HTTPException(
@@ -555,6 +571,7 @@ def export_mission(
     mission_id: str,
     format: str = Query(default="yaml", description="Export format: yaml or md"),
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ):
     """Export a mission in the requested format."""
     from fastapi.responses import PlainTextResponse
@@ -567,6 +584,7 @@ def export_mission(
         raise HTTPException(
             status_code=http_status.HTTP_404_NOT_FOUND, detail=str(exc)
         ) from exc
+    authorize_or_403(user, "read", mission, db)
 
     protocol_service = MissionProtocolService()
     if format == "md":
@@ -651,6 +669,7 @@ def import_mission(
 def submit_mission(
     mission_id: str,
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> MissionSubmitResponse:
     """Submit a mission for DeepSearch execution.
 
@@ -666,6 +685,7 @@ def submit_mission(
     """
     try:
         mission = _get_mission_by_id_or_mission_id(db, mission_id)
+        authorize_or_403(user, "submit", mission, db)
         return _submit_existing_mission(db=db, mission=mission)
 
     except MissionNotFoundError as exc:
@@ -698,6 +718,7 @@ def submit_mission(
 def contract_preview(
     mission_id: str,
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> MissionContractPreviewResponse:
     """Proxy the mission's authoring fields to DeepSearch's preview endpoint.
 
@@ -716,6 +737,7 @@ def contract_preview(
                 suggestion="Check the mission_id spelling or list missions via GET /api/v1/missions.",
             ),
         ) from exc
+    authorize_or_403(user, "read", mission, db)
 
     try:
         preview = _call_deepsearch_preview(mission)
@@ -754,6 +776,7 @@ def contract_preview(
 def promote_mission_report(
     mission_id: UUID,
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> ReportPromotionResponse:
     """Promote a mission's report/markdown to a searchable document.
 
@@ -779,6 +802,7 @@ def promote_mission_report(
     try:
         # Get mission
         mission = _service.get_mission(db, mission_id)
+        authorize_or_403(user, "promote", mission, db)
 
         # Validate mission is completed
         if mission.status != "completed":
@@ -916,9 +940,13 @@ def ingest_mission_logs(
 ) -> dict:
     """Accept a batch of log lines from the DeepSearch runner.
 
-    Intended to be called by TracelabLogHandler from the DeepSearch service.
-    Requires no auth token so the runner can call it with just an API key
-    in future, but for now it's open (same as other mission endpoints).
+    Called by TracelabLogHandler in the DeepSearch service. This is a
+    service-to-service WRITE, so it is a deliberate TRUSTED-ORIGIN CARVE-OUT from
+    per-user authorize() (decision #260(3), the same class as MCP/webhook origins;
+    a formal service-role tier is deferred). Authentication still applies at the
+    router level; only the per-resource authorize() is intentionally omitted —
+    the runner is not a per-user principal with Space membership. The human-facing
+    READ side (GET .../logs) IS authorize()-gated below.
     """
     from app.models.mission_log import MissionLog
 
@@ -952,11 +980,13 @@ def get_mission_logs(
     mission_id: UUID,
     limit: int = Query(default=100, ge=1, le=500, description="Max log lines to return"),
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> list[LogEntryResponse]:
     """Return the most recent log lines for a mission, newest last."""
     from app.models.mission_log import MissionLog
 
     mission = _service.get_mission(db, mission_id)
+    authorize_or_403(user, "read", mission, db)
 
     logs = (
         db.query(MissionLog)

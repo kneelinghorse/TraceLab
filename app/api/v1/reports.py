@@ -5,7 +5,10 @@ from __future__ import annotations
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from sqlalchemy.orm import Session
 
+from app.core.authorization import authorize_or_403
+from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.schemas.report import (
     CitationSchema,
@@ -148,6 +151,7 @@ def get_report(
     report_id: UUID,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
     service: ReportService = Depends(get_report_service),
+    db: Session = Depends(get_db),
 ) -> ReportDetailResponse:
     """Get a single report with its sources."""
     report = service.get_report(report_id)
@@ -156,6 +160,7 @@ def get_report(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Report not found.",
         )
+    authorize_or_403(current_user, "read", report, db)
     return _build_report_detail(report)
 
 
@@ -165,6 +170,7 @@ def export_report(
     format: str = Query(default="md", description="Export format: md, json, or txt"),
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
     service: ReportService = Depends(get_report_service),
+    db: Session = Depends(get_db),
 ) -> Response:
     """Export a report as markdown, JSON, or plain text."""
     import json as json_lib
@@ -181,6 +187,7 @@ def export_report(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Report not found.",
         )
+    authorize_or_403(current_user, "read", report, db)
 
     safe_title = report.title.replace(" ", "-").replace("/", "-")[:80]
 
@@ -211,8 +218,17 @@ def update_report(
     request: ReportUpdate,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
     service: ReportService = Depends(get_report_service),
+    db: Session = Depends(get_db),
 ) -> ReportDetailResponse:
     """Update report title or status."""
+    existing = service.get_report(report_id)
+    if existing is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Report not found.",
+        )
+    authorize_or_403(current_user, "update", existing, db)
+
     updates = request.model_dump(exclude_unset=True)
     report = service.update_report(report_id, updates=updates)
     if report is None:
@@ -230,8 +246,16 @@ def delete_report(
     report_id: UUID,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
     service: ReportService = Depends(get_report_service),
+    db: Session = Depends(get_db),
 ) -> DeleteResponse:
     """Delete a report and its sources."""
+    existing = service.get_report(report_id)
+    if existing is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Report not found.",
+        )
+    authorize_or_403(current_user, "delete", existing, db)
     deleted = service.delete_report(report_id)
     if not deleted:
         raise HTTPException(

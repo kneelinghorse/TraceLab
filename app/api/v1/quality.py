@@ -7,7 +7,9 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.authorization import authorize_or_403
 from app.core.database import get_db
+from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.mission_protocol import MissionProtocolDraft
 from app.schemas.quality_gates import QualityGateReportResponse, QualityGateStatus
 from app.services.cache_manager import get_cache_manager
@@ -35,8 +37,18 @@ def _http_error(exc: MissionProtocolServiceError) -> HTTPException:
 
 @router.get("/missions/{mission_id}/quality", response_model=QualityGateReportResponse)
 def mission_quality_status(
-    mission_id: UUID, db: Session = Depends(get_db)
+    mission_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> QualityGateReportResponse:
+    # Authorize on EVERY request, before (and independent of) the response cache —
+    # a cache hit must not bypass the per-resource check.
+    try:
+        mission_for_authz = _mission_service.get_mission(db, mission_id)
+    except MissionProtocolServiceError as exc:
+        raise _http_error(exc) from exc
+    authorize_or_403(user, "read", mission_for_authz, db)
+
     cache_key = _cache_manager.quality_gate_key(str(mission_id))
 
     def _loader() -> QualityGateReportResponse:

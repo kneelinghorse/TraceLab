@@ -2,9 +2,10 @@
 
 Backend endpoints (no UI) for the owner/admin tier: list users, change a user's
 role, and enable/disable a user. The whole router is gated by require_admin (wired
-in app/main.py). The last owner can never be demoted or disabled
-(LastOwnerError -> 409 Conflict). is_active is recorded here; login-enforcement of
-disabled users is deferred to Sprint C (this is a zero-enforcement sprint).
+in app/main.py). The last ACTIVE owner can never be demoted or disabled (LastOwnerError -> 409
+Conflict). Disabling (is_active=False) is enforced at every auth path as of
+Sprint C (T46.3): a disabled user can no longer log in or be resolved as a
+principal.
 """
 
 from __future__ import annotations
@@ -15,7 +16,14 @@ from fastapi import APIRouter, Body, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.security import ROLE_ADMIN, ROLE_MEMBER, ROLE_OWNER, ROLE_VIEWER
+from app.core.security import (
+    ROLE_ADMIN,
+    ROLE_MEMBER,
+    ROLE_OWNER,
+    ROLE_VIEWER,
+    AuthenticatedUser,
+    require_admin,
+)
 from app.models.user import User
 from app.schemas.auth import AdminUserResponse
 from app.services.ownership import LastOwnerError, assert_not_last_owner
@@ -43,10 +51,20 @@ def set_user_role(
     user_id: UUID,
     role: str = Body(..., embed=True),
     db: Session = Depends(get_db),
+    caller: AuthenticatedUser = Depends(require_admin),
 ) -> User:
-    """Change a user's role (admin only). The last owner cannot be demoted."""
+    """Change a user's role. Admins may assign any NON-owner role; granting
+    ROLE_OWNER requires the caller to be an owner (closes the admin→owner
+    privilege-escalation path, T46.4). The last active owner cannot be demoted."""
     if role not in _VALID_ROLES:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=f"Invalid role: {role!r}")
+    # Only an owner can mint another owner; a mere admin cannot self-promote or
+    # escalate anyone to owner via this endpoint.
+    if role == ROLE_OWNER and caller.role != ROLE_OWNER:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail="Only an owner can grant the owner role",
+        )
     user = _get_user_or_404(db, user_id)
     # Demoting an owner away from 'owner' must not remove the final owner.
     if user.role == ROLE_OWNER and role != ROLE_OWNER:
@@ -66,9 +84,10 @@ def set_user_active(
     is_active: bool = Body(..., embed=True),
     db: Session = Depends(get_db),
 ) -> User:
-    """Enable or disable a user (admin only). The last owner cannot be disabled.
+    """Enable or disable a user (admin only). The last active owner cannot be disabled.
 
-    is_active is recorded now; login-enforcement of disabled users is Sprint C.
+    As of Sprint C (T46.3), is_active is enforced: a disabled user is rejected at
+    login and on every per-request auth path (JWT + API key).
     """
     user = _get_user_or_404(db, user_id)
     # Disabling the final owner would lock out owner administration (once enforced).

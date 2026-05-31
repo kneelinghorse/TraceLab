@@ -20,6 +20,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from fastapi import HTTPException, status
+
 from app.core.config import settings
 from app.core.security import ROLE_ADMIN, ROLE_OWNER, AuthenticatedUser
 
@@ -28,6 +30,12 @@ if TYPE_CHECKING:
 
 # Tier with unconditional access under the enabled policy.
 _PRIVILEGED_ROLES = frozenset({ROLE_OWNER, ROLE_ADMIN})
+
+# Sentinel distinguishing "resource has no project_id column at all" (top-level
+# Project/Collection) from "resource has a project_id column whose value is NULL"
+# (an orphan child Mission/Report). getattr(..., None) collapses both to None;
+# they need opposite handling, so we probe with a unique object instead.
+_NO_PROJECT_FK = object()
 
 
 def _effective_space_id(resource: object, db: Session) -> object | None:
@@ -38,21 +46,32 @@ def _effective_space_id(resource: object, db: Session) -> object | None:
     architecture #196). A top-level resource (e.g. a Project, which has no
     project_id) uses its own ``workspace_id``.
 
+    An *orphan* child — one that has a ``project_id`` column but whose value is
+    NULL — cannot resolve an owning project, so it fails closed (returns None) per
+    decision #260(b). It MUST NOT fall back to its own denormalized
+    ``workspace_id``; doing so would let any member of the child's own Space reach
+    a resource that has been detached from every project.
+
     Returns None when the Space cannot be resolved (no/NULL workspace_id, missing
-    project, None resource) — callers must treat None as "no membership"
-    (fail-closed).
+    project, orphan child, None resource) — callers must treat None as "no
+    membership" (fail-closed).
     """
-    project_id = getattr(resource, "project_id", None)
-    if project_id is not None:
-        # Child resource: the owning project's Space is authoritative, NOT the
-        # child's own (denormalized) workspace_id column.
-        from app.models.project import Project
+    project_id = getattr(resource, "project_id", _NO_PROJECT_FK)
+    if project_id is _NO_PROJECT_FK:
+        # Top-level resource (e.g. Project/Collection): no project_id column at
+        # all -> governed by its own Space.
+        return getattr(resource, "workspace_id", None)
+    if project_id is None:
+        # Orphan child: has a project_id column but it is NULL -> no owning
+        # project to inherit from -> fail closed (decision #260b).
+        return None
 
-        project = db.get(Project, project_id)
-        return getattr(project, "workspace_id", None) if project is not None else None
+    # Child resource with a real project_id: the owning project's Space is
+    # authoritative, NOT the child's own (denormalized) workspace_id column.
+    from app.models.project import Project
 
-    # Top-level resource (e.g. a Project): its own Space.
-    return getattr(resource, "workspace_id", None)
+    project = db.get(Project, project_id)
+    return getattr(project, "workspace_id", None) if project is not None else None
 
 
 def _has_space_membership(
@@ -120,3 +139,29 @@ def authorize(
     if db is None:
         return False
     return _has_space_membership(user, resource, db)
+
+
+def authorize_or_403(
+    user: AuthenticatedUser,
+    action: str,
+    resource: object,
+    db: Session,
+) -> None:
+    """Authorize ``user`` for ``action`` on ``resource`` or raise HTTP 403.
+
+    Imperative wrapper over :func:`authorize` for route call sites (Sprint C
+    T46.2). The route loads the resource (returning 404 itself if it is absent),
+    then calls this immediately before reading/mutating it. The request session is
+    threaded through so the Space-membership branch can resolve; all fail-closed
+    semantics are inherited from ``authorize``.
+
+    While ``rbac_enabled`` is False ``authorize`` is a no-op (returns True), so
+    this never raises and wired routes stay byte-identical to pre-Sprint-C
+    behaviour for the *authorization* layer. (Authentication, added to the same
+    routes, is independent of the flag.)
+    """
+    if not authorize(user, action, resource, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have access to this resource.",
+        )

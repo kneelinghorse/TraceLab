@@ -46,9 +46,11 @@ class ProjectRead(ProjectBase):
     id: UUID
     created_at: datetime
     updated_at: datetime
+    # Authoritative owner (T43.4 write-path; surfaced read-side here in Sprint C
+    # T46.4). Server-derived from the creating caller, never client-settable.
+    owner_id: UUID | None = None
     # Legacy self-asserted field, retained in the response for backward compat.
     # No longer client-settable (T43.4); null for projects created after T43.4.
-    # The authoritative owner is owner_id (surfaced read-side in a later sprint).
     user_id: UUID | None = None
 
     model_config = ConfigDict(from_attributes=True)

@@ -95,12 +95,27 @@ def ensure_owner_bootstrap(db: Session) -> bool:
 
 
 def is_last_owner(db: Session, user_id: UUID) -> bool:
-    """True if ``user_id`` is an owner and no other owner exists."""
+    """True if ``user_id`` is an owner and no other ACTIVE owner exists.
+
+    Sprint C (T46.3): only ``is_active`` owners count as a fallback, because a
+    soft-disabled owner can no longer log in (is_active is enforced at every auth
+    path). So disabling or demoting the last *active* owner is blocked even when
+    other — but disabled — owners exist; otherwise owner administration could be
+    locked out the moment the flag flips.
+    """
     user = db.query(User).filter(User.id == user_id).first()
     if user is None or user.role != ROLE_OWNER:
         return False
-    other_owners = db.query(User).filter(User.role == ROLE_OWNER, User.id != user_id).count()
-    return other_owners == 0
+    other_active_owners = (
+        db.query(User)
+        .filter(
+            User.role == ROLE_OWNER,
+            User.is_active.is_(True),
+            User.id != user_id,
+        )
+        .count()
+    )
+    return other_active_owners == 0
 
 
 def assert_not_last_owner(db: Session, user_id: UUID) -> None:
