@@ -87,9 +87,10 @@ class TestSyncStatesMigration:
         """Simulate the dev-gated create_all having already made sync_states.
 
         Upgrade to 034 (chain just below 035), create sync_states out of band the
-        way create_all would (from the model's own metadata), then upgrade to head.
+        way create_all would (from the model's own metadata), then upgrade to 035.
         035 must NOT raise DuplicateTable — it must detect the table and no-op while
-        still advancing the alembic version to 035.
+        still advancing the alembic version to 035. Targets REV_035 explicitly (not
+        "head") so the version assertion stays correct as later migrations land.
         """
         from app.models.sync_state import SyncState
 
@@ -102,7 +103,7 @@ class TestSyncStatesMigration:
             assert "sync_states" in set(inspect(engine).get_table_names())
 
             # The guarded upgrade must be a clean no-op, not DuplicateTable.
-            command.upgrade(alembic_cfg, "head")
+            command.upgrade(alembic_cfg, REV_035)
 
             assert "sync_states" in set(inspect(engine).get_table_names())
             with engine.connect() as conn:

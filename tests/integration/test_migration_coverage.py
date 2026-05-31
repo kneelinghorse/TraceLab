@@ -32,8 +32,9 @@ pytestmark = pytest.mark.integration
 # Tables created by the migration chain that have no ORM model — allowed extras,
 # not coverage gaps:
 #   - alembic_version : alembic's own revision-bookkeeping table.
-#   - metadata        : orphan from migration 001, no model maps to it (T45.3 drops it).
-NON_MODEL_TABLES = {"alembic_version", "metadata"}
+# The orphan `metadata` table from migration 001 was dropped by migration 036
+# (T45.3), so a head database no longer carries it and it needs no allowlist entry.
+NON_MODEL_TABLES = {"alembic_version"}
 
 
 def _all_model_tables() -> set[str]:
