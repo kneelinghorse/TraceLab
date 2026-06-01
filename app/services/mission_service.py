@@ -44,6 +44,7 @@ class MissionService:
         page_size: int = DEFAULT_PAGE_SIZE,
         status: str | None = None,
         project_id: UUID | None = None,
+        access_filter=None,
     ) -> tuple[list[Mission], PaginationMeta]:
         """Return paginated missions with optional filtering.
 
@@ -70,6 +71,11 @@ class MissionService:
 
         if project_id:
             query = query.filter(Mission.project_id == project_id)
+
+        # RBAC row-filter (T47.3): scope to missions the caller may read, before
+        # count + pagination so the page is correct. None = no filtering.
+        if access_filter is not None:
+            query = query.filter(access_filter)
 
         # Order by creation time (most recent first)
         query = query.order_by(Mission.created_at.desc())

@@ -1,13 +1,17 @@
 """Authentication API endpoints for JWT login, refresh, and API key management."""
 
+import logging
+import re
 from datetime import datetime, timedelta
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.rate_limit import auth_rate_limiter, client_ip
 from app.core.security import (
+    ROLE_MEMBER,
     AuthenticatedUser,
     generate_api_key,
     get_key_prefix,
@@ -32,16 +36,40 @@ from app.schemas.auth import LoginRequest, ProfileResponse, ProfileUpdate, Regis
 
 router = APIRouter(tags=["auth"])
 
+logger = logging.getLogger(__name__)
+
+# Strip C0 control chars + DEL from attacker-controlled values before they enter a
+# line-oriented audit log, so a CRLF-laced email/IP can't forge or split records
+# (CWE-117 log injection; T47.5 review).
+_LOG_UNSAFE = re.compile(r"[\x00-\x1f\x7f]")
+
+
+def _log_safe(value: str) -> str:
+    return _LOG_UNSAFE.sub(" ", value)
+
+
 # Maximum API keys per user
 MAX_API_KEYS_PER_USER = 10
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
+def login(
+    payload: LoginRequest, request: Request, db: Session = Depends(get_db)
+) -> TokenResponse:
     """Authenticate a user against the users table and return a signed JWT."""
+    # T47.5: throttle brute-force at the edge (5/60s per IP) BEFORE touching the DB
+    # or verifying a password — counts every attempt, success or failure (429 + Retry-After).
+    auth_rate_limiter.check(request)
+
     db_user = db.query(User).filter(User.email == payload.email).first()
 
     if not db_user or not verify_password(payload.password, db_user.password_hash):
+        # T47.5: audit failed logins (no reason-leak between "no such user" and
+        # "wrong password" — both are invalid_credentials, so we don't reveal which).
+        logger.warning(
+            f"auth_failure reason=invalid_credentials email={_log_safe(payload.email)} "
+            f"ip={_log_safe(client_ip(request))}"
+        )
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password"
         )
@@ -50,6 +78,10 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse
     # even with correct credentials. 403 (not 401) — the credentials were valid;
     # the account is administratively disabled.
     if not db_user.is_active:
+        logger.warning(
+            f"auth_failure reason=account_disabled email={_log_safe(payload.email)} "
+            f"ip={_log_safe(client_ip(request))}"
+        )
         raise HTTPException(
             status.HTTP_403_FORBIDDEN, detail="Account is disabled"
         )
@@ -90,12 +122,14 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> TokenRe
             status.HTTP_400_BAD_REQUEST, detail="Invite code has expired"
         )
 
-    # Create user
+    # Create user at the least-privilege role (Sprint 47 T47.1). This route used to
+    # hard-code role='admin', so every invite-based signup silently became an admin.
+    # Elevation now goes through the owner/admin-gated admin user API.
     new_user = User(
         email=payload.email,
         display_name=payload.display_name,
         password_hash=hash_password(payload.password),
-        role="admin",
+        role=ROLE_MEMBER,
         invite_code_used=payload.invite_code.upper(),
     )
     db.add(new_user)

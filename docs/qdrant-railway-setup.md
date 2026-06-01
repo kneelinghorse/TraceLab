@@ -34,7 +34,7 @@ TraceLab now standardizes on **Qdrant Cloud** for production while keeping Docke
 
    # Application-level health
    curl -H "Authorization: Bearer $ACCESS_TOKEN" \
-     https://api.namozine.com/api/v1/admin/health
+     https://api.tracelab.aquex.ai/api/v1/admin/health
    ```
    Expect `status=healthy`, `collection_exists=true`, and every entry in `payload_indexes` reporting `present=true`.
 

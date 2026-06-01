@@ -22,6 +22,18 @@ class RateLimitConfig:
     window_seconds: int = 60
 
 
+def client_ip(request: Request) -> str:
+    """Extract the client IP, honoring X-Forwarded-For from a trusted proxy.
+
+    Shared by the rate limiter (keying) and the auth audit log (T47.5), so both
+    attribute a request to the same IP and cannot diverge.
+    """
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
 class RateLimiter:
     """Sliding-window rate limiter keyed by client IP."""
 
@@ -32,15 +44,18 @@ class RateLimiter:
 
     def _get_client_ip(self, request: Request) -> str:
         """Extract client IP, respecting X-Forwarded-For from trusted proxies."""
-        forwarded = request.headers.get("x-forwarded-for")
-        if forwarded:
-            return forwarded.split(",")[0].strip()
-        return request.client.host if request.client else "unknown"
+        return client_ip(request)
 
     def _prune(self, key: str, now: float) -> None:
-        """Remove timestamps outside the current window."""
+        """Remove timestamps outside the current window, and drop the key entirely
+        when it empties so idle IPs don't accumulate forever (bounded memory now that
+        this is wired to a public, unauthenticated endpoint — T47.5 review)."""
         cutoff = now - self.config.window_seconds
-        self._requests[key] = [ts for ts in self._requests[key] if ts > cutoff]
+        fresh = [ts for ts in self._requests.get(key, []) if ts > cutoff]
+        if fresh:
+            self._requests[key] = fresh
+        else:
+            self._requests.pop(key, None)
 
     def check(self, request: Request) -> None:
         """Check rate limit for the request. Raises HTTP 429 if exceeded."""
@@ -72,4 +87,5 @@ __all__ = [
     "RateLimitConfig",
     "RateLimiter",
     "auth_rate_limiter",
+    "client_ip",
 ]

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 const isProductionSmoke = Boolean(process.env.PLAYWRIGHT_BASE_URL);
-const apiBase = (process.env.PLAYWRIGHT_API_BASE_URL ?? "https://api.namozine.com").replace(/\/$/, "");
+const apiBase = (process.env.PLAYWRIGHT_API_BASE_URL ?? "https://api.tracelab.aquex.ai").replace(/\/$/, "");
 const apiPrefix = (process.env.PLAYWRIGHT_API_PATH_PREFIX ?? "/api/v1").replace(/\/$/, "");
 const buildApiUrl = (path: string) => {
   const normalized = path.startsWith("/") ? path : `/${path}`;

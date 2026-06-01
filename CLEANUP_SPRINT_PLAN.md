@@ -227,7 +227,7 @@ When running: `./cmos/cli.py session start`
 **Goal**: Document how production actually works
 
 **Tasks**:
-- [ ] Document production URLs (namozine.com, api.namozine.com)
+- [ ] Document production URLs (tracelab.aquex.ai, api.tracelab.aquex.ai)
 - [ ] Document Railway services and configs
 - [ ] Document Cloudflare settings
 - [ ] Document Qdrant Railway setup

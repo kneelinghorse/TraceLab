@@ -242,7 +242,7 @@ tracelab config show
 tracelab config show --json
 
 # Set API URL
-tracelab config set api-url https://api.tracelab.dev
+tracelab config set api-url https://api.tracelab.aquex.ai
 
 # Set default project
 tracelab config set default-project proj_abc123

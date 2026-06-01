@@ -6,7 +6,7 @@ objective: "Conduct Sprint 06 retrospective evaluating foundational fixes, asses
 
 context: |
   Sprint 06 began with B6.3 (RAG Search UI) blocked due to API connectivity issues. Investigation revealed
-  fundamental API URL misconfiguration (api.namozine.com vs api.namozine.com/api/v1), missing local dev
+  fundamental API URL misconfiguration (api.tracelab.aquex.ai vs api.tracelab.aquex.ai/api/v1), missing local dev
   documentation, and undocumented authentication. Injected fix missions B6.4a-d to address these blockers:
   - B6.4a: API URL Configuration Fix
   - B6.4b: Local Development Environment Setup  

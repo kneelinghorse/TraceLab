@@ -1,6 +1,6 @@
 """Application configuration and settings management."""
 
-from pydantic import Field
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings
 
 
@@ -150,6 +150,47 @@ class Settings(BaseSettings):
             or self.deepsearch_webhook_secret
             or None
         )
+
+    @field_validator("environment")
+    @classmethod
+    def _normalize_environment(cls, v: str) -> str:
+        """Strip whitespace so a raw env var like ``ENVIRONMENT=production\\n`` (common
+        from k8s ConfigMaps / PaaS variable UIs) is canonicalized — otherwise the
+        production gate below (and cors_origins) would silently miss it (T47.5 review)."""
+        return v.strip() if isinstance(v, str) else v
+
+    @model_validator(mode="after")
+    def _reject_placeholder_secrets_in_production(self) -> "Settings":
+        """Fail closed: refuse to start in production on the shipped placeholder
+        secrets (T47.5). ``secret_key='change-me'`` signs forgeable JWTs and
+        ``auth_password='changeme'`` is a known default credential — both are safe
+        dev defaults but a critical vuln if they reach prod. Dev/test keep working
+        with the placeholders; only ``environment in {production, prod}`` is gated.
+        """
+        if self.environment.lower() in {"production", "prod"}:
+            # Compare against each field's shipped DEFAULT rather than a hardcoded
+            # literal: ties the check to the actual placeholder and avoids embedding
+            # the secret strings here.
+            defaults = type(self).model_fields
+            placeholders = []
+            if self.secret_key == defaults["secret_key"].default:
+                placeholders.append("SECRET_KEY")
+            # Only flag AUTH_PASSWORD when it is the ACTIVE credential source. A prod
+            # deploy that sets AUTH_PASSWORD_HASH (the preferred path in
+            # get_configured_credentials) and leaves AUTH_PASSWORD at its default is
+            # secure — the default string is never read — so don't false-positive it.
+            if (
+                not self.auth_password_hash
+                and self.auth_password == defaults["auth_password"].default
+            ):
+                placeholders.append("AUTH_PASSWORD")
+            if placeholders:
+                raise ValueError(
+                    "Refusing to start in production with placeholder secret(s): "
+                    f"{', '.join(placeholders)}. Set real values via environment "
+                    "variables before deploying."
+                )
+        return self
 
 
 settings = Settings()

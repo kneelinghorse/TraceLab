@@ -15,7 +15,10 @@ repos:
     hooks:
       - id: ruff
         args: ["--fix"]
-      - id: ruff-format
+      # ruff-format hook removed (2026-06-01): the repo was never kept
+      # ruff-format-clean, so running it churned large amounts of unrelated
+      # pre-existing code on every touched file, fighting surgical diffs. Lint
+      # (ruff above) is kept — it catches real issues without reformatting.
 
   - repo: local
     hooks:

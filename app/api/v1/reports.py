@@ -7,7 +7,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.core.authorization import authorize_or_403
+from app.core.authorization import accessible_filter, authorize_or_403
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.schemas.report import (
@@ -128,14 +128,22 @@ def list_reports(
     page: int = Query(default=1, ge=1, description="Page number"),
     page_size: int = Query(default=20, ge=1, le=100, description="Items per page"),
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
     service: ReportService = Depends(get_report_service),
 ) -> ReportListResponse:
-    """List reports with optional filtering and pagination."""
+    """List reports with optional filtering and pagination.
+
+    With RBAC enabled, non-privileged callers see only reports they own or whose
+    owning project is in a Space they belong to (T47.3).
+    """
+    from app.models.report import Report
+
     reports, total = service.list_reports(
         project_id=project_id,
         status=report_status,
         page=page,
         page_size=page_size,
+        access_filter=accessible_filter(current_user, Report, db),
     )
     items = [_build_list_item(r) for r in reports]
     return ReportListResponse(

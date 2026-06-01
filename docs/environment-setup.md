@@ -8,8 +8,8 @@ This document provides a clear reference for TraceLab's local development and Ra
 |-----------|-------------------|-------------------|
 | PostgreSQL | localhost:5433 (Docker) | Railway PostgreSQL addon |
 | Qdrant | localhost:6333 (Docker) | Qdrant Cloud (free tier) |
-| FastAPI | localhost:8000 | https://api.namozine.com |
-| Frontend | localhost:3000 | https://tracelab.namozine.com |
+| FastAPI | localhost:8000 | https://api.tracelab.aquex.ai |
+| Frontend | localhost:3000 | https://tracelab.tracelab.aquex.ai |
 
 ## Authentication
 
@@ -87,7 +87,7 @@ For Claude Code MCP integration, use the appropriate API key based on environmen
     "tracelab": {
       "command": "...",
       "env": {
-        "TRACELAB_API_URL": "https://api.namozine.com/api/v1",
+        "TRACELAB_API_URL": "https://api.tracelab.aquex.ai/api/v1",
         "TRACELAB_API_KEY": "tl_mrYJk-Owgy_5DKPz4TiyjhtFLcb1khx0"
       }
     }
@@ -102,7 +102,7 @@ Or if using headers directly:
 curl -H "X-API-Key: tl_YWVLy5cgPI_WggfZjnnALBaGO6W_Oi2I" http://localhost:8000/api/v1/projects
 
 # Production
-curl -H "X-API-Key: tl_mrYJk-Owgy_5DKPz4TiyjhtFLcb1khx0" https://api.namozine.com/api/v1/projects
+curl -H "X-API-Key: tl_mrYJk-Owgy_5DKPz4TiyjhtFLcb1khx0" https://api.tracelab.aquex.ai/api/v1/projects
 ```
 
 ## Database Connections

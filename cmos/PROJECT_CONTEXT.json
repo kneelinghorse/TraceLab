@@ -34,7 +34,7 @@
           "Document updates to foundational references or runtime helpers in MASTER_CONTEXT.json."
         ],
         "decisions_made": [
-          "B5.3 codifies hosted domain wiring: deploy frontend at https://namozine.com, backend at https://api.namozine.com/api/v1, and run the production Playwright smoke before each DNS/env change.",
+          "B5.3 codifies hosted domain wiring: deploy frontend at https://tracelab.aquex.ai, backend at https://api.tracelab.aquex.ai/api/v1, and run the production Playwright smoke before each DNS/env change.",
           "Sprint 07 backlog seeded with B7.1-B7.4 to deliver read APIs, guardrail docs, ingest CLI auth, and Presidio/cache fixes."
         ],
         "files_created": []

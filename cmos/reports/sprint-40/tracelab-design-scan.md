@@ -1,7 +1,7 @@
 # TraceLab Design Fingerprint Scan — Sprint 40 (T40.7)
 
 **Scanned:** 2026-04-23
-**Target:** https://namozine.com/ (TraceLab production)
+**Target:** https://tracelab.aquex.ai/ (TraceLab production)
 **Scope:** Research artifact only — no UI implementation in S40. Captured for input to future OODS Foundry brand-token alignment, likely post-domain-migration.
 
 ## TL;DR

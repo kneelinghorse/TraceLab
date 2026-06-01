@@ -19,8 +19,9 @@ from uuid import uuid4
 import pytest
 from fastapi import Request
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 
-from app.core.config import settings
+from app.core.config import Settings, settings
 from app.core.rate_limit import RateLimitConfig, RateLimiter, auth_rate_limiter
 from app.core.security import (
     generate_api_key,
@@ -121,6 +122,21 @@ class TestRateLimiterUnit:
         limiter.reset()
         limiter.check(mock_request)  # Should work after reset
 
+    def test_idle_ip_key_is_evicted_after_window(self):
+        # T47.5 review: a per-IP key that prunes down to empty must be DROPPED, not
+        # retained forever — otherwise distinct IPs on a public endpoint leak memory.
+        limiter = RateLimiter(RateLimitConfig(max_requests=3, window_seconds=60))
+        mock_request = MagicMock(spec=Request)
+        mock_request.headers = {}
+        mock_request.client = MagicMock()
+        mock_request.client.host = "9.9.9.9"
+
+        limiter.check(mock_request)
+        assert "9.9.9.9" in limiter._requests
+        # Prune as if far past the window → the now-empty key must be gone.
+        limiter._prune("9.9.9.9", 10**12)
+        assert "9.9.9.9" not in limiter._requests
+
 
 class TestLoginRateLimit:
     """Integration test: login endpoint rate limiting."""
@@ -185,6 +201,22 @@ class TestAuditLogging:
         audit_record = next(r for r in caplog.records if "auth_failure" in r.message)
         assert "hacker@evil.com" in audit_record.message
         assert "invalid_credentials" in audit_record.message
+
+    def test_failed_login_email_is_sanitized_no_log_injection(self, client: TestClient, caplog):
+        # T47.5 review (CWE-117): a CRLF-laced email must NOT forge/split audit
+        # records — control chars are stripped before the value is logged.
+        with caplog.at_level(logging.WARNING):
+            client.post(
+                "/api/v1/auth/login",
+                json={
+                    "email": "x@x.com\nauth_failure reason=invalid_credentials email=ceo@corp.com",
+                    "password": "bad",
+                },
+            )
+        records = [r for r in caplog.records if "auth_failure" in r.message]
+        assert len(records) == 1
+        assert "\n" not in records[0].message and "\r" not in records[0].message
+        assert "x@x.com" in records[0].message  # the (sanitized) value is still logged
 
 
 # ===========================================================================
@@ -403,3 +435,76 @@ class TestAPIKeyLookupPerformance:
         assert verify_api_key(key2, hash2) is True
         assert verify_api_key(key1, hash2) is False
         assert verify_api_key(key2, hash1) is False
+
+
+# ===========================================================================
+# 7. FAIL-CLOSED SECRETS (T47.5)
+# ===========================================================================
+
+# Intentional test secrets, not real credentials (noqa S105: hardcoded-string). Passed
+# as VARIABLES below so the Settings(...) calls don't trip S106 on literal kwargs.
+_PLACEHOLDER_SECRET_KEY = "change-me"  # noqa: S105 — the shipped placeholder default
+_PLACEHOLDER_AUTH_PW = "changeme"  # noqa: S105 — the shipped placeholder default
+_REAL_SECRET_KEY = "a-real-signing-key"  # noqa: S105 — stand-in for a real prod secret
+_REAL_AUTH_PW = "a-real-password"  # noqa: S105 — stand-in for a real prod secret
+_FAKE_BCRYPT_HASH = "$2b$12$abcdefghijklmnopqrstuvOWqe"  # noqa: S105 — fake hash, not a credential
+
+
+class TestFailClosedSecrets:
+    """Production must refuse to start on the shipped placeholder secrets:
+    secret_key='change-me' signs forgeable JWTs; auth_password='changeme' is a
+    known default credential. Dev/test keep working with the placeholders."""
+
+    def test_production_rejects_placeholder_secret_key(self):
+        with pytest.raises(ValidationError, match="SECRET_KEY"):
+            Settings(
+                environment="production",
+                secret_key=_PLACEHOLDER_SECRET_KEY,
+                auth_password=_REAL_AUTH_PW,
+            )
+
+    def test_production_rejects_placeholder_auth_password(self):
+        with pytest.raises(ValidationError, match="AUTH_PASSWORD"):
+            Settings(
+                environment="production",
+                secret_key=_REAL_SECRET_KEY,
+                auth_password=_PLACEHOLDER_AUTH_PW,
+            )
+
+    def test_production_boots_with_real_secrets(self):
+        s = Settings(
+            environment="production",
+            secret_key=_REAL_SECRET_KEY,
+            auth_password=_REAL_AUTH_PW,
+        )
+        assert s.environment == "production"
+
+    def test_development_tolerates_placeholders(self):
+        # The defaults are fine for dev/test — only production is gated.
+        s = Settings(
+            environment="development",
+            secret_key=_PLACEHOLDER_SECRET_KEY,
+            auth_password=_PLACEHOLDER_AUTH_PW,
+        )
+        assert s.secret_key == _PLACEHOLDER_SECRET_KEY
+
+    def test_production_gate_handles_whitespace_environment(self):
+        # T47.5 review: a raw env var with a trailing newline (k8s/PaaS UIs) must
+        # still trip the gate — it is stripped, not treated as a non-prod value.
+        with pytest.raises(ValidationError, match="SECRET_KEY"):
+            Settings(
+                environment="production\n",
+                secret_key=_PLACEHOLDER_SECRET_KEY,
+                auth_password=_REAL_AUTH_PW,
+            )
+
+    def test_hash_only_prod_boots_with_default_auth_password(self):
+        # T47.5 review: AUTH_PASSWORD_HASH is the active credential; a default
+        # AUTH_PASSWORD is dormant (never read) and must NOT block a secure prod boot.
+        s = Settings(
+            environment="production",
+            secret_key=_REAL_SECRET_KEY,
+            auth_password=_PLACEHOLDER_AUTH_PW,
+            auth_password_hash=_FAKE_BCRYPT_HASH,
+        )
+        assert s.environment == "production"

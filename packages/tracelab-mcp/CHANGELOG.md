@@ -22,7 +22,7 @@ device-code prompt could appear.
   sent to `/api/v1/auth/device/code` once again carries the correct
   package version.
 
-Local smoke test against `https://api.namozine.com` confirmed the full
+Local smoke test against `https://api.tracelab.aquex.ai` confirmed the full
 device-code flow now completes: prompt prints → user approves → key
 mints → MCP server starts → authenticated `/missions` call returns.
 

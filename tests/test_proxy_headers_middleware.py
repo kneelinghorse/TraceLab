@@ -52,11 +52,11 @@ class TestProxyHeadersMiddleware:
 
         client = TestClient(app)
         response = client.get(
-            "/host-check", headers={"X-Forwarded-Host": "api.namozine.com"}
+            "/host-check", headers={"X-Forwarded-Host": "api.tracelab.aquex.ai"}
         )
         assert response.status_code == 200
         # The middleware should update the host header
-        assert response.json()["host"] == "api.namozine.com"
+        assert response.json()["host"] == "api.tracelab.aquex.ai"
 
     @pytest.mark.asyncio
     async def test_redirect_location_uses_https_scheme(self):

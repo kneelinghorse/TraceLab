@@ -12,8 +12,13 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, sta
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
+from app.core.authorization import POLICY_VERSION
 from app.core.config import settings
+from app.core.database import get_db
+from app.core.security import ROLE_OWNER, AuthenticatedUser, require_admin
+from app.models.user import User
 from app.services.metrics_aggregator import MetricsAggregator, get_metrics_aggregator
 from app.services.qdrant_service import QdrantService, get_qdrant_service
 
@@ -50,6 +55,20 @@ class QdrantHealthResponse(BaseModel):
     expected: dict[str, Any]
     actual: dict[str, Any]
     payload_indexes: list[PayloadIndexStatus]
+
+
+class RbacStatusResponse(BaseModel):
+    """RBAC observability snapshot (T47.1).
+
+    Lets an operator (and the live harness) confirm, with proof, whether enforcement
+    is ON and which policy is deployed — so we are never again blind to whether RBAC
+    works. ``owner_count`` counts ACTIVE owners (the ones who can actually administer;
+    matches the is_last_owner semantics)."""
+
+    rbac_enabled: bool
+    owner_count: int
+    your_role: str
+    policy_version: str
 
 
 def get_admin_qdrant_service() -> QdrantService:
@@ -220,4 +239,28 @@ def dashboard_export(
         io.BytesIO(buffer.read().encode("utf-8")),
         headers={"Content-Disposition": "attachment; filename=dashboard-metrics.csv"},
         media_type="text/csv",
+    )
+
+
+@router.get("/rbac-status", response_model=RbacStatusResponse)
+def rbac_status(
+    caller: AuthenticatedUser = Depends(require_admin),
+    db: Session = Depends(get_db),
+) -> RbacStatusResponse:
+    """Report RBAC enforcement state (T47.1).
+
+    SELF-GATED with an EXPLICIT require_admin: this router is mounted
+    authenticated-only (main.py), so without this dependency any member could read
+    RBAC internals. anon -> 401 (router auth), member -> 403 (here), admin/owner ->
+    200. Counts only ACTIVE owners — the ones who can actually administer."""
+    owner_count = (
+        db.query(User)
+        .filter(User.role == ROLE_OWNER, User.is_active.is_(True))
+        .count()
+    )
+    return RbacStatusResponse(
+        rbac_enabled=settings.rbac_enabled,
+        owner_count=owner_count,
+        your_role=caller.role,
+        policy_version=POLICY_VERSION,
     )

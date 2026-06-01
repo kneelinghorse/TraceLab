@@ -10,7 +10,7 @@ This script tests the complete integration flow against the production API:
 
 Usage:
     # Set credentials
-    export TRACELAB_BASE_URL="https://api.namozine.com"
+    export TRACELAB_BASE_URL="https://api.tracelab.aquex.ai"
     export TRACELAB_USERNAME="kneelinghorse"
     export TRACELAB_PASSWORD="Bigpuma"
 
@@ -405,7 +405,7 @@ class E2EProductionTest:
 
 def main() -> int:
     """Run E2E production tests."""
-    base_url = os.environ.get("TRACELAB_BASE_URL", "https://api.namozine.com")
+    base_url = os.environ.get("TRACELAB_BASE_URL", "https://api.tracelab.aquex.ai")
     username = os.environ.get("TRACELAB_USERNAME", "kneelinghorse")
     password = os.environ.get("TRACELAB_PASSWORD", "Bigpuma")
 

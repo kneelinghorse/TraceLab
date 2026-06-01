@@ -122,14 +122,14 @@ See `docs/authentication.md` for a deeper walkthrough covering frontend usage, P
 
 ## Production URLs & Health Checks
 
-- **UI (Cloudflare vanity domain):** `https://namozine.com/missions` points to the Railway Next.js frontend (`frontend-production-43c3.up.railway.app`). Verify availability with `curl -sS -o /dev/null -w "%{http_code}\n" https://namozine.com/missions` (expect `200`).
-- **API domain:** `https://api.namozine.com` proxies to the FastAPI service on Railway (`tracelab-production.up.railway.app`). Keep `NEXT_PUBLIC_API_BASE_URL` pointed at this host and tune `NEXT_PUBLIC_API_PATH_PREFIX` (`/api/v1` by default, set to `""` when the backend lives at `/`). Validate the health route with `curl https://api.namozine.com/api/v1/health` (adjust the `/api/v1` segment if your prefix differs; expect `{ "status": "healthy" }`).
-- **CORS origins:** Add both `https://namozine.com` and `https://www.namozine.com` to `CORS_ALLOWED_ORIGINS_PROD` in your `.env` when running the backend in production mode. Keep `Full (Strict)` TLS enabled within Cloudflare to preserve end-to-end encryption.
+- **UI (Cloudflare vanity domain):** `https://tracelab.aquex.ai/missions` points to the Railway Next.js frontend (`frontend-production-43c3.up.railway.app`). Verify availability with `curl -sS -o /dev/null -w "%{http_code}\n" https://tracelab.aquex.ai/missions` (expect `200`).
+- **API domain:** `https://api.tracelab.aquex.ai` proxies to the FastAPI service on Railway (`tracelab-production.up.railway.app`). Keep `NEXT_PUBLIC_API_BASE_URL` pointed at this host and tune `NEXT_PUBLIC_API_PATH_PREFIX` (`/api/v1` by default, set to `""` when the backend lives at `/`). Validate the health route with `curl https://api.tracelab.aquex.ai/api/v1/health` (adjust the `/api/v1` segment if your prefix differs; expect `{ "status": "healthy" }`).
+- **CORS origins:** Add both `https://tracelab.aquex.ai` and `https://www.tracelab.aquex.ai` to `CORS_ALLOWED_ORIGINS_PROD` in your `.env` when running the backend in production mode. Keep `Full (Strict)` TLS enabled within Cloudflare to preserve end-to-end encryption.
 - **Playwright smoke:** Run the production smoke suite from `frontend/` whenever DNS or env vars change:
   ```bash
   cd frontend
-  PLAYWRIGHT_BASE_URL=https://namozine.com \
-PLAYWRIGHT_API_BASE_URL=https://api.namozine.com \
+  PLAYWRIGHT_BASE_URL=https://tracelab.aquex.ai \
+PLAYWRIGHT_API_BASE_URL=https://api.tracelab.aquex.ai \
 PLAYWRIGHT_API_PATH_PREFIX=/api/v1 \
 PLAYWRIGHT_SKIP_SERVER=1 \
 npx playwright test tests/e2e/production-smoke.spec.ts

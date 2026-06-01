@@ -35,13 +35,20 @@ class CollectionService:
     # ------------------------------------------------------------------
     # Collection CRUD
     # ------------------------------------------------------------------
-    def list_collections(self) -> list[Collection]:
-        """Return all collections ordered by most recent."""
+    def list_collections(self, access_filter=None) -> list[Collection]:
+        """Return collections ordered by most recent.
+
+        ``access_filter`` (authorization.accessible_filter) is an optional RBAC
+        row-filter (T47.3); it is a session-agnostic SQLAlchemy expression built from
+        the request session and applied here on this service's own session. None = no
+        filtering.
+        """
         session = self.session_factory()
         try:
-            return (
-                session.query(Collection).order_by(Collection.updated_at.desc()).all()
-            )
+            query = session.query(Collection)
+            if access_filter is not None:
+                query = query.filter(access_filter)
+            return query.order_by(Collection.updated_at.desc()).all()
         finally:
             session.close()
 

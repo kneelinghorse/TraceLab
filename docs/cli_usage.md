@@ -235,7 +235,7 @@ tracelab missions delete <mission-id> --confirm
 tracelab config show
 
 # Set value
-tracelab config set api.base_url https://api.tracelab.dev
+tracelab config set api.base_url https://api.tracelab.aquex.ai
 tracelab config set defaults.project_id proj-abc123
 
 # Get value

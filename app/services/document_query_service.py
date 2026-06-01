@@ -28,6 +28,7 @@ class DocumentQueryService:
         processed: bool | None = None,
         search: str | None = None,
         include_deleted: bool = False,
+        access_filter=None,
     ) -> tuple[list[Document], PaginationMeta]:
         """Return paginated documents ordered by upload time.
 
@@ -72,6 +73,11 @@ class DocumentQueryService:
         if search:
             like_term = f"%{search.strip()}%"
             query = query.filter(Document.name.ilike(like_term))
+
+        # RBAC row-filter (T47.3): scope to documents the caller may read, before
+        # count + pagination. None = no filtering.
+        if access_filter is not None:
+            query = query.filter(access_filter)
 
         query = query.order_by(Document.uploaded_at.desc())
         total = query.count()

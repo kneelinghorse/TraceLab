@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import secrets
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -16,6 +17,11 @@ from passlib.context import CryptContext
 
 from app.core.config import settings
 from app.core.database import SessionLocal
+
+# passlib 1.7.x probes bcrypt.__about__.__version__, which bcrypt>=4 removed, and
+# logs a noisy (harmless) "(trapped) error reading bcrypt version" WARNING when the
+# backend loads. Quiet just that logger so it doesn't drown real auth logs (T47.5).
+logging.getLogger("passlib.handlers.bcrypt").setLevel(logging.ERROR)
 
 _pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 _bearer_scheme = HTTPBearer(auto_error=False)
@@ -43,8 +49,19 @@ ROLE_ADMIN = "admin"
 ROLE_MEMBER = "member"
 ROLE_VIEWER = "viewer"
 
-# Ascending privilege rank. Unknown roles default to rank -1 (below viewer) so any
-# future role check fails closed rather than silently granting access.
+# Service principal (T47.4): a non-human machine identity (e.g. the DeepSearch
+# runner) used for service-to-service writes such as POST /missions/{id}/logs.
+# DELIBERATELY OUTSIDE the cumulative human hierarchy above — and deliberately
+# absent from _ROLE_RANK below — so it ranks -1 (fail-closed) on every human role
+# gate (require_admin / require_role) and is non-privileged in authorize(). A
+# service principal therefore passes ONLY the dedicated service gate
+# (authorize_service_or_403); it can do nothing a human role can, and no human
+# role satisfies the service gate. See app/core/authorization.py.
+ROLE_SERVICE = "service"
+
+# Ascending privilege rank. Unknown roles (incl. ROLE_SERVICE, intentionally) default
+# to rank -1 (below viewer) so any future role check fails closed rather than silently
+# granting access.
 _ROLE_RANK: dict[str, int] = {
     ROLE_VIEWER: 0,
     ROLE_MEMBER: 1,

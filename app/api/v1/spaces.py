@@ -30,10 +30,21 @@ from app.schemas.space import (
     SpaceMemberResponse,
     SpaceResponse,
 )
+from app.services.cache_manager import get_cache_manager
 
 router = APIRouter(tags=["admin-spaces"])
 
 _VALID_GRANT_ROLES = frozenset({ROLE_OWNER, ROLE_ADMIN, ROLE_MEMBER, ROLE_VIEWER})
+_cache_manager = get_cache_manager()
+
+
+def _invalidate_membership_caches() -> None:
+    """A Space membership change moves which projects/documents a user may LIST, so
+    the per-scope project + document list caches (T47.3) must be cleared — else a
+    revoked member keeps seeing a stale cached list (and a new member misses theirs)
+    until the TTL expires. Missions/reports/jobs lists are uncached (live queries)."""
+    _cache_manager.invalidate_project_metadata()
+    _cache_manager.invalidate_document_lists()
 
 
 def _get_space_or_404(db: Session, space_id: UUID) -> Workspace:
@@ -98,6 +109,7 @@ def add_space_member(
     db.add(member)
     db.commit()
     db.refresh(member)
+    _invalidate_membership_caches()
     return member
 
 
@@ -124,4 +136,5 @@ def remove_space_member(
         )
     db.delete(member)
     db.commit()
+    _invalidate_membership_caches()
     return {"status": "removed", "space_id": str(space_id), "user_id": str(user_id)}
