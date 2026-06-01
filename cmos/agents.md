@@ -78,9 +78,14 @@ cmos_context_snapshot projectRoot=...             # take a context snapshot
 
 ### Current sprint
 
-**sprint-tl-01** — Stabilize and Bootstrap
-Focus: migrate from v1 CMOS to v2, establish clean test baseline, surface active work in the
-instance network.
+> Authoritative live source: run `cmos_review()`. This hardcoded note has gone stale before
+> (it sat at `sprint-tl-01` for many sprints) — trust `cmos_review()` over this line.
+
+**sprint-47** — Sprint D: RBAC Verifiability & Live-Gap Closure
+Focus: make deny-by-default RBAC enforcement OBSERVABLE and PROVABLE — a runnable live
+verification harness (`scripts/rbac_verify.py`) + an admin `rbac-status` endpoint — and close the
+gaps the per-id flip left open (list row-filtering, model-parity, service-role tier on
+`POST /missions/{id}/logs`, auth-hardening). The full users/roles ADMIN UI is split to S48.
 
 ---
 
