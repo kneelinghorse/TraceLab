@@ -90,7 +90,9 @@ class AdminUserCreate(BaseModel):
     email: str = Field(..., min_length=3, description="Email address")
     password: str = Field(..., min_length=8, description="Password (minimum 8 characters)")
     display_name: str = Field(..., max_length=100, description="Display name")
-    role: str = Field(default="member", description="member | viewer | admin | owner")
+    role: str = Field(
+        default="member", description="member | viewer | admin | owner | service"
+    )
 
     @field_validator("email")
     @classmethod

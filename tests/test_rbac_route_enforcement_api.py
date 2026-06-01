@@ -32,7 +32,12 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.core.config import settings
-from app.core.security import ROLE_MEMBER, create_access_token
+from app.core.security import (
+    ROLE_MEMBER,
+    ROLE_OWNER,
+    ROLE_SERVICE,
+    create_access_token,
+)
 from app.main import app
 from app.models.collection import Collection
 from app.models.document import Document
@@ -194,8 +199,10 @@ PER_ID_ROUTES = [
     ("get", f"{API}/missions/{_RID}/related"),
     ("get", f"{API}/missions/{_RID}/quality"),
     # T46.5: human-facing mission log read + ingestion jobs (governed via parent
-    # Document). POST /missions/{id}/logs is the runner trusted-origin carve-out
-    # (authn-only, not per-user authorized) so it is intentionally excluded here.
+    # Document). POST /missions/{id}/logs is the runner write path: as of T47.4 it is
+    # SERVICE-GATED (authorize_service_or_403), not per-user authorized, so it is
+    # excluded from this per-user matrix — its full triad (anon-401 / human-403 /
+    # service-2xx) is proved by TestServiceRoleLogIngest below.
     ("get", f"{API}/missions/{_RID}/logs"),
     ("post", f"{API}/jobs?document_id={_RID}"),
     ("get", f"{API}/jobs/{_RID}"),
@@ -449,3 +456,63 @@ class TestFlagOffNoOp:
         mission = _make_mission(db_session, owner_id=uuid4(), project_id=None)
         resp = client.get(f"{API}/missions/{mission.id}", headers=_bearer(outsider))
         assert resp.status_code == 200, resp.text
+
+
+# ---------------------------------------------------------------------------
+# Part D (T47.4) — POST /missions/{id}/logs is a SERVICE-gated write.
+# ---------------------------------------------------------------------------
+
+_LOG_BODY = {"logs": [{"level": "INFO", "message": "service-gate test"}]}
+
+
+class TestServiceRoleLogIngest:
+    """The runner log-ingest write (POST /missions/{id}/logs) is gated to a SERVICE
+    principal (role 'service'), NOT per-user authorize(). This closes decision
+    #260(3): with the flag ON, a human-auth token — any role, including owner —
+    can no longer append/spoof logs on an arbitrary mission; only the service
+    principal can. The gate respects rbac_enabled (no-op OFF) so the deployed
+    runner is unaffected until the flip. Authentication is unconditional (401 anon)."""
+
+    def test_log_ingest_requires_authentication(self, client):
+        # Anon -> 401 regardless of the flag (router-level authn, flag-independent).
+        resp = client.post(f"{API}/missions/{uuid4()}/logs", json=_LOG_BODY)
+        assert resp.status_code == 401, resp.text
+
+    def test_log_ingest_member_forbidden(self, client, db_session, rbac_on):
+        member = _make_user(db_session, "svc-member@x.io", role=ROLE_MEMBER)
+        mission = _make_mission(db_session, owner_id=uuid4(), project_id=None)
+        resp = client.post(
+            f"{API}/missions/{mission.id}/logs", json=_LOG_BODY, headers=_bearer(member)
+        )
+        assert resp.status_code == 403, resp.text
+
+    def test_log_ingest_owner_also_forbidden(self, client, db_session, rbac_on):
+        # The service gate is STRICTER than authorize(): even an owner human (who
+        # would pass authorize via the privileged tier) is denied here — proving the
+        # gate keys on "is a service principal", not "is privileged".
+        owner = _make_user(db_session, "svc-owner@x.io", role=ROLE_OWNER)
+        mission = _make_mission(db_session, owner_id=owner.id, project_id=None)
+        resp = client.post(
+            f"{API}/missions/{mission.id}/logs", json=_LOG_BODY, headers=_bearer(owner)
+        )
+        assert resp.status_code == 403, resp.text
+
+    def test_log_ingest_service_principal_ok(self, client, db_session, rbac_on):
+        service = _make_user(db_session, "svc-runner@x.io", role=ROLE_SERVICE)
+        mission = _make_mission(db_session, owner_id=uuid4(), project_id=None)
+        resp = client.post(
+            f"{API}/missions/{mission.id}/logs", json=_LOG_BODY, headers=_bearer(service)
+        )
+        assert resp.status_code == 201, resp.text
+        assert resp.json()["accepted"] == 1
+
+    def test_log_ingest_open_when_flag_off(self, client, db_session):
+        # Flip-back invariant: with the flag OFF a non-service human still succeeds,
+        # so deploying this gate does NOT break the live runner before the flip.
+        assert settings.rbac_enabled is False
+        member = _make_user(db_session, "svc-off@x.io", role=ROLE_MEMBER)
+        mission = _make_mission(db_session, owner_id=uuid4(), project_id=None)
+        resp = client.post(
+            f"{API}/missions/{mission.id}/logs", json=_LOG_BODY, headers=_bearer(member)
+        )
+        assert resp.status_code == 201, resp.text

@@ -16,7 +16,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi import status as http_status
 from sqlalchemy.orm import Session
 
-from app.core.authorization import accessible_filter, authorize_or_403
+from app.core.authorization import (
+    accessible_filter,
+    authorize_or_403,
+    authorize_service_or_403,
+)
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.mission_events import emit_mission_status_change
@@ -944,17 +948,23 @@ def ingest_mission_logs(
     mission_id: UUID,
     payload: LogBatchRequest,
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> dict:
     """Accept a batch of log lines from the DeepSearch runner.
 
     Called by TracelabLogHandler in the DeepSearch service. This is a
-    service-to-service WRITE, so it is a deliberate TRUSTED-ORIGIN CARVE-OUT from
-    per-user authorize() (decision #260(3), the same class as MCP/webhook origins;
-    a formal service-role tier is deferred). Authentication still applies at the
-    router level; only the per-resource authorize() is intentionally omitted —
-    the runner is not a per-user principal with Space membership. The human-facing
-    READ side (GET .../logs) IS authorize()-gated below.
+    service-to-service WRITE, so it is gated to a SERVICE PRINCIPAL (role 'service')
+    via ``authorize_service_or_403`` (T47.4) instead of the per-user ``authorize()``
+    used on the human-facing routes. This closes decision #260(3): a human-auth
+    token (any role, including owner/admin) can no longer append/spoof log records
+    on an arbitrary mission by id — only the runner's service principal can. The
+    gate is a no-op while ``rbac_enabled`` is False, so flip-back stays byte-
+    identical and the deployed runner is unaffected until its account is
+    provisioned as a service principal ahead of the flip (T47.6 runbook). The
+    human-facing READ side (GET .../logs) IS authorize()-gated below.
     """
+    authorize_service_or_403(user)
+
     from app.models.mission_log import MissionLog
 
     mission = _service.get_mission(db, mission_id)

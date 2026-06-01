@@ -394,6 +394,78 @@ class RbacVerifier:
                 Gap("owner-overblock", role, "get", path, "2xx", str(resp.status_code)),
             )
 
+    def service_log_write_matrix(self, mission_id: str, principals: dict[str, str]) -> None:
+        """The mission-log INGEST path (POST /missions/{id}/logs) is a service-to-
+        service write gated to a SERVICE principal (T47.4), NOT per-user authorize().
+        Prove the triad on a real seeded mission:
+
+          * anon (no creds)        -> 401  (router-level authn still applies, flag-free)
+          * a non-service human    -> 403  (a human-auth token can't spoof logs)  CRITICAL
+          * the service principal  -> 2xx  (the legitimate runner is not over-blocked)
+
+        A non-service human receiving 2xx here is the exact BOLA leak this mission
+        closes, so it is reported as a DENY-LEAK-2xx (the harness's critical class).
+        Owner/admin humans are INTENTIONALLY tested as denied too — the service gate
+        is stricter than authorize(), which would allow them. A VALID log body is
+        sent so the SERVICE GATE (not Pydantic body validation) decides the outcome;
+        an empty body would 422 before the gate and prove nothing. The 2xx write is
+        safe to leave: mission_logs FK is ON DELETE CASCADE, so mission teardown
+        reaps it.
+        """
+        path = f"{self._prefix}/missions/{mission_id}/logs"
+        body = {"logs": [{"level": "INFO", "message": "rbac-verify service-gate probe"}]}
+
+        # anon -> 401 (authentication is router-level and independent of the flag)
+        resp = self._call("post", path, json=body)
+        self._record(
+            resp.status_code == 401,
+            Gap("anon-401", "anon", "post", path, "401", str(resp.status_code)),
+        )
+
+        # non-service humans (incl. owner) -> 403. A 2xx is the critical BOLA leak.
+        human_checked = []
+        for role in ("member", "viewer", "owner", "second_owner"):
+            token = principals.get(role)
+            if not token:
+                continue
+            human_checked.append(role)
+            resp = self._call("post", path, token=token, json=body)
+            sc = resp.status_code
+            if 200 <= sc < 300:
+                self.gaps.append(Gap("DENY-LEAK-2xx", role, "post", path, "403", str(sc)))
+            elif sc != 403:
+                self.notes.append(f"log-write: {role} POST {path} -> {sc} (denied, not via 403)")
+        if not human_checked:
+            # No human principal -> the deny half proves nothing. Loud, not silent.
+            self.gaps.append(
+                Gap("NO-DENY-PRINCIPAL", "service-gate", "post", path,
+                    "a human principal to prove denial", "none provisioned")
+            )
+
+        # the service principal -> 2xx (over-blocking guard: the runner must still work)
+        service_token = principals.get("service")
+        if service_token:
+            resp = self._call("post", path, token=service_token, json=body)
+            self._record(
+                200 <= resp.status_code < 300,
+                Gap("service-overblock", "service", "post", path, "2xx", str(resp.status_code)),
+            )
+        else:
+            # Mirror NO-DENY-PRINCIPAL: the service-ALLOW probe IS the over-block
+            # guard that proves the legitimate runner is not denied — the go/no-go
+            # signal for the rbac_enabled flip (a missing service account is exactly
+            # the "log ingestion 403s at flip time" failure the rollout runbook
+            # exists to prevent). This method is only reached against an rbac-ON
+            # target (precheck aborts when OFF), so an un-provisionable service
+            # principal must be a LOUD gap, never a silent green PASS.
+            self.gaps.append(
+                Gap(
+                    "NO-SERVICE-PRINCIPAL", "service-gate", "post", path,
+                    "a service principal to prove the runner is not over-blocked",
+                    "none provisioned (could not mint role='service')",
+                )
+            )
+
     # -- teardown -----------------------------------------------------------------
     def delete_resource(self, owner_key: str, spec: SeedSpec, resource_id: str) -> None:
         path = spec.delete_path.format(id=resource_id)
@@ -466,7 +538,7 @@ class RbacVerifier:
             seeded: list[tuple[SeedSpec, str]] = []
             principals: dict[str, str] = {"owner": owner_token}
             try:
-                for role in ("member", "viewer", "owner"):
+                for role in ("member", "viewer", "owner", "service"):
                     pname = "second_owner" if role == "owner" else role
                     created = self.create_throwaway_user(owner_key, role, run_id)
                     if not created:
@@ -505,6 +577,10 @@ class RbacVerifier:
 
                 if "project" in ctx:
                     self.list_isolation_check(ctx["project"], principals)
+
+                if "mission" in ctx:
+                    self._log("service-role log-ingest gate (POST .../logs)...")
+                    self.service_log_write_matrix(ctx["mission"], principals)
 
                 self.notes.append(
                     f"seeded authz matrix covers project/collection/mission; "

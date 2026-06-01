@@ -13,6 +13,7 @@ safe — asserted with the flag monkeypatched ON unless a test says otherwise:
   * an orphan mission (project_id NULL) is owner+admin only (fail-closed)
   * a disabled user is blocked
   * MCP + webhook trusted-origin paths CANNOT be gated by the flag (structural)
+  * the service-write carve-out (POST .../logs) is explicit + cannot silently widen (T47.4)
   * flipping back to False is a clean no-op (same request: 403 ON -> 200 OFF)
 """
 
@@ -168,6 +169,70 @@ class TestTrustedOriginPathsUnaffected:
             if "authorize_or_403" in p.read_text() or "authorize(" in p.read_text()
         ]
         assert offenders == [], f"trusted-origin path calls authorize(): {offenders}"
+
+
+class TestServiceCarveOutBoundary:
+    """T47.4 — the service-write carve-out must stay EXPLICIT and cannot silently
+    widen. POST /missions/{id}/logs is the ONE service-gated write today; any new
+    service-gated write (or any other change that moves the gate) must be a
+    conscious, reviewed change recorded here + in docs/authentication.md, never an
+    accident. This is the "future cross-resource service write" guard the mission
+    asks for, plus coverage of the published npm MCP client (the real production MCP
+    surface — the in-repo app/mcp_server is production-dark)."""
+
+    _APP_DIR = pathlib.Path(__file__).resolve().parents[1] / "app"
+    _REPO_DIR = pathlib.Path(__file__).resolve().parents[1]
+
+    def test_service_gate_used_in_exactly_the_known_places(self):
+        # The whole app must CALL authorize_service_or_403() in exactly one file
+        # (the mission log-ingest write). A new call anywhere is a widened service
+        # carve-out and fails here until it is added to this allowlist + documented.
+        hits = sorted(
+            str(p.relative_to(self._APP_DIR))
+            for p in self._APP_DIR.rglob("*.py")
+            if "authorize_service_or_403(" in p.read_text()
+        )
+        # core/authorization.py holds the DEFINITION (not a carve-out); exclude it.
+        call_sites = [h for h in hits if not h.endswith("core/authorization.py")]
+        assert call_sites == ["api/v1/missions.py"], (
+            f"service-write carve-out widened or moved: {call_sites}. When you add a "
+            f"service-gated write, update this allowlist AND docs/authentication.md."
+        )
+
+    def test_log_ingest_is_service_gated(self):
+        # Positive: the log-ingest handler actually invokes the service gate.
+        missions = (self._APP_DIR / "api" / "v1" / "missions.py").read_text()
+        assert "authorize_service_or_403(user)" in missions
+
+    def test_npm_mcp_client_authenticates_every_request(self):
+        # The published MCP surface is the npm TS client; guard that it can never
+        # silently become an unauthenticated caller. Assert STRUCTURALLY (not mere
+        # whole-file substring presence, which stays green even if a request path
+        # drops its auth): the credential is injected in the constructor, the shared
+        # request() helper forwards it, the one bypass path (uploadDocument) re-copies
+        # it, and NO new unguarded fetch() site has appeared. (Runtime credential
+        # presence is additionally covered by the package's own vitest suite.)
+        client_ts = self._REPO_DIR / "packages" / "tracelab-mcp" / "src" / "api-client.ts"
+        if not client_ts.exists():
+            pytest.skip("npm MCP client source not present in this checkout")
+        src = client_ts.read_text()
+        # 1. constructor injects the credential header (Bearer JWT or X-API-Key)
+        assert "Bearer ${config.token}" in src, "lost the Bearer-JWT credential path"
+        assert "this.headers['X-API-Key'] = config.apiKey" in src, "lost the API-key path"
+        # 2. the shared request() helper forwards the credentialed headers
+        assert "headers: this.headers" in src, "request() no longer forwards auth headers"
+        # 3. the one fetch() that bypasses request() (uploadDocument) re-copies auth
+        assert "headers['Authorization'] = this.headers['Authorization']" in src, (
+            "uploadDocument's bypass fetch dropped its Authorization header"
+        )
+        # 4. no NEW unguarded request path: exactly the two known fetch() sites
+        #    (request() + uploadDocument). A third fetch must be confirmed to
+        #    authenticate, then this count updated — the client-side widening guard.
+        n = src.count("fetch(")
+        assert n == 2, (
+            f"unexpected fetch() count ({n}) in api-client.ts — a new request path "
+            f"must be confirmed to authenticate, then update this guard."
+        )
 
 
 class TestFlipBackIsCleanNoop:

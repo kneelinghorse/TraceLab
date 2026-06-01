@@ -14,6 +14,8 @@ it is pointed at prod (the live prod run itself is T47.6):
 
 from __future__ import annotations
 
+from uuid import uuid4
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -81,6 +83,55 @@ def test_matrix_flags_leak_when_unenforced(client, owner_principal, monkeypatch)
 
     leaks = [g for g in verifier.gaps if g.kind == "DENY-LEAK-2xx"]
     assert leaks, "harness FAILED to flag a 2xx BOLA leak when RBAC was off"
+
+
+def test_service_log_matrix_flags_leak_when_gate_off(client, owner_principal, monkeypatch):
+    """With RBAC OFF the service gate is a no-op, so a non-service human reaches the
+    log-write (201). The new service_log_write_matrix MUST flag that as a DENY-LEAK —
+    proving the check can go RED (a harness check that can't fail is worthless, the
+    T47.2 review lesson). With the flag ON the full run (above) proves it stays green."""
+    monkeypatch.setattr(settings, "rbac_enabled", False)
+    verifier = RbacVerifier(client)
+    owner_token = verifier.login(OWNER_EMAIL, OWNER_PW)
+    owner_key, _ = verifier.mint_api_key(owner_token)
+    created = verifier.create_throwaway_user(owner_key, "member", "svc-leaktest")
+    assert created is not None, "member provisioning failed"
+    _uid, member_email = created
+    member_jwt = verifier.login(member_email, _THROWAWAY_PASSWORD)
+    proj_spec = next(s for s in _seed_specs(settings.api_v1_prefix) if s.name == "project")
+    mission_spec = next(s for s in _seed_specs(settings.api_v1_prefix) if s.name == "mission")
+    proj_id = verifier.seed(owner_key, proj_spec, {})
+    assert proj_id is not None, "project seeding failed"
+    mid = verifier.seed(owner_key, mission_spec, {"project": proj_id})
+    assert mid is not None, "mission seeding failed"
+
+    verifier.service_log_write_matrix(mid, {"member": member_jwt})
+
+    leaks = [g for g in verifier.gaps if g.kind == "DENY-LEAK-2xx"]
+    assert leaks, "harness FAILED to flag the log-write leak when the service gate was off"
+
+
+def test_service_log_matrix_flags_missing_service_principal(client, owner_principal, monkeypatch):
+    """The service-ALLOW probe is the over-block guard the rbac_enabled flip relies on
+    (proves the legitimate runner is not denied). If the service principal can't be
+    provisioned the harness must go RED (NO-SERVICE-PRINCIPAL), not silently green —
+    the asymmetric soft-fail the T47.4 adversarial review caught. The gate runs first,
+    so a random mission id is fine: a human is denied (403) before the lookup."""
+    monkeypatch.setattr(settings, "rbac_enabled", True)
+    verifier = RbacVerifier(client)
+    owner_token = verifier.login(OWNER_EMAIL, OWNER_PW)
+    owner_key, _ = verifier.mint_api_key(owner_token)
+    created = verifier.create_throwaway_user(owner_key, "member", "no-svc")
+    assert created is not None, "member provisioning failed"
+    _uid, member_email = created
+    member_jwt = verifier.login(member_email, _THROWAWAY_PASSWORD)
+
+    # A human IS present (deny half runs) but NO service principal is supplied.
+    verifier.service_log_write_matrix(str(uuid4()), {"member": member_jwt})
+
+    assert any(g.kind == "NO-SERVICE-PRINCIPAL" for g in verifier.gaps), (
+        "harness FAILED to flag the missing service principal (the allow half soft-failed)"
+    )
 
 
 def test_seed_skips_gracefully_when_dependency_missing(client, owner_principal, monkeypatch):

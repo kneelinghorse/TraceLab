@@ -148,6 +148,49 @@ Refer to `docs/auth_and_cors_guidance.md` for production hardening and additiona
 
 ## Service Accounts & DeepSearch Integration
 
+### Service-Role Tier & trusted-origin writes (T47.4)
+
+> The "Architecture / Production Credentials / Future Multi-User Support" notes
+> below this subsection are **historical** (they describe the original single-user
+> env-var model). TraceLab now has a DB-backed users table with roles
+> (viewer/member/admin/owner) plus a **service** role. This subsection is the
+> current authority for how machine callers authenticate. (Full doc refresh is
+> tracked in T47.6.)
+
+Some writes are **service-to-service**, not per-user. They are gated to a
+**service principal** — a user whose role is `service` — via
+`authorize_service_or_403` (`app/core/authorization.py`), which is **stricter**
+than the per-user `authorize()`: only `role == "service"` passes; *every* human
+role (including owner/admin) is denied. A service principal is fail-closed
+everywhere else (non-privileged, owns no resources, in no Space), so it can do
+nothing but the service write(s) it is explicitly granted. Like all RBAC, the gate
+is a **no-op while `RBAC_ENABLED` is off**, so flip-back stays byte-identical.
+
+**Service / trusted-origin surfaces (the carve-out — kept explicit so it cannot
+silently widen; guarded by `tests/test_rbac_flip_regression.py::TestServiceCarveOutBoundary`):**
+
+| Surface | Auth mechanism | Notes |
+| --- | --- | --- |
+| `POST /missions/{id}/logs` (runner log ingest) | **service principal** (`role=service`) when `RBAC_ENABLED` on; authn-only when off | The one service-gated write today. |
+| `POST /api/v1/webhooks/deepsearch` | HMAC-SHA256 shared secret (env `DEEPSEARCH_TRACELAB_SERVICE_SECRET`, legacy fallback `DEEPSEARCH_WEBHOOK_SECRET`) | Never user-authed; structural carve-out (never calls `authorize()`). ⚠️ If neither is set, HMAC validation is **skipped** (dev-only mode) — must be set in prod. |
+| `app/mcp_server/**` (in-repo Python MCP) | in-process DB access | Production-dark; structural carve-out. |
+| `packages/tracelab-mcp` (published npm MCP client) | human JWT or `tl_` API key over HTTP | The real production MCP surface; must always present a credential. |
+
+**⚠️ Rollout dependency (must happen BEFORE `RBAC_ENABLED` is flipped ON in prod):**
+the DeepSearch runner's `TracelabLogHandler` authenticates by logging in with
+`TRACELAB_USERNAME` / `TRACELAB_PASSWORD` (a **human** JWT) today. Once the flag is
+ON, that human token is **denied** on `POST /missions/{id}/logs`. Before the flip,
+provision a dedicated service account and point the runner at it:
+
+```bash
+# As owner/admin, mint the runner's service principal:
+POST /api/v1/admin/users  { "email": "...", "password": "...", "display_name": "deepsearch-runner", "role": "service" }
+# Then set DeepSearch's TRACELAB_USERNAME / TRACELAB_PASSWORD to that account.
+```
+
+No runner code change is needed — it keeps using password login; only its account's
+role changes. This sequencing is owned by the T47.6 post-flip rollout runbook.
+
 ### Architecture
 
 TraceLab uses **single-user auth via environment variables** - not a database of users. The `AUTH_USERNAME` and `AUTH_PASSWORD` env vars define the ONE account that can authenticate.

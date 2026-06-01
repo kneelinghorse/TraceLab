@@ -21,6 +21,7 @@ from app.core.security import (
     ROLE_ADMIN,
     ROLE_MEMBER,
     ROLE_OWNER,
+    ROLE_SERVICE,
     ROLE_VIEWER,
     AuthenticatedUser,
     hash_password,
@@ -35,7 +36,11 @@ from app.services.ownership import LastOwnerError, assert_not_last_owner
 
 router = APIRouter(tags=["admin-users"])
 
-_VALID_ROLES = frozenset({ROLE_OWNER, ROLE_ADMIN, ROLE_MEMBER, ROLE_VIEWER})
+# ROLE_SERVICE (T47.4) is provisionable by any admin/owner — it grants no human
+# privilege (it fails closed on every human role gate), so it needs no owner-gating
+# like ROLE_OWNER does; it is the credential the DeepSearch runner uses for the
+# service-gated log-ingest write.
+_VALID_ROLES = frozenset({ROLE_OWNER, ROLE_ADMIN, ROLE_MEMBER, ROLE_VIEWER, ROLE_SERVICE})
 
 
 def _get_user_or_404(db: Session, user_id: UUID) -> User:

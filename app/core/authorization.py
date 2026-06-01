@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING
 from fastapi import HTTPException, status
 
 from app.core.config import settings
-from app.core.security import ROLE_ADMIN, ROLE_OWNER, AuthenticatedUser
+from app.core.security import ROLE_ADMIN, ROLE_OWNER, ROLE_SERVICE, AuthenticatedUser
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
@@ -170,6 +170,39 @@ def authorize_or_403(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have access to this resource.",
+        )
+
+
+def is_service_principal(user: AuthenticatedUser) -> bool:
+    """True iff ``user`` is a service principal (machine identity, role 'service')."""
+    return getattr(user, "role", None) == ROLE_SERVICE
+
+
+def authorize_service_or_403(user: AuthenticatedUser) -> None:
+    """Require a SERVICE principal for a service-to-service write, or raise HTTP 403.
+
+    Gates the trusted-origin WRITE surfaces (T47.4) — e.g. POST
+    /missions/{id}/logs, called by the DeepSearch runner — so a human-auth token can
+    no longer append/spoof records there (the BOLA gap decision #260(3) deferred).
+    Unlike :func:`authorize`, this is NOT satisfied by the owner/admin tier: ONLY a
+    ``role == 'service'`` principal passes; EVERY human role (viewer/member/admin/
+    owner) is denied. A service principal, in turn, is fail-closed everywhere else
+    (it is not in _PRIVILEGED_ROLES, owns no resources, and is in no Space), so it
+    can do nothing but the service writes it is explicitly granted.
+
+    Like :func:`authorize` it is a no-op while ``rbac_enabled`` is False, so the
+    flip-back invariant holds (TestFlipBackIsCleanNoop) and the currently-deployed
+    runner — which authenticates as a human user today — is UNAFFECTED until the
+    flip. The runner's account MUST be provisioned as a service principal (role
+    'service') BEFORE rbac_enabled is turned ON (see the T47.6 rollout runbook),
+    otherwise log ingestion 403s at flip time.
+    """
+    if not settings.rbac_enabled:
+        return
+    if not is_service_principal(user):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This endpoint requires a service principal.",
         )
 
 
