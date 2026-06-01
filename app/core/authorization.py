@@ -171,3 +171,80 @@ def authorize_or_403(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have access to this resource.",
         )
+
+
+def _user_space_ids(user: AuthenticatedUser, db: Session) -> list:
+    """The workspace_ids ``user`` is a member of (empty list when none / no user_id)."""
+    from app.models.space_member import SpaceMember
+
+    user_id = getattr(user, "user_id", None)
+    if user_id is None:
+        return []
+    rows = (
+        db.query(SpaceMember.workspace_id)
+        .filter(SpaceMember.user_id == user_id)
+        .all()
+    )
+    return [row[0] for row in rows]
+
+
+def accessible_filter(user: AuthenticatedUser, model: type, db: Session):
+    """Query-level companion to :func:`authorize` for LIST endpoints (T47.3).
+
+    Returns a SQLAlchemy boolean expression selecting the rows ``user`` may READ, or
+    ``None`` meaning "no filter" (all rows). Apply it INSIDE the list query, before
+    count + pagination, so lists stay pagination-safe AND consistent with the per-id
+    ``authorize`` policy (the per-id flip deliberately left lists unfiltered — this
+    closes that cross-tenant read leak, #262). The returned expression embeds literal
+    space ids, so it is session-agnostic (services that use their own session can
+    apply a filter built from the request session).
+
+    Mirrors ``authorize``'s read allow-paths exactly:
+      * ``rbac_enabled`` False -> ``None`` (byte-identical: every row, like authorize)
+      * owner / admin tier      -> ``None`` (full access)
+      * else: ``owner_id == caller``  OR  membership over the row's effective Space:
+          - top-level row (no project_id, has workspace_id): ``workspace_id IN`` my
+            spaces;
+          - child row (has project_id): ``project_id IN`` (projects in my spaces);
+            an orphan (project_id NULL) is excluded by ``IN`` -> fail closed (#260b).
+        A model exposing NEITHER an owner_id NOR a resolvable Space column yields
+        ``false()`` (the caller sees nothing) — never a silent all-rows.
+
+    MODEL-PARITY POLICY (T47.3, decided in lieu of new owner_id/workspace_id columns):
+    child models that carry a NOT-NULL ``project_id`` are governed VIA THEIR PARENT
+    project's Space — Insight and IngestionJob qualify, so no migration is needed and
+    ``authorize``/this filter cover them uniformly via the project_id branch.
+    SavedSearch is governed by its own ``owner`` (username) column and is scoped at
+    its own endpoint, so it is intentionally NOT passed through this helper.
+    """
+    if not settings.rbac_enabled:
+        return None
+    if user.role in _PRIVILEGED_ROLES:
+        return None
+
+    from sqlalchemy import false, or_, select
+
+    conditions = []
+    owner_id_col = getattr(model, "owner_id", None)
+    if owner_id_col is not None:
+        conditions.append(owner_id_col == user.user_id)
+
+    space_ids = _user_space_ids(user, db)
+    if space_ids:
+        project_id_col = getattr(model, "project_id", None)
+        if project_id_col is not None:
+            # Child resource: governed by the OWNING project's Space, not its own
+            # denormalized workspace_id (mirrors _effective_space_id). Orphans
+            # (project_id NULL) are excluded by IN -> fail closed.
+            from app.models.project import Project
+
+            accessible_projects = select(Project.id).where(Project.workspace_id.in_(space_ids))
+            conditions.append(project_id_col.in_(accessible_projects))
+        else:
+            workspace_id_col = getattr(model, "workspace_id", None)
+            if workspace_id_col is not None:
+                conditions.append(workspace_id_col.in_(space_ids))
+
+    if not conditions:
+        return false()  # no owner_id, no resolvable Space -> caller sees nothing
+    return or_(*conditions)

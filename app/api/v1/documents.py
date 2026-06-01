@@ -22,7 +22,7 @@ from fastapi import (
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
-from app.core.authorization import authorize_or_403
+from app.core.authorization import accessible_filter, authorize_or_403
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.document import Document
@@ -83,18 +83,28 @@ def list_documents(
         description="Results per page",
     ),
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ):
     """Return a paginated document list with optional filters.
 
     By default, soft-deleted documents are excluded. Use include_deleted=true to see all documents.
+    With RBAC enabled, non-privileged callers see only documents whose owning project
+    is in a Space they belong to (or that they own) — T47.3 closes the list leak.
     """
-    cache_key = _cache_manager.document_list_key(
-        project_id=str(project_id) if project_id else None,
-        processed=processed,
-        search=search,
-        page=page,
-        page_size=page_size,
-        include_deleted=include_deleted,
+    access = accessible_filter(user, Document, db)
+    # Cache PER access-scope (see list_projects): privileged/flag-off share "all";
+    # each scoped caller gets its own entry so no cross-tenant cache serving.
+    scope = "all" if access is None else str(user.user_id)
+    cache_key = (
+        *_cache_manager.document_list_key(
+            project_id=str(project_id) if project_id else None,
+            processed=processed,
+            search=search,
+            page=page,
+            page_size=page_size,
+            include_deleted=include_deleted,
+        ),
+        f"scope={scope}",
     )
 
     def _loader() -> dict[str, Any]:
@@ -106,6 +116,7 @@ def list_documents(
             processed=processed,
             search=search,
             include_deleted=include_deleted,
+            access_filter=access,
         )
         resources = [
             DocumentListItem.model_validate(document) for document in documents

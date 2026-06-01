@@ -16,7 +16,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi import status as http_status
 from sqlalchemy.orm import Session
 
-from app.core.authorization import authorize_or_403
+from app.core.authorization import accessible_filter, authorize_or_403
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.mission_events import emit_mission_status_change
@@ -241,6 +241,7 @@ def list_missions(
         description="Filter by project UUID",
     ),
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> PaginatedResponse[MissionResponse]:
     """List missions with optional filtering and pagination.
 
@@ -248,7 +249,12 @@ def list_missions(
     - **page_size**: Results per page (1-100, default 20)
     - **status**: Filter by mission status
     - **project_id**: Filter by project UUID
+
+    With RBAC enabled, non-privileged callers see only missions they own or whose
+    owning project is in a Space they belong to (T47.3).
     """
+    from app.models.mission import Mission
+
     try:
         missions, meta = _service.list_missions(
             db,
@@ -256,6 +262,7 @@ def list_missions(
             page_size=page_size,
             status=status,
             project_id=project_id,
+            access_filter=accessible_filter(user, Mission, db),
         )
         return PaginatedResponse(
             data=[_to_response(m) for m in missions],

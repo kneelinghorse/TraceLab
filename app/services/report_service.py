@@ -175,8 +175,14 @@ class ReportService:
         status: str | None = None,
         page: int = 1,
         page_size: int = 20,
+        access_filter=None,
     ) -> tuple[list[Report], int]:
         """List reports with optional filtering and pagination.
+
+        ``access_filter`` (authorization.accessible_filter) is an optional RBAC
+        row-filter applied before count + pagination (T47.3); it is a session-agnostic
+        SQLAlchemy expression, so it is built from the request session in the route and
+        applied here on this service's own session. None = no filtering.
 
         Returns:
             Tuple of (list of reports, total count)
@@ -189,6 +195,8 @@ class ReportService:
                 query = query.filter(Report.project_id == str(project_id))
             if status:
                 query = query.filter(Report.status == status)
+            if access_filter is not None:
+                query = query.filter(access_filter)
 
             # Get total count
             total = query.count()

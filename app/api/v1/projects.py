@@ -9,9 +9,10 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, R
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
-from app.core.authorization import authorize_or_403
+from app.core.authorization import accessible_filter, authorize_or_403
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
+from app.models.project import Project
 from app.onboarding.idempotency import IdempotencyService
 from app.schemas.pagination import PaginatedResponse
 from app.schemas.project import ProjectCreate, ProjectRead, ProjectStats, ProjectUpdate
@@ -72,17 +73,28 @@ def list_projects(
     ),
     include_deleted: bool = Query(False, description="Include soft-deleted projects in results"),
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
 ):
     """Return paginated projects ordered by creation time.
 
     By default, soft-deleted projects are excluded. Use include_deleted=true to see all projects.
+    With RBAC enabled, non-privileged callers see only the projects they own or have
+    Space membership over (T47.3 — closes the list cross-tenant read leak).
     """
-    cache_key = _cache_manager.project_metadata_key(
-        kind="list",
-        search=search,
-        page=page,
-        page_size=page_size,
-        include_deleted=include_deleted,
+    access = accessible_filter(user, Project, db)
+    # Cache PER access-scope: privileged callers / flag-off share the "all" entry;
+    # each scoped caller gets its own so one tenant's filtered list is never served
+    # to another from cache.
+    scope = "all" if access is None else str(user.user_id)
+    cache_key = (
+        *_cache_manager.project_metadata_key(
+            kind="list",
+            search=search,
+            page=page,
+            page_size=page_size,
+            include_deleted=include_deleted,
+        ),
+        f"scope={scope}",
     )
 
     def _loader() -> dict[str, Any]:
@@ -92,6 +104,7 @@ def list_projects(
             page_size=page_size,
             search=search,
             include_deleted=include_deleted,
+            access_filter=access,
         )
         resources = [ProjectRead.model_validate(project) for project in projects]
         return {"data": resources, "pagination": meta}

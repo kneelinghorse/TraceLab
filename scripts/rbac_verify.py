@@ -420,6 +420,34 @@ class RbacVerifier:
                 f"owner api-key {key_id}: DELETE /auth/api-keys/{key_id} -> {resp.status_code} {resp.text}"
             )
 
+    def list_isolation_check(self, owner_project_id: str, principals: dict[str, str]) -> None:
+        """Spot-check list-endpoint row-filtering (T47.3): the owner's seeded project
+        must NOT appear in a non-owner's GET /projects list. A present id is a
+        cross-tenant LIST leak — the gap the per-id flip left open until T47.3."""
+        path = f"{self._prefix}/projects?page_size=100"
+        for role in ("member", "viewer"):
+            token = principals.get(role)
+            if not token:
+                continue
+            resp = self._call("get", path, token=token)
+            if not (200 <= resp.status_code < 300):
+                self.notes.append(f"list-check: {role} GET /projects -> {resp.status_code}")
+                continue
+            ids = {row.get("id") for row in resp.json().get("data", [])}
+            if owner_project_id in ids:
+                self.gaps.append(Gap("LIST-LEAK", role, "get", path, "owner's project absent", "present in list"))
+        # Sanity: the owner DOES see their own project (guards over-filtering).
+        owner_token = principals.get("owner")
+        if owner_token:
+            resp = self._call("get", path, token=owner_token)
+            if 200 <= resp.status_code < 300:
+                ids = {row.get("id") for row in resp.json().get("data", [])}
+                if owner_project_id not in ids:
+                    self.notes.append(
+                        f"list-check: owner's project {owner_project_id} missing from their "
+                        f"own /projects list (over-filtering or pagination?)"
+                    )
+
     # -- orchestration ------------------------------------------------------------
     def run(self, owner_email: str, owner_password: str) -> int:
         """Run the full harness. Returns a process exit code (0 = all enforced)."""
@@ -474,6 +502,9 @@ class RbacVerifier:
                     seeded.append((spec, rid))
                     self._log(f"seeded {spec.name}={rid}; running authz matrix...")
                     self.seeded_matrix(spec, rid, principals)
+
+                if "project" in ctx:
+                    self.list_isolation_check(ctx["project"], principals)
 
                 self.notes.append(
                     f"seeded authz matrix covers project/collection/mission; "

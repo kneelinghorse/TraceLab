@@ -31,6 +31,7 @@ class ProjectQueryService:
         page_size: int,
         search: str | None = None,
         include_deleted: bool = False,
+        access_filter=None,
     ) -> tuple[list[Project], PaginationMeta]:
         """Return paginated projects ordered by recency.
 
@@ -40,6 +41,9 @@ class ProjectQueryService:
             page_size: Results per page
             search: Optional name filter
             include_deleted: If True, include soft-deleted projects
+            access_filter: Optional RBAC row-filter (authorization.accessible_filter)
+                applied BEFORE count + pagination so the page is both correct and
+                scoped to rows the caller may read (T47.3). None = no filtering.
         """
 
         clamped_page_size = min(max(page_size, 1), self.MAX_PAGE_SIZE)
@@ -52,6 +56,9 @@ class ProjectQueryService:
         if search:
             like_term = f"%{search.strip()}%"
             query = query.filter(Project.name.ilike(like_term))
+
+        if access_filter is not None:
+            query = query.filter(access_filter)
 
         query = query.order_by(Project.created_at.desc())
         total = query.count()

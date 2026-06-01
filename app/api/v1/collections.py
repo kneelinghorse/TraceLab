@@ -8,9 +8,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
-from app.core.authorization import authorize_or_403
+from app.core.authorization import accessible_filter, authorize_or_403
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
+from app.models.collection import Collection
 from app.schemas.collection import (
     CollectionCreate,
     CollectionDetailResponse,
@@ -61,10 +62,20 @@ def _build_item_response(item) -> CollectionItemResponse:
 @router.get("", response_model=CollectionListResponse)
 def list_collections(
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
     service: CollectionService = Depends(get_collection_service),
 ) -> CollectionListResponse:
-    """Return all collections."""
-    entries = service.list_collections()
+    """Return the collections the caller may access.
+
+    With RBAC enabled, non-privileged callers see only collections they own or have
+    Space membership over (T47.3). Collections carry owner_id/workspace_id but the API
+    does not yet populate them, so a non-privileged caller currently sees none — which
+    is exactly what authorize() returns for the same collection per-id (consistent
+    fail-closed), pending the collections owner/workspace model-parity work.
+    """
+    entries = service.list_collections(
+        access_filter=accessible_filter(current_user, Collection, db)
+    )
     payload = [_build_collection_response(entry, service) for entry in entries]
     return CollectionListResponse(data=payload, total=len(payload))
 
