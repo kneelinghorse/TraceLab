@@ -31,6 +31,21 @@ def _mission_stub(
         research_phases={},
         tags=[],
         mission_metadata={},
+        # Mission-authoring fields (T40.1/T40.2) the GET serializer reads directly;
+        # the stub predated them, so reading them 500'd (first miss: constraints). All
+        # are Optional on MissionResponse, so None is a faithful "unset" for a draft.
+        constraints=None,
+        background=None,
+        focus=None,
+        references=None,
+        required_entities=None,
+        excluded_entities=None,
+        expected_output_schema=None,
+        coverage_thresholds=None,
+        validation_thresholds=None,
+        deliverable_format=None,
+        max_loops=None,
+        min_loops=None,
         status=status,
         queued_at=None,
         started_at=None,

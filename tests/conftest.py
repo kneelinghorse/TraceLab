@@ -93,6 +93,22 @@ def _create_all_sqlite_safe(eng):
 
 
 @pytest.fixture(autouse=True)
+def _reset_auth_rate_limiter():
+    """Reset the process-global auth rate limiter before each test (T47.5).
+
+    auth_rate_limiter is a module-global sliding window shared across the whole
+    test run via the TestClient's fixed client IP. Now that it is wired into
+    /login, login attempts would otherwise accumulate across tests within the 60s
+    window and spuriously 429 unrelated suites. Resetting per test isolates them;
+    the rate-limit tests' own intra-test loops are unaffected (they run after setup).
+    """
+    from app.core.rate_limit import auth_rate_limiter
+
+    auth_rate_limiter.reset()
+    yield
+
+
+@pytest.fixture(autouse=True)
 def reset_database_and_reports(request):
     """Reset the SQLite database and coverage artifact before each test.
 

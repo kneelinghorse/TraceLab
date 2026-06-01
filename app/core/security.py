@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import secrets
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -16,6 +17,11 @@ from passlib.context import CryptContext
 
 from app.core.config import settings
 from app.core.database import SessionLocal
+
+# passlib 1.7.x probes bcrypt.__about__.__version__, which bcrypt>=4 removed, and
+# logs a noisy (harmless) "(trapped) error reading bcrypt version" WARNING when the
+# backend loads. Quiet just that logger so it doesn't drown real auth logs (T47.5).
+logging.getLogger("passlib.handlers.bcrypt").setLevel(logging.ERROR)
 
 _pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 _bearer_scheme = HTTPBearer(auto_error=False)
