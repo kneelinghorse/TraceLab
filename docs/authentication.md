@@ -169,7 +169,7 @@ import requests
 
 # Login with shared credentials
 resp = requests.post(
-    "https://api.namozine.com/api/v1/auth/login",
+    "https://api.tracelab.aquex.ai/api/v1/auth/login",
     json={"username": "kneelinghorse", "password": "Bigpuma"}
 )
 token = resp.json()["access_token"]
@@ -177,7 +177,7 @@ token = resp.json()["access_token"]
 # Use token for API calls
 headers = {"Authorization": f"Bearer {token}"}
 preflight = requests.post(
-    "https://api.namozine.com/api/v1/pedr/preflight",
+    "https://api.tracelab.aquex.ai/api/v1/pedr/preflight",
     headers=headers,
     json={"query": "passwordless authentication", "top_k": 5}
 )

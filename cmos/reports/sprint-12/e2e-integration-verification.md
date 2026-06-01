@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-The DeepSearch → TraceLab integration flow has been verified end-to-end against production (`https://api.namozine.com`). All critical path tests passed successfully.
+The DeepSearch → TraceLab integration flow has been verified end-to-end against production (`https://api.tracelab.aquex.ai`). All critical path tests passed successfully.
 
 ## Test Results
 

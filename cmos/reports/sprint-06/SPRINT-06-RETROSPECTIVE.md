@@ -22,7 +22,7 @@
 | B6.2 – Document Library UI | ✅ Complete (2025-11-10T15:06:56Z) | Auth provider bootstrapping + typed document events; lint/type-check green. |
 | B6.3 – RAG Search UI | ⚠️ Functionally blocked | UI merged but cannot load data without GET `/documents` + `/projects`; frontend retries indefinitely. |
 | B6.4 – Mission UI Overhaul | ✅ Complete | Evidence gallery + markdown preview improvements. |
-| B6.4a – API URL Configuration Fix | ✅ Complete | `.env.example` + `.env.local` now point to `https://api.namozine.com` in prod and `http://localhost:8000` locally. |
+| B6.4a – API URL Configuration Fix | ✅ Complete | `.env.example` + `.env.local` now point to `https://api.tracelab.aquex.ai` in prod and `http://localhost:8000` locally. |
 | B6.4b – Local Dev Environment | ✅ Docs shipped, **tests still failing** | `scripts/dev-setup.sh` works, but ingestion/Presidio tests fail (see Challenges). |
 | B6.4c – Authentication Documentation & Testing | ✅ Complete | `docs/authentication.md` + targeted pytest suites. |
 | B6.4d – RAG Search UI Implementation | ⚠️ Guardrail gaps | UI promoted but integration tests still fail because `cmos/docs/integration-testing-guide.md` and structured prompting references are missing. |
@@ -48,7 +48,7 @@
 
 ## 🧱 Infrastructure Assessment
 ### API Base URL & Connectivity
-- `.env.example` + `.env.local` now converge on `http://localhost:8000` for dev and `https://api.namozine.com` for prod, so future `npm run build` versions inherit the right host automatically (`.env.example:33`, `frontend/.env.local:6`).
+- `.env.example` + `.env.local` now converge on `http://localhost:8000` for dev and `https://api.tracelab.aquex.ai` for prod, so future `npm run build` versions inherit the right host automatically (`.env.example:33`, `frontend/.env.local:6`).
 - Despite the URL fix, Document & Project listing APIs are still missing in the backend. `app/api/v1/documents.py` only exposes upload/process/detail routes (`app/api/v1/documents.py:1-220`), and there is no `/api/v1/projects` router at all, leaving SWR hooks empty.
 
 ### Local Development Workflow

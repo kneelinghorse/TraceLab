@@ -42,6 +42,7 @@ from app.api.v1 import (
     synthesize,
     webhooks,
 )
+from app.core.authorization import POLICY_VERSION
 from app.core.config import settings
 from app.core.database import SessionLocal
 from app.core.qdrant_client import prewarm_qdrant
@@ -138,6 +139,15 @@ async def startup_event():
             "Qdrant pre-warm failed - first query may experience cold-start latency. "
             "Check QDRANT_URL configuration and Qdrant service availability."
         )
+
+    # RBAC observability (T47.1): make the enforcement flag + policy version visible
+    # in the deploy logs so we are never blind to whether RBAC is ON. Also exposed at
+    # GET /admin/rbac-status.
+    logger.info(
+        "RBAC policy: rbac_enabled=%s policy_version=%s",
+        settings.rbac_enabled,
+        POLICY_VERSION,
+    )
 
     # Owner-bootstrap safety net (Sprint 43 T43.3): guarantee an owner always
     # exists. The authoritative promotion is migration 031; this is the defensive

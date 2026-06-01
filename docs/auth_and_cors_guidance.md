@@ -88,7 +88,7 @@ Use the following `.env` fragment when deploying the FastAPI service behind Clou
 ```
 ENVIRONMENT=production
 DEBUG=false
-CORS_ALLOWED_ORIGINS_PROD=["https://namozine.com", "https://www.namozine.com"]
+CORS_ALLOWED_ORIGINS_PROD=["https://tracelab.aquex.ai", "https://www.tracelab.aquex.ai"]
 CORS_ALLOWED_METHODS=["GET","POST","PUT","PATCH","DELETE","OPTIONS"]
 CORS_ALLOWED_HEADERS=["Authorization","Content-Type"]
 
@@ -96,10 +96,10 @@ CORS_ALLOWED_HEADERS=["Authorization","Content-Type"]
 CORS_ALLOWED_ORIGINS_DEV=["http://localhost:3000"]
 
 # Frontend (Next.js) picks up the vanity domain through NEXT_PUBLIC_API_BASE_URL (host only)
-NEXT_PUBLIC_API_BASE_URL=https://api.namozine.com
+NEXT_PUBLIC_API_BASE_URL=https://api.tracelab.aquex.ai
 ```
 
-After updating the environment variables, restart the FastAPI process and re-run the production Playwright smoke suite to verify that `https://namozine.com/missions` and `https://api.namozine.com/api/v1/health` (or whatever path matches `NEXT_PUBLIC_API_PATH_PREFIX`) both succeed with `access-control-allow-origin: https://namozine.com`. Keep `NEXT_PUBLIC_API_BASE_URL` host-only and adjust `NEXT_PUBLIC_API_PATH_PREFIX` (`/api/v1` by default, set to `""` for root-level APIs) instead of hard-coding suffixes into the base URL.
+After updating the environment variables, restart the FastAPI process and re-run the production Playwright smoke suite to verify that `https://tracelab.aquex.ai/missions` and `https://api.tracelab.aquex.ai/api/v1/health` (or whatever path matches `NEXT_PUBLIC_API_PATH_PREFIX`) both succeed with `access-control-allow-origin: https://tracelab.aquex.ai`. Keep `NEXT_PUBLIC_API_BASE_URL` host-only and adjust `NEXT_PUBLIC_API_PATH_PREFIX` (`/api/v1` by default, set to `""` for root-level APIs) instead of hard-coding suffixes into the base URL.
 
 ## TraceLab Implementation Notes
 

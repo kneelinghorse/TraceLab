@@ -1595,7 +1595,7 @@ domainFields:
       status: Completed
       completed_at: '2025-11-11T00:02:38Z'
       notes: Updated production env templates, docs, and Playwright smoke defaults
-        so NEXT_PUBLIC_API_BASE_URL/PLAYWRIGHT_API_BASE_URL point at https://api.namozine.com
+        so NEXT_PUBLIC_API_BASE_URL/PLAYWRIGHT_API_BASE_URL point at https://api.tracelab.aquex.ai
         (UI appends /api/v1). Verified frontend lint to confirm no regressions.
       metadata:
         metadata:
@@ -1603,7 +1603,7 @@ domainFields:
             metadata:
               metadata:
                 description: Correct API URL configuration across all frontend environments
-                  to match production API endpoint at https://api.namozine.com (remove
+                  to match production API endpoint at https://api.tracelab.aquex.ai (remove
                   /api/v1 suffix)
                 started_at: '2025-11-10T23:58:27Z'
                 completed_at: '2025-11-11T00:02:38Z'

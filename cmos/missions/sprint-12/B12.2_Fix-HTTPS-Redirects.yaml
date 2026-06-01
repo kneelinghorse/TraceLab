@@ -19,7 +19,7 @@ spec:
 
   context: |
     **Current State:**
-    - Requests to /missions redirect to http://api.namozine.com/api/v1/missions/ (HTTP not HTTPS)
+    - Requests to /missions redirect to http://api.tracelab.aquex.ai/api/v1/missions/ (HTTP not HTTPS)
     - When browser/client follows redirect, Authorization header is stripped (security feature)
     - Results in "Missing Authorization bearer token" error after redirect
     - Affects multiple endpoints: /missions, potentially /documents/, /projects/
@@ -27,7 +27,7 @@ spec:
     **Example:**
     ```
     GET /api/v1/missions (with Auth header)
-    -> 307 Redirect to http://api.namozine.com/api/v1/missions/
+    -> 307 Redirect to http://api.tracelab.aquex.ai/api/v1/missions/
     -> GET http://... (Auth header DROPPED by client)
     -> 401 Missing Authorization bearer token
     ```
@@ -49,7 +49,7 @@ spec:
     - All redirects use HTTPS, not HTTP
     - Auth headers preserved across redirects
     - /missions, /documents, /projects all work with or without trailing slash
-    - Verified in production at https://api.namozine.com
+    - Verified in production at https://api.tracelab.aquex.ai
 
   deliverables:
     - Fix applied to FastAPI configuration

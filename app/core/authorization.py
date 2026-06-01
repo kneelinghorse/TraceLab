@@ -28,6 +28,12 @@ from app.core.security import ROLE_ADMIN, ROLE_OWNER, AuthenticatedUser
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
+# Version stamp for the authorization policy below. Surfaced by GET
+# /admin/rbac-status (T47.1) and logged at startup so operators can confirm WHICH
+# policy a deploy is running. Bump this whenever the authorize() policy changes
+# (roles, allow paths, or fail-closed semantics) so the change is observable.
+POLICY_VERSION = "1.0"
+
 # Tier with unconditional access under the enabled policy.
 _PRIVILEGED_ROLES = frozenset({ROLE_OWNER, ROLE_ADMIN})
 

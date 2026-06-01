@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.security import (
+    ROLE_MEMBER,
     AuthenticatedUser,
     generate_api_key,
     get_key_prefix,
@@ -90,12 +91,14 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> TokenRe
             status.HTTP_400_BAD_REQUEST, detail="Invite code has expired"
         )
 
-    # Create user
+    # Create user at the least-privilege role (Sprint 47 T47.1). This route used to
+    # hard-code role='admin', so every invite-based signup silently became an admin.
+    # Elevation now goes through the owner/admin-gated admin user API.
     new_user = User(
         email=payload.email,
         display_name=payload.display_name,
         password_hash=hash_password(payload.password),
-        role="admin",
+        role=ROLE_MEMBER,
         invite_code_used=payload.invite_code.upper(),
     )
     db.add(new_user)

@@ -31,7 +31,7 @@ Sprint 12 focuses on **making TraceLab actually work** rather than premature pro
 **Success Criteria:**
 - GET /api/v1/missions/ returns 200 with list (even if empty)
 - POST /api/v1/missions/ creates missions successfully
-- Works in production at https://api.namozine.com
+- Works in production at https://api.tracelab.aquex.ai
 
 **Files:** app/api/v1/missions.py, app/schemas/mission.py, app/services/mission_protocol_service.py
 

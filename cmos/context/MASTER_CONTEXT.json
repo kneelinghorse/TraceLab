@@ -73,7 +73,7 @@
           "agent": "Claude",
           "focus": "Unblocking Sprint 06 development - API URL and auth issues",
           "key_discoveries": [
-            "Production API is at https://api.namozine.com (root), NOT https://api.namozine.com/api/v1",
+            "Production API is at https://api.tracelab.aquex.ai (root), NOT https://api.tracelab.aquex.ai/api/v1",
             "All frontend configs and docs have wrong URL with /api/v1 suffix",
             "Local development blocked due to missing .env setup and auth configuration",
             "B6.3 (RAG Search UI) blocked by API connectivity issues"
@@ -99,7 +99,7 @@
           ],
           "blockers_identified": {
             "api_url_mismatch": {
-              "issue": "Frontend configured for https://api.namozine.com/api/v1 but API serves at root",
+              "issue": "Frontend configured for https://api.tracelab.aquex.ai/api/v1 but API serves at root",
               "impact": "Complete connectivity failure in production and local",
               "fix": "Mission B6.3 to update all URL references"
             },
@@ -398,7 +398,7 @@
       "date": null
     },
     {
-      "decision": "Cloudflare vanity (namozine.com / api.namozine.com) now fronts the Railway UI/API with Full (Strict) TLS; env templates pin NEXT_PUBLIC_API_BASE_URL=https://api.namozine.com/api/v1 and CORS_ALLOWED_ORIGINS_PROD includes https://namozine.com + https://www.namozine.com.",
+      "decision": "Cloudflare vanity (tracelab.aquex.ai / api.tracelab.aquex.ai) now fronts the Railway UI/API with Full (Strict) TLS; env templates pin NEXT_PUBLIC_API_BASE_URL=https://api.tracelab.aquex.ai/api/v1 and CORS_ALLOWED_ORIGINS_PROD includes https://tracelab.aquex.ai + https://www.tracelab.aquex.ai.",
       "source": "working_memory",
       "date": null
     },
@@ -759,7 +759,7 @@
         "agent": "Claude",
         "focus": "Unblocking Sprint 06 development - API URL and auth issues",
         "key_discoveries": [
-          "Production API is at https://api.namozine.com (root), NOT https://api.namozine.com/api/v1",
+          "Production API is at https://api.tracelab.aquex.ai (root), NOT https://api.tracelab.aquex.ai/api/v1",
           "All frontend configs and docs have wrong URL with /api/v1 suffix",
           "Local development blocked due to missing .env setup and auth configuration",
           "B6.3 (RAG Search UI) blocked by API connectivity issues"
@@ -785,7 +785,7 @@
         ],
         "blockers_identified": {
           "api_url_mismatch": {
-            "issue": "Frontend configured for https://api.namozine.com/api/v1 but API serves at root",
+            "issue": "Frontend configured for https://api.tracelab.aquex.ai/api/v1 but API serves at root",
             "impact": "Complete connectivity failure in production and local",
             "fix": "Mission B6.3 to update all URL references"
           },
@@ -1317,8 +1317,8 @@
         "B6.3: Frontend depends on GET /api/v1/documents and /projects, but production API only allows POST (405). UI keeps retrying and appears unstyled because SWR never hydrates. Need backend redeploy or configuration change to enable GET before frontend can be validated."
       ],
       "critical_context": {
-        "api_endpoint": "https://api.namozine.com (NO /api/v1 suffix)",
-        "frontend_env_var": "NEXT_PUBLIC_API_BASE_URL=https://api.namozine.com",
+        "api_endpoint": "https://api.tracelab.aquex.ai (NO /api/v1 suffix)",
+        "frontend_env_var": "NEXT_PUBLIC_API_BASE_URL=https://api.tracelab.aquex.ai",
         "local_backend": "http://localhost:8000",
         "local_frontend": "http://localhost:3000"
       }

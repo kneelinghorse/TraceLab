@@ -40,7 +40,7 @@ spec:
     - GET /api/v1/missions/ returns 200 with list of missions (even if empty)
     - POST /api/v1/missions/ successfully creates a mission
     - GET /api/v1/missions/{id} returns a specific mission
-    - All endpoints work in production at https://api.namozine.com
+    - All endpoints work in production at https://api.tracelab.aquex.ai
 
   deliverables:
     - Fix applied to missions endpoint

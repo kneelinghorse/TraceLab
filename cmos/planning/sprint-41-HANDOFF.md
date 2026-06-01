@@ -52,7 +52,7 @@ Drop in alongside any of the missions, no scheduling required.
 
 - **T41.8** — Auth modernization (device-code-style, no API key in MCP snippet, mirror cmos-mcp's recent pattern)
 - **T41.9** — `@aquex/tracelab-mcp` npm publish (requires T41.7 first so v1 ships with topical-cluster shape)
-- **Domain cutover** to `tracelab.aquex.ai` — DS workflow currently runs off `api.namozine.com`; no value flipping during their workflow recovery
+- **Domain cutover** to `tracelab.aquex.ai` — DS workflow currently runs off `api.tracelab.aquex.ai`; no value flipping during their workflow recovery
 
 ## Key context for picking up cold
 

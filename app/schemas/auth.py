@@ -78,6 +78,39 @@ class AdminUserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class AdminUserCreate(BaseModel):
+    """Payload for admin-provisioning a user directly (T47.1).
+
+    Lets an admin/owner mint a user at an explicit role without the
+    register->demote dance. ``role`` defaults to the least-privilege tier so a
+    forgotten role never mints an admin; granting ``owner`` is owner-gated in the
+    route, not here. Role validity is checked in the route (400) to share the admin
+    API's existing _VALID_ROLES vocabulary and error shape."""
+
+    email: str = Field(..., min_length=3, description="Email address")
+    password: str = Field(..., min_length=8, description="Password (minimum 8 characters)")
+    display_name: str = Field(..., max_length=100, description="Display name")
+    role: str = Field(default="member", description="member | viewer | admin | owner")
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        v = v.strip().lower()
+        if "@" not in v or "." not in v.split("@")[-1]:
+            raise ValueError("Invalid email format")
+        return v
+
+    @field_validator("display_name")
+    @classmethod
+    def validate_display_name(cls, v: str) -> str:
+        # Mirror ProfileUpdate: a whitespace-only display name is not meaningful and
+        # the column is NOT NULL with no check constraint, so reject it at the edge.
+        v = v.strip()
+        if not v:
+            raise ValueError("display_name cannot be blank")
+        return v
+
+
 class RegisterRequest(BaseModel):
     """Payload for user registration."""
 
