@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.database import SessionLocal
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.report import Report, ReportSource
+from app.services.ownership import default_workspace_id
 from app.schemas.synthesis import (
     CitationInfo,
     SynthesisCacheStatsResponse,
@@ -38,11 +39,17 @@ def _create_report_from_synthesis(
     collection_id: UUID | None,
     chunk_ids: list[UUID] | None,
     project_id: UUID | None,
+    owner_id: UUID | None,
 ) -> UUID:
     """Create a Report record from synthesis results.
 
     This reuses the synthesis content directly (no second LLM call).
     Returns the report UUID.
+
+    owner_id (the caller) + workspace_id (default Space) are set so a project-less
+    report is visible to its own creator once rbac_enabled is on (T48.4 parity) —
+    a NULL-project report has no Space-inheritance fallback, so owner_id is its only
+    non-admin access path.
     """
     content_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
 
@@ -58,6 +65,8 @@ def _create_report_from_synthesis(
             status="draft",
             tokens_used=tokens_used,
             chunk_count=chunk_count,
+            owner_id=owner_id,
+            workspace_id=default_workspace_id(session),
         )
         session.add(report)
         session.flush()  # Get report.id
@@ -172,6 +181,7 @@ def synthesize(
                 collection_id=request.collection_id,
                 chunk_ids=request.chunk_ids,
                 project_id=request.project_id,
+                owner_id=current_user.user_id,
             )
             logger.info(f"Synthesis saved as report {report_id}")
         except Exception as exc:

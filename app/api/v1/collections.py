@@ -22,6 +22,7 @@ from app.schemas.collection import (
     CollectionUpdate,
 )
 from app.services.collection import CollectionService, get_collection_service
+from app.services.ownership import default_workspace_id
 
 router = APIRouter()
 
@@ -68,10 +69,10 @@ def list_collections(
     """Return the collections the caller may access.
 
     With RBAC enabled, non-privileged callers see only collections they own or have
-    Space membership over (T47.3). Collections carry owner_id/workspace_id but the API
-    does not yet populate them, so a non-privileged caller currently sees none — which
-    is exactly what authorize() returns for the same collection per-id (consistent
-    fail-closed), pending the collections owner/workspace model-parity work.
+    Space membership over (T47.3). As of T48.4, POST /collections populates owner_id
+    (the caller) + workspace_id (the default Space) on create, so a non-privileged
+    creator sees the collections they own via the owner_id allow-path — consistent
+    with what authorize() returns for the same collection per-id (fail-closed).
     """
     entries = service.list_collections(
         access_filter=accessible_filter(current_user, Collection, db)
@@ -84,13 +85,21 @@ def list_collections(
 def create_collection(
     request: CollectionCreate,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
     service: CollectionService = Depends(get_collection_service),
 ) -> CollectionResponse:
-    """Create a new collection."""
+    """Create a new collection.
+
+    owner_id (the caller) + workspace_id (default Space) are resolved HERE and passed
+    as scalar UUIDs into the service's own session (T48.4), mirroring POST /projects —
+    so the creator can actually see their collection in the scoped list once RBAC is on.
+    """
     try:
         entry = service.create(
             name=request.name,
             description=request.description,
+            owner_id=current_user.user_id,
+            workspace_id=default_workspace_id(db),
         )
     except ValueError as exc:
         raise HTTPException(

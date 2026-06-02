@@ -14,6 +14,7 @@ from app.models.document import Document
 from app.models.mission import Mission
 from app.models.report import Report
 from app.services.document_ingestion import DocumentIngestionService
+from app.services.ownership import project_owner_workspace
 from app.services.processing_status import ProcessingStatusRecorder
 
 logger = logging.getLogger(__name__)
@@ -94,6 +95,10 @@ class ReportPromotionService:
             document_name,
         )
 
+        # Inherit owner/Space from the parent project (no human caller) so the
+        # promoted doc shares its project's visibility once rbac_enabled flips (T48.4).
+        owner_id, workspace_id = project_owner_workspace(db, mission.project_id)
+
         # Create document record with provenance fields
         document = Document(
             project_id=mission.project_id,
@@ -112,6 +117,8 @@ class ReportPromotionService:
                 "report_title": report.title,
                 "promoted": True,
             },
+            owner_id=owner_id,
+            workspace_id=workspace_id,
             processed=False,
             chunked=False,
             embedded=False,
@@ -228,6 +235,10 @@ class ReportPromotionService:
             document_name,
         )
 
+        # Inherit owner/Space from the parent project (no human caller) so the
+        # promoted doc shares its project's visibility once rbac_enabled flips (T48.4).
+        owner_id, workspace_id = project_owner_workspace(db, mission.project_id)
+
         # Create document record with provenance fields
         document = Document(
             project_id=mission.project_id,
@@ -244,6 +255,8 @@ class ReportPromotionService:
                 "promoted_from": "result_markdown",
                 "promoted": True,
             },
+            owner_id=owner_id,
+            workspace_id=workspace_id,
             processed=False,
             chunked=False,
             embedded=False,

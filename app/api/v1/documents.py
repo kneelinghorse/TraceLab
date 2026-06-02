@@ -35,6 +35,7 @@ from app.services.coverage_report import CoverageReportGenerator
 from app.services.document_ingestion import DocumentIngestionService
 from app.services.document_parser import DocumentParser
 from app.services.document_query_service import DocumentQueryService
+from app.services.ownership import default_workspace_id
 from app.services.processing_status import ProcessingStatusRecorder
 from app.services.soft_delete_service import DocumentSoftDeleteService
 
@@ -134,6 +135,7 @@ async def upload_document(
     file_type: str | None = None,
     source_type: str | None = None,
     background_tasks: BackgroundTasks = None,
+    user: AuthenticatedUser = Depends(require_authenticated_user),
     db: Session = Depends(get_db),
 ) -> DocumentRead:
     """
@@ -205,7 +207,9 @@ async def upload_document(
         }
         file_type = file_type_map.get(file_path.suffix.lower(), "report")
 
-    # Create document record
+    # Create document record. owner_id = the uploading caller and workspace_id =
+    # the default Space, mirroring POST /projects (T48.4) — without this the doc is
+    # minted NULL-owner and invisible to its own uploader once rbac_enabled flips.
     document = Document(
         project_id=project_id,
         name=file.filename,
@@ -214,6 +218,8 @@ async def upload_document(
         file_size=file_size,
         mime_type=mime_type,
         source_type=source_type,
+        owner_id=user.user_id,
+        workspace_id=default_workspace_id(db),
         processed=False,
         chunked=False,
         embedded=False,

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
@@ -168,5 +168,39 @@ describe("RoleProvider", () => {
     await waitFor(() => expect(screen.getByTestId("status").textContent).toBe("error"));
     expect(screen.getByTestId("role").textContent).toBe("none");
     expect(screen.getByTestId("isAdmin").textContent).toBe("false");
+  });
+
+  it("refetch() re-resolves the role after a transient error (#315b)", async () => {
+    // First /auth/me fails, then succeeds — refetch() must recover without a reload.
+    mocks.getProfile
+      .mockRejectedValueOnce(new Error("503 Service Unavailable"))
+      .mockResolvedValueOnce({
+        user_id: "u1",
+        email: "a@example.com",
+        display_name: "A",
+        role: "admin",
+      });
+
+    function RetryProbe() {
+      const { status, isAdmin, refetch } = useRole();
+      return (
+        <div>
+          <span data-testid="status">{status}</span>
+          <span data-testid="isAdmin">{String(isAdmin)}</span>
+          <button onClick={refetch}>retry</button>
+        </div>
+      );
+    }
+    render(
+      <RoleProvider>
+        <RetryProbe />
+      </RoleProvider>,
+    );
+
+    await waitFor(() => expect(screen.getByTestId("status").textContent).toBe("error"));
+    fireEvent.click(screen.getByText("retry"));
+    await waitFor(() => expect(screen.getByTestId("status").textContent).toBe("ready"));
+    expect(screen.getByTestId("isAdmin").textContent).toBe("true");
+    expect(mocks.getProfile).toHaveBeenCalledTimes(2);
   });
 });

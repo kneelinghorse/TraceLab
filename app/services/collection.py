@@ -69,8 +69,15 @@ class CollectionService:
         *,
         name: str,
         description: str | None = None,
+        owner_id: UUID | None = None,
+        workspace_id: UUID | None = None,
     ) -> Collection:
-        """Create a new collection."""
+        """Create a new collection.
+
+        ``owner_id``/``workspace_id`` are resolved by the route (the caller + default
+        Space) and passed as scalar UUIDs — this service opens its OWN session, so it
+        can't read the request principal itself (T48.4).
+        """
         name_value = self._clean_name(name)
         if not name_value:
             raise ValueError("Name is required.")
@@ -80,6 +87,8 @@ class CollectionService:
             entry = Collection(
                 name=name_value,
                 description=self._clean_description(description),
+                owner_id=owner_id,
+                workspace_id=workspace_id,
             )
             session.add(entry)
             session.commit()

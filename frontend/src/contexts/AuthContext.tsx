@@ -1,7 +1,8 @@
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
 import { login as loginRequest, register as registerRequest, refresh as refreshRequest } from "@/lib/api/auth";
+import { AUTH_EXPIRED_EVENT } from "@/lib/api/http";
 import { clearStoredAuth, getStoredAuth, setStoredAuth } from "@/lib/auth/storage";
 import type { TokenResponse, TokenUser } from "@/types/auth";
 
@@ -85,6 +86,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     clearStoredAuth();
     setState({ token: null, user: null, isReady: true });
   }, []);
+
+  // When the http layer sees a 401 it clears storage and fires AUTH_EXPIRED_EVENT;
+  // drop the in-memory session so the app falls back to the login screen instead of
+  // a broken "signed in" shell (decision #315a). The listener is registered in an
+  // effect; the state change happens in the event callback, not synchronously.
+  useEffect(() => {
+    const onExpired = () => logout();
+    window.addEventListener(AUTH_EXPIRED_EVENT, onExpired);
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, onExpired);
+  }, [logout]);
 
   const refresh = useCallback(async () => {
     const response = await refreshRequest();

@@ -73,6 +73,13 @@ class Settings(BaseSettings):
     # pass-through no-op and day-one behavior is byte-identical. Sprint C flips this ON
     # to activate the deny-by-default policy (after the owner is bootstrapped).
     rbac_enabled: bool = False
+    # RL-1 fix (T48.5): the auth limiter keys on the Nth-from-the-RIGHT
+    # X-Forwarded-For entry — the IP a TRUSTED proxy appended — to defeat
+    # leftmost-XFF spoofing. N = number of trusted proxies that prepend to XFF.
+    # The prod backend is Railway-edge-direct (a single hop), so N=1. client_ip()
+    # is fail-safe when a header has fewer than N entries, so an over-estimate
+    # degrades to per-edge keying rather than locking everyone out of /login.
+    rate_limit_trusted_proxy_hops: int = 1
     cors_allowed_origins_dev: list[str] = Field(
         default_factory=lambda: ["http://localhost:3000"]
     )

@@ -23,6 +23,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from app.core.security import ROLE_OWNER
+from app.models.project import Project
 from app.models.user import User
 from app.models.workspace import DEFAULT_WORKSPACE_ID, Workspace
 
@@ -45,6 +46,27 @@ def default_workspace_id(db: Session) -> UUID | None:
     """
     default = db.query(Workspace).filter(Workspace.id == DEFAULT_WORKSPACE_ID).first()
     return default.id if default is not None else None
+
+
+def project_owner_workspace(
+    db: Session, project_id: UUID | None
+) -> tuple[UUID | None, UUID | None]:
+    """The (owner_id, workspace_id) a resource created UNDER a project should inherit.
+
+    For BACKGROUND create paths with no human caller (T48.4: DeepSearch auto-ingest
+    and report promotion) — the new document inherits its parent project's owner +
+    Space so it is visible to exactly the same principals as the project the instant
+    rbac_enabled flips, instead of being minted NULL-owner and going invisible to
+    non-admins. Returns ``(None, None)`` when project_id is None or the project is
+    missing — fail-safe: leave the row unattributed rather than mis-attributed (the
+    037 backfill mops up any NULL stragglers).
+    """
+    if project_id is None:
+        return (None, None)
+    project = db.query(Project).filter(Project.id == project_id).first()
+    if project is None:
+        return (None, None)
+    return (project.owner_id, project.workspace_id)
 
 
 class LastOwnerError(Exception):

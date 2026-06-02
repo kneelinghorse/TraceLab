@@ -6,12 +6,22 @@ No external dependency required — uses a simple dict + TTL pruning.
 
 from __future__ import annotations
 
+import logging
 import time
 from collections import defaultdict
 from dataclasses import dataclass
 from threading import Lock
 
 from fastapi import HTTPException, Request, status
+
+from app.core.config import settings
+
+logger = logging.getLogger(__name__)
+
+# Observed X-Forwarded-For hop counts already logged, so the self-observation
+# below emits once per distinct count instead of on every request. This lets prod
+# logs confirm the real trusted-hop count N without any manual measurement.
+_seen_xff_hop_counts: set[int] = set()
 
 
 @dataclass
@@ -23,24 +33,37 @@ class RateLimitConfig:
 
 
 def client_ip(request: Request) -> str:
-    """Extract the client IP, honoring X-Forwarded-For from a trusted proxy.
+    """Extract the client IP for rate-limit keying + the auth audit log (T47.5),
+    honoring a TRUSTED proxy's X-Forwarded-For.
 
-    Shared by the rate limiter (keying) and the auth audit log (T47.5), so both
-    attribute a request to the same IP and cannot diverge.
+    RL-1 fix (T48.5): key on the Nth-from-the-RIGHT XFF entry, where
+    N = ``settings.rate_limit_trusted_proxy_hops`` is the number of trusted proxies
+    that prepend to XFF. The right-most entries are the ones our trusted edge
+    appended and cannot be forged by the caller; the LEFT-most entries ARE
+    client-controllable (the old, spoofable behavior that let a caller rotate the
+    header to evade the /login limiter). The prod backend is Railway-edge-direct
+    (`server: railway-edge`, no Cloudflare proxy / `cf-ray`), a single hop ⇒ N=1.
 
-    KNOWN GAP (RL-1, T47.5 review — OPEN): this takes the LEFT-most XFF hop, which is
-    client-controllable, so the per-IP login limiter can be evaded by rotating the
-    header. The prod backend (api.tracelab.aquex.ai) is fronted by Railway's edge ONLY
-    (Cloudflare is DNS-only — verified: `server: railway-edge`, no `cf-ray`), so the
-    secure fix is to key on the hop Railway appends (the right-most for a single edge).
-    NOT applied yet: keying on the wrong hop count would collapse all clients to one
-    Railway-internal IP and lock out ALL logins. Confirm Railway's real XFF hop count
-    first (e.g. log the raw XFF on one prod login), then switch to the right-most-of-N
-    hop behind a `rate_limit_trusted_proxy_hops` setting.
+    FAIL-SAFE: if the header is absent or has fewer than N entries, fall back to the
+    socket peer (``request.client.host``) — never an IndexError, never a wrong-slot
+    read. A too-high N therefore degrades to per-edge-IP keying in the pathological
+    case rather than locking everyone out of login; bump the setting if prod logs
+    (below) ever show a hop count > 1.
     """
     forwarded = request.headers.get("x-forwarded-for")
     if forwarded:
-        return forwarded.split(",")[0].strip()
+        entries = [part.strip() for part in forwarded.split(",") if part.strip()]
+        hops = len(entries)
+        if hops and hops not in _seen_xff_hop_counts:
+            _seen_xff_hop_counts.add(hops)
+            logger.info(
+                "Observed X-Forwarded-For hop count=%d (rate_limit_trusted_proxy_hops=%d)",
+                hops,
+                settings.rate_limit_trusted_proxy_hops,
+            )
+        n = settings.rate_limit_trusted_proxy_hops
+        if n >= 1 and hops >= n:
+            return entries[-n]
     return request.client.host if request.client else "unknown"
 
 

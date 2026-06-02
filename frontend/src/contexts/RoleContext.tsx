@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,6 +23,13 @@ type RoleContextValue = {
   status: RoleStatus;
   /** True ONLY when the role resolved cleanly to an admin-tier role. */
   isAdmin: boolean;
+  /**
+   * Re-run the live /auth/me role resolution. Surfaced so a transient failure
+   * (status "error") can be retried in-app instead of locking a legitimate admin
+   * out of the admin pages until a full reload (decision #315b). No-op without a
+   * live session.
+   */
+  refetch: () => void;
 };
 
 /**
@@ -50,6 +57,8 @@ export function RoleProvider({ children }: { children: ReactNode }) {
 
   const [role, setRole] = useState<Role | null>(null);
   const [status, setStatus] = useState<RoleStatus>(sessionKey === null ? "idle" : "loading");
+  // Bumped by refetch() to re-trigger the resolving effect after a transient error.
+  const [retryNonce, setRetryNonce] = useState(0);
 
   // Reset DURING RENDER (React's sanctioned "reset state on input change"
   // pattern), not in an effect, so children never observe a stale privileged
@@ -62,10 +71,21 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     setStatus(sessionKey === null ? "idle" : "loading");
   }
 
+  // Re-run resolution after a transient error. setStatus here runs in an event
+  // handler (not an effect body), so it does not trip react-hooks/set-state-in-effect.
+  const refetch = useCallback(() => {
+    if (sessionKey === null) {
+      return;
+    }
+    setStatus("loading");
+    setRetryNonce((nonce) => nonce + 1);
+  }, [sessionKey]);
+
   useEffect(() => {
     // Resolve the role once auth has hydrated and a session is present. State
     // is set ONLY in the async continuations (never synchronously in the effect
-    // body), and every failure path is fail-closed.
+    // body), and every failure path is fail-closed. retryNonce re-triggers this
+    // on an in-app refetch().
     if (!isReady || sessionKey === null) {
       return;
     }
@@ -91,15 +111,16 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [isReady, sessionKey]);
+  }, [isReady, sessionKey, retryNonce]);
 
   const value = useMemo<RoleContextValue>(
     () => ({
       role,
       status,
       isAdmin: status === "ready" && isAdminRole(role),
+      refetch,
     }),
-    [role, status],
+    [role, status, refetch],
   );
 
   return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>;
