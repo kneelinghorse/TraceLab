@@ -17,6 +17,7 @@ from uuid import uuid4
 import pytest
 from fastapi.testclient import TestClient
 
+import app.api.v1.spaces as spaces_module
 from app.core.security import ROLE_MEMBER, create_access_token
 from app.main import app
 from app.models.project import Project
@@ -27,6 +28,7 @@ from app.models.workspace import Workspace
 _PLACEHOLDER_HASH = "placeholder-not-a-real-hash"
 SPACES_URL = "/api/v1/admin/spaces"
 PROJECTS_ADMIN_URL = "/api/v1/admin/projects"
+PROJECTS_URL = "/api/v1/projects"
 
 
 @pytest.fixture
@@ -303,3 +305,150 @@ class TestAdminGating:
             headers=_bearer(member),
         )
         assert resp.status_code == 403, resp.text
+
+    def test_member_cannot_list_roster(self, client, db_session):
+        member = _make_user(db_session, "gate6@example.com", ROLE_MEMBER)
+        space = _make_space(db_session)
+        resp = client.get(f"{SPACES_URL}/{space.id}/members", headers=_bearer(member))
+        assert resp.status_code == 403, resp.text
+
+
+class TestSpaceMemberRoster:
+    """GET /admin/spaces/{id}/members — roster joined to user identity (T48.3)."""
+
+    def test_roster_returns_members_with_identity(self, client, db_session, auth_headers):
+        space = _make_space(db_session)
+        active = _make_user(db_session, "active@example.com")
+        disabled = _make_user(db_session, "disabled@example.com")
+        disabled.is_active = False
+        db_session.commit()
+
+        for u in (active, disabled):
+            add = client.post(
+                f"{SPACES_URL}/{space.id}/members",
+                json={"user_id": str(u.id)},
+                headers=auth_headers,
+            )
+            assert add.status_code == 201, add.text
+
+        roster = client.get(f"{SPACES_URL}/{space.id}/members", headers=auth_headers)
+        assert roster.status_code == 200, roster.text
+        rows = roster.json()
+        assert len(rows) == 2
+        by_email = {r["email"]: r for r in rows}
+        assert by_email["active@example.com"]["display_name"] == "active"
+        assert by_email["active@example.com"]["role"] == ROLE_MEMBER
+        assert by_email["active@example.com"]["is_active"] is True
+        # A member who was later disabled still appears, flagged is_active=False.
+        assert by_email["disabled@example.com"]["is_active"] is False
+
+    def test_roster_unknown_space_404(self, client, db_session, auth_headers):
+        resp = client.get(f"{SPACES_URL}/{uuid4()}/members", headers=auth_headers)
+        assert resp.status_code == 404, resp.text
+
+
+class TestProjectReadExposesSpace:
+    """ProjectRead.workspace_id lets the assignment UI read a project's Space (T48.3).
+
+    The before→assign→after sequence also pins the assignment cache-bust: the
+    first GET caches the project's (space-less) detail, so the second GET would
+    return a stale NULL unless set_project_space invalidates project_metadata.
+    """
+
+    def test_project_read_exposes_workspace_id_and_assignment_busts_cache(
+        self, client, db_session, auth_headers
+    ):
+        space = _make_space(db_session)
+        project = _make_project(db_session)
+
+        # space-less on creation (also primes the project_metadata detail cache)
+        before = client.get(f"{PROJECTS_URL}/{project.id}", headers=auth_headers)
+        assert before.status_code == 200, before.text
+        assert before.json()["workspace_id"] is None
+
+        client.patch(
+            f"{PROJECTS_ADMIN_URL}/{project.id}/space",
+            json={"space_id": str(space.id)},
+            headers=auth_headers,
+        )
+
+        # Must reflect the new Space immediately (not the cached NULL).
+        after = client.get(f"{PROJECTS_URL}/{project.id}", headers=auth_headers)
+        assert after.status_code == 200, after.text
+        assert after.json()["workspace_id"] == str(space.id)
+
+
+class TestAssignmentCacheBust:
+    """A Space (re)assignment must bust caches at the same scope as a membership
+    change (S47) — a FULL document-list bust, since the unfiltered GET /documents
+    listing is cached per-user under '*' keys a project-scoped bust would miss."""
+
+    def test_assignment_busts_metadata_and_full_document_lists(
+        self, client, db_session, auth_headers, monkeypatch
+    ):
+        import app.api.v1.project_admin as project_admin_module
+
+        pm_calls: list[tuple] = []
+        dl_calls: list[tuple] = []
+        monkeypatch.setattr(
+            project_admin_module._cache_manager,
+            "invalidate_project_metadata",
+            lambda *a, **k: pm_calls.append(a),
+        )
+        monkeypatch.setattr(
+            project_admin_module._cache_manager,
+            "invalidate_document_lists",
+            lambda *a, **k: dl_calls.append(a),
+        )
+
+        space = _make_space(db_session)
+        project = _make_project(db_session)
+        resp = client.patch(
+            f"{PROJECTS_ADMIN_URL}/{project.id}/space",
+            json={"space_id": str(space.id)},
+            headers=auth_headers,
+        )
+        assert resp.status_code == 200, resp.text
+        # project_metadata bust may be scoped (it clears all list keys regardless),
+        # but document_lists MUST be a full bust (no project_id) to clear '*' keys.
+        assert pm_calls == [(str(project.id),)]
+        assert dl_calls == [()]
+
+
+class TestMembershipCacheBust:
+    """Membership changes must clear the per-scope list caches (S47 staleness fix)."""
+
+    def test_add_and_remove_member_bust_both_list_caches(
+        self, client, db_session, auth_headers, monkeypatch
+    ):
+        project_metadata_busts: list[int] = []
+        document_lists_busts: list[int] = []
+        monkeypatch.setattr(
+            spaces_module._cache_manager,
+            "invalidate_project_metadata",
+            lambda *a, **k: project_metadata_busts.append(1),
+        )
+        monkeypatch.setattr(
+            spaces_module._cache_manager,
+            "invalidate_document_lists",
+            lambda *a, **k: document_lists_busts.append(1),
+        )
+
+        space = _make_space(db_session)
+        user = _make_user(db_session, "cachebust@example.com")
+
+        add = client.post(
+            f"{SPACES_URL}/{space.id}/members",
+            json={"user_id": str(user.id)},
+            headers=auth_headers,
+        )
+        assert add.status_code == 201, add.text
+        assert len(project_metadata_busts) == 1
+        assert len(document_lists_busts) == 1
+
+        remove = client.delete(
+            f"{SPACES_URL}/{space.id}/members/{user.id}", headers=auth_headers
+        )
+        assert remove.status_code == 200, remove.text
+        assert len(project_metadata_busts) == 2
+        assert len(document_lists_busts) == 2

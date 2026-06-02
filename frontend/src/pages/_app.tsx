@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 
 import "@/styles/globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { RoleProvider } from "@/contexts/RoleContext";
 import { Navigation } from "@/components/Navigation";
 import { useRouter } from "next/router";
 
@@ -23,10 +24,12 @@ export default function MissionProtocolApp({ Component, pageProps }: AppProps) {
         <title>TraceLab</title>
       </Head>
       <AuthProvider>
-        <div className={`${inter.variable} font-sans bg-[hsl(var(--background))] min-h-screen`}>
-          {showNav && <Navigation />}
-          <Component {...pageProps} />
-        </div>
+        <RoleProvider>
+          <div className={`${inter.variable} font-sans bg-[hsl(var(--background))] min-h-screen`}>
+            {showNav && <Navigation />}
+            <Component {...pageProps} />
+          </div>
+        </RoleProvider>
       </AuthProvider>
     </>
   );

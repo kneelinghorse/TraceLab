@@ -56,6 +56,22 @@ class SpaceMemberResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class SpaceMemberDetail(BaseModel):
+    """A Space member joined to the user's identity (T48.3 roster).
+
+    SpaceMemberResponse carries only ids; the admin Spaces UI needs the member's
+    email/display_name to render a roster, and is_active to flag (or exclude)
+    disabled accounts. Built by joining space_members → users in the route.
+    """
+
+    user_id: UUID
+    email: str
+    display_name: str
+    role: str
+    is_active: bool
+    created_at: datetime
+
+
 class ProjectSpaceUpdate(BaseModel):
     """Assign a project to a Space. ``space_id`` None un-assigns (space-less)."""
 

@@ -47,6 +47,9 @@ export interface Project {
   status?: string;
   created_at?: string;
   updated_at?: string;
+  // Owning Space (workspace_id column), surfaced by ProjectRead in T48.3.
+  // null/undefined = space-less. Assigned via the admin Spaces page.
+  workspace_id?: string | null;
 }
 
 export interface DocumentUploadResponse {

@@ -1,3 +1,9 @@
+// Roles mirror app/core/security.py. Human roles are cumulative
+// (owner ⊇ admin ⊇ member ⊇ viewer); "service" is outside that hierarchy.
+// Role is NEVER stored in TokenUser/StoredAuth/the JWT (decision #226 + #313);
+// the client learns its role only from a live GET /auth/me (see RoleContext).
+export type Role = "owner" | "admin" | "member" | "viewer" | "service";
+
 export type TokenUser = {
   user_id: string;
   email: string;

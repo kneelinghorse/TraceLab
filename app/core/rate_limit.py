@@ -27,6 +27,16 @@ def client_ip(request: Request) -> str:
 
     Shared by the rate limiter (keying) and the auth audit log (T47.5), so both
     attribute a request to the same IP and cannot diverge.
+
+    KNOWN GAP (RL-1, T47.5 review — OPEN): this takes the LEFT-most XFF hop, which is
+    client-controllable, so the per-IP login limiter can be evaded by rotating the
+    header. The prod backend (api.tracelab.aquex.ai) is fronted by Railway's edge ONLY
+    (Cloudflare is DNS-only — verified: `server: railway-edge`, no `cf-ray`), so the
+    secure fix is to key on the hop Railway appends (the right-most for a single edge).
+    NOT applied yet: keying on the wrong hop count would collapse all clients to one
+    Railway-internal IP and lock out ALL logins. Confirm Railway's real XFF hop count
+    first (e.g. log the raw XFF on one prod login), then switch to the right-most-of-N
+    hop behind a `rate_limit_trusted_proxy_hops` setting.
     """
     forwarded = request.headers.get("x-forwarded-for")
     if forwarded:

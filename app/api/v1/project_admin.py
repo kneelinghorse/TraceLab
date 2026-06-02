@@ -26,8 +26,11 @@ from app.schemas.space import (
     ProjectSpaceUpdate,
     ProjectTagResponse,
 )
+from app.services.cache_manager import get_cache_manager
 
 router = APIRouter(tags=["admin-project-grouping"])
+
+_cache_manager = get_cache_manager()
 
 
 def _get_project_or_404(db: Session, project_id: UUID) -> Project:
@@ -56,6 +59,15 @@ def set_project_space(
     project.workspace_id = data.space_id
     db.commit()
     db.refresh(project)
+    # A Space (re)assignment changes the project's cached metadata AND which
+    # members may list it / its documents — so this must bust at the SAME scope
+    # as the membership-change path (spaces.py:_invalidate_membership_caches):
+    # a FULL document-list bust, because the unfiltered `GET /documents` listing
+    # is cached per-user under '*' keys that a project-scoped bust would miss,
+    # leaving stale RBAC visibility for the TTL. invalidate_project_metadata
+    # already clears every list key regardless of the project_id passed.
+    _cache_manager.invalidate_project_metadata(str(project_id))
+    _cache_manager.invalidate_document_lists()
     return ProjectSpaceResponse(project_id=project.id, space_id=project.workspace_id)
 
 

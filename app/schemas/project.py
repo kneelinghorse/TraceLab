@@ -52,6 +52,11 @@ class ProjectRead(ProjectBase):
     # Legacy self-asserted field, retained in the response for backward compat.
     # No longer client-settable (T43.4); null for projects created after T43.4.
     user_id: UUID | None = None
+    # The owning Space (the workspace_id column). Surfaced read-side in T48.3 so
+    # the admin Spaces UI can show a project's current Space; assignment is via
+    # PATCH /admin/projects/{id}/space, which writes this same column. Nullable —
+    # a project may be space-less.
+    workspace_id: UUID | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
