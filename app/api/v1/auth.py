@@ -171,7 +171,12 @@ def get_me(
     db_user = db.query(User).filter(User.id == user.user_id).first()
     if not db_user:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
-    return ProfileResponse(user_id=db_user.id, email=db_user.email, display_name=db_user.display_name)
+    return ProfileResponse(
+        user_id=db_user.id,
+        email=db_user.email,
+        display_name=db_user.display_name,
+        role=db_user.role,
+    )
 
 
 @router.patch("/me", response_model=ProfileResponse)
@@ -200,7 +205,12 @@ def update_me(
 
     db.commit()
     db.refresh(db_user)
-    return ProfileResponse(user_id=db_user.id, email=db_user.email, display_name=db_user.display_name)
+    return ProfileResponse(
+        user_id=db_user.id,
+        email=db_user.email,
+        display_name=db_user.display_name,
+        role=db_user.role,
+    )
 
 
 # --- API Key Management Endpoints ---

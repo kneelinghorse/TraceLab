@@ -5,10 +5,12 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRole } from "@/contexts/RoleContext";
 
 export function Navigation() {
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { isAdmin } = useRole();
 
   const isActive = (path: string) => {
     return router.pathname.startsWith(path);
@@ -98,6 +100,30 @@ export function Navigation() {
               >
                 Console
               </Link>
+              {isAdmin && (
+                <>
+                  <Link
+                    href="/admin/users"
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isActive("/admin/users")
+                        ? "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
+                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    Users
+                  </Link>
+                  <Link
+                    href="/admin/spaces"
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isActive("/admin/spaces")
+                        ? "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white"
+                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    Spaces
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 

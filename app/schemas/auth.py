@@ -57,11 +57,18 @@ class ProfileUpdate(BaseModel):
 
 
 class ProfileResponse(BaseModel):
-    """Response after a profile update."""
+    """Profile payload for GET/PATCH /auth/me.
+
+    ``role`` is the caller's live, per-request role (decision #226 — never baked
+    into the JWT, so a demote/disable takes effect on the next request). This is
+    the ONLY channel by which the frontend learns its role (T48.1); the token,
+    TokenUser, and StoredAuth deliberately carry no role.
+    """
 
     user_id: UUID
     email: str
     display_name: str
+    role: str
 
 
 class AdminUserResponse(BaseModel):

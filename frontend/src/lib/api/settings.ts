@@ -2,6 +2,8 @@
  * Settings API client — profile, API keys, invite codes
  */
 
+import type { Role } from "@/types/auth";
+
 import { httpClient } from "./http";
 
 // --- Profile ---
@@ -10,6 +12,7 @@ export type ProfileResponse = {
   user_id: string;
   email: string;
   display_name: string;
+  role: Role;
 };
 
 export type ProfileUpdatePayload = {

@@ -27,6 +27,7 @@ from app.models.workspace import Workspace
 from app.schemas.space import (
     SpaceCreate,
     SpaceMemberCreate,
+    SpaceMemberDetail,
     SpaceMemberResponse,
     SpaceResponse,
 )
@@ -68,6 +69,37 @@ def create_space(data: SpaceCreate, db: Session = Depends(get_db)) -> Workspace:
 def list_spaces(db: Session = Depends(get_db)) -> list[Workspace]:
     """List all Spaces (admin only)."""
     return db.query(Workspace).order_by(Workspace.created_at.asc()).all()
+
+
+@router.get("/{space_id}/members", response_model=list[SpaceMemberDetail])
+def list_space_members(
+    space_id: UUID, db: Session = Depends(get_db)
+) -> list[SpaceMemberDetail]:
+    """List a Space's members joined to their user identity (admin only).
+
+    SpaceMemberResponse exposes only ids; the admin UI needs email/display_name
+    to render the roster and is_active to flag disabled accounts. 404 if the
+    Space does not exist (consistent with add/remove).
+    """
+    _get_space_or_404(db, space_id)
+    rows = (
+        db.query(SpaceMember, User)
+        .join(User, User.id == SpaceMember.user_id)
+        .filter(SpaceMember.workspace_id == space_id)
+        .order_by(SpaceMember.created_at.asc())
+        .all()
+    )
+    return [
+        SpaceMemberDetail(
+            user_id=member.user_id,
+            email=user.email,
+            display_name=user.display_name,
+            role=member.role,
+            is_active=user.is_active,
+            created_at=member.created_at,
+        )
+        for member, user in rows
+    ]
 
 
 @router.post(
