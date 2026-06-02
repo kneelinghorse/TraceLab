@@ -49,6 +49,8 @@ class ReportService:
         project_id: UUID | None = None,
         prompt: str | None = None,
         output_format: Literal["summary", "report", "bullets", "markdown"] = "summary",
+        owner_id: UUID | None = None,
+        workspace_id: UUID | None = None,
     ) -> tuple[Report, list[dict[str, Any]]]:
         """Create a new report by synthesizing content.
 
@@ -59,6 +61,9 @@ class ReportService:
             project_id: Optional project association
             prompt: Custom synthesis prompt
             output_format: Output format for synthesis
+            owner_id: Creator (the caller) — resolved by the route and passed as a
+                scalar UUID since this service opens its own session (T48.4 parity).
+            workspace_id: Default Space — same rationale.
 
         Returns:
             Tuple of (Report object, list of citation dicts)
@@ -98,6 +103,8 @@ class ReportService:
                 status="draft",
                 tokens_used=tokens_used,
                 chunk_count=chunk_count,
+                owner_id=owner_id,
+                workspace_id=workspace_id,
             )
             session.add(report)
             session.flush()

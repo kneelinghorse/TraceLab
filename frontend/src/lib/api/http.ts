@@ -2,6 +2,15 @@ import { clearStoredAuth, getStoredAuth } from "@/lib/auth/storage";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
+/**
+ * Fired on the window when an authenticated request gets a 401. AuthContext
+ * listens and drives a full logout — clearing localStorage alone (below) leaves
+ * a "signed in" shell whose in-memory token keeps isAuthenticated=true while
+ * every call 401s (decision #315a). A window event decouples this module from
+ * AuthContext (no circular import).
+ */
+export const AUTH_EXPIRED_EVENT = "tracelab:auth-expired";
+
 const normalizePrefix = (value: string | undefined | null): string => {
   if (!value) {
     return "";
@@ -89,6 +98,11 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
 
   if (response.status === 401 && !skipAuth) {
     clearStoredAuth();
+    // Drop AuthContext's in-memory session too, else the user is left in a
+    // logged-in-looking but fully broken shell (decision #315a).
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
+    }
     const detail = await response.text();
     throw new Error(detail || "Unauthorized – please sign in again.");
   }

@@ -25,7 +25,7 @@ type RequireAdminProps = {
  */
 export function RequireAdmin({ children, fallback }: RequireAdminProps) {
   const { isReady, isAuthenticated } = useAuth();
-  const { status, role } = useRole();
+  const { status, role, refetch } = useRole();
 
   // Still resolving: auth not hydrated, or an authenticated caller's role is
   // mid-fetch. Render a neutral placeholder — never the children.
@@ -37,9 +37,36 @@ export function RequireAdmin({ children, fallback }: RequireAdminProps) {
     );
   }
 
-  // Definitive deny: not signed in, the role lookup failed, or the role
-  // resolved to a non-admin tier.
-  if (!isAuthenticated || status === "error" || !isAdminRole(role)) {
+  // Transient resolution failure for an authenticated caller: still fail-closed
+  // (children never render), but offer an in-app retry so a flaky /auth/me does
+  // not lock a legitimate admin out for the whole session (decision #315b).
+  if (isAuthenticated && status === "error") {
+    if (fallback !== undefined) {
+      return <>{fallback}</>;
+    }
+    return (
+      <main className="min-h-screen grid place-items-center bg-[hsl(var(--background))] px-4">
+        <div className="max-w-md text-center">
+          <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Couldn’t verify access</p>
+          <h1 className="mt-2 text-lg font-semibold text-white">Permission check failed</h1>
+          <p className="mt-2 text-sm text-slate-400">
+            A network or server error stopped us from confirming your access. Your session is
+            still active — try again.
+          </p>
+          <button
+            type="button"
+            onClick={refetch}
+            className="mt-4 rounded-md border border-slate-600 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-800"
+          >
+            Retry
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  // Definitive deny: not signed in, or the role resolved to a non-admin tier.
+  if (!isAuthenticated || !isAdminRole(role)) {
     if (fallback !== undefined) {
       return <>{fallback}</>;
     }

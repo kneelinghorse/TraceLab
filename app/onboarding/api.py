@@ -141,6 +141,11 @@ def register_document(
     mutable_payload.setdefault("mime_type", _infer_mime_type(path))
 
     document = Document(**mutable_payload)
+    # Inherit owner/Space from the parent project (server-authoritative, never from
+    # the payload) so the registered doc shares the project's visibility once
+    # rbac_enabled flips (T48.4).
+    document.owner_id = project.owner_id
+    document.workspace_id = project.workspace_id
     db.add(document)
     db.flush()
     db.refresh(document)

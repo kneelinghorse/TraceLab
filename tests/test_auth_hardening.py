@@ -95,21 +95,45 @@ class TestRateLimiterUnit:
             for _ in range(2):
                 limiter.check(mock_request)  # Should not raise
 
-    def test_respects_x_forwarded_for(self):
-        limiter = RateLimiter(RateLimitConfig(max_requests=1, window_seconds=60))
-
+    def _xff_request(self, xff: str, host: str = "127.0.0.1") -> MagicMock:
         mock_request = MagicMock(spec=Request)
-        mock_request.headers = {"x-forwarded-for": "203.0.113.50, 10.0.0.1"}
+        mock_request.headers = {"x-forwarded-for": xff}
         mock_request.client = MagicMock()
-        mock_request.client.host = "127.0.0.1"
+        mock_request.client.host = host
+        return mock_request
 
-        limiter.check(mock_request)  # Uses 203.0.113.50
-
-        # Same IP behind proxy should be blocked
+    def test_keys_on_rightmost_xff_hop(self):
+        # RL-1 fix (T48.5): with one trusted proxy (N=1, the default), the limiter
+        # keys on the RIGHT-most XFF entry — the IP the trusted edge appended — not
+        # the client-supplied left-most one. Two requests whose trusted hop matches
+        # share a bucket and the second is blocked.
         from fastapi import HTTPException
 
+        limiter = RateLimiter(RateLimitConfig(max_requests=1, window_seconds=60))
+        limiter.check(self._xff_request("203.0.113.50, 10.0.0.1"))  # keys on 10.0.0.1
         with pytest.raises(HTTPException):
-            limiter.check(mock_request)
+            limiter.check(self._xff_request("203.0.113.50, 10.0.0.1"))
+
+    def test_spoofed_leftmost_xff_no_longer_bypasses_limit(self):
+        # The attack RL-1 describes: rotate the left-most (client-controllable) entry
+        # to dodge the per-IP limit. With rightmost-of-N keying, the real trusted hop
+        # (10.0.0.1) is constant, so the rotated requests still collapse to one bucket.
+        from fastapi import HTTPException
+
+        limiter = RateLimiter(RateLimitConfig(max_requests=2, window_seconds=60))
+        limiter.check(self._xff_request("1.1.1.1, 10.0.0.1"))
+        limiter.check(self._xff_request("2.2.2.2, 10.0.0.1"))
+        with pytest.raises(HTTPException):
+            limiter.check(self._xff_request("3.3.3.3, 10.0.0.1"))
+
+    def test_xff_shorter_than_trusted_hops_falls_back_to_socket(self, monkeypatch):
+        # FAIL-SAFE: if N is configured higher than the header actually has, key on
+        # the socket peer instead of crashing (IndexError) or locking everyone out.
+        from app.core import rate_limit as rate_limit_module
+
+        monkeypatch.setattr(settings, "rate_limit_trusted_proxy_hops", 2)
+        # One-entry XFF but N=2 → cannot read entries[-2] → fall back to client.host.
+        assert rate_limit_module.client_ip(self._xff_request("10.0.0.1", host="9.9.9.9")) == "9.9.9.9"
 
     def test_reset_clears_all_tracking(self):
         limiter = RateLimiter(RateLimitConfig(max_requests=1, window_seconds=60))

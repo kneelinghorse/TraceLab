@@ -1,11 +1,11 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Drive the guard directly off controllable auth/role state so each fail-closed
 // branch is exercised deterministically (no async role fetch in these cases).
 const mocks = vi.hoisted(() => ({
   auth: { isReady: true, isAuthenticated: true },
-  role: { role: null as string | null, status: "loading" as string },
+  role: { role: null as string | null, status: "loading" as string, refetch: vi.fn() },
 }));
 
 vi.mock("@/contexts/AuthContext", () => ({
@@ -43,6 +43,10 @@ function renderGuard(opts: {
   );
 }
 
+beforeEach(() => {
+  mocks.role.refetch = vi.fn();
+});
+
 describe("RequireAdmin — fail-closed denials", () => {
   it("renders nothing but a placeholder while auth is still hydrating", () => {
     renderGuard({ isReady: false, status: "idle" });
@@ -67,10 +71,19 @@ describe("RequireAdmin — fail-closed denials", () => {
     expect(screen.getByText(/Admin access required/i)).toBeTruthy();
   });
 
-  it("denies (fail-closed) when the /auth/me lookup errored", () => {
+  it("denies (fail-closed) but offers a Retry when the /auth/me lookup errored", () => {
     renderGuard({ status: "error" });
+    // Still fail-closed — children never render on a resolution error...
     expect(screen.queryByText(ADMIN_CONTENT)).toBeNull();
-    expect(screen.getByText(/Admin access required/i)).toBeTruthy();
+    // ...but the user gets an in-app retry instead of a permanent lockout (#315b).
+    expect(screen.getByText(/Permission check failed/i)).toBeTruthy();
+    expect(screen.getByRole("button", { name: /retry/i })).toBeTruthy();
+  });
+
+  it("invokes refetch() when the Retry control is clicked on an errored lookup", () => {
+    renderGuard({ status: "error" });
+    fireEvent.click(screen.getByRole("button", { name: /retry/i }));
+    expect(mocks.role.refetch).toHaveBeenCalledTimes(1);
   });
 
   it.each(["member", "viewer", "service"])(

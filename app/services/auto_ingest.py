@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from app.models.document import Document
 from app.models.mission import Mission
 from app.services.document_ingestion import DocumentIngestionService
+from app.services.ownership import project_owner_workspace
 from app.services.processing_status import ProcessingStatusRecorder
 
 logger = logging.getLogger(__name__)
@@ -90,6 +91,11 @@ class AutoIngestService:
         if mission.deepsearch_job_id:
             metadata["deepsearch_job_id"] = mission.deepsearch_job_id
 
+        # Inherit owner/Space from the parent project (no human caller here) so the
+        # auto-ingested doc is visible to the same principals as its project once
+        # rbac_enabled flips (T48.4).
+        owner_id, workspace_id = project_owner_workspace(db, mission.project_id)
+
         # Create document record
         document = Document(
             project_id=mission.project_id,
@@ -100,6 +106,8 @@ class AutoIngestService:
             mime_type="text/markdown",
             source_type="deepsearch",
             document_metadata=metadata,
+            owner_id=owner_id,
+            workspace_id=workspace_id,
             processed=False,
             chunked=False,
             embedded=False,

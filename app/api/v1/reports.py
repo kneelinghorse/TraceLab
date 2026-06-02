@@ -21,6 +21,7 @@ from app.schemas.report import (
     ReportSourceSchema,
     ReportUpdate,
 )
+from app.services.ownership import default_workspace_id
 from app.services.report_service import ReportService, get_report_service
 
 router = APIRouter()
@@ -87,11 +88,18 @@ def _build_list_item(report) -> ReportListItem:
 def create_report(
     request: ReportCreate,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
     service: ReportService = Depends(get_report_service),
 ) -> ReportResponse:
     """Create a new report by synthesizing content from a collection or chunks.
 
     Either collection_id OR chunk_ids must be provided.
+
+    owner_id (the caller) + workspace_id (default Space) are resolved HERE and passed
+    as scalar UUIDs into the service's own session (T48.4 parity), mirroring POST
+    /collections — without owner_id a project-less report is minted NULL-owner and
+    invisible to its own creator once rbac_enabled is on (a report with NULL project_id
+    has no Space-inheritance fallback, so owner_id is its only non-admin access path).
     """
     if not request.collection_id and not request.chunk_ids:
         raise HTTPException(
@@ -107,6 +115,8 @@ def create_report(
             project_id=request.project_id,
             prompt=request.prompt,
             output_format=request.format,
+            owner_id=current_user.user_id,
+            workspace_id=default_workspace_id(db),
         )
     except ValueError as exc:
         raise HTTPException(
