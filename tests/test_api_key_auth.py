@@ -185,7 +185,7 @@ class TestAPIKeyAuthentication:
     def test_invalid_api_key_rejected(self, client: TestClient):
         response = client.get(
             "/api/v1/projects/",
-            headers={"X-API-Key": "tl_invalid_key_12345678901234567890"},
+            headers={"X-API-Key": "tl_" + ("x" * 32)},
         )
         assert response.status_code == 401
 

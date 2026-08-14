@@ -30,7 +30,7 @@ def mock_settings():
     """Mock settings with valid DeepSearch configuration."""
     with patch("app.services.deepsearch_client.settings") as mock:
         mock.deepsearch_api_url = "https://deepsearch.example.com"
-        mock.deepsearch_api_key = "test-api-key-12345"
+        mock.deepsearch_api_key = "test"
         mock.deepsearch_timeout = 10.0
         mock.deepsearch_retries = 3
         mock.deepsearch_backoff_multiplier = 2.0
@@ -136,7 +136,7 @@ class TestDeepSearchClientConfiguration:
         """Client initializes correctly from settings."""
         client = DeepSearchClient()
         assert client.api_url == "https://deepsearch.example.com"
-        assert client.api_key == "test-api-key-12345"
+        assert client.api_key == "test"
         assert client.timeout == 10.0
         assert client.max_retries == 3
 
@@ -723,7 +723,7 @@ class TestRequestHeaders:
         )
 
         request = httpx_mock.get_request()
-        assert request.headers["Authorization"] == "Bearer test-api-key-12345"
+        assert request.headers["Authorization"] == "Bearer test"
         assert request.headers["Content-Type"] == "application/json"
         assert "TraceLab" in request.headers["User-Agent"]
 
