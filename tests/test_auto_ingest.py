@@ -404,10 +404,10 @@ class TestAutoIngestIntegration:
         db_session.refresh(document)
         assert len(document.chunks) > 0
 
-    def test_auto_ingest_multiple_documents(
+    def test_auto_ingest_replay_reuses_linked_document(
         self, db_session, mission, sample_markdown, mock_ingestion_service
     ):
-        """Test that multiple ingests append to result_document_ids."""
+        """Replaying the same mission result must not create another document."""
         service = AutoIngestService(ingestion_service=mock_ingestion_service)
 
         # First ingest
@@ -417,18 +417,18 @@ class TestAutoIngestIntegration:
             result_markdown=sample_markdown,
         )
 
-        # Second ingest with different content
+        # Replaying the same completed mission returns its linked document.
         doc2 = service.auto_ingest_result(
             db=db_session,
             mission=mission,
-            result_markdown="# Second Result\nMore content.",
+            result_markdown=sample_markdown,
         )
 
         db_session.refresh(mission)
 
-        assert len(mission.result_document_ids) == 2
+        assert doc2.id == doc1.id
+        assert len(mission.result_document_ids) == 1
         assert str(doc1.id) in mission.result_document_ids
-        assert str(doc2.id) in mission.result_document_ids
 
 
 class TestAutoIngestSingleton:
@@ -497,7 +497,16 @@ class TestWebhookHandlerAutoIngestIntegration:
 
         # Create mock services
         mock_ingestion = MagicMock(spec=DocumentIngestionService)
-        mock_ingestion.process_document.return_value = {"status": "completed"}
+
+        def mark_search_ready(*, db, document_id, **_kwargs):
+            document = db.query(Document).filter(Document.id == document_id).one()
+            document.processed = True
+            document.chunked = True
+            document.embedded = True
+            db.commit()
+            return {"status": "completed"}
+
+        mock_ingestion.process_document.side_effect = mark_search_ready
         mock_auto_ingest = AutoIngestService(ingestion_service=mock_ingestion)
 
         handler = WebhookHandler(auto_ingest_service=mock_auto_ingest)
@@ -573,15 +582,15 @@ class TestWebhookHandlerAutoIngestIntegration:
             or updated_mission.result_document_ids == []
         )
 
-    def test_webhook_auto_ingest_failure_does_not_fail_webhook(
+    def test_webhook_auto_ingest_failure_fails_loud_but_keeps_completion(
         self, db_session, project
     ):
-        """Test that auto-ingest failure doesn't fail the webhook processing."""
+        """A failed promotion is retryable without reverting DeepSearch completion."""
         from app.schemas.webhook import (
             DeepSearchWebhookPayload,
             DeepSearchWebhookStatus,
         )
-        from app.services.webhook_handler import WebhookHandler
+        from app.services.webhook_handler import WebhookHandler, WebhookProcessingError
 
         Mission = _get_mission_model()
 
@@ -610,11 +619,9 @@ class TestWebhookHandlerAutoIngestIntegration:
             result_markdown="# Results\nThis will fail ingestion.",
         )
 
-        # Should not raise - webhook processing should succeed
-        updated_mission, status = handler.process_deepsearch_webhook(
-            db_session, payload
-        )
+        with pytest.raises(WebhookProcessingError, match="materialization is incomplete"):
+            handler.process_deepsearch_webhook(db_session, payload)
 
-        # Mission should still be completed
-        assert updated_mission.status == "completed"
-        assert status == "completed"
+        db_session.refresh(mission)
+        assert mission.status == "completed"
+        assert not mission.result_document_ids

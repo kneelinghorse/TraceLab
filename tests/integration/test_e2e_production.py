@@ -11,8 +11,8 @@ This script tests the complete integration flow against the production API:
 Usage:
     # Set credentials
     export TRACELAB_BASE_URL="https://api.tracelab.aquex.ai"
-    export TRACELAB_USERNAME="kneelinghorse"
-    export TRACELAB_PASSWORD="Bigpuma"
+    export TRACELAB_USERNAME="<production-test-user>"
+    export TRACELAB_PASSWORD="<production-test-password>"
 
     # Run tests
     python tests/integration/test_e2e_production.py
@@ -406,8 +406,14 @@ class E2EProductionTest:
 def main() -> int:
     """Run E2E production tests."""
     base_url = os.environ.get("TRACELAB_BASE_URL", "https://api.tracelab.aquex.ai")
-    username = os.environ.get("TRACELAB_USERNAME", "kneelinghorse")
-    password = os.environ.get("TRACELAB_PASSWORD", "Bigpuma")
+    username = os.environ.get("TRACELAB_USERNAME")
+    password = os.environ.get("TRACELAB_PASSWORD")
+    if not username or not password:
+        print(
+            "Error: TRACELAB_USERNAME and TRACELAB_PASSWORD must be set.",
+            file=sys.stderr,
+        )
+        return 2
 
     print("=" * 60)
     print("TraceLab E2E Production Integration Test")

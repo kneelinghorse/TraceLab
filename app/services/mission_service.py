@@ -16,6 +16,7 @@ from app.core.mission_events import emit_mission_status_change
 from app.models.mission import MISSION_STATUSES, Mission
 from app.schemas.mission import MissionCreate, MissionUpdate
 from app.schemas.pagination import PaginationMeta
+from app.services.ownership import project_owner_workspace
 
 
 class MissionServiceError(RuntimeError):
@@ -28,6 +29,59 @@ class MissionNotFoundError(MissionServiceError):
 
 class MissionValidationError(MissionServiceError):
     """Raised when mission data fails validation."""
+
+
+class MissionSubmissionStateError(MissionValidationError):
+    """Raised when an existing mission cannot begin a fresh execution."""
+
+    def __init__(self, message: str, *, suggestion: str | None = None) -> None:
+        super().__init__(message)
+        self.suggestion = suggestion
+
+
+def validate_mission_submission_state(mission: Mission) -> None:
+    """Require one pristine draft per fenced DeepSearch execution."""
+    if mission.status in ("queued", "in_progress"):
+        raise MissionSubmissionStateError(f"Mission is already {mission.status}.")
+
+    if mission.status != "draft":
+        raise MissionSubmissionStateError(
+            (
+                f"Mission is {mission.status} and cannot be resubmitted. "
+                "One mission represents one fenced DeepSearch execution."
+            ),
+            suggestion=(
+                "Create a new mission ID for another run so prior lease and "
+                "result provenance remain immutable."
+            ),
+        )
+
+    prior_execution_state = any(
+        (
+            mission.queued_at,
+            mission.started_at,
+            mission.completed_at,
+            mission.deepsearch_job_id,
+            mission.deepsearch_lease_owner,
+            mission.deepsearch_lease_token,
+            mission.deepsearch_leased_at,
+            mission.deepsearch_heartbeat_at,
+            mission.deepsearch_lease_expires_at,
+            mission.deepsearch_attempt_count,
+            mission.deepsearch_result_key,
+            mission.result_document_ids,
+            mission.result_report_id,
+            mission.result_markdown,
+            mission.result_protocol,
+        )
+    )
+    if prior_execution_state:
+        raise MissionSubmissionStateError(
+            "Draft mission contains prior execution state and cannot be queued safely.",
+            suggestion=(
+                "Create a new mission ID instead of resetting a prior execution in place."
+            ),
+        )
 
 
 class MissionService:
@@ -150,9 +204,15 @@ class MissionService:
         Returns:
             The created Mission instance
         """
+        # Missions are project children: inherit attribution from the required
+        # parent instead of minting a row that becomes invisible under RBAC.
+        owner_id, workspace_id = project_owner_workspace(db, data.project_id)
+
         # Map schema fields to model fields
         mission = Mission(
             project_id=data.project_id,
+            owner_id=owner_id,
+            workspace_id=workspace_id,
             mission_id=data.mission_id,
             title=data.title,
             objective=data.objective,

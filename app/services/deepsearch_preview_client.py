@@ -27,6 +27,8 @@ from dataclasses import dataclass
 from typing import Any
 
 from app.services.contract_compiler import (
+    VENDORED_COMPILER_FIDELITY,
+    VENDORED_COMPILER_REVISION,
     MissionContract,
     compile_contract_from_state,
 )
@@ -55,6 +57,9 @@ class ContractPreviewError(RuntimeError):
 class ContractPreview:
     """Compiled-contract view returned to API/MCP callers."""
 
+    contract_version: str
+    compiler_revision: str
+    fidelity: str
     named_entities: list[str]
     objectives: list[dict[str, Any]]
     evidence_slots: list[dict[str, Any]]
@@ -65,6 +70,9 @@ class ContractPreview:
 
     def to_dict(self) -> dict[str, Any]:
         return {
+            "contract_version": self.contract_version,
+            "compiler_revision": self.compiler_revision,
+            "fidelity": self.fidelity,
             "named_entities": self.named_entities,
             "objectives": self.objectives,
             "evidence_slots": self.evidence_slots,
@@ -171,6 +179,9 @@ def _shape_contract(contract: MissionContract) -> ContractPreview:
     cached snapshots) see byte-identical structure.
     """
     return ContractPreview(
+        contract_version=contract.contract_version,
+        compiler_revision=VENDORED_COMPILER_REVISION,
+        fidelity=VENDORED_COMPILER_FIDELITY,
         named_entities=list(contract.named_entities),
         objectives=[item.model_dump(mode="json") for item in contract.objectives],
         evidence_slots=[item.model_dump(mode="json") for item in contract.evidence_slots],

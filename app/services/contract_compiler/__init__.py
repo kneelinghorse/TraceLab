@@ -22,6 +22,7 @@ contract — DS may rename them between resyncs.
 """
 
 from .contract import (
+    CONTRACT_SCHEMA_VERSION,
     AcceptanceCheck,
     DeliverableSchemaContract,
     EvidenceSlot,
@@ -31,12 +32,21 @@ from .contract import (
     compile_contract_from_state,
 )
 
+# TraceLab-owned provenance for the vendored structural compiler. Keep this
+# separate from the contract schema version: two implementations can emit the
+# same schema while compiling different semantics.
+VENDORED_COMPILER_REVISION = "24e88100624e6221e5fa957508ab77c4b0f519f9"
+VENDORED_COMPILER_FIDELITY = "structural_only"
+
 __all__ = [
     "AcceptanceCheck",
+    "CONTRACT_SCHEMA_VERSION",
     "DeliverableSchemaContract",
     "EvidenceSlot",
     "ExecutionBudget",
     "MissionContract",
     "ObjectiveContract",
+    "VENDORED_COMPILER_FIDELITY",
+    "VENDORED_COMPILER_REVISION",
     "compile_contract_from_state",
 ]

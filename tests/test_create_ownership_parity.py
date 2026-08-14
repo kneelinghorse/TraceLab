@@ -24,8 +24,11 @@ from app.models.mission import Mission
 from app.models.project import Project
 from app.models.report import Report
 from app.models.user import User
+from app.schemas.mission import MissionCreate
 from app.services.auto_ingest import AutoIngestService
+from app.services.auto_report import create_report_from_protocol
 from app.services.document_ingestion import DocumentIngestionService
+from app.services.mission_service import MissionService
 from app.services.ownership import project_owner_workspace
 from app.services.report_promotion import ReportPromotionService
 
@@ -204,6 +207,40 @@ class TestBackgroundSiteWiring:
     persisted Document carried the inherited owner/Space, so a dropped assignment would
     pass green. These drive each site end-to-end; the ingestion pipeline is stubbed so
     only the owner/Space wiring is under test."""
+
+    def test_mission_service_inherits_project_owner_and_workspace(self, db_session):
+        owner = _make_user(db_session, "mission-owner@example.com")
+        ws_id = uuid4()
+        project = _make_project(db_session, owner_id=owner.id, workspace_id=ws_id)
+
+        mission = MissionService().create_mission(
+            db_session,
+            MissionCreate(
+                project_id=project.id,
+                mission_id="T48.8-owner-parity",
+                title="Mission ownership parity",
+                objective="Inherit ownership from the required parent project.",
+                success_criteria=["Mission ownership matches its project."],
+            ),
+        )
+
+        assert str(mission.owner_id) == str(owner.id)
+        assert str(mission.workspace_id) == str(ws_id)
+
+    def test_auto_report_inherits_project_owner_and_workspace(self, db_session):
+        owner = _make_user(db_session, "auto-report-owner@example.com")
+        ws_id = uuid4()
+        project = _make_project(db_session, owner_id=owner.id, workspace_id=ws_id)
+        mission = _make_mission(db_session, project)
+
+        report = create_report_from_protocol(
+            db_session,
+            mission,
+            {"synthesis": "Ownership follows the parent project."},
+        )
+
+        assert str(report.owner_id) == str(owner.id)
+        assert str(report.workspace_id) == str(ws_id)
 
     def test_auto_ingest_inherits_project_owner_and_workspace(self, db_session):
         owner = _make_user(db_session, "ai-owner@example.com")

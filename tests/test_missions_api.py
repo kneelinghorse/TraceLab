@@ -8,8 +8,10 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.models.document import Document
 from app.models.mission import Mission
 from app.models.project import Project
+from app.models.report import Report
 from app.schemas.mission import MissionCreate, MissionUpdate
 
 # T41.6 (sprint-41): MissionCreate.project_id is required as of this sprint.
@@ -929,6 +931,142 @@ class TestMissionVerbContract:
             f"submit route missing in deployed code: got {response.status_code}"
         )
 
+    def test_status_route_is_lightweight_and_hides_worker_proofs(
+        self, auth_headers, db_session
+    ):
+        """Frequent MCP polls must not download results or leak lease tokens."""
+        client = TestClient(app)
+        mission = _create_test_mission(
+            db_session,
+            mission_id="STATUS-LIGHT-001",
+            status="completed",
+        )
+        mission.result_markdown = "# Large result\n" + ("x" * 20_000)
+        mission.result_protocol = {"large": "y" * 20_000}
+        mission.deepsearch_attempt_count = 2
+        mission.deepsearch_lease_token = uuid.uuid4().hex
+        mission.deepsearch_result_key = uuid.uuid4().hex
+        db_session.commit()
+
+        response = client.get(
+            f"/api/v1/missions/{mission.id}/status",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        body = response.json()
+        assert body["mission_id"] == "STATUS-LIGHT-001"
+        assert body["status"] == "completed"
+        assert body["deepsearch_attempt_count"] == 2
+        assert body["materialization_pending"] is True
+        assert body["search_ready"] is False
+        assert "result_markdown" not in body
+        assert "result_protocol" not in body
+        assert "execution_metadata" not in body
+        assert "deepsearch_lease_token" not in body
+        assert "deepsearch_result_key" not in body
+
+    def test_status_route_reports_search_ready_only_for_processed_linked_document(
+        self, auth_headers, db_session
+    ):
+        """Terminal status is ready only after its linked result is searchable."""
+        client = TestClient(app)
+        project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session,
+            mission_id="STATUS-READY-001",
+            status="completed",
+            project_id=project.id,
+        )
+        mission.result_markdown = "# Searchable result"
+        mission.execution_metadata = {
+            "progress_percent": 100,
+            "current_phase": "complete",
+        }
+        document = Document(
+            project_id=project.id,
+            name="Searchable result.md",
+            content=mission.result_markdown,
+            processed=True,
+            chunked=True,
+            embedded=True,
+            source_mission_id=mission.id,
+        )
+        db_session.add(document)
+        db_session.commit()
+        mission.result_document_ids = [str(document.id)]
+        db_session.commit()
+
+        response = client.get(
+            f"/api/v1/missions/{mission.id}/status",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        body = response.json()
+        assert body["progress_percent"] == 100
+        assert body["current_phase"] == "complete"
+        assert body["result_document_ids"] == [str(document.id)]
+        assert body["search_ready"] is True
+        assert body["materialization_pending"] is False
+
+    def test_status_route_tolerates_malformed_legacy_document_id(
+        self, auth_headers, db_session
+    ):
+        """Corrupt legacy linkage is visible as pending, not a polling 500."""
+        client = TestClient(app)
+        mission = _create_test_mission(
+            db_session,
+            mission_id="STATUS-LEGACY-001",
+            status="completed",
+        )
+        mission.result_markdown = "# Result awaiting link repair"
+        mission.result_document_ids = ["not-a-uuid"]
+        db_session.commit()
+
+        response = client.get(
+            f"/api/v1/missions/{mission.id}/status",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        assert response.json()["result_document_ids"] == []
+        assert response.json()["search_ready"] is False
+        assert response.json()["materialization_pending"] is True
+
+    def test_status_route_protocol_only_result_needs_no_document(
+        self, auth_headers, db_session
+    ):
+        """A materialized structured-only result is complete without markdown."""
+        client = TestClient(app)
+        project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session,
+            mission_id="STATUS-PROTOCOL-001",
+            status="completed",
+            project_id=project.id,
+        )
+        report = Report(
+            project_id=project.id,
+            title="Structured result",
+            report_type="markdown",
+            content="Structured protocol rendering",
+        )
+        db_session.add(report)
+        db_session.flush()
+        mission.result_protocol = {"synthesis": "Structured only"}
+        mission.result_report_id = report.id
+        db_session.commit()
+
+        response = client.get(
+            f"/api/v1/missions/{mission.id}/status",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        assert response.json()["search_ready"] is False
+        assert response.json()["materialization_pending"] is False
+
 
 class TestMissionDelete:
     """Tests for DELETE /api/v1/missions/{id} endpoint."""
@@ -1213,8 +1351,10 @@ class TestMissionSubmit:
         detail = response.json()["detail"]
         assert "already in_progress" in detail["message"]
 
-    def test_submit_completed_mission(self, auth_headers, db_session):
-        """Can resubmit a completed mission."""
+    def test_submit_completed_mission_requires_new_mission(
+        self, auth_headers, db_session
+    ):
+        """A mission is one fenced run; terminal provenance is immutable."""
         client = TestClient(app)
         project = _create_test_project(db_session)
         mission = _create_test_mission(
@@ -1229,9 +1369,34 @@ class TestMissionSubmit:
             headers=auth_headers,
         )
 
-        # Completed missions can be resubmitted
-        assert response.status_code == 200
-        assert response.json()["status"] == "queued"
+        assert response.status_code == 400
+        detail = response.json()["detail"]
+        assert "cannot be resubmitted" in detail["message"]
+        assert "new mission ID" in detail["suggestion"]
+
+    def test_submit_rejects_draft_with_stale_lease_state(
+        self, auth_headers, db_session
+    ):
+        """Changing status back to draft cannot bypass lease fencing."""
+        client = TestClient(app)
+        project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session,
+            mission_id="SUBMIT-STALE-001",
+            status="draft",
+            project_id=project.id,
+        )
+        mission.deepsearch_attempt_count = 2
+        mission.deepsearch_result_key = uuid.uuid4().hex
+        db_session.commit()
+
+        response = client.post(
+            f"/api/v1/missions/{mission.id}/submit",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 400
+        assert "prior execution state" in response.json()["detail"]["message"]
 
     def test_submit_mission_updates_status_in_db(self, auth_headers, db_session):
         """Submit should update the mission status in the database."""

@@ -9,11 +9,13 @@ Provides full CRUD operations for missions with:
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi import status as http_status
+from pydantic import AliasChoices, BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.core.authorization import (
@@ -31,11 +33,13 @@ from app.schemas.mission import (
     MissionErrorResponse,
     MissionLintErrorDetail,
     MissionResponse,
+    MissionStatusResponse,
     MissionSubmitResponse,
     MissionUpdate,
     ReportPromotionResponse,
 )
 from app.schemas.pagination import PaginatedResponse
+from app.services.auto_ingest import is_document_search_ready
 from app.services.deepsearch_preview_client import (
     ContractPreviewError,
 )
@@ -46,7 +50,9 @@ from app.services.mission_linter import lint_mission_for_submit
 from app.services.mission_service import (
     MissionNotFoundError,
     MissionService,
+    MissionSubmissionStateError,
     MissionValidationError,
+    validate_mission_submission_state,
 )
 
 logger = logging.getLogger(__name__)
@@ -171,15 +177,18 @@ def _submit_existing_mission(
             ),
         )
 
-    if mission.status in ("queued", "in_progress"):
+    try:
+        validate_mission_submission_state(mission)
+    except MissionSubmissionStateError as exc:
         raise HTTPException(
             status_code=http_status.HTTP_400_BAD_REQUEST,
             detail=_build_actionable_detail(
-                message=f"Mission is already {mission.status}.",
+                message=str(exc),
                 mission=mission,
+                suggestion=exc.suggestion,
                 current_status=mission.status,
             ),
-        )
+        ) from exc
 
     # Submit-time lint gate (T40.3). Hard errors block submit with 422;
     # warnings ride along with the success response so authors can triage.
@@ -327,6 +336,124 @@ def get_mission(
             status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error getting mission: {str(exc)[:200]}",
         ) from exc
+
+
+@router.get(
+    "/{mission_id}/status",
+    response_model=MissionStatusResponse,
+    summary="Get lightweight mission lifecycle and result-readiness state",
+)
+def get_mission_status(
+    mission_id: str,
+    db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
+) -> MissionStatusResponse:
+    """Poll mission progress without returning large results or worker proofs."""
+    try:
+        mission = _get_mission_by_id_or_mission_id(db, mission_id)
+    except MissionNotFoundError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_404_NOT_FOUND,
+            detail=_build_actionable_detail(
+                message=str(exc),
+                suggestion="Check mission_id spelling or list missions via GET /api/v1/missions.",
+            ),
+        ) from exc
+
+    authorize_or_403(user, "read", mission, db)
+
+    metadata = mission.execution_metadata or {}
+    raw_progress = metadata.get("progress_percent")
+    progress_percent = None
+    if (
+        isinstance(raw_progress, (int, float))
+        and not isinstance(raw_progress, bool)
+        and 0 <= raw_progress <= 100
+    ):
+        progress_percent = int(raw_progress)
+
+    raw_phase = metadata.get("current_phase")
+    current_phase = raw_phase if isinstance(raw_phase, str) else None
+
+    document_ids: list[UUID] = []
+    has_invalid_document_ids = False
+    for value in mission.result_document_ids or []:
+        try:
+            document_ids.append(UUID(str(value)))
+        except (TypeError, ValueError):
+            has_invalid_document_ids = True
+    search_ready = False
+    if document_ids:
+        from app.models.document import Document
+
+        documents = (
+            db.query(Document)
+            .filter(
+                Document.id.in_(document_ids),
+                Document.deleted_at.is_(None),
+            )
+            .all()
+        )
+        search_ready = (
+            not has_invalid_document_ids
+            and len(documents) == len(set(document_ids))
+            and all(is_document_search_ready(document) for document in documents)
+        )
+
+    is_terminal_result = mission.status in {"completed", "validation_failed"}
+    document_pending = bool(mission.result_markdown) and (
+        has_invalid_document_ids or not search_ready
+    )
+    report_pending = bool(mission.result_protocol) and mission.result_report_id is None
+    materialization_pending = is_terminal_result and (
+        document_pending or report_pending
+    )
+    raw_materialization = metadata.get("result_materialization")
+    materialization_state = (
+        raw_materialization if isinstance(raw_materialization, dict) else {}
+    )
+    raw_materialization_status = materialization_state.get("status")
+    materialization_status = (
+        raw_materialization_status
+        if isinstance(raw_materialization_status, str)
+        else None
+    )
+    raw_materialization_attempts = materialization_state.get("attempt_count")
+    materialization_attempt_count = (
+        raw_materialization_attempts
+        if isinstance(raw_materialization_attempts, int)
+        and not isinstance(raw_materialization_attempts, bool)
+        and raw_materialization_attempts >= 0
+        else 0
+    )
+    raw_materialization_errors = materialization_state.get("errors")
+    materialization_error = None
+    if isinstance(raw_materialization_errors, list) and raw_materialization_errors:
+        first_error = raw_materialization_errors[0]
+        if isinstance(first_error, str):
+            materialization_error = first_error[:500]
+
+    return MissionStatusResponse(
+        id=mission.id,
+        mission_id=mission.mission_id,
+        status=mission.status,
+        progress_percent=progress_percent,
+        current_phase=current_phase,
+        queued_at=mission.queued_at,
+        started_at=mission.started_at,
+        completed_at=mission.completed_at,
+        error_message=mission.error_message,
+        deepsearch_job_id=mission.deepsearch_job_id,
+        deepsearch_attempt_count=mission.deepsearch_attempt_count or 0,
+        lease_expires_at=mission.deepsearch_lease_expires_at,
+        result_document_ids=document_ids,
+        result_report_id=mission.result_report_id,
+        materialization_pending=materialization_pending,
+        materialization_status=materialization_status,
+        materialization_attempt_count=materialization_attempt_count,
+        materialization_error=materialization_error,
+        search_ready=search_ready,
+    )
 
 
 @router.post(
@@ -731,12 +858,12 @@ def contract_preview(
     db: Session = Depends(get_db),
     user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> MissionContractPreviewResponse:
-    """Proxy the mission's authoring fields to DeepSearch's preview endpoint.
+    """Compile a structural mission preview using TraceLab's pinned vendor.
 
-    Signs the outbound request with the shared HMAC secret, returns the
-    compiled contract so authors can see what DeepSearch will actually
-    execute before they hit submit. No mission-state change — purely a
-    read-side view.
+    No outbound request is made. The response discloses the compiler revision
+    and fidelity so authors can distinguish this structural preview from the
+    newer DeepSearch runtime until cross-repo golden parity is restored. No
+    mission-state change is made.
     """
     try:
         mission = _get_mission_by_id_or_mission_id(db, mission_id)
@@ -914,20 +1041,23 @@ def promote_mission_report(
 # Mission log ingestion + retrieval (T39.3)
 # ---------------------------------------------------------------------------
 
-from datetime import datetime
-
-from pydantic import BaseModel
-
-
 class LogEntry(BaseModel):
     level: str = "INFO"
     message: str
-    source: str | None = None
-    logged_at: datetime | None = None
+    source: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("source", "phase"),
+    )
+    logged_at: datetime | None = Field(
+        default=None,
+        validation_alias=AliasChoices("logged_at", "ts"),
+    )
 
 
 class LogBatchRequest(BaseModel):
-    logs: list[LogEntry]
+    logs: list[LogEntry] = Field(
+        validation_alias=AliasChoices("logs", "entries"),
+    )
 
 
 class LogEntryResponse(BaseModel):
@@ -1008,10 +1138,11 @@ def get_mission_logs(
     logs = (
         db.query(MissionLog)
         .filter(MissionLog.mission_id == mission.id)
-        .order_by(MissionLog.logged_at.asc())
+        .order_by(MissionLog.logged_at.desc())
         .limit(limit)
         .all()
     )
+    logs.reverse()
 
     return [
         LogEntryResponse(

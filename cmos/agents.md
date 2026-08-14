@@ -106,6 +106,10 @@ tests/
 
 ADRs: `docs/adr/001-005`
 
+Planning and architecture changes must stay aligned with the canonical
+`foundational-docs/roadmap_template.md` and
+`foundational-docs/tech_arch_template.md` references.
+
 ---
 
 ## Boundary

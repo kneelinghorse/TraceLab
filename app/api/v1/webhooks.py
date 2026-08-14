@@ -38,6 +38,7 @@ router = APIRouter()
         400: {"model": WebhookErrorResponse, "description": "Invalid payload"},
         401: {"model": WebhookErrorResponse, "description": "Invalid signature"},
         404: {"model": WebhookErrorResponse, "description": "Mission not found"},
+        409: {"model": WebhookErrorResponse, "description": "Attempt mismatch"},
         500: {"model": WebhookErrorResponse, "description": "Processing error"},
     },
     summary="Receive DeepSearch job completion webhook",
@@ -45,7 +46,11 @@ router = APIRouter()
 Receives webhook callbacks from DeepSearch when a job completes.
 
 **Authentication**: Uses HMAC-SHA256 signature verification via X-DeepSearch-Signature header.
-Set DEEPSEARCH_WEBHOOK_SECRET environment variable to enable signature validation.
+TraceLab reads `DEEPSEARCH_TRACELAB_SERVICE_SECRET` (with the legacy
+`DEEPSEARCH_WEBHOOK_SECRET` fallback). DeepSearch must sign receipts with the
+same value from its `TRACELAB_DEEPSEARCH_SERVICE_SECRET`. Production fails
+closed when neither TraceLab variable is configured. Unsigned callbacks are
+limited to explicit test environments or local development with `DEBUG=true`.
 
 **Idempotency**: Safe to receive the same webhook multiple times. If the mission
 has already been updated with this job_id, the request will be acknowledged without
@@ -109,6 +114,13 @@ async def receive_deepsearch_webhook(
         raise HTTPException(
             status_code=http_status.HTTP_404_NOT_FOUND,
             detail=f"Mission '{payload.mission_id}' not found",
+        ) from exc
+
+    except WebhookValidationError as exc:
+        logger.warning("Webhook attempt correlation failed: %s", str(exc))
+        raise HTTPException(
+            status_code=http_status.HTTP_409_CONFLICT,
+            detail=str(exc),
         ) from exc
 
     except WebhookProcessingError as exc:

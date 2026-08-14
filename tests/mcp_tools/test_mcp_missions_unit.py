@@ -8,8 +8,9 @@ test_mcp_missions.py.
 from __future__ import annotations
 
 import asyncio
+import json
 from datetime import datetime
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 
 def _make_mission_mock(**overrides):
@@ -52,6 +53,15 @@ def _make_mission_mock(**overrides):
     mission.started_at = overrides.pop("started_at", None)
     mission.completed_at = overrides.pop("completed_at", None)
     mission.deepsearch_job_id = overrides.pop("deepsearch_job_id", None)
+    mission.deepsearch_lease_owner = overrides.pop("deepsearch_lease_owner", None)
+    mission.deepsearch_lease_token = overrides.pop("deepsearch_lease_token", None)
+    mission.deepsearch_leased_at = overrides.pop("deepsearch_leased_at", None)
+    mission.deepsearch_heartbeat_at = overrides.pop("deepsearch_heartbeat_at", None)
+    mission.deepsearch_lease_expires_at = overrides.pop(
+        "deepsearch_lease_expires_at", None
+    )
+    mission.deepsearch_attempt_count = overrides.pop("deepsearch_attempt_count", 0)
+    mission.deepsearch_result_key = overrides.pop("deepsearch_result_key", None)
     mission.execution_metadata = overrides.pop("execution_metadata", {})
     mission.result_document_ids = overrides.pop("result_document_ids", [])
     mission.result_report_id = overrides.pop("result_report_id", None)
@@ -279,6 +289,74 @@ class TestToolHandlerDispatch:
         from app.mcp_server.tools.missions import MISSION_TOOLS, TOOL_HANDLERS
 
         assert len(TOOL_HANDLERS) == len(MISSION_TOOLS)
+
+
+class TestSubmitMissionExecutionBoundary:
+    """Python MCP must preserve the same one-mission/one-run boundary as REST."""
+
+    def test_terminal_mission_requires_a_new_mission_id(self):
+        from app.mcp_server.tools.missions import handle_submit_mission
+
+        mission = _make_mission_mock(
+            project_id="project-uuid",
+            status="validation_failed",
+            deepsearch_attempt_count=3,
+            deepsearch_result_key="prior-result-key",
+        )
+        db = MagicMock()
+
+        with (
+            patch(
+                "app.mcp_server.tools.missions.get_db",
+                return_value=iter([db]),
+            ),
+            patch(
+                "app.mcp_server.tools.missions._get_mission_by_id_or_mission_id",
+                return_value=mission,
+            ),
+            patch(
+                "app.mcp_server.tools.missions._mission_service.update_mission"
+            ) as update_mission,
+        ):
+            result = asyncio.run(handle_submit_mission({"mission_id": mission.mission_id}))
+
+        body = json.loads(result[0].text)
+        assert "cannot be resubmitted" in body["message"]
+        assert "new mission ID" in body["suggestion"]
+        assert body["current_status"] == "validation_failed"
+        update_mission.assert_not_called()
+        db.close.assert_called_once()
+
+    def test_draft_with_prior_lease_state_cannot_bypass_fencing(self):
+        from app.mcp_server.tools.missions import handle_submit_mission
+
+        mission = _make_mission_mock(
+            project_id="project-uuid",
+            status="draft",
+            deepsearch_attempt_count=2,
+            deepsearch_result_key="prior-result-key",
+        )
+        db = MagicMock()
+
+        with (
+            patch(
+                "app.mcp_server.tools.missions.get_db",
+                return_value=iter([db]),
+            ),
+            patch(
+                "app.mcp_server.tools.missions._get_mission_by_id_or_mission_id",
+                return_value=mission,
+            ),
+            patch(
+                "app.mcp_server.tools.missions._mission_service.update_mission"
+            ) as update_mission,
+        ):
+            result = asyncio.run(handle_submit_mission({"mission_id": mission.mission_id}))
+
+        body = json.loads(result[0].text)
+        assert "prior execution state" in body["message"]
+        update_mission.assert_not_called()
+        db.close.assert_called_once()
 
 
 class TestSerializeMission:

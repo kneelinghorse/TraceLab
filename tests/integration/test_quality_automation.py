@@ -13,7 +13,6 @@ from app.models.document import Document
 from app.models.insight import InsightSource
 from app.models.mission_protocol import MissionProtocolDraft
 from app.models.quality import QualityCheck
-from app.schemas.mission import MissionCreate
 from app.services.evidence_linking import EvidenceLinkingService
 from app.services.mission_protocol_service import MissionProtocolService
 from app.services.quality_checks import QualityAutomationRunner
@@ -126,9 +125,10 @@ def test_mission_updates_trigger_quality_automation(db_session, project):
         quality_runner=runner,
     )
     mission_payload = _build_mission_payload(project.id, chunk_id, insight_id)
-    mission = service.create_mission(
+    mission = service.create_mission_from_draft(
         db_session,
-        MissionCreate(project_id=project.id, mission_data=mission_payload),
+        project_id=project.id,
+        draft=mission_payload,
     )
 
     db_session.expire_all()
@@ -150,8 +150,10 @@ def test_quality_automation_api_run_and_history(
         evidence_service=EvidenceLinkingService(require_entities=False),
         quality_runner=runner,
     )
-    mission = service.create_mission(
-        db_session, MissionCreate(project_id=project.id, mission_data=payload)
+    mission = service.create_mission_from_draft(
+        db_session,
+        project_id=project.id,
+        draft=payload,
     )
 
     run_resp = client.post(

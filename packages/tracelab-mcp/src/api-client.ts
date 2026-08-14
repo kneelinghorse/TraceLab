@@ -372,6 +372,28 @@ export interface MissionSubmitResponse {
   job_id?: string;
 }
 
+export interface MissionStatusResponse {
+  id: string;
+  mission_id: string;
+  status: Mission['status'];
+  progress_percent?: number | null;
+  current_phase?: string | null;
+  queued_at?: string | null;
+  started_at?: string | null;
+  completed_at?: string | null;
+  error_message?: string | null;
+  deepsearch_job_id?: string | null;
+  deepsearch_attempt_count: number;
+  lease_expires_at?: string | null;
+  result_document_ids: string[];
+  result_report_id?: string | null;
+  materialization_pending: boolean;
+  materialization_status?: string | null;
+  materialization_attempt_count: number;
+  materialization_error?: string | null;
+  search_ready: boolean;
+}
+
 export class TraceLabAPIError extends Error {
   constructor(
     message: string,
@@ -745,12 +767,11 @@ export class TraceLabClient {
   /**
    * Get the current status of a mission
    */
-  async getMissionStatus(missionId: string): Promise<{ status: string; progress?: number }> {
-    const mission = await this.getMission(missionId);
-    return {
-      status: mission.status,
-      progress: mission.execution_metadata?.progress_percent as number | undefined,
-    };
+  async getMissionStatus(missionId: string): Promise<MissionStatusResponse> {
+    return this.request<MissionStatusResponse>(
+      'GET',
+      `/api/v1/missions/${missionId}/status`
+    );
   }
 
   /**
@@ -769,6 +790,9 @@ export interface MissionContractPreview {
   mission_id: string;
   mission_uuid: string;
   project_id?: string | null;
+  contract_version: string;
+  compiler_revision: string;
+  fidelity: string;
   named_entities: string[];
   objectives: Array<Record<string, unknown>>;
   evidence_slots: Array<Record<string, unknown>>;

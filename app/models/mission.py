@@ -23,6 +23,9 @@ from sqlalchemy import (
     String,
     Text,
 )
+from sqlalchemy import (
+    text as sql_text,
+)
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -208,6 +211,47 @@ class Mission(Base):
         comment="DeepSearch job ID for tracking async execution",
     )
 
+    # DeepSearch lease boundary (migration 039). These fields are deliberately
+    # internal and are not emitted by ``to_dict``/REST/MCP serializers: the
+    # opaque token is the worker's fencing proof, not mission metadata.
+    deepsearch_lease_owner = Column(
+        Text,
+        nullable=True,
+        comment="Stable worker instance holding the current lease",
+    )
+    deepsearch_lease_token = Column(
+        Text,
+        nullable=True,
+        comment="Opaque per-attempt lease ownership proof",
+    )
+    deepsearch_leased_at = Column(
+        DateTime(timezone=True),
+        nullable=True,
+        comment="When the current DeepSearch lease was acquired",
+    )
+    deepsearch_heartbeat_at = Column(
+        DateTime(timezone=True),
+        nullable=True,
+        comment="Last accepted heartbeat from the lease holder",
+    )
+    deepsearch_lease_expires_at = Column(
+        DateTime(timezone=True),
+        nullable=True,
+        comment="Lease expiry after which the mission is recoverable",
+    )
+    deepsearch_attempt_count = Column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default="0",
+        comment="Monotonic number of DeepSearch claim attempts",
+    )
+    deepsearch_result_key = Column(
+        Text,
+        nullable=True,
+        comment="Stable idempotency key for the terminal lease attempt",
+    )
+
     # Results
     execution_metadata = Column(
         CrossDBJSON,
@@ -285,6 +329,26 @@ class Mission(Base):
         Index("idx_missions_project_status", "project_id", "status"),
         # Index for mission_id lookups
         Index("idx_missions_mission_id", "mission_id"),
+        Index(
+            "missions_deepsearch_lease_token_active_uq",
+            "deepsearch_lease_token",
+            unique=True,
+            postgresql_where=sql_text("deepsearch_lease_token IS NOT NULL"),
+            sqlite_where=sql_text("deepsearch_lease_token IS NOT NULL"),
+        ),
+        Index(
+            "missions_deepsearch_result_key_uq",
+            "deepsearch_result_key",
+            unique=True,
+            postgresql_where=sql_text("deepsearch_result_key IS NOT NULL"),
+            sqlite_where=sql_text("deepsearch_result_key IS NOT NULL"),
+        ),
+        Index(
+            "missions_deepsearch_claim_scan_idx",
+            "status",
+            "deepsearch_lease_expires_at",
+            "queued_at",
+        ),
         Index("ix_missions_workspace_owner_created_at", "workspace_id", "owner_id", "created_at"),
         {"extend_existing": True},
     )

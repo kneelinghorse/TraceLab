@@ -26,6 +26,7 @@ DB-backed (not @pytest.mark.unit) so the autouse fixture seeds the bootstrap use
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta
 from uuid import uuid4
 
 import pytest
@@ -43,6 +44,7 @@ from app.models.collection import Collection
 from app.models.document import Document
 from app.models.ingestion_job import IngestionJob
 from app.models.mission import Mission
+from app.models.mission_log import MissionLog
 from app.models.project import Project
 from app.models.report import Report
 from app.models.space_member import SpaceMember
@@ -413,6 +415,32 @@ class TestAuditSurfacedRoutes:
         resp = client.get(f"{API}/missions/{mission.id}/logs", headers=_bearer(owner))
         assert resp.status_code == 200, resp.text
 
+    def test_mission_logs_limit_keeps_newest_window_in_chronological_order(
+        self, client, db_session, rbac_on
+    ):
+        """A small UI limit must show the latest activity, not the oldest history."""
+        owner = _make_user(db_session, "own-latest-logs@x.io")
+        mission = _make_mission(db_session, owner_id=owner.id, project_id=None)
+        start = datetime(2026, 8, 14, 12, 0, 0)
+        for offset, message in enumerate(("oldest", "older", "newer", "newest")):
+            db_session.add(
+                MissionLog(
+                    mission_id=mission.id,
+                    level="INFO",
+                    message=message,
+                    logged_at=start + timedelta(minutes=offset),
+                    created_at=start + timedelta(minutes=offset),
+                )
+            )
+        db_session.commit()
+
+        resp = client.get(
+            f"{API}/missions/{mission.id}/logs?limit=2", headers=_bearer(owner)
+        )
+
+        assert resp.status_code == 200, resp.text
+        assert [entry["message"] for entry in resp.json()] == ["newer", "newest"]
+
     def test_enqueue_job_forbidden_for_outsider(self, client, db_session, rbac_on):
         # authorize('process') on the parent Document must deny before any job is made.
         outsider = _make_user(db_session, "out-job@x.io")
@@ -505,6 +533,68 @@ class TestServiceRoleLogIngest:
         )
         assert resp.status_code == 201, resp.text
         assert resp.json()["accepted"] == 1
+
+    @pytest.mark.parametrize(
+        ("payload", "expected_logged_at", "expected_source"),
+        [
+            (
+                {
+                    "logs": [
+                        {
+                            "level": "INFO",
+                            "message": "canonical payload",
+                            "source": "deepsearch:running",
+                            "logged_at": "2026-08-14T12:34:56Z",
+                        }
+                    ]
+                },
+                datetime(2026, 8, 14, 12, 34, 56),
+                "deepsearch:running",
+            ),
+            (
+                {
+                    "entries": [
+                        {
+                            "level": "WARNING",
+                            "message": "transitional payload",
+                            "phase": "critique",
+                            "ts": "2026-08-14T12:35:57Z",
+                        }
+                    ]
+                },
+                datetime(2026, 8, 14, 12, 35, 57),
+                "critique",
+            ),
+        ],
+        ids=("canonical", "deepsearch-transitional"),
+    )
+    def test_log_ingest_normalizes_supported_wire_shapes(
+        self,
+        client,
+        db_session,
+        rbac_on,
+        payload,
+        expected_logged_at,
+        expected_source,
+    ):
+        """The receiver accepts the canonical contract during runner migration."""
+        service = _make_user(db_session, f"svc-shape-{uuid4().hex[:8]}@x.io", role=ROLE_SERVICE)
+        mission = _make_mission(db_session, owner_id=uuid4(), project_id=None)
+
+        resp = client.post(
+            f"{API}/missions/{mission.id}/logs",
+            json=payload,
+            headers=_bearer(service),
+        )
+
+        assert resp.status_code == 201, resp.text
+        stored = (
+            db_session.query(MissionLog)
+            .filter(MissionLog.mission_id == mission.id)
+            .one()
+        )
+        assert stored.logged_at == expected_logged_at
+        assert stored.source == expected_source
 
     def test_log_ingest_open_when_flag_off(self, client, db_session):
         # Flip-back invariant: with the flag OFF a non-service human still succeeds,
