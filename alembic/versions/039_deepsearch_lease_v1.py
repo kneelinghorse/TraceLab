@@ -189,7 +189,16 @@ def _ensure_indexes(bind: sa.engine.Connection) -> None:
         current = existing.get(name)
         if current is not None:
             current_columns = tuple(str(value) for value in current["column_names"])
-            if current_columns != columns or bool(current.get("unique")) != unique:
+            current_unique = bool(current.get("unique"))
+            definition_mismatch = (
+                current_columns != columns or current_unique != unique
+            )
+            repairable_legacy_claim_index = (
+                name == "missions_deepsearch_claim_scan_idx"
+                and current_columns == ("project_id", *columns)
+                and current_unique == unique
+            )
+            if definition_mismatch and not repairable_legacy_claim_index:
                 raise RuntimeError(
                     f"Index {name} exists with an incompatible definition: "
                     f"columns={current_columns}, unique={current.get('unique')}"
@@ -199,7 +208,7 @@ def _ensure_indexes(bind: sa.engine.Connection) -> None:
                 dialect_options.get("postgresql_where")
             )
             expected_predicate = normalize_predicate(predicate)
-            if current_predicate != expected_predicate:
+            if definition_mismatch or current_predicate != expected_predicate:
                 op.drop_index(name, table_name="missions")
                 op.create_index(
                     name,

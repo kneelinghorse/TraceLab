@@ -356,3 +356,50 @@ class TestDeepSearchLeaseV1Migration:
             assert predicate is None
         finally:
             engine.dispose()
+
+    def test_legacy_project_scoped_claim_index_is_replaced(
+        self, alembic_cfg, migration_db_url
+    ):
+        """The deployed project-leading index converges to the global scan."""
+        engine = create_engine(migration_db_url)
+        try:
+            command.upgrade(alembic_cfg, REV_038)
+            with engine.begin() as conn:
+                conn.execute(
+                    text(
+                        """
+                        ALTER TABLE missions
+                        ADD COLUMN deepsearch_lease_expires_at timestamptz
+                        """
+                    )
+                )
+                conn.execute(
+                    text(
+                        """
+                        CREATE INDEX missions_deepsearch_claim_scan_idx
+                        ON missions (
+                            project_id, status,
+                            deepsearch_lease_expires_at, queued_at
+                        )
+                        """
+                    )
+                )
+
+            command.upgrade(alembic_cfg, REV_039)
+
+            claim_index = {
+                index["name"]: index
+                for index in inspect(engine).get_indexes("missions")
+            }["missions_deepsearch_claim_scan_idx"]
+            assert claim_index["column_names"] == [
+                "status",
+                "deepsearch_lease_expires_at",
+                "queued_at",
+            ]
+            assert claim_index["unique"] is False
+            assert (
+                claim_index.get("dialect_options", {}).get("postgresql_where")
+                is None
+            )
+        finally:
+            engine.dispose()
