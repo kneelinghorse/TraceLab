@@ -163,19 +163,48 @@ class TestWebhookSchemas:
 class TestWebhookSignatureValidation:
     """Tests for webhook signature validation."""
 
-    def test_validate_signature_no_secret_configured(self):
-        """Validation passes when no secret is configured."""
+    def test_validate_signature_no_secret_configured_in_development(self):
+        """Unsigned callbacks remain available only for local development."""
         handler = WebhookHandler()
         with patch("app.services.webhook_handler.settings") as mock_settings:
-            mock_settings.deepsearch_webhook_secret = None
+            mock_settings.effective_deepsearch_service_secret = None
+            mock_settings.environment = "development"
+            mock_settings.debug = True
             result = handler.validate_signature(b'{"test": "data"}', None)
             assert result is True
+
+    @pytest.mark.parametrize("environment", ["production", "prod", "staging"])
+    def test_validate_signature_no_secret_configured_outside_local_debug(
+        self, environment
+    ):
+        """Every deployed environment fails closed on an unsigned receipt."""
+        handler = WebhookHandler()
+        with patch("app.services.webhook_handler.settings") as mock_settings:
+            mock_settings.effective_deepsearch_service_secret = None
+            mock_settings.environment = environment
+            mock_settings.debug = True
+            with pytest.raises(
+                WebhookValidationError, match="service secret is not configured"
+            ):
+                handler.validate_signature(b'{"test": "data"}', None)
+
+    def test_default_development_without_debug_fails_closed(self):
+        """A missing deployment ENVIRONMENT cannot enable unsigned receipts."""
+        handler = WebhookHandler()
+        with patch("app.services.webhook_handler.settings") as mock_settings:
+            mock_settings.effective_deepsearch_service_secret = None
+            mock_settings.environment = "development"
+            mock_settings.debug = False
+            with pytest.raises(
+                WebhookValidationError, match="service secret is not configured"
+            ):
+                handler.validate_signature(b'{"test": "data"}', None)
 
     def test_validate_signature_missing_header(self):
         """Validation fails when signature header is missing."""
         handler = WebhookHandler()
         with patch("app.services.webhook_handler.settings") as mock_settings:
-            mock_settings.deepsearch_webhook_secret = "test-secret"
+            mock_settings.effective_deepsearch_service_secret = "test-secret"
             with pytest.raises(
                 WebhookValidationError, match="Missing X-DeepSearch-Signature"
             ):
@@ -185,7 +214,7 @@ class TestWebhookSignatureValidation:
         """Validation fails with invalid signature format."""
         handler = WebhookHandler()
         with patch("app.services.webhook_handler.settings") as mock_settings:
-            mock_settings.deepsearch_webhook_secret = "test-secret"
+            mock_settings.effective_deepsearch_service_secret = "test-secret"
             with pytest.raises(
                 WebhookValidationError, match="Invalid signature format"
             ):
@@ -195,7 +224,7 @@ class TestWebhookSignatureValidation:
         """Validation fails with incorrect signature."""
         handler = WebhookHandler()
         with patch("app.services.webhook_handler.settings") as mock_settings:
-            mock_settings.deepsearch_webhook_secret = "test-secret"
+            mock_settings.effective_deepsearch_service_secret = "test-secret"
             with pytest.raises(
                 WebhookValidationError, match="Invalid webhook signature"
             ):
@@ -213,7 +242,7 @@ class TestWebhookSignatureValidation:
         ).hexdigest()
 
         with patch("app.services.webhook_handler.settings") as mock_settings:
-            mock_settings.deepsearch_webhook_secret = secret
+            mock_settings.effective_deepsearch_service_secret = secret
             result = handler.validate_signature(payload, f"sha256={expected_sig}")
             assert result is True
 
@@ -231,7 +260,7 @@ class TestWebhookSignatureValidation:
         ).hexdigest()
 
         with patch("app.services.webhook_handler.settings") as mock_settings:
-            mock_settings.deepsearch_webhook_secret = secret
+            mock_settings.effective_deepsearch_service_secret = secret
             result = handler.validate_signature(
                 payload, f"sha256={expected_sig}", timestamp=timestamp
             )
@@ -495,7 +524,7 @@ class TestWebhookAPIEndpoint:
         }
 
         with patch("app.services.webhook_handler.settings") as mock_settings:
-            mock_settings.deepsearch_webhook_secret = "real-secret"
+            mock_settings.effective_deepsearch_service_secret = "real-secret"
 
             response = client.post(
                 "/api/v1/webhooks/deepsearch",
@@ -524,7 +553,7 @@ class TestWebhookAPIEndpoint:
         signature = hmac.new(secret.encode(), payload_bytes, hashlib.sha256).hexdigest()
 
         with patch("app.services.webhook_handler.settings") as mock_settings:
-            mock_settings.deepsearch_webhook_secret = secret
+            mock_settings.effective_deepsearch_service_secret = secret
 
             response = client.post(
                 "/api/v1/webhooks/deepsearch",

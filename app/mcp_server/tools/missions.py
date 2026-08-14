@@ -35,7 +35,9 @@ from app.services.deepsearch_client import (
 from app.services.mission_service import (
     MissionNotFoundError,
     MissionService,
+    MissionSubmissionStateError,
     MissionValidationError,
+    validate_mission_submission_state,
 )
 
 logger = logging.getLogger(__name__)
@@ -531,7 +533,7 @@ async def handle_submit_mission(arguments: dict[str, Any]) -> list[TextContent]:
     1. Fetches the mission from TraceLab
     2. Validates project_id is set (missions must be associated with a project)
     3. Validates success_criteria is not empty
-    4. Checks mission isn't already queued/in_progress
+    4. Requires a pristine draft (one mission = one fenced execution)
     5. Worker mode: Sets status='queued' for worker to pick up
        HTTP mode: POSTs to DeepSearch /missions/execute
     6. Returns job info
@@ -576,20 +578,23 @@ async def handle_submit_mission(arguments: dict[str, Any]) -> list[TextContent]:
                     )
                 ]
 
-            # 4. Check if already submitted
-            if mission.status in ("queued", "in_progress"):
+            # 4. Enforce the same one-mission/one-run boundary as REST.
+            try:
+                validate_mission_submission_state(mission)
+            except MissionSubmissionStateError as exc:
+                detail = {
+                    "message": str(exc),
+                    "mission_id": mission.mission_id,
+                    "uuid": str(mission.id),
+                    "current_status": mission.status,
+                    "deepsearch_job_id": mission.deepsearch_job_id,
+                }
+                if exc.suggestion:
+                    detail["suggestion"] = exc.suggestion
                 return [
                     TextContent(
                         type="text",
-                        text=json.dumps(
-                            {
-                                "message": f"Mission is already {mission.status}.",
-                                "mission_id": mission.mission_id,
-                                "uuid": str(mission.id),
-                                "current_status": mission.status,
-                                "deepsearch_job_id": mission.deepsearch_job_id,
-                            }
-                        ),
+                        text=json.dumps(detail),
                     )
                 ]
 

@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 from pathlib import Path
+from uuid import uuid4
+
+from sqlalchemy import text
 
 from app.models.chunk import DocumentChunk
 from app.models.document import Document
@@ -194,3 +197,57 @@ def test_embedding_stage_records_failure_without_corrupting_document(
         "Generating embeddings and upserting to Qdrant",
     ) in status_pairs
     assert any(status.status == "failed" for status in statuses)
+
+
+def test_embedding_only_resume_reuses_persisted_chunks(
+    db_session, project, tmp_path
+):
+    """A transient Qdrant failure resumes without reparsing or duplicate chunks."""
+    file_path = tmp_path / "embedding-resume.md"
+    file_path.write_text("Embedding resume path.")
+    document = _create_document(db_session, project, file_path)
+    document.content = "Embedding resume path."
+    document.processed = True
+    document.chunked = True
+    chunk_id = uuid4()
+    db_session.execute(
+        text(
+            """
+            INSERT INTO document_chunks (
+                id, document_id, chunk_index, content, content_tsv, token_count
+            ) VALUES (
+                :id, :document_id, 0, :content, :content_tsv, 4
+            )
+            """
+        ),
+        {
+            "id": str(chunk_id),
+            "document_id": str(document.id),
+            "content": "Embedding resume path.",
+            "content_tsv": "Embedding resume path.",
+        },
+    )
+    db_session.commit()
+    original_chunk_ids = [
+        chunk.id
+        for chunk in db_session.query(DocumentChunk)
+        .filter(DocumentChunk.document_id == document.id)
+        .all()
+    ]
+    assert original_chunk_ids
+
+    healthy_qdrant = StubQdrantService()
+    resumed = _service(StubEmbeddingService(), healthy_qdrant)
+    result = resumed.embed_existing_document(db_session, document.id)
+
+    assert result["status"] == "completed"
+    refreshed = db_session.query(Document).filter(Document.id == document.id).one()
+    assert refreshed.embedded is True
+    final_chunk_ids = [
+        chunk.id
+        for chunk in db_session.query(DocumentChunk)
+        .filter(DocumentChunk.document_id == document.id)
+        .all()
+    ]
+    assert final_chunk_ids == original_chunk_ids
+    assert len(healthy_qdrant.upserts) == 1

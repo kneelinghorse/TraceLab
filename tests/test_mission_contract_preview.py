@@ -82,6 +82,14 @@ class TestContractPreviewRoute:
         assert body["mission_id"] == mission.mission_id
         assert body["mission_uuid"] == str(mission.id)
 
+        # Preview must disclose that TraceLab is using a pinned structural
+        # compiler, not imply byte-for-byte parity with the newer DS runtime.
+        assert body["contract_version"] == "1.0"
+        assert body["compiler_revision"] == (
+            "24e88100624e6221e5fa957508ab77c4b0f519f9"
+        )
+        assert body["fidelity"] == "structural_only"
+
         # Authored required_entities flow through the compiler into
         # named_entities — the regression DS hit on OODS-FIGMA-HOST-01 was
         # exactly this round-trip going dark.

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 from typing import Any
+from uuid import UUID
 
 from sqlalchemy.orm import Session
 
@@ -22,6 +23,16 @@ logger = logging.getLogger(__name__)
 
 class AutoIngestError(RuntimeError):
     """Raised when auto-ingestion fails."""
+
+
+def is_document_search_ready(document: Document) -> bool:
+    """Return the shared database-level readiness invariant for result search."""
+    return bool(
+        document.deleted_at is None
+        and document.processed
+        and document.chunked
+        and document.embedded
+    )
 
 
 class AutoIngestService:
@@ -41,11 +52,62 @@ class AutoIngestService:
             self._ingestion_service = DocumentIngestionService()
         return self._ingestion_service
 
+    @staticmethod
+    def _document_for_id(db: Session, document_id: str) -> Document | None:
+        """Resolve a linked result document, tolerating legacy invalid IDs."""
+        try:
+            parsed_id = UUID(str(document_id))
+        except (TypeError, ValueError):
+            return None
+        return db.query(Document).filter(Document.id == parsed_id).first()
+
+    def _find_existing_mission_document(
+        self,
+        db: Session,
+        mission: Mission,
+        filename: str,
+    ) -> Document | None:
+        """Find a linked or partially-created document for this mission/job."""
+        for document_id in mission.result_document_ids or []:
+            linked = self._document_for_id(db, document_id)
+            if linked is not None:
+                return linked
+
+        candidates = (
+            db.query(Document)
+            .filter(
+                Document.project_id == mission.project_id,
+                Document.name == filename,
+                Document.source_type == "deepsearch",
+                Document.deleted_at.is_(None),
+            )
+            .order_by(Document.uploaded_at.desc())
+            .all()
+        )
+        for document in candidates:
+            metadata = document.document_metadata or {}
+            same_mission = document.source_mission_id == mission.id or metadata.get(
+                "mission_id"
+            ) == mission.mission_id
+            if not same_mission:
+                continue
+            recorded_job = metadata.get("deepsearch_job_id")
+            if (
+                recorded_job
+                and mission.deepsearch_job_id
+                and recorded_job != mission.deepsearch_job_id
+            ):
+                continue
+            return document
+        return None
+
     def auto_ingest_result(
         self,
         db: Session,
         mission: Mission,
         result_markdown: str,
+        *,
+        require_embedded: bool = False,
     ) -> Document:
         """Ingest result_markdown as a document and link to mission.
 
@@ -61,6 +123,9 @@ class AutoIngestService:
             db: Database session
             mission: The completed mission
             result_markdown: Markdown content to ingest
+            require_embedded: Fail unless the returned document is search-ready.
+                Result convergence enables this; legacy/manual callers may still
+                accept a document when embeddings are intentionally disabled.
 
         Returns:
             The created Document with chunks
@@ -83,6 +148,29 @@ class AutoIngestService:
             filename,
         )
 
+        existing_document = self._find_existing_mission_document(
+            db, mission, filename
+        )
+        if mission.result_document_ids and existing_document is None:
+            raise AutoIngestError(
+                f"Mission {mission.mission_id} links a missing result document"
+            )
+        if existing_document is not None and existing_document.deleted_at is not None:
+            raise AutoIngestError(
+                f"Result document {existing_document.id} is soft-deleted and must be restored"
+            )
+        if (
+            existing_document is not None
+            and mission.result_document_ids
+            and (not require_embedded or is_document_search_ready(existing_document))
+        ):
+            logger.info(
+                "Result document %s is already linked to mission %s",
+                existing_document.id,
+                mission.mission_id,
+            )
+            return existing_document
+
         # Build metadata
         metadata: dict[str, Any] = {
             "mission_id": mission.mission_id,
@@ -96,53 +184,82 @@ class AutoIngestService:
         # rbac_enabled flips (T48.4).
         owner_id, workspace_id = project_owner_workspace(db, mission.project_id)
 
-        # Create document record
-        document = Document(
-            project_id=mission.project_id,
-            name=filename,
-            file_type="report",
-            content=result_markdown,  # Store raw content directly
-            file_size=len(result_markdown.encode("utf-8")),
-            mime_type="text/markdown",
-            source_type="deepsearch",
-            document_metadata=metadata,
-            owner_id=owner_id,
-            workspace_id=workspace_id,
-            processed=False,
-            chunked=False,
-            embedded=False,
-            validation_status="pending",
-        )
-        db.add(document)
-        db.commit()
-        db.refresh(document)
+        document = existing_document
+        if document is None:
+            # Create document record. source_mission_id gives retries a stable,
+            # queryable identity even when the first pipeline attempt fails
+            # before result_document_ids can be linked.
+            document = Document(
+                project_id=mission.project_id,
+                name=filename,
+                file_type="report",
+                content=result_markdown,  # Store raw content directly
+                file_size=len(result_markdown.encode("utf-8")),
+                mime_type="text/markdown",
+                source_type="deepsearch",
+                document_metadata=metadata,
+                source_mission_id=mission.id,
+                owner_id=owner_id,
+                workspace_id=workspace_id,
+                processed=False,
+                chunked=False,
+                embedded=False,
+                validation_status="pending",
+            )
+            db.add(document)
+            db.commit()
+            db.refresh(document)
 
-        # Record document creation
-        self._status_recorder.record(
-            db,
-            document.id,
-            stage="uploaded",
-            status="succeeded",
-            details={
-                "file_name": filename,
-                "file_size_bytes": document.file_size,
-                "mime_type": "text/markdown",
-                "source_type": "deepsearch",
-                "auto_ingested": True,
-                "mission_id": mission.mission_id,
-            },
-        )
+            # Record document creation once. A retry resumes this same record.
+            self._status_recorder.record(
+                db,
+                document.id,
+                stage="uploaded",
+                status="succeeded",
+                details={
+                    "file_name": filename,
+                    "file_size_bytes": document.file_size,
+                    "mime_type": "text/markdown",
+                    "source_type": "deepsearch",
+                    "auto_ingested": True,
+                    "mission_id": mission.mission_id,
+                },
+            )
+        else:
+            logger.info(
+                "Resuming partial auto-ingest for mission %s with document %s",
+                mission.mission_id,
+                document.id,
+            )
 
         # Process through ingestion pipeline
         try:
             ingestion_service = self._get_ingestion_service()
 
-            # Pass content as bytes for processing
-            result = ingestion_service.process_document(
-                db=db,
-                document_id=document.id,
-                file_content=result_markdown.encode("utf-8"),
-            )
+            # A fully chunked document only needs its missing mission link. This
+            # avoids duplicating chunks when a prior attempt succeeded but died
+            # between pipeline completion and the final mission update.
+            if require_embedded and is_document_search_ready(document):
+                result = {"status": "completed"}
+            elif document.processed and document.chunked:
+                if require_embedded:
+                    result = ingestion_service.embed_existing_document(
+                        db=db,
+                        document_id=document.id,
+                    )
+                else:
+                    result = {"status": "completed"}
+            elif document.chunks:
+                raise AutoIngestError(
+                    f"Result document {document.id} has partial chunks; refusing "
+                    "a replay that could duplicate them"
+                )
+            else:
+                result = ingestion_service.process_document(
+                    db=db,
+                    document_id=document.id,
+                    file_content=result_markdown.encode("utf-8"),
+                )
 
             if result.get("status") == "failed":
                 error = result.get("error", "Unknown ingestion error")
@@ -155,6 +272,11 @@ class AutoIngestService:
 
             # Refresh document to get updated state
             db.refresh(document)
+
+            if require_embedded and not is_document_search_ready(document):
+                raise AutoIngestError(
+                    f"Result document {document.id} is not search-ready"
+                )
 
             logger.info(
                 "Successfully auto-ingested document %s with %d chunks",
@@ -170,9 +292,10 @@ class AutoIngestService:
 
         # Update mission with document reference
         current_doc_ids = list(mission.result_document_ids or [])
-        current_doc_ids.append(str(document.id))
-        mission.result_document_ids = current_doc_ids
-        db.commit()
+        if str(document.id) not in current_doc_ids:
+            current_doc_ids.append(str(document.id))
+            mission.result_document_ids = current_doc_ids
+            db.commit()
 
         logger.info(
             "Linked document %s to mission %s",

@@ -16,15 +16,16 @@ from app.core.config import settings
 from app.models.mission import Mission
 from app.schemas.mission import MissionUpdate
 from app.schemas.webhook import DeepSearchWebhookPayload, DeepSearchWebhookStatus
-from app.services.auto_ingest import AutoIngestError, AutoIngestService
-from app.services.auto_report import AutoReportError, AutoReportService
+from app.services.auto_ingest import AutoIngestService
+from app.services.auto_report import AutoReportService
 from app.services.mission_service import MissionNotFoundError, MissionService
+from app.services.result_materialization import MissionResultMaterializationService
 
 logger = logging.getLogger(__name__)
 
 
 class WebhookValidationError(RuntimeError):
-    """Raised when webhook signature validation fails."""
+    """Raised when webhook authentication or attempt correlation fails."""
 
 
 class WebhookProcessingError(RuntimeError):
@@ -43,6 +44,7 @@ class WebhookHandler:
         self._mission_service = mission_service or MissionService()
         self._auto_ingest_service = auto_ingest_service
         self._auto_report_service = auto_report_service
+        self._materialization_service: MissionResultMaterializationService | None = None
 
     def validate_signature(
         self,
@@ -69,10 +71,23 @@ class WebhookHandler:
         # deepsearch_webhook_secret for back-compat during the transition.
         secret = settings.effective_deepsearch_service_secret
 
-        # If no secret configured, skip validation (development mode)
+        # Local development may run without DeepSearch, but deployed callbacks
+        # must never become unsigned because ENVIRONMENT or a secret was missed.
         if not secret:
+            environment = settings.environment.strip().lower()
+            unsigned_local_mode = environment in {
+                "development",
+                "dev",
+                "local",
+            } and bool(settings.debug)
+            unsigned_test_mode = environment in {"test", "testing"}
+            if not (unsigned_local_mode or unsigned_test_mode):
+                raise WebhookValidationError(
+                    "DeepSearch service secret is not configured"
+                )
             logger.warning(
-                "Webhook signature validation skipped - no secret configured"
+                "Webhook signature validation skipped in development - "
+                "no secret configured"
             )
             return True
 
@@ -88,10 +103,8 @@ class WebhookHandler:
         provided_signature = signature[7:]  # Remove 'sha256=' prefix
 
         # Build message to sign (include timestamp if provided for replay protection)
-        if timestamp:
-            message = f"{timestamp}.{payload_body.decode('utf-8')}"
-        else:
-            message = payload_body.decode("utf-8")
+        decoded_body = payload_body.decode("utf-8")
+        message = f"{timestamp}.{decoded_body}" if timestamp else decoded_body
 
         # Compute expected signature
         expected_signature = hmac.new(
@@ -143,15 +156,45 @@ class WebhookHandler:
             logger.error("Mission not found for webhook: %s", payload.mission_id)
             raise
 
-        # Idempotency check: if mission already completed/failed, skip processing
-        if mission.status in ("completed", "cancelled"):
-            if mission.deepsearch_job_id == payload.job_id:
-                logger.info(
-                    "Webhook already processed (idempotent): mission=%s, job=%s",
-                    payload.mission_id,
-                    payload.job_id,
-                )
-                return mission, "already_processed"
+        # Lease-v2 terminal writes persist the generated job ID with the fenced
+        # result key. HMAC authenticates DeepSearch as a service; this comparison
+        # authenticates the specific attempt. Legacy rows with no stored job ID
+        # retain the one-run fallback until they are backfilled or replayed.
+        if (
+            mission.deepsearch_job_id is not None
+            and payload.job_id != mission.deepsearch_job_id
+        ):
+            raise WebhookValidationError(
+                "Webhook job_id does not match the persisted mission attempt"
+            )
+
+        # DeepSearch's fenced writer commits terminal state before sending the
+        # receipt. That row is authoritative. Because terminal missions cannot
+        # be resubmitted in place, the legacy NULL-job fallback cannot target a
+        # later attempt on the same mission row.
+        if mission.status in ("completed", "validation_failed", "cancelled"):
+            if (
+                mission.status in ("completed", "validation_failed")
+                and payload.status == DeepSearchWebhookStatus.COMPLETE
+            ):
+                outcome = self._get_materialization_service().materialize(db, mission)
+                if outcome.errors:
+                    raise WebhookProcessingError(
+                        "Mission completed but result materialization is incomplete: "
+                        + "; ".join(outcome.errors)
+                    )
+                if outcome.changed:
+                    logger.info(
+                        "Reconciled persisted results for completed mission %s",
+                        payload.mission_id,
+                    )
+                    return mission, "reconciled"
+            logger.info(
+                "Webhook acknowledged against authoritative terminal row: mission=%s, job=%s",
+                payload.mission_id,
+                payload.job_id,
+            )
+            return mission, "already_processed"
 
         # Build update based on webhook status
         if payload.status == DeepSearchWebhookStatus.COMPLETE:
@@ -175,6 +218,15 @@ class WebhookHandler:
             self._auto_report_service = AutoReportService()
         return self._auto_report_service
 
+    def _get_materialization_service(self) -> MissionResultMaterializationService:
+        """Lazily compose the shared webhook/reconciliation materializer."""
+        if self._materialization_service is None:
+            self._materialization_service = MissionResultMaterializationService(
+                auto_ingest_service=self._get_auto_ingest_service(),
+                auto_report_service=self._get_auto_report_service(),
+            )
+        return self._materialization_service
+
     def _handle_success(
         self,
         db: Session,
@@ -186,16 +238,23 @@ class WebhookHandler:
         Updates mission with results, marks as completed, and auto-ingests
         result_markdown as a document if available.
         """
-        update_data = MissionUpdate(
-            status="completed",
-            deepsearch_job_id=payload.job_id,
-            execution_metadata=payload.execution_metadata.model_dump()
-            if payload.execution_metadata
-            else {},
-            result_markdown=payload.result_markdown,
-            result_protocol=payload.result_protocol,
-            error_message=None,  # Clear any previous error
-        )
+        # DeepSearch's direct writer may already have persisted the result. A
+        # minimal completion receipt intentionally omits those large fields, so
+        # only non-None payload values may replace stored data.
+        update_fields: dict[str, object] = {
+            "status": "completed",
+            "deepsearch_job_id": payload.job_id,
+            "error_message": None,
+        }
+        if payload.execution_metadata is not None:
+            update_fields["execution_metadata"] = (
+                payload.execution_metadata.model_dump()
+            )
+        if payload.result_markdown is not None:
+            update_fields["result_markdown"] = payload.result_markdown
+        if payload.result_protocol is not None:
+            update_fields["result_protocol"] = payload.result_protocol
+        update_data = MissionUpdate(**update_fields)
 
         updated_mission = self._mission_service.update_mission(
             db, mission.id, update_data
@@ -207,78 +266,11 @@ class WebhookHandler:
             payload.job_id,
         )
 
-        # Auto-ingest result_markdown as document (B16.7)
-        if payload.result_markdown and updated_mission.project_id:
-            try:
-                auto_ingest_service = self._get_auto_ingest_service()
-                document = auto_ingest_service.auto_ingest_result(
-                    db=db,
-                    mission=updated_mission,
-                    result_markdown=payload.result_markdown,
-                )
-                logger.info(
-                    "Auto-ingested result for mission %s as document %s",
-                    payload.mission_id,
-                    document.id,
-                )
-            except AutoIngestError as exc:
-                # Log but don't fail the webhook - mission is already completed
-                logger.warning(
-                    "Auto-ingest failed for mission %s: %s",
-                    payload.mission_id,
-                    str(exc),
-                )
-            except Exception:
-                logger.exception(
-                    "Unexpected error during auto-ingest for mission %s",
-                    payload.mission_id,
-                )
-        elif not payload.result_markdown:
-            logger.debug(
-                "No result_markdown to ingest for mission %s", payload.mission_id
-            )
-        elif not updated_mission.project_id:
-            logger.debug(
-                "Mission %s has no project_id, skipping auto-ingest",
-                payload.mission_id,
-            )
-
-        # Auto-create report from result_protocol (B16.8)
-        if payload.result_protocol and updated_mission.project_id:
-            try:
-                auto_report_service = self._get_auto_report_service()
-                # Refresh mission to get updated result_document_ids from auto-ingest
-                db.refresh(updated_mission)
-                report = auto_report_service.create_report_from_protocol(
-                    db=db,
-                    mission=updated_mission,
-                    protocol=payload.result_protocol,
-                )
-                logger.info(
-                    "Auto-created report %s for mission %s",
-                    report.id,
-                    payload.mission_id,
-                )
-            except AutoReportError as exc:
-                # Log but don't fail the webhook - mission is already completed
-                logger.warning(
-                    "Auto-report creation failed for mission %s: %s",
-                    payload.mission_id,
-                    str(exc),
-                )
-            except Exception:
-                logger.exception(
-                    "Unexpected error during auto-report creation for mission %s",
-                    payload.mission_id,
-                )
-        elif not payload.result_protocol:
-            logger.debug(
-                "No result_protocol for auto-report for mission %s", payload.mission_id
-            )
-        elif not updated_mission.project_id:
-            logger.debug(
-                "Mission %s has no project_id, skipping auto-report",
-                payload.mission_id,
+        outcome = self._get_materialization_service().materialize(db, updated_mission)
+        if outcome.errors:
+            raise WebhookProcessingError(
+                "Mission completed but result materialization is incomplete: "
+                + "; ".join(outcome.errors)
             )
 
         return updated_mission, "completed"

@@ -14,12 +14,16 @@ this stops being something we discover via paid smoke regressions."*
 
 | Project | Commit | Branch | Date |
 | --- | --- | --- | --- |
-| TraceLab | sprint-42 T42.2 (research_depth data-layer drop) | `domain-cutover+cleanup` | 2026-04-29 |
-| DeepSearch.alpha | `aca902f` (DS poller.py:133 + :249-254 land in lockstep) | `contract-driven-pipeline` | 2026-04-27 |
+| TraceLab | sprint-49 T49.1 working tree (lease-v2 runtime boundary in migration 039; commit pending) | `RBAC-updates` | 2026-08-14 |
+| DeepSearch.alpha | `b7009c6` + uncommitted Sprint 91 lease-v2 working tree (evidence pending) | `contract-driven-pipeline` | 2026-08-14 |
 
 The vendored DS contract compiler at `app/services/contract_compiler/` is
 pinned separately to DS commit `24e8810`; see
 `cmos/contracts/deepsearch-compiler-vendor.md` for that ritual.
+Contract-preview responses expose `contract_version`, `compiler_revision`, and
+`fidelity`; the current value is `structural_only` because the pinned 1.0
+compiler is intentionally held until DeepSearch publishes a deterministic 1.1
+manifest and golden fixtures.
 
 ## How to use this doc
 
@@ -123,6 +127,96 @@ ownership/tenancy columns: nullable, server-set, never accepted as
 surface, and NOT in the DS worker SELECT. As of Sprint 43 nothing reads them
 (zero enforcement); they back the RBAC ownership model wired up in later
 sprints.
+
+### DeepSearch lease fields (internal operational boundary)
+
+Alembic migration `039_deepsearch_lease_v1` makes the worker's fenced-claim
+schema reproducible from a clean TraceLab checkout. These fields are never
+accepted from mission authors. Opaque ownership/result proofs remain absent
+from REST and MCP; the authorized lightweight status surface exposes only the
+attempt count and lease expiry needed to diagnose a stranded run.
+
+| DB column | PostgreSQL type/default | DeepSearch use | Public REST/MCP |
+| --- | --- | --- | --- |
+| `deepsearch_lease_owner` | `text` nullable | claim, heartbeat, terminal fencing | ✗ |
+| `deepsearch_lease_token` | `text` nullable; unique while non-null | opaque per-attempt ownership proof | ✗ |
+| `deepsearch_leased_at` | `timestamptz` nullable | claim audit | ✗ |
+| `deepsearch_heartbeat_at` | `timestamptz` nullable | liveness/recovery | ✗ |
+| `deepsearch_lease_expires_at` | `timestamptz` nullable | claim/recovery/terminal fencing | authorized status telemetry only |
+| `deepsearch_attempt_count` | `integer NOT NULL DEFAULT 0` | bounded retry and stale-token fencing | authorized status telemetry only |
+| `deepsearch_result_key` | `text` nullable; unique while non-null | idempotent terminal persistence | ✗ |
+
+Runtime contract identifier: `tracelab-missions-lease-v2`. The Alembic revision
+name remains `039_deepsearch_lease_v1` to preserve the immutable migration
+chain; its converged DDL implements the lease-v2 nullability, defaults, index
+predicates, and global claim policy. The frozen claim policy is
+global across non-orphan projects, matching audited DeepSearch `b7009c6`
+`CLAIM_MISSION_SQL`; RBAC controls human visibility, not worker dispatch. The
+claim index is therefore `(status, deepsearch_lease_expires_at, queued_at)` and
+must not lead with `project_id`. DeepSearch must remove the stale
+`TRACELAB_PROJECT_ID`-scoped wording from its S87 coordination report before
+deployment.
+
+One TraceLab mission represents one fenced DeepSearch execution. Only pristine
+`draft` missions may be submitted; terminal missions are immutable and another
+run requires a new mission ID. This prevents an exhausted attempt counter or an
+old result link from contaminating a later run. A terminal database row is
+authoritative when processing the current minimal HMAC completion receipt.
+DeepSearch's current uncommitted Sprint 91 working tree persists
+`deepsearch_job_id` alongside `deepsearch_result_key` in each fenced terminal
+write. Treat that correlation as implemented-but-unverified until DeepSearch
+returns a commit SHA and passing boundary evidence. The unpaid deployed smoke
+must prove the minimal signed receipt's `job_id` exactly matches the persisted
+terminal row; any future multi-run/versioned mission design must retain an
+equivalent fenced correlation proof.
+
+Lease-v2 rollout is deliberately ordered:
+
+1. Drain and stop every legacy/unfenced DeepSearch worker; verify no old worker
+   can still claim or finish a mission.
+2. Deploy TraceLab migration `038_backfill_mission_report`, then
+   `039_deepsearch_lease_v1`. Migration 039 intentionally makes legacy
+   `in_progress` rows without a lease token immediately reclaimable.
+3. Verify the seven lease columns, nullable terminal-clear fields, partial
+   uniqueness predicates, and global claim index in the deployed database.
+4. Only then start the lease-v2 DeepSearch worker and exercise an unpaid
+   create → claim → heartbeat → terminal receipt smoke. Never overlap old and
+   lease-v2 workers; overlap can execute a tokenless legacy mission twice.
+5. Paid CAT dispatch remains a separate explicit authorization after the
+   deployed lifecycle and artifact-search convergence checks pass.
+
+The completion receipt uses one rotated HMAC value under intentionally inverse
+environment names: TraceLab reads `DEEPSEARCH_TRACELAB_SERVICE_SECRET`, while
+DeepSearch signs with `TRACELAB_DEEPSEARCH_SERVICE_SECRET`. Both deployed
+services must hold the exact same value. `DEEPSEARCH_WEBHOOK_SECRET` is a
+TraceLab-only transitional fallback and must not be the steady-state production
+configuration. TraceLab fails closed on a missing production secret. Before
+worker acceptance, exercise an unpaid live receipt and prove both signature
+validation and persisted `job_id` correlation; a local unit test or merely
+setting one side is insufficient. Unsigned callbacks are allowed only in an
+explicit `test`/`testing` environment or local `development`/`dev`/`local`
+mode with `DEBUG=true`; missing `ENVIRONMENT` plus the default `DEBUG=false`
+therefore fails closed.
+
+TraceLab owns the durable fallback when DeepSearch exhausts receipt retries or
+crashes after its terminal database write. The production rollout is not
+convergent until a separate Railway scheduled service is live with:
+
+- start command `python -m app.cli.reconcile_mission_results --limit 100`;
+- schedule `*/15 * * * *` (UTC), using the same `DATABASE_URL`, embedding, and
+  Qdrant configuration as the API service;
+- no public domain and no long-running process—the command must exit after one
+  bounded pass;
+- an alert on non-zero exit and on absence of a successful run for 30 minutes.
+
+Immediately after migrations and before worker acceptance, run the targeted
+backfill
+`python -m app.cli.reconcile_mission_results --mission-id pedr-retrieval-evaluation-R001`,
+then repeat `--limit 500` passes until output reports `eligible: 0`. DeepSearch
+must continue retrying TraceLab receipt `5xx` responses; a durable DS receipt
+outbox can later replace this fallback, but the current in-memory retry queue
+cannot. The cron service, one-time backfill evidence, and alert are TraceLab
+deployment responsibilities.
 
 ### Update-only fields
 

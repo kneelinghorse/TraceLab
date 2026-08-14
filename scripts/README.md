@@ -53,8 +53,8 @@ python scripts/pedr_latency_benchmark.py -c cmos/reports/sprint-18/pedr-baseline
 export TRACELAB_JWT_TOKEN="your-jwt-token"
 
 # Or username/password for auto-auth
-export TRACELAB_USERNAME="testuser"
-export TRACELAB_PASSWORD="testpass"
+export TRACELAB_USERNAME="<production-test-user>"
+export TRACELAB_PASSWORD="<production-test-password>"
 
 # API base URL override
 export TRACELAB_API_BASE="http://localhost:8000/api/v1"

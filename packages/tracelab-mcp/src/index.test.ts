@@ -70,7 +70,7 @@ describe('TraceLabClient', () => {
         ok: false,
         status: 401,
         statusText: 'Unauthorized',
-        json: () => Promise.resolve({ detail: 'Invalid token' }),
+        text: () => Promise.resolve(JSON.stringify({ detail: 'Invalid token' })),
       });
 
       await expect(
@@ -294,7 +294,7 @@ Exported from TraceLab`;
         ok: false,
         status: 404,
         statusText: 'Not Found',
-        json: () => Promise.resolve({ detail: 'Not found' }),
+        text: () => Promise.resolve(JSON.stringify({ detail: 'Not found' })),
       });
 
       await expect(
@@ -1087,7 +1087,22 @@ describe('T41.7 — cluster dispatch (per-cluster smoke)', () => {
   });
 
   it('tracelab_mission_execution routes action="status" to handleGetMissionStatus', async () => {
-    mockFetch.mockResolvedValueOnce(okJson({ status: 'queued', progress: 0 }));
+    mockFetch.mockResolvedValueOnce(
+      okJson({
+        id: '00000000-0000-0000-0000-000000000001',
+        mission_id: 'M001',
+        status: 'queued',
+        progress_percent: 0,
+        deepsearch_attempt_count: 0,
+        result_document_ids: [],
+        result_report_id: null,
+        materialization_pending: true,
+        materialization_status: 'retry_pending',
+        materialization_attempt_count: 2,
+        materialization_error: 'embedding provider unavailable',
+        search_ready: false,
+      })
+    );
     const { handleTracelabMissionExecution } = (await import('./index.js')) as unknown as {
       handleTracelabMissionExecution: (args: unknown) => Promise<{ content: { text: string }[] }>;
     };
@@ -1096,7 +1111,58 @@ describe('T41.7 — cluster dispatch (per-cluster smoke)', () => {
       mission_id: '00000000-0000-0000-0000-000000000001',
     });
     expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(res.content[0].text).toContain('"status": "queued"');
+    expect(mockFetch).toHaveBeenCalledWith(
+      'http://localhost:8000/api/v1/missions/00000000-0000-0000-0000-000000000001/status',
+      expect.objectContaining({ method: 'GET' })
+    );
+    expect(JSON.parse(res.content[0].text)).toMatchObject({
+      status: 'queued',
+      attempts: 0,
+      materialization_pending: true,
+      materialization_status: 'retry_pending',
+      materialization_attempt_count: 2,
+      materialization_error: 'embedding provider unavailable',
+      search_ready: false,
+    });
+  });
+
+  it('tracelab_mission_execution preview exposes compiler provenance', async () => {
+    mockFetch.mockResolvedValueOnce(
+      okJson({
+        mission_id: 'M001',
+        mission_uuid: '00000000-0000-0000-0000-000000000001',
+        project_id: null,
+        contract_version: '1.0',
+        compiler_revision: '24e88100624e6221e5fa957508ab77c4b0f519f9',
+        fidelity: 'structural_only',
+        named_entities: [],
+        objectives: [],
+        evidence_slots: [],
+        acceptance_checks: [],
+        deliverable_schemas: [],
+        coverage_thresholds: {},
+        validation_thresholds: {},
+      })
+    );
+    const { handleTracelabMissionExecution } = (await import('./index.js')) as unknown as {
+      handleTracelabMissionExecution: (args: unknown) => Promise<{ content: { text: string }[] }>;
+    };
+
+    const res = await handleTracelabMissionExecution({
+      action: 'preview',
+      mission_id: '00000000-0000-0000-0000-000000000001',
+    });
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      'http://localhost:8000/api/v1/missions/00000000-0000-0000-0000-000000000001/contract-preview',
+      expect.objectContaining({ method: 'GET' })
+    );
+    const payload = JSON.parse(res.content[0].text);
+    expect(payload.preview.contract_version).toBe('1.0');
+    expect(payload.preview.compiler_revision).toBe(
+      '24e88100624e6221e5fa957508ab77c4b0f519f9'
+    );
+    expect(payload.preview.fidelity).toBe('structural_only');
   });
 
   it('cluster returns a clean error for an unknown action', async () => {

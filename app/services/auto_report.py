@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 from app.models.chunk import DocumentChunk
 from app.models.mission import Mission
 from app.models.report import Report, ReportSource
+from app.services.ownership import project_owner_workspace
 
 logger = logging.getLogger(__name__)
 
@@ -96,10 +97,7 @@ def format_protocol_to_markdown(protocol: dict[str, Any], mission_title: str) ->
                 url = source.get("url", source.get("link", ""))
                 title = source.get("title", url)
                 relevance = source.get("relevance")
-                if url:
-                    entry = f"- [{title}]({url})"
-                else:
-                    entry = f"- {title}"
+                entry = f"- [{title}]({url})" if url else f"- {title}"
                 if relevance:
                     entry += f" *(relevance: {relevance:.0%})*"
                 lines.append(entry)
@@ -213,9 +211,13 @@ def create_report_from_protocol(
     if mission.deepsearch_job_id:
         metadata["deepsearch_job_id"] = mission.deepsearch_job_id
 
+    owner_id, workspace_id = project_owner_workspace(db, mission.project_id)
+
     # Create report
     report = Report(
         project_id=str(mission.project_id),
+        owner_id=owner_id,
+        workspace_id=workspace_id,
         title=f"Research: {mission.title}",
         report_type="markdown",
         prompt=f"Auto-generated from mission {mission.mission_id}",

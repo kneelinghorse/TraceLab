@@ -410,6 +410,34 @@ class MissionResponse(MissionBase):
 MissionRead = MissionResponse
 
 
+class MissionStatusResponse(BaseModel):
+    """Lightweight mission lifecycle state for frequent status polling.
+
+    Worker lease proofs and potentially large result payloads are deliberately
+    excluded from this public response.
+    """
+
+    id: UUID
+    mission_id: str
+    status: MissionStatus
+    progress_percent: int | None = Field(default=None, ge=0, le=100)
+    current_phase: str | None = None
+    queued_at: datetime | None = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
+    error_message: str | None = None
+    deepsearch_job_id: str | None = None
+    deepsearch_attempt_count: int = 0
+    lease_expires_at: datetime | None = None
+    result_document_ids: list[UUID] = Field(default_factory=list)
+    result_report_id: UUID | None = None
+    materialization_pending: bool
+    materialization_status: str | None = None
+    materialization_attempt_count: int = 0
+    materialization_error: str | None = None
+    search_ready: bool
+
+
 class MissionLintViolation(BaseModel):
     """A single submit-time lint finding (T40.3)."""
 
@@ -505,6 +533,18 @@ class MissionContractPreviewResponse(BaseModel):
     mission_id: str = Field(..., description="Human-readable mission ID")
     mission_uuid: UUID = Field(..., description="Mission UUID")
     project_id: UUID | None = Field(None, description="Associated project UUID")
+    contract_version: str = Field(
+        ...,
+        description="Schema version emitted by the pinned compiler.",
+    )
+    compiler_revision: str = Field(
+        ...,
+        description="Exact DeepSearch source revision vendored by TraceLab.",
+    )
+    fidelity: str = Field(
+        ...,
+        description="Preview fidelity relative to the deployed DeepSearch runtime.",
+    )
     named_entities: list[str] = Field(
         default_factory=list,
         description="Entities the compiler recognized from the mission_context.",

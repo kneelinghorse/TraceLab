@@ -364,16 +364,60 @@ class TestMissionTableDefinition:
             "max_loops",
             "min_loops",
             "constraints",
+            # DeepSearch lease boundary (migration 039). These remain internal:
+            # workers need them for fenced claims, but REST/MCP serializers must
+            # never expose the opaque token.
+            "deepsearch_lease_owner",
+            "deepsearch_lease_token",
+            "deepsearch_leased_at",
+            "deepsearch_heartbeat_at",
+            "deepsearch_lease_expires_at",
+            "deepsearch_attempt_count",
+            "deepsearch_result_key",
         }
         assert required.issubset(columns), f"Missing columns: {required - columns}"
 
     def test_indexes_defined(self):
         """Verify expected indexes are defined."""
         index_names = {idx.name for idx in Mission.__table__.indexes}
-        expected = {"idx_missions_project_status", "idx_missions_mission_id"}
+        expected = {
+            "idx_missions_project_status",
+            "idx_missions_mission_id",
+            "missions_deepsearch_lease_token_active_uq",
+            "missions_deepsearch_result_key_uq",
+            "missions_deepsearch_claim_scan_idx",
+        }
         assert expected.issubset(index_names), (
             f"Missing indexes: {expected - index_names}"
         )
+
+    def test_lease_timestamps_are_timezone_aware(self):
+        """Lease comparisons use NOW(); dropping timezone would corrupt fencing."""
+        for name in (
+            "deepsearch_leased_at",
+            "deepsearch_heartbeat_at",
+            "deepsearch_lease_expires_at",
+        ):
+            assert Mission.__table__.columns[name].type.timezone is True
+
+    def test_opaque_lease_fields_are_not_public_dict_fields(self):
+        """Ownership proofs must never leak through the model's public serializer."""
+        lease_token = uuid.uuid4().hex
+        result_key = uuid.uuid4().hex
+        mission = Mission(
+            mission_id="LEASE-PRIVATE-1",
+            title="Lease privacy",
+            objective="Keep worker fencing credentials private",
+            success_criteria=["No opaque token in output"],
+            deepsearch_lease_owner="worker-a",
+            deepsearch_lease_token=lease_token,
+            deepsearch_result_key=result_key,
+        )
+
+        serialized = mission.to_dict()
+
+        assert "deepsearch_lease_token" not in serialized
+        assert "deepsearch_result_key" not in serialized
 
     def test_constraints_defined(self):
         """Verify check constraints are defined."""

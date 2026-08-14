@@ -322,7 +322,9 @@ class DocumentIngestionService:
                         raise RuntimeError("Embedding generation count mismatch")
 
                     payload: list[dict[str, Any]] = []
-                    for chunk_record, embedding in zip(chunk_records, embeddings):
+                    for chunk_record, embedding in zip(
+                        chunk_records, embeddings, strict=True
+                    ):
                         chunk_record.embedding_id = str(chunk_record.id)
                         payload_item: dict[str, Any] = {
                             "chunk_id": chunk_record.id,
@@ -436,3 +438,111 @@ class DocumentIngestionService:
             result["status"] = "failed"
             result["error"] = str(e)
             return result
+
+    def embed_existing_document(
+        self,
+        db: Session,
+        document_id: UUID,
+    ) -> dict[str, Any]:
+        """Resume only the embedding stage for an already-chunked document.
+
+        Qdrant upserts use stable chunk UUIDs, so replay after a partial provider
+        or network failure replaces the same vectors instead of duplicating them.
+        """
+        document = db.query(Document).filter(Document.id == document_id).first()
+        if document is None:
+            raise ValueError(f"Document {document_id} not found")
+        if document.deleted_at is not None:
+            raise ValueError(f"Document {document_id} is soft-deleted")
+        if not document.processed or not document.chunked:
+            raise ValueError(
+                f"Document {document_id} must be processed and chunked before embedding"
+            )
+
+        chunks = (
+            db.query(DocumentChunk)
+            .filter(DocumentChunk.document_id == document_id)
+            .order_by(DocumentChunk.chunk_index)
+            .all()
+        )
+        if not chunks:
+            raise ValueError(f"Document {document_id} has no chunks to embed")
+
+        self._resolve_embedding_dependencies()
+        if self.embedding_service is None or self.qdrant_service is None:
+            raise RuntimeError(self._embedding_skip_reason())
+
+        self.status_recorder.record(
+            db,
+            document_id,
+            "embedded",
+            "in_progress",
+            message="Resuming embeddings and Qdrant upsert",
+        )
+        try:
+            if not self._qdrant_collection_ready:
+                self.qdrant_service.ensure_collection(write_optimized=False)
+                self._qdrant_collection_ready = True
+
+            started = time.perf_counter()
+            embeddings = self.embedding_service.generate_embeddings_batch(
+                [chunk.content for chunk in chunks]
+            )
+            if len(embeddings) != len(chunks):
+                raise RuntimeError("Embedding generation count mismatch")
+
+            payload: list[dict[str, Any]] = []
+            for chunk, embedding in zip(chunks, embeddings, strict=True):
+                chunk.embedding_id = str(chunk.id)
+                item: dict[str, Any] = {
+                    "chunk_id": chunk.id,
+                    "embedding": embedding,
+                    "content": chunk.content,
+                    "document_id": document.id,
+                    "project_id": document.project_id,
+                    "chunk_index": chunk.chunk_index,
+                }
+                if document.source_type:
+                    item["source_type"] = document.source_type
+                if document.source_origin:
+                    item["source_origin"] = document.source_origin
+                payload.append(item)
+
+            self.qdrant_service.upsert_chunks(payload)
+            duration_seconds = round(time.perf_counter() - started, 4)
+            document.embedded = True
+            self.status_recorder.record(
+                db,
+                document_id,
+                "embedded",
+                "succeeded",
+                details={
+                    "chunks_embedded": len(payload),
+                    "duration_seconds": duration_seconds,
+                    "collection": self.qdrant_service.collection_name,
+                    "resumed": True,
+                },
+                commit=False,
+            )
+            db.commit()
+            invalidate_pedr_cache()
+            return {
+                "status": "completed",
+                "chunks_embedded": len(payload),
+                "duration_seconds": duration_seconds,
+            }
+        except Exception as exc:
+            db.rollback()
+            document = db.query(Document).filter(Document.id == document_id).one()
+            document.embedded = False
+            self.status_recorder.record(
+                db,
+                document_id,
+                "embedded",
+                "failed",
+                message="Embedding resume failed",
+                details={"error": str(exc)},
+                commit=False,
+            )
+            db.commit()
+            raise

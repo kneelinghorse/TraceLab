@@ -16,6 +16,12 @@ relevant compiler change.
 | Commit | `24e88100624e6221e5fa957508ab77c4b0f519f9` (2026-04-27, "S59.1 — Worker boundary fix (3 changes)") |
 | Vendored at | TraceLab sprint-41, mission T41.1 |
 
+TraceLab preview responses also expose this full commit as
+`compiler_revision` and label their current fidelity `structural_only`. This is
+intentional: audited DeepSearch commit `b7009c6` is on contract schema `1.1`,
+while this self-contained vendor remains on `1.0`. Preview must not imply
+runtime parity while that pin is stale.
+
 ## Files vendored
 
 | Source path (DS) | Destination (TraceLab) | Edits made |
@@ -127,6 +133,21 @@ python -c "from app.services.contract_compiler import compile_contract_from_stat
 | Date | New commit | Reason | Author |
 | --- | --- | --- | --- |
 | 2026-04-27 | `24e8810` | Initial vendor (T41.1) — replaces broken HTTP proxy | sprint-41 build session |
+
+## Pending 1.1 resync gate (2026-08-14 audit)
+
+Do **not** copy DeepSearch HEAD with the old three-file ritual. The current
+compiler imports `deepsearch.domain_policy` plus runtime configuration and LLM
+entity-disambiguation modules, so the documented file set is no longer
+self-contained and a preview-safe compile is not guaranteed to be offline.
+
+DeepSearch must first publish a deterministic compiler manifest containing the
+source revision, schema version, required files, content hashes, input fields,
+and golden fixtures. Runtime enrichment must be injected or explicitly disabled
+for preview. TraceLab then resyncs the complete manifest, asserts canonical JSON
+parity on the shared fixtures, and changes `fidelity` only after those tests
+pass. Until then, retain `24e8810`/`1.0` and surface the stale pin rather than
+claiming execution parity.
 
 ## Known boundary fields TraceLab forwards
 
