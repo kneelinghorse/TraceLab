@@ -250,7 +250,7 @@
           ],
           "decisions_made": [
             "Added ProxyHeadersMiddleware for X-Forwarded header support",
-            "Shared credentials (kneelinghorse/Bigpuma) for single-user architecture",
+            "Shared credentials (kneelinghorse/[REDACTED: credential rotated 2026-08-14]) for single-user architecture",
             "ListResponse schema for consistent pagination",
             "Pre-flight limitation accepted as LOW impact (missions still retrievable)"
           ],

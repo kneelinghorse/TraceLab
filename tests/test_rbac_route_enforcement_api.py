@@ -34,12 +34,18 @@ from fastapi.testclient import TestClient
 
 from app.core.config import settings
 from app.core.security import (
+    ROLE_ADMIN,
     ROLE_MEMBER,
     ROLE_OWNER,
     ROLE_SERVICE,
+    ROLE_VIEWER,
     create_access_token,
+    generate_api_key,
+    get_key_prefix,
+    hash_api_key,
 )
 from app.main import app
+from app.models.api_key import APIKey
 from app.models.collection import Collection
 from app.models.document import Document
 from app.models.ingestion_job import IngestionJob
@@ -156,6 +162,20 @@ def _make_document(db, *, owner_id, workspace_id, project_id) -> Document:
 
 def _bearer(user) -> dict:
     return {"Authorization": f"Bearer {create_access_token(subject=str(user.id))}"}
+
+
+def _api_key(db, user) -> str:
+    plain = generate_api_key()
+    db.add(
+        APIKey(
+            user_id=user.id,
+            name="service-gate route test",
+            key_hash=hash_api_key(plain),
+            key_prefix=get_key_prefix(plain),
+        )
+    )
+    db.commit()
+    return plain
 
 
 # ---------------------------------------------------------------------------
@@ -506,11 +526,14 @@ class TestServiceRoleLogIngest:
         resp = client.post(f"{API}/missions/{uuid4()}/logs", json=_LOG_BODY)
         assert resp.status_code == 401, resp.text
 
-    def test_log_ingest_member_forbidden(self, client, db_session, rbac_on):
-        member = _make_user(db_session, "svc-member@x.io", role=ROLE_MEMBER)
+    @pytest.mark.parametrize("role", [ROLE_VIEWER, ROLE_MEMBER, ROLE_ADMIN])
+    def test_log_ingest_human_jwt_forbidden(
+        self, client, db_session, rbac_on, role
+    ):
+        human = _make_user(db_session, f"svc-{role}@x.io", role=role)
         mission = _make_mission(db_session, owner_id=uuid4(), project_id=None)
         resp = client.post(
-            f"{API}/missions/{mission.id}/logs", json=_LOG_BODY, headers=_bearer(member)
+            f"{API}/missions/{mission.id}/logs", json=_LOG_BODY, headers=_bearer(human)
         )
         assert resp.status_code == 403, resp.text
 
@@ -533,6 +556,44 @@ class TestServiceRoleLogIngest:
         )
         assert resp.status_code == 201, resp.text
         assert resp.json()["accepted"] == 1
+
+    @pytest.mark.parametrize(
+        ("role", "expected_status"),
+        [
+            (ROLE_VIEWER, 403),
+            (ROLE_MEMBER, 403),
+            (ROLE_ADMIN, 403),
+            (ROLE_OWNER, 403),
+            (ROLE_SERVICE, 201),
+        ],
+        ids=("viewer", "member", "admin", "owner", "service"),
+    )
+    def test_log_ingest_api_key_role_matrix(
+        self, client, db_session, rbac_on, role, expected_status
+    ):
+        """X-API-Key preserves the strict service-only route boundary."""
+        principal = _make_user(db_session, f"api-key-{role}@x.io", role=role)
+        api_key = _api_key(db_session, principal)
+        mission = _make_mission(db_session, owner_id=uuid4(), project_id=None)
+
+        resp = client.post(
+            f"{API}/missions/{mission.id}/logs",
+            json=_LOG_BODY,
+            headers={"X-API-Key": api_key},
+        )
+
+        assert resp.status_code == expected_status, resp.text
+        if role == ROLE_SERVICE:
+            assert resp.json()["accepted"] == 1
+
+    def test_log_ingest_invalid_api_key_rejected(self, client, rbac_on):
+        resp = client.post(
+            f"{API}/missions/{uuid4()}/logs",
+            json=_LOG_BODY,
+            headers={"X-API-Key": "tl_" + ("x" * 32)},
+        )
+
+        assert resp.status_code == 401, resp.text
 
     @pytest.mark.parametrize(
         ("payload", "expected_logged_at", "expected_source"),

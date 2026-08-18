@@ -43,7 +43,7 @@ CLI automation isolated from the service account used elsewhere.
    Response:
    ```json
    {
-     "access_token": "eyJhbGciOiJIUzI1NiIs...",
+     "access_token": "<access-token>",
      "token_type": "bearer",
      "expires_in": 3600,
      "user": {"username": "tracelab-admin"}
@@ -51,7 +51,7 @@ CLI automation isolated from the service account used elsewhere.
    ```
 2. **Call protected APIs**
    ```bash
-   TOKEN="eyJhbGciOiJIUzI1NiIs..."
+   TOKEN="<access-token>"
    curl http://localhost:8000/api/v1/missions/ \
      -H "Authorization: Bearer ${TOKEN}"
    ```
@@ -200,9 +200,9 @@ This is intentional for an internal single-builder tool. Both human operators an
 ### Production Credentials
 
 ```bash
-# Railway environment variables (current production)
-AUTH_USERNAME=kneelinghorse
-AUTH_PASSWORD=Bigpuma
+# Railway environment variables (example — never commit production values)
+AUTH_USERNAME=<admin-email>
+AUTH_PASSWORD=<set-in-Railway-secret-store>
 ```
 
 ### Usage (from DeepSearch)
@@ -213,7 +213,7 @@ import requests
 # Login with shared credentials
 resp = requests.post(
     "https://api.tracelab.aquex.ai/api/v1/auth/login",
-    json={"username": "kneelinghorse", "password": "Bigpuma"}
+    json={"email": "<admin-email>", "password": "<strong-unique-password>"}
 )
 token = resp.json()["access_token"]
 

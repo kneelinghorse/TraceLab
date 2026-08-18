@@ -28,7 +28,7 @@ Sprint 12 was a critical course-correction sprint. After discovering that the en
 ### B12.3: Create Service Account in Production ✅
 **Problem:** DeepSearch had no credentials for TraceLab API
 **Solution:** Used shared single-user credentials (architectural simplicity)
-- Account: `kneelinghorse` / `Bigpuma`
+- Account: `kneelinghorse` / `[REDACTED: credential rotated 2026-08-14]`
 - Token expiry: 24 hours
 **Decision:** Shared credentials appropriate for single-builder internal tool
 **Verification:** DeepSearch can authenticate and call all endpoints

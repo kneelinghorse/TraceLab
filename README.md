@@ -33,7 +33,7 @@ Personal-scale research repository with RAG-powered semantic search, structured 
    ```bash
    docker-compose up -d
    ```
-   
+
    This will:
    - Start PostgreSQL on port 5432
    - Build and start the FastAPI application on port 8000
@@ -106,7 +106,7 @@ Ports forwarded automatically: `8000` (API), `3000` (frontend), `5433` (PostgreS
    ```
 3. **Call a protected endpoint**
    ```bash
-   TOKEN="eyJhbGciOiJIUzI1NiIs..."
+   TOKEN="<access-token>"
    curl http://localhost:8000/api/v1/missions/ \
      -H "Authorization: Bearer ${TOKEN}"
    ```

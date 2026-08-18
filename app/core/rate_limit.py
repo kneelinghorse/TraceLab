@@ -112,8 +112,12 @@ class RateLimiter:
             self._requests.clear()
 
 
-# Shared instance for auth endpoints (5 requests per 60 seconds per IP)
+# Login and registration use independent budgets so registration abuse cannot lock a
+# legitimate caller out of login (T48.7, decision #313).
 auth_rate_limiter = RateLimiter(RateLimitConfig(max_requests=5, window_seconds=60))
+register_rate_limiter = RateLimiter(
+    RateLimitConfig(max_requests=5, window_seconds=60)
+)
 
 
 __all__ = [
@@ -121,4 +125,5 @@ __all__ = [
     "RateLimiter",
     "auth_rate_limiter",
     "client_ip",
+    "register_rate_limiter",
 ]

@@ -23,7 +23,7 @@ The DeepSearch → TraceLab integration flow has been verified end-to-end agains
 
 ### 1. Authentication (B12.3)
 - **Approach:** Shared credentials (single-user architecture)
-- **Account:** `kneelinghorse` / `Bigpuma`
+- **Account:** `kneelinghorse` / `[REDACTED: credential rotated 2026-08-14]`
 - **Token expiry:** 24 hours (86400 seconds)
 - **Recommendation:** Document this in DeepSearch config
 

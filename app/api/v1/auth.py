@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.rate_limit import auth_rate_limiter, client_ip
+from app.core.rate_limit import auth_rate_limiter, client_ip, register_rate_limiter
 from app.core.security import (
     ROLE_MEMBER,
     AuthenticatedUser,
@@ -97,11 +97,21 @@ def login(
 @router.post(
     "/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED
 )
-def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> TokenResponse:
+def register(
+    payload: RegisterRequest, request: Request, db: Session = Depends(get_db)
+) -> TokenResponse:
     """Register a new user with a valid invite code and return a signed JWT."""
+    # T48.7: use a registration-specific budget before any DB lookup or bcrypt work.
+    # This shares T48.5's trusted rightmost-XFF keying without consuming /login's budget.
+    register_rate_limiter.check(request)
+
     # Check email uniqueness
     existing = db.query(User).filter(User.email == payload.email).first()
     if existing:
+        logger.warning(
+            f"auth_failure reason=email_registered email={_log_safe(payload.email)} "
+            f"ip={_log_safe(client_ip(request))}"
+        )
         raise HTTPException(status.HTTP_409_CONFLICT, detail="Email already registered")
 
     # Validate invite code
@@ -114,10 +124,18 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> TokenRe
         .first()
     )
     if not invite:
+        logger.warning(
+            f"auth_failure reason=invalid_invite email={_log_safe(payload.email)} "
+            f"ip={_log_safe(client_ip(request))}"
+        )
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST, detail="Invalid or already used invite code"
         )
     if invite.expires_at and invite.expires_at < datetime.utcnow():
+        logger.warning(
+            f"auth_failure reason=expired_invite email={_log_safe(payload.email)} "
+            f"ip={_log_safe(client_ip(request))}"
+        )
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST, detail="Invite code has expired"
         )

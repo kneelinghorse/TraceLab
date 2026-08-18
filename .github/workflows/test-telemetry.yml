@@ -1,5 +1,5 @@
 # ABOUTME: Multi-stage CI pipeline for quality gates and telemetry.
-# ABOUTME: Runs lint, type-check, unit tests, integration tests, and frontend checks in parallel.
+# ABOUTME: Runs backend checks plus frontend tests in parallel.
 
 name: Test & Telemetry
 
@@ -12,7 +12,7 @@ env:
   PIP_DISABLE_PIP_VERSION_CHECK: "1"
   PYTHONUNBUFFERED: "1"
   PYTHON_VERSION: "3.11"
-  NODE_VERSION: "20"
+  NODE_VERSION: "22"
 
 jobs:
   lint:

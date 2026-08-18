@@ -18,8 +18,8 @@ This document provides a clear reference for TraceLab's local development and Ra
 Both environments use the same auth credentials (stored in `.env`):
 
 ```bash
-AUTH_USERNAME=kneelinghorse
-AUTH_PASSWORD=Bigpuma
+AUTH_USERNAME=<admin-email>
+AUTH_PASSWORD=<strong-unique-password>
 ```
 
 ### JWT Tokens (Short-lived)
@@ -30,7 +30,7 @@ JWT tokens expire after 24 hours. Use for interactive sessions:
 # Get a JWT token
 curl -X POST "http://localhost:8000/api/v1/auth/login" \
   -H "Content-Type: application/json" \
-  -d '{"username":"kneelinghorse","password":"Bigpuma"}'
+  -d '{"email":"<admin-email>","password":"<strong-unique-password>"}'
 
 # Use in requests
 curl -H "Authorization: Bearer <token>" http://localhost:8000/api/v1/projects
@@ -58,8 +58,8 @@ curl -H "X-API-Key: tl_xxxxx" http://localhost:8000/api/v1/projects
 
 | Name | Prefix | Environment | Full Key | Expires |
 |------|--------|-------------|----------|---------|
-| MCP Server Local | tl_YWVLy5cg | Local | tl_YWVLy5cgPI_WggfZjnnALBaGO6W_Oi2I | Never |
-| MCP Server Production | tl_mrYJk-Ow | Production | tl_mrYJk-Owgy_5DKPz4TiyjhtFLcb1khx0 | Never |
+| MCP Server Local | `<key-id>` | Local | `<local-api-key>` | Never |
+| MCP Server Production | `<key-id>` | Production | `<production-api-key>` | Never |
 
 ### MCP Server Configuration
 
@@ -73,7 +73,7 @@ For Claude Code MCP integration, use the appropriate API key based on environmen
       "command": "...",
       "env": {
         "TRACELAB_API_URL": "http://localhost:8000/api/v1",
-        "TRACELAB_API_KEY": "tl_YWVLy5cgPI_WggfZjnnALBaGO6W_Oi2I"
+        "TRACELAB_API_KEY": "<local-api-key>"
       }
     }
   }
@@ -88,7 +88,7 @@ For Claude Code MCP integration, use the appropriate API key based on environmen
       "command": "...",
       "env": {
         "TRACELAB_API_URL": "https://api.tracelab.aquex.ai/api/v1",
-        "TRACELAB_API_KEY": "tl_mrYJk-Owgy_5DKPz4TiyjhtFLcb1khx0"
+        "TRACELAB_API_KEY": "<production-api-key>"
       }
     }
   }
@@ -99,10 +99,10 @@ Or if using headers directly:
 
 ```bash
 # Local
-curl -H "X-API-Key: tl_YWVLy5cgPI_WggfZjnnALBaGO6W_Oi2I" http://localhost:8000/api/v1/projects
+curl -H "X-API-Key: <local-api-key>" http://localhost:8000/api/v1/projects
 
 # Production
-curl -H "X-API-Key: tl_mrYJk-Owgy_5DKPz4TiyjhtFLcb1khx0" https://api.tracelab.aquex.ai/api/v1/projects
+curl -H "X-API-Key: <production-api-key>" https://api.tracelab.aquex.ai/api/v1/projects
 ```
 
 ## Database Connections
@@ -247,8 +247,8 @@ QDRANT_API_KEY=...
 
 # Auth
 SECRET_KEY=...
-AUTH_USERNAME=kneelinghorse
-AUTH_PASSWORD=Bigpuma
+AUTH_USERNAME=<admin-email>
+AUTH_PASSWORD=<set-in-Railway-secret-store>
 JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=1440
 
