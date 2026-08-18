@@ -17,6 +17,17 @@ test.describe("Production smoke", () => {
     await expect(page.locator("main")).toContainText(/Verifying session|Mission Protocol/i);
   });
 
+  for (const route of ["/admin/users", "/admin/spaces"]) {
+    test(`${route} is deployed as its own Next page`, async ({ page }) => {
+      const response = await page.goto(route, { waitUntil: "domcontentloaded" });
+      expect(response?.status()).toBe(200);
+
+      const serialized = await page.locator("#__NEXT_DATA__").textContent();
+      expect(serialized).not.toBeNull();
+      expect(JSON.parse(serialized ?? "{}").page).toBe(route);
+    });
+  }
+
   test("API health endpoint stays reachable", async ({ request }) => {
     const response = await request.get(buildApiUrl("/health"));
     expect(response.status()).toBe(200);
