@@ -22,7 +22,12 @@ from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 from app.core.config import Settings, settings
-from app.core.rate_limit import RateLimitConfig, RateLimiter, auth_rate_limiter
+from app.core.rate_limit import (
+    RateLimitConfig,
+    RateLimiter,
+    auth_rate_limiter,
+    register_rate_limiter,
+)
 from app.core.security import (
     generate_api_key,
     get_key_prefix,
@@ -206,6 +211,91 @@ class TestLoginRateLimit:
         assert resp.status_code == 429
 
 
+class TestRegisterRateLimit:
+    """Integration tests for the registration-specific rate-limit budget."""
+
+    def test_register_uses_rightmost_xff_and_returns_429_after_5_attempts(
+        self, client: TestClient
+    ):
+        # T48.7 inherits T48.5's rightmost-of-N keying. Rotating the attacker-
+        # controlled leftmost entry must not create fresh registration buckets.
+        for attempt in range(5):
+            response = client.post(
+                "/api/v1/auth/register",
+                headers={
+                    "x-forwarded-for": f"198.51.100.{attempt + 1}, 10.0.0.1"
+                },
+                json={
+                    "email": "new@example.com",
+                    "password": "securepass123",
+                    "display_name": "New User",
+                    "invite_code": "ZZZZZZZZ",
+                },
+            )
+            assert response.status_code == 400
+
+        response = client.post(
+            "/api/v1/auth/register",
+            headers={"x-forwarded-for": "203.0.113.99, 10.0.0.1"},
+            json={
+                "email": "new@example.com",
+                "password": "securepass123",
+                "display_name": "New User",
+                "invite_code": "ZZZZZZZZ",
+            },
+        )
+
+        assert response.status_code == 429
+        assert "Retry-After" in response.headers
+
+    def test_register_budget_does_not_consume_login_budget(self, client: TestClient):
+        # Registration abuse must not lock a legitimate caller out of /login.
+        for _ in range(5):
+            response = client.post(
+                "/api/v1/auth/register",
+                json={
+                    "email": "new@example.com",
+                    "password": "securepass123",
+                    "display_name": "New User",
+                    "invite_code": "ZZZZZZZZ",
+                },
+            )
+            assert response.status_code == 400
+
+        login_response = client.post(
+            "/api/v1/auth/login",
+            json={"email": "nonexistent@test.com", "password": "wrong"},
+        )
+        assert login_response.status_code == 401
+
+    def test_register_limit_is_checked_before_database_lookup(self):
+        from fastapi import HTTPException
+
+        from app.api.v1.auth import register
+        from app.schemas.auth import RegisterRequest
+
+        request = MagicMock(spec=Request)
+        request.headers = {}
+        request.client = MagicMock()
+        request.client.host = "192.0.2.10"
+        for _ in range(5):
+            register_rate_limiter.check(request)
+
+        db = MagicMock()
+        payload = RegisterRequest(
+            email="new@example.com",
+            password="securepass123",  # noqa: S106 - inert test credential
+            display_name="New User",
+            invite_code="ZZZZZZZZ",
+        )
+
+        with pytest.raises(HTTPException) as exc_info:
+            register(payload=payload, request=request, db=db)
+
+        assert exc_info.value.status_code == 429
+        db.query.assert_not_called()
+
+
 # ===========================================================================
 # 2. AUDIT LOGGING
 # ===========================================================================
@@ -241,6 +331,81 @@ class TestAuditLogging:
         assert len(records) == 1
         assert "\n" not in records[0].message and "\r" not in records[0].message
         assert "x@x.com" in records[0].message  # the (sanitized) value is still logged
+
+    def test_invalid_invite_rejection_is_logged_and_sanitized(
+        self, client: TestClient, caplog
+    ):
+        with caplog.at_level(logging.WARNING):
+            response = client.post(
+                "/api/v1/auth/register",
+                json={
+                    "email": "x@x.com\nauth_failure reason=forged email=ceo@example.com",
+                    "password": "securepass123",
+                    "display_name": "New User",
+                    "invite_code": "ZZZZZZZZ",
+                },
+            )
+
+        assert response.status_code == 400
+        records = [
+            record
+            for record in caplog.records
+            if "auth_failure reason=invalid_invite" in record.message
+        ]
+        assert len(records) == 1
+        assert "\n" not in records[0].message and "\r" not in records[0].message
+        assert "x@x.com" in records[0].message
+
+    def test_duplicate_email_rejection_is_logged(self, client: TestClient, caplog):
+        with caplog.at_level(logging.WARNING):
+            response = client.post(
+                "/api/v1/auth/register",
+                json={
+                    "email": get_seed_user_email(),
+                    "password": "securepass123",
+                    "display_name": "Duplicate",
+                    "invite_code": "AAAAAAAA",
+                },
+            )
+
+        assert response.status_code == 409
+        assert any(
+            "auth_failure reason=email_registered" in record.message
+            for record in caplog.records
+        )
+
+    def test_expired_invite_rejection_is_logged(
+        self, client: TestClient, db_session, caplog
+    ):
+        from app.models.invite_code import InviteCode
+        from app.models.user import User
+
+        admin = db_session.query(User).first()
+        db_session.add(
+            InviteCode(
+                code="EXPIRED1",
+                created_by=admin.id,
+                expires_at=datetime.utcnow() - timedelta(minutes=1),
+            )
+        )
+        db_session.commit()
+
+        with caplog.at_level(logging.WARNING):
+            response = client.post(
+                "/api/v1/auth/register",
+                json={
+                    "email": "expired@example.com",
+                    "password": "securepass123",
+                    "display_name": "Expired Invite",
+                    "invite_code": "EXPIRED1",
+                },
+            )
+
+        assert response.status_code == 400
+        assert any(
+            "auth_failure reason=expired_invite" in record.message
+            for record in caplog.records
+        )
 
 
 # ===========================================================================
