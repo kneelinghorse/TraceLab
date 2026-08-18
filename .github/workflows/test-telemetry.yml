@@ -1,5 +1,5 @@
 # ABOUTME: Multi-stage CI pipeline for quality gates and telemetry.
-# ABOUTME: Runs backend checks plus frontend tests and a production-artifact build in parallel.
+# ABOUTME: Runs backend checks plus frontend tests in parallel.
 
 name: Test & Telemetry
 
@@ -128,26 +128,6 @@ jobs:
       - name: Run Playwright tests
         working-directory: frontend
         run: npx playwright test tests/e2e/mission-protocol.spec.ts --project=chromium --workers=1
-
-  build-frontend-production:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: Install production frontend dependencies
-        working-directory: frontend
-        run: npm ci --omit=dev
-      - name: Build production frontend
-        working-directory: frontend
-        run: npm run build
-      - name: Verify admin routes are in the production artifact
-        working-directory: frontend
-        run: >-
-          node -e 'const pages = require("./.next/server/pages-manifest.json");
-          for (const route of ["/admin/users", "/admin/spaces"])
-          if (!pages[route]) throw new Error(`Missing production route: ${route}`);'
 
   telemetry:
     needs: [test-health, test-unit]

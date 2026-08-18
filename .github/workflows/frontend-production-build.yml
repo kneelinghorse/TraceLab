@@ -1,0 +1,36 @@
+# ABOUTME: Builds the frontend exactly as a production install on supported Node.
+# ABOUTME: Guards required admin routes independently from the legacy test workflow.
+
+name: Frontend Production Build
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-frontend-production:
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install production frontend dependencies
+        working-directory: frontend
+        run: npm ci --omit=dev
+      - name: Build production frontend
+        working-directory: frontend
+        run: npm run build
+      - name: Verify admin routes are in the production artifact
+        working-directory: frontend
+        run: >-
+          node -e 'const pages = require("./.next/server/pages-manifest.json");
+          for (const route of ["/admin/users", "/admin/spaces"])
+          if (!pages[route]) throw new Error(`Missing production route: ${route}`);'
