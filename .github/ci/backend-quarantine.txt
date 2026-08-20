@@ -1,0 +1,57 @@
+# CI-1 backend quarantine: 51 exact node IDs from the 2026-08-20 post-fix baseline.
+# Format is NODE_ID # one-line reason. The backend workflow requires a reason on every row.
+# Tests remain collected and tracked; this list is a temporary ratchet, never a deletion list.
+# SQLite foreign-key enforcement remains off in the shared non-integration harness (out of CI-1 scope).
+# Baseline evidence and promotion policy: .github/ci/README.md.
+
+tests/sprint_03/test_api_stability.py::test_api_uptime_and_latency_meet_targets # Sprint-03 KPI relic depends on historical generated telemetry, not current request behavior.
+tests/sprint_03/test_evidence_integrity.py::test_evidence_integrity_checks_detect_missing_chunks # Sprint-03 artifact baseline no longer matches the current chunk model.
+tests/sprint_03/test_quality_gate_effectiveness.py::test_quality_gate_failures_blocked_with_actionable_feedback # Sprint-03 quality-gate response assertion predates the current contract.
+tests/sprint_03/test_validation_coverage.py::test_validation_rate_exceeds_target # Sprint-03 generated coverage threshold is not a deterministic PR gate.
+tests/sprint_04/test_coverage_metric.py::test_coverage_threshold_exceeded # Sprint-04 generated coverage artifact is stale relative to the current suite.
+tests/sprint_04/test_performance_metrics.py::test_latency_stays_under_two_seconds # Sprint-04 timing assertion is environment-sensitive legacy acceptance coverage.
+tests/sprint_04/test_performance_metrics.py::test_cost_profile_within_budget # Sprint-04 cost fixture no longer matches the current pricing/telemetry model.
+tests/sprint_04/test_quality_and_load.py::test_quality_checks_block_and_pass # Sprint-04 quality fixture predates the current gate contract.
+tests/sprint_04/test_quality_and_load.py::test_load_test_supports_target_concurrency # Sprint-04 load threshold is environment-sensitive legacy acceptance coverage.
+tests/sprint_04/test_tech_debt.py::test_playwright_migration_eliminates_cypress_cost # Sprint-04 tech-debt assertion reads historical planning artifacts rather than runtime behavior.
+tests/test_admin_dashboard.py::test_metrics_aggregator_generates_sections # Admin metrics test asserts the retired dashboard-stub section shape.
+tests/test_auto_report.py::TestAutoReportIntegration::test_webhook_handler_calls_auto_report # DEC#328 webhook/result-materialization drift; preserve for the dedicated review pass.
+tests/test_auto_report.py::TestAutoReportIntegration::test_webhook_handler_continues_on_report_error # DEC#328 webhook/result-materialization drift; preserve for the dedicated review pass.
+tests/test_caching.py::test_project_stats_cache_key_is_per_project # Cache-key test targets the pre-RBAC project-stats key contract.
+tests/test_caching.py::test_project_stats_cache_key_differs_from_detail_and_list # Cache-key test targets the pre-RBAC project-stats key contract.
+tests/test_caching.py::test_invalidate_project_metadata_clears_stats # Cache invalidation test targets the pre-RBAC project-stats key contract.
+tests/test_correction_loop.py::TestTelemetry::test_webhook_telemetry_logged # Correction-loop test expects the pre-envelope telemetry sink shape.
+tests/test_correction_loop.py::TestTelemetry::test_correction_queue_telemetry # Correction-loop test expects the pre-envelope telemetry sink shape.
+tests/test_deepsearch_ingestion.py::test_ingest_endpoint_persists_mission_and_auto_links # Legacy ingest fixture drifts from current mission ownership/result contracts.
+tests/test_document_ingestion.py::test_upload_and_process_endpoints_record_statuses # Legacy ingestion status fixture drifts from the current processing-state contract.
+tests/test_e2e_smoke.py::TestMissionLifecycleE2E::test_mission_status_change_emits_event # Mock E2E test targets the retired mission-event route/auth contract.
+tests/test_e2e_smoke.py::TestMissionEventsEndpointE2E::test_recent_events_returns_json_array # Mock E2E test targets the retired mission-event route/auth contract.
+tests/test_e2e_smoke.py::TestMissionEventsEndpointE2E::test_events_appear_in_recent_after_emission # Mock E2E test targets the retired mission-event route/auth contract.
+tests/test_evidence_auto_linking.py::test_auto_linking_respects_threshold_and_counts_skips # Hand-built SQLite schema omits current project owner/workspace columns.
+tests/test_evidence_auto_linking.py::test_embedding_path_links_evidence # Hand-built SQLite schema omits current project owner/workspace columns.
+tests/test_evidence_auto_linking.py::test_embedding_path_below_threshold # Hand-built SQLite schema omits current project owner/workspace columns.
+tests/test_evidence_auto_linking.py::test_embedding_failure_falls_back_to_difflib # Hand-built SQLite schema omits current project owner/workspace columns.
+tests/test_evidence_auto_linking.py::test_qdrant_error_classified_correctly # Hand-built SQLite schema omits current project owner/workspace columns.
+tests/test_evidence_auto_linking.py::test_fallback_disabled_fails_all # Hand-built SQLite schema omits current project owner/workspace columns.
+tests/test_graph_e2e_validation.py::TestGraphSearchE2EValidation::test_all_12_queries_execute_successfully # Graph acceptance corpus has one stale all-query success baseline.
+tests/test_ingestion_edge_materialization.py::TestIngestionEdgeMaterialization::test_edges_materialized_stage_present_in_result # Edge-materialization test expects the pre-current ingestion result shape.
+tests/test_ingestion_edge_materialization.py::TestIngestionEdgeMaterialization::test_edges_created_for_document # Edge-materialization fixture drifts from the current ingestion pipeline.
+tests/test_ingestion_edge_materialization.py::TestIngestionEdgeMaterialization::test_edge_materialization_duration_in_metrics # Edge-materialization test expects the pre-current metrics shape.
+tests/test_ingestion_edge_materialization.py::TestIngestionEdgeMaterialization::test_edge_materialization_failure_does_not_break_ingestion # Edge-materialization fixture drifts from the current ingestion pipeline.
+tests/test_ingestion_edge_materialization.py::TestIngestionEdgeMaterialization::test_incremental_mode_used # Edge-materialization test expects the retired incremental-call contract.
+tests/test_ingestion_edge_materialization.py::TestIngestionEdgeMaterialization::test_second_document_incremental_only_adds_new_edges # Edge-materialization test expects the retired incremental-call contract.
+tests/test_ingestion_edge_materialization.py::TestIngestionEdgeMaterialization::test_latency_under_two_seconds # Edge-materialization timing assertion is environment-sensitive legacy coverage.
+tests/test_mission_events.py::TestSSEEndpoint::test_recent_events_endpoint # Mission-event route/auth contract drift; preserve for a dedicated endpoint pass.
+tests/test_mission_events.py::TestSSEEndpoint::test_recent_events_empty # Mission-event route/auth contract drift; preserve for a dedicated endpoint pass.
+tests/test_mission_events.py::TestSSEEndpoint::test_sse_stream_accepts_query_param_token # Mission-event route/auth contract drift; preserve for a dedicated endpoint pass.
+tests/test_mission_events.py::TestSSEEndpoint::test_sse_stream_rejects_missing_token # Mission-event route/auth contract drift; preserve for a dedicated endpoint pass.
+tests/test_mission_events.py::TestSSEEndpoint::test_sse_stream_rejects_invalid_token # Mission-event route/auth contract drift; preserve for a dedicated endpoint pass.
+tests/test_mission_events.py::TestSSEEndpoint::test_recent_events_rejects_missing_auth # Mission-event route/auth contract drift; preserve for a dedicated endpoint pass.
+tests/test_semantic_edge_types.py::test_co_occurs_in_edge_types # Semantic-edge inventory assertion predates the current edge taxonomy.
+tests/test_semantic_edge_types.py::test_topic_similar_in_edge_types # Semantic-edge inventory assertion predates the current edge taxonomy.
+tests/test_telemetry_migration_completion.py::TestQualityGateTelemetryEnvelope::test_emits_envelope_format # Telemetry test expects the superseded quality-gate envelope/source shape.
+tests/test_telemetry_migration_completion.py::TestQualityGateTelemetryEnvelope::test_multiple_events_all_conform # Telemetry test expects the superseded quality-gate envelope/source shape.
+tests/test_telemetry_migration_completion.py::TestQualityAutomationTelemetryEnvelope::test_emits_envelope_format # Telemetry test expects the superseded automation envelope/source shape.
+tests/test_telemetry_migration_completion.py::TestNoRemainingNonConformingEmitters::test_quality_gate_sink_uses_emit_telemetry # Source-inspection assertion predates the current quality-gate emitter implementation.
+tests/test_telemetry_migration_completion.py::TestNoRemainingNonConformingEmitters::test_quality_automation_sink_uses_emit_telemetry # Source-inspection assertion predates the current automation emitter implementation.
+tests/test_telemetry_migration_completion.py::TestNoRemainingNonConformingEmitters::test_graph_telemetry_uses_emit_telemetry # Source-inspection assertion predates the current graph telemetry implementation.

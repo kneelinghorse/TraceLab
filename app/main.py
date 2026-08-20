@@ -1,5 +1,6 @@
 """FastAPI application entry point."""
 
+import logging
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Request
@@ -119,8 +120,6 @@ app.add_middleware(
 # Add proxy headers middleware to trust X-Forwarded-* headers from Cloudflare/Railway
 # This ensures redirects use HTTPS instead of HTTP, preserving auth headers
 app.add_middleware(ProxyHeadersMiddleware)
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -411,8 +410,9 @@ def admin_dashboard(
     metrics = aggregator.collect()
     auth_header = request.headers.get("authorization", "")
     return templates.TemplateResponse(
-        "admin/dashboard.html",
-        {"request": request, "metrics": metrics, "auth_header": auth_header},
+        request=request,
+        name="admin/dashboard.html",
+        context={"metrics": metrics, "auth_header": auth_header},
     )
 
 

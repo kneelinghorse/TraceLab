@@ -8,6 +8,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 from app.models.document import Document
 from scripts.verify_ingestion_parity import generate_parity_report
 
@@ -35,7 +37,7 @@ def test_markdown_cli_flow(tmp_path, db_session, project):
 
     env = os.environ.copy()
     output_path = tmp_path / "cli-output.json"
-    result = subprocess.run(
+    subprocess.run(  # noqa: S603 - fixed interpreter and repository script
         [
             sys.executable,
             "scripts/ingest_cli.py",

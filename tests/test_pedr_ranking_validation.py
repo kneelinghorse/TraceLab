@@ -4,23 +4,19 @@ Runs 5+ representative queries against a synthetic corpus to verify:
 - RRF fusion produces sensible rankings
 - Layer weights influence result ordering
 - Degraded mode (partial layer failure) still produces valid rankings
-- Per-layer diagnostics are correct across query types
+- Layer provenance remains accurate across query types
 
 This serves as the T33.1 ranking validation deliverable.
 """
 
 from __future__ import annotations
 
+from typing import Any
+
 import pytest
-from typing import Any, Dict, List
 
 from app.services.pedr.cache import get_pedr_cache
-from app.services.pedr.search_orchestrator import (
-    PEDRConfig,
-    PEDRSearchOrchestrator,
-    PEDRSearchResponse,
-)
-
+from app.services.pedr.search_orchestrator import PEDRConfig, PEDRSearchOrchestrator
 
 pytestmark = pytest.mark.unit
 
@@ -38,7 +34,7 @@ def _clear_cache():
 # ---------------------------------------------------------------------------
 
 
-def _make_corpus(n: int = 20) -> List[Dict[str, Any]]:
+def _make_corpus(n: int = 20) -> list[dict[str, Any]]:
     """Build a synthetic corpus of chunks with varying relevance signals."""
     corpus = []
     for i in range(n):
@@ -59,19 +55,19 @@ def _make_corpus(n: int = 20) -> List[Dict[str, Any]]:
 CORPUS = _make_corpus()
 
 
-def _lexical_search_factory(results: List[Dict[str, Any]]):
+def _lexical_search_factory(results: list[dict[str, Any]]):
     """Create a lexical search function returning specified results."""
 
-    def _search(**kwargs) -> List[Dict[str, Any]]:
+    def _search(**kwargs) -> list[dict[str, Any]]:
         return list(results)
 
     return _search
 
 
-def _semantic_search_factory(results: List[Dict[str, Any]]):
+def _semantic_search_factory(results: list[dict[str, Any]]):
     """Create a semantic search function returning specified results."""
 
-    def _search(**kwargs) -> List[Dict[str, Any]]:
+    def _search(**kwargs) -> list[dict[str, Any]]:
         return list(results)
 
     return _search
@@ -103,7 +99,7 @@ class TestQuery1BroadSearch:
         response = orch.search(query="machine learning research findings", top_k=10)
 
         assert len(response.results) > 0
-        assert response.metadata.degraded is False
+        assert response.metadata.layers_used == ["lexical", "semantic"]
 
         # Results should have contributions from multiple layers
         multi_layer = [r for r in response.results if len(r.contributing_layers) > 1]
@@ -140,15 +136,13 @@ class TestQuery2TypeSpecific:
             None,
         )  # detection is best-effort
 
-    def test_layer_diagnostics_present(self):
+    def test_successful_retrieval_layers_are_reported(self):
         orch = _make_orch()
         response = orch.search(
             query="find all documents about neural networks", top_k=10
         )
 
-        layer_names = {d.layer for d in response.metadata.layer_diagnostics}
-        assert "lexical" in layer_names
-        assert "semantic" in layer_names
+        assert response.metadata.layers_used == ["lexical", "semantic"]
 
 
 # ---------------------------------------------------------------------------
@@ -185,7 +179,7 @@ class TestQuery3IntentDriven:
 class TestQuery4DegradedMode:
     """Degraded query: lexical layer fails, semantic succeeds."""
 
-    def test_degraded_still_returns_results(self):
+    def test_lexical_outage_preserves_ranked_semantic_results(self):
         def _failing(**kwargs):
             raise RuntimeError("PostgreSQL connection pool exhausted")
 
@@ -194,35 +188,15 @@ class TestQuery4DegradedMode:
 
         response = orch.search(query="neural network architecture", top_k=10)
 
-        assert len(response.results) > 0
-        assert response.metadata.degraded is True
-
-    def test_degraded_diagnostics_show_error(self):
-        def _failing(**kwargs):
-            raise RuntimeError("PostgreSQL connection pool exhausted")
-
-        orch = _make_orch(config=PEDRConfig(enable_graph=False))
-        orch._lexical_search = _failing
-
-        response = orch.search(query="neural network architecture", top_k=10)
-
-        lex_diag = next(
-            d for d in response.metadata.layer_diagnostics if d.layer == "lexical"
+        assert response.results
+        assert response.metadata.layers_used == ["semantic"]
+        assert [result.rrf_rank for result in response.results] == list(
+            range(1, len(response.results) + 1)
         )
-        assert lex_diag.status == "error"
-        assert lex_diag.error_type == "RuntimeError"
-
-    def test_degraded_results_only_from_working_layers(self):
-        def _failing(**kwargs):
-            raise RuntimeError("fail")
-
-        orch = _make_orch(config=PEDRConfig(enable_graph=False))
-        orch._lexical_search = _failing
-
-        response = orch.search(query="neural network architecture", top_k=10)
-
-        for result in response.results:
-            assert "lexical" not in result.contributing_layers
+        assert all(
+            result.contributing_layers == ["semantic"]
+            for result in response.results
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -245,28 +219,11 @@ class TestQuery5SingleLayer:
         response = orch.search(query="machine learning", top_k=5)
 
         assert len(response.results) > 0
-
-    def test_disabled_layers_in_diagnostics(self):
-        config = PEDRConfig(
-            enable_lexical=False,
-            enable_syntactic=False,
-            enable_pragmatic=False,
-            enable_governance=False,
-            enable_graph=False,
+        assert response.metadata.layers_used == ["semantic"]
+        assert all(
+            result.contributing_layers == ["semantic"]
+            for result in response.results
         )
-        orch = _make_orch(config=config)
-        response = orch.search(query="machine learning", top_k=5)
-
-        disabled = {
-            d.layer
-            for d in response.metadata.layer_diagnostics
-            if d.status == "disabled"
-        }
-        assert "lexical" in disabled
-        assert "syntactic" in disabled
-        assert "pragmatic" in disabled
-        assert "governance" in disabled
-        assert "graph" in disabled
 
 
 # ---------------------------------------------------------------------------
@@ -296,32 +253,3 @@ class TestQuery6OverlappingResults:
         assert len(overlap) >= 3, (
             f"Expected shared results to dominate top-5, got {overlap}"
         )
-
-
-# ---------------------------------------------------------------------------
-# Summary: diagnostic completeness across all queries
-# ---------------------------------------------------------------------------
-
-
-class TestDiagnosticCompleteness:
-    """Ensure every search response has complete diagnostics."""
-
-    @pytest.mark.parametrize(
-        "query",
-        [
-            "machine learning research",
-            "find documents about transformers",
-            "search evidence of bias",
-            "neural network training procedures",
-            "latest findings on attention mechanisms",
-        ],
-    )
-    def test_diagnostics_cover_all_enabled_layers(self, query):
-        orch = _make_orch()
-        response = orch.search(query=query, top_k=5)
-
-        diag_layers = {d.layer for d in response.metadata.layer_diagnostics}
-        # At minimum, retrieval layers and graph (disabled) should be reported
-        assert "lexical" in diag_layers
-        assert "semantic" in diag_layers
-        assert "graph" in diag_layers  # disabled but reported

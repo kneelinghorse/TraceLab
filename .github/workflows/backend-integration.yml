@@ -1,0 +1,35 @@
+# ABOUTME: Runs the PostgreSQL integration suite against testcontainers in CI.
+# ABOUTME: Keeps the integration gate independent from lint and unit-test jobs.
+
+name: Backend Integration
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  backend-integration:
+    name: backend-integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -e '.[dev,test]'
+      - name: Run integration tests with testcontainers
+        run: pytest tests/integration -v

@@ -4,25 +4,17 @@ from __future__ import annotations
 
 from uuid import uuid4
 
-import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy.orm import sessionmaker
 
-from app.main import app
 from app.models.chunk import DocumentChunk
 from app.models.document import Document
-from app.models.insight import InsightSource
+from app.models.insight import Insight, InsightSource
 from app.models.mission_protocol import MissionProtocolDraft
 from app.models.quality import QualityCheck
 from app.services.evidence_linking import EvidenceLinkingService
 from app.services.mission_protocol_service import MissionProtocolService
 from app.services.quality_checks import QualityAutomationRunner
-
-
-@pytest.fixture
-def client(auth_headers):
-    with TestClient(app) as test_client:
-        test_client.headers.update(auth_headers)
-        yield test_client
 
 
 def _build_mission_payload(project_id, chunk_id, insight_id):
@@ -103,12 +95,23 @@ def _seed_supporting_documents(db_session, project):
         document_id=document.id,
         chunk_index=0,
         content="Automation chunk",
-        content_tsv="Automation chunk",
     )
     db_session.add(chunk)
     db_session.flush()
 
     insight_id = uuid4()
+    insight = Insight(
+        id=insight_id,
+        project_id=project.id,
+        title="Quality automation finding",
+        content="Automation preserves traceability across quality checks.",
+        insight_type="finding",
+        created_by="ai",
+        validated=True,
+    )
+    db_session.add(insight)
+    db_session.flush()
+
     insight_source = InsightSource(
         insight_id=insight_id, chunk_id=chunk_id, relevance_score=0.95
     )
@@ -119,7 +122,13 @@ def _seed_supporting_documents(db_session, project):
 
 def test_mission_updates_trigger_quality_automation(db_session, project):
     chunk_id, insight_id = _seed_supporting_documents(db_session, project)
-    runner = QualityAutomationRunner(async_enabled=False)
+    runner = QualityAutomationRunner(
+        async_enabled=False,
+        session_factory=sessionmaker(
+            bind=db_session.get_bind(),
+            join_transaction_mode="create_savepoint",
+        ),
+    )
     service = MissionProtocolService(
         evidence_service=EvidenceLinkingService(require_entities=False),
         quality_runner=runner,
@@ -145,7 +154,13 @@ def test_quality_automation_api_run_and_history(
 ):
     chunk_id, insight_id = _seed_supporting_documents(db_session, project)
     payload = _build_mission_payload(project.id, chunk_id, insight_id)
-    runner = QualityAutomationRunner(async_enabled=False)
+    runner = QualityAutomationRunner(
+        async_enabled=False,
+        session_factory=sessionmaker(
+            bind=db_session.get_bind(),
+            join_transaction_mode="create_savepoint",
+        ),
+    )
     service = MissionProtocolService(
         evidence_service=EvidenceLinkingService(require_entities=False),
         quality_runner=runner,
@@ -155,20 +170,43 @@ def test_quality_automation_api_run_and_history(
         project_id=project.id,
         draft=payload,
     )
+    mission_id = mission.id
+    baseline_ids = {
+        str(check_id)
+        for (check_id,) in db_session.query(QualityCheck.id)
+        .filter(QualityCheck.entity_id == mission_id)
+        .all()
+    }
+    assert len(baseline_ids) == 4
+
+    # Canonical missions may carry context that is not a Mission Protocol draft.
+    # Automation must fall back to canonical columns instead of failing the route.
+    mission.context = {"mission_id": "QA-AUTO", "canonical_only": True}
+    db_session.commit()
 
     run_resp = client.post(
         "/api/v1/quality/automated/run",
-        json={"mission_id": str(mission.id), "performed_by": "integration_test"},
+        json={"mission_id": str(mission_id), "performed_by": "integration_test"},
     )
     assert run_resp.status_code == 201
     body = run_resp.json()
-    assert body["mission_id"] == str(mission.id)
+    assert body["mission_id"] == str(mission_id)
     assert len(body["checks"]) == 4
+    assert {check["performed_by"] for check in body["checks"]} == {
+        "integration_test"
+    }
+    run_ids = {check["id"] for check in body["checks"]}
+    assert run_ids.isdisjoint(baseline_ids)
 
     history_resp = client.get(
-        f"/api/v1/quality/automated/history/{mission.id}?limit=10"
+        f"/api/v1/quality/automated/history/{mission_id}?limit=10"
     )
     assert history_resp.status_code == 200
     history = history_resp.json()
-    assert history["mission_id"] == str(mission.id)
-    assert len(history["history"]) >= 4
+    assert history["mission_id"] == str(mission_id)
+    assert len(history["history"]) == 8
+    assert {
+        check["id"]
+        for check in history["history"]
+        if check["performed_by"] == "integration_test"
+    } == run_ids

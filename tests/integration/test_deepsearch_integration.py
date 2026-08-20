@@ -12,7 +12,6 @@ from fastapi.testclient import TestClient
 import app.services.rag_service as rag_service_module
 from app.api.v1 import deepsearch as deepsearch_module
 from app.api.v1 import search as search_module
-from app.main import app
 from app.models.chunk import DocumentChunk
 from app.models.document import Document
 from app.models.mission import Mission
@@ -64,7 +63,6 @@ def _seed_chunks(
             document_id=document.id,
             chunk_index=index,
             content=text,
-            content_tsv=text,
         )
         db_session.add(chunk)
         chunks.append(chunk)
@@ -72,17 +70,14 @@ def _seed_chunks(
     return chunks
 
 
-@pytest.fixture
-def client(auth_headers):
-    with TestClient(app) as test_client:
-        test_client.headers.update(auth_headers)
-        yield test_client
-
-
 @pytest.fixture(autouse=True)
 def configure_auto_linker(monkeypatch, tmp_path):
     telemetry_path = tmp_path / "auto-linking.jsonl"
-    service = EvidenceAutoLinkingService(telemetry_path=telemetry_path)
+    service = EvidenceAutoLinkingService(
+        telemetry_path=telemetry_path,
+        fallback_to_difflib=True,
+    )
+    monkeypatch.setattr(service, "_resolve_services", lambda: (None, None))
     monkeypatch.setattr(deepsearch_module, "_auto_linker", service)
     return telemetry_path
 
@@ -110,7 +105,7 @@ def test_ingest_customer_onboarding_links_all_evidence(
         db_session.query(Mission).order_by(Mission.created_at.desc()).first()
     )
     assert mission_record is not None
-    chunk_ids = {ev["chunk_id"] for ev in mission_record.mission_data["evidence"]}
+    chunk_ids = {ev["chunk_id"] for ev in mission_record.context["evidence"]}
     assert len(chunk_ids) == len(evidence)
     assert None not in chunk_ids
 
@@ -276,7 +271,7 @@ def test_ingest_project_scoped_linking(
     mission_record = (
         db_session.query(Mission).order_by(Mission.created_at.desc()).first()
     )
-    chunk_ids = {item["chunk_id"] for item in mission_record.mission_data["evidence"]}
+    chunk_ids = {item["chunk_id"] for item in mission_record.context["evidence"]}
     assert chunk_ids == {str(chunk.id) for chunk in target_chunks}
 
 
@@ -297,7 +292,7 @@ def test_ingested_mission_available_via_search_endpoint(
     assert response.status_code == 201, response.text
 
     mission = db_session.query(Mission).order_by(Mission.created_at.desc()).first()
-    chunk_id = mission.mission_data["evidence"][0]["chunk_id"]
+    chunk_id = mission.context["evidence"][0]["chunk_id"]
     selected_chunk = next(chunk for chunk in chunks if str(chunk.id) == chunk_id)
 
     class _FakeRagService:
@@ -324,6 +319,10 @@ def test_ingested_mission_available_via_search_endpoint(
             status_filters: list[str] | None = None,
             allow_pii: bool | None = True,
             governance_mode: str | None = None,
+            element_type: str | None = None,
+            element_types: list[str] | None = None,
+            auto_detect_type: bool = True,
+            type_boost_enabled: bool = True,
         ) -> dict[str, object]:
             self.calls.append(
                 {
@@ -364,7 +363,7 @@ def test_ingested_mission_available_via_search_endpoint(
                         "quality_gates_passed": 5,
                         "quality_gates_total": 5,
                         "quality_validated": True,
-                        "quality_mission_id": mission.mission_data["mission_id"],
+                        "quality_mission_id": mission.mission_id,
                         "quality_pii_flagged": False,
                     }
                 ],

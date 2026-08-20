@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from uuid import UUID
 
+from pydantic import ValidationError
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -152,7 +153,26 @@ class QualityAutomationService:
     def evaluate(
         self, db: Session, *, mission: Mission
     ) -> list[QualityAutomationCheckResult]:
-        payload = MissionProtocolDraft.model_validate(mission.mission_data)
+        protocol_data = (
+            mission.context
+            if isinstance(mission.context, dict) and "mission_id" in mission.context
+            else {}
+        )
+        payload: MissionProtocolDraft | None = None
+        if protocol_data:
+            try:
+                payload = MissionProtocolDraft.model_validate(protocol_data)
+            except ValidationError:
+                logger.warning(
+                    "Mission %s context is not a Mission Protocol payload; "
+                    "evaluating canonical fields instead",
+                    mission.id,
+                )
+        if payload is None:
+            payload = MissionProtocolDraft(
+                mission_id=mission.mission_id or "unknown",
+                title=mission.title,
+            )
         if not payload.project_id and mission.project_id:
             payload.project_id = str(mission.project_id)
 
@@ -187,7 +207,7 @@ class QualityAutomationService:
         records = self.repository.create_records(
             db, mission, results, performed_by=performed_by
         )
-        for record, result in zip(records, results):
+        for record, result in zip(records, results, strict=True):
             self.telemetry_sink(record, result)
         if mission.id:
             self.cache_manager.invalidate_quality_gates(str(mission.id))

@@ -1,0 +1,95 @@
+# ABOUTME: Blocks on Ruff regressions in changed Python files only.
+# ABOUTME: Reports the repository-wide Ruff and mypy baselines as advisory jobs.
+
+name: Backend Lint
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ruff-diff:
+    name: ruff-diff
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned Ruff
+        run: pip install ruff==0.8.0
+      - name: Check changed Python files
+        shell: bash
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE_SHA: ${{ github.event.before }}
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            git fetch --no-tags origin "$BASE_REF"
+            base_sha="$(git merge-base "origin/$BASE_REF" "$HEAD_SHA")"
+          elif [[ "$BEFORE_SHA" =~ ^0+$ ]]; then
+            base_sha="$(git hash-object -t tree /dev/null)"
+          else
+            base_sha="$BEFORE_SHA"
+            if ! git cat-file -e "$base_sha^{commit}" 2>/dev/null; then
+              git fetch --no-tags --depth=1 origin "$base_sha"
+            fi
+            git cat-file -e "$base_sha^{commit}"
+          fi
+
+          mapfile -d '' python_files < <(
+            git diff --name-only --diff-filter=ACMR -z "$base_sha" "$HEAD_SHA" -- '*.py'
+          )
+
+          if (( ${#python_files[@]} == 0 )); then
+            echo "No changed Python files to check."
+            exit 0
+          fi
+
+          printf 'Checking %s\n' "${python_files[@]}"
+          ruff check -- "${python_files[@]}"
+
+  ruff-full:
+    name: ruff-full (advisory)
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned Ruff
+        run: pip install ruff==0.8.0
+      - name: Check the full repository
+        run: ruff check .
+
+  mypy:
+    name: mypy (advisory)
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -e '.[dev]'
+      - name: Type check
+        run: mypy app/ --config-file pyproject.toml

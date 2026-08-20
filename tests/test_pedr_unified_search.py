@@ -15,9 +15,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-# Mark all tests in this module as unit tests to skip DB fixture
-pytestmark = pytest.mark.unit
-
 from app.schemas.pedr_search import (
     PEDRLayerWeights,
     PEDRSearchRequest,
@@ -32,10 +29,14 @@ from app.services.pedr.fusion import (
 )
 from app.services.pedr.pragmatic import PragmaticFilters, QueryIntent
 from app.services.pedr.search_orchestrator import (
+    DEFAULT_GRAPH_WEIGHT,
     PEDRConfig,
     PEDRSearchOrchestrator,
 )
 from app.services.pedr.syntactic import SyntacticFilters
+
+# Mark all tests in this module as unit tests to skip DB fixture
+pytestmark = pytest.mark.unit
 
 
 class _GraphRecorder:
@@ -293,7 +294,7 @@ class TestPEDRSearchOrchestrator:
             semantic_search=mock_semantic,
         )
 
-        response = orchestrator.search(
+        orchestrator.search(
             query="test",
             top_k=5,
             enable_lexical=False,
@@ -716,7 +717,7 @@ class TestPEDRSearchOrchestrator:
             query="graph weights enabled", enable_graph=True
         )
         weights_graph = response_graph.metadata.layer_weights
-        assert weights_graph["graph"] == pytest.approx(0.12, rel=1e-3)
+        assert weights_graph["graph"] == pytest.approx(DEFAULT_GRAPH_WEIGHT, rel=1e-3)
         assert sum(weights_graph.values()) == pytest.approx(1.0, rel=1e-3)
 
 
