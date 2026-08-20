@@ -29,6 +29,8 @@ os.environ["DATABASE_URL"] = _TEST_DB_URL  # Force, don't setdefault
 os.environ["ENVIRONMENT"] = "test"
 os.environ.setdefault("AUTH_USERNAME", "tracelab-admin")
 os.environ.setdefault("AUTH_PASSWORD", "changeme")
+# Mocked synthesis tests must never depend on a developer or CI secret.
+os.environ["OPENAI_API_KEY"] = "test"
 
 from sqlalchemy import event  # noqa: E402
 

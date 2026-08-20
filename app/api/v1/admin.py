@@ -201,8 +201,9 @@ def dashboard_page(
     metrics = aggregator.collect()
     auth_header = request.headers.get("authorization", "")
     return _TEMPLATES.TemplateResponse(
-        "admin/dashboard.html",
-        {"request": request, "metrics": metrics, "auth_header": auth_header},
+        request=request,
+        name="admin/dashboard.html",
+        context={"metrics": metrics, "auth_header": auth_header},
     )
 
 
