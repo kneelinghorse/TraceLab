@@ -4,16 +4,28 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.qdrant_client import get_qdrant_health, is_qdrant_ready
+from app.services.reconciler_scheduler import reconciler_health
 
 router = APIRouter()
 
 
 @router.get("/health")
 async def health_check():
-    """Basic health check."""
-    return {"status": "healthy"}
+    """Basic health check.
+
+    rbac_enabled is deliberately public (DEC#329, owner-approved): it discloses
+    config posture only — the same value is boot-logged — and rbac_enabled=false
+    in prod is an incident state that must be alarmable without credentials.
+    The reconciler block is counts-only (no identifiers) for the same reason.
+    """
+    return {
+        "status": "healthy",
+        "rbac_enabled": settings.rbac_enabled,
+        "reconciler": reconciler_health(),
+    }
 
 
 @router.get("/health/db")

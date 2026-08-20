@@ -5,7 +5,47 @@ All notable changes to `@aquex/tracelab-mcp` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.2] — 2026-08-20
+
+### Fixed
+
+- **serverInfo version identity.** The MCP handshake hardcoded
+  `version: '1.0.0'` in `serverInfo`, so 1.0.1 installs still introduced
+  themselves as 1.0.0. The server now reads the version from
+  `package.json` at startup via the same `readPackageVersion()` helper
+  the device-code User-Agent already uses — one source of truth, no
+  literal to forget on the next bump.
+
+### Added
+
+- **Cross-service lifecycle fields in `tracelab_mission_execution`
+  `action: "status"`.** The status projection now passes through
+  `deepsearch_job_id`, `lease_expires_at`, `result_document_ids`, and
+  `result_report_id` under their REST names (matching
+  `GET /api/v1/missions/{id}/status`). The REST API already returned
+  them; the MCP projection stripped them, leaving agents unable to
+  confirm DeepSearch job identity, lease deadlines, or materialized
+  result artifacts for cross-service lifecycle acceptance.
+
 ## [1.0.1] — 2026-04-30
+
+### Added (retroactive addendum)
+
+Documented after the fact: the 1.0.1 tarball also carried the post-tag
+mission-authoring changes from TraceLab commit `21271b5`.
+
+- **Mission-authoring passthrough (T40.1/T41.2).** The 12 authoring
+  columns — `background`, `focus`, `references`, `required_entities`,
+  `excluded_entities`, `expected_output_schema`, `coverage_thresholds`,
+  `validation_thresholds`, `deliverable_format`, `max_loops`,
+  `min_loops`, `constraints` — survive the packaged flow: accepted on
+  mission create/update and returned by `action: "get"` instead of
+  being stripped by the hand-rolled response shape.
+- **Lease-era status typing.** `MissionStatusResponse` in the API client
+  gained the lease-lifecycle fields (`deepsearch_job_id`,
+  `deepsearch_attempt_count`, `lease_expires_at`,
+  `result_document_ids`, `result_report_id`, materialization state,
+  `search_ready`) matching the post-lease REST status endpoint.
 
 Hotfix release. The 1.0.0 build crashed on startup for every fresh
 install. Anyone who ran `npx -y @aquex/tracelab-mcp` or

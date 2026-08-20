@@ -3,8 +3,9 @@
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.routing import APIRoute
 from fastapi.templating import Jinja2Templates
 from starlette.types import ASGIApp, Receive, Scope, Send
@@ -50,6 +51,7 @@ from app.core.security import require_admin, require_authenticated_user
 from app.onboarding import router as onboarding_router
 from app.services.metrics_aggregator import MetricsAggregator, get_metrics_aggregator
 from app.services.ownership import ensure_owner_bootstrap
+from app.services.reconciler_scheduler import start_reconciler, stop_reconciler
 
 
 class ProxyHeadersMiddleware:
@@ -123,6 +125,27 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """422s must never echo submitted values back to the client.
+
+    FastAPI's default handler includes each error's ``input`` (the raw
+    submitted value) and pydantic ``url``/``ctx``. On credential-bearing routes
+    that reflected passwords into error responses, and API consumers persist
+    response bodies — which is how TraceLab credentials ended up in DeepSearch
+    research artifacts. Keep loc/msg/type so field-level errors stay usable.
+    """
+    errors = [
+        {
+            "loc": list(e.get("loc", ())),
+            "msg": e.get("msg", ""),
+            "type": e.get("type", ""),
+        }
+        for e in exc.errors()
+    ]
+    return JSONResponse(status_code=422, content={"detail": errors})
+
+
 @app.on_event("startup")
 async def startup_event():
     """Pre-warm Qdrant connection on application startup.
@@ -162,6 +185,19 @@ async def startup_event():
                 db.close()
         except Exception:
             logger.warning("Owner-bootstrap safety net failed", exc_info=True)
+
+    # Mission-result reconciler (OPS-2): the API process is the schedule host —
+    # no cron exists on any Railway service in this project. Self-gates off under
+    # tests and via RECONCILER_ENABLED. Must never raise — startup resilience.
+    try:
+        start_reconciler()
+    except Exception:
+        logger.error("reconciler_scheduler failed to start", exc_info=True)
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    stop_reconciler()
 
 
 protected_dependencies = [Depends(require_authenticated_user)]

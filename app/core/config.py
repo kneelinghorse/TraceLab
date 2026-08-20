@@ -80,6 +80,12 @@ class Settings(BaseSettings):
     # is fail-safe when a header has fewer than N entries, so an over-estimate
     # degrades to per-edge keying rather than locking everyone out of /login.
     rate_limit_trusted_proxy_hops: int = 1
+    # In-app mission-result reconciler (OPS-2): the Railway project has no cron
+    # facility, so the deployed backend hosts the schedule itself. Counts-only
+    # logging; latest outcome exposed on public GET /health. Disabled under tests.
+    reconciler_enabled: bool = True
+    reconciler_interval_seconds: int = 900
+    reconciler_batch_limit: int = 500
     cors_allowed_origins_dev: list[str] = Field(
         default_factory=lambda: ["http://localhost:3000"]
     )
