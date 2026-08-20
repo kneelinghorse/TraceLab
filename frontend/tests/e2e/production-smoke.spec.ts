@@ -3,6 +3,8 @@ import { expect, test } from "@playwright/test";
 const isProductionSmoke = Boolean(process.env.PLAYWRIGHT_BASE_URL);
 const apiBase = (process.env.PLAYWRIGHT_API_BASE_URL ?? "https://api.tracelab.aquex.ai").replace(/\/$/, "");
 const apiPrefix = (process.env.PLAYWRIGHT_API_PATH_PREFIX ?? "/api/v1").replace(/\/$/, "");
+const reconcilerFreshnessLimitMs = 30 * 60 * 1000;
+const allowedClockSkewMs = 60 * 1000;
 const buildApiUrl = (path: string) => {
   const normalized = path.startsWith("/") ? path : `/${path}`;
   const prefix = apiPrefix ? apiPrefix : "";
@@ -28,10 +30,21 @@ test.describe("Production smoke", () => {
     });
   }
 
-  test("API health endpoint stays reachable", async ({ request }) => {
+  test("API health endpoint confirms production authorization and reconciler freshness", async ({ request }) => {
     const response = await request.get(buildApiUrl("/health"));
     expect(response.status()).toBe(200);
     const payload = await response.json();
     expect(payload.status).toBe("healthy");
+    expect(payload.rbac_enabled).toBe(true);
+
+    const lastRunAt = payload.reconciler?.last_run_at;
+    expect(lastRunAt).toEqual(expect.any(String));
+
+    const lastRunAtMs = Date.parse(lastRunAt);
+    expect(Number.isNaN(lastRunAtMs)).toBe(false);
+
+    const reconcilerAgeMs = Date.now() - lastRunAtMs;
+    expect(reconcilerAgeMs).toBeGreaterThanOrEqual(-allowedClockSkewMs);
+    expect(reconcilerAgeMs).toBeLessThanOrEqual(reconcilerFreshnessLimitMs);
   });
 });

@@ -19,6 +19,43 @@ jobs:
       NEXT_TELEMETRY_DISABLED: "1"
     steps:
       - uses: actions/checkout@v4
+      - name: Reject tests under Next.js pages
+        working-directory: frontend
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ ! -d src/pages ]]; then
+            echo "Expected frontend/src/pages to exist." >&2
+            exit 1
+          fi
+
+          forbidden_path="$(
+            find src/pages \
+              \( \
+                -name '*.test.*' \
+                -o -name '*.spec.*' \
+                -o -name '__tests__' \
+                -o -name '__mocks__' \
+              \) \
+              -print -quit
+          )"
+
+          if [[ -z "$forbidden_path" ]]; then
+            echo "No test files or test directories found under frontend/src/pages."
+            exit 0
+          fi
+
+          echo "Test files and test directories are not allowed under frontend/src/pages:" >&2
+          find src/pages \
+            \( \
+              -name '*.test.*' \
+              -o -name '*.spec.*' \
+              -o -name '__tests__' \
+              -o -name '__mocks__' \
+            \) \
+            -print | sed 's/^/  /' >&2
+          exit 1
       - uses: actions/setup-node@v4
         with:
           node-version: "22"

@@ -34,10 +34,10 @@ Playwright reads `PLAYWRIGHT_BASE_URL` / `PLAYWRIGHT_PORT` when the UI runs on a
 ## Railway Deployment
 
 1. Create a new Railway service that points at this repository and set the **Root Directory** to `frontend/`.
-2. Upload `railway.frontend.json` (or paste its JSON contents) so Nixpacks runs `npm install && npm run build` and starts with `npm run start -- --hostname 0.0.0.0 --port $PORT`.
+2. Railway loads `frontend/railway.json` as the live service configuration. Keep the root `railway.frontend.json` synchronized only as a fallback/template.
 3. Add the environment variables listed in `.env.production.example`. Retrieve `NEXT_PUBLIC_DEFAULT_PROJECT_ID` by calling `GET /api/v1/projects` on the FastAPI backend and selecting the default project UUID.
 4. Trigger a deploy and verify logs show a successful build + `Ready` state. Railway will expose a domain such as `https://<service>.up.railway.app`.
-5. Smoke test the hosted UI with `curl https://<service>.up.railway.app/missions` (or run `PLAYWRIGHT_BASE_URL=https://<service>.up.railway.app npm run test:e2e`).
+5. Smoke test the configured health route with `curl https://<service>.up.railway.app/admin/users` (or run `PLAYWRIGHT_BASE_URL=https://<service>.up.railway.app npm run test:e2e`). A passing route check proves that page is served, but not that Railway is running the latest commit.
 6. For redeploys or rollback, redeploy the previous build from Railway’s deployment history or push the prior git commit—document the action in mission telemetry per `docs/frontend_deployment_decisions.md`.
 
 ## Architecture

@@ -95,10 +95,14 @@ def test_reconciler_health_shape():
     assert health["last_run_at"] is None
 
 
-def test_health_endpoint_exposes_rbac_and_reconciler():
+def test_health_endpoint_exposes_rbac_and_reconciler(monkeypatch):
     from fastapi.testclient import TestClient
 
     from app.main import app
+
+    # Force the non-default posture so a hard-coded ``False`` response cannot
+    # satisfy the production guard by accident.
+    monkeypatch.setattr(settings, "rbac_enabled", True)
 
     # No context manager: skip startup events (Qdrant prewarm) — the endpoint
     # needs no startup state.
@@ -106,5 +110,5 @@ def test_health_endpoint_exposes_rbac_and_reconciler():
     assert resp.status_code == 200
     body = resp.json()
     assert body["status"] == "healthy"
-    assert body["rbac_enabled"] == settings.rbac_enabled
+    assert body["rbac_enabled"] is True
     assert set(body["reconciler"]) >= {"enabled", "last_run_at", "last_status"}
