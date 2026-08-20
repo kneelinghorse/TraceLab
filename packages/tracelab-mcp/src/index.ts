@@ -1760,6 +1760,12 @@ async function handleGetMissionStatus(args: unknown) {
             progress: result.progress_percent,
             current_phase: result.current_phase,
             attempts: result.deepsearch_attempt_count,
+            // Cross-service lifecycle fields, passed through under their
+            // REST names verbatim — DeepSearch acceptance keys on them.
+            deepsearch_job_id: result.deepsearch_job_id,
+            lease_expires_at: result.lease_expires_at,
+            result_document_ids: result.result_document_ids,
+            result_report_id: result.result_report_id,
             materialization_pending: result.materialization_pending,
             materialization_status: result.materialization_status,
             materialization_attempt_count: result.materialization_attempt_count,
@@ -2019,7 +2025,10 @@ async function main() {
   const server = new Server(
     {
       name: 'tracelab-mcp',
-      version: '1.0.0',
+      // Single source of truth: package.json, read at runtime via the same
+      // helper the device-code User-Agent uses. A hardcoded literal here
+      // went stale at 1.0.1 (serverInfo kept reporting 1.0.0).
+      version: await readPackageVersion(),
     },
     {
       capabilities: {
