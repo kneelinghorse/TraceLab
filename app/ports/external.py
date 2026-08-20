@@ -39,7 +39,7 @@ class VectorDBPort(Protocol):
         self,
         document_id: str,
     ) -> None:
-        """Remove all chunks for a document. Not yet implemented in QdrantService."""
+        """Remove all chunks for a document."""
         ...
 
 

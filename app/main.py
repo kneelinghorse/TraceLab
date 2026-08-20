@@ -21,6 +21,7 @@ from app.api.v1 import (
     corrections,
     deepsearch,
     documents,
+    evidence,
     facets,
     health,
     missions,
@@ -249,6 +250,12 @@ app.include_router(
     documents.router,
     prefix=f"{settings.api_v1_prefix}/documents",
     tags=["documents"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    evidence.router,
+    prefix=f"{settings.api_v1_prefix}/evidence",
+    tags=["evidence"],
     dependencies=protected_dependencies,
 )
 app.include_router(

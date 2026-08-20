@@ -394,6 +394,127 @@ export interface MissionStatusResponse {
   search_ready: boolean;
 }
 
+// Evidence Ledger types (LEDGER-1)
+export type EvidenceDisposition =
+  | 'supporting'
+  | 'contradicting'
+  | 'rejected'
+  | 'background';
+
+export type EvidenceOrigin = 'mcp-agent' | 'deepsearch-worker';
+
+export interface EvidenceCaptureItem {
+  claim: string;
+  summary?: string;
+  source_url: string;
+  snippet?: string;
+  query?: string;
+  disposition: EvidenceDisposition;
+  tags?: string[];
+}
+
+export interface EvidenceCaptureRequest {
+  project_id: string;
+  session_key: string;
+  mission_id?: string;
+  entries: EvidenceCaptureItem[];
+}
+
+export interface EvidenceEntry {
+  id: string;
+  project_id: string;
+  mission_id: string | null;
+  session_key: string;
+  origin: EvidenceOrigin;
+  claim: string;
+  summary: string | null;
+  source_url: string;
+  snippet: string | null;
+  query: string | null;
+  disposition: EvidenceDisposition;
+  tags: string[];
+  owner_id: string | null;
+  workspace_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EvidenceCaptureResponse {
+  entries: EvidenceEntry[];
+  count: number;
+}
+
+export interface EvidenceNoteRequest {
+  project_id: string;
+  session_key: string;
+  content: string;
+  mission_id?: string;
+  tags?: string[];
+}
+
+export interface EvidenceNote {
+  id: string;
+  project_id: string;
+  mission_id: string | null;
+  session_key: string;
+  origin: EvidenceOrigin;
+  note_key: string;
+  content: string;
+  tags: string[];
+  owner_id: string | null;
+  workspace_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EvidenceListRequest {
+  project_id: string;
+  session_key?: string;
+  mission_id?: string;
+  disposition?: EvidenceDisposition;
+  page?: number;
+  page_size?: number;
+}
+
+export interface EvidenceListResponse {
+  entries: EvidenceEntry[];
+  notes: EvidenceNote[];
+  entry_total: number;
+  note_total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface EvidenceSearchRequest extends EvidenceListRequest {
+  q: string;
+}
+
+export interface EvidenceSearchResponse {
+  entries: EvidenceEntry[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface EvidencePromoteRequest {
+  project_id: string;
+  session_key: string;
+  target?: 'report' | 'document';
+  title?: string;
+}
+
+export interface EvidencePromoteResponse {
+  project_id: string;
+  session_key: string;
+  target: 'report' | 'document';
+  report_id: string;
+  document_id: string | null;
+  title: string;
+  entry_count: number;
+  note_count: number;
+  status: 'created' | 'completed';
+}
+
 export class TraceLabAPIError extends Error {
   constructor(
     message: string,
@@ -784,6 +905,73 @@ export class TraceLabClient {
       `/api/v1/missions/${missionId}/contract-preview`
     );
   }
+
+  // ============================================
+  // Evidence Ledger Methods
+  // ============================================
+
+  /** Batch-capture sourced evidence for an agent session. */
+  async captureEvidence(data: EvidenceCaptureRequest): Promise<EvidenceCaptureResponse> {
+    return this.request<EvidenceCaptureResponse>(
+      'POST',
+      '/api/v1/evidence/capture',
+      data
+    );
+  }
+
+  /** Create or replace one keyed working note for an agent session. */
+  async putEvidenceNote(
+    noteKey: string,
+    data: EvidenceNoteRequest
+  ): Promise<EvidenceNote> {
+    const normalizedNoteKey = noteKey.trim();
+    if (!normalizedNoteKey) {
+      throw new TypeError('note_key cannot be empty or whitespace');
+    }
+    if (normalizedNoteKey === '.' || normalizedNoteKey === '..') {
+      throw new TypeError('note_key cannot be "." or ".."');
+    }
+    return this.request<EvidenceNote>(
+      'PUT',
+      `/api/v1/evidence/notes/${encodeURIComponent(normalizedNoteKey)}`,
+      data
+    );
+  }
+
+  /** List evidence entries and notes within one project. */
+  async listEvidence(data: EvidenceListRequest): Promise<EvidenceListResponse> {
+    const params = evidenceQueryParams(data);
+    return this.request<EvidenceListResponse>('GET', `/api/v1/evidence?${params}`);
+  }
+
+  /** Search evidence claims within one project. */
+  async searchEvidence(data: EvidenceSearchRequest): Promise<EvidenceSearchResponse> {
+    const params = evidenceQueryParams(data, data.q);
+    return this.request<EvidenceSearchResponse>(
+      'GET',
+      `/api/v1/evidence/search?${params}`
+    );
+  }
+
+  /** Promote one session's evidence into a durable report or document. */
+  async promoteEvidence(data: EvidencePromoteRequest): Promise<EvidencePromoteResponse> {
+    return this.request<EvidencePromoteResponse>(
+      'POST',
+      '/api/v1/evidence/promote',
+      data
+    );
+  }
+}
+
+function evidenceQueryParams(data: EvidenceListRequest, query?: string): URLSearchParams {
+  const params = new URLSearchParams({ project_id: data.project_id });
+  if (query !== undefined) params.set('q', query);
+  if (data.session_key !== undefined) params.set('session_key', data.session_key);
+  if (data.mission_id !== undefined) params.set('mission_id', data.mission_id);
+  if (data.disposition !== undefined) params.set('disposition', data.disposition);
+  if (data.page !== undefined) params.set('page', String(data.page));
+  if (data.page_size !== undefined) params.set('page_size', String(data.page_size));
+  return params;
 }
 
 export interface MissionContractPreview {

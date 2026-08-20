@@ -36,4 +36,4 @@ class QdrantVectorDBAdapter:
         )
 
     def delete_chunks(self, document_id: str) -> None:
-        raise NotImplementedError("QdrantService does not yet support delete_chunks_for_document")
+        self._service.delete_chunks(document_id)

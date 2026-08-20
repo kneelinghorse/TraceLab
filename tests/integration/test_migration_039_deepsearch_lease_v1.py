@@ -71,7 +71,7 @@ class TestDeepSearchLeaseV1Migration:
     ):
         engine = create_engine(migration_db_url)
         try:
-            command.upgrade(alembic_cfg, "head")
+            command.upgrade(alembic_cfg, REV_039)
 
             inspector = inspect(engine)
             columns = {
@@ -188,7 +188,7 @@ class TestDeepSearchLeaseV1Migration:
                     },
                 )
 
-            command.upgrade(alembic_cfg, "head")
+            command.upgrade(alembic_cfg, REV_039)
 
             columns = {
                 column["name"]: column

@@ -1,5 +1,7 @@
 """Qdrant vector database service with optimized configuration."""
 
+# ruff: noqa: S110, SIM105 - payload-index creation is intentionally idempotent.
+
 from typing import Any
 
 try:  # pragma: no cover - allow importing module without qdrant dependency
@@ -291,6 +293,21 @@ class QdrantService:
             self.client.upsert(
                 collection_name=self.collection_name, points=batch, wait=True
             )
+
+    def delete_chunks(self, document_id: str) -> None:
+        """Delete every vector whose payload belongs to one document."""
+        self.client.delete(
+            collection_name=self.collection_name,
+            points_selector=Filter(
+                must=[
+                    FieldCondition(
+                        key="document_id",
+                        match=MatchValue(value=str(document_id)),
+                    )
+                ]
+            ),
+            wait=True,
+        )
 
     def search_chunks(
         self,

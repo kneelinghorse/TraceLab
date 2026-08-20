@@ -35,10 +35,13 @@ manifest and golden fixtures.
   silently dropped 12 T40.1 fields — would have been caught here if this
   doc had existed and a CI check enforced parity.
 
-## MCP tool surface (T41.7 — sprint-41)
+## MCP tool surface (T41.7 foundation; LEDGER-1 extension)
 
-The TS MCP package exposes **7 action-clustered tools**, not the prior
-~24 flat tools. The MCP-param column below uses the legacy names
+The TS MCP package exposes **8 action-clustered tools**, not the prior
+~24 flat tools. LEDGER-1 added `tracelab_evidence` without changing the
+mission-authoring calls documented here; its separate field/verb contract is
+[`evidence-ledger-contract.md`](evidence-ledger-contract.md). The MCP-param
+column below uses the legacy names
 (`create_mission`, `get_mission`, …) for readability — the over-the-wire
 calls now go through:
 
@@ -54,7 +57,7 @@ calls now go through:
 
 Hard-cut migration — legacy names are not registered as tools but the
 dispatcher returns a friendly error pointing to the cluster + action
-target. Full mapping for the rest of the surface (project, collection,
+target. Full mapping for the rest of the legacy surface (project, collection,
 report, document, search) is in
 `packages/tracelab-mcp/src/index.ts::LEGACY_TO_CLUSTER`.
 
