@@ -7,16 +7,19 @@ import os
 from pathlib import Path
 
 import pytest
-from alembic.config import Config
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import sessionmaker
+
+from alembic.config import Config
 
 # Prevent root conftest from interfering with our PG session
 os.environ["SKIP_DB_INIT"] = "1"
 os.environ["ENVIRONMENT"] = "test"
 
-from app.core.database import Base  # noqa: E402
+from app.core.database import Base, get_db  # noqa: E402
+from app.main import app  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -52,6 +55,30 @@ def db_session(pg_engine):
     session.close()
     transaction.rollback()
     connection.close()
+
+
+@pytest.fixture
+def client(auth_headers, db_session):
+    """Exercise API routes against the same PostgreSQL transaction as the test."""
+    request_session_factory = sessionmaker(
+        bind=db_session.get_bind(),
+        join_transaction_mode="create_savepoint",
+    )
+
+    def _override_get_db():
+        request_session = request_session_factory()
+        try:
+            yield request_session
+        finally:
+            request_session.close()
+
+    app.dependency_overrides[get_db] = _override_get_db
+    try:
+        with TestClient(app) as test_client:
+            test_client.headers.update(auth_headers)
+            yield test_client
+    finally:
+        app.dependency_overrides.pop(get_db, None)
 
 
 @pytest.fixture

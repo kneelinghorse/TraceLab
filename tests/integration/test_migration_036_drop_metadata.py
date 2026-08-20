@@ -5,7 +5,7 @@ drops it. Three properties matter, each tied to a concrete failure mode:
 
 1. Round-trip — upgrade drops the table, downgrade recreates it with the exact
    001 column shape, re-upgrade drops it again. Proves the drop is reversible at
-   the schema level and the chain is repeatable (single head, no drift).
+   the schema level and the revision boundary is repeatable.
 
 2. Drop guard (success criterion) — on a database where ``metadata`` is already
    gone, the upgrade must be a clean no-op, not a "table does not exist" error.
@@ -52,8 +52,8 @@ class TestDropMetadataMigration:
     ):
         engine = create_engine(migration_db_url)
         try:
-            # --- upgrade the full chain to head (036): metadata must be gone ---
-            command.upgrade(alembic_cfg, "head")
+            # --- upgrade the full chain to 036: metadata must be gone ---
+            command.upgrade(alembic_cfg, REV_036)
             assert "metadata" not in set(inspect(engine).get_table_names()), (
                 "036 upgrade must drop the orphan metadata table"
             )
@@ -92,7 +92,7 @@ class TestDropMetadataMigration:
             )
 
             # --- re-upgrade proves the chain is repeatable and drops it again ---
-            command.upgrade(alembic_cfg, "head")
+            command.upgrade(alembic_cfg, REV_036)
             assert "metadata" not in set(inspect(engine).get_table_names())
         finally:
             engine.dispose()
@@ -101,7 +101,7 @@ class TestDropMetadataMigration:
         """The drop must be a clean no-op where metadata is already gone.
 
         Reach rev 035 (where 001 has created metadata), drop the table out of band,
-        then upgrade to head. 036 must NOT raise "table does not exist" — it must
+        then upgrade to 036. 036 must NOT raise "table does not exist" — it must
         detect the absence and no-op while still advancing the version to 036.
         """
         engine = create_engine(migration_db_url)
@@ -114,7 +114,7 @@ class TestDropMetadataMigration:
             assert "metadata" not in set(inspect(engine).get_table_names())
 
             # The guarded upgrade must be a clean no-op, not an error.
-            command.upgrade(alembic_cfg, "head")
+            command.upgrade(alembic_cfg, REV_036)
 
             assert "metadata" not in set(inspect(engine).get_table_names())
             with engine.connect() as conn:
@@ -130,13 +130,13 @@ class TestDropMetadataMigration:
     def test_downgrade_guard_noops_when_table_exists(self, alembic_cfg, migration_db_url):
         """The recreate must be a clean no-op where metadata already exists.
 
-        Reach head (036, metadata dropped), recreate the table out of band, then
+        Reach revision 036 (metadata dropped), recreate the table out of band, then
         downgrade to 035. 036's downgrade must NOT raise DuplicateTable — it must
         detect the table and no-op while still moving the version back to 035.
         """
         engine = create_engine(migration_db_url)
         try:
-            command.upgrade(alembic_cfg, "head")
+            command.upgrade(alembic_cfg, REV_036)
             assert "metadata" not in set(inspect(engine).get_table_names())
 
             with engine.begin() as conn:

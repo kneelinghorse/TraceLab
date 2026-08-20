@@ -1,0 +1,65 @@
+# ABOUTME: Runs the serialized SQLite-backed backend suite with an explicit quarantine ratchet.
+# ABOUTME: Keeps every quarantined node collected and documented until its owning follow-up lands.
+
+name: Backend Tests
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PEDR_GRAPH_TELEMETRY_ENABLED: "0"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  backend-suite:
+    name: backend-suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -e '.[dev,test]'
+      - name: Run serialized backend suite
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          deselect_args=()
+          quarantine_count=0
+          while IFS= read -r line; do
+            [[ -z "$line" || "$line" == \#* ]] && continue
+            node_id="${line%% \#*}"
+            if [[ "$node_id" == "$line" ]]; then
+              echo "Quarantine row is missing its reason: $line" >&2
+              exit 1
+            fi
+            deselect_args+=("--deselect=$node_id")
+            ((quarantine_count += 1))
+          done < .github/ci/backend-quarantine.txt
+
+          if [[ "$quarantine_count" -ne 51 ]]; then
+            echo "Expected 51 quarantined nodes, found $quarantine_count" >&2
+            exit 1
+          fi
+
+          pytest_output="$(mktemp)"
+          trap 'rm -f "$pytest_output"' EXIT
+          pytest --ignore=tests/integration "${deselect_args[@]}" | tee "$pytest_output"
+
+          if ! grep -Eq '(^|, )51 deselected(,| in )' "$pytest_output"; then
+            echo "Pytest did not report exactly 51 deselected tests." >&2
+            exit 1
+          fi

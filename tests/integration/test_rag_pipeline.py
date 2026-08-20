@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
+import pytest
+
 from app.services import rag_service as rag_module
 from app.services.quality_assessment import QualityAssessmentResult
 

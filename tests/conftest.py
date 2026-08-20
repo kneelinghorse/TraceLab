@@ -30,12 +30,15 @@ os.environ["ENVIRONMENT"] = "test"
 os.environ.setdefault("AUTH_USERNAME", "tracelab-admin")
 os.environ.setdefault("AUTH_PASSWORD", "changeme")
 
-from sqlalchemy import event
+from sqlalchemy import event  # noqa: E402
 
-from app.core.database import Base, SessionLocal, engine
-from app.core.security import get_configured_credentials, issue_token_response
-from app.models.project import Project
-from app.models.user import User
+from app.core.database import Base, SessionLocal, engine  # noqa: E402
+from app.core.security import (  # noqa: E402
+    get_configured_credentials,
+    issue_token_response,
+)
+from app.models.project import Project  # noqa: E402
+from app.models.user import User  # noqa: E402
 
 
 # Register PostgreSQL-only functions for SQLite test compatibility
@@ -82,14 +85,19 @@ def _create_all_sqlite_safe(eng):
     for table in Base.metadata.sorted_tables:
         for col in list(table.columns):
             if hasattr(col, "computed") and col.computed is not None:
-                _originals[(table.fullname, col.name)] = col.computed
+                _originals[(table.fullname, col.name)] = (
+                    col.computed,
+                    col.nullable,
+                )
                 col.computed = None
+                col.nullable = True
     try:
         Base.metadata.create_all(bind=eng)
     finally:
-        for (table_name, col_name), computed in _originals.items():
+        for (table_name, col_name), (computed, nullable) in _originals.items():
             table = Base.metadata.tables[table_name]
             table.columns[col_name].computed = computed
+            table.columns[col_name].nullable = nullable
 
 
 @pytest.fixture(autouse=True)

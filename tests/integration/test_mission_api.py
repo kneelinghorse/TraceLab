@@ -4,81 +4,48 @@ from __future__ import annotations
 
 from textwrap import dedent
 
-import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
 
-
-@pytest.fixture
-def client(auth_headers):
-    with TestClient(app) as test_client:
-        test_client.headers.update(auth_headers)
-        yield test_client
-
-
-def _api_payload(project_id):
+def _api_payload(project_id, mission_id="B3.2-api"):
     return {
         "project_id": str(project_id),
-        "mission_data": {
-            "mission_id": "B3.2-api",
+        "mission_id": mission_id,
+        "title": "Protocol Engine",
+        "objective": "Test API endpoint for mission creation and export workflow",
+        "success_criteria": [
+            "API creates mission successfully",
+            "Export returns YAML",
+        ],
+        "context": {
+            "mission_id": mission_id,
+            "project_id": str(project_id),
             "title": "Protocol Engine",
-            "research_statement": {
-                "topic": "Protocol Engine",
-                "objective": "Test API",
-                "scope": "Backend",
-            },
-            "key_questions": [
-                {
-                    "question": "How do we test?",
-                    "status": "answered",
-                    "answer": "with pytest",
-                }
-            ],
-            "synthesis": {
-                "key_insights": [
-                    "API works end-to-end and persists telemetry-friendly quality gate outcomes."
-                ],
-                "recommendations": ["Monitor quality gate endpoint from UI"],
-                "next_steps": ["Publish integration test coverage"],
-            },
-            "evidence": [
-                {
-                    "evidence_id": "EV-api",
-                    "source": "docs/mission_protocol_validation.md",
-                    "summary": "Spec",
-                    "chunk_id": "00000000-0000-0000-0000-000000000002",
-                }
-            ],
-            "quality_checkpoints": [
-                {"gate": "research_statement", "status": "pass"},
-                {"gate": "evidence_links", "status": "pass"},
-                {"gate": "synthesis_quality", "status": "pass"},
-                {"gate": "traceability", "status": "pass"},
-                {"gate": "contradictions_resolved", "status": "pass"},
-            ],
         },
     }
 
 
 def test_create_and_export_mission(client: TestClient, project):
-    response = client.post("/api/v1/missions/", json=_api_payload(project.id))
+    response = client.post("/api/v1/missions", json=_api_payload(project.id))
     assert response.status_code == 201
     created = response.json()
     mission_id = created["id"]
-    assert created["status"] == "complete"
+    assert created["mission_id"] == "B3.2-api"
+    assert created["status"] == "draft"
 
     fetched = client.get(f"/api/v1/missions/{mission_id}")
     assert fetched.status_code == 200
-    assert fetched.json()["mission_data"]["mission_id"] == "B3.2-api"
+    assert fetched.json()["mission_id"] == "B3.2-api"
 
     export_resp = client.get(f"/api/v1/missions/{mission_id}/export")
     assert export_resp.status_code == 200
-    assert "mission_id: B3.2-api" in export_resp.json()["yaml_text"]
+    assert export_resp.headers["content-type"].startswith("text/yaml")
+    assert "mission_id: B3.2-api" in export_resp.text
 
 
 def test_export_mission_as_markdown(client: TestClient, project):
-    response = client.post("/api/v1/missions/", json=_api_payload(project.id))
+    payload = _api_payload(project.id, "B3.2-md-export")
+    response = client.post("/api/v1/missions", json=payload)
     assert response.status_code == 201
     mission_id = response.json()["id"]
 
@@ -137,23 +104,45 @@ def test_import_yaml_endpoint(client: TestClient, project):
     )
     assert import_resp.status_code == 201
     mission = import_resp.json()["mission"]
-    assert mission["mission_data"]["mission_id"] == "B3.2-import"
+    assert mission["mission_id"] == "B3.2-import"
 
-    list_resp = client.get(f"/api/v1/missions/?project_id={project.id}")
+    list_resp = client.get(f"/api/v1/missions?project_id={project.id}")
     assert list_resp.status_code == 200
     response_data = list_resp.json()
     assert "data" in response_data, "Response should have 'data' key for consistency"
     missions = response_data["data"]
-    assert any(item["mission_data"]["mission_id"] == "B3.2-import" for item in missions)
+    assert any(item["mission_id"] == "B3.2-import" for item in missions)
 
 
 def test_quality_endpoint_reports_gate_status(client: TestClient, project):
-    create_resp = client.post("/api/v1/missions/", json=_api_payload(project.id))
+    payload = _api_payload(project.id, "B3.2-quality")
+    create_resp = client.post("/api/v1/missions", json=payload)
     assert create_resp.status_code == 201
     mission_id = create_resp.json()["id"]
 
     quality_resp = client.get(f"/api/v1/missions/{mission_id}/quality")
     assert quality_resp.status_code == 200
-    payload = quality_resp.json()
-    assert payload["all_passed"] is True
-    assert "research_statement" in payload["gates"]
+    report = quality_resp.json()
+    assert report["mission_id"] == mission_id
+    assert report["protocol_mission_id"] == "B3.2-quality"
+    assert set(report["gates"]) == {
+        "research_statement",
+        "evidence_links",
+        "contradictions_resolved",
+        "synthesis_quality",
+        "traceability",
+    }
+    assert {name: gate["status"] for name, gate in report["gates"].items()} == {
+        "research_statement": "fail",
+        "evidence_links": "fail",
+        "contradictions_resolved": "pass",
+        "synthesis_quality": "fail",
+        "traceability": "fail",
+    }
+    assert report["failing_gates"] == [
+        "research_statement",
+        "evidence_links",
+        "synthesis_quality",
+        "traceability",
+    ]
+    assert report["all_passed"] is False
