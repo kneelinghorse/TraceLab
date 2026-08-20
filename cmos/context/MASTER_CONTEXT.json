@@ -224,7 +224,7 @@
             "B12.4: Standardize API response structure (HIGH)",
             "B12.5: End-to-end integration verification (HIGH)",
             "B12.6: Sprint retrospective",
-            "Service account credentials standardized: deepsearch-service / ds-TraceLab-2024!secure",
+            "Service account credentials standardized: [REDACTED 2026-08-19: service-account credential pair removed; flagged by DeepSearch s92 audit, rotation pending]",
             "DeepSearch answers doc updated with honest status and workarounds"
           ],
           "mistakes_made": [],
@@ -541,7 +541,7 @@
       "date": "2025-12-05"
     },
     {
-      "decision": "Service account credentials standardized across projects: deepsearch-service / ds-TraceLab-2024!secure",
+      "decision": "Service account credentials standardized across projects: [REDACTED 2026-08-19: service-account credential pair removed; flagged by DeepSearch s92 audit, rotation pending]",
       "source": "Sprint 12 finalization session",
       "date": "2025-12-05"
     },
