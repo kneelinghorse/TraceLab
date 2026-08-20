@@ -3,9 +3,10 @@
 MCP server for [TraceLab](https://github.com/kneelinghorse/TraceLab). Lets AI
 agents run complete research-to-output loops — semantic search, project and
 collection management, mission authoring, DeepSearch execution, and report
-generation — against a TraceLab knowledge base.
+generation, plus cross-session evidence capture — against a TraceLab knowledge
+base.
 
-- **7 action-clustered tools** (one tool per noun, dispatched by `action`)
+- **8 action-clustered tools** (one tool per noun, dispatched by `action`)
 - **RFC 8628 device-code login** — install, run, click a link, you're in
 - Works out of the box with **Claude Desktop**, **Claude Code**, and any
   Model Context Protocol client over stdio
@@ -141,7 +142,7 @@ never leak across deployments.
 
 ## Tools
 
-Seven action-clustered tools. Each cluster exposes multiple actions
+Eight action-clustered tools. Each cluster exposes multiple actions
 selected via the `action` parameter.
 
 | Cluster | Actions | Purpose |
@@ -153,6 +154,7 @@ selected via the `action` parameter.
 | `tracelab_document` | `upload`, `get_content` | Document ingestion + full-text fetch. |
 | `tracelab_mission` | `create`, `list`, `get`, `update` | Mission CRUD against the DeepSearch authoring contract. |
 | `tracelab_mission_execution` | `submit`, `status`, `preview` | DeepSearch lifecycle: queue, poll status, preview the compiled contract. |
+| `tracelab_evidence` | `capture`, `note`, `list`, `search`, `promote` | Capture sourced findings and working notes, reuse them across sessions, and promote a session to a report or document. |
 
 ### Example calls
 
@@ -210,6 +212,47 @@ Synthesize a collection into a report:
 }
 ```
 
+Capture sourced findings for reuse in later sessions:
+
+```json
+{
+  "name": "tracelab_evidence",
+  "arguments": {
+    "action": "capture",
+    "project_id": "fbd3bd03-5ddc-49ee-8013-529163a99290",
+    "session_key": "competitive-scan-2026-08-20",
+    "entries": [
+      {
+        "claim": "The vendor publishes a documented data-retention limit.",
+        "source_url": "https://example.com/security/retention",
+        "snippet": "Customer content is retained for no more than 30 days.",
+        "query": "vendor data retention policy",
+        "disposition": "supporting",
+        "tags": ["security", "retention"]
+      }
+    ]
+  }
+}
+```
+
+Search the project ledger before repeating research:
+
+```json
+{
+  "name": "tracelab_evidence",
+  "arguments": {
+    "action": "search",
+    "project_id": "fbd3bd03-5ddc-49ee-8013-529163a99290",
+    "q": "data retention"
+  }
+}
+```
+
+Evidence required text and tags are trimmed and must remain nonblank. Working
+note keys may contain ordinary encoded path characters (including `/`), but
+the dot-only keys `.` and `..` are reserved because URL parsers treat them as
+navigation segments.
+
 ---
 
 ## Migration from earlier names
@@ -217,7 +260,8 @@ Synthesize a collection into a report:
 If you previously used the un-published `@tracelab/mcp-server` name from
 this repo, the only change is the package name on install. Tool names,
 schemas, and behavior are unchanged. The flat `~24` tool surface from
-sprint-40 was already collapsed into the 7 clusters in sprint-41 (T41.7);
+sprint-40 was collapsed into 7 clusters in sprint-41 (T41.7), then extended
+to 8 by the additive Evidence Ledger cluster in LEDGER-1;
 calls to the legacy names return a friendly migration error pointing at
 the cluster equivalent.
 

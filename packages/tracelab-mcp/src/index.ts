@@ -2,7 +2,7 @@
 /**
  * TraceLab MCP Server
  *
- * Provides 7 action-clustered tools for AI agents to perform complete
+ * Provides 8 action-clustered tools for AI agents to perform complete
  * research-to-output loops against TraceLab's knowledge base. T41.7
  * (sprint-41) collapsed the prior ~24 flat tools into topical clusters
  * matching the cmos-mcp pattern. Each cluster dispatches by an `action`
@@ -16,6 +16,7 @@
  * 5. tracelab_document         — actions: upload, get_content
  * 6. tracelab_mission          — actions: create, list, get, update (CRUD)
  * 7. tracelab_mission_execution — actions: submit, status, preview (DS-bound lifecycle)
+ * 8. tracelab_evidence         — actions: capture, note, list, search, promote
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -60,13 +61,14 @@ let client: TraceLabClient = new TraceLabClient({
 
 // Tool definitions
 // T41.7 (sprint-41): Tool surface refactored from ~24 flat tools into 7
-// action-clustered tools, matching the cmos-mcp pattern. Each tool dispatches
+// action-clustered tools. LEDGER-1 adds the eighth cluster without changing
+// the original mappings. Each tool dispatches
 // by an `action` parameter to the existing per-action handlers below. Cluster
 // boundaries chosen to mirror domain nouns (search/project/collection/report/
 // document/mission). Mission CRUD and DeepSearch-bound execution lifecycle
 // are split into two clusters because their callers and lifecycles differ —
 // matches the cmos-mcp cmos_mission vs cmos_mission_transition precedent.
-const TOOLS: Tool[] = [
+export const TOOLS: Tool[] = [
   // ─────────────────────────────────────────────────────────────────────────
   // 1. tracelab_search — semantic knowledge-base search
   // ─────────────────────────────────────────────────────────────────────────
@@ -527,6 +529,153 @@ const TOOLS: Tool[] = [
       required: ['action', 'mission_id'],
     },
   },
+  // ─────────────────────────────────────────────────────────────────────────
+  // 8. tracelab_evidence — cross-session evidence ledger
+  // ─────────────────────────────────────────────────────────────────────────
+  {
+    name: 'tracelab_evidence',
+    description:
+      'Capture and reuse sourced research findings across agent sessions. Actions: capture (batch findings), note (upsert a keyed working note), list (entries and notes), search (query prior findings), promote (roll a session into a report or document). All actions require project_id; capture/note/promote require session_key; search requires q.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: {
+          type: 'string',
+          enum: ['capture', 'note', 'list', 'search', 'promote'],
+          description: 'Evidence action. capture: batch sourced findings. note: upsert a keyed working note. list: browse scoped entries and notes. search: query prior claims. promote: create a durable report or document from one session.',
+        },
+        project_id: {
+          type: 'string',
+          format: 'uuid',
+          description: 'Project UUID. Required for every action; authorization and reads are project-scoped.',
+        },
+        session_key: {
+          type: 'string',
+          minLength: 1,
+          maxLength: 255,
+          pattern: '\\S',
+          description: 'Agent session key, trimmed and nonblank. Required for capture, note, and promote; optional filter for list/search.',
+        },
+        mission_id: {
+          type: 'string',
+          format: 'uuid',
+          description: 'Optional mission UUID associated with captured findings/notes or used as a list/search filter.',
+        },
+        entries: {
+          type: 'array',
+          minItems: 1,
+          maxItems: 100,
+          description: 'For action="capture": findings to store atomically.',
+          items: {
+            type: 'object',
+            properties: {
+              claim: {
+                type: 'string',
+                minLength: 1,
+                maxLength: 20000,
+                pattern: '\\S',
+                description: 'The trimmed, nonblank evidence-backed claim.',
+              },
+              summary: {
+                type: 'string',
+                maxLength: 20000,
+                description: 'Optional concise summary distinct from the full claim.',
+              },
+              source_url: {
+                type: 'string',
+                format: 'uri',
+                pattern: '^[Hh][Tt][Tt][Pp][Ss]?://',
+                minLength: 1,
+                maxLength: 4096,
+                description: 'Canonical absolute HTTP(S) source URL for the finding.',
+              },
+              snippet: {
+                type: 'string',
+                maxLength: 20000,
+                description: 'Optional supporting source excerpt.',
+              },
+              query: {
+                type: 'string',
+                maxLength: 4000,
+                description: 'Optional research query that surfaced the source.',
+              },
+              disposition: {
+                type: 'string',
+                enum: ['supporting', 'contradicting', 'rejected', 'background'],
+                description: 'How the finding relates to the active line of inquiry.',
+              },
+              tags: {
+                type: 'array',
+                maxItems: 50,
+                items: { type: 'string', minLength: 1, maxLength: 64, pattern: '\\S' },
+                description: 'Optional trimmed, nonblank tags for later filtering and synthesis.',
+              },
+            },
+            required: ['claim', 'source_url', 'disposition'],
+            additionalProperties: false,
+          },
+        },
+        note_key: {
+          type: 'string',
+          minLength: 1,
+          maxLength: 100,
+          pattern: '^(?!\\s*\\.{1,2}\\s*$)(?=[\\s\\S]*\\S)[\\s\\S]*$',
+          description: 'For action="note": trimmed, nonblank stable key used to create or replace a working note. Dot-only keys "." and ".." are reserved because URL parsers treat them as navigation segments.',
+        },
+        content: {
+          type: 'string',
+          minLength: 1,
+          maxLength: 50000,
+          pattern: '\\S',
+          description: 'For action="note": trimmed, nonblank working-note content.',
+        },
+        tags: {
+          type: 'array',
+          maxItems: 50,
+          items: { type: 'string', minLength: 1, maxLength: 64, pattern: '\\S' },
+          description: 'For action="note": optional trimmed, nonblank note tags.',
+        },
+        q: {
+          type: 'string',
+          minLength: 1,
+          maxLength: 4000,
+          pattern: '\\S',
+          description: 'For action="search": trimmed, nonblank query text matched against prior evidence.',
+        },
+        disposition: {
+          type: 'string',
+          enum: ['supporting', 'contradicting', 'rejected', 'background'],
+          description: 'For list/search: optional disposition filter.',
+        },
+        page: {
+          type: 'integer',
+          minimum: 1,
+          description: 'For list/search: page number (default: 1).',
+        },
+        page_size: {
+          type: 'integer',
+          minimum: 1,
+          maximum: 100,
+          description: 'For list/search: results per page (default: 20).',
+        },
+        title: {
+          type: 'string',
+          minLength: 1,
+          maxLength: 255,
+          pattern: '\\S',
+          description: 'For action="promote": optional trimmed, nonblank artifact title.',
+        },
+        target: {
+          type: 'string',
+          enum: ['report', 'document'],
+          default: 'report',
+          description: 'For action="promote": durable artifact type (default: report).',
+        },
+      },
+      required: ['action'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 // Legacy → cluster action mapping (T41.7). Kept as a const for the
@@ -752,6 +901,91 @@ const GetMissionStatusInput = z.object({
 
 const PreviewMissionContractInput = z.object({
   mission_id: z.string().uuid(),
+});
+
+// Evidence Ledger input schemas (LEDGER-1). Keep every nested capture field
+// explicit: Zod strips unknown keys, so an omitted schema field would otherwise
+// disappear silently before the request reaches TraceLab.
+const EvidenceDispositionSchema = z.enum([
+  'supporting',
+  'contradicting',
+  'rejected',
+  'background',
+]);
+
+function requiredEvidenceText(field: string, maxLength: number) {
+  return z
+    .string()
+    .min(1)
+    .max(maxLength)
+    .refine((value) => value.trim().length > 0, `${field} cannot be empty or whitespace`)
+    .transform((value) => value.trim());
+}
+
+const EvidenceTagSchema = z
+  .string()
+  .trim()
+  .min(1, 'tags cannot contain empty values')
+  .max(64, 'tags cannot exceed 64 characters');
+
+const EvidenceTagsSchema = z
+  .array(EvidenceTagSchema)
+  .max(50)
+  .transform((tags) => [...new Set(tags)]);
+
+const EvidenceNoteKeySchema = requiredEvidenceText('note_key', 100).refine(
+  (value) => value !== '.' && value !== '..',
+  'note_key cannot be "." or ".."'
+);
+
+const EvidenceCaptureItemSchema = z.object({
+  claim: requiredEvidenceText('claim', 20000),
+  summary: z.string().max(20000).optional(),
+  source_url: z
+    .string()
+    .url()
+    .regex(/^https?:\/\//i, 'source_url must be an absolute HTTP(S) URL')
+    .max(4096),
+  snippet: z.string().max(20000).optional(),
+  query: z.string().max(4000).optional(),
+  disposition: EvidenceDispositionSchema,
+  tags: EvidenceTagsSchema.optional(),
+});
+
+const CaptureEvidenceInput = z.object({
+  project_id: z.string().uuid(),
+  session_key: requiredEvidenceText('session_key', 255),
+  mission_id: z.string().uuid().optional(),
+  entries: z.array(EvidenceCaptureItemSchema).min(1).max(100),
+});
+
+const PutEvidenceNoteInput = z.object({
+  project_id: z.string().uuid(),
+  session_key: requiredEvidenceText('session_key', 255),
+  note_key: EvidenceNoteKeySchema,
+  content: requiredEvidenceText('content', 50000),
+  mission_id: z.string().uuid().optional(),
+  tags: EvidenceTagsSchema.optional(),
+});
+
+const ListEvidenceInput = z.object({
+  project_id: z.string().uuid(),
+  session_key: requiredEvidenceText('session_key', 255).optional(),
+  mission_id: z.string().uuid().optional(),
+  disposition: EvidenceDispositionSchema.optional(),
+  page: z.number().int().min(1).optional().default(1),
+  page_size: z.number().int().min(1).max(100).optional().default(20),
+});
+
+const SearchEvidenceInput = ListEvidenceInput.extend({
+  q: requiredEvidenceText('q', 4000),
+});
+
+const PromoteEvidenceInput = z.object({
+  project_id: z.string().uuid(),
+  session_key: requiredEvidenceText('session_key', 255),
+  title: requiredEvidenceText('title', 255).optional(),
+  target: z.enum(['report', 'document']).optional().default('report'),
 });
 
 // Tool handlers
@@ -1781,6 +2015,43 @@ async function handleGetMissionStatus(args: unknown) {
   };
 }
 
+function rawJsonResponse(result: unknown) {
+  return {
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(result, null, 2),
+      },
+    ],
+  };
+}
+
+async function handleCaptureEvidence(args: unknown) {
+  const input = CaptureEvidenceInput.parse(args);
+  return rawJsonResponse(await client.captureEvidence(input));
+}
+
+async function handlePutEvidenceNote(args: unknown) {
+  const input = PutEvidenceNoteInput.parse(args);
+  const { note_key: noteKey, ...body } = input;
+  return rawJsonResponse(await client.putEvidenceNote(noteKey, body));
+}
+
+async function handleListEvidence(args: unknown) {
+  const input = ListEvidenceInput.parse(args);
+  return rawJsonResponse(await client.listEvidence(input));
+}
+
+async function handleSearchEvidence(args: unknown) {
+  const input = SearchEvidenceInput.parse(args);
+  return rawJsonResponse(await client.searchEvidence(input));
+}
+
+async function handlePromoteEvidence(args: unknown) {
+  const input = PromoteEvidenceInput.parse(args);
+  return rawJsonResponse(await client.promoteEvidence(input));
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // T41.7 cluster dispatchers
 //
@@ -1939,6 +2210,25 @@ export async function handleTracelabMissionExecution(args: unknown) {
   }
 }
 
+const EVIDENCE_ACTIONS = ['capture', 'note', 'list', 'search', 'promote'] as const;
+export async function handleTracelabEvidence(args: unknown) {
+  const action = getAction(args);
+  switch (action) {
+    case 'capture':
+      return await handleCaptureEvidence(args);
+    case 'note':
+      return await handlePutEvidenceNote(args);
+    case 'list':
+      return await handleListEvidence(args);
+    case 'search':
+      return await handleSearchEvidence(args);
+    case 'promote':
+      return await handlePromoteEvidence(args);
+    default:
+      return unknownAction('tracelab_evidence', action, EVIDENCE_ACTIONS);
+  }
+}
+
 // Exported for the parity test in index.test.ts — every legacy tool name in
 // LEGACY_TO_CLUSTER must map to a (cluster, action) pair where action ∈ the
 // cluster's action enum. Compile-time guarded by the readonly tuples above.
@@ -1950,7 +2240,34 @@ export const CLUSTER_ACTIONS = {
   tracelab_document: DOCUMENT_ACTIONS,
   tracelab_mission: MISSION_ACTIONS,
   tracelab_mission_execution: MISSION_EXECUTION_ACTIONS,
+  tracelab_evidence: EVIDENCE_ACTIONS,
 } as const;
+
+// One registry powers the real CallTool dispatcher and its parity tests. Keeping
+// descriptors, action enums, and dispatch handlers as independently-maintained
+// lists previously allowed a tool to appear in tests without being callable.
+export const CLUSTER_HANDLERS = {
+  tracelab_search: handleTracelabSearch,
+  tracelab_project: handleTracelabProject,
+  tracelab_collection: handleTracelabCollection,
+  tracelab_report: handleTracelabReport,
+  tracelab_document: handleTracelabDocument,
+  tracelab_mission: handleTracelabMission,
+  tracelab_mission_execution: handleTracelabMissionExecution,
+  tracelab_evidence: handleTracelabEvidence,
+} as const;
+
+export function resolveClusterHandler(name: string) {
+  return Object.hasOwn(CLUSTER_HANDLERS, name)
+    ? CLUSTER_HANDLERS[name as keyof typeof CLUSTER_HANDLERS]
+    : undefined;
+}
+
+export function resolveLegacyTool(name: string) {
+  return Object.hasOwn(LEGACY_TO_CLUSTER, name)
+    ? LEGACY_TO_CLUSTER[name]
+    : undefined;
+}
 
 /**
  * Resolve the auth credential the MCP client will use against TraceLab.
@@ -2047,57 +2364,44 @@ async function main() {
     const { name, arguments: args } = request.params;
 
     try {
-      // T41.7: 7 cluster tools. Each cluster dispatches by `action`
+      // T41.7 + LEDGER-1: 8 cluster tools. Each cluster dispatches by `action`
       // internally (see handleTracelab* functions above). Hard-cut from
       // the prior 24 flat tools — no deprecation period (rationale:
       // pre-v1 npm publish, internal use, cmos-mcp precedent). Legacy
       // tool name → cluster mapping documented in LEGACY_TO_CLUSTER.
-      switch (name) {
-        case 'tracelab_search':
-          return await handleTracelabSearch(args);
-        case 'tracelab_project':
-          return await handleTracelabProject(args);
-        case 'tracelab_collection':
-          return await handleTracelabCollection(args);
-        case 'tracelab_report':
-          return await handleTracelabReport(args);
-        case 'tracelab_document':
-          return await handleTracelabDocument(args);
-        case 'tracelab_mission':
-          return await handleTracelabMission(args);
-        case 'tracelab_mission_execution':
-          return await handleTracelabMissionExecution(args);
-        default: {
-          // T41.7 hard-cut: surface the migration target if an agent
-          // calls a legacy tool name. The mapping is exported for tests.
-          const migrated = LEGACY_TO_CLUSTER[name];
-          if (migrated) {
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text:
-                    `Tool "${name}" was renamed in T41.7 (sprint-41). ` +
-                    `Use ${migrated.tool}(action="${migrated.action}", ...) ` +
-                    `with the same parameters. See packages/tracelab-mcp/CHANGELOG ` +
-                    `or cmos/contracts/mission-authoring-contract.md for the ` +
-                    `full legacy → cluster mapping.`,
-                },
-              ],
-              isError: true,
-            };
-          }
-          return {
-            content: [
-              {
-                type: 'text',
-                text: `Unknown tool: ${name}`,
-              },
-            ],
-            isError: true,
-          };
-        }
+      const clusterHandler = resolveClusterHandler(name);
+      if (clusterHandler) {
+        return await clusterHandler(args);
       }
+
+      // T41.7 hard-cut: surface the migration target if an agent calls a
+      // legacy tool name. The mapping is exported for tests.
+      const migrated = resolveLegacyTool(name);
+      if (migrated) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text:
+                `Tool "${name}" was renamed in T41.7 (sprint-41). ` +
+                `Use ${migrated.tool}(action="${migrated.action}", ...) ` +
+                `with the same parameters. See packages/tracelab-mcp/CHANGELOG ` +
+                `or cmos/contracts/mission-authoring-contract.md for the ` +
+                `full legacy → cluster mapping.`,
+            },
+          ],
+          isError: true,
+        };
+      }
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Unknown tool: ${name}`,
+          },
+        ],
+        isError: true,
+      };
     } catch (error) {
       if (error instanceof z.ZodError) {
         return {

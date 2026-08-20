@@ -4,12 +4,34 @@
  * These tests verify the tool implementations work correctly with mocked API responses.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeAll, beforeEach, afterEach, afterAll } from 'vitest';
 import { TraceLabClient, TraceLabAPIError } from './api-client.js';
 
 // Mock fetch globally
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
+
+// Handler tests exercise the module-level shared client constructed by index.ts.
+// Pin its credential before the first dynamic import so evidence calls prove the
+// published MCP path forwards API-key authentication, not only URL/method/body.
+const originalTraceLabToken = process.env.TRACELAB_TOKEN;
+const originalTraceLabApiKey = process.env.TRACELAB_API_KEY;
+const originalTraceLabApiUrl = process.env.TRACELAB_API_URL;
+
+beforeAll(() => {
+  delete process.env.TRACELAB_TOKEN;
+  process.env.TRACELAB_API_KEY = 'tl_shared-client-test';
+  process.env.TRACELAB_API_URL = 'http://localhost:8000';
+});
+
+afterAll(() => {
+  if (originalTraceLabToken === undefined) delete process.env.TRACELAB_TOKEN;
+  else process.env.TRACELAB_TOKEN = originalTraceLabToken;
+  if (originalTraceLabApiKey === undefined) delete process.env.TRACELAB_API_KEY;
+  else process.env.TRACELAB_API_KEY = originalTraceLabApiKey;
+  if (originalTraceLabApiUrl === undefined) delete process.env.TRACELAB_API_URL;
+  else process.env.TRACELAB_API_URL = originalTraceLabApiUrl;
+});
 
 describe('TraceLabClient', () => {
   let client: TraceLabClient;
@@ -890,30 +912,58 @@ describe('MCP handlers — T41.4 slim/full payload split for get_mission', () =>
 // T41.7 — Tool-grouping refactor: cluster surface + parity
 //
 // Surface invariants:
-//   1. Exactly 7 visible MCP tools, all named tracelab_*
+//   1. Exactly 8 visible MCP tools, all named tracelab_*
 //   2. Every legacy tool name maps to a (cluster, action) pair where
 //      action is in the cluster's action enum
 //   3. Each cluster dispatches to the correct per-action handler
 // ─────────────────────────────────────────────────────────────────────────
 
 describe('T41.7 — cluster surface', () => {
-  it('exposes exactly 7 tracelab_* tools', async () => {
+  it('exposes exactly 8 tracelab_* tools and keeps descriptors aligned with action enums', async () => {
     const indexSource = await import('./index.js');
-    const { CLUSTER_ACTIONS } = indexSource as unknown as {
+    const { CLUSTER_ACTIONS, CLUSTER_HANDLERS, TOOLS } = indexSource as unknown as {
       CLUSTER_ACTIONS: Record<string, readonly string[]>;
+      CLUSTER_HANDLERS: Record<string, (args: unknown) => Promise<unknown>>;
+      TOOLS: Array<{
+        name: string;
+        inputSchema: {
+          properties?: Record<string, { enum?: string[] }>;
+        };
+      }>;
     };
     const toolNames = Object.keys(CLUSTER_ACTIONS);
-    expect(toolNames).toHaveLength(7);
+    expect(toolNames).toHaveLength(8);
     expect(toolNames.sort()).toEqual([
       'tracelab_collection',
       'tracelab_document',
+      'tracelab_evidence',
       'tracelab_mission',
       'tracelab_mission_execution',
       'tracelab_project',
       'tracelab_report',
       'tracelab_search',
     ]);
+
+    const descriptors = new Map(TOOLS.map((tool) => [tool.name, tool]));
+    expect([...descriptors.keys()].sort()).toEqual(toolNames.sort());
+    expect(Object.keys(CLUSTER_HANDLERS).sort()).toEqual(toolNames.sort());
+    for (const [toolName, actions] of Object.entries(CLUSTER_ACTIONS)) {
+      expect(
+        descriptors.get(toolName)?.inputSchema.properties?.action?.enum,
+        `${toolName} descriptor action enum must match CLUSTER_ACTIONS`
+      ).toEqual([...actions]);
+    }
   });
+
+  it.each(['toString', 'constructor', '__proto__', 'hasOwnProperty'])(
+    'never dispatches prototype-inherited tool name %s',
+    async (name) => {
+      const { resolveClusterHandler, resolveLegacyTool } = await import('./index.js');
+
+      expect(resolveClusterHandler(name)).toBeUndefined();
+      expect(resolveLegacyTool(name)).toBeUndefined();
+    }
+  );
 
   it('every legacy tool maps to a valid (cluster, action) pair', async () => {
     const { LEGACY_TO_CLUSTER, CLUSTER_ACTIONS } = (await import(
@@ -1185,5 +1235,455 @@ describe('T41.7 — cluster dispatch (per-cluster smoke)', () => {
     // The error should enumerate the valid actions.
     expect(res.content[0].text).toContain('create');
     expect(res.content[0].text).toContain('update');
+  });
+});
+
+describe('LEDGER-1 — tracelab_evidence published contract', () => {
+  const PROJECT_ID = '11111111-1111-4111-8111-111111111111';
+  const MISSION_ID = '22222222-2222-4222-8222-222222222222';
+  const ENTRY_ID = '33333333-3333-4333-8333-333333333333';
+  const NOTE_ID = '44444444-4444-4444-8444-444444444444';
+  const OWNER_ID = '55555555-5555-4555-8555-555555555555';
+  const WORKSPACE_ID = '66666666-6666-4666-8666-666666666666';
+
+  const entryFixture = {
+    id: ENTRY_ID,
+    project_id: PROJECT_ID,
+    mission_id: MISSION_ID,
+    session_key: 'session / 42',
+    origin: 'mcp-agent',
+    claim: 'The API preserves the full evidence record.',
+    summary: 'Full evidence survives MCP serialization.',
+    source_url: 'https://example.com/research?a=1&b=2',
+    snippet: 'A directly supporting excerpt.',
+    query: 'evidence serialization behavior',
+    disposition: 'supporting',
+    tags: ['contract', 'mcp'],
+    owner_id: OWNER_ID,
+    workspace_id: WORKSPACE_ID,
+    created_at: '2026-08-20T12:00:00Z',
+    updated_at: '2026-08-20T12:01:00Z',
+  };
+
+  const noteFixture = {
+    id: NOTE_ID,
+    project_id: PROJECT_ID,
+    mission_id: MISSION_ID,
+    session_key: 'session / 42',
+    origin: 'mcp-agent',
+    note_key: 'open/question ?',
+    content: 'Resolve the contradictory source before promotion.',
+    tags: ['working-note'],
+    owner_id: OWNER_ID,
+    workspace_id: WORKSPACE_ID,
+    created_at: '2026-08-20T12:02:00Z',
+    updated_at: '2026-08-20T12:03:00Z',
+  };
+
+  const okJson = (body: unknown) => ({
+    ok: true,
+    headers: new Headers({ 'content-type': 'application/json' }),
+    json: () => Promise.resolve(body),
+  });
+
+  beforeEach(() => {
+    mockFetch.mockReset();
+  });
+
+  it('publishes explicit capture item fields and never accepts caller-supplied origin', async () => {
+    type SchemaNode = {
+      maxLength?: number;
+      maxItems?: number;
+      pattern?: string;
+      properties?: Record<string, SchemaNode>;
+      required?: string[];
+      additionalProperties?: boolean;
+      items?: SchemaNode;
+    };
+    const { TOOLS } = (await import('./index.js')) as unknown as {
+      TOOLS: Array<{
+        name: string;
+        inputSchema: SchemaNode & { properties: Record<string, SchemaNode> };
+      }>;
+    };
+    const schema = TOOLS.find((tool) => tool.name === 'tracelab_evidence')?.inputSchema;
+    expect(schema).toBeDefined();
+    expect(Object.keys(schema!.properties.entries.items!.properties!).sort()).toEqual([
+      'claim',
+      'disposition',
+      'query',
+      'snippet',
+      'source_url',
+      'summary',
+      'tags',
+    ]);
+    expect(schema!.properties.entries.items!.required).toEqual([
+      'claim',
+      'source_url',
+      'disposition',
+    ]);
+    expect(schema!.properties.entries.items!.additionalProperties).toBe(false);
+    expect(schema!.properties.entries.maxItems).toBe(100);
+    expect(schema!.properties.note_key.maxLength).toBe(100);
+    expect(schema!.additionalProperties).toBe(false);
+    expect(schema!.properties).not.toHaveProperty('origin');
+
+    const captureFields = schema!.properties.entries.items!.properties!;
+    expect('   ').not.toMatch(new RegExp(captureFields.claim.pattern!));
+    expect(' claim ').toMatch(new RegExp(captureFields.claim.pattern!));
+    expect('\t').not.toMatch(new RegExp(captureFields.tags.items!.pattern!));
+    expect('  ').not.toMatch(new RegExp(schema!.properties.session_key.pattern!));
+    expect('\n\t').not.toMatch(new RegExp(schema!.properties.content.pattern!));
+    expect('  ').not.toMatch(new RegExp(schema!.properties.q.pattern!));
+    expect('  ').not.toMatch(new RegExp(schema!.properties.title.pattern!));
+    const noteKeyPattern = new RegExp(schema!.properties.note_key.pattern!);
+    expect('.').not.toMatch(noteKeyPattern);
+    expect(' .. ').not.toMatch(noteKeyPattern);
+    expect('open/question').toMatch(noteKeyPattern);
+  });
+
+  it('rejects backend-invalid whitespace-only required text and tags before fetch', async () => {
+    const { handleTracelabEvidence } = await import('./index.js');
+    const validEntry = {
+      claim: 'Valid claim',
+      source_url: 'https://example.com/source',
+      disposition: 'supporting',
+    };
+    const invalidCalls: Array<{ label: string; args: Record<string, unknown> }> = [
+      {
+        label: 'capture session_key',
+        args: {
+          action: 'capture',
+          project_id: PROJECT_ID,
+          session_key: '   ',
+          entries: [validEntry],
+        },
+      },
+      {
+        label: 'capture claim',
+        args: {
+          action: 'capture',
+          project_id: PROJECT_ID,
+          session_key: 'session',
+          entries: [{ ...validEntry, claim: '\t\n' }],
+        },
+      },
+      {
+        label: 'capture tag',
+        args: {
+          action: 'capture',
+          project_id: PROJECT_ID,
+          session_key: 'session',
+          entries: [{ ...validEntry, tags: ['  '] }],
+        },
+      },
+      {
+        label: 'note note_key',
+        args: {
+          action: 'note',
+          project_id: PROJECT_ID,
+          session_key: 'session',
+          note_key: '  ',
+          content: 'content',
+        },
+      },
+      {
+        label: 'note content',
+        args: {
+          action: 'note',
+          project_id: PROJECT_ID,
+          session_key: 'session',
+          note_key: 'key',
+          content: '\n\t',
+        },
+      },
+      {
+        label: 'list session_key',
+        args: { action: 'list', project_id: PROJECT_ID, session_key: '  ' },
+      },
+      {
+        label: 'search q',
+        args: { action: 'search', project_id: PROJECT_ID, q: '\t' },
+      },
+      {
+        label: 'promote title',
+        args: {
+          action: 'promote',
+          project_id: PROJECT_ID,
+          session_key: 'session',
+          title: '  ',
+        },
+      },
+    ];
+
+    for (const { label, args } of invalidCalls) {
+      await expect(handleTracelabEvidence(args), label).rejects.toThrow(
+        /empty|whitespace/
+      );
+    }
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it.each(['.', '..', ' . ', ' .. '])(
+    'rejects URL-navigation note key %j in Zod before fetch',
+    async (noteKey) => {
+      const { handleTracelabEvidence } = await import('./index.js');
+
+      await expect(
+        handleTracelabEvidence({
+          action: 'note',
+          project_id: PROJECT_ID,
+          session_key: 'session',
+          note_key: noteKey,
+          content: 'content',
+        })
+      ).rejects.toThrow(/note_key cannot be/);
+      expect(mockFetch).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each(['.', '..'])(
+    'guards direct API-client note key %j before WHATWG URL normalization',
+    async (noteKey) => {
+      const candidateUrl =
+        `http://localhost:8000/api/v1/evidence/notes/` + encodeURIComponent(noteKey);
+      expect(new URL(candidateUrl).pathname).not.toBe(
+        `/api/v1/evidence/notes/${noteKey}`
+      );
+      const directClient = new TraceLabClient({
+        baseUrl: 'http://localhost:8000',
+        apiKey: 'tl_direct-client-test',
+      });
+
+      await expect(
+        directClient.putEvidenceNote(noteKey, {
+          project_id: PROJECT_ID,
+          session_key: 'session',
+          content: 'content',
+        })
+      ).rejects.toThrow('note_key cannot be "." or ".."');
+      expect(mockFetch).not.toHaveBeenCalled();
+    }
+  );
+
+  it('guards a whitespace-only direct API-client note key before fetch', async () => {
+    const directClient = new TraceLabClient({
+      baseUrl: 'http://localhost:8000',
+      apiKey: 'tl_direct-client-test',
+    });
+
+    await expect(
+      directClient.putEvidenceNote('   ', {
+        project_id: PROJECT_ID,
+        session_key: 'session',
+        content: 'content',
+      })
+    ).rejects.toThrow(/empty or whitespace/);
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it('capture uses POST with API-key auth, exact body, and raw full-entry response', async () => {
+    const apiResponse = { entries: [entryFixture], count: 1 };
+    mockFetch.mockResolvedValueOnce(okJson(apiResponse));
+    const { handleTracelabEvidence } = await import('./index.js');
+
+    const result = await handleTracelabEvidence({
+      action: 'capture',
+      project_id: PROJECT_ID,
+      session_key: ' session / 42 ',
+      mission_id: MISSION_ID,
+      entries: [
+        {
+          claim: ` ${entryFixture.claim} `,
+          summary: entryFixture.summary,
+          source_url: entryFixture.source_url,
+          snippet: entryFixture.snippet,
+          query: entryFixture.query,
+          disposition: entryFixture.disposition,
+          tags: [' contract ', 'mcp', 'contract'],
+        },
+      ],
+    });
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    const [url, request] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('http://localhost:8000/api/v1/evidence/capture');
+    expect(request.method).toBe('POST');
+    expect(request.headers).toEqual(
+      expect.objectContaining({
+        'Content-Type': 'application/json',
+        'X-API-Key': 'tl_shared-client-test',
+      })
+    );
+    expect(JSON.parse(request.body as string)).toEqual({
+      project_id: PROJECT_ID,
+      session_key: 'session / 42',
+      mission_id: MISSION_ID,
+      entries: [
+        {
+          claim: entryFixture.claim,
+          summary: entryFixture.summary,
+          source_url: entryFixture.source_url,
+          snippet: entryFixture.snippet,
+          query: entryFixture.query,
+          disposition: entryFixture.disposition,
+          tags: entryFixture.tags,
+        },
+      ],
+    });
+    expect(JSON.parse(result.content[0].text)).toEqual(apiResponse);
+  });
+
+  it('rejects a non-HTTP source URL before issuing a capture request', async () => {
+    const { handleTracelabEvidence } = await import('./index.js');
+
+    await expect(
+      handleTracelabEvidence({
+        action: 'capture',
+        project_id: PROJECT_ID,
+        session_key: 'session / 42',
+        entries: [
+          {
+            claim: 'FTP sources are outside the canonical web-source contract.',
+            source_url: 'ftp://example.com/research',
+            disposition: 'rejected',
+          },
+        ],
+      })
+    ).rejects.toThrow('source_url must be an absolute HTTP(S) URL');
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it('note uses PUT with an encoded key, exact body, and raw full-note response', async () => {
+    mockFetch.mockResolvedValueOnce(okJson(noteFixture));
+    const { handleTracelabEvidence } = await import('./index.js');
+
+    const result = await handleTracelabEvidence({
+      action: 'note',
+      project_id: PROJECT_ID,
+      session_key: ' session / 42 ',
+      note_key: ' open/question ? ',
+      content: ` ${noteFixture.content} `,
+      mission_id: MISSION_ID,
+      tags: [' working-note ', 'working-note'],
+    });
+
+    const [url, request] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(
+      'http://localhost:8000/api/v1/evidence/notes/open%2Fquestion%20%3F'
+    );
+    expect(request.method).toBe('PUT');
+    expect(JSON.parse(request.body as string)).toEqual({
+      project_id: PROJECT_ID,
+      session_key: 'session / 42',
+      content: noteFixture.content,
+      mission_id: MISSION_ID,
+      tags: noteFixture.tags,
+    });
+    expect(JSON.parse(result.content[0].text)).toEqual(noteFixture);
+  });
+
+  it('list uses GET with exact encoded filters and returns entries and notes unchanged', async () => {
+    const apiResponse = {
+      entries: [entryFixture],
+      notes: [noteFixture],
+      entry_total: 1,
+      note_total: 1,
+      page: 2,
+      page_size: 5,
+    };
+    mockFetch.mockResolvedValueOnce(okJson(apiResponse));
+    const { handleTracelabEvidence } = await import('./index.js');
+
+    const result = await handleTracelabEvidence({
+      action: 'list',
+      project_id: PROJECT_ID,
+      session_key: ' session / 42 ',
+      mission_id: MISSION_ID,
+      disposition: 'background',
+      page: 2,
+      page_size: 5,
+    });
+
+    const [url, request] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(
+      `http://localhost:8000/api/v1/evidence?project_id=${PROJECT_ID}` +
+        `&session_key=session+%2F+42&mission_id=${MISSION_ID}` +
+        '&disposition=background&page=2&page_size=5'
+    );
+    expect(request.method).toBe('GET');
+    expect(request.body).toBeUndefined();
+    expect(JSON.parse(result.content[0].text)).toEqual(apiResponse);
+  });
+
+  it('search uses GET with q plus exact encoded filters and returns entries unchanged', async () => {
+    const apiResponse = { entries: [entryFixture], total: 1, page: 3, page_size: 7 };
+    mockFetch.mockResolvedValueOnce(okJson(apiResponse));
+    const { handleTracelabEvidence } = await import('./index.js');
+
+    const result = await handleTracelabEvidence({
+      action: 'search',
+      project_id: PROJECT_ID,
+      q: ' conflicting source & context ',
+      session_key: ' session / 42 ',
+      mission_id: MISSION_ID,
+      disposition: 'contradicting',
+      page: 3,
+      page_size: 7,
+    });
+
+    const [url, request] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(
+      `http://localhost:8000/api/v1/evidence/search?project_id=${PROJECT_ID}` +
+        '&q=conflicting+source+%26+context&session_key=session+%2F+42' +
+        `&mission_id=${MISSION_ID}&disposition=contradicting&page=3&page_size=7`
+    );
+    expect(request.method).toBe('GET');
+    expect(request.body).toBeUndefined();
+    expect(JSON.parse(result.content[0].text)).toEqual(apiResponse);
+  });
+
+  it('promote defaults target to report, POSTs the exact body, and preserves every response field', async () => {
+    const apiResponse = {
+      project_id: PROJECT_ID,
+      session_key: 'session / 42',
+      target: 'report',
+      report_id: '77777777-7777-4777-8777-777777777777',
+      document_id: null,
+      title: 'Session evidence',
+      entry_count: 1,
+      note_count: 1,
+      status: 'created',
+    };
+    mockFetch.mockResolvedValueOnce(okJson(apiResponse));
+    const { handleTracelabEvidence } = await import('./index.js');
+
+    const result = await handleTracelabEvidence({
+      action: 'promote',
+      project_id: PROJECT_ID,
+      session_key: ' session / 42 ',
+      title: ' Session evidence ',
+    });
+
+    const [url, request] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('http://localhost:8000/api/v1/evidence/promote');
+    expect(request.method).toBe('POST');
+    expect(JSON.parse(request.body as string)).toEqual({
+      project_id: PROJECT_ID,
+      session_key: 'session / 42',
+      title: 'Session evidence',
+      target: 'report',
+    });
+    expect(JSON.parse(result.content[0].text)).toEqual(apiResponse);
+  });
+
+  it('returns an actionable error for an unknown evidence action without calling the API', async () => {
+    const { handleTracelabEvidence } = await import('./index.js');
+    const result = await handleTracelabEvidence({ action: 'erase' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('tracelab_evidence');
+    expect(result.content[0].text).toContain('capture, note, list, search, promote');
+    expect(mockFetch).not.toHaveBeenCalled();
   });
 });

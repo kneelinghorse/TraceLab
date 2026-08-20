@@ -6,6 +6,7 @@ from app.models.chunk import DocumentChunk
 from app.models.collection import Collection, CollectionItem
 from app.models.device_authorization import DeviceAuthorizationGrant
 from app.models.document import Document
+from app.models.evidence_ledger import LedgerEntry, LedgerNote
 from app.models.graph_edge import GraphEdge
 from app.models.idempotency import IdempotencyRecord
 from app.models.ingestion_job import IngestionJob
@@ -31,6 +32,8 @@ __all__ = [
     "Project",
     "Document",
     "DocumentChunk",
+    "LedgerEntry",
+    "LedgerNote",
     "Tag",
     "DocumentTag",
     "Insight",

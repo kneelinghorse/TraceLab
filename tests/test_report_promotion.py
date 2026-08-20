@@ -196,7 +196,7 @@ class TestReportPromotionService:
 
         # Mock the ingestion service
         mock_ingestion = MagicMock()
-        mock_ingestion.process_document.return_value = {"status": "success"}
+        mock_ingestion.process_document.return_value = {"status": "completed"}
         mock_ingestion_class.return_value = mock_ingestion
 
         project = _create_test_project(db_session)
@@ -328,7 +328,7 @@ class TestPromoteReportEndpoint:
 
         # Mock the ingestion service
         mock_ingestion = MagicMock()
-        mock_ingestion.process_document.return_value = {"status": "success"}
+        mock_ingestion.process_document.return_value = {"status": "completed"}
         mock_ingestion_class.return_value = mock_ingestion
 
         project = _create_test_project(db_session)
@@ -363,7 +363,7 @@ class TestPromoteReportEndpoint:
 
         # Mock the ingestion service
         mock_ingestion = MagicMock()
-        mock_ingestion.process_document.return_value = {"status": "success"}
+        mock_ingestion.process_document.return_value = {"status": "completed"}
         mock_ingestion_class.return_value = mock_ingestion
 
         project = _create_test_project(db_session)

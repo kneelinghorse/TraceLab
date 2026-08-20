@@ -5,6 +5,29 @@ All notable changes to `@aquex/tracelab-mcp` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] — 2026-08-20
+
+### Added
+
+- **Evidence Ledger MCP surface.** Added the eighth action-clustered tool,
+  `tracelab_evidence`, with `capture`, `note`, `list`, `search`, and
+  `promote` actions. It uses the authenticated TraceLab REST API to batch
+  capture sourced findings, upsert keyed working notes, reuse project-scoped
+  evidence across sessions, and promote a session to a report or document.
+- **Evidence contract guards.** The package now locks tool-descriptor,
+  action-enum, and real CallTool-dispatch parity. Handler-level tests assert
+  each evidence action's exact HTTP verb, encoded URL, request body, shared
+  API-key forwarding, and full unprojected REST response round-trip.
+- **Boundary-safe evidence input.** Required evidence text and tags now mirror
+  backend trimming/nonblank validation. Dot-only note keys are rejected before
+  WHATWG URL normalization can turn them into navigation, and dispatcher
+  lookups ignore inherited object-prototype names.
+
+### Changed
+
+- Bumped the public package to 1.1.0 because the eighth visible MCP tool is an
+  additive public API change.
+
 ## [1.0.2] — 2026-08-20
 
 ### Fixed
@@ -112,4 +135,5 @@ swap the install line to `npm install -g @aquex/tracelab-mcp` (or `npx
 Calls against legacy flat tool names continue to return a friendly
 migration error pointing at the cluster equivalent.
 
+[1.1.0]: https://github.com/kneelinghorse/TraceLab/releases/tag/tracelab-mcp-v1.1.0
 [1.0.0]: https://github.com/kneelinghorse/TraceLab/releases/tag/tracelab-mcp-v1.0.0

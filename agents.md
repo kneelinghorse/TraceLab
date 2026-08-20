@@ -150,7 +150,14 @@ pre-commit install
 - After editing `packages/tracelab-mcp/src/`, rebuild before testing locally: `cd packages/tracelab-mcp && npm run build`. The `bin` entry (`dist/index.js`) won't exist on a fresh clone until you build.
 - `npm publish` automatically runs `prepublishOnly` → `npm run build`, so the published tarball is always built from current src — no manual step needed at publish time.
 - If the MCP appears stale in Claude Desktop, run `npm run build` and restart the client; do not re-add `dist/` to git.
-- **MCP tool surface (T41.7 — sprint-41):** 7 action-clustered tools, not the prior ~24 flat ones. Each cluster takes an `action` param plus action-specific keys: `tracelab_search` (knowledge), `tracelab_project` (list/create/update/stats), `tracelab_collection` (list/get/export/create/add/synthesize), `tracelab_report` (create/list/get/export), `tracelab_document` (upload/get_content), `tracelab_mission` (create/list/get/update — CRUD), `tracelab_mission_execution` (submit/status/preview — DS lifecycle). Legacy tool-name calls return a friendly migration error pointing at the new cluster+action. Mapping table and migration error live in `packages/tracelab-mcp/src/index.ts::LEGACY_TO_CLUSTER`.
+- **MCP tool surface (T41.7 foundation; LEDGER-1 extension):** 8 action-clustered tools, not the prior ~24 flat ones. Each cluster takes an `action` param plus action-specific keys: `tracelab_search` (knowledge), `tracelab_project` (list/create/update/stats), `tracelab_collection` (list/get/export/create/add/synthesize), `tracelab_report` (create/list/get/export), `tracelab_document` (upload/get_content), `tracelab_mission` (create/list/get/update — CRUD), `tracelab_mission_execution` (submit/status/preview — DS lifecycle), `tracelab_evidence` (capture/note/search/list/promote — cross-session research ledger). Legacy tool-name calls return a friendly migration error pointing at the new cluster+action. Mapping table and migration error live in `packages/tracelab-mcp/src/index.ts::LEGACY_TO_CLUSTER`.
+
+### Evidence Ledger Research Convention
+
+- Before starting external research for a known project, call `tracelab_evidence(action="search", project_id=..., q=...)` and reuse relevant prior-session evidence rather than repeating work blindly.
+- After research, batch-capture material findings with `tracelab_evidence(action="capture", ...)`. Record at least the claim, source URL, and disposition; include the supporting snippet, original query, summary, and tags when available.
+- Preserve contradictory and rejected findings with those dispositions. Do not silently discard them merely because they do not support the emerging answer.
+- Use `tracelab_evidence(action="note", ...)` only for keyed working state. Notes are not a substitute for sourced claims.
 
 ### Testing
 ```bash
