@@ -23,6 +23,7 @@ class SearchHistoryEntry(BaseModel):
     top_k: int
     duration_ms: int | None = None
     cache_hit: bool = False
+    owner_id: UUID | None = None
     user_label: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
     top_chunks: list[str] = Field(default_factory=list)

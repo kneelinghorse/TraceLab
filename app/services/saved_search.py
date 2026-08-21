@@ -7,8 +7,9 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
+from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Query, Session
 
 from app.core.database import SessionLocal
 from app.models.saved_search import SavedSearch
@@ -31,37 +32,51 @@ class SavedSearchService:
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
-    def list_for_owner(self, owner: str) -> list[SavedSearch]:
-        """Return all saved searches for the authenticated owner."""
+    def list_for_owner(
+        self, owner_id: UUID | None, *, legacy_owner: str | None = None
+    ) -> list[SavedSearch]:
+        """Return saved searches within the request's ownership scope.
+
+        ``None`` is reserved for trusted internal callers. Public routes always
+        provide the stable user UUID; RBAC-off callers may additionally recover
+        their unresolved pre-migration rows through ``legacy_owner``.
+        """
         session = self.session_factory()
         try:
-            return (
-                session.query(SavedSearch)
-                .filter(SavedSearch.owner == owner)
-                .order_by(SavedSearch.updated_at.desc())
-                .all()
+            query = session.query(SavedSearch)
+            query = self._scope_query(
+                query, owner_id=owner_id, legacy_owner=legacy_owner
             )
+            return query.order_by(SavedSearch.updated_at.desc()).all()
         finally:
             session.close()
 
-    def get(self, saved_search_id: UUID | str, owner: str) -> SavedSearch | None:
-        """Look up a saved search owned by the specified user."""
+    def get(
+        self,
+        saved_search_id: UUID | str,
+        owner_id: UUID | None,
+        *,
+        legacy_owner: str | None = None,
+    ) -> SavedSearch | None:
+        """Look up a saved search within the request's ownership scope."""
         session = self.session_factory()
         try:
-            return (
-                session.query(SavedSearch)
-                .filter(
-                    SavedSearch.id == str(saved_search_id), SavedSearch.owner == owner
-                )
-                .one_or_none()
+            query = session.query(SavedSearch).filter(
+                SavedSearch.id == str(saved_search_id)
             )
+            query = self._scope_query(
+                query, owner_id=owner_id, legacy_owner=legacy_owner
+            )
+            return query.one_or_none()
         finally:
             session.close()
 
     def create(
         self,
         *,
+        owner_id: UUID,
         owner: str,
+        legacy_owner: str | None = None,
         name: str,
         query_text: str,
         search_mode: str,
@@ -85,15 +100,18 @@ class SavedSearchService:
         normalized_filters = dict(filters or {})
         session = self.session_factory()
         try:
-            current_total = (
-                session.query(SavedSearch)
-                .filter(SavedSearch.owner == owner_key)
-                .count()
+            owner_query = self._scope_query(
+                session.query(SavedSearch),
+                owner_id=owner_id,
+                legacy_owner=legacy_owner,
             )
+            current_total = owner_query.count()
             if current_total >= self.max_saved_per_user:
                 raise ValueError(
                     f"Saved search limit of {self.max_saved_per_user} reached."
                 )
+            if owner_query.filter(SavedSearch.name == name_value).count():
+                raise ValueError("A saved search with that name already exists.")
 
             entry = SavedSearch(
                 name=name_value,
@@ -102,6 +120,7 @@ class SavedSearchService:
                 search_mode=self._normalize_mode(search_mode),
                 filters=normalized_filters,
                 top_k=self._normalize_top_k(top_k),
+                owner_id=owner_id,
                 owner=owner_key,
             )
             session.add(entry)
@@ -121,19 +140,20 @@ class SavedSearchService:
         self,
         saved_search_id: UUID | str,
         *,
-        owner: str,
+        owner_id: UUID | None,
+        legacy_owner: str | None = None,
         updates: dict[str, Any],
     ) -> SavedSearch | None:
         """Update mutable fields for a saved search."""
         session = self.session_factory()
         try:
-            entry = (
-                session.query(SavedSearch)
-                .filter(
-                    SavedSearch.id == str(saved_search_id), SavedSearch.owner == owner
-                )
-                .one_or_none()
+            query = session.query(SavedSearch).filter(
+                SavedSearch.id == str(saved_search_id)
             )
+            query = self._scope_query(
+                query, owner_id=owner_id, legacy_owner=legacy_owner
+            )
+            entry = query.one_or_none()
             if entry is None:
                 return None
 
@@ -141,6 +161,15 @@ class SavedSearchService:
                 next_name = self._clean_name(updates["name"])
                 if not next_name:
                     raise ValueError("Name is required.")
+                duplicate = self._scope_query(
+                    session.query(SavedSearch).filter(
+                        SavedSearch.id != str(saved_search_id)
+                    ),
+                    owner_id=owner_id,
+                    legacy_owner=legacy_owner,
+                ).filter(SavedSearch.name == next_name)
+                if duplicate.first() is not None:
+                    raise ValueError("A saved search with that name already exists.")
                 entry.name = next_name
             if "description" in updates:
                 entry.description = self._clean_description(updates.get("description"))
@@ -171,17 +200,23 @@ class SavedSearchService:
         finally:
             session.close()
 
-    def delete(self, saved_search_id: UUID | str, *, owner: str) -> bool:
-        """Delete a saved search owned by the user."""
+    def delete(
+        self,
+        saved_search_id: UUID | str,
+        *,
+        owner_id: UUID | None,
+        legacy_owner: str | None = None,
+    ) -> bool:
+        """Delete a saved search within the request's ownership scope."""
         session = self.session_factory()
         try:
-            deleted = (
-                session.query(SavedSearch)
-                .filter(
-                    SavedSearch.id == str(saved_search_id), SavedSearch.owner == owner
-                )
-                .delete(synchronize_session=False)
+            query = session.query(SavedSearch).filter(
+                SavedSearch.id == str(saved_search_id)
             )
+            query = self._scope_query(
+                query, owner_id=owner_id, legacy_owner=legacy_owner
+            )
+            deleted = query.delete(synchronize_session=False)
             session.commit()
             return bool(deleted)
         except Exception:
@@ -191,18 +226,22 @@ class SavedSearchService:
             session.close()
 
     def mark_used(
-        self, saved_search_id: UUID | str, *, owner: str
+        self,
+        saved_search_id: UUID | str,
+        *,
+        owner_id: UUID | None,
+        legacy_owner: str | None = None,
     ) -> SavedSearch | None:
-        """Increment usage metrics for a saved search."""
+        """Increment usage metrics within the request's ownership scope."""
         session = self.session_factory()
         try:
-            entry = (
-                session.query(SavedSearch)
-                .filter(
-                    SavedSearch.id == str(saved_search_id), SavedSearch.owner == owner
-                )
-                .one_or_none()
+            query = session.query(SavedSearch).filter(
+                SavedSearch.id == str(saved_search_id)
             )
+            query = self._scope_query(
+                query, owner_id=owner_id, legacy_owner=legacy_owner
+            )
+            entry = query.one_or_none()
             if entry is None:
                 return None
             entry.use_count = int(entry.use_count or 0) + 1
@@ -222,6 +261,25 @@ class SavedSearchService:
     @staticmethod
     def _clean_owner(owner: str) -> str:
         return (owner or "").strip()
+
+    @classmethod
+    def _scope_query(
+        cls,
+        query: Query[SavedSearch],
+        *,
+        owner_id: UUID | None,
+        legacy_owner: str | None,
+    ) -> Query[SavedSearch]:
+        """Apply stable ownership plus the explicit RBAC-off legacy fallback."""
+        if owner_id is None:
+            return query
+        owner_filters = [SavedSearch.owner_id == owner_id]
+        legacy_key = cls._clean_owner(legacy_owner or "")
+        if legacy_key:
+            owner_filters.append(
+                and_(SavedSearch.owner_id.is_(None), SavedSearch.owner == legacy_key)
+            )
+        return query.filter(or_(*owner_filters))
 
     @staticmethod
     def _clean_name(name: str | None) -> str:

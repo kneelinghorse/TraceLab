@@ -4,13 +4,13 @@ This directory records the measured baseline behind CI-1. The introducing pull
 request must reproduce the blocking results below; this file is evidence, not a
 substitute for green GitHub checks.
 
-## 2026-08-21 post-PEDR-1B baseline
+## 2026-08-21 post-PEDR-1C baseline
 
 | Lane | Command | Result |
 | --- | --- | --- |
-| Clean collection | Fresh Python 3.11.9 virtualenv, `pip install -e '.[dev,test]'`, then `pytest --collect-only -q` | 2,237 collected, 0 errors |
-| Backend suite | `pytest --ignore=tests/integration` with every node in `backend-quarantine.txt` passed as `--deselect` | 2,084 passed, 3 skipped, 49 deselected |
-| PostgreSQL integration | `pytest tests/integration -q` with a PostgreSQL 15 testcontainer | 97 passed, 4 skipped |
+| Clean collection | Fresh Python 3.11.9 virtualenv, `pip install -e '.[dev,test]'`, then `pytest --collect-only -q` | 2,303 collected, 0 errors |
+| Backend suite | `pytest --ignore=tests/integration` with every node in `backend-quarantine.txt` passed as `--deselect` | 2,141 passed, 3 skipped, 49 deselected |
+| PostgreSQL integration | `pytest tests/integration -v` with a PostgreSQL 15 testcontainer | 106 passed, 4 skipped |
 | Frontend unit | `npm run test:unit -- --run` | 66 passed |
 | Frontend types | `npm run type-check` | Passed |
 | Frontend production build | `npm run build` | Passed |

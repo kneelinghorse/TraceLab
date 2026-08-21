@@ -14,6 +14,7 @@ from app.core.authorization import accessible_project_ids, authorize_or_403
 from app.core.database import SessionLocal, get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.collection import Collection
+from app.models.project import Project
 from app.models.report import Report, ReportSource
 from app.schemas.synthesis import (
     CitationInfo,
@@ -156,6 +157,19 @@ def synthesize(
                 detail="Collection not found.",
             )
         authorize_or_403(current_user, "read", collection, db)
+
+    if (
+        request.save_as_report
+        and request.project_id is not None
+        and project_scope is not None
+    ):
+        project = db.get(Project, request.project_id)
+        if project is None or project.deleted_at is not None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Project not found.",
+            )
+        authorize_or_403(current_user, "create", project, db)
 
     if project_scope == []:
         result = SynthesisService._empty_result(include_effective_chunk_ids=True)

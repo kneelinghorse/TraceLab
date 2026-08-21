@@ -10,6 +10,8 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
+from app.models.chunk import DocumentChunk
+from app.models.document import Document
 from app.models.search_history import SearchHistory
 
 SessionFactory = Callable[[], Session]
@@ -43,6 +45,7 @@ class SearchHistoryService:
         duration_ms: float | None,
         cache_hit: bool,
         executed_by: str | None,
+        owner_id: UUID | None = None,
         top_chunks: Iterable[str] | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> SearchHistory:
@@ -56,16 +59,17 @@ class SearchHistoryService:
                 top_k=int(top_k) if top_k else 5,
                 result_count=max(0, int(result_count or 0)),
                 duration_ms=int(round(duration_ms))
-                if isinstance(duration_ms, (float, int))
+                if isinstance(duration_ms, float | int)
                 else None,
                 cache_hit=bool(cache_hit),
+                owner_id=owner_id,
                 user_label=executed_by,
                 metadata_payload=dict(metadata or {}),
                 top_chunks=list(top_chunks or []),
             )
             session.add(entry)
             session.flush()
-            self._enforce_retention(session)
+            self._enforce_retention(session, owner_id=owner_id)
             session.commit()
             session.refresh(entry)
             return entry
@@ -75,31 +79,92 @@ class SearchHistoryService:
         finally:
             session.close()
 
-    def list_history(self, limit: int = 20) -> list[SearchHistory]:
-        """Return the most recent search entries."""
+    def list_history(
+        self, limit: int = 20, *, owner_id: UUID | None = None
+    ) -> list[SearchHistory]:
+        """Return recent entries within the request's ownership scope."""
         session = self.session_factory()
         try:
-            rows = (
-                session.query(SearchHistory)
-                .order_by(SearchHistory.created_at.desc())
-                .limit(max(1, limit))
-                .all()
-            )
+            query = session.query(SearchHistory)
+            if owner_id is not None:
+                query = query.filter(SearchHistory.owner_id == owner_id)
+            rows = query.order_by(SearchHistory.created_at.desc()).limit(
+                max(1, limit)
+            ).all()
             return rows or []
         finally:
             session.close()
 
-    def get_entry(self, entry_id: UUID | str) -> SearchHistory | None:
-        """Return a specific search entry by identifier."""
+    def get_entry(
+        self, entry_id: UUID | str, *, owner_id: UUID | None = None
+    ) -> SearchHistory | None:
+        """Return an entry within the request's ownership scope."""
         session = self.session_factory()
         try:
-            return (
-                session.query(SearchHistory)
-                .filter(SearchHistory.id == str(entry_id))
-                .one_or_none()
+            query = session.query(SearchHistory).filter(
+                SearchHistory.id == str(entry_id)
             )
+            if owner_id is not None:
+                query = query.filter(SearchHistory.owner_id == owner_id)
+            return query.one_or_none()
         finally:
             session.close()
+
+    def visible_top_chunks(
+        self,
+        entries: Iterable[SearchHistory],
+        *,
+        allowed_project_ids: list[UUID] | None,
+    ) -> dict[UUID, list[str]]:
+        """Batch-resolve history chunk IDs through live, authorized documents.
+
+        ``None`` deliberately returns the stored values unchanged for the
+        unrestricted legacy path. Scoped callers only receive UUIDs that still
+        resolve through ``DocumentChunk -> Document`` to an allowed, non-deleted
+        document.
+        """
+        rows = list(entries)
+        if allowed_project_ids is None:
+            return {row.id: list(row.top_chunks or []) for row in rows}
+        if not rows or not allowed_project_ids:
+            return {row.id: [] for row in rows}
+
+        parsed_by_value: dict[str, UUID] = {}
+        for row in rows:
+            for value in row.top_chunks or []:
+                text_value = str(value)
+                try:
+                    parsed_by_value[text_value] = UUID(text_value)
+                except (TypeError, ValueError, AttributeError):
+                    continue
+
+        if not parsed_by_value:
+            return {row.id: [] for row in rows}
+
+        session = self.session_factory()
+        try:
+            resolved = (
+                session.query(DocumentChunk.id)
+                .join(Document, Document.id == DocumentChunk.document_id)
+                .filter(
+                    DocumentChunk.id.in_(set(parsed_by_value.values())),
+                    Document.deleted_at.is_(None),
+                    Document.project_id.in_(allowed_project_ids),
+                )
+                .all()
+            )
+            visible_ids = {UUID(str(item[0])) for item in resolved}
+        finally:
+            session.close()
+
+        return {
+            row.id: [
+                str(value)
+                for value in row.top_chunks or []
+                if parsed_by_value.get(str(value)) in visible_ids
+            ]
+            for row in rows
+        }
 
     def retention_policy(self) -> dict[str, int]:
         """Expose configured retention limits."""
@@ -108,11 +173,14 @@ class SearchHistoryService:
             "max_age_days": self.max_age_days,
         }
 
-    def clear_history(self) -> int:
-        """Remove all search history entries."""
+    def clear_history(self, *, owner_id: UUID | None = None) -> int:
+        """Remove entries within the request's ownership scope."""
         session = self.session_factory()
         try:
-            deleted = session.query(SearchHistory).delete(synchronize_session=False)
+            query = session.query(SearchHistory)
+            if owner_id is not None:
+                query = query.filter(SearchHistory.owner_id == owner_id)
+            deleted = query.delete(synchronize_session=False)
             session.commit()
             return int(deleted or 0)
         except Exception:
@@ -124,16 +192,23 @@ class SearchHistoryService:
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
-    def _enforce_retention(self, session: Session) -> None:
-        """Delete search records that exceed age/count limits."""
+    def _enforce_retention(
+        self, session: Session, *, owner_id: UUID | None
+    ) -> None:
+        """Delete all expired rows, then enforce the caller's count limit."""
         cutoff = datetime.utcnow() - timedelta(days=self.max_age_days)
-        session.query(SearchHistory).filter(SearchHistory.created_at < cutoff).delete(
-            synchronize_session=False
+        stale_query = session.query(SearchHistory).filter(
+            SearchHistory.created_at < cutoff
         )
+        retained_query = session.query(SearchHistory.id)
+        if owner_id is not None:
+            retained_query = retained_query.filter(
+                SearchHistory.owner_id == owner_id
+            )
+        stale_query.delete(synchronize_session=False)
 
         extra_ids = (
-            session.query(SearchHistory.id)
-            .order_by(SearchHistory.created_at.desc())
+            retained_query.order_by(SearchHistory.created_at.desc())
             .offset(self.max_entries)
             .all()
         )

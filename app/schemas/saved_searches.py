@@ -42,6 +42,7 @@ class SavedSearchResponse(SavedSearchBase):
     """Saved search representation returned by the API."""
 
     id: UUID
+    owner_id: UUID | None = None
     owner: str
     use_count: int = 0
     last_used_at: datetime | None = None

@@ -152,7 +152,8 @@ class TestUserFacingCreateVisibility:
         # non-admin access path. Before the fix POST /reports minted NULL owner → the
         # creator 201'd a report they could not then see. Synthesis is stubbed so the
         # test pins ONLY the owner attribution, not the LLM path.
-        from app.services.report_service import ReportService, get_report_service
+        from app.api.v1.reports import get_report_service_factory
+        from app.services.report_service import ReportService
 
         member = _make_user(db_session, "report-member@example.com")
         mock_synth = MagicMock()
@@ -162,8 +163,8 @@ class TestUserFacingCreateVisibility:
             "tokens_used": 1,
             "chunk_count": 1,
         }
-        app.dependency_overrides[get_report_service] = lambda: ReportService(
-            synthesis_service=mock_synth
+        app.dependency_overrides[get_report_service_factory] = lambda: (
+            lambda: ReportService(synthesis_service=mock_synth)
         )
         try:
             created = client.post(
@@ -174,7 +175,7 @@ class TestUserFacingCreateVisibility:
             assert created.status_code == 201, created.text
             report_id = created.json()["id"]
         finally:
-            app.dependency_overrides.pop(get_report_service, None)
+            app.dependency_overrides.pop(get_report_service_factory, None)
 
         listed = client.get(REPORTS_URL, headers=_bearer(member))
         assert listed.status_code == 200, listed.text

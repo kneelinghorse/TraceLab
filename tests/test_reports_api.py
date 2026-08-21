@@ -116,7 +116,8 @@ class TestReportCreate:
 
     def test_create_report_with_collection(self, auth_headers, db_session):
         """Create a report from a collection."""
-        from app.services.report_service import ReportService, get_report_service
+        from app.api.v1.reports import get_report_service_factory
+        from app.services.report_service import ReportService
 
         client = TestClient(app)
 
@@ -132,7 +133,9 @@ class TestReportCreate:
         mock_synthesis = MockSynthesisService()
         mock_report_service = ReportService(synthesis_service=mock_synthesis)
 
-        app.dependency_overrides[get_report_service] = lambda: mock_report_service
+        app.dependency_overrides[get_report_service_factory] = lambda: (
+            lambda: mock_report_service
+        )
         try:
             response = client.post(
                 "/api/v1/reports",
@@ -157,7 +160,8 @@ class TestReportCreate:
 
     def test_create_report_with_chunk_ids(self, auth_headers, db_session):
         """Create a report from specific chunks."""
-        from app.services.report_service import ReportService, get_report_service
+        from app.api.v1.reports import get_report_service_factory
+        from app.services.report_service import ReportService
 
         client = TestClient(app)
 
@@ -169,7 +173,9 @@ class TestReportCreate:
         mock_synthesis = MockSynthesisService()
         mock_report_service = ReportService(synthesis_service=mock_synthesis)
 
-        app.dependency_overrides[get_report_service] = lambda: mock_report_service
+        app.dependency_overrides[get_report_service_factory] = lambda: (
+            lambda: mock_report_service
+        )
         try:
             response = client.post(
                 "/api/v1/reports",
@@ -189,7 +195,8 @@ class TestReportCreate:
 
     def test_create_report_with_custom_prompt(self, auth_headers, db_session):
         """Create a report with a custom prompt."""
-        from app.services.report_service import ReportService, get_report_service
+        from app.api.v1.reports import get_report_service_factory
+        from app.services.report_service import ReportService
 
         client = TestClient(app)
 
@@ -202,7 +209,9 @@ class TestReportCreate:
         mock_synthesis = MockSynthesisService()
         mock_report_service = ReportService(synthesis_service=mock_synthesis)
 
-        app.dependency_overrides[get_report_service] = lambda: mock_report_service
+        app.dependency_overrides[get_report_service_factory] = lambda: (
+            lambda: mock_report_service
+        )
         try:
             response = client.post(
                 "/api/v1/reports",
@@ -644,7 +653,8 @@ class TestReportFormats:
     )
     def test_create_report_all_formats(self, auth_headers, db_session, format_type):
         """Test creating reports with all format types."""
-        from app.services.report_service import ReportService, get_report_service
+        from app.api.v1.reports import get_report_service_factory
+        from app.services.report_service import ReportService
 
         client = TestClient(app)
 
@@ -657,7 +667,9 @@ class TestReportFormats:
         mock_synthesis = MockSynthesisService()
         mock_report_service = ReportService(synthesis_service=mock_synthesis)
 
-        app.dependency_overrides[get_report_service] = lambda: mock_report_service
+        app.dependency_overrides[get_report_service_factory] = lambda: (
+            lambda: mock_report_service
+        )
         try:
             response = client.post(
                 "/api/v1/reports",
