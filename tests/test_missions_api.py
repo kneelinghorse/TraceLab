@@ -1174,6 +1174,58 @@ class TestMissionVerbContract:
         assert "Qdrant host" not in response.text
         assert str(private_identifier) not in response.text
 
+    def test_status_route_marks_linked_legacy_auto_report_repair_pending(
+        self,
+        auth_headers,
+        db_session,
+    ):
+        """A linked v1-owned draft remains pending until repaired in place."""
+        client = TestClient(app)
+        project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session,
+            mission_id="STATUS-REPORT-REPAIR-001",
+            status="completed",
+            project_id=project.id,
+        )
+        mission.result_protocol = {
+            "synthesis": {
+                "key_insights": ["The active payload has substantive content."],
+                "recommendations": ["Repair the linked report without a rerun."],
+            }
+        }
+        report = Report(
+            project_id=project.id,
+            title=f"Research: {mission.title}",
+            report_type="markdown",
+            prompt=f"Auto-generated from mission {mission.mission_id}",
+            content=(
+                f"# Research: {mission.title}\n\n"
+                "## Quality Checkpoints\n\n"
+                "- [ ] Checkpoint\n\n"
+                "---\n"
+                "*Generated automatically from DeepSearch results at "
+                "2026-08-21T12:00:00Z*"
+            ),
+            status="draft",
+        )
+        db_session.add(report)
+        db_session.flush()
+        mission.result_report_id = report.id
+        db_session.commit()
+
+        response = client.get(
+            f"/api/v1/missions/{mission.id}/status",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        body = response.json()
+        assert body["result_report_id"] == str(report.id)
+        assert body["materialization_pending"] is True
+        assert body["materialization_status"] == "pending"
+        assert body["search_ready"] is False
+
     def test_status_route_protocol_only_result_needs_no_document(
         self, auth_headers, db_session
     ):

@@ -35,11 +35,80 @@ from app.services.auto_report import (
     format_protocol_to_markdown,
     get_auto_report_service,
     get_document_chunks,
+    protocol_uses_current_report_shape,
 )
 
 
 class TestFormatProtocolToMarkdown:
     """Tests for protocol to markdown conversion."""
+
+    def test_format_current_deepsearch_protocol_shape(self):
+        """The active protocol's synthesis and checkpoint keys stay visible."""
+        protocol = {
+            "synthesis": {
+                "key_insights": [
+                    "The existing interface already supports the required flow."
+                ],
+                "recommendations": [
+                    "Bind the existing interface before adding another abstraction."
+                ],
+            },
+            "quality_checkpoints": [
+                {"gate": "interface_coverage", "status": "pass"},
+                {"gate": "optional_follow_up", "status": "skip"},
+            ],
+        }
+
+        result = format_protocol_to_markdown(protocol, "Current Protocol Mission")
+
+        assert "### Key Insights" in result
+        assert "The existing interface already supports the required flow." in result
+        assert "### Recommendations" in result
+        assert (
+            "Bind the existing interface before adding another abstraction." in result
+        )
+        assert "- [x] interface_coverage" in result
+        assert "optional_follow_up" in result
+        assert "*(skipped)*" in result
+
+    @pytest.mark.parametrize(
+        ("synthesis", "expected"),
+        [
+            ({"key_insights": None}, False),
+            ({"recommendations": None}, False),
+            ({"key_insights": []}, True),
+            ({"recommendations": []}, True),
+        ],
+    )
+    def test_current_shape_detection_matches_json_candidate_null_semantics(
+        self,
+        synthesis,
+        expected,
+    ):
+        """Runtime repair eligibility must match SQL JSON text null handling."""
+        assert (
+            protocol_uses_current_report_shape({"synthesis": synthesis}) is expected
+        )
+
+    def test_format_legacy_deepsearch_protocol_shape_remains_supported(self):
+        """Fixing current payloads cannot erase previously accepted field names."""
+        protocol = {
+            "synthesis": {
+                "summary": "Legacy summary remains readable.",
+                "key_findings": ["Legacy key finding remains readable."],
+            },
+            "quality_checkpoints": [
+                {"name": "Legacy checkpoint", "status": "passed"},
+            ],
+        }
+
+        result = format_protocol_to_markdown(protocol, "Legacy Protocol Mission")
+
+        assert "## Summary" in result
+        assert "Legacy summary remains readable." in result
+        assert "### Key Findings" in result
+        assert "Legacy key finding remains readable." in result
+        assert "- [x] Legacy checkpoint" in result
 
     def test_format_basic_synthesis(self):
         """Format protocol with basic synthesis string."""

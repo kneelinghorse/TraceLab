@@ -21,6 +21,15 @@ from app.services.ownership import project_owner_workspace
 
 logger = logging.getLogger(__name__)
 
+AUTO_REPORT_FORMAT_MARKER = "[tracelab-auto-report:v2]"
+AUTO_REPORT_PROMPT_PREFIX = "Auto-generated from mission "
+LEGACY_AUTO_REPORT_HEADER_PREFIX = "# Research: "
+LEGACY_AUTO_REPORT_CHECKPOINT_LINE = "\n- [ ] Checkpoint\n"
+LEGACY_AUTO_REPORT_FOOTER_PREFIX = (
+    "\n---\n*Generated automatically from DeepSearch results at "
+)
+LEGACY_AUTO_REPORT_FOOTER_SUFFIX = "Z*"
+
 
 AutoReportErrorCategory = Literal[
     "empty_protocol",
@@ -45,6 +54,43 @@ class AutoReportError(RuntimeError):
             raise ValueError(f"Unsupported auto-report error category: {category}")
         super().__init__(message)
         self.category = category
+
+
+def legacy_auto_report_prompt(mission_id: str) -> str:
+    """Return the exact prompt written by the pre-v2 auto-report formatter."""
+    return f"{AUTO_REPORT_PROMPT_PREFIX}{mission_id}"
+
+
+def auto_report_prompt(mission_id: str) -> str:
+    """Return the versioned provenance marker for newly formatted reports."""
+    return f"{legacy_auto_report_prompt(mission_id)} {AUTO_REPORT_FORMAT_MARKER}"
+
+
+def protocol_uses_current_report_shape(protocol: object) -> bool:
+    """Return whether a protocol contains the active synthesis report fields."""
+    if not isinstance(protocol, dict):
+        return False
+    synthesis = protocol.get("synthesis")
+    return isinstance(synthesis, dict) and (
+        synthesis.get("key_insights") is not None
+        or synthesis.get("recommendations") is not None
+    )
+
+
+def is_legacy_auto_generated_draft(report: Report, mission: Mission) -> bool:
+    """Return whether a linked report is safe for an in-place v2 repair."""
+    expected_header = f"{LEGACY_AUTO_REPORT_HEADER_PREFIX}{mission.title}\n\n"
+    return (
+        mission.result_report_id == report.id
+        and report.project_id == mission.project_id
+        and report.report_type == "markdown"
+        and report.status == "draft"
+        and report.prompt == legacy_auto_report_prompt(mission.mission_id)
+        and report.content.startswith(expected_header)
+        and LEGACY_AUTO_REPORT_CHECKPOINT_LINE in report.content
+        and LEGACY_AUTO_REPORT_FOOTER_PREFIX in report.content
+        and report.content.endswith(LEGACY_AUTO_REPORT_FOOTER_SUFFIX)
+    )
 
 
 def format_protocol_to_markdown(protocol: dict[str, Any], mission_title: str) -> str:
@@ -87,6 +133,20 @@ def format_protocol_to_markdown(protocol: dict[str, Any], mission_title: str) ->
                         lines.append(
                             f"- **{finding.get('title', 'Finding')}**: {finding.get('description', '')}"
                         )
+                lines.append("")
+            if synthesis.get("key_insights"):
+                lines.append("### Key Insights")
+                lines.append("")
+                for insight in synthesis["key_insights"]:
+                    if isinstance(insight, str):
+                        lines.append(f"- {insight}")
+                lines.append("")
+            if synthesis.get("recommendations"):
+                lines.append("### Recommendations")
+                lines.append("")
+                for recommendation in synthesis["recommendations"]:
+                    if isinstance(recommendation, str):
+                        lines.append(f"- {recommendation}")
                 lines.append("")
 
     # Findings section
@@ -132,10 +192,16 @@ def format_protocol_to_markdown(protocol: dict[str, Any], mission_title: str) ->
             if isinstance(checkpoint, str):
                 lines.append(f"- [x] {checkpoint}")
             elif isinstance(checkpoint, dict):
-                name = checkpoint.get("name", "Checkpoint")
-                status = checkpoint.get("status", "passed")
-                icon = "[x]" if status == "passed" else "[ ]"
-                lines.append(f"- {icon} {name}")
+                name = checkpoint.get("name") or checkpoint.get("gate") or "Checkpoint"
+                raw_status = checkpoint.get("status", "passed")
+                status = raw_status.casefold() if isinstance(raw_status, str) else ""
+                icon = "[x]" if status in {"pass", "passed"} else "[ ]"
+                suffix = ""
+                if status in {"skip", "skipped"}:
+                    suffix = " *(skipped)*"
+                elif status in {"fail", "failed"}:
+                    suffix = " *(failed)*"
+                lines.append(f"- {icon} {name}{suffix}")
         lines.append("")
 
     # Raw protocol data as fallback
@@ -247,7 +313,7 @@ def create_report_from_protocol(
         workspace_id=workspace_id,
         title=f"Research: {mission.title}",
         report_type="markdown",
-        prompt=f"Auto-generated from mission {mission.mission_id}",
+        prompt=auto_report_prompt(mission.mission_id),
         content=content,
         content_hash=content_hash,
         status="draft",
@@ -306,6 +372,50 @@ def create_report_from_protocol(
     return report
 
 
+def repair_report_from_protocol(
+    db: Session,
+    mission: Mission,
+    protocol: dict[str, Any],
+) -> Report:
+    """Repair a legacy auto-generated draft report in place.
+
+    The matching project plus exact legacy prompt/content signature form the
+    provenance fence. User-created, finalized, and already-versioned reports
+    are never overwritten by this path.
+    """
+    if not protocol:
+        raise AutoReportError(
+            "No protocol data to repair report from",
+            category="empty_protocol",
+        )
+    if mission.result_report_id is None:
+        raise AutoReportError(
+            f"Mission {mission.mission_id} has no linked report",
+            category="unexpected_report_error",
+        )
+
+    report = db.get(Report, mission.result_report_id)
+    if report is None or not is_legacy_auto_generated_draft(report, mission):
+        raise AutoReportError(
+            f"Mission {mission.mission_id} has no eligible legacy auto-report",
+            category="unexpected_report_error",
+        )
+
+    content = format_protocol_to_markdown(protocol, mission.title)
+    report.content = content
+    report.content_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
+    report.prompt = auto_report_prompt(mission.mission_id)
+    db.commit()
+    db.refresh(report)
+
+    logger.info(
+        "Repaired auto-report %s in place for mission %s",
+        report.id,
+        mission.mission_id,
+    )
+    return report
+
+
 class AutoReportService:
     """Service for automatically creating reports from mission protocols."""
 
@@ -320,6 +430,15 @@ class AutoReportService:
         Wraps the module-level function for dependency injection.
         """
         return create_report_from_protocol(db, mission, protocol)
+
+    def repair_report_from_protocol(
+        self,
+        db: Session,
+        mission: Mission,
+        protocol: dict[str, Any],
+    ) -> Report:
+        """Repair an eligible linked auto-report without creating artifacts."""
+        return repair_report_from_protocol(db, mission, protocol)
 
 
 # Module-level singleton

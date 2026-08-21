@@ -17,7 +17,7 @@ from sqlalchemy.pool import NullPool
 from app.models.document import Document
 from app.models.mission import Mission
 from app.models.project import Project
-from app.models.report import Report
+from app.models.report import Report, ReportSource
 from app.services.auto_ingest import AutoIngestService
 from app.services.result_materialization import MissionResultMaterializationService
 
@@ -38,6 +38,19 @@ class _SuccessfulSlowIngestion:
 
     def embed_existing_document(self, *, db, document_id):
         return self.process_document(db=db, document_id=document_id)
+
+
+def _active_result_protocol() -> dict[str, object]:
+    """Return a protocol that was substantive but skeletal under formatter v1."""
+    return {
+        "synthesis": {
+            "key_insights": ["PostgreSQL repair preserves this insight."],
+            "recommendations": ["Repair the linked row in place."],
+        },
+        "quality_checkpoints": [
+            {"gate": "traceability", "status": "pass"},
+        ],
+    }
 
 
 def test_concurrent_receipts_create_one_document_and_report(pg_engine):
@@ -99,6 +112,247 @@ def test_concurrent_receipts_create_one_document_and_report(pg_engine):
             cleanup.query(Report).filter(Report.project_id == project.id).delete()
             cleanup.query(Mission).filter(Mission.id == mission_id).delete()
             cleanup.query(Project).filter(Project.id == project.id).delete()
+            cleanup.commit()
+        finally:
+            cleanup.close()
+
+
+def test_postgres_reconciler_repairs_linked_legacy_report_once(pg_engine):
+    """The real JSONB candidate scan finds one v1 draft, then converges."""
+    session_factory = sessionmaker(bind=pg_engine, expire_on_commit=False)
+    seed = session_factory()
+    project = Project(name=f"PG report repair {uuid4().hex}")
+    seed.add(project)
+    seed.flush()
+    mission = Mission(
+        project_id=project.id,
+        mission_id=f"PG-REPORT-REPAIR-{uuid4().hex}",
+        title="PostgreSQL linked report repair",
+        objective="Repair the existing generated report without new artifacts.",
+        success_criteria=["The second pass has no candidate"],
+        status="completed",
+        result_markdown="# Already materialized and searchable",
+        result_protocol=_active_result_protocol(),
+    )
+    seed.add(mission)
+    seed.flush()
+    document = Document(
+        project_id=project.id,
+        name=f"{mission.mission_id}_report.md",
+        file_type="report",
+        content=mission.result_markdown,
+        source_type="deepsearch",
+        source_mission_id=mission.id,
+        document_metadata={"mission_id": mission.mission_id},
+        processed=True,
+        chunked=True,
+        embedded=True,
+    )
+    report = Report(
+        project_id=project.id,
+        title=f"Research: {mission.title}",
+        report_type="markdown",
+        prompt=f"Auto-generated from mission {mission.mission_id}",
+        content=(
+            f"# Research: {mission.title}\n\n"
+            "## Quality Checkpoints\n\n"
+            "- [ ] Checkpoint\n\n"
+            "---\n"
+            "*Generated automatically from DeepSearch results at "
+            "2026-08-21T12:00:00Z*"
+        ),
+        status="draft",
+    )
+    seed.add_all([document, report])
+    seed.flush()
+    source_id = uuid4()
+    seed.add(
+        ReportSource(
+            report_id=report.id,
+            source_type="chunk",
+            source_id=source_id,
+        )
+    )
+    mission.result_document_ids = [str(document.id)]
+    mission.result_report_id = report.id
+    seed.commit()
+    mission_id = mission.id
+    document_id = document.id
+    report_id = report.id
+    project_id = project.id
+    auto_ingest = MagicMock(spec=AutoIngestService)
+    service = MissionResultMaterializationService(auto_ingest_service=auto_ingest)
+
+    try:
+        first = service.reconcile_completed(seed, limit=10)
+        second = service.reconcile_completed(seed, limit=10)
+
+        seed.expire_all()
+        persisted = seed.query(Mission).filter(Mission.id == mission_id).one()
+        repaired_report = seed.query(Report).filter(Report.id == report_id).one()
+        persisted_sources = (
+            seed.query(ReportSource)
+            .filter(ReportSource.report_id == report_id)
+            .all()
+        )
+        assert first.scanned == 1
+        assert first.eligible == 1
+        assert first.repaired == 1
+        assert first.failed == 0
+        assert second.scanned == 0
+        assert second.eligible == 0
+        assert persisted.result_document_ids == [str(document_id)]
+        assert persisted.result_report_id == report_id
+        assert "PostgreSQL repair preserves this insight." in repaired_report.content
+        assert "Repair the linked row in place." in repaired_report.content
+        assert "[tracelab-auto-report:v2]" in repaired_report.prompt
+        assert len(persisted_sources) == 1
+        assert persisted_sources[0].source_id == source_id
+        assert (
+            seed.query(Document)
+            .filter(Document.source_mission_id == mission_id)
+            .count()
+            == 1
+        )
+        assert seed.query(Report).filter(Report.project_id == project_id).count() == 1
+        auto_ingest.auto_ingest_result.assert_not_called()
+    finally:
+        seed.close()
+        cleanup = session_factory()
+        try:
+            cleanup.query(ReportSource).filter(
+                ReportSource.report_id == report_id
+            ).delete()
+            cleanup.query(Document).filter(Document.id == document_id).delete()
+            cleanup.query(Report).filter(Report.id == report_id).delete()
+            cleanup.query(Mission).filter(Mission.id == mission_id).delete()
+            cleanup.query(Project).filter(Project.id == project_id).delete()
+            cleanup.commit()
+        finally:
+            cleanup.close()
+
+
+def test_concurrent_linked_legacy_report_repair_updates_same_row_once(pg_engine):
+    """The advisory lock serializes two repairers around the existing report ID."""
+    session_factory = sessionmaker(bind=pg_engine, expire_on_commit=False)
+    seed = session_factory()
+    project = Project(name=f"Concurrent report repair {uuid4().hex}")
+    seed.add(project)
+    seed.flush()
+    mission = Mission(
+        project_id=project.id,
+        mission_id=f"CONCURRENT-RPT-{uuid4().hex}",
+        title="Concurrent linked report repair",
+        objective="Update one generated report under contention.",
+        success_criteria=["Exactly one repair changes the existing row"],
+        status="completed",
+        result_markdown="# Existing searchable result",
+        result_protocol=_active_result_protocol(),
+    )
+    seed.add(mission)
+    seed.flush()
+    document = Document(
+        project_id=project.id,
+        name=f"{mission.mission_id}_report.md",
+        file_type="report",
+        content=mission.result_markdown,
+        source_type="deepsearch",
+        source_mission_id=mission.id,
+        document_metadata={"mission_id": mission.mission_id},
+        processed=True,
+        chunked=True,
+        embedded=True,
+    )
+    report = Report(
+        project_id=project.id,
+        title=f"Research: {mission.title}",
+        report_type="markdown",
+        prompt=f"Auto-generated from mission {mission.mission_id}",
+        content=(
+            f"# Research: {mission.title}\n\n"
+            "## Quality Checkpoints\n\n"
+            "- [ ] Checkpoint\n\n"
+            "---\n"
+            "*Generated automatically from DeepSearch results at "
+            "2026-08-21T12:00:00Z*"
+        ),
+        status="draft",
+    )
+    seed.add_all([document, report])
+    seed.flush()
+    source_id = uuid4()
+    seed.add(
+        ReportSource(
+            report_id=report.id,
+            source_type="chunk",
+            source_id=source_id,
+        )
+    )
+    mission.result_document_ids = [str(document.id)]
+    mission.result_report_id = report.id
+    seed.commit()
+    mission_id = mission.id
+    document_id = document.id
+    report_id = report.id
+    project_id = project.id
+    seed.close()
+    auto_ingest = MagicMock(spec=AutoIngestService)
+    service = MissionResultMaterializationService(auto_ingest_service=auto_ingest)
+    barrier = Barrier(2)
+
+    def repair_once():
+        db = session_factory()
+        try:
+            current = db.query(Mission).filter(Mission.id == mission_id).one()
+            barrier.wait(timeout=5)
+            return service.materialize(db, current)
+        finally:
+            db.close()
+
+    try:
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            outcomes = list(executor.map(lambda _index: repair_once(), range(2)))
+
+        verify = session_factory()
+        try:
+            persisted = verify.query(Mission).filter(Mission.id == mission_id).one()
+            repaired_report = verify.query(Report).filter(Report.id == report_id).one()
+            persisted_sources = (
+                verify.query(ReportSource)
+                .filter(ReportSource.report_id == report_id)
+                .all()
+            )
+            assert sum(outcome.changed for outcome in outcomes) == 1
+            assert all(outcome.errors == [] for outcome in outcomes)
+            assert persisted.result_document_ids == [str(document_id)]
+            assert persisted.result_report_id == report_id
+            assert "PostgreSQL repair preserves this insight." in repaired_report.content
+            assert "[tracelab-auto-report:v2]" in repaired_report.prompt
+            assert len(persisted_sources) == 1
+            assert persisted_sources[0].source_id == source_id
+            assert (
+                verify.query(Document)
+                .filter(Document.source_mission_id == mission_id)
+                .count()
+                == 1
+            )
+            assert (
+                verify.query(Report).filter(Report.project_id == project_id).count()
+                == 1
+            )
+            auto_ingest.auto_ingest_result.assert_not_called()
+        finally:
+            verify.close()
+    finally:
+        cleanup = session_factory()
+        try:
+            cleanup.query(ReportSource).filter(
+                ReportSource.report_id == report_id
+            ).delete()
+            cleanup.query(Document).filter(Document.id == document_id).delete()
+            cleanup.query(Report).filter(Report.id == report_id).delete()
+            cleanup.query(Mission).filter(Mission.id == mission_id).delete()
+            cleanup.query(Project).filter(Project.id == project_id).delete()
             cleanup.commit()
         finally:
             cleanup.close()

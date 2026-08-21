@@ -412,7 +412,9 @@ def get_mission_status(
     document_pending = (
         document_state is DocumentMaterializationState.NEEDS
     )
-    report_pending = bool(mission.result_protocol) and mission.result_report_id is None
+    report_pending = MissionResultMaterializationService.report_needs_materialization(
+        db, mission
+    )
     materialization_pending = is_terminal_result and (
         document_pending or report_pending
     )
@@ -448,10 +450,10 @@ def get_mission_status(
             materialization_status = (
                 "failed" if error_categories else "blocked_soft_deleted"
             )
+        elif not error_categories and (document_pending or report_pending):
+            materialization_status = "pending"
         elif materialization_status == "blocked_soft_deleted":
-            materialization_status = (
-                "pending" if document_pending or report_pending else "ready"
-            )
+            materialization_status = "ready"
 
     return MissionStatusResponse(
         id=mission.id,

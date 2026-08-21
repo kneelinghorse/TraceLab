@@ -14,7 +14,17 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from uuid import UUID
 
-from sqlalchemy import Boolean, Integer, and_, case, func, literal_column, or_, text
+from sqlalchemy import (
+    Boolean,
+    Integer,
+    and_,
+    case,
+    func,
+    literal,
+    literal_column,
+    or_,
+    text,
+)
 from sqlalchemy.engine import Connection
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import Session
@@ -22,6 +32,7 @@ from sqlalchemy.orm.exc import StaleDataError
 
 from app.models.document import Document
 from app.models.mission import Mission
+from app.models.report import Report
 from app.services.auto_ingest import (
     AUTO_INGEST_ERROR_CATEGORIES,
     AutoIngestError,
@@ -30,8 +41,15 @@ from app.services.auto_ingest import (
 )
 from app.services.auto_report import (
     AUTO_REPORT_ERROR_CATEGORIES,
+    AUTO_REPORT_PROMPT_PREFIX,
+    LEGACY_AUTO_REPORT_CHECKPOINT_LINE,
+    LEGACY_AUTO_REPORT_FOOTER_PREFIX,
+    LEGACY_AUTO_REPORT_FOOTER_SUFFIX,
+    LEGACY_AUTO_REPORT_HEADER_PREFIX,
     AutoReportError,
     AutoReportService,
+    is_legacy_auto_generated_draft,
+    protocol_uses_current_report_shape,
 )
 
 logger = logging.getLogger(__name__)
@@ -76,7 +94,7 @@ class MaterializationResult:
 
     @property
     def changed(self) -> bool:
-        """Return whether this attempt linked a missing result artifact."""
+        """Return whether this attempt created or repaired a result artifact."""
         return self.document_id is not None or self.report_id is not None
 
 
@@ -180,8 +198,59 @@ class MissionResultMaterializationService:
             cls.document_materialization_state(db, mission)
             is DocumentMaterializationState.NEEDS
         )
-        needs_report = bool(mission.result_protocol) and mission.result_report_id is None
+        needs_report = cls.report_needs_materialization(db, mission)
         return needs_document or needs_report
+
+    @staticmethod
+    def report_needs_materialization(db: Session, mission: Mission) -> bool:
+        """Return whether a report is missing or an eligible v1 draft needs repair."""
+        if not mission.result_protocol:
+            return False
+        if mission.result_report_id is None:
+            return True
+
+        report = db.get(Report, mission.result_report_id)
+        if report is None:
+            return True
+        return protocol_uses_current_report_shape(
+            mission.result_protocol
+        ) and is_legacy_auto_generated_draft(report, mission)
+
+    @staticmethod
+    def report_repair_candidate_expression():
+        """Return the SQL candidate matching the live v1 report predicate."""
+        current_protocol_shape = or_(
+            Mission.result_protocol["synthesis"]["key_insights"]
+            .as_string()
+            .is_not(None),
+            Mission.result_protocol["synthesis"]["recommendations"]
+            .as_string()
+            .is_not(None),
+        )
+        expected_header = (
+            literal(LEGACY_AUTO_REPORT_HEADER_PREFIX)
+            + Mission.title
+            + literal("\n\n")
+        )
+        legacy_auto_report = Mission.result_report.has(
+            and_(
+                Report.project_id == Mission.project_id,
+                Report.report_type == "markdown",
+                Report.status == "draft",
+                Report.prompt
+                == literal(AUTO_REPORT_PROMPT_PREFIX) + Mission.mission_id,
+                func.substr(Report.content, 1, func.length(expected_header))
+                == expected_header,
+                Report.content.contains(LEGACY_AUTO_REPORT_CHECKPOINT_LINE),
+                Report.content.contains(LEGACY_AUTO_REPORT_FOOTER_PREFIX),
+                Report.content.endswith(LEGACY_AUTO_REPORT_FOOTER_SUFFIX),
+            )
+        )
+        return and_(
+            Mission.result_report_id.is_not(None),
+            current_protocol_shape,
+            legacy_auto_report,
+        )
 
     @staticmethod
     def _advisory_lock_key(mission_id: UUID) -> int:
@@ -361,13 +430,20 @@ class MissionResultMaterializationService:
         # Auto-ingest commits the mission link. Refresh so report source linking
         # observes it, including when this is a repair of a prior partial attempt.
         db.refresh(mission)
-        if mission.result_protocol and mission.result_report_id is None:
+        if mission.result_protocol and self.report_needs_materialization(db, mission):
             try:
-                report = self._auto_report_service.create_report_from_protocol(
-                    db=db,
-                    mission=mission,
-                    protocol=mission.result_protocol,
-                )
+                if mission.result_report_id is None:
+                    report = self._auto_report_service.create_report_from_protocol(
+                        db=db,
+                        mission=mission,
+                        protocol=mission.result_protocol,
+                    )
+                else:
+                    report = self._auto_report_service.repair_report_from_protocol(
+                        db=db,
+                        mission=mission,
+                        protocol=mission.result_protocol,
+                    )
                 result.report_id = report.id
             except AutoReportError as exc:
                 db.rollback()
@@ -422,10 +498,7 @@ class MissionResultMaterializationService:
         )
         pending = (
             live_document_state is DocumentMaterializationState.NEEDS
-            or (
-                bool(mission.result_protocol)
-                and mission.result_report_id is None
-            )
+            or cls.report_needs_materialization(db, mission)
         )
         if result.errors:
             status = "failed"
@@ -723,6 +796,7 @@ class MissionResultMaterializationService:
                 result_protocol_truthy,
                 Mission.result_report_id.is_(None),
             ),
+            self.report_repair_candidate_expression(),
             materialization_status.in_(("pending", "failed")),
         )
 

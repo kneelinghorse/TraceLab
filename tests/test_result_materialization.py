@@ -15,6 +15,7 @@ from sqlalchemy import event
 from app.main import app
 from app.models.document import Document
 from app.models.mission import Mission
+from app.models.project import Project
 from app.models.report import Report
 from app.schemas.webhook import DeepSearchWebhookPayload, DeepSearchWebhookStatus
 from app.services.auto_ingest import AutoIngestError, AutoIngestService
@@ -87,6 +88,58 @@ def _result_document(
     db_session.refresh(document)
     db_session.refresh(mission)
     return document
+
+
+def _current_deepsearch_protocol() -> dict[str, object]:
+    """Return the active synthesis/checkpoint shape that v1 rendered skeletally."""
+    return {
+        "synthesis": {
+            "key_insights": ["A substantive current-shape insight."],
+            "recommendations": ["A substantive current-shape recommendation."],
+        },
+        "quality_checkpoints": [
+            {"gate": "traceability", "status": "pass"},
+            {"gate": "optional_follow_up", "status": "skip"},
+        ],
+    }
+
+
+def _link_legacy_auto_report(
+    db_session,
+    mission: Mission,
+    *,
+    status: str = "draft",
+    prompt: str | None = None,
+) -> tuple[Document, Report]:
+    """Link the ready document and exact v1 auto-report provenance to a mission."""
+    mission.result_protocol = _current_deepsearch_protocol()
+    document = _result_document(db_session, mission, ready=True)
+    skeletal_content = (
+        f"# Research: {mission.title}\n\n"
+        "## Quality Checkpoints\n\n"
+        "- [ ] Checkpoint\n\n"
+        "---\n"
+        "*Generated automatically from DeepSearch results at "
+        "2026-08-21T12:00:00Z*"
+    )
+    report = Report(
+        project_id=mission.project_id,
+        title=f"Research: {mission.title}",
+        report_type="markdown",
+        prompt=prompt or f"Auto-generated from mission {mission.mission_id}",
+        content=skeletal_content,
+        content_hash=hashlib.sha256(skeletal_content.encode()).hexdigest(),
+        status=status,
+        version=3,
+        chunk_count=7,
+    )
+    db_session.add(report)
+    db_session.flush()
+    mission.result_report_id = report.id
+    db_session.commit()
+    db_session.refresh(mission)
+    db_session.refresh(report)
+    return document, report
 
 
 def _set_retry_state(db_session, mission: Mission, status: str = "failed") -> None:
@@ -218,6 +271,254 @@ def test_replayed_receipt_does_not_duplicate_document_or_report(db_session, proj
     assert len(mission.result_document_ids) == 1
     assert db_session.query(Document).count() == 1
     assert db_session.query(Report).count() == 1
+
+
+def test_linked_legacy_auto_report_repairs_in_place_once_without_ingestion(
+    db_session,
+    project,
+):
+    """A v1-owned draft is reformatted once without rerunning document work."""
+    mission = _completed_mission(
+        db_session,
+        project,
+        f"REPORT-REPAIR-{uuid.uuid4().hex}",
+    )
+    document, report = _link_legacy_auto_report(db_session, mission)
+    report_id = report.id
+    document_id = document.id
+    original_content_hash = report.content_hash
+    original_fields = {
+        "title": report.title,
+        "status": report.status,
+        "report_type": report.report_type,
+        "version": report.version,
+        "chunk_count": report.chunk_count,
+    }
+    auto_ingest = MagicMock(spec=AutoIngestService)
+    service = MissionResultMaterializationService(auto_ingest_service=auto_ingest)
+
+    first = service.materialize(db_session, mission)
+    db_session.refresh(mission)
+    db_session.refresh(report)
+    first_updated_at = mission.updated_at
+    first_state = json.loads(
+        json.dumps(mission.execution_metadata["result_materialization"])
+    )
+    repaired_content = report.content
+    repaired_hash = report.content_hash
+    second = service.materialize(db_session, mission)
+
+    db_session.refresh(mission)
+    db_session.refresh(report)
+    assert first.document_id is None
+    assert first.report_id == report_id
+    assert first.changed is True
+    assert second.changed is False
+    assert second.errors == []
+    assert mission.result_document_ids == [str(document_id)]
+    assert mission.result_report_id == report_id
+    assert report.id == report_id
+    assert report.content_hash != original_content_hash
+    assert report.content_hash == repaired_hash
+    assert report.content == repaired_content
+    assert "A substantive current-shape insight." in report.content
+    assert "A substantive current-shape recommendation." in report.content
+    assert "[tracelab-auto-report:v2]" in report.prompt
+    assert original_fields == {
+        "title": report.title,
+        "status": report.status,
+        "report_type": report.report_type,
+        "version": report.version,
+        "chunk_count": report.chunk_count,
+    }
+    assert mission.updated_at == first_updated_at
+    assert mission.execution_metadata["result_materialization"] == first_state
+    assert mission.execution_metadata["result_materialization"]["status"] == "ready"
+    assert db_session.query(Document).count() == 1
+    assert db_session.query(Report).count() == 1
+    auto_ingest.auto_ingest_result.assert_not_called()
+
+
+def test_terminal_receipt_repairs_legacy_report_but_stays_idempotent(
+    db_session,
+    project,
+):
+    """A local report repair cannot relabel an already-processed DS receipt."""
+    mission = _completed_mission(
+        db_session,
+        project,
+        f"REPLAY-RPT-{uuid.uuid4().hex}",
+    )
+    document, report = _link_legacy_auto_report(db_session, mission)
+    document_id = document.id
+    report_id = report.id
+    handler = _handler()
+    signing_key = "report-repair-idempotency-key"
+    body, signature = _signed_receipt(mission, signing_key)
+
+    app.dependency_overrides[get_webhook_handler] = lambda: handler
+    try:
+        with patch("app.services.webhook_handler.settings") as mock_settings:
+            mock_settings.effective_deepsearch_service_secret = signing_key
+            response = TestClient(app).post(
+                "/api/v1/webhooks/deepsearch",
+                content=body,
+                headers={
+                    "Content-Type": "application/json",
+                    "X-DeepSearch-Signature": signature,
+                },
+            )
+    finally:
+        app.dependency_overrides.pop(get_webhook_handler, None)
+
+    assert response.status_code == 200
+    assert response.json()["message"] == "Webhook already processed (idempotent)"
+    db_session.refresh(mission)
+    db_session.refresh(report)
+    assert mission.result_document_ids == [str(document_id)]
+    assert mission.result_report_id == report_id
+    assert "A substantive current-shape insight." in report.content
+    assert "[tracelab-auto-report:v2]" in report.prompt
+    assert db_session.query(Document).count() == 1
+    assert db_session.query(Report).count() == 1
+
+
+def test_sqlite_reconciler_selects_linked_legacy_report_once(
+    db_session,
+    project,
+):
+    """SQLite structural selection must converge like PostgreSQL selection."""
+    mission = _completed_mission(
+        db_session,
+        project,
+        f"SQLITE-RPT-{uuid.uuid4().hex}",
+    )
+    document, report = _link_legacy_auto_report(db_session, mission)
+    service = MissionResultMaterializationService(
+        auto_ingest_service=MagicMock(spec=AutoIngestService)
+    )
+
+    first = service.reconcile_completed(db_session, limit=10)
+    second = service.reconcile_completed(db_session, limit=10)
+
+    db_session.refresh(mission)
+    db_session.refresh(report)
+    assert first.scanned == 1
+    assert first.eligible == 1
+    assert first.repaired == 1
+    assert first.failed == 0
+    assert second.scanned == 0
+    assert second.eligible == 0
+    assert mission.result_document_ids == [str(document.id)]
+    assert mission.result_report_id == report.id
+    assert "A substantive current-shape insight." in report.content
+    assert db_session.query(Document).count() == 1
+    assert db_session.query(Report).count() == 1
+
+
+@pytest.mark.parametrize(
+    ("report_status", "report_prompt"),
+    [
+        ("final", None),
+        ("draft", "Prepared manually by a TraceLab reviewer"),
+    ],
+    ids=["final-auto-report", "manual-draft"],
+)
+def test_linked_final_or_manual_report_is_never_reformatted(
+    db_session,
+    project,
+    report_status,
+    report_prompt,
+):
+    """Repair provenance must fail closed around finalized and user-owned work."""
+    mission = _completed_mission(
+        db_session,
+        project,
+        f"REPORT-PROTECTED-{uuid.uuid4().hex}",
+    )
+    _, report = _link_legacy_auto_report(
+        db_session,
+        mission,
+        status=report_status,
+        prompt=report_prompt,
+    )
+    original_content = report.content
+    original_hash = report.content_hash
+    service = MissionResultMaterializationService(
+        auto_ingest_service=MagicMock(spec=AutoIngestService)
+    )
+
+    assert service.needs_materialization(db_session, mission) is False
+    first = service.materialize(db_session, mission)
+    second = service.materialize(db_session, mission)
+
+    db_session.refresh(report)
+    assert first.changed is False
+    assert second.changed is False
+    assert report.content == original_content
+    assert report.content_hash == original_hash
+    assert report.status == report_status
+    assert report.prompt == (
+        report_prompt or f"Auto-generated from mission {mission.mission_id}"
+    )
+    assert db_session.query(Document).count() == 1
+    assert db_session.query(Report).count() == 1
+
+
+def test_legacy_prompt_without_generated_content_is_never_reformatted(
+    db_session,
+    project,
+):
+    """A user-supplied reserved prompt alone cannot authorize an overwrite."""
+    mission = _completed_mission(
+        db_session,
+        project,
+        f"RPT-CONTENT-{uuid.uuid4().hex}",
+    )
+    _, report = _link_legacy_auto_report(db_session, mission)
+    report.content = "# Manually authored analysis\n\nPreserve this draft."
+    report.content_hash = hashlib.sha256(report.content.encode()).hexdigest()
+    db_session.commit()
+    service = MissionResultMaterializationService(
+        auto_ingest_service=MagicMock(spec=AutoIngestService)
+    )
+
+    assert service.needs_materialization(db_session, mission) is False
+    result = service.materialize(db_session, mission)
+
+    db_session.refresh(report)
+    assert result.changed is False
+    assert report.content == "# Manually authored analysis\n\nPreserve this draft."
+
+
+def test_cross_project_legacy_report_is_never_reformatted(
+    db_session,
+    project,
+):
+    """Corrupt cross-project links must fail closed even with a legacy signature."""
+    mission = _completed_mission(
+        db_session,
+        project,
+        f"RPT-PROJECT-{uuid.uuid4().hex}",
+    )
+    _, report = _link_legacy_auto_report(db_session, mission)
+    other_project = Project(name=f"Other report project {uuid.uuid4().hex}")
+    db_session.add(other_project)
+    db_session.flush()
+    report.project_id = other_project.id
+    original_content = report.content
+    db_session.commit()
+    service = MissionResultMaterializationService(
+        auto_ingest_service=MagicMock(spec=AutoIngestService)
+    )
+
+    assert service.needs_materialization(db_session, mission) is False
+    result = service.materialize(db_session, mission)
+
+    db_session.refresh(report)
+    assert result.changed is False
+    assert report.project_id == other_project.id
+    assert report.content == original_content
 
 
 def test_minimal_receipt_preserves_reviewable_validation_failure(db_session, project):
