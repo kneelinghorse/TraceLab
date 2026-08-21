@@ -19,6 +19,7 @@ from app.core.security import (
     hash_password,
     issue_token_response,
     require_admin,
+    require_authenticated_principal,
     require_authenticated_user,
     verify_password,
 )
@@ -182,10 +183,10 @@ def refresh_token(
 
 @router.get("/me", response_model=ProfileResponse)
 def get_me(
-    user: AuthenticatedUser = Depends(require_authenticated_user),
+    user: AuthenticatedUser = Depends(require_authenticated_principal),
     db: Session = Depends(get_db),
 ) -> ProfileResponse:
-    """Return the authenticated user's profile."""
+    """Return the authenticated principal's profile, including its live role."""
     db_user = db.query(User).filter(User.id == user.user_id).first()
     if not db_user:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")

@@ -6,10 +6,10 @@ surface and the LEDGER-3 retrieval boundary:
 **`tracelab_evidence` MCP input → TypeScript API client → authenticated REST
 request → REST response → MCP response.**
 
-The public package version for this contract is `@aquex/tracelab-mcp` 1.1.1.
-This response-only revision adds canonical source metadata to the eighth
-action-clustered tool introduced in 1.1.0; it does not change tool inputs or
-legacy-name mappings.
+The public package version for the MCP portion of this contract is
+`@aquex/tracelab-mcp` 1.1.1. The LEDGER-2 service-writer channel documented
+below is deliberately REST-only and does not add an MCP action, tool input, or
+legacy-name mapping.
 
 ## Runtime ownership
 
@@ -27,6 +27,204 @@ its intentionally flat mission-only surface. LEDGER-1 does not expose a
 parallel Python evidence tool. The FastAPI REST implementation remains the
 server-side authority for authentication, authorization, persistence, and
 validation.
+
+## LEDGER-2 DeepSearch service-writer channel
+
+DeepSearch triggers one server-owned projection after its result is durably
+completed in TraceLab:
+
+```http
+POST /api/v1/missions/{mission_uuid}/evidence
+X-API-Key: <service-principal API key>
+Content-Type: application/json
+
+{
+  "schema_version": 1,
+  "deepsearch_job_id": "persisted-job-id"
+}
+```
+
+The request rejects additional fields. It contains no claims, sources,
+dispositions, ownership values, or workspace identifiers. This is not an MCP
+surface: the published `tracelab_evidence` cluster remains the human/agent
+writer and retrieval surface described below. DeepSearch calls this
+authenticated REST route directly. Both fields are required; the job id is
+matched exactly and surrounding whitespace is rejected rather than normalized.
+
+`authorize_service_or_403(..., enforce_when_disabled=True)` runs before mission
+lookup. Regardless of the global RBAC rollout flag, only `role = service`
+passes; human owner and admin roles do not. The server then
+requires a terminal reviewable mission whose status is exactly `completed` or
+`validation_failed`, a byte-matching persisted `deepsearch_job_id`, and an
+existing mission project with `deleted_at IS NULL`. Every other mission status
+is ineligible.
+
+Projected entries are stamped from server state:
+
+- `project_id = mission.project_id` and `mission_id = mission.id`;
+- `session_key = "deepsearch:" + mission.deepsearch_job_id`;
+- `origin = "deepsearch-worker"`;
+- `owner_id = mission.owner_id`, falling back to `project.owner_id` only when
+  the mission owner is null;
+- `workspace_id = project.workspace_id`;
+- `query = null`.
+
+The caller cannot override these values. The projection never invents a
+`contradicting` disposition, research query, loop number, or other provenance.
+
+### Authoritative projection
+
+Only these persisted paths participate:
+
+- `mission.result_protocol.sources_collected`;
+- `mission.result_protocol.citations`;
+- `mission.result_markdown` for citation spans;
+- `mission.execution_metadata.synthesis_telemetry.critique_telemetry.annotations`;
+- `mission.execution_metadata.synthesis_telemetry.tool_outcomes.ledger_records`
+  and `ledger_records_truncated`.
+
+`execution_metadata.synthesis_telemetry`, its `tool_outcomes` object, and the
+`ledger_records` and `ledger_records_truncated` keys are required active-result
+envelopes. An explicit empty `ledger_records` list with
+`ledger_records_truncated = 0` is valid; a missing key is malformed persisted
+data rather than an implicit empty audit. Generic diagnostic `records` and
+`records_truncated` are not projection inputs, and there is no legacy fallback
+or historical reconstruction.
+
+DeepSearch must derive `ledger_records` before applying the generic diagnostic
+250-record cap, preserve each relevant full URL up to the 4,096-character
+consumer limit, sanitize `error_category` into the bounded taxonomy rather than
+persisting raw errors, and merge relevant attempts recovered across
+checkpoints. The producer must impose and test an attempt budget compatible
+with the 1,000-entry projection ceiling; it may never silently clip this audit.
+If completeness cannot be proved, a nonzero `ledger_records_truncated` makes
+TraceLab fail the handoff loudly.
+
+The similarly named
+`result_protocol.report_metadata.forensic.critique_telemetry` summary is not a
+second writer. Raw collected-source `body` text is never copied into an entry
+and never included in the idempotency digest. Source claims use title and
+snippet, then the source URL as a non-invented fallback.
+
+| Persisted fact | Ledger projection |
+| --- | --- |
+| Citation with `live = true` | `supporting`; `claim` is exactly `result_markdown[start_index:end_index]`. |
+| Citation with `live = null` | `background` with tag `liveness-unknown`; the exact markdown span remains the claim, and any failed outcome remains a separate rejected attempt. |
+| Citation with `live = false` | `rejected`; summary preserves the liveness rationale and structured failed outcome for the URL. |
+| Uncited collected source with `alive = true` or absent | `background`; claim is `title: snippet`, title, snippet, or URL in that order. |
+| Uncited collected source with `alive = false` | `rejected`; the source claim and structured rejection rationale are retained. |
+| Applied critique annotation with verdict `unsupported` or `hallucinated` | One `rejected` claim per `citation_url`; claim is the exact anchor and summary preserves note and reason. |
+| Failed `source_fetch` or `url_liveness` record | One distinct `rejected` attempt claim per distinct structured outcome, preserving `tool`, `status`, `status_code`, `error_category`, and `alive` when present. Raw free-form `error` is not copied because it can contain secrets. |
+
+A failure for an already-rejected collected or cited URL enriches that claim
+instead of creating a duplicate. Otherwise the rejected attempt remains beside
+any live or background evidence claim: one URL can truthfully support a claim
+while also recording a failed retrieval attempt. Applied critique claims remain
+distinct for the same claim-level reason.
+
+Every source, citation, critique, and relevant tool-outcome URL is normalized
+through the same `AnyHttpUrl` boundary before any map, set, hash, or source
+upsert. URLs containing username or password userinfo are rejected so embedded
+credentials cannot reach the ledger or MCP; query parameters remain part of
+the source identity. Canonical-equivalent collected-source rows collapse deterministically:
+null and non-null metadata merge, while conflicting nonempty title, snippet,
+or liveness values fail the entire projection. Canonical-equivalent URLs across
+citations, critiques, and tool outcomes therefore enrich and sight the same
+ledger source. Critique anchors are exact claims and surrounding whitespace is
+rejected rather than silently stripped.
+
+Relevant `source_fetch` and `url_liveness` records require `status = ok|error`
+and a canonical URL. Optional `status_code` is null or a non-boolean integer
+from 0 through 599 (zero is an upstream timeout/connect sentinel), optional
+`error_category` is null or a string of at most 200 characters, and optional
+`alive` is null or boolean; `url_liveness` requires a non-null `alive` value.
+The exact allowed key subset is `tool`, `url`, `status`, `status_code`,
+`error_category`, and `alive`. An unknown tool or any extra key, including raw
+`error`, fails the trusted ledger envelope; no extra value is copied or hashed.
+Generic diagnostic records remain outside the projection contract entirely.
+
+Every projected record is validated against the `CaptureItem` limits. Active
+envelopes, records, URLs, liveness values, citation spans, applied-critique
+verdicts, and structured outcome fields fail loudly when malformed. A nonzero
+`tool_outcomes.ledger_records_truncated` fails rather than capturing a partial
+ledger.
+Exact duplicate projected items are removed; distinct claims sharing a URL are
+retained. The canonical projection must contain 1–1,000 entries after exact
+deduplication, with no truncation.
+
+### Atomicity and replay
+
+`deepsearch_ledger_batches` owns the idempotency claim. It stores a unique
+`(mission_id, deepsearch_job_id)`, `session_key`, SHA-256 `payload_hash`,
+`entry_count`, and timestamps. Each projected `ledger_entries` row links to its
+batch through nullable `deepsearch_batch_id`; interactive MCP entries leave the
+column null. The link uses `ON DELETE SET NULL`: deleting a mission cascades to
+its batch without deleting the durable evidence rows.
+SQLite referential-action tests explicitly enable `PRAGMA foreign_keys=ON`;
+the production core database is PostgreSQL, and LEDGER-2 does not change the
+global SQLite engine policy.
+
+Validated items are normalized, sorted by their complete serialized fields,
+and exact-deduplicated before hashing and insertion. The canonical SHA-256
+payload includes schema version, project UUID, mission UUID, job ID, session
+key, and every projected item. Array reordering does not create false drift;
+a material claim, source, disposition, or rationale change does.
+
+The service locks the mission on PostgreSQL and claims the batch with a
+dialect-specific `INSERT ... ON CONFLICT DO NOTHING`. The batch, canonical
+source upserts, and ledger entries commit in one transaction. PostgreSQL
+concurrent callers converge on one batch and one entry set.
+
+- Initial capture returns HTTP 201 with `status = "captured"`.
+- An exact replay returns HTTP 200 with `status = "already_processed"`, the
+  same lexically ordered `entry_ids`, and the same `entry_count`. Replay exits
+  before source upsert and does not increment `source_sighting_count`.
+- A replay whose canonical payload differs returns HTTP 409 and changes
+  nothing.
+
+Successful responses contain exactly `status`, `mission_id`,
+`deepsearch_job_id`, `session_key`, `entry_ids`, and `entry_count`. Request
+schema errors (including unsupported schema version or an extra field) are HTTP
+422. Malformed persisted result data is HTTP 400, missing mission or live
+project is HTTP 404, and state, job, or replay conflicts are HTTP 409.
+
+### Durable terminal delivery outbox
+
+`deepsearch_evidence_outbox` makes the trigger durable without changing the
+REST request or MCP surface. Its composite identity is
+`(mission_id, deepsearch_job_id)`. The immutable enrollment snapshot stores a
+nonempty `deepsearch_result_key`, positive `mission_attempt_count`, terminal
+status (`completed` or `validation_failed`), and `schema_version = 1`. Delivery
+state stores `pending|leased|acked|dead_letter`, attempt count, next-attempt
+time, lease token and expiry, acknowledgement time, last HTTP status/error
+code, and timestamps. Database checks enforce coherent leases and
+acknowledgements; the dispatcher index is `(state, next_attempt_at,
+created_at)`.
+
+DeepSearch enrolls the outbox row in the same fenced terminal SQL CTE that
+persists a `completed` or `validation_failed` result, using `ON CONFLICT DO
+NOTHING`. A conflict is successful only when the existing result key, mission
+attempt count, terminal status, and schema version exactly match; any reused
+job identity with a different snapshot fails closed. There is no history scan
+or migration backfill.
+
+Dispatchers claim at most 25 due `pending` rows or expired `leased` rows with
+`FOR UPDATE SKIP LOCKED`, write a unique lease token/expiry, and set
+`next_attempt_at = lease_expires_at` so that the single delivery index supports
+both cases. They use bounded backoff for at most 12 delivery attempts. Ack,
+retry release, and dead-letter updates are fenced by mission ID, job ID,
+`state = leased`, and the exact lease token. Any 2xx response acknowledges the
+row. Network failures, HTTP 429, and HTTP 5xx retry. Deterministic HTTP 400,
+401, 403, 404, 409, and 422 responses move the row to `dead_letter` and alert.
+The projection endpoint remains callable by an authorized service principal
+without an enrollment row, so manual recovery is possible.
+
+The outbox mission foreign key uses `ON DELETE CASCADE`. An authorized mission
+hard-delete therefore cancels unacknowledged delivery; this is intentional
+because that deletion also destroys the persisted result that is the sole
+authoritative projection source. Migration 043 refuses downgrade while either
+outbox rows or DeepSearch batch rows exist, preventing silent loss of delivery
+or replay ownership.
 
 ## Tool surface
 

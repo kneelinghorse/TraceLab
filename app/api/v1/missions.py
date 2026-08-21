@@ -26,7 +26,15 @@ from app.core.authorization import (
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.mission_events import emit_mission_status_change
-from app.core.security import AuthenticatedUser, require_authenticated_user
+from app.core.security import (
+    AuthenticatedUser,
+    require_authenticated_principal,
+    require_authenticated_user,
+)
+from app.schemas.evidence_ledger import (
+    DeepSearchEvidenceRequest,
+    DeepSearchEvidenceResponse,
+)
 from app.schemas.mission import (
     MissionContractPreviewResponse,
     MissionCreate,
@@ -46,6 +54,13 @@ from app.services.deepsearch_preview_client import (
 from app.services.deepsearch_preview_client import (
     preview_mission_contract as _call_deepsearch_preview,
 )
+from app.services.evidence_ledger import (
+    DeepSearchEvidenceConflictError,
+    DeepSearchEvidenceNotFoundError,
+    DeepSearchEvidenceValidationError,
+    EvidenceLedgerService,
+    get_evidence_ledger_service,
+)
 from app.services.mission_linter import lint_mission_for_submit
 from app.services.mission_service import (
     MissionNotFoundError,
@@ -63,6 +78,7 @@ from app.services.result_materialization import (
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+service_router = APIRouter()
 _service = MissionService()
 
 
@@ -1091,7 +1107,7 @@ class LogEntryResponse(BaseModel):
     created_at: datetime
 
 
-@router.post(
+@service_router.post(
     "/{mission_id}/logs",
     status_code=http_status.HTTP_201_CREATED,
     summary="Ingest a batch of log records for a mission",
@@ -1100,7 +1116,7 @@ def ingest_mission_logs(
     mission_id: UUID,
     payload: LogBatchRequest,
     db: Session = Depends(get_db),
-    user: AuthenticatedUser = Depends(require_authenticated_user),
+    user: AuthenticatedUser = Depends(require_authenticated_principal),
 ) -> dict:
     """Accept a batch of log lines from the DeepSearch runner.
 
@@ -1138,6 +1154,77 @@ def ingest_mission_logs(
     db.commit()
 
     return {"accepted": len(records)}
+
+
+@service_router.post(
+    "/{mission_id}/evidence",
+    response_model=DeepSearchEvidenceResponse,
+    status_code=http_status.HTTP_201_CREATED,
+    summary="Project a completed DeepSearch result into the Evidence Ledger",
+    responses={
+        http_status.HTTP_200_OK: {
+            "description": "Exact replay; returns the original stable entry identifiers.",
+            "model": DeepSearchEvidenceResponse,
+        }
+    },
+)
+def capture_mission_evidence(
+    mission_id: UUID,
+    payload: DeepSearchEvidenceRequest,
+    response: Response,
+    db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_principal),
+    ledger_service: EvidenceLedgerService = Depends(get_evidence_ledger_service),
+) -> DeepSearchEvidenceResponse:
+    """Trigger a server-owned, idempotent projection of persisted evidence.
+
+    The service-principal gate deliberately runs before any mission lookup so
+    human callers cannot use this trusted write surface as an identifier oracle.
+    The request carries only the persisted job correlation key; evidence and
+    tenancy fields are derived from the completed mission and its live project.
+    """
+    authorize_service_or_403(user, enforce_when_disabled=True)
+    try:
+        result = ledger_service.capture_deepsearch_mission_evidence(
+            db,
+            mission_id,
+            payload.deepsearch_job_id,
+        )
+    except DeepSearchEvidenceNotFoundError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
+    except DeepSearchEvidenceConflictError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        ) from exc
+    except DeepSearchEvidenceValidationError as exc:
+        raise HTTPException(
+            status_code=http_status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+    except Exception as exc:
+        logger.exception(
+            "DeepSearch evidence projection failed for mission %s",
+            mission_id,
+        )
+        raise HTTPException(
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="DeepSearch evidence projection failed",
+        ) from exc
+
+    if result.status == "already_processed":
+        response.status_code = http_status.HTTP_200_OK
+    return DeepSearchEvidenceResponse(
+        status=result.status,
+        mission_id=result.mission_id,
+        deepsearch_job_id=result.deepsearch_job_id,
+        session_key=result.session_key,
+        entry_ids=result.entry_ids,
+        entry_count=result.entry_count,
+    )
 
 
 @router.get(
