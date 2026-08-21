@@ -16,14 +16,19 @@ router = APIRouter()
 async def health_check():
     """Basic health check.
 
-    rbac_enabled is deliberately public (DEC#329, owner-approved): it discloses
-    config posture only — the same value is boot-logged — and rbac_enabled=false
-    in prod is an incident state that must be alarmable without credentials.
-    The reconciler block is counts-only (no identifiers) for the same reason.
+    Configuration booleans are deliberately public (DEC#329, owner-approved):
+    they disclose posture only, and a false production value is an incident
+    state that must be alarmable without credentials. The receipt field proves
+    only that this receiver has a secret configured; it cannot prove equality
+    with the remote signer's secret. The reconciler block is counts-only (no
+    identifiers) for the same reason.
     """
     return {
         "status": "healthy",
         "rbac_enabled": settings.rbac_enabled,
+        "deepsearch_receipt_receiver_configured": bool(
+            settings.effective_deepsearch_service_secret
+        ),
         "reconciler": reconciler_health(),
     }
 

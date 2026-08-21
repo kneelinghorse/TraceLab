@@ -174,6 +174,12 @@ def test_health_endpoint_exposes_rbac_and_reconciler(monkeypatch):
     # Force the non-default posture so a hard-coded ``False`` response cannot
     # satisfy the production guard by accident.
     monkeypatch.setattr(settings, "rbac_enabled", True)
+    monkeypatch.setattr(
+        settings,
+        "deepsearch_tracelab_service_secret",
+        "configured-receiver-secret",
+    )
+    monkeypatch.setattr(settings, "deepsearch_webhook_secret", None)
 
     # No context manager: skip startup events (Qdrant prewarm) — the endpoint
     # needs no startup state.
@@ -182,4 +188,32 @@ def test_health_endpoint_exposes_rbac_and_reconciler(monkeypatch):
     body = resp.json()
     assert body["status"] == "healthy"
     assert body["rbac_enabled"] is True
+    assert body["deepsearch_receipt_receiver_configured"] is True
     assert set(body["reconciler"]) >= {"enabled", "last_run_at", "last_status"}
+
+
+@pytest.mark.parametrize(
+    ("canonical", "legacy", "expected"),
+    [
+        (None, None, False),
+        (None, "legacy-receiver-secret", True),
+        ("canonical-receiver-secret", None, True),
+    ],
+)
+def test_health_reports_receipt_receiver_configuration(
+    monkeypatch,
+    canonical,
+    legacy,
+    expected,
+):
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    monkeypatch.setattr(settings, "deepsearch_tracelab_service_secret", canonical)
+    monkeypatch.setattr(settings, "deepsearch_webhook_secret", legacy)
+
+    response = TestClient(app).get("/api/v1/health")
+
+    assert response.status_code == 200
+    assert response.json()["deepsearch_receipt_receiver_configured"] is expected

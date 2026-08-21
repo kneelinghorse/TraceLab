@@ -69,8 +69,38 @@ class TestSignPayload:
             None,
             raising=False,
         )
-        with pytest.raises(HmacSigningError):
+        with pytest.raises(
+            HmacSigningError,
+            match="DEEPSEARCH_TRACELAB_SERVICE_SECRET",
+        ):
             sign_payload(b'{"x":1}')
+
+    def test_settings_bind_only_the_tracelab_receiver_env_name(self, monkeypatch):
+        """The inverse DeepSearch signer name must not fake receiver readiness."""
+        from app.core.config import Settings
+
+        for name in (
+            "DEEPSEARCH_TRACELAB_SERVICE_SECRET",
+            "TRACELAB_DEEPSEARCH_SERVICE_SECRET",
+            "DEEPSEARCH_WEBHOOK_SECRET",
+        ):
+            monkeypatch.delenv(name, raising=False)
+
+        receiver_value = "configured-receiver-secret"
+        monkeypatch.setenv(
+            "DEEPSEARCH_TRACELAB_SERVICE_SECRET",
+            receiver_value,
+        )
+        receiver_settings = Settings(_env_file=None, environment="test")
+        assert receiver_settings.effective_deepsearch_service_secret == receiver_value
+
+        monkeypatch.delenv("DEEPSEARCH_TRACELAB_SERVICE_SECRET")
+        monkeypatch.setenv(
+            "TRACELAB_DEEPSEARCH_SERVICE_SECRET",
+            "sender-only-secret",
+        )
+        sender_only_settings = Settings(_env_file=None, environment="test")
+        assert sender_only_settings.effective_deepsearch_service_secret is None
 
     def test_falls_back_to_legacy_env(self, monkeypatch):
         """Transitional: deepsearch_webhook_secret still works when new isn't set."""

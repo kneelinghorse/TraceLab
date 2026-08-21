@@ -80,7 +80,7 @@ def sign_payload(
     if not resolved_secret:
         raise HmacSigningError(
             "Cannot sign outbound DeepSearch request: no secret configured. "
-            "Set TRACELAB_DEEPSEARCH_SERVICE_SECRET (preferred) or "
+            "Set DEEPSEARCH_TRACELAB_SERVICE_SECRET (preferred) or "
             "DEEPSEARCH_WEBHOOK_SECRET (transitional fallback)."
         )
 
