@@ -185,10 +185,10 @@ class WebhookHandler:
                 outcome = self._materialize_result(db, mission)
                 if outcome.changed:
                     logger.info(
-                        "Reconciled persisted results for completed mission %s",
+                        "Reconciled persisted results while acknowledging idempotent "
+                        "receipt for completed mission %s",
                         payload.mission_id,
                     )
-                    return mission, "reconciled"
             logger.info(
                 "Webhook acknowledged against authoritative terminal row: mission=%s, job=%s",
                 payload.mission_id,

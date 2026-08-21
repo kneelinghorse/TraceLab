@@ -53,8 +53,9 @@ closed when neither TraceLab variable is configured. Unsigned callbacks are
 limited to explicit test environments or local development with `DEBUG=true`.
 
 **Idempotency**: Safe to receive the same webhook multiple times. If the mission
-has already been updated with this job_id, the request will be acknowledged without
-making changes.
+has already been updated with this job_id, the worker payload is not reapplied and
+the request receives the idempotent acknowledgement. TraceLab may still reconcile
+missing or stale local result artifacts from the authoritative persisted result.
 
 **Payload**: DeepSearch sends job results including:
 - job_id: The DeepSearch job identifier
