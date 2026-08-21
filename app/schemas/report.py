@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class CitationSchema(BaseModel):
@@ -60,6 +60,13 @@ class ReportCreate(BaseModel):
         default="summary",
         description="Output format for synthesis",
     )
+
+    @model_validator(mode="after")
+    def validate_source_input(self) -> ReportCreate:
+        """Reject ambiguous requests that name both supported source types."""
+        if self.collection_id is not None and self.chunk_ids is not None:
+            raise ValueError("Provide either collection_id or chunk_ids, not both.")
+        return self
 
 
 class ReportUpdate(BaseModel):

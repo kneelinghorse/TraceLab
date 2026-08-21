@@ -8,7 +8,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
-from app.core.authorization import accessible_filter, authorize_or_403
+from app.core.authorization import (
+    accessible_filter,
+    accessible_project_ids,
+    authorize_or_403,
+)
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.collection import Collection
@@ -21,23 +25,38 @@ from app.schemas.collection import (
     CollectionResponse,
     CollectionUpdate,
 )
-from app.services.collection import CollectionService, get_collection_service
+from app.services.collection import (
+    CollectionChunkForbiddenError,
+    CollectionChunkNotFoundError,
+    CollectionService,
+    get_collection_service,
+)
 from app.services.ownership import default_workspace_id
 
 router = APIRouter()
 
 
 def _build_collection_response(
-    collection, service: CollectionService
+    collection,
+    service: CollectionService,
+    *,
+    project_scope: list[UUID] | None = None,
 ) -> CollectionResponse:
     """Build a CollectionResponse with item count."""
+    if project_scope is None:
+        item_count = service.get_item_count(collection.id)
+    else:
+        item_count = service.get_item_count(
+            collection.id,
+            accessible_project_ids=project_scope,
+        )
     return CollectionResponse(
         id=collection.id,
         name=collection.name,
         description=collection.description,
         created_at=collection.created_at,
         updated_at=collection.updated_at,
-        item_count=service.get_item_count(collection.id),
+        item_count=item_count,
     )
 
 
@@ -74,10 +93,14 @@ def list_collections(
     creator sees the collections they own via the owner_id allow-path — consistent
     with what authorize() returns for the same collection per-id (fail-closed).
     """
+    project_scope = accessible_project_ids(current_user, db)
     entries = service.list_collections(
         access_filter=accessible_filter(current_user, Collection, db)
     )
-    payload = [_build_collection_response(entry, service) for entry in entries]
+    payload = [
+        _build_collection_response(entry, service, project_scope=project_scope)
+        for entry in entries
+    ]
     return CollectionListResponse(data=payload, total=len(payload))
 
 
@@ -94,6 +117,7 @@ def create_collection(
     as scalar UUIDs into the service's own session (T48.4), mirroring POST /projects —
     so the creator can actually see their collection in the scoped list once RBAC is on.
     """
+    project_scope = accessible_project_ids(current_user, db)
     try:
         entry = service.create(
             name=request.name,
@@ -105,7 +129,7 @@ def create_collection(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
         ) from exc
-    return _build_collection_response(entry, service)
+    return _build_collection_response(entry, service, project_scope=project_scope)
 
 
 @router.get("/{collection_id}", response_model=CollectionDetailResponse)
@@ -123,7 +147,14 @@ def get_collection(
         )
     authorize_or_403(current_user, "read", entry, db)
 
-    items = service.get_items(collection_id)
+    project_scope = accessible_project_ids(current_user, db)
+    if project_scope is None:
+        items = service.get_items(collection_id)
+    else:
+        items = service.get_items(
+            collection_id,
+            accessible_project_ids=project_scope,
+        )
     item_responses = [_build_item_response(item) for item in items]
 
     return CollectionDetailResponse(
@@ -156,7 +187,14 @@ def export_collection(
         )
     authorize_or_403(current_user, "read", entry, db)
 
-    markdown = service.export_markdown(collection_id)
+    project_scope = accessible_project_ids(current_user, db)
+    if project_scope is None:
+        markdown = service.export_markdown(collection_id)
+    else:
+        markdown = service.export_markdown(
+            collection_id,
+            accessible_project_ids=project_scope,
+        )
     if markdown is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found."
@@ -195,6 +233,7 @@ def update_collection(
             status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found."
         )
     authorize_or_403(current_user, "update", existing, db)
+    project_scope = accessible_project_ids(current_user, db)
     try:
         entry = service.update(
             collection_id,
@@ -209,7 +248,7 @@ def update_collection(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found."
         )
-    return _build_collection_response(entry, service)
+    return _build_collection_response(entry, service, project_scope=project_scope)
 
 
 @router.delete("/{collection_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -253,12 +292,29 @@ def add_chunk_to_collection(
             status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found."
         )
     authorize_or_403(current_user, "update", existing, db)
+    project_scope = accessible_project_ids(current_user, db)
     try:
-        item = service.add_chunk(
-            collection_id,
-            chunk_id=request.chunk_id,
-            notes=request.notes,
-        )
+        if project_scope is None:
+            item = service.add_chunk(
+                collection_id,
+                chunk_id=request.chunk_id,
+                notes=request.notes,
+            )
+        else:
+            item = service.add_chunk(
+                collection_id,
+                chunk_id=request.chunk_id,
+                notes=request.notes,
+                accessible_project_ids=project_scope,
+            )
+    except CollectionChunkNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)
+        ) from exc
+    except CollectionChunkForbiddenError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)
+        ) from exc
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
@@ -283,7 +339,15 @@ def remove_chunk_from_collection(
             status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found."
         )
     authorize_or_403(current_user, "update", existing, db)
-    deleted = service.remove_chunk(collection_id, chunk_id)
+    project_scope = accessible_project_ids(current_user, db)
+    if project_scope is None:
+        deleted = service.remove_chunk(collection_id, chunk_id)
+    else:
+        deleted = service.remove_chunk(
+            collection_id,
+            chunk_id,
+            accessible_project_ids=project_scope,
+        )
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

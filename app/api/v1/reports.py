@@ -2,14 +2,21 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
-from app.core.authorization import accessible_filter, authorize_or_403
+from app.core.authorization import (
+    accessible_filter,
+    accessible_project_ids,
+    authorize_or_403,
+)
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
+from app.models.collection import Collection
+from app.models.project import Project
 from app.schemas.report import (
     CitationSchema,
     DeleteResponse,
@@ -25,6 +32,13 @@ from app.services.ownership import default_workspace_id
 from app.services.report_service import ReportService, get_report_service
 
 router = APIRouter()
+
+ReportServiceFactory = Callable[[], ReportService]
+
+
+def get_report_service_factory() -> ReportServiceFactory:
+    """Return the report service constructor without initializing synthesis."""
+    return get_report_service
 
 
 def _build_report_response(report, citations: list) -> ReportResponse:
@@ -89,7 +103,7 @@ def create_report(
     request: ReportCreate,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
     db: Session = Depends(get_db),
-    service: ReportService = Depends(get_report_service),
+    service_factory: ReportServiceFactory = Depends(get_report_service_factory),
 ) -> ReportResponse:
     """Create a new report by synthesizing content from a collection or chunks.
 
@@ -107,8 +121,29 @@ def create_report(
             detail="Either collection_id or chunk_ids must be provided.",
         )
 
+    project_scope = accessible_project_ids(current_user, db)
+    if project_scope is not None:
+        if request.collection_id is not None:
+            collection = db.get(Collection, request.collection_id)
+            if collection is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Collection not found.",
+                )
+            authorize_or_403(current_user, "read", collection, db)
+
+        if request.project_id is not None:
+            project = db.get(Project, request.project_id)
+            if project is None or project.deleted_at is not None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Project not found.",
+                )
+            authorize_or_403(current_user, "create", project, db)
+
     try:
-        report, citations = service.create_report(
+        service = service_factory()
+        create_kwargs = dict(
             title=request.title,
             collection_id=request.collection_id,
             chunk_ids=request.chunk_ids,
@@ -118,6 +153,9 @@ def create_report(
             owner_id=current_user.user_id,
             workspace_id=default_workspace_id(db),
         )
+        if project_scope is not None:
+            create_kwargs["accessible_project_ids"] = project_scope
+        report, citations = service.create_report(**create_kwargs)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

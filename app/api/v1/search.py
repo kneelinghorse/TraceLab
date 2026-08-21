@@ -7,8 +7,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.authorization import accessible_project_ids
+from app.core.config import settings
 from app.core.database import get_db
-from app.core.security import AuthenticatedUser, require_authenticated_user
+from app.core.security import ROLE_SERVICE, AuthenticatedUser, require_authenticated_user
 from app.schemas.rag import RagQuery, RagResponse
 from app.services.rag_service import build_empty_scope_result, get_rag_service
 from app.services.search_history import SearchHistoryService, get_search_history_service
@@ -87,6 +88,9 @@ def _log_search_history(
     history_service: SearchHistoryService,
 ) -> None:
     """Persist search history without impacting the primary request."""
+    if settings.rbac_enabled and current_user.role == ROLE_SERVICE:
+        return
+
     filters: dict[str, Any] = {
         "project_id": str(payload.project_id) if payload.project_id else None,
         "document_id": str(payload.document_id) if payload.document_id else None,
@@ -126,6 +130,7 @@ def _log_search_history(
             duration_ms=response.latency_ms,
             cache_hit=cache.get("hit", False),
             executed_by=current_user.username,
+            owner_id=current_user.user_id,
             top_chunks=top_chunks,
             metadata=metadata,
         )

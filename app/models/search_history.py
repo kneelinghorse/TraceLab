@@ -5,7 +5,17 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import JSON, Boolean, Column, DateTime, Index, Integer, String, Text
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+)
 
 from app.core.database import Base
 from app.models.types import GUID
@@ -24,6 +34,7 @@ class SearchHistory(Base):
     top_k = Column(Integer, nullable=False, default=5)
     duration_ms = Column(Integer, nullable=True)
     cache_hit = Column(Boolean, nullable=False, default=False)
+    owner_id = Column(GUID(), ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
     user_label = Column(String(255), nullable=True)
     metadata_payload = Column(JSON, nullable=False, default=dict)
     top_chunks = Column(JSON, nullable=False, default=list)
@@ -38,4 +49,5 @@ class SearchHistory(Base):
     __table_args__ = (
         Index("ix_search_history_created_at", "created_at"),
         Index("ix_search_history_query_mode", "search_mode"),
+        Index("ix_search_history_owner_id_created_at", "owner_id", "created_at"),
     )

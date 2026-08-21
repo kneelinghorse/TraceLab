@@ -51,6 +51,7 @@ class ReportService:
         output_format: Literal["summary", "report", "bullets", "markdown"] = "summary",
         owner_id: UUID | None = None,
         workspace_id: UUID | None = None,
+        accessible_project_ids: list[UUID] | None = None,
     ) -> tuple[Report, list[dict[str, Any]]]:
         """Create a new report by synthesizing content.
 
@@ -64,6 +65,9 @@ class ReportService:
             owner_id: Creator (the caller) — resolved by the route and passed as a
                 scalar UUID since this service opens its own session (T48.4 parity).
             workspace_id: Default Space — same rationale.
+            accessible_project_ids: Projects the caller may read. ``None`` keeps
+                the legacy unrestricted synthesis and source-snapshot path; an
+                empty list produces an empty report without provider or cache use.
 
         Returns:
             Tuple of (Report object, list of citation dicts)
@@ -74,18 +78,40 @@ class ReportService:
         if not collection_id and not chunk_ids:
             raise ValueError("Either collection_id or chunk_ids must be provided.")
 
-        # Perform synthesis
-        synthesis_result = self.synthesis_service.synthesize(
-            collection_id=collection_id,
-            chunk_ids=chunk_ids,
-            prompt=prompt,
-            output_format=output_format,
-        )
+        # Perform synthesis. Omit the scope keyword on the unrestricted path so
+        # legacy collaborators and cache identities retain their exact call shape.
+        if accessible_project_ids == []:
+            synthesis_result = SynthesisService._empty_result(
+                include_effective_chunk_ids=True
+            )
+        elif accessible_project_ids is None:
+            synthesis_result = self.synthesis_service.synthesize(
+                collection_id=collection_id,
+                chunk_ids=chunk_ids,
+                prompt=prompt,
+                output_format=output_format,
+            )
+        else:
+            synthesis_result = self.synthesis_service.synthesize(
+                collection_id=collection_id,
+                chunk_ids=chunk_ids,
+                prompt=prompt,
+                output_format=output_format,
+                accessible_project_ids=accessible_project_ids,
+            )
 
         content = synthesis_result.get("content", "")
         citations = synthesis_result.get("citations", [])
         tokens_used = synthesis_result.get("tokens_used", 0)
         chunk_count = synthesis_result.get("chunk_count", 0)
+        effective_chunk_ids = (
+            [
+                chunk_id if isinstance(chunk_id, UUID) else UUID(str(chunk_id))
+                for chunk_id in synthesis_result.get("effective_chunk_ids", [])
+            ]
+            if accessible_project_ids is not None
+            else None
+        )
 
         # Compute content hash for dedup
         content_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
@@ -118,9 +144,12 @@ class ReportService:
                 )
                 session.add(source)
 
-                # Also snapshot individual chunk IDs from collection
-                collection_chunks = self._get_collection_chunk_ids(
-                    session, collection_id
+                # Scoped synthesis has already resolved the authoritative subset.
+                # Re-expanding the collection here would reintroduce foreign chunks.
+                collection_chunks = (
+                    self._get_collection_chunk_ids(session, collection_id)
+                    if effective_chunk_ids is None
+                    else effective_chunk_ids
                 )
                 for chunk_id in collection_chunks:
                     chunk_source = ReportSource(
@@ -131,7 +160,10 @@ class ReportService:
                     session.add(chunk_source)
 
             if chunk_ids:
-                for chunk_id in chunk_ids:
+                source_chunk_ids = (
+                    chunk_ids if effective_chunk_ids is None else effective_chunk_ids
+                )
+                for chunk_id in source_chunk_ids:
                     source = ReportSource(
                         report_id=report.id,
                         source_type="chunk",

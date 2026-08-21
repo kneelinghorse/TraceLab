@@ -20,6 +20,14 @@ SessionFactory = Callable[[], Session]
 MAX_CHUNKS_PER_COLLECTION = 100
 
 
+class CollectionChunkNotFoundError(ValueError):
+    """Raised when an add target is missing from the authoritative document graph."""
+
+
+class CollectionChunkForbiddenError(ValueError):
+    """Raised when an existing add target is outside the caller's project scope."""
+
+
 class CollectionService:
     """Provide CRUD operations for collections and their items."""
 
@@ -163,27 +171,61 @@ class CollectionService:
         *,
         chunk_id: UUID | str,
         notes: str | None = None,
+        accessible_project_ids: list[UUID] | None = None,
     ) -> CollectionItem:
-        """Add a chunk to a collection."""
+        """Add a live chunk to a collection within the caller's project scope."""
         session = self.session_factory()
         try:
-            # Verify collection exists
-            collection = (
-                session.query(Collection)
-                .filter(Collection.id == str(collection_id))
-                .one_or_none()
-            )
+            if accessible_project_ids is None:
+                # Preserve the unrestricted lookup exactly, including its SQL shape.
+                collection = (
+                    session.query(Collection)
+                    .filter(Collection.id == str(collection_id))
+                    .one_or_none()
+                )
+            else:
+                # Lock the parent where the database supports row locking. This
+                # keeps the scoped limit check and insert in one transaction.
+                collection = (
+                    session.query(Collection)
+                    .filter(Collection.id == str(collection_id))
+                    .with_for_update(of=Collection)
+                    .one_or_none()
+                )
             if collection is None:
-                raise ValueError("Collection not found.")
+                if accessible_project_ids is None:
+                    raise ValueError("Collection not found.")
+                raise CollectionChunkNotFoundError("Collection not found.")
 
-            # Verify chunk exists
-            chunk = (
-                session.query(DocumentChunk)
-                .filter(DocumentChunk.id == str(chunk_id))
-                .one_or_none()
-            )
-            if chunk is None:
-                raise ValueError("Chunk not found.")
+            if accessible_project_ids is None:
+                chunk = (
+                    session.query(DocumentChunk)
+                    .filter(DocumentChunk.id == str(chunk_id))
+                    .one_or_none()
+                )
+                if chunk is None:
+                    raise ValueError("Chunk not found.")
+            else:
+                # Resolve through the live document and lock the matched row where
+                # supported. Its project_id is authoritative for authorization.
+                chunk_row = (
+                    session.query(DocumentChunk, Document.project_id)
+                    .join(Document, Document.id == DocumentChunk.document_id)
+                    .filter(
+                        DocumentChunk.id == str(chunk_id),
+                        Document.deleted_at.is_(None),
+                    )
+                    .with_for_update()
+                    .one_or_none()
+                )
+                if chunk_row is None:
+                    raise CollectionChunkNotFoundError("Chunk not found.")
+
+                _chunk, project_id = chunk_row
+                if project_id not in set(accessible_project_ids):
+                    raise CollectionChunkForbiddenError(
+                        "You do not have access to this chunk."
+                    )
 
             # Check limit
             item_count = (
@@ -221,10 +263,38 @@ class CollectionService:
         self,
         collection_id: UUID | str,
         chunk_id: UUID | str,
+        *,
+        accessible_project_ids: list[UUID] | None = None,
     ) -> bool:
-        """Remove a chunk from a collection."""
+        """Remove a chunk visible within the caller's project scope."""
+        if accessible_project_ids == []:
+            return False
+
         session = self.session_factory()
         try:
+            if accessible_project_ids is not None:
+                item = (
+                    session.query(CollectionItem)
+                    .join(
+                        DocumentChunk,
+                        CollectionItem.chunk_id == DocumentChunk.id,
+                    )
+                    .join(Document, DocumentChunk.document_id == Document.id)
+                    .filter(
+                        CollectionItem.collection_id == str(collection_id),
+                        CollectionItem.chunk_id == str(chunk_id),
+                        Document.deleted_at.is_(None),
+                        Document.project_id.in_(accessible_project_ids),
+                    )
+                    .with_for_update(of=CollectionItem)
+                    .one_or_none()
+                )
+                if item is None:
+                    return False
+                session.delete(item)
+                session.commit()
+                return True
+
             deleted = (
                 session.query(CollectionItem)
                 .filter(
@@ -241,10 +311,35 @@ class CollectionService:
         finally:
             session.close()
 
-    def get_items(self, collection_id: UUID | str) -> list[CollectionItem]:
+    def get_items(
+        self,
+        collection_id: UUID | str,
+        *,
+        accessible_project_ids: list[UUID] | None = None,
+    ) -> list[CollectionItem]:
         """Get all items in a collection with chunk data."""
+        if accessible_project_ids == []:
+            return []
+
         session = self.session_factory()
         try:
+            if accessible_project_ids is not None:
+                return (
+                    session.query(CollectionItem)
+                    .join(
+                        DocumentChunk,
+                        CollectionItem.chunk_id == DocumentChunk.id,
+                    )
+                    .join(Document, DocumentChunk.document_id == Document.id)
+                    .filter(
+                        CollectionItem.collection_id == str(collection_id),
+                        Document.deleted_at.is_(None),
+                        Document.project_id.in_(accessible_project_ids),
+                    )
+                    .order_by(CollectionItem.added_at.desc())
+                    .all()
+                )
+
             return (
                 session.query(CollectionItem)
                 .filter(CollectionItem.collection_id == str(collection_id))
@@ -254,10 +349,34 @@ class CollectionService:
         finally:
             session.close()
 
-    def get_item_count(self, collection_id: UUID | str) -> int:
+    def get_item_count(
+        self,
+        collection_id: UUID | str,
+        *,
+        accessible_project_ids: list[UUID] | None = None,
+    ) -> int:
         """Get count of items in a collection."""
+        if accessible_project_ids == []:
+            return 0
+
         session = self.session_factory()
         try:
+            if accessible_project_ids is not None:
+                return (
+                    session.query(CollectionItem)
+                    .join(
+                        DocumentChunk,
+                        CollectionItem.chunk_id == DocumentChunk.id,
+                    )
+                    .join(Document, DocumentChunk.document_id == Document.id)
+                    .filter(
+                        CollectionItem.collection_id == str(collection_id),
+                        Document.deleted_at.is_(None),
+                        Document.project_id.in_(accessible_project_ids),
+                    )
+                    .count()
+                )
+
             return (
                 session.query(CollectionItem)
                 .filter(CollectionItem.collection_id == str(collection_id))
@@ -269,7 +388,12 @@ class CollectionService:
     # ------------------------------------------------------------------
     # Export
     # ------------------------------------------------------------------
-    def export_markdown(self, collection_id: UUID | str) -> str | None:
+    def export_markdown(
+        self,
+        collection_id: UUID | str,
+        *,
+        accessible_project_ids: list[UUID] | None = None,
+    ) -> str | None:
         """Export collection as markdown bundle for agent synthesis.
 
         Returns None if collection not found, otherwise a markdown string.
@@ -284,13 +408,33 @@ class CollectionService:
             if collection is None:
                 return None
 
-            # Get items with chunks eagerly loaded
-            items = (
-                session.query(CollectionItem)
-                .filter(CollectionItem.collection_id == str(collection_id))
-                .order_by(CollectionItem.added_at.asc())
-                .all()
-            )
+            # Keep the unrestricted query byte-identical. Scoped reads instead
+            # resolve each child through its live document and project grant.
+            if accessible_project_ids is None:
+                items = (
+                    session.query(CollectionItem)
+                    .filter(CollectionItem.collection_id == str(collection_id))
+                    .order_by(CollectionItem.added_at.asc())
+                    .all()
+                )
+            elif accessible_project_ids == []:
+                items = []
+            else:
+                items = (
+                    session.query(CollectionItem)
+                    .join(
+                        DocumentChunk,
+                        CollectionItem.chunk_id == DocumentChunk.id,
+                    )
+                    .join(Document, DocumentChunk.document_id == Document.id)
+                    .filter(
+                        CollectionItem.collection_id == str(collection_id),
+                        Document.deleted_at.is_(None),
+                        Document.project_id.in_(accessible_project_ids),
+                    )
+                    .order_by(CollectionItem.added_at.asc())
+                    .all()
+                )
 
             # Gather document info for chunks
             doc_ids = set()
