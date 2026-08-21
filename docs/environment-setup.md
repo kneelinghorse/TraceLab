@@ -9,7 +9,7 @@ This document provides a clear reference for TraceLab's local development and Ra
 | PostgreSQL | localhost:5433 (Docker) | Railway PostgreSQL addon |
 | Qdrant | localhost:6333 (Docker) | Qdrant Cloud (free tier) |
 | FastAPI | localhost:8000 | https://api.tracelab.aquex.ai |
-| Frontend | localhost:3000 | https://tracelab.tracelab.aquex.ai |
+| Frontend | localhost:3000 | https://tracelab.aquex.ai |
 
 ## Authentication
 
@@ -70,9 +70,10 @@ For Claude Code MCP integration, use the appropriate API key based on environmen
 {
   "mcpServers": {
     "tracelab": {
-      "command": "...",
+      "command": "npx",
+      "args": ["-y", "@aquex/tracelab-mcp"],
       "env": {
-        "TRACELAB_API_URL": "http://localhost:8000/api/v1",
+        "TRACELAB_API_URL": "http://localhost:8000",
         "TRACELAB_API_KEY": "<local-api-key>"
       }
     }
@@ -85,15 +86,19 @@ For Claude Code MCP integration, use the appropriate API key based on environmen
 {
   "mcpServers": {
     "tracelab": {
-      "command": "...",
+      "command": "npx",
+      "args": ["-y", "@aquex/tracelab-mcp"],
       "env": {
-        "TRACELAB_API_URL": "https://api.tracelab.aquex.ai/api/v1",
+        "TRACELAB_API_URL": "https://api.tracelab.aquex.ai",
         "TRACELAB_API_KEY": "<production-api-key>"
       }
     }
   }
 }
 ```
+
+`TRACELAB_API_URL` is an origin, not an API-prefix URL. The MCP package
+appends `/api/v1` to its request paths.
 
 Or if using headers directly:
 

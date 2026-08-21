@@ -1,6 +1,6 @@
 {
   "name": "@aquex/tracelab-mcp",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "MCP server for TraceLab — gives AI agents research-to-output loops against a TraceLab knowledge base. Eight action-clustered tools (search, project, collection, report, document, mission, mission-execution, evidence) and an RFC 8628 device-code login so installers don't hand-paste API keys.",
   "type": "module",
   "main": "dist/index.js",

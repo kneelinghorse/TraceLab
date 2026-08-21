@@ -109,6 +109,8 @@ class LedgerEntryRead(BaseModel):
     claim: str
     summary: str | None
     source_url: str
+    source_id: UUID
+    source_sighting_count: int = Field(ge=1)
     snippet: str | None
     query: str | None
     disposition: LedgerDisposition
@@ -159,7 +161,7 @@ class LedgerListResponse(BaseModel):
 
 
 class LedgerSearchResponse(BaseModel):
-    """Paginated literal keyword search results."""
+    """Paginated project-scoped keyword search results."""
 
     entries: list[LedgerEntryRead]
     total: int

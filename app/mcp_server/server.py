@@ -1,13 +1,11 @@
 """MCP server for TraceLab.
 
-This module provides the main MCP server entry point that can be run
-as a standalone process or imported for testing.
+This module provides the legacy in-repo MCP server used by parity tests and
+local development. Production clients use the published stdio package at
+``packages/tracelab-mcp``.
 
 Usage:
     python -m app.mcp_server.server
-
-Or via the CLI:
-    tracelab mcp-server
 """
 
 from __future__ import annotations

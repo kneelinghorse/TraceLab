@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.core.authorization import (
     accessible_filter,
+    accessible_project_ids,
     authorize_or_403,
     is_service_principal,
 )
@@ -189,6 +190,7 @@ def list_evidence(
     """List accessible evidence and notes for one project."""
     _load_project(db, current_user, project_id, "read")
     _authorize_mission(db, current_user, mission_id, project_id, "read")
+    project_scope = accessible_project_ids(current_user, db)
     normalized_session = _normalize_optional_filter(session_key, "session_key")
     entries, notes, entry_total, note_total = service.list_ledger(
         db,
@@ -200,6 +202,7 @@ def list_evidence(
         page_size=page_size,
         entry_access_filter=_evidence_access_filter(current_user, LedgerEntry, db),
         note_access_filter=_evidence_access_filter(current_user, LedgerNote, db),
+        allowed_project_ids=project_scope,
     )
     return LedgerListResponse(
         entries=entries,
@@ -224,9 +227,10 @@ def search_evidence(
     db: Session = Depends(get_db),
     service: EvidenceLedgerService = Depends(get_evidence_ledger_service),
 ) -> LedgerSearchResponse:
-    """Search accessible claims using a literal, escaped ILIKE query."""
+    """Search accessible claims with PostgreSQL FTS or literal ILIKE."""
     _load_project(db, current_user, project_id, "read")
     _authorize_mission(db, current_user, mission_id, project_id, "read")
+    project_scope = accessible_project_ids(current_user, db)
     keyword = _normalize_required_filter(q, "q")
     normalized_session = _normalize_optional_filter(session_key, "session_key")
     entries, total = service.search(
@@ -239,6 +243,7 @@ def search_evidence(
         page=page,
         page_size=page_size,
         access_filter=_evidence_access_filter(current_user, LedgerEntry, db),
+        allowed_project_ids=project_scope,
     )
     return LedgerSearchResponse(
         entries=entries,
