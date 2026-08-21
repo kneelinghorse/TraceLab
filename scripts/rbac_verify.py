@@ -1157,6 +1157,7 @@ class RbacVerifier:
         self,
         *,
         owner_token: str,
+        expected_owner_id: str,
         project_id: str,
     ) -> tuple[dict[str, str | None], str | None]:
         """Create per-role foreign saved searches and locate owner-positive history."""
@@ -1207,6 +1208,7 @@ class RbacVerifier:
                 filters = entry.get("filters")
                 if (
                     entry.get("query_text") == _PEDR_SCOPE_QUERY
+                    and str(entry.get("owner_id")) == expected_owner_id
                     and isinstance(filters, dict)
                     and str(filters.get("project_id")) == project_id
                 ):
@@ -2150,6 +2152,19 @@ class RbacVerifier:
 
         project_id, chunk_id = self._pedr1b_fixture
         principal_ids = principal_ids or self._principal_ids
+        expected_owner_id = principal_ids.get("second_owner")
+        if not expected_owner_id:
+            self.gaps.append(
+                Gap(
+                    "NO-DISPOSABLE-OWNER",
+                    "setup",
+                    "post",
+                    f"{self._prefix}/admin/users",
+                    "throwaway second-owner fixture principal UUID",
+                    "missing",
+                )
+            )
+            return
         disjoint_scope = self._discover_disjoint_scope_space(
             owner_token=owner_token,
             foreign_project_id=project_id,
@@ -2175,6 +2190,7 @@ class RbacVerifier:
         try:
             owner_saved_ids, owner_history_id = self._pedr1c_owner_fixtures(
                 owner_token=owner_token,
+                expected_owner_id=expected_owner_id,
                 project_id=project_id,
             )
             foreign_collection_id = self._pedr1c_foreign_collection_fixture(
