@@ -1,6 +1,7 @@
 """OPS-2: in-app reconciler scheduler — tick outcomes and /health exposure."""
 
 import asyncio
+import logging
 from types import SimpleNamespace
 
 import pytest
@@ -50,6 +51,44 @@ def test_tick_success_records_ok(monkeypatch):
     assert sched._state.runs == 1
     assert sched._state.consecutive_errors == 0
     assert sched._state.last_run_at is not None
+
+
+def test_success_evidence_uses_uvicorn_info_without_root_mutation(
+    monkeypatch,
+    caplog,
+):
+    """Success evidence must reach Uvicorn INFO without widening root logs."""
+    from uvicorn.config import LOGGING_CONFIG
+
+    root_level = logging.getLogger().level
+    monkeypatch.setattr(
+        sched,
+        "run_reconciliation_once",
+        lambda: {
+            "scanned": 10,
+            "eligible": 0,
+            "repaired": 0,
+            "failed": 0,
+            "skipped_soft_deleted": 10,
+        },
+    )
+    with caplog.at_level(logging.INFO, logger="uvicorn.error"):
+        asyncio.run(sched.run_tick())
+
+    records = [
+        record
+        for record in caplog.records
+        if record.getMessage().startswith("reconciler_run")
+    ]
+    assert len(records) == 1
+    assert records[0].name == "uvicorn.error.reconciler"
+    assert records[0].levelno == logging.INFO
+    assert "status=ok scanned=10 eligible=0 repaired=0 failed=0" in (
+        records[0].getMessage()
+    )
+    assert "skipped_soft_deleted=10" in records[0].getMessage()
+    assert LOGGING_CONFIG["loggers"]["uvicorn.error"]["level"] == "INFO"
+    assert logging.getLogger().level == root_level
 
 
 def test_tick_partial_when_failures_present(monkeypatch):

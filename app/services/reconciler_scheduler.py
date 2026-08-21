@@ -25,7 +25,7 @@ from typing import Any
 from app.core.config import settings
 from app.core.database import SessionLocal
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("uvicorn.error.reconciler")
 
 
 @dataclass
