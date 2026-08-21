@@ -3,9 +3,13 @@
 from datetime import date
 from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
 
+from app.core.authorization import accessible_project_ids
+from app.core.database import get_db
+from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.services.faceted_search import FacetedSearchService, FacetFilters
 
 router = APIRouter()
@@ -58,9 +62,14 @@ class FacetResponse(BaseModel):
 
 
 @router.post("/facets", response_model=FacetResponse)
-async def fetch_facets(payload: FacetRequest) -> FacetResponse:
+async def fetch_facets(
+    payload: FacetRequest,
+    db: Session = Depends(get_db),
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+) -> FacetResponse:
     """Return available facet values scoped by the provided filters."""
 
+    allowed_project_ids = accessible_project_ids(current_user, db)
     service = FacetedSearchService()
     filters = FacetFilters.from_kwargs(
         project_id=str(payload.project_id) if payload.project_id else None,
@@ -70,7 +79,7 @@ async def fetch_facets(payload: FacetRequest) -> FacetResponse:
         date_from=payload.date_from,
         date_to=payload.date_to,
     )
-    facets = service.get_facets(filters)
+    facets = service.get_facets(filters, allowed_project_ids=allowed_project_ids)
     return FacetResponse(
         projects=[FacetValue(**item) for item in facets["projects"]],
         document_types=[FacetValue(**item) for item in facets["document_types"]],

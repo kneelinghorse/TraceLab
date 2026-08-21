@@ -5,6 +5,7 @@ import re
 import time
 from datetime import date
 from typing import Any
+from uuid import UUID
 
 from app.core.config import settings
 from app.services.cache_manager import get_cache_manager
@@ -53,6 +54,66 @@ MODEL_COST_ESTIMATES = {
     "gpt-5.1": 0.0010,
     "gpt-5.2": 0.0016,
 }
+
+
+def build_empty_scope_result(
+    *,
+    search_mode: str,
+    primary_model: str | None = None,
+    compression_threshold: float | None = None,
+    quality_threshold: float | None = None,
+    routing_metrics: dict[str, int] | None = None,
+) -> dict[str, Any]:
+    """Build a normal empty response without constructing caches or providers."""
+    return {
+        "answer": "No accessible sources were found for this query.",
+        "citations": [],
+        "sources": [],
+        "latency_ms": 0.0,
+        "compression": {
+            "original_chunks": 0,
+            "filtered_chunks": 0,
+            "original_tokens": 0,
+            "filtered_tokens": 0,
+            "reduction_ratio": 0.0,
+            "threshold": (
+                settings.rag_context_threshold
+                if compression_threshold is None
+                else compression_threshold
+            ),
+            "compression_ms": 0.0,
+        },
+        "cache": {
+            "hit": False,
+            "score": None,
+            "age_seconds": None,
+            "ttl_seconds": None,
+        },
+        "quality": {
+            "composite_score": 0.0,
+            "threshold": (
+                settings.tiered_routing_threshold
+                if quality_threshold is None
+                else quality_threshold
+            ),
+            "pillar_scores": {
+                "linguistic_uncertainty": 0.0,
+                "answer_integrity": 0.0,
+                "source_provenance": 0.0,
+            },
+            "hard_failures": ["no_accessible_sources"],
+            "reasons": ["The request authorization scope contains no projects."],
+            "pre_escalation_score": None,
+        },
+        "routing": {
+            "selected_model": primary_model or settings.openai_chat_model,
+            "escalated": False,
+            "attempts": [],
+            "estimated_cost_usd": 0.0,
+            "metrics": dict(routing_metrics or {"total_queries": 0, "escalations": 0}),
+        },
+        "search_mode": (search_mode or "semantic").strip().lower(),
+    }
 
 
 class RagService:
@@ -167,11 +228,20 @@ class RagService:
         auto_detect_type: bool = True,
         type_boost_enabled: bool = True,
         include_graph_context: bool = False,
+        allowed_project_ids: list[UUID] | None = None,
     ) -> dict[str, Any]:
         """
         Execute a full RAG workflow: retrieve context and synthesize an answer.
         """
         normalized_mode = (search_mode or "semantic").strip().lower()
+        allowed_project_scope = self._normalize_project_scope(allowed_project_ids)
+        if allowed_project_scope == () or (
+            allowed_project_scope is not None
+            and project_id is not None
+            and str(project_id) not in set(allowed_project_scope)
+        ):
+            return self._empty_scope_result(search_mode=normalized_mode)
+
         filters = FacetFilters.from_kwargs(
             project_id=project_id,
             document_types=document_types,
@@ -181,6 +251,12 @@ class RagService:
             date_from=date_from,
             date_to=date_to,
         )
+        filters_signature = filters.signature()
+        if allowed_project_scope is not None:
+            filters_signature = self._scoped_filters_signature(
+                filters_signature,
+                allowed_project_scope,
+            )
         cache_key = self.cache_manager.rag_query_key(
             query=query,
             project_id=project_id,
@@ -190,7 +266,7 @@ class RagService:
             temperature=temperature,
             max_tokens=max_tokens,
             search_mode=normalized_mode,
-            filters_signature=filters.signature(),
+            filters_signature=filters_signature,
             quality_signature=self._quality_filter_signature(
                 min_quality_gates=min_quality_gates,
                 statuses=status_filters,
@@ -226,6 +302,12 @@ class RagService:
                 auto_detect_type=auto_detect_type,
                 type_boost_enabled=type_boost_enabled,
                 include_graph_context=include_graph_context,
+                allowed_project_ids=(
+                    [UUID(project_id) for project_id in allowed_project_scope]
+                    if allowed_project_scope is not None
+                    else None
+                ),
+                filters_signature=filters_signature,
             )
 
         result, hit = self.cache_manager.cached_value(
@@ -277,6 +359,8 @@ class RagService:
         auto_detect_type: bool = True,
         type_boost_enabled: bool = True,
         include_graph_context: bool = False,
+        allowed_project_ids: list[UUID] | None = None,
+        filters_signature: str | None = None,
     ) -> dict[str, Any]:
         start = time.perf_counter()
         normalized_mode = (search_mode or "semantic").strip().lower()
@@ -299,15 +383,19 @@ class RagService:
             if max_tokens is not None
             else self.default_max_tokens,
             "search_mode": normalized_mode,
-            "filters_signature": FacetFilters.from_kwargs(
-                project_id=project_id,
-                document_types=document_types,
-                source_types=source_types,
-                source_type=source_type,
-                tags=tags,
-                date_from=date_from,
-                date_to=date_to,
-            ).signature(),
+            "filters_signature": (
+                filters_signature
+                if filters_signature is not None
+                else FacetFilters.from_kwargs(
+                    project_id=project_id,
+                    document_types=document_types,
+                    source_types=source_types,
+                    source_type=source_type,
+                    tags=tags,
+                    date_from=date_from,
+                    date_to=date_to,
+                ).signature()
+            ),
             "min_quality_gates": min_quality_gates,
             "status_filters": list(status_filters or []),
             "allow_pii": allow_pii if allow_pii is not None else True,
@@ -336,7 +424,7 @@ class RagService:
                 return response
 
         # Use PEDR orchestrator for retrieval with proper RRF fusion
-        pedr_response = self.pedr_orchestrator.search(
+        search_kwargs: dict[str, Any] = dict(
             query=query,
             top_k=top_k,
             project_id=project_id,
@@ -358,6 +446,9 @@ class RagService:
             allow_pii=allow_pii,
             governance_mode=governance_mode,
         )
+        if allowed_project_ids is not None:
+            search_kwargs["allowed_project_ids"] = allowed_project_ids
+        pedr_response = self.pedr_orchestrator.search(**search_kwargs)
 
         # Convert PEDR results to dict format for context compression
         retrieved_chunks = [
@@ -432,7 +523,7 @@ class RagService:
                 )
             except Exception:
                 # Cache writes must never impact the primary query path.
-                pass
+                logger.debug("Semantic cache write failed", exc_info=True)
 
         total_cost = self._record_cost_events(
             attempts=routing_details.get("attempts", []),
@@ -446,6 +537,38 @@ class RagService:
         return result
 
     @staticmethod
+    def _normalize_project_scope(
+        allowed_project_ids: list[UUID] | None,
+    ) -> tuple[str, ...] | None:
+        """Return a stable cache-safe representation of a request project scope."""
+        if allowed_project_ids is None:
+            return None
+        return tuple(sorted({str(project_id) for project_id in allowed_project_ids}))
+
+    @staticmethod
+    def _scoped_filters_signature(
+        filters_signature: str,
+        allowed_project_scope: tuple[str, ...],
+    ) -> str:
+        """Bind both RAG cache layers to the canonical authorization scope."""
+        return f"{filters_signature}|allowed_projects:{','.join(allowed_project_scope)}"
+
+    def _empty_scope_result(self, *, search_mode: str) -> dict[str, Any]:
+        """Return a normal empty result without consulting caches or providers."""
+        threshold = getattr(
+            getattr(self.quality_assessor, "config", None),
+            "escalation_threshold",
+            settings.tiered_routing_threshold,
+        )
+        return build_empty_scope_result(
+            search_mode=search_mode,
+            primary_model=self.primary_model,
+            compression_threshold=self.compression_threshold,
+            quality_threshold=threshold,
+            routing_metrics=self.routing_metrics,
+        )
+
+    @staticmethod
     def _quality_filter_signature(
         *,
         min_quality_gates: int | None,
@@ -455,7 +578,7 @@ class RagService:
     ) -> str:
         """Generate a cache-friendly signature for governance filters."""
         if min_quality_gates is None:
-            gates_token = "*"
+            gates_token = "*"  # noqa: S105 - cache token, not a credential
         else:
             try:
                 value = int(min_quality_gates)
@@ -473,7 +596,7 @@ class RagService:
             )
             status_token = ",".join(normalized) if normalized else "*"
         else:
-            status_token = "*"
+            status_token = "*"  # noqa: S105 - cache token, not a credential
 
         pii_token = "no_pii" if allow_pii is False else "any"
         mode = (governance_mode or "strict").strip().lower()

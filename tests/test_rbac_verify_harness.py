@@ -28,6 +28,7 @@ from scripts.rbac_verify import (
     HarnessError,
     RbacVerifier,
     _seed_specs,
+    pedr1b_scope_routes,
     pedr_scope_routes,
 )
 
@@ -63,6 +64,11 @@ def test_harness_passes_against_enforced_app(client, owner_principal, monkeypatc
         RbacVerifier,
         "_note_owner_preflight_baseline",
         lambda _self, _owner_token: None,
+    )
+    monkeypatch.setattr(
+        RbacVerifier,
+        "_discover_pedr1b_fixture",
+        lambda _self, _owner_token: (str(uuid4()), str(uuid4())),
     )
     verifier = RbacVerifier(client)
     code = verifier.run(OWNER_EMAIL, OWNER_PW)
@@ -189,6 +195,23 @@ def test_pedr_scope_routes_cover_exact_mission_surface():
     ]
     assert routes[0][2]["project_id"] == project_id
     assert routes[3][2]["project_id"] == project_id
+
+
+def test_pedr1b_scope_routes_cover_exact_mission_surface():
+    """PEDR-1B adds the RAG, synthesis, and facet probes as one unit."""
+    project_id = str(uuid4())
+    chunk_id = str(uuid4())
+
+    routes = pedr1b_scope_routes("/api/v1", project_id, chunk_id)
+
+    assert [(method, path) for method, path, _body in routes] == [
+        ("post", "/api/v1/search"),
+        ("post", "/api/v1/synthesize"),
+        ("post", "/api/v1/facets"),
+    ]
+    assert routes[0][2]["project_id"] == project_id
+    assert routes[1][2]["chunk_ids"] == [chunk_id]
+    assert routes[2][2]["project_id"] == project_id
 
 
 class _StubResponse:
@@ -344,3 +367,137 @@ def test_pedr_scope_matrix_fails_when_no_known_positive_search_project_exists():
     assert transport.explicit_search_calls == 0
     assert any("smoke only" in note for note in verifier.notes)
     assert verifier.report() == 1
+
+
+class _LeakyPedr1bTransport:
+    """Hide foreign content behind otherwise-empty metadata for deny callers."""
+
+    project_id = str(uuid4())
+    chunk_id = str(uuid4())
+
+    def request(self, method, path, *, headers, json):
+        is_owner = headers.get("Authorization") == "Bearer owner-jwt"
+        if path.endswith("/retrieval/search"):
+            return _StubResponse(
+                200,
+                {
+                    "results": [
+                        {
+                            "project_id": self.project_id,
+                            "chunk_id": self.chunk_id,
+                        }
+                    ]
+                },
+            )
+        if path.endswith("/search"):
+            return _StubResponse(
+                200,
+                {
+                    "answer": "foreign content",
+                    "sources": (
+                        [{"project_id": self.project_id}] if is_owner else []
+                    ),
+                    "citations": (
+                        [{"chunk_id": self.chunk_id}] if is_owner else []
+                    ),
+                },
+            )
+        if path.endswith("/synthesize"):
+            return _StubResponse(
+                200,
+                {
+                    "content": "foreign content",
+                    "citations": (
+                        [{"chunk_id": self.chunk_id}] if is_owner else []
+                    ),
+                    "chunk_count": 1 if is_owner else 0,
+                },
+            )
+        if path.endswith("/facets"):
+            return _StubResponse(
+                200,
+                {
+                    "projects": (
+                        [
+                            {
+                                "value": self.project_id,
+                                "label": "foreign project",
+                                "count": 1,
+                            }
+                        ]
+                        if is_owner
+                        else []
+                    ),
+                    "document_types": (
+                        []
+                        if is_owner
+                        else [{"value": "secret", "label": "secret", "count": 1}]
+                    ),
+                    "source_types": [],
+                    "tags": [],
+                    "date_range": {"min": None, "max": None},
+                },
+            )
+        if path.endswith("/projects?page_size=100"):
+            return _StubResponse(200, {"data": []})
+        raise AssertionError(f"unexpected probe: {method} {path} {headers} {json}")
+
+
+class _NoPedr1bFixtureTransport:
+    """Return no owner corpus and reject any accidental deny probe."""
+
+    def __init__(self):
+        self.calls = 0
+
+    def request(self, method, path, *, headers, json):
+        self.calls += 1
+        if path.endswith("/retrieval/search"):
+            return _StubResponse(200, {"results": []})
+        raise AssertionError(f"fixture failure must stop probes: {method} {path}")
+
+
+def test_pedr1b_scope_matrix_flags_rag_synthesis_and_facet_leaks():
+    """Every PEDR-1B live assertion must fail against a leaky transport."""
+    verifier = RbacVerifier(_LeakyPedr1bTransport(), log=lambda _message: None)
+
+    verifier.pedr1b_scope_matrix(
+        {"owner": "owner-jwt", "member": "member-jwt"}
+    )
+
+    assert any(gap.kind == "RAG-SCOPE-LEAK" for gap in verifier.gaps)
+    assert any(gap.kind == "SYNTHESIS-SCOPE-LEAK" for gap in verifier.gaps)
+    assert any(gap.kind == "FACET-SCOPE-LEAK" for gap in verifier.gaps)
+    assert not any(gap.kind == "NO-PEDR1B-FIXTURE" for gap in verifier.gaps)
+    assert verifier.report() == 1
+
+
+def test_pedr1b_scope_matrix_fails_without_owner_positive_fixture():
+    """An empty production corpus cannot make tenant-isolation probes vacuous."""
+    transport = _NoPedr1bFixtureTransport()
+    verifier = RbacVerifier(transport, log=lambda _message: None)
+
+    verifier.pedr1b_scope_matrix(
+        {"owner": "owner-jwt", "member": "member-jwt"}
+    )
+
+    assert any(gap.kind == "NO-PEDR1B-FIXTURE" for gap in verifier.gaps)
+    assert transport.calls == 1
+    assert verifier.report() == 1
+
+
+def test_pedr1b_anon_sweep_can_detect_a_public_route():
+    """The new anonymous gate must go red when even one route returns 2xx."""
+
+    class _Transport:
+        def request(self, method, path, *, headers, json):
+            status_code = 200 if path.endswith("/facets") else 401
+            return _StubResponse(status_code, {})
+
+    verifier = RbacVerifier(_Transport(), log=lambda _message: None)
+
+    verifier.pedr1b_anon_sweep()
+
+    assert any(
+        gap.kind == "anon-401" and gap.path.endswith("/facets")
+        for gap in verifier.gaps
+    )

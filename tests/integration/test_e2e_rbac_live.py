@@ -21,9 +21,31 @@ import os
 
 import pytest
 
-from scripts.rbac_verify import RbacVerifier, pedr_scope_routes, per_id_routes
+from scripts.rbac_verify import (
+    RbacVerifier,
+    pedr1b_scope_routes,
+    pedr_scope_routes,
+    per_id_routes,
+)
 
 BASE_URL = os.environ.get("RBAC_VERIFY_BASE_URL")
+
+
+def _wired_routes() -> set[tuple[str, str]]:
+    """Return effective method/path pairs across eager and lazy FastAPI routers."""
+    try:
+        from fastapi.routing import iter_route_contexts
+    except ImportError:  # FastAPI < 0.141 flattens included routes eagerly.
+        iter_route_contexts = None
+
+    from app.main import app
+
+    routes = app.routes if iter_route_contexts is None else iter_route_contexts(app.routes)
+    return {
+        (method.lower(), route.path)
+        for route in routes
+        for method in getattr(route, "methods", set())
+    }
 
 
 def test_harness_routes_match_wired_per_id_routes():
@@ -39,22 +61,11 @@ def test_harness_routes_match_wired_per_id_routes():
 
 def test_harness_pedr_scope_routes_match_wired_surface():
     """The deployed matrix must probe all four PEDR-1 route entry points."""
-    try:
-        from fastapi.routing import iter_route_contexts
-    except ImportError:  # FastAPI < 0.141 flattens included routes eagerly.
-        iter_route_contexts = None
-
     from app.core.config import settings
-    from app.main import app
 
     project_id = "00000000-0000-0000-0000-000000000001"
     probed = {(method, path) for method, path, _body in pedr_scope_routes(settings.api_v1_prefix, project_id)}
-    routes = app.routes if iter_route_contexts is None else iter_route_contexts(app.routes)
-    wired = {
-        (method.lower(), route.path)
-        for route in routes
-        for method in getattr(route, "methods", set())
-    }
+    wired = _wired_routes()
 
     assert ("post", f"{settings.api_v1_prefix}/pedr/search") in probed & wired
     assert ("post", f"{settings.api_v1_prefix}/pedr/preflight") in probed & wired
@@ -64,6 +75,24 @@ def test_harness_pedr_scope_routes_match_wired_surface():
         for method, path in probed
     )
     assert ("get", f"{settings.api_v1_prefix}/pedr/related/{{urn:path}}") in wired
+
+
+def test_harness_pedr1b_scope_routes_match_wired_surface():
+    """The deployed matrix must probe all three PEDR-1B entry points."""
+    from app.core.config import settings
+
+    project_id = "00000000-0000-0000-0000-000000000001"
+    chunk_id = "00000000-0000-0000-0000-000000000002"
+    probed = {
+        (method, path)
+        for method, path, _body in pedr1b_scope_routes(
+            settings.api_v1_prefix,
+            project_id,
+            chunk_id,
+        )
+    }
+
+    assert probed <= _wired_routes()
 
 
 @pytest.mark.e2e_prod

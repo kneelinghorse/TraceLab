@@ -316,5 +316,9 @@ def accessible_project_ids(
     if space_ids:
         conditions.append(Project.workspace_id.in_(space_ids))
 
-    rows = db.query(Project.id).filter(or_(*conditions)).all()
+    rows = (
+        db.query(Project.id)
+        .filter(Project.deleted_at.is_(None), or_(*conditions))
+        .all()
+    )
     return [row[0] for row in rows]
