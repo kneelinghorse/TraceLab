@@ -7,7 +7,7 @@ import logging
 import uuid
 from collections import Counter
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, cast
 from uuid import UUID
 
 from sqlalchemy import func, literal_column, or_
@@ -15,6 +15,7 @@ from sqlalchemy.dialects.postgresql import insert as postgresql_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Query, Session
+from sqlalchemy.sql.elements import ColumnElement
 
 from app.models.document import Document
 from app.models.evidence_ledger import LedgerEntry, LedgerNote, LedgerSource
@@ -211,7 +212,7 @@ class EvidenceLedgerService:
     ) -> dict[str, LedgerSource]:
         """Increment project-local source sightings and resolve their rows."""
         urls_by_hash: dict[str, str] = {}
-        source_rows = []
+        source_values: list[dict[str, object]] = []
         ordered_sightings = sorted(
             (
                 _source_url_hash(source_url),
@@ -226,7 +227,7 @@ class EvidenceLedgerService:
                 raise RuntimeError(
                     f"Ledger source hash collision within capture batch: {existing_url!r} and {source_url!r}"
                 )
-            source_rows.append(
+            source_values.append(
                 {
                     "id": uuid.uuid4(),
                     "project_id": project_id,
@@ -238,37 +239,38 @@ class EvidenceLedgerService:
 
         dialect_name = db.get_bind().dialect.name
         if dialect_name == "postgresql":
-            statement = postgresql_insert(LedgerSource).values(source_rows)
-            statement = statement.on_conflict_do_update(
+            pg_statement = postgresql_insert(LedgerSource).values(source_values)
+            pg_statement = pg_statement.on_conflict_do_update(
                 constraint=_SOURCE_IDENTITY_CONSTRAINT,
                 set_={
-                    "sighting_count": (LedgerSource.sighting_count + statement.excluded.sighting_count),
+                    "sighting_count": (LedgerSource.sighting_count + pg_statement.excluded.sighting_count),
                     "last_seen_at": func.greatest(
                         LedgerSource.last_seen_at,
                         func.statement_timestamp(),
                     ),
                 },
             )
+            db.execute(pg_statement)
         elif dialect_name == "sqlite":
-            statement = sqlite_insert(LedgerSource).values(source_rows)
-            statement = statement.on_conflict_do_update(
+            sqlite_statement = sqlite_insert(LedgerSource).values(source_values)
+            sqlite_statement = sqlite_statement.on_conflict_do_update(
                 index_elements=[
                     LedgerSource.project_id,
                     LedgerSource.source_url_hash,
                 ],
                 set_={
-                    "sighting_count": (LedgerSource.sighting_count + statement.excluded.sighting_count),
+                    "sighting_count": (LedgerSource.sighting_count + sqlite_statement.excluded.sighting_count),
                     "last_seen_at": func.max(
                         LedgerSource.last_seen_at,
                         func.current_timestamp(),
                     ),
                 },
             )
+            db.execute(sqlite_statement)
         else:
             raise RuntimeError(f"Evidence source upsert does not support {dialect_name!r}")
 
-        db.execute(statement)
-        source_rows = (
+        resolved_sources: list[LedgerSource] = (
             db.query(LedgerSource)
             .filter(
                 LedgerSource.project_id == project_id,
@@ -278,7 +280,7 @@ class EvidenceLedgerService:
             .all()
         )
         sources_by_url: dict[str, LedgerSource] = {}
-        sources_by_hash = {source.source_url_hash: source for source in source_rows}
+        sources_by_hash = {cast(str, source.source_url_hash): source for source in resolved_sources}
         for source_url_hash, source_url in urls_by_hash.items():
             source = sources_by_hash.get(source_url_hash)
             if source is None:
@@ -418,7 +420,7 @@ class EvidenceLedgerService:
         ).filter(LedgerEntry.project_id == project_id)
         rank = None
         if db.get_bind().dialect.name == "postgresql" and any(character.isalnum() for character in keyword):
-            search_vector = literal_column(_SEARCH_VECTOR_SQL)
+            search_vector: ColumnElement[Any] = literal_column(_SEARCH_VECTOR_SQL)
             ts_query = func.websearch_to_tsquery(
                 literal_column("'english'::regconfig"),
                 keyword,

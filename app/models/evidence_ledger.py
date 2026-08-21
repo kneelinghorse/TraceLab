@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import (
     CheckConstraint,
@@ -30,8 +31,12 @@ class LedgerSource(Base):
 
     __tablename__ = "ledger_sources"
 
-    id = Column(GUID(), primary_key=True, default=uuid.uuid4)
-    project_id = Column(GUID(), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
+    id: Any = Column(GUID(), primary_key=True, default=uuid.uuid4)
+    project_id: Any = Column(
+        GUID(),
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     source_url = Column(Text, nullable=False)
     source_url_hash = Column(String(64), nullable=False)
     sighting_count = Column(
@@ -104,7 +109,7 @@ class LedgerEntry(Base):
     claim = Column(Text, nullable=False)
     summary = Column(Text, nullable=True)
     source_url = Column(Text, nullable=False)
-    source_id = Column(
+    source_id: Any = Column(
         GUID(),
         nullable=False,
     )
