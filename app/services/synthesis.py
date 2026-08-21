@@ -6,7 +6,7 @@ import logging
 import time
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Literal
-from uuid import UUID
+from uuid import NAMESPACE_URL, UUID, uuid5
 
 from sqlalchemy.orm import Session
 
@@ -73,16 +73,6 @@ class SynthesisService:
         cache_service: SynthesisCacheService | None = None,
         enable_cache: bool = True,
     ) -> None:
-        if _openai_import_error is not None:
-            raise RuntimeError(
-                "The OpenAI SDK is required for synthesis. Install dependencies from requirements.txt."
-            ) from _openai_import_error
-
-        if client is None:
-            if not settings.openai_api_key:
-                raise ValueError("OPENAI_API_KEY must be set for synthesis.")
-            client = OpenAI(api_key=settings.openai_api_key)
-
         self.client = client
         self.session_factory = session_factory
         self.model = model or settings.openai_chat_model
@@ -95,6 +85,19 @@ class SynthesisService:
 
         # Lazy-load cache service to avoid circular imports
         self._cache_service = cache_service
+
+    def _get_client(self) -> Any:
+        """Initialize the OpenAI client only when synthesis needs a completion."""
+        if self.client is not None:
+            return self.client
+        if _openai_import_error is not None:
+            raise RuntimeError(
+                "The OpenAI SDK is required for synthesis. Install dependencies from requirements.txt."
+            ) from _openai_import_error
+        if not settings.openai_api_key:
+            raise ValueError("OPENAI_API_KEY must be set for synthesis.")
+        self.client = OpenAI(api_key=settings.openai_api_key)
+        return self.client
 
     @property
     def cache_service(self) -> SynthesisCacheService | None:
@@ -116,6 +119,7 @@ class SynthesisService:
         prompt: str | None = None,
         output_format: Literal["markdown", "summary", "report", "bullets"] = "markdown",
         skip_cache: bool = False,
+        accessible_project_ids: list[UUID] | None = None,
     ) -> dict[str, Any]:
         """Generate a synthesis from collection or chunk IDs.
 
@@ -125,39 +129,63 @@ class SynthesisService:
             prompt: Custom instruction (default: format-specific instruction)
             output_format: Output format - summary, report, or bullets
             skip_cache: If True, bypass cache lookup (still stores result)
+            accessible_project_ids: Projects the caller may read. ``None`` keeps
+                the legacy unrestricted path; an empty list fails closed.
 
         Returns:
             Dict with content, citations, tokens_used, truncated, chunk_count, cache_hit
         """
         start_time = time.perf_counter()
 
+        if collection_id is None and not chunk_ids:
+            raise ValueError("Either collection_id or chunk_ids must be provided.")
+
+        normalized_scope: list[UUID] | None = None
+        if accessible_project_ids is not None:
+            normalized_scope = sorted(set(accessible_project_ids), key=str)
+            if not normalized_scope:
+                return self._empty_result(include_effective_chunk_ids=True)
+
         # Fetch chunks - needed both for cache key and synthesis
         if collection_id is not None:
-            chunks, truncated = self._fetch_collection_chunks(collection_id)
+            if normalized_scope is None:
+                chunks, truncated = self._fetch_collection_chunks(collection_id)
+            else:
+                chunks, truncated = self._fetch_collection_chunks(
+                    collection_id,
+                    accessible_project_ids=normalized_scope,
+                )
             # Extract chunk IDs for cache key
             effective_chunk_ids = [UUID(c["chunk_id"]) for c in chunks]
         elif chunk_ids:
-            chunks, truncated = self._fetch_chunks_by_ids(chunk_ids)
-            effective_chunk_ids = chunk_ids[:MAX_CHUNKS_PER_REQUEST]
-        else:
-            raise ValueError("Either collection_id or chunk_ids must be provided.")
+            if normalized_scope is None:
+                chunks, truncated = self._fetch_chunks_by_ids(chunk_ids)
+                effective_chunk_ids = chunk_ids[:MAX_CHUNKS_PER_REQUEST]
+            else:
+                chunks, truncated = self._fetch_chunks_by_ids(
+                    chunk_ids,
+                    accessible_project_ids=normalized_scope,
+                )
+                effective_chunk_ids = [UUID(c["chunk_id"]) for c in chunks]
 
         if not chunks:
-            return {
-                "content": "No content available for synthesis. The collection or chunks are empty.",
-                "citations": [],
-                "tokens_used": 0,
-                "truncated": False,
-                "chunk_count": 0,
-                "cache_hit": False,
-            }
+            return self._empty_result(
+                include_effective_chunk_ids=normalized_scope is not None
+            )
+
+        cache_chunk_ids = effective_chunk_ids
+        if normalized_scope is not None:
+            cache_chunk_ids = self._scoped_cache_chunk_ids(
+                effective_chunk_ids,
+                normalized_scope,
+            )
 
         # Check cache before calling LLM
         cache_result = None
-        if not skip_cache and self.cache_service and effective_chunk_ids:
+        if not skip_cache and self.cache_service and cache_chunk_ids:
             try:
                 cache_result = self.cache_service.get(
-                    chunk_ids=effective_chunk_ids,
+                    chunk_ids=cache_chunk_ids,
                     prompt=prompt,
                     output_format=output_format,
                 )
@@ -169,7 +197,7 @@ class SynthesisService:
             latency_ms = (time.perf_counter() - start_time) * 1000
             self._track_cache_hit(latency_ms=latency_ms)
 
-            return {
+            result = {
                 "content": cache_result["content"],
                 "citations": cache_result["citations"],
                 "tokens_used": cache_result["tokens_used"],
@@ -178,6 +206,9 @@ class SynthesisService:
                 "cache_hit": True,
                 "cache_id": cache_result.get("cache_id"),
             }
+            if normalized_scope is not None:
+                result["effective_chunk_ids"] = [str(cid) for cid in effective_chunk_ids]
+            return result
 
         # Cache miss - generate synthesis via LLM
         # Build context with source markers
@@ -203,10 +234,10 @@ class SynthesisService:
 
         # Store in cache for future requests
         cache_id = None
-        if self.cache_service and effective_chunk_ids:
+        if self.cache_service and cache_chunk_ids:
             try:
                 cache_id = self.cache_service.set(
-                    chunk_ids=effective_chunk_ids,
+                    chunk_ids=cache_chunk_ids,
                     prompt=prompt,
                     output_format=output_format,
                     content=final_content,
@@ -217,7 +248,7 @@ class SynthesisService:
             except Exception:
                 logger.debug("Cache store failed", exc_info=True)
 
-        return {
+        result = {
             "content": final_content,
             "citations": used_citations,
             "tokens_used": tokens_used,
@@ -226,6 +257,33 @@ class SynthesisService:
             "cache_hit": False,
             "cache_id": cache_id,
         }
+        if normalized_scope is not None:
+            result["effective_chunk_ids"] = [str(cid) for cid in effective_chunk_ids]
+        return result
+
+    @staticmethod
+    def _empty_result(*, include_effective_chunk_ids: bool) -> dict[str, Any]:
+        """Return the established zero-effective-content response."""
+        result: dict[str, Any] = {
+            "content": "No content available for synthesis. The collection or chunks are empty.",
+            "citations": [],
+            "tokens_used": 0,
+            "truncated": False,
+            "chunk_count": 0,
+            "cache_hit": False,
+        }
+        if include_effective_chunk_ids:
+            result["effective_chunk_ids"] = []
+        return result
+
+    @staticmethod
+    def _scoped_cache_chunk_ids(
+        effective_chunk_ids: list[UUID], project_scope: list[UUID]
+    ) -> list[UUID]:
+        """Add a canonical project-scope signature to the cache identity."""
+        signature = ",".join(str(project_id) for project_id in project_scope)
+        scope_id = uuid5(NAMESPACE_URL, f"tracelab:synthesis-scope:{signature}")
+        return [*effective_chunk_ids, scope_id]
 
     def _track_cache_hit(self, *, latency_ms: float) -> None:
         """Track a cache hit for cost monitoring."""
@@ -248,7 +306,10 @@ class SynthesisService:
             logger.debug("Cache hit tracking failed", exc_info=True)
 
     def _fetch_collection_chunks(
-        self, collection_id: UUID
+        self,
+        collection_id: UUID,
+        *,
+        accessible_project_ids: list[UUID] | None = None,
     ) -> tuple[list[dict[str, Any]], bool]:
         """Fetch all chunks from a collection."""
         session = self.session_factory()
@@ -261,6 +322,38 @@ class SynthesisService:
             )
             if collection is None:
                 raise ValueError(f"Collection {collection_id} not found.")
+
+            if accessible_project_ids is not None:
+                rows = (
+                    session.query(DocumentChunk, Document)
+                    .join(
+                        CollectionItem,
+                        CollectionItem.chunk_id == DocumentChunk.id,
+                    )
+                    .join(Document, Document.id == DocumentChunk.document_id)
+                    .filter(
+                        CollectionItem.collection_id == str(collection_id),
+                        Document.deleted_at.is_(None),
+                        Document.project_id.in_(accessible_project_ids),
+                    )
+                    .order_by(CollectionItem.added_at.asc())
+                    .limit(MAX_CHUNKS_PER_REQUEST + 1)
+                    .all()
+                )
+                truncated = len(rows) > MAX_CHUNKS_PER_REQUEST
+                return (
+                    [
+                        {
+                            "chunk_id": str(chunk.id),
+                            "document_id": str(document.id),
+                            "document_name": document.name,
+                            "chunk_index": chunk.chunk_index,
+                            "content": chunk.content or "",
+                        }
+                        for chunk, document in rows[:MAX_CHUNKS_PER_REQUEST]
+                    ],
+                    truncated,
+                )
 
             # Get items with chunks
             items = (
@@ -304,13 +397,49 @@ class SynthesisService:
             session.close()
 
     def _fetch_chunks_by_ids(
-        self, chunk_ids: list[UUID]
+        self,
+        chunk_ids: list[UUID],
+        *,
+        accessible_project_ids: list[UUID] | None = None,
     ) -> tuple[list[dict[str, Any]], bool]:
         """Fetch specific chunks by their IDs."""
         session = self.session_factory()
         try:
             truncated = len(chunk_ids) > MAX_CHUNKS_PER_REQUEST
             chunk_ids_to_fetch = chunk_ids[:MAX_CHUNKS_PER_REQUEST]
+
+            if accessible_project_ids is not None:
+                rows = (
+                    session.query(DocumentChunk, Document)
+                    .join(Document, Document.id == DocumentChunk.document_id)
+                    .filter(
+                        DocumentChunk.id.in_(
+                            [str(cid) for cid in chunk_ids_to_fetch]
+                        ),
+                        Document.deleted_at.is_(None),
+                        Document.project_id.in_(accessible_project_ids),
+                    )
+                    .all()
+                )
+                by_id = {str(chunk.id): (chunk, document) for chunk, document in rows}
+                chunks = []
+                seen: set[str] = set()
+                for chunk_id in chunk_ids_to_fetch:
+                    key = str(chunk_id)
+                    if key in seen or key not in by_id:
+                        continue
+                    seen.add(key)
+                    chunk, document = by_id[key]
+                    chunks.append(
+                        {
+                            "chunk_id": str(chunk.id),
+                            "document_id": str(document.id),
+                            "document_name": document.name,
+                            "chunk_index": chunk.chunk_index,
+                            "content": chunk.content or "",
+                        }
+                    )
+                return chunks, truncated
 
             # Fetch chunks
             db_chunks = (
@@ -421,6 +550,7 @@ class SynthesisService:
     ) -> tuple[str, dict[str, int] | None]:
         """Call OpenAI API and return content with usage stats."""
         try:
+            client = self._get_client()
             is_gpt5 = self.model.lower().startswith(("gpt-5.1", "gpt-5.2"))
             request = {
                 "model": self.model,
@@ -431,7 +561,7 @@ class SynthesisService:
             if is_gpt5:
                 # GPT-5.1/5.2 support temperature when reasoning_effort is explicitly none.
                 request["reasoning_effort"] = "none"
-            response = self.client.chat.completions.create(**request)
+            response = client.chat.completions.create(**request)
             content = response.choices[0].message.content if response.choices else None
             usage = self._extract_usage(response)
             if not content:

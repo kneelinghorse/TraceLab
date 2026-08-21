@@ -103,6 +103,34 @@ def test_accessible_project_ids_combines_ownership_and_space_membership(
     assert foreign.id not in result
 
 
+def test_accessible_project_ids_excludes_soft_deleted_projects(
+    monkeypatch, db_session
+):
+    """Lifecycle-deleted projects cannot remain readable through stale grants."""
+    monkeypatch.setattr(settings, "rbac_enabled", True)
+    caller = _user(db_session, email="deleted-scope-caller@example.com")
+    shared_space = Workspace(name="Deleted Scope Space")
+    db_session.add(shared_space)
+    db_session.flush()
+    db_session.add(
+        SpaceMember(workspace_id=shared_space.id, user_id=caller.id, role=ROLE_MEMBER)
+    )
+    active = Project(name="Active project", owner_id=caller.id)
+    deleted_owned = Project(name="Deleted owned", owner_id=caller.id)
+    deleted_shared = Project(
+        name="Deleted shared",
+        workspace_id=shared_space.id,
+    )
+    deleted_owned.soft_delete("scope-test")
+    deleted_shared.soft_delete("scope-test")
+    db_session.add_all([active, deleted_owned, deleted_shared])
+    db_session.commit()
+
+    result = accessible_project_ids(_principal(caller), db_session)
+
+    assert result == [active.id]
+
+
 def test_accessible_project_ids_service_and_ungranted_callers_fail_closed(
     monkeypatch, db_session
 ):

@@ -163,14 +163,29 @@ class FacetedSearchService:
     # ------------------------------------------------------------------
     # Facet aggregation
     # ------------------------------------------------------------------
-    def get_facets(self, filters: FacetFilters) -> dict[str, Any]:
+    def get_facets(
+        self,
+        filters: FacetFilters,
+        allowed_project_ids: list[UUID] | None = None,
+    ) -> dict[str, Any]:
         """Return facet counts for projects, document/source types, tags, and date ranges."""
+        if allowed_project_ids == []:
+            return {
+                "projects": [],
+                "document_types": [],
+                "source_types": [],
+                "tags": [],
+                "date_range": {"min": None, "max": None},
+            }
+
         session = self.session_factory()
         try:
             project_rows = session.query(
                 Project.id, Project.name, func.count(Document.id)
             ).join(Document, Document.project_id == Project.id)
-            project_rows = self._apply_query_filters(project_rows, filters)
+            project_rows = self._apply_query_filters(
+                project_rows, filters, allowed_project_ids
+            )
             project_rows = project_rows.group_by(Project.id, Project.name).order_by(
                 Project.name
             )
@@ -184,7 +199,9 @@ class FacetedSearchService:
             ]
 
             document_rows = session.query(Document.file_type, func.count(Document.id))
-            document_rows = self._apply_query_filters(document_rows, filters)
+            document_rows = self._apply_query_filters(
+                document_rows, filters, allowed_project_ids
+            )
             document_rows = document_rows.group_by(Document.file_type).order_by(
                 Document.file_type
             )
@@ -195,7 +212,9 @@ class FacetedSearchService:
             ]
 
             source_rows = session.query(Document.source_type, func.count(Document.id))
-            source_rows = self._apply_query_filters(source_rows, filters)
+            source_rows = self._apply_query_filters(
+                source_rows, filters, allowed_project_ids
+            )
             source_rows = source_rows.group_by(Document.source_type).order_by(
                 Document.source_type
             )
@@ -210,7 +229,9 @@ class FacetedSearchService:
                 .join(DocumentTag, DocumentTag.tag_id == Tag.id)
                 .join(Document, Document.id == DocumentTag.document_id)
             )
-            tag_rows = self._apply_query_filters(tag_rows, filters)
+            tag_rows = self._apply_query_filters(
+                tag_rows, filters, allowed_project_ids
+            )
             tag_rows = tag_rows.group_by(Tag.name).order_by(Tag.name)
             tags = [
                 {"value": name, "label": name, "count": int(total or 0)}
@@ -222,7 +243,9 @@ class FacetedSearchService:
                 func.min(Document.collection_date),
                 func.max(Document.collection_date),
             )
-            date_row = self._apply_query_filters(date_row, filters)
+            date_row = self._apply_query_filters(
+                date_row, filters, allowed_project_ids
+            )
             min_date, max_date = date_row.first()
             date_range = {
                 "min": min_date.isoformat() if min_date else None,
@@ -242,14 +265,29 @@ class FacetedSearchService:
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
-    def _apply_query_filters(self, query, filters: FacetFilters):
-        conditions = self._build_document_conditions(filters)
+    def _apply_query_filters(
+        self,
+        query,
+        filters: FacetFilters,
+        allowed_project_ids: list[UUID] | None = None,
+    ):
+        conditions = self._build_document_conditions(
+            filters, allowed_project_ids=allowed_project_ids
+        )
         if not conditions:
             return query
         return query.filter(*conditions)
 
-    def _build_document_conditions(self, filters: FacetFilters):
+    def _build_document_conditions(
+        self,
+        filters: FacetFilters,
+        *,
+        allowed_project_ids: list[UUID] | None = None,
+    ):
         conditions = []
+        if allowed_project_ids is not None:
+            conditions.append(Document.project_id.in_(allowed_project_ids))
+            conditions.append(Document.deleted_at.is_(None))
         project_uuid = self._parse_uuid(filters.project_id)
         if project_uuid:
             conditions.append(Document.project_id == project_uuid)

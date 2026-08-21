@@ -28,6 +28,11 @@ Checks:
       - member / viewer -> empty search responses for an inaccessible explicit
         project and a deny on that project's related-entity URN;
       - owner -> 2xx on the related-entity URN (over-blocking guard).
+  * RAG/synthesis/facet scope matrix:
+      - anon -> 401 on all three PEDR-1B routes;
+      - member / viewer -> no sources from an owner-positive RAG project, no
+        citations from an owner-owned chunk, and facet projects limited to the
+        caller's own project list.
   * reports / documents / ingestion-jobs are anon-401-only in v1 (seeding a document
     needs a multipart upload; a report can trigger synthesis). They are reported
     LOUDLY as "not in the authz matrix" — no silent coverage gap — to be extended in
@@ -51,6 +56,10 @@ from typing import Any
 
 DEFAULT_PREFIX = "/api/v1"
 _PEDR_SCOPE_QUERY = "rbac verification tenant isolation"
+_RAG_EMPTY_ANSWER = "No accessible sources were found for this query."
+_SYNTHESIS_EMPTY_CONTENT = (
+    "No content available for synthesis. The collection or chunks are empty."
+)
 
 # Throwaway-user password (>= 8 chars, per AdminUserCreate). Not a real secret — the
 # users exist only for the duration of a run and are purged at the end.
@@ -123,6 +132,33 @@ def pedr_scope_routes(prefix: str, project_id: str) -> list[tuple[str, str, dict
             f"{prefix}/retrieval/search",
             {"query": _PEDR_SCOPE_QUERY, "project_id": project_id, "top_k": 1},
         ),
+    ]
+
+
+def pedr1b_scope_routes(
+    prefix: str,
+    project_id: str,
+    chunk_id: str,
+) -> list[tuple[str, str, dict[str, Any]]]:
+    """RAG, synthesis, and facet routes scoped by PEDR-1B."""
+    return [
+        (
+            "post",
+            f"{prefix}/search",
+            {
+                "query": _PEDR_SCOPE_QUERY,
+                "project_id": project_id,
+                "top_k": 1,
+                "search_mode": "semantic",
+                "max_tokens": 64,
+            },
+        ),
+        (
+            "post",
+            f"{prefix}/synthesize",
+            {"chunk_ids": [chunk_id], "format": "summary"},
+        ),
+        ("post", f"{prefix}/facets", {"project_id": project_id}),
     ]
 
 
@@ -399,6 +435,21 @@ class RbacVerifier:
                 Gap("anon-401", "anon", method, path, "401", str(resp.status_code)),
             )
 
+    def pedr1b_anon_sweep(self) -> None:
+        """All three RAG/synthesis/facet entry points reject anonymous callers."""
+        project_id = str(uuid.uuid4())
+        chunk_id = str(uuid.uuid4())
+        for method, path, body in pedr1b_scope_routes(
+            self._prefix,
+            project_id,
+            chunk_id,
+        ):
+            resp = self._call(method, path, json=body)
+            self._record(
+                resp.status_code == 401,
+                Gap("anon-401", "anon", method, path, "401", str(resp.status_code)),
+            )
+
     @staticmethod
     def _search_rows(response: Any) -> list[dict[str, Any]] | None:
         """Return search rows, distinguishing an empty result from a bad shape."""
@@ -473,6 +524,345 @@ class RbacVerifier:
             "retrieval results was positive on both explicit-project search routes"
         )
         return None
+
+    @staticmethod
+    def _rag_payload(response: Any) -> dict[str, Any] | None:
+        """Return a RAG payload only when its source/citation lists are shaped."""
+        try:
+            payload = response.json()
+        except Exception:  # pragma: no cover - real HTTP adapters vary
+            return None
+        if not isinstance(payload, dict):
+            return None
+        if not isinstance(payload.get("sources"), list):
+            return None
+        if not isinstance(payload.get("citations"), list):
+            return None
+        return payload
+
+    @staticmethod
+    def _facet_project_ids(response: Any) -> set[str] | None:
+        """Extract UUID-shaped facet project values, rejecting malformed rows."""
+        try:
+            payload = response.json()
+        except Exception:  # pragma: no cover - real HTTP adapters vary
+            return None
+        rows = payload.get("projects") if isinstance(payload, dict) else None
+        if not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
+            return None
+        project_ids: set[str] = set()
+        for row in rows:
+            try:
+                project_ids.add(str(uuid.UUID(str(row.get("value")))))
+            except (TypeError, ValueError):
+                return None
+        return project_ids
+
+    @staticmethod
+    def _synthesis_payload(response: Any) -> dict[str, Any] | None:
+        """Return a synthesis payload only when its leak-sensitive fields are shaped."""
+        try:
+            payload = response.json()
+        except Exception:  # pragma: no cover - real HTTP adapters vary
+            return None
+        if not isinstance(payload, dict):
+            return None
+        if not isinstance(payload.get("content"), str):
+            return None
+        if not isinstance(payload.get("citations"), list):
+            return None
+        if not isinstance(payload.get("chunk_count"), int):
+            return None
+        return payload
+
+    @staticmethod
+    def _facets_are_empty(response: Any) -> bool:
+        """Require every facet aggregate to be empty, not only project labels."""
+        try:
+            payload = response.json()
+        except Exception:  # pragma: no cover - real HTTP adapters vary
+            return False
+        if not isinstance(payload, dict):
+            return False
+        date_range = payload.get("date_range")
+        return (
+            payload.get("projects") == []
+            and payload.get("document_types") == []
+            and payload.get("source_types") == []
+            and payload.get("tags") == []
+            and isinstance(date_range, dict)
+            and date_range.get("min") is None
+            and date_range.get("max") is None
+        )
+
+    def _discover_pedr1b_fixture(
+        self,
+        owner_token: str | None,
+    ) -> tuple[str, str] | None:
+        """Find a real owner project/chunk proven positive on RAG and facets."""
+        if not owner_token:
+            return None
+
+        retrieval = self._call(
+            "post",
+            f"{self._prefix}/retrieval/search",
+            token=owner_token,
+            json={"query": _PEDR_SCOPE_QUERY, "top_k": 50},
+        )
+        if retrieval.status_code != 200:
+            self.notes.append(
+                "pedr1b fixture discovery: owner retrieval returned "
+                f"{retrieval.status_code}"
+            )
+            return None
+        rows = self._search_rows(retrieval)
+        if rows is None:
+            self.notes.append(
+                "pedr1b fixture discovery: owner retrieval returned invalid JSON shape"
+            )
+            return None
+
+        candidates: list[tuple[str, str]] = []
+        for row in rows:
+            try:
+                candidate = (
+                    str(uuid.UUID(str(row.get("project_id")))),
+                    str(uuid.UUID(str(row.get("chunk_id")))),
+                )
+            except (TypeError, ValueError):
+                continue
+            if candidate not in candidates:
+                candidates.append(candidate)
+
+        # RAG and synthesis are provider-backed, so bound fixture discovery instead
+        # of turning a stale production corpus into dozens of paid probe calls.
+        for project_id, chunk_id in candidates[:5]:
+            rag_route, synthesis_route, facets_route = pedr1b_scope_routes(
+                self._prefix,
+                project_id,
+                chunk_id,
+            )
+            facets = self._call(
+                facets_route[0],
+                facets_route[1],
+                token=owner_token,
+                json=facets_route[2],
+            )
+            facet_ids = (
+                self._facet_project_ids(facets)
+                if facets.status_code == 200
+                else None
+            )
+            if facet_ids is None or project_id not in facet_ids:
+                continue
+
+            rag = self._call(
+                rag_route[0],
+                rag_route[1],
+                token=owner_token,
+                json=rag_route[2],
+            )
+            rag_payload = self._rag_payload(rag) if rag.status_code == 200 else None
+            if not rag_payload or not rag_payload["sources"]:
+                continue
+
+            synthesis = self._call(
+                synthesis_route[0],
+                synthesis_route[1],
+                token=owner_token,
+                json=synthesis_route[2],
+            )
+            synthesis_payload = (
+                self._synthesis_payload(synthesis)
+                if synthesis.status_code == 200
+                else None
+            )
+            if (
+                synthesis_payload is None
+                or synthesis_payload["chunk_count"] < 1
+                or not synthesis_payload["content"].strip()
+                or synthesis_payload["content"] == _SYNTHESIS_EMPTY_CONTENT
+            ):
+                continue
+            return project_id, chunk_id
+
+        self.notes.append(
+            "pedr1b fixture discovery: none of the first five owner retrieval "
+            "candidates was positive on explicit-project facets, RAG, and synthesis"
+        )
+        return None
+
+    def pedr1b_scope_matrix(self, principals: dict[str, str]) -> None:
+        """Prove RAG, synthesis, and facet isolation with owner-positive data."""
+        fixture = self._discover_pedr1b_fixture(principals.get("owner"))
+        if fixture is None:
+            self.gaps.append(
+                Gap(
+                    "NO-PEDR1B-FIXTURE",
+                    "setup",
+                    "post",
+                    f"{self._prefix}/retrieval/search",
+                    "an owner-positive project/chunk on RAG and facets",
+                    "none found",
+                )
+            )
+            return
+
+        project_id, chunk_id = fixture
+        routes = pedr1b_scope_routes(self._prefix, project_id, chunk_id)
+        for role in ("member", "viewer"):
+            token = principals.get(role)
+            if not token:
+                continue
+
+            list_path = f"{self._prefix}/projects?page_size=100"
+            project_list = self._call("get", list_path, token=token)
+            accessible_ids: set[str] | None = None
+            if project_list.status_code == 200:
+                try:
+                    list_rows = project_list.json().get("data")
+                except Exception:  # pragma: no cover - real HTTP adapters vary
+                    list_rows = None
+                if isinstance(list_rows, list) and all(
+                    isinstance(row, dict) for row in list_rows
+                ):
+                    accessible_ids = {str(row.get("id")) for row in list_rows}
+            if accessible_ids is None:
+                self.gaps.append(
+                    Gap(
+                        "PEDR1B-PROJECT-LIST",
+                        role,
+                        "get",
+                        list_path,
+                        "200 with data list",
+                        str(project_list.status_code),
+                    )
+                )
+
+            rag_route, synthesis_route, facets_route = routes
+            rag = self._call(
+                rag_route[0],
+                rag_route[1],
+                token=token,
+                json=rag_route[2],
+            )
+            if rag.status_code != 200:
+                self.gaps.append(
+                    Gap(
+                        "PEDR1B-SCOPE-STATUS",
+                        role,
+                        rag_route[0],
+                        rag_route[1],
+                        "200",
+                        str(rag.status_code),
+                    )
+                )
+            else:
+                payload = self._rag_payload(rag)
+                self._record(
+                    payload is not None
+                    and payload.get("answer") == _RAG_EMPTY_ANSWER
+                    and payload["sources"] == []
+                    and payload["citations"] == [],
+                    Gap(
+                        "RAG-SCOPE-LEAK",
+                        role,
+                        rag_route[0],
+                        rag_route[1],
+                        "zero sources and citations",
+                        "invalid shape"
+                        if payload is None
+                        else (
+                            f"answer={payload.get('answer')!r}, "
+                            f"sources={len(payload['sources'])}, "
+                            f"citations={len(payload['citations'])}"
+                        ),
+                    ),
+                )
+
+            synthesis = self._call(
+                synthesis_route[0],
+                synthesis_route[1],
+                token=token,
+                json=synthesis_route[2],
+            )
+            if synthesis.status_code != 200:
+                self.gaps.append(
+                    Gap(
+                        "PEDR1B-SCOPE-STATUS",
+                        role,
+                        synthesis_route[0],
+                        synthesis_route[1],
+                        "200",
+                        str(synthesis.status_code),
+                    )
+                )
+            else:
+                try:
+                    payload = self._synthesis_payload(synthesis)
+                except Exception:  # pragma: no cover - real HTTP adapters vary
+                    payload = None
+                safe = (
+                    payload is not None
+                    and payload["content"] == _SYNTHESIS_EMPTY_CONTENT
+                    and payload["citations"] == []
+                    and payload["chunk_count"] == 0
+                )
+                self._record(
+                    safe,
+                    Gap(
+                        "SYNTHESIS-SCOPE-LEAK",
+                        role,
+                        synthesis_route[0],
+                        synthesis_route[1],
+                        "zero chunks and citations",
+                        "invalid shape"
+                        if payload is None
+                        else (
+                            f"content={payload['content']!r}, "
+                            f"chunk_count={payload['chunk_count']!r}, "
+                            f"citations={len(payload['citations'])}"
+                        ),
+                    ),
+                )
+
+            facets = self._call(
+                facets_route[0],
+                facets_route[1],
+                token=token,
+                json=facets_route[2],
+            )
+            if facets.status_code != 200:
+                self.gaps.append(
+                    Gap(
+                        "PEDR1B-SCOPE-STATUS",
+                        role,
+                        facets_route[0],
+                        facets_route[1],
+                        "200",
+                        str(facets.status_code),
+                    )
+                )
+                continue
+            facet_ids = self._facet_project_ids(facets)
+            facet_safe = (
+                self._facets_are_empty(facets)
+                and facet_ids == set()
+                and accessible_ids is not None
+            )
+            self._record(
+                facet_safe,
+                Gap(
+                    "FACET-SCOPE-LEAK",
+                    role,
+                    facets_route[0],
+                    facets_route[1],
+                    "all facet aggregates empty for inaccessible project",
+                    "invalid shape"
+                    if facet_ids is None
+                    else f"facet_projects={sorted(facet_ids)}",
+                ),
+            )
 
     def _note_owner_preflight_baseline(self, owner_token: str | None) -> None:
         """State transparently whether the preflight deny smoke is non-vacuous."""
@@ -837,6 +1227,8 @@ class RbacVerifier:
             self.anon_sweep()
             self._log("anon-401 sweep across PEDR/retrieval scope routes...")
             self.pedr_anon_sweep()
+            self._log("anon-401 sweep across RAG/synthesis/facet scope routes...")
+            self.pedr1b_anon_sweep()
 
             provisioned: list[str] = []
             seeded: list[tuple[SeedSpec, str]] = []
@@ -883,6 +1275,9 @@ class RbacVerifier:
                     self.list_isolation_check(ctx["project"], principals)
                     self._log("PEDR/retrieval tenant-scope matrix...")
                     self.pedr_scope_matrix(ctx["project"], principals)
+
+                self._log("RAG/synthesis/facet tenant-scope matrix...")
+                self.pedr1b_scope_matrix(principals)
 
                 if "mission" in ctx:
                     self._log("service-role log-ingest gate (POST .../logs)...")
@@ -933,9 +1328,9 @@ class RbacVerifier:
             )
             return 1
         self._log(
-            "\nPASS: anon-401 enforced on every per-id and PEDR/retrieval route + "
-            "seeded authz matrix (project/collection/mission/PEDR scope) clean; "
-            "no leaked cruft."
+            "\nPASS: anon-401 enforced on every per-id and scoped retrieval route + "
+            "seeded authz matrix (project/collection/mission/PEDR/RAG/synthesis/"
+            "facets) clean; no leaked cruft."
         )
         return 0
 

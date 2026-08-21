@@ -4,10 +4,13 @@ import logging
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
+from app.core.authorization import accessible_project_ids
+from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.schemas.rag import RagQuery, RagResponse
-from app.services.rag_service import get_rag_service
+from app.services.rag_service import build_empty_scope_result, get_rag_service
 from app.services.search_history import SearchHistoryService, get_search_history_service
 
 router = APIRouter()
@@ -18,6 +21,7 @@ logger = logging.getLogger(__name__)
 async def run_rag_search(
     payload: RagQuery,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
     history_service: SearchHistoryService = Depends(get_search_history_service),
 ) -> RagResponse:
     """
@@ -29,31 +33,42 @@ async def run_rag_search(
     if not payload.query.strip():
         raise HTTPException(status_code=400, detail="Query text must not be empty.")
 
-    service = get_rag_service()
-    result = service.run_query(
-        query=payload.query,
-        top_k=payload.top_k,
-        project_id=str(payload.project_id) if payload.project_id else None,
-        document_id=str(payload.document_id) if payload.document_id else None,
-        source_type=payload.source_type,
-        document_types=payload.document_types,
-        source_types=payload.source_types,
-        date_from=payload.date_from,
-        date_to=payload.date_to,
-        tags=payload.tags,
-        hnsw_ef=payload.hnsw_ef,
-        temperature=payload.temperature,
-        max_tokens=payload.max_tokens,
-        search_mode=payload.search_mode,
-        min_quality_gates=payload.min_quality_gates,
-        status_filters=payload.status,
-        allow_pii=payload.allow_pii,
-        governance_mode=payload.governance_mode,
-        element_type=payload.element_type,
-        element_types=payload.element_types,
-        auto_detect_type=payload.auto_detect_type,
-        type_boost_enabled=payload.type_boost_enabled,
-    )
+    allowed_project_ids = accessible_project_ids(current_user, db)
+    if allowed_project_ids == [] or (
+        allowed_project_ids is not None
+        and payload.project_id is not None
+        and payload.project_id not in set(allowed_project_ids)
+    ):
+        result = build_empty_scope_result(search_mode=payload.search_mode)
+    else:
+        service = get_rag_service()
+        query_kwargs: dict[str, Any] = dict(
+            query=payload.query,
+            top_k=payload.top_k,
+            project_id=str(payload.project_id) if payload.project_id else None,
+            document_id=str(payload.document_id) if payload.document_id else None,
+            source_type=payload.source_type,
+            document_types=payload.document_types,
+            source_types=payload.source_types,
+            date_from=payload.date_from,
+            date_to=payload.date_to,
+            tags=payload.tags,
+            hnsw_ef=payload.hnsw_ef,
+            temperature=payload.temperature,
+            max_tokens=payload.max_tokens,
+            search_mode=payload.search_mode,
+            min_quality_gates=payload.min_quality_gates,
+            status_filters=payload.status,
+            allow_pii=payload.allow_pii,
+            governance_mode=payload.governance_mode,
+            element_type=payload.element_type,
+            element_types=payload.element_types,
+            auto_detect_type=payload.auto_detect_type,
+            type_boost_enabled=payload.type_boost_enabled,
+        )
+        if allowed_project_ids is not None:
+            query_kwargs["allowed_project_ids"] = allowed_project_ids
+        result = service.run_query(**query_kwargs)
     response = RagResponse.model_validate(result)
     _log_search_history(
         payload=payload,

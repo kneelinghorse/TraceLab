@@ -4,20 +4,24 @@ from __future__ import annotations
 
 import hashlib
 import logging
+from collections.abc import Callable
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
-from app.core.database import SessionLocal
+from app.core.authorization import accessible_project_ids, authorize_or_403
+from app.core.database import SessionLocal, get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
+from app.models.collection import Collection
 from app.models.report import Report, ReportSource
-from app.services.ownership import default_workspace_id
 from app.schemas.synthesis import (
     CitationInfo,
     SynthesisCacheStatsResponse,
     SynthesizeRequest,
     SynthesizeResponse,
 )
+from app.services.ownership import default_workspace_id
 from app.services.synthesis import SynthesisService, get_synthesis_service
 from app.services.synthesis_cache import (
     SynthesisCacheService,
@@ -26,6 +30,13 @@ from app.services.synthesis_cache import (
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+SynthesisServiceFactory = Callable[[], SynthesisService]
+
+
+def get_synthesis_service_factory() -> SynthesisServiceFactory:
+    """Return the service constructor without initializing its LLM client."""
+    return get_synthesis_service
 
 
 def _create_report_from_synthesis(
@@ -104,7 +115,10 @@ def _create_report_from_synthesis(
 def synthesize(
     request: SynthesizeRequest,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
-    service: SynthesisService = Depends(get_synthesis_service),
+    db: Session = Depends(get_db),
+    service_factory: SynthesisServiceFactory = Depends(
+        get_synthesis_service_factory
+    ),
 ) -> SynthesizeResponse:
     """Generate an LLM-powered summary from a collection or set of chunks.
 
@@ -133,29 +147,52 @@ def synthesize(
     the UUID of the created report. This simplifies the workflow by combining
     synthesis and report creation into a single API call.
     """
-    try:
-        result = service.synthesize(
-            collection_id=request.collection_id,
-            chunk_ids=request.chunk_ids,
-            prompt=request.prompt,
-            output_format=request.format,
-        )
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(exc),
-        ) from exc
-    except RuntimeError as exc:
-        # OpenAI SDK not available or API key not set
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(exc),
-        ) from exc
-    except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Synthesis failed: {exc}",
-        ) from exc
+    project_scope = accessible_project_ids(current_user, db)
+    if request.collection_id is not None and project_scope is not None:
+        collection = db.get(Collection, request.collection_id)
+        if collection is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Collection not found.",
+            )
+        authorize_or_403(current_user, "read", collection, db)
+
+    if project_scope == []:
+        result = SynthesisService._empty_result(include_effective_chunk_ids=True)
+    else:
+        try:
+            service = service_factory()
+            if project_scope is None:
+                result = service.synthesize(
+                    collection_id=request.collection_id,
+                    chunk_ids=request.chunk_ids,
+                    prompt=request.prompt,
+                    output_format=request.format,
+                )
+            else:
+                result = service.synthesize(
+                    collection_id=request.collection_id,
+                    chunk_ids=request.chunk_ids,
+                    prompt=request.prompt,
+                    output_format=request.format,
+                    accessible_project_ids=project_scope,
+                )
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+        except RuntimeError as exc:
+            # OpenAI SDK not available or API key not set
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=str(exc),
+            ) from exc
+        except Exception as exc:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Synthesis failed: {exc}",
+            ) from exc
 
     # Map result to response schema
     citations = [
@@ -179,7 +216,12 @@ def synthesize(
                 tokens_used=result.get("tokens_used", 0),
                 chunk_count=result.get("chunk_count", 0),
                 collection_id=request.collection_id,
-                chunk_ids=request.chunk_ids,
+                chunk_ids=[
+                    chunk_id if isinstance(chunk_id, UUID) else UUID(chunk_id)
+                    for chunk_id in result.get(
+                        "effective_chunk_ids", request.chunk_ids or []
+                    )
+                ],
                 project_id=request.project_id,
                 owner_id=current_user.user_id,
             )
