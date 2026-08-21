@@ -3,6 +3,7 @@
 # ruff: noqa: S110, SIM105 - payload-index creation is intentionally idempotent.
 
 from typing import Any
+from uuid import UUID
 
 try:  # pragma: no cover - allow importing module without qdrant dependency
     from qdrant_client import QdrantClient
@@ -12,6 +13,7 @@ try:  # pragma: no cover - allow importing module without qdrant dependency
         Filter,
         HnswConfig,
         HnswConfigDiff,
+        MatchAny,
         MatchValue,
         OptimizersConfigDiff,
         PayloadSchemaType,
@@ -25,7 +27,7 @@ except ModuleNotFoundError as exc:  # pragma: no cover
     QdrantClient = None  # type: ignore
     Distance = VectorParams = PointStruct = HnswConfig = HnswConfigDiff = None  # type: ignore
     ScalarQuantization = ScalarQuantizationConfig = ScalarType = None  # type: ignore
-    Filter = FieldCondition = MatchValue = PayloadSchemaType = None  # type: ignore
+    Filter = FieldCondition = MatchAny = MatchValue = PayloadSchemaType = None  # type: ignore
     OptimizersConfigDiff = None  # type: ignore
     _qdrant_import_error = exc
 else:
@@ -319,6 +321,7 @@ class QdrantService:
         source_origin: str | None = None,
         hnsw_ef: int | None = None,
         with_vectors: bool = False,
+        allowed_project_ids: list[UUID] | None = None,
     ) -> list[dict[str, Any]]:
         """
         Search for similar chunks using vector similarity.
@@ -332,6 +335,8 @@ class QdrantService:
             source_origin: Optional filter by source origin (upload, synthesized, imported)
             hnsw_ef: HNSW search parameter (higher = better recall, slower).
                      Defaults to settings.qdrant_hnsw_ef_default (64).
+            allowed_project_ids: Per-request RBAC project scope. ``None`` keeps
+                the legacy unrestricted behavior; an empty list fails closed.
 
         Returns:
             List of search result dicts with keys:
@@ -343,6 +348,23 @@ class QdrantService:
                 - score: Similarity score
                 - source_origin: Document origin type
         """
+        scoped_project_ids: list[str] | None = None
+        if allowed_project_ids is not None:
+            # Preserve caller order while removing duplicates so the emitted
+            # MatchAny predicate is deterministic and no broader than necessary.
+            scoped_project_ids = list(
+                dict.fromkeys(str(identifier) for identifier in allowed_project_ids)
+            )
+            if project_id is not None:
+                requested_project_id = str(project_id)
+                scoped_project_ids = (
+                    [requested_project_id]
+                    if requested_project_id in scoped_project_ids
+                    else []
+                )
+            if not scoped_project_ids:
+                return []
+
         # Use configured default if not specified
         effective_hnsw_ef = (
             hnsw_ef if hnsw_ef is not None else settings.qdrant_hnsw_ef_default
@@ -350,7 +372,13 @@ class QdrantService:
 
         # Build filter
         filter_conditions = []
-        if project_id:
+        if scoped_project_ids is not None:
+            filter_conditions.append(
+                FieldCondition(
+                    key="project_id", match=MatchAny(any=scoped_project_ids)
+                )
+            )
+        elif project_id:
             filter_conditions.append(
                 FieldCondition(
                     key="project_id", match=MatchValue(value=str(project_id))

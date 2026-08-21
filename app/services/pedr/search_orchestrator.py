@@ -31,8 +31,14 @@ from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
+from uuid import UUID
+
+from sqlalchemy import select
 
 from app.core.config import settings
+from app.core.database import SessionLocal
+from app.models.chunk import DocumentChunk
+from app.models.document import Document
 from app.services.pedr.cache import (
     get_pedr_cache,
 )
@@ -262,6 +268,7 @@ class PEDRSearchResponse:
 
     results: list[PEDRSearchResult]
     metadata: PEDRMetadata
+    scope_verified: bool = field(default=False, repr=False, compare=False)
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for API response."""
@@ -401,6 +408,7 @@ class PEDRSearchOrchestrator:
         graph_decay: float | None = None,
         graph_edge_types: list[str] | None = None,
         graph_top_k_seeds: int | None = None,
+        allowed_project_ids: list[UUID] | None = None,
     ) -> PEDRSearchResponse:
         """Execute PEDR unified search across all layers.
 
@@ -435,6 +443,8 @@ class PEDRSearchOrchestrator:
             graph_decay: Score decay per hop in graph traversal.
             graph_edge_types: Optional edge types to include (None = all).
             graph_top_k_seeds: Number of top retrieval results to use as graph seeds.
+            allowed_project_ids: Request-local project scope. ``None`` leaves search
+                unscoped; an empty list denies every project.
 
         Returns:
             PEDRSearchResponse with fused results and metadata.
@@ -472,6 +482,32 @@ class PEDRSearchOrchestrator:
             config=config,
             graph_weight_override=graph_weight,
         )
+        allowed_project_scope = _normalize_project_scope(allowed_project_ids)
+        if allowed_project_scope == () or (
+            allowed_project_scope is not None
+            and project_id is not None
+            and str(project_id) not in set(allowed_project_scope)
+        ):
+            timings.total_ms = (time.perf_counter() - start_time) * 1000
+            return PEDRSearchResponse(
+                results=[],
+                metadata=PEDRMetadata(
+                    query=query,
+                    intent="search",
+                    intent_confidence=0.0,
+                    detected_type=None,
+                    type_confidence=0.0,
+                    layers_used=[],
+                    layer_weights=dict(effective_layer_weights),
+                    timings=timings,
+                    graph_enabled=config.enable_graph,
+                    graph_candidates_expanded=0 if config.enable_graph else None,
+                    total_candidates=0,
+                    result_count=0,
+                    cache_hit=False,
+                ),
+                scope_verified=True,
+            )
 
         # Build cache filter key from all search parameters
         from app.core.config import settings as app_settings
@@ -505,6 +541,8 @@ class PEDRSearchOrchestrator:
             "graph_edge_types": config.graph_edge_types,
             "graph_top_k_seeds": config.graph_top_k_seeds,
         }
+        if allowed_project_scope is not None:
+            cache_filters["allowed_project_ids"] = allowed_project_scope
 
         # Check cache first (if enabled)
         cache = get_pedr_cache()
@@ -513,6 +551,12 @@ class PEDRSearchOrchestrator:
         if cache_enabled:
             cached_response = cache.get(query, top_k, cache_filters)
             if cached_response is not None:
+                cached_response = _filter_payloads_by_scope(
+                    cached_response,
+                    allowed_project_scope,
+                    project_id=project_id,
+                    document_id=document_id,
+                )
                 # Cache hit - return cached response with updated timing
                 timings.total_ms = (time.perf_counter() - start_time) * 1000
                 cache_stats = cache.get_stats().to_dict()
@@ -527,6 +571,7 @@ class PEDRSearchOrchestrator:
                     timings=timings,
                     cache_stats=cache_stats,
                     graph_enabled=config.enable_graph,
+                    scope_verified=allowed_project_scope is not None,
                 )
 
         # Cache miss - execute full search pipeline
@@ -548,7 +593,7 @@ class PEDRSearchOrchestrator:
         fetch_multiplier = max(1, config.result_multiplier)
         fetch_count = max(top_k, config.top_k_per_layer) * fetch_multiplier
 
-        search_params = {
+        search_params: dict[str, Any] = {
             "query": query,
             "top_k": fetch_count,
             "project_id": project_id,
@@ -563,6 +608,8 @@ class PEDRSearchOrchestrator:
             "hnsw_ef": hnsw_ef,
             "include_embeddings": include_embeddings,
         }
+        if allowed_project_ids is not None:
+            search_params["allowed_project_ids"] = allowed_project_ids
 
         def _run_retrieval(
             search_fn: Callable[..., list[dict[str, Any]]],
@@ -580,9 +627,17 @@ class PEDRSearchOrchestrator:
                 return [], (time.perf_counter() - t0) * 1000, exc
 
         retrieval_jobs: list[tuple[str, Callable[..., list[dict[str, Any]]]]] = []
-        if config.enable_lexical and self._lexical_search:
+        if (
+            allowed_project_scope != ()
+            and config.enable_lexical
+            and self._lexical_search
+        ):
             retrieval_jobs.append(("lexical", self._lexical_search))
-        if config.enable_semantic and self._semantic_search:
+        if (
+            allowed_project_scope != ()
+            and config.enable_semantic
+            and self._semantic_search
+        ):
             retrieval_jobs.append(("semantic", self._semantic_search))
 
         retrieval_outputs: dict[
@@ -606,7 +661,14 @@ class PEDRSearchOrchestrator:
             lexical_results, timings.lexical_ms, lexical_error = lexical_payload
             if lexical_error is not None:
                 logger.warning("Lexical search failed: %s", lexical_error)
-            elif lexical_results:
+            else:
+                lexical_results = _filter_payloads_by_scope(
+                    lexical_results,
+                    allowed_project_scope,
+                    project_id=project_id,
+                    document_id=document_id,
+                )
+            if lexical_error is None and lexical_results:
                 layer_results.append(
                     LayerResult(
                         layer_name="lexical",
@@ -624,7 +686,14 @@ class PEDRSearchOrchestrator:
             semantic_results, timings.semantic_ms, semantic_error = semantic_payload
             if semantic_error is not None:
                 logger.warning("Semantic search failed: %s", semantic_error)
-            elif semantic_results:
+            else:
+                semantic_results = _filter_payloads_by_scope(
+                    semantic_results,
+                    allowed_project_scope,
+                    project_id=project_id,
+                    document_id=document_id,
+                )
+            if semantic_error is None and semantic_results:
                 layer_results.append(
                     LayerResult(
                         layer_name="semantic",
@@ -651,6 +720,14 @@ class PEDRSearchOrchestrator:
                         allowed_edge_types=config.graph_edge_types,
                     ),
                 )
+                graph_layer.results = _filter_graph_payloads_by_scope(
+                    graph_layer.results,
+                    allowed_project_scope,
+                    project_id=project_id,
+                    document_id=document_id,
+                )
+                graph_layer.metadata = dict(graph_layer.metadata or {})
+                graph_layer.metadata["total_candidates"] = len(graph_layer.results)
                 graph_layer_result = graph_layer
                 timings.graph_ms = graph_layer.latency_ms or (
                     (time.perf_counter() - t0) * 1000
@@ -757,7 +834,11 @@ class PEDRSearchOrchestrator:
             cache_stats=cache_stats,
         )
 
-        response = PEDRSearchResponse(results=final_results, metadata=metadata)
+        response = PEDRSearchResponse(
+            results=final_results,
+            metadata=metadata,
+            scope_verified=allowed_project_scope is not None,
+        )
 
         if (
             self.telemetry_enabled
@@ -1030,6 +1111,7 @@ class PEDRSearchOrchestrator:
         cache_stats: dict[str, Any],
         graph_enabled: bool = False,
         graph_candidates_expanded: int | None = None,
+        scope_verified: bool = False,
     ) -> PEDRSearchResponse:
         """Build a PEDRSearchResponse from cached result dictionaries.
 
@@ -1091,7 +1173,11 @@ class PEDRSearchOrchestrator:
             cache_stats=cache_stats,
         )
 
-        return PEDRSearchResponse(results=results, metadata=metadata)
+        return PEDRSearchResponse(
+            results=results,
+            metadata=metadata,
+            scope_verified=scope_verified,
+        )
 
 
 # Singleton instance
@@ -1108,6 +1194,132 @@ def get_pedr_orchestrator() -> PEDRSearchOrchestrator:
     if _pedr_orchestrator is None:
         _pedr_orchestrator = PEDRSearchOrchestrator()
     return _pedr_orchestrator
+
+
+def _normalize_project_scope(
+    allowed_project_ids: list[UUID] | None,
+) -> tuple[str, ...] | None:
+    """Return a stable cache-safe representation of a request project scope."""
+    if allowed_project_ids is None:
+        return None
+    return tuple(sorted({str(project_id) for project_id in allowed_project_ids}))
+
+
+def _filter_payloads_by_scope(
+    results: list[dict[str, Any]],
+    allowed_project_scope: tuple[str, ...] | None,
+    *,
+    project_id: str | None = None,
+    document_id: str | None = None,
+) -> list[dict[str, Any]]:
+    """Keep payloads inside authorization and explicit request filters."""
+    if allowed_project_scope is None:
+        return results
+    allowed = set(allowed_project_scope)
+    filtered: list[dict[str, Any]] = []
+    for result in results:
+        result_project_id = result.get("project_id")
+        result_document_id = result.get("document_id")
+        if (
+            result_project_id is None or str(result_project_id) not in allowed
+        ):
+            continue
+        if project_id is not None and str(result_project_id) != str(project_id):
+            continue
+        if document_id is not None and str(result_document_id) != str(document_id):
+            continue
+        filtered.append(result)
+    return filtered
+
+
+def _filter_graph_payloads_by_scope(
+    results: list[dict[str, Any]],
+    allowed_project_scope: tuple[str, ...] | None,
+    *,
+    project_id: str | None = None,
+    document_id: str | None = None,
+) -> list[dict[str, Any]]:
+    """Scope graph payloads using authoritative chunk ownership in one query."""
+    if allowed_project_scope is None:
+        return results
+    if allowed_project_scope == () or not results:
+        return []
+
+    allowed = set(allowed_project_scope)
+    parsed_chunk_ids: dict[int, str] = {}
+    valid_chunk_ids: dict[str, UUID] = {}
+    for index, result in enumerate(results):
+        try:
+            parsed_chunk_id = UUID(str(result.get("chunk_id")))
+        except (TypeError, ValueError):
+            continue
+        canonical_chunk_id = str(parsed_chunk_id)
+        parsed_chunk_ids[index] = canonical_chunk_id
+        valid_chunk_ids[canonical_chunk_id] = parsed_chunk_id
+
+    if not valid_chunk_ids:
+        return []
+
+    resolved: dict[str, tuple[str, str]] = {}
+    session = SessionLocal()
+    try:
+        rows = session.execute(
+            select(
+                DocumentChunk.id.label("chunk_id"),
+                DocumentChunk.document_id.label("document_id"),
+                Document.project_id.label("project_id"),
+            )
+            .join(Document, DocumentChunk.document_id == Document.id)
+            .where(
+                DocumentChunk.id.in_(list(valid_chunk_ids.values())),
+                Document.deleted_at.is_(None),
+            )
+        ).all()
+        for row in rows:
+            mapping = row._mapping
+            resolved[str(mapping["chunk_id"])] = (
+                str(mapping["document_id"]),
+                str(mapping["project_id"]),
+            )
+    except Exception as exc:
+        logger.warning("Failed to resolve graph result project scope: %s", exc)
+        return []
+    finally:
+        session.close()
+
+    filtered: list[dict[str, Any]] = []
+    for index, result in enumerate(results):
+        chunk_id = parsed_chunk_ids.get(index)
+        if chunk_id is None:
+            continue
+        identifiers = resolved.get(chunk_id)
+        if identifiers is None:
+            continue
+        resolved_document_id, resolved_project_id = identifiers
+        claimed_project_id = result.get("project_id")
+        claimed_document_id = result.get("document_id")
+        if (
+            claimed_project_id is not None
+            and str(claimed_project_id) != resolved_project_id
+        ):
+            continue
+        if (
+            claimed_document_id is not None
+            and str(claimed_document_id) != resolved_document_id
+        ):
+            continue
+        if resolved_project_id not in allowed:
+            continue
+        if project_id is not None and resolved_project_id != str(project_id):
+            continue
+        if document_id is not None and resolved_document_id != str(document_id):
+            continue
+        enriched = dict(result)
+        enriched["document_id"] = resolved_document_id
+        enriched["project_id"] = resolved_project_id
+        filtered.append(enriched)
+
+    return filtered
 
 
 def create_pedr_orchestrator(
@@ -1144,6 +1356,7 @@ def create_pedr_orchestrator(
         document_id: str | None = None,
         source_type: str | None = None,
         source_origin: str | None = None,
+        allowed_project_ids: list[UUID] | None = None,
         **kwargs: Any,
     ) -> list[dict[str, Any]]:
         from app.services.faceted_search import FacetFilters
@@ -1158,7 +1371,7 @@ def create_pedr_orchestrator(
                 in ("document_types", "source_types", "date_from", "date_to", "tags")
             },
         )
-        return hybrid_service._keyword_search(
+        lexical_kwargs: dict[str, Any] = dict(
             query=query,
             project_id=project_id,
             document_id=document_id,
@@ -1167,6 +1380,9 @@ def create_pedr_orchestrator(
             filters=filters,
             limit=top_k,
         )
+        if allowed_project_ids is not None:
+            lexical_kwargs["allowed_project_ids"] = allowed_project_ids
+        return hybrid_service._keyword_search(**lexical_kwargs)
 
     # Create wrapper for semantic search
     def _semantic_wrapper(
@@ -1183,9 +1399,10 @@ def create_pedr_orchestrator(
         tags: list[str] | None = None,
         hnsw_ef: int | None = None,
         include_embeddings: bool = False,
+        allowed_project_ids: list[UUID] | None = None,
         **kwargs: Any,
     ) -> list[dict[str, Any]]:
-        return retrieval_service.search(
+        semantic_kwargs: dict[str, Any] = dict(
             query=query,
             top_k=top_k,
             project_id=project_id,
@@ -1200,6 +1417,9 @@ def create_pedr_orchestrator(
             hnsw_ef=hnsw_ef,
             include_embeddings=include_embeddings,
         )
+        if allowed_project_ids is not None:
+            semantic_kwargs["allowed_project_ids"] = allowed_project_ids
+        return retrieval_service.search(**semantic_kwargs)
 
     return PEDRSearchOrchestrator(
         config=config,

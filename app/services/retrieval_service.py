@@ -2,6 +2,7 @@
 
 from datetime import date
 from typing import Any
+from uuid import UUID
 
 from app.core.config import settings
 from app.services.embedding_service import get_embedding_service
@@ -33,6 +34,7 @@ class RetrievalService:
         hnsw_ef: int | None = None,
         query_embedding: list[float] | None = None,
         include_embeddings: bool = False,
+        allowed_project_ids: list[UUID] | None = None,
     ) -> list[dict[str, Any]]:
         """
         Search for relevant chunks using semantic similarity.
@@ -46,10 +48,19 @@ class RetrievalService:
             source_origin: Optional filter by source origin (upload, synthesized, imported)
             hnsw_ef: Explicit HNSW search parameter override
             include_embeddings: Include embedding vectors in results
+            allowed_project_ids: Per-request RBAC project scope. ``None`` keeps
+                legacy unrestricted behavior; an empty list fails closed.
 
         Returns:
             List of search result dicts with chunk information and scores
         """
+        if allowed_project_ids is not None:
+            allowed_values = {str(identifier) for identifier in allowed_project_ids}
+            if not allowed_values or (
+                project_id is not None and str(project_id) not in allowed_values
+            ):
+                return []
+
         resolved_hnsw_ef = self.recommend_hnsw_ef(top_k) if hnsw_ef is None else hnsw_ef
 
         # Generate query embedding (can be precomputed by caller)
@@ -69,7 +80,42 @@ class RetrievalService:
             source_origin=source_origin,
             hnsw_ef=resolved_hnsw_ef,
             with_vectors=include_embeddings,
+            allowed_project_ids=allowed_project_ids,
         )
+        if allowed_project_ids is not None:
+            # Defense in depth: do not trust the vector backend alone to enforce
+            # tenancy. Missing, malformed, and out-of-scope payload IDs all fail
+            # closed for a scoped request. ``None`` deliberately skips this block
+            # to preserve the unrestricted legacy response byte-for-byte.
+            expected_project_ids = set(allowed_project_ids)
+            if project_id is not None:
+                try:
+                    expected_project_ids = {UUID(str(project_id))}
+                except (TypeError, ValueError, AttributeError):
+                    return []
+            expected_document_id = None
+            if document_id is not None:
+                try:
+                    expected_document_id = UUID(str(document_id))
+                except (TypeError, ValueError, AttributeError):
+                    return []
+            scoped_results = []
+            for result in results:
+                try:
+                    result_project_id = UUID(str(result.get("project_id")))
+                except (TypeError, ValueError, AttributeError):
+                    continue
+                if result_project_id not in expected_project_ids:
+                    continue
+                if expected_document_id is not None:
+                    try:
+                        result_document_id = UUID(str(result.get("document_id")))
+                    except (TypeError, ValueError, AttributeError):
+                        continue
+                    if result_document_id != expected_document_id:
+                        continue
+                scoped_results.append(result)
+            results = scoped_results
 
         filters = FacetFilters.from_kwargs(
             project_id=project_id,

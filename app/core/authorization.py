@@ -19,6 +19,7 @@ Policy when enabled (deny-by-default):
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from uuid import UUID
 
 from fastapi import HTTPException, status
 
@@ -281,3 +282,39 @@ def accessible_filter(user: AuthenticatedUser, model: type, db: Session):
     if not conditions:
         return false()  # no owner_id, no resolvable Space -> caller sees nothing
     return or_(*conditions)
+
+
+def accessible_project_ids(
+    user: AuthenticatedUser, db: Session
+) -> list[UUID] | None:
+    """Return the projects readable by ``user`` for non-relational backends.
+
+    This is the project-ID companion to :func:`accessible_filter` for stores such
+    as Qdrant, where a SQLAlchemy expression cannot be applied directly. ``None``
+    means unrestricted access (RBAC disabled, or an owner/admin principal). An
+    ordinary human principal receives projects they own OR projects governed by a
+    Space they belong to. Service principals and principals with no matching
+    ownership/membership grants receive an empty list so callers can fail closed.
+    """
+    if not settings.rbac_enabled:
+        return None
+    if user.role in _PRIVILEGED_ROLES:
+        return None
+    if user.role == ROLE_SERVICE:
+        return []
+
+    user_id = getattr(user, "user_id", None)
+    if user_id is None:
+        return []
+
+    from sqlalchemy import or_
+
+    from app.models.project import Project
+
+    conditions = [Project.owner_id == user_id]
+    space_ids = _user_space_ids(user, db)
+    if space_ids:
+        conditions.append(Project.workspace_id.in_(space_ids))
+
+    rows = db.query(Project.id).filter(or_(*conditions)).all()
+    return [row[0] for row in rows]

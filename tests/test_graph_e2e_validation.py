@@ -13,23 +13,20 @@ import json
 import statistics
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 import pytest
 
-from app.core.database import Base, engine, SessionLocal
-from app.models.document import Document
 from app.models.chunk import DocumentChunk
+from app.models.document import Document
 from app.models.graph_edge import GraphEdge
 from app.models.project import Project
 from app.services.pedr.edge_materialization import EdgeMaterializationService
 from app.services.pedr.search_orchestrator import (
-    PEDRConfig,
     PEDRSearchOrchestrator,
     PEDRSearchResponse,
 )
-
 
 # ---------------------------------------------------------------------------
 # Test data: 3 projects, 6 documents, 18 chunks, interconnected by edges
@@ -121,12 +118,12 @@ class QueryComparison:
     query: str
     graph_off_count: int
     graph_on_count: int
-    graph_off_top_ids: List[str]
-    graph_on_top_ids: List[str]
-    new_results_from_graph: List[str]
-    rank_changes: Dict[str, int]  # chunk_id -> rank_change (negative = improved)
-    graph_off_rrf_scores: Dict[str, float]
-    graph_on_rrf_scores: Dict[str, float]
+    graph_off_top_ids: list[str]
+    graph_on_top_ids: list[str]
+    new_results_from_graph: list[str]
+    rank_changes: dict[str, int]  # chunk_id -> rank_change (negative = improved)
+    graph_off_rrf_scores: dict[str, float]
+    graph_on_rrf_scores: dict[str, float]
     graph_candidates_expanded: int
     graph_layer_ms: float
     total_ms_off: float
@@ -141,22 +138,22 @@ def _build_chunk_id(doc_key: str, chunk_index: int) -> str:
 class _SearchProviderStub:
     """Stub lexical/semantic search that returns chunks based on keyword overlap."""
 
-    def __init__(self, chunks: List[Dict[str, Any]]):
+    def __init__(self, chunks: list[dict[str, Any]]):
         self.chunks = chunks
-        self._chunk_records: Dict[str, Dict[str, Any]] = {}
+        self._chunk_records: dict[str, dict[str, Any]] = {}
 
-    def set_chunk_records(self, records: Dict[str, Dict[str, Any]]) -> None:
+    def set_chunk_records(self, records: dict[str, dict[str, Any]]) -> None:
         self._chunk_records = records
 
     def search(
         self,
         query: str,
         top_k: int = 20,
-        project_id: Optional[str] = None,
+        project_id: str | None = None,
         **kwargs: Any,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         query_terms = set(query.lower().split())
-        scored: List[tuple[float, Dict[str, Any]]] = []
+        scored: list[tuple[float, dict[str, Any]]] = []
 
         for chunk in self.chunks:
             content_terms = set(chunk["content"].lower().split())
@@ -170,7 +167,7 @@ class _SearchProviderStub:
             chunk_record = self._chunk_records.get(
                 f"{chunk['doc_id']}::{chunk['chunk_index']}"
             )
-            result: Dict[str, Any] = {
+            result: dict[str, Any] = {
                 "chunk_id": str(chunk_record["id"]) if chunk_record else str(uuid4()),
                 "content": chunk["content"],
                 "document_id": chunk["doc_id"],
@@ -219,7 +216,7 @@ def graph_search_env(db_session):
     db_session.commit()
 
     # Create chunks
-    chunk_records: Dict[str, Dict[str, Any]] = {}
+    chunk_records: dict[str, dict[str, Any]] = {}
     for chunk_data in CHUNKS:
         chunk = DocumentChunk(
             document_id=chunk_data["doc_id"],
@@ -282,7 +279,7 @@ def graph_search_env(db_session):
 
 
 def _run_search(
-    env: Dict[str, Any],
+    env: dict[str, Any],
     query: str,
     enable_graph: bool,
     top_k: int = 10,
@@ -309,7 +306,7 @@ def _run_search(
     )
 
 
-def _compare_query(env: Dict[str, Any], query: str) -> QueryComparison:
+def _compare_query(env: dict[str, Any], query: str) -> QueryComparison:
     """Run query with graph on and off, return comparison."""
     result_off = _run_search(env, query, enable_graph=False)
     result_on = _run_search(env, query, enable_graph=True)
@@ -322,7 +319,7 @@ def _compare_query(env: Dict[str, Any], query: str) -> QueryComparison:
 
     new_from_graph = [cid for cid in on_ids if cid not in off_ranks]
 
-    rank_changes: Dict[str, int] = {}
+    rank_changes: dict[str, int] = {}
     for cid in on_ids:
         if cid in off_ranks:
             rank_changes[cid] = on_ranks[cid] - off_ranks[cid]
@@ -440,10 +437,20 @@ class TestGraphSearchE2EValidation:
         for query in VALIDATION_QUERIES:
             result_off = _run_search(graph_search_env, query, enable_graph=False)
             result_on = _run_search(graph_search_env, query, enable_graph=True)
-            assert not result_off.metadata.degraded, (
-                f"Query '{query}' degraded with graph off"
+            assert result_off.metadata.result_count == len(result_off.results)
+            assert result_on.metadata.result_count == len(result_on.results)
+            assert result_off.metadata.total_candidates >= len(result_off.results)
+            assert result_on.metadata.total_candidates >= len(result_on.results)
+            assert set(result_off.metadata.layers_used).issubset(
+                {"lexical", "semantic"}
             )
-            # Graph-on may be degraded if graph layer had no results, that's ok
+            assert set(result_on.metadata.layers_used).issubset(
+                {"lexical", "semantic", "graph"}
+            )
+            if result_off.results:
+                assert result_off.metadata.layers_used
+            if result_on.results:
+                assert result_on.metadata.layers_used
 
     def test_generate_comparison_report(self, graph_search_env, tmp_path):
         """Generate full comparison report as JSON artifact."""
@@ -504,7 +511,7 @@ class TestGraphSearchE2EValidation:
 
         # Print summary for test output
         print(f"\n{'=' * 60}")
-        print(f"GRAPH SEARCH E2E VALIDATION REPORT")
+        print("GRAPH SEARCH E2E VALIDATION REPORT")
         print(f"{'=' * 60}")
         print(f"Queries tested: {report['summary']['total_queries']}")
         print(

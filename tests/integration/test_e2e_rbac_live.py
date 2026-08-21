@@ -11,8 +11,8 @@ refuses a postgresql/rlwy.net DATABASE_URL (conftest.py:22-26), so prod is
 unreachable via fixtures BY DESIGN. The harness talks to the deploy over HTTP only,
 so this wrapper never touches the local DB guard.
 
-The lockstep test below always runs (no deploy needed) and fails if the harness's
-route list drifts from the wired PER_ID_ROUTES.
+The lockstep tests below always run (no deploy needed) and fail if the harness's
+route lists drift from the wired per-id or PEDR/retrieval surfaces.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ import os
 
 import pytest
 
-from scripts.rbac_verify import RbacVerifier, per_id_routes
+from scripts.rbac_verify import RbacVerifier, pedr_scope_routes, per_id_routes
 
 BASE_URL = os.environ.get("RBAC_VERIFY_BASE_URL")
 
@@ -35,6 +35,35 @@ def test_harness_routes_match_wired_per_id_routes():
     from tests.test_rbac_route_enforcement_api import _RID, PER_ID_ROUTES
 
     assert set(per_id_routes(settings.api_v1_prefix, _RID)) == set(PER_ID_ROUTES)
+
+
+def test_harness_pedr_scope_routes_match_wired_surface():
+    """The deployed matrix must probe all four PEDR-1 route entry points."""
+    try:
+        from fastapi.routing import iter_route_contexts
+    except ImportError:  # FastAPI < 0.141 flattens included routes eagerly.
+        iter_route_contexts = None
+
+    from app.core.config import settings
+    from app.main import app
+
+    project_id = "00000000-0000-0000-0000-000000000001"
+    probed = {(method, path) for method, path, _body in pedr_scope_routes(settings.api_v1_prefix, project_id)}
+    routes = app.routes if iter_route_contexts is None else iter_route_contexts(app.routes)
+    wired = {
+        (method.lower(), route.path)
+        for route in routes
+        for method in getattr(route, "methods", set())
+    }
+
+    assert ("post", f"{settings.api_v1_prefix}/pedr/search") in probed & wired
+    assert ("post", f"{settings.api_v1_prefix}/pedr/preflight") in probed & wired
+    assert ("post", f"{settings.api_v1_prefix}/retrieval/search") in probed & wired
+    assert any(
+        method == "get" and path.startswith(f"{settings.api_v1_prefix}/pedr/related/")
+        for method, path in probed
+    )
+    assert ("get", f"{settings.api_v1_prefix}/pedr/related/{{urn:path}}") in wired
 
 
 @pytest.mark.e2e_prod

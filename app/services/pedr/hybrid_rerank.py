@@ -27,6 +27,7 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Literal
+from uuid import UUID
 
 import numpy as np
 from sqlalchemy import func, select
@@ -113,6 +114,7 @@ class HybridReranker:
         source_origin: str | None = None,
         hnsw_ef: int | None = None,
         include_embeddings: bool = False,
+        allowed_project_ids: list[UUID] | None = None,
     ) -> HybridRerankResult:
         """Execute hybrid rerank search.
 
@@ -125,6 +127,7 @@ class HybridReranker:
             document_id: Optional document UUID filter.
             source_type: Optional source type filter.
             hnsw_ef: HNSW ef override for full semantic search.
+            allowed_project_ids: Request-local readable project scope.
 
         Returns:
             HybridRerankResult with results, timings, and metadata.
@@ -132,18 +135,37 @@ class HybridReranker:
         start_time = time.perf_counter()
         timings = HybridRerankTimings()
 
+        if allowed_project_ids == [] or (
+            allowed_project_ids is not None
+            and project_id is not None
+            and str(project_id)
+            not in {str(allowed_id) for allowed_id in allowed_project_ids}
+        ):
+            timings.total_ms = (time.perf_counter() - start_time) * 1000
+            return HybridRerankResult(
+                results=[],
+                timings=timings,
+                mode_used=mode,
+                fts_candidates_count=0,
+                fallback_used=False,
+            )
+
+        full_search_kwargs: dict[str, Any] = dict(
+            query=query,
+            top_k=top_k,
+            project_id=project_id,
+            document_id=document_id,
+            source_type=source_type,
+            source_origin=source_origin,
+            hnsw_ef=hnsw_ef,
+            include_embeddings=include_embeddings,
+        )
+        if allowed_project_ids is not None:
+            full_search_kwargs["allowed_project_ids"] = allowed_project_ids
+
         if mode == "full":
             # Standard semantic search (delegate to existing retrieval)
-            results = self._full_semantic_search(
-                query=query,
-                top_k=top_k,
-                project_id=project_id,
-                document_id=document_id,
-                source_type=source_type,
-                source_origin=source_origin,
-                hnsw_ef=hnsw_ef,
-                include_embeddings=include_embeddings,
-            )
+            results = self._full_semantic_search(**full_search_kwargs)
             timings.total_ms = (time.perf_counter() - start_time) * 1000
             return HybridRerankResult(
                 results=results,
@@ -157,13 +179,22 @@ class HybridReranker:
 
         # Stage 1: FTS candidates
         t0 = time.perf_counter()
-        candidates = self._fts_candidates(
+        fts_kwargs: dict[str, Any] = dict(
             query=query,
             limit=candidate_pool,
             project_id=project_id,
             document_id=document_id,
             source_type=source_type,
             source_origin=source_origin,
+        )
+        if allowed_project_ids is not None:
+            fts_kwargs["allowed_project_ids"] = allowed_project_ids
+        candidates = self._fts_candidates(**fts_kwargs)
+        candidates = self._filter_results_by_scope(
+            candidates,
+            allowed_project_ids=allowed_project_ids,
+            project_id=project_id,
+            document_id=document_id,
         )
         timings.fts_ms = (time.perf_counter() - t0) * 1000
         fts_count = len(candidates)
@@ -173,16 +204,7 @@ class HybridReranker:
             logger.info(
                 "Hybrid rerank: FTS returned no candidates, falling back to full semantic"
             )
-            results = self._full_semantic_search(
-                query=query,
-                top_k=top_k,
-                project_id=project_id,
-                document_id=document_id,
-                source_type=source_type,
-                source_origin=source_origin,
-                hnsw_ef=hnsw_ef,
-                include_embeddings=include_embeddings,
-            )
+            results = self._full_semantic_search(**full_search_kwargs)
             timings.total_ms = (time.perf_counter() - start_time) * 1000
             return HybridRerankResult(
                 results=results,
@@ -235,6 +257,7 @@ class HybridReranker:
         document_id: str | None = None,
         source_type: str | None = None,
         source_origin: str | None = None,
+        allowed_project_ids: list[UUID] | None = None,
     ) -> list[dict[str, Any]]:
         """Retrieve candidate chunks using PostgreSQL full-text search.
 
@@ -252,6 +275,8 @@ class HybridReranker:
             List of candidate chunk dictionaries with FTS scores.
         """
         if not query.strip():
+            return []
+        if allowed_project_ids == []:
             return []
 
         session = self.session_factory()
@@ -291,6 +316,8 @@ class HybridReranker:
                 stmt = stmt.where(Document.source_type == source_type)
             if source_origin:
                 stmt = stmt.where(Document.source_origin == source_origin)
+            if allowed_project_ids is not None:
+                stmt = stmt.where(Document.project_id.in_(allowed_project_ids))
 
             rows = session.execute(stmt).all()
 
@@ -432,6 +459,7 @@ class HybridReranker:
         source_origin: str | None = None,
         hnsw_ef: int | None = None,
         include_embeddings: bool = False,
+        allowed_project_ids: list[UUID] | None = None,
     ) -> list[dict[str, Any]]:
         """Execute full semantic search via retrieval service.
 
@@ -450,7 +478,7 @@ class HybridReranker:
         embedding = self.embedding_service.generate_embedding(query)
 
         # Search via Qdrant service
-        results = self.qdrant_service.search_chunks(
+        search_kwargs: dict[str, Any] = dict(
             query_vector=embedding,
             top_k=top_k,
             project_id=project_id,
@@ -459,6 +487,15 @@ class HybridReranker:
             source_origin=source_origin,
             hnsw_ef=hnsw_ef,
             with_vectors=include_embeddings,
+        )
+        if allowed_project_ids is not None:
+            search_kwargs["allowed_project_ids"] = allowed_project_ids
+        results = self.qdrant_service.search_chunks(**search_kwargs)
+        results = self._filter_results_by_scope(
+            results,
+            allowed_project_ids=allowed_project_ids,
+            project_id=project_id,
+            document_id=document_id,
         )
 
         # Annotate results for consistency
@@ -469,6 +506,35 @@ class HybridReranker:
             result["fts_score"] = 0.0
 
         return results
+
+    @staticmethod
+    def _filter_results_by_scope(
+        results: list[dict[str, Any]],
+        *,
+        allowed_project_ids: list[UUID] | None,
+        project_id: str | None,
+        document_id: str | None,
+    ) -> list[dict[str, Any]]:
+        """Fail closed if either rerank backend ignores request filters."""
+        if allowed_project_ids is None:
+            return results
+        allowed = {str(allowed_id) for allowed_id in allowed_project_ids}
+        return [
+            result
+            for result in results
+            if (
+                result.get("project_id") is not None
+                and str(result["project_id"]) in allowed
+            )
+            and (
+                project_id is None
+                or str(result.get("project_id")) == str(project_id)
+            )
+            and (
+                document_id is None
+                or str(result.get("document_id")) == str(document_id)
+            )
+        ]
 
     @staticmethod
     def _cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:

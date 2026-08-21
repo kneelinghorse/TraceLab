@@ -9,7 +9,10 @@ from __future__ import annotations
 import logging
 
 from fastapi import APIRouter, Depends, Header, HTTPException, status
+from sqlalchemy.orm import Session
 
+from app.core.authorization import accessible_project_ids
+from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.schemas.pedr_preflight import PreflightQuery, PreflightRecommendation
 from app.services.pedr import PreflightService, get_preflight_service
@@ -81,6 +84,7 @@ def get_service() -> PreflightService:
 )
 async def preflight_query(
     request: PreflightQuery,
+    db: Session = Depends(get_db),
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
     service: PreflightService = Depends(get_service),
     x_agent_id: str | None = Header(
@@ -109,9 +113,14 @@ async def preflight_query(
         )
 
     agent = x_agent_id or current_user.username or "unknown"
+    allowed_project_ids = accessible_project_ids(current_user, db)
 
     try:
-        result = service.query(request, agent=agent)
+        result = service.query(
+            request,
+            agent=agent,
+            allowed_project_ids=allowed_project_ids,
+        )
     except Exception as e:
         logger.exception("Pre-flight query failed: %s", e)
         raise HTTPException(
