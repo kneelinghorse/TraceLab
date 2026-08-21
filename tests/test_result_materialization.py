@@ -1364,7 +1364,7 @@ def test_tombstone_evidence_surfaces_are_counts_only(
     scheduler._state = scheduler.ReconcilerState()
     monkeypatch.setattr(scheduler, "run_reconciliation_once", lambda: counts)
     try:
-        with caplog.at_level(logging.INFO, logger=scheduler.__name__):
+        with caplog.at_level(logging.INFO, logger=scheduler.logger.name):
             import asyncio
 
             asyncio.run(scheduler.run_tick())

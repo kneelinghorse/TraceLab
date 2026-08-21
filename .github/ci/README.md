@@ -8,8 +8,8 @@ substitute for green GitHub checks.
 
 | Lane | Command | Result |
 | --- | --- | --- |
-| Clean collection | Fresh Python 3.11.9 virtualenv, `pip install -e '.[dev,test]'`, then `pytest --collect-only -q` | 2,147 collected, 0 errors |
-| Backend suite | `pytest --ignore=tests/integration` with every node in `backend-quarantine.txt` passed as `--deselect` | 1,996 passed, 3 skipped, 49 deselected |
+| Clean collection | Fresh Python 3.11.9 virtualenv, `pip install -e '.[dev,test]'`, then `pytest --collect-only -q` | 2,148 collected, 0 errors |
+| Backend suite | `pytest --ignore=tests/integration` with every node in `backend-quarantine.txt` passed as `--deselect` | 1,997 passed, 3 skipped, 49 deselected |
 | PostgreSQL integration | `pytest tests/integration -q` with a PostgreSQL 15 testcontainer | 95 passed, 4 skipped |
 | Frontend unit | `npm run test:unit -- --run` | 66 passed |
 | Frontend types | `npm run type-check` | Passed |
