@@ -77,6 +77,28 @@ credential file and relaunch.
 
 ## Configure your MCP client
 
+`TRACELAB_API_URL` is the FastAPI origin, without an `/api/v1` suffix. The
+client appends `/api/v1` to each request itself. For production, use
+`https://api.tracelab.aquex.ai`; `https://tracelab.aquex.ai` is the browser UI.
+
+### Codex (desktop, CLI, and IDE)
+
+Add the stdio server to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.tracelab]
+command = "npx"
+args = ["-y", "@aquex/tracelab-mcp"]
+startup_timeout_sec = 30
+
+[mcp_servers.tracelab.env]
+TRACELAB_API_URL = "https://api.tracelab.aquex.ai"
+```
+
+Restart Codex after saving the configuration. TraceLab does not expose a
+remote SSE MCP endpoint; a connector configured with `url =
+"https://aquex.ai/mcp"` is not the TraceLab MCP server.
+
 ### Claude Desktop
 
 Add to `claude_desktop_config.json`:
@@ -88,7 +110,7 @@ Add to `claude_desktop_config.json`:
       "command": "npx",
       "args": ["-y", "@aquex/tracelab-mcp"],
       "env": {
-        "TRACELAB_API_URL": "https://tracelab.aquex.ai"
+        "TRACELAB_API_URL": "https://api.tracelab.aquex.ai"
       }
     }
   }
@@ -101,13 +123,9 @@ on stderr (visible in Claude Desktop's MCP server logs).
 ### Claude Code
 
 ```bash
-claude mcp add tracelab -- npx -y @aquex/tracelab-mcp
-```
-
-Then set the API URL:
-
-```bash
-claude mcp env tracelab TRACELAB_API_URL https://tracelab.aquex.ai
+claude mcp add --transport stdio tracelab \
+  --env TRACELAB_API_URL=https://api.tracelab.aquex.ai \
+  -- npx -y @aquex/tracelab-mcp
 ```
 
 ### Other MCP clients

@@ -370,7 +370,7 @@ export function defaultPrompter(response: DeviceCodeResponse): void {
 }
 
 export interface DeviceCodeFlowOptions {
-  /** TraceLab API base URL (e.g. `https://tracelab.aquex.ai`). */
+  /** TraceLab API base URL (e.g. `https://api.tracelab.aquex.ai`). */
   baseUrl: string;
   /** MCP version for the User-Agent (default: read from package.json at runtime). */
   version?: string;

@@ -24,6 +24,13 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
   PEDR/preflight. No MCP input schema or action changed.
 - Bumped the public package to 1.1.1 for the additive evidence response fields.
 
+### Fixed
+
+- Corrected MCP setup examples to use the production FastAPI origin
+  (`https://api.tracelab.aquex.ai`) without an `/api/v1` suffix, and added the
+  supported Codex stdio configuration. TraceLab does not expose an SSE MCP
+  endpoint at `https://aquex.ai/mcp`.
+
 ## [1.1.0] — 2026-08-20
 
 ### Added
