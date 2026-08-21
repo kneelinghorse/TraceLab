@@ -201,6 +201,13 @@ explicit `test`/`testing` environment or local `development`/`dev`/`local`
 mode with `DEBUG=true`; missing `ENVIRONMENT` plus the default `DEBUG=false`
 therefore fails closed.
 
+TraceLab's public `GET /api/v1/health` response exposes
+`deepsearch_receipt_receiver_configured`. This boolean proves only that the
+TraceLab receiver resolved a canonical or transitional secret; it cannot prove
+value equality with the worker. DeepSearch acceptance preflight must fail
+closed when the field is false, missing, malformed, or unreachable, then still
+require a signed live receipt with persisted `job_id` correlation.
+
 TraceLab owns the durable fallback when DeepSearch exhausts receipt retries or
 crashes after its terminal database write. The production rollout is not
 convergent until a separate Railway scheduled service is live with:

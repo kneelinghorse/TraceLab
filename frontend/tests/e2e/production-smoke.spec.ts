@@ -36,6 +36,7 @@ test.describe("Production smoke", () => {
     const payload = await response.json();
     expect(payload.status).toBe("healthy");
     expect(payload.rbac_enabled).toBe(true);
+    expect(payload.deepsearch_receipt_receiver_configured).toBe(true);
 
     const lastRunAt = payload.reconciler?.last_run_at;
     expect(lastRunAt).toEqual(expect.any(String));
