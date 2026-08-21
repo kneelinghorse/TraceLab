@@ -1034,6 +1034,146 @@ class TestMissionVerbContract:
         assert response.json()["search_ready"] is False
         assert response.json()["materialization_pending"] is True
 
+    def test_status_route_explains_tombstone_without_requesting_recreation(
+        self, auth_headers, db_session
+    ):
+        """Polling honors owner deletion intent instead of advertising a retry."""
+        client = TestClient(app)
+        project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session,
+            mission_id="STATUS-TOMBSTONE-001",
+            status="completed",
+            project_id=project.id,
+        )
+        mission.result_markdown = "# Intentionally removed result"
+        mission.execution_metadata = {
+            "result_materialization": {
+                "status": "failed",
+                "attempt_count": 2,
+                "attempted_at": "2026-01-01T00:00:00+00:00",
+                "error_categories": [],
+            }
+        }
+        document = Document(
+            project_id=project.id,
+            name=f"{mission.mission_id}_report.md",
+            content=mission.result_markdown,
+            source_type="deepsearch",
+            source_mission_id=mission.id,
+            processed=True,
+            chunked=True,
+            embedded=True,
+        )
+        document.soft_delete(deleted_by="owner@example.com")
+        db_session.add(document)
+        db_session.flush()
+        mission.result_document_ids = [str(document.id)]
+        db_session.commit()
+
+        response = client.get(
+            f"/api/v1/missions/{mission.id}/status",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        body = response.json()
+        assert body["materialization_pending"] is False
+        assert body["materialization_status"] == "blocked_soft_deleted"
+        assert body["materialization_attempt_count"] == 2
+        assert body["materialization_error"] is None
+        assert body["search_ready"] is False
+        assert "owner@example.com" not in response.text
+
+    def test_status_route_preserves_genuine_failure_when_document_is_tombstoned(
+        self, auth_headers, db_session
+    ):
+        """Deletion disposition cannot erase a genuine report repair failure."""
+        client = TestClient(app)
+        project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session,
+            mission_id="STATUS-TOMBSTONE-FAILED-001",
+            status="completed",
+            project_id=project.id,
+        )
+        mission.result_markdown = "# Intentionally removed document"
+        mission.result_protocol = {"synthesis": "Report still needs repair"}
+        mission.execution_metadata = {
+            "result_materialization": {
+                "status": "failed",
+                "attempt_count": 3,
+                "attempted_at": "2026-01-01T00:00:00+00:00",
+                "error_categories": ["unexpected_report_error"],
+            }
+        }
+        document = Document(
+            project_id=project.id,
+            name=f"{mission.mission_id}_report.md",
+            content=mission.result_markdown,
+            source_type="deepsearch",
+            source_mission_id=mission.id,
+            processed=True,
+            chunked=True,
+            embedded=True,
+        )
+        document.soft_delete(deleted_by="owner@example.com")
+        db_session.add(document)
+        db_session.flush()
+        mission.result_document_ids = [str(document.id)]
+        db_session.commit()
+
+        response = client.get(
+            f"/api/v1/missions/{mission.id}/status",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        body = response.json()
+        assert body["materialization_status"] == "failed"
+        assert body["materialization_error"] == "unexpected_report_error"
+        assert body["materialization_pending"] is True
+        assert body["materialization_attempt_count"] == 3
+        assert body["search_ready"] is False
+        assert "owner@example.com" not in response.text
+
+    def test_status_route_exposes_bounded_error_category_only(
+        self, auth_headers, db_session
+    ):
+        """Operators get an actionable code without private exception text."""
+        client = TestClient(app)
+        private_identifier = uuid.uuid4()
+        private_error = f"Qdrant host failed for document {private_identifier}"
+        project = _create_test_project(db_session)
+        mission = _create_test_mission(
+            db_session,
+            mission_id="STATUS-CATEGORY-001",
+            status="completed",
+            project_id=project.id,
+        )
+        mission.execution_metadata = {
+            "result_materialization": {
+                "status": "failed",
+                "attempt_count": 1,
+                "attempted_at": "2026-01-01T00:00:00+00:00",
+                "error_categories": [private_error],
+            },
+            "private_error": private_error,
+        }
+        db_session.commit()
+
+        response = client.get(
+            f"/api/v1/missions/{mission.id}/status",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200
+        assert response.json()["materialization_error"] == (
+            "unexpected_materialization_error"
+        )
+        assert "Qdrant host" not in response.text
+        assert str(private_identifier) not in response.text
+
     def test_status_route_protocol_only_result_needs_no_document(
         self, auth_headers, db_session
     ):

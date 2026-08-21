@@ -7,7 +7,7 @@ linking them back to the mission and running through the chunking/embedding pipe
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -21,8 +21,43 @@ from app.services.processing_status import ProcessingStatusRecorder
 logger = logging.getLogger(__name__)
 
 
+AutoIngestErrorCategory = Literal[
+    "empty_result",
+    "missing_project",
+    "missing_linked_document",
+    "soft_deleted_document",
+    "partial_chunks_conflict",
+    "ingestion_failed",
+    "not_search_ready",
+    "unexpected_ingest_error",
+]
+AUTO_INGEST_ERROR_CATEGORIES = frozenset(
+    {
+        "empty_result",
+        "missing_project",
+        "missing_linked_document",
+        "soft_deleted_document",
+        "partial_chunks_conflict",
+        "ingestion_failed",
+        "not_search_ready",
+        "unexpected_ingest_error",
+    }
+)
+
+
 class AutoIngestError(RuntimeError):
-    """Raised when auto-ingestion fails."""
+    """Raised when auto-ingestion fails with a bounded public category."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        category: AutoIngestErrorCategory = "unexpected_ingest_error",
+    ) -> None:
+        if category not in AUTO_INGEST_ERROR_CATEGORIES:
+            raise ValueError(f"Unsupported auto-ingest error category: {category}")
+        super().__init__(message)
+        self.category = category
 
 
 def is_document_search_ready(document: Document) -> bool:
@@ -134,10 +169,16 @@ class AutoIngestService:
             AutoIngestError: If ingestion fails
         """
         if not result_markdown:
-            raise AutoIngestError("No result_markdown to ingest")
+            raise AutoIngestError(
+                "No result_markdown to ingest",
+                category="empty_result",
+            )
 
         if not mission.project_id:
-            raise AutoIngestError(f"Mission {mission.mission_id} has no project_id")
+            raise AutoIngestError(
+                f"Mission {mission.mission_id} has no project_id",
+                category="missing_project",
+            )
 
         # Create document filename
         filename = f"{mission.mission_id}_report.md"
@@ -153,11 +194,13 @@ class AutoIngestService:
         )
         if mission.result_document_ids and existing_document is None:
             raise AutoIngestError(
-                f"Mission {mission.mission_id} links a missing result document"
+                f"Mission {mission.mission_id} links a missing result document",
+                category="missing_linked_document",
             )
         if existing_document is not None and existing_document.deleted_at is not None:
             raise AutoIngestError(
-                f"Result document {existing_document.id} is soft-deleted and must be restored"
+                f"Result document {existing_document.id} is soft-deleted and must be restored",
+                category="soft_deleted_document",
             )
         if (
             existing_document is not None
@@ -252,7 +295,8 @@ class AutoIngestService:
             elif document.chunks:
                 raise AutoIngestError(
                     f"Result document {document.id} has partial chunks; refusing "
-                    "a replay that could duplicate them"
+                    "a replay that could duplicate them",
+                    category="partial_chunks_conflict",
                 )
             else:
                 result = ingestion_service.process_document(
@@ -268,14 +312,18 @@ class AutoIngestService:
                     document.id,
                     error,
                 )
-                raise AutoIngestError(f"Ingestion failed: {error}")
+                raise AutoIngestError(
+                    f"Ingestion failed: {error}",
+                    category="ingestion_failed",
+                )
 
             # Refresh document to get updated state
             db.refresh(document)
 
             if require_embedded and not is_document_search_ready(document):
                 raise AutoIngestError(
-                    f"Result document {document.id} is not search-ready"
+                    f"Result document {document.id} is not search-ready",
+                    category="not_search_ready",
                 )
 
             logger.info(
@@ -288,7 +336,10 @@ class AutoIngestService:
             raise
         except Exception as exc:
             logger.exception("Unexpected error during auto-ingestion")
-            raise AutoIngestError(f"Ingestion error: {str(exc)}") from exc
+            raise AutoIngestError(
+                f"Ingestion error: {str(exc)}",
+                category="unexpected_ingest_error",
+            ) from exc
 
         # Update mission with document reference
         current_doc_ids = list(mission.result_document_ids or [])

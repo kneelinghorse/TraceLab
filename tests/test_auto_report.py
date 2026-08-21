@@ -374,8 +374,10 @@ class TestCreateReportFromProtocol:
         """Raises error when protocol is empty."""
         mission = self._create_test_mission(db_session)
 
-        with pytest.raises(AutoReportError, match="No protocol data"):
+        with pytest.raises(AutoReportError, match="No protocol data") as exc_info:
             create_report_from_protocol(db_session, mission, {})
+
+        assert exc_info.value.category == "empty_protocol"
 
     def test_create_report_no_project_raises(self, db_session):
         """Raises error when mission has no project_id."""
@@ -390,8 +392,10 @@ class TestCreateReportFromProtocol:
         db_session.add(mission)
         db_session.commit()
 
-        with pytest.raises(AutoReportError, match="has no project_id"):
+        with pytest.raises(AutoReportError, match="has no project_id") as exc_info:
             create_report_from_protocol(db_session, mission, {"synthesis": "Test"})
+
+        assert exc_info.value.category == "missing_project"
 
     def test_create_report_content_hash(self, db_session):
         """Report has content hash for dedup."""
@@ -455,7 +459,7 @@ class TestAutoReportIntegration:
     """Integration tests with webhook handler."""
 
     def test_webhook_handler_calls_auto_report(self, db_session):
-        """Webhook handler invokes auto-report on success with protocol."""
+        """Protocol-only receipts converge through the shared materializer."""
         from app.schemas.webhook import (
             DeepSearchWebhookPayload,
             DeepSearchWebhookStatus,
@@ -478,19 +482,13 @@ class TestAutoReportIntegration:
         db_session.add(mission)
         db_session.commit()
 
-        # Mock auto-ingest to avoid document processing
-        mock_auto_ingest = MagicMock()
-        mock_document = MagicMock()
-        mock_document.id = uuid.uuid4()
-        mock_auto_ingest.auto_ingest_result.return_value = mock_document
-
-        handler = WebhookHandler(auto_ingest_service=mock_auto_ingest)
+        handler = WebhookHandler()
 
         payload = DeepSearchWebhookPayload(
             job_id="ds-auto-report-test",
             mission_id="WH-AR-001",
             status=DeepSearchWebhookStatus.COMPLETE,
-            result_markdown="# Results",
+            result_markdown=None,
             result_protocol={"synthesis": "Webhook integration test."},
         )
 
@@ -501,6 +499,18 @@ class TestAutoReportIntegration:
         assert status_msg == "completed"
         db_session.refresh(updated_mission)
         assert updated_mission.result_report_id is not None
+        assert updated_mission.result_document_ids in (None, [])
+        state = updated_mission.execution_metadata["result_materialization"]
+        assert set(state) == {
+            "status",
+            "attempt_count",
+            "attempted_at",
+            "error_categories",
+        }
+        assert state["status"] == "ready"
+        assert state["attempt_count"] == 1
+        assert isinstance(state["attempted_at"], str)
+        assert state["error_categories"] == []
 
         # Verify report was created
         report = (
@@ -552,12 +562,12 @@ class TestAutoReportIntegration:
         assert updated_mission.result_report_id is None
 
     def test_webhook_handler_continues_on_report_error(self, db_session):
-        """Webhook handler logs but doesn't fail on auto-report error."""
+        """Report failures stay retryable and disclose only a category code."""
         from app.schemas.webhook import (
             DeepSearchWebhookPayload,
             DeepSearchWebhookStatus,
         )
-        from app.services.webhook_handler import WebhookHandler
+        from app.services.webhook_handler import WebhookHandler, WebhookProcessingError
 
         project = Project(name="Error Test Project")
         db_session.add(project)
@@ -577,7 +587,8 @@ class TestAutoReportIntegration:
         # Mock auto-report to raise error
         mock_auto_report = MagicMock()
         mock_auto_report.create_report_from_protocol.side_effect = AutoReportError(
-            "Test error"
+            "private report detail",
+            category="empty_protocol",
         )
 
         handler = WebhookHandler(auto_report_service=mock_auto_report)
@@ -589,13 +600,22 @@ class TestAutoReportIntegration:
             result_protocol={"synthesis": "Test"},
         )
 
-        # Should not raise - logs warning instead
-        updated_mission, status_msg = handler.process_deepsearch_webhook(
-            db_session, payload
-        )
+        with pytest.raises(
+            WebhookProcessingError,
+            match=r"materialization is incomplete: empty_protocol$",
+        ) as exc_info:
+            handler.process_deepsearch_webhook(db_session, payload)
 
-        assert status_msg == "completed"
-        assert updated_mission.status == "completed"
+        db_session.refresh(mission)
+        assert "private report detail" not in str(exc_info.value)
+        assert mission.status == "completed"
+        assert mission.result_report_id is None
+        assert mission.execution_metadata["result_materialization"]["status"] == (
+            "failed"
+        )
+        assert mission.execution_metadata["result_materialization"][
+            "error_categories"
+        ] == ["empty_protocol"]
 
 
 class TestEdgeCases:

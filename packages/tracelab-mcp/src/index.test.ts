@@ -1149,9 +1149,9 @@ describe('T41.7 — cluster dispatch (per-cluster smoke)', () => {
         result_document_ids: ['00000000-0000-0000-0000-00000000000d'],
         result_report_id: '00000000-0000-0000-0000-00000000000e',
         materialization_pending: true,
-        materialization_status: 'retry_pending',
+        materialization_status: 'failed',
         materialization_attempt_count: 2,
-        materialization_error: 'embedding provider unavailable',
+        materialization_error: 'ingestion_failed',
         search_ready: false,
       })
     );
@@ -1176,9 +1176,9 @@ describe('T41.7 — cluster dispatch (per-cluster smoke)', () => {
       result_document_ids: ['00000000-0000-0000-0000-00000000000d'],
       result_report_id: '00000000-0000-0000-0000-00000000000e',
       materialization_pending: true,
-      materialization_status: 'retry_pending',
+      materialization_status: 'failed',
       materialization_attempt_count: 2,
-      materialization_error: 'embedding provider unavailable',
+      materialization_error: 'ingestion_failed',
       search_ready: false,
     });
   });

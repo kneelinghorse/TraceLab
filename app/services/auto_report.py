@@ -9,7 +9,7 @@ from __future__ import annotations
 import hashlib
 import logging
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -22,8 +22,29 @@ from app.services.ownership import project_owner_workspace
 logger = logging.getLogger(__name__)
 
 
+AutoReportErrorCategory = Literal[
+    "empty_protocol",
+    "missing_project",
+    "unexpected_report_error",
+]
+AUTO_REPORT_ERROR_CATEGORIES = frozenset(
+    {"empty_protocol", "missing_project", "unexpected_report_error"}
+)
+
+
 class AutoReportError(RuntimeError):
-    """Raised when auto-report creation fails."""
+    """Raised when auto-report creation fails with a bounded public category."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        category: AutoReportErrorCategory = "unexpected_report_error",
+    ) -> None:
+        if category not in AUTO_REPORT_ERROR_CATEGORIES:
+            raise ValueError(f"Unsupported auto-report error category: {category}")
+        super().__init__(message)
+        self.category = category
 
 
 def format_protocol_to_markdown(protocol: dict[str, Any], mission_title: str) -> str:
@@ -186,10 +207,16 @@ def create_report_from_protocol(
         AutoReportError: If report creation fails
     """
     if not protocol:
-        raise AutoReportError("No protocol data to create report from")
+        raise AutoReportError(
+            "No protocol data to create report from",
+            category="empty_protocol",
+        )
 
     if not mission.project_id:
-        raise AutoReportError(f"Mission {mission.mission_id} has no project_id")
+        raise AutoReportError(
+            f"Mission {mission.mission_id} has no project_id",
+            category="missing_project",
+        )
 
     logger.info(
         "Creating auto-report for mission %s",

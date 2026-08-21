@@ -18,7 +18,10 @@ from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
 from app.models.mission import Mission
-from app.services.result_materialization import MissionResultMaterializationService
+from app.services.result_materialization import (
+    MAX_RECONCILE_BATCH,
+    MissionResultMaterializationService,
+)
 
 
 def _mission_by_identifier(db: Session, identifier: str) -> Mission | None:
@@ -55,6 +58,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="Repair one UUID or human-readable mission ID instead of scanning",
     )
     args = parser.parse_args(argv)
+    if not 1 <= args.limit <= MAX_RECONCILE_BATCH:
+        parser.error(
+            f"limit must be between 1 and {MAX_RECONCILE_BATCH}, got {args.limit}"
+        )
 
     db = SessionLocal()
     try:
@@ -77,18 +84,30 @@ def main(argv: Sequence[str] | None = None) -> int:
                 return 2
             outcome = service.materialize(db, mission)
             pending = service.needs_materialization(db, mission)
+            payload = {
+                "mission_id": mission.mission_id,
+                "changed": outcome.changed,
+                "pending": pending,
+                "errors": outcome.errors,
+            }
+            if outcome.document_blocked:
+                payload.update(
+                    {
+                        "disposition": "blocked_soft_deleted",
+                        "owner_action": "restore_soft_deleted_result_document",
+                    }
+                )
             print(
                 json.dumps(
-                    {
-                        "mission_id": mission.mission_id,
-                        "changed": outcome.changed,
-                        "pending": pending,
-                        "errors": outcome.errors,
-                    },
+                    payload,
                     sort_keys=True,
                 )
             )
-            return 1 if outcome.errors or pending else 0
+            if outcome.errors:
+                return 1
+            if outcome.document_blocked:
+                return 3
+            return 1 if pending else 0
 
         summary = service.reconcile_completed(db, limit=args.limit)
         print(
@@ -98,13 +117,12 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "eligible": summary.eligible,
                     "repaired": summary.repaired,
                     "failed": summary.failed,
+                    "skipped_soft_deleted": summary.skipped_soft_deleted,
                 },
                 sort_keys=True,
             )
         )
         return 1 if summary.failed else 0
-    except (TypeError, ValueError) as exc:
-        parser.error(str(exc))
     finally:
         db.close()
 

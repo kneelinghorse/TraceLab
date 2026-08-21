@@ -6,10 +6,12 @@ any of its services, so the deployed backend itself is the schedule host; the
 run loop lives and dies with the app (started from the FastAPI startup hook,
 cancelled on shutdown).
 
-Evidence contract (DeepSearch s92): each run emits exactly one counts-only log
-record — {scanned, eligible, repaired, failed} — never mission bodies, URLs, or
-raw identifiers. The latest run's outcome is exposed on the public GET /health
-payload so external monitors can assert freshness without credentials.
+Evidence contract (DeepSearch s92): the single ``reconciler_run`` record and
+``GET /health.reconciler`` are aggregate-only evidence surfaces — counts never
+mission bodies, URLs, or raw identifiers. Their count shape is ``{scanned,
+eligible, repaired, failed, skipped_soft_deleted}``. Private diagnostic records
+elsewhere may carry internal identifiers needed for repair, but never secrets or
+result bodies. The public health snapshot lets monitors assert freshness unauthenticated.
 """
 
 from __future__ import annotations
@@ -65,6 +67,7 @@ def run_reconciliation_once() -> dict[str, int]:
             "eligible": summary.eligible,
             "repaired": summary.repaired,
             "failed": summary.failed,
+            "skipped_soft_deleted": summary.skipped_soft_deleted,
         }
     finally:
         db.close()
@@ -77,6 +80,7 @@ async def run_tick() -> None:
     except asyncio.CancelledError:
         raise
     except Exception:
+        logger.exception("Mission result reconciliation failed")
         _state.last_run_at = datetime.now(UTC)
         _state.last_status = "error"
         _state.last_counts = None
@@ -85,7 +89,6 @@ async def run_tick() -> None:
         logger.error(
             "reconciler_run status=error consecutive_errors=%s",
             _state.consecutive_errors,
-            exc_info=True,
         )
         return
 
@@ -96,12 +99,14 @@ async def run_tick() -> None:
     _state.last_status = "partial" if counts["failed"] else "ok"
     log = logger.error if counts["failed"] else logger.info
     log(
-        "reconciler_run status=%s scanned=%s eligible=%s repaired=%s failed=%s",
+        "reconciler_run status=%s scanned=%s eligible=%s repaired=%s failed=%s "
+        "skipped_soft_deleted=%s",
         _state.last_status,
         counts["scanned"],
         counts["eligible"],
         counts["repaired"],
         counts["failed"],
+        counts["skipped_soft_deleted"],
     )
 
 

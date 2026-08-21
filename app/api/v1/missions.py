@@ -54,6 +54,11 @@ from app.services.mission_service import (
     MissionValidationError,
     validate_mission_submission_state,
 )
+from app.services.result_materialization import (
+    DocumentMaterializationState,
+    MissionResultMaterializationService,
+    normalize_materialization_error_categories,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -366,7 +371,7 @@ def get_mission_status(
     raw_progress = metadata.get("progress_percent")
     progress_percent = None
     if (
-        isinstance(raw_progress, (int, float))
+        isinstance(raw_progress, int | float)
         and not isinstance(raw_progress, bool)
         and 0 <= raw_progress <= 100
     ):
@@ -401,8 +406,11 @@ def get_mission_status(
         )
 
     is_terminal_result = mission.status in {"completed", "validation_failed"}
-    document_pending = bool(mission.result_markdown) and (
-        has_invalid_document_ids or not search_ready
+    document_state = MissionResultMaterializationService.document_materialization_state(
+        db, mission
+    )
+    document_pending = (
+        document_state is DocumentMaterializationState.NEEDS
     )
     report_pending = bool(mission.result_protocol) and mission.result_report_id is None
     materialization_pending = is_terminal_result and (
@@ -426,12 +434,24 @@ def get_mission_status(
         and raw_materialization_attempts >= 0
         else 0
     )
-    raw_materialization_errors = materialization_state.get("errors")
+    raw_materialization_errors = materialization_state.get("error_categories")
+    error_categories: list[str] = []
     materialization_error = None
     if isinstance(raw_materialization_errors, list) and raw_materialization_errors:
-        first_error = raw_materialization_errors[0]
-        if isinstance(first_error, str):
-            materialization_error = first_error[:500]
+        error_categories = normalize_materialization_error_categories(
+            raw_materialization_errors
+        )
+        materialization_error = error_categories[0] if error_categories else None
+
+    if is_terminal_result:
+        if document_state is DocumentMaterializationState.BLOCKED_TOMBSTONE:
+            materialization_status = (
+                "failed" if error_categories else "blocked_soft_deleted"
+            )
+        elif materialization_status == "blocked_soft_deleted":
+            materialization_status = (
+                "pending" if document_pending or report_pending else "ready"
+            )
 
     return MissionStatusResponse(
         id=mission.id,
