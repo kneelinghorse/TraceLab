@@ -39,14 +39,20 @@ def test_harness_routes_match_wired_per_id_routes():
 
 def test_harness_pedr_scope_routes_match_wired_surface():
     """The deployed matrix must probe all four PEDR-1 route entry points."""
+    try:
+        from fastapi.routing import iter_route_contexts
+    except ImportError:  # FastAPI < 0.141 flattens included routes eagerly.
+        iter_route_contexts = None
+
     from app.core.config import settings
     from app.main import app
 
     project_id = "00000000-0000-0000-0000-000000000001"
     probed = {(method, path) for method, path, _body in pedr_scope_routes(settings.api_v1_prefix, project_id)}
+    routes = app.routes if iter_route_contexts is None else iter_route_contexts(app.routes)
     wired = {
         (method.lower(), route.path)
-        for route in app.routes
+        for route in routes
         for method in getattr(route, "methods", set())
     }
 
