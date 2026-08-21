@@ -56,6 +56,9 @@ from scripts.rbac_verify import (
 OWNER_EMAIL = "tracelab-admin@tracelab.local"  # conftest seed: {AUTH_USERNAME}@tracelab.local
 OWNER_PW = "changeme"  # conftest AUTH_PASSWORD
 _SECOND_OWNER_TOKEN = "second-owner-jwt"  # noqa: S105 - fake transport credential
+_SECOND_OWNER_ID = str(uuid4())
+_MEMBER_ID = str(uuid4())
+_VIEWER_ID = str(uuid4())
 
 
 @pytest.fixture
@@ -941,6 +944,7 @@ class _Pedr1cTransport:
     accessible_project_id = str(uuid4())
     accessible_space_id = str(uuid4())
     owner_history_id = str(uuid4())
+    newer_viewer_history_id = str(uuid4())
     foreign_preview = "foreign preview known only to the fixture owner"
 
     def __init__(self, *, leaky: bool, content_leak: str | None = None):
@@ -962,6 +966,10 @@ class _Pedr1cTransport:
         self.revoked_memberships: set[tuple[str, str]] = set()
         self.cross_saved_probes: set[tuple[str, str]] = set()
         self.cross_saved_probe_ids: dict[str, set[str]] = {
+            "member": set(),
+            "viewer": set(),
+        }
+        self.cross_history_probe_ids: dict[str, set[str]] = {
             "member": set(),
             "viewer": set(),
         }
@@ -1137,16 +1145,30 @@ class _Pedr1cTransport:
                 "filters": {"project_id": self.project_id},
                 "result_count": 1,
                 "top_chunks": [self.chunk_id],
+                "owner_id": _SECOND_OWNER_ID,
                 "metadata": {},
             }
             if token == _SECOND_OWNER_TOKEN:
-                return _StubResponse(200, {"entries": [owner_entry]})
+                newer_viewer_entry = {
+                    "id": self.newer_viewer_history_id,
+                    "query_text": _PEDR_SCOPE_QUERY,
+                    "filters": {"project_id": self.project_id},
+                    "result_count": 0,
+                    "top_chunks": [],
+                    "owner_id": _VIEWER_ID,
+                    "metadata": {},
+                }
+                return _StubResponse(
+                    200,
+                    {"entries": [newer_viewer_entry, owner_entry]},
+                )
             own_entry = {
                 "id": self.role_history[role],
                 "query_text": _PEDR_SCOPE_QUERY,
                 "filters": {"project_id": self.project_id},
                 "result_count": 1 if self.leaky else 0,
                 "top_chunks": [self.chunk_id] if self.leaky else [],
+                "owner_id": _MEMBER_ID if role == "member" else _VIEWER_ID,
                 "metadata": {"saved_search_id": self.role_saved[role]},
             }
             entries = [own_entry, owner_entry] if self.leaky else [own_entry]
@@ -1154,6 +1176,18 @@ class _Pedr1cTransport:
 
         if method == "POST" and "/search/replay/" in path:
             history_id = path.rsplit("/", 1)[-1]
+            if history_id in {
+                self.owner_history_id,
+                self.newer_viewer_history_id,
+            }:
+                self.cross_history_probe_ids[role].add(history_id)
+            if history_id == self.newer_viewer_history_id:
+                if role == "viewer":
+                    return _StubResponse(
+                        200,
+                        self._empty_execution(history_id=history_id),
+                    )
+                return _StubResponse(404, {})
             if history_id == self.owner_history_id:
                 if self.leaky:
                     return _StubResponse(
@@ -1332,7 +1366,11 @@ def _run_pedr1c_transport(*, leaky=False, content_leak=None):
             "member": "member-jwt",
             "viewer": "viewer-jwt",
         },
-        {"member": "member-id", "viewer": "viewer-id"},
+        {
+            "second_owner": _SECOND_OWNER_ID,
+            "member": _MEMBER_ID,
+            "viewer": _VIEWER_ID,
+        },
     )
     return verifier, transport
 
@@ -1439,6 +1477,21 @@ def test_pedr1c_scope_matrix_accepts_exact_fail_closed_responses():
     assert transport.report_payloads.keys() <= transport.deleted_reports
     assert set(transport.role_collection.values()) <= transport.deleted_collections
     assert transport.foreign_collection_id in transport.deleted_collections
+
+
+def test_pedr1c_history_fixture_uses_exact_owner_id_before_cross_owner_replay():
+    """A newer viewer row cannot masquerade as the privileged fixture owner's."""
+    verifier, transport = _run_pedr1c_transport()
+
+    assert verifier.gaps == []
+    assert transport.cross_history_probe_ids == {
+        "member": {transport.owner_history_id},
+        "viewer": {transport.owner_history_id},
+    }
+    assert all(
+        transport.newer_viewer_history_id not in history_ids
+        for history_ids in transport.cross_history_probe_ids.values()
+    )
 
 
 def test_pedr1c_scope_matrix_flags_artifact_child_and_report_leaks():
@@ -1641,7 +1694,11 @@ def test_pedr1c_matrix_is_compatible_with_real_testclient_routes(
 
     verifier.pedr1c_scope_matrix(
         principals,
-        {"member": str(member.id), "viewer": str(viewer.id)},
+        {
+            "second_owner": str(second_owner.id),
+            "member": str(member.id),
+            "viewer": str(viewer.id),
+        },
     )
 
     assert verifier.gaps == [], [str(gap) for gap in verifier.gaps]
