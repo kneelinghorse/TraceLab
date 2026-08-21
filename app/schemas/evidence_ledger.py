@@ -149,6 +149,40 @@ class CaptureResponse(BaseModel):
     count: int
 
 
+class DeepSearchEvidenceRequest(BaseModel):
+    """Trigger a server-owned projection of one persisted DeepSearch result."""
+
+    schema_version: Literal[1]
+    deepsearch_job_id: str = Field(min_length=1, max_length=100)
+
+    model_config = ConfigDict(extra="forbid")
+
+    @field_validator("schema_version", mode="before")
+    @classmethod
+    def validate_schema_version(cls, value: object) -> int:
+        if type(value) is not int or value != 1:
+            raise ValueError("schema_version must be the integer 1")
+        return value
+
+    @field_validator("deepsearch_job_id")
+    @classmethod
+    def validate_deepsearch_job_id(cls, value: str) -> str:
+        if value != value.strip():
+            raise ValueError("deepsearch_job_id cannot contain surrounding whitespace")
+        return _required_text(value)
+
+
+class DeepSearchEvidenceResponse(BaseModel):
+    """Stable identifiers returned for an initial or replayed projection."""
+
+    status: Literal["captured", "already_processed"]
+    mission_id: UUID
+    deepsearch_job_id: str
+    session_key: str
+    entry_ids: list[UUID]
+    entry_count: int = Field(ge=1, le=1_000)
+
+
 class LedgerListResponse(BaseModel):
     """Paginated ledger entries and working notes."""
 

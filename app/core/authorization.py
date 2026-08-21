@@ -179,7 +179,11 @@ def is_service_principal(user: AuthenticatedUser) -> bool:
     return getattr(user, "role", None) == ROLE_SERVICE
 
 
-def authorize_service_or_403(user: AuthenticatedUser) -> None:
+def authorize_service_or_403(
+    user: AuthenticatedUser,
+    *,
+    enforce_when_disabled: bool = False,
+) -> None:
     """Require a SERVICE principal for a service-to-service write, or raise HTTP 403.
 
     Gates the trusted-origin WRITE surfaces (T47.4) — e.g. POST
@@ -191,14 +195,12 @@ def authorize_service_or_403(user: AuthenticatedUser) -> None:
     (it is not in _PRIVILEGED_ROLES, owns no resources, and is in no Space), so it
     can do nothing but the service writes it is explicitly granted.
 
-    Like :func:`authorize` it is a no-op while ``rbac_enabled`` is False, so the
-    flip-back invariant holds (TestFlipBackIsCleanNoop) and the currently-deployed
-    runner — which authenticates as a human user today — is UNAFFECTED until the
-    flip. The runner's account MUST be provisioned as a service principal (role
-    'service') BEFORE rbac_enabled is turned ON (see the T47.6 rollout runbook),
-    otherwise log ingestion 403s at flip time.
+    Legacy service routes remain a no-op while ``rbac_enabled`` is False. New
+    cross-tenant machine-only routes pass ``enforce_when_disabled=True`` so the
+    service-role boundary is unconditional and cannot be widened by the feature
+    flag. The distinction is explicit at each call site and regression-tested.
     """
-    if not settings.rbac_enabled:
+    if not settings.rbac_enabled and not enforce_when_disabled:
         return
     if not is_service_principal(user):
         raise HTTPException(

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import (
@@ -14,6 +14,8 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     Index,
     Integer,
+    PrimaryKeyConstraint,
+    SmallInteger,
     String,
     Text,
     UniqueConstraint,
@@ -91,6 +93,189 @@ class LedgerSource(Base):
     )
 
 
+class DeepSearchLedgerBatch(Base):
+    """One atomically claimed DeepSearch-to-ledger projection batch."""
+
+    __tablename__ = "deepsearch_ledger_batches"
+
+    id = Column(GUID(), primary_key=True, default=uuid.uuid4)
+    mission_id = Column(
+        GUID(),
+        ForeignKey(
+            "missions.id",
+            name="fk_deepsearch_ledger_batches_mission",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+    )
+    deepsearch_job_id = Column(String(100), nullable=False)
+    session_key = Column(String(255), nullable=False)
+    payload_hash = Column(String(64), nullable=False)
+    entry_count = Column(Integer, nullable=False)
+    created_at = Column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        server_default=func.now(),
+    )
+    updated_at = Column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        server_default=func.now(),
+    )
+
+    entries = relationship("LedgerEntry", back_populates="deepsearch_batch")
+
+    __table_args__ = (
+        CheckConstraint(
+            "length(trim(deepsearch_job_id)) > 0",
+            name="ck_deepsearch_ledger_batches_nonempty_job",
+        ),
+        CheckConstraint(
+            "length(trim(session_key)) > 0",
+            name="ck_deepsearch_ledger_batches_nonempty_session",
+        ),
+        CheckConstraint(
+            "length(payload_hash) = 64",
+            name="ck_deepsearch_ledger_batches_hash_length",
+        ),
+        CheckConstraint(
+            "entry_count > 0 AND entry_count <= 1000",
+            name="ck_deepsearch_ledger_batches_entry_count",
+        ),
+        UniqueConstraint(
+            "mission_id",
+            "deepsearch_job_id",
+            name="uq_deepsearch_ledger_batches_mission_job",
+        ),
+        Index(
+            "ix_deepsearch_ledger_batches_mission_created",
+            "mission_id",
+            "created_at",
+        ),
+    )
+
+
+class DeepSearchEvidenceOutbox(Base):
+    """Durable terminal-result delivery state owned by DeepSearch."""
+
+    __tablename__ = "deepsearch_evidence_outbox"
+
+    mission_id = Column(
+        GUID(),
+        ForeignKey(
+            "missions.id",
+            name="fk_deepsearch_evidence_outbox_mission",
+            ondelete="CASCADE",
+        ),
+        primary_key=True,
+    )
+    deepsearch_job_id = Column(String(100), primary_key=True)
+    deepsearch_result_key = Column(Text, nullable=False)
+    mission_attempt_count = Column(Integer, nullable=False)
+    terminal_status = Column(String(32), nullable=False)
+    schema_version = Column(
+        SmallInteger,
+        nullable=False,
+        default=1,
+        server_default=text("1"),
+    )
+    state = Column(
+        String(16),
+        nullable=False,
+        default="pending",
+        server_default="pending",
+    )
+    delivery_attempt_count = Column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default=text("0"),
+    )
+    next_attempt_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(UTC),
+        server_default=func.now(),
+    )
+    lease_token = Column(GUID(), nullable=True)
+    lease_expires_at = Column(DateTime(timezone=True), nullable=True)
+    acked_at = Column(DateTime(timezone=True), nullable=True)
+    last_http_status = Column(SmallInteger, nullable=True)
+    last_error_code = Column(String(100), nullable=True)
+    created_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(UTC),
+        server_default=func.now(),
+    )
+    updated_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+        server_default=func.now(),
+    )
+
+    __table_args__ = (
+        PrimaryKeyConstraint(
+            "mission_id",
+            "deepsearch_job_id",
+            name="pk_deepsearch_evidence_outbox",
+        ),
+        CheckConstraint(
+            "length(trim(deepsearch_job_id)) > 0",
+            name="ck_deepsearch_evidence_outbox_nonempty_job",
+        ),
+        CheckConstraint(
+            "length(trim(deepsearch_result_key)) > 0",
+            name="ck_deepsearch_evidence_outbox_nonempty_result_key",
+        ),
+        CheckConstraint(
+            "mission_attempt_count > 0",
+            name="ck_deepsearch_evidence_outbox_positive_attempt",
+        ),
+        CheckConstraint(
+            "terminal_status IN ('completed', 'validation_failed')",
+            name="ck_deepsearch_evidence_outbox_terminal_status",
+        ),
+        CheckConstraint(
+            "schema_version = 1",
+            name="ck_deepsearch_evidence_outbox_schema_version",
+        ),
+        CheckConstraint(
+            "state IN ('pending', 'leased', 'acked', 'dead_letter')",
+            name="ck_deepsearch_evidence_outbox_state",
+        ),
+        CheckConstraint(
+            "delivery_attempt_count >= 0",
+            name="ck_deepsearch_evidence_outbox_delivery_attempts",
+        ),
+        CheckConstraint(
+            "last_http_status IS NULL OR (last_http_status >= 100 AND last_http_status <= 599)",
+            name="ck_deepsearch_evidence_outbox_http_status",
+        ),
+        CheckConstraint(
+            "(state = 'leased' AND lease_token IS NOT NULL "
+            "AND lease_expires_at IS NOT NULL "
+            "AND next_attempt_at = lease_expires_at AND acked_at IS NULL) OR "
+            "(state = 'acked' AND lease_token IS NULL "
+            "AND lease_expires_at IS NULL AND acked_at IS NOT NULL) OR "
+            "(state IN ('pending', 'dead_letter') AND lease_token IS NULL "
+            "AND lease_expires_at IS NULL AND acked_at IS NULL)",
+            name="ck_deepsearch_evidence_outbox_state_coherence",
+        ),
+        Index(
+            "ix_deepsearch_evidence_outbox_delivery",
+            "state",
+            "next_attempt_at",
+            "created_at",
+        ),
+    )
+
+
 class LedgerEntry(Base):
     """A source-backed claim captured during a research session."""
 
@@ -99,6 +284,15 @@ class LedgerEntry(Base):
     id = Column(GUID(), primary_key=True, default=uuid.uuid4)
     project_id = Column(GUID(), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
     mission_id = Column(GUID(), ForeignKey("missions.id", ondelete="SET NULL"), nullable=True)
+    deepsearch_batch_id = Column(
+        GUID(),
+        ForeignKey(
+            "deepsearch_ledger_batches.id",
+            name="fk_ledger_entries_deepsearch_batch",
+            ondelete="SET NULL",
+        ),
+        nullable=True,
+    )
     session_key = Column(String(255), nullable=False)
     origin = Column(
         String(32),
@@ -137,6 +331,10 @@ class LedgerEntry(Base):
         "LedgerSource",
         back_populates="entries",
         lazy="joined",
+    )
+    deepsearch_batch = relationship(
+        "DeepSearchLedgerBatch",
+        back_populates="entries",
     )
 
     @property
@@ -197,6 +395,11 @@ class LedgerEntry(Base):
         Index(
             "ix_ledger_entries_source_created",
             "source_id",
+            "created_at",
+        ),
+        Index(
+            "ix_ledger_entries_deepsearch_batch_created",
+            "deepsearch_batch_id",
             "created_at",
         ),
     )

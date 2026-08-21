@@ -1,0 +1,270 @@
+{
+  "fixture_version": 1,
+  "description": "Transport-neutral completed DeepSearch mission state and the semantic Evidence Ledger projection expected from it.",
+  "request": {
+    "schema_version": 1,
+    "deepsearch_job_id": "ds-job-ledger-v1"
+  },
+  "mission": {
+    "mission_id": "LEDGER-PROJECTION-FIXTURE",
+    "status": "completed",
+    "deepsearch_job_id": "ds-job-ledger-v1",
+    "result_markdown": "# Findings\n\nHTTP 307 responses preserve the request method when redirecting [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110#section-15.4.8).\n\nA secondary explainer provides implementation background.\n",
+    "result_protocol": {
+      "sources_collected": [
+        {
+          "url": "https://www.rfc-editor.org/rfc/rfc9110#section-15.4.8",
+          "title": "RFC 9110: HTTP Semantics",
+          "snippet": "A 307 response indicates that the target resource resides temporarily under a different URI.",
+          "body": "The user agent MUST NOT change the request method if it performs an automatic redirection to that URI.",
+          "body_source": "full",
+          "content_quality": "readable_body",
+          "score": 0.99,
+          "authority_tier": "high",
+          "alive": true
+        },
+        {
+          "url": "https://developer.example.test/http-redirects",
+          "title": "HTTP redirect implementation notes",
+          "snippet": "A secondary explanation of redirect handling.",
+          "body": "Implementation guidance can help interpret the normative RFC text.",
+          "body_source": "full",
+          "content_quality": "readable_body",
+          "score": 0.61,
+          "authority_tier": "medium",
+          "alive": true
+        },
+        {
+          "url": "https://dead.example.test/removed-redirect-guide",
+          "title": "Removed redirect guide",
+          "snippet": "An obsolete guide discovered during research.",
+          "body": "",
+          "body_source": "search_snippet",
+          "content_quality": "snippet",
+          "score": 0.21,
+          "authority_tier": "low",
+          "alive": false
+        }
+      ],
+      "citations": [
+        {
+          "type": "url_citation",
+          "start_index": 12,
+          "end_index": 75,
+          "url": "https://www.rfc-editor.org/rfc/rfc9110#section-15.4.8",
+          "title": "RFC 9110: HTTP Semantics",
+          "live": true
+        }
+      ],
+      "report_metadata": {
+        "forensic": {
+          "critique_telemetry": {
+            "claim_count": 2,
+            "gap_notes_inserted": 1,
+            "error": null,
+            "annotation_summary": {
+              "total": 1,
+              "applied": 1,
+              "skipped": 0,
+              "dropped": 0,
+              "by_reason": {
+                "unsupported_claim": 1
+              },
+              "reconciled": true
+            },
+            "annotations": [
+              {
+                "anchor": "A secondary explainer provides implementation background.",
+                "verdict": "unsupported",
+                "note": "The secondary explainer does not establish the normative redirect rule.",
+                "citation_urls": [
+                  "https://developer.example.test/http-redirects"
+                ],
+                "applied": true,
+                "reason": "unsupported_claim"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "execution_metadata": {
+      "synthesis_telemetry": {
+        "critique_telemetry": {
+          "claim_count": 2,
+          "gap_notes_inserted": 1,
+          "error": null,
+            "annotation_summary": {
+              "total": 1,
+              "applied": 1,
+            "skipped": 0,
+            "dropped": 0,
+            "by_reason": {
+              "unsupported_claim": 1
+              },
+              "reconciled": true
+            },
+            "annotations": [
+              {
+                "anchor": "A secondary explainer provides implementation background.",
+                "verdict": "unsupported",
+                "note": "The secondary explainer does not establish the normative redirect rule.",
+                "citation_urls": [
+                  "https://developer.example.test/http-redirects"
+                ],
+                "applied": true,
+                "reason": "unsupported_claim"
+              }
+            ]
+        },
+        "tool_outcomes": {
+          "by_tool": {
+            "web_search": {
+              "calls": 1,
+              "ok": 1,
+              "error": 0,
+              "results_total": 3,
+              "circuit_open": 0,
+              "by_category": {}
+            },
+            "source_fetch": {
+              "calls": 2,
+              "ok": 1,
+              "error": 1,
+              "results_total": 1,
+              "circuit_open": 0,
+              "by_category": {
+                "http_404": 1
+              }
+            }
+          },
+          "records": [
+            {
+              "tool": "web_search",
+              "query": "HTTP 307 method preservation RFC 9110",
+              "status": "ok",
+              "error_category": null,
+              "result_count": 3
+            },
+            {
+              "tool": "source_fetch",
+              "url": "https://www.rfc-editor.org/rfc/rfc9110#section-15.4.8",
+              "status": "ok",
+              "error_category": null,
+              "status_code": 200,
+              "result_count": 1
+            },
+            {
+              "tool": "source_fetch",
+              "url": "https://dead.example.test/removed-redirect-guide",
+              "status": "error",
+              "error_category": "http_404",
+              "status_code": 404,
+              "error": "generic diagnostic detail excluded from ledger projection",
+              "result_count": 0
+            }
+          ],
+          "records_truncated": 9,
+          "ledger_records": [
+            {
+              "tool": "source_fetch",
+              "url": "https://www.rfc-editor.org/rfc/rfc9110#section-15.4.8",
+              "status": "ok",
+              "error_category": null,
+              "status_code": 200
+            },
+            {
+              "tool": "source_fetch",
+              "url": "https://dead.example.test/removed-redirect-guide",
+              "status": "error",
+              "error_category": "http_404",
+              "status_code": 404
+            }
+          ],
+          "ledger_records_truncated": 0
+        }
+      }
+    }
+  },
+  "expected_projection": {
+    "session_key": "deepsearch:ds-job-ledger-v1",
+    "entry_count": 4,
+    "origin": "deepsearch-worker",
+    "server_owned_fields": [
+      "project_id",
+      "mission_id",
+      "session_key",
+      "origin",
+      "source_id",
+      "source_sighting_count",
+      "owner_id",
+      "workspace_id"
+    ],
+    "entries": [
+      {
+        "source_url": "https://developer.example.test/http-redirects",
+        "disposition": "rejected",
+        "claim": "A secondary explainer provides implementation background.",
+        "summary": "note=The secondary explainer does not establish the normative redirect rule.; reason=unsupported_claim",
+        "snippet": null,
+        "query": null,
+        "tags": [
+          "deepsearch",
+          "critique",
+          "applied"
+        ],
+        "claim_contains": "A secondary explainer provides implementation background.",
+        "rationale_contains": "unsupported_claim"
+      },
+      {
+        "source_url": "https://www.rfc-editor.org/rfc/rfc9110#section-15.4.8",
+        "disposition": "supporting",
+        "claim": "HTTP 307 responses preserve the request method when redirecting",
+        "summary": "RFC 9110: HTTP Semantics",
+        "snippet": "A 307 response indicates that the target resource resides temporarily under a different URI.",
+        "query": null,
+        "tags": [
+          "deepsearch",
+          "citation",
+          "live"
+        ],
+        "claim_contains": "HTTP 307 responses preserve the request method",
+        "rationale_contains": null
+      },
+      {
+        "source_url": "https://developer.example.test/http-redirects",
+        "disposition": "background",
+        "claim": "HTTP redirect implementation notes: A secondary explanation of redirect handling.",
+        "summary": null,
+        "snippet": "A secondary explanation of redirect handling.",
+        "query": null,
+        "tags": [
+          "deepsearch",
+          "source-collected"
+        ],
+        "claim_contains": "HTTP redirect implementation notes",
+        "rationale_contains": null
+      },
+      {
+        "source_url": "https://dead.example.test/removed-redirect-guide",
+        "disposition": "rejected",
+        "claim": "Removed redirect guide: An obsolete guide discovered during research.",
+        "summary": "source alive=False\ntool=source_fetch; status=error; status_code=404; error_category=http_404",
+        "snippet": "An obsolete guide discovered during research.",
+        "query": null,
+        "tags": [
+          "deepsearch",
+          "source-collected",
+          "rejected-liveness"
+        ],
+        "claim_contains": "Removed redirect guide",
+        "rationale_contains": "http_404"
+      }
+    ],
+    "forbidden_dispositions": [
+      "contradicting"
+    ],
+    "first_response_status": "captured",
+    "replay_response_status": "already_processed"
+  }
+}

@@ -54,9 +54,10 @@ ROLE_VIEWER = "viewer"
 # DELIBERATELY OUTSIDE the cumulative human hierarchy above — and deliberately
 # absent from _ROLE_RANK below — so it ranks -1 (fail-closed) on every human role
 # gate (require_admin / require_role) and is non-privileged in authorize(). A
-# service principal therefore passes ONLY the dedicated service gate
-# (authorize_service_or_403); it can do nothing a human role can, and no human
-# role satisfies the service gate. See app/core/authorization.py.
+# service principal therefore passes only the dedicated service gates plus the
+# read-only ``GET /auth/me`` role-verification endpoint; it can do nothing a
+# human role can, and no human role satisfies the service gate. See
+# app/core/authorization.py.
 ROLE_SERVICE = "service"
 
 # Ascending privilege rank. Unknown roles (incl. ROLE_SERVICE, intentionally) default
@@ -295,15 +296,20 @@ def _resolve_user_from_jwt(subject: str) -> AuthenticatedUser:
         db.close()
 
 
-async def require_authenticated_user(
+async def require_authenticated_principal(
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer_scheme),
     x_api_key: str | None = Header(default=None, alias="X-API-Key"),
 ) -> AuthenticatedUser:
-    """FastAPI dependency that ensures requests include a valid bearer token or API key.
+    """Resolve any active authenticated principal, including a service account.
 
     Authentication priority:
     1. X-API-Key header (if present)
     2. Authorization bearer token (JWT)
+
+    This lower-level dependency is intentionally restricted to explicit machine
+    carve-outs and ``GET /auth/me`` (which DeepSearch uses to verify its startup
+    role). Human-facing routes must use :func:`require_authenticated_user` so a
+    service credential cannot become a general API credential when RBAC is off.
     """
     # Check API key first
     if x_api_key:
@@ -325,6 +331,33 @@ async def require_authenticated_user(
     return _resolve_user_from_jwt(subject)
 
 
+def _require_human_principal(user: AuthenticatedUser) -> AuthenticatedUser:
+    """Reject machine identities at the shared human-route authentication gate."""
+    if user.role == ROLE_SERVICE:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail="Service principals may only access explicit service endpoints.",
+        )
+    return user
+
+
+async def require_authenticated_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer_scheme),
+    x_api_key: str | None = Header(default=None, alias="X-API-Key"),
+) -> AuthenticatedUser:
+    """Require an active authenticated human principal.
+
+    ``ROLE_SERVICE`` is denied here unconditionally, independently of the RBAC
+    rollout flag. Explicit service routes use ``require_authenticated_principal``
+    and then apply their dedicated service authorization policy.
+    """
+    user = await require_authenticated_principal(
+        credentials=credentials,
+        x_api_key=x_api_key,
+    )
+    return _require_human_principal(user)
+
+
 async def require_authenticated_user_sse(
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer_scheme),
     x_api_key: str | None = Header(default=None, alias="X-API-Key"),
@@ -339,7 +372,7 @@ async def require_authenticated_user_sse(
     # Check query param token first (SSE / EventSource)
     if token:
         subject = _decode_access_token(token)
-        return _resolve_user_from_jwt(subject)
+        return _require_human_principal(_resolve_user_from_jwt(subject))
 
     # Fall through to standard auth
     return await require_authenticated_user(

@@ -13,7 +13,8 @@ safe — asserted with the flag monkeypatched ON unless a test says otherwise:
   * an orphan mission (project_id NULL) is owner+admin only (fail-closed)
   * a disabled user is blocked
   * MCP + webhook trusted-origin paths CANNOT be gated by the flag (structural)
-  * the service-write carve-out (POST .../logs) is explicit + cannot silently widen (T47.4)
+  * the two service-write carve-outs (logs + evidence projection) are explicit
+    and cannot silently widen (T47.4 / LEDGER-2)
   * flipping back to False is a clean no-op (same request: 403 ON -> 200 OFF)
 """
 
@@ -173,20 +174,19 @@ class TestTrustedOriginPathsUnaffected:
 
 class TestServiceCarveOutBoundary:
     """T47.4 — the service-write carve-out must stay EXPLICIT and cannot silently
-    widen. POST /missions/{id}/logs is the ONE service-gated write today; any new
-    service-gated write (or any other change that moves the gate) must be a
-    conscious, reviewed change recorded here + in docs/authentication.md, never an
-    accident. This is the "future cross-resource service write" guard the mission
-    asks for, plus coverage of the published npm MCP client (the real production MCP
-    surface — the in-repo app/mcp_server is production-dark)."""
+    widen. POST /missions/{id}/logs and POST /missions/{id}/evidence are the two
+    known service-gated writes; any addition or relocation must be a conscious,
+    reviewed change recorded here and in docs/authentication.md. This is the
+    "future cross-resource service write" guard, plus coverage of the published
+    npm MCP client (the real production MCP surface — the in-repo app/mcp_server
+    is production-dark)."""
 
     _APP_DIR = pathlib.Path(__file__).resolve().parents[1] / "app"
     _REPO_DIR = pathlib.Path(__file__).resolve().parents[1]
 
     def test_service_gate_used_in_exactly_the_known_places(self):
-        # The whole app must CALL authorize_service_or_403() in exactly one file
-        # (the mission log-ingest write). A new call anywhere is a widened service
-        # carve-out and fails here until it is added to this allowlist + documented.
+        # Both known service writes live in missions.py. A call in any other file
+        # widens the carve-out and fails until the allowlist and docs are reviewed.
         hits = sorted(
             str(p.relative_to(self._APP_DIR))
             for p in self._APP_DIR.rglob("*.py")
@@ -199,10 +199,22 @@ class TestServiceCarveOutBoundary:
             f"service-gated write, update this allowlist AND docs/authentication.md."
         )
 
-    def test_log_ingest_is_service_gated(self):
-        # Positive: the log-ingest handler actually invokes the service gate.
+    def test_known_service_writes_are_explicitly_gated(self):
+        # Positive: both named handlers invoke the gate. Counting calls keeps a
+        # third service write in the same file from bypassing the file allowlist.
         missions = (self._APP_DIR / "api" / "v1" / "missions.py").read_text()
+        assert missions.count("authorize_service_or_403(") == 2
         assert "authorize_service_or_403(user)" in missions
+        assert (
+            "authorize_service_or_403(user, enforce_when_disabled=True)"
+            in missions
+        )
+        assert '"/{mission_id}/logs"' in missions
+        assert '"/{mission_id}/evidence"' in missions
+
+        auth_docs = (self._REPO_DIR / "docs" / "authentication.md").read_text()
+        assert "POST /missions/{id}/logs" in auth_docs
+        assert "POST /missions/{id}/evidence" in auth_docs
 
     def test_npm_mcp_client_authenticates_every_request(self):
         # The published MCP surface is the npm TS client; guard that it can never

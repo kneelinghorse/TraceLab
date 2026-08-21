@@ -161,35 +161,43 @@ Some writes are **service-to-service**, not per-user. They are gated to a
 **service principal** — a user whose role is `service` — via
 `authorize_service_or_403` (`app/core/authorization.py`), which is **stricter**
 than the per-user `authorize()`: only `role == "service"` passes; *every* human
-role (including owner/admin) is denied. A service principal is fail-closed
-everywhere else (non-privileged, owns no resources, in no Space), so it can do
-nothing but the service write(s) it is explicitly granted. Like all RBAC, the gate
-is a **no-op while `RBAC_ENABLED` is off**, so flip-back stays byte-identical.
+role (including owner/admin) is denied. A service principal is rejected by the
+shared human-route authentication dependency everywhere else, regardless of
+`RBAC_ENABLED`, resource ownership, or Space membership. It can therefore do
+nothing but the explicit service writes below plus `GET /api/v1/auth/me`, which
+is intentionally available for startup role verification. Legacy log ingest
+retains the feature-flag no-op for flip-back compatibility. The evidence
+projection passes `enforce_when_disabled=True`, so its service-role boundary is
+unconditional even when `RBAC_ENABLED` is off.
 
 **Service / trusted-origin surfaces (the carve-out — kept explicit so it cannot
 silently widen; guarded by `tests/test_rbac_flip_regression.py::TestServiceCarveOutBoundary`):**
 
 | Surface | Auth mechanism | Notes |
 | --- | --- | --- |
-| `POST /missions/{id}/logs` (runner log ingest) | **service principal** (`role=service`) when `RBAC_ENABLED` on; authn-only when off | The one service-gated write today. |
+| `GET /api/v1/auth/me` (startup role verification) | Any authenticated principal | Read-only exception: returns the caller's live database role so a worker can fail closed unless it resolves to `service`. |
+| `POST /missions/{id}/logs` (runner log ingest) | **service principal** (`role=service`) when `RBAC_ENABLED` on; authn-only when off | Accepts only canonical/transitional runner log batches. |
+| `POST /missions/{id}/evidence` (DeepSearch ledger projection) | **service principal** (`role=service`) in every feature-flag state | Triggers idempotent projection of the exact persisted terminal mission/job result; every human role is denied and the request cannot supply evidence, project, session, or origin fields. |
 | `POST /api/v1/webhooks/deepsearch` | HMAC-SHA256 shared secret (env `DEEPSEARCH_TRACELAB_SERVICE_SECRET`, legacy fallback `DEEPSEARCH_WEBHOOK_SECRET`) | Never user-authed; structural carve-out (never calls `authorize()`). ⚠️ If neither is set, HMAC validation is **skipped** (dev-only mode) — must be set in prod. |
 | `app/mcp_server/**` (in-repo Python MCP) | in-process DB access | Production-dark; structural carve-out. |
 | `packages/tracelab-mcp` (published npm MCP client) | human JWT or `tl_` API key over HTTP | The real production MCP surface; must always present a credential. |
 
-**⚠️ Rollout dependency (must happen BEFORE `RBAC_ENABLED` is flipped ON in prod):**
-the DeepSearch runner's `TracelabLogHandler` authenticates by logging in with
-`TRACELAB_USERNAME` / `TRACELAB_PASSWORD` (a **human** JWT) today. Once the flag is
-ON, that human token is **denied** on `POST /missions/{id}/logs`. Before the flip,
-provision a dedicated service account and point the runner at it:
+**⚠️ Rollout dependency:** the DeepSearch runner must use a dedicated
+`role=service` principal before invoking `POST /missions/{id}/evidence`, and
+before `RBAC_ENABLED` is flipped on for `POST /missions/{id}/logs`. Provision
+the service account and give the runner a revocable API key first:
 
 ```bash
 # As owner/admin, mint the runner's service principal:
 POST /api/v1/admin/users  { "email": "...", "password": "...", "display_name": "deepsearch-runner", "role": "service" }
-# Then set DeepSearch's TRACELAB_USERNAME / TRACELAB_PASSWORD to that account.
+# Then set DeepSearch's TRACELAB_API_KEY to a key minted for that account.
 ```
 
-No runner code change is needed — it keeps using password login; only its account's
-role changes. This sequencing is owned by the T47.6 post-flip rollout runbook.
+The `s92-m05` runner integration must verify `/api/v1/auth/me` at startup and
+fail closed unless that key resolves to the service role. TraceLab must deploy
+the evidence endpoint before that integration is enabled. This sequencing is
+owned by the T47.6 post-flip rollout runbook and the LEDGER-2 cross-service
+handoff.
 
 ### Architecture
 

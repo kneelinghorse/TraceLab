@@ -307,6 +307,11 @@ app.include_router(
     dependencies=protected_dependencies,
 )
 app.include_router(
+    missions.service_router,
+    prefix=f"{settings.api_v1_prefix}/missions",
+    tags=["missions"],
+)
+app.include_router(
     relationships.router,
     prefix=f"{settings.api_v1_prefix}/missions",
     tags=["relationships"],
