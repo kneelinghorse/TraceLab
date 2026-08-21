@@ -23,6 +23,11 @@ Checks:
         (the BOLA/IDOR deny requirement — a 200 here is a CRITICAL enforcement gap);
       - owner -> 2xx and second-owner -> 2xx on the canonical GET (an over-blocking
         guard: enforcement must not 403 the legitimate owner).
+  * PEDR search-scope matrix:
+      - anon -> 401 on PEDR search, related, preflight, and retrieval search;
+      - member / viewer -> empty search responses for an inaccessible explicit
+        project and a deny on that project's related-entity URN;
+      - owner -> 2xx on the related-entity URN (over-blocking guard).
   * reports / documents / ingestion-jobs are anon-401-only in v1 (seeding a document
     needs a multipart upload; a report can trigger synthesis). They are reported
     LOUDLY as "not in the authz matrix" — no silent coverage gap — to be extended in
@@ -45,6 +50,7 @@ from dataclasses import dataclass
 from typing import Any
 
 DEFAULT_PREFIX = "/api/v1"
+_PEDR_SCOPE_QUERY = "rbac verification tenant isolation"
 
 # Throwaway-user password (>= 8 chars, per AdminUserCreate). Not a real secret — the
 # users exist only for the duration of a run and are purged at the end.
@@ -94,6 +100,29 @@ def per_id_routes(prefix: str, rid: str) -> list[tuple[str, str]]:
         ("get", f"{api}/missions/{rid}/logs"),
         ("post", f"{api}/jobs?document_id={rid}"),
         ("get", f"{api}/jobs/{rid}"),
+    ]
+
+
+def pedr_scope_routes(prefix: str, project_id: str) -> list[tuple[str, str, dict[str, Any] | None]]:
+    """PEDR/retrieval routes whose tenant scope is verified outside PER_ID_ROUTES."""
+    return [
+        (
+            "post",
+            f"{prefix}/pedr/search",
+            {
+                "query": _PEDR_SCOPE_QUERY,
+                "project_id": project_id,
+                "top_k": 1,
+                "enable_governance": False,
+            },
+        ),
+        ("get", f"{prefix}/pedr/related/urn:research:project:{project_id}", None),
+        ("post", f"{prefix}/pedr/preflight", {"query": _PEDR_SCOPE_QUERY}),
+        (
+            "post",
+            f"{prefix}/retrieval/search",
+            {"query": _PEDR_SCOPE_QUERY, "project_id": project_id, "top_k": 1},
+        ),
     ]
 
 
@@ -360,6 +389,279 @@ class RbacVerifier:
                 Gap("anon-401", "anon", method, path, "401", str(resp.status_code)),
             )
 
+    def pedr_anon_sweep(self) -> None:
+        """All four PEDR/retrieval entry points reject anonymous callers."""
+        project_id = str(uuid.uuid4())
+        for method, path, body in pedr_scope_routes(self._prefix, project_id):
+            resp = self._call(method, path, json=body)
+            self._record(
+                resp.status_code == 401,
+                Gap("anon-401", "anon", method, path, "401", str(resp.status_code)),
+            )
+
+    @staticmethod
+    def _search_rows(response: Any) -> list[dict[str, Any]] | None:
+        """Return search rows, distinguishing an empty result from a bad shape."""
+        try:
+            payload = response.json()
+        except Exception:  # pragma: no cover - real HTTP adapters vary
+            return None
+        rows = payload.get("results") if isinstance(payload, dict) else None
+        if not isinstance(rows, list):
+            return None
+        if not all(isinstance(row, dict) for row in rows):
+            return None
+        return rows
+
+    def _discover_pedr_search_project(self, owner_token: str | None) -> str | None:
+        """Find an existing project that is known-positive on both search routes."""
+        if not owner_token:
+            return None
+
+        retrieval_path = f"{self._prefix}/retrieval/search"
+        discovery = self._call(
+            "post",
+            retrieval_path,
+            token=owner_token,
+            json={"query": _PEDR_SCOPE_QUERY, "top_k": 50},
+        )
+        if discovery.status_code != 200:
+            self.notes.append(
+                "pedr-search fixture discovery: owner POST /retrieval/search -> "
+                f"{discovery.status_code}"
+            )
+            return None
+
+        candidate_ids: list[str] = []
+        discovery_rows = self._search_rows(discovery)
+        if discovery_rows is None:
+            self.notes.append(
+                "pedr-search fixture discovery: owner retrieval returned invalid JSON shape"
+            )
+            return None
+        for row in discovery_rows:
+            try:
+                candidate_id = str(uuid.UUID(str(row.get("project_id"))))
+            except (TypeError, ValueError):
+                continue
+            if candidate_id not in candidate_ids:
+                candidate_ids.append(candidate_id)
+
+        for candidate_id in candidate_ids:
+            routes = pedr_scope_routes(self._prefix, candidate_id)
+            pedr_method, pedr_path, pedr_body = routes[0]
+            retrieval_method, scoped_retrieval_path, retrieval_body = routes[3]
+            retrieval = self._call(
+                retrieval_method,
+                scoped_retrieval_path,
+                token=owner_token,
+                json=retrieval_body,
+            )
+            if retrieval.status_code != 200 or not self._search_rows(retrieval):
+                continue
+            pedr = self._call(
+                pedr_method,
+                pedr_path,
+                token=owner_token,
+                json=pedr_body,
+            )
+            if pedr.status_code == 200 and self._search_rows(pedr):
+                return candidate_id
+
+        self.notes.append(
+            "pedr-search fixture discovery: no project from the owner's top-50 "
+            "retrieval results was positive on both explicit-project search routes"
+        )
+        return None
+
+    def _note_owner_preflight_baseline(self, owner_token: str | None) -> None:
+        """State transparently whether the preflight deny smoke is non-vacuous."""
+        if not owner_token:
+            self.notes.append(
+                "pedr-preflight: no owner principal; scoped-empty checks are smoke only"
+            )
+            return
+        response = self._call(
+            "post",
+            f"{self._prefix}/pedr/preflight",
+            token=owner_token,
+            json={"query": _PEDR_SCOPE_QUERY},
+        )
+        if response.status_code != 200:
+            self.notes.append(
+                "pedr-preflight: owner baseline returned "
+                f"{response.status_code}; scoped-empty checks are smoke only"
+            )
+            return
+        try:
+            payload = response.json()
+        except Exception:  # pragma: no cover - real HTTP adapters vary
+            payload = {}
+        if not isinstance(payload, dict) or not payload.get("match_count"):
+            self.notes.append(
+                "pedr-preflight: owner baseline had zero matches; member/viewer "
+                "scoped-empty checks are smoke only, not a non-vacuous isolation proof"
+            )
+
+    def pedr_scope_matrix(self, project_id: str, principals: dict[str, str]) -> None:
+        """Prove related denial and search isolation with a known-positive corpus."""
+        routes = pedr_scope_routes(self._prefix, project_id)
+        related_method, related_path, _ = routes[1]
+        preflight_method, preflight_path, preflight_body = routes[2]
+
+        for role in ("member", "viewer"):
+            token = principals.get(role)
+            if not token:
+                continue
+
+            related = self._call(related_method, related_path, token=token)
+            if 200 <= related.status_code < 300:
+                self.gaps.append(
+                    Gap(
+                        "DENY-LEAK-2xx",
+                        role,
+                        related_method,
+                        related_path,
+                        "403",
+                        str(related.status_code),
+                    )
+                )
+            elif related.status_code != 403:
+                self.gaps.append(
+                    Gap(
+                        "PEDR-RELATED-STATUS",
+                        role,
+                        related_method,
+                        related_path,
+                        "403",
+                        str(related.status_code),
+                    )
+                )
+
+            preflight = self._call(
+                preflight_method,
+                preflight_path,
+                token=token,
+                json=preflight_body,
+            )
+            if preflight.status_code != 200:
+                self.gaps.append(
+                    Gap(
+                        "PEDR-SCOPE-STATUS",
+                        role,
+                        preflight_method,
+                        preflight_path,
+                        "200",
+                        str(preflight.status_code),
+                    )
+                )
+                continue
+            try:
+                payload = preflight.json()
+            except Exception:  # pragma: no cover - real HTTP adapters vary
+                payload = {}
+            scoped_empty = (
+                isinstance(payload, dict)
+                and payload.get("action") == "proceed"
+                and payload.get("match_count") == 0
+                and payload.get("matches") == []
+            )
+            actual = (
+                f"action={payload.get('action')!r}, "
+                f"match_count={payload.get('match_count')!r}, "
+                f"matches={len(payload.get('matches') or [])}"
+                if isinstance(payload, dict)
+                else "non-object JSON"
+            )
+            self._record(
+                scoped_empty,
+                Gap(
+                    "PEDR-SCOPE-LEAK",
+                    role,
+                    preflight_method,
+                    preflight_path,
+                    "empty scoped response",
+                    actual,
+                ),
+            )
+
+        for role in ("owner", "second_owner"):
+            token = principals.get(role)
+            if not token:
+                continue
+            resp = self._call(related_method, related_path, token=token)
+            self._record(
+                200 <= resp.status_code < 300,
+                Gap(
+                    "owner-overblock",
+                    role,
+                    related_method,
+                    related_path,
+                    "2xx",
+                    str(resp.status_code),
+                ),
+            )
+
+        owner_token = principals.get("owner")
+        self._note_owner_preflight_baseline(owner_token)
+        search_project_id = self._discover_pedr_search_project(owner_token)
+        if search_project_id is None:
+            self.gaps.append(
+                Gap(
+                    "NO-SEARCHABLE-PROJECT",
+                    "setup",
+                    "post",
+                    f"{self._prefix}/retrieval/search",
+                    "an owner-known-positive project on retrieval and PEDR search",
+                    "none found",
+                )
+            )
+            return
+
+        search_routes = pedr_scope_routes(self._prefix, search_project_id)
+        for role in ("member", "viewer"):
+            token = principals.get(role)
+            if not token:
+                continue
+            for method, path, body in (search_routes[0], search_routes[3]):
+                response = self._call(method, path, token=token, json=body)
+                if response.status_code != 200:
+                    self.gaps.append(
+                        Gap(
+                            "PEDR-SCOPE-STATUS",
+                            role,
+                            method,
+                            path,
+                            "200",
+                            str(response.status_code),
+                        )
+                    )
+                    continue
+                rows = self._search_rows(response)
+                if rows is None:
+                    self.gaps.append(
+                        Gap(
+                            "PEDR-SCOPE-SHAPE",
+                            role,
+                            method,
+                            path,
+                            "JSON object with a results list",
+                            "invalid response shape",
+                        )
+                    )
+                    continue
+                self._record(
+                    rows == [],
+                    Gap(
+                        "PEDR-SCOPE-LEAK",
+                        role,
+                        method,
+                        path,
+                        "zero rows for owner-known-positive project",
+                        f"results={len(rows)}",
+                    ),
+                )
+
     def seeded_matrix(self, spec: SeedSpec, resource_id: str, principals: dict[str, str]) -> None:
         """member/viewer -> denied on every per-id route; owner/second-owner -> 2xx
         on the canonical GET (over-blocking guard).
@@ -533,6 +835,8 @@ class RbacVerifier:
 
             self._log("anon-401 sweep across every per-id route...")
             self.anon_sweep()
+            self._log("anon-401 sweep across PEDR/retrieval scope routes...")
+            self.pedr_anon_sweep()
 
             provisioned: list[str] = []
             seeded: list[tuple[SeedSpec, str]] = []
@@ -577,6 +881,8 @@ class RbacVerifier:
 
                 if "project" in ctx:
                     self.list_isolation_check(ctx["project"], principals)
+                    self._log("PEDR/retrieval tenant-scope matrix...")
+                    self.pedr_scope_matrix(ctx["project"], principals)
 
                 if "mission" in ctx:
                     self._log("service-role log-ingest gate (POST .../logs)...")
@@ -627,8 +933,9 @@ class RbacVerifier:
             )
             return 1
         self._log(
-            "\nPASS: anon-401 enforced on every per-id route + seeded authz matrix "
-            "(project/collection/mission) clean; no leaked cruft."
+            "\nPASS: anon-401 enforced on every per-id and PEDR/retrieval route + "
+            "seeded authz matrix (project/collection/mission/PEDR scope) clean; "
+            "no leaked cruft."
         )
         return 0
 

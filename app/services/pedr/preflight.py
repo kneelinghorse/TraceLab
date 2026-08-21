@@ -15,6 +15,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
@@ -28,7 +29,7 @@ from app.schemas.pedr_preflight import (
     PreflightRecommendation,
     PreflightTelemetry,
 )
-from app.services.pedr.quality_scoring import QualityFilters, QualityScoringService
+from app.services.pedr.quality_scoring import QualityScoringService
 
 if TYPE_CHECKING:
     from app.services.hybrid_search import HybridSearchService
@@ -75,25 +76,30 @@ class PreflightService:
         request: PreflightQuery,
         *,
         agent: str = "unknown",
+        allowed_project_ids: list[uuid.UUID] | None = None,
     ) -> PreflightRecommendation:
         """Execute pre-flight query and return recommendation."""
         start_time = time.perf_counter()
 
-        quality_filters = QualityFilters(
-            min_quality_gates=request.min_quality_gates,
-            statuses=tuple(request.status),
-            allow_pii=True,
-        )
+        if allowed_project_ids is not None and not allowed_project_ids:
+            search_results: list[dict[str, Any]] = []
+        else:
+            search_kwargs: dict[str, Any] = {
+                "query": request.query,
+                "top_k": request.top_k * 2,
+                "search_mode": "hybrid",
+                "min_quality_gates": request.min_quality_gates,
+                "status_filters": request.status,
+            }
+            if allowed_project_ids is not None:
+                search_kwargs["allowed_project_ids"] = allowed_project_ids
+            search_results = self.search_service.search(**search_kwargs)
 
-        search_results = self.search_service.search(
-            query=request.query,
-            top_k=request.top_k * 2,
-            search_mode="hybrid",
-            min_quality_gates=request.min_quality_gates,
-            status_filters=request.status,
+        matches = self._build_matches(
+            search_results,
+            request.similarity_threshold,
+            allowed_project_ids=allowed_project_ids,
         )
-
-        matches = self._build_matches(search_results, request.similarity_threshold)
 
         action, summary = self._determine_recommendation(
             matches=matches,
@@ -128,6 +134,8 @@ class PreflightService:
         self,
         search_results: list[dict[str, Any]],
         min_similarity: float,
+        *,
+        allowed_project_ids: list[uuid.UUID] | None = None,
     ) -> list[PreflightMatch]:
         """Convert search results to PreflightMatch instances."""
         if not search_results:
@@ -139,7 +147,13 @@ class PreflightService:
         if not document_ids:
             return []
 
-        mission_map = self._load_mission_metadata(document_ids)
+        if allowed_project_ids is None:
+            mission_map = self._load_mission_metadata(document_ids)
+        else:
+            mission_map = self._load_mission_metadata(
+                document_ids,
+                allowed_project_ids=allowed_project_ids,
+            )
 
         seen_missions: set[str] = set()
         matches: list[PreflightMatch] = []
@@ -179,13 +193,19 @@ class PreflightService:
         synthesis = mission_data.get("synthesis") or {}
 
         mission_id = (
-            mission_data.get("mission_id") or metadata.get("mission_id") or "unknown"
+            metadata.get("mission_id") or mission_data.get("mission_id") or "unknown"
         )
         title = (
-            mission_data.get("title") or research_statement.get("topic") or "Untitled"
+            metadata.get("title")
+            or mission_data.get("title")
+            or research_statement.get("topic")
+            or "Untitled"
         )
         objective = (
-            research_statement.get("objective") or mission_data.get("objective") or ""
+            metadata.get("objective")
+            or research_statement.get("objective")
+            or mission_data.get("objective")
+            or ""
         )
         if len(objective) > 200:
             objective = objective[:197] + "..."
@@ -199,7 +219,7 @@ class PreflightService:
                     text = text[:147] + "..."
                 key_insights.append(PreflightMatchInsight(text=text, index=i))
 
-        tags = mission_data.get("tags") or []
+        tags = metadata.get("tags") or mission_data.get("tags") or []
         if not isinstance(tags, list):
             tags = []
 
@@ -228,9 +248,13 @@ class PreflightService:
     def _load_mission_metadata(
         self,
         document_ids: list[str],
+        *,
+        allowed_project_ids: list[uuid.UUID] | None = None,
     ) -> dict[str, dict[str, Any]]:
         """Load mission metadata for documents."""
         if not document_ids:
+            return {}
+        if allowed_project_ids is not None and not allowed_project_ids:
             return {}
 
         session = self.session_factory()
@@ -245,27 +269,43 @@ class PreflightService:
             if not parsed_ids:
                 return {}
 
-            rows = (
+            query = (
                 session.query(
                     Document.id.label("document_id"),
                     Mission.id.label("mission_uuid"),
-                    Mission.mission_data,
-                    Mission.quality_gates,
+                    Mission.mission_id,
+                    Mission.title,
+                    Mission.objective,
+                    Mission.tags,
+                    Mission.context.label("mission_data"),
+                    Mission.execution_metadata,
                     Mission.status,
                     Mission.created_at,
                 )
                 .join(Project, Document.project_id == Project.id)
-                .outerjoin(Mission, Project.mission_protocol_id == Mission.id)
-                .filter(Document.id.in_(parsed_ids))
-                .all()
             )
+            if allowed_project_ids is None:
+                query = query.outerjoin(
+                    Mission,
+                    Project.mission_protocol_id == Mission.id,
+                )
+            else:
+                query = query.outerjoin(
+                    Mission,
+                    and_(
+                        Project.mission_protocol_id == Mission.id,
+                        Mission.project_id == Project.id,
+                    ),
+                ).filter(Document.project_id.in_(allowed_project_ids))
+            rows = query.filter(Document.id.in_(parsed_ids)).all()
 
             result: dict[str, dict[str, Any]] = {}
             for row in rows:
                 payload = row._mapping
                 doc_id = str(payload["document_id"])
                 mission_data = payload["mission_data"] or {}
-                quality_gates = payload["quality_gates"] or {}
+                execution_metadata = payload["execution_metadata"] or {}
+                quality_gates = execution_metadata.get("quality_gates") or {}
 
                 passed = self._count_passed_gates(quality_gates, mission_data)
 
@@ -274,6 +314,10 @@ class PreflightService:
                     "mission_uuid": str(payload["mission_uuid"])
                     if payload["mission_uuid"]
                     else None,
+                    "mission_id": payload["mission_id"],
+                    "title": payload["title"],
+                    "objective": payload["objective"],
+                    "tags": payload["tags"] or [],
                     "mission_data": mission_data,
                     "status": payload["status"],
                     "created_at": payload["created_at"],
@@ -317,12 +361,12 @@ class PreflightService:
                         continue
                     gate_name = str(checkpoint.get("gate") or "").lower()
                     checkpoint_status = str(checkpoint.get("status") or "").lower()
-                    if gate_name in expected_gates and checkpoint_status in (
-                        "pass",
-                        "passed",
+                    if (
+                        gate_name in expected_gates
+                        and checkpoint_status in ("pass", "passed")
+                        and quality_gates.get(gate_name) is None
                     ):
-                        if quality_gates.get(gate_name) is None:
-                            passed += 1
+                        passed += 1
 
         return min(passed, 5)
 

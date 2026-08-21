@@ -204,6 +204,7 @@ class RelationalService:
         exclude_types: list[EntityType] | None = None,
         relation_types: list[RelationType] | None = None,
         session: Session | None = None,
+        allowed_project_ids: list[UUID] | None = None,
     ) -> GraphExpansionResult:
         """Get entities related to the given URN.
 
@@ -217,6 +218,8 @@ class RelationalService:
             include_types: Only include these entity types.
             exclude_types: Exclude these entity types.
             relation_types: Only follow these relation types.
+            allowed_project_ids: Project scope for returned and traversed entities.
+                None preserves the unscoped behavior; an empty list denies all.
 
         Returns:
             GraphExpansionResult with related entities.
@@ -225,11 +228,42 @@ class RelationalService:
 
         related: list[RelatedEntity] = []
         visited: set[str] = {f"{entity_type.value}:{entity_id}"}
+        allowed_project_id_set = (
+            set(allowed_project_ids) if allowed_project_ids is not None else None
+        )
+
+        if allowed_project_id_set is not None and not allowed_project_id_set:
+            return GraphExpansionResult(
+                source_urn=urn,
+                source_entity_type=entity_type,
+                source_entity_id=entity_id,
+                related_entities=[],
+                total_found=0,
+                expansion_depth=max_depth,
+            )
 
         # BFS traversal
         current_level = [(entity_type, entity_id, 0)]  # (type, id, depth)
 
         with self._session_scope(session) as active_session:
+            if (
+                allowed_project_id_set is not None
+                and self._entity_project_id(
+                    active_session,
+                    entity_type,
+                    entity_id,
+                )
+                not in allowed_project_id_set
+            ):
+                return GraphExpansionResult(
+                    source_urn=urn,
+                    source_entity_type=entity_type,
+                    source_entity_id=entity_id,
+                    related_entities=[],
+                    total_found=0,
+                    expansion_depth=max_depth,
+                )
+
             while current_level and len(related) < limit:
                 next_level = []
 
@@ -248,6 +282,16 @@ class RelationalService:
                     )
 
                     for neighbor in neighbors:
+                        if (
+                            allowed_project_id_set is not None
+                            and self._entity_project_id(
+                                active_session,
+                                neighbor.entity_type,
+                                neighbor.entity_id,
+                            )
+                            not in allowed_project_id_set
+                        ):
+                            continue
                         key = f"{neighbor.entity_type.value}:{neighbor.entity_id}"
                         if key not in visited:
                             visited.add(key)
@@ -275,6 +319,42 @@ class RelationalService:
             total_found=len(related),
             expansion_depth=max_depth,
         )
+
+    def _entity_project_id(
+        self,
+        session: Session,
+        entity_type: EntityType,
+        entity_id: str,
+    ) -> UUID | None:
+        """Resolve the project governing an entity for graph-scope pruning."""
+        try:
+            entity_uuid = UUID(entity_id)
+        except (TypeError, ValueError):
+            return None
+
+        if entity_type == EntityType.PROJECT:
+            return entity_uuid
+        if entity_type == EntityType.CHUNK:
+            return session.execute(
+                select(Document.project_id)
+                .join(
+                    DocumentChunk,
+                    DocumentChunk.document_id == Document.id,
+                )
+                .where(DocumentChunk.id == entity_uuid)
+            ).scalar_one_or_none()
+
+        model_by_type = {
+            EntityType.DOCUMENT: Document,
+            EntityType.MISSION: Mission,
+            EntityType.INSIGHT: Insight,
+            EntityType.REPORT: Report,
+        }
+        model = model_by_type.get(entity_type)
+        if model is None:
+            return None
+        resource = session.get(model, entity_uuid)
+        return resource.project_id if resource is not None else None
 
     def _get_neighbors(
         self,
@@ -1125,6 +1205,7 @@ class RelationalService:
         *,
         include_related: bool = True,
         max_related_per_result: int = 5,
+        allowed_project_ids: list[UUID] | None = None,
     ) -> list[dict[str, Any]]:
         """Enrich search results with related entities.
 
@@ -1135,6 +1216,7 @@ class RelationalService:
             results: Search results to enrich.
             include_related: Whether to include related entities.
             max_related_per_result: Max related entities per result.
+            allowed_project_ids: Request-local project scope for graph expansion.
 
         Returns:
             Enriched results with related entities.
@@ -1156,12 +1238,16 @@ class RelationalService:
 
                 if urn:
                     try:
-                        expansion = self.get_related(
-                            urn,
-                            max_depth=1,
-                            limit=max_related_per_result,
-                            session=session,
-                        )
+                        expansion_kwargs: dict[str, Any] = {
+                            "max_depth": 1,
+                            "limit": max_related_per_result,
+                            "session": session,
+                        }
+                        if allowed_project_ids is not None:
+                            expansion_kwargs["allowed_project_ids"] = (
+                                allowed_project_ids
+                            )
+                        expansion = self.get_related(urn, **expansion_kwargs)
                         enriched_result["related_entities"] = [
                             e.to_dict() for e in expansion.related_entities
                         ]

@@ -6,6 +6,7 @@ import uuid
 from collections.abc import Callable
 from datetime import date
 from typing import Any
+from uuid import UUID
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -105,6 +106,7 @@ class HybridSearchService:
         element_types: list[str] | None = None,
         auto_detect_type: bool = True,
         type_boost_enabled: bool = True,
+        allowed_project_ids: list[UUID] | None = None,
     ) -> list[dict[str, Any]]:
         """Execute the requested search mode and return ranked chunks."""
         normalized_mode = (search_mode or "semantic").strip().lower()
@@ -114,6 +116,13 @@ class HybridSearchService:
             )
 
         limit = max(1, int(top_k))
+        if allowed_project_ids == [] or (
+            allowed_project_ids is not None
+            and project_id is not None
+            and str(project_id)
+            not in {str(allowed_id) for allowed_id in allowed_project_ids}
+        ):
+            return []
 
         facet_filters = FacetFilters.from_kwargs(
             project_id=project_id,
@@ -139,7 +148,7 @@ class HybridSearchService:
         )
 
         if normalized_mode == "semantic":
-            semantic_only = self._semantic_only(
+            semantic_only_kwargs: dict[str, Any] = dict(
                 query=query,
                 top_k=limit,
                 project_id=project_id,
@@ -154,6 +163,9 @@ class HybridSearchService:
                 query_embedding=query_embedding,
                 include_embeddings=include_embeddings,
             )
+            if allowed_project_ids is not None:
+                semantic_only_kwargs["allowed_project_ids"] = allowed_project_ids
+            semantic_only = self._semantic_only(**semantic_only_kwargs)
             quality_scored = self._apply_quality_scoring(
                 semantic_only, limit=limit, quality_filters=quality_filters
             )
@@ -162,13 +174,22 @@ class HybridSearchService:
             )
 
         if normalized_mode == "keyword":
-            keyword_results = self._keyword_search(
+            keyword_kwargs: dict[str, Any] = dict(
                 query=query,
                 project_id=project_id,
                 document_id=document_id,
                 source_type=source_type,
                 filters=facet_filters,
                 limit=limit,
+            )
+            if allowed_project_ids is not None:
+                keyword_kwargs["allowed_project_ids"] = allowed_project_ids
+            keyword_results = self._keyword_search(**keyword_kwargs)
+            keyword_results = self._filter_allowed_projects(
+                keyword_results,
+                allowed_project_ids,
+                project_id=project_id,
+                document_id=document_id,
             )
             finalized = self._finalize_keyword_results(keyword_results, limit=limit)
             quality_scored = self._apply_quality_scoring(
@@ -178,7 +199,7 @@ class HybridSearchService:
                 quality_scored, limit=limit, syntactic_filters=syntactic_filters
             )
 
-        semantic_results = self.retrieval_service.search(
+        semantic_kwargs: dict[str, Any] = dict(
             query=query,
             top_k=limit * self.keyword_limit_multiplier,
             project_id=project_id,
@@ -193,13 +214,31 @@ class HybridSearchService:
             query_embedding=query_embedding,
             include_embeddings=include_embeddings,
         )
-        keyword_results = self._keyword_search(
+        if allowed_project_ids is not None:
+            semantic_kwargs["allowed_project_ids"] = allowed_project_ids
+        semantic_results = self.retrieval_service.search(**semantic_kwargs)
+        semantic_results = self._filter_allowed_projects(
+            semantic_results,
+            allowed_project_ids,
+            project_id=project_id,
+            document_id=document_id,
+        )
+        hybrid_keyword_kwargs: dict[str, Any] = dict(
             query=query,
             project_id=project_id,
             document_id=document_id,
             source_type=source_type,
             filters=facet_filters,
             limit=limit * self.keyword_limit_multiplier,
+        )
+        if allowed_project_ids is not None:
+            hybrid_keyword_kwargs["allowed_project_ids"] = allowed_project_ids
+        keyword_results = self._keyword_search(**hybrid_keyword_kwargs)
+        keyword_results = self._filter_allowed_projects(
+            keyword_results,
+            allowed_project_ids,
+            project_id=project_id,
+            document_id=document_id,
         )
         merged = self._merge_results(semantic_results, keyword_results, limit=limit)
         quality_scored = self._apply_quality_scoring(
@@ -225,9 +264,10 @@ class HybridSearchService:
         hnsw_ef: int | None,
         query_embedding: list[float] | None,
         include_embeddings: bool,
+        allowed_project_ids: list[UUID] | None = None,
     ) -> list[dict[str, Any]]:
         """Delegate to the semantic retriever and annotate payloads."""
-        results = self.retrieval_service.search(
+        semantic_kwargs: dict[str, Any] = dict(
             query=query,
             top_k=top_k,
             project_id=project_id,
@@ -241,6 +281,15 @@ class HybridSearchService:
             hnsw_ef=hnsw_ef,
             query_embedding=query_embedding,
             include_embeddings=include_embeddings,
+        )
+        if allowed_project_ids is not None:
+            semantic_kwargs["allowed_project_ids"] = allowed_project_ids
+        results = self.retrieval_service.search(**semantic_kwargs)
+        results = self._filter_allowed_projects(
+            results,
+            allowed_project_ids,
+            project_id=project_id,
+            document_id=document_id,
         )
         annotated: list[dict[str, Any]] = []
         for result in results:
@@ -262,9 +311,12 @@ class HybridSearchService:
         source_origin: str | None = None,
         filters: FacetFilters,
         limit: int,
+        allowed_project_ids: list[UUID] | None = None,
     ) -> list[dict[str, Any]]:
         """Execute PostgreSQL full-text search via SQLAlchemy."""
         if not query.strip():
+            return []
+        if allowed_project_ids == []:
             return []
 
         session = self.session_factory()
@@ -298,6 +350,8 @@ class HybridSearchService:
                 stmt = stmt.where(Document.source_type == source_type)
             if source_origin:
                 stmt = stmt.where(Document.source_origin == source_origin)
+            if allowed_project_ids is not None:
+                stmt = stmt.where(Document.project_id.in_(allowed_project_ids))
 
             rows = session.execute(stmt).all()
             results: list[dict[str, Any]] = []
@@ -410,6 +464,36 @@ class HybridSearchService:
         )
         return ranked[:limit]
 
+    @staticmethod
+    def _filter_allowed_projects(
+        results: list[dict[str, Any]],
+        allowed_project_ids: list[UUID] | None,
+        *,
+        project_id: str | None = None,
+        document_id: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Fail closed if an upstream provider ignores request filters."""
+        if allowed_project_ids is None:
+            return results
+        allowed = {str(allowed_id) for allowed_id in allowed_project_ids}
+        filtered: list[dict[str, Any]] = []
+        for result in results:
+            result_project_id = result.get("project_id")
+            result_document_id = result.get("document_id")
+            if (
+                result_project_id is None or str(result_project_id) not in allowed
+            ):
+                continue
+            if project_id is not None and str(result_project_id) != str(project_id):
+                continue
+            if (
+                document_id is not None
+                and str(result_document_id) != str(document_id)
+            ):
+                continue
+            filtered.append(result)
+        return filtered
+
     def _apply_syntactic_processing(
         self,
         results: list[dict[str, Any]],
@@ -453,7 +537,7 @@ class HybridSearchService:
         span = maximum - minimum
 
         normalized: list[dict[str, Any]] = []
-        for result, score in zip(results, scores):
+        for result, score in zip(results, scores, strict=True):
             payload = dict(result)
             if span <= 0:
                 payload[target_key] = 1.0 if score > 0 or score == maximum else 0.0

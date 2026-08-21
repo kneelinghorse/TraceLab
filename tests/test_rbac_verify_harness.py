@@ -23,7 +23,13 @@ from app.core.config import settings
 from app.core.security import ROLE_OWNER
 from app.main import app
 from app.models.user import User
-from scripts.rbac_verify import _THROWAWAY_PASSWORD, HarnessError, RbacVerifier, _seed_specs
+from scripts.rbac_verify import (
+    _THROWAWAY_PASSWORD,
+    HarnessError,
+    RbacVerifier,
+    _seed_specs,
+    pedr_scope_routes,
+)
 
 OWNER_EMAIL = "tracelab-admin@tracelab.local"  # conftest seed: {AUTH_USERNAME}@tracelab.local
 OWNER_PW = "changeme"  # conftest AUTH_PASSWORD
@@ -48,6 +54,16 @@ def owner_principal(db_session):
 
 def test_harness_passes_against_enforced_app(client, owner_principal, monkeypatch):
     monkeypatch.setattr(settings, "rbac_enabled", True)
+    monkeypatch.setattr(
+        RbacVerifier,
+        "_discover_pedr_search_project",
+        lambda _self, _owner_token: str(uuid4()),
+    )
+    monkeypatch.setattr(
+        RbacVerifier,
+        "_note_owner_preflight_baseline",
+        lambda _self, _owner_token: None,
+    )
     verifier = RbacVerifier(client)
     code = verifier.run(OWNER_EMAIL, OWNER_PW)
     leaks = [g for g in verifier.gaps if g.kind == "DENY-LEAK-2xx"]
@@ -158,3 +174,173 @@ def test_coverage_accounts_for_every_wired_route():
     verifier.check_coverage()
     unaccounted = [g for g in verifier.gaps if g.kind == "UNACCOUNTED-ROUTE"]
     assert not unaccounted, f"routes neither seeded nor anon-only: {[str(g) for g in unaccounted]}"
+
+
+def test_pedr_scope_routes_cover_exact_mission_surface():
+    """PEDR-1 keeps its four route probes separate from the per-id route registry."""
+    project_id = str(uuid4())
+    routes = pedr_scope_routes("/api/v1", project_id)
+
+    assert [(method, path) for method, path, _body in routes] == [
+        ("post", "/api/v1/pedr/search"),
+        ("get", f"/api/v1/pedr/related/urn:research:project:{project_id}"),
+        ("post", "/api/v1/pedr/preflight"),
+        ("post", "/api/v1/retrieval/search"),
+    ]
+    assert routes[0][2]["project_id"] == project_id
+    assert routes[3][2]["project_id"] == project_id
+
+
+class _StubResponse:
+    def __init__(self, status_code, payload):
+        self.status_code = status_code
+        self._payload = payload
+
+    def json(self):
+        return self._payload
+
+
+class _LeakyPedrTransport:
+    """Return one related 2xx and one search row to prove both guards go red."""
+
+    search_project_id = str(uuid4())
+
+    def __init__(self, *, malformed_member_search: bool = False):
+        self.malformed_member_search = malformed_member_search
+
+    def request(self, method, path, *, headers, json):
+        if "/pedr/related/" in path:
+            return _StubResponse(200, {"related_entities": []})
+        if path.endswith("/pedr/search"):
+            if (
+                self.malformed_member_search
+                and headers.get("Authorization") == "Bearer member-jwt"
+            ):
+                return _StubResponse(200, {"results": "not-a-list"})
+            return _StubResponse(200, {"results": [{"project_id": json["project_id"]}]})
+        if path.endswith("/pedr/preflight"):
+            return _StubResponse(200, {"action": "proceed", "match_count": 0, "matches": []})
+        if path.endswith("/retrieval/search"):
+            project_id = json.get("project_id") or self.search_project_id
+            return _StubResponse(200, {"results": [{"project_id": project_id}]})
+        raise AssertionError(f"unexpected probe: {method} {path} {headers}")
+
+
+class _WrongRelatedStatusTransport:
+    """Keep search probes clean while returning a broken related-route denial."""
+
+    def __init__(self, related_status: int):
+        self.related_status = related_status
+
+    def request(self, method, path, *, headers, json):
+        if "/pedr/related/" in path:
+            return _StubResponse(self.related_status, {})
+        if path.endswith("/pedr/preflight"):
+            return _StubResponse(
+                200,
+                {"action": "proceed", "match_count": 0, "matches": []},
+            )
+        if path.endswith(("/pedr/search", "/retrieval/search")):
+            return _StubResponse(200, {"results": []})
+        raise AssertionError(f"unexpected probe: {method} {path} {headers} {json}")
+
+
+class _NoSearchFixtureTransport:
+    """Owner discovery is empty; no deny probe may fall back to the seeded project."""
+
+    def __init__(self):
+        self.explicit_search_calls = 0
+
+    def request(self, method, path, *, headers, json):
+        if "/pedr/related/" in path:
+            status_code = (
+                200
+                if headers.get("Authorization") == "Bearer owner-jwt"
+                else 403
+            )
+            return _StubResponse(status_code, {"related_entities": []})
+        if path.endswith("/pedr/preflight"):
+            return _StubResponse(
+                200,
+                {"action": "proceed", "match_count": 0, "matches": []},
+            )
+        if path.endswith("/retrieval/search") and json.get("project_id") is None:
+            return _StubResponse(200, {"results": []})
+        if path.endswith(("/pedr/search", "/retrieval/search")):
+            self.explicit_search_calls += 1
+            raise AssertionError("empty fixture discovery must not run deny probes")
+        raise AssertionError(f"unexpected probe: {method} {path} {headers} {json}")
+
+
+def test_pedr_scope_matrix_flags_related_and_search_leaks():
+    """The deployed harness must fail on either a root-resource or result-row leak."""
+    verifier = RbacVerifier(_LeakyPedrTransport())
+    verifier.pedr_scope_matrix(str(uuid4()), {"member": "member-jwt", "owner": "owner-jwt"})
+
+    assert any(g.kind == "DENY-LEAK-2xx" and g.role == "member" for g in verifier.gaps)
+    assert any(
+        g.kind == "PEDR-SCOPE-LEAK" and g.role == "member" and g.path.endswith("/pedr/search")
+        for g in verifier.gaps
+    )
+    assert any(
+        g.kind == "PEDR-SCOPE-LEAK"
+        and g.role == "member"
+        and g.path.endswith("/retrieval/search")
+        for g in verifier.gaps
+    )
+    assert not any(g.kind == "NO-SEARCHABLE-PROJECT" for g in verifier.gaps)
+    assert not any(g.kind == "owner-overblock" for g in verifier.gaps)
+
+
+def test_pedr_scope_matrix_rejects_malformed_empty_search_shape():
+    """A malformed response cannot be mistaken for a correctly scoped empty list."""
+    verifier = RbacVerifier(
+        _LeakyPedrTransport(malformed_member_search=True),
+        log=lambda _message: None,
+    )
+
+    verifier.pedr_scope_matrix(
+        str(uuid4()),
+        {"member": "member-jwt", "owner": "owner-jwt"},
+    )
+
+    assert any(
+        gap.kind == "PEDR-SCOPE-SHAPE"
+        and gap.path.endswith("/pedr/search")
+        for gap in verifier.gaps
+    )
+
+
+@pytest.mark.parametrize("status_code", [404, 500])
+def test_pedr_scope_matrix_requires_exact_related_403(status_code):
+    """A broken/nonexistent related path is not proof of authorization denial."""
+    verifier = RbacVerifier(
+        _WrongRelatedStatusTransport(status_code),
+        log=lambda _message: None,
+    )
+
+    verifier.pedr_scope_matrix(str(uuid4()), {"member": "member-jwt"})
+
+    assert any(
+        gap.kind == "PEDR-RELATED-STATUS"
+        and gap.expected == "403"
+        and gap.actual == str(status_code)
+        for gap in verifier.gaps
+    )
+    assert verifier.report() == 1
+
+
+def test_pedr_scope_matrix_fails_when_no_known_positive_search_project_exists():
+    """An empty seeded project cannot masquerade as live search-isolation proof."""
+    transport = _NoSearchFixtureTransport()
+    verifier = RbacVerifier(transport, log=lambda _message: None)
+
+    verifier.pedr_scope_matrix(
+        str(uuid4()),
+        {"member": "member-jwt", "owner": "owner-jwt"},
+    )
+
+    assert any(gap.kind == "NO-SEARCHABLE-PROJECT" for gap in verifier.gaps)
+    assert transport.explicit_search_calls == 0
+    assert any("smoke only" in note for note in verifier.notes)
+    assert verifier.report() == 1

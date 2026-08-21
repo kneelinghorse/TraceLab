@@ -15,14 +15,21 @@ import logging
 import time
 from functools import lru_cache
 from typing import Any
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
+from app.core.authorization import accessible_project_ids
+from app.core.database import get_db
 from app.core.mission_events import (
     MissionEventType,
     emit_pedr_layer_event,
 )
 from app.core.security import AuthenticatedUser, require_authenticated_user
+from app.models.chunk import DocumentChunk
+from app.models.document import Document
 from app.schemas.pedr_search import (
     PEDRLayerTimings,
     PEDRSearchMetadata,
@@ -50,6 +57,7 @@ def _get_pedr_orchestrator():
 async def pedr_search(
     payload: PEDRSearchRequest,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
 ) -> PEDRSearchResponse:
     """Execute PEDR unified search across all 5 layers.
 
@@ -76,9 +84,21 @@ async def pedr_search(
         raise HTTPException(status_code=400, detail="Query text must not be empty.")
 
     try:
+        allowed_project_ids = accessible_project_ids(current_user, db)
+        if allowed_project_ids == [] or (
+            allowed_project_ids is not None
+            and payload.project_id is not None
+            and payload.project_id not in set(allowed_project_ids)
+        ):
+            return _empty_search_response(payload)
+
         # Use hybrid reranker for "hybrid" mode (B19.4)
         if payload.rerank_mode == "hybrid":
-            return await _execute_hybrid_search(payload, current_user)
+            return await _execute_hybrid_search(
+                payload,
+                current_user,
+                allowed_project_ids=allowed_project_ids,
+            )
 
         # Standard PEDR search for "full" mode
         orchestrator = _get_pedr_orchestrator()
@@ -95,8 +115,7 @@ async def pedr_search(
             }
 
         # Execute PEDR search
-        result = await asyncio.to_thread(
-            orchestrator.search,
+        search_kwargs = dict(
             query=payload.query,
             top_k=payload.top_k,
             project_id=str(payload.project_id) if payload.project_id else None,
@@ -133,6 +152,26 @@ async def pedr_search(
             graph_edge_types=payload.graph_edge_types,
             graph_weight=payload.graph_weight,
         )
+        if allowed_project_ids is not None:
+            search_kwargs["allowed_project_ids"] = allowed_project_ids
+        result = await asyncio.to_thread(orchestrator.search, **search_kwargs)
+
+        # Defense in depth: providers are scoped before retrieval, and the API
+        # still fails closed if a provider returns an out-of-scope payload.
+        if allowed_project_ids is not None and not getattr(
+            result, "scope_verified", False
+        ):
+            result.results = _resolve_graph_result_projects(result.results, db)
+        unfiltered_result_count = len(result.results)
+        result.results = _filter_results_by_scope(
+            result.results,
+            allowed_project_ids,
+            project_id=payload.project_id,
+            document_id=payload.document_id,
+        )
+        result.metadata.result_count = len(result.results)
+        if len(result.results) != unfiltered_result_count:
+            result.metadata.total_candidates = len(result.results)
 
         # Apply graph expansion if requested
         relational_ms = 0.0
@@ -142,10 +181,15 @@ async def pedr_search(
             for search_result in result.results:
                 if search_result.urn:
                     try:
+                        related_kwargs: dict[str, Any] = {
+                            "max_depth": 1,
+                            "limit": payload.max_related_per_result,
+                        }
+                        if allowed_project_ids is not None:
+                            related_kwargs["allowed_project_ids"] = allowed_project_ids
                         expansion = relational_service.get_related(
                             search_result.urn,
-                            max_depth=1,
-                            limit=payload.max_related_per_result,
+                            **related_kwargs,
                         )
                         # Store as dict for serialization
                         search_result.related_entities = [
@@ -169,6 +213,16 @@ async def pedr_search(
             include_related=payload.include_related,
             rerank_mode="full",
         )
+        unfiltered_response_count = len(response.results)
+        response.results = _filter_results_by_scope(
+            response.results,
+            allowed_project_ids,
+            project_id=payload.project_id,
+            document_id=payload.document_id,
+        )
+        response.metadata.result_count = len(response.results)
+        if len(response.results) != unfiltered_response_count:
+            response.metadata.total_candidates = len(response.results)
 
         logger.info(
             "PEDR search completed: query=%r, mode=full, results=%d, latency=%.1fms, relational=%.1fms, user=%s",
@@ -179,45 +233,28 @@ async def pedr_search(
             current_user.username,
         )
 
-        # Emit layer diagnostics to mission event bus
-        for diag in response.metadata.layer_diagnostics:
-            evt = (
-                MissionEventType.PEDR_LAYER_COMPLETED
-                if diag.status == "ok"
-                else MissionEventType.PEDR_LAYER_FAILED
-                if diag.status == "error"
-                else None
-            )
-            if evt:
-                emit_pedr_layer_event(
-                    event_type=evt,
-                    layer=diag.layer,
-                    duration_ms=diag.duration_ms,
-                    result_count=diag.result_count,
-                    error=diag.error,
-                )
-
         emit_pedr_layer_event(
             event_type=MissionEventType.PEDR_SEARCH_COMPLETED,
             layer="fusion",
             duration_ms=response.metadata.timings.total_ms,
             result_count=response.metadata.result_count,
-            details={"degraded": response.metadata.degraded},
         )
 
         return response
 
     except ValueError as e:
         logger.warning("PEDR search validation error: %s", e)
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
         logger.exception("PEDR search failed: %s", e)
-        raise HTTPException(status_code=500, detail=INTERNAL_ERROR_DETAIL)
+        raise HTTPException(status_code=500, detail=INTERNAL_ERROR_DETAIL) from e
 
 
 async def _execute_hybrid_search(
     payload: PEDRSearchRequest,
     current_user: AuthenticatedUser,
+    *,
+    allowed_project_ids: list[UUID] | None = None,
 ) -> PEDRSearchResponse:
     """Execute hybrid FTS+semantic rerank search (B19.4).
 
@@ -228,14 +265,14 @@ async def _execute_hybrid_search(
     Args:
         payload: Search request parameters.
         current_user: Authenticated user.
+        allowed_project_ids: Request-local readable project scope.
 
     Returns:
         PEDRSearchResponse with hybrid search results.
     """
     reranker = get_hybrid_reranker()
 
-    hybrid_result = await asyncio.to_thread(
-        reranker.search,
+    search_kwargs = dict(
         query=payload.query,
         top_k=payload.top_k,
         candidate_pool=payload.candidate_pool,
@@ -247,9 +284,18 @@ async def _execute_hybrid_search(
         hnsw_ef=payload.hnsw_ef,
         include_embeddings=payload.include_embeddings,
     )
+    if allowed_project_ids is not None:
+        search_kwargs["allowed_project_ids"] = allowed_project_ids
+    hybrid_result = await asyncio.to_thread(reranker.search, **search_kwargs)
 
     governance_ms = 0.0
-    hybrid_payloads = hybrid_result.results
+    hybrid_payloads = _filter_results_by_scope(
+        hybrid_result.results,
+        allowed_project_ids,
+        project_id=payload.project_id,
+        document_id=payload.document_id,
+    )
+    authorized_candidates = len(hybrid_payloads)
     if payload.enable_governance:
         t0 = time.perf_counter()
         quality_service = get_quality_scoring_service()
@@ -340,13 +386,27 @@ async def _execute_hybrid_search(
         timings=timings,
         graph_enabled=False,
         graph_candidates_expanded=None,
-        total_candidates=hybrid_result.fts_candidates_count,
+        total_candidates=(
+            hybrid_result.fts_candidates_count
+            if allowed_project_ids is None
+            else authorized_candidates
+        ),
         result_count=len(results),
         rerank_mode="hybrid",
         hybrid_fallback_used=hybrid_result.fallback_used,
     )
 
     response = PEDRSearchResponse(results=results, metadata=metadata)
+    unfiltered_response_count = len(response.results)
+    response.results = _filter_results_by_scope(
+        response.results,
+        allowed_project_ids,
+        project_id=payload.project_id,
+        document_id=payload.document_id,
+    )
+    response.metadata.result_count = len(response.results)
+    if len(response.results) != unfiltered_response_count:
+        response.metadata.total_candidates = len(response.results)
 
     logger.info(
         "PEDR search completed: query=%r, mode=hybrid, results=%d, "
@@ -363,6 +423,156 @@ async def _execute_hybrid_search(
     )
 
     return response
+
+
+def _filter_results_by_scope(
+    results: list[Any],
+    allowed_project_ids: list[UUID] | None,
+    *,
+    project_id: UUID | None = None,
+    document_id: UUID | None = None,
+) -> list[Any]:
+    """Fail closed on payloads outside authorization and explicit filters."""
+    if allowed_project_ids is None:
+        return results
+
+    allowed = {str(allowed_id) for allowed_id in allowed_project_ids}
+    filtered: list[Any] = []
+    for result in results:
+        result_project_id = (
+            result.get("project_id")
+            if isinstance(result, dict)
+            else getattr(result, "project_id", None)
+        )
+        result_document_id = (
+            result.get("document_id")
+            if isinstance(result, dict)
+            else getattr(result, "document_id", None)
+        )
+        if (
+            result_project_id is None or str(result_project_id) not in allowed
+        ):
+            continue
+        if project_id is not None and str(result_project_id) != str(project_id):
+            continue
+        if document_id is not None and str(result_document_id) != str(document_id):
+            continue
+        filtered.append(result)
+    return filtered
+
+
+def _resolve_graph_result_projects(results: list[Any], db: Session) -> list[Any]:
+    """Resolve scoped graph chunks against authoritative document ownership."""
+    parsed_chunk_ids: dict[int, str] = {}
+    valid_chunk_ids: dict[str, UUID] = {}
+    for index, result in enumerate(results):
+        if "graph" not in (getattr(result, "contributing_layers", None) or ()):
+            continue
+        chunk_id = getattr(result, "chunk_id", None)
+        try:
+            parsed_chunk_id = UUID(str(chunk_id))
+        except (TypeError, ValueError):
+            continue
+        canonical_chunk_id = str(parsed_chunk_id)
+        parsed_chunk_ids[index] = canonical_chunk_id
+        valid_chunk_ids[canonical_chunk_id] = parsed_chunk_id
+
+    if not valid_chunk_ids:
+        return [
+            result
+            for result in results
+            if "graph"
+            not in (getattr(result, "contributing_layers", None) or ())
+        ]
+
+    try:
+        rows = db.execute(
+            select(
+                DocumentChunk.id.label("chunk_id"),
+                DocumentChunk.document_id.label("document_id"),
+                Document.project_id.label("project_id"),
+            )
+            .join(Document, DocumentChunk.document_id == Document.id)
+            .where(
+                DocumentChunk.id.in_(list(valid_chunk_ids.values())),
+                Document.deleted_at.is_(None),
+            )
+        ).all()
+    except Exception as exc:
+        logger.warning("Failed to resolve graph result project scope: %s", exc)
+        return [
+            result
+            for result in results
+            if "graph"
+            not in (getattr(result, "contributing_layers", None) or ())
+        ]
+
+    resolved: dict[str, tuple[str, str]] = {}
+    for row in rows:
+        mapping = row._mapping
+        resolved[str(mapping["chunk_id"])] = (
+            str(mapping["document_id"]),
+            str(mapping["project_id"]),
+        )
+
+    filtered: list[Any] = []
+    for index, result in enumerate(results):
+        if "graph" not in (getattr(result, "contributing_layers", None) or ()):
+            filtered.append(result)
+            continue
+        chunk_id = parsed_chunk_ids.get(index)
+        identifiers = resolved.get(chunk_id) if chunk_id is not None else None
+        if identifiers is None:
+            continue
+        resolved_document_id, resolved_project_id = identifiers
+        claimed_document_id = getattr(result, "document_id", None)
+        claimed_project_id = getattr(result, "project_id", None)
+        if (
+            claimed_document_id is not None
+            and str(claimed_document_id) != resolved_document_id
+        ):
+            continue
+        if (
+            claimed_project_id is not None
+            and str(claimed_project_id) != resolved_project_id
+        ):
+            continue
+        result.document_id = resolved_document_id
+        result.project_id = resolved_project_id
+        filtered.append(result)
+    return filtered
+
+
+def _empty_search_response(payload: PEDRSearchRequest) -> PEDRSearchResponse:
+    """Return a normal empty 200 response for an empty authorization intersection."""
+    timings = PEDRLayerTimings(
+        lexical_ms=0.0,
+        semantic_ms=0.0,
+        graph_ms=0.0,
+        syntactic_ms=0.0,
+        pragmatic_ms=0.0,
+        governance_ms=0.0,
+        fusion_ms=0.0,
+        relational_ms=0.0,
+        total_ms=0.0,
+    )
+    metadata = PEDRSearchMetadata(
+        query=payload.query,
+        intent="search",
+        intent_confidence=0.0,
+        detected_type=None,
+        type_confidence=0.0,
+        layers_used=[],
+        layer_weights={},
+        timings=timings,
+        graph_enabled=payload.enable_graph,
+        graph_candidates_expanded=0 if payload.enable_graph else None,
+        total_candidates=0,
+        result_count=0,
+        rerank_mode=payload.rerank_mode,
+        hybrid_fallback_used=False,
+    )
+    return PEDRSearchResponse(results=[], metadata=metadata)
 
 
 def _convert_to_response(

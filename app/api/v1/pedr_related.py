@@ -7,11 +7,16 @@ This endpoint provides graph expansion capabilities, enabling queries like
 """
 
 import logging
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
 
+from app.core.authorization import accessible_project_ids, authorize_or_403
+from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
+from app.models import Document, DocumentChunk, Insight, Mission, Project, Report
 from app.services.pedr.relational import (
     EntityType,
     RelationType,
@@ -20,6 +25,7 @@ from app.services.pedr.relational import (
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+INTERNAL_ERROR_DETAIL = "Graph expansion failed due to an internal error."
 
 
 class RelatedEntityResponse(BaseModel):
@@ -75,6 +81,7 @@ async def get_related_entities(
         default=None,
         description="Comma-separated relation types to follow (belongs_to,contains,references,derived_from,sibling_of,related_to)",
     ),
+    db: Session = Depends(get_db),
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> GraphExpansionResponse:
     """Get entities related to the given URN.
@@ -119,7 +126,7 @@ async def get_related_entities(
             raise HTTPException(
                 status_code=400,
                 detail=f"Invalid entity type in include_types: {e}",
-            )
+            ) from e
 
     # Parse exclude_types
     parsed_exclude_types: list[EntityType] | None = None
@@ -134,7 +141,7 @@ async def get_related_entities(
             raise HTTPException(
                 status_code=400,
                 detail=f"Invalid entity type in exclude_types: {e}",
-            )
+            ) from e
 
     # Parse relation_types
     parsed_relation_types: list[RelationType] | None = None
@@ -149,10 +156,39 @@ async def get_related_entities(
             raise HTTPException(
                 status_code=400,
                 detail=f"Invalid relation type in relation_types: {e}",
-            )
+            ) from e
+
+    service = get_relational_service()
+    try:
+        source_type, source_id = service.parse_urn(urn)
+        source_uuid = UUID(source_id)
+    except ValueError as e:
+        logger.warning("Invalid URN: %s", e)
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+    resource_models = {
+        EntityType.PROJECT: Project,
+        EntityType.DOCUMENT: Document,
+        EntityType.MISSION: Mission,
+        EntityType.INSIGHT: Insight,
+        EntityType.REPORT: Report,
+    }
+    if source_type == EntityType.CHUNK:
+        chunk = db.get(DocumentChunk, source_uuid)
+        resource = db.get(Document, chunk.document_id) if chunk is not None else None
+    else:
+        resource = db.get(resource_models[source_type], source_uuid)
+
+    if resource is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"{source_type.value.capitalize()} {source_uuid} not found",
+        )
+
+    authorize_or_403(current_user, "read", resource, db)
+    allowed_project_ids = accessible_project_ids(current_user, db)
 
     try:
-        service = get_relational_service()
         result = service.get_related(
             urn,
             max_depth=max_depth,
@@ -160,6 +196,8 @@ async def get_related_entities(
             include_types=parsed_include_types,
             exclude_types=parsed_exclude_types,
             relation_types=parsed_relation_types,
+            session=db,
+            allowed_project_ids=allowed_project_ids,
         )
 
         logger.info(
@@ -196,13 +234,13 @@ async def get_related_entities(
 
     except ValueError as e:
         logger.warning("Invalid URN or parameters: %s", e)
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
         logger.exception("Graph expansion failed: %s", e)
         raise HTTPException(
             status_code=500,
-            detail=f"Graph expansion failed: {str(e)}",
-        )
+            detail=INTERNAL_ERROR_DETAIL,
+        ) from e
 
 
 __all__ = ["router"]
