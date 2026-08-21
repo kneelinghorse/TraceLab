@@ -77,6 +77,28 @@ credential file and relaunch.
 
 ## Configure your MCP client
 
+`TRACELAB_API_URL` is the FastAPI origin, without an `/api/v1` suffix. The
+client appends `/api/v1` to each request itself. For production, use
+`https://api.tracelab.aquex.ai`; `https://tracelab.aquex.ai` is the browser UI.
+
+### Codex (desktop, CLI, and IDE)
+
+Add the stdio server to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.tracelab]
+command = "npx"
+args = ["-y", "@aquex/tracelab-mcp"]
+startup_timeout_sec = 30
+
+[mcp_servers.tracelab.env]
+TRACELAB_API_URL = "https://api.tracelab.aquex.ai"
+```
+
+Restart Codex after saving the configuration. TraceLab does not expose a
+remote SSE MCP endpoint; a connector configured with `url =
+"https://aquex.ai/mcp"` is not the TraceLab MCP server.
+
 ### Claude Desktop
 
 Add to `claude_desktop_config.json`:
@@ -88,7 +110,7 @@ Add to `claude_desktop_config.json`:
       "command": "npx",
       "args": ["-y", "@aquex/tracelab-mcp"],
       "env": {
-        "TRACELAB_API_URL": "https://tracelab.aquex.ai"
+        "TRACELAB_API_URL": "https://api.tracelab.aquex.ai"
       }
     }
   }
@@ -101,13 +123,9 @@ on stderr (visible in Claude Desktop's MCP server logs).
 ### Claude Code
 
 ```bash
-claude mcp add tracelab -- npx -y @aquex/tracelab-mcp
-```
-
-Then set the API URL:
-
-```bash
-claude mcp env tracelab TRACELAB_API_URL https://tracelab.aquex.ai
+claude mcp add --transport stdio tracelab \
+  --env TRACELAB_API_URL=https://api.tracelab.aquex.ai \
+  -- npx -y @aquex/tracelab-mcp
 ```
 
 ### Other MCP clients
@@ -247,6 +265,38 @@ Search the project ledger before repeating research:
   }
 }
 ```
+
+### Search before research
+
+Use the two search surfaces in this order:
+
+1. Call `tracelab_evidence(action="search")` with the project ID to reuse raw
+   findings from earlier sessions. These results retain the source URL,
+   disposition, canonical `source_id`, and `source_sighting_count`.
+2. Call `tracelab_search(action="knowledge")` when you need semantic matches
+   from the ingested document corpus.
+3. Capture material new findings with `tracelab_evidence(action="capture")`,
+   including contradictory and rejected evidence rather than silently dropping
+   it.
+
+Raw ledger entries do not automatically appear in `tracelab_search`. When a
+reviewed session should join the document corpus, promote it explicitly:
+
+```json
+{
+  "name": "tracelab_evidence",
+  "arguments": {
+    "action": "promote",
+    "project_id": "fbd3bd03-5ddc-49ee-8013-529163a99290",
+    "session_key": "competitive-scan-2026-08-20",
+    "target": "document"
+  }
+}
+```
+
+Document promotion is the bridge into TraceLab's normal ingestion, chunking,
+embedding, Qdrant, and PEDR/preflight paths. Report-only promotion preserves a
+durable report but does not add its content to document search.
 
 Evidence required text and tags are trimmed and must remain nonblank. Working
 note keys may contain ordinary encoded path characters (including `/`), but
