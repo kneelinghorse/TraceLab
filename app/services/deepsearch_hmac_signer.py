@@ -129,10 +129,11 @@ def verify_signature(
         )
 
     provided = signature_header[len("sha256="):]
-    if timestamp_header:
-        message = f"{timestamp_header}.{body.decode('utf-8')}"
-    else:
-        message = body.decode("utf-8")
+    message = (
+        f"{timestamp_header}.{body.decode('utf-8')}"
+        if timestamp_header
+        else body.decode("utf-8")
+    )
 
     expected = hmac.new(
         resolved_secret.encode("utf-8"),

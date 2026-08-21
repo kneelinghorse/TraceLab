@@ -48,7 +48,7 @@ class TestSignPayload:
         timestamp = signed.headers["X-TraceLab-Timestamp"]
         expected = hmac.new(
             SECRET.encode("utf-8"),
-            f"{timestamp}.{body.decode('utf-8')}".encode("utf-8"),
+            f"{timestamp}.{body.decode('utf-8')}".encode(),
             hashlib.sha256,
         ).hexdigest()
         assert signed.headers["X-TraceLab-Signature"] == f"sha256={expected}"
@@ -175,7 +175,7 @@ class TestVerifySignature:
             signed.body,
             signed.headers["X-TraceLab-Signature"],
             signed.headers["X-TraceLab-Timestamp"],
-            secret="other-secret",
+            secret=SECRET[::-1],
         )
 
     def test_mutated_body_fails_verification(self):

@@ -44,7 +44,7 @@ async def db_health_check(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(
             status_code=503, detail=f"Database connection failed: {str(e)}"
-        )
+        ) from e
 
 
 @router.get("/health/qdrant")
