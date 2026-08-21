@@ -248,6 +248,38 @@ Search the project ledger before repeating research:
 }
 ```
 
+### Search before research
+
+Use the two search surfaces in this order:
+
+1. Call `tracelab_evidence(action="search")` with the project ID to reuse raw
+   findings from earlier sessions. These results retain the source URL,
+   disposition, canonical `source_id`, and `source_sighting_count`.
+2. Call `tracelab_search(action="knowledge")` when you need semantic matches
+   from the ingested document corpus.
+3. Capture material new findings with `tracelab_evidence(action="capture")`,
+   including contradictory and rejected evidence rather than silently dropping
+   it.
+
+Raw ledger entries do not automatically appear in `tracelab_search`. When a
+reviewed session should join the document corpus, promote it explicitly:
+
+```json
+{
+  "name": "tracelab_evidence",
+  "arguments": {
+    "action": "promote",
+    "project_id": "fbd3bd03-5ddc-49ee-8013-529163a99290",
+    "session_key": "competitive-scan-2026-08-20",
+    "target": "document"
+  }
+}
+```
+
+Document promotion is the bridge into TraceLab's normal ingestion, chunking,
+embedding, Qdrant, and PEDR/preflight paths. Report-only promotion preserves a
+durable report but does not add its content to document search.
+
 Evidence required text and tags are trimmed and must remain nonblank. Working
 note keys may contain ordinary encoded path characters (including `/`), but
 the dot-only keys `.` and `..` are reserved because URL parsers treat them as

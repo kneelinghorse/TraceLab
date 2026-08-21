@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import hashlib
 from urllib.parse import quote
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
@@ -29,7 +29,7 @@ from app.core.security import (
 from app.main import app
 from app.models.api_key import APIKey
 from app.models.document import Document
-from app.models.evidence_ledger import LedgerEntry, LedgerNote
+from app.models.evidence_ledger import LedgerEntry, LedgerNote, LedgerSource
 from app.models.mission import Mission
 from app.models.project import Project
 from app.models.report import Report, ReportSource
@@ -55,6 +55,8 @@ ENTRY_FIELDS = {
     "claim",
     "summary",
     "source_url",
+    "source_id",
+    "source_sighting_count",
     "snippet",
     "query",
     "disposition",
@@ -215,6 +217,8 @@ class TestCaptureContract:
             assert returned["session_key"] == "agent-session-001"
             assert returned["owner_id"] == str(member.id)
             assert returned["workspace_id"] == str(space.id)
+            assert returned["source_id"]
+            assert returned["source_sighting_count"] == 1
             for field, value in submitted.items():
                 assert returned[field] == value
 
@@ -227,6 +231,122 @@ class TestCaptureContract:
         assert len(persisted) == 2
         assert {row.origin for row in persisted} == {"mcp-agent"}
         assert {row.disposition for row in persisted} == {"supporting", "rejected"}
+        assert {row.source_id for row in persisted} == {UUID(entry["source_id"]) for entry in body["entries"]}
+
+    def test_same_source_across_sessions_reuses_one_source_and_updates_sightings(
+        self,
+        client,
+        db_session,
+        rbac_on,
+    ):
+        """Cross-session reuse compounds only when URL identity is project-stable."""
+        member = _user(db_session, "source-reuse@example.com")
+        _space, project = _space_project(db_session, member, name="Source reuse")
+        first_mission = _mission(db_session, project, label="SOURCE-ONE")
+        second_mission = _mission(db_session, project, label="SOURCE-TWO")
+        headers = _bearer(member)
+
+        first = _capture(
+            client,
+            headers,
+            project,
+            mission=first_mission,
+            session_key="source-session-one",
+            entries=[
+                {
+                    "claim": "The first session found the canonical source.",
+                    "source_url": "HTTPS://Example.TEST:443/research",
+                    "disposition": "supporting",
+                }
+            ],
+        )
+        second = _capture(
+            client,
+            headers,
+            project,
+            mission=second_mission,
+            session_key="source-session-two",
+            entries=[
+                {
+                    "claim": "A later mission independently reused that source.",
+                    "source_url": "https://example.test/research",
+                    "disposition": "background",
+                }
+            ],
+        )
+
+        assert first.status_code == 201, first.text
+        assert second.status_code == 201, second.text
+        first_entry = first.json()["entries"][0]
+        second_entry = second.json()["entries"][0]
+        assert first_entry["source_id"] == second_entry["source_id"]
+        assert first_entry["source_sighting_count"] == 1
+        assert second_entry["source_sighting_count"] == 2
+
+        sources = db_session.query(LedgerSource).filter(LedgerSource.project_id == project.id).all()
+        assert len(sources) == 1
+        assert sources[0].source_url == "https://example.test/research"
+        assert sources[0].sighting_count == 2
+        entries = (
+            db_session.query(LedgerEntry)
+            .filter(LedgerEntry.project_id == project.id)
+            .order_by(LedgerEntry.session_key)
+            .all()
+        )
+        assert [entry.session_key for entry in entries] == [
+            "source-session-one",
+            "source-session-two",
+        ]
+        assert {entry.source_id for entry in entries} == {sources[0].id}
+
+    def test_source_identity_is_project_scoped_even_for_the_same_url(
+        self,
+        client,
+        db_session,
+        rbac_on,
+    ):
+        """A global URL row would couple tenants through counts and lifecycle."""
+        member = _user(db_session, "source-project-scope@example.com")
+        space, first_project = _space_project(
+            db_session,
+            member,
+            name="First source project",
+        )
+        second_project = Project(name="Second source project", workspace_id=space.id)
+        db_session.add(second_project)
+        db_session.commit()
+        db_session.refresh(second_project)
+        headers = _bearer(member)
+        source_url = "https://example.test/shared-across-projects"
+
+        responses = [
+            _capture(
+                client,
+                headers,
+                project,
+                session_key=f"project-source-{index}",
+                entries=[
+                    {
+                        "claim": f"Project {index} has its own sighting.",
+                        "source_url": source_url,
+                        "disposition": "background",
+                    }
+                ],
+            )
+            for index, project in enumerate((first_project, second_project), start=1)
+        ]
+
+        assert [response.status_code for response in responses] == [201, 201]
+        returned = [response.json()["entries"][0] for response in responses]
+        assert returned[0]["source_id"] != returned[1]["source_id"]
+        assert [entry["source_sighting_count"] for entry in returned] == [1, 1]
+        sources = db_session.query(LedgerSource).filter(LedgerSource.source_url == source_url).all()
+        assert len(sources) == 2
+        assert {source.project_id for source in sources} == {
+            first_project.id,
+            second_project.id,
+        }
+        assert {source.sighting_count for source in sources} == {1}
 
     def test_invalid_batch_is_rejected_without_partial_persistence(self, client, db_session, rbac_on):
         member = _user(db_session, "atomic-member@example.com")
@@ -254,7 +374,7 @@ class TestCaptureContract:
         assert response.status_code == 422, response.text
         assert db_session.query(LedgerEntry).count() == 0, "a rejected batch must not leave the valid prefix committed"
 
-    def test_database_failure_on_later_row_rolls_back_the_full_batch(
+    def test_database_failure_rolls_back_entries_source_creation_and_sighting_increment(
         self,
         db_session,
     ):
@@ -264,6 +384,19 @@ class TestCaptureContract:
             db_session,
             member,
             name="Atomic service project",
+        )
+        initial_request = CaptureRequest.model_validate(
+            {
+                "project_id": str(project.id),
+                "session_key": "database-atomicity-seed",
+                "entries": [
+                    {
+                        "claim": "The existing source begins with one sighting.",
+                        "source_url": "https://example.test/atomic-prefix",
+                        "disposition": "supporting",
+                    }
+                ],
+            }
         )
         request = CaptureRequest.model_validate(
             {
@@ -289,6 +422,12 @@ class TestCaptureContract:
 
         write_session = SessionLocal()
         try:
+            EvidenceLedgerService().capture(
+                write_session,
+                initial_request,
+                owner_id=member.id,
+                workspace_id=space.id,
+            )
             with pytest.raises(IntegrityError):
                 EvidenceLedgerService().capture(
                     write_session,
@@ -301,7 +440,13 @@ class TestCaptureContract:
 
         verification_session = SessionLocal()
         try:
-            assert verification_session.query(LedgerEntry).filter(LedgerEntry.project_id == project.id).count() == 0
+            entries = verification_session.query(LedgerEntry).filter(LedgerEntry.project_id == project.id).all()
+            sources = verification_session.query(LedgerSource).filter(LedgerSource.project_id == project.id).all()
+            assert len(entries) == 1
+            assert entries[0].session_key == "database-atomicity-seed"
+            assert len(sources) == 1
+            assert sources[0].source_url == "https://example.test/atomic-prefix"
+            assert sources[0].sighting_count == 1
         finally:
             verification_session.close()
 
@@ -730,6 +875,70 @@ class TestScopedReadPaths:
         assert searched.status_code == 200, searched.text
         assert searched.json()["total"] == 1
         assert [row["id"] for row in searched.json()["entries"]] == [visible_id]
+
+    def test_read_paths_apply_request_local_project_scope_in_addition_to_row_filters(
+        self,
+        client,
+        db_session,
+        rbac_on,
+        monkeypatch,
+    ):
+        """The shared PEDR scope must fail closed without replacing child-row RBAC."""
+        from app.api.v1 import evidence as evidence_api
+
+        member = _user(db_session, "project-scope-wiring@example.com")
+        _space, project = _space_project(db_session, member, name="Project scope wiring")
+        headers = _bearer(member)
+        captured = _capture(
+            client,
+            headers,
+            project,
+            session_key="project-scope-session",
+            entries=[
+                {
+                    "claim": "The request-local project scope is a second tenant boundary.",
+                    "source_url": "https://example.test/project-scope",
+                    "disposition": "supporting",
+                }
+            ],
+        )
+        assert captured.status_code == 201, captured.text
+
+        state = {"scope": None}
+        scope_calls = []
+
+        def request_scope(user, db):
+            scope_calls.append((user.user_id, db))
+            return state["scope"]
+
+        monkeypatch.setattr(evidence_api, "accessible_project_ids", request_scope)
+
+        unrestricted = client.get(
+            API,
+            params={"project_id": str(project.id)},
+            headers=headers,
+        )
+        state["scope"] = [project.id]
+        allowed = client.get(
+            f"{API}/search",
+            params={"project_id": str(project.id), "q": "tenant boundary"},
+            headers=headers,
+        )
+        state["scope"] = []
+        denied = client.get(
+            f"{API}/search",
+            params={"project_id": str(project.id), "q": "tenant boundary"},
+            headers=headers,
+        )
+
+        assert unrestricted.status_code == 200, unrestricted.text
+        assert unrestricted.json()["entry_total"] == 1
+        assert allowed.status_code == 200, allowed.text
+        assert allowed.json()["total"] == 1
+        assert denied.status_code == 200, denied.text
+        assert denied.json()["total"] == 0
+        assert denied.json()["entries"] == []
+        assert [user_id for user_id, _db in scope_calls] == [member.id] * 3
 
     def test_project_owner_without_space_membership_sees_member_written_rows(
         self,

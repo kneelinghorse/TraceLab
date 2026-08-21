@@ -1,14 +1,15 @@
 # Evidence Ledger Boundary Contract
 
 This document is the single source of truth for the LEDGER-1 agent-writer
-surface:
+surface and the LEDGER-3 retrieval boundary:
 
 **`tracelab_evidence` MCP input → TypeScript API client → authenticated REST
 request → REST response → MCP response.**
 
-The public package version for this contract is `@aquex/tracelab-mcp` 1.1.0.
-It adds the eighth visible action-clustered tool without changing the seven
-T41.7 clusters or their legacy-name mappings.
+The public package version for this contract is `@aquex/tracelab-mcp` 1.1.1.
+This response-only revision adds canonical source metadata to the eighth
+action-clustered tool introduced in 1.1.0; it does not change tool inputs or
+legacy-name mappings.
 
 ## Runtime ownership
 
@@ -44,6 +45,31 @@ validation.
 WHATWG URL parsers normalize those values as navigation segments even though
 `encodeURIComponent` leaves them unchanged. GET filters are encoded with
 `URLSearchParams`. GET requests never carry a body.
+
+## LEDGER-3 retrieval boundary
+
+Raw ledger entries and document chunks deliberately remain separate search
+surfaces:
+
+- `tracelab_evidence(action="search")` searches raw, project-scoped ledger
+  claims and returns their complete source, disposition, session, and ownership
+  metadata. Agents use this action before external research to reuse prior
+  findings without losing provenance.
+- `tracelab_search(action="knowledge")` remains semantic search over ingested
+  document chunks. It does not query `ledger_entries`, embed raw ledger claims,
+  or assign them synthetic document identifiers.
+- `tracelab_evidence(action="promote", target="document")` is the explicit
+  bridge between the surfaces. Promotion first creates the provenance-linked
+  report, then sends that report through the canonical document ingestion,
+  chunking, embedding, and Qdrant pipeline. Only promoted document material can
+  enter document-backed `tracelab_search` and downstream PEDR/preflight flows.
+
+This boundary is intentional. A raw ledger entry can be supporting,
+contradicting, rejected, or background evidence, while PEDR preflight makes a
+mission-level reuse decision over governed document results. Directly mixing
+raw claims into the document-chunk result contract would either discard that
+disposition and source provenance or require a new heterogeneous result and
+durable vector-indexing lifecycle. LEDGER-3 does neither implicitly.
 
 ## Input contract
 
@@ -141,10 +167,14 @@ requests independently.
 
 ## Server-owned fields and enums
 
-Clients must never send `origin`, `owner_id`, or `workspace_id`.
+Clients must never send `origin`, `source_id`, `source_sighting_count`,
+`owner_id`, or `workspace_id`.
 
 - Interactive MCP writes are stamped `origin = "mcp-agent"` by the server.
 - `deepsearch-worker` is reserved for the separate service-writer channel.
+- `source_id` identifies the canonical project source derived from the
+  normalized source URL. `source_sighting_count` reports how many captures have
+  cited that source and is always at least one.
 - Ownership and workspace are derived from the authenticated principal and
   project; callers cannot self-assign tenancy.
 
@@ -173,6 +203,8 @@ Every entry returned through capture, list, or search contains every field:
 | `claim` | string |
 | `summary` | string or `null` |
 | `source_url` | string |
+| `source_id` | UUID string |
+| `source_sighting_count` | integer, at least 1 |
 | `snippet` | string or `null` |
 | `query` | string or `null` |
 | `disposition` | evidence disposition |
@@ -216,10 +248,11 @@ field projections. This prevents a repeat of T41.2, where the REST client
 received fields that the MCP handler silently discarded.
 
 The regression fixture must include every public Entry and Note field,
-including nullable fields, tenancy identifiers, `origin`, and timestamps, and
-must compare the parsed MCP payload to the complete REST fixture with exact
-equality. Capture, note, list, search, and promote tests also lock their exact
-URL, HTTP method, encoded query/path, and request body through
+including nullable fields, canonical source identity and sighting count,
+tenancy identifiers, `origin`, and timestamps, and must compare the parsed MCP
+payload to the complete REST fixture with exact equality. Capture, note, list,
+search, and promote tests also lock their exact URL, HTTP method, encoded
+query/path, and request body through
 `handleTracelabEvidence`, which is the published MCP handler path.
 
 Tool-list parity is a three-way invariant:
@@ -237,7 +270,7 @@ migration records.
 
 ## Update ritual
 
-Any evidence request or response field, endpoint, HTTP verb, enum, default, or
+Any evidence request field, endpoint, HTTP verb, input enum, default, or
 validation-limit change must update in the same commit:
 
 1. the FastAPI schema and route;
@@ -245,6 +278,10 @@ validation-limit change must update in the same commit:
 3. the MCP JSON Schema and Zod schema in `index.ts`;
 4. the exact handler-level contract fixture in `index.test.ts`; and
 5. this document.
+
+A response-only field addition does not change the MCP input schema. It must
+update the FastAPI response schema, the `api-client.ts` response type, the full
+handler-level response fixture, and this document in the same commit.
 
 Before publishing, follow the repository package smoke gate: build, test,
 `npm pack`, install the tarball in a clean directory, start the real entrypoint,

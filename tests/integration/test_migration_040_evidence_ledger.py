@@ -114,10 +114,81 @@ def _foreign_keys(inspector, table: str) -> dict[str, dict]:
 
 
 def _create_model_ledger_tables(engine) -> None:
-    from app.models.evidence_ledger import LedgerEntry, LedgerNote
+    """Create the historical rev-040 ORM shape without importing today's ORM.
 
-    LedgerEntry.__table__.create(bind=engine)
-    LedgerNote.__table__.create(bind=engine)
+    Later ledger revisions intentionally evolve ``LedgerEntry``.  Importing the
+    current model here would make this rev-040 convergence test change meaning
+    whenever the live model gains a column.
+    """
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                """
+                CREATE TABLE ledger_entries (
+                    id uuid PRIMARY KEY,
+                    project_id uuid NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+                    mission_id uuid REFERENCES missions(id) ON DELETE SET NULL,
+                    session_key varchar(255) NOT NULL,
+                    origin varchar(32) NOT NULL DEFAULT 'mcp-agent',
+                    claim text NOT NULL,
+                    summary text,
+                    source_url text NOT NULL,
+                    snippet text,
+                    query text,
+                    disposition varchar(32) NOT NULL,
+                    tags jsonb NOT NULL DEFAULT '[]'::jsonb,
+                    owner_id uuid REFERENCES users(id) ON DELETE SET NULL,
+                    workspace_id uuid REFERENCES workspaces(id) ON DELETE SET NULL,
+                    created_at timestamp without time zone NOT NULL DEFAULT now(),
+                    updated_at timestamp without time zone NOT NULL DEFAULT now(),
+                    CONSTRAINT ck_ledger_entries_origin
+                        CHECK (origin IN ('mcp-agent', 'deepsearch-worker')),
+                    CONSTRAINT ck_ledger_entries_disposition
+                        CHECK (disposition IN ('supporting', 'contradicting', 'rejected', 'background')),
+                    CONSTRAINT ck_ledger_entries_nonempty_session
+                        CHECK (length(trim(session_key)) > 0),
+                    CONSTRAINT ck_ledger_entries_nonempty_claim
+                        CHECK (length(trim(claim)) > 0),
+                    CONSTRAINT ck_ledger_entries_nonempty_source_url
+                        CHECK (length(trim(source_url)) > 0)
+                )
+                """
+            )
+        )
+        conn.execute(
+            text(
+                """
+                CREATE TABLE ledger_notes (
+                    id uuid PRIMARY KEY,
+                    project_id uuid NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+                    mission_id uuid REFERENCES missions(id) ON DELETE SET NULL,
+                    session_key varchar(255) NOT NULL,
+                    note_key varchar(100) NOT NULL,
+                    origin varchar(32) NOT NULL DEFAULT 'mcp-agent',
+                    content text NOT NULL,
+                    tags jsonb NOT NULL DEFAULT '[]'::jsonb,
+                    owner_id uuid REFERENCES users(id) ON DELETE SET NULL,
+                    workspace_id uuid REFERENCES workspaces(id) ON DELETE SET NULL,
+                    created_at timestamp without time zone NOT NULL DEFAULT now(),
+                    updated_at timestamp without time zone NOT NULL DEFAULT now(),
+                    CONSTRAINT ck_ledger_notes_origin
+                        CHECK (origin IN ('mcp-agent', 'deepsearch-worker')),
+                    CONSTRAINT ck_ledger_notes_nonempty_session
+                        CHECK (length(trim(session_key)) > 0),
+                    CONSTRAINT ck_ledger_notes_nonempty_key
+                        CHECK (length(trim(note_key)) > 0),
+                    CONSTRAINT ck_ledger_notes_nonempty_content
+                        CHECK (length(trim(content)) > 0),
+                    CONSTRAINT uq_ledger_notes_project_session_key
+                        UNIQUE (project_id, session_key, note_key)
+                )
+                """
+            )
+        )
+        for name, columns in ENTRY_INDEXES.items():
+            conn.execute(text(f"CREATE INDEX {name} ON ledger_entries ({', '.join(columns)})"))
+        for name, columns in NOTE_INDEXES.items():
+            conn.execute(text(f"CREATE INDEX {name} ON ledger_notes ({', '.join(columns)})"))
 
 
 def _assert_upgrade_refused_at_039(
@@ -528,12 +599,12 @@ class TestEvidenceLedgerMigration:
                 r"ledger_entries\.summary has incompatible nullability",
             ),
             (
-                ("ALTER TABLE ledger_entries " "ALTER COLUMN origin SET DEFAULT 'deepsearch-worker'",),
+                ("ALTER TABLE ledger_entries ALTER COLUMN origin SET DEFAULT 'deepsearch-worker'",),
                 r"ledger_entries\.origin has incompatible server default",
             ),
             (
                 (
-                    "ALTER TABLE ledger_entries DROP CONSTRAINT " "ck_ledger_entries_nonempty_claim",
+                    "ALTER TABLE ledger_entries DROP CONSTRAINT ck_ledger_entries_nonempty_claim",
                     "ALTER TABLE ledger_entries ADD CONSTRAINT "
                     "ck_ledger_entries_nonempty_claim "
                     "CHECK (length(trim(claim)) >= 0)",
@@ -578,7 +649,7 @@ class TestEvidenceLedgerMigration:
             with engine.begin() as conn:
                 conn.execute(text("ALTER TABLE ledger_entries DROP COLUMN summary"))
                 conn.execute(
-                    text("ALTER TABLE ledger_entries ADD COLUMN summary text " "GENERATED ALWAYS AS (claim) STORED")
+                    text("ALTER TABLE ledger_entries ADD COLUMN summary text GENERATED ALWAYS AS (claim) STORED")
                 )
 
             _assert_upgrade_refused_at_039(
@@ -628,7 +699,7 @@ class TestEvidenceLedgerMigration:
             with engine.begin() as conn:
                 conn.execute(text("CREATE SCHEMA ledger_shadow"))
                 conn.execute(text("CREATE TABLE ledger_shadow.projects (id uuid PRIMARY KEY)"))
-                conn.execute(text("ALTER TABLE ledger_entries " f"DROP CONSTRAINT {quoted_constraint}"))
+                conn.execute(text(f"ALTER TABLE ledger_entries DROP CONSTRAINT {quoted_constraint}"))
                 conn.execute(
                     text(
                         "ALTER TABLE ledger_entries ADD CONSTRAINT "
@@ -655,7 +726,7 @@ class TestEvidenceLedgerMigration:
             command.upgrade(alembic_cfg, REV_039)
             _create_model_ledger_tables(engine)
             with engine.begin() as conn:
-                conn.execute(text("ALTER TABLE ledger_notes DROP CONSTRAINT " "uq_ledger_notes_project_session_key"))
+                conn.execute(text("ALTER TABLE ledger_notes DROP CONSTRAINT uq_ledger_notes_project_session_key"))
 
             _assert_upgrade_refused_at_039(
                 alembic_cfg,
@@ -671,9 +742,8 @@ class TestEvidenceLedgerMigration:
             "CREATE INDEX ix_ledger_entries_project_created "
             "ON ledger_entries (project_id, created_at) "
             "WHERE disposition = 'supporting'",
-            "CREATE INDEX ix_ledger_entries_project_created "
-            "ON ledger_entries (project_id, created_at) INCLUDE (claim)",
-            "CREATE INDEX ix_ledger_entries_project_created " "ON ledger_entries (project_id, created_at DESC)",
+            "CREATE INDEX ix_ledger_entries_project_created ON ledger_entries (project_id, created_at) INCLUDE (claim)",
+            "CREATE INDEX ix_ledger_entries_project_created ON ledger_entries (project_id, created_at DESC)",
             "CREATE INDEX ix_ledger_entries_project_created "
             "ON ledger_entries (project_id, created_at) WITH (fillfactor = 70)",
         ),

@@ -429,6 +429,8 @@ export interface EvidenceEntry {
   claim: string;
   summary: string | null;
   source_url: string;
+  source_id: string;
+  source_sighting_count: number;
   snippet: string | null;
   query: string | null;
   disposition: EvidenceDisposition;

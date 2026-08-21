@@ -5,6 +5,25 @@ All notable changes to `@aquex/tracelab-mcp` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.1.1] — 2026-08-21
+
+### Added
+
+- **Canonical evidence-source metadata.** Evidence entry responses now expose
+  the backend-owned `source_id` and `source_sighting_count` fields so agents can
+  recognize repeated citations of the same normalized project source. The MCP
+  keeps serializing evidence responses wholesale, and its full-response
+  contract fixture now requires both fields.
+
+### Changed
+
+- **Search-before-research boundary.** Documented that raw findings remain in
+  `tracelab_evidence(action="search")`, while `tracelab_search` remains a
+  document-chunk search. `tracelab_evidence(action="promote",
+  target="document")` is the explicit path into ingestion, Qdrant, and
+  PEDR/preflight. No MCP input schema or action changed.
+- Bumped the public package to 1.1.1 for the additive evidence response fields.
+
 ## [1.1.0] — 2026-08-20
 
 ### Added
@@ -135,5 +154,6 @@ swap the install line to `npm install -g @aquex/tracelab-mcp` (or `npx
 Calls against legacy flat tool names continue to return a friendly
 migration error pointing at the cluster equivalent.
 
+[1.1.1]: https://github.com/kneelinghorse/TraceLab/releases/tag/tracelab-mcp-v1.1.1
 [1.1.0]: https://github.com/kneelinghorse/TraceLab/releases/tag/tracelab-mcp-v1.1.0
 [1.0.0]: https://github.com/kneelinghorse/TraceLab/releases/tag/tracelab-mcp-v1.0.0
