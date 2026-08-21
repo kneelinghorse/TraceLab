@@ -17,21 +17,35 @@ def _reset_state():
     sched.stop_reconciler()
 
 
-def _summary(scanned=5, eligible=2, repaired=2, failed=0):
+def _summary(scanned=5, eligible=2, repaired=2, failed=0, skipped_soft_deleted=0):
     return SimpleNamespace(
-        scanned=scanned, eligible=eligible, repaired=repaired, failed=failed
+        scanned=scanned,
+        eligible=eligible,
+        repaired=repaired,
+        failed=failed,
+        skipped_soft_deleted=skipped_soft_deleted,
     )
 
 
 def test_tick_success_records_ok(monkeypatch):
     monkeypatch.setattr(
         sched, "run_reconciliation_once",
-        lambda: {"scanned": 5, "eligible": 2, "repaired": 2, "failed": 0},
+        lambda: {
+            "scanned": 5,
+            "eligible": 2,
+            "repaired": 2,
+            "failed": 0,
+            "skipped_soft_deleted": 3,
+        },
     )
     asyncio.run(sched.run_tick())
     assert sched._state.last_status == "ok"
     assert sched._state.last_counts == {
-        "scanned": 5, "eligible": 2, "repaired": 2, "failed": 0
+        "scanned": 5,
+        "eligible": 2,
+        "repaired": 2,
+        "failed": 0,
+        "skipped_soft_deleted": 3,
     }
     assert sched._state.runs == 1
     assert sched._state.consecutive_errors == 0
@@ -41,7 +55,13 @@ def test_tick_success_records_ok(monkeypatch):
 def test_tick_partial_when_failures_present(monkeypatch):
     monkeypatch.setattr(
         sched, "run_reconciliation_once",
-        lambda: {"scanned": 5, "eligible": 3, "repaired": 1, "failed": 2},
+        lambda: {
+            "scanned": 5,
+            "eligible": 3,
+            "repaired": 1,
+            "failed": 2,
+            "skipped_soft_deleted": 0,
+        },
     )
     asyncio.run(sched.run_tick())
     assert sched._state.last_status == "partial"
@@ -60,7 +80,13 @@ def test_tick_error_never_raises_and_records_error(monkeypatch):
     # a subsequent success resets the error streak
     monkeypatch.setattr(
         sched, "run_reconciliation_once",
-        lambda: {"scanned": 0, "eligible": 0, "repaired": 0, "failed": 0},
+        lambda: {
+            "scanned": 0,
+            "eligible": 0,
+            "repaired": 0,
+            "failed": 0,
+            "skipped_soft_deleted": 0,
+        },
     )
     asyncio.run(sched.run_tick())
     assert sched._state.consecutive_errors == 0
@@ -71,13 +97,19 @@ def test_run_reconciliation_once_maps_summary(monkeypatch):
     class FakeService:
         def reconcile_completed(self, db, limit):
             assert limit == settings.reconciler_batch_limit
-            return _summary(7, 3, 3, 0)
+            return _summary(7, 3, 3, 0, 4)
 
     import app.services.result_materialization as rm
 
     monkeypatch.setattr(rm, "MissionResultMaterializationService", FakeService)
     counts = sched.run_reconciliation_once()
-    assert counts == {"scanned": 7, "eligible": 3, "repaired": 3, "failed": 0}
+    assert counts == {
+        "scanned": 7,
+        "eligible": 3,
+        "repaired": 3,
+        "failed": 0,
+        "skipped_soft_deleted": 4,
+    }
 
 
 def test_start_reconciler_gated_off_under_tests():

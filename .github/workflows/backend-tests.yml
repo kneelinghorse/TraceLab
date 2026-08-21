@@ -50,8 +50,8 @@ jobs:
             ((quarantine_count += 1))
           done < .github/ci/backend-quarantine.txt
 
-          if [[ "$quarantine_count" -ne 51 ]]; then
-            echo "Expected 51 quarantined nodes, found $quarantine_count" >&2
+          if [[ "$quarantine_count" -ne 49 ]]; then
+            echo "Expected 49 quarantined nodes, found $quarantine_count" >&2
             exit 1
           fi
 
@@ -59,7 +59,7 @@ jobs:
           trap 'rm -f "$pytest_output"' EXIT
           pytest --ignore=tests/integration "${deselect_args[@]}" | tee "$pytest_output"
 
-          if ! grep -Eq '(^|, )51 deselected(,| in )' "$pytest_output"; then
-            echo "Pytest did not report exactly 51 deselected tests." >&2
+          if ! grep -Eq '(^|, )49 deselected(,| in )' "$pytest_output"; then
+            echo "Pytest did not report exactly 49 deselected tests." >&2
             exit 1
           fi

@@ -19,7 +19,12 @@ from app.schemas.webhook import DeepSearchWebhookPayload, DeepSearchWebhookStatu
 from app.services.auto_ingest import AutoIngestService
 from app.services.auto_report import AutoReportService
 from app.services.mission_service import MissionNotFoundError, MissionService
-from app.services.result_materialization import MissionResultMaterializationService
+from app.services.result_materialization import (
+    UNEXPECTED_MATERIALIZATION_ERROR,
+    MaterializationResult,
+    MissionResultMaterializationService,
+    normalize_materialization_error_categories,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -177,12 +182,7 @@ class WebhookHandler:
                 mission.status in ("completed", "validation_failed")
                 and payload.status == DeepSearchWebhookStatus.COMPLETE
             ):
-                outcome = self._get_materialization_service().materialize(db, mission)
-                if outcome.errors:
-                    raise WebhookProcessingError(
-                        "Mission completed but result materialization is incomplete: "
-                        + "; ".join(outcome.errors)
-                    )
+                outcome = self._materialize_result(db, mission)
                 if outcome.changed:
                     logger.info(
                         "Reconciled persisted results for completed mission %s",
@@ -227,6 +227,48 @@ class WebhookHandler:
             )
         return self._materialization_service
 
+    @staticmethod
+    def _merged_execution_metadata(
+        mission: Mission,
+        payload: DeepSearchWebhookPayload,
+    ) -> dict[str, object]:
+        """Merge worker metadata without accepting the reserved retry subrecord."""
+        metadata: dict[str, object] = dict(mission.execution_metadata or {})
+        if payload.execution_metadata is None:
+            return metadata
+        incoming = payload.execution_metadata.model_dump(exclude_none=True)
+        incoming.pop("result_materialization", None)
+        metadata.update(incoming)
+        return metadata
+
+    def _materialize_result(
+        self,
+        db: Session,
+        mission: Mission,
+    ) -> MaterializationResult:
+        """Materialize with a category-only public failure boundary."""
+        try:
+            outcome = self._get_materialization_service().materialize(db, mission)
+        except Exception as exc:
+            logger.exception(
+                "Unexpected result materialization error for mission %s",
+                mission.mission_id,
+            )
+            raise WebhookProcessingError(
+                "Mission completed but result materialization is incomplete: "
+                + UNEXPECTED_MATERIALIZATION_ERROR
+            ) from exc
+
+        if outcome.errors:
+            error_categories = normalize_materialization_error_categories(
+                outcome.errors
+            )
+            raise WebhookProcessingError(
+                "Mission completed but result materialization is incomplete: "
+                + "; ".join(error_categories)
+            )
+        return outcome
+
     def _handle_success(
         self,
         db: Session,
@@ -245,11 +287,8 @@ class WebhookHandler:
             "status": "completed",
             "deepsearch_job_id": payload.job_id,
             "error_message": None,
+            "execution_metadata": self._merged_execution_metadata(mission, payload),
         }
-        if payload.execution_metadata is not None:
-            update_fields["execution_metadata"] = (
-                payload.execution_metadata.model_dump()
-            )
         if payload.result_markdown is not None:
             update_fields["result_markdown"] = payload.result_markdown
         if payload.result_protocol is not None:
@@ -266,12 +305,7 @@ class WebhookHandler:
             payload.job_id,
         )
 
-        outcome = self._get_materialization_service().materialize(db, updated_mission)
-        if outcome.errors:
-            raise WebhookProcessingError(
-                "Mission completed but result materialization is incomplete: "
-                + "; ".join(outcome.errors)
-            )
+        self._materialize_result(db, updated_mission)
 
         return updated_mission, "completed"
 
@@ -288,9 +322,7 @@ class WebhookHandler:
         update_data = MissionUpdate(
             status="blocked",
             deepsearch_job_id=payload.job_id,
-            execution_metadata=payload.execution_metadata.model_dump()
-            if payload.execution_metadata
-            else {},
+            execution_metadata=self._merged_execution_metadata(mission, payload),
             error_message=payload.error
             or "DeepSearch job failed without error message",
         )
@@ -321,9 +353,7 @@ class WebhookHandler:
         update_data = MissionUpdate(
             status="cancelled",
             deepsearch_job_id=payload.job_id,
-            execution_metadata=payload.execution_metadata.model_dump()
-            if payload.execution_metadata
-            else {},
+            execution_metadata=self._merged_execution_metadata(mission, payload),
             error_message=payload.error or "Job was cancelled",
         )
 

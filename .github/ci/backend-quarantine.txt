@@ -1,4 +1,4 @@
-# CI-1 backend quarantine: 51 exact node IDs from the 2026-08-20 post-fix baseline.
+# CI-1 backend quarantine: 49 exact node IDs after the OPS-3 review pass.
 # Format is NODE_ID # one-line reason. The backend workflow requires a reason on every row.
 # Tests remain collected and tracked; this list is a temporary ratchet, never a deletion list.
 # SQLite foreign-key enforcement remains off in the shared non-integration harness (out of CI-1 scope).
@@ -15,8 +15,6 @@ tests/sprint_04/test_quality_and_load.py::test_quality_checks_block_and_pass # S
 tests/sprint_04/test_quality_and_load.py::test_load_test_supports_target_concurrency # Sprint-04 load threshold is environment-sensitive legacy acceptance coverage.
 tests/sprint_04/test_tech_debt.py::test_playwright_migration_eliminates_cypress_cost # Sprint-04 tech-debt assertion reads historical planning artifacts rather than runtime behavior.
 tests/test_admin_dashboard.py::test_metrics_aggregator_generates_sections # Admin metrics test asserts the retired dashboard-stub section shape.
-tests/test_auto_report.py::TestAutoReportIntegration::test_webhook_handler_calls_auto_report # DEC#328 webhook/result-materialization drift; preserve for the dedicated review pass.
-tests/test_auto_report.py::TestAutoReportIntegration::test_webhook_handler_continues_on_report_error # DEC#328 webhook/result-materialization drift; preserve for the dedicated review pass.
 tests/test_caching.py::test_project_stats_cache_key_is_per_project # Cache-key test targets the pre-RBAC project-stats key contract.
 tests/test_caching.py::test_project_stats_cache_key_differs_from_detail_and_list # Cache-key test targets the pre-RBAC project-stats key contract.
 tests/test_caching.py::test_invalidate_project_metadata_clears_stats # Cache invalidation test targets the pre-RBAC project-stats key contract.

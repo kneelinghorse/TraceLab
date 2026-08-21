@@ -17,7 +17,8 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
+from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
@@ -29,6 +30,7 @@ from app.schemas.webhook import (
 )
 from app.services.webhook_handler import (
     WebhookHandler,
+    WebhookProcessingError,
     WebhookValidationError,
 )
 
@@ -73,16 +75,28 @@ def _create_test_mission(
 def _create_webhook_signature(payload: dict, secret: str, timestamp: str = None) -> str:
     """Generate HMAC-SHA256 signature for webhook payload."""
     payload_str = json.dumps(payload, separators=(",", ":"))
-    if timestamp:
-        message = f"{timestamp}.{payload_str}"
-    else:
-        message = payload_str
+    message = f"{timestamp}.{payload_str}" if timestamp else payload_str
     signature = hmac.new(
         secret.encode("utf-8"),
         message.encode("utf-8"),
         hashlib.sha256,
     ).hexdigest()
     return f"sha256={signature}"
+
+
+def _colliding_execution_metadata(private_id: str, *, loops: int) -> ExecutionMetadata:
+    """Build valid worker metadata that collides with TraceLab's reserved state."""
+    return ExecutionMetadata(
+        loops_executed=loops,
+        worker_metric="merged",
+        result_materialization={
+            "status": "worker-private-status",
+            "attempt_count": 99,
+            "attempted_at": private_id,
+            "errors": [f"private provider detail for {private_id}"],
+            "document_id": private_id,
+        },
+    )
 
 
 class TestWebhookSchemas:
@@ -204,7 +218,7 @@ class TestWebhookSignatureValidation:
         """Validation fails when signature header is missing."""
         handler = WebhookHandler()
         with patch("app.services.webhook_handler.settings") as mock_settings:
-            mock_settings.effective_deepsearch_service_secret = "test-secret"
+            mock_settings.effective_deepsearch_service_secret = "test-secret"  # noqa: S105
             with pytest.raises(
                 WebhookValidationError, match="Missing X-DeepSearch-Signature"
             ):
@@ -214,7 +228,7 @@ class TestWebhookSignatureValidation:
         """Validation fails with invalid signature format."""
         handler = WebhookHandler()
         with patch("app.services.webhook_handler.settings") as mock_settings:
-            mock_settings.effective_deepsearch_service_secret = "test-secret"
+            mock_settings.effective_deepsearch_service_secret = "test-secret"  # noqa: S105
             with pytest.raises(
                 WebhookValidationError, match="Invalid signature format"
             ):
@@ -224,7 +238,7 @@ class TestWebhookSignatureValidation:
         """Validation fails with incorrect signature."""
         handler = WebhookHandler()
         with patch("app.services.webhook_handler.settings") as mock_settings:
-            mock_settings.effective_deepsearch_service_secret = "test-secret"
+            mock_settings.effective_deepsearch_service_secret = "test-secret"  # noqa: S105
             with pytest.raises(
                 WebhookValidationError, match="Invalid webhook signature"
             ):
@@ -233,7 +247,7 @@ class TestWebhookSignatureValidation:
     def test_validate_signature_valid(self):
         """Validation passes with correct signature."""
         handler = WebhookHandler()
-        secret = "test-secret"
+        secret = "test-secret"  # noqa: S105
         payload = b'{"test": "data"}'
         expected_sig = hmac.new(
             secret.encode("utf-8"),
@@ -249,7 +263,7 @@ class TestWebhookSignatureValidation:
     def test_validate_signature_with_timestamp(self):
         """Validation passes with timestamp included in signature."""
         handler = WebhookHandler()
-        secret = "test-secret"
+        secret = "test-secret"  # noqa: S105
         payload = b'{"test": "data"}'
         timestamp = "1234567890"
         message = f"{timestamp}.{payload.decode('utf-8')}"
@@ -271,21 +285,29 @@ class TestWebhookProcessing:
     """Tests for webhook processing logic."""
 
     def test_process_complete_webhook(self, db_session):
-        """Process successful job completion webhook."""
+        """Success merges worker metrics without accepting reserved-state collisions."""
         mission = _create_test_mission(
             db_session, mission_id="COMPLETE-001", status="in_progress"
         )
+        canonical_state = {
+            "status": "pending",
+            "attempt_count": 1,
+            "attempted_at": "2026-01-01T00:00:00+00:00",
+            "error_categories": [],
+        }
+        mission.execution_metadata = {
+            "existing_metric": "preserved",
+            "result_materialization": canonical_state,
+        }
+        db_session.commit()
+        private_id = str(uuid4())
 
         handler = WebhookHandler()
         payload = DeepSearchWebhookPayload(
             job_id="ds-job-complete",
             mission_id="COMPLETE-001",
             status=DeepSearchWebhookStatus.COMPLETE,
-            execution_metadata=ExecutionMetadata(
-                loops_executed=3,
-                sources_found=12,
-                duration_seconds=187.5,
-            ),
+            execution_metadata=_colliding_execution_metadata(private_id, loops=3),
             result_markdown="# Research Results\n\nFindings here.",
             result_protocol={"summary": "Completed successfully"},
         )
@@ -299,26 +321,92 @@ class TestWebhookProcessing:
         assert updated_mission.result_markdown == "# Research Results\n\nFindings here."
         assert updated_mission.result_protocol == {"summary": "Completed successfully"}
         assert updated_mission.execution_metadata["loops_executed"] == 3
-        assert updated_mission.execution_metadata["sources_found"] == 12
+        assert updated_mission.execution_metadata["worker_metric"] == "merged"
+        assert updated_mission.execution_metadata["existing_metric"] == "preserved"
+        assert updated_mission.execution_metadata["result_materialization"] == (
+            canonical_state
+        )
+        assert private_id not in json.dumps(updated_mission.execution_metadata)
         assert updated_mission.completed_at is not None
         assert updated_mission.error_message is None
         assert status_msg == "completed"
 
+    def test_complete_webhook_collision_stays_canonical_when_materializer_raises(
+        self,
+        db_session,
+    ):
+        """A failed materializer cannot leave worker-private reserved metadata behind."""
+        mission = _create_test_mission(
+            db_session,
+            mission_id="COMPLETE-COLLISION-ERROR",
+            status="in_progress",
+        )
+        canonical_state = {
+            "status": "pending",
+            "attempt_count": 2,
+            "attempted_at": "2026-01-02T00:00:00+00:00",
+            "error_categories": [],
+        }
+        mission.execution_metadata = {
+            "existing_metric": "preserved",
+            "result_materialization": canonical_state,
+        }
+        db_session.commit()
+        private_id = str(uuid4())
+        materializer = MagicMock()
+        materializer.materialize.side_effect = RuntimeError(
+            f"private materializer failure for {private_id}"
+        )
+        handler = WebhookHandler()
+        handler._materialization_service = materializer
+        payload = DeepSearchWebhookPayload(
+            job_id="ds-job-complete-collision-error",
+            mission_id=mission.mission_id,
+            status=DeepSearchWebhookStatus.COMPLETE,
+            execution_metadata=_colliding_execution_metadata(private_id, loops=4),
+            result_markdown="# Persisted before materialization failed",
+        )
+
+        with pytest.raises(
+            WebhookProcessingError,
+            match=r"unexpected_materialization_error$",
+        ) as exc_info:
+            handler.process_deepsearch_webhook(db_session, payload)
+
+        db_session.refresh(mission)
+        assert mission.status == "completed"
+        assert mission.execution_metadata["loops_executed"] == 4
+        assert mission.execution_metadata["worker_metric"] == "merged"
+        assert mission.execution_metadata["existing_metric"] == "preserved"
+        assert mission.execution_metadata["result_materialization"] == canonical_state
+        assert private_id not in json.dumps(mission.execution_metadata)
+        assert private_id not in str(exc_info.value)
+        materializer.materialize.assert_called_once()
+
     def test_process_failed_webhook(self, db_session):
-        """Process failed job webhook."""
+        """Failure merges metrics without overwriting canonical reserved state."""
         mission = _create_test_mission(
             db_session, mission_id="FAILED-001", status="in_progress"
         )
+        canonical_state = {
+            "status": "pending",
+            "attempt_count": 1,
+            "attempted_at": "2026-01-01T00:00:00+00:00",
+            "error_categories": [],
+        }
+        mission.execution_metadata = {
+            "existing_metric": "preserved",
+            "result_materialization": canonical_state,
+        }
+        db_session.commit()
+        private_id = str(uuid4())
 
         handler = WebhookHandler()
         payload = DeepSearchWebhookPayload(
             job_id="ds-job-failed",
             mission_id="FAILED-001",
             status=DeepSearchWebhookStatus.FAILED,
-            execution_metadata=ExecutionMetadata(
-                loops_executed=1,
-                duration_seconds=30.0,
-            ),
+            execution_metadata=_colliding_execution_metadata(private_id, loops=1),
             error="API rate limit exceeded",
         )
 
@@ -330,19 +418,38 @@ class TestWebhookProcessing:
         assert updated_mission.deepsearch_job_id == "ds-job-failed"
         assert updated_mission.error_message == "API rate limit exceeded"
         assert updated_mission.execution_metadata["loops_executed"] == 1
+        assert updated_mission.execution_metadata["worker_metric"] == "merged"
+        assert updated_mission.execution_metadata["existing_metric"] == "preserved"
+        assert updated_mission.execution_metadata["result_materialization"] == (
+            canonical_state
+        )
+        assert private_id not in json.dumps(updated_mission.execution_metadata)
         assert status_msg == "failed"
 
     def test_process_cancelled_webhook(self, db_session):
-        """Process cancelled job webhook."""
+        """Cancellation merges metrics without overwriting canonical reserved state."""
         mission = _create_test_mission(
             db_session, mission_id="CANCEL-001", status="in_progress"
         )
+        canonical_state = {
+            "status": "failed",
+            "attempt_count": 2,
+            "attempted_at": "2026-01-02T00:00:00+00:00",
+            "error_categories": ["not_search_ready"],
+        }
+        mission.execution_metadata = {
+            "existing_metric": "preserved",
+            "result_materialization": canonical_state,
+        }
+        db_session.commit()
+        private_id = str(uuid4())
 
         handler = WebhookHandler()
         payload = DeepSearchWebhookPayload(
             job_id="ds-job-cancelled",
             mission_id="CANCEL-001",
             status=DeepSearchWebhookStatus.CANCELLED,
+            execution_metadata=_colliding_execution_metadata(private_id, loops=2),
             error="User requested cancellation",
         )
 
@@ -353,6 +460,13 @@ class TestWebhookProcessing:
         assert updated_mission.status == "cancelled"
         assert updated_mission.deepsearch_job_id == "ds-job-cancelled"
         assert "cancellation" in updated_mission.error_message.lower()
+        assert updated_mission.execution_metadata["loops_executed"] == 2
+        assert updated_mission.execution_metadata["worker_metric"] == "merged"
+        assert updated_mission.execution_metadata["existing_metric"] == "preserved"
+        assert updated_mission.execution_metadata["result_materialization"] == (
+            canonical_state
+        )
+        assert private_id not in json.dumps(updated_mission.execution_metadata)
         assert status_msg == "cancelled"
 
     def test_process_webhook_mission_not_found(self, db_session):
@@ -371,7 +485,7 @@ class TestWebhookProcessing:
 
     def test_process_webhook_idempotent_same_job(self, db_session):
         """Webhook is idempotent - same job_id processed twice returns early."""
-        mission = _create_test_mission(
+        _create_test_mission(
             db_session,
             mission_id="IDEMPOTENT-001",
             status="completed",
@@ -396,7 +510,7 @@ class TestWebhookProcessing:
 
     def test_process_webhook_idempotent_cancelled_status(self, db_session):
         """Webhook is idempotent for cancelled missions."""
-        mission = _create_test_mission(
+        _create_test_mission(
             db_session,
             mission_id="IDEMPOTENT-002",
             status="cancelled",
@@ -524,7 +638,7 @@ class TestWebhookAPIEndpoint:
         }
 
         with patch("app.services.webhook_handler.settings") as mock_settings:
-            mock_settings.effective_deepsearch_service_secret = "real-secret"
+            mock_settings.effective_deepsearch_service_secret = "real-secret"  # noqa: S105
 
             response = client.post(
                 "/api/v1/webhooks/deepsearch",
@@ -548,7 +662,7 @@ class TestWebhookAPIEndpoint:
         }
 
         # Compute signature (need to match exact JSON serialization)
-        secret = "test-webhook-secret"
+        secret = "test-webhook-secret"  # noqa: S105
         payload_bytes = json.dumps(payload, separators=(",", ":")).encode("utf-8")
         signature = hmac.new(secret.encode(), payload_bytes, hashlib.sha256).hexdigest()
 
@@ -589,7 +703,7 @@ class TestWebhookFailedStatus:
 
     def test_failed_without_error_message(self, db_session):
         """Failed webhook without error uses default message."""
-        mission = _create_test_mission(
+        _create_test_mission(
             db_session, mission_id="FAIL-NO-MSG", status="in_progress"
         )
 
@@ -608,7 +722,7 @@ class TestWebhookFailedStatus:
 
     def test_failed_preserves_partial_results(self, db_session):
         """Failed webhook can still have partial execution_metadata."""
-        mission = _create_test_mission(
+        _create_test_mission(
             db_session, mission_id="FAIL-PARTIAL", status="in_progress"
         )
 
@@ -636,7 +750,7 @@ class TestWebhookEdgeCases:
 
     def test_empty_execution_metadata(self, db_session):
         """Webhook with no execution_metadata uses empty dict."""
-        mission = _create_test_mission(
+        _create_test_mission(
             db_session, mission_id="EMPTY-META", status="in_progress"
         )
 
@@ -655,7 +769,7 @@ class TestWebhookEdgeCases:
 
     def test_large_result_markdown(self, db_session):
         """Webhook with large markdown content is stored correctly."""
-        mission = _create_test_mission(
+        _create_test_mission(
             db_session, mission_id="LARGE-MD", status="in_progress"
         )
 
@@ -676,7 +790,7 @@ class TestWebhookEdgeCases:
 
     def test_complex_result_protocol(self, db_session):
         """Webhook with complex nested result_protocol."""
-        mission = _create_test_mission(
+        _create_test_mission(
             db_session, mission_id="COMPLEX-PROTO", status="in_progress"
         )
 

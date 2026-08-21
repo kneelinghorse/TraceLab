@@ -8,9 +8,9 @@ substitute for green GitHub checks.
 
 | Lane | Command | Result |
 | --- | --- | --- |
-| Clean collection | Fresh Python 3.11.9 virtualenv, `pip install -e '.[dev,test]'`, then `pytest --collect-only -q` | 2,054 collected, 0 errors |
-| Backend suite | `pytest --ignore=tests/integration` with every node in `backend-quarantine.txt` passed as `--deselect` | 1,932 passed, 3 skipped, 51 deselected |
-| PostgreSQL integration | `pytest tests/integration -q` with a PostgreSQL 15 testcontainer | 64 passed, 4 skipped |
+| Clean collection | Fresh Python 3.11.9 virtualenv, `pip install -e '.[dev,test]'`, then `pytest --collect-only -q` | 2,147 collected, 0 errors |
+| Backend suite | `pytest --ignore=tests/integration` with every node in `backend-quarantine.txt` passed as `--deselect` | 1,996 passed, 3 skipped, 49 deselected |
+| PostgreSQL integration | `pytest tests/integration -q` with a PostgreSQL 15 testcontainer | 95 passed, 4 skipped |
 | Frontend unit | `npm run test:unit -- --run` | 66 passed |
 | Frontend types | `npm run type-check` | Passed |
 | Frontend production build | `npm run build` | Passed |
@@ -31,9 +31,9 @@ mypy reports 970 errors. They are not silently treated as passing gates.
 
 ## Quarantine contract
 
-`backend-quarantine.txt` contains exactly 51 unique pytest node IDs. Every row
+`backend-quarantine.txt` contains exactly 49 unique pytest node IDs. Every row
 has a reason, tests remain collected, and the workflow fails unless pytest's own
-summary reports exactly 51 deselections. A stale, duplicate, or misspelled node
+summary reports exactly 49 deselections. A stale, duplicate, or misspelled node
 therefore breaks the gate instead of quietly shrinking coverage.
 
 ## Promotion ratchet
