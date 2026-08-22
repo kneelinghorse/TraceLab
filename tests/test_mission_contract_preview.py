@@ -10,6 +10,7 @@ entirely in-process.
 """
 from __future__ import annotations
 
+import builtins
 import uuid
 
 import pytest
@@ -20,6 +21,7 @@ from app.main import app
 from app.models.mission import Mission
 from app.models.project import Project
 from app.services import deepsearch_preview_client
+from app.services.contract_compiler import contract as contract_compiler
 
 
 def _make_project(db_session) -> Project:
@@ -109,6 +111,124 @@ class TestContractPreviewRoute:
         # Threshold overrides are passed through unchanged.
         assert body["coverage_thresholds"]["min_sources"] == pytest.approx(12.0)
         assert body["validation_thresholds"]["structural"] == pytest.approx(0.85)
+
+    @pytest.mark.parametrize("required_entities", [None, []], ids=["none", "empty"])
+    def test_empty_required_entities_use_offline_deterministic_regex_preview(
+        self,
+        auth_headers,
+        db_session,
+        monkeypatch,
+        required_entities,
+    ):
+        """Legacy missions always use the vendored deterministic preview path.
+
+        TraceLab deploys without the DeepSearch package, and an accidental local
+        installation must not change preview behavior. Empty entity authoring uses
+        regex extraction without importing DeepSearch or contacting a provider.
+        """
+        import httpx
+
+        real_import = builtins.__import__
+        real_regex_extractor = contract_compiler._extract_named_entities
+        blocked_imports: list[str] = []
+        regex_results: list[list[str]] = []
+        outbound_attempts: list[str] = []
+
+        def reject_deepsearch_import(name, *args, **kwargs):
+            if name == "deepsearch" or name.startswith("deepsearch."):
+                blocked_imports.append(name)
+                raise AssertionError(
+                    "contract preview must not import the DeepSearch runtime"
+                )
+            return real_import(name, *args, **kwargs)
+
+        def record_regex_fallback(*args, **kwargs):
+            result = real_regex_extractor(*args, **kwargs)
+            regex_results.append(result)
+            return result
+
+        def fail_outbound(*args, **kwargs):
+            outbound_attempts.append("httpx call attempted")
+            raise AssertionError("contract preview must not call an outbound provider")
+
+        monkeypatch.setattr(builtins, "__import__", reject_deepsearch_import)
+        monkeypatch.setattr(
+            contract_compiler,
+            "_extract_named_entities",
+            record_regex_fallback,
+        )
+        monkeypatch.setattr(httpx.HTTPTransport, "handle_request", fail_outbound)
+        monkeypatch.setattr(
+            httpx.AsyncHTTPTransport,
+            "handle_async_request",
+            fail_outbound,
+        )
+
+        project = _make_project(db_session)
+        mission = _make_mission(
+            db_session,
+            project,
+            title="Compare NASA and PyTorch",
+            objective="Compare NASA, PyTorch, and TensorFlow.",
+            success_criteria=["Rank source coverage."],
+            background=None,
+            focus=None,
+            references=[],
+            required_entities=required_entities,
+        )
+
+        client = TestClient(app)
+        response = client.get(
+            f"/api/v1/missions/{mission.id}/contract-preview",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200, response.text
+        assert response.json()["named_entities"] == ["NASA", "PyTorch", "TensorFlow"]
+        assert regex_results == [["NASA", "PyTorch", "TensorFlow"]]
+        assert blocked_imports == []
+        assert outbound_attempts == []
+
+    def test_declared_entities_bypass_extractors_when_deepsearch_is_absent(
+        self,
+        auth_headers,
+        db_session,
+        monkeypatch,
+    ):
+        """Authored entities remain authoritative and require no extractor."""
+        real_import = builtins.__import__
+
+        def reject_deepsearch_import(name, *args, **kwargs):
+            if name == "deepsearch" or name.startswith("deepsearch."):
+                raise AssertionError("declared required_entities must bypass DeepSearch imports")
+            return real_import(name, *args, **kwargs)
+
+        def reject_regex_fallback(*args, **kwargs):
+            raise AssertionError("declared required_entities must bypass regex extraction")
+
+        monkeypatch.setattr(builtins, "__import__", reject_deepsearch_import)
+        monkeypatch.setattr(
+            contract_compiler,
+            "_extract_named_entities",
+            reject_regex_fallback,
+        )
+
+        project = _make_project(db_session)
+        mission = _make_mission(
+            db_session,
+            project,
+            objective="Compare NASA, PyTorch, and TensorFlow.",
+            required_entities=["AWS Lambda", "Google Cloud Run"],
+        )
+
+        client = TestClient(app)
+        response = client.get(
+            f"/api/v1/missions/{mission.id}/contract-preview",
+            headers=auth_headers,
+        )
+
+        assert response.status_code == 200, response.text
+        assert response.json()["named_entities"] == ["AWS Lambda", "Google Cloud Run"]
 
     def test_compiler_rejection_returns_422(
         self, auth_headers, db_session, monkeypatch

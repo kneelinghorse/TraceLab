@@ -100,6 +100,9 @@ ignore = ["E501", "B008"]  # E501: line length relaxed; B008: FastAPI Depends() 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101"]
 "alembic/**" = ["E402"]
+# Preserve the pinned compiler's upstream typing syntax; correctness rules
+# (E/F/W/B/SIM/S) remain enforced on the vendored package.
+"app/services/contract_compiler/**" = ["UP006", "UP007", "UP017", "UP035", "UP038"]
 
 # --- Mypy ---
 

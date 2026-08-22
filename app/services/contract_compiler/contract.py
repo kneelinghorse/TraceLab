@@ -3,10 +3,10 @@
 VENDORED from DeepSearch.alpha — see cmos/contracts/deepsearch-compiler-vendor.md
 for the pinned commit, resync ritual, and rationale (T41.1, sprint-41).
 
-Do not hand-edit. Regenerate via the resync ritual when DS publishes a new
-contract compiler revision. Local edits are permitted only when the upstream
-removes a symbol TraceLab still needs — document any such patch in the
-vendor doc.
+Do not hand-edit except for TraceLab-local patches explicitly listed in the
+vendor document. Regenerate via the resync ritual when DS publishes a new
+contract compiler revision, then reapply and revalidate those documented
+patches.
 """
 
 from __future__ import annotations
@@ -1282,7 +1282,13 @@ def _extract_entities_llm_first(
     required_entities: Sequence[str],
     missing_registry_acronyms: set[str],
 ) -> tuple[List[str], Dict[str, str], Dict[str, List[str]], str, List[Dict[str, str]]]:
-    """Run LLM-first entity extraction with regex fallback (S54.2 + S56.3).
+    """Extract preview entities without importing DeepSearch runtime code.
+
+    TraceLab intentionally vendors only the deterministic compiler boundary;
+    the DeepSearch worker package and its provider-backed entity extractor are
+    not runtime dependencies of the API service. Declared entities remain
+    authoritative. When they are absent, preview uses the vendored regex
+    extractor so compilation stays local, deterministic, and offline.
 
     Returns a 5-tuple
     ``(entity_names, disambiguation, query_surfaces, path, llm_decisions)``:
@@ -1296,14 +1302,12 @@ def _extract_entities_llm_first(
     - ``query_surfaces`` — S56.3. Mapping entity → list of retrieval-friendly
       variants the LLM emitted alongside the canonical name. Empty dict on
       the regex fallback path.
-    - ``path`` — telemetry tag: ``"llm_primary"`` (LLM call succeeded),
-      ``"regex_fallback"`` (LLM construction or call failed), or
+    - ``path`` — telemetry tag: ``"regex_fallback"`` (TraceLab-local
+      deterministic extraction), or
       ``"skipped_declared_authoritative"`` (S59.2 — author declared
       ``required_entities`` so the prose-extraction path is bypassed).
-    - ``llm_decisions`` — extraction-decision rows for entities the LLM
-      explicitly rejected (e.g., participial fragments). Each row carries
-      ``decision="rejected_llm"`` and a ``reason`` from the model's
-      ``rejection_reason`` field. Empty list on the regex fallback path.
+    - ``llm_decisions`` — retained for compiler-shape compatibility and always
+      empty in TraceLab's offline preview path.
     """
 
     # S59.2 — when the author explicitly declares ``required_entities``, the
@@ -1315,70 +1319,11 @@ def _extract_entities_llm_first(
     if any(str(e or "").strip() for e in required_entities):
         return [], {}, {}, "skipped_declared_authoritative", []
 
-    from deepsearch.mission.entity_extractor_llm import (
-        LLMEntityExtractor,
-        run_llm_entity_extraction_sync,
+    regex_entities = _extract_named_entities(
+        extraction_inputs,
+        missing_registry_acronyms=missing_registry_acronyms,
     )
-
-    try:
-        from deepsearch.config import DeepSearchSettings
-    except ImportError:  # pragma: no cover - defensive
-        regex_entities = _extract_named_entities(
-            extraction_inputs,
-            missing_registry_acronyms=missing_registry_acronyms,
-        )
-        return regex_entities, {}, {}, "regex_fallback", []
-
-    try:
-        settings = DeepSearchSettings.load()
-        structured_extractor = settings.build_structured_extractor()
-    except Exception:
-        logger.exception(
-            "build_structured_extractor failed; falling back to regex entity extractor"
-        )
-        regex_entities = _extract_named_entities(
-            extraction_inputs,
-            missing_registry_acronyms=missing_registry_acronyms,
-        )
-        return regex_entities, {}, {}, "regex_fallback", []
-
-    extractor = LLMEntityExtractor(structured_extractor=structured_extractor)
-    objective_text = str(objective or "").strip()
-    objective_inputs = [objective_text] if objective_text else []
-    outcome = run_llm_entity_extraction_sync(
-        extractor,
-        objectives=objective_inputs or list(extraction_inputs),
-        deliverables=list(deliverables),
-        required_entities=list(required_entities),
-    )
-
-    if outcome is None:
-        regex_entities = _extract_named_entities(
-            extraction_inputs,
-            missing_registry_acronyms=missing_registry_acronyms,
-        )
-        return regex_entities, {}, {}, "regex_fallback", []
-
-    # Surface explicit rejections in entity_extraction_decisions so the
-    # audit row makes the extractor's classification visible. Filter empty
-    # rejection_reason to a stable placeholder.
-    rejection_rows: List[Dict[str, str]] = []
-    for entry in outcome.rejected:
-        rejection_rows.append(
-            {
-                "entity": str(entry.name or "").strip(),
-                "decision": "rejected_llm",
-                "reason": (entry.rejection_reason or "").strip() or "llm_rejected",
-            }
-        )
-
-    return (
-        outcome.entity_names,
-        dict(outcome.disambiguation),
-        {entity: list(surfaces) for entity, surfaces in outcome.query_surfaces.items()},
-        outcome.path,
-        rejection_rows,
-    )
+    return regex_entities, {}, {}, "regex_fallback", []
 
 
 def _extract_named_entities(

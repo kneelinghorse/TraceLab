@@ -26,7 +26,7 @@ runtime parity while that pin is stale.
 
 | Source path (DS) | Destination (TraceLab) | Edits made |
 | --- | --- | --- |
-| `deepsearch/mission/contract.py` | `app/services/contract_compiler/contract.py` | Module docstring updated to flag vendor + link this doc; `from deepsearch.agent.deliverable_schemas import ...` rewritten to `from .deliverable_schemas import ...`; `from deepsearch.mission.title_utils import ...` rewritten to `from .title_utils import ...`. No behavior changes. |
+| `deepsearch/mission/contract.py` | `app/services/contract_compiler/contract.py` | Module docstring updated to flag vendor + link this doc; `from deepsearch.agent.deliverable_schemas import ...` rewritten to `from .deliverable_schemas import ...`; `from deepsearch.mission.title_utils import ...` rewritten to `from .title_utils import ...`; the COMPILER-1 offline-preview guard described below is retained. |
 | `deepsearch/agent/deliverable_schemas.py` | `app/services/contract_compiler/deliverable_schemas.py` | Module docstring vendor banner only. |
 | `deepsearch/mission/title_utils.py` | `app/services/contract_compiler/title_utils.py` | Module docstring vendor banner only. |
 
@@ -34,6 +34,24 @@ runtime parity while that pin is stale.
 (not vendored). It exposes the public API surface used by
 `deepsearch_preview_client.py` so internal compiler details remain
 swappable when DS reorganizes its own modules.
+
+### TraceLab-local clean-runtime fallback (COMPILER-1)
+
+The `deepsearch` runtime package is intentionally not a TraceLab dependency.
+When `required_entities` is empty, the vendored compiler always uses its local
+deterministic regex extractor without importing DeepSearch runtime code,
+constructing an LLM client, or making a provider/outbound call. An accidentally
+installed `deepsearch` package must not change preview behavior. Missions with
+non-empty `required_entities` retain the earlier authoritative bypass and never
+enter prose extraction. This guard is a TraceLab-owned runtime-boundary patch,
+not a claim of newer DeepSearch compiler parity; preserve and revalidate it on
+every resync.
+
+The package also retains the pinned source revision's legacy typing syntax.
+`pyproject.toml` suppresses only the pinned CI Ruff version's `UP006`, `UP007`,
+`UP017`, `UP035`, and `UP038` modernization rules for this vendored directory;
+correctness rules remain enabled. This avoids mechanical whole-file churn when
+applying a surgical vendor patch.
 
 ## Why vendor instead of HTTP-call
 
@@ -95,11 +113,14 @@ cp ~/portfolio/DeepSearch.alpha/deepsearch/agent/deliverable_schemas.py \
 cp ~/portfolio/DeepSearch.alpha/deepsearch/mission/title_utils.py \
    app/services/contract_compiler/title_utils.py
 
-# Re-apply the two patches the vendor needs:
+# Re-apply the three patches the vendor needs:
 #   1. The vendor banner in each module docstring
 #   2. In contract.py only:
 #        from deepsearch.agent.deliverable_schemas import (...)  →  from .deliverable_schemas import (...)
 #        from deepsearch.mission.title_utils import normalize_mission_title  →  from .title_utils import normalize_mission_title
+#   3. In contract.py only: preserve the COMPILER-1 offline-preview guard that
+#      always routes empty required_entities to the local regex extractor and
+#      never imports DeepSearch runtime/provider code.
 
 # Run the validation checklist:
 source .venv/bin/activate
@@ -121,6 +142,9 @@ python -c "from app.services.contract_compiler import compile_contract_from_stat
 ## Validation checklist (pass before committing a resync)
 
 - [ ] `pytest tests/test_mission_contract_preview.py` — all green
+- [ ] Clean-runtime route regression — a mission without `required_entities`
+      previews via the deterministic regex fallback and does not import or call
+      DeepSearch runtime/provider code
 - [ ] `pytest tests/test_missions_api.py` — all green (route contract still holds)
 - [ ] `python -c "from app.services.contract_compiler import compile_contract_from_state, MissionContract"` — imports clean
 - [ ] Live ping against canonical mission UUID `2a781109-6122-4576-b5c2-052e5450d22e` (OODS-FIGMA-HOST-01) — `named_entities` includes the 5 declared `required_entities` (AWS Lambda, Google Cloud Run, Vercel Functions, Fly.io, Railway)
