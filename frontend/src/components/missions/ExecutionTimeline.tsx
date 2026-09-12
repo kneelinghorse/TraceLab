@@ -27,10 +27,10 @@ interface TimelineEvent {
 }
 
 const ICON_CLASSES: Record<TimelineEvent["icon"], { bg: string; icon: string }> = {
-  create: { bg: "bg-gray-400", icon: "+" },
-  queue: { bg: "bg-amber-400", icon: "Q" },
-  start: { bg: "bg-blue-400", icon: "S" },
-  complete: { bg: "bg-emerald-400", icon: "C" },
+  create: { bg: "bg-surface-alt", icon: "+" },
+  queue: { bg: "bg-warning", icon: "Q" },
+  start: { bg: "bg-accent", icon: "S" },
+  complete: { bg: "bg-success", icon: "C" },
 };
 
 function TimelineItem({ event, isLast }: { event: TimelineEvent; isLast: boolean }) {
@@ -42,14 +42,14 @@ function TimelineItem({ event, isLast }: { event: TimelineEvent; isLast: boolean
   return (
     <div className="flex gap-3">
       <div className="flex flex-col items-center">
-        <div className={`w-8 h-8 rounded-full ${styles.bg} flex items-center justify-center text-white text-xs font-bold`}>
+        <div className={`w-8 h-8 rounded-full ${styles.bg} flex items-center justify-center text-foreground text-xs font-bold`}>
           {styles.icon}
         </div>
-        {!isLast && <div className="w-0.5 h-full bg-gray-200 dark:bg-gray-700 min-h-[24px]" />}
+        {!isLast && <div className="w-0.5 h-full bg-surface-alt dark:bg-surface-alt min-h-[24px]" />}
       </div>
       <div className="pb-4">
-        <p className="font-medium text-gray-900 dark:text-white">{event.label}</p>
-        <p className="text-sm text-gray-500 dark:text-gray-400" title={absolute}>
+        <p className="font-medium text-foreground dark:text-foreground">{event.label}</p>
+        <p className="text-sm text-muted dark:text-muted" title={absolute}>
           {relative}
         </p>
       </div>
@@ -59,10 +59,10 @@ function TimelineItem({ event, isLast }: { event: TimelineEvent; isLast: boolean
 
 function MetadataCard({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{label}</p>
-      <p className="font-medium text-gray-900 dark:text-white">{String(value)}</p>
-      {hint && <p className="mt-1 text-[11px] text-gray-400 dark:text-gray-500">{hint}</p>}
+    <div className="bg-background dark:bg-background rounded-lg p-3">
+      <p className="text-xs text-muted dark:text-muted mb-1">{label}</p>
+      <p className="font-medium text-foreground dark:text-foreground">{String(value)}</p>
+      {hint && <p className="mt-1 text-[11px] text-muted dark:text-muted">{hint}</p>}
     </div>
   );
 }
@@ -123,7 +123,7 @@ export function ExecutionTimeline({
     <div className="space-y-6">
       {events.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-4">
+          <h3 className="text-sm font-semibold text-secondary dark:text-secondary uppercase tracking-wide mb-4">
             Timeline
           </h3>
           <div className="space-y-0">
@@ -136,7 +136,7 @@ export function ExecutionTimeline({
 
       {hasMetadata && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-4">
+          <h3 className="text-sm font-semibold text-secondary dark:text-secondary uppercase tracking-wide mb-4">
             Execution Details
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -173,7 +173,7 @@ export function ExecutionTimeline({
       )}
 
       {events.length === 0 && !hasMetadata && (
-        <p className="text-gray-500 dark:text-gray-400 text-sm">No execution data available yet.</p>
+        <p className="text-muted dark:text-muted text-sm">No execution data available yet.</p>
       )}
     </div>
   );

@@ -12,11 +12,11 @@ interface CorrectionStatusCardProps {
 }
 
 const STATUS_COLORS: Record<CorrectionStatus, string> = {
-  pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-  in_progress: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  completed: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  failed: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-  skipped: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+  pending: "bg-warning-surface text-warning dark:bg-warning-surface dark:text-warning",
+  in_progress: "bg-info-surface text-info dark:bg-info-surface dark:text-info",
+  completed: "bg-success-surface text-success dark:bg-success-surface dark:text-success",
+  failed: "bg-danger-surface text-danger dark:bg-danger-surface dark:text-danger",
+  skipped: "bg-surface text-foreground dark:bg-surface-alt dark:text-secondary",
 };
 
 const ERROR_TYPE_LABELS: Record<string, string> = {
@@ -33,7 +33,7 @@ function StatBox({ label, value, color }: { label: string; value: number; color:
   return (
     <div className={`px-4 py-3 rounded-lg ${color}`}>
       <div className="text-2xl font-bold">{value}</div>
-      <div className="text-sm opacity-80">{label}</div>
+      <div className="text-sm">{label}</div>
     </div>
   );
 }
@@ -51,22 +51,22 @@ function CorrectionItemRow({ item }: { item: CorrectionItem }) {
   };
 
   return (
-    <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+    <div className="flex items-center justify-between py-2 border-b border-line dark:border-line last:border-0">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className={`text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[item.status]}`}>
             {item.status}
           </span>
-          <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
+          <span className="text-sm font-medium text-foreground dark:text-foreground truncate">
             {item.evidence_id}
           </span>
         </div>
-        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <div className="text-xs text-muted dark:text-muted mt-1">
           {ERROR_TYPE_LABELS[item.error_type] ?? item.error_type} • Retry {item.retry_count}/{item.max_retries}
           {item.best_similarity != null && ` • Best: ${Math.round(item.best_similarity * 100)}%`}
         </div>
       </div>
-      <div className="text-xs text-gray-400 dark:text-gray-500 ml-4">
+      <div className="text-xs text-muted dark:text-muted ml-4">
         {timeSince(item.updated_at)}
       </div>
     </div>
@@ -85,9 +85,9 @@ export function CorrectionStatusCard({
     : 0;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+    <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 className="text-lg font-semibold text-foreground dark:text-foreground">
           Correction Queue
         </h3>
         <div className="flex gap-2">
@@ -95,7 +95,7 @@ export function CorrectionStatusCard({
             <button
               onClick={onTriggerRetry}
               disabled={isLoading}
-              className="text-sm px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+              className="text-sm px-3 py-1.5 bg-accent text-on-accent rounded hover:bg-accent disabled:opacity-50"
             >
               Retry Pending
             </button>
@@ -104,7 +104,7 @@ export function CorrectionStatusCard({
             <button
               onClick={onClearCompleted}
               disabled={isLoading}
-              className="text-sm px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+              className="text-sm px-3 py-1.5 border border-line-strong dark:border-line-strong text-secondary dark:text-secondary rounded hover:bg-background dark:hover:bg-surface-alt disabled:opacity-50"
             >
               Clear Completed
             </button>
@@ -117,41 +117,41 @@ export function CorrectionStatusCard({
         <StatBox
           label="Pending"
           value={stats.pending}
-          color="bg-yellow-50 text-yellow-900 dark:bg-yellow-900/30 dark:text-yellow-200"
+          color="bg-warning-surface text-warning dark:bg-warning-surface dark:text-warning"
         />
         <StatBox
           label="In Progress"
           value={stats.in_progress}
-          color="bg-blue-50 text-blue-900 dark:bg-blue-900/30 dark:text-blue-200"
+          color="bg-info-surface text-info dark:bg-info-surface dark:text-accent-text"
         />
         <StatBox
           label="Completed"
           value={stats.completed}
-          color="bg-green-50 text-green-900 dark:bg-green-900/30 dark:text-green-200"
+          color="bg-success-surface text-success dark:bg-success-surface dark:text-success"
         />
         <StatBox
           label="Failed"
           value={stats.failed}
-          color="bg-red-50 text-red-900 dark:bg-red-900/30 dark:text-red-200"
+          color="bg-danger-surface text-danger dark:bg-danger-surface dark:text-danger"
         />
         <StatBox
           label="Success Rate"
           value={successRate}
-          color="bg-purple-50 text-purple-900 dark:bg-purple-900/30 dark:text-purple-200"
+          color="bg-info-surface text-info dark:bg-info-surface dark:text-accent-text"
         />
       </div>
 
       {/* Error Distribution */}
       {Object.keys(error_distribution).length > 0 && (
         <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <h4 className="text-sm font-medium text-secondary dark:text-secondary mb-3">
             Error Distribution
           </h4>
           <div className="flex flex-wrap gap-2">
             {Object.entries(error_distribution).map(([type, count]) => (
               <span
                 key={type}
-                className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded"
+                className="text-xs px-2 py-1 bg-surface dark:bg-surface-alt text-secondary dark:text-secondary rounded"
               >
                 {ERROR_TYPE_LABELS[type] ?? type}: {count}
               </span>
@@ -163,7 +163,7 @@ export function CorrectionStatusCard({
       {/* Recent Items */}
       {recent_items.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <h4 className="text-sm font-medium text-secondary dark:text-secondary mb-3">
             Recent Items
           </h4>
           <div className="max-h-64 overflow-y-auto">
@@ -176,13 +176,13 @@ export function CorrectionStatusCard({
 
       {/* Empty State */}
       {stats.total === 0 && (
-        <p className="text-center text-gray-500 dark:text-gray-400 py-4">
+        <p className="text-center text-muted dark:text-muted py-4">
           No corrections in queue.
         </p>
       )}
 
       {/* Last Updated */}
-      <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-400 dark:text-gray-500">
+      <div className="mt-4 pt-4 border-t border-line dark:border-line text-xs text-muted dark:text-muted">
         Last updated: {new Date(status.last_updated).toLocaleString()}
       </div>
     </div>

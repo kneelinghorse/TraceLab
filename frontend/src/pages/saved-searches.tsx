@@ -99,20 +99,20 @@ function SavedSearchesManager() {
   };
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--background))]">
-      <main className="mx-auto max-w-5xl space-y-8 px-4 py-12 sm:px-6 lg:px-8">
-        <header className="glass-card rounded-3xl p-8 text-white">
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Saved searches</p>
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto max-w-5xl space-y-8 px-4 py-12 sm:px-6 lg:px-8">
+        <header className="panel rounded-3xl p-8 text-foreground">
+          <p className="text-xs uppercase tracking-[0.3em] text-muted">Saved searches</p>
           <h1 className="mt-2 text-3xl font-semibold">Organize high-signal queries</h1>
-          <p className="mt-3 text-slate-300">
+          <p className="mt-3 text-secondary">
             Bookmark the prompts you trust, edit their metadata, and prune the list when you hit the {limit} search limit.
           </p>
         </header>
 
-        <section className="glass-card rounded-3xl p-6">
+        <section className="panel rounded-3xl p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold text-white">Your saved searches</h2>
-            <span className="text-sm text-slate-400">
+            <h2 className="text-2xl font-semibold text-foreground">Your saved searches</h2>
+            <span className="text-sm text-muted">
               {savedSearches.length}/{limit} used
             </span>
           </div>
@@ -128,36 +128,36 @@ function SavedSearchesManager() {
           </div>
         </section>
 
-        <section className="glass-card rounded-3xl p-6 text-white">
+        <section className="panel rounded-3xl p-6 text-foreground">
           <h2 className="text-2xl font-semibold">Edit metadata</h2>
-          <p className="mt-2 text-sm text-slate-300">Select an entry above to rename it, tweak the description, or adjust Top K.</p>
+          <p className="mt-2 text-sm text-secondary">Select an entry above to rename it, tweak the description, or adjust Top K.</p>
           <form onSubmit={handleUpdate} className="mt-4 space-y-4">
             <div>
-              <label className="text-xs uppercase tracking-[0.3em] text-slate-400" htmlFor="saved-name">
+              <label className="text-xs uppercase tracking-[0.3em] text-muted" htmlFor="saved-name">
                 Name
               </label>
               <input
                 id="saved-name"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                className="mt-1 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-sky-400/60"
+                className="mt-1 w-full rounded-2xl border border-line bg-surface px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-focus"
                 placeholder="Daily checkout briefing"
               />
             </div>
             <div>
-              <label className="text-xs uppercase tracking-[0.3em] text-slate-400" htmlFor="saved-description">
+              <label className="text-xs uppercase tracking-[0.3em] text-muted" htmlFor="saved-description">
                 Description
               </label>
               <textarea
                 id="saved-description"
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
-                className="mt-1 w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-sky-400/60"
+                className="mt-1 w-full rounded-2xl border border-line bg-surface px-4 py-3 text-foreground focus:outline-none focus:ring-2 focus:ring-focus"
                 placeholder="Summarize incidents for the go-to-market team."
               />
             </div>
             <div>
-              <label className="text-xs uppercase tracking-[0.3em] text-slate-400" htmlFor="saved-topk">
+              <label className="text-xs uppercase tracking-[0.3em] text-muted" htmlFor="saved-topk">
                 Top K
               </label>
               <input
@@ -167,26 +167,26 @@ function SavedSearchesManager() {
                 max={50}
                 value={topK}
                 onChange={(event) => setTopK(Number(event.target.value))}
-                className="mt-1 w-32 rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-sky-400/60"
+                className="mt-1 w-32 rounded-2xl border border-line bg-surface px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-focus"
               />
             </div>
-            {error && <p className="text-sm text-rose-300">{error}</p>}
-            {message && <p className="text-sm text-emerald-300">{message}</p>}
+            {error && <p className="text-sm text-danger">{error}</p>}
+            {message && <p className="text-sm text-success">{message}</p>}
             <div className="flex flex-wrap items-center gap-3">
               <button
                 type="submit"
                 disabled={!selected || isSaving}
-                className="rounded-full bg-gradient-to-r from-sky-500 to-indigo-500 px-6 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-full bg-accent px-6 py-2 font-semibold text-on-accent disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isSaving ? "Saving…" : "Save changes"}
               </button>
-              <button type="button" onClick={clearSelection} className="text-sm text-slate-400 hover:text-white">
+              <button type="button" onClick={clearSelection} className="text-sm text-muted hover:text-foreground">
                 Clear selection
               </button>
             </div>
           </form>
         </section>
-      </main>
+      </div>
     </div>
   );
 }

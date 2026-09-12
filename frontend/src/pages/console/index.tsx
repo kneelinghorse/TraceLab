@@ -93,28 +93,28 @@ function ConsoleDashboard() {
     .slice(0, 5);
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-background dark:bg-background py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">
             Mission Operations Center
           </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-secondary dark:text-muted">
             Real-time mission progress, PEDR search activity, and operations visibility
           </p>
         </div>
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200">
+          <div className="mb-6 p-4 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg text-danger dark:text-danger">
             {error}
           </div>
         )}
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="text-gray-500 dark:text-gray-400">Loading dashboard...</div>
+            <div className="text-muted dark:text-muted">Loading dashboard...</div>
           </div>
         ) : (
           <>
@@ -159,23 +159,23 @@ function ConsoleDashboard() {
               <div className="flex gap-4">
                 <Link
                   href="/console/missions"
-                  className="flex-1 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
+                  className="flex-1 p-4 bg-surface dark:bg-surface rounded-lg border border-line dark:border-line hover:border-info-line dark:hover:border-info-line transition-colors"
                 >
-                  <h3 className="font-semibold text-gray-900 dark:text-white">
+                  <h3 className="font-semibold text-foreground dark:text-foreground">
                     Mission List
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-muted dark:text-muted mt-1">
                     Browse and filter all missions
                   </p>
                 </Link>
                 <Link
                   href="/console/corrections"
-                  className="flex-1 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
+                  className="flex-1 p-4 bg-surface dark:bg-surface rounded-lg border border-line dark:border-line hover:border-info-line dark:hover:border-info-line transition-colors"
                 >
-                  <h3 className="font-semibold text-gray-900 dark:text-white">
+                  <h3 className="font-semibold text-foreground dark:text-foreground">
                     Corrections Queue
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-muted dark:text-muted mt-1">
                     View and manage pending corrections
                   </p>
                 </Link>
@@ -185,30 +185,30 @@ function ConsoleDashboard() {
             {/* Recent Missions */}
             <section className="mb-8">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-lg font-semibold text-foreground dark:text-foreground">
                   Recent Missions
                 </h2>
                 <Link
                   href="/console/missions"
-                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                  className="text-sm text-accent-text dark:text-accent-text underline underline-offset-4"
                 >
                   View all
                 </Link>
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
+              <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line divide-y divide-line dark:divide-line">
                 {recentMissions.map((mission) => {
                   const hasError = !!mission.error_message;
                   return (
                     <Link
                       key={mission.id}
                       href={`/console/missions/${mission.id}`}
-                      className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      className="flex items-center justify-between p-4 hover:bg-background dark:hover:bg-surface-alt transition-colors"
                     >
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-gray-900 dark:text-white truncate">
+                        <h3 className="font-medium text-foreground dark:text-foreground truncate">
                           {mission.title ?? mission.mission_id ?? "Untitled"}
                         </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-sm text-muted dark:text-muted">
                           {mission.objective?.slice(0, 80) ?? "No objective"}
                           {(mission.objective?.length ?? 0) > 80 ? "..." : ""}
                         </p>
@@ -217,20 +217,20 @@ function ConsoleDashboard() {
                         <span
                           className={`text-xs px-2 py-1 rounded-full ${
                             mission.status === "completed"
-                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                              ? "bg-success-surface text-success dark:bg-success-surface dark:text-success"
                               : mission.status === "in_progress"
-                              ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                              ? "bg-warning-surface text-warning dark:bg-warning-surface dark:text-warning"
                               : mission.status === "queued"
-                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                              ? "bg-info-surface text-info dark:bg-info-surface dark:text-info"
                               : mission.status === "blocked"
-                              ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                              : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                              ? "bg-danger-surface text-danger dark:bg-danger-surface dark:text-danger"
+                              : "bg-surface text-foreground dark:bg-surface-alt dark:text-secondary"
                           }`}
                         >
                           {mission.status ?? "draft"}
                         </span>
                         {hasError && (
-                          <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                          <span className="text-xs px-2 py-1 rounded-full bg-danger-surface text-danger dark:bg-danger-surface dark:text-danger">
                             error
                           </span>
                         )}
@@ -239,7 +239,7 @@ function ConsoleDashboard() {
                   );
                 })}
                 {recentMissions.length === 0 && (
-                  <p className="p-4 text-center text-gray-500 dark:text-gray-400">
+                  <p className="p-4 text-center text-muted dark:text-muted">
                     No missions found.
                   </p>
                 )}
@@ -249,7 +249,7 @@ function ConsoleDashboard() {
             {/* Corrections Status */}
             {data.corrections && (
               <section>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
                   Corrections Overview
                 </h2>
                 <CorrectionStatusCard
@@ -263,7 +263,7 @@ function ConsoleDashboard() {
           </>
         )}
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -299,43 +299,43 @@ function GraphHealthPanel() {
   }, []);
 
   const EDGE_COLORS: Record<string, string> = {
-    topic_similar: "bg-violet-500",
-    contains: "bg-blue-500",
-    part_of: "bg-sky-500",
-    co_occurs: "bg-teal-500",
-    belongs_to: "bg-green-500",
-    references: "bg-yellow-500",
-    derived_from: "bg-orange-500",
+    topic_similar: "bg-accent",
+    contains: "bg-accent",
+    part_of: "bg-accent",
+    co_occurs: "bg-success",
+    belongs_to: "bg-success",
+    references: "bg-warning",
+    derived_from: "bg-warning",
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Graph Layer</h2>
+    <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
+      <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">Graph Layer</h2>
 
       {isLoading ? (
-        <p className="text-sm text-gray-400 dark:text-gray-500">Loading...</p>
+        <p className="text-sm text-muted dark:text-muted">Loading...</p>
       ) : !stats ? (
-        <p className="text-sm text-gray-400 dark:text-gray-500">Graph stats unavailable</p>
+        <p className="text-sm text-muted dark:text-muted">Graph stats unavailable</p>
       ) : (
         <>
           <div className="grid grid-cols-3 gap-4 mb-6">
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-2xl font-bold text-foreground dark:text-foreground">
                 {stats.total_edges?.toLocaleString() ?? "—"}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Total edges</p>
+              <p className="text-xs text-muted dark:text-muted mt-0.5">Total edges</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-2xl font-bold text-foreground dark:text-foreground">
                 {stats.document_count?.toLocaleString() ?? "—"}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Documents</p>
+              <p className="text-xs text-muted dark:text-muted mt-0.5">Documents</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-2xl font-bold text-foreground dark:text-foreground">
                 {stats.chunk_count?.toLocaleString() ?? "—"}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Chunks</p>
+              <p className="text-xs text-muted dark:text-muted mt-0.5">Chunks</p>
             </div>
           </div>
 
@@ -347,12 +347,12 @@ function GraphHealthPanel() {
                 return (
                   <div key={type}>
                     <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-gray-600 dark:text-gray-400">{type}</span>
-                      <span className="font-medium text-gray-900 dark:text-white">{count.toLocaleString()}</span>
+                      <span className="text-secondary dark:text-muted">{type}</span>
+                      <span className="font-medium text-foreground dark:text-foreground">{count.toLocaleString()}</span>
                     </div>
-                    <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5">
+                    <div className="w-full bg-surface dark:bg-surface-alt rounded-full h-1.5">
                       <div
-                        className={`h-1.5 rounded-full ${EDGE_COLORS[type] ?? "bg-gray-400"}`}
+                        className={`h-1.5 rounded-full ${EDGE_COLORS[type] ?? "bg-surface-alt"}`}
                         style={{ width: `${Math.max(pct, 0.5)}%` }}
                       />
                     </div>

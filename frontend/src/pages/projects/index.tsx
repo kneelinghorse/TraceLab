@@ -63,40 +63,40 @@ export default function ProjectsPage() {
 
   return (
     <AuthGate>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-background dark:bg-background">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <header className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Projects</h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Projects</h1>
+            <p className="mt-2 text-secondary dark:text-muted">
               Create and manage research projects. Click a project to view details and upload documents.
             </p>
           </header>
 
           <div className="space-y-6">
             {/* Create Form */}
-            <form onSubmit={handleCreate} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-4">
+            <form onSubmit={handleCreate} className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-6 space-y-4">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Create Project</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Required for document uploads and mission tracking.</p>
+                <h2 className="text-lg font-semibold text-foreground dark:text-foreground">Create Project</h2>
+                <p className="text-sm text-muted dark:text-muted">Required for document uploads and mission tracking.</p>
               </div>
               <div className="grid gap-4 sm:grid-cols-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Name *</label>
+                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Name *</label>
                   <input
                     type="text"
                     value={formState.name}
                     onChange={(e) => setFormState((prev) => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground"
                     placeholder="E.g., 2025 Field Insights"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Research Type</label>
-                  <select
+                  <label htmlFor="project-research-type" className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Research Type</label>
+                  <select id="project-research-type"
                     value={formState.research_type}
                     onChange={(e) => setFormState((prev) => ({ ...prev, research_type: e.target.value }))}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground"
                   >
                     <option value="">Select...</option>
                     {RESEARCH_TYPES.map((type) => (
@@ -110,73 +110,73 @@ export default function ProjectsPage() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                    className="w-full px-6 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent disabled:bg-surface-alt"
                   >
                     {submitting ? "Creating..." : "Create Project"}
                   </button>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description (optional)</label>
+                <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Description (optional)</label>
                 <textarea
                   value={formState.description}
                   onChange={(e) => setFormState((prev) => ({ ...prev, description: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground"
                   rows={2}
                   placeholder="Brief description of the project..."
                 />
               </div>
-              {formError && <p className="text-sm text-red-600">{formError}</p>}
+              {formError && <p className="text-sm text-danger">{formError}</p>}
             </form>
 
             {/* Project List */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-4">
+            <div className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-6 space-y-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Project Library</h2>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Click a project to manage documents and settings.</p>
+                  <h2 className="text-lg font-semibold text-foreground dark:text-foreground">Project Library</h2>
+                  <p className="text-sm text-muted dark:text-muted">Click a project to manage documents and settings.</p>
                 </div>
                 <input
                   type="search"
                   placeholder="Search..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                  className="px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground"
                 />
               </div>
 
               {isLoading && !projectResponse ? (
-                <p className="text-gray-500">Loading projects...</p>
+                <p className="text-muted">Loading projects...</p>
               ) : projects.length === 0 ? (
-                <p className="text-gray-500">No projects found. Create one to begin.</p>
+                <p className="text-muted">No projects found. Create one to begin.</p>
               ) : (
                 <div className="grid gap-4 sm:grid-cols-2">
                   {projects.map((project) => (
                     <Link
                       key={project.id}
                       href={`/projects/${project.id}`}
-                      className="block border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-400 hover:shadow-md transition-all group"
+                      className="block border border-line dark:border-line rounded-lg p-4 hover:border-info-line hover:shadow-md transition-all group"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate">
+                          <p className="font-semibold text-foreground dark:text-foreground group-hover:text-accent-text dark:group-hover:text-accent-text truncate">
                             {project.name}
                           </p>
                           {project.description && (
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{project.description}</p>
+                            <p className="text-sm text-muted dark:text-muted mt-1 line-clamp-2">{project.description}</p>
                           )}
                         </div>
                         {project.research_type && (
-                          <span className="ml-2 px-2 py-1 text-xs rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                          <span className="ml-2 px-2 py-1 text-xs rounded bg-surface dark:bg-surface-alt text-secondary dark:text-secondary">
                             {project.research_type}
                           </span>
                         )}
                       </div>
-                      <div className="mt-3 flex items-center gap-4 text-xs text-gray-400">
+                      <div className="mt-3 flex items-center gap-4 text-xs text-muted">
                         <span>
                           Updated {project.updated_at ? formatDistanceToNow(new Date(project.updated_at), { addSuffix: true }) : "recently"}
                         </span>
-                        <span className={`px-2 py-0.5 rounded ${project.status === "active" ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" : "bg-gray-100 text-gray-600"}`}>
+                        <span className={`px-2 py-0.5 rounded ${project.status === "active" ? "bg-success-surface text-success dark:bg-success-surface dark:text-success" : "bg-surface text-secondary"}`}>
                           {project.status || "active"}
                         </span>
                       </div>
@@ -206,7 +206,7 @@ function ProjectsPagination({ page, pages = 0, onChange }: ProjectsPaginationPro
   }
 
   return (
-    <div className="flex items-center justify-between pt-4 text-sm text-gray-600 dark:text-gray-400">
+    <div className="flex items-center justify-between pt-4 text-sm text-secondary dark:text-muted">
       <span>
         Page {page} of {pages}
       </span>
@@ -214,14 +214,14 @@ function ProjectsPagination({ page, pages = 0, onChange }: ProjectsPaginationPro
         <button
           onClick={() => onChange(Math.max(1, page - 1))}
           disabled={page === 1}
-          className="px-3 py-1 border border-gray-300 dark:border-gray-700 rounded-lg disabled:opacity-40"
+          className="px-3 py-1 border border-line-strong dark:border-line rounded-lg disabled:opacity-40"
         >
           Previous
         </button>
         <button
           onClick={() => onChange(Math.min(pages, page + 1))}
           disabled={page >= pages}
-          className="px-3 py-1 border border-gray-300 dark:border-gray-700 rounded-lg disabled:opacity-40"
+          className="px-3 py-1 border border-line-strong dark:border-line rounded-lg disabled:opacity-40"
         >
           Next
         </button>

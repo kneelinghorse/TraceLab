@@ -49,12 +49,12 @@ export function DynamicListInput({
       <div className="flex items-center justify-between">
         <label className="form-label">
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="text-danger ml-1">*</span>}
         </label>
         <button
           type="button"
           onClick={handleAdd}
-          className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+          className="text-xs font-medium text-accent-text hover:text-accent-text transition-colors"
         >
           + Add Item
         </button>
@@ -74,7 +74,7 @@ export function DynamicListInput({
               <button
                 type="button"
                 onClick={() => handleRemove(index)}
-                className="px-3 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                className="px-3 py-2 text-sm font-medium text-danger hover:text-danger hover:bg-danger-surface rounded-lg transition-colors"
                 aria-label={`Remove item ${index + 1}`}
               >
                 Remove

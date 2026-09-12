@@ -27,19 +27,19 @@ export const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function R
     <div
       ref={ref}
       className={clsx(
-        "rounded-2xl border p-5 transition bg-white/5 backdrop-blur text-white/90",
+        "rounded-2xl border p-5 transition bg-surface backdrop-blur text-foreground",
         isHighlighted
-          ? "border-amber-300 shadow-lg shadow-amber-500/30"
-          : "border-white/10 hover:border-sky-300/60",
+          ? "border-warning-line shadow-lg shadow-sm"
+          : "border-line hover:border-info-line",
       )}
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Chunk score</p>
-          <p className="text-2xl font-semibold text-sky-200">{scoreLabel}</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-secondary">Chunk score</p>
+          <p className="text-2xl font-semibold text-accent-text">{scoreLabel}</p>
         </div>
         {result.chunk_id && (
-          <code className="rounded-full border border-white/15 bg-black/30 px-3 py-1 text-xs text-slate-200">
+          <code className="rounded-full border border-line bg-surface-alt px-3 py-1 text-xs text-secondary">
             {result.chunk_id}
           </code>
         )}
@@ -50,47 +50,47 @@ export const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function R
           {result.project_id && (
             <Link
               href={`/projects/${result.project_id}`}
-              className="text-sky-300 hover:text-sky-200 hover:underline"
+              className="text-accent-text hover:text-accent-text underline underline-offset-4"
             >
               {projectLabel}
             </Link>
           )}
           {result.project_id && result.document_id && (
-            <span className="text-slate-500">/</span>
+            <span className="text-secondary">/</span>
           )}
           {result.document_id ? (
             <Link
               href={`/documents/${result.document_id}`}
-              className="text-slate-300 hover:text-white hover:underline"
+              className="text-secondary hover:text-foreground underline underline-offset-4"
             >
               {documentLabel}
             </Link>
           ) : (
-            <span className="text-slate-300">{documentLabel}</span>
+            <span className="text-secondary">{documentLabel}</span>
           )}
         </div>
-        <div className="flex flex-wrap items-center gap-2 text-sm text-slate-400">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-secondary">
           <span>{result.source_type ? result.source_type : "Unknown type"}</span>
           {document?.uploaded_at && (
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-secondary">
               Uploaded {new Date(document.uploaded_at).toLocaleDateString()}
             </span>
           )}
           {/* PEDR metadata badges */}
           {result.element_type && (
-            <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-300">
+            <span className="rounded-full border border-success-line bg-success-surface px-2 py-0.5 text-xs text-success">
               {result.element_type}
             </span>
           )}
           {result.quality_score !== undefined && result.quality_score < 1 && (
-            <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs text-amber-300">
+            <span className="rounded-full border border-warning-line bg-warning-surface px-2 py-0.5 text-xs text-warning">
               Quality: {(result.quality_score * 100).toFixed(0)}%
             </span>
           )}
         </div>
       </div>
 
-      <p className="mt-4 text-slate-100 leading-relaxed whitespace-pre-line">{chunkPreview}</p>
+      <p className="mt-4 text-foreground leading-relaxed whitespace-pre-line">{chunkPreview}</p>
 
       <div className="mt-4 flex flex-wrap items-center justify-end gap-4">
         {result.chunk_id && (

@@ -38,18 +38,18 @@ export function ExportButtons({ mission, relationships, className = "" }: Export
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <span className="text-sm text-gray-500 dark:text-gray-400">Export:</span>
+      <span className="text-sm text-muted dark:text-muted">Export:</span>
       <button
         onClick={() => handleExport("json")}
         disabled={isExporting}
-        className="text-sm px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+        className="text-sm px-3 py-1.5 border border-line-strong dark:border-line-strong text-secondary dark:text-secondary rounded hover:bg-background dark:hover:bg-surface-alt disabled:opacity-50 transition-colors"
       >
         JSON
       </button>
       <button
         onClick={() => handleExport("yaml")}
         disabled={isExporting}
-        className="text-sm px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors"
+        className="text-sm px-3 py-1.5 border border-line-strong dark:border-line-strong text-secondary dark:text-secondary rounded hover:bg-background dark:hover:bg-surface-alt disabled:opacity-50 transition-colors"
       >
         YAML
       </button>

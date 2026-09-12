@@ -118,78 +118,78 @@ export function SaveSearchButton({
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-secondary">
           Saved searches: {savedSearchCount}/{limitPerUser}
         </p>
         <button
           type="button"
           onClick={() => openPanel()}
           disabled={!canCreate}
-          className="rounded-full border border-white/20 px-4 py-1 text-sm text-white hover:border-sky-300 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full border border-line px-4 py-1 text-sm text-foreground hover:border-info-line disabled:cursor-not-allowed disabled:opacity-50"
         >
           Save current search
         </button>
       </div>
       {isOpen && draft && (
-        <div className="rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-slate-200">
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Save search</p>
+        <div className="rounded-2xl border border-line bg-surface-alt p-4 text-sm text-secondary">
+          <p className="text-xs uppercase tracking-[0.3em] text-secondary">Save search</p>
           <div className="mt-3 space-y-3">
             <div>
-              <label className="text-xs uppercase tracking-[0.3em] text-slate-400" htmlFor="saved-search-name">
+              <label className="text-xs uppercase tracking-[0.3em] text-secondary" htmlFor="saved-search-name">
                 Name
               </label>
               <input
                 id="saved-search-name"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                className="mt-1 w-full rounded-xl border border-white/15 bg-slate-900/60 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-sky-500/60"
+                className="mt-1 w-full rounded-xl border border-line bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-focus"
                 placeholder="Weekly risk briefing"
               />
             </div>
             <div>
-              <label className="text-xs uppercase tracking-[0.3em] text-slate-400" htmlFor="saved-search-description">
+              <label className="text-xs uppercase tracking-[0.3em] text-secondary" htmlFor="saved-search-description">
                 Description
               </label>
               <textarea
                 id="saved-search-description"
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
-                className="mt-1 w-full rounded-xl border border-white/15 bg-slate-900/60 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-sky-500/60"
+                className="mt-1 w-full rounded-xl border border-line bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-focus"
                 placeholder="Highlights checkout incidents in Sprint 09."
               />
             </div>
-            <div className="rounded-xl border border-white/10 bg-slate-900/40 p-3 text-xs text-slate-300">
-              <p className="font-semibold text-white">Query</p>
+            <div className="rounded-xl border border-line bg-background p-3 text-xs text-secondary">
+              <p className="font-semibold text-foreground">Query</p>
               <p>{draft.query}</p>
               {filtersSummary.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {filtersSummary.map((chip) => (
-                    <span key={chip} className="rounded-full border border-white/15 px-2 py-0.5 text-[11px] text-white/80">
+                    <span key={chip} className="rounded-full border border-line px-2 py-0.5 text-[11px] text-foreground">
                       {chip}
                     </span>
                   ))}
                 </div>
               )}
-              <p className="mt-1 text-slate-400">Top K: {draft.topK}</p>
+              <p className="mt-1 text-secondary">Top K: {draft.topK}</p>
             </div>
-            {error && <p className="text-sm text-rose-300">{error}</p>}
+            {error && <p className="text-sm text-danger">{error}</p>}
             <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 onClick={() => void handleSave()}
                 disabled={isSaving}
-                className="rounded-full bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-2 font-semibold text-white shadow-lg shadow-sky-500/30 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-full bg-accent px-4 py-2 font-semibold text-on-accent shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSaving ? "Saving…" : "Save search"}
               </button>
-              <button type="button" onClick={closePanel} className="text-sm text-slate-400 hover:text-white">
+              <button type="button" onClick={closePanel} className="text-sm text-secondary hover:text-foreground">
                 Cancel
               </button>
             </div>
           </div>
         </div>
       )}
-      {!canCreate && <p className="text-xs text-amber-300">Limit reached. Remove an entry to add another.</p>}
+      {!canCreate && <p className="text-xs text-warning">Limit reached. Remove an entry to add another.</p>}
     </div>
   );
 }

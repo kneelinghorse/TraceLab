@@ -9,7 +9,7 @@ import type { Mission } from "@/types/mission";
 import { EvidenceLinking } from "@/components/EvidenceLinking";
 import { missionFormSchema, type MissionFormValues } from "@/lib/schemas/missionForm";
 
-const SECTION_CLASS = "rounded-3xl border border-slate-200 bg-white p-6 shadow-sm";
+const SECTION_CLASS = "rounded-3xl border border-line bg-surface p-6 shadow-sm";
 
 type MissionProtocolFormProps = {
   mission?: Mission;
@@ -274,8 +274,8 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
     <form onSubmit={onSubmit} className="space-y-6">
       <section className={`${SECTION_CLASS} space-y-4`}>
         <header>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Mission Metadata</p>
-          <h2 className="text-2xl font-semibold text-slate-900">Mission Protocol Draft</h2>
+          <p className="text-xs uppercase tracking-[0.3em] text-muted">Mission Metadata</p>
+          <h2 className="text-2xl font-semibold text-foreground">Mission Protocol Draft</h2>
         </header>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
@@ -311,8 +311,8 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
             {errors.summary && <p className="form-error">{errors.summary.message}</p>}
           </div>
         </div>
-        <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4">
-          <p className="text-sm font-semibold text-slate-800">Mission templates</p>
+        <div className="rounded-2xl border border-dashed border-line bg-background p-4">
+          <p className="text-sm font-semibold text-foreground">Mission templates</p>
           <div className="mt-2 flex flex-col gap-3 md:flex-row">
             <select
               value={selectedTemplateId}
@@ -330,19 +330,19 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
               type="button"
               onClick={handleTemplateApply}
               disabled={!selectedTemplateId}
-              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-lg bg-background px-4 py-2 text-sm font-semibold text-foreground shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
             >
               Apply template
             </button>
           </div>
-          {selectedTemplate && <p className="mt-2 text-xs text-slate-500">{selectedTemplate.description}</p>}
+          {selectedTemplate && <p className="mt-2 text-xs text-muted">{selectedTemplate.description}</p>}
         </div>
       </section>
 
       <section className={`${SECTION_CLASS} space-y-4`}>
         <header>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Research Statement</p>
-          <h2 className="text-2xl font-semibold text-slate-900">Anchor the Mission</h2>
+          <p className="text-xs uppercase tracking-[0.3em] text-muted">Research Statement</p>
+          <h2 className="text-2xl font-semibold text-foreground">Anchor the Mission</h2>
         </header>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
@@ -382,20 +382,20 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
       <section className={`${SECTION_CLASS} space-y-4`}>
         <header className="flex items-center justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Key Questions</p>
-            <h2 className="text-2xl font-semibold text-slate-900">Decision Frame</h2>
+            <p className="text-xs uppercase tracking-[0.3em] text-muted">Key Questions</p>
+            <h2 className="text-2xl font-semibold text-foreground">Decision Frame</h2>
           </div>
           <button
             type="button"
             onClick={() => appendQuestion(DEFAULT_QUESTION)}
-            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+            className="rounded-lg bg-background px-4 py-2 text-sm font-semibold text-foreground shadow-sm transition hover:bg-surface"
           >
             Add Key Question
           </button>
         </header>
         <div className="space-y-4">
           {questionFields.map((field, index) => (
-            <div key={field.id} className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-4">
+            <div key={field.id} className="grid gap-3 rounded-2xl border border-line bg-background p-4 md:grid-cols-4">
               <div className="md:col-span-2">
                 <label className="form-label">Question</label>
                 <input {...register(`keyQuestions.${index}.question` as const)} className="form-input" />
@@ -420,7 +420,7 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
                 <textarea {...register(`keyQuestions.${index}.answer` as const)} className="form-input min-h-[70px]" />
               </div>
               <div className="flex items-center justify-end">
-                <button type="button" onClick={() => removeQuestion(index)} className="text-sm font-medium text-rose-600 hover:text-rose-700">
+                <button type="button" onClick={() => removeQuestion(index)} className="text-sm font-medium text-danger hover:text-danger">
                   Remove
                 </button>
               </div>
@@ -431,8 +431,8 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
 
       <section className={`${SECTION_CLASS} space-y-4`}>
         <header>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Synthesis</p>
-          <h2 className="text-2xl font-semibold text-slate-900">Insights & Next Steps</h2>
+          <p className="text-xs uppercase tracking-[0.3em] text-muted">Synthesis</p>
+          <h2 className="text-2xl font-semibold text-foreground">Insights & Next Steps</h2>
         </header>
         <div className="grid gap-4 lg:grid-cols-2">
           <div>
@@ -440,13 +440,13 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
             <textarea {...register("keyInsights")} className="form-input min-h-[180px]" placeholder="* Insight with citation" />
             {errors.keyInsights && <p className="form-error">{errors.keyInsights.message}</p>}
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Preview</p>
+          <div className="rounded-2xl border border-line bg-background p-4 text-sm text-secondary">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted">Preview</p>
             <div className="markdown-preview mt-2 min-h-[140px]">
               {keyInsightsValue ? (
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{keyInsightsValue}</ReactMarkdown>
               ) : (
-                <p className="text-slate-500">Write insights on the left to render Markdown preview.</p>
+                <p className="text-muted">Write insights on the left to render Markdown preview.</p>
               )}
             </div>
           </div>
@@ -497,7 +497,7 @@ export function MissionProtocolForm({ mission, onCompleted }: MissionProtocolFor
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-3 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-semibold shadow-lg shadow-sky-900/40 disabled:opacity-50"
+          className="w-full py-3 rounded-xl bg-accent text-on-accent font-semibold shadow-sm disabled:opacity-50"
         >
           {mission ? "Update Mission" : "Create Mission"}
         </button>

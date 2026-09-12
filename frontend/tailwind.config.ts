@@ -1,36 +1,55 @@
 import type { Config } from "tailwindcss";
 import typography from "@tailwindcss/typography";
+import contextVariants from "@oods/tw-variants";
+import path from "node:path";
+
+const tokenColor = (name: string) => `color-mix(in srgb, var(--theme-${name}) calc(<alpha-value> * 100%), transparent)`;
 
 const config: Config = {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx}",
-    "./src/components/**/*.{js,ts,jsx,tsx}",
-    "./src/features/**/*.{js,ts,jsx,tsx}",
-    "./src/app/**/*.{js,ts,jsx,tsx}",
-    "./src/lib/**/*.{js,ts,jsx,tsx}",
-  ],
+  darkMode: "class",
+  content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
-        background: "hsl(var(--background))",
-        surface: "hsl(var(--surface))",
-        "surface-alt": "hsl(var(--surface-alt))",
-        card: "hsl(var(--card))",
-        accent: "hsl(var(--accent))",
-        "accent-strong": "hsl(var(--accent-strong))",
-        danger: "hsl(var(--danger))",
-        success: "hsl(var(--success))",
-        warning: "hsl(var(--warning))",
+        background: tokenColor("surface-canvas"),
+        surface: tokenColor("surface-raised"),
+        "surface-alt": tokenColor("surface-subtle"),
+        card: tokenColor("surface-raised"),
+        foreground: tokenColor("text-primary"),
+        secondary: tokenColor("text-secondary"),
+        muted: tokenColor("text-muted"),
+        line: tokenColor("border-subtle"),
+        "line-strong": tokenColor("border-strong"),
+        accent: tokenColor("surface-interactive-primary-default"),
+        "accent-strong": tokenColor("surface-interactive-primary-hover"),
+        "accent-text": tokenColor("text-accent"),
+        "on-accent": tokenColor("text-on-interactive"),
+        inverse: tokenColor("surface-inverse"),
+        "on-inverse": tokenColor("text-inverse"),
+        backdrop: tokenColor("surface-backdrop"),
+        focus: tokenColor("focus-ring-outer"),
+        info: tokenColor("status-info-text"),
+        "info-surface": tokenColor("status-info-surface"),
+        "info-line": tokenColor("status-info-border"),
+        danger: tokenColor("status-critical-text"),
+        "danger-surface": tokenColor("status-critical-surface"),
+        "danger-line": tokenColor("status-critical-border"),
+        success: tokenColor("status-success-text"),
+        "success-surface": tokenColor("status-success-surface"),
+        "success-line": tokenColor("status-success-border"),
+        warning: tokenColor("status-warning-text"),
+        "warning-surface": tokenColor("status-warning-surface"),
+        "warning-line": tokenColor("status-warning-border"),
       },
       fontFamily: {
         sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
       },
-      boxShadow: {
-        glass: "0 25px 60px rgba(0,0,0,0.45)",
-      },
     },
   },
-  plugins: [typography],
+  plugins: [
+    typography,
+    contextVariants({ tokensPath: path.join(__dirname, "node_modules/@oods/tokens/dist/tailwind/tokens.json") }),
+  ],
 };
 
 export default config;

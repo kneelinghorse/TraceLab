@@ -1,6 +1,7 @@
 "use client";
 
 import { formatDistanceToNow } from "date-fns";
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SVGProps } from "react";
 import useSWR from "swr";
@@ -45,11 +46,7 @@ function SparklesIcon(props: SVGProps<SVGSVGElement>) {
 export function SearchPage({ initialSection = "search" }: SearchPageProps) {
   return (
     <AuthGate>
-      <div className="relative min-h-screen overflow-hidden bg-[hsl(var(--background))]">
-        <div className="pointer-events-none absolute inset-0 opacity-40">
-          <div className="h-[40rem] w-[40rem] rounded-full bg-sky-500/40 blur-[180px]" />
-          <div className="absolute right-10 top-10 h-72 w-72 rounded-full bg-indigo-500/40 blur-3xl" />
-        </div>
+      <div className="min-w-0 bg-background">
         <SearchExperience initialSection={initialSection} />
       </div>
     </AuthGate>
@@ -57,6 +54,8 @@ export function SearchPage({ initialSection = "search" }: SearchPageProps) {
 }
 
 function SearchExperience({ initialSection }: SearchPageProps) {
+  const router = useRouter();
+  const lastRouteQuery = useRef<string | null>(null);
   const [query, setQuery] = useState("");
   const [topK, setTopK] = useState(10);
   const [filters, setFilters] = useState<SearchFiltersState>({ projectId: "", documentType: "", startDate: "", endDate: "" });
@@ -323,6 +322,19 @@ function SearchExperience({ initialSection }: SearchPageProps) {
     [filters.documentType, filters.projectId, graphEnabled, mutateHistory, query, topK, usePedr],
   );
 
+  // Run the shell's search command once, including a second command while
+  // already on this page. Filter edits and results must not replay it.
+  useEffect(() => {
+    if (!router.isReady) return;
+    const routeQuery = typeof router.query.q === "string" ? router.query.q.trim() : "";
+    if (lastRouteQuery.current === routeQuery) return;
+    lastRouteQuery.current = routeQuery;
+    if (routeQuery) {
+      setQuery(routeQuery);
+      void executeSearch({ query: routeQuery });
+    }
+  }, [router.isReady, router.query.q, executeSearch]);
+
   const handleHistoryRun = async (entry: SearchHistoryEntryPayload) => {
     const nextFilters = extractHistoryFilters(entry);
     setQuery(entry.query_text);
@@ -426,16 +438,16 @@ function SearchExperience({ initialSection }: SearchPageProps) {
   };
 
   return (
-    <main className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-10" ref={resultsAnchorRef}>
+    <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-10" ref={resultsAnchorRef}>
       {/* Search bar at top - prominent and full width */}
       <div className="mb-8">
         <div className="mb-4 flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500/20 text-sky-200">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-info-surface text-accent-text">
             <SparklesIcon className="h-5 w-5" />
           </span>
           <div>
-            <h1 className="text-2xl font-semibold text-white">Search TraceLab</h1>
-            <p className="text-sm text-slate-400">Semantic search with RAG synthesis</p>
+            <h1 className="text-2xl font-semibold text-foreground">Search TraceLab</h1>
+            <p className="text-sm text-secondary">Semantic search with RAG synthesis</p>
           </div>
         </div>
         <SearchBar
@@ -460,23 +472,23 @@ function SearchExperience({ initialSection }: SearchPageProps) {
         <div className="space-y-6">
           {/* Results section */}
           <section className="space-y-4">
-            <div className="glass-card flex flex-wrap items-center justify-between gap-3 rounded-2xl p-4">
+            <div className="panel flex flex-wrap items-center justify-between gap-3 rounded-2xl p-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Results</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-secondary">Results</p>
                   {pedrMetadata && (
-                    <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs text-emerald-300">
+                    <span className="rounded-full border border-success-line bg-success-surface px-2 py-0.5 text-xs text-success">
                       PEDR
                     </span>
                   )}
                 </div>
-                <p className="text-lg font-semibold text-white">
+                <p className="text-lg font-semibold text-foreground">
                   {filteredResults.length} chunk{filteredResults.length === 1 ? "" : "s"}
                 </p>
               </div>
-              {searchError && <p className="text-sm text-rose-300">{searchError}</p>}
+              {searchError && <p className="text-sm text-danger">{searchError}</p>}
               {isSearching && !searchError && (
-                <p className="text-sm text-slate-400">Searching…</p>
+                <p className="text-sm text-secondary">Searching…</p>
               )}
             </div>
 
@@ -484,25 +496,25 @@ function SearchExperience({ initialSection }: SearchPageProps) {
             <PEDRMetadataPanel metadata={pedrMetadata} />
 
             {filteredResults.length === 0 && !isSearching ? (
-              <div className="glass-card rounded-2xl p-8 text-slate-300">
+              <div className="panel rounded-2xl p-8 text-secondary">
                 <div className="text-center">
-                  <p className="text-lg font-semibold text-white">No results yet</p>
-                  <p className="mt-2 text-sm text-slate-400">
+                  <p className="text-lg font-semibold text-foreground">No results yet</p>
+                  <p className="mt-2 text-sm text-secondary">
                     Enter a query and search to find relevant content.
                   </p>
                 </div>
                 {!query && historyEntries.length > 0 && (
-                  <div className="mt-6 border-t border-white/10 pt-6">
-                    <p className="text-sm font-medium text-slate-400 mb-3">Recent searches</p>
+                  <div className="mt-6 border-t border-line pt-6">
+                    <p className="text-sm font-medium text-secondary mb-3">Recent searches</p>
                     <div className="flex flex-wrap gap-2">
                       {historyEntries.slice(0, 5).map((entry) => (
                         <button
                           key={entry.id}
                           onClick={() => void handleHistoryRun(entry)}
-                          className="group flex items-center gap-2 rounded-full border border-white/15 bg-black/20 px-3 py-1.5 text-sm text-slate-200 hover:border-sky-400 hover:bg-sky-500/10 transition-colors"
+                          className="group flex items-center gap-2 rounded-full border border-line bg-surface-alt px-3 py-1.5 text-sm text-secondary hover:border-info-line hover:bg-info-surface transition-colors"
                         >
                           <span className="truncate max-w-[200px]">{entry.query_text}</span>
-                          <span className="text-xs text-slate-500 group-hover:text-sky-400">
+                          <span className="text-xs text-secondary group-hover:text-accent-text">
                             {entry.result_count} results
                           </span>
                         </button>
@@ -537,23 +549,23 @@ function SearchExperience({ initialSection }: SearchPageProps) {
 
           {/* History and Saved Searches */}
           <section className="grid gap-6 lg:grid-cols-2">
-            <div className="glass-card rounded-2xl p-5">
+            <div className="panel rounded-2xl p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">History</p>
-                  <h3 className="text-lg font-semibold text-white">Recent searches</h3>
+                  <p className="text-xs uppercase tracking-[0.2em] text-secondary">History</p>
+                  <h3 className="text-lg font-semibold text-foreground">Recent searches</h3>
                 </div>
                 {historyEntries.length > 0 && (
                   <button
                     onClick={() => void clearHistory()}
-                    className="text-sm text-slate-400 hover:text-white"
+                    className="text-sm text-secondary hover:text-foreground"
                   >
                     Clear
                   </button>
                 )}
               </div>
               {historyEntries.length === 0 ? (
-                <p className="mt-4 text-sm text-slate-400">No previous queries.</p>
+                <p className="mt-4 text-sm text-secondary">No previous queries.</p>
               ) : (
                 <ul className="mt-4 space-y-2">
                   {historyEntries.slice(0, 5).map((entry) => {
@@ -561,12 +573,12 @@ function SearchExperience({ initialSection }: SearchPageProps) {
                     return (
                       <li
                         key={entry.id}
-                        className="rounded-xl border border-white/10 bg-black/20 p-3"
+                        className="rounded-xl border border-line bg-surface-alt p-3"
                       >
                         <div className="flex items-center justify-between gap-2">
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm text-white">{entry.query_text}</p>
-                            <p className="text-xs text-slate-400">
+                            <p className="truncate text-sm text-foreground">{entry.query_text}</p>
+                            <p className="text-xs text-secondary">
                               {formatDistanceToNow(new Date(entry.created_at), {
                                 addSuffix: true,
                               })}
@@ -575,20 +587,20 @@ function SearchExperience({ initialSection }: SearchPageProps) {
                           <div className="flex items-center gap-1">
                             <button
                               onClick={() => void handleHistoryRun(entry)}
-                              className="rounded-lg border border-white/20 px-2 py-1 text-xs text-slate-200 hover:border-sky-300"
+                              className="rounded-lg border border-line px-2 py-1 text-xs text-secondary hover:border-info-line"
                             >
                               Run
                             </button>
                             <button
                               onClick={() => handleSaveFromHistory(entry)}
-                              className="px-2 py-1 text-xs text-slate-400 hover:text-white"
+                              className="px-2 py-1 text-xs text-secondary hover:text-foreground"
                             >
                               Save
                             </button>
                           </div>
                         </div>
                         {(entryFilters.projectId || entry.top_k !== 10) && (
-                          <div className="mt-1 flex flex-wrap gap-1 text-xs text-slate-500">
+                          <div className="mt-1 flex flex-wrap gap-1 text-xs text-secondary">
                             {entryFilters.projectId && (
                               <span>Project: {projectIndex.get(entryFilters.projectId)?.name ?? entryFilters.projectId}</span>
                             )}
@@ -602,10 +614,10 @@ function SearchExperience({ initialSection }: SearchPageProps) {
               )}
             </div>
 
-            <div className="glass-card rounded-2xl p-5">
+            <div className="panel rounded-2xl p-5">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Saved</p>
-                <h3 className="text-lg font-semibold text-white">Quick access</h3>
+                <p className="text-xs uppercase tracking-[0.2em] text-secondary">Saved</p>
+                <h3 className="text-lg font-semibold text-foreground">Quick access</h3>
               </div>
               <div className="mt-4">
                 <SaveSearchButton
@@ -638,57 +650,57 @@ function SearchExperience({ initialSection }: SearchPageProps) {
 
         {/* Right sidebar - Stats */}
         <aside className="space-y-4 lg:sticky lg:top-8 lg:self-start">
-          <div className="glass-card rounded-2xl p-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Corpus Stats</p>
+          <div className="panel rounded-2xl p-5">
+            <p className="text-xs uppercase tracking-[0.2em] text-secondary">Corpus Stats</p>
             <div className="mt-4 space-y-4">
               <div>
-                <p className="text-3xl font-semibold text-white">
+                <p className="text-3xl font-semibold text-foreground">
                   {projectResponse?.pagination?.total ?? projects.length}
                 </p>
-                <p className="text-sm text-slate-400">Projects</p>
+                <p className="text-sm text-secondary">Projects</p>
                 {projectError && (
-                  <p className="text-xs text-rose-400 mt-1">Failed to load</p>
+                  <p className="text-xs text-danger mt-1">Failed to load</p>
                 )}
               </div>
               <div>
-                <p className="text-3xl font-semibold text-white">
+                <p className="text-3xl font-semibold text-foreground">
                   {documentResponse?.pagination?.total ?? documents.length}
                 </p>
-                <p className="text-sm text-slate-400">Documents</p>
+                <p className="text-sm text-secondary">Documents</p>
                 {documentError && (
-                  <p className="text-xs text-rose-400 mt-1">Failed to load</p>
+                  <p className="text-xs text-danger mt-1">Failed to load</p>
                 )}
               </div>
               <div>
-                <p className="text-3xl font-semibold text-white">{historyEntries.length}</p>
-                <p className="text-sm text-slate-400">Queries this session</p>
+                <p className="text-3xl font-semibold text-foreground">{historyEntries.length}</p>
+                <p className="text-sm text-secondary">Queries this session</p>
               </div>
             </div>
           </div>
 
-          <div className="glass-card rounded-2xl p-5">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Session Status</p>
+          <div className="panel rounded-2xl p-5">
+            <p className="text-xs uppercase tracking-[0.2em] text-secondary">Session Status</p>
             <div className="mt-4 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-400">Matches</span>
-                <span className="text-lg font-semibold text-white">{filteredResults.length}</span>
+                <span className="text-sm text-secondary">Matches</span>
+                <span className="text-lg font-semibold text-foreground">{filteredResults.length}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-400">RAG</span>
-                <span className={`text-sm font-medium ${ragPayload ? "text-emerald-400" : "text-slate-500"}`}>
+                <span className="text-sm text-secondary">RAG</span>
+                <span className={`text-sm font-medium ${ragPayload ? "text-success" : "text-secondary"}`}>
                   {ragPayload ? "Ready" : "Pending"}
                 </span>
               </div>
               {filters.projectId && (
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-400">Filter</span>
-                  <span className="text-sm text-sky-400">Project active</span>
+                  <span className="text-sm text-secondary">Filter</span>
+                  <span className="text-sm text-accent-text">Project active</span>
                 </div>
               )}
             </div>
           </div>
         </aside>
       </div>
-    </main>
+    </div>
   );
 }

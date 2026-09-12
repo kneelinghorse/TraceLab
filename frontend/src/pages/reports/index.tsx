@@ -34,13 +34,13 @@ export default function ReportsPage() {
     const baseClasses = "px-2 py-0.5 rounded-full text-xs font-medium";
     if (status === "final") {
       return (
-        <span className={`${baseClasses} bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400`}>
+        <span className={`${baseClasses} bg-success-surface dark:bg-success-surface text-success dark:text-success`}>
           Final
         </span>
       );
     }
     return (
-      <span className={`${baseClasses} bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400`}>
+      <span className={`${baseClasses} bg-warning-surface dark:bg-warning-surface text-warning dark:text-warning`}>
         Draft
       </span>
     );
@@ -48,19 +48,19 @@ export default function ReportsPage() {
 
   return (
     <AuthGate>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-background dark:bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Reports</h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Reports</h1>
+            <p className="mt-2 text-secondary dark:text-muted">
               View and manage synthesized reports from your collections
             </p>
           </div>
 
           {/* Filters */}
           <div className="mb-6 flex items-center gap-4">
-            <span className="text-sm text-gray-600 dark:text-gray-400">Filter by status:</span>
+            <span className="text-sm text-secondary dark:text-muted">Filter by status:</span>
             <div className="flex gap-2">
               {(["all", "draft", "final"] as const).map((status) => (
                 <button
@@ -71,8 +71,8 @@ export default function ReportsPage() {
                   }}
                   className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                     statusFilter === status
-                      ? "bg-blue-600 text-white"
-                      : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      ? "bg-accent text-on-accent"
+                      : "bg-surface dark:bg-surface text-secondary dark:text-muted border border-line-strong dark:border-line-strong hover:bg-background dark:hover:bg-surface-alt"
                   }`}
                 >
                   {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -84,74 +84,74 @@ export default function ReportsPage() {
           {/* Reports List */}
           {isLoading ? (
             <div className="text-center py-12">
-              <p className="text-gray-500">Loading reports...</p>
+              <p className="text-muted">Loading reports...</p>
             </div>
           ) : reports.length === 0 ? (
-            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-              <p className="text-gray-500 dark:text-gray-400 mb-4">No reports yet</p>
-              <p className="text-sm text-gray-400 dark:text-gray-500">
+            <div className="text-center py-12 bg-surface dark:bg-surface rounded-lg border border-line dark:border-line">
+              <p className="text-muted dark:text-muted mb-4">No reports yet</p>
+              <p className="text-sm text-muted dark:text-muted">
                 Create a report from a collection to synthesize content with AI.
               </p>
               <Link
                 href="/collections"
-                className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="mt-4 inline-block px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent transition-colors"
               >
                 Go to Collections
               </Link>
             </div>
           ) : (
             <>
-              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-gray-50 dark:bg-gray-700">
+              <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line overflow-hidden">
+                <table className="min-w-full divide-y divide-line dark:divide-line">
+                  <thead className="bg-background dark:bg-surface-alt">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted dark:text-muted uppercase tracking-wider">
                         Title
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted dark:text-muted uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted dark:text-muted uppercase tracking-wider">
                         Type
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted dark:text-muted uppercase tracking-wider">
                         Chunks
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted dark:text-muted uppercase tracking-wider">
                         Tokens
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted dark:text-muted uppercase tracking-wider">
                         Created
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                  <tbody className="bg-surface dark:bg-surface divide-y divide-line dark:divide-line">
                     {reports.map((report: ReportListItem) => (
                       <tr
                         key={report.id}
-                        className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                        className="hover:bg-background dark:hover:bg-surface-alt cursor-pointer"
                         onClick={() => (window.location.href = `/reports/${report.id}`)}
                       >
                         <td className="px-6 py-4">
                           <Link
                             href={`/reports/${report.id}`}
-                            className="text-gray-900 dark:text-white font-medium hover:text-blue-600 dark:hover:text-blue-400"
+                            className="text-foreground dark:text-foreground font-medium hover:text-accent-text dark:hover:text-accent-text"
                             onClick={(e) => e.stopPropagation()}
                           >
                             {report.title}
                           </Link>
                         </td>
                         <td className="px-6 py-4">{getStatusBadge(report.status)}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                        <td className="px-6 py-4 text-sm text-secondary dark:text-muted">
                           {report.report_type}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                        <td className="px-6 py-4 text-sm text-secondary dark:text-muted">
                           {report.chunk_count}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                        <td className="px-6 py-4 text-sm text-secondary dark:text-muted">
                           {report.tokens_used.toLocaleString()}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                        <td className="px-6 py-4 text-sm text-muted dark:text-muted">
                           {formatDistanceToNow(new Date(report.created_at), { addSuffix: true })}
                         </td>
                       </tr>
@@ -166,17 +166,17 @@ export default function ReportsPage() {
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="px-4 py-2 text-sm border border-line-strong dark:border-line-strong rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface dark:hover:bg-surface-alt"
                   >
                     Previous
                   </button>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                  <span className="text-sm text-secondary dark:text-muted">
                     Page {page} of {totalPages} ({total} total)
                   </span>
                   <button
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page >= totalPages}
-                    className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="px-4 py-2 text-sm border border-line-strong dark:border-line-strong rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface dark:hover:bg-surface-alt"
                   >
                     Next
                   </button>

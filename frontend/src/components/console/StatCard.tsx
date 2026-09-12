@@ -15,21 +15,21 @@ interface StatCardProps {
 }
 
 const COLOR_CLASSES = {
-  default: "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700",
-  blue: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800",
-  green: "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800",
-  yellow: "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800",
-  red: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800",
-  purple: "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800",
+  default: "bg-surface dark:bg-surface border-line dark:border-line",
+  blue: "bg-info-surface dark:bg-info-surface border-info-line dark:border-info-line",
+  green: "bg-success-surface dark:bg-success-surface border-success-line dark:border-success-line",
+  yellow: "bg-warning-surface dark:bg-warning-surface border-warning-line dark:border-warning-line",
+  red: "bg-danger-surface dark:bg-danger-surface border-danger-line dark:border-danger-line",
+  purple: "bg-info-surface dark:bg-info-surface border-info-line dark:border-info-line",
 };
 
 const VALUE_COLORS = {
-  default: "text-gray-900 dark:text-white",
-  blue: "text-blue-900 dark:text-blue-100",
-  green: "text-green-900 dark:text-green-100",
-  yellow: "text-yellow-900 dark:text-yellow-100",
-  red: "text-red-900 dark:text-red-100",
-  purple: "text-purple-900 dark:text-purple-100",
+  default: "text-foreground dark:text-foreground",
+  blue: "text-info dark:text-accent-text",
+  green: "text-success dark:text-success",
+  yellow: "text-warning dark:text-warning",
+  red: "text-danger dark:text-danger",
+  purple: "text-info dark:text-accent-text",
 };
 
 const SIZE_CLASSES = {
@@ -52,7 +52,7 @@ export function StatCard({
     <div
       className={`rounded-lg border ${COLOR_CLASSES[color]} ${sizeClasses.container}`}
     >
-      <div className={`${sizeClasses.label} font-medium text-gray-500 dark:text-gray-400 mb-1`}>
+      <div className={`${sizeClasses.label} font-medium text-secondary dark:text-secondary mb-1`}>
         {label}
       </div>
       <div className="flex items-end gap-2">
@@ -63,10 +63,10 @@ export function StatCard({
           <span
             className={`text-sm ${
               trend.direction === "up"
-                ? "text-green-600 dark:text-green-400"
+                ? "text-success dark:text-success"
                 : trend.direction === "down"
-                ? "text-red-600 dark:text-red-400"
-                : "text-gray-500 dark:text-gray-400"
+                ? "text-danger dark:text-danger"
+                : "text-secondary dark:text-secondary"
             }`}
           >
             {trend.direction === "up" ? "↑" : trend.direction === "down" ? "↓" : "→"}
@@ -75,7 +75,7 @@ export function StatCard({
         )}
       </div>
       {sublabel && (
-        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <div className="text-xs text-secondary dark:text-secondary mt-1">
           {sublabel}
         </div>
       )}

@@ -182,8 +182,8 @@ export default function ProjectDetailPage() {
   if (projectLoading) {
     return (
       <AuthGate>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-          <p className="text-gray-500">Loading project...</p>
+        <div className="min-h-screen bg-background dark:bg-background flex items-center justify-center">
+          <p className="text-muted">Loading project...</p>
         </div>
       </AuthGate>
     );
@@ -192,10 +192,10 @@ export default function ProjectDetailPage() {
   if (!project) {
     return (
       <AuthGate>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="min-h-screen bg-background dark:bg-background flex items-center justify-center">
           <div className="text-center">
-            <p className="text-gray-500 mb-4">Project not found</p>
-            <Link href="/projects" className="text-blue-600 hover:text-blue-700">
+            <p className="text-muted mb-4">Project not found</p>
+            <Link href="/projects" className="text-accent-text hover:text-accent-text">
               Back to Projects
             </Link>
           </div>
@@ -206,45 +206,45 @@ export default function ProjectDetailPage() {
 
   return (
     <AuthGate>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-background dark:bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Breadcrumb */}
           <nav className="mb-6">
-            <Link href="/projects" className="text-blue-600 dark:text-blue-400 hover:underline">
+            <Link href="/projects" className="text-accent-text dark:text-accent-text underline underline-offset-4">
               Projects
             </Link>
-            <span className="mx-2 text-gray-400">/</span>
-            <span className="text-gray-600 dark:text-gray-300">{project.name}</span>
+            <span className="mx-2 text-muted">/</span>
+            <span className="text-secondary dark:text-secondary">{project.name}</span>
           </nav>
 
           {/* Project Header */}
-          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+          <div className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-6 mb-6">
             {editing ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Name *</label>
+                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Name *</label>
                   <input
                     type="text"
                     value={editForm.name}
                     onChange={(e) => setEditForm((prev) => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Description</label>
                   <textarea
                     value={editForm.description}
                     onChange={(e) => setEditForm((prev) => ({ ...prev, description: e.target.value }))}
                     rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Research Type</label>
+                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Research Type</label>
                   <select
                     value={editForm.research_type}
                     onChange={(e) => setEditForm((prev) => ({ ...prev, research_type: e.target.value }))}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground"
                   >
                     <option value="">Select...</option>
                     {RESEARCH_TYPES.map((type) => (
@@ -258,14 +258,14 @@ export default function ProjectDetailPage() {
                   <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                    className="px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent disabled:bg-surface-alt"
                   >
                     {saving ? "Saving..." : "Save Changes"}
                   </button>
                   <button
                     onClick={cancelEditing}
                     disabled={saving}
-                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg hover:bg-background dark:hover:bg-surface-alt"
                   >
                     Cancel
                   </button>
@@ -275,11 +275,11 @@ export default function ProjectDetailPage() {
               <div>
                 <div className="flex items-start justify-between">
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{project.name}</h1>
+                    <h1 className="text-2xl font-bold text-foreground dark:text-foreground">{project.name}</h1>
                     {project.description && (
-                      <p className="mt-2 text-gray-600 dark:text-gray-400">{project.description}</p>
+                      <p className="mt-2 text-secondary dark:text-muted">{project.description}</p>
                     )}
-                    <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
+                    <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted dark:text-muted">
                       <span>Research Type: {project.research_type || "Not set"}</span>
                       <span>Status: {project.status || "active"}</span>
                       {project.created_at && (
@@ -290,13 +290,13 @@ export default function ProjectDetailPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={startEditing}
-                      className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="px-4 py-2 text-sm border border-line-strong dark:border-line-strong rounded-lg hover:bg-background dark:hover:bg-surface-alt"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => setShowDeleteConfirm(true)}
-                      className="px-4 py-2 text-sm text-red-600 border border-red-300 dark:border-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20"
+                      className="px-4 py-2 text-sm text-danger border border-danger-line dark:border-danger-line rounded-lg hover:bg-danger-surface dark:hover:bg-danger-surface"
                     >
                       Delete
                     </button>
@@ -318,24 +318,24 @@ export default function ProjectDetailPage() {
 
           {/* Delete Confirmation Modal */}
           {showDeleteConfirm && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Delete Project?</h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <div className="fixed inset-0 bg-backdrop/50 flex items-center justify-center z-50">
+              <div className="bg-surface dark:bg-surface rounded-lg p-6 max-w-md w-full mx-4">
+                <h3 className="text-lg font-semibold text-foreground dark:text-foreground mb-2">Delete Project?</h3>
+                <p className="text-secondary dark:text-muted mb-4">
                   This will permanently delete <strong>{project.name}</strong> and all its documents, chunks, and associated data. This action cannot be undone.
                 </p>
                 <div className="flex gap-3 justify-end">
                   <button
                     onClick={() => setShowDeleteConfirm(false)}
                     disabled={deleting}
-                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg hover:bg-background dark:hover:bg-surface-alt"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleDelete}
                     disabled={deleting}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400"
+                    className="px-4 py-2 bg-danger-surface text-danger rounded-lg hover:bg-danger-surface disabled:bg-surface-alt"
                   >
                     {deleting ? "Deleting..." : "Delete Project"}
                   </button>
@@ -348,31 +348,31 @@ export default function ProjectDetailPage() {
             {/* Documents List */}
             <section className="lg:col-span-2 space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Documents</h2>
+                <h2 className="text-lg font-semibold text-foreground dark:text-foreground">Documents</h2>
               </div>
 
               {docsLoading && !documentsResponse ? (
-                <p className="text-gray-500">Loading documents...</p>
+                <p className="text-muted">Loading documents...</p>
               ) : documents.length === 0 ? (
-                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center">
-                  <p className="text-gray-500 dark:text-gray-400">No documents yet. Upload some using the panel on the right.</p>
+                <div className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-8 text-center">
+                  <p className="text-muted dark:text-muted">No documents yet. Upload some using the panel on the right.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {documents.map((doc) => (
                     <div
                       key={doc.id}
-                      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                      className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-4"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
                           <Link
                             href={`/documents/${doc.id}`}
-                            className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 truncate block"
+                            className="font-medium text-foreground dark:text-foreground hover:text-accent-text dark:hover:text-accent-text truncate block"
                           >
                             {doc.name}
                           </Link>
-                          <div className="mt-1 flex flex-wrap gap-3 text-xs text-gray-500 dark:text-gray-400">
+                          <div className="mt-1 flex flex-wrap gap-3 text-xs text-muted dark:text-muted">
                             <span>{doc.file_type || doc.mime_type?.split("/")[1] || "Unknown"}</span>
                             {doc.file_size && <span>{(doc.file_size / 1024).toFixed(1)} KB</span>}
                             {doc.uploaded_at && (
@@ -387,7 +387,7 @@ export default function ProjectDetailPage() {
                         </div>
                         <button
                           onClick={() => handleDeleteDocument(doc.id)}
-                          className="ml-4 text-sm text-red-600 dark:text-red-400 hover:text-red-700"
+                          className="ml-4 text-sm text-danger dark:text-danger hover:text-danger"
                         >
                           Delete
                         </button>
@@ -398,21 +398,21 @@ export default function ProjectDetailPage() {
                   {/* Pagination */}
                   {docPagination && docPagination.pages > 1 && (
                     <div className="flex items-center justify-between pt-2 text-sm">
-                      <span className="text-gray-500">
+                      <span className="text-muted">
                         Page {docPagination.page} of {docPagination.pages}
                       </span>
                       <div className="flex gap-2">
                         <button
                           onClick={() => setDocPage((p) => Math.max(1, p - 1))}
                           disabled={docPage === 1}
-                          className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded disabled:opacity-40"
+                          className="px-3 py-1 border border-line-strong dark:border-line-strong rounded disabled:opacity-40"
                         >
                           Prev
                         </button>
                         <button
                           onClick={() => setDocPage((p) => Math.min(docPagination.pages, p + 1))}
                           disabled={docPage >= docPagination.pages}
-                          className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded disabled:opacity-40"
+                          className="px-3 py-1 border border-line-strong dark:border-line-strong rounded disabled:opacity-40"
                         >
                           Next
                         </button>
@@ -425,12 +425,12 @@ export default function ProjectDetailPage() {
 
             {/* Upload Panel */}
             <aside className="space-y-4">
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Upload Documents</h3>
+              <div className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">Upload Documents</h3>
 
                 {/* Drop Zone */}
                 <div
-                  className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors cursor-pointer"
+                  className="border-2 border-dashed border-line-strong dark:border-line-strong rounded-lg p-6 text-center hover:border-info-line dark:hover:border-info-line transition-colors cursor-pointer"
                   onDrop={handleDrop}
                   onDragOver={(e) => e.preventDefault()}
                   onClick={() => document.getElementById("file-input-detail")?.click()}
@@ -447,28 +447,28 @@ export default function ProjectDetailPage() {
 
                   {files.length === 0 ? (
                     <>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className="text-sm text-secondary dark:text-muted">
                         Drop files here or click to select
                       </p>
-                      <p className="mt-1 text-xs text-gray-400">
+                      <p className="mt-1 text-xs text-muted">
                         PDF, DOCX, PPTX, CSV, XLSX, MD, TXT
                       </p>
                     </>
                   ) : (
                     <div className="text-left">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                      <p className="text-sm text-secondary dark:text-muted mb-2">
                         {files.length} file(s) selected:
                       </p>
                       <ul className="space-y-1">
                         {files.map((file, idx) => (
                           <li key={idx} className="text-sm flex justify-between items-center">
-                            <span className="truncate text-gray-900 dark:text-white">{file.name}</span>
+                            <span className="truncate text-foreground dark:text-foreground">{file.name}</span>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setFiles(files.filter((_, i) => i !== idx));
                               }}
-                              className="text-red-600 text-xs ml-2"
+                              className="text-danger text-xs ml-2"
                               disabled={uploading}
                             >
                               Remove
@@ -481,7 +481,7 @@ export default function ProjectDetailPage() {
                 </div>
 
                 {/* Auto-process option */}
-                <label className="flex items-center gap-2 mt-4 text-sm text-gray-700 dark:text-gray-300">
+                <label className="flex items-center gap-2 mt-4 text-sm text-secondary dark:text-secondary">
                   <input
                     type="checkbox"
                     checked={autoProcess}
@@ -494,9 +494,9 @@ export default function ProjectDetailPage() {
 
                 {/* Progress */}
                 {uploadProgress.length > 0 && (
-                  <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-900 rounded border text-sm max-h-32 overflow-y-auto">
+                  <div className="mt-4 p-3 bg-background dark:bg-background rounded border text-sm max-h-32 overflow-y-auto">
                     {uploadProgress.map((msg, idx) => (
-                      <div key={idx} className="text-gray-700 dark:text-gray-300">{msg}</div>
+                      <div key={idx} className="text-secondary dark:text-secondary">{msg}</div>
                     ))}
                   </div>
                 )}
@@ -505,7 +505,7 @@ export default function ProjectDetailPage() {
                 <button
                   onClick={handleUpload}
                   disabled={uploading || files.length === 0}
-                  className="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="w-full mt-4 px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent disabled:bg-surface-alt disabled:cursor-not-allowed"
                 >
                   {uploading ? "Uploading..." : "Upload"}
                 </button>
@@ -520,9 +520,9 @@ export default function ProjectDetailPage() {
 
 function StatCard({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 text-center">
-      <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
-      <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
+    <div className="bg-background dark:bg-background rounded-lg p-3 text-center">
+      <p className="text-2xl font-bold text-foreground dark:text-foreground">{value}</p>
+      <p className="text-xs text-muted dark:text-muted">{label}</p>
     </div>
   );
 }
@@ -532,8 +532,8 @@ function StatusBadge({ label, status }: { label: string; status: boolean }) {
     <span
       className={`px-2 py-0.5 text-xs rounded ${
         status
-          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-          : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
+          ? "bg-success-surface text-success dark:bg-success-surface dark:text-success"
+          : "bg-surface text-secondary dark:bg-surface-alt dark:text-muted"
       }`}
     >
       {status ? "✓" : "○"} {label}

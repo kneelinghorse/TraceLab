@@ -49,17 +49,17 @@ export function RegisterPanel({ onSwitchToLogin }: RegisterPanelProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-md glass-card border border-white/5 rounded-3xl p-8 space-y-6"
+      className="w-full max-w-md panel border border-line rounded-3xl p-8 space-y-6"
     >
       <div>
-        <p className="text-xs uppercase tracking-[0.4em] text-slate-400">TraceLab</p>
-        <h1 className="text-3xl text-white font-semibold mt-2">Create account</h1>
-        <p className="text-sm text-slate-300 mt-3">
+        <p className="text-xs uppercase tracking-[0.4em] text-muted">TraceLab</p>
+        <h1 className="text-3xl text-foreground font-semibold mt-2">Create account</h1>
+        <p className="text-sm text-secondary mt-3">
           Register for access to Mission Protocol.
         </p>
       </div>
 
-      <label className="block space-y-2 text-sm text-slate-200">
+      <label className="block space-y-2 text-sm text-secondary">
         <span>Invite code</span>
         <input
           type="text"
@@ -68,12 +68,12 @@ export function RegisterPanel({ onSwitchToLogin }: RegisterPanelProps) {
           placeholder="Enter your 8-character invite code"
           required
           maxLength={8}
-          className="w-full rounded-xl bg-slate-900/40 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400 uppercase tracking-widest font-mono"
+          className="w-full rounded-xl bg-background border border-line px-4 py-3 focus:outline-none focus:ring-2 focus:ring-focus uppercase tracking-widest font-mono"
           autoComplete="off"
         />
       </label>
 
-      <label className="block space-y-2 text-sm text-slate-200">
+      <label className="block space-y-2 text-sm text-secondary">
         <span>Email</span>
         <input
           type="email"
@@ -81,12 +81,12 @@ export function RegisterPanel({ onSwitchToLogin }: RegisterPanelProps) {
           onChange={(event) => setEmail(event.target.value)}
           placeholder="you@example.com"
           required
-          className="w-full rounded-xl bg-slate-900/40 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400"
+          className="w-full rounded-xl bg-background border border-line px-4 py-3 focus:outline-none focus:ring-2 focus:ring-focus"
           autoComplete="email"
         />
       </label>
 
-      <label className="block space-y-2 text-sm text-slate-200">
+      <label className="block space-y-2 text-sm text-secondary">
         <span>Display name</span>
         <input
           type="text"
@@ -94,12 +94,12 @@ export function RegisterPanel({ onSwitchToLogin }: RegisterPanelProps) {
           onChange={(event) => setDisplayName(event.target.value)}
           placeholder="How you want to be identified"
           required
-          className="w-full rounded-xl bg-slate-900/40 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400"
+          className="w-full rounded-xl bg-background border border-line px-4 py-3 focus:outline-none focus:ring-2 focus:ring-focus"
           autoComplete="name"
         />
       </label>
 
-      <label className="block space-y-2 text-sm text-slate-200">
+      <label className="block space-y-2 text-sm text-secondary">
         <span>Password</span>
         <input
           type="password"
@@ -108,28 +108,28 @@ export function RegisterPanel({ onSwitchToLogin }: RegisterPanelProps) {
           placeholder="Minimum 8 characters"
           required
           minLength={8}
-          className="w-full rounded-xl bg-slate-900/40 border border-white/10 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400"
+          className="w-full rounded-xl bg-background border border-line px-4 py-3 focus:outline-none focus:ring-2 focus:ring-focus"
           autoComplete="new-password"
         />
       </label>
 
-      {error && <p className="text-sm text-rose-300">{error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
 
       <button
         type="submit"
-        className="w-full py-3 rounded-xl bg-sky-400 text-slate-900 font-semibold disabled:opacity-50"
+        className="w-full py-3 rounded-xl bg-accent text-on-accent font-semibold disabled:opacity-50"
         disabled={isSubmitting}
       >
         {isSubmitting ? "Creating account\u2026" : "Create account"}
       </button>
 
       {onSwitchToLogin && (
-        <p className="text-center text-sm text-slate-400">
+        <p className="text-center text-sm text-muted">
           Already have an account?{" "}
           <button
             type="button"
             onClick={onSwitchToLogin}
-            className="text-sky-400 hover:text-sky-300 font-medium"
+            className="text-accent-text hover:text-accent-text font-medium"
           >
             Sign in
           </button>

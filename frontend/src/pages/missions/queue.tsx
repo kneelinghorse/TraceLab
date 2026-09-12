@@ -79,7 +79,7 @@ function MissionQueueContent() {
   const hasActiveMissions = inProgressMissions.length > 0 || sortedQueuedMissions.length > 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-background dark:bg-background">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
@@ -87,19 +87,19 @@ function MissionQueueContent() {
             <div className="flex items-center gap-3 mb-1">
               <Link
                 href="/missions"
-                className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                className="text-sm text-muted dark:text-muted hover:text-secondary dark:hover:text-secondary transition-colors"
               >
                 Missions
               </Link>
-              <span className="text-gray-300 dark:text-gray-600">/</span>
-              <span className="text-sm font-medium text-gray-900 dark:text-white">
+              <span className="text-secondary dark:text-secondary">/</span>
+              <span className="text-sm font-medium text-foreground dark:text-foreground">
                 Queue
               </span>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-foreground dark:text-foreground">
               Mission Queue
             </h1>
-            <p className="mt-1 text-gray-600 dark:text-gray-400">
+            <p className="mt-1 text-secondary dark:text-muted">
               {hasActiveMissions
                 ? `${inProgressMissions.length} running, ${sortedQueuedMissions.length} waiting`
                 : "No active missions"}
@@ -110,7 +110,7 @@ function MissionQueueContent() {
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+              className="px-3 py-1.5 text-sm font-medium text-secondary dark:text-muted hover:text-foreground dark:hover:text-foreground border border-line-strong dark:border-line-strong rounded-lg hover:bg-background dark:hover:bg-surface-alt transition-colors disabled:opacity-50"
             >
               Refresh
             </button>
@@ -119,7 +119,7 @@ function MissionQueueContent() {
 
         {isLoading && !hasActiveMissions ? (
           <div className="py-12 text-center">
-            <p className="text-gray-500 dark:text-gray-400">Loading queue...</p>
+            <p className="text-muted dark:text-muted">Loading queue...</p>
           </div>
         ) : !hasActiveMissions ? (
           <EmptyQueueState />
@@ -128,7 +128,7 @@ function MissionQueueContent() {
             {/* Running Missions Section */}
             {inProgressMissions.length > 0 && (
               <section>
-                <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-4">
+                <h2 className="text-sm font-semibold text-secondary dark:text-secondary uppercase tracking-wide mb-4">
                   Currently Running
                 </h2>
                 <div className="space-y-4">
@@ -142,7 +142,7 @@ function MissionQueueContent() {
             {/* Queued Missions Section */}
             {sortedQueuedMissions.length > 0 && (
               <section>
-                <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-4">
+                <h2 className="text-sm font-semibold text-secondary dark:text-secondary uppercase tracking-wide mb-4">
                   Waiting in Queue ({sortedQueuedMissions.length})
                 </h2>
                 <div className="space-y-3">

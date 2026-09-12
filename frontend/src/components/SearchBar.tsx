@@ -53,7 +53,7 @@ export function SearchBar({
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <div className="glass-card rounded-2xl p-4 sm:p-6">
+      <div className="panel rounded-2xl p-4 sm:p-6">
         {/* Search input row */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
           <div className="flex-1">
@@ -64,16 +64,16 @@ export function SearchBar({
               onKeyDown={handleKeyDown}
               placeholder="Search TraceLab intelligence..."
               rows={2}
-              className="w-full resize-none rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-lg text-white placeholder:text-slate-500 focus:border-sky-400/60 focus:outline-none focus:ring-2 focus:ring-sky-400/30"
+              className="w-full resize-none rounded-xl border border-line bg-surface px-4 py-3 text-lg text-foreground placeholder:text-muted focus:border-info-line focus:outline-none focus:ring-2 focus:ring-focus"
             />
           </div>
           <button
             type="submit"
             disabled={isSearching}
-            className="inline-flex h-[52px] items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-8 font-semibold text-white shadow-lg shadow-sky-500/25 transition hover:from-sky-400 hover:to-indigo-400 disabled:cursor-not-allowed disabled:opacity-70"
+            className="inline-flex h-[52px] items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-accent px-8 font-semibold text-on-accent shadow-sm transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-70"
           >
             {isSearching && (
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/70 border-t-transparent" />
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-line border-t-transparent" />
             )}
             {isSearching ? "Searching..." : "Search"}
           </button>
@@ -84,7 +84,7 @@ export function SearchBar({
           <div className="flex items-center gap-2">
             <label
               htmlFor="project-filter"
-              className="text-sm text-slate-400"
+              className="text-sm text-muted"
             >
               Project
             </label>
@@ -94,14 +94,14 @@ export function SearchBar({
               onChange={(event) =>
                 onFiltersChange({ projectId: event.target.value })
               }
-              className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white focus:border-sky-400/60 focus:outline-none"
+              className="rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground focus:border-info-line focus:outline-none"
             >
               <option value="">All projects</option>
               {projects.map((project) => (
                 <option
                   key={project.id}
                   value={project.id}
-                  className="bg-slate-900 text-white"
+                  className="bg-background text-foreground"
                 >
                   {project.name}
                 </option>
@@ -110,20 +110,20 @@ export function SearchBar({
           </div>
 
           <div className="flex items-center gap-2">
-            <label htmlFor="chunks-filter" className="text-sm text-slate-400">
+            <label htmlFor="chunks-filter" className="text-sm text-muted">
               Chunks
             </label>
             <select
               id="chunks-filter"
               value={topK}
               onChange={(event) => onTopKChange(Number(event.target.value))}
-              className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white focus:border-sky-400/60 focus:outline-none"
+              className="rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground focus:border-info-line focus:outline-none"
             >
               {CHUNKS_PRESETS.map((preset) => (
                 <option
                   key={preset}
                   value={preset}
-                  className="bg-slate-900 text-white"
+                  className="bg-background text-foreground"
                 >
                   {preset}
                 </option>
@@ -132,7 +132,7 @@ export function SearchBar({
           </div>
 
           <div className="flex items-center gap-2">
-            <label htmlFor="graph-toggle" className="text-sm text-slate-400">
+            <label htmlFor="graph-toggle" className="text-sm text-muted">
               Graph expansion
             </label>
             <input
@@ -140,7 +140,7 @@ export function SearchBar({
               type="checkbox"
               checked={graphEnabled}
               onChange={(event) => onGraphEnabledChange(event.target.checked)}
-              className="h-4 w-4 rounded border-white/20 bg-white/5 text-sky-400 focus:ring-2 focus:ring-sky-400/40"
+              className="h-4 w-4 rounded border-line bg-surface text-accent-text focus:ring-2 focus:ring-focus"
             />
           </div>
 
@@ -151,7 +151,7 @@ export function SearchBar({
                 onFiltersChange({ projectId: "" });
                 onTopKChange(10);
               }}
-              className="text-sm text-slate-400 hover:text-white"
+              className="text-sm text-muted hover:text-foreground"
             >
               Reset
             </button>

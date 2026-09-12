@@ -11,33 +11,33 @@ interface RunningMissionCardProps {
 
 export function RunningMissionCard({ mission }: RunningMissionCardProps) {
   return (
-    <div className="bg-white dark:bg-gray-800 border-2 border-blue-400 dark:border-blue-500 rounded-xl p-6 shadow-sm">
+    <div className="bg-surface dark:bg-surface border-2 border-info-line dark:border-info-line rounded-xl p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="relative flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-accent" />
           </span>
-          <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+          <span className="text-sm font-semibold text-accent-text dark:text-accent-text uppercase tracking-wide">
             Running
           </span>
         </div>
         <Link
           href={`/missions/${mission.id}`}
-          className="text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          className="text-sm text-muted dark:text-muted hover:text-accent-text dark:hover:text-accent-text transition-colors"
         >
           View Details
         </Link>
       </div>
 
-      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+      <h2 className="text-xl font-bold text-foreground dark:text-foreground mb-1">
         {mission.title}
       </h2>
-      <p className="text-sm font-mono text-gray-500 dark:text-gray-400 mb-4">
+      <p className="text-sm font-mono text-muted dark:text-muted mb-4">
         {mission.mission_id}
       </p>
 
-      <p className="text-gray-600 dark:text-gray-300 text-sm mb-6 line-clamp-2">
+      <p className="text-secondary dark:text-secondary text-sm mb-6 line-clamp-2">
         {mission.objective}
       </p>
 
@@ -48,7 +48,7 @@ export function RunningMissionCard({ mission }: RunningMissionCardProps) {
       />
 
       {mission.started_at && (
-        <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
+        <p className="mt-4 text-xs text-muted dark:text-muted">
           Started {formatDistanceToNow(new Date(mission.started_at), { addSuffix: true })}
         </p>
       )}
@@ -70,36 +70,36 @@ export function QueuedMissionCard({
   onCancel,
 }: QueuedMissionCardProps) {
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-amber-400 dark:hover:border-amber-500 transition-colors">
+    <div className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-4 hover:border-warning-line dark:hover:border-warning-line transition-colors">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-            <span className="text-lg font-bold text-amber-600 dark:text-amber-400">
+          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-warning-surface dark:bg-warning-surface flex items-center justify-center">
+            <span className="text-lg font-bold text-warning dark:text-warning">
               {position}
             </span>
           </div>
           <div className="min-w-0">
             <Link
               href={`/missions/${mission.id}`}
-              className="font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors truncate block"
+              className="font-semibold text-foreground dark:text-foreground hover:text-accent-text dark:hover:text-accent-text transition-colors truncate block"
             >
               {mission.title}
             </Link>
-            <p className="text-xs font-mono text-gray-500 dark:text-gray-400">
+            <p className="text-xs font-mono text-muted dark:text-muted">
               {mission.mission_id}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {estimatedWait && (
-            <span className="text-xs text-gray-500 dark:text-gray-400">
+            <span className="text-xs text-muted dark:text-muted">
               ~{estimatedWait}
             </span>
           )}
           {onCancel && (
             <button
               onClick={() => onCancel(mission.id)}
-              className="text-xs text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
+              className="text-xs text-danger dark:text-danger hover:text-danger dark:hover:text-danger transition-colors px-2 py-1 rounded hover:bg-danger-surface dark:hover:bg-danger-surface"
             >
               Cancel
             </button>
@@ -107,12 +107,12 @@ export function QueuedMissionCard({
         </div>
       </div>
 
-      <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 line-clamp-1 pl-13">
+      <p className="mt-2 text-sm text-secondary dark:text-secondary line-clamp-1 pl-13">
         {mission.objective}
       </p>
 
       {mission.queued_at && (
-        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 pl-13">
+        <p className="mt-2 text-xs text-muted dark:text-muted pl-13">
           Queued {formatDistanceToNow(new Date(mission.queued_at), { addSuffix: true })}
         </p>
       )}
@@ -122,10 +122,10 @@ export function QueuedMissionCard({
 
 export function EmptyQueueState() {
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-12 text-center">
-      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+    <div className="bg-surface dark:bg-surface border border-line dark:border-line rounded-xl p-12 text-center">
+      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-surface dark:bg-surface-alt flex items-center justify-center">
         <svg
-          className="w-8 h-8 text-gray-400"
+          className="w-8 h-8 text-muted"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -138,16 +138,16 @@ export function EmptyQueueState() {
           />
         </svg>
       </div>
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+      <h3 className="text-lg font-semibold text-foreground dark:text-foreground mb-2">
         No Active Missions
       </h3>
-      <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
+      <p className="text-muted dark:text-muted max-w-sm mx-auto">
         There are no missions currently running or waiting in the queue.
         Create a new mission to get started.
       </p>
       <Link
         href="/missions/new"
-        className="mt-6 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+        className="mt-6 inline-flex items-center px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent transition-colors font-medium text-sm"
       >
         Create Mission
       </Link>
@@ -162,7 +162,7 @@ interface RefreshIndicatorProps {
 
 export function RefreshIndicator({ lastRefresh, isRefreshing }: RefreshIndicatorProps) {
   return (
-    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+    <div className="flex items-center gap-2 text-xs text-muted dark:text-muted">
       {isRefreshing ? (
         <>
           <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
@@ -184,7 +184,7 @@ export function RefreshIndicator({ lastRefresh, isRefreshing }: RefreshIndicator
         </>
       ) : (
         <>
-          <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+          <span className="w-1.5 h-1.5 rounded-full bg-success" />
           <span>
             Last updated {formatDistanceToNow(lastRefresh, { addSuffix: true })}
           </span>

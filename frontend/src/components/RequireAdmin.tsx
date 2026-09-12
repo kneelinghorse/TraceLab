@@ -31,9 +31,9 @@ export function RequireAdmin({ children, fallback }: RequireAdminProps) {
   // mid-fetch. Render a neutral placeholder — never the children.
   if (!isReady || (isAuthenticated && (status === "idle" || status === "loading"))) {
     return (
-      <main className="min-h-screen grid place-items-center bg-[hsl(var(--background))] text-slate-300">
+      <div className="min-h-screen grid place-items-center bg-background text-secondary">
         Checking permissions…
-      </main>
+      </div>
     );
   }
 
@@ -45,23 +45,23 @@ export function RequireAdmin({ children, fallback }: RequireAdminProps) {
       return <>{fallback}</>;
     }
     return (
-      <main className="min-h-screen grid place-items-center bg-[hsl(var(--background))] px-4">
+      <div className="min-h-screen grid place-items-center bg-background px-4">
         <div className="max-w-md text-center">
-          <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Couldn’t verify access</p>
-          <h1 className="mt-2 text-lg font-semibold text-white">Permission check failed</h1>
-          <p className="mt-2 text-sm text-slate-400">
+          <p className="text-xs uppercase tracking-[0.4em] text-muted">Couldn’t verify access</p>
+          <h1 className="mt-2 text-lg font-semibold text-foreground">Permission check failed</h1>
+          <p className="mt-2 text-sm text-muted">
             A network or server error stopped us from confirming your access. Your session is
             still active — try again.
           </p>
           <button
             type="button"
             onClick={refetch}
-            className="mt-4 rounded-md border border-slate-600 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-800"
+            className="mt-4 rounded-md border border-line-strong px-4 py-2 text-sm font-medium text-secondary hover:bg-surface"
           >
             Retry
           </button>
         </div>
-      </main>
+      </div>
     );
   }
 
@@ -71,15 +71,15 @@ export function RequireAdmin({ children, fallback }: RequireAdminProps) {
       return <>{fallback}</>;
     }
     return (
-      <main className="min-h-screen grid place-items-center bg-[hsl(var(--background))] px-4">
+      <div className="min-h-screen grid place-items-center bg-background px-4">
         <div className="max-w-md text-center">
-          <p className="text-xs uppercase tracking-[0.4em] text-slate-400">403 — Forbidden</p>
-          <h1 className="mt-2 text-lg font-semibold text-white">Admin access required</h1>
-          <p className="mt-2 text-sm text-slate-400">
+          <p className="text-xs uppercase tracking-[0.4em] text-muted">403 — Forbidden</p>
+          <h1 className="mt-2 text-lg font-semibold text-foreground">Admin access required</h1>
+          <p className="mt-2 text-sm text-muted">
             Your account does not have permission to view this page.
           </p>
         </div>
-      </main>
+      </div>
     );
   }
 

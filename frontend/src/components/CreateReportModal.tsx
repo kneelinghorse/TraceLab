@@ -66,19 +66,19 @@ export function CreateReportModal({
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+        className="fixed inset-0 bg-backdrop bg-opacity-50 transition-opacity"
         onClick={handleClose}
       />
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative w-full max-w-lg bg-white dark:bg-gray-800 rounded-lg shadow-xl">
+        <div className="relative w-full max-w-lg bg-surface dark:bg-surface rounded-lg shadow-xl">
           {/* Header */}
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <div className="px-6 py-4 border-b border-line dark:border-line">
+            <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
               Create Report
             </h2>
-            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            <p className="mt-1 text-sm text-secondary dark:text-muted">
               Synthesize content from &quot;{collectionName}&quot;
             </p>
           </div>
@@ -90,7 +90,7 @@ export function CreateReportModal({
               <div>
                 <label
                   htmlFor="report-title"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className="block text-sm font-medium text-secondary dark:text-secondary mb-1"
                 >
                   Title *
                 </label>
@@ -100,7 +100,7 @@ export function CreateReportModal({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g., Research Summary - Q4 Findings"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground focus:ring-2 focus:ring-focus focus:border-transparent"
                   disabled={isCreating}
                   autoFocus
                 />
@@ -110,7 +110,7 @@ export function CreateReportModal({
               <div>
                 <label
                   htmlFor="report-format"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className="block text-sm font-medium text-secondary dark:text-secondary mb-1"
                 >
                   Format
                 </label>
@@ -118,7 +118,7 @@ export function CreateReportModal({
                   id="report-format"
                   value={format}
                   onChange={(e) => setFormat(e.target.value as ReportFormat)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground focus:ring-2 focus:ring-focus focus:border-transparent"
                   disabled={isCreating}
                 >
                   <option value="summary">Summary - Concise overview</option>
@@ -132,7 +132,7 @@ export function CreateReportModal({
               <div>
                 <label
                   htmlFor="report-prompt"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className="block text-sm font-medium text-secondary dark:text-secondary mb-1"
                 >
                   Custom Prompt (optional)
                 </label>
@@ -142,41 +142,41 @@ export function CreateReportModal({
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder="e.g., Focus on technical implementation details..."
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground focus:ring-2 focus:ring-focus focus:border-transparent resize-none"
                   disabled={isCreating}
                 />
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-xs text-muted dark:text-muted">
                   Add specific instructions for the AI synthesis
                 </p>
               </div>
 
               {/* Error */}
               {error && (
-                <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg">
-                  <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
+                <div className="p-3 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg">
+                  <p className="text-sm text-danger dark:text-danger">{error}</p>
                 </div>
               )}
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+            <div className="px-6 py-4 border-t border-line dark:border-line flex justify-end gap-3">
               <button
                 type="button"
                 onClick={handleClose}
                 disabled={isCreating}
-                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors disabled:opacity-50"
+                className="px-4 py-2 text-secondary dark:text-muted hover:text-foreground dark:hover:text-foreground transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isCreating}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent transition-colors disabled:bg-surface-alt disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {isCreating ? (
                   <>
                     <svg
-                      className="animate-spin h-4 w-4 text-white"
+                      className="animate-spin h-4 w-4 text-foreground"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"

@@ -12,9 +12,9 @@ import { useCallback, useEffect, useState } from "react";
 export default function SettingsPage() {
   return (
     <AuthGate>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-background dark:bg-background">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
+          <h1 className="text-2xl font-bold text-foreground dark:text-foreground">Settings</h1>
           <ProfileSection />
           <APIKeysSection />
           <InviteCodesSection />
@@ -79,65 +79,65 @@ function ProfileSection() {
   };
 
   return (
-    <section className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Profile</h2>
+    <section className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
+      <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">Profile</h2>
       <form onSubmit={handleSave} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">
             Email
           </label>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{user?.email}</p>
+          <p className="text-sm text-muted dark:text-muted">{user?.email}</p>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label htmlFor="display-name" className="block text-sm font-medium text-secondary dark:text-secondary mb-1">
             Display name
           </label>
-          <input
+          <input id="display-name"
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+            className="w-full px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground text-sm"
           />
         </div>
 
-        <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Change password</p>
+        <div className="pt-2 border-t border-line dark:border-line">
+          <p className="text-sm font-medium text-secondary dark:text-secondary mb-3">Change password</p>
           <div className="space-y-3">
             <div>
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Current password</label>
-              <input
+              <label htmlFor="current-password" className="block text-xs text-secondary dark:text-muted mb-1">Current password</label>
+              <input id="current-password"
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 autoComplete="current-password"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                className="w-full px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground text-sm"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">New password</label>
-              <input
+              <label htmlFor="new-password" className="block text-xs text-secondary dark:text-muted mb-1">New password</label>
+              <input id="new-password"
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 autoComplete="new-password"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                className="w-full px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground text-sm"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Confirm new password</label>
-              <input
+              <label htmlFor="confirm-password" className="block text-xs text-secondary dark:text-muted mb-1">Confirm new password</label>
+              <input id="confirm-password"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 autoComplete="new-password"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                className="w-full px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground text-sm"
               />
             </div>
           </div>
         </div>
 
         {message && (
-          <p className={`text-sm ${message.type === "success" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+          <p className={`text-sm ${message.type === "success" ? "text-success dark:text-success" : "text-danger dark:text-danger"}`}>
             {message.text}
           </p>
         )}
@@ -145,7 +145,7 @@ function ProfileSection() {
         <button
           type="submit"
           disabled={isSaving}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors text-sm font-medium"
+          className="px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent disabled:opacity-50 transition-colors text-sm font-medium"
         >
           {isSaving ? "Saving..." : "Save changes"}
         </button>
@@ -221,29 +221,29 @@ function APIKeysSection() {
   };
 
   return (
-    <section className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+    <section className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">API Keys</h2>
-        <span className="text-xs text-gray-500 dark:text-gray-400">Used by MCP and external integrations</span>
+        <h2 className="text-lg font-semibold text-foreground dark:text-foreground">API Keys</h2>
+        <span className="text-xs text-muted dark:text-muted">Used by MCP and external integrations</span>
       </div>
 
       {error && (
-        <p className="mb-4 text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p className="mb-4 text-sm text-danger dark:text-danger">{error}</p>
       )}
 
       {/* New key created — show full key once */}
       {createdKey && (
-        <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-          <p className="text-sm font-medium text-green-800 dark:text-green-300 mb-2">
+        <div className="mb-4 p-4 bg-success-surface dark:bg-success-surface border border-success-line dark:border-success-line rounded-lg">
+          <p className="text-sm font-medium text-success dark:text-success mb-2">
             API key created — copy it now, it won&apos;t be shown again.
           </p>
           <div className="flex items-center gap-3">
-            <code className="text-sm font-mono bg-green-100 dark:bg-green-900/40 px-3 py-1.5 rounded text-green-900 dark:text-green-100 break-all">
+            <code className="text-sm font-mono bg-success-surface dark:bg-success-surface px-3 py-1.5 rounded text-success dark:text-success break-all">
               {createdKey.key}
             </code>
             <button
               onClick={() => handleCopy(createdKey.key, "new")}
-              className="shrink-0 px-3 py-1.5 text-xs bg-green-700 text-white rounded hover:bg-green-800 transition-colors"
+              className="shrink-0 px-3 py-1.5 text-xs bg-success-surface text-success rounded hover:bg-success-surface transition-colors"
             >
               {copiedKeyId === "new" ? "Copied!" : "Copy"}
             </button>
@@ -258,12 +258,12 @@ function APIKeysSection() {
           value={newKeyName}
           onChange={(e) => setNewKeyName(e.target.value)}
           placeholder="Key name (e.g. MCP local)"
-          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+          className="flex-1 px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground text-sm"
         />
         <button
           type="submit"
           disabled={isCreating || !newKeyName.trim()}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors text-sm font-medium"
+          className="px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent disabled:opacity-50 transition-colors text-sm font-medium"
         >
           {isCreating ? "Creating..." : "Create key"}
         </button>
@@ -271,25 +271,25 @@ function APIKeysSection() {
 
       {/* Key list */}
       {isLoading ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
+        <p className="text-sm text-muted dark:text-muted">Loading...</p>
       ) : keys.length === 0 ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">No API keys yet.</p>
+        <p className="text-sm text-muted dark:text-muted">No API keys yet.</p>
       ) : (
         <ul className="space-y-2">
           {keys.map((key) => (
             <li
               key={key.id}
-              className="flex items-center justify-between py-3 px-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+              className="flex items-center justify-between py-3 px-4 bg-background dark:bg-surface-alt rounded-lg"
             >
               <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">{key.name}</p>
+                <p className="text-sm font-medium text-foreground dark:text-foreground">{key.name}</p>
                 <div className="flex items-center gap-3 mt-0.5">
-                  <code className="text-xs text-gray-500 dark:text-gray-400 font-mono">{key.key_prefix}…</code>
-                  <span className="text-xs text-gray-400 dark:text-gray-500">
+                  <code className="text-xs text-muted dark:text-muted font-mono">{key.key_prefix}…</code>
+                  <span className="text-xs text-muted dark:text-muted">
                     Created {formatDistanceToNow(new Date(key.created_at), { addSuffix: true })}
                   </span>
                   {key.last_used_at && (
-                    <span className="text-xs text-gray-400 dark:text-gray-500">
+                    <span className="text-xs text-muted dark:text-muted">
                       Last used {formatDistanceToNow(new Date(key.last_used_at), { addSuffix: true })}
                     </span>
                   )}
@@ -297,7 +297,7 @@ function APIKeysSection() {
               </div>
               <button
                 onClick={() => handleDelete(key.id, key.name)}
-                className="ml-4 px-3 py-1 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                className="ml-4 px-3 py-1 text-xs text-danger dark:text-danger hover:bg-danger-surface dark:hover:bg-danger-surface rounded transition-colors"
               >
                 Revoke
               </button>
@@ -372,32 +372,32 @@ function InviteCodesSection() {
   };
 
   return (
-    <section className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+    <section id="invites" className="scroll-mt-20 bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Invite Codes</h2>
+        <h2 className="text-lg font-semibold text-foreground dark:text-foreground">Invite Codes</h2>
         <button
           onClick={handleGenerate}
           disabled={isCreating}
-          className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors font-medium"
+          className="px-3 py-1.5 text-sm bg-accent text-on-accent rounded-lg hover:bg-accent disabled:opacity-50 transition-colors font-medium"
         >
           {isCreating ? "Generating..." : "Generate code"}
         </button>
       </div>
 
       {error && (
-        <p className="mb-4 text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p className="mb-4 text-sm text-danger dark:text-danger">{error}</p>
       )}
 
       {newCode && (
-        <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-          <p className="text-sm text-green-700 dark:text-green-300 mb-2">New invite code:</p>
+        <div className="mb-4 p-4 bg-success-surface dark:bg-success-surface border border-success-line dark:border-success-line rounded-lg">
+          <p className="text-sm text-success dark:text-success mb-2">New invite code:</p>
           <div className="flex items-center gap-3">
-            <code className="text-xl font-mono font-bold tracking-[0.25em] text-green-900 dark:text-green-100">
+            <code className="text-xl font-mono font-bold tracking-[0.25em] text-success dark:text-success">
               {newCode}
             </code>
             <button
               onClick={() => handleCopy(newCode)}
-              className="px-3 py-1 text-sm bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200 rounded hover:bg-green-200 dark:hover:bg-green-700 transition-colors"
+              className="px-3 py-1 text-sm bg-success-surface dark:bg-success-surface text-success dark:text-success rounded hover:bg-success-surface dark:hover:bg-success-surface transition-colors"
             >
               {copied ? "Copied!" : "Copy"}
             </button>
@@ -406,47 +406,47 @@ function InviteCodesSection() {
       )}
 
       {isLoading ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
+        <p className="text-sm text-muted dark:text-muted">Loading...</p>
       ) : codes.length === 0 ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">No invite codes yet.</p>
+        <p className="text-sm text-muted dark:text-muted">No invite codes yet.</p>
       ) : (
         <ul className="space-y-2">
           {codes.map((code) => (
             <li
               key={code.id}
-              className="flex items-center justify-between py-2.5 px-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+              className="flex items-center justify-between py-2.5 px-4 bg-background dark:bg-surface-alt rounded-lg"
             >
               <div className="flex items-center gap-4">
-                <code className="font-mono text-base tracking-widest text-gray-900 dark:text-white">
+                <code className="font-mono text-base tracking-widest text-foreground dark:text-foreground">
                   {code.code}
                 </code>
                 <span
                   className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                     code.status === "unused"
-                      ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
+                      ? "bg-success-surface dark:bg-success-surface text-success dark:text-success"
                       : code.status === "used"
-                      ? "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
-                      : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300"
+                      ? "bg-surface dark:bg-surface-alt text-secondary dark:text-muted"
+                      : "bg-warning-surface dark:bg-warning-surface text-warning dark:text-warning"
                   }`}
                 >
                   {code.status}
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs text-gray-400 dark:text-gray-500">
+                <span className="text-xs text-muted dark:text-muted">
                   {new Date(code.created_at).toLocaleDateString()}
                 </span>
                 {code.status === "unused" && (
                   <>
                     <button
                       onClick={() => handleCopy(code.code)}
-                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                      className="text-xs text-accent-text dark:text-accent-text underline underline-offset-4"
                     >
                       Copy
                     </button>
                     <button
                       onClick={() => handleDelete(code.id)}
-                      className="text-xs text-red-600 dark:text-red-400 hover:underline"
+                      className="text-xs text-danger dark:text-danger underline underline-offset-4"
                     >
                       Delete
                     </button>

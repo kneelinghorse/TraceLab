@@ -96,8 +96,8 @@ export default function DocumentDetailPage() {
   if (!document) {
     return (
       <AuthGate>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-          <p className="text-gray-500">Loading document...</p>
+        <div className="min-h-screen bg-background dark:bg-background flex items-center justify-center">
+          <p className="text-muted">Loading document...</p>
         </div>
       </AuthGate>
     );
@@ -105,19 +105,19 @@ export default function DocumentDetailPage() {
 
   return (
     <AuthGate>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-background dark:bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Back Link */}
           <Link
             href="/documents"
-            className="text-blue-600 dark:text-blue-400 hover:underline mb-4 inline-block"
+            className="text-accent-text dark:text-accent-text underline underline-offset-4 mb-4 inline-block"
           >
             ← Back to Documents
           </Link>
 
           {/* Header */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6 mb-6">
+            <h1 className="text-2xl font-bold text-foreground dark:text-foreground mb-4">
               {document.name}
             </h1>
 
@@ -125,27 +125,27 @@ export default function DocumentDetailPage() {
             {document.chunked && (document.chunk_count || document.word_count || document.total_tokens) && (
               <div className="mb-6 flex flex-wrap gap-4">
                 {document.chunk_count !== undefined && document.chunk_count > 0 && (
-                  <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-3">
-                    <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                  <div className="bg-info-surface dark:bg-info-surface border border-info-line dark:border-info-line rounded-lg px-4 py-3">
+                    <div className="text-2xl font-bold text-accent-text dark:text-accent-text">
                       {document.chunk_count}
                     </div>
-                    <div className="text-sm text-blue-600 dark:text-blue-400">Chunks</div>
+                    <div className="text-sm text-accent-text dark:text-accent-text">Chunks</div>
                   </div>
                 )}
                 {document.word_count !== undefined && document.word_count > 0 && (
-                  <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg px-4 py-3">
-                    <div className="text-2xl font-bold text-green-700 dark:text-green-300">
+                  <div className="bg-success-surface dark:bg-success-surface border border-success-line dark:border-success-line rounded-lg px-4 py-3">
+                    <div className="text-2xl font-bold text-success dark:text-success">
                       {document.word_count.toLocaleString()}
                     </div>
-                    <div className="text-sm text-green-600 dark:text-green-400">Words</div>
+                    <div className="text-sm text-success dark:text-success">Words</div>
                   </div>
                 )}
                 {document.total_tokens !== undefined && document.total_tokens > 0 && (
-                  <div className="bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800 rounded-lg px-4 py-3">
-                    <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">
+                  <div className="bg-info-surface dark:bg-info-surface border border-info-line dark:border-info-line rounded-lg px-4 py-3">
+                    <div className="text-2xl font-bold text-accent-text dark:text-accent-text">
                       {document.total_tokens.toLocaleString()}
                     </div>
-                    <div className="text-sm text-purple-600 dark:text-purple-400">Tokens</div>
+                    <div className="text-sm text-accent-text dark:text-accent-text">Tokens</div>
                   </div>
                 )}
               </div>
@@ -153,11 +153,11 @@ export default function DocumentDetailPage() {
 
             {/* Content Preview */}
             {document.preview && (
-              <div className="mb-6 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+              <div className="mb-6 bg-background dark:bg-surface-alt rounded-lg p-4">
+                <h3 className="text-sm font-medium text-foreground dark:text-foreground mb-2">
                   Content Preview
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">
+                <p className="text-sm text-secondary dark:text-secondary whitespace-pre-wrap">
                   {document.preview}
                 </p>
               </div>
@@ -166,31 +166,31 @@ export default function DocumentDetailPage() {
             {/* Metadata */}
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-500 dark:text-gray-400">File Type:</span>
-                <span className="ml-2 text-gray-900 dark:text-white">
+                <span className="text-muted dark:text-muted">File Type:</span>
+                <span className="ml-2 text-foreground dark:text-foreground">
                   {document.file_type || document.mime_type || "Unknown"}
                 </span>
               </div>
               {document.file_size && (
                 <div>
-                  <span className="text-gray-500 dark:text-gray-400">File Size:</span>
-                  <span className="ml-2 text-gray-900 dark:text-white">
+                  <span className="text-muted dark:text-muted">File Size:</span>
+                  <span className="ml-2 text-foreground dark:text-foreground">
                     {(document.file_size / 1024).toFixed(2)} KB
                   </span>
                 </div>
               )}
               {document.uploaded_at && (
                 <div>
-                  <span className="text-gray-500 dark:text-gray-400">Uploaded:</span>
-                  <span className="ml-2 text-gray-900 dark:text-white">
+                  <span className="text-muted dark:text-muted">Uploaded:</span>
+                  <span className="ml-2 text-foreground dark:text-foreground">
                     {formatDistanceToNow(new Date(document.uploaded_at), { addSuffix: true })}
                   </span>
                 </div>
               )}
               {document.source_type && (
                 <div>
-                  <span className="text-gray-500 dark:text-gray-400">Source:</span>
-                  <span className="ml-2 text-gray-900 dark:text-white">
+                  <span className="text-muted dark:text-muted">Source:</span>
+                  <span className="ml-2 text-foreground dark:text-foreground">
                     {document.source_type}
                   </span>
                 </div>
@@ -199,7 +199,7 @@ export default function DocumentDetailPage() {
 
             {/* Processing Status */}
             <div className="mt-6">
-              <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+              <h3 className="text-sm font-medium text-foreground dark:text-foreground mb-3">
                 Processing Status
               </h3>
               <div className="space-y-2">
@@ -209,9 +209,9 @@ export default function DocumentDetailPage() {
               </div>
               {document.validation_status && (
                 <div className="mt-4">
-                  <span className="text-sm text-gray-500 dark:text-gray-400">Validation Status: </span>
+                  <span className="text-sm text-muted dark:text-muted">Validation Status: </span>
                   <span className={`text-sm font-medium ${
-                    document.validation_status === "completed" ? "text-green-600 dark:text-green-400" : "text-yellow-600 dark:text-yellow-400"
+                    document.validation_status === "completed" ? "text-success dark:text-success" : "text-warning dark:text-warning"
                   }`}>
                     {document.validation_status}
                   </span>
@@ -224,7 +224,7 @@ export default function DocumentDetailPage() {
               <button
                 onClick={handleDownload}
                 disabled={downloading}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 bg-success-surface text-success rounded-lg hover:bg-success-surface disabled:bg-surface-alt disabled:cursor-not-allowed transition-colors"
               >
                 {downloading ? "Downloading..." : "Download Original"}
               </button>
@@ -232,14 +232,14 @@ export default function DocumentDetailPage() {
                 <button
                   onClick={handleProcess}
                   disabled={processing}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                  className="px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent disabled:bg-surface-alt disabled:cursor-not-allowed transition-colors"
                 >
                   {processing ? "Processing..." : "Process Document"}
                 </button>
               )}
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 border border-red-600 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 border border-danger-line text-danger dark:text-danger rounded-lg hover:bg-danger-surface dark:hover:bg-surface-alt transition-colors"
               >
                 Delete Document
               </button>
@@ -248,34 +248,34 @@ export default function DocumentDetailPage() {
 
           {/* Processing Events */}
           {document.processing_events && document.processing_events.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6 mb-6">
+              <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
                 Processing History
               </h2>
               <div className="space-y-3">
                 {document.processing_events.map((event) => (
                   <div
                     key={event.id}
-                    className="border-l-4 border-blue-500 pl-4 py-2"
+                    className="border-l-4 border-info-line pl-4 py-2"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-gray-900 dark:text-white">
+                      <span className="font-medium text-foreground dark:text-foreground">
                         {event.stage}
                       </span>
                       <span className={`text-sm ${
-                        event.status === "succeeded" ? "text-green-600 dark:text-green-400" :
-                        event.status === "failed" ? "text-red-600 dark:text-red-400" :
-                        "text-yellow-600 dark:text-yellow-400"
+                        event.status === "succeeded" ? "text-success dark:text-success" :
+                        event.status === "failed" ? "text-danger dark:text-danger" :
+                        "text-warning dark:text-warning"
                       }`}>
                         {event.status}
                       </span>
                     </div>
                     {event.message && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <p className="text-sm text-secondary dark:text-muted mt-1">
                         {event.message}
                       </p>
                     )}
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    <p className="text-xs text-muted dark:text-muted mt-1">
                       {formatDistanceToNow(new Date(event.created_at), { addSuffix: true })}
                     </p>
                   </div>
@@ -286,18 +286,18 @@ export default function DocumentDetailPage() {
 
           {/* Document Chunks */}
           {document.chunked && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
+              <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
                 Document Chunks
                 {chunksResponse && (
-                  <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
+                  <span className="ml-2 text-sm font-normal text-muted dark:text-muted">
                     ({chunksResponse.pagination.total} total)
                   </span>
                 )}
               </h2>
 
               {chunksLoading && (
-                <p className="text-gray-500 dark:text-gray-400">Loading chunks...</p>
+                <p className="text-muted dark:text-muted">Loading chunks...</p>
               )}
 
               {chunksResponse && chunksResponse.data.length > 0 && (
@@ -306,30 +306,30 @@ export default function DocumentDetailPage() {
                     {chunksResponse.data.map((chunk) => (
                       <div
                         key={chunk.id}
-                        className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden"
+                        className="border border-line dark:border-line-strong rounded-lg overflow-hidden"
                       >
-                        <div className="px-4 py-3 flex items-center justify-between bg-gray-50 dark:bg-gray-700">
+                        <div className="px-4 py-3 flex items-center justify-between bg-background dark:bg-surface-alt">
                           <button
                             onClick={() => toggleChunk(chunk.id)}
-                            className="flex items-center gap-4 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                            className="flex items-center gap-4 hover:text-accent-text dark:hover:text-accent-text transition-colors"
                           >
-                            <span className="font-mono text-sm text-blue-600 dark:text-blue-400">
+                            <span className="font-mono text-sm text-accent-text dark:text-accent-text">
                               #{chunk.chunk_index}
                             </span>
                             {chunk.token_count && (
-                              <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-2 py-0.5 rounded">
+                              <span className="text-xs text-muted dark:text-muted bg-surface-alt dark:bg-surface-alt px-2 py-0.5 rounded">
                                 {chunk.token_count} tokens
                               </span>
                             )}
-                            <span className="text-gray-400">
+                            <span className="text-muted">
                               {expandedChunks.has(chunk.id) ? "−" : "+"}
                             </span>
                           </button>
                           <AddToCollection chunkId={chunk.id} variant="compact" />
                         </div>
                         {expandedChunks.has(chunk.id) && (
-                          <div className="px-4 py-3 bg-white dark:bg-gray-800">
-                            <pre className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-mono overflow-x-auto">
+                          <div className="px-4 py-3 bg-surface dark:bg-surface">
+                            <pre className="text-sm text-secondary dark:text-secondary whitespace-pre-wrap font-mono overflow-x-auto">
                               {chunk.content}
                             </pre>
                           </div>
@@ -344,17 +344,17 @@ export default function DocumentDetailPage() {
                       <button
                         onClick={() => setChunksPage((p) => Math.max(1, p - 1))}
                         disabled={chunksPage === 1}
-                        className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700"
+                        className="px-3 py-1 text-sm border border-line-strong dark:border-line-strong rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface dark:hover:bg-surface-alt"
                       >
                         Previous
                       </button>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                      <span className="text-sm text-secondary dark:text-muted">
                         Page {chunksResponse.pagination.page} of {chunksResponse.pagination.pages}
                       </span>
                       <button
                         onClick={() => setChunksPage((p) => Math.min(chunksResponse.pagination.pages, p + 1))}
                         disabled={chunksPage >= chunksResponse.pagination.pages}
-                        className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700"
+                        className="px-3 py-1 text-sm border border-line-strong dark:border-line-strong rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface dark:hover:bg-surface-alt"
                       >
                         Next
                       </button>
@@ -364,7 +364,7 @@ export default function DocumentDetailPage() {
               )}
 
               {chunksResponse && chunksResponse.data.length === 0 && (
-                <p className="text-gray-500 dark:text-gray-400">No chunks available.</p>
+                <p className="text-muted dark:text-muted">No chunks available.</p>
               )}
             </div>
           )}
@@ -378,10 +378,10 @@ function StatusRow({ label, status }: { label: string; status: boolean }) {
   return (
     <div className="flex items-center gap-3">
       <div className={`w-4 h-4 rounded-full ${
-        status ? "bg-green-500" : "bg-gray-300 dark:bg-gray-600"
+        status ? "bg-success" : "bg-surface-alt dark:bg-surface-alt"
       }`} />
-      <span className="text-sm text-gray-900 dark:text-white">{label}</span>
-      <span className="text-sm text-gray-500 dark:text-gray-400">
+      <span className="text-sm text-foreground dark:text-foreground">{label}</span>
+      <span className="text-sm text-muted dark:text-muted">
         {status ? "Complete" : "Pending"}
       </span>
     </div>

@@ -24,13 +24,13 @@ const MISSION_STATUSES: { value: MissionStatus | "all"; label: string }[] = [
 ];
 
 const STATUS_COLORS: Record<MissionStatus, { bg: string; text: string; dot: string }> = {
-  draft: { bg: "bg-gray-100 dark:bg-gray-700", text: "text-gray-700 dark:text-gray-300", dot: "bg-gray-400" },
-  queued: { bg: "bg-amber-100 dark:bg-amber-900/30", text: "text-amber-700 dark:text-amber-300", dot: "bg-amber-400" },
-  in_progress: { bg: "bg-blue-100 dark:bg-blue-900/30", text: "text-blue-700 dark:text-blue-300", dot: "bg-blue-400" },
-  completed: { bg: "bg-emerald-100 dark:bg-emerald-900/30", text: "text-emerald-700 dark:text-emerald-300", dot: "bg-emerald-400" },
-  blocked: { bg: "bg-red-100 dark:bg-red-900/30", text: "text-red-700 dark:text-red-300", dot: "bg-red-400" },
-  cancelled: { bg: "bg-gray-100 dark:bg-gray-700", text: "text-gray-500 dark:text-gray-400", dot: "bg-gray-300" },
-  validation_failed: { bg: "bg-orange-100 dark:bg-orange-900/30", text: "text-orange-700 dark:text-orange-300", dot: "bg-orange-400" },
+  draft: { bg: "bg-surface dark:bg-surface-alt", text: "text-secondary dark:text-secondary", dot: "bg-surface-alt" },
+  queued: { bg: "bg-warning-surface dark:bg-warning-surface", text: "text-warning dark:text-warning", dot: "bg-warning" },
+  in_progress: { bg: "bg-info-surface dark:bg-info-surface", text: "text-accent-text dark:text-accent-text", dot: "bg-accent" },
+  completed: { bg: "bg-success-surface dark:bg-success-surface", text: "text-success dark:text-success", dot: "bg-success" },
+  blocked: { bg: "bg-danger-surface dark:bg-danger-surface", text: "text-danger dark:text-danger", dot: "bg-danger" },
+  cancelled: { bg: "bg-surface dark:bg-surface-alt", text: "text-muted dark:text-muted", dot: "bg-surface-alt" },
+  validation_failed: { bg: "bg-warning-surface dark:bg-warning-surface", text: "text-warning dark:text-warning", dot: "bg-warning" },
 };
 
 function StatusBadge({ status }: { status: MissionStatus }) {
@@ -49,8 +49,8 @@ function QueuePosition({ position }: { position: number | null }) {
   if (position === null) return null;
 
   return (
-    <span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 font-medium">
-      <span className="text-amber-500">#</span>
+    <span className="inline-flex items-center gap-1 text-xs text-warning dark:text-warning font-medium">
+      <span className="text-warning">#</span>
       {position} in queue
     </span>
   );
@@ -69,7 +69,7 @@ function MissionCard({ mission, queuePosition }: MissionCardProps) {
   return (
     <Link
       href={`/missions/${mission.id}`}
-      className="block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-sm transition-all"
+      className="block bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-5 hover:border-info-line dark:hover:border-info-line hover:shadow-sm transition-all"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
@@ -77,25 +77,25 @@ function MissionCard({ mission, queuePosition }: MissionCardProps) {
             <StatusBadge status={mission.status} />
             <QueuePosition position={queuePosition} />
           </div>
-          <h3 className="mt-2 text-lg font-semibold text-gray-900 dark:text-white truncate">
+          <h3 className="mt-2 text-lg font-semibold text-foreground dark:text-foreground truncate">
             {mission.title}
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 font-mono">
+          <p className="text-sm text-muted dark:text-muted font-mono">
             {mission.mission_id}
           </p>
         </div>
       </div>
 
-      <p className="mt-3 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+      <p className="mt-3 text-sm text-secondary dark:text-secondary line-clamp-2">
         {mission.objective}
       </p>
 
-      <div className="mt-4 flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+      <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-muted dark:text-muted">
         <span>Created {createdAt}</span>
         {mission.tags.length > 0 && (
-          <span className="flex items-center gap-1">
+          <span className="flex flex-wrap items-center gap-1">
             {mission.tags.slice(0, 3).map((tag) => (
-              <span key={tag} className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-gray-600 dark:text-gray-300">
+              <span key={tag} className="max-w-full px-1.5 py-0.5 bg-surface dark:bg-surface-alt rounded text-secondary dark:text-secondary">
                 {tag}
               </span>
             ))}
@@ -105,7 +105,7 @@ function MissionCard({ mission, queuePosition }: MissionCardProps) {
       </div>
 
       {mission.error_message && (
-        <p className="mt-2 text-xs text-red-600 dark:text-red-400 line-clamp-1">
+        <p className="mt-2 text-xs text-danger dark:text-danger line-clamp-1">
           Error: {mission.error_message}
         </p>
       )}
@@ -123,7 +123,7 @@ function Pagination({ page, totalPages, onChange }: PaginationProps) {
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between pt-4 text-sm text-gray-600 dark:text-gray-400">
+    <div className="flex items-center justify-between pt-4 text-sm text-secondary dark:text-muted">
       <span>
         Page {page} of {totalPages}
       </span>
@@ -131,14 +131,14 @@ function Pagination({ page, totalPages, onChange }: PaginationProps) {
         <button
           onClick={() => onChange(Math.max(1, page - 1))}
           disabled={page === 1}
-          className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          className="px-3 py-1.5 border border-line-strong dark:border-line-strong rounded-lg disabled:opacity-40 hover:bg-background dark:hover:bg-surface-alt transition-colors"
         >
           Previous
         </button>
         <button
           onClick={() => onChange(Math.min(totalPages, page + 1))}
           disabled={page >= totalPages}
-          className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          className="px-3 py-1.5 border border-line-strong dark:border-line-strong rounded-lg disabled:opacity-40 hover:bg-background dark:hover:bg-surface-alt transition-colors"
         >
           Next
         </button>
@@ -175,24 +175,24 @@ function MissionsContent() {
   const totalPages = pagination?.pages ?? 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-background dark:bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Missions</h1>
-            <p className="mt-1 text-gray-600 dark:text-gray-400">
+            <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Missions</h1>
+            <p className="mt-1 text-secondary dark:text-muted">
               Browse and manage research missions
             </p>
           </div>
           <Link
             href="/missions/new"
-            className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+            className="inline-flex items-center justify-center px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent transition-colors font-medium text-sm"
           >
             Create Mission
           </Link>
         </header>
 
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+        <div className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
             <div className="flex flex-wrap gap-3">
               <div>
@@ -203,7 +203,7 @@ function MissionsContent() {
                   id="status-filter"
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value as MissionStatus | "all")}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm"
+                  className="px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground text-sm"
                 >
                   {MISSION_STATUSES.map((s) => (
                     <option key={s.value} value={s.value}>
@@ -221,7 +221,7 @@ function MissionsContent() {
                   id="project-filter"
                   value={projectFilter}
                   onChange={(e) => setProjectFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm"
+                  className="px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground text-sm"
                 >
                   <option value="all">All Projects</option>
                   {projects.map((p) => (
@@ -235,15 +235,15 @@ function MissionsContent() {
 
             <button
               onClick={refresh}
-              className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="text-sm font-medium text-secondary dark:text-muted hover:text-foreground dark:hover:text-foreground transition-colors"
             >
               Refresh
             </button>
           </div>
 
           {error && (
-            <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-600 dark:text-red-400">
+            <div className="mb-4 p-4 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg">
+              <p className="text-sm text-danger dark:text-danger">
                 Failed to load missions: {error.message}
               </p>
             </div>
@@ -251,16 +251,16 @@ function MissionsContent() {
 
           {isLoading && !missions.length ? (
             <div className="py-12 text-center">
-              <p className="text-gray-500 dark:text-gray-400">Loading missions...</p>
+              <p className="text-muted dark:text-muted">Loading missions...</p>
             </div>
           ) : missions.length === 0 ? (
             <div className="py-12 text-center">
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-muted dark:text-muted">
                 No missions found. Create one to get started.
               </p>
               <Link
                 href="/missions/new"
-                className="mt-4 inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700"
+                className="mt-4 inline-flex items-center text-sm font-medium text-accent-text hover:text-accent-text"
               >
                 Create your first mission
               </Link>

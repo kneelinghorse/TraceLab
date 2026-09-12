@@ -75,24 +75,24 @@ export default function DocumentsPage() {
 
   return (
     <AuthGate>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-background dark:bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Documents</h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Documents</h1>
+            <p className="mt-2 text-secondary dark:text-muted">
               Browse and manage documents across all projects. For project-specific management, use the project detail page.
             </p>
           </div>
 
           {/* Actions & Filters */}
           <div className="mb-6 flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-            <div className="flex gap-4 items-center flex-wrap">
+            <div className="flex max-w-full gap-4 items-center flex-wrap">
               {/* Project Filter */}
               <select
                 value={selectedProject}
                 onChange={(e) => setSelectedProject(e.target.value)}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="px-4 py-2 border border-line-strong dark:border-line rounded-lg bg-surface dark:bg-surface text-foreground dark:text-foreground"
                 aria-label="Filter by project"
               >
                 <option value="">All Projects</option>
@@ -107,7 +107,7 @@ export default function DocumentsPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="px-4 py-2 border border-line-strong dark:border-line rounded-lg bg-surface dark:bg-surface text-foreground dark:text-foreground"
                 aria-label="Filter by status"
               >
                 <option value="all">All Status</option>
@@ -121,7 +121,7 @@ export default function DocumentsPage() {
                 placeholder="Search name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="px-4 py-2 border border-line-strong dark:border-line rounded-lg bg-surface dark:bg-surface text-foreground dark:text-foreground"
                 aria-label="Search documents"
               />
 
@@ -130,13 +130,13 @@ export default function DocumentsPage() {
                 type="button"
                 onClick={handleRefresh}
                 disabled={isValidating}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+                className="px-4 py-2 border border-line-strong dark:border-line rounded-lg hover:bg-background dark:hover:bg-surface-alt disabled:opacity-50"
                 title="Refresh documents"
               >
                 {isValidating ? (
-                  <span className="inline-block w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                  <span className="inline-block w-4 h-4 border-2 border-line-strong border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-secondary dark:text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
                 )}
@@ -145,7 +145,7 @@ export default function DocumentsPage() {
 
             <Link
               href="/documents/upload"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent transition-colors"
             >
               Upload Document
             </Link>
@@ -154,14 +154,14 @@ export default function DocumentsPage() {
           {/* Documents List */}
           {isLoading && !documentsResponse ? (
             <div className="text-center py-12">
-              <p className="text-gray-500">Loading documents...</p>
+              <p className="text-muted">Loading documents...</p>
             </div>
           ) : documents.length === 0 ? (
-            <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-              <p className="text-gray-500 dark:text-gray-400 mb-4">No documents found</p>
+            <div className="text-center py-12 bg-surface dark:bg-surface rounded-lg border border-line dark:border-line">
+              <p className="text-muted dark:text-muted mb-4">No documents found</p>
               <Link
                 href="/documents/upload"
-                className="text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                className="text-accent-text hover:text-accent-text dark:text-accent-text"
               >
                 Upload your first document
               </Link>
@@ -171,21 +171,21 @@ export default function DocumentsPage() {
               {documents.map((document) => (
                 <div
                   key={document.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow"
+                  className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6 hover:shadow-lg transition-shadow"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <Link
                         href={`/documents/${document.id}`}
-                        className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
+                        className="text-lg font-semibold text-foreground dark:text-foreground hover:text-accent-text dark:hover:text-accent-text"
                       >
                         {document.name}
                       </Link>
 
-                      <div className="mt-2 flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="mt-2 flex flex-wrap gap-4 text-sm text-secondary dark:text-muted">
                         <Link
                           href={`/projects/${document.project_id}`}
-                          className="hover:text-blue-600 dark:hover:text-blue-400"
+                          className="hover:text-accent-text dark:hover:text-accent-text"
                         >
                           Project: {projectLookup.get(document.project_id) ?? "Unknown"}
                         </Link>
@@ -224,14 +224,14 @@ export default function DocumentsPage() {
                     <div className="ml-4 flex gap-2">
                       <Link
                         href={`/documents/${document.id}`}
-                        className="px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded"
+                        className="px-4 py-2 text-sm text-accent-text dark:text-accent-text hover:bg-info-surface dark:hover:bg-surface-alt rounded"
                       >
                         View
                       </Link>
                       <button
                         type="button"
                         onClick={() => handleDelete(document.id)}
-                        className="px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-gray-700 rounded"
+                        className="px-4 py-2 text-sm text-danger dark:text-danger hover:bg-danger-surface dark:hover:bg-surface-alt rounded"
                       >
                         Delete
                       </button>
@@ -265,7 +265,7 @@ function PaginationControls({ page, pages, onChange }: PaginationControlsProps) 
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between pt-4">
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-0">
+      <p className="text-sm text-secondary dark:text-muted mb-2 sm:mb-0">
         Page {page} of {pages}
       </p>
       <div className="flex gap-2">
@@ -273,7 +273,7 @@ function PaginationControls({ page, pages, onChange }: PaginationControlsProps) 
           type="button"
           onClick={() => onChange(Math.max(1, page - 1))}
           disabled={page === 1}
-          className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg disabled:opacity-50"
+          className="px-4 py-2 border border-line-strong dark:border-line rounded-lg disabled:opacity-50"
         >
           Previous
         </button>
@@ -281,7 +281,7 @@ function PaginationControls({ page, pages, onChange }: PaginationControlsProps) 
           type="button"
           onClick={() => onChange(Math.min(pages, page + 1))}
           disabled={page >= pages}
-          className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg disabled:opacity-50"
+          className="px-4 py-2 border border-line-strong dark:border-line rounded-lg disabled:opacity-50"
         >
           Next
         </button>
@@ -295,8 +295,8 @@ function StatusBadge({ label, status }: { label: string; status: boolean }) {
     <span
       className={`px-2 py-1 text-xs rounded ${
         status
-          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-          : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"
+          ? "bg-success-surface text-success dark:bg-success-surface dark:text-success"
+          : "bg-surface text-secondary dark:bg-surface-alt dark:text-muted"
       }`}
     >
       {status ? "✓" : "○"} {label}

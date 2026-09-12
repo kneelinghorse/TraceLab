@@ -110,11 +110,11 @@ function DeviceApproval() {
   }
 
   return (
-    <main className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-slate-900/60 p-8 shadow-xl text-slate-200">
-        <p className="text-xs uppercase tracking-[0.4em] text-slate-400">Device login</p>
-        <h1 className="mt-1 text-2xl font-semibold text-white">Approve TraceLab MCP</h1>
-        <p className="mt-2 text-sm text-slate-400">
+    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-lg rounded-2xl border border-line bg-background p-8 shadow-xl text-secondary">
+        <p className="text-xs uppercase tracking-[0.4em] text-muted">Device login</p>
+        <h1 className="mt-1 text-2xl font-semibold text-foreground">Approve TraceLab MCP</h1>
+        <p className="mt-2 text-sm text-muted">
           Enter the code shown by the TraceLab MCP client to issue it an API key on
           your account.
         </p>
@@ -148,7 +148,7 @@ function DeviceApproval() {
             heading="Device approved"
             body={
               <>
-                Issued API key <span className="font-mono text-emerald-300">{outcome.label}</span>.
+                Issued API key <span className="font-mono text-success">{outcome.label}</span>.
                 You can close this tab — the MCP client will pick it up within
                 seconds.
               </>
@@ -176,7 +176,7 @@ function DeviceApproval() {
           />
         ) : null}
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -190,7 +190,7 @@ interface CodeEntryFormProps {
 function CodeEntryForm({ code, setCode, onSubmit, disabled }: CodeEntryFormProps) {
   return (
     <form onSubmit={onSubmit} className="mt-6 space-y-4">
-      <label className="block text-sm font-medium text-slate-300" htmlFor="device-code">
+      <label className="block text-sm font-medium text-secondary" htmlFor="device-code">
         Code
       </label>
       <input
@@ -201,13 +201,13 @@ function CodeEntryForm({ code, setCode, onSubmit, disabled }: CodeEntryFormProps
         value={code}
         onChange={(e) => setCode(formatUserCode(e.target.value))}
         placeholder="ABCD-EFGH"
-        className="w-full rounded-lg border border-white/15 bg-slate-950/40 px-4 py-3 font-mono text-lg tracking-widest text-white placeholder:text-slate-600 focus:border-sky-400 focus:outline-none"
+        className="w-full rounded-lg border border-line bg-background px-4 py-3 font-mono text-lg tracking-widest text-foreground placeholder:text-secondary focus:border-info-line focus:outline-none"
         disabled={disabled}
       />
       <button
         type="submit"
         disabled={disabled}
-        className="w-full rounded-lg bg-sky-500 px-4 py-3 text-sm font-semibold text-white shadow hover:bg-sky-400 disabled:opacity-60"
+        className="w-full rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-on-accent shadow hover:bg-accent disabled:opacity-60"
       >
         {disabled ? "Looking up…" : "Continue"}
       </button>
@@ -252,21 +252,21 @@ function PreviewPanel({
 
   return (
     <div className="mt-6 space-y-5">
-      <dl className="rounded-lg border border-white/10 bg-slate-950/40 p-4 text-sm">
+      <dl className="rounded-lg border border-line bg-background p-4 text-sm">
         <Row label="Code">
-          <span className="font-mono tracking-widest text-white">{grant.user_code}</span>
+          <span className="font-mono tracking-widest text-foreground">{grant.user_code}</span>
         </Row>
         <Row label="Client">
-          <span className="font-mono text-slate-200">{grant.client_label}</span>
+          <span className="font-mono text-secondary">{grant.client_label}</span>
         </Row>
         <Row label="Expires in">
-          <span className="text-slate-200">~{minutesLeft} min</span>
+          <span className="text-secondary">~{minutesLeft} min</span>
         </Row>
       </dl>
 
       <div>
-        <label className="block text-sm font-medium text-slate-300" htmlFor="device-label">
-          Key label <span className="text-slate-500 font-normal">(optional)</span>
+        <label className="block text-sm font-medium text-secondary" htmlFor="device-label">
+          Key label <span className="text-muted font-normal">(optional)</span>
         </label>
         <input
           id="device-label"
@@ -274,9 +274,9 @@ function PreviewPanel({
           value={labelOverride}
           onChange={(e) => setLabelOverride(e.target.value)}
           placeholder={grant.client_label}
-          className="mt-1 w-full rounded-lg border border-white/15 bg-slate-950/40 px-3 py-2 text-sm text-white placeholder:text-slate-600 focus:border-sky-400 focus:outline-none"
+          className="mt-1 w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-foreground placeholder:text-secondary focus:border-info-line focus:outline-none"
         />
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs text-muted">
           Defaults to the client name. Override if you want to label this key
           (e.g. "Work laptop", "CI runner").
         </p>
@@ -286,14 +286,14 @@ function PreviewPanel({
         <button
           type="button"
           onClick={onApprove}
-          className="flex-1 rounded-lg bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-emerald-400"
+          className="flex-1 rounded-lg bg-success px-4 py-2.5 text-sm font-semibold text-on-accent shadow hover:bg-success-surface"
         >
           Approve
         </button>
         <button
           type="button"
           onClick={onDeny}
-          className="flex-1 rounded-lg border border-white/15 px-4 py-2.5 text-sm font-semibold text-white hover:border-rose-400 hover:text-rose-300"
+          className="flex-1 rounded-lg border border-line px-4 py-2.5 text-sm font-semibold text-foreground hover:border-danger-line hover:text-danger"
         >
           Deny
         </button>
@@ -302,7 +302,7 @@ function PreviewPanel({
       <button
         type="button"
         onClick={onChangeCode}
-        className="text-xs text-slate-400 hover:text-slate-200"
+        className="text-xs text-muted hover:text-secondary"
       >
         ← Use a different code
       </button>
@@ -312,8 +312,8 @@ function PreviewPanel({
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-baseline justify-between py-1.5 first:pt-0 last:pb-0 border-b border-white/5 last:border-b-0">
-      <dt className="text-xs uppercase tracking-wider text-slate-500">{label}</dt>
+    <div className="flex items-baseline justify-between py-1.5 first:pt-0 last:pb-0 border-b border-line last:border-b-0">
+      <dt className="text-xs uppercase tracking-wider text-muted">{label}</dt>
       <dd>{children}</dd>
     </div>
   );
@@ -328,9 +328,9 @@ interface ResultPanelProps {
 
 function ResultPanel({ tone, heading, body, onRetry }: ResultPanelProps) {
   const accent = {
-    success: "border-emerald-400/40 bg-emerald-500/10 text-emerald-100",
-    warning: "border-amber-400/40 bg-amber-500/10 text-amber-100",
-    error: "border-rose-400/40 bg-rose-500/10 text-rose-100",
+    success: "border-success-line bg-success-surface text-success",
+    warning: "border-warning-line bg-warning-surface text-warning",
+    error: "border-danger-line bg-danger-surface text-danger",
   }[tone];
 
   return (
@@ -341,7 +341,7 @@ function ResultPanel({ tone, heading, body, onRetry }: ResultPanelProps) {
         <button
           type="button"
           onClick={onRetry}
-          className="mt-3 rounded border border-white/20 px-3 py-1 text-xs hover:bg-white/10"
+          className="mt-3 rounded border border-line px-3 py-1 text-xs hover:bg-surface"
         >
           Try another code
         </button>

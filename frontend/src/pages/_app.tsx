@@ -2,11 +2,12 @@ import type { AppProps } from "next/app";
 import Head from "next/head";
 import { Inter } from "next/font/google";
 
+import "@oods/tokens/css";
 import "@/styles/globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { RoleProvider } from "@/contexts/RoleContext";
-import { Navigation } from "@/components/Navigation";
-import { useRouter } from "next/router";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { AppShell } from "@/components/AppShell";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -14,9 +15,6 @@ const inter = Inter({
 });
 
 export default function MissionProtocolApp({ Component, pageProps }: AppProps) {
-  const router = useRouter();
-  const showNav = !["/"].includes(router.pathname);
-
   return (
     <>
       <Head>
@@ -25,10 +23,11 @@ export default function MissionProtocolApp({ Component, pageProps }: AppProps) {
       </Head>
       <AuthProvider>
         <RoleProvider>
-          <div className={`${inter.variable} font-sans bg-[hsl(var(--background))] min-h-screen`}>
-            {showNav && <Navigation />}
-            <Component {...pageProps} />
-          </div>
+          <ThemeProvider>
+            <div className={`${inter.variable} font-sans min-h-screen`}>
+              <AppShell><Component {...pageProps} /></AppShell>
+            </div>
+          </ThemeProvider>
         </RoleProvider>
       </AuthProvider>
     </>

@@ -1,0 +1,137 @@
+import { test, expect } from "@playwright/test";
+import path from "node:path";
+
+// Browser-level focus, hydration, and command integration. API responses are
+// deterministic here; scripts/ui-shell-smoke.mjs covers real deployed data.
+test.beforeEach(async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.addInitScript(() => {
+    localStorage.setItem("tracelab.auth.v2", JSON.stringify({ token: "shell-test", user_id: "alice", email: "alice@example.test", display_name: "Alice" }));
+  });
+  await page.route("**/api/v1/**", async route => {
+    const pathname = new URL(route.request().url()).pathname;
+    let body: unknown = {};
+    if (pathname.endsWith("/auth/me")) body = { user_id: "alice", email: "alice@example.test", display_name: "Alice", role: "admin" };
+    else if (pathname.endsWith("/projects") || pathname.endsWith("/missions") || pathname.endsWith("/documents")) body = { data: [], pagination: { page: 1, page_size: 20, total: 0, pages: 1 } };
+    else if (pathname.endsWith("/search/history")) body = { entries: [] };
+    else if (pathname.endsWith("/saved-searches")) body = { items: [] };
+    else if (pathname.endsWith("/pedr/search")) body = { results: [], metadata: null };
+    else if (pathname.endsWith("/search")) body = { answer: "No matching sources", citations: [], sources: [], latency_ms: 12, quality: { composite_score: 0.9, threshold: 0.8 }, routing: { selected_model: "test" }, cache: { hit: false } };
+    await route.fulfill({ json: body });
+  });
+});
+
+test("theme persists through hydration and OS changes without a wrong-color frame", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", error => errors.push(error.message));
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.addInitScript(() => {
+    (window as unknown as { paintedThemes: string[] }).paintedThemes = [];
+    function sample() {
+      if (document.body?.innerText) (window as unknown as { paintedThemes: string[] }).paintedThemes.push(document.documentElement.dataset.theme || "missing");
+      if (performance.now() < 3000) requestAnimationFrame(sample);
+    }
+    requestAnimationFrame(sample);
+  });
+  await page.goto("/missions");
+  await expect(page.getByRole("heading", { name: "Missions", exact: true })).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  expect(await page.evaluate(() => (window as unknown as { paintedThemes: string[] }).paintedThemes.every(theme => theme === "dark"))).toBe(true);
+  await page.getByRole("combobox", { name: "Color theme" }).selectOption("light");
+  await page.reload();
+  await expect(page.getByRole("combobox", { name: "Color theme" })).toHaveValue("light");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await page.getByRole("combobox", { name: "Color theme" }).selectOption("system");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.emulateMedia({ colorScheme: "light" });
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  expect(errors).toEqual([]);
+});
+
+test("mobile drawer traps focus, closes with Escape, and returns focus to its trigger", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/missions");
+  const trigger = page.getByRole("button", { name: "Open navigation" });
+  await trigger.click();
+  const dialog = page.getByRole("dialog", { name: "Navigation", exact: true });
+  await expect(dialog).toBeVisible();
+  for (let i = 0; i < 22; i++) {
+    await page.keyboard.press("Tab");
+    expect(await dialog.evaluate(node => node.contains(document.activeElement))).toBe(true);
+  }
+  await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
+  await expect(trigger).toBeFocused();
+  await trigger.click();
+  await dialog.getByRole("link", { name: "Saved searches" }).click();
+  await expect(page).toHaveURL(/saved-searches/);
+  await expect(dialog).not.toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test("command palette submits a real search request and supports keyboard dismissal", async ({ page }) => {
+  await page.goto("/missions");
+  await page.getByRole("heading", { name: "Missions", exact: true }).waitFor();
+  await page.keyboard.press("Control+k");
+  const query = page.getByRole("textbox", { name: "Search research or find a section" });
+  await expect(query).toBeFocused();
+  await query.fill("source & provenance");
+  const request = page.waitForRequest(r => r.url().endsWith("/pedr/search") && r.method() === "POST");
+  await query.press("Enter");
+  expect((await request).postDataJSON().query).toBe("source & provenance");
+  await expect(page).toHaveURL(/search\?q=source%20%26%20provenance/);
+  await expect(page.getByText("No matching sources", { exact: true })).toBeVisible();
+  for (const theme of ["light", "dark"] as const) {
+    await page.emulateMedia({ colorScheme: theme });
+    await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+    await page.addScriptTag({ path: path.resolve("node_modules/axe-core/axe.min.js") });
+    const violations = await page.evaluate(async () => {
+      const axe = (window as unknown as { axe: { run: (node: Document) => Promise<{ violations: { id: string; impact: string }[] }> } }).axe;
+      return (await axe.run(document)).violations.filter(v => ["critical", "serious"].includes(v.impact));
+    });
+    expect(violations).toEqual([]);
+  }
+  await page.keyboard.press("Meta+k");
+  await expect(query).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog", { name: "Search and navigation" })).not.toBeVisible();
+});
+
+test("open modal surfaces meet the same axe severity and landmark gates", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/missions");
+  for (const name of ["Open navigation", "Search"]) {
+    await page.getByRole("button", { name, exact: true }).click();
+    await page.addScriptTag({ path: path.resolve("node_modules/axe-core/axe.min.js") });
+    const violations = await page.evaluate(async () => {
+      const axe = (window as unknown as { axe: { run: (node: Document) => Promise<{ violations: { id: string; impact: string }[] }> } }).axe;
+      return (await axe.run(document)).violations.filter(v => ["critical", "serious"].includes(v.impact) || ["html-has-lang", "region", "landmark-one-main", "landmark-no-duplicate-banner"].includes(v.id));
+    });
+    expect(violations).toEqual([]);
+    await page.keyboard.press("Escape");
+  }
+});
+
+for (const theme of ["light", "dark"] as const) {
+  for (const width of [390, 1440]) {
+    test(`login and registration share accessible ${theme} surfaces at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.emulateMedia({ colorScheme: theme });
+      await page.goto("/missions");
+      await page.getByRole("heading", { name: "Missions", exact: true }).waitFor();
+      await page.evaluate(() => window.dispatchEvent(new Event("tracelab:auth-expired")));
+      await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
+      for (const view of ["login", "register"]) {
+        if (view === "register") await page.getByRole("button", { name: "Create one" }).click();
+        await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+        await expect(page.getByRole("main")).toHaveCount(1);
+        await page.addScriptTag({ path: path.resolve("node_modules/axe-core/axe.min.js") });
+        const result = await page.evaluate(async () => {
+          const axe = (window as unknown as { axe: { run: (node: Document) => Promise<{ violations: { id: string; impact: string }[] }> } }).axe;
+          return { overflow: document.documentElement.scrollWidth > innerWidth, violations: (await axe.run(document)).violations.filter(v => ["critical", "serious"].includes(v.impact)) };
+        });
+        expect(result).toEqual({ overflow: false, violations: [] });
+      }
+    });
+  }
+}
