@@ -41,16 +41,25 @@
     "changed_file_ruff": "passed",
     "foundational_refs": "passed",
     "credential_literal_scan": "passed",
-    "diff_check": "passed"
+    "diff_check": "passed",
+    "cmos_database_health": "passed"
   },
   "full_backend": {
     "status": "running in isolated worktree"
   },
   "hosted_ci": {
-    "status": "pending"
+    "pr": 255,
+    "url": "https://github.com/kneelinghorse/TraceLab/pull/255",
+    "status": "five required gates and PostgreSQL integration pass; backend awaiting fixture corrections"
   },
   "production": {
     "status": "pending deployment"
   },
-  "telemetry_churn_committed": false
+  "telemetry_churn_committed": false,
+  "followup_fixtures": {
+    "baseline": "Cache assertion fails on restored envelope; FK test teardown raises closed-database ProgrammingError after disposing a checked-out StaticPool connection.",
+    "fix": "Read event.payload in cache test; close the FK-test session before disposing its pool.",
+    "validation": "40 passed, 14 warnings in 10.55s across caching and admin user management",
+    "commit": "f7725d070db7157a38c25f96156d685ed8605fc7"
+  }
 }
