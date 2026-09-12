@@ -467,6 +467,9 @@ class TestAdminUserHardDelete:
             assert db_session.query(User).filter(User.id == target.id).first() is None
         finally:
             event.remove(engine, "connect", _fk_on)
+            # StaticPool owns one connection, including the session's checked-out
+            # connection. Release the session before disposal closes that handle.
+            db_session.close()
             engine.dispose()  # restore FK-off for subsequent tests
 
     def test_last_owner_self_delete_gets_409(self, client, db_session):
