@@ -11,8 +11,8 @@
   - option "Name Z–A"
 - list "Records":
   - listitem:
-    - button "consumer-owner-id Consumer label Consumer description Sep 5, 2026, 12:00 PM consumer-owner-id supporting":
-      - text: consumer-owner-id Consumer label Consumer description
+    - button "Consumer id Consumer label Consumer description Sep 5, 2026, 12:00 PM consumer-owner-id supporting":
+      - text: Consumer id Consumer label Consumer description
       - time: Sep 5, 2026, 12:00 PM
       - text: consumer-owner-id supporting
 - navigation "Pagination":

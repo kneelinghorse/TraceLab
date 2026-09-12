@@ -440,9 +440,9 @@
       }
     }
   },
-  "schemaRef": "compose-6cb1b9ee",
-  "schemaRefCreatedAt": "2026-09-12T22:19:56.714Z",
-  "schemaRefExpiresAt": "2026-09-12T22:49:56.714Z",
+  "schemaRef": "compose-75a15299",
+  "schemaRefCreatedAt": "2026-09-12T23:41:01.953Z",
+  "schemaRefExpiresAt": "2026-09-13T00:11:01.953Z",
   "selections": [
     {
       "slotName": "header",

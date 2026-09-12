@@ -5,9 +5,9 @@
   },
   "saved": {
     "name": "tracelab-mission-workflow-v1",
-    "version": 3,
-    "createdAt": "2026-09-12T21:56:41.810Z",
-    "updatedAt": "2026-09-12T22:19:39.046Z",
+    "version": 2,
+    "createdAt": "2026-09-12T23:09:15.206Z",
+    "updatedAt": "2026-09-12T23:38:44.742Z",
     "tags": [
       "tracelab",
       "research",
@@ -177,7 +177,7 @@
                       "component": "Button",
                       "collectionControl": "open",
                       "props": {
-                        "field": "mission_id"
+                        "field": "id"
                       },
                       "layout": {
                         "type": "inline",
@@ -250,7 +250,7 @@
                   ],
                   "collection": {
                     "source": "rows",
-                    "keyField": "mission_id",
+                    "keyField": "id",
                     "labelField": "title"
                   }
                 },
@@ -1655,9 +1655,9 @@
         }
       }
     },
-    "schemaRef": "compose-ee98d8aa",
-    "schemaRefCreatedAt": "2026-09-12T22:19:39.042Z",
-    "schemaRefExpiresAt": "2026-09-12T22:49:39.042Z",
+    "schemaRef": "compose-c95c87c9",
+    "schemaRefCreatedAt": "2026-09-12T23:38:44.740Z",
+    "schemaRefExpiresAt": "2026-09-13T00:08:44.740Z",
     "selections": [
       {
         "slotName": "items",

@@ -5,9 +5,9 @@
   },
   "saved": {
     "name": "tracelab-collection-list-v1",
-    "version": 1,
+    "version": 2,
     "createdAt": "2026-09-12T23:09:15.076Z",
-    "updatedAt": "2026-09-12T23:09:15.076Z",
+    "updatedAt": "2026-09-12T23:38:44.628Z",
     "tags": [
       "tracelab",
       "research",
@@ -101,6 +101,7 @@
                         "label": "filters"
                       },
                       "props": {
+                        "field": "owner_type",
                         "label": "Owner type",
                         "options": [
                           {
@@ -149,7 +150,7 @@
                       "component": "Button",
                       "collectionControl": "open",
                       "props": {
-                        "field": "owner_id"
+                        "field": "id"
                       },
                       "layout": {
                         "type": "inline",
@@ -214,7 +215,7 @@
                   ],
                   "collection": {
                     "source": "rows",
-                    "keyField": "owner_id",
+                    "keyField": "id",
                     "labelField": "name"
                   }
                 },
@@ -424,9 +425,9 @@
         }
       }
     },
-    "schemaRef": "compose-aeeb47c6",
-    "schemaRefCreatedAt": "2026-09-12T23:09:15.075Z",
-    "schemaRefExpiresAt": "2026-09-12T23:39:15.075Z",
+    "schemaRef": "compose-473c2196",
+    "schemaRefCreatedAt": "2026-09-12T23:38:44.627Z",
+    "schemaRefExpiresAt": "2026-09-13T00:08:44.627Z",
     "selections": [
       {
         "slotName": "items",

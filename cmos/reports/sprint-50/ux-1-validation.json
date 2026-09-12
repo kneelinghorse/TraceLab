@@ -1,15 +1,15 @@
 {
   "mission": "UX-1",
   "status": "in_progress; Forge runtime CI and canonical registry activation pending",
-  "updated_at": "2026-09-12T23:09:50.654979+00:00",
+  "updated_at": "2026-09-12T23:42:19.160144+00:00",
   "forge": {
     "base": "114a268ea10b9141bc96925c69132179c7c4b334",
-    "implementation_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+    "implementation_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
     "pull_request": "https://github.com/kneelinghorse/OODS-Forge/pull/105",
     "backlog_request": "f091c849-fe1a-49d5-93ee-b8029219685a",
-    "current_ci_run": 34722431783,
+    "current_ci_run": 34725928271,
     "canonical_registry_activation": "pending merge and native worker refresh",
-    "ci_merge_revision": "a1b7763da69732d6e22593fc6d9c74406bdfa753",
+    "ci_merge_revision": "a7ef99a21c303e3ef66f57845e9f2b52475f79a3",
     "ci_merge_base": "e9f15a4a586921ce8c68dd3d24f5a01d0b24a281",
     "upstream_change": "Roadmap-only Sprint196 review closure; merged locally and source tree equality with tested CI revision verified before retaining receipts.",
     "bundled_runtime": {
@@ -21,7 +21,25 @@
       "head": "a1b7763da69732d6e22593fc6d9c74406bdfa753",
       "archive_sha256": "60aab21dbade6f2dbef5ea252ca0cbd523bb8c91d6593261e630e2aa5a93c53c",
       "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/release"
-    }
+    },
+    "runtime_attempts": [
+      {
+        "run": 34722431783,
+        "job": 103630675634,
+        "head": "a1b7763da69732d6e22593fc6d9c74406bdfa753",
+        "summary": {
+          "cells": 240,
+          "pass": 228,
+          "typedGap": 0,
+          "fail": 12
+        },
+        "disposition": "rejected; not retained as canonical proof",
+        "cause": "Six research objects used different collection row and workflow-store keys. Canonical id precedence is now aligned; six intent regressions failed before the fix.",
+        "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/diagnostics/runtime-ci-34722431783"
+      }
+    ],
+    "runtime_job": 103639903728,
+    "release_job": 103639903681
   },
   "mapping": {
     "objects": 7,
@@ -33,26 +51,32 @@
   "local_forge_checks": {
     "initial_regression_suites": "157 passed, no skips",
     "expanded_census_and_research_suites": "69 passed; 2 retained-current-ledger tests fail pending real 240-cell CI evidence; no skips",
-    "research_workflows": "all six generated workflows strictly compile for React and Vue",
+    "research_workflows": "All six actual packed React/Vue workflow consumers passed at 2a277133: 192 state observations, 144 screenshots, zero failed runtime gates.",
     "component_styles": "47 passed including 29 browser tests; no skips",
     "mcp_build": "passed",
     "object_type_generation": "7 objects passed",
     "schema_type_generation": "passed",
     "targeted_lint": "zero errors; one pre-existing warning in design.compose.ts",
     "coverage_regression_fixes": "48 passed: current claim counts, historical source-byte qualification and exact temporal SVG assets",
-    "tool_reference_index": "31 passed after regeneration at e9cf5a1824f26d357570f6e76be0221bbdb0500b"
+    "tool_reference_index": "31 passed after regeneration at e9cf5a1824f26d357570f6e76be0221bbdb0500b",
+    "identity_regressions": "All six intent regressions passed after failing before the correction.",
+    "declared_filter_regressions": "2 failed before the fix; 2 passed afterward (22 other tests excluded by focused selection). Non-status enum filters must target their declared field.",
+    "research_object_tests": "24 passed, no skips in the full run.",
+    "collection_regressions": "41 passed, 1 Vue compilation timeout and 1 worker communication timeout under host memory pressure; isolated Vue retry passed in 8.6 seconds (11 unrelated tests excluded by name selection)."
   },
   "saved_schemas": {
     "count": 20,
     "zero_validation_errors": true,
     "summary": "oods-previews/schema-summary.json",
     "store": "canonical Forge schema store; 20 TraceLab schemas visible through the provided public schema(list) tool, 36 total, original 16 metadata records unchanged",
-    "canonical_persistence": "oods-previews/canonical-schemas/persistence.json"
+    "canonical_persistence": "oods-previews/canonical-schemas/persistence.json",
+    "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+    "canonical_version": 2
   },
   "previews": [
     {
       "path": "cmos/reports/sprint-50/oods-previews/evidence-detail-dark/react/receipt.json",
-      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
       "object": "Evidence",
       "context": "detail",
       "theme": "dark",
@@ -67,7 +91,7 @@
     },
     {
       "path": "cmos/reports/sprint-50/oods-previews/evidence-detail-light/react/receipt.json",
-      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
       "object": "Evidence",
       "context": "detail",
       "theme": "light",
@@ -82,7 +106,7 @@
     },
     {
       "path": "cmos/reports/sprint-50/oods-previews/evidence-list-dark/react/receipt.json",
-      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
       "object": "Evidence",
       "context": "list",
       "theme": "dark",
@@ -97,7 +121,7 @@
     },
     {
       "path": "cmos/reports/sprint-50/oods-previews/evidence-list-light/react/receipt.json",
-      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
       "object": "Evidence",
       "context": "list",
       "theme": "light",
@@ -112,7 +136,7 @@
     },
     {
       "path": "cmos/reports/sprint-50/oods-previews/mission-detail-dark/react/receipt.json",
-      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
       "object": "Mission",
       "context": "detail",
       "theme": "dark",
@@ -127,7 +151,7 @@
     },
     {
       "path": "cmos/reports/sprint-50/oods-previews/mission-detail-light/react/receipt.json",
-      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
       "object": "Mission",
       "context": "detail",
       "theme": "light",
@@ -142,7 +166,7 @@
     },
     {
       "path": "cmos/reports/sprint-50/oods-previews/mission-list-dark/react/receipt.json",
-      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
       "object": "Mission",
       "context": "list",
       "theme": "dark",
@@ -157,7 +181,7 @@
     },
     {
       "path": "cmos/reports/sprint-50/oods-previews/mission-list-light/react/receipt.json",
-      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
       "object": "Mission",
       "context": "list",
       "theme": "light",
@@ -172,7 +196,7 @@
     },
     {
       "path": "cmos/reports/sprint-50/oods-previews/mission-timeline-dark/react/receipt.json",
-      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
       "object": "Mission",
       "context": "timeline",
       "theme": "dark",
@@ -187,7 +211,7 @@
     },
     {
       "path": "cmos/reports/sprint-50/oods-previews/mission-timeline-light/react/receipt.json",
-      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
       "object": "Mission",
       "context": "timeline",
       "theme": "light",
@@ -202,7 +226,7 @@
     }
   ],
   "visual_review": {
-    "phone": "Evidence sidebar stacks below claim; Mission detail text retains readable width in dark theme. Original overlap reproduced and fixed with bounds tests.",
+    "phone": "Fresh Evidence list/light and Mission detail/dark images visually reviewed at 390. Sidebars remain below the main content; native select values truncate and pagination wraps in the generic prototype.",
     "text_wrapping": "14 telemetry observations retain ordinary word wrapping in phone pagination labels and cancellation reason text. They are recorded, not relabeled as zero.",
     "limitations": [
       "Synthetic Forge consumer fixtures; no production TraceLab data is shown.",

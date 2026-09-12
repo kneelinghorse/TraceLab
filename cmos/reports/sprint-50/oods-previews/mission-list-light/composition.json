@@ -154,7 +154,7 @@
                     "component": "Button",
                     "collectionControl": "open",
                     "props": {
-                      "field": "mission_id"
+                      "field": "id"
                     },
                     "layout": {
                       "type": "inline",
@@ -227,7 +227,7 @@
                 ],
                 "collection": {
                   "source": "rows",
-                  "keyField": "mission_id",
+                  "keyField": "id",
                   "labelField": "title"
                 }
               },
@@ -722,9 +722,9 @@
       }
     }
   },
-  "schemaRef": "compose-2f663b7b",
-  "schemaRefCreatedAt": "2026-09-12T22:19:40.769Z",
-  "schemaRefExpiresAt": "2026-09-12T22:49:40.769Z",
+  "schemaRef": "compose-013f0b51",
+  "schemaRefCreatedAt": "2026-09-12T23:40:48.405Z",
+  "schemaRefExpiresAt": "2026-09-13T00:10:48.405Z",
   "selections": [
     {
       "slotName": "items",

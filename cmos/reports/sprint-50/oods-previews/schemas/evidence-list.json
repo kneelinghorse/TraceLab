@@ -5,9 +5,9 @@
   },
   "saved": {
     "name": "tracelab-evidence-list-v1",
-    "version": 3,
-    "createdAt": "2026-09-12T21:56:41.877Z",
-    "updatedAt": "2026-09-12T22:19:39.094Z",
+    "version": 2,
+    "createdAt": "2026-09-12T23:09:15.276Z",
+    "updatedAt": "2026-09-12T23:38:44.794Z",
     "tags": [
       "tracelab",
       "research",
@@ -101,6 +101,7 @@
                         "label": "filters"
                       },
                       "props": {
+                        "field": "owner_type",
                         "label": "Owner type",
                         "options": [
                           {
@@ -120,7 +121,7 @@
                       "component": "Select",
                       "collectionControl": "sort",
                       "props": {
-                        "field": "owner_id",
+                        "field": "id",
                         "label": "Sort",
                         "options": [
                           {
@@ -149,7 +150,7 @@
                       "component": "Button",
                       "collectionControl": "open",
                       "props": {
-                        "field": "owner_id"
+                        "field": "id"
                       },
                       "layout": {
                         "type": "inline",
@@ -160,7 +161,7 @@
                           "id": "list-items-5-title",
                           "component": "Text",
                           "props": {
-                            "field": "owner_id"
+                            "field": "id"
                           }
                         },
                         {
@@ -213,8 +214,8 @@
                   ],
                   "collection": {
                     "source": "rows",
-                    "keyField": "owner_id",
-                    "labelField": "owner_id"
+                    "keyField": "id",
+                    "labelField": "id"
                   }
                 },
                 {
@@ -520,9 +521,9 @@
         }
       }
     },
-    "schemaRef": "compose-65e9503a",
-    "schemaRefCreatedAt": "2026-09-12T22:19:39.094Z",
-    "schemaRefExpiresAt": "2026-09-12T22:49:39.094Z",
+    "schemaRef": "compose-3d987cee",
+    "schemaRefCreatedAt": "2026-09-12T23:38:44.793Z",
+    "schemaRefExpiresAt": "2026-09-13T00:08:44.793Z",
     "selections": [
       {
         "slotName": "items",

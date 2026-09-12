@@ -21,7 +21,7 @@
           "contentHash": "sha256:582ace0a8681507c07084239271528be7fad7b0339625cefc3801231ad8c79f5"
         }
       ],
-      "sourceHead": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "sourceHead": "335664b5875981f1a3ec0a9635263d17e40bfe42",
       "model": {
         "activeFilters": [],
         "categories": [],
@@ -410,17 +410,17 @@
       ],
       "errors": [],
       "timings": {
-        "composeMs": 68.63533400000006,
-        "generateMs": 8.917332999999985,
-        "captureMs": 841.7015420000535
+        "composeMs": 66.99262500000009,
+        "generateMs": 8.919583999999986,
+        "captureMs": 827.9087500000023
       },
-      "output": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-preview-0Xy8eE/receipt/react",
+      "output": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-preview-4xRsSv/receipt/react",
       "consumer": {
-        "root": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-loop-react-8QB1iZ",
+        "root": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-loop-react-POjCrt",
         "port": 4478,
-        "pid": 74087
+        "pid": 15831
       }
     }
   ],
-  "durationMs": 958.2608749999999
+  "durationMs": 943.1073340000002
 }

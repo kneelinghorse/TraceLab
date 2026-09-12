@@ -82,6 +82,7 @@
                       "label": "filters"
                     },
                     "props": {
+                      "field": "owner_type",
                       "label": "Owner type",
                       "options": [
                         {
@@ -101,7 +102,7 @@
                     "component": "Select",
                     "collectionControl": "sort",
                     "props": {
-                      "field": "owner_id",
+                      "field": "id",
                       "label": "Sort",
                       "options": [
                         {
@@ -130,7 +131,7 @@
                     "component": "Button",
                     "collectionControl": "open",
                     "props": {
-                      "field": "owner_id"
+                      "field": "id"
                     },
                     "layout": {
                       "type": "inline",
@@ -141,7 +142,7 @@
                         "id": "list-items-5-title",
                         "component": "Text",
                         "props": {
-                          "field": "owner_id"
+                          "field": "id"
                         }
                       },
                       {
@@ -194,8 +195,8 @@
                 ],
                 "collection": {
                   "source": "rows",
-                  "keyField": "owner_id",
-                  "labelField": "owner_id"
+                  "keyField": "id",
+                  "labelField": "id"
                 }
               },
               {
@@ -501,9 +502,9 @@
       }
     }
   },
-  "schemaRef": "compose-8a852aba",
-  "schemaRefCreatedAt": "2026-09-12T22:19:52.660Z",
-  "schemaRefExpiresAt": "2026-09-12T22:49:52.660Z",
+  "schemaRef": "compose-a27c028b",
+  "schemaRefCreatedAt": "2026-09-12T23:40:58.696Z",
+  "schemaRefExpiresAt": "2026-09-13T00:10:58.696Z",
   "selections": [
     {
       "slotName": "items",

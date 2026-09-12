@@ -5,9 +5,9 @@
   },
   "saved": {
     "name": "tracelab-mission-list-v1",
-    "version": 1,
+    "version": 2,
     "createdAt": "2026-09-12T23:09:15.124Z",
-    "updatedAt": "2026-09-12T23:09:15.124Z",
+    "updatedAt": "2026-09-12T23:38:44.666Z",
     "tags": [
       "tracelab",
       "research",
@@ -173,7 +173,7 @@
                       "component": "Button",
                       "collectionControl": "open",
                       "props": {
-                        "field": "mission_id"
+                        "field": "id"
                       },
                       "layout": {
                         "type": "inline",
@@ -246,7 +246,7 @@
                   ],
                   "collection": {
                     "source": "rows",
-                    "keyField": "mission_id",
+                    "keyField": "id",
                     "labelField": "title"
                   }
                 },
@@ -741,9 +741,9 @@
         }
       }
     },
-    "schemaRef": "compose-679e9f79",
-    "schemaRefCreatedAt": "2026-09-12T23:09:15.122Z",
-    "schemaRefExpiresAt": "2026-09-12T23:39:15.122Z",
+    "schemaRef": "compose-dfed40fa",
+    "schemaRefCreatedAt": "2026-09-12T23:38:44.665Z",
+    "schemaRefExpiresAt": "2026-09-13T00:08:44.665Z",
     "selections": [
       {
         "slotName": "items",

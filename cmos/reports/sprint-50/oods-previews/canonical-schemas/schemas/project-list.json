@@ -5,9 +5,9 @@
   },
   "saved": {
     "name": "tracelab-project-list-v1",
-    "version": 1,
+    "version": 2,
     "createdAt": "2026-09-12T23:09:14.936Z",
-    "updatedAt": "2026-09-12T23:09:14.936Z",
+    "updatedAt": "2026-09-12T23:38:44.517Z",
     "tags": [
       "tracelab",
       "research",
@@ -157,7 +157,7 @@
                       "component": "Button",
                       "collectionControl": "open",
                       "props": {
-                        "field": "project_id"
+                        "field": "id"
                       },
                       "layout": {
                         "type": "inline",
@@ -230,7 +230,7 @@
                   ],
                   "collection": {
                     "source": "rows",
-                    "keyField": "project_id",
+                    "keyField": "id",
                     "labelField": "name"
                   }
                 },
@@ -529,9 +529,9 @@
         }
       }
     },
-    "schemaRef": "compose-ebdfbde9",
-    "schemaRefCreatedAt": "2026-09-12T23:09:14.923Z",
-    "schemaRefExpiresAt": "2026-09-12T23:39:14.923Z",
+    "schemaRef": "compose-66573bb7",
+    "schemaRefCreatedAt": "2026-09-12T23:38:44.505Z",
+    "schemaRefExpiresAt": "2026-09-13T00:08:44.505Z",
     "selections": [
       {
         "slotName": "items",

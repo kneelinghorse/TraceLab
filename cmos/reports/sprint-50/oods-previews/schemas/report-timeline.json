@@ -5,9 +5,9 @@
   },
   "saved": {
     "name": "tracelab-report-timeline-v1",
-    "version": 3,
-    "createdAt": "2026-09-12T21:56:41.863Z",
-    "updatedAt": "2026-09-12T22:19:39.083Z",
+    "version": 2,
+    "createdAt": "2026-09-12T23:09:15.253Z",
+    "updatedAt": "2026-09-12T23:38:44.782Z",
     "tags": [
       "tracelab",
       "research",
@@ -319,9 +319,9 @@
         }
       }
     },
-    "schemaRef": "compose-0110851f",
-    "schemaRefCreatedAt": "2026-09-12T22:19:39.082Z",
-    "schemaRefExpiresAt": "2026-09-12T22:49:39.082Z",
+    "schemaRef": "compose-77eaa4fa",
+    "schemaRefCreatedAt": "2026-09-12T23:38:44.781Z",
+    "schemaRefExpiresAt": "2026-09-13T00:08:44.781Z",
     "selections": [
       {
         "slotName": "entry-0",

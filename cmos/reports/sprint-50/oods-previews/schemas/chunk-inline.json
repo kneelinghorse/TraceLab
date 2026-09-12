@@ -5,9 +5,9 @@
   },
   "saved": {
     "name": "tracelab-chunk-inline-v1",
-    "version": 3,
-    "createdAt": "2026-09-12T21:56:41.546Z",
-    "updatedAt": "2026-09-12T22:19:38.908Z",
+    "version": 2,
+    "createdAt": "2026-09-12T23:09:15.063Z",
+    "updatedAt": "2026-09-12T23:38:44.615Z",
     "tags": [
       "tracelab",
       "research",
@@ -228,9 +228,9 @@
         }
       }
     },
-    "schemaRef": "compose-e1e21844",
-    "schemaRefCreatedAt": "2026-09-12T22:19:38.907Z",
-    "schemaRefExpiresAt": "2026-09-12T22:49:38.907Z",
+    "schemaRef": "compose-e3c1f90c",
+    "schemaRefCreatedAt": "2026-09-12T23:38:44.613Z",
+    "schemaRefExpiresAt": "2026-09-13T00:08:44.613Z",
     "selections": [
       {
         "slotName": "items",

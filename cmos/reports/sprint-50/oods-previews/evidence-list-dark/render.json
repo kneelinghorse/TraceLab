@@ -1,5 +1,5 @@
 {
-  "schemaHash": "sha256:cf5fcd0eb6d31c1caea41231d51eb6b25b0694e1718925a206e8e09687085d56",
+  "schemaHash": "sha256:508e62964fbdbedb4c1b11ed96de24a0757862cc5960169123e845ddb57ed73c",
   "receipts": [
     {
       "version": "1.1",
@@ -13,15 +13,15 @@
           "theme": "dark"
         }
       },
-      "schemaHash": "sha256:cf5fcd0eb6d31c1caea41231d51eb6b25b0694e1718925a206e8e09687085d56",
-      "artifactContentHash": "sha256:778969854c69dcc09420593f041462d8377a49747f04f225c1dd81136aebc36d",
+      "schemaHash": "sha256:508e62964fbdbedb4c1b11ed96de24a0757862cc5960169123e845ddb57ed73c",
+      "artifactContentHash": "sha256:3baf733c6f4a0fe4582063a8f39f214dddb1fa382e559925abcd6486f6e99ba4",
       "files": [
         {
           "path": "src/GeneratedUI.tsx",
-          "contentHash": "sha256:ea817b5f298ff656de148f401d99c27ccf57857ad69f26b861c2dd66a27891ce"
+          "contentHash": "sha256:6d631658bd71b1b49aa69ee3d96411eb9a7cb87b19c78daf648034ba47a7772e"
         }
       ],
-      "sourceHead": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "sourceHead": "335664b5875981f1a3ec0a9635263d17e40bfe42",
       "model": {
         "activeFilters": [],
         "categories": [],
@@ -154,8 +154,8 @@
       "views": [
         {
           "width": 390,
-          "accessibility": "- search \"Search\":\n  - text: Search\n  - searchbox \"Search\"\n- text: Owner type\n- combobox \"Owner type\":\n  - option \"All states\" [selected]\n  - option \"user\"\n- text: Sort\n- combobox \"Sort\":\n  - option \"Name A–Z\" [selected]\n  - option \"Name Z–A\"\n- list \"Records\":\n  - listitem:\n    - button \"consumer-owner-id Consumer label Consumer description Sep 5, 2026, 12:00 PM consumer-owner-id supporting\":\n      - text: consumer-owner-id Consumer label Consumer description\n      - time: Sep 5, 2026, 12:00 PM\n      - text: consumer-owner-id supporting\n- navigation \"Pagination\":\n  - text: 20 records Showing 1–10 of 20\n  - button \"Previous page\" [disabled]: ‹\n  - list:\n    - listitem:\n      - button \"Page 1\": \"1\"\n    - listitem:\n      - button \"Page 2\": \"2\"\n  - button \"Next page\": ›\n  - text: Page 1 of 2",
-          "visibleText": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nconsumer-owner-id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2",
+          "accessibility": "- search \"Search\":\n  - text: Search\n  - searchbox \"Search\"\n- text: Owner type\n- combobox \"Owner type\":\n  - option \"All states\" [selected]\n  - option \"user\"\n- text: Sort\n- combobox \"Sort\":\n  - option \"Name A–Z\" [selected]\n  - option \"Name Z–A\"\n- list \"Records\":\n  - listitem:\n    - button \"Consumer id Consumer label Consumer description Sep 5, 2026, 12:00 PM consumer-owner-id supporting\":\n      - text: Consumer id Consumer label Consumer description\n      - time: Sep 5, 2026, 12:00 PM\n      - text: consumer-owner-id supporting\n- navigation \"Pagination\":\n  - text: 20 records Showing 1–10 of 20\n  - button \"Previous page\" [disabled]: ‹\n  - list:\n    - listitem:\n      - button \"Page 1\": \"1\"\n    - listitem:\n      - button \"Page 2\": \"2\"\n  - button \"Next page\": ›\n  - text: Page 1 of 2",
+          "visibleText": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2",
           "measurements": {
             "bodyBackground": "oklch(0.18 0.05 45)",
             "chartCanvasFills": [],
@@ -216,12 +216,12 @@
             {
               "id": "screen-list-9",
               "component": "Stack",
-              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nconsumer-owner-id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
             },
             {
               "id": "screen-list-9-success",
               "component": "Stack",
-              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nconsumer-owner-id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
             },
             {
               "id": "list-toolbar-4",
@@ -251,17 +251,17 @@
             {
               "id": "list-items-5",
               "component": "section",
-              "text": "consumer-owner-id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
+              "text": "Consumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
             },
             {
               "id": "list-items-5-row-0",
               "component": "Button",
-              "text": "consumer-owner-id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
+              "text": "Consumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
             },
             {
               "id": "list-items-5-title-0",
               "component": "Text",
-              "text": "consumer-owner-id"
+              "text": "Consumer id"
             },
             {
               "id": "ve-items-10-0",
@@ -295,13 +295,13 @@
             }
           ],
           "screenshot": "390.png",
-          "screenshotHash": "sha256:bbc0a4827381dd8b69c3082b5ef503e541713bfba2c6388002d2f0ea60b818fa",
+          "screenshotHash": "sha256:5ad2bb571128de87c45e6e6f4d272635aa2b7c6b797ea8603f6bd539059673c9",
           "dump": "390.a11y.txt"
         },
         {
           "width": 820,
-          "accessibility": "- search \"Search\":\n  - text: Search\n  - searchbox \"Search\"\n- text: Owner type\n- combobox \"Owner type\":\n  - option \"All states\" [selected]\n  - option \"user\"\n- text: Sort\n- combobox \"Sort\":\n  - option \"Name A–Z\" [selected]\n  - option \"Name Z–A\"\n- list \"Records\":\n  - listitem:\n    - button \"consumer-owner-id Consumer label Consumer description Sep 5, 2026, 12:00 PM consumer-owner-id supporting\":\n      - text: consumer-owner-id Consumer label Consumer description\n      - time: Sep 5, 2026, 12:00 PM\n      - text: consumer-owner-id supporting\n- navigation \"Pagination\":\n  - text: 20 records Showing 1–10 of 20\n  - button \"Previous page\" [disabled]: ‹\n  - list:\n    - listitem:\n      - button \"Page 1\": \"1\"\n    - listitem:\n      - button \"Page 2\": \"2\"\n  - button \"Next page\": ›\n  - text: Page 1 of 2",
-          "visibleText": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nconsumer-owner-id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2",
+          "accessibility": "- search \"Search\":\n  - text: Search\n  - searchbox \"Search\"\n- text: Owner type\n- combobox \"Owner type\":\n  - option \"All states\" [selected]\n  - option \"user\"\n- text: Sort\n- combobox \"Sort\":\n  - option \"Name A–Z\" [selected]\n  - option \"Name Z–A\"\n- list \"Records\":\n  - listitem:\n    - button \"Consumer id Consumer label Consumer description Sep 5, 2026, 12:00 PM consumer-owner-id supporting\":\n      - text: Consumer id Consumer label Consumer description\n      - time: Sep 5, 2026, 12:00 PM\n      - text: consumer-owner-id supporting\n- navigation \"Pagination\":\n  - text: 20 records Showing 1–10 of 20\n  - button \"Previous page\" [disabled]: ‹\n  - list:\n    - listitem:\n      - button \"Page 1\": \"1\"\n    - listitem:\n      - button \"Page 2\": \"2\"\n  - button \"Next page\": ›\n  - text: Page 1 of 2",
+          "visibleText": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2",
           "measurements": {
             "bodyBackground": "oklch(0.18 0.05 45)",
             "chartCanvasFills": [],
@@ -335,12 +335,12 @@
             {
               "id": "screen-list-9",
               "component": "Stack",
-              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nconsumer-owner-id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
             },
             {
               "id": "screen-list-9-success",
               "component": "Stack",
-              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nconsumer-owner-id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
             },
             {
               "id": "list-toolbar-4",
@@ -370,17 +370,17 @@
             {
               "id": "list-items-5",
               "component": "section",
-              "text": "consumer-owner-id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
+              "text": "Consumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
             },
             {
               "id": "list-items-5-row-0",
               "component": "Button",
-              "text": "consumer-owner-id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
+              "text": "Consumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
             },
             {
               "id": "list-items-5-title-0",
               "component": "Text",
-              "text": "consumer-owner-id"
+              "text": "Consumer id"
             },
             {
               "id": "ve-items-10-0",
@@ -414,13 +414,13 @@
             }
           ],
           "screenshot": "820.png",
-          "screenshotHash": "sha256:d0aaea7b390d296c206199e83ab02157e118b5b519d3265066a6e48d8ea7211d",
+          "screenshotHash": "sha256:b0ae65761bdd5aa7894946f132ca1c1bb1996bf1bea33078a371cead8f6b3b18",
           "dump": "820.a11y.txt"
         },
         {
           "width": 1440,
-          "accessibility": "- search \"Search\":\n  - text: Search\n  - searchbox \"Search\"\n- text: Owner type\n- combobox \"Owner type\":\n  - option \"All states\" [selected]\n  - option \"user\"\n- text: Sort\n- combobox \"Sort\":\n  - option \"Name A–Z\" [selected]\n  - option \"Name Z–A\"\n- list \"Records\":\n  - listitem:\n    - button \"consumer-owner-id Consumer label Consumer description Sep 5, 2026, 12:00 PM consumer-owner-id supporting\":\n      - text: consumer-owner-id Consumer label Consumer description\n      - time: Sep 5, 2026, 12:00 PM\n      - text: consumer-owner-id supporting\n- navigation \"Pagination\":\n  - text: 20 records Showing 1–10 of 20\n  - button \"Previous page\" [disabled]: ‹\n  - list:\n    - listitem:\n      - button \"Page 1\": \"1\"\n    - listitem:\n      - button \"Page 2\": \"2\"\n  - button \"Next page\": ›\n  - text: Page 1 of 2",
-          "visibleText": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nconsumer-owner-id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2",
+          "accessibility": "- search \"Search\":\n  - text: Search\n  - searchbox \"Search\"\n- text: Owner type\n- combobox \"Owner type\":\n  - option \"All states\" [selected]\n  - option \"user\"\n- text: Sort\n- combobox \"Sort\":\n  - option \"Name A–Z\" [selected]\n  - option \"Name Z–A\"\n- list \"Records\":\n  - listitem:\n    - button \"Consumer id Consumer label Consumer description Sep 5, 2026, 12:00 PM consumer-owner-id supporting\":\n      - text: Consumer id Consumer label Consumer description\n      - time: Sep 5, 2026, 12:00 PM\n      - text: consumer-owner-id supporting\n- navigation \"Pagination\":\n  - text: 20 records Showing 1–10 of 20\n  - button \"Previous page\" [disabled]: ‹\n  - list:\n    - listitem:\n      - button \"Page 1\": \"1\"\n    - listitem:\n      - button \"Page 2\": \"2\"\n  - button \"Next page\": ›\n  - text: Page 1 of 2",
+          "visibleText": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2",
           "measurements": {
             "bodyBackground": "oklch(0.18 0.05 45)",
             "chartCanvasFills": [],
@@ -454,12 +454,12 @@
             {
               "id": "screen-list-9",
               "component": "Stack",
-              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nconsumer-owner-id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
             },
             {
               "id": "screen-list-9-success",
               "component": "Stack",
-              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nconsumer-owner-id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
             },
             {
               "id": "list-toolbar-4",
@@ -489,17 +489,17 @@
             {
               "id": "list-items-5",
               "component": "section",
-              "text": "consumer-owner-id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
+              "text": "Consumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
             },
             {
               "id": "list-items-5-row-0",
               "component": "Button",
-              "text": "consumer-owner-id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
+              "text": "Consumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
             },
             {
               "id": "list-items-5-title-0",
               "component": "Text",
-              "text": "consumer-owner-id"
+              "text": "Consumer id"
             },
             {
               "id": "ve-items-10-0",
@@ -533,23 +533,23 @@
             }
           ],
           "screenshot": "1440.png",
-          "screenshotHash": "sha256:af5a584e1a8f0b7cb0c617c80e72e5d65eb75fec99f96531b962a431c5867208",
+          "screenshotHash": "sha256:28a60ebb2e1e4bbcc6f07dfa195f1b701ea201273f0999b4c08797a38b3f689c",
           "dump": "1440.a11y.txt"
         }
       ],
       "errors": [],
       "timings": {
-        "composeMs": 114.26445799999999,
-        "generateMs": 10.067957999999976,
-        "captureMs": 901.1903340000426
+        "composeMs": 67.51987500000007,
+        "generateMs": 9.316749999999956,
+        "captureMs": 791.2794589999976
       },
-      "output": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-preview-oJGP0J/receipt/react",
+      "output": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-preview-YcLNcv/receipt/react",
       "consumer": {
-        "root": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-loop-react-8QB1iZ",
+        "root": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-loop-react-POjCrt",
         "port": 4478,
-        "pid": 74087
+        "pid": 15831
       }
     }
   ],
-  "durationMs": 1081.089458
+  "durationMs": 906.2671670000001
 }

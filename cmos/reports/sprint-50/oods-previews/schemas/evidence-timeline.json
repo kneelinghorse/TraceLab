@@ -5,9 +5,9 @@
   },
   "saved": {
     "name": "tracelab-evidence-timeline-v1",
-    "version": 3,
-    "createdAt": "2026-09-12T21:56:41.910Z",
-    "updatedAt": "2026-09-12T22:19:39.121Z",
+    "version": 2,
+    "createdAt": "2026-09-12T23:09:15.340Z",
+    "updatedAt": "2026-09-12T23:38:44.818Z",
     "tags": [
       "tracelab",
       "research",
@@ -47,7 +47,7 @@
                   "id": "timeline-header-1-title",
                   "component": "Text",
                   "props": {
-                    "field": "owner_id"
+                    "field": "id"
                   }
                 }
               ]
@@ -363,9 +363,9 @@
         }
       }
     },
-    "schemaRef": "compose-80618b03",
-    "schemaRefCreatedAt": "2026-09-12T22:19:39.120Z",
-    "schemaRefExpiresAt": "2026-09-12T22:49:39.120Z",
+    "schemaRef": "compose-47f9edd0",
+    "schemaRefCreatedAt": "2026-09-12T23:38:44.818Z",
+    "schemaRefExpiresAt": "2026-09-13T00:08:44.818Z",
     "selections": [
       {
         "slotName": "entry-0",

@@ -5,9 +5,9 @@
   },
   "saved": {
     "name": "tracelab-project-detail-v1",
-    "version": 1,
+    "version": 2,
     "createdAt": "2026-09-12T23:09:14.971Z",
-    "updatedAt": "2026-09-12T23:09:14.971Z",
+    "updatedAt": "2026-09-12T23:38:44.541Z",
     "tags": [
       "tracelab",
       "research",
@@ -489,9 +489,9 @@
         }
       }
     },
-    "schemaRef": "compose-7c3c6cf3",
-    "schemaRefCreatedAt": "2026-09-12T23:09:14.969Z",
-    "schemaRefExpiresAt": "2026-09-12T23:39:14.969Z",
+    "schemaRef": "compose-f16ce601",
+    "schemaRefCreatedAt": "2026-09-12T23:38:44.540Z",
+    "schemaRefExpiresAt": "2026-09-13T00:08:44.540Z",
     "selections": [
       {
         "slotName": "header",

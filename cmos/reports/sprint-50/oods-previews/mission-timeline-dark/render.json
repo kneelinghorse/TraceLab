@@ -21,7 +21,7 @@
           "contentHash": "sha256:9770490586faaec091e9c6e93bbca98bbbcae1ed8583999a9da9ab0dca150d8f"
         }
       ],
-      "sourceHead": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "sourceHead": "335664b5875981f1a3ec0a9635263d17e40bfe42",
       "model": {
         "activeFilters": [],
         "allowedTransitions": [],
@@ -362,17 +362,17 @@
       ],
       "errors": [],
       "timings": {
-        "composeMs": 91.84116700000004,
-        "generateMs": 8.361458000000084,
-        "captureMs": 923.6620839999523
+        "composeMs": 65.56108299999994,
+        "generateMs": 7.584625000000074,
+        "captureMs": 807.2884590000031
       },
-      "output": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-preview-Nnibda/receipt/react",
+      "output": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-preview-XIe5WQ/receipt/react",
       "consumer": {
-        "root": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-loop-react-8QB1iZ",
+        "root": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-loop-react-POjCrt",
         "port": 4478,
-        "pid": 74087
+        "pid": 15831
       }
     }
   ],
-  "durationMs": 1101.906209
+  "durationMs": 917.7254159999999
 }

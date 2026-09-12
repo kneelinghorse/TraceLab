@@ -1,5 +1,5 @@
 {
-  "schemaHash": "sha256:f5a14e300b7580dc662ebe128a01c786dcb3eb4bb6fc5eaf78d558a9bf3cb7a6",
+  "schemaHash": "sha256:885ad516a02c6c9996b09e5a0cbbe9cc3b086d5b05623aadf3f033a27c57e2c2",
   "receipts": [
     {
       "version": "1.1",
@@ -13,15 +13,15 @@
           "theme": "light"
         }
       },
-      "schemaHash": "sha256:f5a14e300b7580dc662ebe128a01c786dcb3eb4bb6fc5eaf78d558a9bf3cb7a6",
-      "artifactContentHash": "sha256:a219417d026723284cfa8233cefe43318a897c1db8ed6758d03fb50065543604",
+      "schemaHash": "sha256:885ad516a02c6c9996b09e5a0cbbe9cc3b086d5b05623aadf3f033a27c57e2c2",
+      "artifactContentHash": "sha256:42f8e3915899e828c6828375f680a94e2a37929c21c79ec05d1fe2d4ec2347b6",
       "files": [
         {
           "path": "src/GeneratedUI.tsx",
-          "contentHash": "sha256:9bba5324ab07a12dd32685ef22a2e747e955a6769a650039c551e5e6bd68de11"
+          "contentHash": "sha256:457d18fde7d2db1415e18fed8c9b8f4a2963205b36bd330417774bcce5ecda36"
         }
       ],
-      "sourceHead": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "sourceHead": "335664b5875981f1a3ec0a9635263d17e40bfe42",
       "model": {
         "activeFilters": [],
         "allowedTransitions": [],
@@ -618,17 +618,17 @@
       ],
       "errors": [],
       "timings": {
-        "composeMs": 82.50749999999994,
-        "generateMs": 10.874291999999969,
-        "captureMs": 1325.7727080000332
+        "composeMs": 79.9034999999999,
+        "generateMs": 10.256874999999809,
+        "captureMs": 1114.8086659999972
       },
-      "output": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-preview-famzVw/receipt/react",
+      "output": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-preview-gJCyIS/receipt/react",
       "consumer": {
-        "root": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-loop-react-8QB1iZ",
+        "root": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-loop-react-POjCrt",
         "port": 4478,
-        "pid": 74087
+        "pid": 15831
       }
     }
   ],
-  "durationMs": 1507.194208
+  "durationMs": 1266.295125
 }
