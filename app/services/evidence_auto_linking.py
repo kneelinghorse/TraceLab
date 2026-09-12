@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-import json
 import logging
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
 from difflib import SequenceMatcher
 from enum import Enum
 from pathlib import Path
@@ -16,6 +14,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
+from app.core.telemetry import emit_telemetry
 from app.models.chunk import DocumentChunk
 from app.models.document import Document
 from app.models.mission_protocol import MissionProtocolComplete
@@ -545,15 +544,17 @@ class EvidenceAutoLinkingService:
         linking_method = "embedding" if "embedding" in methods_used else "difflib"
 
         payload = {
-            "ts": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
             "mission_id": mission.mission_id,
             "project_id": str(project_id) if project_id else None,
             "linking_method": linking_method,
             "auto_linking": result.as_dict(),
         }
-        self.telemetry_path.parent.mkdir(parents=True, exist_ok=True)
-        with self.telemetry_path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
+        emit_telemetry(
+            path=self.telemetry_path,
+            event_type="evidence.auto_linking.completed",
+            source="tracelab",
+            payload=payload,
+        )
 
     @staticmethod
     def _normalize_text(text: str | None) -> str:

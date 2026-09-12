@@ -67,6 +67,15 @@ DB / REST / DS-worker columns are unaffected by the cluster refactor.
 
 ## Top-level field map
 
+RECOVER-1 (2026-09-12) restores the legacy protocol adapter boundary: YAML
+export uses a protocol-shaped stored `context` when present and otherwise
+exports `Mission.to_mission_protocol()`, retaining every canonical compiler
+field below. Adapter updates accept an explicit protocol context, reuse a
+stored protocol, or delegate ordinary field updates to `MissionService` when
+neither context is protocol-shaped. MCP parameters, REST update verbs, and
+the worker field map are unchanged. Regression coverage lives in
+`tests/test_mission_protocol_service.py`.
+
 Listed in MCP `create_mission` argument order — for clusters this means
 `tracelab_mission(action="create", ...)`. Every field is documented in
 both create and update flows unless noted.

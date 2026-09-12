@@ -8,6 +8,7 @@ from uuid import UUID
 
 import pytest
 
+from app.models.mission import Mission
 from app.models.mission_protocol import MissionProtocolDraft
 from app.schemas.mission import MissionUpdate
 from app.services.evidence_linking import EvidenceLinkingService
@@ -66,6 +67,51 @@ def _service() -> MissionProtocolService:
     return MissionProtocolService(
         evidence_service=EvidenceLinkingService(require_entities=False)
     )
+
+
+def test_export_canonical_mission_without_legacy_protocol(db_session, project):
+    """Missions authored through today's form must export all compiler fields."""
+    import yaml
+
+    mission = Mission(
+        project_id=project.id,
+        mission_id="RECOVER-export",
+        title="Canonical export",
+        objective="Preserve canonical fields",
+        success_criteria=["All fields survive"],
+        context={"operator_note": "retain"},
+        focus="specific focus",
+        required_entities=["TraceLab"],
+    )
+    db_session.add(mission)
+    db_session.commit()
+    payload = yaml.safe_load(_service().export_mission_yaml(db_session, mission.id))
+    assert payload == mission.to_mission_protocol()
+
+
+def test_update_canonical_mission_without_legacy_protocol(db_session, project):
+    """Ordinary updates must not require a legacy draft in context."""
+    mission = Mission(
+        project_id=project.id,
+        mission_id="RECOVER-update",
+        title="Canonical update",
+        objective="Preserve updates",
+        success_criteria=["Updates persist"],
+        context={"operator_note": "retain"},
+    )
+    db_session.add(mission)
+    db_session.commit()
+    updated = _service().update_mission(
+        db_session,
+        mission.id,
+        MissionUpdate(
+            title="Revised canonical title", focus="new focus", tags=["recovered"]
+        ),
+    )
+    assert updated.title == "Revised canonical title"
+    assert updated.focus == "new focus"
+    assert updated.tags == ["recovered"]
+    assert updated.context == {"operator_note": "retain"}
 
 
 def test_create_mission_uses_progress_metrics(db_session, project):

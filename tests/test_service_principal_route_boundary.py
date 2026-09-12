@@ -152,6 +152,8 @@ def test_service_credential_is_machine_only_in_every_rbac_state(
 
     # Human reads and writes are denied even though the service owns both rows.
     ordinary_requests = (
+        client.get(f"{API}/missions/events/recent", headers=headers),
+        client.get(f"{API}/decisions/linked", headers=headers),
         client.get(f"{API}/projects", headers=headers),
         client.get(f"{API}/projects/{project.id}", headers=headers),
         client.get(f"{API}/missions/{mission.id}", headers=headers),
@@ -203,6 +205,18 @@ def test_service_credential_is_machine_only_in_every_rbac_state(
     assert evidence.status_code == 201, evidence.text
     assert evidence.json()["status"] == "captured"
 
+    cmos_event = client.post(
+        f"{API}/missions/events/cmos",
+        headers=headers,
+        json={
+            "mission_id": "RECOVER-1",
+            "name": "Service boundary verification",
+            "new_status": "In Progress",
+        },
+    )
+    assert cmos_event.status_code == 200, cmos_event.text
+    assert cmos_event.json()["emitted"] is True
+
 
 def test_evidence_openapi_documents_initial_and_replay_responses(client):
     operation = client.get("/openapi.json").json()["paths"][f"{API}/missions/{{mission_id}}/evidence"]["post"]
@@ -221,5 +235,6 @@ def test_raw_principal_dependency_is_limited_to_reviewed_carve_outs():
 
     assert call_sites == {
         "api/v1/auth.py": 1,
+        "api/v1/mission_events.py": 1,
         "api/v1/missions.py": 2,
     }

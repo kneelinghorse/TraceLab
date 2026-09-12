@@ -14,7 +14,7 @@ import asyncio
 import json
 import logging
 from collections import deque
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator, Callable
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from enum import Enum
@@ -109,6 +109,8 @@ class MissionEventBus:
         self,
         include_history: bool = True,
         heartbeat_seconds: int = 15,
+        history_filter: Callable[[list[MissionEvent]], list[MissionEvent]]
+        | None = None,
     ) -> AsyncGenerator[MissionEvent, None]:
         """Subscribe to events as an async generator for SSE streaming.
 
@@ -122,7 +124,10 @@ class MissionEventBus:
         try:
             # Replay recent history
             if include_history:
-                for event in self._history:
+                history = list(self._history)
+                if history_filter is not None:
+                    history = history_filter(history)
+                for event in history:
                     yield event
 
             # Stream live events with heartbeat

@@ -58,10 +58,10 @@ def _json_canon(value: Any) -> str:
     if isinstance(value, URN):
         value = str(value)
 
-    if value is None or isinstance(value, (str, int, float, bool)):
+    if value is None or isinstance(value, str | int | float | bool):
         return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
 
-    if isinstance(value, (list, tuple)):
+    if isinstance(value, list | tuple):
         return "[" + ",".join(_json_canon(item) for item in value) + "]"
 
     if isinstance(value, dict):
@@ -103,6 +103,8 @@ EDGE_TYPES = frozenset(
         "binds_to",  # Protocol binding relationship
         "part_of",  # Chunk is part of document
         "sibling_of",  # Same parent relationship
+        "co_occurs",  # Shared collection membership
+        "topic_similar",  # Semantic similarity
     }
 )
 
@@ -1453,11 +1455,7 @@ class SemanticProtocol:
         # Check tags
         tags = data.get("tags") or []
         pii_tags = {"pii", "privacy", "redaction", "sensitive"}
-        for tag in tags:
-            if isinstance(tag, str) and tag.lower() in pii_tags:
-                return True
-
-        return False
+        return any(isinstance(tag, str) and tag.lower() in pii_tags for tag in tags)
 
     def _extract_purpose(self, data: dict[str, Any]) -> str:
         """Extract purpose/objective from entity data."""

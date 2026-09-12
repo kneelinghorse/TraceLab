@@ -241,7 +241,9 @@ def test_ingest_writes_auto_linking_telemetry(
     lines = configure_auto_linker.read_text(encoding="utf-8").strip().splitlines()
     assert len(lines) == 1
     entry = json.loads(lines[0])
-    assert entry["mission_id"] == payload["mission"]["mission_id"]
+    assert entry["event_type"] == "evidence.auto_linking.completed"
+    assert entry["source"] == "tracelab"
+    assert entry["payload"]["mission_id"] == payload["mission"]["mission_id"]
 
 
 def test_ingest_project_scoped_linking(
@@ -424,8 +426,8 @@ def test_ingested_mission_available_via_search_endpoint(
     fake_history = _FakeHistory()
     monkeypatch.setattr(search_module, "get_rag_service", lambda: fake_rag)
     monkeypatch.setattr(rag_service_module, "get_rag_service", lambda: fake_rag)
-    client.app.dependency_overrides[search_module.get_search_history_service] = lambda: (
-        fake_history
+    client.app.dependency_overrides[search_module.get_search_history_service] = (
+        lambda: (fake_history)
     )
 
     search_payload = {

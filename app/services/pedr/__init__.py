@@ -12,6 +12,16 @@ from .edge_materialization import (
     EdgeMaterializationService,
     MaterializationResult,
 )
+from .exceptions import (
+    FusionError,
+    GovernanceLayerError,
+    GraphLayerError,
+    LexicalSearchError,
+    PEDRError,
+    PragmaticLayerError,
+    SemanticSearchError,
+    SyntacticLayerError,
+)
 from .fusion import (
     RRF_K,
     FusedResult,
@@ -75,6 +85,7 @@ from .relational import (
 )
 from .search_orchestrator import (
     DEFAULT_LAYER_WEIGHTS,
+    LayerDiagnostic,
     LayerTimings,
     PEDRConfig,
     PEDRMetadata,
@@ -126,6 +137,14 @@ from .syntactic import (
 )
 
 __all__ = [
+    "FusionError",
+    "GovernanceLayerError",
+    "PragmaticLayerError",
+    "SyntacticLayerError",
+    "GraphLayerError",
+    "SemanticSearchError",
+    "LexicalSearchError",
+    "PEDRError",
     # Quality scoring
     "QualityFilters",
     "QualityScore",
@@ -197,6 +216,7 @@ __all__ = [
     "RRF_K",
     # Search Orchestrator
     "PEDRConfig",
+    "LayerDiagnostic",
     "LayerTimings",
     "PEDRMetadata",
     "PEDRSearchResult",

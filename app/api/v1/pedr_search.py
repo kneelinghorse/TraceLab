@@ -31,6 +31,7 @@ from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.chunk import DocumentChunk
 from app.models.document import Document
 from app.schemas.pedr_search import (
+    PEDRLayerDiagnostic,
     PEDRLayerTimings,
     PEDRSearchMetadata,
     PEDRSearchRequest,
@@ -232,6 +233,18 @@ async def pedr_search(
             relational_ms,
             current_user.username,
         )
+
+        for diagnostic in response.metadata.layer_diagnostics:
+            if diagnostic.status in {"ok", "error"}:
+                emit_pedr_layer_event(
+                    event_type=MissionEventType.PEDR_LAYER_FAILED
+                    if diagnostic.status == "error"
+                    else MissionEventType.PEDR_LAYER_COMPLETED,
+                    layer=diagnostic.layer,
+                    duration_ms=diagnostic.duration_ms,
+                    result_count=diagnostic.result_count,
+                    error=diagnostic.error,
+                )
 
         emit_pedr_layer_event(
             event_type=MissionEventType.PEDR_SEARCH_COMPLETED,
@@ -449,9 +462,7 @@ def _filter_results_by_scope(
             if isinstance(result, dict)
             else getattr(result, "document_id", None)
         )
-        if (
-            result_project_id is None or str(result_project_id) not in allowed
-        ):
+        if result_project_id is None or str(result_project_id) not in allowed:
             continue
         if project_id is not None and str(result_project_id) != str(project_id):
             continue
@@ -481,8 +492,7 @@ def _resolve_graph_result_projects(results: list[Any], db: Session) -> list[Any]
         return [
             result
             for result in results
-            if "graph"
-            not in (getattr(result, "contributing_layers", None) or ())
+            if "graph" not in (getattr(result, "contributing_layers", None) or ())
         ]
 
     try:
@@ -503,8 +513,7 @@ def _resolve_graph_result_projects(results: list[Any], db: Session) -> list[Any]
         return [
             result
             for result in results
-            if "graph"
-            not in (getattr(result, "contributing_layers", None) or ())
+            if "graph" not in (getattr(result, "contributing_layers", None) or ())
         ]
 
     resolved: dict[str, tuple[str, str]] = {}
@@ -636,6 +645,10 @@ def _convert_to_response(
         layers_used=metadata.layers_used,
         layer_weights=metadata.layer_weights,
         timings=timings,
+        layer_diagnostics=[
+            PEDRLayerDiagnostic(**d.to_dict()) for d in metadata.layer_diagnostics
+        ],
+        degraded=metadata.degraded,
         graph_enabled=metadata.graph_enabled,
         graph_candidates_expanded=metadata.graph_candidates_expanded,
         total_candidates=metadata.total_candidates,

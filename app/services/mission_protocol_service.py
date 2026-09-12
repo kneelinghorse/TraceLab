@@ -119,7 +119,14 @@ class MissionProtocolService:
         self, db: Session, mission_id: UUID, payload: MissionUpdate
     ) -> Mission:
         mission = self.get_mission(db, mission_id)
-        source_payload = payload.context if payload.context is not None else mission.context
+        # Explicit protocol, stored protocol, or a canonical field-only update.
+        source_payload = (
+            payload.context if payload.context is not None else mission.context
+        )
+        if not isinstance(source_payload, dict) or "mission_id" not in source_payload:
+            updated = self.mission_service.update_mission(db, mission_id, payload)
+            self._after_write(mission_id)
+            return updated
         draft = self._ensure_draft(source_payload)
         report = self.quality_gate_service.evaluate(
             draft, db=db, mission_uuid=mission.id
@@ -181,8 +188,10 @@ class MissionProtocolService:
 
     def export_mission_yaml(self, db: Session, mission_id: UUID) -> str:
         mission = self.get_mission(db, mission_id)
-        draft = self._ensure_draft(mission.context)
-        return dump_mission_yaml(draft.model_dump(mode="json"))
+        if isinstance(mission.context, dict) and "mission_id" in mission.context:
+            draft = self._ensure_draft(mission.context)
+            return dump_mission_yaml(draft.model_dump(mode="json"))
+        return dump_mission_yaml(mission.to_mission_protocol())
 
     # ------------------------------------------------------------------
     # Internal helpers

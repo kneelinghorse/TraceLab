@@ -185,7 +185,8 @@ class TestServiceCarveOutBoundary:
     _REPO_DIR = pathlib.Path(__file__).resolve().parents[1]
 
     def test_service_gate_used_in_exactly_the_known_places(self):
-        # Both known service writes live in missions.py. A call in any other file
+        # Mission writes and the restored CMOS bridge are reviewed service writes.
+        # A call in any other file
         # widens the carve-out and fails until the allowlist and docs are reviewed.
         hits = sorted(
             str(p.relative_to(self._APP_DIR))
@@ -194,7 +195,7 @@ class TestServiceCarveOutBoundary:
         )
         # core/authorization.py holds the DEFINITION (not a carve-out); exclude it.
         call_sites = [h for h in hits if not h.endswith("core/authorization.py")]
-        assert call_sites == ["api/v1/missions.py"], (
+        assert call_sites == ["api/v1/mission_events.py", "api/v1/missions.py"], (
             f"service-write carve-out widened or moved: {call_sites}. When you add a "
             f"service-gated write, update this allowlist AND docs/authentication.md."
         )
@@ -212,9 +213,15 @@ class TestServiceCarveOutBoundary:
         assert '"/{mission_id}/logs"' in missions
         assert '"/{mission_id}/evidence"' in missions
 
+        events = (self._APP_DIR / "api" / "v1" / "mission_events.py").read_text()
+        assert events.count("authorize_service_or_403(") == 1
+        assert "authorize_service_or_403(_user)" in events
+        assert '"/events/cmos"' in events
+
         auth_docs = (self._REPO_DIR / "docs" / "authentication.md").read_text()
         assert "POST /missions/{id}/logs" in auth_docs
         assert "POST /missions/{id}/evidence" in auth_docs
+        assert "POST /missions/events/cmos" in auth_docs
 
     def test_npm_mcp_client_authenticates_every_request(self):
         # The published MCP surface is the npm TS client; guard that it can never

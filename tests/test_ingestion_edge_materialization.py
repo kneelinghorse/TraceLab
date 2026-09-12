@@ -3,23 +3,19 @@
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import pytest
-
-from app.models.document import Document
 from app.models.chunk import DocumentChunk
+from app.models.document import Document
 from app.models.graph_edge import GraphEdge
-from app.models.project import Project
-from app.services.document_ingestion import DocumentIngestionService
 from app.services.chunking import ChunkingService
-from app.services.processing_status import ProcessingStatusRecorder
 from app.services.coverage_report import CoverageReportGenerator
+from app.services.document_ingestion import DocumentIngestionService
 from app.services.pedr.edge_materialization import (
     EdgeMaterializationService,
     MaterializationResult,
 )
-
+from app.services.processing_status import ProcessingStatusRecorder
 
 SAMPLE_TEXT = (
     "Graph edge materialization validates implicit FK relationships. " * 30
@@ -105,6 +101,39 @@ class TestIngestionEdgeMaterialization:
         assert (doc_urn, project_urn, "belongs_to") in edge_pairs
         assert (project_urn, doc_urn, "contains") in edge_pairs
 
+    def test_document_and_chunk_edges_survive_caller_rollback(
+        self, db_session, project, tmp_path
+    ):
+        """The worker closes its session after ingest; flushed edges must persist."""
+        path = _build_txt(tmp_path / "durable.txt", SAMPLE_TEXT)
+        doc = _create_document(db_session, project, path)
+        service = _make_service(
+            chunking_service=ChunkingService(
+                target_chunk_size=100, min_chunk_size=20, max_chunk_size=150
+            )
+        )
+        result = service.process_document(
+            db=db_session, document_id=doc.id, file_path=path
+        )
+        assert result["stages"]["chunked"]["chunk_count"] > 0
+        doc_id = doc.id
+        db_session.rollback()
+        chunks = (
+            db_session.query(DocumentChunk)
+            .filter(DocumentChunk.document_id == doc_id)
+            .all()
+        )
+        pairs = {
+            (edge.from_urn, edge.to_urn, edge.edge_type)
+            for edge in db_session.query(GraphEdge).all()
+        }
+        for chunk in chunks:
+            assert (
+                f"urn:research:document:{doc_id}",
+                f"urn:research:chunk:{doc_id}-chunk-{chunk.chunk_index}",
+                "contains",
+            ) in pairs
+
     def test_edge_materialization_duration_in_metrics(
         self, db_session, project, tmp_path
     ):
@@ -162,7 +191,7 @@ class TestIngestionEdgeMaterialization:
             "materialize_implicit_edges",
             return_value=mock_result,
         ) as mock_materialize:
-            result = service.process_document(
+            service.process_document(
                 db=db_session, document_id=doc.id, file_path=file_path
             )
 
@@ -237,6 +266,6 @@ class TestIngestionEdgeMaterialization:
 
         assert result["status"] == "completed"
         duration = result["stages"]["edges_materialized"]["duration_seconds"]
-        assert duration < 2.0, (
-            f"Edge materialization took {duration}s, exceeding 2s target"
-        )
+        assert (
+            duration < 2.0
+        ), f"Edge materialization took {duration}s, exceeding 2s target"

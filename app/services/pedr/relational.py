@@ -53,6 +53,8 @@ class RelationType(str, Enum):
     DERIVED_FROM = "derived_from"  # insight -> source chunks
     SIBLING_OF = "sibling_of"  # same parent
     RELATED_TO = "related_to"  # general association
+    CO_OCCURS = "co_occurs"  # shared collection membership
+    TOPIC_SIMILAR = "topic_similar"  # semantic similarity
 
 
 class EntityType(str, Enum):

@@ -12,7 +12,12 @@ from __future__ import annotations
 
 import asyncio
 import json
-from unittest.mock import MagicMock
+
+# T41.6 (sprint-41): MissionCreate.project_id is required as of this sprint.
+# Tests construct MissionCreate to test OTHER validators (mission_id format,
+# title length, etc.) — they need a stable project_id supplied so the
+# under-test field validation runs instead of failing on missing project_id.
+import uuid as _uuid_t41_6
 
 import pytest
 from fastapi.testclient import TestClient
@@ -29,11 +34,6 @@ from app.core.mission_events import (
 from app.core.security import get_configured_credentials, issue_token_response
 from app.main import app
 
-# T41.6 (sprint-41): MissionCreate.project_id is required as of this sprint.
-# Tests construct MissionCreate to test OTHER validators (mission_id format,
-# title length, etc.) — they need a stable project_id supplied so the
-# under-test field validation runs instead of failing on missing project_id.
-import uuid as _uuid_t41_6
 _TEST_PROJECT_ID = _uuid_t41_6.uuid4()
 
 
@@ -134,7 +134,7 @@ class TestEventSerialization:
         assert sse.endswith("\n\n")
 
         # Parse the data line
-        data_line = [l for l in sse.split("\n") if l.startswith("data: ")][0]
+        data_line = [line for line in sse.split("\n") if line.startswith("data: ")][0]
         data = json.loads(data_line[6:])
         assert data["mission_id"] == "M-1"
         assert data["event_type"] == "mission.started"
@@ -145,7 +145,7 @@ class TestEventSerialization:
             timestamp="2026-03-12T00:00:00Z",
         )
         sse = event.to_sse()
-        data_line = [l for l in sse.split("\n") if l.startswith("data: ")][0]
+        data_line = [line for line in sse.split("\n") if line.startswith("data: ")][0]
         data = json.loads(data_line[6:])
         assert "mission_id" not in data
         assert "layer" not in data
@@ -249,11 +249,10 @@ class TestSSEEndpoint:
         the infinite SSE generator. The 401 tests below prove the
         endpoint correctly wires the dependency.
         """
-        import asyncio
         from app.core.security import require_authenticated_user_sse
 
         # Build a mock credentials=None (simulating EventSource — no header)
-        user = asyncio.get_event_loop().run_until_complete(
+        user = asyncio.run(
             require_authenticated_user_sse(
                 credentials=None, x_api_key=None, token=auth_token
             )
@@ -263,17 +262,21 @@ class TestSSEEndpoint:
 
     def test_sse_stream_rejects_missing_token(self):
         """SSE stream should reject requests with no auth at all."""
-        with TestClient(app, raise_server_exceptions=False) as c:
-            with c.stream("GET", "/api/v1/missions/events/stream") as resp:
-                assert resp.status_code == 401
+        with (
+            TestClient(app, raise_server_exceptions=False) as c,
+            c.stream("GET", "/api/v1/missions/events/stream") as resp,
+        ):
+            assert resp.status_code == 401
 
     def test_sse_stream_rejects_invalid_token(self):
         """SSE stream should reject an invalid JWT query param."""
-        with TestClient(app, raise_server_exceptions=False) as c:
-            with c.stream(
+        with (
+            TestClient(app, raise_server_exceptions=False) as c,
+            c.stream(
                 "GET", "/api/v1/missions/events/stream?token=bogus.jwt.token"
-            ) as resp:
-                assert resp.status_code == 401
+            ) as resp,
+        ):
+            assert resp.status_code == 401
 
     def test_recent_events_rejects_missing_auth(self):
         """GET /events/recent should reject requests with no auth."""

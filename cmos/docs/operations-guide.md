@@ -264,6 +264,7 @@ See `cmos/docs/mcp-reference.md` for complete parameter documentation.
 2. Sync Layer-0 identity: `cmos_context(action="update", contextType="project_identity", mode="manual", fieldUpdates=[{path:"status", value:"sprint-<N>-active"}])`
 3. Sync master_context in one call: `cmos_context(action="update", contextType="master_context", mode="manual", fieldUpdates=[{path:"project_identity.status", value:"sprint-<N>-active"}, {path:"metadata.current_sprint", value:"sprint-<N>"}, {path:"metadata.sprint_status", value:"Active"}, {path:"current_sprint", value:{id:"sprint-<N>", name:"<title>", status:"Active", focus:"<one-line focus>"}}])`
 4. Verify: `cmos_review()` → `project.status` reads `sprint-<N>-active` and `sprint.id` = `sprint-<N>`. The full `master_context` view is large; extract just these fields with `jq` rather than reading the whole blob.
+5. Update the living roadmap `cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md` (authoritative for intent; CMOS is authoritative for status): at sprint CLOSE, rewrite the closing sprint's section as outcome (what shipped, what moved, where); at sprint OPEN, re-plan the opening sprint's section from the CMOS missions; append a dated line to its Change Log either way. A sprint is not closed while its roadmap section still reads as a plan.
 
 On **sprint close** with no immediately-following open, use the `-complete` variant and `metadata.sprint_status:"Completed"`.
 

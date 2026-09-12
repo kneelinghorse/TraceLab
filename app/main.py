@@ -19,11 +19,13 @@ from app.api.v1 import (
     cache,
     collections,
     corrections,
+    decision_links,
     deepsearch,
     documents,
     evidence,
     facets,
     health,
+    mission_events,
     missions,
     monitoring,
     pedr_preflight,
@@ -49,7 +51,11 @@ from app.core.authorization import POLICY_VERSION
 from app.core.config import settings
 from app.core.database import SessionLocal
 from app.core.qdrant_client import prewarm_qdrant
-from app.core.security import require_admin, require_authenticated_user
+from app.core.security import (
+    require_admin,
+    require_authenticated_user,
+    require_authenticated_user_sse,
+)
 from app.onboarding import router as onboarding_router
 from app.services.metrics_aggregator import MetricsAggregator, get_metrics_aggregator
 from app.services.ownership import ensure_owner_bootstrap
@@ -203,6 +209,32 @@ async def shutdown_event():
 protected_dependencies = [Depends(require_authenticated_user)]
 
 # Include routers
+app.include_router(
+    mission_events.router,
+    prefix=f"{settings.api_v1_prefix}/missions",
+    tags=["mission-events"],
+    dependencies=protected_dependencies,
+)
+# Match the explicit service mounts used by mission log/evidence ingestion.
+app.include_router(
+    mission_events.service_router,
+    prefix=f"{settings.api_v1_prefix}/missions",
+    tags=["mission-events"],
+)
+# EventSource cannot set Authorization headers; retain the authenticated SSE
+# dependency at the mount boundary without imposing a second bearer-only gate.
+app.include_router(
+    mission_events.stream_router,
+    prefix=f"{settings.api_v1_prefix}/missions",
+    tags=["mission-events"],
+    dependencies=[Depends(require_authenticated_user_sse)],
+)
+app.include_router(
+    decision_links.router,
+    prefix=settings.api_v1_prefix,
+    tags=["decision-links"],
+    dependencies=protected_dependencies,
+)
 app.include_router(health.router, prefix=settings.api_v1_prefix, tags=["health"])
 app.include_router(
     admin.router,

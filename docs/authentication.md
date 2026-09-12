@@ -177,6 +177,7 @@ silently widen; guarded by `tests/test_rbac_flip_regression.py::TestServiceCarve
 | --- | --- | --- |
 | `GET /api/v1/auth/me` (startup role verification) | Any authenticated principal | Read-only exception: returns the caller's live database role so a worker can fail closed unless it resolves to `service`. |
 | `POST /missions/{id}/logs` (runner log ingest) | **service principal** (`role=service`) when `RBAC_ENABLED` on; authn-only when off | Accepts only canonical/transitional runner log batches. |
+| `POST /missions/events/cmos` (CMOS event bridge) | **service principal** when `RBAC_ENABLED` on; authn-only when off | Emits operational CMOS transition events. |
 | `POST /missions/{id}/evidence` (DeepSearch ledger projection) | **service principal** (`role=service`) in every feature-flag state | Triggers idempotent projection of the exact persisted terminal mission/job result; every human role is denied and the request cannot supply evidence, project, session, or origin fields. |
 | `POST /api/v1/webhooks/deepsearch` | HMAC-SHA256 shared secret (env `DEEPSEARCH_TRACELAB_SERVICE_SECRET`, legacy fallback `DEEPSEARCH_WEBHOOK_SECRET`) | Never user-authed; structural carve-out (never calls `authorize()`). ⚠️ If neither is set, HMAC validation is **skipped** (dev-only mode) — must be set in prod. |
 | `app/mcp_server/**` (in-repo Python MCP) | in-process DB access | Production-dark; structural carve-out. |
@@ -248,3 +249,29 @@ For now, shared credentials are appropriate.
 **Cross-Reference:**
 - DeepSearch integration: `DeepSearch.alpha/cmos/planning/Answers-from-tracelab-sprint12.md`
 - Sprint 12 mission: `cmos/missions/sprint-12/B12.3_Create-Service-Account-Production.yaml`
+
+
+### Restored operational routes (RECOVER-1)
+
+Following the authorization design in `foundational-docs/tech_arch_template.md`,
+`POST /missions/events/cmos` is a trusted machine write: under RBAC it requires a
+service principal, just like mission logs. A human owner/admin token cannot
+publish CMOS transitions while RBAC is enabled. Its legacy flag-off behavior
+matches the log-write gate. Configure the CMOS bridge with a service credential.
+The bridge uses a separate router mount and `require_authenticated_principal`,
+matching mission log/evidence ingestion. The human-route dependency remains on
+event reads and rejects service credentials in both RBAC states. Regression tests
+exercise the actual JWT and API-key authentication paths for this boundary.
+
+`GET /missions/events/recent` and `/missions/events/stream` scope mission events
+by current mission ownership/Space membership. They resolve the human mission ID
+emitted by MissionService and row UUIDs; UUID-shaped aliases cannot grant access
+to another mission. Unscoped CMOS/PEDR events are only visible to owner/admin
+principals under RBAC. The stream rechecks grants for each event, applies the
+limit after filtering replay history, and supports EventSource query-token auth.
+
+All `/decisions/linked` reads and evidence writes require owner/admin access
+unconditionally. CMOS decisions are global operational records with no TraceLab
+owner/Space field; ordinary users and service principals cannot read or alter
+them. Router-level authentication protects every restored route independently
+of the RBAC feature flag.
