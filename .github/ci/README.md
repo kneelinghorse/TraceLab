@@ -31,9 +31,9 @@ mypy reports 970 errors. They are not silently treated as passing gates.
 
 ## Quarantine contract
 
-`backend-quarantine.txt` contains exactly 49 unique pytest node IDs. Every row
+`backend-quarantine.txt` contains exactly 46 unique pytest node IDs. Every row
 has a reason, tests remain collected, and the workflow fails unless pytest's own
-summary reports exactly 49 deselections. A stale, duplicate, or misspelled node
+summary reports exactly 46 deselections. A stale, duplicate, or misspelled node
 therefore breaks the gate instead of quietly shrinking coverage.
 
 ## Promotion ratchet
