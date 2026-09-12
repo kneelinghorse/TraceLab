@@ -32,7 +32,9 @@ def test_cost_monitor_tracks_usage_and_summary(tmp_path):
     assert telemetry.exists()
     with telemetry.open() as handle:
         line = json.loads(handle.readline())
-        assert line["model"] == "gpt-5.1"
+        assert line["event_type"] == "cost.monitor.event"
+        assert line["source"] == "tracelab"
+        assert line["payload"]["model"] == "gpt-5.1"
 
 
 def test_cost_monitor_retention_and_cache_hits(tmp_path):

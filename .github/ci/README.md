@@ -31,9 +31,9 @@ mypy reports 970 errors. They are not silently treated as passing gates.
 
 ## Quarantine contract
 
-`backend-quarantine.txt` contains exactly 22 unique pytest node IDs. Every row
+`backend-quarantine.txt` contains exactly 12 unique pytest node IDs. Every row
 has a reason, tests remain collected, and the workflow fails unless pytest's own
-summary reports exactly 22 deselections. A stale, duplicate, or misspelled node
+summary reports exactly 12 deselections. A stale, duplicate, or misspelled node
 therefore breaks the gate instead of quietly shrinking coverage.
 
 ## Promotion ratchet
@@ -68,3 +68,22 @@ The evidence fixtures now include the current owner/Space columns; the mission
 status smoke uses the current PATCH verb. Restored behavior has additional
 regression coverage for partial search diagnostics, disabled layers, caching,
 canonical YAML/update dispatch, telemetry failures, and route RBAC.
+
+## RECOVER-2 restoration (2026-09-12)
+
+Re-enabled ten nodes: eight telemetry/correction assertions, DeepSearch ingest
+persistence, and the twelve-query graph acceptance case. DeepSearch now injects
+only external embedding/vector providers; real linking, quality gates, and the
+canonical mission writes remain under test. Nine actual telemetry writers have
+additional envelope/payload and failing-sink coverage. The twelve remaining
+quarantine reasons record reproduced failures rather than claiming the recovered
+contracts were intentionally retired.
+
+The required `ruff-diff` job also checks every commit in the change range with
+`scripts/check_format_only_changes.py`. Formatting-only/style claims with net
+non-whitespace deletions in `app/` fail when the Python AST changes (non-Python
+files are conservatively flagged). Identical Python ASTs permit line wrapping
+and comment cleanup. Rename detection is disabled so deleting or renaming a
+module cannot bypass the check. A deliberate behavioral change must be described
+as such in the commit message. This guard flags d592c92 and tests intermediate
+commits even when a later commit restores their deletions.

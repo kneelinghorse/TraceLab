@@ -60,7 +60,7 @@
     "topic_similar": 19102,
     "configured_owner_login": 401
   },
-  "completion": "pending hosted CI, deployment and authenticated production smoke",
+  "completion": "all RECOVER-1 verification gates passed",
   "final_targeted": {
     "passed": 149,
     "failed": 0,
@@ -114,5 +114,36 @@
     },
     "fix": "Use iter_route_contexts when available, matching existing live-harness coverage guard."
   },
-  "production_owner_credential": "Existing production Railway bootstrap login verified HTTP 200 and owner role; no secret persisted. Full live matrix ready."
+  "production_owner_credential": "Existing production Railway bootstrap login verified HTTP 200 and owner role; no secret persisted. Full live matrix ready.",
+  "hosted_final": {
+    "head": "7ca1d7c",
+    "required_checks": "6/6 passed",
+    "backend": {
+      "passed": 2352,
+      "skipped": 3,
+      "deselected": 22,
+      "seconds": 381.57
+    },
+    "run_url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34713561751",
+    "integration": "passed"
+  },
+  "production_verified": {
+    "commit": "429ac59",
+    "smoke_checks": 30,
+    "graph_before": 60301,
+    "graph_after": 60305,
+    "ingestion_edges_inserted": 4,
+    "pedr_layer_diagnostics": 6,
+    "pedr_degraded": false,
+    "rbac_matrix": "passed",
+    "public_health_and_frontend": 200,
+    "cleanup": "passed"
+  },
+  "extra_local_reproduction": {
+    "passed": 2351,
+    "failed": 1,
+    "skipped": 3,
+    "deselected": 22,
+    "failure": "5ms graph-latency threshold; also fails on isolated baseline main (6.91ms). Final hosted suite passes unchanged test."
+  }
 }

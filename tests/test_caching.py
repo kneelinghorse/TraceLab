@@ -106,6 +106,9 @@ def test_cache_manager_snapshot_writes_telemetry(tmp_path: Path) -> None:
     assert telemetry_path.exists()
     lines = telemetry_path.read_text(encoding="utf-8").strip().splitlines()
     assert lines, "telemetry snapshot not written"
-    payload = json.loads(lines[-1])
+    event = json.loads(lines[-1])
+    assert event["event_type"] == "cache.metrics.snapshot"
+    assert event["source"] == "tracelab"
+    payload = event["payload"]
     assert "caches" in payload
     assert "project_metadata" in payload["caches"]

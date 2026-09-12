@@ -1,0 +1,340 @@
+{
+  "tag": "RECOVER-1-smoke-399e9f05aa2a",
+  "checks": [
+    {
+      "method": "GET",
+      "path": "/openapi.json",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/refresh",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/admin/rbac-status",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/projects",
+      "status": 201,
+      "expected": 201
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/graph/stats",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/documents/upload",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/documents/77a3f8e2-7296-42c7-92bc-87036f674865/process",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/graph/stats",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/pedr/related/urn:research:document:77a3f8e2-7296-42c7-92bc-87036f674865",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/pedr/search",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/missions",
+      "status": 201,
+      "expected": 201
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/missions/f47922db-d9e9-45e9-84cf-c9b2b389a0d4",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/events/recent",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/events/recent",
+      "status": 401,
+      "expected": 401
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/linked",
+      "status": 401,
+      "expected": 401
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/f47922db-d9e9-45e9-84cf-c9b2b389a0d4",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/linked",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/linked/1",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/missions/events/cmos",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/events/recent",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/f47922db-d9e9-45e9-84cf-c9b2b389a0d4",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/linked",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/linked/1",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/missions/events/cmos",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/events/recent",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/f47922db-d9e9-45e9-84cf-c9b2b389a0d4",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/linked",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/linked/1",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/missions/events/cmos",
+      "status": 200,
+      "expected": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/missions/events/recent",
+      "status": 403,
+      "expected": 403
+    }
+  ],
+  "fixtures": {
+    "project_id": "2caf0ea3-9270-4f33-bee4-8119f4a55a4a",
+    "document_id": "77a3f8e2-7296-42c7-92bc-87036f674865",
+    "mission_id": "f47922db-d9e9-45e9-84cf-c9b2b389a0d4",
+    "member": "d67c7b69-0960-4f14-889e-a485f70315c2",
+    "viewer": "7f7fb970-442b-45dd-a844-e4f2f4352bac",
+    "service": "d6986274-7f7c-4f2a-9302-dd046cfbf483"
+  },
+  "cleanup": [
+    {
+      "resource": "missions",
+      "id": "f47922db-d9e9-45e9-84cf-c9b2b389a0d4",
+      "status": 204
+    },
+    {
+      "resource": "documents",
+      "id": "77a3f8e2-7296-42c7-92bc-87036f674865",
+      "status": 200
+    },
+    {
+      "resource": "projects",
+      "id": "2caf0ea3-9270-4f33-bee4-8119f4a55a4a",
+      "status": 200
+    }
+  ],
+  "ingestion": {
+    "before": {
+      "edge_counts": {
+        "topic_similar": 19102,
+        "contains": 17031,
+        "part_of": 15193,
+        "co_occurs": 6300,
+        "belongs_to": 1826,
+        "references": 528,
+        "derived_from": 321
+      },
+      "total_edges": 60301,
+      "document_count": 1584,
+      "chunk_count": 16431
+    },
+    "after": {
+      "edge_counts": {
+        "topic_similar": 19102,
+        "contains": 17033,
+        "part_of": 15194,
+        "co_occurs": 6300,
+        "belongs_to": 1827,
+        "references": 528,
+        "derived_from": 321
+      },
+      "total_edges": 60305,
+      "document_count": 1585,
+      "chunk_count": 16432
+    },
+    "edge_stage": {
+      "status": "success",
+      "inserted": 4,
+      "updated": 0,
+      "skipped": 0,
+      "duration_seconds": 0.4206
+    }
+  },
+  "pedr": {
+    "query": "RECOVER-1-smoke-399e9f05aa2a ingestion relationships",
+    "intent": "search",
+    "intent_confidence": 0.5,
+    "detected_type": null,
+    "type_confidence": 0.0,
+    "layers_used": [
+      "semantic",
+      "graph"
+    ],
+    "layer_weights": {
+      "lexical": 0.22,
+      "semantic": 0.308,
+      "syntactic": 0.132,
+      "pragmatic": 0.08800000000000001,
+      "governance": 0.132,
+      "graph": 0.12
+    },
+    "timings": {
+      "lexical_ms": 9.624291909858584,
+      "semantic_ms": 657.1367550641298,
+      "graph_ms": 8.01,
+      "syntactic_ms": 0.0395399983972311,
+      "pragmatic_ms": 0.0414201058447361,
+      "governance_ms": 5.969824036583304,
+      "fusion_ms": 0.05797902122139931,
+      "relational_ms": 0.0,
+      "total_ms": 673.644848051481
+    },
+    "layer_diagnostics": [
+      {
+        "layer": "lexical",
+        "status": "ok",
+        "duration_ms": 9.62,
+        "result_count": 0,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "layer": "semantic",
+        "status": "ok",
+        "duration_ms": 657.14,
+        "result_count": 1,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "layer": "graph",
+        "status": "ok",
+        "duration_ms": 8.01,
+        "result_count": 2,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "layer": "syntactic",
+        "status": "ok",
+        "duration_ms": 0.04,
+        "result_count": 1,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "layer": "pragmatic",
+        "status": "ok",
+        "duration_ms": 0.04,
+        "result_count": 1,
+        "error": null,
+        "error_type": null
+      },
+      {
+        "layer": "governance",
+        "status": "ok",
+        "duration_ms": 5.97,
+        "result_count": 1,
+        "error": null,
+        "error_type": null
+      }
+    ],
+    "degraded": false,
+    "graph_enabled": true,
+    "graph_candidates_expanded": 2,
+    "total_candidates": 1,
+    "result_count": 1,
+    "rerank_mode": "full",
+    "hybrid_fallback_used": false
+  },
+  "result": "passed",
+  "user_cleanup_failures": [],
+  "deployed_commit": "429ac59a3de06e635cff70246804a750b3f99d4f",
+  "backend_deployment_id": "9cfe4c58-bc30-4918-8d0c-9497536fc2fc",
+  "postdeploy_rbac": "passed; full owner matrix; no teardown failures",
+  "cleanup_semantics": "Mission hard-deleted; smoke document/project soft-deleted through supported API; throwaway users purged."
+}

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from unittest.mock import MagicMock
 
 import pytest
 from fastapi.testclient import TestClient
@@ -99,10 +100,21 @@ def test_ingest_endpoint_persists_mission_and_auto_links(
     from app.api.v1 import deepsearch as deepsearch_module
 
     telemetry_path = tmp_path / "ingest.jsonl"
+    # Exercise real linking + persistence without depending on paid external services.
+    embeddings = MagicMock()
+    embeddings.generate_embedding.return_value = [0.1] * 3072
+    vectors = MagicMock()
+    vectors.search_chunks.return_value = [
+        {"chunk_id": str(chunk.id), "document_id": str(chunk.document_id),
+         "project_id": str(project.id), "content": chunk.content, "score": 0.95}
+    ]
     monkeypatch.setattr(
         deepsearch_module,
         "_auto_linker",
-        EvidenceAutoLinkingService(telemetry_path=telemetry_path),
+        EvidenceAutoLinkingService(
+            telemetry_path=telemetry_path, embedding_service=embeddings,
+            qdrant_service=vectors,
+        ),
     )
 
     payload = {
@@ -116,11 +128,14 @@ def test_ingest_endpoint_persists_mission_and_auto_links(
     assert response.status_code == 201, response.text
     body = response.json()
     assert body["mission_uuid"]
+    assert body["mission_id"] == payload["mission"]["mission_id"]
     assert body["quality_gates_passed"] is True
     assert body["auto_linking"]["linked"] == 1
     mission_record = db_session.query(Mission).one()
     exec_meta = mission_record.execution_metadata or {}
     assert exec_meta.get("evidence_linking", {}).get("linked") == 1
+    assert body["quality_gates"] == exec_meta["quality_gates"]
+    assert exec_meta["completion_percentage"] > 0
     assert mission_record.context["evidence"][0]["chunk_id"] == str(chunk.id)
 
 

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from collections.abc import Callable, Mapping, MutableMapping
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -65,9 +64,16 @@ class _FileTelemetrySink:
         self.path = path or (repo_root / "telemetry" / "events" / "quality-gates.jsonl")
 
     def __call__(self, payload: dict[str, Any]) -> None:  # pragma: no cover - simple IO
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        with self.path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
+        from app.core.telemetry import emit_telemetry
+
+        event_payload = dict(payload)
+        event_payload.pop("ts", None)
+        emit_telemetry(
+            path=self.path,
+            event_type="quality.gate.evaluated",
+            source="quality",
+            payload=event_payload,
+        )
 
 
 class QualityGateService:

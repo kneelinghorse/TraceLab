@@ -1,0 +1,11 @@
+{
+  "is_nullable": "NO",
+  "is_generated": "ALWAYS",
+  "generation_expression": "to_tsvector('english'::regconfig, COALESCE(content, ''::text))",
+  "data_type": "tsvector",
+  "udt_name": "tsvector",
+  "alembic_heads": [
+    "043_deepsearch_evidence"
+  ],
+  "read_only": true
+}

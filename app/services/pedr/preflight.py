@@ -11,7 +11,7 @@ import time
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -27,7 +27,6 @@ from app.schemas.pedr_preflight import (
     PreflightMatchInsight,
     PreflightQuery,
     PreflightRecommendation,
-    PreflightTelemetry,
 )
 from app.services.pedr.quality_scoring import QualityScoringService
 
@@ -433,29 +432,25 @@ class PreflightService:
         agent: str,
     ) -> None:
         """Write telemetry event for pre-flight query."""
-        try:
-            telemetry = PreflightTelemetry(
-                timestamp=datetime.now(UTC),
-                query=recommendation.query,
-                action=recommendation.action,
-                top_score=recommendation.top_score,
-                match_count=recommendation.match_count,
-                latency_ms=recommendation.latency_ms,
-                min_quality_gates=recommendation.filters_applied.get(
-                    "min_quality_gates", 4
-                ),
-                status_filters=recommendation.filters_applied.get("status", []),
-                agent=agent,
-            )
+        from app.core.telemetry import emit_telemetry
 
-            self.TELEMETRY_DIR.mkdir(parents=True, exist_ok=True)
-            telemetry_path = self.TELEMETRY_DIR / "sprint-11-preflight.jsonl"
+        telemetry_path = self.TELEMETRY_DIR / "sprint-11-preflight.jsonl"
 
-            with telemetry_path.open("a", encoding="utf-8") as f:
-                f.write(telemetry.model_dump_json())
-                f.write("\n")
-        except Exception as e:
-            logger.warning("Failed to emit preflight telemetry: %s", e)
+        emit_telemetry(
+            path=telemetry_path,
+            event_type="preflight.query.completed",
+            source="tracelab",
+            payload={
+                "query": recommendation.query,
+                "action": recommendation.action,
+                "top_score": recommendation.top_score,
+                "match_count": recommendation.match_count,
+                "latency_ms": recommendation.latency_ms,
+                "min_quality_gates": recommendation.filters_applied.get("min_quality_gates", 4),
+                "status_filters": recommendation.filters_applied.get("status", []),
+                "agent": agent,
+            },
+        )
 
 
 _preflight_service: PreflightService | None = None

@@ -52,6 +52,8 @@ jobs:
             git cat-file -e "$base_sha^{commit}"
           fi
 
+          python scripts/check_format_only_changes.py "$base_sha" "$HEAD_SHA"
+
           mapfile -d '' python_files < <(
             git diff --name-only --diff-filter=ACMR -z "$base_sha" "$HEAD_SHA" -- '*.py'
           )

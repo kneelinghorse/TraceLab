@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -239,25 +238,24 @@ class WebhookClient:
         context: dict[str, str] | None,
     ) -> None:
         """Write telemetry record for Grafana dashboards."""
-        record = {
-            "ts": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
-            "event": event,
-            "mission_id": payload.get("mission_id", ""),
-            "evidence_id": payload.get("evidence_id"),
-            "notification_type": payload.get("notification_type"),
-            "success": result.success,
-            "status_code": result.status_code,
-            "duration_ms": result.duration_ms,
-            "attempt": result.attempt,
-            "error": result.error_message,
-            "context": context or {},
-        }
-        try:
-            self.telemetry_path.parent.mkdir(parents=True, exist_ok=True)
-            with self.telemetry_path.open("a", encoding="utf-8") as f:
-                f.write(json.dumps(record, ensure_ascii=False) + "\n")
-        except OSError as e:
-            logger.warning("Failed to write webhook telemetry: %s", e)
+        from app.core.telemetry import emit_telemetry
+
+        emit_telemetry(
+            path=self.telemetry_path,
+            event_type=f"webhook.{event}",
+            source="tracelab",
+            payload={
+                "mission_id": payload.get("mission_id", ""),
+                "evidence_id": payload.get("evidence_id"),
+                "notification_type": payload.get("notification_type"),
+                "success": result.success,
+                "status_code": result.status_code,
+                "duration_ms": result.duration_ms,
+                "attempt": result.attempt,
+                "error": result.error_message,
+                "context": context or {},
+            },
+        )
 
     def get_stats(self) -> dict[str, Any]:
         """Return current delivery statistics."""
