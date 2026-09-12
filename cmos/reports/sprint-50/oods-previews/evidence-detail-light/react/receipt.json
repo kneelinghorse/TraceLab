@@ -1,0 +1,420 @@
+{
+  "version": "1.1",
+  "theme": "light",
+  "brand": "A",
+  "framework": "react",
+  "compose": {
+    "object": "Evidence",
+    "context": "detail",
+    "preferences": {
+      "theme": "light"
+    }
+  },
+  "schemaHash": "sha256:8033640e42b2e478030d37a6588ee53c020943fd826cdfff735333603f50064f",
+  "artifactContentHash": "sha256:8c57765890f485e8340755a3682767f2ebec9fd1816034723aaa49de0361b0f6",
+  "files": [
+    {
+      "path": "src/GeneratedUI.tsx",
+      "contentHash": "sha256:582ace0a8681507c07084239271528be7fad7b0339625cefc3801231ad8c79f5"
+    }
+  ],
+  "sourceHead": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+  "model": {
+    "activeFilters": [],
+    "categories": [],
+    "claim": "Consumer claim",
+    "classificationMetadata": "Consumer classification metadata",
+    "createdAt": "2026-09-05T12:00:00.000Z",
+    "description": "Consumer description",
+    "disposition": "supporting",
+    "filterCount": 0,
+    "filters": [],
+    "id": "Consumer id",
+    "label": "Consumer label",
+    "lastEvent": "Consumer last event",
+    "lastEventAt": "2026-09-05T12:00:00.000Z",
+    "missionId": "consumer-mission-id",
+    "origin": "mcp-agent",
+    "ownerId": "consumer-owner-id",
+    "ownerType": "user",
+    "ownershipRole": "Consumer ownership role",
+    "ownershipTransferredAt": "2026-09-05T12:00:00.000Z",
+    "page": 0,
+    "pageSize": 0,
+    "placeholder": "Consumer placeholder",
+    "primaryCategoryId": "supporting",
+    "primaryCategoryPath": "Consumer primary category path",
+    "projectId": "consumer-project-id",
+    "query": "Consumer query",
+    "searchActive": false,
+    "searchQuery": "Consumer searchQuery",
+    "sessionKey": "Consumer session key",
+    "snippet": "Consumer snippet",
+    "sourceId": "consumer-source-id",
+    "sourceSightingCount": 0,
+    "sourceUrl": "Consumer source url",
+    "summary": "Consumer summary",
+    "tagCount": 0,
+    "tagPreview": "Consumer tag preview",
+    "tags": [],
+    "totalItems": 0,
+    "totalPages": 0,
+    "updatedAt": "2026-09-05T12:00:00.000Z",
+    "workspaceId": "consumer-workspace-id"
+  },
+  "steps": [],
+  "clock": "2026-09-08T12:00:00.000Z",
+  "clockStepMs": 1,
+  "locale": "en-US",
+  "timezone": "UTC",
+  "packages": [
+    {
+      "name": "@oods/tokens",
+      "version": "0.1.0",
+      "installSpec": "file:./tarballs/oods-tokens-0.1.0.tgz",
+      "sha256": "sha256:69422edecf1d2853a844003bebbe2e4b514987e86a9fa1d860946f873c1c28c5",
+      "bytes": 238478
+    },
+    {
+      "name": "@oods/component-contracts",
+      "version": "0.1.0",
+      "installSpec": "file:./tarballs/oods-component-contracts-0.1.0.tgz",
+      "sha256": "sha256:b4bdbfccf2cea62f728e4f8123ad4bb7d8a4cdb42767e3395445694724e45381",
+      "bytes": 197852
+    },
+    {
+      "name": "@oods/component-styles",
+      "version": "0.1.0",
+      "installSpec": "file:./tarballs/oods-component-styles-0.1.0.tgz",
+      "sha256": "sha256:0f012b95395e8a70a2fb787580ab363af2e5e15940e7d13e3b255b71c143a9df",
+      "bytes": 12894
+    },
+    {
+      "name": "@oods/components-react",
+      "version": "0.1.0",
+      "installSpec": "file:./tarballs/oods-components-react-0.1.0.tgz",
+      "sha256": "sha256:02036aecde76093980d8e4e93bb3458c60a96009ee4b1d8c523b621e32a308e2",
+      "bytes": 95069
+    }
+  ],
+  "views": [
+    {
+      "width": 390,
+      "accessibility": "- banner:\n  - heading \"Consumer label\" [level=1]\n  - text: Consumer description\n- search \"Search Query\":\n  - text: Search Query\n  - searchbox \"Search Query\": Consumer searchQuery\n  - button \"Clear search\": ×\n- heading \"Ownership Summary\" [level=3]\n- term: Owner ID\n- definition: consumer-owner-id\n- term: Owner Type\n- definition: user\n- term: Role\n- definition: Consumer ownership role\n- tablist \"Record details\":\n  - tab \"Details\" [selected]\n- tabpanel \"Details\": Consumer claim\n- complementary:\n  - heading \"Classification\" [level=3]\n  - region \"Filters\"\n- group \"Screen actions\":\n  - button \"Delete\"\n  - button \"Edit\"\n  - button \"View timeline\"",
+      "visibleText": "Consumer label\nConsumer description\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nDetails\nConsumer claim\nClassification\nDeleteEditView timeline",
+      "measurements": {
+        "bodyBackground": "oklch(0.967 0.03 86)",
+        "chartCanvasFills": [],
+        "viewportWidth": 390,
+        "documentWidth": 390,
+        "elementCount": 44,
+        "overflow": [],
+        "glyphWraps": []
+      },
+      "values": [
+        {
+          "element": "ve-header-26",
+          "name": "Search Query",
+          "value": "Consumer searchQuery",
+          "checked": false
+        }
+      ],
+      "regions": [
+        {
+          "id": "screen-detail-13",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nDetails\nConsumer claim\nClassification"
+        },
+        {
+          "id": "detail-header-1",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role"
+        },
+        {
+          "id": "slot-header-2",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role"
+        },
+        {
+          "id": "ve-header-24",
+          "component": "DetailHeader",
+          "text": "Consumer label\nConsumer description"
+        },
+        {
+          "id": "",
+          "component": "SearchInput",
+          "text": "Search Query\n×"
+        },
+        {
+          "id": "ve-header-26",
+          "component": "SearchInput",
+          "text": ""
+        },
+        {
+          "id": "ve-header-28",
+          "component": "OwnershipSummary",
+          "text": "Ownership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role"
+        },
+        {
+          "id": "detail-body-10",
+          "component": "Card",
+          "text": "Details\nConsumer claim\nClassification"
+        },
+        {
+          "id": "detail-tabs-9",
+          "component": "Tabs",
+          "text": "Details\nConsumer claim"
+        },
+        {
+          "id": "detail-tab-panel-5",
+          "component": "Stack",
+          "text": "Consumer claim"
+        },
+        {
+          "id": "slot-tab-1-6",
+          "component": "Text",
+          "text": "Consumer claim"
+        },
+        {
+          "id": "detail-meta-11",
+          "component": "Stack",
+          "text": "Classification"
+        },
+        {
+          "id": "slot-metadata-12",
+          "component": "Stack",
+          "text": "Classification"
+        },
+        {
+          "id": "ve-metadata-25",
+          "component": "ClassificationPanel",
+          "text": "Classification"
+        },
+        {
+          "id": "ve-metadata-27",
+          "component": "FilterPanel",
+          "text": ""
+        }
+      ],
+      "screenshot": "390.png",
+      "screenshotHash": "sha256:b131e54537a1e552d534fb361ee2a3992d13e96003bb4cfb96eeb7b6a2eb9d76",
+      "dump": "390.a11y.txt"
+    },
+    {
+      "width": 820,
+      "accessibility": "- banner:\n  - heading \"Consumer label\" [level=1]\n  - text: Consumer description\n- search \"Search Query\":\n  - text: Search Query\n  - searchbox \"Search Query\": Consumer searchQuery\n  - button \"Clear search\": ×\n- heading \"Ownership Summary\" [level=3]\n- term: Owner ID\n- definition: consumer-owner-id\n- term: Owner Type\n- definition: user\n- term: Role\n- definition: Consumer ownership role\n- tablist \"Record details\":\n  - tab \"Details\" [selected]\n- tabpanel \"Details\": Consumer claim\n- complementary:\n  - heading \"Classification\" [level=3]\n  - region \"Filters\"\n- group \"Screen actions\":\n  - button \"Delete\"\n  - button \"Edit\"\n  - button \"View timeline\"",
+      "visibleText": "Consumer label\nConsumer description\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nDetails\nConsumer claim\nClassification\nDeleteEditView timeline",
+      "measurements": {
+        "bodyBackground": "oklch(0.967 0.03 86)",
+        "chartCanvasFills": [],
+        "viewportWidth": 820,
+        "documentWidth": 820,
+        "elementCount": 44,
+        "overflow": [],
+        "glyphWraps": []
+      },
+      "values": [
+        {
+          "element": "ve-header-26",
+          "name": "Search Query",
+          "value": "Consumer searchQuery",
+          "checked": false
+        }
+      ],
+      "regions": [
+        {
+          "id": "screen-detail-13",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nDetails\nConsumer claim\nClassification"
+        },
+        {
+          "id": "detail-header-1",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role"
+        },
+        {
+          "id": "slot-header-2",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role"
+        },
+        {
+          "id": "ve-header-24",
+          "component": "DetailHeader",
+          "text": "Consumer label\nConsumer description"
+        },
+        {
+          "id": "",
+          "component": "SearchInput",
+          "text": "Search Query\n×"
+        },
+        {
+          "id": "ve-header-26",
+          "component": "SearchInput",
+          "text": ""
+        },
+        {
+          "id": "ve-header-28",
+          "component": "OwnershipSummary",
+          "text": "Ownership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role"
+        },
+        {
+          "id": "detail-body-10",
+          "component": "Card",
+          "text": "Details\nConsumer claim\nClassification"
+        },
+        {
+          "id": "detail-tabs-9",
+          "component": "Tabs",
+          "text": "Details\nConsumer claim"
+        },
+        {
+          "id": "detail-tab-panel-5",
+          "component": "Stack",
+          "text": "Consumer claim"
+        },
+        {
+          "id": "slot-tab-1-6",
+          "component": "Text",
+          "text": "Consumer claim"
+        },
+        {
+          "id": "detail-meta-11",
+          "component": "Stack",
+          "text": "Classification"
+        },
+        {
+          "id": "slot-metadata-12",
+          "component": "Stack",
+          "text": "Classification"
+        },
+        {
+          "id": "ve-metadata-25",
+          "component": "ClassificationPanel",
+          "text": "Classification"
+        },
+        {
+          "id": "ve-metadata-27",
+          "component": "FilterPanel",
+          "text": ""
+        }
+      ],
+      "screenshot": "820.png",
+      "screenshotHash": "sha256:ca11ca40a4ae467be7ea14bf3a2c97605549380c830198aeb36c3df6858542fc",
+      "dump": "820.a11y.txt"
+    },
+    {
+      "width": 1440,
+      "accessibility": "- banner:\n  - heading \"Consumer label\" [level=1]\n  - text: Consumer description\n- search \"Search Query\":\n  - text: Search Query\n  - searchbox \"Search Query\": Consumer searchQuery\n  - button \"Clear search\": ×\n- heading \"Ownership Summary\" [level=3]\n- term: Owner ID\n- definition: consumer-owner-id\n- term: Owner Type\n- definition: user\n- term: Role\n- definition: Consumer ownership role\n- tablist \"Record details\":\n  - tab \"Details\" [selected]\n- tabpanel \"Details\": Consumer claim\n- complementary:\n  - heading \"Classification\" [level=3]\n  - region \"Filters\"\n- group \"Screen actions\":\n  - button \"Delete\"\n  - button \"Edit\"\n  - button \"View timeline\"",
+      "visibleText": "Consumer label\nConsumer description\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nDetails\nConsumer claim\nClassification\nDeleteEditView timeline",
+      "measurements": {
+        "bodyBackground": "oklch(0.967 0.03 86)",
+        "chartCanvasFills": [],
+        "viewportWidth": 1440,
+        "documentWidth": 1440,
+        "elementCount": 44,
+        "overflow": [],
+        "glyphWraps": []
+      },
+      "values": [
+        {
+          "element": "ve-header-26",
+          "name": "Search Query",
+          "value": "Consumer searchQuery",
+          "checked": false
+        }
+      ],
+      "regions": [
+        {
+          "id": "screen-detail-13",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nDetails\nConsumer claim\nClassification"
+        },
+        {
+          "id": "detail-header-1",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role"
+        },
+        {
+          "id": "slot-header-2",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role"
+        },
+        {
+          "id": "ve-header-24",
+          "component": "DetailHeader",
+          "text": "Consumer label\nConsumer description"
+        },
+        {
+          "id": "",
+          "component": "SearchInput",
+          "text": "Search Query\n×"
+        },
+        {
+          "id": "ve-header-26",
+          "component": "SearchInput",
+          "text": ""
+        },
+        {
+          "id": "ve-header-28",
+          "component": "OwnershipSummary",
+          "text": "Ownership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role"
+        },
+        {
+          "id": "detail-body-10",
+          "component": "Card",
+          "text": "Details\nConsumer claim\nClassification"
+        },
+        {
+          "id": "detail-tabs-9",
+          "component": "Tabs",
+          "text": "Details\nConsumer claim"
+        },
+        {
+          "id": "detail-tab-panel-5",
+          "component": "Stack",
+          "text": "Consumer claim"
+        },
+        {
+          "id": "slot-tab-1-6",
+          "component": "Text",
+          "text": "Consumer claim"
+        },
+        {
+          "id": "detail-meta-11",
+          "component": "Stack",
+          "text": "Classification"
+        },
+        {
+          "id": "slot-metadata-12",
+          "component": "Stack",
+          "text": "Classification"
+        },
+        {
+          "id": "ve-metadata-25",
+          "component": "ClassificationPanel",
+          "text": "Classification"
+        },
+        {
+          "id": "ve-metadata-27",
+          "component": "FilterPanel",
+          "text": ""
+        }
+      ],
+      "screenshot": "1440.png",
+      "screenshotHash": "sha256:956635e20d09c708396dfd8a3f976f35cebf4ed22637e5955d0deb78e425003a",
+      "dump": "1440.a11y.txt"
+    }
+  ],
+  "errors": [],
+  "timings": {
+    "composeMs": 67.48775,
+    "generateMs": 8.954875000000015,
+    "captureMs": 845.6826250000158
+  },
+  "output": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-preview-7gzfUp/receipt/react",
+  "consumer": {
+    "root": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-loop-react-8QB1iZ",
+    "port": 4478,
+    "pid": 74087
+  }
+}

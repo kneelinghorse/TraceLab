@@ -1,0 +1,523 @@
+{
+  "version": "1.1",
+  "theme": "light",
+  "brand": "A",
+  "framework": "react",
+  "compose": {
+    "object": "Mission",
+    "context": "detail",
+    "preferences": {
+      "theme": "light"
+    }
+  },
+  "schemaHash": "sha256:c0e57599524b83223148146a17048c08cb5ccfffa125f5b765362955f4b76b00",
+  "artifactContentHash": "sha256:2444db5bb1c32065b2a42a3aa770509079f5b4df554f689d07bfb49e4b16ee5c",
+  "files": [
+    {
+      "path": "src/GeneratedUI.tsx",
+      "contentHash": "sha256:3843e00157fd89c603c3d03cea54fe110204a9d0d629db7d4f719104e69a04ff"
+    }
+  ],
+  "sourceHead": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+  "model": {
+    "activeFilters": [],
+    "allowedTransitions": [],
+    "background": "Consumer background",
+    "cancelAtPeriodEnd": false,
+    "cancellationReason": "Consumer cancellation reason",
+    "cancellationReasonCode": "Consumer cancellation reason code",
+    "cancellationRequestedAt": "2026-09-05T12:00:00.000Z",
+    "completedAt": "2026-09-05T12:00:00.000Z",
+    "constraints": [],
+    "context": {},
+    "coverageThresholds": {},
+    "createdAt": "2026-09-05T12:00:00.000Z",
+    "createdBy": "Consumer created by",
+    "currentPhase": "Consumer current phase",
+    "deepsearchAttemptCount": 0,
+    "deepsearchJobId": "consumer-deepsearch-job-id",
+    "deliverableFormat": "Consumer deliverable format",
+    "deliverables": [],
+    "description": "Consumer description",
+    "errorMessage": "Consumer error message",
+    "excludedEntities": [],
+    "executionMetadata": {},
+    "expectedOutputSchema": {},
+    "filterCount": 0,
+    "filters": [],
+    "focus": "Consumer focus",
+    "id": "Consumer id",
+    "label": "Consumer label",
+    "lastEvent": "Consumer last event",
+    "lastEventAt": "2026-09-05T12:00:00.000Z",
+    "leaseExpiresAt": "2026-09-05T12:00:00.000Z",
+    "materializationAttemptCount": 0,
+    "materializationError": "Consumer materialization error",
+    "materializationPending": false,
+    "materializationStatus": "Consumer materialization status",
+    "maxLoops": 0,
+    "metadata": {},
+    "minLoops": 0,
+    "missionId": "consumer-mission-id",
+    "objective": "Consumer objective",
+    "ownerId": "consumer-owner-id",
+    "ownerType": "user",
+    "ownershipRole": "Consumer ownership role",
+    "ownershipTransferredAt": "2026-09-05T12:00:00.000Z",
+    "page": 0,
+    "pageSize": 0,
+    "placeholder": "Consumer placeholder",
+    "progressPercent": 0,
+    "projectId": "consumer-project-id",
+    "projectName": "Consumer project name",
+    "queuedAt": "2026-09-05T12:00:00.000Z",
+    "references": [],
+    "requiredEntities": [],
+    "researchPhases": {},
+    "resultDocumentIds": [],
+    "resultMarkdown": "Consumer result markdown",
+    "resultProtocol": {},
+    "resultReportId": "consumer-result-report-id",
+    "searchReady": false,
+    "searchActive": false,
+    "searchQuery": "Consumer searchQuery",
+    "startedAt": "2026-09-05T12:00:00.000Z",
+    "stateHistory": [],
+    "status": "draft",
+    "successCriteria": [],
+    "tagCount": 0,
+    "tagMetadata": [],
+    "tags": [
+      "Consumer tag"
+    ],
+    "title": "Consumer title",
+    "totalItems": 0,
+    "totalPages": 0,
+    "updatedAt": "2026-09-05T12:00:00.000Z",
+    "validationThresholds": {}
+  },
+  "steps": [],
+  "clock": "2026-09-08T12:00:00.000Z",
+  "clockStepMs": 1,
+  "locale": "en-US",
+  "timezone": "UTC",
+  "packages": [
+    {
+      "name": "@oods/tokens",
+      "version": "0.1.0",
+      "installSpec": "file:./tarballs/oods-tokens-0.1.0.tgz",
+      "sha256": "sha256:69422edecf1d2853a844003bebbe2e4b514987e86a9fa1d860946f873c1c28c5",
+      "bytes": 238478
+    },
+    {
+      "name": "@oods/component-contracts",
+      "version": "0.1.0",
+      "installSpec": "file:./tarballs/oods-component-contracts-0.1.0.tgz",
+      "sha256": "sha256:b4bdbfccf2cea62f728e4f8123ad4bb7d8a4cdb42767e3395445694724e45381",
+      "bytes": 197852
+    },
+    {
+      "name": "@oods/component-styles",
+      "version": "0.1.0",
+      "installSpec": "file:./tarballs/oods-component-styles-0.1.0.tgz",
+      "sha256": "sha256:0f012b95395e8a70a2fb787580ab363af2e5e15940e7d13e3b255b71c143a9df",
+      "bytes": 12894
+    },
+    {
+      "name": "@oods/components-react",
+      "version": "0.1.0",
+      "installSpec": "file:./tarballs/oods-components-react-0.1.0.tgz",
+      "sha256": "sha256:02036aecde76093980d8e4e93bb3458c60a96009ee4b1d8c523b621e32a308e2",
+      "bytes": 95069
+    }
+  ],
+  "views": [
+    {
+      "width": 390,
+      "accessibility": "- banner:\n  - heading \"Consumer label\" [level=1]\n  - text: Consumer description\n- log \"Status Timeline\":\n  - heading \"Status Timeline\" [level=3]\n  - paragraph: \"Current status: Draft\"\n  - list:\n    - listitem: No events\n- search \"Search Query\":\n  - text: Search Query\n  - searchbox \"Search Query\": Consumer searchQuery\n  - button \"Clear search\": ×\n- heading \"Ownership Summary\" [level=3]\n- term: Owner ID\n- definition: consumer-owner-id\n- term: Owner Type\n- definition: user\n- term: Role\n- definition: Consumer ownership role\n- heading \"Tags\" [level=3]\n- term: Tag Count\n- definition: \"0\"\n- term: Tags\n- definition: Consumer tag\n- article \"Cancellation\":\n  - heading \"Cancellation\" [level=3]\n  - list:\n    - listitem:\n      - strong: Cancellation requested\n      - paragraph:\n        - time: Sep 5, 2026, 12:00 PM\n      - paragraph: \"Reason: Consumer cancellation reason\"\n      - paragraph: \"Code: Consumer cancellation reason code\"\n- tablist \"Record details\":\n  - tab \"Details\" [selected]\n- tabpanel \"Details\":\n  - log \"Status Timeline\":\n    - heading \"Status Timeline\" [level=3]\n    - text: draft\n  - text: 2026-09-05T12:00:00.000Z\n- complementary:\n  - region \"Filters\"\n- group \"Screen actions\":\n  - button \"Cancel record\"\n  - button \"Delete\"\n  - button \"Edit\"\n  - button \"View timeline\"",
+      "visibleText": "Consumer label\nConsumer description\nStatus Timeline\n\nCurrent status: Draft\n\nNo events\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nTags\nTag Count\n0\nTags\nConsumer tag\nCancellation\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code\n\nDetails\nStatus Timeline\ndraft\n2026-09-05T12:00:00.000Z\nCancel recordDeleteEditView timeline",
+      "measurements": {
+        "bodyBackground": "oklch(0.967 0.03 86)",
+        "chartCanvasFills": [],
+        "viewportWidth": 390,
+        "documentWidth": 390,
+        "elementCount": 65,
+        "overflow": [],
+        "glyphWraps": [
+          {
+            "element": "p",
+            "text": "Consumer cancellation reason code",
+            "lines": [
+              "Consumer cancellation reason",
+              "code"
+            ]
+          }
+        ]
+      },
+      "values": [
+        {
+          "element": "ve-header-26",
+          "name": "Search Query",
+          "value": "Consumer searchQuery",
+          "checked": false
+        }
+      ],
+      "regions": [
+        {
+          "id": "screen-detail-13",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nStatus Timeline\n\nCurrent status: Draft\n\nNo events\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nTags\nTag Count\n0\nTags\nConsumer tag\nCancellation\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code\n\nDetails\nStatus Timeline\ndraft\n2026-09-05T12:00:00.000Z"
+        },
+        {
+          "id": "detail-header-1",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nStatus Timeline\n\nCurrent status: Draft\n\nNo events\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nTags\nTag Count\n0\nTags\nConsumer tag\nCancellation\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        },
+        {
+          "id": "slot-header-2",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nStatus Timeline\n\nCurrent status: Draft\n\nNo events\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nTags\nTag Count\n0\nTags\nConsumer tag\nCancellation\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        },
+        {
+          "id": "ve-header-24",
+          "component": "DetailHeader",
+          "text": "Consumer label\nConsumer description"
+        },
+        {
+          "id": "ve-header-25",
+          "component": "StatusTimeline",
+          "text": "Status Timeline\n\nCurrent status: Draft\n\nNo events"
+        },
+        {
+          "id": "",
+          "component": "SearchInput",
+          "text": "Search Query\n×"
+        },
+        {
+          "id": "ve-header-26",
+          "component": "SearchInput",
+          "text": ""
+        },
+        {
+          "id": "ve-header-28",
+          "component": "OwnershipSummary",
+          "text": "Ownership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role"
+        },
+        {
+          "id": "ve-header-29",
+          "component": "TagSummary",
+          "text": "Tags\nTag Count\n0\nTags\nConsumer tag"
+        },
+        {
+          "id": "ve-header-30",
+          "component": "CancellationEvent",
+          "text": "Cancellation\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        },
+        {
+          "id": "detail-body-10",
+          "component": "Card",
+          "text": "Details\nStatus Timeline\ndraft\n2026-09-05T12:00:00.000Z"
+        },
+        {
+          "id": "detail-tabs-9",
+          "component": "Tabs",
+          "text": "Details\nStatus Timeline\ndraft\n2026-09-05T12:00:00.000Z"
+        },
+        {
+          "id": "detail-tab-panel-3",
+          "component": "Stack",
+          "text": "Status Timeline\ndraft\n2026-09-05T12:00:00.000Z"
+        },
+        {
+          "id": "slot-tab-0-4",
+          "component": "StatusTimeline",
+          "text": "Status Timeline\ndraft"
+        },
+        {
+          "id": "pg-status-timeline-32",
+          "component": "Text",
+          "text": "draft"
+        },
+        {
+          "id": "pg-status-timeline-33",
+          "component": "Text",
+          "text": ""
+        },
+        {
+          "id": "slot-tab-2-8",
+          "component": "Text",
+          "text": "2026-09-05T12:00:00.000Z"
+        },
+        {
+          "id": "detail-meta-11",
+          "component": "Stack",
+          "text": ""
+        },
+        {
+          "id": "slot-metadata-12",
+          "component": "FilterPanel",
+          "text": ""
+        }
+      ],
+      "screenshot": "390.png",
+      "screenshotHash": "sha256:45d0b37c55decdcc7ed69ea28d7efc0cc1227a29fe0b5a1cf90cf4b84e4ec47f",
+      "dump": "390.a11y.txt"
+    },
+    {
+      "width": 820,
+      "accessibility": "- banner:\n  - heading \"Consumer label\" [level=1]\n  - text: Consumer description\n- log \"Status Timeline\":\n  - heading \"Status Timeline\" [level=3]\n  - paragraph: \"Current status: Draft\"\n  - list:\n    - listitem: No events\n- search \"Search Query\":\n  - text: Search Query\n  - searchbox \"Search Query\": Consumer searchQuery\n  - button \"Clear search\": ×\n- heading \"Ownership Summary\" [level=3]\n- term: Owner ID\n- definition: consumer-owner-id\n- term: Owner Type\n- definition: user\n- term: Role\n- definition: Consumer ownership role\n- heading \"Tags\" [level=3]\n- term: Tag Count\n- definition: \"0\"\n- term: Tags\n- definition: Consumer tag\n- article \"Cancellation\":\n  - heading \"Cancellation\" [level=3]\n  - list:\n    - listitem:\n      - strong: Cancellation requested\n      - paragraph:\n        - time: Sep 5, 2026, 12:00 PM\n      - paragraph: \"Reason: Consumer cancellation reason\"\n      - paragraph: \"Code: Consumer cancellation reason code\"\n- tablist \"Record details\":\n  - tab \"Details\" [selected]\n- tabpanel \"Details\":\n  - log \"Status Timeline\":\n    - heading \"Status Timeline\" [level=3]\n    - text: draft\n  - text: 2026-09-05T12:00:00.000Z\n- complementary:\n  - region \"Filters\"\n- group \"Screen actions\":\n  - button \"Cancel record\"\n  - button \"Delete\"\n  - button \"Edit\"\n  - button \"View timeline\"",
+      "visibleText": "Consumer label\nConsumer description\nStatus Timeline\n\nCurrent status: Draft\n\nNo events\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nTags\nTag Count\n0\nTags\nConsumer tag\nCancellation\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code\n\nDetails\nStatus Timeline\ndraft\n2026-09-05T12:00:00.000Z\nCancel recordDeleteEditView timeline",
+      "measurements": {
+        "bodyBackground": "oklch(0.967 0.03 86)",
+        "chartCanvasFills": [],
+        "viewportWidth": 820,
+        "documentWidth": 820,
+        "elementCount": 65,
+        "overflow": [],
+        "glyphWraps": []
+      },
+      "values": [
+        {
+          "element": "ve-header-26",
+          "name": "Search Query",
+          "value": "Consumer searchQuery",
+          "checked": false
+        }
+      ],
+      "regions": [
+        {
+          "id": "screen-detail-13",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nStatus Timeline\n\nCurrent status: Draft\n\nNo events\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nTags\nTag Count\n0\nTags\nConsumer tag\nCancellation\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code\n\nDetails\nStatus Timeline\ndraft\n2026-09-05T12:00:00.000Z"
+        },
+        {
+          "id": "detail-header-1",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nStatus Timeline\n\nCurrent status: Draft\n\nNo events\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nTags\nTag Count\n0\nTags\nConsumer tag\nCancellation\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        },
+        {
+          "id": "slot-header-2",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nStatus Timeline\n\nCurrent status: Draft\n\nNo events\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nTags\nTag Count\n0\nTags\nConsumer tag\nCancellation\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        },
+        {
+          "id": "ve-header-24",
+          "component": "DetailHeader",
+          "text": "Consumer label\nConsumer description"
+        },
+        {
+          "id": "ve-header-25",
+          "component": "StatusTimeline",
+          "text": "Status Timeline\n\nCurrent status: Draft\n\nNo events"
+        },
+        {
+          "id": "",
+          "component": "SearchInput",
+          "text": "Search Query\n×"
+        },
+        {
+          "id": "ve-header-26",
+          "component": "SearchInput",
+          "text": ""
+        },
+        {
+          "id": "ve-header-28",
+          "component": "OwnershipSummary",
+          "text": "Ownership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role"
+        },
+        {
+          "id": "ve-header-29",
+          "component": "TagSummary",
+          "text": "Tags\nTag Count\n0\nTags\nConsumer tag"
+        },
+        {
+          "id": "ve-header-30",
+          "component": "CancellationEvent",
+          "text": "Cancellation\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        },
+        {
+          "id": "detail-body-10",
+          "component": "Card",
+          "text": "Details\nStatus Timeline\ndraft\n2026-09-05T12:00:00.000Z"
+        },
+        {
+          "id": "detail-tabs-9",
+          "component": "Tabs",
+          "text": "Details\nStatus Timeline\ndraft\n2026-09-05T12:00:00.000Z"
+        },
+        {
+          "id": "detail-tab-panel-3",
+          "component": "Stack",
+          "text": "Status Timeline\ndraft\n2026-09-05T12:00:00.000Z"
+        },
+        {
+          "id": "slot-tab-0-4",
+          "component": "StatusTimeline",
+          "text": "Status Timeline\ndraft"
+        },
+        {
+          "id": "pg-status-timeline-32",
+          "component": "Text",
+          "text": "draft"
+        },
+        {
+          "id": "pg-status-timeline-33",
+          "component": "Text",
+          "text": ""
+        },
+        {
+          "id": "slot-tab-2-8",
+          "component": "Text",
+          "text": "2026-09-05T12:00:00.000Z"
+        },
+        {
+          "id": "detail-meta-11",
+          "component": "Stack",
+          "text": ""
+        },
+        {
+          "id": "slot-metadata-12",
+          "component": "FilterPanel",
+          "text": ""
+        }
+      ],
+      "screenshot": "820.png",
+      "screenshotHash": "sha256:dda621fb37e594cb7e710b98b59f266aff21b5a266e7794824d85d1e11b7a202",
+      "dump": "820.a11y.txt"
+    },
+    {
+      "width": 1440,
+      "accessibility": "- banner:\n  - heading \"Consumer label\" [level=1]\n  - text: Consumer description\n- log \"Status Timeline\":\n  - heading \"Status Timeline\" [level=3]\n  - paragraph: \"Current status: Draft\"\n  - list:\n    - listitem: No events\n- search \"Search Query\":\n  - text: Search Query\n  - searchbox \"Search Query\": Consumer searchQuery\n  - button \"Clear search\": ×\n- heading \"Ownership Summary\" [level=3]\n- term: Owner ID\n- definition: consumer-owner-id\n- term: Owner Type\n- definition: user\n- term: Role\n- definition: Consumer ownership role\n- heading \"Tags\" [level=3]\n- term: Tag Count\n- definition: \"0\"\n- term: Tags\n- definition: Consumer tag\n- article \"Cancellation\":\n  - heading \"Cancellation\" [level=3]\n  - list:\n    - listitem:\n      - strong: Cancellation requested\n      - paragraph:\n        - time: Sep 5, 2026, 12:00 PM\n      - paragraph: \"Reason: Consumer cancellation reason\"\n      - paragraph: \"Code: Consumer cancellation reason code\"\n- tablist \"Record details\":\n  - tab \"Details\" [selected]\n- tabpanel \"Details\":\n  - log \"Status Timeline\":\n    - heading \"Status Timeline\" [level=3]\n    - text: draft\n  - text: 2026-09-05T12:00:00.000Z\n- complementary:\n  - region \"Filters\"\n- group \"Screen actions\":\n  - button \"Cancel record\"\n  - button \"Delete\"\n  - button \"Edit\"\n  - button \"View timeline\"",
+      "visibleText": "Consumer label\nConsumer description\nStatus Timeline\n\nCurrent status: Draft\n\nNo events\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nTags\nTag Count\n0\nTags\nConsumer tag\nCancellation\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code\n\nDetails\nStatus Timeline\ndraft\n2026-09-05T12:00:00.000Z\nCancel recordDeleteEditView timeline",
+      "measurements": {
+        "bodyBackground": "oklch(0.967 0.03 86)",
+        "chartCanvasFills": [],
+        "viewportWidth": 1440,
+        "documentWidth": 1440,
+        "elementCount": 65,
+        "overflow": [],
+        "glyphWraps": []
+      },
+      "values": [
+        {
+          "element": "ve-header-26",
+          "name": "Search Query",
+          "value": "Consumer searchQuery",
+          "checked": false
+        }
+      ],
+      "regions": [
+        {
+          "id": "screen-detail-13",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nStatus Timeline\n\nCurrent status: Draft\n\nNo events\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nTags\nTag Count\n0\nTags\nConsumer tag\nCancellation\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code\n\nDetails\nStatus Timeline\ndraft\n2026-09-05T12:00:00.000Z"
+        },
+        {
+          "id": "detail-header-1",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nStatus Timeline\n\nCurrent status: Draft\n\nNo events\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nTags\nTag Count\n0\nTags\nConsumer tag\nCancellation\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        },
+        {
+          "id": "slot-header-2",
+          "component": "Stack",
+          "text": "Consumer label\nConsumer description\nStatus Timeline\n\nCurrent status: Draft\n\nNo events\nSearch Query\n×\nOwnership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role\nTags\nTag Count\n0\nTags\nConsumer tag\nCancellation\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        },
+        {
+          "id": "ve-header-24",
+          "component": "DetailHeader",
+          "text": "Consumer label\nConsumer description"
+        },
+        {
+          "id": "ve-header-25",
+          "component": "StatusTimeline",
+          "text": "Status Timeline\n\nCurrent status: Draft\n\nNo events"
+        },
+        {
+          "id": "",
+          "component": "SearchInput",
+          "text": "Search Query\n×"
+        },
+        {
+          "id": "ve-header-26",
+          "component": "SearchInput",
+          "text": ""
+        },
+        {
+          "id": "ve-header-28",
+          "component": "OwnershipSummary",
+          "text": "Ownership Summary\nOwner ID\nconsumer-owner-id\nOwner Type\nuser\nRole\nConsumer ownership role"
+        },
+        {
+          "id": "ve-header-29",
+          "component": "TagSummary",
+          "text": "Tags\nTag Count\n0\nTags\nConsumer tag"
+        },
+        {
+          "id": "ve-header-30",
+          "component": "CancellationEvent",
+          "text": "Cancellation\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        },
+        {
+          "id": "detail-body-10",
+          "component": "Card",
+          "text": "Details\nStatus Timeline\ndraft\n2026-09-05T12:00:00.000Z"
+        },
+        {
+          "id": "detail-tabs-9",
+          "component": "Tabs",
+          "text": "Details\nStatus Timeline\ndraft\n2026-09-05T12:00:00.000Z"
+        },
+        {
+          "id": "detail-tab-panel-3",
+          "component": "Stack",
+          "text": "Status Timeline\ndraft\n2026-09-05T12:00:00.000Z"
+        },
+        {
+          "id": "slot-tab-0-4",
+          "component": "StatusTimeline",
+          "text": "Status Timeline\ndraft"
+        },
+        {
+          "id": "pg-status-timeline-32",
+          "component": "Text",
+          "text": "draft"
+        },
+        {
+          "id": "pg-status-timeline-33",
+          "component": "Text",
+          "text": ""
+        },
+        {
+          "id": "slot-tab-2-8",
+          "component": "Text",
+          "text": "2026-09-05T12:00:00.000Z"
+        },
+        {
+          "id": "detail-meta-11",
+          "component": "Stack",
+          "text": ""
+        },
+        {
+          "id": "slot-metadata-12",
+          "component": "FilterPanel",
+          "text": ""
+        }
+      ],
+      "screenshot": "1440.png",
+      "screenshotHash": "sha256:f6c6a2383a35951d98cc16b49091d0cf1f07295f9a0ee8f95a5e4cb44647674a",
+      "dump": "1440.a11y.txt"
+    }
+  ],
+  "errors": [],
+  "timings": {
+    "composeMs": 87.04824999999994,
+    "generateMs": 11.319208000000003,
+    "captureMs": 933.9003750000848
+  },
+  "output": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-preview-kNKwJn/receipt/react",
+  "consumer": {
+    "root": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-loop-react-8QB1iZ",
+    "port": 4478,
+    "pid": 74087
+  }
+}

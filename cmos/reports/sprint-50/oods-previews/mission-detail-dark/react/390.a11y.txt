@@ -1,0 +1,47 @@
+- banner:
+  - heading "Consumer label" [level=1]
+  - text: Consumer description
+- log "Status Timeline":
+  - heading "Status Timeline" [level=3]
+  - paragraph: "Current status: Draft"
+  - list:
+    - listitem: No events
+- search "Search Query":
+  - text: Search Query
+  - searchbox "Search Query": Consumer searchQuery
+  - button "Clear search": ×
+- heading "Ownership Summary" [level=3]
+- term: Owner ID
+- definition: consumer-owner-id
+- term: Owner Type
+- definition: user
+- term: Role
+- definition: Consumer ownership role
+- heading "Tags" [level=3]
+- term: Tag Count
+- definition: "0"
+- term: Tags
+- definition: Consumer tag
+- article "Cancellation":
+  - heading "Cancellation" [level=3]
+  - list:
+    - listitem:
+      - strong: Cancellation requested
+      - paragraph:
+        - time: Sep 5, 2026, 12:00 PM
+      - paragraph: "Reason: Consumer cancellation reason"
+      - paragraph: "Code: Consumer cancellation reason code"
+- tablist "Record details":
+  - tab "Details" [selected]
+- tabpanel "Details":
+  - log "Status Timeline":
+    - heading "Status Timeline" [level=3]
+    - text: draft
+  - text: 2026-09-05T12:00:00.000Z
+- complementary:
+  - region "Filters"
+- group "Screen actions":
+  - button "Cancel record"
+  - button "Delete"
+  - button "Edit"
+  - button "View timeline"

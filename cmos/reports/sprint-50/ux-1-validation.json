@@ -1,0 +1,205 @@
+{
+  "mission": "UX-1",
+  "status": "in_progress; Forge runtime CI and canonical registry activation pending",
+  "updated_at": "2026-09-12T22:22:33.561147+00:00",
+  "forge": {
+    "base": "114a268ea10b9141bc96925c69132179c7c4b334",
+    "implementation_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+    "pull_request": "https://github.com/kneelinghorse/OODS-Forge/pull/105",
+    "backlog_request": "f091c849-fe1a-49d5-93ee-b8029219685a",
+    "current_ci_run": 34722431783,
+    "canonical_registry_activation": "pending merge and native worker refresh"
+  },
+  "mapping": {
+    "objects": 7,
+    "model_field_mappings": 522,
+    "nested_field_mappings": 10,
+    "traceLab_tests": "11 passed, no skips; five dependency deprecation warnings",
+    "foundational_references": "passed"
+  },
+  "local_forge_checks": {
+    "initial_regression_suites": "157 passed, no skips",
+    "expanded_census_and_research_suites": "69 passed; 2 retained-current-ledger tests fail pending real 240-cell CI evidence; no skips",
+    "research_workflows": "all six generated workflows strictly compile for React and Vue",
+    "component_styles": "47 passed including 29 browser tests; no skips",
+    "mcp_build": "passed",
+    "object_type_generation": "7 objects passed",
+    "schema_type_generation": "passed",
+    "targeted_lint": "zero errors; one pre-existing warning in design.compose.ts"
+  },
+  "saved_schemas": {
+    "count": 20,
+    "zero_validation_errors": true,
+    "summary": "oods-previews/schema-summary.json",
+    "store": "isolated Forge workspace; canonical persistence pending"
+  },
+  "previews": [
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/evidence-detail-dark/react/receipt.json",
+      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "object": "Evidence",
+      "context": "detail",
+      "theme": "dark",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/evidence-detail-light/react/receipt.json",
+      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "object": "Evidence",
+      "context": "detail",
+      "theme": "light",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/evidence-list-dark/react/receipt.json",
+      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "object": "Evidence",
+      "context": "list",
+      "theme": "dark",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/evidence-list-light/react/receipt.json",
+      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "object": "Evidence",
+      "context": "list",
+      "theme": "light",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/mission-detail-dark/react/receipt.json",
+      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "object": "Mission",
+      "context": "detail",
+      "theme": "dark",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 1
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/mission-detail-light/react/receipt.json",
+      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "object": "Mission",
+      "context": "detail",
+      "theme": "light",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 1
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/mission-list-dark/react/receipt.json",
+      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "object": "Mission",
+      "context": "list",
+      "theme": "dark",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/mission-list-light/react/receipt.json",
+      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "object": "Mission",
+      "context": "list",
+      "theme": "light",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/mission-timeline-dark/react/receipt.json",
+      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "object": "Mission",
+      "context": "timeline",
+      "theme": "dark",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/mission-timeline-light/react/receipt.json",
+      "source_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+      "object": "Mission",
+      "context": "timeline",
+      "theme": "light",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    }
+  ],
+  "visual_review": {
+    "phone": "Evidence sidebar stacks below claim; Mission detail text retains readable width in dark theme. Original overlap reproduced and fixed with bounds tests.",
+    "text_wrapping": "14 telemetry observations retain ordinary word wrapping in phone pagination labels and cancellation reason text. They are recorded, not relabeled as zero.",
+    "limitations": [
+      "Synthetic Forge consumer fixtures; no production TraceLab data is shown.",
+      "Generic consumer labels, serif default typography and generated actions are structural prototypes, not the final frontend design.",
+      "Missing ownership, history, source counts and classification content must remain unavailable when later bound to the real API."
+    ]
+  },
+  "pending": [
+    "Complete pinned Linux 240-cell catalog run and retain authentic referenced receipts",
+    "Pass Forge full CI and portable artifact smoke; merge PR105",
+    "Refresh canonical Forge worker and persist 20 schemas in its store",
+    "Attach landed commit to the roadmap-required backlog request",
+    "Pass TraceLab PR checks and merge mapping/evidence changes",
+    "CMOS health and final status verification"
+  ]
+}

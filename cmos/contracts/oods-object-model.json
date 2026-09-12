@@ -1,0 +1,3660 @@
+{
+  "version": 1,
+  "forge_base_commit": "114a268ea10b9141bc96925c69132179c7c4b334",
+  "backlog_request": "f091c849-fe1a-49d5-93ee-b8029219685a",
+  "objects": {
+    "Project": {
+      "module": "app.schemas.project",
+      "primary_models": [
+        "ProjectRead",
+        "ProjectStats"
+      ],
+      "role": "container",
+      "label_source": "name",
+      "fields": {
+        "name": {
+          "type": "string",
+          "required": true
+        },
+        "description": {
+          "type": "string",
+          "required": false
+        },
+        "mission_protocol_id": {
+          "type": "uuid",
+          "required": false
+        },
+        "research_type": {
+          "type": "string",
+          "required": false
+        },
+        "methodology": {
+          "type": "string",
+          "required": false
+        },
+        "status": {
+          "type": "string",
+          "required": true,
+          "validation": {
+            "enum": [
+              "active",
+              "archived",
+              "completed"
+            ]
+          }
+        },
+        "quality_score": {
+          "type": "number",
+          "required": false
+        },
+        "last_quality_check": {
+          "type": "datetime",
+          "required": false
+        },
+        "id": {
+          "type": "uuid",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        "created_at": {
+          "type": "datetime",
+          "required": true,
+          "validation": {
+            "format": "date-time"
+          }
+        },
+        "updated_at": {
+          "type": "datetime",
+          "required": true,
+          "validation": {
+            "format": "date-time"
+          }
+        },
+        "owner_id": {
+          "type": "uuid",
+          "required": false
+        },
+        "user_id": {
+          "type": "uuid",
+          "required": false
+        },
+        "workspace_id": {
+          "type": "uuid",
+          "required": false
+        },
+        "project_id": {
+          "type": "uuid",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        "document_count": {
+          "type": "number",
+          "required": true
+        },
+        "chunk_count": {
+          "type": "number",
+          "required": true
+        },
+        "report_count": {
+          "type": "number",
+          "required": true
+        },
+        "total_tokens": {
+          "type": "number",
+          "required": true
+        },
+        "last_updated": {
+          "type": "datetime",
+          "required": false
+        },
+        "label": {
+          "type": "string",
+          "required": true
+        },
+        "owner_type": {
+          "type": "string",
+          "required": false,
+          "validation": {
+            "enum": [
+              "user"
+            ]
+          }
+        },
+        "last_event": {
+          "type": "string",
+          "required": false
+        }
+      },
+      "schemas": {
+        "ProjectBase": {
+          "name": {
+            "annotation": "<class 'str'>",
+            "mapping": "Project.name \u2192 Labelled.label (display alias)"
+          },
+          "description": {
+            "annotation": "str | None",
+            "mapping": "Project.description"
+          },
+          "mission_protocol_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Project.mission_protocol_id"
+          },
+          "research_type": {
+            "annotation": "str | None",
+            "mapping": "Project.research_type"
+          },
+          "methodology": {
+            "annotation": "str | None",
+            "mapping": "Project.methodology"
+          },
+          "status": {
+            "annotation": "str | None",
+            "mapping": "Project.status \u2192 Stateful.status"
+          },
+          "quality_score": {
+            "annotation": "int | None",
+            "mapping": "Project.quality_score"
+          },
+          "last_quality_check": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Project.last_quality_check"
+          }
+        },
+        "ProjectCreate": {
+          "name": {
+            "annotation": "<class 'str'>",
+            "mapping": "Project.name \u2192 Labelled.label (display alias)"
+          },
+          "description": {
+            "annotation": "str | None",
+            "mapping": "Project.description"
+          },
+          "mission_protocol_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Project.mission_protocol_id"
+          },
+          "research_type": {
+            "annotation": "str | None",
+            "mapping": "Project.research_type"
+          },
+          "methodology": {
+            "annotation": "str | None",
+            "mapping": "Project.methodology"
+          },
+          "status": {
+            "annotation": "str | None",
+            "mapping": "Project.status \u2192 Stateful.status"
+          },
+          "quality_score": {
+            "annotation": "int | None",
+            "mapping": "Project.quality_score"
+          },
+          "last_quality_check": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Project.last_quality_check"
+          }
+        },
+        "ProjectUpdate": {
+          "name": {
+            "annotation": "str | None",
+            "mapping": "Project.name \u2192 Labelled.label (display alias)"
+          },
+          "description": {
+            "annotation": "str | None",
+            "mapping": "Project.description"
+          },
+          "mission_protocol_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Project.mission_protocol_id"
+          },
+          "research_type": {
+            "annotation": "str | None",
+            "mapping": "Project.research_type"
+          },
+          "methodology": {
+            "annotation": "str | None",
+            "mapping": "Project.methodology"
+          },
+          "status": {
+            "annotation": "str | None",
+            "mapping": "Project.status \u2192 Stateful.status"
+          },
+          "quality_score": {
+            "annotation": "int | None",
+            "mapping": "Project.quality_score"
+          },
+          "last_quality_check": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Project.last_quality_check"
+          }
+        },
+        "ProjectRead": {
+          "name": {
+            "annotation": "<class 'str'>",
+            "mapping": "Project.name \u2192 Labelled.label (display alias)"
+          },
+          "description": {
+            "annotation": "str | None",
+            "mapping": "Project.description"
+          },
+          "mission_protocol_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Project.mission_protocol_id"
+          },
+          "research_type": {
+            "annotation": "str | None",
+            "mapping": "Project.research_type"
+          },
+          "methodology": {
+            "annotation": "str | None",
+            "mapping": "Project.methodology"
+          },
+          "status": {
+            "annotation": "str | None",
+            "mapping": "Project.status \u2192 Stateful.status"
+          },
+          "quality_score": {
+            "annotation": "int | None",
+            "mapping": "Project.quality_score"
+          },
+          "last_quality_check": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Project.last_quality_check"
+          },
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Project.id"
+          },
+          "created_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Project.created_at \u2192 Timestampable.created_at"
+          },
+          "updated_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Project.updated_at \u2192 Timestampable.updated_at"
+          },
+          "owner_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Project.owner_id \u2192 Ownerable.owner_id (nullable)"
+          },
+          "user_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Project.user_id"
+          },
+          "workspace_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Project.workspace_id"
+          }
+        },
+        "ProjectStats": {
+          "project_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Project.id (join aggregate by project_id)"
+          },
+          "name": {
+            "annotation": "<class 'str'>",
+            "mapping": "Project.name \u2192 Labelled.label (display alias)"
+          },
+          "document_count": {
+            "annotation": "<class 'int'>",
+            "mapping": "Project.document_count"
+          },
+          "chunk_count": {
+            "annotation": "<class 'int'>",
+            "mapping": "Project.chunk_count"
+          },
+          "report_count": {
+            "annotation": "<class 'int'>",
+            "mapping": "Project.report_count"
+          },
+          "total_tokens": {
+            "annotation": "<class 'int'>",
+            "mapping": "Project.total_tokens"
+          },
+          "last_updated": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Project.last_updated"
+          }
+        }
+      },
+      "traits": [
+        {
+          "name": "content/Labelled",
+          "parameters": {
+            "maxLabelLength": 255,
+            "maxDescriptionLength": 1000
+          }
+        },
+        {
+          "name": "lifecycle/Stateful",
+          "parameters": {
+            "states": [
+              "active",
+              "archived",
+              "completed"
+            ],
+            "initialState": "active"
+          }
+        },
+        {
+          "name": "lifecycle/Timestampable",
+          "parameters": {
+            "recordedEvents": [
+              "created",
+              "updated"
+            ],
+            "timezone": "UTC"
+          }
+        },
+        {
+          "name": "structural/Ownerable",
+          "parameters": {
+            "ownerTypes": [
+              "user"
+            ],
+            "primaryOwnerType": "user",
+            "allowTransfer": false
+          }
+        },
+        {
+          "name": "behavioral/Taggable",
+          "parameters": {
+            "maxTags": 50,
+            "allowCustomTags": true,
+            "caseSensitive": true
+          }
+        },
+        {
+          "name": "behavioral/Searchable",
+          "parameters": {
+            "placeholder": "Search projects"
+          }
+        },
+        {
+          "name": "behavioral/Filterable"
+        },
+        {
+          "name": "behavioral/Pageable",
+          "parameters": {
+            "defaultPageSize": 20,
+            "pageSizeOptions": [
+              10,
+              20,
+              50,
+              100
+            ]
+          }
+        }
+      ],
+      "contexts": [
+        "list",
+        "detail",
+        "timeline"
+      ]
+    },
+    "Document": {
+      "module": "app.schemas.document",
+      "primary_models": [
+        "DocumentRead",
+        "DocumentListItem"
+      ],
+      "role": "data",
+      "label_source": "name",
+      "fields": {
+        "project_id": {
+          "type": "uuid",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        "name": {
+          "type": "string",
+          "required": true
+        },
+        "file_path": {
+          "type": "string",
+          "required": false
+        },
+        "file_type": {
+          "type": "string",
+          "required": false
+        },
+        "content": {
+          "type": "string",
+          "required": false
+        },
+        "raw_content": {
+          "type": "string",
+          "required": false
+        },
+        "uploaded_at": {
+          "type": "datetime",
+          "required": false
+        },
+        "file_size": {
+          "type": "number",
+          "required": false
+        },
+        "mime_type": {
+          "type": "string",
+          "required": false
+        },
+        "source_type": {
+          "type": "string",
+          "required": false
+        },
+        "participant_count": {
+          "type": "number",
+          "required": false
+        },
+        "collection_date": {
+          "type": "string",
+          "required": false
+        },
+        "processed": {
+          "type": "boolean",
+          "required": false
+        },
+        "chunked": {
+          "type": "boolean",
+          "required": false
+        },
+        "embedded": {
+          "type": "boolean",
+          "required": false
+        },
+        "transcription_accuracy": {
+          "type": "number",
+          "required": false
+        },
+        "validation_status": {
+          "type": "string",
+          "required": false
+        },
+        "id": {
+          "type": "uuid",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        "chunks": {
+          "type": "DocumentChunkRead[]",
+          "required": false
+        },
+        "tags": {
+          "type": "DocumentTagRead[]",
+          "required": false
+        },
+        "processing_events": {
+          "type": "DocumentProcessingStatusRead[]",
+          "required": false
+        },
+        "chunk_count": {
+          "type": "number",
+          "required": false
+        },
+        "total_tokens": {
+          "type": "number",
+          "required": false
+        },
+        "word_count": {
+          "type": "number",
+          "required": false
+        },
+        "preview": {
+          "type": "string",
+          "required": false
+        },
+        "label": {
+          "type": "string",
+          "required": true
+        },
+        "status": {
+          "type": "string",
+          "required": true,
+          "validation": {
+            "enum": [
+              "pending",
+              "processed",
+              "chunked",
+              "embedded",
+              "failed"
+            ]
+          }
+        },
+        "owner_id": {
+          "type": "uuid",
+          "required": false
+        },
+        "owner_type": {
+          "type": "string",
+          "required": false,
+          "validation": {
+            "enum": [
+              "user"
+            ]
+          }
+        },
+        "last_event": {
+          "type": "string",
+          "required": false
+        },
+        "created_at": {
+          "type": "datetime",
+          "required": false
+        }
+      },
+      "schemas": {
+        "DocumentBase": {
+          "project_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Document.project_id"
+          },
+          "name": {
+            "annotation": "<class 'str'>",
+            "mapping": "Document.name \u2192 Labelled.label (display alias)"
+          },
+          "file_path": {
+            "annotation": "str | None",
+            "mapping": "Document.file_path"
+          },
+          "file_type": {
+            "annotation": "str | None",
+            "mapping": "Document.file_type"
+          },
+          "content": {
+            "annotation": "str | None",
+            "mapping": "Document.content"
+          },
+          "raw_content": {
+            "annotation": "bytes | None",
+            "mapping": "Document.raw_content"
+          },
+          "uploaded_at": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Document.uploaded_at"
+          },
+          "file_size": {
+            "annotation": "int | None",
+            "mapping": "Document.file_size"
+          },
+          "mime_type": {
+            "annotation": "str | None",
+            "mapping": "Document.mime_type"
+          },
+          "source_type": {
+            "annotation": "str | None",
+            "mapping": "Document.source_type"
+          },
+          "participant_count": {
+            "annotation": "int | None",
+            "mapping": "Document.participant_count"
+          },
+          "collection_date": {
+            "annotation": "datetime.date | None",
+            "mapping": "Document.collection_date"
+          },
+          "processed": {
+            "annotation": "bool | None",
+            "mapping": "Document.processed"
+          },
+          "chunked": {
+            "annotation": "bool | None",
+            "mapping": "Document.chunked"
+          },
+          "embedded": {
+            "annotation": "bool | None",
+            "mapping": "Document.embedded"
+          },
+          "transcription_accuracy": {
+            "annotation": "decimal.Decimal | None",
+            "mapping": "Document.transcription_accuracy"
+          },
+          "validation_status": {
+            "annotation": "str | None",
+            "mapping": "Document.validation_status"
+          }
+        },
+        "DocumentCreate": {
+          "project_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Document.project_id"
+          },
+          "name": {
+            "annotation": "<class 'str'>",
+            "mapping": "Document.name \u2192 Labelled.label (display alias)"
+          },
+          "file_path": {
+            "annotation": "str | None",
+            "mapping": "Document.file_path"
+          },
+          "file_type": {
+            "annotation": "str | None",
+            "mapping": "Document.file_type"
+          },
+          "content": {
+            "annotation": "str | None",
+            "mapping": "Document.content"
+          },
+          "raw_content": {
+            "annotation": "bytes | None",
+            "mapping": "Document.raw_content"
+          },
+          "uploaded_at": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Document.uploaded_at"
+          },
+          "file_size": {
+            "annotation": "int | None",
+            "mapping": "Document.file_size"
+          },
+          "mime_type": {
+            "annotation": "str | None",
+            "mapping": "Document.mime_type"
+          },
+          "source_type": {
+            "annotation": "str | None",
+            "mapping": "Document.source_type"
+          },
+          "participant_count": {
+            "annotation": "int | None",
+            "mapping": "Document.participant_count"
+          },
+          "collection_date": {
+            "annotation": "datetime.date | None",
+            "mapping": "Document.collection_date"
+          },
+          "processed": {
+            "annotation": "bool | None",
+            "mapping": "Document.processed"
+          },
+          "chunked": {
+            "annotation": "bool | None",
+            "mapping": "Document.chunked"
+          },
+          "embedded": {
+            "annotation": "bool | None",
+            "mapping": "Document.embedded"
+          },
+          "transcription_accuracy": {
+            "annotation": "decimal.Decimal | None",
+            "mapping": "Document.transcription_accuracy"
+          },
+          "validation_status": {
+            "annotation": "str | None",
+            "mapping": "Document.validation_status"
+          }
+        },
+        "DocumentUpdate": {
+          "project_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Document.project_id"
+          },
+          "name": {
+            "annotation": "str | None",
+            "mapping": "Document.name \u2192 Labelled.label (display alias)"
+          },
+          "file_path": {
+            "annotation": "str | None",
+            "mapping": "Document.file_path"
+          },
+          "file_type": {
+            "annotation": "str | None",
+            "mapping": "Document.file_type"
+          },
+          "content": {
+            "annotation": "str | None",
+            "mapping": "Document.content"
+          },
+          "raw_content": {
+            "annotation": "bytes | None",
+            "mapping": "Document.raw_content"
+          },
+          "uploaded_at": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Document.uploaded_at"
+          },
+          "file_size": {
+            "annotation": "int | None",
+            "mapping": "Document.file_size"
+          },
+          "mime_type": {
+            "annotation": "str | None",
+            "mapping": "Document.mime_type"
+          },
+          "source_type": {
+            "annotation": "str | None",
+            "mapping": "Document.source_type"
+          },
+          "participant_count": {
+            "annotation": "int | None",
+            "mapping": "Document.participant_count"
+          },
+          "collection_date": {
+            "annotation": "datetime.date | None",
+            "mapping": "Document.collection_date"
+          },
+          "processed": {
+            "annotation": "bool | None",
+            "mapping": "Document.processed"
+          },
+          "chunked": {
+            "annotation": "bool | None",
+            "mapping": "Document.chunked"
+          },
+          "embedded": {
+            "annotation": "bool | None",
+            "mapping": "Document.embedded"
+          },
+          "transcription_accuracy": {
+            "annotation": "decimal.Decimal | None",
+            "mapping": "Document.transcription_accuracy"
+          },
+          "validation_status": {
+            "annotation": "str | None",
+            "mapping": "Document.validation_status"
+          }
+        },
+        "DocumentRead": {
+          "project_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Document.project_id"
+          },
+          "name": {
+            "annotation": "<class 'str'>",
+            "mapping": "Document.name \u2192 Labelled.label (display alias)"
+          },
+          "file_path": {
+            "annotation": "str | None",
+            "mapping": "Document.file_path"
+          },
+          "file_type": {
+            "annotation": "str | None",
+            "mapping": "Document.file_type"
+          },
+          "content": {
+            "annotation": "str | None",
+            "mapping": "Document.content"
+          },
+          "raw_content": {
+            "annotation": "bytes | None",
+            "mapping": "Document.raw_content"
+          },
+          "uploaded_at": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Document.uploaded_at"
+          },
+          "file_size": {
+            "annotation": "int | None",
+            "mapping": "Document.file_size"
+          },
+          "mime_type": {
+            "annotation": "str | None",
+            "mapping": "Document.mime_type"
+          },
+          "source_type": {
+            "annotation": "str | None",
+            "mapping": "Document.source_type"
+          },
+          "participant_count": {
+            "annotation": "int | None",
+            "mapping": "Document.participant_count"
+          },
+          "collection_date": {
+            "annotation": "datetime.date | None",
+            "mapping": "Document.collection_date"
+          },
+          "processed": {
+            "annotation": "bool | None",
+            "mapping": "Document.processed"
+          },
+          "chunked": {
+            "annotation": "bool | None",
+            "mapping": "Document.chunked"
+          },
+          "embedded": {
+            "annotation": "bool | None",
+            "mapping": "Document.embedded"
+          },
+          "transcription_accuracy": {
+            "annotation": "decimal.Decimal | None",
+            "mapping": "Document.transcription_accuracy"
+          },
+          "validation_status": {
+            "annotation": "str | None",
+            "mapping": "Document.validation_status"
+          },
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Document.id"
+          },
+          "chunks": {
+            "annotation": "list[app.schemas.chunk.DocumentChunkRead] | None",
+            "mapping": "Document.chunks"
+          },
+          "tags": {
+            "annotation": "list[app.schemas.tag.DocumentTagRead] | None",
+            "mapping": "Document.tags"
+          },
+          "processing_events": {
+            "annotation": "list[app.schemas.document_status.DocumentProcessingStatusRead] | None",
+            "mapping": "Document.processing_events"
+          },
+          "chunk_count": {
+            "annotation": "int | None",
+            "mapping": "Document.chunk_count"
+          },
+          "total_tokens": {
+            "annotation": "int | None",
+            "mapping": "Document.total_tokens"
+          },
+          "word_count": {
+            "annotation": "int | None",
+            "mapping": "Document.word_count"
+          },
+          "preview": {
+            "annotation": "str | None",
+            "mapping": "Document.preview"
+          }
+        },
+        "DocumentListItem": {
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Document.id"
+          },
+          "project_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Document.project_id"
+          },
+          "name": {
+            "annotation": "<class 'str'>",
+            "mapping": "Document.name \u2192 Labelled.label (display alias)"
+          },
+          "file_type": {
+            "annotation": "str | None",
+            "mapping": "Document.file_type"
+          },
+          "file_size": {
+            "annotation": "int | None",
+            "mapping": "Document.file_size"
+          },
+          "mime_type": {
+            "annotation": "str | None",
+            "mapping": "Document.mime_type"
+          },
+          "source_type": {
+            "annotation": "str | None",
+            "mapping": "Document.source_type"
+          },
+          "uploaded_at": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Document.uploaded_at"
+          },
+          "processed": {
+            "annotation": "<class 'bool'>",
+            "mapping": "Document.processed"
+          },
+          "chunked": {
+            "annotation": "<class 'bool'>",
+            "mapping": "Document.chunked"
+          },
+          "embedded": {
+            "annotation": "<class 'bool'>",
+            "mapping": "Document.embedded"
+          },
+          "validation_status": {
+            "annotation": "str | None",
+            "mapping": "Document.validation_status"
+          }
+        }
+      },
+      "traits": [
+        {
+          "name": "content/Labelled",
+          "parameters": {
+            "maxLabelLength": 255,
+            "maxDescriptionLength": 1000
+          }
+        },
+        {
+          "name": "lifecycle/Stateful",
+          "parameters": {
+            "states": [
+              "pending",
+              "processed",
+              "chunked",
+              "embedded",
+              "failed"
+            ],
+            "initialState": "pending"
+          }
+        },
+        {
+          "name": "lifecycle/Timestampable",
+          "parameters": {
+            "recordedEvents": [
+              "created",
+              "updated"
+            ],
+            "timezone": "UTC"
+          }
+        },
+        {
+          "name": "structural/Ownerable",
+          "parameters": {
+            "ownerTypes": [
+              "user"
+            ],
+            "primaryOwnerType": "user",
+            "allowTransfer": false
+          }
+        },
+        {
+          "name": "core/Classifiable",
+          "parameters": {
+            "classification_mode": "hybrid",
+            "tag_policy": "open",
+            "max_tags": 50,
+            "require_primary_category": false
+          }
+        },
+        {
+          "name": "behavioral/Searchable",
+          "parameters": {
+            "placeholder": "Search documents"
+          }
+        },
+        {
+          "name": "behavioral/Filterable"
+        },
+        {
+          "name": "behavioral/Pageable",
+          "parameters": {
+            "defaultPageSize": 20,
+            "pageSizeOptions": [
+              10,
+              20,
+              50,
+              100
+            ]
+          }
+        }
+      ],
+      "contexts": [
+        "list",
+        "detail",
+        "timeline"
+      ]
+    },
+    "Chunk": {
+      "module": "app.schemas.chunk",
+      "primary_models": [
+        "DocumentChunkRead"
+      ],
+      "role": "data",
+      "label_source": "content",
+      "fields": {
+        "document_id": {
+          "type": "uuid",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        "chunk_index": {
+          "type": "number",
+          "required": true
+        },
+        "content": {
+          "type": "string",
+          "required": true
+        },
+        "embedding_id": {
+          "type": "string",
+          "required": false
+        },
+        "token_count": {
+          "type": "number",
+          "required": false
+        },
+        "start_char": {
+          "type": "number",
+          "required": false
+        },
+        "end_char": {
+          "type": "number",
+          "required": false
+        },
+        "prev_chunk_id": {
+          "type": "uuid",
+          "required": false
+        },
+        "next_chunk_id": {
+          "type": "uuid",
+          "required": false
+        },
+        "id": {
+          "type": "uuid",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        "created_at": {
+          "type": "datetime",
+          "required": true,
+          "validation": {
+            "format": "date-time"
+          }
+        },
+        "label": {
+          "type": "string",
+          "required": true
+        }
+      },
+      "schemas": {
+        "DocumentChunkBase": {
+          "document_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Chunk.document_id"
+          },
+          "chunk_index": {
+            "annotation": "<class 'int'>",
+            "mapping": "Chunk.chunk_index"
+          },
+          "content": {
+            "annotation": "<class 'str'>",
+            "mapping": "Chunk.content \u2192 Labelled.label (display alias)"
+          },
+          "embedding_id": {
+            "annotation": "str | None",
+            "mapping": "Chunk.embedding_id"
+          },
+          "token_count": {
+            "annotation": "int | None",
+            "mapping": "Chunk.token_count"
+          },
+          "start_char": {
+            "annotation": "int | None",
+            "mapping": "Chunk.start_char"
+          },
+          "end_char": {
+            "annotation": "int | None",
+            "mapping": "Chunk.end_char"
+          },
+          "prev_chunk_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Chunk.prev_chunk_id"
+          },
+          "next_chunk_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Chunk.next_chunk_id"
+          }
+        },
+        "DocumentChunkCreate": {
+          "document_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Chunk.document_id"
+          },
+          "chunk_index": {
+            "annotation": "<class 'int'>",
+            "mapping": "Chunk.chunk_index"
+          },
+          "content": {
+            "annotation": "<class 'str'>",
+            "mapping": "Chunk.content \u2192 Labelled.label (display alias)"
+          },
+          "embedding_id": {
+            "annotation": "str | None",
+            "mapping": "Chunk.embedding_id"
+          },
+          "token_count": {
+            "annotation": "int | None",
+            "mapping": "Chunk.token_count"
+          },
+          "start_char": {
+            "annotation": "int | None",
+            "mapping": "Chunk.start_char"
+          },
+          "end_char": {
+            "annotation": "int | None",
+            "mapping": "Chunk.end_char"
+          },
+          "prev_chunk_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Chunk.prev_chunk_id"
+          },
+          "next_chunk_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Chunk.next_chunk_id"
+          }
+        },
+        "DocumentChunkUpdate": {
+          "chunk_index": {
+            "annotation": "int | None",
+            "mapping": "Chunk.chunk_index"
+          },
+          "content": {
+            "annotation": "str | None",
+            "mapping": "Chunk.content \u2192 Labelled.label (display alias)"
+          },
+          "embedding_id": {
+            "annotation": "str | None",
+            "mapping": "Chunk.embedding_id"
+          },
+          "token_count": {
+            "annotation": "int | None",
+            "mapping": "Chunk.token_count"
+          },
+          "start_char": {
+            "annotation": "int | None",
+            "mapping": "Chunk.start_char"
+          },
+          "end_char": {
+            "annotation": "int | None",
+            "mapping": "Chunk.end_char"
+          },
+          "prev_chunk_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Chunk.prev_chunk_id"
+          },
+          "next_chunk_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Chunk.next_chunk_id"
+          }
+        },
+        "DocumentChunkRead": {
+          "document_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Chunk.document_id"
+          },
+          "chunk_index": {
+            "annotation": "<class 'int'>",
+            "mapping": "Chunk.chunk_index"
+          },
+          "content": {
+            "annotation": "<class 'str'>",
+            "mapping": "Chunk.content \u2192 Labelled.label (display alias)"
+          },
+          "embedding_id": {
+            "annotation": "str | None",
+            "mapping": "Chunk.embedding_id"
+          },
+          "token_count": {
+            "annotation": "int | None",
+            "mapping": "Chunk.token_count"
+          },
+          "start_char": {
+            "annotation": "int | None",
+            "mapping": "Chunk.start_char"
+          },
+          "end_char": {
+            "annotation": "int | None",
+            "mapping": "Chunk.end_char"
+          },
+          "prev_chunk_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Chunk.prev_chunk_id"
+          },
+          "next_chunk_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Chunk.next_chunk_id"
+          },
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Chunk.id"
+          },
+          "created_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Chunk.created_at \u2192 Timestampable.created_at"
+          }
+        }
+      },
+      "traits": [
+        {
+          "name": "content/Labelled",
+          "parameters": {
+            "maxLabelLength": 255,
+            "maxDescriptionLength": 1000
+          }
+        }
+      ],
+      "contexts": [
+        "inline"
+      ]
+    },
+    "Collection": {
+      "module": "app.schemas.collection",
+      "primary_models": [
+        "CollectionDetailResponse"
+      ],
+      "role": "context",
+      "label_source": "name",
+      "fields": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "validation": {
+            "maxLength": 255,
+            "minLength": 1
+          }
+        },
+        "description": {
+          "type": "string",
+          "required": false
+        },
+        "id": {
+          "type": "uuid",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        "created_at": {
+          "type": "datetime",
+          "required": true,
+          "validation": {
+            "format": "date-time"
+          }
+        },
+        "updated_at": {
+          "type": "datetime",
+          "required": true,
+          "validation": {
+            "format": "date-time"
+          }
+        },
+        "item_count": {
+          "type": "number",
+          "required": false
+        },
+        "items": {
+          "type": "CollectionItemResponse[]",
+          "required": false
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "validation": {
+            "maxLength": 255,
+            "minLength": 1
+          }
+        },
+        "owner_id": {
+          "type": "uuid",
+          "required": false
+        },
+        "owner_type": {
+          "type": "string",
+          "required": false,
+          "validation": {
+            "enum": [
+              "user"
+            ]
+          }
+        },
+        "last_event": {
+          "type": "string",
+          "required": false
+        }
+      },
+      "schemas": {
+        "CollectionItemBase": {
+          "chunk_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Collection.items[].chunk_id"
+          },
+          "notes": {
+            "annotation": "str | None",
+            "mapping": "Collection.items[].notes"
+          }
+        },
+        "CollectionItemCreate": {
+          "chunk_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Collection.items[].chunk_id"
+          },
+          "notes": {
+            "annotation": "str | None",
+            "mapping": "Collection.items[].notes"
+          }
+        },
+        "CollectionItemResponse": {
+          "chunk_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Collection.items[].chunk_id"
+          },
+          "notes": {
+            "annotation": "str | None",
+            "mapping": "Collection.items[].notes"
+          },
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Collection.items[].id"
+          },
+          "collection_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Collection.items[].collection_id"
+          },
+          "added_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Collection.items[].added_at"
+          },
+          "chunk_content": {
+            "annotation": "str | None",
+            "mapping": "Collection.items[].chunk_content"
+          },
+          "document_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Collection.items[].document_id"
+          }
+        },
+        "CollectionBase": {
+          "name": {
+            "annotation": "<class 'str'>",
+            "mapping": "Collection.name \u2192 Labelled.label (display alias)"
+          },
+          "description": {
+            "annotation": "str | None",
+            "mapping": "Collection.description"
+          }
+        },
+        "CollectionCreate": {
+          "name": {
+            "annotation": "<class 'str'>",
+            "mapping": "Collection.name \u2192 Labelled.label (display alias)"
+          },
+          "description": {
+            "annotation": "str | None",
+            "mapping": "Collection.description"
+          }
+        },
+        "CollectionUpdate": {
+          "name": {
+            "annotation": "str | None",
+            "mapping": "Collection.name \u2192 Labelled.label (display alias)"
+          },
+          "description": {
+            "annotation": "str | None",
+            "mapping": "Collection.description"
+          }
+        },
+        "CollectionResponse": {
+          "name": {
+            "annotation": "<class 'str'>",
+            "mapping": "Collection.name \u2192 Labelled.label (display alias)"
+          },
+          "description": {
+            "annotation": "str | None",
+            "mapping": "Collection.description"
+          },
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Collection.id"
+          },
+          "created_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Collection.created_at \u2192 Timestampable.created_at"
+          },
+          "updated_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Collection.updated_at \u2192 Timestampable.updated_at"
+          },
+          "item_count": {
+            "annotation": "<class 'int'>",
+            "mapping": "Collection.item_count"
+          }
+        },
+        "CollectionDetailResponse": {
+          "name": {
+            "annotation": "<class 'str'>",
+            "mapping": "Collection.name \u2192 Labelled.label (display alias)"
+          },
+          "description": {
+            "annotation": "str | None",
+            "mapping": "Collection.description"
+          },
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Collection.id"
+          },
+          "created_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Collection.created_at \u2192 Timestampable.created_at"
+          },
+          "updated_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Collection.updated_at \u2192 Timestampable.updated_at"
+          },
+          "item_count": {
+            "annotation": "<class 'int'>",
+            "mapping": "Collection.item_count"
+          },
+          "items": {
+            "annotation": "list[app.schemas.collection.CollectionItemResponse]",
+            "mapping": "Collection.items"
+          }
+        },
+        "CollectionListResponse": {
+          "data": {
+            "annotation": "list[app.schemas.collection.CollectionResponse]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "total": {
+            "annotation": "<class 'int'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        }
+      },
+      "traits": [
+        {
+          "name": "content/Labelled",
+          "parameters": {
+            "maxLabelLength": 255,
+            "maxDescriptionLength": 1000
+          }
+        },
+        {
+          "name": "lifecycle/Timestampable",
+          "parameters": {
+            "recordedEvents": [
+              "created",
+              "updated"
+            ],
+            "timezone": "UTC"
+          }
+        },
+        {
+          "name": "structural/Ownerable",
+          "parameters": {
+            "ownerTypes": [
+              "user"
+            ],
+            "primaryOwnerType": "user",
+            "allowTransfer": false
+          }
+        },
+        {
+          "name": "behavioral/Taggable",
+          "parameters": {
+            "maxTags": 50,
+            "allowCustomTags": true,
+            "caseSensitive": true
+          }
+        },
+        {
+          "name": "behavioral/Searchable",
+          "parameters": {
+            "placeholder": "Search collections"
+          }
+        },
+        {
+          "name": "behavioral/Filterable"
+        },
+        {
+          "name": "behavioral/Pageable",
+          "parameters": {
+            "defaultPageSize": 20,
+            "pageSizeOptions": [
+              10,
+              20,
+              50,
+              100
+            ]
+          }
+        }
+      ],
+      "contexts": [
+        "list",
+        "detail",
+        "timeline"
+      ]
+    },
+    "Mission": {
+      "module": "app.schemas.mission",
+      "primary_models": [
+        "MissionResponse",
+        "MissionStatusResponse"
+      ],
+      "role": "job",
+      "label_source": "title",
+      "fields": {
+        "mission_id": {
+          "type": "string",
+          "required": true,
+          "validation": {
+            "maxLength": 50,
+            "minLength": 1
+          }
+        },
+        "title": {
+          "type": "string",
+          "required": true,
+          "validation": {
+            "maxLength": 255,
+            "minLength": 3
+          }
+        },
+        "objective": {
+          "type": "string",
+          "required": true,
+          "validation": {
+            "minLength": 10
+          }
+        },
+        "success_criteria": {
+          "type": "string[]",
+          "required": true,
+          "validation": {
+            "minItems": 1
+          }
+        },
+        "id": {
+          "type": "uuid",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        "project_id": {
+          "type": "uuid",
+          "required": false
+        },
+        "project_name": {
+          "type": "string",
+          "required": false
+        },
+        "context": {
+          "type": "object",
+          "required": false
+        },
+        "deliverables": {
+          "type": "string[]",
+          "required": false
+        },
+        "research_phases": {
+          "type": "object",
+          "required": false
+        },
+        "tags": {
+          "type": "string[]",
+          "required": false
+        },
+        "metadata": {
+          "type": "object",
+          "required": false
+        },
+        "background": {
+          "type": "string",
+          "required": false
+        },
+        "focus": {
+          "type": "string",
+          "required": false
+        },
+        "references": {
+          "type": "object[]",
+          "required": false
+        },
+        "required_entities": {
+          "type": "string[]",
+          "required": false
+        },
+        "excluded_entities": {
+          "type": "string[]",
+          "required": false
+        },
+        "expected_output_schema": {
+          "type": "object",
+          "required": false
+        },
+        "coverage_thresholds": {
+          "type": "object",
+          "required": false
+        },
+        "validation_thresholds": {
+          "type": "object",
+          "required": false
+        },
+        "deliverable_format": {
+          "type": "string",
+          "required": false
+        },
+        "max_loops": {
+          "type": "number",
+          "required": false
+        },
+        "min_loops": {
+          "type": "number",
+          "required": false
+        },
+        "constraints": {
+          "type": "string[]",
+          "required": false
+        },
+        "status": {
+          "type": "string",
+          "required": true,
+          "validation": {
+            "enum": [
+              "draft",
+              "queued",
+              "in_progress",
+              "completed",
+              "blocked",
+              "cancelled",
+              "validation_failed"
+            ]
+          }
+        },
+        "queued_at": {
+          "type": "datetime",
+          "required": false
+        },
+        "started_at": {
+          "type": "datetime",
+          "required": false
+        },
+        "completed_at": {
+          "type": "datetime",
+          "required": false
+        },
+        "deepsearch_job_id": {
+          "type": "string",
+          "required": false
+        },
+        "execution_metadata": {
+          "type": "object",
+          "required": false
+        },
+        "result_document_ids": {
+          "type": "uuid[]",
+          "required": false
+        },
+        "result_report_id": {
+          "type": "uuid",
+          "required": false
+        },
+        "result_markdown": {
+          "type": "string",
+          "required": false
+        },
+        "result_protocol": {
+          "type": "object",
+          "required": false
+        },
+        "error_message": {
+          "type": "string",
+          "required": false
+        },
+        "created_at": {
+          "type": "datetime",
+          "required": true,
+          "validation": {
+            "format": "date-time"
+          }
+        },
+        "updated_at": {
+          "type": "datetime",
+          "required": true,
+          "validation": {
+            "format": "date-time"
+          }
+        },
+        "created_by": {
+          "type": "string",
+          "required": false
+        },
+        "progress_percent": {
+          "type": "number",
+          "required": false
+        },
+        "current_phase": {
+          "type": "string",
+          "required": false
+        },
+        "deepsearch_attempt_count": {
+          "type": "number",
+          "required": false
+        },
+        "lease_expires_at": {
+          "type": "datetime",
+          "required": false
+        },
+        "materialization_pending": {
+          "type": "boolean",
+          "required": true
+        },
+        "materialization_status": {
+          "type": "string",
+          "required": false
+        },
+        "materialization_attempt_count": {
+          "type": "number",
+          "required": false
+        },
+        "materialization_error": {
+          "type": "string",
+          "required": false
+        },
+        "search_ready": {
+          "type": "boolean",
+          "required": true
+        },
+        "label": {
+          "type": "string",
+          "required": true,
+          "validation": {
+            "maxLength": 255,
+            "minLength": 3
+          }
+        },
+        "description": {
+          "type": "string",
+          "required": true,
+          "validation": {
+            "minLength": 10
+          }
+        },
+        "owner_id": {
+          "type": "uuid",
+          "required": false
+        },
+        "owner_type": {
+          "type": "string",
+          "required": false,
+          "validation": {
+            "enum": [
+              "user"
+            ]
+          }
+        },
+        "last_event": {
+          "type": "string",
+          "required": false
+        },
+        "cancel_at_period_end": {
+          "type": "boolean",
+          "required": false
+        }
+      },
+      "schemas": {
+        "MissionBase": {
+          "mission_id": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.mission_id"
+          },
+          "title": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.title \u2192 Labelled.label (display alias)"
+          },
+          "objective": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.objective"
+          },
+          "success_criteria": {
+            "annotation": "list[str]",
+            "mapping": "Mission.success_criteria"
+          }
+        },
+        "MissionCreate": {
+          "mission_id": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.mission_id"
+          },
+          "title": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.title \u2192 Labelled.label (display alias)"
+          },
+          "objective": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.objective"
+          },
+          "success_criteria": {
+            "annotation": "list[str]",
+            "mapping": "Mission.success_criteria"
+          },
+          "project_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Mission.project_id"
+          },
+          "context": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.context"
+          },
+          "deliverables": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.deliverables"
+          },
+          "research_phases": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.research_phases"
+          },
+          "tags": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.tags"
+          },
+          "metadata": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.metadata"
+          },
+          "background": {
+            "annotation": "str | None",
+            "mapping": "Mission.background"
+          },
+          "focus": {
+            "annotation": "str | None",
+            "mapping": "Mission.focus"
+          },
+          "references": {
+            "annotation": "list[dict[str, typing.Any]] | None",
+            "mapping": "Mission.references"
+          },
+          "required_entities": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.required_entities"
+          },
+          "excluded_entities": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.excluded_entities"
+          },
+          "expected_output_schema": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.expected_output_schema"
+          },
+          "coverage_thresholds": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.coverage_thresholds"
+          },
+          "validation_thresholds": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.validation_thresholds"
+          },
+          "deliverable_format": {
+            "annotation": "str | None",
+            "mapping": "Mission.deliverable_format"
+          },
+          "max_loops": {
+            "annotation": "int | None",
+            "mapping": "Mission.max_loops"
+          },
+          "min_loops": {
+            "annotation": "int | None",
+            "mapping": "Mission.min_loops"
+          },
+          "constraints": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.constraints"
+          },
+          "status": {
+            "annotation": "typing.Optional[typing.Literal['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled', 'validation_failed']]",
+            "mapping": "Mission.status \u2192 Stateful.status"
+          },
+          "created_by": {
+            "annotation": "str | None",
+            "mapping": "Mission.created_by"
+          }
+        },
+        "MissionUpdate": {
+          "project_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Mission.project_id"
+          },
+          "title": {
+            "annotation": "str | None",
+            "mapping": "Mission.title \u2192 Labelled.label (display alias)"
+          },
+          "objective": {
+            "annotation": "str | None",
+            "mapping": "Mission.objective"
+          },
+          "success_criteria": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.success_criteria"
+          },
+          "context": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.context"
+          },
+          "deliverables": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.deliverables"
+          },
+          "research_phases": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.research_phases"
+          },
+          "tags": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.tags"
+          },
+          "metadata": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.metadata"
+          },
+          "background": {
+            "annotation": "str | None",
+            "mapping": "Mission.background"
+          },
+          "focus": {
+            "annotation": "str | None",
+            "mapping": "Mission.focus"
+          },
+          "references": {
+            "annotation": "list[dict[str, typing.Any]] | None",
+            "mapping": "Mission.references"
+          },
+          "required_entities": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.required_entities"
+          },
+          "excluded_entities": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.excluded_entities"
+          },
+          "expected_output_schema": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.expected_output_schema"
+          },
+          "coverage_thresholds": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.coverage_thresholds"
+          },
+          "validation_thresholds": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.validation_thresholds"
+          },
+          "deliverable_format": {
+            "annotation": "str | None",
+            "mapping": "Mission.deliverable_format"
+          },
+          "max_loops": {
+            "annotation": "int | None",
+            "mapping": "Mission.max_loops"
+          },
+          "min_loops": {
+            "annotation": "int | None",
+            "mapping": "Mission.min_loops"
+          },
+          "constraints": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.constraints"
+          },
+          "status": {
+            "annotation": "typing.Optional[typing.Literal['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled', 'validation_failed']]",
+            "mapping": "Mission.status \u2192 Stateful.status"
+          },
+          "deepsearch_job_id": {
+            "annotation": "str | None",
+            "mapping": "Mission.deepsearch_job_id"
+          },
+          "result_document_ids": {
+            "annotation": "list[uuid.UUID] | None",
+            "mapping": "Mission.result_document_ids"
+          },
+          "result_report_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Mission.result_report_id"
+          },
+          "result_markdown": {
+            "annotation": "str | None",
+            "mapping": "Mission.result_markdown"
+          },
+          "result_protocol": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.result_protocol"
+          },
+          "error_message": {
+            "annotation": "str | None",
+            "mapping": "Mission.error_message"
+          },
+          "execution_metadata": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.execution_metadata"
+          }
+        },
+        "MissionResponse": {
+          "mission_id": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.mission_id"
+          },
+          "title": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.title \u2192 Labelled.label (display alias)"
+          },
+          "objective": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.objective"
+          },
+          "success_criteria": {
+            "annotation": "list[str]",
+            "mapping": "Mission.success_criteria"
+          },
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Mission.id"
+          },
+          "project_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Mission.project_id"
+          },
+          "project_name": {
+            "annotation": "str | None",
+            "mapping": "Mission.project_name"
+          },
+          "context": {
+            "annotation": "dict[str, typing.Any]",
+            "mapping": "Mission.context"
+          },
+          "deliverables": {
+            "annotation": "list[str]",
+            "mapping": "Mission.deliverables"
+          },
+          "research_phases": {
+            "annotation": "dict[str, typing.Any]",
+            "mapping": "Mission.research_phases"
+          },
+          "tags": {
+            "annotation": "list[str]",
+            "mapping": "Mission.tags"
+          },
+          "metadata": {
+            "annotation": "dict[str, typing.Any]",
+            "mapping": "Mission.metadata"
+          },
+          "background": {
+            "annotation": "str | None",
+            "mapping": "Mission.background"
+          },
+          "focus": {
+            "annotation": "str | None",
+            "mapping": "Mission.focus"
+          },
+          "references": {
+            "annotation": "list[dict[str, typing.Any]] | None",
+            "mapping": "Mission.references"
+          },
+          "required_entities": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.required_entities"
+          },
+          "excluded_entities": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.excluded_entities"
+          },
+          "expected_output_schema": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.expected_output_schema"
+          },
+          "coverage_thresholds": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.coverage_thresholds"
+          },
+          "validation_thresholds": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.validation_thresholds"
+          },
+          "deliverable_format": {
+            "annotation": "str | None",
+            "mapping": "Mission.deliverable_format"
+          },
+          "max_loops": {
+            "annotation": "int | None",
+            "mapping": "Mission.max_loops"
+          },
+          "min_loops": {
+            "annotation": "int | None",
+            "mapping": "Mission.min_loops"
+          },
+          "constraints": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.constraints"
+          },
+          "status": {
+            "annotation": "typing.Literal['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled', 'validation_failed']",
+            "mapping": "Mission.status \u2192 Stateful.status"
+          },
+          "queued_at": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Mission.queued_at"
+          },
+          "started_at": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Mission.started_at"
+          },
+          "completed_at": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Mission.completed_at"
+          },
+          "deepsearch_job_id": {
+            "annotation": "str | None",
+            "mapping": "Mission.deepsearch_job_id"
+          },
+          "execution_metadata": {
+            "annotation": "dict[str, typing.Any]",
+            "mapping": "Mission.execution_metadata"
+          },
+          "result_document_ids": {
+            "annotation": "list[uuid.UUID]",
+            "mapping": "Mission.result_document_ids"
+          },
+          "result_report_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Mission.result_report_id"
+          },
+          "result_markdown": {
+            "annotation": "str | None",
+            "mapping": "Mission.result_markdown"
+          },
+          "result_protocol": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.result_protocol"
+          },
+          "error_message": {
+            "annotation": "str | None",
+            "mapping": "Mission.error_message"
+          },
+          "created_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Mission.created_at \u2192 Timestampable.created_at"
+          },
+          "updated_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Mission.updated_at \u2192 Timestampable.updated_at"
+          },
+          "created_by": {
+            "annotation": "str | None",
+            "mapping": "Mission.created_by"
+          }
+        },
+        "MissionRead": {
+          "mission_id": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.mission_id"
+          },
+          "title": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.title \u2192 Labelled.label (display alias)"
+          },
+          "objective": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.objective"
+          },
+          "success_criteria": {
+            "annotation": "list[str]",
+            "mapping": "Mission.success_criteria"
+          },
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Mission.id"
+          },
+          "project_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Mission.project_id"
+          },
+          "project_name": {
+            "annotation": "str | None",
+            "mapping": "Mission.project_name"
+          },
+          "context": {
+            "annotation": "dict[str, typing.Any]",
+            "mapping": "Mission.context"
+          },
+          "deliverables": {
+            "annotation": "list[str]",
+            "mapping": "Mission.deliverables"
+          },
+          "research_phases": {
+            "annotation": "dict[str, typing.Any]",
+            "mapping": "Mission.research_phases"
+          },
+          "tags": {
+            "annotation": "list[str]",
+            "mapping": "Mission.tags"
+          },
+          "metadata": {
+            "annotation": "dict[str, typing.Any]",
+            "mapping": "Mission.metadata"
+          },
+          "background": {
+            "annotation": "str | None",
+            "mapping": "Mission.background"
+          },
+          "focus": {
+            "annotation": "str | None",
+            "mapping": "Mission.focus"
+          },
+          "references": {
+            "annotation": "list[dict[str, typing.Any]] | None",
+            "mapping": "Mission.references"
+          },
+          "required_entities": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.required_entities"
+          },
+          "excluded_entities": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.excluded_entities"
+          },
+          "expected_output_schema": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.expected_output_schema"
+          },
+          "coverage_thresholds": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.coverage_thresholds"
+          },
+          "validation_thresholds": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.validation_thresholds"
+          },
+          "deliverable_format": {
+            "annotation": "str | None",
+            "mapping": "Mission.deliverable_format"
+          },
+          "max_loops": {
+            "annotation": "int | None",
+            "mapping": "Mission.max_loops"
+          },
+          "min_loops": {
+            "annotation": "int | None",
+            "mapping": "Mission.min_loops"
+          },
+          "constraints": {
+            "annotation": "list[str] | None",
+            "mapping": "Mission.constraints"
+          },
+          "status": {
+            "annotation": "typing.Literal['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled', 'validation_failed']",
+            "mapping": "Mission.status \u2192 Stateful.status"
+          },
+          "queued_at": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Mission.queued_at"
+          },
+          "started_at": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Mission.started_at"
+          },
+          "completed_at": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Mission.completed_at"
+          },
+          "deepsearch_job_id": {
+            "annotation": "str | None",
+            "mapping": "Mission.deepsearch_job_id"
+          },
+          "execution_metadata": {
+            "annotation": "dict[str, typing.Any]",
+            "mapping": "Mission.execution_metadata"
+          },
+          "result_document_ids": {
+            "annotation": "list[uuid.UUID]",
+            "mapping": "Mission.result_document_ids"
+          },
+          "result_report_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Mission.result_report_id"
+          },
+          "result_markdown": {
+            "annotation": "str | None",
+            "mapping": "Mission.result_markdown"
+          },
+          "result_protocol": {
+            "annotation": "dict[str, typing.Any] | None",
+            "mapping": "Mission.result_protocol"
+          },
+          "error_message": {
+            "annotation": "str | None",
+            "mapping": "Mission.error_message"
+          },
+          "created_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Mission.created_at \u2192 Timestampable.created_at"
+          },
+          "updated_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Mission.updated_at \u2192 Timestampable.updated_at"
+          },
+          "created_by": {
+            "annotation": "str | None",
+            "mapping": "Mission.created_by"
+          }
+        },
+        "MissionStatusResponse": {
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Mission.id"
+          },
+          "mission_id": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.mission_id"
+          },
+          "status": {
+            "annotation": "typing.Literal['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled', 'validation_failed']",
+            "mapping": "Mission.status \u2192 Stateful.status"
+          },
+          "progress_percent": {
+            "annotation": "int | None",
+            "mapping": "Mission.progress_percent"
+          },
+          "current_phase": {
+            "annotation": "str | None",
+            "mapping": "Mission.current_phase"
+          },
+          "queued_at": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Mission.queued_at"
+          },
+          "started_at": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Mission.started_at"
+          },
+          "completed_at": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Mission.completed_at"
+          },
+          "error_message": {
+            "annotation": "str | None",
+            "mapping": "Mission.error_message"
+          },
+          "deepsearch_job_id": {
+            "annotation": "str | None",
+            "mapping": "Mission.deepsearch_job_id"
+          },
+          "deepsearch_attempt_count": {
+            "annotation": "<class 'int'>",
+            "mapping": "Mission.deepsearch_attempt_count"
+          },
+          "lease_expires_at": {
+            "annotation": "datetime.datetime | None",
+            "mapping": "Mission.lease_expires_at"
+          },
+          "result_document_ids": {
+            "annotation": "list[uuid.UUID]",
+            "mapping": "Mission.result_document_ids"
+          },
+          "result_report_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Mission.result_report_id"
+          },
+          "materialization_pending": {
+            "annotation": "<class 'bool'>",
+            "mapping": "Mission.materialization_pending"
+          },
+          "materialization_status": {
+            "annotation": "str | None",
+            "mapping": "Mission.materialization_status"
+          },
+          "materialization_attempt_count": {
+            "annotation": "<class 'int'>",
+            "mapping": "Mission.materialization_attempt_count"
+          },
+          "materialization_error": {
+            "annotation": "str | None",
+            "mapping": "Mission.materialization_error"
+          },
+          "search_ready": {
+            "annotation": "<class 'bool'>",
+            "mapping": "Mission.search_ready"
+          }
+        },
+        "MissionLintViolation": {
+          "rule": {
+            "annotation": "<class 'str'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "field": {
+            "annotation": "<class 'str'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "message": {
+            "annotation": "<class 'str'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "suggestion": {
+            "annotation": "str | None",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        },
+        "MissionLintErrorDetail": {
+          "message": {
+            "annotation": "<class 'str'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "errors": {
+            "annotation": "list[app.schemas.mission.MissionLintViolation]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "warnings": {
+            "annotation": "list[app.schemas.mission.MissionLintViolation]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        },
+        "MissionSubmitResponse": {
+          "status": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.status \u2192 Stateful.status"
+          },
+          "mode": {
+            "annotation": "<class 'str'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "mission_id": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.mission_id"
+          },
+          "uuid": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "message": {
+            "annotation": "<class 'str'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "job_id": {
+            "annotation": "str | None",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "warnings": {
+            "annotation": "list[app.schemas.mission.MissionLintViolation]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        },
+        "MissionActionableError": {
+          "message": {
+            "annotation": "<class 'str'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "mission_id": {
+            "annotation": "str | None",
+            "mapping": "Mission.mission_id"
+          },
+          "uuid": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "suggestion": {
+            "annotation": "str | None",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "current_status": {
+            "annotation": "typing.Optional[typing.Literal['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled', 'validation_failed']]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        },
+        "MissionErrorResponse": {
+          "detail": {
+            "annotation": "<class 'app.schemas.mission.MissionActionableError'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        },
+        "ReportPromotionResponse": {
+          "document_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "document_name": {
+            "annotation": "<class 'str'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "status": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.status \u2192 Stateful.status"
+          },
+          "message": {
+            "annotation": "<class 'str'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "chunk_count": {
+            "annotation": "int | None",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        },
+        "MissionContractPreviewResponse": {
+          "mission_id": {
+            "annotation": "<class 'str'>",
+            "mapping": "Mission.mission_id"
+          },
+          "mission_uuid": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "project_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Mission.project_id"
+          },
+          "contract_version": {
+            "annotation": "<class 'str'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "compiler_revision": {
+            "annotation": "<class 'str'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "fidelity": {
+            "annotation": "<class 'str'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "named_entities": {
+            "annotation": "list[str]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "objectives": {
+            "annotation": "list[dict[str, typing.Any]]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "evidence_slots": {
+            "annotation": "list[dict[str, typing.Any]]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "acceptance_checks": {
+            "annotation": "list[dict[str, typing.Any]]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "deliverable_schemas": {
+            "annotation": "list[dict[str, typing.Any]]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "coverage_thresholds": {
+            "annotation": "dict[str, float]",
+            "mapping": "Mission.coverage_thresholds"
+          },
+          "validation_thresholds": {
+            "annotation": "dict[str, float]",
+            "mapping": "Mission.validation_thresholds"
+          }
+        }
+      },
+      "traits": [
+        {
+          "name": "content/Labelled",
+          "parameters": {
+            "maxLabelLength": 255,
+            "maxDescriptionLength": 1000
+          }
+        },
+        {
+          "name": "lifecycle/Stateful",
+          "parameters": {
+            "states": [
+              "draft",
+              "queued",
+              "in_progress",
+              "completed",
+              "blocked",
+              "cancelled",
+              "validation_failed"
+            ],
+            "initialState": "draft"
+          }
+        },
+        {
+          "name": "lifecycle/Timestampable",
+          "parameters": {
+            "recordedEvents": [
+              "created",
+              "queued",
+              "started",
+              "completed",
+              "updated"
+            ],
+            "timezone": "UTC"
+          }
+        },
+        {
+          "name": "structural/Ownerable",
+          "parameters": {
+            "ownerTypes": [
+              "user"
+            ],
+            "primaryOwnerType": "user",
+            "allowTransfer": false
+          }
+        },
+        {
+          "name": "behavioral/Taggable",
+          "parameters": {
+            "maxTags": 50,
+            "allowCustomTags": true,
+            "caseSensitive": true
+          }
+        },
+        {
+          "name": "lifecycle/Cancellable",
+          "parameters": {
+            "allowCancellationAfterStart": true,
+            "requireReason": false
+          }
+        },
+        {
+          "name": "behavioral/Searchable",
+          "parameters": {
+            "placeholder": "Search missions"
+          }
+        },
+        {
+          "name": "behavioral/Filterable"
+        },
+        {
+          "name": "behavioral/Pageable",
+          "parameters": {
+            "defaultPageSize": 20,
+            "pageSizeOptions": [
+              10,
+              20,
+              50,
+              100
+            ]
+          }
+        }
+      ],
+      "contexts": [
+        "list",
+        "detail",
+        "timeline"
+      ]
+    },
+    "Report": {
+      "module": "app.schemas.report",
+      "primary_models": [
+        "ReportDetailResponse",
+        "ReportListItem"
+      ],
+      "role": "synthesis",
+      "label_source": "title",
+      "fields": {
+        "id": {
+          "type": "uuid",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        "title": {
+          "type": "string",
+          "required": true
+        },
+        "content": {
+          "type": "string",
+          "required": true
+        },
+        "citations": {
+          "type": "CitationSchema[]",
+          "required": false
+        },
+        "tokens_used": {
+          "type": "number",
+          "required": false
+        },
+        "status": {
+          "type": "string",
+          "required": true,
+          "validation": {
+            "enum": [
+              "draft",
+              "final"
+            ]
+          }
+        },
+        "created_at": {
+          "type": "datetime",
+          "required": true,
+          "validation": {
+            "format": "date-time"
+          }
+        },
+        "project_id": {
+          "type": "uuid",
+          "required": false
+        },
+        "report_type": {
+          "type": "string",
+          "required": false
+        },
+        "prompt": {
+          "type": "string",
+          "required": false
+        },
+        "chunk_count": {
+          "type": "number",
+          "required": false
+        },
+        "sources": {
+          "type": "ReportSourceSchema[]",
+          "required": false
+        },
+        "updated_at": {
+          "type": "datetime",
+          "required": true,
+          "validation": {
+            "format": "date-time"
+          }
+        },
+        "label": {
+          "type": "string",
+          "required": true
+        },
+        "owner_id": {
+          "type": "uuid",
+          "required": false
+        },
+        "owner_type": {
+          "type": "string",
+          "required": false,
+          "validation": {
+            "enum": [
+              "user"
+            ]
+          }
+        },
+        "last_event": {
+          "type": "string",
+          "required": false
+        }
+      },
+      "schemas": {
+        "CitationSchema": {
+          "chunk_id": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.citations[].chunk_id"
+          },
+          "document_id": {
+            "annotation": "str | None",
+            "mapping": "Report.citations[].document_id"
+          },
+          "excerpt": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.citations[].excerpt"
+          }
+        },
+        "ReportSourceSchema": {
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Report.sources[].id"
+          },
+          "report_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Report.sources[].report_id"
+          },
+          "source_type": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.sources[].source_type"
+          },
+          "source_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Report.sources[].source_id"
+          },
+          "added_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Report.sources[].added_at"
+          }
+        },
+        "ReportBase": {
+          "title": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.title \u2192 Labelled.label (display alias)"
+          }
+        },
+        "ReportCreate": {
+          "title": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.title \u2192 Labelled.label (display alias)"
+          },
+          "collection_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "chunk_ids": {
+            "annotation": "list[uuid.UUID] | None",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "project_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Report.project_id"
+          },
+          "prompt": {
+            "annotation": "str | None",
+            "mapping": "Report.prompt"
+          },
+          "format": {
+            "annotation": "typing.Literal['summary', 'report', 'bullets', 'markdown']",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        },
+        "ReportUpdate": {
+          "title": {
+            "annotation": "str | None",
+            "mapping": "Report.title \u2192 Labelled.label (display alias)"
+          },
+          "status": {
+            "annotation": "typing.Optional[typing.Literal['draft', 'final']]",
+            "mapping": "Report.status \u2192 Stateful.status"
+          }
+        },
+        "ReportResponse": {
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Report.id"
+          },
+          "title": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.title \u2192 Labelled.label (display alias)"
+          },
+          "content": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.content"
+          },
+          "citations": {
+            "annotation": "list[app.schemas.report.CitationSchema]",
+            "mapping": "Report.citations"
+          },
+          "tokens_used": {
+            "annotation": "<class 'int'>",
+            "mapping": "Report.tokens_used"
+          },
+          "status": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.status \u2192 Stateful.status"
+          },
+          "created_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Report.created_at \u2192 Timestampable.created_at"
+          }
+        },
+        "ReportDetailResponse": {
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Report.id"
+          },
+          "title": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.title \u2192 Labelled.label (display alias)"
+          },
+          "content": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.content"
+          },
+          "citations": {
+            "annotation": "list[app.schemas.report.CitationSchema]",
+            "mapping": "Report.citations"
+          },
+          "tokens_used": {
+            "annotation": "<class 'int'>",
+            "mapping": "Report.tokens_used"
+          },
+          "status": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.status \u2192 Stateful.status"
+          },
+          "created_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Report.created_at \u2192 Timestampable.created_at"
+          },
+          "project_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Report.project_id"
+          },
+          "report_type": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.report_type"
+          },
+          "prompt": {
+            "annotation": "str | None",
+            "mapping": "Report.prompt"
+          },
+          "chunk_count": {
+            "annotation": "<class 'int'>",
+            "mapping": "Report.chunk_count"
+          },
+          "sources": {
+            "annotation": "list[app.schemas.report.ReportSourceSchema]",
+            "mapping": "Report.sources"
+          },
+          "updated_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Report.updated_at \u2192 Timestampable.updated_at"
+          }
+        },
+        "ReportListItem": {
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Report.id"
+          },
+          "title": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.title \u2192 Labelled.label (display alias)"
+          },
+          "status": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.status \u2192 Stateful.status"
+          },
+          "report_type": {
+            "annotation": "<class 'str'>",
+            "mapping": "Report.report_type"
+          },
+          "tokens_used": {
+            "annotation": "<class 'int'>",
+            "mapping": "Report.tokens_used"
+          },
+          "chunk_count": {
+            "annotation": "<class 'int'>",
+            "mapping": "Report.chunk_count"
+          },
+          "project_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Report.project_id"
+          },
+          "created_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Report.created_at \u2192 Timestampable.created_at"
+          },
+          "updated_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Report.updated_at \u2192 Timestampable.updated_at"
+          }
+        },
+        "ReportListResponse": {
+          "items": {
+            "annotation": "list[app.schemas.report.ReportListItem]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "total": {
+            "annotation": "<class 'int'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "page": {
+            "annotation": "<class 'int'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "page_size": {
+            "annotation": "<class 'int'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        },
+        "DeleteResponse": {
+          "success": {
+            "annotation": "<class 'bool'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        }
+      },
+      "traits": [
+        {
+          "name": "content/Labelled",
+          "parameters": {
+            "maxLabelLength": 255,
+            "maxDescriptionLength": 1000
+          }
+        },
+        {
+          "name": "lifecycle/Stateful",
+          "parameters": {
+            "states": [
+              "draft",
+              "final"
+            ],
+            "initialState": "draft"
+          }
+        },
+        {
+          "name": "lifecycle/Timestampable",
+          "parameters": {
+            "recordedEvents": [
+              "created",
+              "updated"
+            ],
+            "timezone": "UTC"
+          }
+        },
+        {
+          "name": "structural/Ownerable",
+          "parameters": {
+            "ownerTypes": [
+              "user"
+            ],
+            "primaryOwnerType": "user",
+            "allowTransfer": false
+          }
+        },
+        {
+          "name": "behavioral/Searchable",
+          "parameters": {
+            "placeholder": "Search reports"
+          }
+        },
+        {
+          "name": "behavioral/Filterable"
+        },
+        {
+          "name": "behavioral/Pageable",
+          "parameters": {
+            "defaultPageSize": 20,
+            "pageSizeOptions": [
+              10,
+              20,
+              50,
+              100
+            ]
+          }
+        }
+      ],
+      "contexts": [
+        "list",
+        "detail",
+        "timeline"
+      ]
+    },
+    "Evidence": {
+      "module": "app.schemas.evidence_ledger",
+      "primary_models": [
+        "LedgerEntryRead"
+      ],
+      "role": "data",
+      "label_source": "claim",
+      "fields": {
+        "id": {
+          "type": "uuid",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        "project_id": {
+          "type": "uuid",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        "mission_id": {
+          "type": "uuid",
+          "required": false
+        },
+        "session_key": {
+          "type": "string",
+          "required": true
+        },
+        "origin": {
+          "type": "string",
+          "required": true,
+          "validation": {
+            "enum": [
+              "mcp-agent",
+              "deepsearch-worker"
+            ]
+          }
+        },
+        "claim": {
+          "type": "string",
+          "required": true
+        },
+        "summary": {
+          "type": "string",
+          "required": false
+        },
+        "source_url": {
+          "type": "string",
+          "required": true
+        },
+        "source_id": {
+          "type": "uuid",
+          "required": true,
+          "validation": {
+            "format": "uuid"
+          }
+        },
+        "source_sighting_count": {
+          "type": "number",
+          "required": true,
+          "validation": {
+            "minimum": 1
+          }
+        },
+        "snippet": {
+          "type": "string",
+          "required": false
+        },
+        "query": {
+          "type": "string",
+          "required": false
+        },
+        "disposition": {
+          "type": "string",
+          "required": true,
+          "validation": {
+            "enum": [
+              "supporting",
+              "contradicting",
+              "rejected",
+              "background"
+            ]
+          }
+        },
+        "tags": {
+          "type": "string[]",
+          "required": true
+        },
+        "owner_id": {
+          "type": "uuid",
+          "required": false
+        },
+        "workspace_id": {
+          "type": "uuid",
+          "required": false
+        },
+        "created_at": {
+          "type": "datetime",
+          "required": true,
+          "validation": {
+            "format": "date-time"
+          }
+        },
+        "updated_at": {
+          "type": "datetime",
+          "required": true,
+          "validation": {
+            "format": "date-time"
+          }
+        },
+        "label": {
+          "type": "string",
+          "required": true
+        },
+        "description": {
+          "type": "string",
+          "required": false
+        },
+        "owner_type": {
+          "type": "string",
+          "required": false,
+          "validation": {
+            "enum": [
+              "user"
+            ]
+          }
+        },
+        "last_event": {
+          "type": "string",
+          "required": false
+        },
+        "primary_category_id": {
+          "type": "string",
+          "required": true,
+          "validation": {
+            "enum": [
+              "supporting",
+              "contradicting",
+              "rejected",
+              "background"
+            ]
+          }
+        },
+        "categories": {
+          "type": "CategoryNode[]",
+          "required": true
+        }
+      },
+      "schemas": {
+        "CaptureItem": {
+          "claim": {
+            "annotation": "<class 'str'>",
+            "mapping": "Evidence.claim \u2192 Labelled.label (display alias)"
+          },
+          "summary": {
+            "annotation": "str | None",
+            "mapping": "Evidence.summary"
+          },
+          "source_url": {
+            "annotation": "<class 'pydantic.networks.AnyHttpUrl'>",
+            "mapping": "Evidence.source_url"
+          },
+          "snippet": {
+            "annotation": "str | None",
+            "mapping": "Evidence.snippet"
+          },
+          "query": {
+            "annotation": "str | None",
+            "mapping": "Evidence.query"
+          },
+          "disposition": {
+            "annotation": "typing.Literal['supporting', 'contradicting', 'rejected', 'background']",
+            "mapping": "Evidence.disposition \u2192 Classifiable.primary_category_id"
+          },
+          "tags": {
+            "annotation": "list[str]",
+            "mapping": "Evidence.tags"
+          }
+        },
+        "CaptureRequest": {
+          "project_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Evidence.project_id"
+          },
+          "mission_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Evidence.mission_id"
+          },
+          "session_key": {
+            "annotation": "<class 'str'>",
+            "mapping": "Evidence.session_key"
+          },
+          "entries": {
+            "annotation": "list[app.schemas.evidence_ledger.CaptureItem]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        },
+        "NoteUpsertRequest": {
+          "project_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Evidence working note (separate from sourced entries).project_id"
+          },
+          "mission_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Evidence working note (separate from sourced entries).mission_id"
+          },
+          "session_key": {
+            "annotation": "<class 'str'>",
+            "mapping": "Evidence working note (separate from sourced entries).session_key"
+          },
+          "content": {
+            "annotation": "<class 'str'>",
+            "mapping": "Evidence working note (separate from sourced entries).content"
+          },
+          "tags": {
+            "annotation": "list[str]",
+            "mapping": "Evidence working note (separate from sourced entries).tags"
+          }
+        },
+        "LedgerEntryRead": {
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Evidence.id"
+          },
+          "project_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Evidence.project_id"
+          },
+          "mission_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Evidence.mission_id"
+          },
+          "session_key": {
+            "annotation": "<class 'str'>",
+            "mapping": "Evidence.session_key"
+          },
+          "origin": {
+            "annotation": "typing.Literal['mcp-agent', 'deepsearch-worker']",
+            "mapping": "Evidence.origin"
+          },
+          "claim": {
+            "annotation": "<class 'str'>",
+            "mapping": "Evidence.claim \u2192 Labelled.label (display alias)"
+          },
+          "summary": {
+            "annotation": "str | None",
+            "mapping": "Evidence.summary"
+          },
+          "source_url": {
+            "annotation": "<class 'str'>",
+            "mapping": "Evidence.source_url"
+          },
+          "source_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Evidence.source_id"
+          },
+          "source_sighting_count": {
+            "annotation": "<class 'int'>",
+            "mapping": "Evidence.source_sighting_count"
+          },
+          "snippet": {
+            "annotation": "str | None",
+            "mapping": "Evidence.snippet"
+          },
+          "query": {
+            "annotation": "str | None",
+            "mapping": "Evidence.query"
+          },
+          "disposition": {
+            "annotation": "typing.Literal['supporting', 'contradicting', 'rejected', 'background']",
+            "mapping": "Evidence.disposition \u2192 Classifiable.primary_category_id"
+          },
+          "tags": {
+            "annotation": "list[str]",
+            "mapping": "Evidence.tags"
+          },
+          "owner_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Evidence.owner_id \u2192 Ownerable.owner_id (nullable)"
+          },
+          "workspace_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Evidence.workspace_id"
+          },
+          "created_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Evidence.created_at \u2192 Timestampable.created_at"
+          },
+          "updated_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Evidence.updated_at \u2192 Timestampable.updated_at"
+          }
+        },
+        "LedgerNoteRead": {
+          "id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Evidence working note (separate from sourced entries).id"
+          },
+          "project_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Evidence working note (separate from sourced entries).project_id"
+          },
+          "mission_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Evidence working note (separate from sourced entries).mission_id"
+          },
+          "session_key": {
+            "annotation": "<class 'str'>",
+            "mapping": "Evidence working note (separate from sourced entries).session_key"
+          },
+          "note_key": {
+            "annotation": "<class 'str'>",
+            "mapping": "Evidence working note (separate from sourced entries).note_key"
+          },
+          "origin": {
+            "annotation": "typing.Literal['mcp-agent', 'deepsearch-worker']",
+            "mapping": "Evidence working note (separate from sourced entries).origin"
+          },
+          "content": {
+            "annotation": "<class 'str'>",
+            "mapping": "Evidence working note (separate from sourced entries).content"
+          },
+          "tags": {
+            "annotation": "list[str]",
+            "mapping": "Evidence working note (separate from sourced entries).tags"
+          },
+          "owner_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Evidence working note (separate from sourced entries).owner_id"
+          },
+          "workspace_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Evidence working note (separate from sourced entries).workspace_id"
+          },
+          "created_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Evidence working note (separate from sourced entries).created_at"
+          },
+          "updated_at": {
+            "annotation": "<class 'datetime.datetime'>",
+            "mapping": "Evidence working note (separate from sourced entries).updated_at"
+          }
+        },
+        "CaptureResponse": {
+          "entries": {
+            "annotation": "list[app.schemas.evidence_ledger.LedgerEntryRead]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "count": {
+            "annotation": "<class 'int'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        },
+        "DeepSearchEvidenceRequest": {
+          "schema_version": {
+            "annotation": "typing.Literal[1]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "deepsearch_job_id": {
+            "annotation": "<class 'str'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        },
+        "DeepSearchEvidenceResponse": {
+          "status": {
+            "annotation": "typing.Literal['captured', 'already_processed']",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "mission_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Evidence.mission_id"
+          },
+          "deepsearch_job_id": {
+            "annotation": "<class 'str'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "session_key": {
+            "annotation": "<class 'str'>",
+            "mapping": "Evidence.session_key"
+          },
+          "entry_ids": {
+            "annotation": "list[uuid.UUID]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "entry_count": {
+            "annotation": "<class 'int'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        },
+        "LedgerListResponse": {
+          "entries": {
+            "annotation": "list[app.schemas.evidence_ledger.LedgerEntryRead]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "notes": {
+            "annotation": "list[app.schemas.evidence_ledger.LedgerNoteRead]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "entry_total": {
+            "annotation": "<class 'int'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "note_total": {
+            "annotation": "<class 'int'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "page": {
+            "annotation": "<class 'int'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "page_size": {
+            "annotation": "<class 'int'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        },
+        "LedgerSearchResponse": {
+          "entries": {
+            "annotation": "list[app.schemas.evidence_ledger.LedgerEntryRead]",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "total": {
+            "annotation": "<class 'int'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "page": {
+            "annotation": "<class 'int'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "page_size": {
+            "annotation": "<class 'int'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        },
+        "PromotionRequest": {
+          "project_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Evidence.project_id"
+          },
+          "session_key": {
+            "annotation": "<class 'str'>",
+            "mapping": "Evidence.session_key"
+          },
+          "title": {
+            "annotation": "str | None",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "target": {
+            "annotation": "typing.Literal['report', 'document']",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        },
+        "PromotionResponse": {
+          "project_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Evidence.project_id"
+          },
+          "session_key": {
+            "annotation": "<class 'str'>",
+            "mapping": "Evidence.session_key"
+          },
+          "target": {
+            "annotation": "typing.Literal['report', 'document']",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "report_id": {
+            "annotation": "<class 'uuid.UUID'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "document_id": {
+            "annotation": "uuid.UUID | None",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "title": {
+            "annotation": "<class 'str'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "entry_count": {
+            "annotation": "<class 'int'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "note_count": {
+            "annotation": "<class 'int'>",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          },
+          "status": {
+            "annotation": "typing.Literal['created', 'completed']",
+            "mapping": "Transport/request envelope; not a displayed object field."
+          }
+        }
+      },
+      "traits": [
+        {
+          "name": "content/Labelled",
+          "parameters": {
+            "maxLabelLength": 255,
+            "maxDescriptionLength": 1000
+          }
+        },
+        {
+          "name": "lifecycle/Timestampable",
+          "parameters": {
+            "recordedEvents": [
+              "created",
+              "updated"
+            ],
+            "timezone": "UTC"
+          }
+        },
+        {
+          "name": "structural/Ownerable",
+          "parameters": {
+            "ownerTypes": [
+              "user"
+            ],
+            "primaryOwnerType": "user",
+            "allowTransfer": false
+          }
+        },
+        {
+          "name": "core/Classifiable",
+          "parameters": {
+            "classification_mode": "hybrid",
+            "tag_policy": "open",
+            "max_tags": 50,
+            "require_primary_category": true
+          }
+        },
+        {
+          "name": "behavioral/Searchable",
+          "parameters": {
+            "placeholder": "Search evidences"
+          }
+        },
+        {
+          "name": "behavioral/Filterable"
+        },
+        {
+          "name": "behavioral/Pageable",
+          "parameters": {
+            "defaultPageSize": 20,
+            "pageSizeOptions": [
+              10,
+              20,
+              50,
+              100
+            ]
+          }
+        }
+      ],
+      "contexts": [
+        "list",
+        "detail",
+        "timeline"
+      ]
+    }
+  },
+  "nested_schemas": {
+    "app.schemas.document_status.DocumentProcessingStatusRead": {
+      "document_id": {
+        "annotation": "<class 'uuid.UUID'>",
+        "mapping": "Document.processing_events[].document_id"
+      },
+      "stage": {
+        "annotation": "<class 'str'>",
+        "mapping": "Document.processing_events[].stage"
+      },
+      "status": {
+        "annotation": "<class 'str'>",
+        "mapping": "Document.processing_events[].status"
+      },
+      "message": {
+        "annotation": "str | None",
+        "mapping": "Document.processing_events[].message"
+      },
+      "details": {
+        "annotation": "dict[str, typing.Any] | None",
+        "mapping": "Document.processing_events[].details"
+      },
+      "id": {
+        "annotation": "<class 'uuid.UUID'>",
+        "mapping": "Document.processing_events[].id"
+      },
+      "created_at": {
+        "annotation": "<class 'datetime.datetime'>",
+        "mapping": "Document.processing_events[].created_at"
+      },
+      "updated_at": {
+        "annotation": "<class 'datetime.datetime'>",
+        "mapping": "Document.processing_events[].updated_at"
+      }
+    },
+    "app.schemas.tag.DocumentTagRead": {
+      "document_id": {
+        "annotation": "<class 'uuid.UUID'>",
+        "mapping": "Document.tags[].document_id"
+      },
+      "tag_id": {
+        "annotation": "<class 'uuid.UUID'>",
+        "mapping": "Document.tags[].tag_id"
+      }
+    }
+  },
+  "forge_implementation_commit": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+  "forge_pull_request": "https://github.com/kneelinghorse/OODS-Forge/pull/105"
+}

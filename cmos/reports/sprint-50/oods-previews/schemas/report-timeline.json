@@ -1,0 +1,601 @@
+{
+  "input": {
+    "object": "Report",
+    "context": "timeline"
+  },
+  "saved": {
+    "name": "tracelab-report-timeline-v1",
+    "version": 3,
+    "createdAt": "2026-09-12T21:56:41.863Z",
+    "updatedAt": "2026-09-12T22:19:39.083Z",
+    "tags": [
+      "tracelab",
+      "research",
+      "ux-1",
+      "timeline"
+    ],
+    "object": "Report",
+    "author": "TraceLab UX-1"
+  },
+  "composition": {
+    "status": "ok",
+    "layout": "timeline",
+    "schema": {
+      "version": "2026.02",
+      "theme": "light",
+      "screens": [
+        {
+          "id": "screen-timeline-14",
+          "component": "Stack",
+          "layout": {
+            "type": "stack",
+            "gapToken": "cluster-default"
+          },
+          "children": [
+            {
+              "id": "timeline-header-1",
+              "component": "Stack",
+              "layout": {
+                "type": "inline",
+                "align": "space-between"
+              },
+              "style": {
+                "spacingToken": "inset-default"
+              },
+              "children": [
+                {
+                  "id": "timeline-header-1-title",
+                  "component": "Text",
+                  "props": {
+                    "field": "title"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "timeline-entries-13",
+              "component": "Stack",
+              "layout": {
+                "type": "stack",
+                "gapToken": "cluster-default"
+              },
+              "children": [
+                {
+                  "id": "timeline-entries-13-entry",
+                  "component": "Card",
+                  "collectionControl": "event",
+                  "children": [
+                    {
+                      "id": "ve-entry-0-15",
+                      "component": "TimelineEntryLabel",
+                      "props": {
+                        "field": "label",
+                        "compact": true,
+                        "label": "Label"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "timeline-entries-13-empty",
+                  "component": "Banner",
+                  "props": {
+                    "message": "No events yet."
+                  },
+                  "collectionControl": "empty"
+                }
+              ],
+              "collection": {
+                "source": "events",
+                "keyField": "id",
+                "labelField": "title",
+                "historyField": "state_history"
+              }
+            },
+            {
+              "id": "timeline-entries-13-trait-events",
+              "component": "Stack",
+              "children": [
+                {
+                  "id": "ve-entry-0-16",
+                  "component": "StateTransitionEvent",
+                  "props": {
+                    "historyField": "state_history",
+                    "labelField": "status",
+                    "showActor": true,
+                    "showReason": true
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "objectSchema": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "description": "Display projection of title; retain the complete source field.",
+          "semanticType": "text.label"
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "description": "Supporting description used in detail and card contexts.",
+          "semanticType": "text.description"
+        },
+        "placeholder": {
+          "type": "string",
+          "required": false,
+          "description": "Hint copy surfaced in form fields when the label is empty.",
+          "semanticType": "text.placeholder"
+        },
+        "status": {
+          "type": "string",
+          "required": true,
+          "description": "Canonical research lifecycle. The API remains authoritative; do not coerce an unknown server value.",
+          "enum": [
+            "draft",
+            "final"
+          ],
+          "semanticType": "status.state"
+        },
+        "state_history": {
+          "type": "StateTransition[]",
+          "required": false,
+          "description": "Chronological log of state transitions. Each entry records the before/after states,\ntimestamp, and (when governance is enabled) the actor, reason, and transition metadata.\nRendered by StatusTimeline in the detail and timeline views.\n\nEntry structure:\n  - from: string (previous state)\n  - to: string (new state)\n  - timestamp: ISO 8601 datetime\n  - actor_id: string (user/system who triggered the transition, optional)\n  - reason: string (human-readable justification, required when requireTransitionReason is true)\n  - transition_metadata: Record<string, unknown> (arbitrary context, optional)\n",
+          "semanticType": "timeline.state_transition"
+        },
+        "allowed_transitions": {
+          "type": "string[]",
+          "required": false,
+          "description": "Materialized list of valid next states from the current status, computed from the\ntransitionRules parameter. When transitionRules is null (open model), this contains\nall states except the current one. Used by StatusSelector to disable invalid options\nand by StatusBadge to indicate available paths.\n",
+          "semanticType": "status.navigation"
+        },
+        "created_at": {
+          "type": "datetime",
+          "required": true,
+          "description": "Created at.",
+          "semanticType": "audit.created_at"
+        },
+        "updated_at": {
+          "type": "datetime",
+          "required": true,
+          "description": "Updated at.",
+          "semanticType": "audit.updated_at"
+        },
+        "last_event": {
+          "type": "string",
+          "required": false,
+          "description": "Only from an explicit event or timestamp projection; absence is unknown, not a fabricated audit event.",
+          "semanticType": "audit.event.type"
+        },
+        "last_event_at": {
+          "type": "datetime",
+          "required": false,
+          "description": "Timestamp for the lifecycle event captured in last_event.",
+          "semanticType": "audit.event.timestamp"
+        },
+        "owner_id": {
+          "type": "uuid",
+          "required": false,
+          "description": "Authoritative nullable server owner_id. Not exposed by the current response; unavailable until the API exposes it. Never derive from created_by, user_id, or project owner.",
+          "semanticType": "ownership.owner.id"
+        },
+        "owner_type": {
+          "type": "string",
+          "required": false,
+          "description": "user only when an authoritative owner_id is present.",
+          "enum": [
+            "user"
+          ],
+          "semanticType": "ownership.owner.type"
+        },
+        "ownership_role": {
+          "type": "string",
+          "required": false,
+          "description": "Optional role name describing how the owner governs the entity.",
+          "semanticType": "ownership.owner.role"
+        },
+        "ownership_transferred_at": {
+          "type": "datetime",
+          "required": false,
+          "description": "Timestamp recording when ownership was last transferred.",
+          "semanticType": "ownership.owner.transferred_at"
+        },
+        "searchQuery": {
+          "type": "string",
+          "required": false,
+          "description": "The current search query string entered by the user.",
+          "semanticType": "input.search.query"
+        },
+        "searchActive": {
+          "type": "boolean",
+          "required": false,
+          "description": "Whether the search input is currently focused or has a non-empty query.",
+          "semanticType": "state.search.active"
+        },
+        "filters": {
+          "type": "object[]",
+          "required": false,
+          "description": "Array of available filter descriptors. Each entry defines a filterable dimension:\n  - field: string (the schema field to filter on)\n  - label: string (display label)\n  - type: \"select\" | \"multi-select\" | \"range\" | \"boolean\" | \"date-range\"\n  - options: array of { value, label } for select/multi-select types\n",
+          "semanticType": "input.filter.descriptors"
+        },
+        "activeFilters": {
+          "type": "object[]",
+          "required": false,
+          "description": "Array of currently applied filter values:\n  - field: string (matches a filter descriptor field)\n  - operator: \"eq\" | \"in\" | \"range\" | \"gt\" | \"lt\" | \"between\"\n  - value: unknown (the selected filter value or values)\n",
+          "semanticType": "state.filter.active"
+        },
+        "filterCount": {
+          "type": "number",
+          "required": true,
+          "description": "Computed count of currently active filters.",
+          "semanticType": "metric.filter.count"
+        },
+        "page": {
+          "type": "number",
+          "required": true,
+          "description": "Current page number (1-based).",
+          "semanticType": "state.pagination.page"
+        },
+        "pageSize": {
+          "type": "number",
+          "required": true,
+          "description": "Number of items displayed per page.",
+          "semanticType": "state.pagination.pageSize"
+        },
+        "totalItems": {
+          "type": "number",
+          "required": false,
+          "description": "Total number of items across all pages. Used to compute total page count.",
+          "semanticType": "metric.pagination.totalItems"
+        },
+        "totalPages": {
+          "type": "number",
+          "required": false,
+          "description": "Computed total number of pages (ceil(totalItems / pageSize)).",
+          "semanticType": "metric.pagination.totalPages"
+        },
+        "id": {
+          "type": "uuid",
+          "required": true,
+          "description": "Id.",
+          "semanticType": "research.report.id"
+        },
+        "title": {
+          "type": "string",
+          "required": true,
+          "description": "Title.",
+          "semanticType": "text.label"
+        },
+        "content": {
+          "type": "string",
+          "required": true,
+          "description": "Content.",
+          "semanticType": "research.report.content"
+        },
+        "citations": {
+          "type": "CitationSchema[]",
+          "required": false,
+          "description": "Citations.",
+          "semanticType": "research.report.citations"
+        },
+        "tokens_used": {
+          "type": "number",
+          "required": false,
+          "description": "Tokens used.",
+          "semanticType": "research.report.tokens_used"
+        },
+        "project_id": {
+          "type": "uuid",
+          "required": false,
+          "description": "Project id.",
+          "semanticType": "research.report.project_id"
+        },
+        "report_type": {
+          "type": "string",
+          "required": false,
+          "description": "Report type.",
+          "semanticType": "research.report.report_type"
+        },
+        "prompt": {
+          "type": "string",
+          "required": false,
+          "description": "Prompt.",
+          "semanticType": "research.report.prompt"
+        },
+        "chunk_count": {
+          "type": "number",
+          "required": false,
+          "description": "Chunk count.",
+          "semanticType": "research.report.chunk_count"
+        },
+        "sources": {
+          "type": "ReportSourceSchema[]",
+          "required": false,
+          "description": "Sources.",
+          "semanticType": "research.report.sources"
+        }
+      }
+    },
+    "schemaRef": "compose-0110851f",
+    "schemaRefCreatedAt": "2026-09-12T22:19:39.082Z",
+    "schemaRefExpiresAt": "2026-09-12T22:49:39.082Z",
+    "selections": [
+      {
+        "slotName": "entry-0",
+        "intent": "timeline-entry",
+        "selectedComponent": "TimelineEntryLabel",
+        "confidence": 0.95,
+        "confidenceLevel": "high",
+        "explanation": "TimelineEntryLabel was selected for slot \"entry-0\" because view_extension placement. Confidence is high (0.95).",
+        "candidates": [
+          {
+            "name": "TimelineEntryLabel",
+            "confidence": 0.95,
+            "reason": "view_extension placement"
+          },
+          {
+            "name": "StateTransitionEvent",
+            "confidence": 0.95,
+            "reason": "view_extension placement"
+          }
+        ]
+      },
+      {
+        "slotName": "header",
+        "intent": "page-header",
+        "selectedComponent": "Text",
+        "confidence": 0.5,
+        "confidenceLevel": "medium",
+        "explanation": "Text was selected for slot \"header\" because fallback placement. Confidence is medium (0.50).",
+        "candidates": [
+          {
+            "name": "Text",
+            "confidence": 0.5,
+            "reason": "fallback placement"
+          }
+        ]
+      },
+      {
+        "slotName": "entry-1",
+        "intent": "timeline-entry",
+        "selectedComponent": "Stack",
+        "confidence": 0.74,
+        "confidenceLevel": "medium",
+        "explanation": "Stack was selected for slot \"entry-1\" because preferred for \"data-list\" (rank 1); 1 context match(es); context match (timeline); 2 region match(es). Confidence is medium (0.74).",
+        "candidates": [
+          {
+            "name": "Stack",
+            "confidence": 1,
+            "reason": "preferred for \"data-list\" (rank 1); 1 context match(es); context match (timeline); 2 region match(es)",
+            "keywordTagMatches": 0,
+            "keywordTraitMatches": 0,
+            "contextTagMatches": 0,
+            "contextTraitMatches": 0
+          },
+          {
+            "name": "Table",
+            "confidence": 0.86,
+            "reason": "preferred for \"data-list\" (rank 2); 1 tag match(es); 1 context match(es); 2 region match(es)",
+            "keywordTagMatches": 0,
+            "keywordTraitMatches": 0,
+            "contextTagMatches": 0,
+            "contextTraitMatches": 0
+          },
+          {
+            "name": "AuditTimeline",
+            "confidence": 0.5,
+            "reason": "context match (timeline); 1 region match(es); 2 trait(s); name contains \"timeline\"",
+            "keywordTagMatches": 0,
+            "keywordTraitMatches": 0,
+            "contextTagMatches": 0,
+            "contextTraitMatches": 0
+          }
+        ]
+      },
+      {
+        "slotName": "entry-2",
+        "intent": "timeline-entry",
+        "selectedComponent": "Stack",
+        "confidence": 0.74,
+        "confidenceLevel": "medium",
+        "explanation": "Stack was selected for slot \"entry-2\" because preferred for \"data-list\" (rank 1); 1 context match(es); context match (timeline); 2 region match(es). Confidence is medium (0.74).",
+        "candidates": [
+          {
+            "name": "Stack",
+            "confidence": 1,
+            "reason": "preferred for \"data-list\" (rank 1); 1 context match(es); context match (timeline); 2 region match(es)",
+            "keywordTagMatches": 0,
+            "keywordTraitMatches": 0,
+            "contextTagMatches": 0,
+            "contextTraitMatches": 0
+          },
+          {
+            "name": "Table",
+            "confidence": 0.86,
+            "reason": "preferred for \"data-list\" (rank 2); 1 tag match(es); 1 context match(es); 2 region match(es)",
+            "keywordTagMatches": 0,
+            "keywordTraitMatches": 0,
+            "contextTagMatches": 0,
+            "contextTraitMatches": 0
+          },
+          {
+            "name": "AuditTimeline",
+            "confidence": 0.5,
+            "reason": "context match (timeline); 1 region match(es); 2 trait(s); name contains \"timeline\"",
+            "keywordTagMatches": 0,
+            "keywordTraitMatches": 0,
+            "contextTagMatches": 0,
+            "contextTraitMatches": 0
+          }
+        ]
+      },
+      {
+        "slotName": "entry-3",
+        "intent": "timeline-entry",
+        "selectedComponent": "Stack",
+        "confidence": 0.74,
+        "confidenceLevel": "medium",
+        "explanation": "Stack was selected for slot \"entry-3\" because preferred for \"data-list\" (rank 1); 1 context match(es); context match (timeline); 2 region match(es). Confidence is medium (0.74).",
+        "candidates": [
+          {
+            "name": "Stack",
+            "confidence": 1,
+            "reason": "preferred for \"data-list\" (rank 1); 1 context match(es); context match (timeline); 2 region match(es)",
+            "keywordTagMatches": 0,
+            "keywordTraitMatches": 0,
+            "contextTagMatches": 0,
+            "contextTraitMatches": 0
+          },
+          {
+            "name": "Table",
+            "confidence": 0.86,
+            "reason": "preferred for \"data-list\" (rank 2); 1 tag match(es); 1 context match(es); 2 region match(es)",
+            "keywordTagMatches": 0,
+            "keywordTraitMatches": 0,
+            "contextTagMatches": 0,
+            "contextTraitMatches": 0
+          },
+          {
+            "name": "AuditTimeline",
+            "confidence": 0.5,
+            "reason": "context match (timeline); 1 region match(es); 2 trait(s); name contains \"timeline\"",
+            "keywordTagMatches": 0,
+            "keywordTraitMatches": 0,
+            "contextTagMatches": 0,
+            "contextTraitMatches": 0
+          }
+        ]
+      },
+      {
+        "slotName": "entry-4",
+        "intent": "timeline-entry",
+        "selectedComponent": "Stack",
+        "confidence": 0.74,
+        "confidenceLevel": "medium",
+        "explanation": "Stack was selected for slot \"entry-4\" because preferred for \"data-list\" (rank 1); 1 context match(es); context match (timeline); 2 region match(es). Confidence is medium (0.74).",
+        "candidates": [
+          {
+            "name": "Stack",
+            "confidence": 1,
+            "reason": "preferred for \"data-list\" (rank 1); 1 context match(es); context match (timeline); 2 region match(es)",
+            "keywordTagMatches": 0,
+            "keywordTraitMatches": 0,
+            "contextTagMatches": 0,
+            "contextTraitMatches": 0
+          },
+          {
+            "name": "Table",
+            "confidence": 0.86,
+            "reason": "preferred for \"data-list\" (rank 2); 1 tag match(es); 1 context match(es); 2 region match(es)",
+            "keywordTagMatches": 0,
+            "keywordTraitMatches": 0,
+            "contextTagMatches": 0,
+            "contextTraitMatches": 0
+          },
+          {
+            "name": "AuditTimeline",
+            "confidence": 0.5,
+            "reason": "context match (timeline); 1 region match(es); 2 trait(s); name contains \"timeline\"",
+            "keywordTagMatches": 0,
+            "keywordTraitMatches": 0,
+            "contextTagMatches": 0,
+            "contextTraitMatches": 0
+          }
+        ]
+      }
+    ],
+    "validation": {
+      "status": "ok",
+      "errors": [],
+      "warnings": []
+    },
+    "warnings": [
+      {
+        "code": "OODS-V121",
+        "message": "Object 'Report' has maturity 'alpha' — composed output may change.",
+        "hint": "Consider using stable objects for production compositions."
+      },
+      {
+        "code": "OODS-V117",
+        "message": "Field collision: \"status\" in object schema overrides trait definition"
+      },
+      {
+        "code": "OODS-V117",
+        "message": "Field collision: \"created_at\" in object schema overrides trait definition"
+      },
+      {
+        "code": "OODS-V117",
+        "message": "Field collision: \"updated_at\" in object schema overrides trait definition"
+      },
+      {
+        "code": "OODS-V117",
+        "message": "Field collision: \"label\" in object schema overrides trait definition"
+      },
+      {
+        "code": "OODS-V117",
+        "message": "Field collision: \"owner_id\" in object schema overrides trait definition"
+      },
+      {
+        "code": "OODS-V117",
+        "message": "Field collision: \"owner_type\" in object schema overrides trait definition"
+      },
+      {
+        "code": "OODS-V117",
+        "message": "Field collision: \"last_event\" in object schema overrides trait definition"
+      },
+      {
+        "code": "OODS-V120",
+        "message": "No matching slot for position \"main\" from lifecycle/Timestampable/AuditEvent."
+      }
+    ],
+    "objectUsed": {
+      "name": "Report",
+      "version": "0.1.0",
+      "traits": [
+        "content/Labelled",
+        "lifecycle/Stateful",
+        "lifecycle/Timestampable",
+        "structural/Ownerable",
+        "behavioral/Searchable",
+        "behavioral/Filterable",
+        "behavioral/Pageable"
+      ],
+      "fieldsComposed": 33,
+      "viewExtensionsApplied": {
+        "list": 7,
+        "detail": 6,
+        "form": 2,
+        "card": 3,
+        "timeline": 3,
+        "inline": 1
+      }
+    },
+    "meta": {
+      "intentParsed": "Report timeline view",
+      "layoutDetected": "context-inferred: timeline (from context=\"timeline\")",
+      "slotCount": 6,
+      "nodeCount": 9,
+      "intentSynthetic": true,
+      "warnings": [
+        "Object 'Report' has maturity 'alpha' — composed output may change.",
+        "Field collision: \"status\" in object schema overrides trait definition",
+        "Field collision: \"created_at\" in object schema overrides trait definition",
+        "Field collision: \"updated_at\" in object schema overrides trait definition",
+        "Field collision: \"label\" in object schema overrides trait definition",
+        "Field collision: \"owner_id\" in object schema overrides trait definition",
+        "Field collision: \"owner_type\" in object schema overrides trait definition",
+        "Field collision: \"last_event\" in object schema overrides trait definition",
+        "No matching slot for position \"main\" from lifecycle/Timestampable/AuditEvent."
+      ],
+      "intelligence": {
+        "fieldsExpanded": false,
+        "positionAffinityUsed": true,
+        "fieldAffinityUsed": true,
+        "compositionConfidence": 0.74
+      }
+    }
+  }
+}
