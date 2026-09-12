@@ -139,6 +139,8 @@ Key decisions carried forward: hexagonal boundaries stay (routers â†’ services â
 
 **Goal:** rebuild the pages people and agents live in, on the object model and the shell.
 
+**UX-1 implementation references:** use the [API-to-object contract](../contracts/oods-object-model.md) and [saved-schema index](../reports/sprint-50/oods-previews/schema-summary.json). UX-6 starts from Mission list/detail/timeline/workflow; UX-7 from Project, Document and inline Chunk; UX-8 from Collection and Report. The retained [Mission detail preview](../reports/sprint-50/oods-previews/mission-detail-light/react/receipt.json) and [Evidence detail preview](../reports/sprint-50/oods-previews/evidence-detail-light/react/receipt.json), with adjacent dark-theme receipts, establish the structural references. These use synthetic fixtures; bind real API data and regenerate phone/tablet/desktop previews before implementing each surface.
+
 - **UX-6 Missions as inspectable jobs.** New authoring flow (contract preview inline), run view with named steps from DeepSearch phases, live logs, results and evidence tab, exceptions-first list with the queue folded in, cancel and re-run.
 - **UX-7 Projects as bundles and Documents.** Project hub with Overview, Documents, Evidence, Collections, Missions, Reports tabs; upload with per-file progress; document detail with chunks and evidence references.
 - **UX-8 Collections as context spaces and Reports.** Collections carry instructions and documents and can seed a mission; report detail whose citations resolve to evidence; export retained.
