@@ -1,0 +1,1143 @@
+{
+  "mission": "UX-0",
+  "implementation_commit": "346bfc6c13cf7a8827ab0cf4715306781c5e5b94",
+  "base": "http://localhost:3100",
+  "routes": 28,
+  "checks": 112,
+  "viewport_widths": [
+    390,
+    1440
+  ],
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "overflow_routes": 0,
+  "critical_serious_axe_findings": 0,
+  "required_axe_findings": 0,
+  "javascript_errors": 0,
+  "transport_failures": 0,
+  "artifact_directory": "artifacts/ux-0/local",
+  "cases": [
+    {
+      "route": "/",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_.png"
+    },
+    {
+      "route": "/projects",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/projects",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_projects.png"
+    },
+    {
+      "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_projects_0afcc588-e722-45bd-8320-f486601b877c.png"
+    },
+    {
+      "route": "/documents",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/documents",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_documents.png"
+    },
+    {
+      "route": "/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_documents_e51e0fe0-9a08-4ed0-83ad-041a7396472d.png"
+    },
+    {
+      "route": "/documents/upload",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/documents/upload",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_documents_upload.png"
+    },
+    {
+      "route": "/collections",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/collections",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_collections.png"
+    },
+    {
+      "route": "/collections/ca279662-9224-47b7-80d6-341aeda41540",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/collections/ca279662-9224-47b7-80d6-341aeda41540",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_collections_ca279662-9224-47b7-80d6-341aeda41540.png"
+    },
+    {
+      "route": "/reports",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/reports",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_reports.png"
+    },
+    {
+      "route": "/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_reports_f4d46a82-2e25-4f5c-a2f8-68d565ad51be.png"
+    },
+    {
+      "route": "/missions",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_missions.png"
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png"
+    },
+    {
+      "route": "/missions/new",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions/new",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_missions_new.png"
+    },
+    {
+      "route": "/missions/queue",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions/queue",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_missions_queue.png"
+    },
+    {
+      "route": "/search",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/search",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_search.png"
+    },
+    {
+      "route": "/search/results",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/search/results",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_search_results.png"
+    },
+    {
+      "route": "/saved-searches",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/saved-searches",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_saved-searches.png"
+    },
+    {
+      "route": "/settings",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/settings",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_settings.png"
+    },
+    {
+      "route": "/invites",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/settings#invites",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_invites.png"
+    },
+    {
+      "route": "/device",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/device",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_device.png"
+    },
+    {
+      "route": "/admin/users",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/admin/users",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_admin_users.png"
+    },
+    {
+      "route": "/admin/spaces",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/admin/spaces",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_admin_spaces.png"
+    },
+    {
+      "route": "/console",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/console",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_console.png"
+    },
+    {
+      "route": "/console/missions",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/console/missions",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_console_missions.png"
+    },
+    {
+      "route": "/console/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/console/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_console_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png"
+    },
+    {
+      "route": "/console/corrections",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/console/corrections",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_console_corrections.png"
+    },
+    {
+      "route": "/404",
+      "theme": "dark",
+      "width": 1440,
+      "status": 404,
+      "finalUrl": "http://localhost:3100/404",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_404.png"
+    },
+    {
+      "route": "/evidence",
+      "theme": "dark",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/evidence",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "dark-1440-_evidence.png"
+    },
+    {
+      "route": "/",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_.png"
+    },
+    {
+      "route": "/projects",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/projects",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_projects.png"
+    },
+    {
+      "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_projects_0afcc588-e722-45bd-8320-f486601b877c.png"
+    },
+    {
+      "route": "/documents",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/documents",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_documents.png"
+    },
+    {
+      "route": "/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_documents_e51e0fe0-9a08-4ed0-83ad-041a7396472d.png"
+    },
+    {
+      "route": "/documents/upload",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/documents/upload",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_documents_upload.png"
+    },
+    {
+      "route": "/collections",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/collections",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_collections.png"
+    },
+    {
+      "route": "/collections/ca279662-9224-47b7-80d6-341aeda41540",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/collections/ca279662-9224-47b7-80d6-341aeda41540",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_collections_ca279662-9224-47b7-80d6-341aeda41540.png"
+    },
+    {
+      "route": "/reports",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/reports",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_reports.png"
+    },
+    {
+      "route": "/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_reports_f4d46a82-2e25-4f5c-a2f8-68d565ad51be.png"
+    },
+    {
+      "route": "/missions",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_missions.png"
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png"
+    },
+    {
+      "route": "/missions/new",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions/new",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_missions_new.png"
+    },
+    {
+      "route": "/missions/queue",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions/queue",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_missions_queue.png"
+    },
+    {
+      "route": "/search",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/search",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_search.png"
+    },
+    {
+      "route": "/search/results",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/search/results",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_search_results.png"
+    },
+    {
+      "route": "/saved-searches",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/saved-searches",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_saved-searches.png"
+    },
+    {
+      "route": "/settings",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/settings",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_settings.png"
+    },
+    {
+      "route": "/invites",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/settings#invites",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_invites.png"
+    },
+    {
+      "route": "/device",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/device",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_device.png"
+    },
+    {
+      "route": "/admin/users",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/admin/users",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_admin_users.png"
+    },
+    {
+      "route": "/admin/spaces",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/admin/spaces",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_admin_spaces.png"
+    },
+    {
+      "route": "/console",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/console",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_console.png"
+    },
+    {
+      "route": "/console/missions",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/console/missions",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_console_missions.png"
+    },
+    {
+      "route": "/console/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/console/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_console_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png"
+    },
+    {
+      "route": "/console/corrections",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/console/corrections",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_console_corrections.png"
+    },
+    {
+      "route": "/404",
+      "theme": "dark",
+      "width": 390,
+      "status": 404,
+      "finalUrl": "http://localhost:3100/404",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_404.png"
+    },
+    {
+      "route": "/evidence",
+      "theme": "dark",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/evidence",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "dark-390-_evidence.png"
+    },
+    {
+      "route": "/",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_.png"
+    },
+    {
+      "route": "/projects",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/projects",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_projects.png"
+    },
+    {
+      "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_projects_0afcc588-e722-45bd-8320-f486601b877c.png"
+    },
+    {
+      "route": "/documents",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/documents",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_documents.png"
+    },
+    {
+      "route": "/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_documents_e51e0fe0-9a08-4ed0-83ad-041a7396472d.png"
+    },
+    {
+      "route": "/documents/upload",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/documents/upload",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_documents_upload.png"
+    },
+    {
+      "route": "/collections",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/collections",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_collections.png"
+    },
+    {
+      "route": "/collections/ca279662-9224-47b7-80d6-341aeda41540",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/collections/ca279662-9224-47b7-80d6-341aeda41540",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_collections_ca279662-9224-47b7-80d6-341aeda41540.png"
+    },
+    {
+      "route": "/reports",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/reports",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_reports.png"
+    },
+    {
+      "route": "/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_reports_f4d46a82-2e25-4f5c-a2f8-68d565ad51be.png"
+    },
+    {
+      "route": "/missions",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_missions.png"
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png"
+    },
+    {
+      "route": "/missions/new",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions/new",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_missions_new.png"
+    },
+    {
+      "route": "/missions/queue",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions/queue",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_missions_queue.png"
+    },
+    {
+      "route": "/search",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/search",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_search.png"
+    },
+    {
+      "route": "/search/results",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/search/results",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_search_results.png"
+    },
+    {
+      "route": "/saved-searches",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/saved-searches",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_saved-searches.png"
+    },
+    {
+      "route": "/settings",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/settings",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_settings.png"
+    },
+    {
+      "route": "/invites",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/settings#invites",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_invites.png"
+    },
+    {
+      "route": "/device",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/device",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_device.png"
+    },
+    {
+      "route": "/admin/users",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/admin/users",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_admin_users.png"
+    },
+    {
+      "route": "/admin/spaces",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/admin/spaces",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_admin_spaces.png"
+    },
+    {
+      "route": "/console",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/console",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_console.png"
+    },
+    {
+      "route": "/console/missions",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/console/missions",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_console_missions.png"
+    },
+    {
+      "route": "/console/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/console/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_console_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png"
+    },
+    {
+      "route": "/console/corrections",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/console/corrections",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_console_corrections.png"
+    },
+    {
+      "route": "/404",
+      "theme": "light",
+      "width": 1440,
+      "status": 404,
+      "finalUrl": "http://localhost:3100/404",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_404.png"
+    },
+    {
+      "route": "/evidence",
+      "theme": "light",
+      "width": 1440,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/evidence",
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "screenshot": "light-1440-_evidence.png"
+    },
+    {
+      "route": "/",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_.png"
+    },
+    {
+      "route": "/projects",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/projects",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_projects.png"
+    },
+    {
+      "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_projects_0afcc588-e722-45bd-8320-f486601b877c.png"
+    },
+    {
+      "route": "/documents",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/documents",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_documents.png"
+    },
+    {
+      "route": "/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_documents_e51e0fe0-9a08-4ed0-83ad-041a7396472d.png"
+    },
+    {
+      "route": "/documents/upload",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/documents/upload",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_documents_upload.png"
+    },
+    {
+      "route": "/collections",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/collections",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_collections.png"
+    },
+    {
+      "route": "/collections/ca279662-9224-47b7-80d6-341aeda41540",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/collections/ca279662-9224-47b7-80d6-341aeda41540",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_collections_ca279662-9224-47b7-80d6-341aeda41540.png"
+    },
+    {
+      "route": "/reports",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/reports",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_reports.png"
+    },
+    {
+      "route": "/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_reports_f4d46a82-2e25-4f5c-a2f8-68d565ad51be.png"
+    },
+    {
+      "route": "/missions",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_missions.png"
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png"
+    },
+    {
+      "route": "/missions/new",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions/new",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_missions_new.png"
+    },
+    {
+      "route": "/missions/queue",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/missions/queue",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_missions_queue.png"
+    },
+    {
+      "route": "/search",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/search",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_search.png"
+    },
+    {
+      "route": "/search/results",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/search/results",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_search_results.png"
+    },
+    {
+      "route": "/saved-searches",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/saved-searches",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_saved-searches.png"
+    },
+    {
+      "route": "/settings",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/settings",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_settings.png"
+    },
+    {
+      "route": "/invites",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/settings#invites",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_invites.png"
+    },
+    {
+      "route": "/device",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/device",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_device.png"
+    },
+    {
+      "route": "/admin/users",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/admin/users",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_admin_users.png"
+    },
+    {
+      "route": "/admin/spaces",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/admin/spaces",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_admin_spaces.png"
+    },
+    {
+      "route": "/console",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/console",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_console.png"
+    },
+    {
+      "route": "/console/missions",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/console/missions",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_console_missions.png"
+    },
+    {
+      "route": "/console/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/console/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_console_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png"
+    },
+    {
+      "route": "/console/corrections",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/console/corrections",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_console_corrections.png"
+    },
+    {
+      "route": "/404",
+      "theme": "light",
+      "width": 390,
+      "status": 404,
+      "finalUrl": "http://localhost:3100/404",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_404.png"
+    },
+    {
+      "route": "/evidence",
+      "theme": "light",
+      "width": 390,
+      "status": 200,
+      "finalUrl": "http://localhost:3100/evidence",
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "screenshot": "light-390-_evidence.png"
+    }
+  ]
+}

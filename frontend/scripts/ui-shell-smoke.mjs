@@ -54,7 +54,8 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
    localStorage.setItem('tracelab.theme.v1:'+user.user_id,theme);
   },{user:me,theme});
   const page=await context.newPage();
-  let errors=[];page.on('pageerror',e=>errors.push(e.message.slice(0,300)));
+  let errors=[];page.on('pageerror',()=>errors.push('Client-side exception (detail suppressed)'));
+  page.on('requestfailed', request => { if(new URL(request.url()).origin === api) transportErrors.push({path:new URL(request.url()).pathname,error:'Browser API request failed'}); });
   for(const route of selected) {
    errors=[]; transportErrors=[];
    const slug=route.replace(/\//g,'_')||'home';
@@ -66,7 +67,7 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
     const axe=await window.axe.run(document,{resultTypes:['violations']});
     const rules=['html-has-lang','region','landmark-one-main','landmark-no-duplicate-banner'];
     const root=document.documentElement;
-    return {width:innerWidth,scrollWidth:root.scrollWidth,theme:root.dataset.theme,mainCount:document.querySelectorAll('main').length,background:getComputedStyle(document.body).backgroundColor,
+    return {width:innerWidth,scrollWidth:root.scrollWidth,theme:root.dataset.theme,mainCount:document.querySelectorAll('main').length,shellPresent:!!document.querySelector('.app-workspace'),background:getComputedStyle(document.body).backgroundColor,
      overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width>0&&(r.right>innerWidth+1||r.left < -1)&&getComputedStyle(e).visibility!=='hidden'&&e.getClientRects().length}).slice(0,15).map(e=>({tag:e.tagName,class:e.className,text:e.textContent?.slice(0,45)})),
      violations:axe.violations.filter(v=>rules.includes(v.id)||['critical','serious'].includes(v.impact)).map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>({target:n.target,html:n.html.slice(0,400),summary:n.failureSummary}))}))};
    });
@@ -82,7 +83,7 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
 }
 await browser.close();
 browser=undefined;
-const failures=results.filter(r => r.scrollWidth > r.width+1 || r.violations.length || r.errors.length || r.transportErrors.length || r.mainCount !== 1 || r.theme !== r.themeRequested || r.status !== (r.route === '/404' ? 404 : 200));
+const failures=results.filter(r => r.scrollWidth > r.width+1 || r.violations.length || r.errors.length || r.transportErrors.length || r.mainCount !== 1 || !r.shellPresent || r.theme !== r.themeRequested || r.status !== (r.route === '/404' ? 404 : 200));
 await fs.writeFile(out+'/summary.json', JSON.stringify({base, checkedAt:new Date().toISOString(), checks:results.length, routes:[...new Set(results.map(r=>r.route))].length, failures:failures.map(r=>({route:r.route,theme:r.theme,width:r.width})), localApiProxy:base.startsWith('http://localhost')},null,2));
 if(failures.length)process.exitCode=1;
 
