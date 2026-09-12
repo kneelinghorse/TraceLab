@@ -21,11 +21,13 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from app.core.security import AuthenticatedUser, require_authenticated_user
+from app.core.security import AuthenticatedUser, require_admin
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter()
+# CMOS decisions are global operational records, without a TraceLab owner or
+# Space to authorize. Restrict all reads/writes before touching the SQLite store.
+router = APIRouter(dependencies=[Depends(require_admin)])
 
 _CMOS_DB_PATH: Path | None = None
 
@@ -117,7 +119,7 @@ def list_linked_decisions(
         False, description="Only return decisions with evidence links"
     ),
     limit: int = Query(50, ge=1, le=200),
-    _user: AuthenticatedUser = Depends(require_authenticated_user),
+    _user: AuthenticatedUser = Depends(require_admin),
 ):
     """List CMOS strategic decisions with their TraceLab evidence links."""
     try:
@@ -151,16 +153,20 @@ def list_linked_decisions(
         return [_row_to_linked_decision(row) for row in rows]
 
     except FileNotFoundError:
-        raise HTTPException(status_code=503, detail="CMOS database not available")
+        raise HTTPException(
+            status_code=503, detail="CMOS database not available"
+        ) from None
     except Exception as exc:
         logger.warning("Failed to query CMOS decisions: %s", exc)
-        raise HTTPException(status_code=500, detail="Failed to query decisions")
+        raise HTTPException(
+            status_code=500, detail="Failed to query decisions"
+        ) from exc
 
 
 @router.get("/decisions/linked/{decision_id}", response_model=LinkedDecision)
 def get_linked_decision(
     decision_id: int,
-    _user: AuthenticatedUser = Depends(require_authenticated_user),
+    _user: AuthenticatedUser = Depends(require_admin),
 ):
     """Get a single CMOS decision with its evidence links."""
     try:
@@ -184,17 +190,19 @@ def get_linked_decision(
     except HTTPException:
         raise
     except FileNotFoundError:
-        raise HTTPException(status_code=503, detail="CMOS database not available")
+        raise HTTPException(
+            status_code=503, detail="CMOS database not available"
+        ) from None
     except Exception as exc:
         logger.warning("Failed to get decision %s: %s", decision_id, exc)
-        raise HTTPException(status_code=500, detail="Failed to get decision")
+        raise HTTPException(status_code=500, detail="Failed to get decision") from exc
 
 
 @router.post("/decisions/linked/{decision_id}/evidence", response_model=LinkedDecision)
 def add_evidence_to_decision(
     decision_id: int,
     payload: AddEvidenceRequest,
-    _user: AuthenticatedUser = Depends(require_authenticated_user),
+    _user: AuthenticatedUser = Depends(require_admin),
 ):
     """Add TraceLab evidence references to an existing CMOS decision.
 
@@ -246,10 +254,12 @@ def add_evidence_to_decision(
     except HTTPException:
         raise
     except FileNotFoundError:
-        raise HTTPException(status_code=503, detail="CMOS database not available")
+        raise HTTPException(
+            status_code=503, detail="CMOS database not available"
+        ) from None
     except Exception as exc:
         logger.warning("Failed to add evidence to decision %s: %s", decision_id, exc)
-        raise HTTPException(status_code=500, detail="Failed to add evidence")
+        raise HTTPException(status_code=500, detail="Failed to add evidence") from exc
 
 
 # --- Helpers ---

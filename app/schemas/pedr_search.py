@@ -185,11 +185,11 @@ class PEDRSearchRequest(BaseModel):
 
     # Graph layer options (L6)
     enable_graph: bool = Field(
-        default=False,
+        default=True,
         description="Enable graph layer expansion",
     )
     graph_depth: int = Field(
-        default=1,
+        default=2,
         ge=1,
         le=5,
         description="Max BFS traversal depth",
@@ -205,7 +205,7 @@ class PEDRSearchRequest(BaseModel):
         description="Filter to specific graph edge types (None = all)",
     )
     graph_weight: float = Field(
-        default=0.08,
+        default=0.12,
         ge=0.0,
         le=0.5,
         description="Graph layer weight in RRF fusion",
@@ -263,6 +263,30 @@ class PEDRLayerTimings(BaseModel):
     total_ms: float = Field(description="Total search latency in milliseconds")
 
 
+PEDRLayerStatus = Literal["ok", "error", "skipped", "disabled"]
+
+
+class PEDRLayerDiagnostic(BaseModel):
+    """Diagnostic information for a single PEDR layer execution."""
+
+    layer: str = Field(
+        description="Layer name (lexical, semantic, graph, syntactic, pragmatic, governance)"
+    )
+    status: PEDRLayerStatus = Field(description="Layer execution status")
+    duration_ms: float = Field(
+        default=0.0, ge=0.0, description="Execution time in milliseconds"
+    )
+    result_count: int = Field(
+        default=0, ge=0, description="Number of results produced by this layer"
+    )
+    error: str | None = Field(
+        default=None, description="Error message if status is 'error'"
+    )
+    error_type: str | None = Field(
+        default=None, description="Exception class name if status is 'error'"
+    )
+
+
 class PEDRSearchMetadata(BaseModel):
     """Metadata about PEDR search execution."""
 
@@ -282,6 +306,10 @@ class PEDRSearchMetadata(BaseModel):
     )
     layer_weights: dict[str, float] = Field(description="Effective layer weights used")
     timings: PEDRLayerTimings = Field(description="Per-layer timing information")
+    layer_diagnostics: list[PEDRLayerDiagnostic] = Field(default_factory=list)
+    degraded: bool = Field(
+        default=False, description="True when any search layer failed"
+    )
     graph_enabled: bool = Field(
         default=False, description="True if graph layer was enabled"
     )
@@ -406,6 +434,8 @@ __all__ = [
     "PEDRLayerWeights",
     "PEDRSearchRequest",
     "PEDRLayerTimings",
+    "PEDRLayerDiagnostic",
+    "PEDRLayerStatus",
     "PEDRSearchMetadata",
     "PEDRSearchResult",
     "PEDRSearchResponse",

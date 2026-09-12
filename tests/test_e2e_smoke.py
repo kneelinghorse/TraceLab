@@ -12,14 +12,12 @@ Validates the complete TraceLab operational flow:
 
 from __future__ import annotations
 
-import json
 from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
 
 from app.core.mission_events import get_mission_event_bus
-from app.core.security import get_configured_credentials, issue_token_response
 from app.main import app
 from tests.conftest import get_seed_user_email
 
@@ -179,7 +177,7 @@ class TestMissionLifecycleE2E:
         mission_uuid = create_resp.json()["id"]
 
         # Update status to in_progress
-        update_resp = client.put(
+        update_resp = client.patch(
             f"/api/v1/missions/{mission_uuid}",
             json={"status": "in_progress"},
             headers=auth_headers,

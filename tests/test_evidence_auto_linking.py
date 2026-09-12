@@ -36,7 +36,9 @@ CREATE TABLE IF NOT EXISTS projects (
     created_at DATETIME,
     updated_at DATETIME,
     deleted_at DATETIME,
-    deleted_by VARCHAR(100)
+    deleted_by VARCHAR(100),
+    owner_id CHAR(36),
+    workspace_id CHAR(36)
 )
 """
 
@@ -67,6 +69,8 @@ CREATE TABLE IF NOT EXISTS documents (
     source_origin VARCHAR(20),
     deleted_at DATETIME,
     deleted_by VARCHAR(100),
+    owner_id CHAR(36),
+    workspace_id CHAR(36),
     FOREIGN KEY(project_id) REFERENCES projects (id) ON DELETE CASCADE
 )
 """
@@ -175,12 +179,12 @@ def _seed_chunks(db_session, project_id, texts: list[str]) -> list[DocumentChunk
     db_session.add(document)
     db_session.flush()
     chunks: list[DocumentChunk] = []
-    for index, text in enumerate(texts):
+    for index, chunk_text in enumerate(texts):
         chunk = DocumentChunk(
             document_id=document.id,
             chunk_index=index,
-            content=text,
-            content_tsv=text,
+            content=chunk_text,
+            content_tsv=chunk_text,
         )
         db_session.add(chunk)
         chunks.append(chunk)

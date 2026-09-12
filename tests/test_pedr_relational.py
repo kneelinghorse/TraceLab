@@ -388,6 +388,8 @@ class TestRelationType:
             "derived_from",
             "sibling_of",
             "related_to",
+            "co_occurs",
+            "topic_similar",
         }
         actual = {r.value for r in RelationType}
         assert expected == actual
@@ -542,11 +544,13 @@ class TestSessionManagement:
         service = RelationalService()
         owned_session = MagicMock()
 
-        with patch(
-            "app.services.pedr.relational.SessionLocal", return_value=owned_session
+        with (
+            patch(
+                "app.services.pedr.relational.SessionLocal", return_value=owned_session
+            ),
+            patch.object(service, "_get_neighbors", return_value=[]),
         ):
-            with patch.object(service, "_get_neighbors", return_value=[]):
-                service.get_related("urn:research:chunk:test", max_depth=1)
+            service.get_related("urn:research:chunk:test", max_depth=1)
 
         owned_session.close.assert_called_once()
 

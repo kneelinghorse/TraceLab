@@ -31,9 +31,9 @@ mypy reports 970 errors. They are not silently treated as passing gates.
 
 ## Quarantine contract
 
-`backend-quarantine.txt` contains exactly 46 unique pytest node IDs. Every row
+`backend-quarantine.txt` contains exactly 22 unique pytest node IDs. Every row
 has a reason, tests remain collected, and the workflow fails unless pytest's own
-summary reports exactly 46 deselections. A stale, duplicate, or misspelled node
+summary reports exactly 22 deselections. A stale, duplicate, or misspelled node
 therefore breaks the gate instead of quietly shrinking coverage.
 
 ## Promotion ratchet
@@ -59,3 +59,12 @@ Until promoted, the day-one required contexts are `backend-suite`, `vitest`,
 `type-check`, `ruff-diff`, `build-frontend-production`, and `Secret Scan`.
 Production smoke, `backend-integration`, Playwright, ESLint, full-repository
 Ruff, and mypy are not day-one required contexts.
+
+## RECOVER-1 restoration (2026-09-12)
+
+Re-enabled 24 nodes: ingestion edge materialization (7), semantic edge inventory
+(2), mission-event endpoints (6), event smoke flows (3), and evidence linking (6).
+The evidence fixtures now include the current owner/Space columns; the mission
+status smoke uses the current PATCH verb. Restored behavior has additional
+regression coverage for partial search diagnostics, disabled layers, caching,
+canonical YAML/update dispatch, telemetry failures, and route RBAC.

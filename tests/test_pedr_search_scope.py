@@ -131,8 +131,8 @@ def test_route_scope_is_request_local_and_none_preserves_legacy_shape(
     assert fake.calls[0]["allowed_project_ids"] == [first_project]
     assert fake.calls[1]["allowed_project_ids"] == [second_project]
     assert "allowed_project_ids" not in fake.calls[2]
-    assert "layer_diagnostics" not in first.json()["metadata"]
-    assert "degraded" not in first.json()["metadata"]
+    assert first.json()["metadata"]["layer_diagnostics"] == []
+    assert first.json()["metadata"]["degraded"] is False
 
 
 @pytest.mark.parametrize("rerank_mode", ["full", "hybrid"])
