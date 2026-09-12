@@ -1,0 +1,56 @@
+{
+  "mission": "RECOVER-2",
+  "implementation_commit": "93ab9fb275efd2bc522bfecec3c2dd9e09d1a236",
+  "baseline": {
+    "existing_telemetry_tests": "8 failed, 56 passed",
+    "new_regressions": "14 failed, 5 passed; all nine writers lose envelope fields, four can raise on failed sink, SQLite request thread cannot see in-memory table"
+  },
+  "local_targeted": {
+    "result": "197 passed, 17 warnings in 37.06s",
+    "suites": [
+      "recovery telemetry writers",
+      "recovery database engine",
+      "format-only Git guard",
+      "telemetry standardization/migration",
+      "correction loop",
+      "DeepSearch ingest",
+      "auth hardening",
+      "mission protocol service",
+      "semantic edge types",
+      "PEDR delta sync/preflight",
+      "cost monitor"
+    ]
+  },
+  "graph_and_deepsearch": "4 passed; graph acceptance and deterministic HTTP ingest",
+  "format_guard": {
+    "historical_incident": "d592c92 flagged by executing checker against its parent",
+    "git_fixtures": "7 passed: four claim styles, AST-equivalent formatting, explicit behavior changes, deleted file hidden by later restoration"
+  },
+  "quarantine": {
+    "before": 22,
+    "after": 12,
+    "restored": 10,
+    "remaining": "10 historical envelope-reader fixtures, 1 stale admin rolling-window fixture, 1 missing processing_events response fixture"
+  },
+  "schema": {
+    "decision": "keep content_tsv nullable=False; no migration",
+    "evidence": "recover-2-schema-verification.json",
+    "cmos_decision_id": 382
+  },
+  "checks": {
+    "changed_file_ruff": "passed",
+    "foundational_refs": "passed",
+    "credential_literal_scan": "passed",
+    "diff_check": "passed"
+  },
+  "full_backend": {
+    "status": "running in isolated worktree"
+  },
+  "hosted_ci": {
+    "status": "pending"
+  },
+  "production": {
+    "status": "pending deployment"
+  },
+  "telemetry_churn_committed": false
+}
