@@ -248,3 +248,25 @@ complete affected ingest file then passed all 10 tests. Hosted CI/deploy outcome
 remain required before mission closure. Telemetry emitter
 losses outside evidence auto-linking, SQLite test-engine kwargs, schema parity,
 and the later-restoration completeness sweep remain RECOVER-2 work.
+
+### RECOVER-1 final verification
+
+Merged in PR #254 as `429ac59` after all six required checks passed on `7ca1d7c`:
+2,352 backend tests passed, three explicit skips, and 22 quarantined deselections.
+PostgreSQL integration passed. Service authentication was corrected in `83b3c4f`;
+real JWT/API-key tests cover the service mount, and `7ca1d7c` adapts the duplicate
+route guard to both eager and lazy FastAPI routers.
+
+Railway deployed `429ac59`. Thirty production HTTP checks passed: test ingestion
+inserted four graph edges (60,301 → 60,305), full PEDR returned six diagnostics with
+`degraded=false`, restored routes appeared in OpenAPI, and member/viewer/service
+route boundaries held. The complete owner-based live RBAC harness passed after
+deploy, with its existing scope notes retained in the validation record. Test
+users and the mission were purged; the smoke document/project were soft-deleted
+through the supported APIs. API health and frontend returned HTTP 200.
+
+An extra local full-suite reproduction hit the existing 5 ms graph-latency
+assertion; the isolated baseline also fails that threshold. The final hosted
+suite passes the unchanged test. The two legacy CMOS asset-runner failures
+remain disclosed above. See `cmos/reports/sprint-50/recover-1-validation.json` and
+`cmos/reports/sprint-50/recover-1-production-smoke.json` for the recorded evidence.
