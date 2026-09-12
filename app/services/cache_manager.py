@@ -193,6 +193,8 @@ class CacheManager:
     ) -> tuple[Any, ...]:
         if kind == "detail" and identifier:
             return ("detail", identifier)
+        if kind == "stats" and identifier:
+            return ("stats", identifier)
         normalized_search = (search or "").strip().lower()
         return (
             "list",
@@ -220,11 +222,9 @@ class CacheManager:
         entity_types: Sequence[str] | None,
         min_relevance: float | None,
     ) -> tuple[Any, ...]:
-        normalized_types: tuple[str, ...]
-        if entity_types:
-            normalized_types = tuple(sorted(entity_types))
-        else:
-            normalized_types = tuple()
+        normalized_types: tuple[str, ...] = (
+            tuple(sorted(entity_types)) if entity_types else tuple()
+        )
         normalized_relevance = (
             None if min_relevance is None else round(float(min_relevance), 3)
         )
@@ -246,6 +246,11 @@ class CacheManager:
         removed = self.invalidate(
             "project_metadata",
             predicate=lambda key: key[0] == "detail" and key[1] == project_id,
+        )
+        # Project updates also impact stats
+        removed += self.invalidate(
+            "project_metadata",
+            predicate=lambda key: key[0] == "stats" and key[1] == project_id,
         )
         # Project updates also impact listings
         removed += self.invalidate(
@@ -298,7 +303,7 @@ class CacheManager:
                     datetime.fromtimestamp(last_event, tz=UTC)
                     .isoformat()
                     .replace("+00:00", "Z")
-                    if isinstance(last_event, (int, float))
+                    if isinstance(last_event, int | float)
                     else None
                 ),
             }

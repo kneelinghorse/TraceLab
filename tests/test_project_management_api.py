@@ -108,6 +108,60 @@ class TestProjectStats:
         )
         assert stats.last_updated is None
 
+    def test_stats_are_never_served_from_another_projects_cache(self, db_session, auth_headers):
+        """Stats are cached per project id, so B must never receive A's cached payload.
+
+        Regression for the d592c92 key collision (every project shared one stats key),
+        observed in production as three project ids all returning the same stats.
+        """
+        from fastapi.testclient import TestClient
+
+        from app.main import app
+        from app.models.project import Project
+
+        project_a = Project(name="Stats Cache A")
+        project_b = Project(name="Stats Cache B")
+        db_session.add_all([project_a, project_b])
+        db_session.commit()
+
+        with TestClient(app) as client:
+            first = client.get(f"/api/v1/projects/{project_a.id}/stats", headers=auth_headers)
+            second = client.get(f"/api/v1/projects/{project_b.id}/stats", headers=auth_headers)
+
+        assert first.status_code == 200
+        assert second.status_code == 200
+        assert first.json()["project_id"] == str(project_a.id)
+        assert second.json()["project_id"] == str(project_b.id)
+        assert second.json()["name"] == "Stats Cache B"
+
+    def test_project_update_invalidates_cached_stats(self, db_session, auth_headers):
+        """A project rename must be visible in stats immediately, not after cache expiry."""
+        from fastapi.testclient import TestClient
+
+        from app.main import app
+        from app.models.project import Project
+
+        project = Project(name="Before Rename")
+        db_session.add(project)
+        db_session.commit()
+
+        with TestClient(app) as client:
+            warm = client.get(f"/api/v1/projects/{project.id}/stats", headers=auth_headers)
+            assert warm.status_code == 200
+            assert warm.json()["name"] == "Before Rename"
+
+            renamed = client.put(
+                f"/api/v1/projects/{project.id}",
+                json={"name": "After Rename"},
+                headers=auth_headers,
+            )
+            assert renamed.status_code == 200
+
+            after = client.get(f"/api/v1/projects/{project.id}/stats", headers=auth_headers)
+
+        assert after.status_code == 200
+        assert after.json()["name"] == "After Rename"
+
 
 class TestProjectQueryService:
     """Tests for ProjectQueryService methods."""
