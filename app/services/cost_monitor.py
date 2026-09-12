@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import threading
 from collections import defaultdict
 from datetime import UTC, datetime, timedelta
@@ -253,13 +252,18 @@ class CostMonitor:
     def _append_telemetry(
         self, payload: dict[str, Any]
     ) -> None:  # pragma: no cover - simple IO
-        self.telemetry_path.parent.mkdir(parents=True, exist_ok=True)
-        with self.telemetry_path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
+        from app.core.telemetry import emit_telemetry
+
+        emit_telemetry(
+            path=self.telemetry_path,
+            event_type="cost.monitor.event",
+            source="tracelab",
+            payload=payload,
+        )
 
     @staticmethod
     def _safe_mean(values: Any) -> float:
-        numeric = [value for value in values if isinstance(value, (int, float))]
+        numeric = [value for value in values if isinstance(value, int | float)]
         return round(mean(numeric), 3) if numeric else 0.0
 
 

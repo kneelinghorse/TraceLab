@@ -6,7 +6,6 @@ Reference: cmos/planning/PEDR-docs/tracelab-to-pedr-mapping.md
 
 from __future__ import annotations
 
-import json
 import logging
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
@@ -201,12 +200,11 @@ class DeltaSyncService:
                 batch_manifests.append(result.manifest)
 
                 # Track latest updated_at for sync state
-                if mission.updated_at:
-                    if (
-                        latest_updated_at is None
-                        or mission.updated_at > latest_updated_at
-                    ):
-                        latest_updated_at = mission.updated_at
+                if mission.updated_at and (
+                    latest_updated_at is None
+                    or mission.updated_at > latest_updated_at
+                ):
+                    latest_updated_at = mission.updated_at
 
                 # Process batch when full
                 if len(batch_manifests) >= self.batch_size:
@@ -343,12 +341,11 @@ class DeltaSyncService:
 
                 if result.success:
                     batch_manifests.append(result.manifest)
-                    if doc.uploaded_at:
-                        if (
-                            latest_uploaded_at is None
-                            or doc.uploaded_at > latest_uploaded_at
-                        ):
-                            latest_uploaded_at = doc.uploaded_at
+                    if doc.uploaded_at and (
+                        latest_uploaded_at is None
+                        or doc.uploaded_at > latest_uploaded_at
+                    ):
+                        latest_uploaded_at = doc.uploaded_at
                 else:
                     failed += 1
                     errors.append(f"Document {doc.id}: {result.error}")
@@ -575,24 +572,22 @@ class DeltaSyncService:
         if not self.telemetry_path:
             return
 
-        event = {
-            "ts": datetime.now(UTC).isoformat(),
-            "event": "pedr_sync",
-            "entity_type": entity_type.value,
-            "mode": mode.value,
-            "synced_count": synced,
-            "failed_count": failed,
-            "skipped_count": skipped,
-            "duration_ms": round(duration_ms, 2),
-            "success": failed == 0,
-        }
+        from app.core.telemetry import emit_telemetry
 
-        try:
-            self.telemetry_path.parent.mkdir(parents=True, exist_ok=True)
-            with self.telemetry_path.open("a") as f:
-                f.write(json.dumps(event) + "\n")
-        except Exception as e:
-            logger.warning(f"Failed to write telemetry: {e}")
+        emit_telemetry(
+            path=self.telemetry_path,
+            event_type="pedr.delta_sync.completed",
+            source="pedr",
+            payload={
+                "entity_type": entity_type.value,
+                "mode": mode.value,
+                "synced_count": synced,
+                "failed_count": failed,
+                "skipped_count": skipped,
+                "duration_ms": round(duration_ms, 2),
+                "success": failed == 0,
+            },
+        )
 
 
 # Singleton instance

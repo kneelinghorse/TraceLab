@@ -1,28 +1,18 @@
-# CI-1 backend quarantine: 22 exact node IDs after RECOVER-1.
+# CI-1 backend quarantine: 12 exact node IDs after RECOVER-2.
 # Format is NODE_ID # one-line reason. The backend workflow requires a reason on every row.
 # Tests remain collected and tracked; this list is a temporary ratchet, never a deletion list.
 # SQLite foreign-key enforcement remains off in the shared non-integration harness (out of CI-1 scope).
 # Baseline evidence and promotion policy: .github/ci/README.md.
 
-tests/sprint_03/test_api_stability.py::test_api_uptime_and_latency_meet_targets # Sprint-03 KPI relic depends on historical generated telemetry, not current request behavior.
-tests/sprint_03/test_evidence_integrity.py::test_evidence_integrity_checks_detect_missing_chunks # Sprint-03 artifact baseline no longer matches the current chunk model.
-tests/sprint_03/test_quality_gate_effectiveness.py::test_quality_gate_failures_blocked_with_actionable_feedback # Sprint-03 quality-gate response assertion predates the current contract.
-tests/sprint_03/test_validation_coverage.py::test_validation_rate_exceeds_target # Sprint-03 generated coverage threshold is not a deterministic PR gate.
-tests/sprint_04/test_coverage_metric.py::test_coverage_threshold_exceeded # Sprint-04 generated coverage artifact is stale relative to the current suite.
-tests/sprint_04/test_performance_metrics.py::test_latency_stays_under_two_seconds # Sprint-04 timing assertion is environment-sensitive legacy acceptance coverage.
-tests/sprint_04/test_performance_metrics.py::test_cost_profile_within_budget # Sprint-04 cost fixture no longer matches the current pricing/telemetry model.
-tests/sprint_04/test_quality_and_load.py::test_quality_checks_block_and_pass # Sprint-04 quality fixture predates the current gate contract.
-tests/sprint_04/test_quality_and_load.py::test_load_test_supports_target_concurrency # Sprint-04 load threshold is environment-sensitive legacy acceptance coverage.
-tests/sprint_04/test_tech_debt.py::test_playwright_migration_eliminates_cypress_cost # Sprint-04 tech-debt assertion reads historical planning artifacts rather than runtime behavior.
-tests/test_admin_dashboard.py::test_metrics_aggregator_generates_sections # Admin metrics test asserts the retired dashboard-stub section shape.
-tests/test_correction_loop.py::TestTelemetry::test_webhook_telemetry_logged # Correction-loop test expects the pre-envelope telemetry sink shape.
-tests/test_correction_loop.py::TestTelemetry::test_correction_queue_telemetry # Correction-loop test expects the pre-envelope telemetry sink shape.
-tests/test_deepsearch_ingestion.py::test_ingest_endpoint_persists_mission_and_auto_links # Legacy ingest fixture drifts from current mission ownership/result contracts.
-tests/test_document_ingestion.py::test_upload_and_process_endpoints_record_statuses # Legacy ingestion status fixture drifts from the current processing-state contract.
-tests/test_graph_e2e_validation.py::TestGraphSearchE2EValidation::test_all_12_queries_execute_successfully # Graph acceptance corpus has one stale all-query success baseline.
-tests/test_telemetry_migration_completion.py::TestQualityGateTelemetryEnvelope::test_emits_envelope_format # Telemetry test expects the superseded quality-gate envelope/source shape.
-tests/test_telemetry_migration_completion.py::TestQualityGateTelemetryEnvelope::test_multiple_events_all_conform # Telemetry test expects the superseded quality-gate envelope/source shape.
-tests/test_telemetry_migration_completion.py::TestQualityAutomationTelemetryEnvelope::test_emits_envelope_format # Telemetry test expects the superseded automation envelope/source shape.
-tests/test_telemetry_migration_completion.py::TestNoRemainingNonConformingEmitters::test_quality_gate_sink_uses_emit_telemetry # Source-inspection assertion predates the current quality-gate emitter implementation.
-tests/test_telemetry_migration_completion.py::TestNoRemainingNonConformingEmitters::test_quality_automation_sink_uses_emit_telemetry # Source-inspection assertion predates the current automation emitter implementation.
-tests/test_telemetry_migration_completion.py::TestNoRemainingNonConformingEmitters::test_graph_telemetry_uses_emit_telemetry # Source-inspection assertion predates the current graph telemetry implementation.
+tests/sprint_03/test_api_stability.py::test_api_uptime_and_latency_meet_targets # Historical Sprint-03 evaluator reads unwrapped telemetry and finds no uptime data points.
+tests/sprint_03/test_evidence_integrity.py::test_evidence_integrity_checks_detect_missing_chunks # Historical Sprint-03 evaluator reads unwrapped telemetry and reports zero relevance.
+tests/sprint_03/test_quality_gate_effectiveness.py::test_quality_gate_failures_blocked_with_actionable_feedback # Historical Sprint-03 evaluator does not unwrap the preserved TelemetryEnvelope; actionable_ratio is zero.
+tests/sprint_03/test_validation_coverage.py::test_validation_rate_exceeds_target # Historical Sprint-03 evaluator does not unwrap telemetry; mission_id and validation layers are missing.
+tests/sprint_04/test_coverage_metric.py::test_coverage_threshold_exceeded # Historical Sprint-04 coverage evaluator finds no coverage event in its telemetry fixture.
+tests/sprint_04/test_performance_metrics.py::test_latency_stays_under_two_seconds # Historical Sprint-04 evaluator raises Latency telemetry missing; it does not unwrap envelopes.
+tests/sprint_04/test_performance_metrics.py::test_cost_profile_within_budget # Historical Sprint-04 evaluator raises Cost telemetry missing; it does not unwrap envelopes.
+tests/sprint_04/test_quality_and_load.py::test_quality_checks_block_and_pass # Historical Sprint-04 evaluator cannot find the enveloped quality event in its fixture.
+tests/sprint_04/test_quality_and_load.py::test_load_test_supports_target_concurrency # Historical Sprint-04 evaluator raises Load test telemetry missing; it does not unwrap envelopes.
+tests/sprint_04/test_tech_debt.py::test_playwright_migration_eliminates_cypress_cost # Historical Sprint-04 evaluator cannot find the enveloped tech-debt event in its fixture.
+tests/test_admin_dashboard.py::test_metrics_aggregator_generates_sections # Fixed 2025 cost-event timestamps fall outside the current rolling retention window; expected 0.45 is zero.
+tests/test_document_ingestion.py::test_upload_and_process_endpoints_record_statuses # Document detail fixture expects processing_events, which the current DocumentResponse does not expose (KeyError).

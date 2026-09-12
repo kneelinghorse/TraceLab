@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -459,24 +458,23 @@ class CorrectionQueueService:
 
     def _log_telemetry(self, event: str, item: CorrectionQueueItem) -> None:
         """Write telemetry record for Grafana dashboards."""
-        record = {
-            "ts": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
-            "event": event,
-            "mission_id": item.mission_id,
-            "evidence_id": item.evidence_id,
-            "error_type": item.error_type.value,
-            "retry_count": item.retry_count,
-            "similarity": item.best_similarity,
-            "threshold": item.similarity_threshold,
-            "status": item.status.value,
-            "success": item.status == CorrectionStatus.COMPLETED,
-        }
-        try:
-            self.telemetry_path.parent.mkdir(parents=True, exist_ok=True)
-            with self.telemetry_path.open("a", encoding="utf-8") as f:
-                f.write(json.dumps(record, ensure_ascii=False) + "\n")
-        except OSError as e:
-            logger.warning("Failed to write correction telemetry: %s", e)
+        from app.core.telemetry import emit_telemetry
+
+        emit_telemetry(
+            path=self.telemetry_path,
+            event_type=f"correction.{event}",
+            source="tracelab",
+            payload={
+                "mission_id": item.mission_id,
+                "evidence_id": item.evidence_id,
+                "error_type": item.error_type.value,
+                "retry_count": item.retry_count,
+                "similarity": item.best_similarity,
+                "threshold": item.similarity_threshold,
+                "status": item.status.value,
+                "success": item.status == CorrectionStatus.COMPLETED,
+            },
+        )
 
     def get_telemetry_summary(self) -> dict[str, Any]:
         """Generate Grafana-ready telemetry summary."""
