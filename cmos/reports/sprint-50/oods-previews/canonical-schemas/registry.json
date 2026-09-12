@@ -1,0 +1,162 @@
+{
+  "objects": [
+    {
+      "name": "Chunk",
+      "domain": "research.data",
+      "version": "0.1.0",
+      "maturity": "alpha",
+      "description": "TraceLab chunk: data in the research notebook. An excerpt shown inline within its source document; no standalone page.",
+      "traits": [
+        "content/Labelled"
+      ],
+      "fieldCount": 12,
+      "tags": [
+        "research",
+        "tracelab",
+        "data"
+      ]
+    },
+    {
+      "name": "Collection",
+      "domain": "research.context",
+      "version": "0.1.0",
+      "maturity": "alpha",
+      "description": "TraceLab collection: context in the research notebook. API provenance and unavailable trait fields are specified in the TraceLab OODS mapping contract.",
+      "traits": [
+        "content/Labelled",
+        "lifecycle/Timestampable",
+        "structural/Ownerable",
+        "behavioral/Taggable",
+        "behavioral/Searchable",
+        "behavioral/Filterable",
+        "behavioral/Pageable"
+      ],
+      "fieldCount": 11,
+      "tags": [
+        "research",
+        "tracelab",
+        "context"
+      ]
+    },
+    {
+      "name": "Document",
+      "domain": "research.data",
+      "version": "0.1.0",
+      "maturity": "alpha",
+      "description": "TraceLab document: data in the research notebook. API provenance and unavailable trait fields are specified in the TraceLab OODS mapping contract.",
+      "traits": [
+        "content/Labelled",
+        "lifecycle/Stateful",
+        "lifecycle/Timestampable",
+        "structural/Ownerable",
+        "core/Classifiable",
+        "behavioral/Searchable",
+        "behavioral/Filterable",
+        "behavioral/Pageable"
+      ],
+      "fieldCount": 31,
+      "tags": [
+        "research",
+        "tracelab",
+        "data"
+      ]
+    },
+    {
+      "name": "Evidence",
+      "domain": "research.data",
+      "version": "0.1.0",
+      "maturity": "alpha",
+      "description": "TraceLab evidence: data in the research notebook. API provenance and unavailable trait fields are specified in the TraceLab OODS mapping contract.",
+      "traits": [
+        "content/Labelled",
+        "lifecycle/Timestampable",
+        "structural/Ownerable",
+        "core/Classifiable",
+        "behavioral/Searchable",
+        "behavioral/Filterable",
+        "behavioral/Pageable"
+      ],
+      "fieldCount": 24,
+      "tags": [
+        "research",
+        "tracelab",
+        "data"
+      ]
+    },
+    {
+      "name": "Mission",
+      "domain": "research.job",
+      "version": "0.1.0",
+      "maturity": "alpha",
+      "description": "TraceLab mission: job in the research notebook. API provenance and unavailable trait fields are specified in the TraceLab OODS mapping contract.",
+      "traits": [
+        "content/Labelled",
+        "lifecycle/Stateful",
+        "lifecycle/Timestampable",
+        "structural/Ownerable",
+        "behavioral/Taggable",
+        "lifecycle/Cancellable",
+        "behavioral/Searchable",
+        "behavioral/Filterable",
+        "behavioral/Pageable"
+      ],
+      "fieldCount": 53,
+      "tags": [
+        "research",
+        "tracelab",
+        "job"
+      ]
+    },
+    {
+      "name": "Project",
+      "domain": "research.container",
+      "version": "0.1.0",
+      "maturity": "alpha",
+      "description": "TraceLab project: container in the research notebook. API provenance and unavailable trait fields are specified in the TraceLab OODS mapping contract.",
+      "traits": [
+        "content/Labelled",
+        "lifecycle/Stateful",
+        "lifecycle/Timestampable",
+        "structural/Ownerable",
+        "behavioral/Taggable",
+        "behavioral/Searchable",
+        "behavioral/Filterable",
+        "behavioral/Pageable"
+      ],
+      "fieldCount": 23,
+      "tags": [
+        "research",
+        "tracelab",
+        "container"
+      ]
+    },
+    {
+      "name": "Report",
+      "domain": "research.synthesis",
+      "version": "0.1.0",
+      "maturity": "alpha",
+      "description": "TraceLab report: synthesis in the research notebook. API provenance and unavailable trait fields are specified in the TraceLab OODS mapping contract.",
+      "traits": [
+        "content/Labelled",
+        "lifecycle/Stateful",
+        "lifecycle/Timestampable",
+        "structural/Ownerable",
+        "behavioral/Searchable",
+        "behavioral/Filterable",
+        "behavioral/Pageable"
+      ],
+      "fieldCount": 17,
+      "tags": [
+        "research",
+        "tracelab",
+        "synthesis"
+      ]
+    }
+  ],
+  "totalCount": 7,
+  "filters": {
+    "domain": "research",
+    "maturity": null,
+    "trait": null
+  }
+}

@@ -25,7 +25,7 @@ The companion [machine-readable contract](oods-object-model.json) lists each mod
 
 ## Supported compositions
 
-All six page-level objects support list/detail/timeline; Chunk supports inline. Mission also has a saved workflow with list/detail/form/timeline and loading/empty/error/success states. Saved schema names are `tracelab-<object>-<context>-v1`; the schema store's monotonic version is separate from this consumer name. Schemas and React design_preview receipts are retained under `cmos/reports/sprint-50/oods-previews/`; Mission list/detail/timeline and Evidence list/detail are measured at 390/820/1440 in both themes. These are Forge prototypes for later implementation missions, not deployed TraceLab screenshots.
+All six page-level objects support list/detail/timeline; Chunk supports inline. Mission also has a saved workflow with list/detail/form/timeline and loading/empty/error/success states. Saved schema names are `tracelab-<object>-<context>-v1`; the schema store's monotonic version is separate from this consumer name. All 20 are persisted in the canonical Forge store; [the persistence receipt](../reports/sprint-50/oods-previews/canonical-schemas/persistence.json) records the public schema-list verification. Schemas and React design_preview receipts are retained under `cmos/reports/sprint-50/oods-previews/`; Mission list/detail/timeline and Evidence list/detail are measured at 390/820/1440 in both themes. These are Forge prototypes for later implementation missions, not deployed TraceLab screenshots.
 
 ## Universal objects
 

@@ -1,7 +1,7 @@
 {
   "mission": "UX-1",
   "status": "in_progress; Forge runtime CI and canonical registry activation pending",
-  "updated_at": "2026-09-12T22:22:33.561147+00:00",
+  "updated_at": "2026-09-12T23:09:50.654979+00:00",
   "forge": {
     "base": "114a268ea10b9141bc96925c69132179c7c4b334",
     "implementation_head": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
@@ -46,7 +46,8 @@
     "count": 20,
     "zero_validation_errors": true,
     "summary": "oods-previews/schema-summary.json",
-    "store": "isolated Forge workspace; canonical persistence pending"
+    "store": "canonical Forge schema store; 20 TraceLab schemas visible through the provided public schema(list) tool, 36 total, original 16 metadata records unchanged",
+    "canonical_persistence": "oods-previews/canonical-schemas/persistence.json"
   },
   "previews": [
     {
@@ -212,35 +213,35 @@
   "pending": [
     "Complete pinned Linux 240-cell catalog run and retain authentic referenced receipts",
     "Pass Forge full CI and portable artifact smoke; merge PR105",
-    "Refresh canonical Forge worker and persist 20 schemas in its store",
+    "Refresh canonical Forge worker and verify the seven research objects through the provided connection",
     "Attach landed commit to the roadmap-required backlog request",
     "Pass TraceLab PR checks and merge mapping/evidence changes",
     "CMOS health and final status verification"
   ],
   "traceLab_ci": {
-    "head": "7f0e907",
+    "head": "9df87f610087e3f75f3e96cc126ccdd876a27ced",
     "pull_request": "https://github.com/kneelinghorse/TraceLab/pull/257",
     "required_checks": "passed at this head; draft pending Forge activation",
     "backend": {
-      "run": 34722628691,
-      "passed": 2402,
+      "run": 34723462099,
+      "passed": 2409,
       "skipped": 3,
       "deselected": 12,
       "warnings": 47
     },
     "integration": {
-      "run": 34722628693,
+      "run": 34723462107,
       "passed": 125,
       "skipped": 4,
       "warnings": 17
     },
     "frontend_production_build": {
-      "run": 34722628680,
+      "run": 34723462116,
       "status": "passed",
       "browser_tests_passed": 8
     },
     "frontend_unit_and_types": {
-      "run": 34722628645,
+      "run": 34723462097,
       "status": "passed"
     },
     "secret_scan": "passed",
@@ -250,5 +251,10 @@
       "mypy",
       "frontend lint"
     ]
+  },
+  "handoff_references": {
+    "UX-2": "CMOS referenceDocs includes contract, schema index, Mission list/detail light/dark receipts",
+    "UX-3": "CMOS referenceDocs includes contract, schema index, Evidence list/detail light/dark receipts",
+    "Sprint51": "No missions instantiated yet; planned UX-6/UX-7/UX-8 entries in the guiding roadmap now reference the saved schema index and structural preview receipts."
   }
 }

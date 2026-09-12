@@ -1,0 +1,825 @@
+{
+  "input": {
+    "object": "Document",
+    "context": "list"
+  },
+  "saved": {
+    "name": "tracelab-document-list-v1",
+    "version": 1,
+    "createdAt": "2026-09-12T23:09:15.015Z",
+    "updatedAt": "2026-09-12T23:09:15.015Z",
+    "tags": [
+      "tracelab",
+      "research",
+      "ux-1",
+      "list"
+    ],
+    "object": "Document",
+    "author": "TraceLab UX-1"
+  },
+  "composition": {
+    "status": "ok",
+    "layout": "list",
+    "schema": {
+      "version": "2026.02",
+      "theme": "light",
+      "screens": [
+        {
+          "id": "screen-list-9",
+          "component": "Stack",
+          "layout": {
+            "type": "stack",
+            "gapToken": "cluster-default"
+          },
+          "children": [
+            {
+              "id": "screen-list-9-loading",
+              "component": "Banner",
+              "state": "loading",
+              "props": {
+                "title": "Loading",
+                "message": "Loading your records."
+              }
+            },
+            {
+              "id": "screen-list-9-empty",
+              "component": "Banner",
+              "state": "empty",
+              "props": {
+                "title": "No records found",
+                "message": "Change the filters or add a record."
+              }
+            },
+            {
+              "id": "screen-list-9-error",
+              "component": "Banner",
+              "state": "error",
+              "props": {
+                "title": "Unable to load records",
+                "message": "Try again or choose another record."
+              }
+            },
+            {
+              "id": "screen-list-9-success",
+              "component": "Stack",
+              "state": "success",
+              "layout": {
+                "type": "stack",
+                "gapToken": "cluster-default"
+              },
+              "children": [
+                {
+                  "id": "list-toolbar-4",
+                  "component": "Stack",
+                  "layout": {
+                    "type": "inline",
+                    "align": "space-between"
+                  },
+                  "style": {
+                    "spacingToken": "inset-default"
+                  },
+                  "children": [
+                    {
+                      "id": "slot-search-1",
+                      "component": "SearchInput",
+                      "meta": {
+                        "intent": "slot:search",
+                        "label": "search"
+                      },
+                      "props": {
+                        "label": "Search",
+                        "placeholder": "Search records",
+                        "clearable": true
+                      },
+                      "collectionControl": "search"
+                    },
+                    {
+                      "id": "slot-filters-2",
+                      "component": "Select",
+                      "meta": {
+                        "intent": "slot:filters",
+                        "label": "filters"
+                      },
+                      "props": {
+                        "label": "Status",
+                        "options": [
+                          {
+                            "value": "",
+                            "label": "All states"
+                          },
+                          {
+                            "value": "pending",
+                            "label": "pending"
+                          },
+                          {
+                            "value": "processed",
+                            "label": "processed"
+                          },
+                          {
+                            "value": "chunked",
+                            "label": "chunked"
+                          },
+                          {
+                            "value": "embedded",
+                            "label": "embedded"
+                          },
+                          {
+                            "value": "failed",
+                            "label": "failed"
+                          }
+                        ]
+                      },
+                      "collectionControl": "filter"
+                    },
+                    {
+                      "id": "list-toolbar-4-sort",
+                      "component": "Select",
+                      "collectionControl": "sort",
+                      "props": {
+                        "field": "name",
+                        "label": "Sort",
+                        "options": [
+                          {
+                            "value": "asc",
+                            "label": "Name A–Z"
+                          },
+                          {
+                            "value": "desc",
+                            "label": "Name Z–A"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "id": "list-items-5",
+                  "component": "Stack",
+                  "layout": {
+                    "type": "stack",
+                    "gapToken": "cluster-tight"
+                  },
+                  "children": [
+                    {
+                      "id": "list-items-5-row",
+                      "component": "Button",
+                      "collectionControl": "open",
+                      "props": {
+                        "field": "owner_id"
+                      },
+                      "layout": {
+                        "type": "inline",
+                        "gapToken": "cluster-default"
+                      },
+                      "children": [
+                        {
+                          "id": "list-items-5-title",
+                          "component": "Text",
+                          "props": {
+                            "field": "name"
+                          }
+                        },
+                        {
+                          "id": "ve-items-10",
+                          "component": "LabelCell",
+                          "props": {
+                            "field": "label",
+                            "descriptionField": "description",
+                            "truncate": true,
+                            "maxLengthParameter": "maxLabelLength",
+                            "label": "Label"
+                          }
+                        },
+                        {
+                          "id": "ve-items-14",
+                          "component": "StatusBadge",
+                          "props": {
+                            "tone": "lifecycle",
+                            "statusField": "status"
+                          }
+                        },
+                        {
+                          "id": "ve-items-15",
+                          "component": "RelativeTimestamp",
+                          "props": {
+                            "field": "updated_at",
+                            "fallbackField": "created_at",
+                            "timezoneParameter": "timezone"
+                          }
+                        },
+                        {
+                          "id": "ve-items-16",
+                          "component": "OwnerBadge",
+                          "props": {
+                            "ownerIdField": "owner_id",
+                            "ownerTypeField": "owner_type"
+                          }
+                        },
+                        {
+                          "id": "ve-toolbar-actions-17",
+                          "component": "ClassificationBadge",
+                          "props": {
+                            "mode": "{classification_mode}",
+                            "primaryCategoryField": "primary_category_id",
+                            "tagPreviewField": "tag_preview"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "list-items-5-empty",
+                      "component": "Banner",
+                      "props": {
+                        "message": "No records found."
+                      },
+                      "collectionControl": "empty"
+                    }
+                  ],
+                  "collection": {
+                    "source": "rows",
+                    "keyField": "owner_id",
+                    "labelField": "name"
+                  }
+                },
+                {
+                  "id": "list-pagination-7",
+                  "component": "Stack",
+                  "layout": {
+                    "type": "inline",
+                    "align": "center"
+                  },
+                  "style": {
+                    "spacingToken": "inset-default"
+                  },
+                  "children": [
+                    {
+                      "id": "slot-pagination-8",
+                      "component": "PaginationBar",
+                      "meta": {
+                        "intent": "slot:pagination",
+                        "label": "pagination",
+                        "confidence": 0.77,
+                        "confidenceLevel": "low"
+                      },
+                      "collectionControl": "page",
+                      "props": {
+                        "showItemRange": true
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "bindings": {
+            "onRowClick": "handleRowClick",
+            "onSort": "handleSort",
+            "onFilter": "handleFilter",
+            "onPageChange": "handlePageChange"
+          }
+        }
+      ],
+      "objectSchema": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "description": "Display projection of name; retain the complete source field.",
+          "semanticType": "text.label"
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "description": "Supporting description used in detail and card contexts.",
+          "semanticType": "text.description"
+        },
+        "placeholder": {
+          "type": "string",
+          "required": false,
+          "description": "Hint copy surfaced in form fields when the label is empty.",
+          "semanticType": "text.placeholder"
+        },
+        "status": {
+          "type": "string",
+          "required": true,
+          "description": "Canonical research lifecycle. Display projection only: explicit latest failure, then embedded, chunked, processed, pending; missing input remains unknown.",
+          "enum": [
+            "pending",
+            "processed",
+            "chunked",
+            "embedded",
+            "failed"
+          ],
+          "semanticType": "status.state"
+        },
+        "state_history": {
+          "type": "StateTransition[]",
+          "required": false,
+          "description": "Chronological log of state transitions. Each entry records the before/after states,\ntimestamp, and (when governance is enabled) the actor, reason, and transition metadata.\nRendered by StatusTimeline in the detail and timeline views.\n\nEntry structure:\n  - from: string (previous state)\n  - to: string (new state)\n  - timestamp: ISO 8601 datetime\n  - actor_id: string (user/system who triggered the transition, optional)\n  - reason: string (human-readable justification, required when requireTransitionReason is true)\n  - transition_metadata: Record<string, unknown> (arbitrary context, optional)\n",
+          "semanticType": "timeline.state_transition"
+        },
+        "allowed_transitions": {
+          "type": "string[]",
+          "required": false,
+          "description": "Materialized list of valid next states from the current status, computed from the\ntransitionRules parameter. When transitionRules is null (open model), this contains\nall states except the current one. Used by StatusSelector to disable invalid options\nand by StatusBadge to indicate available paths.\n",
+          "semanticType": "status.navigation"
+        },
+        "created_at": {
+          "type": "datetime",
+          "required": false,
+          "description": "uploaded_at when present; unavailable otherwise.",
+          "semanticType": "audit.created_at"
+        },
+        "updated_at": {
+          "type": "datetime",
+          "required": false,
+          "description": "Timestamp for the most recent modification, when available.",
+          "semanticType": "audit.updated_at"
+        },
+        "last_event": {
+          "type": "string",
+          "required": false,
+          "description": "Only from an explicit event or timestamp projection; absence is unknown, not a fabricated audit event.",
+          "semanticType": "audit.event.type"
+        },
+        "last_event_at": {
+          "type": "datetime",
+          "required": false,
+          "description": "Timestamp for the lifecycle event captured in last_event.",
+          "semanticType": "audit.event.timestamp"
+        },
+        "owner_id": {
+          "type": "uuid",
+          "required": false,
+          "description": "Authoritative nullable server owner_id. Not exposed by the current response; unavailable until the API exposes it. Never derive from created_by, user_id, or project owner.",
+          "semanticType": "ownership.owner.id"
+        },
+        "owner_type": {
+          "type": "string",
+          "required": false,
+          "description": "user only when an authoritative owner_id is present.",
+          "enum": [
+            "user"
+          ],
+          "semanticType": "ownership.owner.type"
+        },
+        "ownership_role": {
+          "type": "string",
+          "required": false,
+          "description": "Optional role name describing how the owner governs the entity.",
+          "semanticType": "ownership.owner.role"
+        },
+        "ownership_transferred_at": {
+          "type": "datetime",
+          "required": false,
+          "description": "Timestamp recording when ownership was last transferred.",
+          "semanticType": "ownership.owner.transferred_at"
+        },
+        "classification_metadata": {
+          "type": "ClassificationMetadata",
+          "required": true,
+          "description": "Operational metadata describing mode, storage model, governance rules, and audit timestamps.\n",
+          "semanticType": "classification.metadata"
+        },
+        "categories": {
+          "type": "CategoryNode[]",
+          "required": false,
+          "description": "Ordered taxonomy nodes scoped to the object.",
+          "semanticType": "classification.categories"
+        },
+        "primary_category_id": {
+          "type": "string",
+          "required": false,
+          "description": "Identifier of the canonical taxonomy node.",
+          "semanticType": "classification.primary"
+        },
+        "primary_category_path": {
+          "type": "string",
+          "required": false,
+          "description": "Human-readable breadcrumb path (Electronics > Mobile > Android)."
+        },
+        "tags": {
+          "type": "DocumentTagRead[]",
+          "required": false,
+          "description": "Tags.",
+          "semanticType": "classification.tags"
+        },
+        "tag_count": {
+          "type": "number",
+          "required": false,
+          "description": "Number of canonical tags assigned to the object."
+        },
+        "tag_preview": {
+          "type": "string",
+          "required": false,
+          "description": "Denormalized comma-delimited preview for list renders."
+        },
+        "searchQuery": {
+          "type": "string",
+          "required": false,
+          "description": "The current search query string entered by the user.",
+          "semanticType": "input.search.query"
+        },
+        "searchActive": {
+          "type": "boolean",
+          "required": false,
+          "description": "Whether the search input is currently focused or has a non-empty query.",
+          "semanticType": "state.search.active"
+        },
+        "filters": {
+          "type": "object[]",
+          "required": false,
+          "description": "Array of available filter descriptors. Each entry defines a filterable dimension:\n  - field: string (the schema field to filter on)\n  - label: string (display label)\n  - type: \"select\" | \"multi-select\" | \"range\" | \"boolean\" | \"date-range\"\n  - options: array of { value, label } for select/multi-select types\n",
+          "semanticType": "input.filter.descriptors"
+        },
+        "activeFilters": {
+          "type": "object[]",
+          "required": false,
+          "description": "Array of currently applied filter values:\n  - field: string (matches a filter descriptor field)\n  - operator: \"eq\" | \"in\" | \"range\" | \"gt\" | \"lt\" | \"between\"\n  - value: unknown (the selected filter value or values)\n",
+          "semanticType": "state.filter.active"
+        },
+        "filterCount": {
+          "type": "number",
+          "required": true,
+          "description": "Computed count of currently active filters.",
+          "semanticType": "metric.filter.count"
+        },
+        "page": {
+          "type": "number",
+          "required": true,
+          "description": "Current page number (1-based).",
+          "semanticType": "state.pagination.page"
+        },
+        "pageSize": {
+          "type": "number",
+          "required": true,
+          "description": "Number of items displayed per page.",
+          "semanticType": "state.pagination.pageSize"
+        },
+        "totalItems": {
+          "type": "number",
+          "required": false,
+          "description": "Total number of items across all pages. Used to compute total page count.",
+          "semanticType": "metric.pagination.totalItems"
+        },
+        "totalPages": {
+          "type": "number",
+          "required": false,
+          "description": "Computed total number of pages (ceil(totalItems / pageSize)).",
+          "semanticType": "metric.pagination.totalPages"
+        },
+        "project_id": {
+          "type": "uuid",
+          "required": true,
+          "description": "Project id.",
+          "semanticType": "research.document.project_id"
+        },
+        "name": {
+          "type": "string",
+          "required": true,
+          "description": "Name.",
+          "semanticType": "text.label"
+        },
+        "file_path": {
+          "type": "string",
+          "required": false,
+          "description": "File path.",
+          "semanticType": "research.document.file_path"
+        },
+        "file_type": {
+          "type": "string",
+          "required": false,
+          "description": "File type.",
+          "semanticType": "research.document.file_type"
+        },
+        "content": {
+          "type": "string",
+          "required": false,
+          "description": "Content.",
+          "semanticType": "research.document.content"
+        },
+        "raw_content": {
+          "type": "string",
+          "required": false,
+          "description": "Raw content.",
+          "semanticType": "research.document.raw_content"
+        },
+        "uploaded_at": {
+          "type": "datetime",
+          "required": false,
+          "description": "Uploaded at.",
+          "semanticType": "research.document.uploaded_at"
+        },
+        "file_size": {
+          "type": "number",
+          "required": false,
+          "description": "File size.",
+          "semanticType": "research.document.file_size"
+        },
+        "mime_type": {
+          "type": "string",
+          "required": false,
+          "description": "Mime type.",
+          "semanticType": "research.document.mime_type"
+        },
+        "source_type": {
+          "type": "string",
+          "required": false,
+          "description": "Source type.",
+          "semanticType": "research.document.source_type"
+        },
+        "participant_count": {
+          "type": "number",
+          "required": false,
+          "description": "Participant count.",
+          "semanticType": "research.document.participant_count"
+        },
+        "collection_date": {
+          "type": "string",
+          "required": false,
+          "description": "Collection date.",
+          "semanticType": "research.document.collection_date"
+        },
+        "processed": {
+          "type": "boolean",
+          "required": false,
+          "description": "Processed.",
+          "semanticType": "research.document.processed"
+        },
+        "chunked": {
+          "type": "boolean",
+          "required": false,
+          "description": "Chunked.",
+          "semanticType": "research.document.chunked"
+        },
+        "embedded": {
+          "type": "boolean",
+          "required": false,
+          "description": "Embedded.",
+          "semanticType": "research.document.embedded"
+        },
+        "transcription_accuracy": {
+          "type": "number",
+          "required": false,
+          "description": "Transcription accuracy.",
+          "semanticType": "research.document.transcription_accuracy"
+        },
+        "validation_status": {
+          "type": "string",
+          "required": false,
+          "description": "Validation status.",
+          "semanticType": "research.document.validation_status"
+        },
+        "id": {
+          "type": "uuid",
+          "required": true,
+          "description": "Id.",
+          "semanticType": "research.document.id"
+        },
+        "chunks": {
+          "type": "DocumentChunkRead[]",
+          "required": false,
+          "description": "Chunks.",
+          "semanticType": "research.document.chunks"
+        },
+        "processing_events": {
+          "type": "DocumentProcessingStatusRead[]",
+          "required": false,
+          "description": "Processing events.",
+          "semanticType": "research.document.processing_events"
+        },
+        "chunk_count": {
+          "type": "number",
+          "required": false,
+          "description": "Chunk count.",
+          "semanticType": "research.document.chunk_count"
+        },
+        "total_tokens": {
+          "type": "number",
+          "required": false,
+          "description": "Total tokens.",
+          "semanticType": "research.document.total_tokens"
+        },
+        "word_count": {
+          "type": "number",
+          "required": false,
+          "description": "Word count.",
+          "semanticType": "research.document.word_count"
+        },
+        "preview": {
+          "type": "string",
+          "required": false,
+          "description": "Preview.",
+          "semanticType": "research.document.preview"
+        }
+      }
+    },
+    "schemaRef": "compose-6b093895",
+    "schemaRefCreatedAt": "2026-09-12T23:09:15.013Z",
+    "schemaRefExpiresAt": "2026-09-12T23:39:15.013Z",
+    "selections": [
+      {
+        "slotName": "items",
+        "intent": "data-list",
+        "selectedComponent": "LabelCell",
+        "confidence": 0.95,
+        "confidenceLevel": "high",
+        "explanation": "LabelCell was selected for slot \"items\" because view_extension placement. Confidence is high (0.95).",
+        "candidates": [
+          {
+            "name": "LabelCell",
+            "confidence": 0.95,
+            "reason": "view_extension placement"
+          },
+          {
+            "name": "StatusBadge",
+            "confidence": 0.95,
+            "reason": "view_extension placement"
+          },
+          {
+            "name": "RelativeTimestamp",
+            "confidence": 0.95,
+            "reason": "view_extension placement"
+          },
+          {
+            "name": "OwnerBadge",
+            "confidence": 0.95,
+            "reason": "view_extension placement"
+          }
+        ]
+      },
+      {
+        "slotName": "search",
+        "intent": "search-input",
+        "selectedComponent": "SearchInput",
+        "confidence": 0.95,
+        "confidenceLevel": "high",
+        "explanation": "SearchInput was selected for slot \"search\" because view_extension placement. Confidence is high (0.95).",
+        "candidates": [
+          {
+            "name": "SearchInput",
+            "confidence": 0.95,
+            "reason": "view_extension placement"
+          }
+        ]
+      },
+      {
+        "slotName": "toolbar-actions",
+        "intent": "action-button",
+        "selectedComponent": "PaginationBar",
+        "confidence": 0.95,
+        "confidenceLevel": "high",
+        "explanation": "PaginationBar was selected for slot \"toolbar-actions\" because view_extension placement. Confidence is high (0.95).",
+        "candidates": [
+          {
+            "name": "PaginationBar",
+            "confidence": 0.95,
+            "reason": "view_extension placement"
+          },
+          {
+            "name": "ClassificationBadge",
+            "confidence": 0.95,
+            "reason": "view_extension placement"
+          }
+        ]
+      },
+      {
+        "slotName": "filters",
+        "intent": "filter-control",
+        "selectedComponent": "FilterPanel",
+        "confidence": 0.95,
+        "confidenceLevel": "high",
+        "explanation": "FilterPanel was selected for slot \"filters\" because view_extension placement. Confidence is high (0.95).",
+        "candidates": [
+          {
+            "name": "FilterPanel",
+            "confidence": 0.95,
+            "reason": "view_extension placement"
+          }
+        ]
+      },
+      {
+        "slotName": "pagination",
+        "intent": "pagination-control",
+        "selectedComponent": "PaginationBar",
+        "confidence": 0.77,
+        "confidenceLevel": "medium",
+        "explanation": "PaginationBar was selected for slot \"pagination\" because 2 tag match(es); tag match (pagination, navigation); 1 context match(es); 1 trait(s); name contains \"pagination\"; position affinity: PaginationBar fits well in footer. Confidence is medium (0.77).",
+        "candidates": [
+          {
+            "name": "PaginationBar",
+            "confidence": 1,
+            "reason": "2 tag match(es); tag match (pagination, navigation); 1 context match(es); 1 trait(s); name contains \"pagination\"; position affinity: PaginationBar fits well in footer",
+            "keywordTagMatches": 2,
+            "keywordTraitMatches": 0,
+            "contextTagMatches": 1,
+            "contextTraitMatches": 0
+          },
+          {
+            "name": "Button",
+            "confidence": 0.75,
+            "reason": "preferred for \"pagination-control\" (rank 2); 1 context match(es); 1 region match(es); position affinity: Button fits well in footer",
+            "keywordTagMatches": 0,
+            "keywordTraitMatches": 0,
+            "contextTagMatches": 0,
+            "contextTraitMatches": 0
+          },
+          {
+            "name": "Text",
+            "confidence": 0.65,
+            "reason": "preferred for \"pagination-control\" (rank 1); 1 context match(es)",
+            "keywordTagMatches": 0,
+            "keywordTraitMatches": 0,
+            "contextTagMatches": 0,
+            "contextTraitMatches": 0
+          }
+        ]
+      }
+    ],
+    "validation": {
+      "status": "ok",
+      "errors": [],
+      "warnings": []
+    },
+    "warnings": [
+      {
+        "code": "OODS-V121",
+        "message": "Object 'Document' has maturity 'alpha' — composed output may change.",
+        "hint": "Consider using stable objects for production compositions."
+      },
+      {
+        "code": "OODS-V117",
+        "message": "Field collision: \"tags\" in object schema overrides trait definition"
+      },
+      {
+        "code": "OODS-V117",
+        "message": "Field collision: \"label\" in object schema overrides trait definition"
+      },
+      {
+        "code": "OODS-V117",
+        "message": "Field collision: \"status\" in object schema overrides trait definition"
+      },
+      {
+        "code": "OODS-V117",
+        "message": "Field collision: \"owner_id\" in object schema overrides trait definition"
+      },
+      {
+        "code": "OODS-V117",
+        "message": "Field collision: \"owner_type\" in object schema overrides trait definition"
+      },
+      {
+        "code": "OODS-V117",
+        "message": "Field collision: \"last_event\" in object schema overrides trait definition"
+      },
+      {
+        "code": "OODS-V117",
+        "message": "Field collision: \"created_at\" in object schema overrides trait definition"
+      }
+    ],
+    "objectUsed": {
+      "name": "Document",
+      "version": "0.1.0",
+      "traits": [
+        "content/Labelled",
+        "lifecycle/Stateful",
+        "lifecycle/Timestampable",
+        "structural/Ownerable",
+        "core/Classifiable",
+        "behavioral/Searchable",
+        "behavioral/Filterable",
+        "behavioral/Pageable"
+      ],
+      "fieldsComposed": 54,
+      "viewExtensionsApplied": {
+        "list": 8,
+        "detail": 7,
+        "form": 3,
+        "card": 3,
+        "timeline": 3,
+        "inline": 1
+      }
+    },
+    "meta": {
+      "intentParsed": "Document list view",
+      "layoutDetected": "context-inferred: list (from context=\"list\")",
+      "slotCount": 5,
+      "nodeCount": 20,
+      "intentSynthetic": true,
+      "warnings": [
+        "Object 'Document' has maturity 'alpha' — composed output may change.",
+        "Field collision: \"tags\" in object schema overrides trait definition",
+        "Field collision: \"label\" in object schema overrides trait definition",
+        "Field collision: \"status\" in object schema overrides trait definition",
+        "Field collision: \"owner_id\" in object schema overrides trait definition",
+        "Field collision: \"owner_type\" in object schema overrides trait definition",
+        "Field collision: \"last_event\" in object schema overrides trait definition",
+        "Field collision: \"created_at\" in object schema overrides trait definition"
+      ],
+      "intelligence": {
+        "fieldsExpanded": false,
+        "positionAffinityUsed": true,
+        "fieldAffinityUsed": true,
+        "compositionConfidence": 0.91
+      }
+    }
+  }
+}
