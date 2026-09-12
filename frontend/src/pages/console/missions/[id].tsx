@@ -56,31 +56,31 @@ function MissionDetailContent() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+      <div className="min-h-screen bg-background dark:bg-background py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center py-12">
-            <div className="text-gray-500 dark:text-gray-400">Loading mission...</div>
+            <div className="text-muted dark:text-muted">Loading mission...</div>
           </div>
         </div>
-      </main>
+      </div>
     );
   }
 
   if (error || !mission) {
     return (
-      <main className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+      <div className="min-h-screen bg-background dark:bg-background py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200">
+          <div className="p-4 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg text-danger dark:text-danger">
             {error ?? "Mission not found"}
           </div>
           <Link
             href="/console/missions"
-            className="mt-4 inline-block text-blue-600 dark:text-blue-400 hover:underline"
+            className="mt-4 inline-block text-accent-text dark:text-accent-text underline underline-offset-4"
           >
             Back to missions
           </Link>
         </div>
-      </main>
+      </div>
     );
   }
 
@@ -91,28 +91,28 @@ function MissionDetailContent() {
   const hasResult = !!mission.result_markdown || !!mission.result_report_id;
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-background dark:bg-background py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
-        <nav className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          <Link href="/console" className="hover:text-gray-700 dark:hover:text-gray-200">
+        <nav className="text-sm text-muted dark:text-muted mb-4">
+          <Link href="/console" className="hover:text-secondary dark:hover:text-secondary">
             Console
           </Link>
           {" / "}
-          <Link href="/console/missions" className="hover:text-gray-700 dark:hover:text-gray-200">
+          <Link href="/console/missions" className="hover:text-secondary dark:hover:text-secondary">
             Missions
           </Link>
           {" / "}
-          <span className="text-gray-900 dark:text-white">{mission.mission_id ?? id}</span>
+          <span className="text-foreground dark:text-foreground">{mission.mission_id ?? id}</span>
         </nav>
 
         {/* Header */}
         <div className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-foreground dark:text-foreground">
               {mission.title ?? "Untitled Mission"}
             </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <p className="mt-2 text-secondary dark:text-muted">
               {mission.mission_id}
             </p>
           </div>
@@ -121,20 +121,20 @@ function MissionDetailContent() {
             <span
               className={`text-sm px-3 py-1.5 rounded-full ${
                 mission.status === "completed"
-                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                  ? "bg-success-surface text-success dark:bg-success-surface dark:text-success"
                   : mission.status === "in_progress"
-                  ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                  ? "bg-warning-surface text-warning dark:bg-warning-surface dark:text-warning"
                   : mission.status === "queued"
-                  ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                  ? "bg-info-surface text-info dark:bg-info-surface dark:text-info"
                   : mission.status === "blocked"
-                  ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                  : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                  ? "bg-danger-surface text-danger dark:bg-danger-surface dark:text-danger"
+                  : "bg-surface text-foreground dark:bg-surface-alt dark:text-secondary"
               }`}
             >
               {mission.status ?? "draft"}
             </span>
             {hasError && (
-              <span className="text-sm px-3 py-1.5 rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+              <span className="text-sm px-3 py-1.5 rounded-full bg-danger-surface text-danger dark:bg-danger-surface dark:text-danger">
                 error
               </span>
             )}
@@ -179,11 +179,11 @@ function MissionDetailContent() {
 
         {/* Objective */}
         {mission.objective && (
-          <section className="mb-8 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <section className="mb-8 bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
+            <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
               Objective
             </h2>
-            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+            <p className="text-secondary dark:text-secondary whitespace-pre-wrap">
               {mission.objective}
             </p>
           </section>
@@ -191,15 +191,15 @@ function MissionDetailContent() {
 
         {/* Success Criteria */}
         {successCriteriaCount > 0 && (
-          <section className="mb-8 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <section className="mb-8 bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
+            <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
               Success Criteria
             </h2>
             <ul className="space-y-2">
               {mission.success_criteria.map((criterion, idx) => (
                 <li key={idx} className="flex items-start gap-2">
-                  <span className="text-green-500 mt-1">✓</span>
-                  <span className="text-gray-700 dark:text-gray-300">{criterion}</span>
+                  <span className="text-success mt-1">✓</span>
+                  <span className="text-secondary dark:text-secondary">{criterion}</span>
                 </li>
               ))}
             </ul>
@@ -208,15 +208,15 @@ function MissionDetailContent() {
 
         {/* Deliverables */}
         {deliverablesCount > 0 && (
-          <section className="mb-8 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <section className="mb-8 bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
+            <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
               Deliverables
             </h2>
             <ul className="space-y-2">
               {mission.deliverables.map((deliverable, idx) => (
                 <li key={idx} className="flex items-start gap-2">
-                  <span className="text-blue-500 mt-1">•</span>
-                  <span className="text-gray-700 dark:text-gray-300">{deliverable}</span>
+                  <span className="text-accent-text mt-1">•</span>
+                  <span className="text-secondary dark:text-secondary">{deliverable}</span>
                 </li>
               ))}
             </ul>
@@ -225,15 +225,15 @@ function MissionDetailContent() {
 
         {/* Tags */}
         {tagsCount > 0 && (
-          <section className="mb-8 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <section className="mb-8 bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
+            <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
               Tags
             </h2>
             <div className="flex flex-wrap gap-2">
               {mission.tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded-full text-sm"
+                  className="px-3 py-1 bg-surface text-secondary dark:bg-surface-alt dark:text-secondary rounded-full text-sm"
                 >
                   {tag}
                 </span>
@@ -244,11 +244,11 @@ function MissionDetailContent() {
 
         {/* Error Message */}
         {hasError && (
-          <section className="mb-8 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-4">
+          <section className="mb-8 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg p-6">
+            <h2 className="text-lg font-semibold text-danger dark:text-danger mb-4">
               Error
             </h2>
-            <p className="text-red-700 dark:text-red-300 whitespace-pre-wrap">
+            <p className="text-danger dark:text-danger whitespace-pre-wrap">
               {mission.error_message}
             </p>
           </section>
@@ -256,8 +256,8 @@ function MissionDetailContent() {
 
         {/* Result Markdown */}
         {mission.result_markdown && (
-          <section className="mb-8 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <section className="mb-8 bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
+            <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
               Result
             </h2>
             <MarkdownRenderer content={mission.result_markdown} />
@@ -267,7 +267,7 @@ function MissionDetailContent() {
         {/* Relationships */}
         {relationships && (
           <section className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
               Relationships
             </h2>
             <RelationshipTree relationships={relationships} />
@@ -275,7 +275,7 @@ function MissionDetailContent() {
         )}
 
         {/* Metadata */}
-        <section className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
+        <section className="text-sm text-muted dark:text-muted space-y-1">
           <p>Created: {new Date(mission.created_at).toLocaleString()}</p>
           <p>Updated: {new Date(mission.updated_at).toLocaleString()}</p>
           {mission.queued_at && <p>Queued: {new Date(mission.queued_at).toLocaleString()}</p>}
@@ -284,7 +284,7 @@ function MissionDetailContent() {
           {mission.created_by && <p>Created by: {mission.created_by}</p>}
         </section>
       </div>
-    </main>
+    </div>
   );
 }
 

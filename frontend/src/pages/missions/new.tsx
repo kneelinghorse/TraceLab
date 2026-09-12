@@ -18,21 +18,21 @@ function NewMissionContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-background dark:bg-background">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <header className="mb-8">
-          <nav className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            <Link href="/missions" className="hover:text-gray-700 dark:hover:text-gray-200">
+          <nav className="text-sm text-muted dark:text-muted mb-4">
+            <Link href="/missions" className="hover:text-secondary dark:hover:text-secondary">
               Missions
             </Link>
             <span className="mx-2">/</span>
-            <span className="text-gray-900 dark:text-white">New Mission</span>
+            <span className="text-foreground dark:text-foreground">New Mission</span>
           </nav>
 
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-foreground dark:text-foreground">
             Create New Mission
           </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-secondary dark:text-muted">
             Define a research mission for DeepSearch to execute. Fill in the required
             fields and optionally add context, deliverables, and tags.
           </p>

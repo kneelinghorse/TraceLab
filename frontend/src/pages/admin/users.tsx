@@ -33,8 +33,8 @@ function roleOptions(currentRole: Role | null, isOwnerCaller: boolean): Role[] {
 
 function StatusBadge({ active }: { active: boolean }) {
   const classes = active
-    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
-    : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300";
+    ? "bg-success-surface text-success dark:bg-success-surface dark:text-success"
+    : "bg-surface-alt text-secondary dark:bg-surface-alt dark:text-secondary";
   return (
     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${classes}`}>
       {active ? "Active" : "Disabled"}
@@ -125,35 +125,35 @@ export function UsersAdmin() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-background dark:bg-background">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">User management</h1>
+        <h1 className="text-2xl font-bold text-foreground dark:text-foreground">User management</h1>
 
         <CreateUserForm isOwnerCaller={isOwnerCaller} onCreated={reload} />
 
-        <section className="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Users</h2>
+        <section className="rounded-lg bg-surface dark:bg-surface border border-line dark:border-line p-6">
+          <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">Users</h2>
 
           {actionError && (
-            <p className="mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-300">
+            <p className="mb-4 rounded-lg bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line px-4 py-3 text-sm text-danger dark:text-danger">
               {actionError}
             </p>
           )}
           {loadError && (
-            <p className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-300">
+            <p className="rounded-lg bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line px-4 py-3 text-sm text-danger dark:text-danger">
               {loadError}
             </p>
           )}
 
           {loadError ? null : users === null ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">Loading users…</p>
+            <p className="text-sm text-muted dark:text-muted">Loading users…</p>
           ) : users.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">No users.</p>
+            <p className="text-sm text-muted dark:text-muted">No users.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                  <tr className="text-left text-xs uppercase tracking-wide text-muted dark:text-muted border-b border-line dark:border-line">
                     <th className="py-2 pr-4 font-medium">Email</th>
                     <th className="py-2 pr-4 font-medium">Name</th>
                     <th className="py-2 pr-4 font-medium">Role</th>
@@ -166,19 +166,19 @@ export function UsersAdmin() {
                     const isSelf = u.id === selfId;
                     const rowBusy = busyId === u.id;
                     return (
-                      <tr key={u.id} className="border-b border-gray-100 dark:border-gray-700/50">
-                        <td className="py-3 pr-4 text-gray-900 dark:text-white">
+                      <tr key={u.id} className="border-b border-line dark:border-line">
+                        <td className="py-3 pr-4 text-foreground dark:text-foreground">
                           {u.email}
-                          {isSelf && <span className="ml-2 text-xs text-gray-400">(you)</span>}
+                          {isSelf && <span className="ml-2 text-xs text-muted">(you)</span>}
                         </td>
-                        <td className="py-3 pr-4 text-gray-700 dark:text-gray-300">{u.display_name}</td>
+                        <td className="py-3 pr-4 text-secondary dark:text-secondary">{u.display_name}</td>
                         <td className="py-3 pr-4">
                           <select
                             aria-label={`Role for ${u.email}`}
                             value={u.role}
                             disabled={rowBusy}
                             onChange={(e) => changeRole(u, e.target.value as Role)}
-                            className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-sm text-gray-900 dark:text-white disabled:opacity-50"
+                            className="rounded-md border border-line-strong dark:border-line-strong bg-surface dark:bg-surface-alt px-2 py-1 text-sm text-foreground dark:text-foreground disabled:opacity-50"
                           >
                             {roleOptions(u.role, isOwnerCaller).map((r) => (
                               <option key={r} value={r}>
@@ -196,7 +196,7 @@ export function UsersAdmin() {
                               type="button"
                               onClick={() => toggleActive(u)}
                               disabled={rowBusy}
-                              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white disabled:opacity-40"
+                              className="text-secondary dark:text-secondary hover:text-foreground dark:hover:text-foreground disabled:opacity-40"
                             >
                               {u.is_active ? "Disable" : "Enable"}
                             </button>
@@ -205,7 +205,7 @@ export function UsersAdmin() {
                               onClick={() => setPendingDelete(u)}
                               disabled={rowBusy || isSelf}
                               title={isSelf ? "You cannot delete your own account" : undefined}
-                              className="text-red-600 hover:text-red-700 disabled:opacity-40"
+                              className="text-danger hover:text-danger disabled:opacity-40"
                             >
                               Delete
                             </button>
@@ -231,13 +231,13 @@ export function UsersAdmin() {
               setPendingDelete(null);
             }
           }}
-          className="fixed inset-0 z-30 grid place-items-center bg-black/50 px-4"
+          className="fixed inset-0 z-30 grid place-items-center bg-backdrop/50 px-4"
         >
-          <div className="max-w-md w-full rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6">
-            <h2 id="delete-dialog-title" className="text-lg font-semibold text-gray-900 dark:text-white">
+          <div className="max-w-md w-full rounded-lg bg-surface dark:bg-surface border border-line dark:border-line p-6">
+            <h2 id="delete-dialog-title" className="text-lg font-semibold text-foreground dark:text-foreground">
               Delete {pendingDelete.email}?
             </h2>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            <p className="mt-2 text-sm text-secondary dark:text-secondary">
               This permanently deletes the account along with its API keys and invite codes. Any
               projects, collections, documents, missions, and reports they own are kept, but their
               owner is cleared (set to no owner). This cannot be undone.
@@ -247,7 +247,7 @@ export function UsersAdmin() {
                 ref={cancelDeleteRef}
                 type="button"
                 onClick={() => setPendingDelete(null)}
-                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                className="px-4 py-2 text-sm font-medium text-secondary dark:text-secondary hover:text-foreground dark:hover:text-foreground"
               >
                 Cancel
               </button>
@@ -255,7 +255,7 @@ export function UsersAdmin() {
                 type="button"
                 onClick={confirmDelete}
                 disabled={busyId === pendingDelete.id}
-                className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium bg-danger-surface text-danger rounded-lg hover:bg-danger-surface disabled:opacity-50"
               >
                 Delete user
               </button>
@@ -299,16 +299,16 @@ function CreateUserForm({
   });
 
   return (
-    <section className="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Create user</h2>
+    <section className="rounded-lg bg-surface dark:bg-surface border border-line dark:border-line p-6">
+      <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">Create user</h2>
 
       {createError && (
-        <p className="mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-300">
+        <p className="mb-4 rounded-lg bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line px-4 py-3 text-sm text-danger dark:text-danger">
           {createError}
         </p>
       )}
       {createSuccess && (
-        <p className="mb-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 px-4 py-3 text-sm text-green-700 dark:text-green-300">
+        <p className="mb-4 rounded-lg bg-success-surface dark:bg-success-surface border border-success-line dark:border-success-line px-4 py-3 text-sm text-success dark:text-success">
           {createSuccess}
         </p>
       )}
@@ -382,7 +382,7 @@ function CreateUserForm({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium"
+            className="px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent disabled:opacity-50 text-sm font-medium"
           >
             {isSubmitting ? "Creating…" : "Create user"}
           </button>

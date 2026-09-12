@@ -19,10 +19,10 @@ import { projectsApi } from "@/lib/api/projects";
 import type { Project } from "@/types/document";
 
 const errorBox =
-  "rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-300";
+  "rounded-lg bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line px-4 py-3 text-sm text-danger dark:text-danger";
 const successBox =
-  "rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 px-4 py-3 text-sm text-green-700 dark:text-green-300";
-const cardClass = "rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6";
+  "rounded-lg bg-success-surface dark:bg-success-surface border border-success-line dark:border-success-line px-4 py-3 text-sm text-success dark:text-success";
+const cardClass = "rounded-lg bg-surface dark:bg-surface border border-line dark:border-line p-6";
 
 export function SpacesAdmin() {
   const [spaces, setSpaces] = useState<AdminSpace[] | null>(null);
@@ -169,9 +169,9 @@ export function SpacesAdmin() {
   const selectedSpace = spaces?.find((s) => s.id === selectedSpaceId) ?? null;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-background dark:bg-background">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Spaces</h1>
+        <h1 className="text-2xl font-bold text-foreground dark:text-foreground">Spaces</h1>
 
         {loadError && <p className={errorBox}>{loadError}</p>}
         {/* Action errors (member add/remove/load, project assignment) — page-level
@@ -179,7 +179,7 @@ export function SpacesAdmin() {
         {actionError && <p className={errorBox}>{actionError}</p>}
 
         <section className={cardClass}>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Create space</h2>
+          <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">Create space</h2>
           {createError && <p className={`mb-4 ${errorBox}`}>{createError}</p>}
           {createSuccess && <p className={`mb-4 ${successBox}`}>{createSuccess}</p>}
           <form onSubmit={createSpace} className="flex flex-col sm:flex-row gap-3" noValidate>
@@ -194,7 +194,7 @@ export function SpacesAdmin() {
             <button
               type="submit"
               disabled={creating}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium"
+              className="px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent disabled:opacity-50 text-sm font-medium"
             >
               {creating ? "Creating…" : "Create space"}
             </button>
@@ -202,23 +202,23 @@ export function SpacesAdmin() {
         </section>
 
         <section className={cardClass}>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Spaces</h2>
+          <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">Spaces</h2>
           {spaces === null ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">Loading spaces…</p>
+            <p className="text-sm text-muted dark:text-muted">Loading spaces…</p>
           ) : spaces.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">No spaces yet.</p>
+            <p className="text-sm text-muted dark:text-muted">No spaces yet.</p>
           ) : (
-            <ul className="divide-y divide-gray-100 dark:divide-gray-700/50">
+            <ul className="divide-y divide-line dark:divide-line">
               {spaces.map((s) => (
                 <li key={s.id} className="flex items-center justify-between py-3">
-                  <span className="text-gray-900 dark:text-white">{s.name}</span>
+                  <span className="text-foreground dark:text-foreground">{s.name}</span>
                   <button
                     type="button"
                     onClick={() => setSelectedSpaceId(s.id)}
                     className={`text-sm font-medium ${
                       s.id === selectedSpaceId
-                        ? "text-blue-700 dark:text-blue-300"
-                        : "text-blue-600 hover:text-blue-700"
+                        ? "text-accent-text dark:text-accent-text"
+                        : "text-accent-text hover:text-accent-text"
                     }`}
                   >
                     Manage members
@@ -231,7 +231,7 @@ export function SpacesAdmin() {
 
         {selectedSpace && (
           <section className={cardClass}>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
               Members of “{selectedSpace.name}”
             </h2>
 
@@ -253,29 +253,29 @@ export function SpacesAdmin() {
                 type="button"
                 onClick={addMember}
                 disabled={!pickedUserId || memberBusy}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium"
+                className="px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent disabled:opacity-50 text-sm font-medium"
               >
                 Add member
               </button>
             </div>
 
             {members === null ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400">Loading members…</p>
+              <p className="text-sm text-muted dark:text-muted">Loading members…</p>
             ) : members.length === 0 ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400">No members in this Space.</p>
+              <p className="text-sm text-muted dark:text-muted">No members in this Space.</p>
             ) : (
-              <ul className="divide-y divide-gray-100 dark:divide-gray-700/50">
+              <ul className="divide-y divide-line dark:divide-line">
                 {members.map((m) => (
                   <li key={m.user_id} className="flex items-center justify-between py-3 text-sm">
-                    <span className="text-gray-900 dark:text-white">
-                      {m.display_name} <span className="text-gray-400">({m.email})</span>
-                      {!m.is_active && <span className="ml-2 text-xs text-amber-600">disabled</span>}
+                    <span className="text-foreground dark:text-foreground">
+                      {m.display_name} <span className="text-muted">({m.email})</span>
+                      {!m.is_active && <span className="ml-2 text-xs text-warning">disabled</span>}
                     </span>
                     <button
                       type="button"
                       onClick={() => removeMember(m.user_id)}
                       disabled={memberBusy}
-                      className="text-red-600 hover:text-red-700 disabled:opacity-40"
+                      className="text-danger hover:text-danger disabled:opacity-40"
                     >
                       Remove
                     </button>
@@ -287,27 +287,27 @@ export function SpacesAdmin() {
         )}
 
         <section className={cardClass}>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
             Project assignment
           </h2>
           {projectTotal > projects.length && (
-            <p className="mb-4 text-sm text-amber-600 dark:text-amber-400">
+            <p className="mb-4 text-sm text-warning dark:text-warning">
               Showing the first {projects.length} of {projectTotal} projects. Use search on the
               Projects page to assign the rest.
             </p>
           )}
           {projects.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">No projects.</p>
+            <p className="text-sm text-muted dark:text-muted">No projects.</p>
           ) : (
-            <ul className="divide-y divide-gray-100 dark:divide-gray-700/50">
+            <ul className="divide-y divide-line dark:divide-line">
               {projects.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-3 text-sm">
-                  <span className="text-gray-900 dark:text-white">{p.name}</span>
+                  <span className="text-foreground dark:text-foreground">{p.name}</span>
                   <select
                     aria-label={`Space for ${p.name}`}
                     value={p.workspace_id ?? ""}
                     onChange={(e) => assignProject(p, e.target.value)}
-                    className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-sm text-gray-900 dark:text-white"
+                    className="rounded-md border border-line-strong dark:border-line-strong bg-surface dark:bg-surface-alt px-2 py-1 text-sm text-foreground dark:text-foreground"
                   >
                     <option value="">— No Space —</option>
                     {(spaces ?? []).map((s) => (

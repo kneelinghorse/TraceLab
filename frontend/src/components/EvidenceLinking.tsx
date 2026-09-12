@@ -21,32 +21,32 @@ const EMPTY_EVIDENCE = {
 
 export function EvidenceLinking({ fields, register, errors, append, remove }: EvidenceLinkingProps) {
   return (
-    <div className="space-y-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="space-y-4 rounded-3xl border border-line bg-surface p-6 shadow-sm">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Evidence</p>
-          <h3 className="text-2xl font-semibold text-slate-900">Evidence Linking</h3>
+          <p className="text-xs uppercase tracking-[0.3em] text-muted">Evidence</p>
+          <h3 className="text-2xl font-semibold text-foreground">Evidence Linking</h3>
         </div>
         <button
           type="button"
           onClick={() => append(EMPTY_EVIDENCE)}
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800"
+          className="rounded-lg bg-background px-4 py-2 text-sm font-semibold text-foreground shadow-sm hover:bg-surface"
         >
           Add Evidence
         </button>
       </div>
-      <p className="text-sm text-slate-600">
+      <p className="text-sm text-secondary">
         Link insights back to supporting document chunks to satisfy the <strong>traceability</strong> gate.
       </p>
       <div className="space-y-4">
         {fields.map((field, index) => (
-          <div key={field.id ?? index} className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <div key={field.id ?? index} className="space-y-3 rounded-2xl border border-line bg-background p-4">
             <div className="grid gap-3 md:grid-cols-2">
               <div>
                 <label className="form-label">Evidence ID</label>
                 <input {...register(`evidence.${index}.evidence_id` as const)} className="form-input" placeholder="EV-001" />
                 {errors.evidence?.[index]?.evidence_id && (
-                  <p className="mt-1 text-xs text-rose-600">{errors.evidence[index]?.evidence_id?.message as string}</p>
+                  <p className="mt-1 text-xs text-danger">{errors.evidence[index]?.evidence_id?.message as string}</p>
                 )}
               </div>
               <div>
@@ -81,14 +81,14 @@ export function EvidenceLinking({ fields, register, errors, append, remove }: Ev
               </div>
             </div>
             <div className="flex justify-end">
-              <button type="button" onClick={() => remove(index)} className="text-sm font-medium text-rose-600 hover:text-rose-700">
+              <button type="button" onClick={() => remove(index)} className="text-sm font-medium text-danger hover:text-danger">
                 Remove evidence
               </button>
             </div>
           </div>
         ))}
         {fields.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-slate-600">
+          <div className="rounded-2xl border border-dashed border-line-strong p-6 text-center text-secondary">
             Attach at least one evidence record to satisfy traceability.
           </div>
         )}

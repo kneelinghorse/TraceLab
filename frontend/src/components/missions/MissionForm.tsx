@@ -16,7 +16,7 @@ import type { PaginatedResponse } from "@/types/pagination";
 import { DynamicListInput } from "./DynamicListInput";
 
 const SECTION_CLASS =
-  "rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm";
+  "rounded-2xl border border-line dark:border-line bg-surface dark:bg-surface p-6 shadow-sm";
 
 interface MissionFormProps {
   onSuccess?: (mission: ApiMission) => void;
@@ -196,20 +196,20 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
       {/* Basic Information */}
       <section className={`${SECTION_CLASS} space-y-4`}>
         <header>
-          <p className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400">
+          <p className="text-xs uppercase tracking-widest text-muted dark:text-muted">
             Required
           </p>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
             Mission Details
           </h2>
         </header>
 
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <label className="form-label">
-              Mission ID <span className="text-red-500">*</span>
+            <label htmlFor="mission-mission_id" className="form-label">
+              Mission ID <span className="text-danger">*</span>
             </label>
-            <input
+            <input id="mission-mission_id"
               {...register("mission_id")}
               placeholder="e.g., M-2024-001"
               className="form-input"
@@ -220,10 +220,10 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
           </div>
 
           <div>
-            <label className="form-label">
-              Title <span className="text-red-500">*</span>
+            <label htmlFor="mission-title" className="form-label">
+              Title <span className="text-danger">*</span>
             </label>
-            <input
+            <input id="mission-title"
               {...register("title")}
               placeholder="Mission title"
               className="form-input"
@@ -233,10 +233,10 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
         </div>
 
         <div>
-          <label className="form-label">
-            Objective <span className="text-red-500">*</span>
+          <label htmlFor="mission-objective" className="form-label">
+            Objective <span className="text-danger">*</span>
           </label>
-          <textarea
+          <textarea id="mission-objective"
             {...register("objective")}
             placeholder="Describe the mission goal and what you want to achieve..."
             className="form-input min-h-[100px]"
@@ -266,19 +266,19 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
       {/* Project & Configuration */}
       <section className={`${SECTION_CLASS} space-y-4`}>
         <header>
-          <p className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400">
+          <p className="text-xs uppercase tracking-widest text-muted dark:text-muted">
             Configuration
           </p>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
             Project & Settings
           </h2>
         </header>
 
         <div>
-          <label className="form-label">
-            Project <span className="text-red-500">*</span>
+          <label htmlFor="mission-project_id" className="form-label">
+            Project <span className="text-danger">*</span>
           </label>
-          <select {...register("project_id")} className="form-input">
+          <select id="mission-project_id" {...register("project_id")} className="form-input">
             <option value="">Select a project</option>
             {projects.map((p) => (
               <option key={p.id} value={p.id}>
@@ -287,7 +287,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
             ))}
           </select>
           {!isProjectSelected && (
-            <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+            <p className="mt-1 text-xs text-warning dark:text-warning">
               Required — missions must belong to a project
             </p>
           )}
@@ -297,8 +297,8 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
         </div>
 
         <div>
-          <label className="form-label">Priority</label>
-          <select {...register("priority")} className="form-input">
+          <label htmlFor="mission-priority" className="form-label">Priority</label>
+          <select id="mission-priority" {...register("priority")} className="form-input">
             <option value="low">Low</option>
             <option value="normal">Normal</option>
             <option value="high">High</option>
@@ -309,21 +309,21 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
       {/* Research Contract — authoring fields consumed by DeepSearch */}
       <section className={`${SECTION_CLASS} space-y-4`}>
         <header>
-          <p className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400">
+          <p className="text-xs uppercase tracking-widest text-muted dark:text-muted">
             Authoring Contract
           </p>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
             Research Contract
           </h2>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-muted dark:text-muted">
             Optional fields the DeepSearch contract compiler reads when shaping
             retrieval and synthesis. Skip any that don't apply.
           </p>
         </header>
 
         <div>
-          <label className="form-label">Background</label>
-          <textarea
+          <label htmlFor="mission-background" className="form-label">Background</label>
+          <textarea id="mission-background"
             {...register("background")}
             placeholder="Free-form prose orienting the research (e.g., what prior work is this building on?)"
             className="form-input min-h-[80px]"
@@ -331,8 +331,8 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
         </div>
 
         <div>
-          <label className="form-label">Focus</label>
-          <textarea
+          <label htmlFor="mission-focus" className="form-label">Focus</label>
+          <textarea id="mission-focus"
             {...register("focus")}
             placeholder="Narrow framing for the research question"
             className="form-input min-h-[60px]"
@@ -399,16 +399,16 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
 
         <div className="grid gap-4 md:grid-cols-3">
           <div>
-            <label className="form-label">Deliverable format</label>
-            <input
+            <label htmlFor="mission-deliverable_format" className="form-label">Deliverable format</label>
+            <input id="mission-deliverable_format"
               {...register("deliverable_format")}
               placeholder="e.g. markdown report, comparison table"
               className="form-input"
             />
           </div>
           <div>
-            <label className="form-label">Min loops</label>
-            <input
+            <label htmlFor="mission-min_loops" className="form-label">Min loops</label>
+            <input id="mission-min_loops"
               type="number"
               min={1}
               max={50}
@@ -420,8 +420,8 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
             )}
           </div>
           <div>
-            <label className="form-label">Max loops</label>
-            <input
+            <label htmlFor="mission-max_loops" className="form-label">Max loops</label>
+            <input id="mission-max_loops"
               type="number"
               min={1}
               max={50}
@@ -437,8 +437,8 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
         {/* JSON-shaped fields */}
         {(Object.keys(JSON_FIELD_LABELS) as JsonFieldName[]).map((key) => (
           <div key={key}>
-            <label className="form-label">{JSON_FIELD_LABELS[key]}</label>
-            <textarea
+            <label htmlFor={`mission-${key}`} className="form-label">{JSON_FIELD_LABELS[key]}</label>
+            <textarea id={`mission-${key}`}
               value={jsonFields[key]}
               onChange={(e) => {
                 setJsonFields((prev) => ({ ...prev, [key]: e.target.value }));
@@ -463,10 +463,10 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
       {/* Deliverables & Tags */}
       <section className={`${SECTION_CLASS} space-y-4`}>
         <header>
-          <p className="text-xs uppercase tracking-widest text-gray-500 dark:text-gray-400">
+          <p className="text-xs uppercase tracking-widest text-muted dark:text-muted">
             Optional
           </p>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
             Deliverables & Tags
           </h2>
         </header>
@@ -502,8 +502,8 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
 
       {/* Error Display */}
       {submitError && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-sm text-red-600 dark:text-red-400">{submitError}</p>
+        <div className="p-4 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg">
+          <p className="text-sm text-danger dark:text-danger">{submitError}</p>
         </div>
       )}
 
@@ -514,7 +514,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="px-4 py-2.5 text-sm font-medium text-secondary dark:text-secondary hover:bg-surface dark:hover:bg-surface-alt rounded-lg transition-colors"
             >
               Cancel
             </button>
@@ -527,8 +527,8 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
               disabled={isSubmitting}
               className={`px-4 py-2.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 ${
                 isProjectSelected
-                  ? "text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
-                  : "text-gray-400 bg-gray-200 dark:bg-gray-700 cursor-not-allowed"
+                  ? "text-secondary dark:text-secondary bg-surface dark:bg-surface-alt hover:bg-surface-alt dark:hover:bg-surface-alt"
+                  : "text-muted bg-surface-alt dark:bg-surface-alt cursor-not-allowed"
               }`}
               title={isProjectSelected ? undefined : "Select a project to save"}
             >
@@ -543,15 +543,15 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
                 disabled={isSubmitting}
                 className={`px-4 py-2.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 ${
                   isProjectSelected
-                    ? "text-white bg-blue-600 hover:bg-blue-700"
-                    : "text-gray-400 bg-gray-300 dark:bg-gray-600 cursor-not-allowed"
+                    ? "text-on-accent bg-accent hover:bg-accent"
+                    : "text-muted bg-surface-alt dark:bg-surface-alt cursor-not-allowed"
                 }`}
                 title={isProjectSelected ? undefined : "Select a project to submit to DeepSearch"}
               >
                 {isSubmitting ? "Submitting..." : "Submit to DeepSearch"}
               </button>
               {showProjectRequiredTooltip && !isProjectSelected && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg whitespace-nowrap shadow-lg z-10">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-background dark:bg-surface-alt text-foreground text-xs rounded-lg whitespace-nowrap shadow-lg z-10">
                   Select a project to submit to DeepSearch
                   <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700" />
                 </div>

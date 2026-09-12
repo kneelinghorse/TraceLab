@@ -52,14 +52,14 @@ export function ExecutionProgress({
   return (
     <div className="space-y-3">
       {/* Progress bar */}
-      <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+      <div className="h-2 bg-surface-alt dark:bg-surface-alt rounded-full overflow-hidden">
         {status === "in_progress" ? (
           <div
-            className="h-full bg-blue-500 rounded-full transition-all duration-500"
+            className="h-full bg-accent rounded-full transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
           />
         ) : (
-          <div className="h-full bg-amber-400 w-0" />
+          <div className="h-full bg-warning w-0" />
         )}
       </div>
 
@@ -68,47 +68,47 @@ export function ExecutionProgress({
         {status === "in_progress" && (
           <>
             {currentLoop !== undefined && (
-              <span className="text-gray-600 dark:text-gray-300">
+              <span className="text-secondary dark:text-secondary">
                 Loop{" "}
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="font-medium text-foreground dark:text-foreground">
                   {currentLoop}
                   {totalLoops !== undefined && ` / ${totalLoops}`}
                 </span>
               </span>
             )}
             {currentPhase && (
-              <span className="text-gray-600 dark:text-gray-300">
+              <span className="text-secondary dark:text-secondary">
                 Phase{" "}
-                <span className="font-medium text-gray-900 dark:text-white capitalize">
+                <span className="font-medium text-foreground dark:text-foreground capitalize">
                   {currentPhase.replace(/_/g, " ")}
                 </span>
               </span>
             )}
             {elapsedTime && (
-              <span className="text-gray-600 dark:text-gray-300">
+              <span className="text-secondary dark:text-secondary">
                 Elapsed{" "}
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="font-medium text-foreground dark:text-foreground">
                   {elapsedTime}
                 </span>
               </span>
             )}
             {sources !== undefined && (
-              <span className="text-gray-600 dark:text-gray-300">
+              <span className="text-secondary dark:text-secondary">
                 Sources{" "}
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="font-medium text-foreground dark:text-foreground">
                   {sources}
                 </span>
               </span>
             )}
             {model && (
-              <span className="text-gray-500 dark:text-gray-400 text-xs">
+              <span className="text-muted dark:text-muted text-xs">
                 {model}
               </span>
             )}
           </>
         )}
         {status === "queued" && (
-          <span className="text-amber-600 dark:text-amber-400 text-sm">
+          <span className="text-warning dark:text-warning text-sm">
             Waiting in queue...
           </span>
         )}

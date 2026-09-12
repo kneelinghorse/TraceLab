@@ -24,14 +24,14 @@ interface MissionActivityFeedProps {
 function EventDot({ type }: { type: MissionEventType }) {
   const category = getEventCategory(type);
   const colors: Record<string, string> = {
-    mission: "bg-blue-500",
-    pedr: "bg-purple-500",
-    quality: "bg-green-500",
-    system: "bg-gray-400",
+    mission: "bg-accent",
+    pedr: "bg-accent",
+    quality: "bg-success",
+    system: "bg-surface-alt",
   };
   return (
     <span
-      className={`inline-block w-2 h-2 rounded-full ${colors[category] ?? "bg-gray-400"}`}
+      className={`inline-block w-2 h-2 rounded-full ${colors[category] ?? "bg-surface-alt"}`}
     />
   );
 }
@@ -42,10 +42,10 @@ function ConnectionStatus({ connected }: { connected: boolean }) {
     <span className="flex items-center gap-1.5 text-xs">
       <span
         className={`w-1.5 h-1.5 rounded-full ${
-          connected ? "bg-green-500 animate-pulse" : "bg-red-500"
+          connected ? "bg-success animate-pulse" : "bg-danger"
         }`}
       />
-      <span className={connected ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"}>
+      <span className={connected ? "text-success dark:text-success" : "text-danger dark:text-danger"}>
         {connected ? "Live" : "Disconnected"}
       </span>
     </span>
@@ -178,19 +178,19 @@ export function MissionActivityFeed({ maxDisplay = 50 }: MissionActivityFeedProp
   const displayEvents = events.slice(0, maxDisplay);
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+    <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-line dark:border-line">
+        <h3 className="text-sm font-semibold text-foreground dark:text-foreground">
           Mission Activity
         </h3>
         <ConnectionStatus connected={connected} />
       </div>
 
       {/* Event list */}
-      <div className="max-h-[400px] overflow-y-auto divide-y divide-gray-50 dark:divide-gray-700/50">
+      <div className="max-h-[400px] overflow-y-auto divide-y divide-line dark:divide-line">
         {displayEvents.length === 0 ? (
-          <div className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+          <div className="px-4 py-8 text-center text-sm text-muted dark:text-muted">
             No activity yet. Events will appear here when missions run.
           </div>
         ) : (
@@ -203,8 +203,8 @@ export function MissionActivityFeed({ maxDisplay = 50 }: MissionActivityFeedProp
                 key={`${event.timestamp}-${i}`}
                 className={`px-4 py-2 flex items-start gap-2.5 text-sm ${
                   isError
-                    ? "bg-red-50/50 dark:bg-red-900/10"
-                    : "hover:bg-gray-50 dark:hover:bg-gray-700/30"
+                    ? "bg-danger-surface dark:bg-danger-surface"
+                    : "hover:bg-background dark:hover:bg-surface-alt"
                 }`}
               >
                 <span className="mt-1.5 flex-shrink-0">
@@ -214,14 +214,14 @@ export function MissionActivityFeed({ maxDisplay = 50 }: MissionActivityFeedProp
                   <p
                     className={`truncate ${
                       isError
-                        ? "text-red-700 dark:text-red-300"
-                        : "text-gray-800 dark:text-gray-200"
+                        ? "text-danger dark:text-danger"
+                        : "text-foreground dark:text-secondary"
                     }`}
                   >
                     {getEventLabel(event)}
                   </p>
                 </div>
-                <span className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap flex-shrink-0">
+                <span className="text-xs text-muted dark:text-muted whitespace-nowrap flex-shrink-0">
                   {formatRelativeTime(event.timestamp)}
                 </span>
               </div>

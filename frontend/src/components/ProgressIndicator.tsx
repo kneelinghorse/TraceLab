@@ -28,10 +28,10 @@ export function ProgressIndicator({ value = 0, label = "Completion", mission }: 
   const missingFields = REQUIRED_FIELDS.filter((rule) => !rule.isPresent(mission)).map((rule) => rule.label);
 
   return (
-    <div className="w-full rounded-3xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm">
-      <div className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">{label}</div>
+    <div className="w-full rounded-3xl border border-line bg-surface p-6 text-foreground shadow-sm">
+      <div className="text-sm font-semibold uppercase tracking-[0.3em] text-muted">{label}</div>
       <div className="relative mt-4 flex items-center justify-center">
-        <svg className="h-32 w-32 text-slate-200" viewBox="0 0 120 120">
+        <svg className="h-32 w-32 text-secondary" viewBox="0 0 120 120">
           <circle cx="60" cy="60" r={radius} stroke="currentColor" strokeWidth="10" fill="transparent" />
           <circle
             cx="60"
@@ -51,13 +51,13 @@ export function ProgressIndicator({ value = 0, label = "Completion", mission }: 
             </linearGradient>
           </defs>
         </svg>
-        <div className="absolute text-4xl font-semibold text-slate-900">{normalized}%</div>
+        <div className="absolute text-4xl font-semibold text-foreground">{normalized}%</div>
       </div>
       {missingFields.length === 0 ? (
-        <p className="mt-3 text-sm text-emerald-700">All required fields are populated.</p>
+        <p className="mt-3 text-sm text-success">All required fields are populated.</p>
       ) : (
-        <div className="mt-3 text-sm text-slate-600">
-          <p className="font-medium text-slate-900">Missing fields</p>
+        <div className="mt-3 text-sm text-secondary">
+          <p className="font-medium text-foreground">Missing fields</p>
           <ul className="mt-1 list-disc space-y-1 pl-5">
             {missingFields.map((field) => (
               <li key={field}>{field}</li>

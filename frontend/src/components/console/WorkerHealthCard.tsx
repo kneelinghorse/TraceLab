@@ -32,9 +32,9 @@ function formatUptime(seconds: number | null | undefined): string {
 
 function StatusBadge({ status }: { status: string }) {
   const colorClasses: Record<string, string> = {
-    healthy: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200",
-    degraded: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200",
-    offline: "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200",
+    healthy: "bg-success-surface text-success dark:bg-success-surface dark:text-success",
+    degraded: "bg-warning-surface text-warning dark:bg-warning-surface dark:text-warning",
+    offline: "bg-danger-surface text-danger dark:bg-danger-surface dark:text-danger",
   };
 
   const colorClass = colorClasses[status] ?? colorClasses.offline;
@@ -49,8 +49,8 @@ function StatusBadge({ status }: { status: string }) {
 function StatItem({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="flex flex-col">
-      <span className="text-xs text-gray-500 dark:text-gray-400">{label}</span>
-      <span className="text-lg font-semibold text-gray-900 dark:text-white">{value}</span>
+      <span className="text-xs text-muted dark:text-muted">{label}</span>
+      <span className="text-lg font-semibold text-foreground dark:text-foreground">{value}</span>
     </div>
   );
 }
@@ -91,10 +91,10 @@ export function WorkerHealthCard({ refreshInterval = 30000 }: WorkerHealthCardPr
   const isOffline = health?.status === "offline";
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+    <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 className="text-lg font-semibold text-foreground dark:text-foreground">
           DeepSearch Worker
         </h3>
         <div className="flex items-center gap-3">
@@ -102,7 +102,7 @@ export function WorkerHealthCard({ refreshInterval = 30000 }: WorkerHealthCardPr
           <button
             onClick={fetchHealth}
             disabled={isLoading}
-            className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 disabled:opacity-50"
+            className="text-sm text-muted dark:text-muted hover:text-secondary dark:hover:text-secondary disabled:opacity-50"
             title="Refresh"
           >
             <svg
@@ -124,7 +124,7 @@ export function WorkerHealthCard({ refreshInterval = 30000 }: WorkerHealthCardPr
 
       {/* Error message */}
       {error && (
-        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-sm text-red-800 dark:text-red-200">
+        <div className="mb-4 p-3 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded text-sm text-danger dark:text-danger">
           {error}
         </div>
       )}
@@ -132,7 +132,7 @@ export function WorkerHealthCard({ refreshInterval = 30000 }: WorkerHealthCardPr
       {/* Loading state */}
       {isLoading && !health && (
         <div className="flex items-center justify-center py-8">
-          <div className="text-gray-500 dark:text-gray-400">Loading worker status...</div>
+          <div className="text-muted dark:text-muted">Loading worker status...</div>
         </div>
       )}
 
@@ -141,7 +141,7 @@ export function WorkerHealthCard({ refreshInterval = 30000 }: WorkerHealthCardPr
         <>
           {/* Offline message */}
           {isOffline && health.error && (
-            <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded text-sm text-gray-600 dark:text-gray-300">
+            <div className="mb-4 p-3 bg-background dark:bg-surface-alt rounded text-sm text-secondary dark:text-secondary">
               {health.error}
             </div>
           )}
@@ -167,11 +167,11 @@ export function WorkerHealthCard({ refreshInterval = 30000 }: WorkerHealthCardPr
           </div>
 
           {/* Additional info */}
-          <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex flex-wrap gap-4 text-sm text-secondary dark:text-muted">
             {health.current_mission_id && (
               <div>
                 <span className="font-medium">Current:</span>{" "}
-                <span className="text-blue-600 dark:text-blue-400">
+                <span className="text-accent-text dark:text-accent-text">
                   {health.current_mission_id}
                 </span>
               </div>
@@ -187,7 +187,7 @@ export function WorkerHealthCard({ refreshInterval = 30000 }: WorkerHealthCardPr
 
       {/* Last updated */}
       {lastFetched && (
-        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-400 dark:text-gray-500">
+        <div className="mt-4 pt-4 border-t border-line dark:border-line text-xs text-muted dark:text-muted">
           Last checked: {lastFetched.toLocaleString()}
         </div>
       )}

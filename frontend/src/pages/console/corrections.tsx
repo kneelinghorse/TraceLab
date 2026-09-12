@@ -90,24 +90,24 @@ function CorrectionsContent() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-background dark:bg-background py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
-        <nav className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          <Link href="/console" className="hover:text-gray-700 dark:hover:text-gray-200">
+        <nav className="text-sm text-muted dark:text-muted mb-4">
+          <Link href="/console" className="hover:text-secondary dark:hover:text-secondary">
             Console
           </Link>
           {" / "}
-          <span className="text-gray-900 dark:text-white">Corrections</span>
+          <span className="text-foreground dark:text-foreground">Corrections</span>
         </nav>
 
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-foreground dark:text-foreground">
               Correction Queue
             </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <p className="mt-2 text-secondary dark:text-muted">
               Manage auto-linking corrections and webhook delivery
             </p>
           </div>
@@ -115,14 +115,14 @@ function CorrectionsContent() {
             <button
               onClick={handleProcessNow}
               disabled={isLoading || actionLoading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent disabled:opacity-50"
             >
               Process Now
             </button>
             <button
               onClick={loadData}
               disabled={isLoading}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+              className="px-4 py-2 border border-line-strong dark:border-line-strong text-secondary dark:text-secondary rounded-lg hover:bg-background dark:hover:bg-surface-alt disabled:opacity-50"
             >
               Refresh
             </button>
@@ -131,14 +131,14 @@ function CorrectionsContent() {
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200">
+          <div className="mb-6 p-4 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg text-danger dark:text-danger">
             {error}
           </div>
         )}
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="text-gray-500 dark:text-gray-400">Loading corrections...</div>
+            <div className="text-muted dark:text-muted">Loading corrections...</div>
           </div>
         ) : (
           <>
@@ -176,13 +176,13 @@ function CorrectionsContent() {
             )}
 
             {/* Tabs */}
-            <div className="flex gap-4 mb-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex gap-4 mb-6 border-b border-line dark:border-line">
               <button
                 onClick={() => setActiveTab("queue")}
                 className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === "queue"
-                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                    ? "border-info-line text-accent-text dark:text-accent-text"
+                    : "border-transparent text-muted dark:text-muted hover:text-secondary dark:hover:text-secondary"
                 }`}
               >
                 Queue
@@ -191,8 +191,8 @@ function CorrectionsContent() {
                 onClick={() => setActiveTab("telemetry")}
                 className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === "telemetry"
-                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                    ? "border-info-line text-accent-text dark:text-accent-text"
+                    : "border-transparent text-muted dark:text-muted hover:text-secondary dark:hover:text-secondary"
                 }`}
               >
                 Telemetry
@@ -201,13 +201,13 @@ function CorrectionsContent() {
                 onClick={() => setActiveTab("deadletter")}
                 className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
                   activeTab === "deadletter"
-                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                    ? "border-info-line text-accent-text dark:text-accent-text"
+                    : "border-transparent text-muted dark:text-muted hover:text-secondary dark:hover:text-secondary"
                 }`}
               >
                 Dead Letter
                 {deadLetter.length > 0 && (
-                  <span className="px-1.5 py-0.5 text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-full">
+                  <span className="px-1.5 py-0.5 text-xs bg-danger-surface text-danger dark:bg-danger-surface dark:text-danger rounded-full">
                     {deadLetter.length}
                   </span>
                 )}
@@ -226,34 +226,34 @@ function CorrectionsContent() {
 
             {/* Telemetry Tab */}
             {activeTab === "telemetry" && telemetry && (
-              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
+                <h3 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
                   Grafana-Ready Telemetry
                 </h3>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <h4 className="text-sm font-medium text-secondary dark:text-secondary mb-2">
                       Queue Counts
                     </h4>
-                    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                      <pre className="text-sm text-gray-600 dark:text-gray-300 overflow-x-auto">
+                    <div className="bg-background dark:bg-surface-alt rounded-lg p-4">
+                      <pre className="text-sm text-secondary dark:text-secondary overflow-x-auto">
                         {JSON.stringify(telemetry.queue_counts, null, 2)}
                       </pre>
                     </div>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <h4 className="text-sm font-medium text-secondary dark:text-secondary mb-2">
                       Webhook Stats
                     </h4>
-                    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                      <pre className="text-sm text-gray-600 dark:text-gray-300 overflow-x-auto">
+                    <div className="bg-background dark:bg-surface-alt rounded-lg p-4">
+                      <pre className="text-sm text-secondary dark:text-secondary overflow-x-auto">
                         {JSON.stringify(telemetry.webhook_stats ?? { message: "No webhook data" }, null, 2)}
                       </pre>
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="mt-4 pt-4 border-t border-line dark:border-line">
+                  <p className="text-sm text-muted dark:text-muted">
                     Success Rate: {Math.round(telemetry.success_rate * 100)}% |
                     Last Updated: {new Date(telemetry.last_updated).toLocaleString()}
                   </p>
@@ -263,9 +263,9 @@ function CorrectionsContent() {
 
             {/* Dead Letter Tab */}
             {activeTab === "deadletter" && (
-              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+              <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-lg font-semibold text-foreground dark:text-foreground">
                     Dead Letter Queue ({deadLetter.length})
                   </h3>
                   {deadLetter.length > 0 && (
@@ -274,7 +274,7 @@ function CorrectionsContent() {
                         // Implement clear dead letter
                         setError("Clear dead letter not yet implemented");
                       }}
-                      className="text-sm px-3 py-1.5 text-red-600 dark:text-red-400 border border-red-300 dark:border-red-700 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
+                      className="text-sm px-3 py-1.5 text-danger dark:text-danger border border-danger-line dark:border-danger-line rounded hover:bg-danger-surface dark:hover:bg-danger-surface"
                     >
                       Clear All
                     </button>
@@ -282,7 +282,7 @@ function CorrectionsContent() {
                 </div>
 
                 {deadLetter.length === 0 ? (
-                  <p className="text-center text-gray-500 dark:text-gray-400 py-8">
+                  <p className="text-center text-muted dark:text-muted py-8">
                     No failed webhook deliveries.
                   </p>
                 ) : (
@@ -290,28 +290,28 @@ function CorrectionsContent() {
                     {deadLetter.map((item, idx) => (
                       <div
                         key={idx}
-                        className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
+                        className="p-4 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg"
                       >
                         <div className="flex items-start justify-between mb-2">
-                          <span className="font-medium text-gray-900 dark:text-white text-sm truncate max-w-[60%]">
+                          <span className="font-medium text-foreground dark:text-foreground text-sm truncate max-w-[60%]">
                             {item.url}
                           </span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                          <span className="text-xs text-muted dark:text-muted">
                             {item.attempts} attempts
                           </span>
                         </div>
-                        <p className="text-sm text-red-700 dark:text-red-300 mb-2">
+                        <p className="text-sm text-danger dark:text-danger mb-2">
                           {item.error}
                         </p>
                         <details className="text-xs">
-                          <summary className="cursor-pointer text-gray-500 dark:text-gray-400">
+                          <summary className="cursor-pointer text-muted dark:text-muted">
                             View Payload
                           </summary>
-                          <pre className="mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded overflow-x-auto text-gray-600 dark:text-gray-300">
+                          <pre className="mt-2 p-2 bg-surface dark:bg-surface-alt rounded overflow-x-auto text-secondary dark:text-secondary">
                             {JSON.stringify(item.payload, null, 2)}
                           </pre>
                         </details>
-                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                        <p className="text-xs text-muted dark:text-muted mt-2">
                           Last attempt: {new Date(item.last_attempt).toLocaleString()}
                         </p>
                       </div>
@@ -323,7 +323,7 @@ function CorrectionsContent() {
           </>
         )}
       </div>
-    </main>
+    </div>
   );
 }
 

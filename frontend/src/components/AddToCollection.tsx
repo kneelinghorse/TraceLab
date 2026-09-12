@@ -143,8 +143,8 @@ export function AddToCollection({
   };
 
   const buttonClass = variant === "compact"
-    ? "text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-    : "px-3 py-1.5 text-sm border border-white/20 rounded-lg text-slate-200 hover:border-sky-300 hover:text-sky-200";
+    ? "text-xs px-2 py-1 border border-line-strong dark:border-line-strong rounded text-secondary dark:text-muted hover:bg-surface dark:hover:bg-surface-alt"
+    : "px-3 py-1.5 text-sm border border-line rounded-lg text-secondary hover:border-info-line hover:text-accent-text";
 
   // Only render portal after mount (SSR safety) and when position is calculated
   const dropdownMenu = isMounted && isOpen && menuPosition ? createPortal(
@@ -157,18 +157,18 @@ export function AddToCollection({
 
       {/* Menu */}
       <div
-        className="fixed w-64 z-[9999] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl"
+        className="fixed w-64 z-[9999] bg-surface dark:bg-surface border border-line dark:border-line rounded-lg shadow-xl"
         style={{ top: menuPosition.top, left: menuPosition.left }}
       >
         <div className="p-2">
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 px-2 py-1">
+          <p className="text-xs font-medium text-muted dark:text-muted px-2 py-1">
             Add to collection
           </p>
 
           {/* Existing collections */}
           <div className="max-h-48 overflow-y-auto">
             {collections.length === 0 ? (
-              <p className="px-2 py-2 text-sm text-gray-500 dark:text-gray-400">
+              <p className="px-2 py-2 text-sm text-muted dark:text-muted">
                 No collections yet
               </p>
             ) : (
@@ -177,10 +177,10 @@ export function AddToCollection({
                   key={collection.id}
                   onClick={() => handleAddToCollection(collection)}
                   disabled={isAdding}
-                  className="w-full text-left px-2 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-50"
+                  className="w-full text-left px-2 py-2 text-sm text-secondary dark:text-secondary hover:bg-surface dark:hover:bg-surface-alt rounded disabled:opacity-50"
                 >
                   <span className="block truncate">{collection.name}</span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                  <span className="text-xs text-muted dark:text-muted">
                     {collection.item_count} {collection.item_count === 1 ? "chunk" : "chunks"}
                   </span>
                 </button>
@@ -189,7 +189,7 @@ export function AddToCollection({
           </div>
 
           {/* Divider */}
-          <div className="border-t border-gray-200 dark:border-gray-700 my-2" />
+          <div className="border-t border-line dark:border-line my-2" />
 
           {/* Create new */}
           {isCreating ? (
@@ -199,14 +199,14 @@ export function AddToCollection({
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="Collection name..."
-                className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full px-2 py-1 text-sm border border-line-strong dark:border-line-strong rounded bg-surface dark:bg-surface-alt text-foreground dark:text-foreground"
                 autoFocus
               />
               <div className="flex gap-2 mt-2">
                 <button
                   type="submit"
                   disabled={!newName.trim() || isAdding}
-                  className="flex-1 px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                  className="flex-1 px-2 py-1 text-xs bg-accent text-on-accent rounded hover:bg-accent disabled:opacity-50"
                 >
                   Create & Add
                 </button>
@@ -216,7 +216,7 @@ export function AddToCollection({
                     setIsCreating(false);
                     setNewName("");
                   }}
-                  className="px-2 py-1 text-xs text-gray-600 dark:text-gray-400"
+                  className="px-2 py-1 text-xs text-secondary dark:text-muted"
                 >
                   Cancel
                 </button>
@@ -225,7 +225,7 @@ export function AddToCollection({
           ) : (
             <button
               onClick={() => setIsCreating(true)}
-              className="w-full text-left px-2 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+              className="w-full text-left px-2 py-2 text-sm text-accent-text dark:text-accent-text hover:bg-surface dark:hover:bg-surface-alt rounded"
             >
               + New Collection
             </button>
@@ -255,8 +255,8 @@ export function AddToCollection({
         <div
           className={`absolute right-0 mt-1 px-3 py-1.5 text-xs rounded-lg whitespace-nowrap z-50 ${
             feedback.type === "success"
-              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-              : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+              ? "bg-success-surface text-success dark:bg-success-surface dark:text-success"
+              : "bg-danger-surface text-danger dark:bg-danger-surface dark:text-danger"
           }`}
         >
           {feedback.message}

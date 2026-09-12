@@ -26,22 +26,22 @@ function TreeNode({ label, sublabel, badge, children, defaultOpen = false, onCli
   const hasChildren = Boolean(children);
 
   return (
-    <div className="ml-4 border-l border-gray-200 dark:border-gray-700 pl-4">
+    <div className="ml-4 border-l border-line dark:border-line pl-4">
       <div
-        className={`flex items-center gap-2 py-2 ${onClick ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 -ml-4 pl-4 pr-2 rounded" : ""}`}
+        className={`flex items-center gap-2 py-2 ${onClick ? "cursor-pointer hover:bg-background dark:hover:bg-surface -ml-4 pl-4 pr-2 rounded" : ""}`}
         onClick={() => {
           if (hasChildren) setIsOpen(!isOpen);
           onClick?.();
         }}
       >
         {hasChildren && (
-          <span className="text-gray-400 w-4 text-center">
+          <span className="text-muted w-4 text-center">
             {isOpen ? "−" : "+"}
           </span>
         )}
-        <span className="font-medium text-gray-900 dark:text-white">{label}</span>
+        <span className="font-medium text-foreground dark:text-foreground">{label}</span>
         {sublabel && (
-          <span className="text-sm text-gray-500 dark:text-gray-400">{sublabel}</span>
+          <span className="text-sm text-muted dark:text-muted">{sublabel}</span>
         )}
         {badge && (
           <span className={`text-xs px-2 py-0.5 rounded-full ${badge.color}`}>
@@ -63,7 +63,7 @@ function DocumentNode({ doc, chunks, onChunkClick }: { doc: RelatedDocument; chu
       sublabel={doc.file_type ?? undefined}
       badge={{
         text: `${doc.evidence_chunks} chunks`,
-        color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+        color: "bg-info-surface text-info dark:bg-info-surface dark:text-info",
       }}
     >
       {docChunks.map((chunk) => (
@@ -77,10 +77,10 @@ function DocumentNode({ doc, chunks, onChunkClick }: { doc: RelatedDocument; chu
                   text: `${Math.round(chunk.relationship.relevance_score * 100)}%`,
                   color:
                     chunk.relationship.relevance_score >= 0.8
-                      ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                      ? "bg-success-surface text-success dark:bg-success-surface dark:text-success"
                       : chunk.relationship.relevance_score >= 0.6
-                      ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                      : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+                      ? "bg-warning-surface text-warning dark:bg-warning-surface dark:text-warning"
+                      : "bg-danger-surface text-danger dark:bg-danger-surface dark:text-danger",
                 }
               : undefined
           }
@@ -99,8 +99,8 @@ function InsightNode({ insight }: { insight: RelatedInsight }) {
       badge={{
         text: insight.validated ? "Validated" : "Pending",
         color: insight.validated
-          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-          : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+          ? "bg-success-surface text-success dark:bg-success-surface dark:text-success"
+          : "bg-surface text-foreground dark:bg-surface-alt dark:text-secondary",
       }}
     />
   );
@@ -110,17 +110,17 @@ export function RelationshipTree({ relationships, onChunkClick, onDocumentClick 
   const { documents, chunks, insights, totals, cached } = relationships;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+    <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 className="text-lg font-semibold text-foreground dark:text-foreground">
           Relationship Tree
         </h3>
         <div className="flex items-center gap-3 text-sm">
-          <span className="text-gray-500 dark:text-gray-400">
+          <span className="text-muted dark:text-muted">
             {totals.documents} docs, {totals.chunks} chunks, {totals.insights} insights
           </span>
           {cached && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-info-surface text-info dark:bg-info-surface dark:text-info">
               Cached
             </span>
           )}
@@ -134,7 +134,7 @@ export function RelationshipTree({ relationships, onChunkClick, onDocumentClick 
             label="Documents"
             badge={{
               text: `${documents.length}`,
-              color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+              color: "bg-info-surface text-info dark:bg-info-surface dark:text-info",
             }}
             defaultOpen
           >
@@ -155,7 +155,7 @@ export function RelationshipTree({ relationships, onChunkClick, onDocumentClick 
             label="Insights"
             badge={{
               text: `${insights.length}`,
-              color: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
+              color: "bg-success-surface text-success dark:bg-success-surface dark:text-success",
             }}
             defaultOpen
           >
@@ -171,7 +171,7 @@ export function RelationshipTree({ relationships, onChunkClick, onDocumentClick 
             label="Related Missions"
             badge={{
               text: `${relationships.related_missions.length}`,
-              color: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
+              color: "bg-warning-surface text-warning dark:bg-warning-surface dark:text-warning",
             }}
           >
             {relationships.related_missions.map((mission) => (
@@ -183,8 +183,8 @@ export function RelationshipTree({ relationships, onChunkClick, onDocumentClick 
                   text: mission.status,
                   color:
                     mission.status === "complete"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-gray-100 text-gray-800",
+                      ? "bg-success-surface text-success"
+                      : "bg-surface text-foreground",
                 }}
               />
             ))}
@@ -193,7 +193,7 @@ export function RelationshipTree({ relationships, onChunkClick, onDocumentClick 
 
         {/* Empty State */}
         {documents.length === 0 && insights.length === 0 && (
-          <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+          <p className="text-muted dark:text-muted text-center py-4">
             No relationships found for this mission.
           </p>
         )}

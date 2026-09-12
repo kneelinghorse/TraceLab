@@ -127,7 +127,7 @@ export default function ReportDetailPage() {
       return (
         <button
           onClick={handleToggleStatus}
-          className={`${baseClasses} bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50`}
+          className={`${baseClasses} bg-success-surface dark:bg-success-surface text-success dark:text-success hover:bg-success-surface dark:hover:bg-success-surface`}
           title="Click to change to draft"
         >
           Final
@@ -137,7 +137,7 @@ export default function ReportDetailPage() {
     return (
       <button
         onClick={handleToggleStatus}
-        className={`${baseClasses} bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-200 dark:hover:bg-yellow-900/50`}
+        className={`${baseClasses} bg-warning-surface dark:bg-warning-surface text-warning dark:text-warning hover:bg-warning-surface dark:hover:bg-warning-surface`}
         title="Click to finalize"
       >
         Draft
@@ -148,8 +148,8 @@ export default function ReportDetailPage() {
   if (isLoading || !report) {
     return (
       <AuthGate>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-          <p className="text-gray-500">Loading report...</p>
+        <div className="min-h-screen bg-background dark:bg-background flex items-center justify-center">
+          <p className="text-muted">Loading report...</p>
         </div>
       </AuthGate>
     );
@@ -157,39 +157,39 @@ export default function ReportDetailPage() {
 
   return (
     <AuthGate>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-background dark:bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Back Link */}
           <Link
             href="/reports"
-            className="text-blue-600 dark:text-blue-400 hover:underline mb-4 inline-block"
+            className="text-accent-text dark:text-accent-text underline underline-offset-4 mb-4 inline-block"
           >
             &larr; Back to Reports
           </Link>
 
           {/* Header */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 mb-6">
+          <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6 mb-6">
             {isEditing ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">
                     Title *
                   </label>
                   <input
                     type="text"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground"
                     autoFocus
                   />
                 </div>
                 {editError && (
-                  <p className="text-sm text-red-600 dark:text-red-400">{editError}</p>
+                  <p className="text-sm text-danger dark:text-danger">{editError}</p>
                 )}
                 <div className="flex gap-3">
                   <button
                     onClick={handleSaveEdit}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent transition-colors"
                   >
                     Save
                   </button>
@@ -198,7 +198,7 @@ export default function ReportDetailPage() {
                       setIsEditing(false);
                       setEditError(null);
                     }}
-                    className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                    className="px-4 py-2 text-secondary dark:text-muted hover:text-foreground dark:hover:text-foreground transition-colors"
                   >
                     Cancel
                   </button>
@@ -206,39 +206,39 @@ export default function ReportDetailPage() {
               </div>
             ) : (
               <>
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div className="flex items-center gap-3">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <h1 className="text-2xl font-bold text-foreground dark:text-foreground">
                       {report.title}
                     </h1>
                     {getStatusBadge(report.status)}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex max-w-full flex-wrap gap-2">
                     <div className="relative" ref={exportRef}>
                       <button
                         onClick={() => setShowExportMenu((v) => !v)}
                         disabled={isExporting}
-                        className="px-4 py-2 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 rounded disabled:opacity-50"
+                        className="px-4 py-2 text-sm text-accent-text dark:text-accent-text hover:bg-info-surface dark:hover:bg-surface-alt rounded disabled:opacity-50"
                       >
                         {isExporting ? "Exporting..." : "Export ▾"}
                       </button>
                       {showExportMenu && (
-                        <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-10 min-w-[140px]">
+                        <div className="absolute right-0 top-full mt-1 bg-surface dark:bg-surface border border-line dark:border-line-strong rounded-lg shadow-lg z-10 min-w-[140px]">
                           <button
                             onClick={() => { handleExport("md"); setShowExportMenu(false); }}
-                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
+                            className="block w-full text-left px-4 py-2 text-sm text-secondary dark:text-secondary hover:bg-surface dark:hover:bg-surface-alt rounded-t-lg"
                           >
                             Markdown (.md)
                           </button>
                           <button
                             onClick={() => { handleExport("json"); setShowExportMenu(false); }}
-                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            className="block w-full text-left px-4 py-2 text-sm text-secondary dark:text-secondary hover:bg-surface dark:hover:bg-surface-alt"
                           >
                             JSON (.json)
                           </button>
                           <button
                             onClick={() => { handleExport("txt"); setShowExportMenu(false); }}
-                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-lg"
+                            className="block w-full text-left px-4 py-2 text-sm text-secondary dark:text-secondary hover:bg-surface dark:hover:bg-surface-alt rounded-b-lg"
                           >
                             Plain text (.txt)
                           </button>
@@ -247,19 +247,19 @@ export default function ReportDetailPage() {
                     </div>
                     <button
                       onClick={handleCopy}
-                      className="px-4 py-2 text-sm text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-gray-700 rounded"
+                      className="px-4 py-2 text-sm text-success dark:text-success hover:bg-success-surface dark:hover:bg-surface-alt rounded"
                     >
                       {isCopied ? "Copied!" : "Copy"}
                     </button>
                     <button
                       onClick={handleStartEdit}
-                      className="px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded"
+                      className="px-4 py-2 text-sm text-accent-text dark:text-accent-text hover:bg-info-surface dark:hover:bg-surface-alt rounded"
                     >
                       Edit
                     </button>
                     <button
                       onClick={handleDelete}
-                      className="px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-gray-700 rounded"
+                      className="px-4 py-2 text-sm text-danger dark:text-danger hover:bg-danger-surface dark:hover:bg-surface-alt rounded"
                     >
                       Delete
                     </button>
@@ -267,12 +267,12 @@ export default function ReportDetailPage() {
                 </div>
 
                 {/* Metadata */}
-                <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
+                <div className="mt-4 flex flex-wrap gap-4 text-sm text-secondary dark:text-muted">
                   <span>
                     Type: <span className="font-medium">{report.report_type}</span>
                   </span>
                   <span>
-                    Chunks: <span className="font-medium text-blue-600 dark:text-blue-400">{report.chunk_count}</span>
+                    Chunks: <span className="font-medium text-accent-text dark:text-accent-text">{report.chunk_count}</span>
                   </span>
                   <span>
                     Tokens: <span className="font-medium">{report.tokens_used.toLocaleString()}</span>
@@ -288,11 +288,11 @@ export default function ReportDetailPage() {
                 </div>
 
                 {report.prompt && (
-                  <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                    <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <div className="mt-4 p-3 bg-background dark:bg-surface-alt rounded-lg">
+                    <span className="text-xs text-muted dark:text-muted uppercase tracking-wider">
                       Custom Prompt
                     </span>
-                    <p className="mt-1 text-sm text-gray-700 dark:text-gray-300 italic">
+                    <p className="mt-1 text-sm text-secondary dark:text-secondary italic">
                       {report.prompt}
                     </p>
                   </div>
@@ -302,8 +302,8 @@ export default function ReportDetailPage() {
           </div>
 
           {/* Report Content */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6 mb-6">
+            <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
               Content
             </h2>
             <MarkdownRenderer content={report.content} />
@@ -311,31 +311,31 @@ export default function ReportDetailPage() {
 
           {/* Citations */}
           {report.citations && report.citations.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6 mb-6">
+              <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
                 Citations ({report.citations.length})
               </h2>
               <div className="space-y-3">
                 {report.citations.map((citation, index) => (
                   <div
                     key={`${citation.chunk_id}-${index}`}
-                    className="border border-gray-200 dark:border-gray-600 rounded-lg p-4"
+                    className="border border-line dark:border-line-strong rounded-lg p-4"
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <code className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded text-gray-600 dark:text-gray-300">
+                      <code className="text-xs bg-surface dark:bg-surface-alt px-2 py-0.5 rounded text-secondary dark:text-secondary">
                         {citation.chunk_id.slice(0, 8)}...
                       </code>
                       {citation.document_id && (
                         <Link
                           href={`/documents/${citation.document_id}`}
-                          className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                          className="text-xs text-accent-text dark:text-accent-text underline underline-offset-4"
                         >
                           View document
                         </Link>
                       )}
                     </div>
                     {citation.excerpt && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 italic">
+                      <p className="text-sm text-secondary dark:text-muted italic">
                         &quot;{citation.excerpt}&quot;
                       </p>
                     )}
@@ -347,29 +347,29 @@ export default function ReportDetailPage() {
 
           {/* Sources */}
           {report.sources && report.sources.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
+              <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
                 Sources ({report.sources.length})
               </h2>
               <div className="space-y-2">
                 {report.sources.map((source) => (
                   <div
                     key={source.id}
-                    className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                    className="flex items-center justify-between py-2 border-b border-line dark:border-line last:border-0"
                   >
                     <div className="flex items-center gap-3">
                       <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                         source.source_type === "collection"
-                          ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400"
-                          : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
+                          ? "bg-info-surface dark:bg-info-surface text-accent-text dark:text-accent-text"
+                          : "bg-info-surface dark:bg-info-surface text-accent-text dark:text-accent-text"
                       }`}>
                         {source.source_type}
                       </span>
-                      <code className="text-sm text-gray-600 dark:text-gray-400">
+                      <code className="text-sm text-secondary dark:text-muted">
                         {source.source_id.slice(0, 8)}...
                       </code>
                     </div>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                    <span className="text-xs text-muted dark:text-muted">
                       {formatDistanceToNow(new Date(source.added_at), { addSuffix: true })}
                     </span>
                   </div>

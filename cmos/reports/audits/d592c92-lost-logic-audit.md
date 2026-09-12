@@ -365,3 +365,9 @@ Implementation: `93ab9fb`. All **51 findings** now have explicit dispositions: *
 Ten tests return to the required backend suite (22 → 12 quarantines). Eight cover recovered telemetry, one exercises real DeepSearch linking/persistence with deterministic external providers, and one covers all twelve graph queries. Remaining reasons name reproduced failures: ten historical evaluators do not unwrap envelopes, the admin cost fixture is outside its rolling date window, and document detail lacks the test’s processing_events field. These are not evidence of a retired quality/telemetry contract.
 
 The required lint job checks formatting-only claims against non-whitespace net deletions in every commit, preserving AST-equivalent Python formatting. It detects d592c92 and a bad intermediate commit hidden by a later repair. See [validation evidence](../sprint-50/recover-2-validation.json) for local and hosted results. Test-generated telemetry is excluded from commits.
+
+### RECOVER-2 final verification
+
+PR [#255](https://github.com/kneelinghorse/TraceLab/pull/255) merged as `6155d88` and deployed successfully on Railway (backend deployment `5096255a-d883-4cc3-ae06-9e44b927c2d2`). All six required CI checks pass on `1d47346`: backend **2,391 passed / 3 skipped / 12 deselected**, PostgreSQL integration **125 passed / 4 skipped**. Existing mypy/full-Ruff/frontend-lint advisories remain documented in the validation report; mypy stays at 1,039 errors.
+
+The deployed-container smoke verified all nine real writers’ envelope fields, complete payloads, append behavior, and isolation from an unwritable sink against the exact merge commit, then removed its temporary files. Five live HTTP checks returned 200 (API health, profile, graph stats, cache stats, and frontend missions). See [production evidence](../sprint-50/recover-2-production-smoke.json). No generated telemetry was committed.

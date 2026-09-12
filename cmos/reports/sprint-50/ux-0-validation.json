@@ -1,0 +1,54 @@
+{
+  "mission": "UX-0",
+  "status": "implementation verified locally; final route matrix, CI and deploy pending",
+  "guiding_roadmap": "cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md",
+  "design_system": {
+    "source_repository": "OODS-Forge",
+    "checkout_head": "114a268ea10b9141bc96925c69132179c7c4b334",
+    "packaging": "npm pack --ignore-scripts from existing built artifacts; immutable tarballs, no registry publishing",
+    "packages": [
+      {
+        "file": "vendor/oods-tokens-0.1.0.tgz",
+        "sha256": "69422edecf1d2853a844003bebbe2e4b514987e86a9fa1d860946f873c1c28c5",
+        "size_bytes": 238478
+      },
+      {
+        "file": "vendor/oods-tw-variants-0.1.0.tgz",
+        "sha256": "30b3ebfae93f7e8a5f0c0b35dcef2269254baff12bb480ebaad15365a3a5a34a",
+        "size_bytes": 13166
+      }
+    ],
+    "clean_install_smoke": "passed: CSS exposes Brand A light/dark/hc; Tailwind generates context rules using packaged plugin"
+  },
+  "implementation": [
+    "Shared role-grouped shell and mobile drawer",
+    "Per-user system/light/dark theme with pre-paint bootstrap and hydration guard",
+    "Native command palette: section navigation and search execution",
+    "One main, lang, skip link, keyboard focus, accessible controls and scroll regions",
+    "Semantic OODS colors across existing pages, with required build gate",
+    "Read-only project-scoped Evidence destination; full workflow stays in UX-3",
+    "Temporary /invites redirect to /settings#invites"
+  ],
+  "local_checks": {
+    "unit": "88 passed, no skipped tests",
+    "production_build": "passed",
+    "shell_browser": "8 passed; first-paint, persistence, OS changes, native modal focus, both shortcut modifiers, real search client dispatch, modal axe, login/register at 390/1440 in both themes",
+    "new_source_lint": "passed",
+    "foundational_references": "passed",
+    "token_color_gate": "passed",
+    "diff_check": "passed"
+  },
+  "route_smoke": {
+    "inventory": "27 baseline routes including generated 404, plus new /evidence = 28",
+    "phone": "28 routes x 2 themes passed: zero overflow, required axe rules and serious/critical findings, zero JS errors",
+    "desktop": "final run in progress",
+    "screenshots": "Kept in local artifacts; sensitive settings code values masked. No screenshots or credentials published."
+  },
+  "boundaries": [
+    "No backend runtime changes",
+    "Existing console count behavior remains for UX-4 aggregate redesign",
+    "Home keeps its existing redirect until UX-2",
+    "No claim of UX-0 completion before deployed smoke"
+  ],
+  "updated_at": "2026-09-12T21:19:11.524261+00:00"
+}

@@ -71,3 +71,21 @@ jobs:
           node -e 'const pages = require("./.next/server/pages-manifest.json");
           for (const route of ["/admin/users", "/admin/spaces"])
           if (!pages[route]) throw new Error(`Missing production route: ${route}`);'
+      - name: Install browser test dependencies after the production build
+        working-directory: frontend
+        run: |
+          npm ci --include=dev
+          npx playwright install --with-deps chromium
+      - name: Verify shell behavior against the production artifact
+        working-directory: frontend
+        env:
+          PLAYWRIGHT_SKIP_SERVER: "1"
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3100
+          PLAYWRIGHT_TELEMETRY_OUTPUT: ${{ runner.temp }}/shell-browser-tests.json
+        run: |
+          set -euo pipefail
+          npm run start -- --hostname 127.0.0.1 --port 3100 > "$RUNNER_TEMP/shell-server.log" 2>&1 &
+          shell_server_pid=$!
+          trap 'kill "$shell_server_pid" 2>/dev/null || true' EXIT
+          curl --fail --silent --retry 30 --retry-connrefused --retry-delay 1 http://127.0.0.1:3100/missions > /dev/null
+          npx playwright test tests/e2e/app-shell.spec.ts --workers=1

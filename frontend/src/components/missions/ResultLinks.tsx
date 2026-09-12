@@ -37,7 +37,7 @@ export function ResultLinks({ documentIds, reportId }: ResultLinksProps) {
 
   if (!hasDocuments && !hasReport) {
     return (
-      <div className="text-gray-500 dark:text-gray-400 text-sm py-2">
+      <div className="text-muted dark:text-muted text-sm py-2">
         No results available yet. Results will appear after mission execution.
       </div>
     );
@@ -47,7 +47,7 @@ export function ResultLinks({ documentIds, reportId }: ResultLinksProps) {
     <div className="space-y-4">
       {hasDocuments && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">
+          <h3 className="text-sm font-semibold text-secondary dark:text-secondary uppercase tracking-wide mb-3">
             Result Documents ({documentIds.length})
           </h3>
           <div className="space-y-2">
@@ -55,15 +55,15 @@ export function ResultLinks({ documentIds, reportId }: ResultLinksProps) {
               <Link
                 key={docId}
                 href={`/documents/${docId}`}
-                className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+                className="flex items-center gap-3 p-3 bg-background dark:bg-background rounded-lg hover:bg-surface dark:hover:bg-surface transition-colors group"
               >
-                <span className="text-gray-400 group-hover:text-blue-500 transition-colors">
+                <span className="text-muted group-hover:text-accent-text transition-colors">
                   <DocumentIcon />
                 </span>
-                <span className="font-mono text-sm text-gray-700 dark:text-gray-300 truncate">
+                <span className="font-mono text-sm text-secondary dark:text-secondary truncate">
                   {docId}
                 </span>
-                <span className="ml-auto text-gray-400 group-hover:text-blue-500 transition-colors">
+                <span className="ml-auto text-muted group-hover:text-accent-text transition-colors">
                   &rarr;
                 </span>
               </Link>
@@ -74,21 +74,21 @@ export function ResultLinks({ documentIds, reportId }: ResultLinksProps) {
 
       {hasReport && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-3">
+          <h3 className="text-sm font-semibold text-secondary dark:text-secondary uppercase tracking-wide mb-3">
             Generated Report
           </h3>
           <Link
             href={`/reports/${reportId}`}
-            className="flex items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors group"
+            className="flex items-center gap-3 p-4 bg-success-surface dark:bg-success-surface border border-success-line dark:border-success-line rounded-lg hover:bg-success-surface dark:hover:bg-success-surface transition-colors group"
           >
-            <span className="text-emerald-500">
+            <span className="text-success">
               <ReportIcon />
             </span>
             <div className="flex-1">
-              <p className="font-medium text-emerald-700 dark:text-emerald-300">View Synthesis Report</p>
-              <p className="text-sm text-emerald-600 dark:text-emerald-400 font-mono truncate">{reportId}</p>
+              <p className="font-medium text-success dark:text-success">View Synthesis Report</p>
+              <p className="text-sm text-success dark:text-success font-mono truncate">{reportId}</p>
             </div>
-            <span className="text-emerald-400 group-hover:text-emerald-500 transition-colors">
+            <span className="text-success group-hover:text-success transition-colors">
               &rarr;
             </span>
           </Link>

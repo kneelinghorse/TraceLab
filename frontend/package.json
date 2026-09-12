@@ -7,15 +7,18 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run check:tokens && next build",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "type-check": "tsc --pretty --noEmit",
     "test:unit": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "check:tokens": "node scripts/check-token-colors.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@oods/tokens": "file:vendor/oods-tokens-0.1.0.tgz",
+    "@oods/tw-variants": "file:vendor/oods-tw-variants-0.1.0.tgz",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "next": "^16.0.10",
@@ -31,19 +34,19 @@
     "@playwright/test": "^1.56.1",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.19",
+    "@testing-library/jest-dom": "^6.6.0",
+    "@testing-library/react": "^16.1.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "autoprefixer": "^10.4.22",
-    "@testing-library/jest-dom": "^6.6.0",
-    "@testing-library/react": "^16.1.0",
-    "eslint": "^9",
-    "vitest": "^3.2.0",
     "@vitejs/plugin-react": "^4.5.0",
-    "jsdom": "^26.1.0",
+    "autoprefixer": "^10.4.22",
+    "eslint": "^9",
     "eslint-config-next": "16.0.1",
+    "jsdom": "^26.1.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.14",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "^3.2.0"
   }
 }
