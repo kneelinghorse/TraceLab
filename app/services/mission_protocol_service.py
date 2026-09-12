@@ -124,8 +124,8 @@ class MissionProtocolService:
             payload.context if payload.context is not None else mission.context
         )
         if not isinstance(source_payload, dict) or "mission_id" not in source_payload:
-            updated = self.mission_service.update_mission(db, mission.id, payload)
-            self._after_write(updated.id)
+            updated = self.mission_service.update_mission(db, mission_id, payload)
+            self._after_write(mission_id)
             return updated
         draft = self._ensure_draft(source_payload)
         report = self.quality_gate_service.evaluate(
