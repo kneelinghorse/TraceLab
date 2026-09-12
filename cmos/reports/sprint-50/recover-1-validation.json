@@ -1,0 +1,71 @@
+{
+  "mission": "RECOVER-1",
+  "baseline_commit": "0d63d97",
+  "reference_commit": "8b049ed",
+  "date": "2026-09-12",
+  "regression_baseline": {
+    "ingestion_and_semantic_edges": "9 failures before restore",
+    "search_telemetry_protocol": "new regressions fail on baseline",
+    "new_routes": "14 failed on isolated baseline"
+  },
+  "backend_initial": {
+    "passed": 2343,
+    "failed": 3,
+    "skipped": 3,
+    "deselected": 22,
+    "seconds": 607.39,
+    "failures": [
+      "SSE test assumes ambient event loop",
+      "relation inventory still expects six types",
+      "service carve-out allowlist omits restored CMOS bridge"
+    ]
+  },
+  "postgres_initial": {
+    "passed": 124,
+    "failed": 1,
+    "skipped": 4,
+    "seconds": 235.71,
+    "failure": "legacy flat telemetry assertion"
+  },
+  "postgres_retest": {
+    "passed": 10,
+    "failed": 0,
+    "file": "tests/integration/test_deepsearch_integration.py"
+  },
+  "frontend": {
+    "unit_passed": 66,
+    "type_check": "passed",
+    "production_build": "passed"
+  },
+  "ruff": "passed (changed files)",
+  "secret_scan": "passed",
+  "foundational_refs": "passed",
+  "legacy_cmos_asset_runner": {
+    "passed": 13,
+    "failed": 2,
+    "baseline_failures": [
+      "missing cmos/runtime/boomerang",
+      "obsolete cmos/agents.md heading assertions"
+    ]
+  },
+  "quarantine": {
+    "before": 46,
+    "after": 22,
+    "reenabled": 24
+  },
+  "production_baseline": {
+    "restored_routes_present": false,
+    "graph_total": 60301,
+    "co_occurs": 6300,
+    "topic_similar": 19102,
+    "configured_owner_login": 401
+  },
+  "completion": "pending hosted CI, deployment and authenticated production smoke",
+  "final_targeted": {
+    "passed": 149,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 47.32
+  },
+  "implementation_commit": "2f9c183"
+}

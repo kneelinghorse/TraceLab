@@ -183,3 +183,65 @@ Pre-commit, the ORM column `content_tsv` was declared `nullable=True`. d592c92 c
 - CMOS learnings #142 (second casualty), #144 (mechanism); decision #376 (stats-cache restore).
 - Stats-cache restore branch: `fix/project-stats-cache-key`.
 - Prior known casualty: T33.1 LayerDiagnostic (S49 planning note).
+
+
+## RECOVER-1 implementation ledger — 2026-09-12
+
+The historical audit above remains a record of `0d63d97` and its ancestors.
+This ledger records the surgical restoration against `8b049ed`; it does not
+claim production completion before the deployment checks pass. The roadmap
+remains the intent authority: `cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md`.
+
+| Audited loss | Recovery commit | Regression coverage |
+| --- | --- | --- |
+| Ingestion Stage 6 and its import | `2f9c183` | `tests/test_ingestion_edge_materialization.py` (including durable document/chunk edges after caller rollback) |
+| `LayerDiagnostic` class, metadata fields, serializer and package re-export | `2f9c183` | `tests/unit/test_recovery_search_diagnostics.py`; `tests/test_recovery_routes.py::test_full_pedr_http_preserves_diagnostics_and_emits_layer_events` |
+| PEDR exception hierarchy package re-exports | `2f9c183` | `test_package_reexports_diagnostics_and_exception_hierarchy` |
+| `enable_graph`, depth, seed count, graph weight and derived layer weights | `2f9c183` | `test_tuned_defaults_reach_the_rest_search_request` |
+| Phase 1 syntactic/pragmatic fallbacks | `2f9c183` | `test_analysis_failure_uses_neutral_filters_without_retrying_broken_service`; `test_disabled_layers_do_not_run_analysis_or_boost` |
+| Phase 4 syntactic/pragmatic/governance fallbacks | `2f9c183` | `test_failed_layer_keeps_results_and_reports_degradation`; `test_governance_failure_cannot_bypass_explicit_filters` |
+| Structured lexical/semantic/graph failure logging | `2f9c183` | `test_failed_layer_keeps_results_and_reports_degradation` asserts layer and exception fields |
+| `RelationType.CO_OCCURS`, `TOPIC_SIMILAR` (both audit entries) and `EDGE_TYPES` | `2f9c183` | `tests/test_semantic_edge_types.py`; package/enum contract coverage |
+| Evidence auto-linking telemetry envelope and write-failure isolation | `2f9c183` | `tests/unit/test_recovery_evidence_telemetry.py`; `tests/test_evidence_auto_linking.py` |
+| YAML export stored-protocol/canonical fallback | `2f9c183` | `tests/test_mission_protocol_service.py::test_export_canonical_mission_without_legacy_protocol`; existing YAML round trip |
+| Mission update explicit protocol / stored protocol / canonical dispatch | `2f9c183` | `test_update_canonical_mission_without_legacy_protocol`; existing protocol update tests |
+| Mission-events router mount and authenticated EventSource | `2f9c183` | `tests/test_recovery_routes.py`; `tests/test_mission_events.py`; `tests/test_e2e_smoke.py` |
+| Decision-links router mount | `2f9c183` | `test_openapi_registers_restored_verbs_once`; admin read/write and non-admin denial cases in `tests/test_recovery_routes.py` |
+
+### Adaptations to current contracts
+
+- `materialize_implicit_edges(session=db)` no longer commits caller-owned sessions;
+  ingestion now commits successful edge writes and rolls back a failed edge stage
+  without losing the already committed document/chunks.
+- REST graph defaults now match the tuned dataclass defaults. The old restore alone
+  would leave normal HTTP searches on disabled graph / depth 1 / weight .08.
+- Failed query analysis uses neutral dataclasses, so its fallback cannot call the
+  same failed service again. Failed responses bypass the result cache. Explicit
+  governance filters fail closed if scoring cannot evaluate them.
+- CMOS decisions have no TraceLab owner or Space; every decision-link route is
+  admin-only before SQLite access. Event lists/replay/live delivery filter real
+  mission IDs/UUIDs using `accessible_filter`; unscoped CMOS/PEDR events are privileged
+  only. CMOS event writes use the existing service-principal boundary under RBAC.
+- The EventSource route has an authenticated SSE mount, preserving query-token
+  support; JSON reads and bridge writes use `protected_dependencies`. Subscription
+  begins before replay, snapshots the history deque, and closes on disconnect.
+- Twenty-four quarantined tests are re-enabled (46 → 22). Six evidence fixtures
+  needed current owner/Space columns; one event smoke needed the current PATCH
+  verb. One scoped-search test had conformed to the diagnostics deletion and now
+  checks the restored metadata while retaining its scope assertions.
+
+### Validation record
+
+New search/telemetry/canonical-dispatch regressions failed before restoration;
+all 14 new route tests also failed in an isolated `origin/main` checkout at
+`0d63d97`. Targeted recovery and RBAC harness runs pass. Frontend: 66 tests, type-check,
+and production build pass. Ruff, secret scan, and foundational refs pass.
+The legacy CMOS asset runner passes 13/15 checks; the missing Boomerang
+directory and obsolete agent-heading checks also fail on baseline. The full backend pass recorded 2,343 passing tests, three test-contract failures,
+three explicit skips and 22 deselections. After correcting those contracts, the
+final targeted recovery/RBAC suite passed 149 tests with no skips. PostgreSQL
+recorded 124 passes, four explicit skips and one stale telemetry assertion; the
+complete affected ingest file then passed all 10 tests. Hosted CI/deploy outcomes
+remain required before mission closure. Telemetry emitter
+losses outside evidence auto-linking, SQLite test-engine kwargs, schema parity,
+and the later-restoration completeness sweep remain RECOVER-2 work.
