@@ -1141,6 +1141,10 @@
     "reimplemented_sweep_count": 20,
     "quarantine_remaining": 12,
     "schema_decision_id": 382,
-    "validation_report": "cmos/reports/sprint-50/recover-2-validation.json"
+    "validation_report": "cmos/reports/sprint-50/recover-2-validation.json",
+    "merge_commit": "6155d88acbf0f8ee3b966a57b3dd2762bd43ae68",
+    "ci_commit": "1d473465e8a72383cc3bba78db87640f04da53f2",
+    "required_checks": "all six passed",
+    "production": "nine deployed writers and five HTTP checks passed"
   }
 }

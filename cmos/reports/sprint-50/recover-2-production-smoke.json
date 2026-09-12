@@ -1,0 +1,78 @@
+{
+  "commit": "6155d88acbf0f8ee3b966a57b3dd2762bd43ae68",
+  "checks": [
+    {
+      "writer": "cache",
+      "envelope_payload_append": "passed",
+      "sink_failure_isolation": "passed"
+    },
+    {
+      "writer": "cost",
+      "envelope_payload_append": "passed",
+      "sink_failure_isolation": "passed"
+    },
+    {
+      "writer": "correction",
+      "envelope_payload_append": "passed",
+      "sink_failure_isolation": "passed"
+    },
+    {
+      "writer": "sync",
+      "envelope_payload_append": "passed",
+      "sink_failure_isolation": "passed"
+    },
+    {
+      "writer": "preflight",
+      "envelope_payload_append": "passed",
+      "sink_failure_isolation": "passed"
+    },
+    {
+      "writer": "automation",
+      "envelope_payload_append": "passed",
+      "sink_failure_isolation": "passed"
+    },
+    {
+      "writer": "gate",
+      "envelope_payload_append": "passed",
+      "sink_failure_isolation": "passed"
+    },
+    {
+      "writer": "webhook",
+      "envelope_payload_append": "passed",
+      "sink_failure_isolation": "passed"
+    },
+    {
+      "writer": "graph",
+      "envelope_payload_append": "passed",
+      "sink_failure_isolation": "passed"
+    }
+  ],
+  "temporary_files_cleaned": true,
+  "http_checks": [
+    {
+      "method": "GET",
+      "path": "/api/v1/health",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/me",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/graph/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/cache/stats",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "https://tracelab.aquex.ai/missions",
+      "status": 200
+    }
+  ]
+}

@@ -45,15 +45,32 @@
     "cmos_database_health": "passed"
   },
   "full_backend": {
-    "status": "running in isolated worktree"
+    "status": "completed on initial implementation 93ab9fb",
+    "result": "2390 passed, 3 skipped, 12 deselected, 1 failure, 1 teardown error, 46 warnings in 285.34s",
+    "failures": "Cache envelope assertion and checked-out SQLite connection disposal; both fixed by f7725d0 and verified in the 40-test follow-up. Current-head full hosted run is pending."
   },
   "hosted_ci": {
     "pr": 255,
     "url": "https://github.com/kneelinghorse/TraceLab/pull/255",
-    "status": "five required gates and PostgreSQL integration pass; backend awaiting fixture corrections"
+    "commit": "1d473465e8a72383cc3bba78db87640f04da53f2",
+    "required_checks": "all six passed",
+    "backend": "2391 passed, 3 skipped, 12 deselected, 47 warnings in 381.35s",
+    "backend_run": "https://github.com/kneelinghorse/TraceLab/actions/runs/34716340602",
+    "postgresql_integration": "125 passed, 4 skipped, 17 warnings in 84.41s",
+    "integration_run": "https://github.com/kneelinghorse/TraceLab/actions/runs/34716340597",
+    "advisories": {
+      "mypy": "1039 errors, same as RECOVER-1 baseline",
+      "full_ruff": "1635 errors, down from RECOVER-1 1638",
+      "frontend_lint": "existing advisory failures; frontend untouched"
+    }
   },
   "production": {
-    "status": "pending deployment"
+    "status": "passed",
+    "backend_commit": "6155d88acbf0f8ee3b966a57b3dd2762bd43ae68",
+    "backend_deployment_id": "5096255a-d883-4cc3-ae06-9e44b927c2d2",
+    "writer_checks": "All nine real deployed writers pass envelope/payload/append and unwritable-sink isolation checks; temporary files removed.",
+    "http_checks": "API health, authenticated profile, graph stats, cache stats, frontend missions route: all 200",
+    "evidence": "recover-2-production-smoke.json"
   },
   "telemetry_churn_committed": false,
   "followup_fixtures": {
@@ -61,5 +78,6 @@
     "fix": "Read event.payload in cache test; close the FK-test session before disposing its pool.",
     "validation": "40 passed, 14 warnings in 10.55s across caching and admin user management",
     "commit": "f7725d070db7157a38c25f96156d685ed8605fc7"
-  }
+  },
+  "merge_commit": "6155d88acbf0f8ee3b966a57b3dd2762bd43ae68"
 }
