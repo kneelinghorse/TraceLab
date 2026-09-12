@@ -65,6 +65,12 @@ def test_recovered_read_routes_require_auth(client, path):
 
 
 def test_openapi_registers_restored_verbs_once():
+    try:
+        from fastapi.routing import iter_route_contexts
+    except ImportError:  # FastAPI < 0.141 eagerly flattens included routers.
+        routes = app.routes
+    else:
+        routes = list(iter_route_contexts(app.routes))
     schema = app.openapi()
     expected = [
         ("/api/v1/missions/events/recent", "get"),
@@ -79,7 +85,7 @@ def test_openapi_registers_restored_verbs_once():
         assert (
             sum(
                 r.path == path and verb.upper() in getattr(r, "methods", ())
-                for r in app.routes
+                for r in routes
             )
             == 1
         )

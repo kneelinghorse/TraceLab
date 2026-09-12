@@ -93,5 +93,26 @@
     "deny_leaks": 0,
     "teardown_failures": 0,
     "owner_credential_needed_for_full_live_matrix": true
-  }
+  },
+  "hosted_backend_first_completed": {
+    "passed": 2351,
+    "failed": 1,
+    "skipped": 3,
+    "deselected": 22,
+    "seconds": 371.36,
+    "head": "83b3c4f",
+    "failure": "duplicate-route test assumed eager routers; CI uses FastAPI 0.141.1 lazy includes"
+  },
+  "route_version_compatibility": {
+    "fastapi_0_135_1": {
+      "passed": 18,
+      "failed": 0
+    },
+    "fastapi_0_141_1_starlette_1_6_0": {
+      "passed": 18,
+      "failed": 0
+    },
+    "fix": "Use iter_route_contexts when available, matching existing live-harness coverage guard."
+  },
+  "production_owner_credential": "Existing production Railway bootstrap login verified HTTP 200 and owner role; no secret persisted. Full live matrix ready."
 }
