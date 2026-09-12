@@ -215,6 +215,12 @@ app.include_router(
     tags=["mission-events"],
     dependencies=protected_dependencies,
 )
+# Match the explicit service mounts used by mission log/evidence ingestion.
+app.include_router(
+    mission_events.service_router,
+    prefix=f"{settings.api_v1_prefix}/missions",
+    tags=["mission-events"],
+)
 # EventSource cannot set Authorization headers; retain the authenticated SSE
 # dependency at the mount boundary without imposing a second bearer-only gate.
 app.include_router(

@@ -67,5 +67,31 @@
     "skipped": 0,
     "seconds": 47.32
   },
-  "implementation_commit": "2f9c183"
+  "implementation_commit": "2f9c183",
+  "service_auth_regression": {
+    "before": {
+      "failed": 4,
+      "passed": 2
+    },
+    "after": {
+      "passed": 53,
+      "failed": 0
+    },
+    "coverage": "real JWT and API-key service authentication with RBAC on/off; real owner/admin/member/viewer bridge denial under RBAC; raw-principal allowlist"
+  },
+  "hosted_postgres": {
+    "passed": 125,
+    "skipped": 4,
+    "head": "66d0252"
+  },
+  "production_admin_credential": "existing MCP secure store verified; sufficient for recovery smoke",
+  "production_rbac_baseline": {
+    "result": "incomplete",
+    "gaps": [
+      "NO-DISPOSABLE-OWNER: admin cannot grant owner role"
+    ],
+    "deny_leaks": 0,
+    "teardown_failures": 0,
+    "owner_credential_needed_for_full_live_matrix": true
+  }
 }

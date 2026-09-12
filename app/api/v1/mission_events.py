@@ -35,6 +35,7 @@ from app.core.mission_events import (
 )
 from app.core.security import (
     AuthenticatedUser,
+    require_authenticated_principal,
     require_authenticated_user,
     require_authenticated_user_sse,
 )
@@ -44,6 +45,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 stream_router = APIRouter()
+service_router = APIRouter()
 
 
 @stream_router.get("/events/stream")
@@ -118,10 +120,10 @@ class CmosMissionEventRequest(BaseModel):
     sprint_id: str | None = Field(None, description="Sprint ID (e.g. sprint-35)")
 
 
-@router.post("/events/cmos")
+@service_router.post("/events/cmos")
 def ingest_cmos_mission_event(
     payload: CmosMissionEventRequest,
-    _user: AuthenticatedUser = Depends(require_authenticated_user),
+    _user: AuthenticatedUser = Depends(require_authenticated_principal),
 ):
     """Ingest a CMOS mission transition as a TraceLab SSE event.
 

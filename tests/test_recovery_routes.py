@@ -9,11 +9,13 @@ from app.core.config import settings
 from app.core.mission_events import MissionEvent, MissionEventBus
 from app.core.security import (
     AuthenticatedUser,
+    create_access_token,
     require_authenticated_user,
     require_authenticated_user_sse,
 )
 from app.main import app
 from app.models.mission import Mission
+from app.models.user import User
 
 
 @pytest.fixture
@@ -161,25 +163,33 @@ def test_recent_events_filter_before_limit_and_deny_global_events(
     assert [e["mission_id"] for e in response.json()] == [str(own.id)]
 
 
-def test_cmos_bridge_only_service_can_publish(client, caller, bus, monkeypatch):
+@pytest.mark.parametrize("role", ["owner", "admin", "member", "viewer"])
+def test_cmos_bridge_denies_real_human_credentials(
+    client, db_session, bus, monkeypatch, role
+):
+    monkeypatch.setattr(settings, "rbac_enabled", True)
+    user = User(
+        email=f"bridge-{uuid4().hex}@example.test",
+        display_name="Bridge human principal",
+        password_hash="placeholder-not-a-real-hash",  # noqa: S106 - JWT fixture
+        role=role,
+    )
+    db_session.add(user)
+    db_session.commit()
+    token = create_access_token(subject=str(user.id))
     payload = {
         "mission_id": "RECOVER-1",
         "name": "Recovery",
         "new_status": "In Progress",
     }
-    assert client.post("/api/v1/missions/events/cmos", json=payload).status_code == 403
+    assert client.post("/api/v1/missions/events/cmos", json=payload).status_code == 401
+    response = client.post(
+        "/api/v1/missions/events/cmos",
+        headers={"Authorization": f"Bearer {token}"},
+        json=payload,
+    )
+    assert response.status_code == 403
     assert bus.get_recent_events() == []
-    service = AuthenticatedUser(
-        user_id=uuid4(),
-        email="service@example.test",
-        display_name="service",
-        role="service",
-    )
-    monkeypatch.setitem(
-        app.dependency_overrides, require_authenticated_user, lambda: service
-    )
-    assert client.post("/api/v1/missions/events/cmos", json=payload).status_code == 200
-    assert bus.get_recent_events()[0].mission_id == "RECOVER-1"
 
 
 def test_human_mission_ids_are_scoped_without_uuid_alias_confusion(

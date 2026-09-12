@@ -223,7 +223,10 @@ remains the intent authority: `cmos/foundational-docs/roadmap-sprints-50-53-ux-o
   mission IDs/UUIDs using `accessible_filter`; unscoped CMOS/PEDR events are privileged
   only. CMOS event writes use the existing service-principal boundary under RBAC.
 - The EventSource route has an authenticated SSE mount, preserving query-token
-  support; JSON reads and bridge writes use `protected_dependencies`. Subscription
+  support; JSON reads use `protected_dependencies`. The bridge has a separate
+  service mount with `require_authenticated_principal`, matching the existing
+  mission log/evidence mounts. Real JWT and API-key tests cover both RBAC states;
+  dependency overrides must not hide the shared human gate. Subscription
   begins before replay, snapshots the history deque, and closes on disconnect.
 - Twenty-four quarantined tests are re-enabled (46 → 22). Six evidence fixtures
   needed current owner/Space columns; one event smoke needed the current PATCH

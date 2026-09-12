@@ -258,6 +258,10 @@ Following the authorization design in `foundational-docs/tech_arch_template.md`,
 service principal, just like mission logs. A human owner/admin token cannot
 publish CMOS transitions while RBAC is enabled. Its legacy flag-off behavior
 matches the log-write gate. Configure the CMOS bridge with a service credential.
+The bridge uses a separate router mount and `require_authenticated_principal`,
+matching mission log/evidence ingestion. The human-route dependency remains on
+event reads and rejects service credentials in both RBAC states. Regression tests
+exercise the actual JWT and API-key authentication paths for this boundary.
 
 `GET /missions/events/recent` and `/missions/events/stream` scope mission events
 by current mission ownership/Space membership. They resolve the human mission ID
