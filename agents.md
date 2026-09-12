@@ -305,6 +305,7 @@ def get_doc(doc_id: UUID, repo: DocumentRepository = Depends(get_document_reposi
 - `cmos/docs/Agentic_Migration_Playbook.md` – agent memory layer expectations.
 - `cmos/docs/AI-coding-assistant-workflows.md` & `cmos/docs/cmos_Playbook.md` – orchestration, validation, and telemetry policies.
 - `cmos/docs/integration-testing-guide.md`, `cmos/docs/packaging-guide.md`, `cmos/docs/sqlite-*` – test, packaging, and database procedures.
+- `cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md` – **the living vision and roadmap** for the d592c92 recovery and the UX overhaul (Sprints 50–53): intent, sprint plan, UI definition of done, route migration map. Authoritative for intent; CMOS is authoritative for status. Update at every sprint open and close.
 - `foundational-docs/roadmap_template.md` – canonical backlog + milestone template used for every sprint.
 - `foundational-docs/tech_arch_template.md` – authoritative technical architecture template for Mission Protocol deliverables.
 - `cmos/contracts/mission-authoring-contract.md` – single source of truth for the MCP param ↔ DB column ↔ REST ↔ DS worker mapping (T41.3).
