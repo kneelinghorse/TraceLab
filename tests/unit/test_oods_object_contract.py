@@ -63,3 +63,16 @@ def test_absent_ownership_is_not_made_required_and_chunks_stay_embedded():
     for name in ["Project", "Document", "Collection", "Mission", "Report", "Evidence"]:
         assert objects[name]["fields"]["owner_id"]["required"] is False
     assert objects["Chunk"]["contexts"] == ["inline"]
+
+
+@pytest.mark.parametrize("name", CONTRACT["objects"])
+def test_mapping_constraints_match_the_retained_native_forge_registry(name):
+    """The mapping must describe the tool's composed schema, including trait overrides."""
+    snapshot = Path(__file__).resolve().parents[2] / "cmos/reports/sprint-50/oods-previews/objects" / f"{name}.json"
+    actual = json.loads(snapshot.read_text())
+    assert actual["name"] == name
+    assert actual["maturity"] == "alpha"
+    for field, expected in CONTRACT["objects"][name]["fields"].items():
+        assert field in actual["schema"], (name, field)
+        for constraint in ("type", "required", "validation"):
+            assert actual["schema"][field].get(constraint) == expected.get(constraint), (name, field, constraint)

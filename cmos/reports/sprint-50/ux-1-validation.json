@@ -8,13 +8,26 @@
     "pull_request": "https://github.com/kneelinghorse/OODS-Forge/pull/105",
     "backlog_request": "f091c849-fe1a-49d5-93ee-b8029219685a",
     "current_ci_run": 34722431783,
-    "canonical_registry_activation": "pending merge and native worker refresh"
+    "canonical_registry_activation": "pending merge and native worker refresh",
+    "ci_merge_revision": "a1b7763da69732d6e22593fc6d9c74406bdfa753",
+    "ci_merge_base": "e9f15a4a586921ce8c68dd3d24f5a01d0b24a281",
+    "upstream_change": "Roadmap-only Sprint196 review closure; merged locally and source tree equality with tested CI revision verified before retaining receipts.",
+    "bundled_runtime": {
+      "status": "passed",
+      "cells": 42,
+      "failures": 0,
+      "typed_gaps": 0,
+      "replay_tests_passed": 26,
+      "head": "a1b7763da69732d6e22593fc6d9c74406bdfa753",
+      "archive_sha256": "60aab21dbade6f2dbef5ea252ca0cbd523bb8c91d6593261e630e2aa5a93c53c",
+      "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/release"
+    }
   },
   "mapping": {
     "objects": 7,
     "model_field_mappings": 522,
     "nested_field_mappings": 10,
-    "traceLab_tests": "11 passed, no skips; five dependency deprecation warnings",
+    "traceLab_tests": "18 passed, no skips; five dependency deprecation warnings. Includes native Forge composed-schema parity for every mapped field constraint.",
     "foundational_references": "passed"
   },
   "local_forge_checks": {
@@ -25,7 +38,9 @@
     "mcp_build": "passed",
     "object_type_generation": "7 objects passed",
     "schema_type_generation": "passed",
-    "targeted_lint": "zero errors; one pre-existing warning in design.compose.ts"
+    "targeted_lint": "zero errors; one pre-existing warning in design.compose.ts",
+    "coverage_regression_fixes": "48 passed: current claim counts, historical source-byte qualification and exact temporal SVG assets",
+    "tool_reference_index": "31 passed after regeneration at e9cf5a1824f26d357570f6e76be0221bbdb0500b"
   },
   "saved_schemas": {
     "count": 20,
@@ -201,5 +216,39 @@
     "Attach landed commit to the roadmap-required backlog request",
     "Pass TraceLab PR checks and merge mapping/evidence changes",
     "CMOS health and final status verification"
-  ]
+  ],
+  "traceLab_ci": {
+    "head": "7f0e907",
+    "pull_request": "https://github.com/kneelinghorse/TraceLab/pull/257",
+    "required_checks": "passed at this head; draft pending Forge activation",
+    "backend": {
+      "run": 34722628691,
+      "passed": 2402,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 47
+    },
+    "integration": {
+      "run": 34722628693,
+      "passed": 125,
+      "skipped": 4,
+      "warnings": 17
+    },
+    "frontend_production_build": {
+      "run": 34722628680,
+      "status": "passed",
+      "browser_tests_passed": 8
+    },
+    "frontend_unit_and_types": {
+      "run": 34722628645,
+      "status": "passed"
+    },
+    "secret_scan": "passed",
+    "changed_file_ruff": "passed",
+    "advisory_failures": [
+      "ruff-full",
+      "mypy",
+      "frontend lint"
+    ]
+  }
 }
