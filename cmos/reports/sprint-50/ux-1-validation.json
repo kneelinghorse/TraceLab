@@ -1,15 +1,14 @@
 {
   "mission": "UX-1",
-  "status": "in_progress; Forge runtime CI and canonical registry activation pending",
-  "updated_at": "2026-09-13T00:13:36.926080+00:00",
+  "status": "blocked; GitHub Actions billing/capacity prevents final CI before merge and registry activation",
+  "updated_at": "2026-09-13T00:47:48.283405+00:00",
   "forge": {
     "base": "114a268ea10b9141bc96925c69132179c7c4b334",
-    "implementation_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+    "implementation_head": "a6c845163368af3e21fff61c88b75a1823448871",
     "pull_request": "https://github.com/kneelinghorse/OODS-Forge/pull/105",
     "backlog_request": "f091c849-fe1a-49d5-93ee-b8029219685a",
-    "current_ci_run": 34725928271,
+    "current_ci_run": 34728733886,
     "canonical_registry_activation": "pending merge and native worker refresh",
-    "ci_merge_revision": "a7ef99a21c303e3ef66f57845e9f2b52475f79a3",
     "ci_merge_base": "e9f15a4a586921ce8c68dd3d24f5a01d0b24a281",
     "upstream_change": "Roadmap-only Sprint196 review closure; merged locally and source tree equality with tested CI revision verified before retaining receipts.",
     "bundled_runtime": {
@@ -40,7 +39,36 @@
     ],
     "runtime_job": 103639903728,
     "release_job": 103639903681,
-    "current_ci_coverage": {
+    "catalog_runtime": {
+      "status": "passed",
+      "run": 34725928271,
+      "job": 103639903728,
+      "head": "a7ef99a21c303e3ef66f57845e9f2b52475f79a3",
+      "run_id": "edadede9-db2d-4a7a-83df-14048d51ccd0",
+      "cells": 240,
+      "passed": 240,
+      "failed": 0,
+      "typed_gaps": 0,
+      "workflow_cells": 34,
+      "dashboard_cells_passed": 4,
+      "chart_theme_scopes_passed": 48,
+      "pack_count": 1,
+      "browser": "pinned Linux Chromium 141.0.7390.37",
+      "emitter_mutation": "rejected; byte-identical restored source passes",
+      "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/runtime",
+      "receipt_heads_modified": false,
+      "runtime_job_seconds": 3539,
+      "next_job_budget_minutes": 75
+    },
+    "final_ci": {
+      "head": "a6c845163368af3e21fff61c88b75a1823448871",
+      "run": 34728733886,
+      "status": "jobs not started",
+      "reason": "GitHub account payments failed or spending limit needs increasing",
+      "url": "https://github.com/kneelinghorse/OODS-Forge/actions/runs/34728733886",
+      "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/local-portable/ci-34728733886-billing-block.json"
+    },
+    "prior_ci_coverage": {
       "passed": 7163,
       "failed": 5,
       "skipped": 16,
@@ -48,9 +76,11 @@
       "failures": [
         "2 generated Tool-Specs freshness tests; regenerated document committed locally at ce2239c, 19 contract tests now pass",
         "3 retained runtime-ledger tests await fresh 240-cell proof"
-      ]
+      ],
+      "run": 34725928271,
+      "resolution": "Docs and canonical proof refreshed; all 61 targeted regression tests pass, including dist-only health after removing its authoring-file dependency."
     },
-    "current_ci_mcp_suite": {
+    "prior_ci_mcp_suite": {
       "job": 103639903791,
       "passed": 6834,
       "failed": 6,
@@ -62,8 +92,20 @@
       "failures": [
         "2 generated Tool-Specs freshness tests fixed locally at ce2239c",
         "4 runtime-ledger and portable-health tests await fresh valid 240-cell evidence"
-      ]
-    }
+      ],
+      "run": 34725928271,
+      "resolution": "Docs and canonical proof refreshed; all 61 targeted regression tests pass, including dist-only health after removing its authoring-file dependency."
+    },
+    "prior_ci_consumer_suite": {
+      "job": 103639903737,
+      "passed": 304,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "Portable-health assertion against old canonical ledger; fixed proof is now retained, regression validation running.",
+      "run": 34725928271,
+      "resolution": "Docs and canonical proof refreshed; all 61 targeted regression tests pass, including dist-only health after removing its authoring-file dependency."
+    },
+    "retained_proof_ci_merge_revision": "a7ef99a21c303e3ef66f57845e9f2b52475f79a3"
   },
   "mapping": {
     "objects": 7,
@@ -86,7 +128,23 @@
     "identity_regressions": "All six intent regressions passed after failing before the correction.",
     "declared_filter_regressions": "2 failed before the fix; 2 passed afterward (22 other tests excluded by focused selection). Non-status enum filters must target their declared field.",
     "research_object_tests": "24 passed, no skips in the full run.",
-    "collection_regressions": "41 passed, 1 Vue compilation timeout and 1 worker communication timeout under host memory pressure; isolated Vue retry passed in 8.6 seconds (11 unrelated tests excluded by name selection)."
+    "collection_regressions": "41 passed, 1 Vue compilation timeout and 1 worker communication timeout under host memory pressure; isolated Vue retry passed in 8.6 seconds (11 unrelated tests excluded by name selection).",
+    "research_worker_scheduling": "24 passed, no skips or unhandled errors after yielding between synchronous compiler calls; lint passed. Full CI confirmation pending.",
+    "retained_proof_replay": "61 passed, zero skipped or unhandled errors after fixing dist-only census file dependence; generated docs and targeted lint pass.",
+    "package_build": "All packages passed after wiring the existing playground dependency link in the temporary worktree.",
+    "portable_archive": {
+      "status": "passed",
+      "tools": 19,
+      "node": "v24.6.0",
+      "head": "a6c845163368af3e21fff61c88b75a1823448871",
+      "manifest_dirty": true,
+      "note": "Untracked temporary node_modules links; no tracked source changes when assembled. This is a local development smoke, not clean --final release certification.",
+      "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/local-portable/e2e.json",
+      "extraction_tree_unchanged": true,
+      "bridge_parity": true,
+      "runtime_cells": 240,
+      "release_cells": 42
+    }
   },
   "saved_schemas": {
     "count": 20,
@@ -259,37 +317,36 @@
     ]
   },
   "pending": [
-    "Complete pinned Linux 240-cell catalog run and retain authentic referenced receipts",
-    "Pass Forge full CI and portable artifact smoke; merge PR105",
+    "Restore GitHub Actions billing/capacity, rerun final Forge CI and merge PR105",
     "Refresh canonical Forge worker and verify the seven research objects through the provided connection",
     "Attach landed commit to the roadmap-required backlog request",
     "Pass TraceLab PR checks and merge mapping/evidence changes",
     "CMOS health and final status verification"
   ],
   "traceLab_ci": {
-    "head": "00500e7f524cb8b7e6bef32993f04c0b4c80075e",
+    "head": "e3952e471d457966528286e9bc6f92e740c69b7b",
     "pull_request": "https://github.com/kneelinghorse/TraceLab/pull/257",
-    "required_checks": "passed at refreshed schema/preview head; draft pending Forge activation",
+    "required_checks": "passed at full 120-viewport preview head; draft pending Forge activation",
     "backend": {
-      "run": 34726168534,
+      "run": 34727448769,
       "passed": 2409,
       "skipped": 3,
       "deselected": 12,
       "warnings": 47
     },
     "integration": {
-      "run": 34726168520,
+      "run": 34727448767,
       "passed": 125,
       "skipped": 4,
       "warnings": 17
     },
     "frontend_production_build": {
-      "run": 34726168552,
+      "run": 34727448766,
       "status": "passed",
       "browser_tests_passed": 8
     },
     "frontend_unit_and_types": {
-      "run": 34726168554,
+      "run": 34727448771,
       "status": "passed"
     },
     "secret_scan": "passed",
