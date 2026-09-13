@@ -10,6 +10,7 @@ const {chromium}=require('playwright');
 let browser;
 async function run() {
 const base=process.env.UI_BASE || 'http://localhost:3100';
+const directProduction = new URL(base).origin === 'https://tracelab.aquex.ai';
 const out=process.env.UI_OUT || path.join(os.tmpdir(), 'tracelab-ui-shell');
 await fs.mkdir(out,{recursive:true});
 const creds=JSON.parse(await fs.readFile(path.join(os.homedir(),'.config/tracelab-mcp/credentials.json'),'utf8'));
@@ -33,6 +34,14 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
   await context.route(/https?:\/\/(api\.tracelab\.aquex\.ai|localhost:8000|127\.0\.0\.1:8103)\/.*/, async route => {
     const incoming = new URL(route.request().url());
     try {
+      if (directProduction) {
+        if (incoming.origin !== api) throw Error('Production UI requested a non-production API');
+        if (route.request().method() === 'OPTIONS') { await route.continue(); return; }
+        if (route.request().method() !== 'GET') throw Error('Smoke forbids API writes');
+        const headers = {...route.request().headers(), 'x-api-key':creds.key};
+        delete headers.authorization;
+        await route.continue({headers}); return;
+      }
       if (route.request().method() === 'OPTIONS') {
         await route.fulfill({status:204, headers:{'access-control-allow-origin':base,'access-control-allow-headers':'authorization,content-type,x-api-key','access-control-allow-methods':'GET,OPTIONS'}}); return;
       }
@@ -40,7 +49,7 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
       const response = await fetch(api + incoming.pathname + incoming.search, {headers:{'X-API-Key':creds.key}});
       if (!response.ok) transportErrors.push({path:incoming.pathname,status:response.status});
       await route.fulfill({status:response.status,body:await response.text(),headers:{'content-type':'application/json','access-control-allow-origin':base}});
-    } catch { transportErrors.push({path:incoming.pathname,error:'API proxy request failed'}); await route.abort().catch(() => {}); }
+    } catch { transportErrors.push({path:incoming.pathname,error:'API smoke request failed'}); await route.abort().catch(() => {}); }
   });
   await context.addInitScript(({user,theme})=>{
    localStorage.setItem('tracelab.auth.v2',JSON.stringify({token:'ui-smoke-placeholder',user_id:user.user_id,email:user.email,display_name:'UX validation'}));
@@ -48,6 +57,7 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
   },{user:me,theme});
   const page=await context.newPage();
   let errors=[];page.on('pageerror',()=>errors.push('Client-side exception (detail suppressed)'));
+  page.on('response', response => { if(directProduction && new URL(response.url()).origin === api && response.status() >= 400) transportErrors.push({path:new URL(response.url()).pathname,status:response.status()}); });
   page.on('requestfailed', request => { if(new URL(request.url()).origin === api) { const failure = request.failure()?.errorText; const item={path:new URL(request.url()).pathname,error:failure || 'Browser API request failed'}; if(failure === 'net::ERR_ABORTED') navigationCancellations.push(item); else transportErrors.push(item); } });
   for(const route of selected) {
    errors=[]; transportErrors=[]; navigationCancellations=[];
@@ -77,7 +87,7 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
 await browser.close();
 browser=undefined;
 const failures=results.filter(r => r.scrollWidth > r.width+1 || r.violations.length || r.errors.length || r.transportErrors.length || r.mainCount !== 1 || !r.shellPresent || r.theme !== r.themeRequested || r.status !== (r.route === '/404' ? 404 : 200));
-await fs.writeFile(out+'/summary.json', JSON.stringify({base, checkedAt:new Date().toISOString(), checks:results.length, routes:[...new Set(results.map(r=>r.route))].length, failures:failures.map(r=>({route:r.route,theme:r.theme,width:r.width})), readOnlyApiProxy:true},null,2));
+await fs.writeFile(out+'/summary.json', JSON.stringify({base, checkedAt:new Date().toISOString(), checks:results.length, routes:[...new Set(results.map(r=>r.route))].length, failures:failures.map(r=>({route:r.route,theme:r.theme,width:r.width})), readOnly:true, directProductionApi:directProduction, readOnlyApiProxy:!directProduction},null,2));
 if(failures.length)process.exitCode=1;
 
 }
