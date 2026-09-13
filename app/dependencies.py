@@ -14,6 +14,7 @@ from app.adapters.repositories.sqlalchemy_project_repo import SQLAlchemyProjectR
 from app.core.config import settings
 from app.ports.external import EmbeddingPort, LLMPort, VectorDBPort
 from app.ports.repositories import DocumentRepository, MissionRepository, ProjectRepository
+from app.services.home import HomeService
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,12 @@ def get_project_repository() -> ProjectRepository:
 def get_mission_repository() -> MissionRepository:
     """Provide a MissionRepository backed by SQLAlchemy."""
     return SQLAlchemyMissionRepository()
+
+
+def get_home_service() -> HomeService:
+    """Wire Home's scoped aggregate repository to its service."""
+    from app.adapters.repositories.sqlalchemy_home_repo import SQLAlchemyHomeRepository
+    return HomeService(SQLAlchemyHomeRepository())
 
 
 def get_embedding_port() -> EmbeddingPort | None:

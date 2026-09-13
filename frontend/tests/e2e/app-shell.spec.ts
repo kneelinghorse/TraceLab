@@ -12,6 +12,13 @@ test.beforeEach(async ({ page }) => {
     const pathname = new URL(route.request().url()).pathname;
     let body: unknown = {};
     if (pathname.endsWith("/auth/me")) body = { user_id: "alice", email: "alice@example.test", display_name: "Alice", role: "admin" };
+    else if (pathname.endsWith("/home")) body = {
+      generated_at: "2026-09-13T00:00:00Z", refresh_seconds: 30, stalled_after_seconds: 3600,
+      missions: { total: 433, by_status: { completed: 424 } },
+      attention: { total: 0, items: [] }, active_runs: { total: 0, items: [] },
+      recent_reports: { total: 0, items: [] }, recent_projects: { total: 0, items: [] },
+      evidence_activity: { total: 0, items: [] },
+    };
     else if (pathname.endsWith("/projects") || pathname.endsWith("/missions") || pathname.endsWith("/documents")) body = { data: [], pagination: { page: 1, page_size: 20, total: 0, pages: 1 } };
     else if (pathname.endsWith("/search/history")) body = { entries: [] };
     else if (pathname.endsWith("/saved-searches")) body = { items: [] };
@@ -19,6 +26,20 @@ test.beforeEach(async ({ page }) => {
     else if (pathname.endsWith("/search")) body = { answer: "No matching sources", citations: [], sources: [], latency_ms: 12, quality: { composite_score: 0.9, threshold: 0.8 }, routing: { selected_model: "test" }, cache: { hit: false } };
     await route.fulfill({ json: body });
   });
+});
+
+test("Home stays at the root and its search opens the shell palette", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Home", exact: true })).toBeVisible();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole("link", { name: "433 missions" })).toBeVisible();
+  await expect(page.getByText("You’re up to date.")).toBeVisible();
+  const search = page.getByRole("button", { name: /Search research or jump to a section/ });
+  await search.click();
+  await expect(page.getByRole("textbox", { name: "Search research or find a section" })).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(search).toBeFocused();
+  await expect(page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: "Missions", exact: true })).toHaveAttribute("href", "/missions");
 });
 
 test("theme persists through hydration and OS changes without a wrong-color frame", async ({ page }) => {

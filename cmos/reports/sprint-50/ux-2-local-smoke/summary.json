@@ -1,0 +1,12 @@
+{
+  "checked_at": "2026-09-13T03:09:56.103Z",
+  "base": "http://127.0.0.1:3102",
+  "api": "http://127.0.0.1:8102",
+  "fixture": true,
+  "viewport_checks": 6,
+  "failures": 0,
+  "mission_total": 143,
+  "project_total": 1,
+  "report_total": 1,
+  "all_status_totals_match": true
+}

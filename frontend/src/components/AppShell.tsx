@@ -8,6 +8,7 @@ import { Navigation, NavigationIcon, activeNavigationItem, navigationGroups } fr
 import { ThemeSelect } from "@/components/ThemeSelect";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRole } from "@/contexts/RoleContext";
+import { OPEN_COMMAND_PALETTE_EVENT } from "@/lib/command-palette";
 
 function Brand() {
   return <Link href="/" className="flex items-center gap-3 font-semibold tracking-tight text-foreground"><span aria-hidden="true" className="grid h-8 w-8 place-items-center rounded-lg bg-accent text-on-accent">T</span><span>TraceLab</span></Link>;
@@ -53,16 +54,24 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+    function requested() {
+      if (!isAuthenticated) return;
+      setQuery("");
+      if (!commands.current?.open) commands.current?.showModal();
+      searchInput.current?.focus();
+    }
     function keyboard(event: KeyboardEvent) {
       if (isAuthenticated && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
-        setQuery("");
-        if (!commands.current?.open) commands.current?.showModal();
-        searchInput.current?.focus();
+        requested();
       }
     }
     window.addEventListener("keydown", keyboard);
-    return () => window.removeEventListener("keydown", keyboard);
+    window.addEventListener(OPEN_COMMAND_PALETTE_EVENT, requested);
+    return () => {
+      window.removeEventListener("keydown", keyboard);
+      window.removeEventListener(OPEN_COMMAND_PALETTE_EVENT, requested);
+    };
   }, [isAuthenticated]);
 
   useEffect(() => {

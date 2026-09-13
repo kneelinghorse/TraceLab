@@ -19,6 +19,7 @@ from app.models.ingestion_job import IngestionJob
 from app.models.insight import Insight, InsightSource
 from app.models.invite_code import InviteCode
 from app.models.mission import Mission
+from app.models.mission_review import MissionReview
 from app.models.processing_status import DocumentProcessingStatus
 from app.models.project import Project
 from app.models.project_tag import ProjectTag
@@ -48,6 +49,7 @@ __all__ = [
     "Insight",
     "InsightSource",
     "Mission",
+    "MissionReview",
     "QualityCheck",
     "DocumentProcessingStatus",
     "IngestionJob",

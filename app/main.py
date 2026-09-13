@@ -25,6 +25,7 @@ from app.api.v1 import (
     evidence,
     facets,
     health,
+    home,
     mission_events,
     missions,
     monitoring,
@@ -288,6 +289,12 @@ app.include_router(
     evidence.router,
     prefix=f"{settings.api_v1_prefix}/evidence",
     tags=["evidence"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    home.router,
+    prefix=f"{settings.api_v1_prefix}/home",
+    tags=["home"],
     dependencies=protected_dependencies,
 )
 app.include_router(

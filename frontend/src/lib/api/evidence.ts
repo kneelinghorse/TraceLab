@@ -22,7 +22,7 @@ export interface LedgerPage {
 }
 
 export const evidenceApi = {
-  list(projectId: string, page = 1): Promise<LedgerPage> {
-    return httpClient.get("/evidence", { params: { project_id: projectId, page, page_size: 20 } });
+  list(projectId: string, page = 1, filters: { mission_id?: string; session_key?: string } = {}): Promise<LedgerPage> {
+    return httpClient.get("/evidence", { params: { project_id: projectId, page, page_size: 20, ...filters } });
   },
 };
