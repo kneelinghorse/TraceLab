@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
@@ -84,8 +85,8 @@ def _build_item_response(item) -> CollectionItemResponse:
 @router.get("", response_model=CollectionListResponse)
 def list_collections(
     project_id: UUID | None = None,
-    page: int = Query(1, ge=1),
-    page_size: int | None = Query(None, ge=1, le=100),
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int | None, Query(ge=1, le=100)] = None,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
     db: Session = Depends(get_db),
     service: CollectionService = Depends(get_collection_service),

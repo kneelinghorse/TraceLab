@@ -1,7 +1,7 @@
 {
   "mission": "UX-7",
   "status": "local_validation_passed",
-  "checked_at": "2026-09-13T21:11:09.267304+00:00",
+  "checked_at": "2026-09-13T21:21:18.950298+00:00",
   "base_commit": "71cca0633aa47c43fd0d3a628731ebfa7b597734",
   "decisions": [
     410
@@ -14,8 +14,8 @@
   ],
   "validation": {
     "python": {
-      "command": ".venv/bin/pytest tests/test_project_hub.py tests/test_home_api.py tests/test_collections.py tests/test_project_management_api.py tests/test_project_document_read_api.py tests/test_document_chunks_api.py tests/test_document_download_api.py tests/test_rbac_route_enforcement_api.py tests/test_create_ownership_parity.py -q",
-      "passed": 140,
+      "command": ".venv/bin/pytest tests/test_pedr_collection_scope.py tests/test_project_hub.py tests/test_home_api.py tests/test_collections.py tests/test_project_management_api.py tests/test_project_document_read_api.py tests/test_document_chunks_api.py tests/test_document_download_api.py tests/test_rbac_route_enforcement_api.py tests/test_create_ownership_parity.py -q",
+      "passed": 144,
       "skipped": 0,
       "warnings": 14
     },
@@ -73,5 +73,15 @@
     "Production counts, two-file upload and two-user favorite isolation",
     "124-check direct-production baseline and visual review",
     "Receipt publication and CMOS completion"
-  ]
+  ],
+  "ci_initial_failure": {
+    "run_id": 34783099090,
+    "passed": 2436,
+    "failed": 1,
+    "skipped": 3,
+    "deselected_quarantine": 12,
+    "warnings": 48,
+    "test": "tests/test_pedr_collection_scope.py::test_unrestricted_routes_preserve_legacy_child_service_call_shapes",
+    "resolution": "Use Annotated query validation with ordinary scalar defaults, preserving direct legacy Python callers. Existing regression now passes in the 144-test targeted suite."
+  }
 }
