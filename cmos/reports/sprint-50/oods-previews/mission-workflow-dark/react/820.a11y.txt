@@ -1,0 +1,87 @@
+- main:
+  - paragraph: MISSION WORKSPACE
+  - heading "Missions" [level=1]
+  - text: Local workspace
+  - navigation "Workflow screens":
+    - button "List"
+    - button "Detail"
+    - button "Edit"
+    - button "Timeline"
+  - region "Mission screen":
+    - search "Search":
+      - text: Search
+      - searchbox "Search"
+    - text: Status
+    - combobox "Status":
+      - option "All states" [selected]
+      - option "draft"
+      - option "queued"
+      - option "in progress"
+      - option "completed"
+      - option "blocked"
+      - option "cancelled"
+      - option "validation failed"
+    - text: Sort
+    - combobox "Sort":
+      - option "Name A–Z" [selected]
+      - option "Name Z–A"
+    - list "Records":
+      - listitem:
+        - 'button "Mission 01 label sample 1 description sample 1 Status: Draft Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000001"':
+          - text: Mission 01 label sample 1 description sample 1 Draft
+          - time: Sep 1, 2026, 12:00 PM
+          - text: 00000000-0000-4000-8000-000000000001
+      - listitem:
+        - 'button "Mission 02 label sample 2 description sample 2 Status: Queued Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000002"':
+          - text: Mission 02 label sample 2 description sample 2 Queued
+          - time: Sep 1, 2026, 12:00 PM
+          - text: 00000000-0000-4000-8000-000000000002
+      - listitem:
+        - 'button "Mission 03 label sample 3 description sample 3 Status: In Progress Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000003"':
+          - text: Mission 03 label sample 3 description sample 3 In Progress
+          - time: Sep 1, 2026, 12:00 PM
+          - text: 00000000-0000-4000-8000-000000000003
+      - listitem:
+        - 'button "Mission 04 label sample 4 description sample 4 Status: Completed Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000004"':
+          - text: Mission 04 label sample 4 description sample 4 Completed
+          - time: Sep 1, 2026, 12:00 PM
+          - text: 00000000-0000-4000-8000-000000000004
+      - listitem:
+        - 'button "Mission 05 label sample 5 description sample 5 Status: Blocked Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000005"':
+          - text: Mission 05 label sample 5 description sample 5 Blocked
+          - time: Sep 1, 2026, 12:00 PM
+          - text: 00000000-0000-4000-8000-000000000005
+      - listitem:
+        - 'button "Mission 06 label sample 6 description sample 6 Status: Cancelled Aug 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000006"':
+          - text: Mission 06 label sample 6 description sample 6 Cancelled
+          - time: Aug 1, 2026, 12:00 PM
+          - text: 00000000-0000-4000-8000-000000000006
+      - listitem:
+        - 'button "Mission 07 label sample 7 description sample 7 Status: Validation Failed Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000007"':
+          - text: Mission 07 label sample 7 description sample 7 Validation Failed
+          - time: Sep 1, 2026, 12:00 PM
+          - text: 00000000-0000-4000-8000-000000000007
+      - listitem:
+        - 'button "Mission 08 label sample 8 description sample 8 Status: Draft Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000008"':
+          - text: Mission 08 label sample 8 description sample 8 Draft
+          - time: Sep 1, 2026, 12:00 PM
+          - text: 00000000-0000-4000-8000-000000000008
+      - listitem:
+        - 'button "Mission 09 label sample 9 description sample 9 Status: Queued Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000009"':
+          - text: Mission 09 label sample 9 description sample 9 Queued
+          - time: Sep 1, 2026, 12:00 PM
+          - text: 00000000-0000-4000-8000-000000000009
+      - listitem:
+        - 'button "Mission 10 label sample 10 description sample 10 Status: In Progress Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000010"':
+          - text: Mission 10 label sample 10 description sample 10 In Progress
+          - time: Sep 1, 2026, 12:00 PM
+          - text: 00000000-0000-4000-8000-000000000010
+    - navigation "Pagination":
+      - text: 10 records Showing 1–10 of 10
+      - button "Previous page" [disabled]: ‹
+      - list:
+        - listitem:
+          - button "Page 1": "1"
+      - button "Next page" [disabled]: ›
+      - text: Page 1 of 1
+  - status

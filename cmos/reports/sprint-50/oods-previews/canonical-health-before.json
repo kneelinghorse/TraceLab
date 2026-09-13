@@ -1,0 +1,42 @@
+{
+  "status": "ok",
+  "registry": {
+    "components": 109,
+    "traits": 45,
+    "objects": 11,
+    "lastSync": "2026-09-11T05:30:00Z"
+  },
+  "schemas": {
+    "savedCount": 16,
+    "storeDir": "/Users/systemsystems/portfolio/Design-Tools/OODS-Forge/packages/mcp-server/.oods/schemas"
+  },
+  "productReality": {
+    "runtime": {
+      "cells": 154,
+      "pass": 154,
+      "typedGap": 0,
+      "fail": 0,
+      "head": "39deb793a3161621b5a0893618f9d40201c22256"
+    },
+    "tools": {
+      "entries": 24,
+      "byTier": {
+        "product-reality": 19,
+        "contract": 5,
+        "unit": 0,
+        "none": 0
+      },
+      "head": "a0c10f8b075ba07c28816cb2c453061a53400a4a"
+    },
+    "viz": {
+      "types": 13,
+      "patterns": 21,
+      "families": 8,
+      "classified": 34,
+      "coreCells": 20,
+      "coreSurfaceComplete": 13,
+      "typedGaps": 7
+    }
+  },
+  "note": "Public Forge health before UX-1 canonical checkout activation; the existing schemas must remain available."
+}

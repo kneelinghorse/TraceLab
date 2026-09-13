@@ -1,6 +1,6 @@
 {
   "mission": "UX-0",
-  "status": "implementation verified locally; final route matrix, CI and deploy pending",
+  "status": "completed; implementation merged, both services deployed, all live checks passed",
   "guiding_roadmap": "cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md",
   "design_system": {
     "source_repository": "OODS-Forge",
@@ -36,19 +36,45 @@
     "new_source_lint": "passed",
     "foundational_references": "passed",
     "token_color_gate": "passed",
-    "diff_check": "passed"
+    "diff_check": "passed",
+    "cmos_health": "passed",
+    "credential_literal_scan": "passed; no credential in staged diff or frontend sources"
   },
   "route_smoke": {
     "inventory": "27 baseline routes including generated 404, plus new /evidence = 28",
     "phone": "28 routes x 2 themes passed: zero overflow, required axe rules and serious/critical findings, zero JS errors",
-    "desktop": "final run in progress",
-    "screenshots": "Kept in local artifacts; sensitive settings code values masked. No screenshots or credentials published."
+    "desktop": "28 routes x 2 themes passed; same zero-finding gates as phone",
+    "screenshots": "Kept in local artifacts; sensitive settings code values masked. No screenshots or credentials published.",
+    "local_evidence": "ux-0-local-browser.json",
+    "production": "112 passed: 28 routes x 2 themes x 2 widths; authenticated shell, zero overflow, axe severity/landmark/lang findings, JS errors and transport failures",
+    "production_evidence": "ux-0-production-browser.json"
   },
   "boundaries": [
-    "No backend runtime changes",
-    "Existing console count behavior remains for UX-4 aggregate redesign",
+    "Existing console count behavior remains assigned to UX-4 aggregate redesign",
     "Home keeps its existing redirect until UX-2",
-    "No claim of UX-0 completion before deployed smoke"
+    "Evidence advanced filters/details/provenance/promotion remain assigned to UX-3"
   ],
-  "updated_at": "2026-09-12T21:19:11.524261+00:00"
+  "updated_at": "2026-09-12T21:36:56.628946+00:00",
+  "implementation_commit": "346bfc6c13cf7a8827ab0cf4715306781c5e5b94",
+  "pull_request": "https://github.com/kneelinghorse/TraceLab/pull/256",
+  "merge_commit": "703a91a30c2751767547252e722cbc42f34ad8c2",
+  "ci": {
+    "head": "346bfc6c13cf7a8827ab0cf4715306781c5e5b94",
+    "required_checks": "all passed",
+    "production_build_run": 34719667216,
+    "production_browser": "8 passed on Linux against production artifact",
+    "backend_run": 34719667285,
+    "backend_result": "2391 passed, 3 skipped, 12 deselected, 47 warnings in 357.49s",
+    "integration_run": 34719667226,
+    "integration_result": "125 passed, 4 skipped, 17 warnings in 125.80s",
+    "frontend_lint_advisory": "12 errors, 12 warnings; no errors in new source files",
+    "other_advisories": "existing full Ruff and mypy failures remain"
+  },
+  "deployment": {
+    "merge_commit": "703a91a30c2751767547252e722cbc42f34ad8c2",
+    "frontend_deployment": "304d0523-57fe-43e5-8984-a01b609219f3",
+    "backend_deployment": "b8244615-31ba-4b74-bb59-f8328120a471",
+    "deploy_status": "SUCCESS"
+  },
+  "production_interaction_tests": "8 passed against deployed frontend with deterministic API fixtures"
 }

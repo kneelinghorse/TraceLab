@@ -1,0 +1,555 @@
+{
+  "schemaHash": "sha256:24c05e214d9688bba2234de5b9c7cf4e087796db73c34ae03b0267b8eaf980e8",
+  "receipts": [
+    {
+      "version": "1.1",
+      "theme": "light",
+      "brand": "A",
+      "framework": "react",
+      "compose": {
+        "object": "Evidence",
+        "context": "list",
+        "preferences": {
+          "theme": "light"
+        }
+      },
+      "schemaHash": "sha256:24c05e214d9688bba2234de5b9c7cf4e087796db73c34ae03b0267b8eaf980e8",
+      "artifactContentHash": "sha256:3baf733c6f4a0fe4582063a8f39f214dddb1fa382e559925abcd6486f6e99ba4",
+      "files": [
+        {
+          "path": "src/GeneratedUI.tsx",
+          "contentHash": "sha256:6d631658bd71b1b49aa69ee3d96411eb9a7cb87b19c78daf648034ba47a7772e"
+        }
+      ],
+      "sourceHead": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "model": {
+        "activeFilters": [],
+        "categories": [],
+        "claim": "Consumer claim",
+        "classificationMetadata": "Consumer classification metadata",
+        "createdAt": "2026-09-05T12:00:00.000Z",
+        "description": "Consumer description",
+        "disposition": "supporting",
+        "filterCount": 0,
+        "filters": [],
+        "id": "Consumer id",
+        "label": "Consumer label",
+        "lastEvent": "Consumer last event",
+        "lastEventAt": "2026-09-05T12:00:00.000Z",
+        "missionId": "consumer-mission-id",
+        "origin": "mcp-agent",
+        "ownerId": "consumer-owner-id",
+        "ownerType": "user",
+        "ownershipRole": "Consumer ownership role",
+        "ownershipTransferredAt": "2026-09-05T12:00:00.000Z",
+        "page": 0,
+        "pageSize": 0,
+        "placeholder": "Consumer placeholder",
+        "primaryCategoryId": "supporting",
+        "primaryCategoryPath": "Consumer primary category path",
+        "projectId": "consumer-project-id",
+        "query": "Consumer query",
+        "searchActive": false,
+        "searchQuery": "Consumer searchQuery",
+        "sessionKey": "Consumer session key",
+        "snippet": "Consumer snippet",
+        "sourceId": "consumer-source-id",
+        "sourceSightingCount": 0,
+        "sourceUrl": "Consumer source url",
+        "summary": "Consumer summary",
+        "tagCount": 0,
+        "tagPreview": "Consumer tag preview",
+        "tags": [],
+        "totalItems": 0,
+        "totalPages": 0,
+        "updatedAt": "2026-09-05T12:00:00.000Z",
+        "workspaceId": "consumer-workspace-id",
+        "rows": [
+          {
+            "activeFilters": [],
+            "categories": [],
+            "claim": "Consumer claim",
+            "classificationMetadata": "Consumer classification metadata",
+            "createdAt": "2026-09-05T12:00:00.000Z",
+            "description": "Consumer description",
+            "disposition": "supporting",
+            "filterCount": 0,
+            "filters": [],
+            "id": "Consumer id",
+            "label": "Consumer label",
+            "lastEvent": "Consumer last event",
+            "lastEventAt": "2026-09-05T12:00:00.000Z",
+            "missionId": "consumer-mission-id",
+            "origin": "mcp-agent",
+            "ownerId": "consumer-owner-id",
+            "ownerType": "user",
+            "ownershipRole": "Consumer ownership role",
+            "ownershipTransferredAt": "2026-09-05T12:00:00.000Z",
+            "page": 0,
+            "pageSize": 0,
+            "placeholder": "Consumer placeholder",
+            "primaryCategoryId": "supporting",
+            "primaryCategoryPath": "Consumer primary category path",
+            "projectId": "consumer-project-id",
+            "query": "Consumer query",
+            "searchActive": false,
+            "searchQuery": "Consumer searchQuery",
+            "sessionKey": "Consumer session key",
+            "snippet": "Consumer snippet",
+            "sourceId": "consumer-source-id",
+            "sourceSightingCount": 0,
+            "sourceUrl": "Consumer source url",
+            "summary": "Consumer summary",
+            "tagCount": 0,
+            "tagPreview": "Consumer tag preview",
+            "tags": [],
+            "totalItems": 0,
+            "totalPages": 0,
+            "updatedAt": "2026-09-05T12:00:00.000Z",
+            "workspaceId": "consumer-workspace-id"
+          }
+        ],
+        "collectionQuery": {
+          "page": 1,
+          "pageSize": 10,
+          "total": 20
+        },
+        "uiState": "success"
+      },
+      "steps": [],
+      "clock": "2026-09-08T12:00:00.000Z",
+      "clockStepMs": 1,
+      "locale": "en-US",
+      "timezone": "UTC",
+      "packages": [
+        {
+          "name": "@oods/tokens",
+          "version": "0.1.0",
+          "installSpec": "file:./tarballs/oods-tokens-0.1.0.tgz",
+          "sha256": "sha256:69422edecf1d2853a844003bebbe2e4b514987e86a9fa1d860946f873c1c28c5",
+          "bytes": 238478
+        },
+        {
+          "name": "@oods/component-contracts",
+          "version": "0.1.0",
+          "installSpec": "file:./tarballs/oods-component-contracts-0.1.0.tgz",
+          "sha256": "sha256:b4bdbfccf2cea62f728e4f8123ad4bb7d8a4cdb42767e3395445694724e45381",
+          "bytes": 197852
+        },
+        {
+          "name": "@oods/component-styles",
+          "version": "0.1.0",
+          "installSpec": "file:./tarballs/oods-component-styles-0.1.0.tgz",
+          "sha256": "sha256:0f012b95395e8a70a2fb787580ab363af2e5e15940e7d13e3b255b71c143a9df",
+          "bytes": 12894
+        },
+        {
+          "name": "@oods/components-react",
+          "version": "0.1.0",
+          "installSpec": "file:./tarballs/oods-components-react-0.1.0.tgz",
+          "sha256": "sha256:02036aecde76093980d8e4e93bb3458c60a96009ee4b1d8c523b621e32a308e2",
+          "bytes": 95069
+        }
+      ],
+      "views": [
+        {
+          "width": 390,
+          "accessibility": "- search \"Search\":\n  - text: Search\n  - searchbox \"Search\"\n- text: Owner type\n- combobox \"Owner type\":\n  - option \"All states\" [selected]\n  - option \"user\"\n- text: Sort\n- combobox \"Sort\":\n  - option \"Name A–Z\" [selected]\n  - option \"Name Z–A\"\n- list \"Records\":\n  - listitem:\n    - button \"Consumer id Consumer label Consumer description Sep 5, 2026, 12:00 PM consumer-owner-id supporting\":\n      - text: Consumer id Consumer label Consumer description\n      - time: Sep 5, 2026, 12:00 PM\n      - text: consumer-owner-id supporting\n- navigation \"Pagination\":\n  - text: 20 records Showing 1–10 of 20\n  - button \"Previous page\" [disabled]: ‹\n  - list:\n    - listitem:\n      - button \"Page 1\": \"1\"\n    - listitem:\n      - button \"Page 2\": \"2\"\n  - button \"Next page\": ›\n  - text: Page 1 of 2",
+          "visibleText": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2",
+          "measurements": {
+            "bodyBackground": "oklch(0.967 0.03 86)",
+            "chartCanvasFills": [],
+            "viewportWidth": 390,
+            "documentWidth": 390,
+            "elementCount": 47,
+            "overflow": [],
+            "glyphWraps": [
+              {
+                "element": "span",
+                "text": "20 records",
+                "lines": [
+                  "20",
+                  "records"
+                ]
+              },
+              {
+                "element": "span",
+                "text": "Showing 1–10 of 20",
+                "lines": [
+                  "Showing",
+                  "1–10 of",
+                  "20"
+                ]
+              },
+              {
+                "element": "span",
+                "text": "Page 1 of 2",
+                "lines": [
+                  "Page",
+                  "1 of",
+                  "2"
+                ]
+              }
+            ]
+          },
+          "values": [
+            {
+              "element": "slot-search-1",
+              "name": "Search",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "slot-filters-2",
+              "name": "Owner type",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "list-toolbar-4-sort",
+              "name": "Sort",
+              "value": "asc",
+              "checked": false
+            }
+          ],
+          "regions": [
+            {
+              "id": "screen-list-9",
+              "component": "Stack",
+              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "screen-list-9-success",
+              "component": "Stack",
+              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "list-toolbar-4",
+              "component": "Stack",
+              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A"
+            },
+            {
+              "id": "",
+              "component": "SearchInput",
+              "text": "Search"
+            },
+            {
+              "id": "slot-search-1",
+              "component": "Input",
+              "text": ""
+            },
+            {
+              "id": "slot-filters-2",
+              "component": "Select",
+              "text": "All states\nuser"
+            },
+            {
+              "id": "list-toolbar-4-sort",
+              "component": "Select",
+              "text": "Name A–Z\nName Z–A"
+            },
+            {
+              "id": "list-items-5",
+              "component": "section",
+              "text": "Consumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
+            },
+            {
+              "id": "list-items-5-row-0",
+              "component": "Button",
+              "text": "Consumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
+            },
+            {
+              "id": "list-items-5-title-0",
+              "component": "Text",
+              "text": "Consumer id"
+            },
+            {
+              "id": "ve-items-10-0",
+              "component": "LabelCell",
+              "text": "Consumer label\nConsumer description"
+            },
+            {
+              "id": "ve-items-14-0",
+              "component": "RelativeTimestamp",
+              "text": "Sep 5, 2026, 12:00 PM"
+            },
+            {
+              "id": "ve-items-15-0",
+              "component": "OwnerBadge",
+              "text": "CONSUMER-OWNER-ID"
+            },
+            {
+              "id": "ve-toolbar-actions-16-0",
+              "component": "ClassificationBadge",
+              "text": "SUPPORTING"
+            },
+            {
+              "id": "list-pagination-7",
+              "component": "Stack",
+              "text": "20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "slot-pagination-8",
+              "component": "PaginationBar",
+              "text": "20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            }
+          ],
+          "screenshot": "390.png",
+          "screenshotHash": "sha256:7363642b1be015d1a7566a653c3b637982218a6013679a0fd5e243974d2c30c8",
+          "dump": "390.a11y.txt"
+        },
+        {
+          "width": 820,
+          "accessibility": "- search \"Search\":\n  - text: Search\n  - searchbox \"Search\"\n- text: Owner type\n- combobox \"Owner type\":\n  - option \"All states\" [selected]\n  - option \"user\"\n- text: Sort\n- combobox \"Sort\":\n  - option \"Name A–Z\" [selected]\n  - option \"Name Z–A\"\n- list \"Records\":\n  - listitem:\n    - button \"Consumer id Consumer label Consumer description Sep 5, 2026, 12:00 PM consumer-owner-id supporting\":\n      - text: Consumer id Consumer label Consumer description\n      - time: Sep 5, 2026, 12:00 PM\n      - text: consumer-owner-id supporting\n- navigation \"Pagination\":\n  - text: 20 records Showing 1–10 of 20\n  - button \"Previous page\" [disabled]: ‹\n  - list:\n    - listitem:\n      - button \"Page 1\": \"1\"\n    - listitem:\n      - button \"Page 2\": \"2\"\n  - button \"Next page\": ›\n  - text: Page 1 of 2",
+          "visibleText": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2",
+          "measurements": {
+            "bodyBackground": "oklch(0.967 0.03 86)",
+            "chartCanvasFills": [],
+            "viewportWidth": 820,
+            "documentWidth": 820,
+            "elementCount": 47,
+            "overflow": [],
+            "glyphWraps": []
+          },
+          "values": [
+            {
+              "element": "slot-search-1",
+              "name": "Search",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "slot-filters-2",
+              "name": "Owner type",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "list-toolbar-4-sort",
+              "name": "Sort",
+              "value": "asc",
+              "checked": false
+            }
+          ],
+          "regions": [
+            {
+              "id": "screen-list-9",
+              "component": "Stack",
+              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "screen-list-9-success",
+              "component": "Stack",
+              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "list-toolbar-4",
+              "component": "Stack",
+              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A"
+            },
+            {
+              "id": "",
+              "component": "SearchInput",
+              "text": "Search"
+            },
+            {
+              "id": "slot-search-1",
+              "component": "Input",
+              "text": ""
+            },
+            {
+              "id": "slot-filters-2",
+              "component": "Select",
+              "text": "All states\nuser"
+            },
+            {
+              "id": "list-toolbar-4-sort",
+              "component": "Select",
+              "text": "Name A–Z\nName Z–A"
+            },
+            {
+              "id": "list-items-5",
+              "component": "section",
+              "text": "Consumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
+            },
+            {
+              "id": "list-items-5-row-0",
+              "component": "Button",
+              "text": "Consumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
+            },
+            {
+              "id": "list-items-5-title-0",
+              "component": "Text",
+              "text": "Consumer id"
+            },
+            {
+              "id": "ve-items-10-0",
+              "component": "LabelCell",
+              "text": "Consumer label\nConsumer description"
+            },
+            {
+              "id": "ve-items-14-0",
+              "component": "RelativeTimestamp",
+              "text": "Sep 5, 2026, 12:00 PM"
+            },
+            {
+              "id": "ve-items-15-0",
+              "component": "OwnerBadge",
+              "text": "CONSUMER-OWNER-ID"
+            },
+            {
+              "id": "ve-toolbar-actions-16-0",
+              "component": "ClassificationBadge",
+              "text": "SUPPORTING"
+            },
+            {
+              "id": "list-pagination-7",
+              "component": "Stack",
+              "text": "20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "slot-pagination-8",
+              "component": "PaginationBar",
+              "text": "20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            }
+          ],
+          "screenshot": "820.png",
+          "screenshotHash": "sha256:5e6d71cc63c98374bb58d398595dbcee7865c51c05a31a2f12ff5652fc2be95e",
+          "dump": "820.a11y.txt"
+        },
+        {
+          "width": 1440,
+          "accessibility": "- search \"Search\":\n  - text: Search\n  - searchbox \"Search\"\n- text: Owner type\n- combobox \"Owner type\":\n  - option \"All states\" [selected]\n  - option \"user\"\n- text: Sort\n- combobox \"Sort\":\n  - option \"Name A–Z\" [selected]\n  - option \"Name Z–A\"\n- list \"Records\":\n  - listitem:\n    - button \"Consumer id Consumer label Consumer description Sep 5, 2026, 12:00 PM consumer-owner-id supporting\":\n      - text: Consumer id Consumer label Consumer description\n      - time: Sep 5, 2026, 12:00 PM\n      - text: consumer-owner-id supporting\n- navigation \"Pagination\":\n  - text: 20 records Showing 1–10 of 20\n  - button \"Previous page\" [disabled]: ‹\n  - list:\n    - listitem:\n      - button \"Page 1\": \"1\"\n    - listitem:\n      - button \"Page 2\": \"2\"\n  - button \"Next page\": ›\n  - text: Page 1 of 2",
+          "visibleText": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2",
+          "measurements": {
+            "bodyBackground": "oklch(0.967 0.03 86)",
+            "chartCanvasFills": [],
+            "viewportWidth": 1440,
+            "documentWidth": 1440,
+            "elementCount": 47,
+            "overflow": [],
+            "glyphWraps": []
+          },
+          "values": [
+            {
+              "element": "slot-search-1",
+              "name": "Search",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "slot-filters-2",
+              "name": "Owner type",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "list-toolbar-4-sort",
+              "name": "Sort",
+              "value": "asc",
+              "checked": false
+            }
+          ],
+          "regions": [
+            {
+              "id": "screen-list-9",
+              "component": "Stack",
+              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "screen-list-9-success",
+              "component": "Stack",
+              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A\nConsumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "list-toolbar-4",
+              "component": "Stack",
+              "text": "Search\nOwner type\nAll states\nuser\nSort\nName A–Z\nName Z–A"
+            },
+            {
+              "id": "",
+              "component": "SearchInput",
+              "text": "Search"
+            },
+            {
+              "id": "slot-search-1",
+              "component": "Input",
+              "text": ""
+            },
+            {
+              "id": "slot-filters-2",
+              "component": "Select",
+              "text": "All states\nuser"
+            },
+            {
+              "id": "list-toolbar-4-sort",
+              "component": "Select",
+              "text": "Name A–Z\nName Z–A"
+            },
+            {
+              "id": "list-items-5",
+              "component": "section",
+              "text": "Consumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
+            },
+            {
+              "id": "list-items-5-row-0",
+              "component": "Button",
+              "text": "Consumer id\nConsumer label\nConsumer description\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nSUPPORTING"
+            },
+            {
+              "id": "list-items-5-title-0",
+              "component": "Text",
+              "text": "Consumer id"
+            },
+            {
+              "id": "ve-items-10-0",
+              "component": "LabelCell",
+              "text": "Consumer label\nConsumer description"
+            },
+            {
+              "id": "ve-items-14-0",
+              "component": "RelativeTimestamp",
+              "text": "Sep 5, 2026, 12:00 PM"
+            },
+            {
+              "id": "ve-items-15-0",
+              "component": "OwnerBadge",
+              "text": "CONSUMER-OWNER-ID"
+            },
+            {
+              "id": "ve-toolbar-actions-16-0",
+              "component": "ClassificationBadge",
+              "text": "SUPPORTING"
+            },
+            {
+              "id": "list-pagination-7",
+              "component": "Stack",
+              "text": "20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "slot-pagination-8",
+              "component": "PaginationBar",
+              "text": "20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            }
+          ],
+          "screenshot": "1440.png",
+          "screenshotHash": "sha256:121486417194bf29bd4ff7aae900b3dc9e45aff0e2aa46297a22508ba6746401",
+          "dump": "1440.a11y.txt"
+        }
+      ],
+      "errors": [],
+      "timings": {
+        "composeMs": 62.53833399999996,
+        "generateMs": 8.554666999999995,
+        "captureMs": 781.5570409999928
+      },
+      "output": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-preview-tLOV01/receipt/react",
+      "consumer": {
+        "root": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-loop-react-POjCrt",
+        "port": 4478,
+        "pid": 15831
+      }
+    }
+  ],
+  "durationMs": 891.4602500000001
+}

@@ -1,0 +1,596 @@
+{
+  "schemaHash": "sha256:eff2f87775fc868a71b781fa7cc5355d0b03c87650d383ee501852479e8ca5b1",
+  "receipts": [
+    {
+      "version": "1.1",
+      "theme": "light",
+      "brand": "A",
+      "framework": "react",
+      "compose": {
+        "object": "Document",
+        "context": "list",
+        "preferences": {
+          "theme": "light"
+        }
+      },
+      "schemaHash": "sha256:eff2f87775fc868a71b781fa7cc5355d0b03c87650d383ee501852479e8ca5b1",
+      "artifactContentHash": "sha256:fbd2a7db2bc6cd8bed8d90406130622252b0dcaefc3e8c73c171ada397bf6de0",
+      "files": [
+        {
+          "path": "src/GeneratedUI.tsx",
+          "contentHash": "sha256:83b018d3818d533110730e2b8949fc40ccab62894c5e622c68e9d6952fcb4a49"
+        }
+      ],
+      "sourceHead": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "model": {
+        "activeFilters": [],
+        "allowedTransitions": [],
+        "categories": [],
+        "chunkCount": 0,
+        "chunked": false,
+        "chunks": [],
+        "classificationMetadata": "Consumer classification metadata",
+        "collectionDate": "Consumer collection date",
+        "content": "Consumer content",
+        "createdAt": "2026-09-05T12:00:00.000Z",
+        "description": "Consumer description",
+        "embedded": false,
+        "filePath": "Consumer file path",
+        "fileSize": 0,
+        "fileType": "Consumer file type",
+        "filterCount": 0,
+        "filters": [],
+        "id": "Consumer id",
+        "label": "Consumer label",
+        "lastEvent": "Consumer last event",
+        "lastEventAt": "2026-09-05T12:00:00.000Z",
+        "mimeType": "Consumer mime type",
+        "name": "Consumer name",
+        "ownerId": "consumer-owner-id",
+        "ownerType": "user",
+        "ownershipRole": "Consumer ownership role",
+        "ownershipTransferredAt": "2026-09-05T12:00:00.000Z",
+        "page": 0,
+        "pageSize": 0,
+        "participantCount": 0,
+        "placeholder": "Consumer placeholder",
+        "preview": "Consumer preview",
+        "primaryCategoryId": "consumer-primary-category-id",
+        "primaryCategoryPath": "Consumer primary category path",
+        "processed": false,
+        "processingEvents": [],
+        "projectId": "consumer-project-id",
+        "rawContent": "Consumer raw content",
+        "searchActive": false,
+        "searchQuery": "Consumer searchQuery",
+        "sourceType": "Consumer source type",
+        "stateHistory": [],
+        "status": "pending",
+        "tagCount": 0,
+        "tagPreview": "Consumer tag preview",
+        "tags": [],
+        "totalTokens": 0,
+        "totalItems": 0,
+        "totalPages": 0,
+        "transcriptionAccuracy": 0,
+        "updatedAt": "2026-09-05T12:00:00.000Z",
+        "uploadedAt": "2026-09-05T12:00:00.000Z",
+        "validationStatus": "Consumer validation status",
+        "wordCount": 0,
+        "rows": [
+          {
+            "activeFilters": [],
+            "allowedTransitions": [],
+            "categories": [],
+            "chunkCount": 0,
+            "chunked": false,
+            "chunks": [],
+            "classificationMetadata": "Consumer classification metadata",
+            "collectionDate": "Consumer collection date",
+            "content": "Consumer content",
+            "createdAt": "2026-09-05T12:00:00.000Z",
+            "description": "Consumer description",
+            "embedded": false,
+            "filePath": "Consumer file path",
+            "fileSize": 0,
+            "fileType": "Consumer file type",
+            "filterCount": 0,
+            "filters": [],
+            "id": "Consumer id",
+            "label": "Consumer label",
+            "lastEvent": "Consumer last event",
+            "lastEventAt": "2026-09-05T12:00:00.000Z",
+            "mimeType": "Consumer mime type",
+            "name": "Consumer name",
+            "ownerId": "consumer-owner-id",
+            "ownerType": "user",
+            "ownershipRole": "Consumer ownership role",
+            "ownershipTransferredAt": "2026-09-05T12:00:00.000Z",
+            "page": 0,
+            "pageSize": 0,
+            "participantCount": 0,
+            "placeholder": "Consumer placeholder",
+            "preview": "Consumer preview",
+            "primaryCategoryId": "consumer-primary-category-id",
+            "primaryCategoryPath": "Consumer primary category path",
+            "processed": false,
+            "processingEvents": [],
+            "projectId": "consumer-project-id",
+            "rawContent": "Consumer raw content",
+            "searchActive": false,
+            "searchQuery": "Consumer searchQuery",
+            "sourceType": "Consumer source type",
+            "stateHistory": [],
+            "status": "pending",
+            "tagCount": 0,
+            "tagPreview": "Consumer tag preview",
+            "tags": [],
+            "totalTokens": 0,
+            "totalItems": 0,
+            "totalPages": 0,
+            "transcriptionAccuracy": 0,
+            "updatedAt": "2026-09-05T12:00:00.000Z",
+            "uploadedAt": "2026-09-05T12:00:00.000Z",
+            "validationStatus": "Consumer validation status",
+            "wordCount": 0
+          }
+        ],
+        "collectionQuery": {
+          "page": 1,
+          "pageSize": 10,
+          "total": 20
+        },
+        "uiState": "success"
+      },
+      "steps": [],
+      "clock": "2026-09-08T12:00:00.000Z",
+      "clockStepMs": 1,
+      "locale": "en-US",
+      "timezone": "UTC",
+      "packages": [
+        {
+          "name": "@oods/tokens",
+          "version": "0.1.0",
+          "installSpec": "file:./tarballs/oods-tokens-0.1.0.tgz",
+          "sha256": "sha256:69422edecf1d2853a844003bebbe2e4b514987e86a9fa1d860946f873c1c28c5",
+          "bytes": 238478
+        },
+        {
+          "name": "@oods/component-contracts",
+          "version": "0.1.0",
+          "installSpec": "file:./tarballs/oods-component-contracts-0.1.0.tgz",
+          "sha256": "sha256:b4bdbfccf2cea62f728e4f8123ad4bb7d8a4cdb42767e3395445694724e45381",
+          "bytes": 197852
+        },
+        {
+          "name": "@oods/component-styles",
+          "version": "0.1.0",
+          "installSpec": "file:./tarballs/oods-component-styles-0.1.0.tgz",
+          "sha256": "sha256:0f012b95395e8a70a2fb787580ab363af2e5e15940e7d13e3b255b71c143a9df",
+          "bytes": 12894
+        },
+        {
+          "name": "@oods/components-react",
+          "version": "0.1.0",
+          "installSpec": "file:./tarballs/oods-components-react-0.1.0.tgz",
+          "sha256": "sha256:02036aecde76093980d8e4e93bb3458c60a96009ee4b1d8c523b621e32a308e2",
+          "bytes": 95069
+        }
+      ],
+      "views": [
+        {
+          "width": 390,
+          "accessibility": "- search \"Search\":\n  - text: Search\n  - searchbox \"Search\"\n- text: Status\n- combobox \"Status\":\n  - option \"All states\" [selected]\n  - option \"pending\"\n  - option \"processed\"\n  - option \"chunked\"\n  - option \"embedded\"\n  - option \"failed\"\n- text: Sort\n- combobox \"Sort\":\n  - option \"Name A–Z\" [selected]\n  - option \"Name Z–A\"\n- list \"Records\":\n  - listitem:\n    - 'button \"Consumer name Consumer label Consumer description Status: Pending Sep 5, 2026, 12:00 PM consumer-owner-id consumer-primary-category-id\"':\n      - text: Consumer name Consumer label Consumer description Pending\n      - time: Sep 5, 2026, 12:00 PM\n      - text: consumer-owner-id consumer-primary-category-id\n- navigation \"Pagination\":\n  - text: 20 records Showing 1–10 of 20\n  - button \"Previous page\" [disabled]: ‹\n  - list:\n    - listitem:\n      - button \"Page 1\": \"1\"\n    - listitem:\n      - button \"Page 2\": \"2\"\n  - button \"Next page\": ›\n  - text: Page 1 of 2",
+          "visibleText": "Search\nStatus\nAll states\npending\nprocessed\nchunked\nembedded\nfailed\nSort\nName A–Z\nName Z–A\nConsumer name\nConsumer label\nConsumer description\nPending\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nCONSUMER-PRIMARY-CATEGORY-ID\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2",
+          "measurements": {
+            "bodyBackground": "oklch(0.967 0.03 86)",
+            "chartCanvasFills": [],
+            "viewportWidth": 390,
+            "documentWidth": 390,
+            "elementCount": 49,
+            "overflow": [],
+            "glyphWraps": [
+              {
+                "element": "span",
+                "text": "20 records",
+                "lines": [
+                  "20",
+                  "records"
+                ]
+              },
+              {
+                "element": "span",
+                "text": "Showing 1–10 of 20",
+                "lines": [
+                  "Showing",
+                  "1–10 of",
+                  "20"
+                ]
+              },
+              {
+                "element": "span",
+                "text": "Page 1 of 2",
+                "lines": [
+                  "Page",
+                  "1 of",
+                  "2"
+                ]
+              }
+            ]
+          },
+          "values": [
+            {
+              "element": "slot-search-1",
+              "name": "Search",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "slot-filters-2",
+              "name": "Status",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "list-toolbar-4-sort",
+              "name": "Sort",
+              "value": "asc",
+              "checked": false
+            }
+          ],
+          "regions": [
+            {
+              "id": "screen-list-9",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\npending\nprocessed\nchunked\nembedded\nfailed\nSort\nName A–Z\nName Z–A\nConsumer name\nConsumer label\nConsumer description\nPending\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nCONSUMER-PRIMARY-CATEGORY-ID\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "screen-list-9-success",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\npending\nprocessed\nchunked\nembedded\nfailed\nSort\nName A–Z\nName Z–A\nConsumer name\nConsumer label\nConsumer description\nPending\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nCONSUMER-PRIMARY-CATEGORY-ID\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "list-toolbar-4",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\npending\nprocessed\nchunked\nembedded\nfailed\nSort\nName A–Z\nName Z–A"
+            },
+            {
+              "id": "",
+              "component": "SearchInput",
+              "text": "Search"
+            },
+            {
+              "id": "slot-search-1",
+              "component": "Input",
+              "text": ""
+            },
+            {
+              "id": "slot-filters-2",
+              "component": "Select",
+              "text": "All states\npending\nprocessed\nchunked\nembedded\nfailed"
+            },
+            {
+              "id": "list-toolbar-4-sort",
+              "component": "Select",
+              "text": "Name A–Z\nName Z–A"
+            },
+            {
+              "id": "list-items-5",
+              "component": "section",
+              "text": "Consumer name\nConsumer label\nConsumer description\nPending\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nCONSUMER-PRIMARY-CATEGORY-ID"
+            },
+            {
+              "id": "list-items-5-row-0",
+              "component": "Button",
+              "text": "Consumer name\nConsumer label\nConsumer description\nPending\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nCONSUMER-PRIMARY-CATEGORY-ID"
+            },
+            {
+              "id": "list-items-5-title-0",
+              "component": "Text",
+              "text": "Consumer name"
+            },
+            {
+              "id": "ve-items-10-0",
+              "component": "LabelCell",
+              "text": "Consumer label\nConsumer description"
+            },
+            {
+              "id": "ve-items-14-0",
+              "component": "StatusBadge",
+              "text": "Pending"
+            },
+            {
+              "id": "ve-items-15-0",
+              "component": "RelativeTimestamp",
+              "text": "Sep 5, 2026, 12:00 PM"
+            },
+            {
+              "id": "ve-items-16-0",
+              "component": "OwnerBadge",
+              "text": "CONSUMER-OWNER-ID"
+            },
+            {
+              "id": "ve-toolbar-actions-17-0",
+              "component": "ClassificationBadge",
+              "text": "CONSUMER-PRIMARY-CATEGORY-ID"
+            },
+            {
+              "id": "list-pagination-7",
+              "component": "Stack",
+              "text": "20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "slot-pagination-8",
+              "component": "PaginationBar",
+              "text": "20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            }
+          ],
+          "screenshot": "390.png",
+          "screenshotHash": "sha256:7dee911d55e0d2424363390ff0bccbb76008053499d81d89321a7b2705a9edcd",
+          "dump": "390.a11y.txt"
+        },
+        {
+          "width": 820,
+          "accessibility": "- search \"Search\":\n  - text: Search\n  - searchbox \"Search\"\n- text: Status\n- combobox \"Status\":\n  - option \"All states\" [selected]\n  - option \"pending\"\n  - option \"processed\"\n  - option \"chunked\"\n  - option \"embedded\"\n  - option \"failed\"\n- text: Sort\n- combobox \"Sort\":\n  - option \"Name A–Z\" [selected]\n  - option \"Name Z–A\"\n- list \"Records\":\n  - listitem:\n    - 'button \"Consumer name Consumer label Consumer description Status: Pending Sep 5, 2026, 12:00 PM consumer-owner-id consumer-primary-category-id\"':\n      - text: Consumer name Consumer label Consumer description Pending\n      - time: Sep 5, 2026, 12:00 PM\n      - text: consumer-owner-id consumer-primary-category-id\n- navigation \"Pagination\":\n  - text: 20 records Showing 1–10 of 20\n  - button \"Previous page\" [disabled]: ‹\n  - list:\n    - listitem:\n      - button \"Page 1\": \"1\"\n    - listitem:\n      - button \"Page 2\": \"2\"\n  - button \"Next page\": ›\n  - text: Page 1 of 2",
+          "visibleText": "Search\nStatus\nAll states\npending\nprocessed\nchunked\nembedded\nfailed\nSort\nName A–Z\nName Z–A\nConsumer name\nConsumer label\nConsumer description\nPending\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nCONSUMER-PRIMARY-CATEGORY-ID\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2",
+          "measurements": {
+            "bodyBackground": "oklch(0.967 0.03 86)",
+            "chartCanvasFills": [],
+            "viewportWidth": 820,
+            "documentWidth": 820,
+            "elementCount": 49,
+            "overflow": [],
+            "glyphWraps": []
+          },
+          "values": [
+            {
+              "element": "slot-search-1",
+              "name": "Search",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "slot-filters-2",
+              "name": "Status",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "list-toolbar-4-sort",
+              "name": "Sort",
+              "value": "asc",
+              "checked": false
+            }
+          ],
+          "regions": [
+            {
+              "id": "screen-list-9",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\npending\nprocessed\nchunked\nembedded\nfailed\nSort\nName A–Z\nName Z–A\nConsumer name\nConsumer label\nConsumer description\nPending\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nCONSUMER-PRIMARY-CATEGORY-ID\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "screen-list-9-success",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\npending\nprocessed\nchunked\nembedded\nfailed\nSort\nName A–Z\nName Z–A\nConsumer name\nConsumer label\nConsumer description\nPending\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nCONSUMER-PRIMARY-CATEGORY-ID\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "list-toolbar-4",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\npending\nprocessed\nchunked\nembedded\nfailed\nSort\nName A–Z\nName Z–A"
+            },
+            {
+              "id": "",
+              "component": "SearchInput",
+              "text": "Search"
+            },
+            {
+              "id": "slot-search-1",
+              "component": "Input",
+              "text": ""
+            },
+            {
+              "id": "slot-filters-2",
+              "component": "Select",
+              "text": "All states\npending\nprocessed\nchunked\nembedded\nfailed"
+            },
+            {
+              "id": "list-toolbar-4-sort",
+              "component": "Select",
+              "text": "Name A–Z\nName Z–A"
+            },
+            {
+              "id": "list-items-5",
+              "component": "section",
+              "text": "Consumer name\nConsumer label\nConsumer description\nPending\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nCONSUMER-PRIMARY-CATEGORY-ID"
+            },
+            {
+              "id": "list-items-5-row-0",
+              "component": "Button",
+              "text": "Consumer name\nConsumer label\nConsumer description\nPending\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nCONSUMER-PRIMARY-CATEGORY-ID"
+            },
+            {
+              "id": "list-items-5-title-0",
+              "component": "Text",
+              "text": "Consumer name"
+            },
+            {
+              "id": "ve-items-10-0",
+              "component": "LabelCell",
+              "text": "Consumer label\nConsumer description"
+            },
+            {
+              "id": "ve-items-14-0",
+              "component": "StatusBadge",
+              "text": "Pending"
+            },
+            {
+              "id": "ve-items-15-0",
+              "component": "RelativeTimestamp",
+              "text": "Sep 5, 2026, 12:00 PM"
+            },
+            {
+              "id": "ve-items-16-0",
+              "component": "OwnerBadge",
+              "text": "CONSUMER-OWNER-ID"
+            },
+            {
+              "id": "ve-toolbar-actions-17-0",
+              "component": "ClassificationBadge",
+              "text": "CONSUMER-PRIMARY-CATEGORY-ID"
+            },
+            {
+              "id": "list-pagination-7",
+              "component": "Stack",
+              "text": "20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "slot-pagination-8",
+              "component": "PaginationBar",
+              "text": "20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            }
+          ],
+          "screenshot": "820.png",
+          "screenshotHash": "sha256:ab6224ec3f3229b66d180bee4e3f48e715eed337b08eeda3a15fe9113bbd7d3e",
+          "dump": "820.a11y.txt"
+        },
+        {
+          "width": 1440,
+          "accessibility": "- search \"Search\":\n  - text: Search\n  - searchbox \"Search\"\n- text: Status\n- combobox \"Status\":\n  - option \"All states\" [selected]\n  - option \"pending\"\n  - option \"processed\"\n  - option \"chunked\"\n  - option \"embedded\"\n  - option \"failed\"\n- text: Sort\n- combobox \"Sort\":\n  - option \"Name A–Z\" [selected]\n  - option \"Name Z–A\"\n- list \"Records\":\n  - listitem:\n    - 'button \"Consumer name Consumer label Consumer description Status: Pending Sep 5, 2026, 12:00 PM consumer-owner-id consumer-primary-category-id\"':\n      - text: Consumer name Consumer label Consumer description Pending\n      - time: Sep 5, 2026, 12:00 PM\n      - text: consumer-owner-id consumer-primary-category-id\n- navigation \"Pagination\":\n  - text: 20 records Showing 1–10 of 20\n  - button \"Previous page\" [disabled]: ‹\n  - list:\n    - listitem:\n      - button \"Page 1\": \"1\"\n    - listitem:\n      - button \"Page 2\": \"2\"\n  - button \"Next page\": ›\n  - text: Page 1 of 2",
+          "visibleText": "Search\nStatus\nAll states\npending\nprocessed\nchunked\nembedded\nfailed\nSort\nName A–Z\nName Z–A\nConsumer name\nConsumer label\nConsumer description\nPending\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nCONSUMER-PRIMARY-CATEGORY-ID\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2",
+          "measurements": {
+            "bodyBackground": "oklch(0.967 0.03 86)",
+            "chartCanvasFills": [],
+            "viewportWidth": 1440,
+            "documentWidth": 1440,
+            "elementCount": 49,
+            "overflow": [],
+            "glyphWraps": []
+          },
+          "values": [
+            {
+              "element": "slot-search-1",
+              "name": "Search",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "slot-filters-2",
+              "name": "Status",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "list-toolbar-4-sort",
+              "name": "Sort",
+              "value": "asc",
+              "checked": false
+            }
+          ],
+          "regions": [
+            {
+              "id": "screen-list-9",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\npending\nprocessed\nchunked\nembedded\nfailed\nSort\nName A–Z\nName Z–A\nConsumer name\nConsumer label\nConsumer description\nPending\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nCONSUMER-PRIMARY-CATEGORY-ID\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "screen-list-9-success",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\npending\nprocessed\nchunked\nembedded\nfailed\nSort\nName A–Z\nName Z–A\nConsumer name\nConsumer label\nConsumer description\nPending\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nCONSUMER-PRIMARY-CATEGORY-ID\n20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "list-toolbar-4",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\npending\nprocessed\nchunked\nembedded\nfailed\nSort\nName A–Z\nName Z–A"
+            },
+            {
+              "id": "",
+              "component": "SearchInput",
+              "text": "Search"
+            },
+            {
+              "id": "slot-search-1",
+              "component": "Input",
+              "text": ""
+            },
+            {
+              "id": "slot-filters-2",
+              "component": "Select",
+              "text": "All states\npending\nprocessed\nchunked\nembedded\nfailed"
+            },
+            {
+              "id": "list-toolbar-4-sort",
+              "component": "Select",
+              "text": "Name A–Z\nName Z–A"
+            },
+            {
+              "id": "list-items-5",
+              "component": "section",
+              "text": "Consumer name\nConsumer label\nConsumer description\nPending\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nCONSUMER-PRIMARY-CATEGORY-ID"
+            },
+            {
+              "id": "list-items-5-row-0",
+              "component": "Button",
+              "text": "Consumer name\nConsumer label\nConsumer description\nPending\nSep 5, 2026, 12:00 PM\nCONSUMER-OWNER-ID\nCONSUMER-PRIMARY-CATEGORY-ID"
+            },
+            {
+              "id": "list-items-5-title-0",
+              "component": "Text",
+              "text": "Consumer name"
+            },
+            {
+              "id": "ve-items-10-0",
+              "component": "LabelCell",
+              "text": "Consumer label\nConsumer description"
+            },
+            {
+              "id": "ve-items-14-0",
+              "component": "StatusBadge",
+              "text": "Pending"
+            },
+            {
+              "id": "ve-items-15-0",
+              "component": "RelativeTimestamp",
+              "text": "Sep 5, 2026, 12:00 PM"
+            },
+            {
+              "id": "ve-items-16-0",
+              "component": "OwnerBadge",
+              "text": "CONSUMER-OWNER-ID"
+            },
+            {
+              "id": "ve-toolbar-actions-17-0",
+              "component": "ClassificationBadge",
+              "text": "CONSUMER-PRIMARY-CATEGORY-ID"
+            },
+            {
+              "id": "list-pagination-7",
+              "component": "Stack",
+              "text": "20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            },
+            {
+              "id": "slot-pagination-8",
+              "component": "PaginationBar",
+              "text": "20 records\nShowing 1–10 of 20\n‹\n1\n2\n›\nPage 1 of 2"
+            }
+          ],
+          "screenshot": "1440.png",
+          "screenshotHash": "sha256:17a983c06dc3d6437f32101612cb00b04ecd84927aee3678afc1fedd49b362b9",
+          "dump": "1440.a11y.txt"
+        }
+      ],
+      "errors": [],
+      "timings": {
+        "composeMs": 60.99187500000005,
+        "generateMs": 9.141250000000014,
+        "captureMs": 797.9637499999953
+      },
+      "output": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-preview-foCcrm/receipt/react",
+      "consumer": {
+        "root": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-loop-react-QHpBOL",
+        "port": 4478,
+        "pid": 24016
+      }
+    }
+  ],
+  "durationMs": 902.9917080000001
+}

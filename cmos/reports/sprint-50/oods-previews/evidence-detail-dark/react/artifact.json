@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "1.0.0",
+  "framework": "react",
+  "files": [
+    {
+      "path": "src/GeneratedUI.tsx",
+      "contents": "import React from 'react';\nimport { Card, ClassificationPanel, DetailHeader, FilterPanel, OwnershipSummary, SearchInput, Stack, Tabs, Text } from '@oods/components-react';\nimport '@oods/component-styles/css';\n\nexport interface GeneratedUIActions {\n  /* @oods-domain-action handleDelete sha256:221fdee3330ccb3c003961fa632660ca61b4f1713ca9b67d2612c45fe63a1f43 */\n  /* @oods-domain-source sha256:74252fa49ed24d37978bced342336a0b2aac9bed23e8fa0d6d3db7f99f0fe9fc */\n  handleDelete: () => void;\n  /* @oods-domain-action handleEdit sha256:8d06ae954d1e16d46333996b5945dbfef37c642e52d7bc1f68ece666c760d9b2 */\n  /* @oods-domain-source sha256:c0d990cc2989feb07786ba35c93b878e524cccf8ecc11583869e8f3344f87f48 */\n  handleEdit: () => void;\n  /* @oods-domain-action handleViewTimeline sha256:71b845bd5c850e444bda9b61a19589b098d52255006045a1c1979efd3844a6b1 */\n  /* @oods-domain-source sha256:67df05e1fca7b25d68f0c064be69dd0ac5d61fc1682331b45d695c043e2a4dda */\n  handleViewTimeline: () => void;\n}\n\nexport interface PageProps {\n  actions: GeneratedUIActions;\n  /** Array of currently applied filter values:\n  - field: string (matches a filter descriptor field)\n  - operator: \"eq\" | \"in\" | \"range\" | \"gt\" | \"lt\" | \"between\"\n  - value: unknown (the selected filter value or values)\n */\n  activeFilters?: Record<string, unknown>[];\n  /** One fixed category with id and label derived from disposition; no inferred taxonomy. */\n  categories: unknown[];\n  /** Claim. */\n  claim: string;\n  /** Operational metadata describing mode, storage model, governance rules, and audit timestamps.\n */\n  classificationMetadata: unknown;\n  /** Created at. */\n  createdAt: string;\n  /** Display projection of summary; never truncates persisted content. */\n  description?: string;\n  /** Disposition. */\n  disposition: 'supporting' | 'contradicting' | 'rejected' | 'background';\n  /** Computed count of currently active filters. */\n  filterCount: number;\n  /** Array of available filter descriptors. Each entry defines a filterable dimension:\n  - field: string (the schema field to filter on)\n  - label: string (display label)\n  - type: \"select\" | \"multi-select\" | \"range\" | \"boolean\" | \"date-range\"\n  - options: array of { value, label } for select/multi-select types\n */\n  filters?: Record<string, unknown>[];\n  /** Id. */\n  id: string;\n  /** Display projection of claim; retain the complete source field. */\n  label: string;\n  /** Only from an explicit event or timestamp projection; absence is unknown, not a fabricated audit event. */\n  lastEvent?: string;\n  /** Timestamp for the lifecycle event captured in last_event. */\n  lastEventAt?: string;\n  /** Mission id. */\n  missionId?: string;\n  /** Origin. */\n  origin: 'mcp-agent' | 'deepsearch-worker';\n  /** Authoritative nullable server owner_id. Present in this response. */\n  ownerId?: string;\n  /** user only when an authoritative owner_id is present. */\n  ownerType?: 'user';\n  /** Optional role name describing how the owner governs the entity. */\n  ownershipRole?: string;\n  /** Timestamp recording when ownership was last transferred. */\n  ownershipTransferredAt?: string;\n  /** Current page number (1-based). */\n  page: number;\n  /** Number of items displayed per page. */\n  pageSize: number;\n  /** Hint copy surfaced in form fields when the label is empty. */\n  placeholder?: string;\n  /** Exact disposition; classification dimension, never a lifecycle state. */\n  primaryCategoryId: 'supporting' | 'contradicting' | 'rejected' | 'background';\n  /** Human-readable breadcrumb path (Electronics > Mobile > Android). */\n  primaryCategoryPath?: string;\n  /** Project id. */\n  projectId: string;\n  /** Query. */\n  query?: string;\n  /** Whether the search input is currently focused or has a non-empty query. */\n  searchActive?: boolean;\n  /** The current search query string entered by the user. */\n  searchQuery?: string;\n  /** Session key. */\n  sessionKey: string;\n  /** Snippet. */\n  snippet?: string;\n  /** Source id. */\n  sourceId: string;\n  /** Source sighting count. */\n  sourceSightingCount: number;\n  /** Source url. */\n  sourceUrl: string;\n  /** Summary. */\n  summary?: string;\n  /** Number of canonical tags assigned to the object. */\n  tagCount?: number;\n  /** Denormalized comma-delimited preview for list renders. */\n  tagPreview?: string;\n  /** Tags. */\n  tags: string[];\n  /** Total number of items across all pages. Used to compute total page count. */\n  totalItems?: number;\n  /** Computed total number of pages (ceil(totalItems / pageSize)). */\n  totalPages?: number;\n  /** Updated at. */\n  updatedAt: string;\n  /** Workspace id. */\n  workspaceId?: string;\n}\n\ntype CardProps = React.ComponentPropsWithoutRef<typeof Card>;\ntype ClassificationPanelProps = React.ComponentPropsWithoutRef<typeof ClassificationPanel>;\ntype DetailHeaderProps = React.ComponentPropsWithoutRef<typeof DetailHeader>;\ntype FilterPanelProps = React.ComponentPropsWithoutRef<typeof FilterPanel>;\ntype OwnershipSummaryProps = React.ComponentPropsWithoutRef<typeof OwnershipSummary>;\ntype SearchInputProps = React.ComponentPropsWithoutRef<typeof SearchInput>;\ntype StackProps = React.ComponentPropsWithoutRef<typeof Stack>;\ntype TabsProps = React.ComponentPropsWithoutRef<typeof Tabs>;\ntype TextProps = React.ComponentPropsWithoutRef<typeof Text>;\n\nexport const GeneratedUI: React.FC<PageProps> = ({ actions, activeFilters, categories, claim, classificationMetadata, createdAt, description, disposition, filterCount, filters, id, label, lastEvent, lastEventAt, missionId, origin, ownerId, ownerType, ownershipRole, ownershipTransferredAt, page, pageSize, placeholder, primaryCategoryId, primaryCategoryPath, projectId, query, searchActive, searchQuery, sessionKey, snippet, sourceId, sourceSightingCount, sourceUrl, summary, tagCount, tagPreview, tags, totalItems, totalPages, updatedAt, workspaceId }) => {\n  if (!actions || !Object.prototype.hasOwnProperty.call(actions, 'handleDelete') || typeof actions.handleDelete !== 'function') { throw new Error('GeneratedUI requires actions.handleDelete.'); }\n  if (!actions || !Object.prototype.hasOwnProperty.call(actions, 'handleEdit') || typeof actions.handleEdit !== 'function') { throw new Error('GeneratedUI requires actions.handleEdit.'); }\n  if (!actions || !Object.prototype.hasOwnProperty.call(actions, 'handleViewTimeline') || typeof actions.handleViewTimeline !== 'function') { throw new Error('GeneratedUI requires actions.handleViewTimeline.'); }\n\n  /* @oods-domain-binding handleDelete */ const handleDelete = () => { actions.handleDelete(); };\n  /* @oods-domain-binding handleEdit */ const handleEdit = () => { actions.handleEdit(); };\n  const [handleUpdate_searchQueryState, setHandleUpdate_searchQueryState] = React.useState<string>(String(searchQuery ?? ''));\n  /* @oods-local-binding handleUpdate_searchQuery */ const handleUpdate_searchQuery = (value: string) => { setHandleUpdate_searchQueryState(value); };\n  /* @oods-domain-binding handleViewTimeline */ const handleViewTimeline = () => { actions.handleViewTimeline(); };\n\n  return (\n    <>\n      <>\n        <Stack id=\"screen-detail-13\" data-oods-component=\"Stack\" data-layout=\"stack\" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ref-space-cluster-default)' }}>\n              <Stack id=\"detail-header-1\" data-oods-component=\"Stack\" data-layout=\"inline\" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: 'var(--ref-space-inset-default)' }}>\n                      <Stack id=\"slot-header-2\" data-oods-component=\"Stack\" data-layout=\"stack\" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ref-space-cluster-default)' }}>\n                                <DetailHeader id=\"ve-header-24\" data-oods-component=\"DetailHeader\" title={label} subtitle={description} level={1} />\n                                <SearchInput id=\"ve-header-26\" data-oods-component=\"SearchInput\" label=\"Search Query\" placeholder=\"Enter searchQuery\" value={handleUpdate_searchQueryState} onUpdate={handleUpdate_searchQuery} />\n                                <OwnershipSummary id=\"ve-header-28\" data-oods-component=\"OwnershipSummary\" ownerId={ownerId} ownerType={ownerType} role={ownershipRole} />\n                              </Stack>\n                    </Stack>\n              <Card id=\"detail-body-10\" data-oods-component=\"Card\" data-layout=\"sidebar\" style={{ alignItems: 'start', display: 'grid', gap: 'var(--ref-space-cluster-default)', gridTemplateColumns: 'minmax(0, 1fr) minmax(16rem, 24rem)' }}>\n                      <div data-sidebar-main>\n                        <Tabs id=\"detail-tabs-9\" data-oods-component=\"Tabs\" ariaLabel=\"Record details\" items={[\n                          { ...{\"id\":\"detail-tab-panel-5\",\"label\":\"Details\"}, panel: (\n                            <Stack id=\"detail-tab-panel-5\" data-oods-component=\"Stack\" data-layout=\"stack\" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ref-space-cluster-default)' }}>\n                              <Text id=\"slot-tab-1-6\" data-oods-component=\"Text\" label=\"Claim\">{claim}</Text>\n                            </Stack>\n                          ) }\n                        ]} />\n                      </div>\n                      <aside data-sidebar-aside>\n                        <Stack id=\"detail-meta-11\" data-oods-component=\"Stack\" data-layout=\"stack\" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ref-space-cluster-tight)', padding: 'var(--ref-space-inset-default)' }}>\n                                    <Stack id=\"slot-metadata-12\" data-oods-component=\"Stack\" data-layout=\"stack\" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ref-space-cluster-default)' }}>\n                                                  <ClassificationPanel id=\"ve-metadata-25\" data-oods-component=\"ClassificationPanel\" />\n                                                  <FilterPanel id=\"ve-metadata-27\" data-oods-component=\"FilterPanel\" activeFilters={activeFilters} filters={filters} />\n                                                </Stack>\n                                  </Stack>\n                      </aside>\n                    </Card>\n            </Stack>\n        <div role=\"group\" aria-label=\"Screen actions\" data-oods-screen-actions=\"screen-detail-13\">\n          <button type=\"button\" data-oods-action=\"handleDelete\" onClick={() => handleDelete()}>Delete</button>\n          <button type=\"button\" data-oods-action=\"handleEdit\" onClick={() => handleEdit()}>Edit</button>\n          <button type=\"button\" data-oods-action=\"handleViewTimeline\" onClick={() => handleViewTimeline()}>View timeline</button>\n        </div>\n      </>\n    </>\n  );\n};\n",
+      "contentHash": "sha256:582ace0a8681507c07084239271528be7fad7b0339625cefc3801231ad8c79f5"
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "@oods/component-styles",
+      "version": "0.1.0",
+      "kind": "dependency"
+    },
+    {
+      "name": "@oods/components-react",
+      "version": "0.1.0",
+      "kind": "dependency"
+    },
+    {
+      "name": "react",
+      "version": "19.2.0",
+      "kind": "peerDependency"
+    },
+    {
+      "name": "react-dom",
+      "version": "19.2.0",
+      "kind": "peerDependency"
+    }
+  ],
+  "actions": [
+    {
+      "name": "handleDelete",
+      "parameters": [],
+      "sources": [
+        {
+          "nodeId": "screen-detail-13",
+          "component": "Stack",
+          "event": "onDelete"
+        }
+      ]
+    },
+    {
+      "name": "handleEdit",
+      "parameters": [],
+      "sources": [
+        {
+          "nodeId": "screen-detail-13",
+          "component": "Stack",
+          "event": "onEdit"
+        }
+      ]
+    },
+    {
+      "name": "handleViewTimeline",
+      "parameters": [],
+      "sources": [
+        {
+          "nodeId": "screen-detail-13",
+          "component": "Stack",
+          "event": "onViewTimeline"
+        }
+      ]
+    }
+  ],
+  "contentHash": "sha256:8c57765890f485e8340755a3682767f2ebec9fd1816034723aaa49de0361b0f6"
+}

@@ -1,0 +1,14 @@
+- search "Embedding id":
+  - text: Embedding id
+  - searchbox "Embedding id": consumer-embedding-id
+  - button "Clear search": ×
+- text: Chunk index
+- spinbutton "Chunk index": "0"
+- button
+- text: Consumer label
+- navigation "Pagination":
+  - text: 0 records
+  - button "Previous page" [disabled]: ‹
+  - list
+  - button "Next page" [disabled]: ›
+  - text: Page 1 of 1

@@ -1,0 +1,100 @@
+{
+  "schemaVersion": "1.0.0",
+  "framework": "react",
+  "files": [
+    {
+      "path": "src/GeneratedUI.tsx",
+      "contents": "import React from 'react';\nimport { Banner, Button, ClassificationBadge, LabelCell, OwnerBadge, PaginationBar, RelativeTimestamp, SearchInput, Select, Stack, Text } from '@oods/components-react';\nimport '@oods/component-styles/css';\n\nexport type GeneratedUIState = 'loading' | 'empty' | 'error' | 'success';\n\nexport interface GeneratedUIActions {\n  /* @oods-domain-action handleFilter sha256:16ab1e92d1fca94435e207207864ab7015dc274fc62e2f211a0df55cc291ea36 */\n  /* @oods-domain-source sha256:8e5f3caefc9ad5e749948c77de5f5978bb91ef33958f95a5a2be4b419cff400e */\n  handleFilter: (criteria: Record<string, unknown>) => void;\n  /* @oods-domain-action handlePageChange sha256:78ef60870d55a6e088b4e3ef0a0961fa95794baa77ee43f37fdaee1bcc395469 */\n  /* @oods-domain-source sha256:300063760dda8c519a2f55163f592f1d2a1c688624ead19adb05a6639ee54617 */\n  handlePageChange: (page: number) => void;\n  /* @oods-domain-action handleRowClick sha256:773eb5947f10b9c469abd54e200f61529df89035100d7d19eaa88adcd565efc0 */\n  /* @oods-domain-source sha256:2691a39947329776a84396671cd57ad501e6855e24bc09bfe575a98e1fde4a88 */\n  handleRowClick: (rowId: string) => void;\n  /* @oods-domain-action handleSort sha256:757d6df84825c12c0f0cf60e76596eb7c5d0f48a6a4d4cf4186ee36063811b44 */\n  /* @oods-domain-source sha256:a44f6b01c1934ac2bd84da820758bea74479e3a4ec56f169390a3d3eeaf34649 */\n  handleSort: (column: string) => void;\n}\n\nexport interface PageProps {\n  rows?: Array<{ label: string; description?: string; placeholder?: string; createdAt: string; updatedAt: string; lastEvent?: string; lastEventAt?: string; ownerId?: string; ownerType?: 'user'; ownershipRole?: string; ownershipTransferredAt?: string; classificationMetadata: unknown; categories: unknown[]; primaryCategoryId: 'supporting' | 'contradicting' | 'rejected' | 'background'; primaryCategoryPath?: string; tags: string[]; tagCount?: number; tagPreview?: string; searchQuery?: string; searchActive?: boolean; filters?: Record<string, unknown>[]; activeFilters?: Record<string, unknown>[]; filterCount: number; page: number; pageSize: number; totalItems?: number; totalPages?: number; id: string; projectId: string; missionId?: string; sessionKey: string; origin: 'mcp-agent' | 'deepsearch-worker'; claim: string; summary?: string; sourceUrl: string; sourceId: string; sourceSightingCount: number; snippet?: string; query?: string; disposition: 'supporting' | 'contradicting' | 'rejected' | 'background'; workspaceId?: string }>;\n  collectionQuery?: { search?: string; status?: string; descending?: boolean; archived?: boolean; page?: number; pageSize?: number; total?: number };\n  actions: GeneratedUIActions;\n  uiState: GeneratedUIState;\n  /** Array of currently applied filter values:\n  - field: string (matches a filter descriptor field)\n  - operator: \"eq\" | \"in\" | \"range\" | \"gt\" | \"lt\" | \"between\"\n  - value: unknown (the selected filter value or values)\n */\n  activeFilters?: Record<string, unknown>[];\n  /** One fixed category with id and label derived from disposition; no inferred taxonomy. */\n  categories: unknown[];\n  /** Claim. */\n  claim: string;\n  /** Operational metadata describing mode, storage model, governance rules, and audit timestamps.\n */\n  classificationMetadata: unknown;\n  /** Created at. */\n  createdAt: string;\n  /** Display projection of summary; never truncates persisted content. */\n  description?: string;\n  /** Disposition. */\n  disposition: 'supporting' | 'contradicting' | 'rejected' | 'background';\n  /** Computed count of currently active filters. */\n  filterCount: number;\n  /** Array of available filter descriptors. Each entry defines a filterable dimension:\n  - field: string (the schema field to filter on)\n  - label: string (display label)\n  - type: \"select\" | \"multi-select\" | \"range\" | \"boolean\" | \"date-range\"\n  - options: array of { value, label } for select/multi-select types\n */\n  filters?: Record<string, unknown>[];\n  /** Id. */\n  id: string;\n  /** Display projection of claim; retain the complete source field. */\n  label: string;\n  /** Only from an explicit event or timestamp projection; absence is unknown, not a fabricated audit event. */\n  lastEvent?: string;\n  /** Timestamp for the lifecycle event captured in last_event. */\n  lastEventAt?: string;\n  /** Mission id. */\n  missionId?: string;\n  /** Origin. */\n  origin: 'mcp-agent' | 'deepsearch-worker';\n  /** Authoritative nullable server owner_id. Present in this response. */\n  ownerId?: string;\n  /** user only when an authoritative owner_id is present. */\n  ownerType?: 'user';\n  /** Optional role name describing how the owner governs the entity. */\n  ownershipRole?: string;\n  /** Timestamp recording when ownership was last transferred. */\n  ownershipTransferredAt?: string;\n  /** Current page number (1-based). */\n  page: number;\n  /** Number of items displayed per page. */\n  pageSize: number;\n  /** Hint copy surfaced in form fields when the label is empty. */\n  placeholder?: string;\n  /** Exact disposition; classification dimension, never a lifecycle state. */\n  primaryCategoryId: 'supporting' | 'contradicting' | 'rejected' | 'background';\n  /** Human-readable breadcrumb path (Electronics > Mobile > Android). */\n  primaryCategoryPath?: string;\n  /** Project id. */\n  projectId: string;\n  /** Query. */\n  query?: string;\n  /** Whether the search input is currently focused or has a non-empty query. */\n  searchActive?: boolean;\n  /** The current search query string entered by the user. */\n  searchQuery?: string;\n  /** Session key. */\n  sessionKey: string;\n  /** Snippet. */\n  snippet?: string;\n  /** Source id. */\n  sourceId: string;\n  /** Source sighting count. */\n  sourceSightingCount: number;\n  /** Source url. */\n  sourceUrl: string;\n  /** Summary. */\n  summary?: string;\n  /** Number of canonical tags assigned to the object. */\n  tagCount?: number;\n  /** Denormalized comma-delimited preview for list renders. */\n  tagPreview?: string;\n  /** Tags. */\n  tags: string[];\n  /** Total number of items across all pages. Used to compute total page count. */\n  totalItems?: number;\n  /** Computed total number of pages (ceil(totalItems / pageSize)). */\n  totalPages?: number;\n  /** Updated at. */\n  updatedAt: string;\n  /** Workspace id. */\n  workspaceId?: string;\n}\n\ntype BannerProps = React.ComponentPropsWithoutRef<typeof Banner>;\ntype ButtonProps = React.ComponentPropsWithoutRef<typeof Button>;\ntype ClassificationBadgeProps = React.ComponentPropsWithoutRef<typeof ClassificationBadge>;\ntype LabelCellProps = React.ComponentPropsWithoutRef<typeof LabelCell>;\ntype OwnerBadgeProps = React.ComponentPropsWithoutRef<typeof OwnerBadge>;\ntype PaginationBarProps = React.ComponentPropsWithoutRef<typeof PaginationBar>;\ntype RelativeTimestampProps = React.ComponentPropsWithoutRef<typeof RelativeTimestamp>;\ntype SearchInputProps = React.ComponentPropsWithoutRef<typeof SearchInput>;\ntype SelectProps = React.ComponentPropsWithoutRef<typeof Select>;\ntype StackProps = React.ComponentPropsWithoutRef<typeof Stack>;\ntype TextProps = React.ComponentPropsWithoutRef<typeof Text>;\n\nexport const GeneratedUI: React.FC<PageProps> = ({ actions, uiState, activeFilters, categories, claim, classificationMetadata, createdAt, description, disposition, filterCount, filters, id, label, lastEvent, lastEventAt, missionId, origin, ownerId, ownerType, ownershipRole, ownershipTransferredAt, page, pageSize, placeholder, primaryCategoryId, primaryCategoryPath, projectId, query, searchActive, searchQuery, sessionKey, snippet, sourceId, sourceSightingCount, sourceUrl, summary, tagCount, tagPreview, tags, totalItems, totalPages, updatedAt, workspaceId, rows = [], collectionQuery = {} }) => {\n  if (!actions || !Object.prototype.hasOwnProperty.call(actions, 'handleFilter') || typeof actions.handleFilter !== 'function') { throw new Error('GeneratedUI requires actions.handleFilter.'); }\n  if (!actions || !Object.prototype.hasOwnProperty.call(actions, 'handlePageChange') || typeof actions.handlePageChange !== 'function') { throw new Error('GeneratedUI requires actions.handlePageChange.'); }\n  if (!actions || !Object.prototype.hasOwnProperty.call(actions, 'handleRowClick') || typeof actions.handleRowClick !== 'function') { throw new Error('GeneratedUI requires actions.handleRowClick.'); }\n  if (!actions || !Object.prototype.hasOwnProperty.call(actions, 'handleSort') || typeof actions.handleSort !== 'function') { throw new Error('GeneratedUI requires actions.handleSort.'); }\n\n  /* @oods-domain-binding handleFilter */ const handleFilter = (criteria: Record<string, unknown>) => { actions.handleFilter(criteria); };\n  /* @oods-domain-binding handlePageChange */ const handlePageChange = (page: number) => { actions.handlePageChange(page); };\n  /* @oods-domain-binding handleRowClick */ const handleRowClick = (rowId: string) => { actions.handleRowClick(rowId); };\n  /* @oods-domain-binding handleSort */ const handleSort = (column: string) => { actions.handleSort(column); };\n\n  return (\n    <>\n      <Stack id=\"screen-list-9\" data-oods-component=\"Stack\" data-layout=\"stack\" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ref-space-cluster-default)' }}>\n            {uiState === 'loading' && (\n              <Banner id=\"screen-list-9-loading\" data-oods-component=\"Banner\" data-oods-state=\"loading\" content=\"Loading your records.\" title=\"Loading\" />\n            )}\n            {uiState === 'empty' && (\n              <Banner id=\"screen-list-9-empty\" data-oods-component=\"Banner\" data-oods-state=\"empty\" content=\"Change the filters or add a record.\" title=\"No records found\" />\n            )}\n            {uiState === 'error' && (\n              <Banner id=\"screen-list-9-error\" data-oods-component=\"Banner\" data-oods-state=\"error\" content=\"Try again or choose another record.\" title=\"Unable to load records\" />\n            )}\n            {(uiState === 'success' || uiState === 'empty') && (\n              <Stack id=\"screen-list-9-success\" data-oods-component=\"Stack\" data-oods-state={uiState === 'success' ? 'success' : undefined} data-layout=\"stack\" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ref-space-cluster-default)' }}>\n                      <Stack id=\"list-toolbar-4\" data-oods-component=\"Stack\" data-layout=\"inline\" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: 'var(--ref-space-inset-default)' }}>\n                                <SearchInput id=\"slot-search-1\" label=\"Search\" placeholder=\"Search records\" value={collectionQuery.search ?? ''} clearable={true} onValueChange={(search) => handleFilter({ ...collectionQuery, search })} />\n                                <Select id=\"slot-filters-2\" label=\"Owner type\" value={collectionQuery.status ?? ''} options={[{'value': '', 'label': 'All states'}, {'value': 'user', 'label': 'user'}]} onChange={(event) => handleFilter({ ...collectionQuery, status: event.currentTarget.value })} />\n                                <Select id=\"list-toolbar-4-sort\" label=\"Sort\" value={collectionQuery.descending ? 'desc' : 'asc'} options={[{'value': 'asc', 'label': 'Name A–Z'}, {'value': 'desc', 'label': 'Name Z–A'}]} onChange={() => handleSort('id')} />\n                              </Stack>\n                      <section id=\"list-items-5\" data-oods-collection=\"rows\">{rows.length === 0 ? (<Banner id=\"list-items-5-empty\" data-oods-component=\"Banner\" content=\"No records found.\" />) : (<ol aria-label=\"Records\" className=\"oods-collection\">{rows.map(({ label, description, placeholder, createdAt, updatedAt, lastEvent, lastEventAt, ownerId, ownerType, ownershipRole, ownershipTransferredAt, classificationMetadata, categories, primaryCategoryId, primaryCategoryPath, tags, tagCount, tagPreview, searchQuery, searchActive, filters, activeFilters, filterCount, page, pageSize, totalItems, totalPages, id, projectId, missionId, sessionKey, origin, claim, summary, sourceUrl, sourceId, sourceSightingCount, snippet, query, disposition, workspaceId }, collectionIndex) => <li key={String(id)}><Button id={'list-items-5-row-' + collectionIndex} type=\"button\" className=\"oods-collection-row\" data-record-id={String(id)} onClick={() => handleRowClick(String(id))}><Text id={'list-items-5-title-' + collectionIndex} data-oods-component=\"Text\">{id}</Text>\n                      <LabelCell id={'ve-items-10-' + collectionIndex} data-oods-component=\"LabelCell\" truncate description={description} label={label} />\n                      <RelativeTimestamp id={'ve-items-14-' + collectionIndex} data-oods-component=\"RelativeTimestamp\" datetime={updatedAt ?? createdAt} />\n                      <OwnerBadge id={'ve-items-15-' + collectionIndex} data-oods-component=\"OwnerBadge\" owner={ownerId} ownerType={ownerType} />\n                      <ClassificationBadge id={'ve-toolbar-actions-16-' + collectionIndex} data-oods-component=\"ClassificationBadge\" mode=\"{classification_mode}\" category={primaryCategoryId} /></Button></li>)}</ol>)}</section>\n                      <Stack id=\"list-pagination-7\" data-oods-component=\"Stack\" data-layout=\"inline\" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', padding: 'var(--ref-space-inset-default)' }}>\n                                <PaginationBar id=\"slot-pagination-8\" page={collectionQuery.page ?? 1} pageSize={collectionQuery.pageSize ?? 10} totalItems={collectionQuery.total ?? rows.length} onPageChange={handlePageChange} />\n                              </Stack>\n                    </Stack>\n            )}\n          </Stack>\n    </>\n  );\n};\n",
+      "contentHash": "sha256:6d631658bd71b1b49aa69ee3d96411eb9a7cb87b19c78daf648034ba47a7772e"
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "@oods/component-styles",
+      "version": "0.1.0",
+      "kind": "dependency"
+    },
+    {
+      "name": "@oods/components-react",
+      "version": "0.1.0",
+      "kind": "dependency"
+    },
+    {
+      "name": "react",
+      "version": "19.2.0",
+      "kind": "peerDependency"
+    },
+    {
+      "name": "react-dom",
+      "version": "19.2.0",
+      "kind": "peerDependency"
+    }
+  ],
+  "actions": [
+    {
+      "name": "handleFilter",
+      "parameters": [
+        {
+          "name": "criteria",
+          "type": "Record<string, unknown>"
+        }
+      ],
+      "sources": [
+        {
+          "nodeId": "screen-list-9",
+          "component": "Stack",
+          "event": "onFilter"
+        }
+      ]
+    },
+    {
+      "name": "handlePageChange",
+      "parameters": [
+        {
+          "name": "page",
+          "type": "number"
+        }
+      ],
+      "sources": [
+        {
+          "nodeId": "screen-list-9",
+          "component": "Stack",
+          "event": "onPageChange"
+        }
+      ]
+    },
+    {
+      "name": "handleRowClick",
+      "parameters": [
+        {
+          "name": "rowId",
+          "type": "string"
+        }
+      ],
+      "sources": [
+        {
+          "nodeId": "screen-list-9",
+          "component": "Stack",
+          "event": "onRowClick"
+        }
+      ]
+    },
+    {
+      "name": "handleSort",
+      "parameters": [
+        {
+          "name": "column",
+          "type": "string"
+        }
+      ],
+      "sources": [
+        {
+          "nodeId": "screen-list-9",
+          "component": "Stack",
+          "event": "onSort"
+        }
+      ]
+    }
+  ],
+  "contentHash": "sha256:3baf733c6f4a0fe4582063a8f39f214dddb1fa382e559925abcd6486f6e99ba4"
+}

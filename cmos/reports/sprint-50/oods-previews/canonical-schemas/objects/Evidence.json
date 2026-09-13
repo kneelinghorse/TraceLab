@@ -1,0 +1,903 @@
+{
+  "name": "Evidence",
+  "version": "0.1.0",
+  "domain": "research.data",
+  "description": "TraceLab evidence: data in the research notebook. API provenance and unavailable trait fields are specified in the TraceLab OODS mapping contract.",
+  "tags": [
+    "research",
+    "tracelab",
+    "data"
+  ],
+  "maturity": "alpha",
+  "traits": [
+    {
+      "name": "content/Labelled",
+      "alias": null,
+      "parameters": {
+        "maxLabelLength": 255,
+        "maxDescriptionLength": 1000
+      }
+    },
+    {
+      "name": "lifecycle/Timestampable",
+      "alias": null,
+      "parameters": {
+        "recordedEvents": [
+          "created",
+          "updated"
+        ],
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "structural/Ownerable",
+      "alias": null,
+      "parameters": {
+        "ownerTypes": [
+          "user"
+        ],
+        "primaryOwnerType": "user",
+        "allowTransfer": false
+      }
+    },
+    {
+      "name": "core/Classifiable",
+      "alias": null,
+      "parameters": {
+        "classification_mode": "hybrid",
+        "tag_policy": "open",
+        "max_tags": 50,
+        "require_primary_category": true
+      }
+    },
+    {
+      "name": "behavioral/Searchable",
+      "alias": null,
+      "parameters": {
+        "placeholder": "Search evidences"
+      }
+    },
+    {
+      "name": "behavioral/Filterable",
+      "alias": null,
+      "parameters": null
+    },
+    {
+      "name": "behavioral/Pageable",
+      "alias": null,
+      "parameters": {
+        "defaultPageSize": 20,
+        "pageSizeOptions": [
+          10,
+          20,
+          50,
+          100
+        ]
+      }
+    }
+  ],
+  "schema": {
+    "label": {
+      "type": "string",
+      "required": true,
+      "description": "Display projection of claim; retain the complete source field."
+    },
+    "description": {
+      "type": "string",
+      "required": false,
+      "description": "Display projection of summary; never truncates persisted content."
+    },
+    "placeholder": {
+      "type": "string",
+      "required": false,
+      "description": "Hint copy surfaced in form fields when the label is empty.",
+      "validation": {
+        "maxLength": 80
+      }
+    },
+    "created_at": {
+      "type": "datetime",
+      "required": true,
+      "description": "Created at.",
+      "validation": {
+        "format": "date-time"
+      }
+    },
+    "updated_at": {
+      "type": "datetime",
+      "required": true,
+      "description": "Updated at.",
+      "validation": {
+        "format": "date-time"
+      }
+    },
+    "last_event": {
+      "type": "string",
+      "required": false,
+      "description": "Only from an explicit event or timestamp projection; absence is unknown, not a fabricated audit event."
+    },
+    "last_event_at": {
+      "type": "datetime",
+      "required": false,
+      "description": "Timestamp for the lifecycle event captured in last_event."
+    },
+    "owner_id": {
+      "type": "uuid",
+      "required": false,
+      "description": "Authoritative nullable server owner_id. Present in this response."
+    },
+    "owner_type": {
+      "type": "string",
+      "required": false,
+      "description": "user only when an authoritative owner_id is present.",
+      "validation": {
+        "enum": [
+          "user"
+        ]
+      }
+    },
+    "ownership_role": {
+      "type": "string",
+      "required": false,
+      "description": "Optional role name describing how the owner governs the entity.",
+      "validation": {
+        "maxLength": 80
+      }
+    },
+    "ownership_transferred_at": {
+      "type": "datetime",
+      "required": false,
+      "description": "Timestamp recording when ownership was last transferred."
+    },
+    "classification_metadata": {
+      "type": "ClassificationMetadata",
+      "required": true,
+      "description": "Operational metadata describing mode, storage model, governance rules, and audit timestamps.\n"
+    },
+    "categories": {
+      "type": "CategoryNode[]",
+      "required": true,
+      "description": "One fixed category with id and label derived from disposition; no inferred taxonomy."
+    },
+    "primary_category_id": {
+      "type": "string",
+      "required": true,
+      "description": "Exact disposition; classification dimension, never a lifecycle state.",
+      "validation": {
+        "enum": [
+          "supporting",
+          "contradicting",
+          "rejected",
+          "background"
+        ]
+      }
+    },
+    "primary_category_path": {
+      "type": "string",
+      "required": false,
+      "description": "Human-readable breadcrumb path (Electronics > Mobile > Android)."
+    },
+    "tags": {
+      "type": "string[]",
+      "required": true,
+      "description": "Tags."
+    },
+    "tag_count": {
+      "type": "number",
+      "required": false,
+      "default": 0,
+      "description": "Number of canonical tags assigned to the object."
+    },
+    "tag_preview": {
+      "type": "string",
+      "required": false,
+      "description": "Denormalized comma-delimited preview for list renders."
+    },
+    "searchQuery": {
+      "type": "string",
+      "required": false,
+      "description": "The current search query string entered by the user.",
+      "default": "",
+      "validation": {
+        "maxLength": 256
+      }
+    },
+    "searchActive": {
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the search input is currently focused or has a non-empty query.",
+      "default": false
+    },
+    "filters": {
+      "type": "object[]",
+      "required": false,
+      "description": "Array of available filter descriptors. Each entry defines a filterable dimension:\n  - field: string (the schema field to filter on)\n  - label: string (display label)\n  - type: \"select\" | \"multi-select\" | \"range\" | \"boolean\" | \"date-range\"\n  - options: array of { value, label } for select/multi-select types\n",
+      "default": []
+    },
+    "activeFilters": {
+      "type": "object[]",
+      "required": false,
+      "description": "Array of currently applied filter values:\n  - field: string (matches a filter descriptor field)\n  - operator: \"eq\" | \"in\" | \"range\" | \"gt\" | \"lt\" | \"between\"\n  - value: unknown (the selected filter value or values)\n",
+      "default": []
+    },
+    "filterCount": {
+      "type": "number",
+      "required": true,
+      "description": "Computed count of currently active filters.",
+      "default": 0,
+      "validation": {
+        "minimum": 0
+      }
+    },
+    "page": {
+      "type": "number",
+      "required": true,
+      "description": "Current page number (1-based).",
+      "default": 1,
+      "validation": {
+        "minimum": 1
+      }
+    },
+    "pageSize": {
+      "type": "number",
+      "required": true,
+      "description": "Number of items displayed per page.",
+      "default": 25,
+      "validation": {
+        "minimum": 1,
+        "maximum": 500
+      }
+    },
+    "totalItems": {
+      "type": "number",
+      "required": false,
+      "description": "Total number of items across all pages. Used to compute total page count.",
+      "default": 0,
+      "validation": {
+        "minimum": 0
+      }
+    },
+    "totalPages": {
+      "type": "number",
+      "required": false,
+      "description": "Computed total number of pages (ceil(totalItems / pageSize)).",
+      "default": 0,
+      "validation": {
+        "minimum": 0
+      }
+    },
+    "id": {
+      "type": "uuid",
+      "required": true,
+      "description": "Id.",
+      "validation": {
+        "format": "uuid"
+      }
+    },
+    "project_id": {
+      "type": "uuid",
+      "required": true,
+      "description": "Project id.",
+      "validation": {
+        "format": "uuid"
+      }
+    },
+    "mission_id": {
+      "type": "uuid",
+      "required": false,
+      "description": "Mission id."
+    },
+    "session_key": {
+      "type": "string",
+      "required": true,
+      "description": "Session key."
+    },
+    "origin": {
+      "type": "string",
+      "required": true,
+      "description": "Origin.",
+      "validation": {
+        "enum": [
+          "mcp-agent",
+          "deepsearch-worker"
+        ]
+      }
+    },
+    "claim": {
+      "type": "string",
+      "required": true,
+      "description": "Claim."
+    },
+    "summary": {
+      "type": "string",
+      "required": false,
+      "description": "Summary."
+    },
+    "source_url": {
+      "type": "string",
+      "required": true,
+      "description": "Source url."
+    },
+    "source_id": {
+      "type": "uuid",
+      "required": true,
+      "description": "Source id.",
+      "validation": {
+        "format": "uuid"
+      }
+    },
+    "source_sighting_count": {
+      "type": "number",
+      "required": true,
+      "description": "Source sighting count.",
+      "validation": {
+        "minimum": 1
+      }
+    },
+    "snippet": {
+      "type": "string",
+      "required": false,
+      "description": "Snippet."
+    },
+    "query": {
+      "type": "string",
+      "required": false,
+      "description": "Query."
+    },
+    "disposition": {
+      "type": "string",
+      "required": true,
+      "description": "Disposition.",
+      "validation": {
+        "enum": [
+          "supporting",
+          "contradicting",
+          "rejected",
+          "background"
+        ]
+      }
+    },
+    "workspace_id": {
+      "type": "uuid",
+      "required": false,
+      "description": "Workspace id."
+    }
+  },
+  "semantics": {
+    "label": {
+      "semantic_type": "text.label",
+      "token_mapping": "tokenMap(text.label.*)",
+      "ui_hints": {
+        "component": "TextHeading",
+        "maxLengthParameter": "maxLabelLength",
+        "headingLevel": 2
+      }
+    },
+    "description": {
+      "semantic_type": "text.description",
+      "token_mapping": "tokenMap(text.body.*)",
+      "ui_hints": {
+        "component": "TextBody",
+        "maxLengthParameter": "maxDescriptionLength"
+      }
+    },
+    "placeholder": {
+      "semantic_type": "text.placeholder",
+      "token_mapping": "tokenMap(text.placeholder.*)",
+      "ui_hints": {
+        "component": "FormHint",
+        "maxLength": 80
+      }
+    },
+    "created_at": {
+      "semantic_type": "audit.created_at",
+      "token_mapping": "tokenMap(audit.created)",
+      "ui_hints": {
+        "component": "TimelineTimestamp",
+        "timezoneParameter": "timezone"
+      }
+    },
+    "updated_at": {
+      "semantic_type": "audit.updated_at",
+      "token_mapping": "tokenMap(audit.updated)",
+      "ui_hints": {
+        "component": "TimelineTimestamp",
+        "timezoneParameter": "timezone",
+        "allowNullParameter": "allowNullUpdatedAt"
+      }
+    },
+    "last_event": {
+      "semantic_type": "audit.event.type",
+      "token_mapping": "tokenMap(audit.event.*)",
+      "ui_hints": {
+        "component": "AuditBadge",
+        "parameterSource": "recordedEvents"
+      }
+    },
+    "last_event_at": {
+      "semantic_type": "audit.event.timestamp",
+      "token_mapping": "tokenMap(audit.event.timestamp)",
+      "ui_hints": {
+        "component": "TimelineTimestamp",
+        "timezoneParameter": "timezone"
+      }
+    },
+    "owner_id": {
+      "semantic_type": "ownership.owner.id",
+      "token_mapping": "tokenMap(ownership.owner.id)",
+      "ui_hints": {
+        "component": "OwnerReference",
+        "ownerTypeField": "owner_type"
+      }
+    },
+    "owner_type": {
+      "semantic_type": "ownership.owner.type",
+      "token_mapping": "tokenMap(ownership.owner.type)",
+      "ui_hints": {
+        "component": "OwnerTypeBadge",
+        "parameterSource": "ownerTypes"
+      }
+    },
+    "ownership_role": {
+      "semantic_type": "ownership.owner.role",
+      "token_mapping": "tokenMap(ownership.owner.role)",
+      "ui_hints": {
+        "component": "OwnerRolePill"
+      }
+    },
+    "ownership_transferred_at": {
+      "semantic_type": "ownership.owner.transferred_at",
+      "token_mapping": "tokenMap(ownership.owner.timestamp)",
+      "ui_hints": {
+        "component": "TimelineTimestamp"
+      }
+    },
+    "classification_metadata": {
+      "semantic_type": "classification.metadata",
+      "token_mapping": "tokenMap(classification.metadata)",
+      "ui_hints": {
+        "component": "ClassificationDiagnostics"
+      }
+    },
+    "categories": {
+      "semantic_type": "classification.categories",
+      "token_mapping": "tokenMap(classification.categories.*)",
+      "ui_hints": {
+        "component": "CategoryTree"
+      }
+    },
+    "tags": {
+      "semantic_type": "classification.tags",
+      "token_mapping": "tokenMap(classification.tags.*)",
+      "ui_hints": {
+        "component": "TagTokenCloud",
+        "policyParameter": "tag_policy"
+      }
+    },
+    "primary_category_id": {
+      "semantic_type": "classification.primary",
+      "token_mapping": "tokenMap(classification.primary)",
+      "ui_hints": {
+        "component": "CategoryBreadcrumb"
+      }
+    },
+    "searchQuery": {
+      "semantic_type": "input.search.query",
+      "token_mapping": "tokenMap(search.input.*)",
+      "ui_hints": {
+        "component": "SearchInput",
+        "placeholderParameter": "placeholder",
+        "debounceParameter": "debounceMs"
+      }
+    },
+    "searchActive": {
+      "semantic_type": "state.search.active",
+      "token_mapping": "computed",
+      "ui_hints": {
+        "component": "SearchInput",
+        "description": "Drives visual active/inactive state of the search region."
+      }
+    },
+    "filters": {
+      "semantic_type": "input.filter.descriptors",
+      "token_mapping": "tokenMap(filter.panel.*)",
+      "ui_hints": {
+        "component": "FilterPanel",
+        "modeParameter": "filterMode"
+      }
+    },
+    "activeFilters": {
+      "semantic_type": "state.filter.active",
+      "token_mapping": "computed",
+      "ui_hints": {
+        "component": "FilterPanel",
+        "description": "Drives active filter chip display and clear actions."
+      }
+    },
+    "filterCount": {
+      "semantic_type": "metric.filter.count",
+      "token_mapping": "tokenMap(filter.badge.*)",
+      "ui_hints": {
+        "component": "MetricBadge",
+        "format": "integer"
+      }
+    },
+    "page": {
+      "semantic_type": "state.pagination.page",
+      "token_mapping": "computed",
+      "ui_hints": {
+        "component": "PaginationBar",
+        "description": "Current active page, drives page button highlight state."
+      }
+    },
+    "pageSize": {
+      "semantic_type": "state.pagination.pageSize",
+      "token_mapping": "computed",
+      "ui_hints": {
+        "component": "PaginationBar",
+        "defaultParameter": "defaultPageSize"
+      }
+    },
+    "totalItems": {
+      "semantic_type": "metric.pagination.totalItems",
+      "token_mapping": "tokenMap(pagination.info.*)",
+      "ui_hints": {
+        "component": "PaginationBar",
+        "format": "integer"
+      }
+    },
+    "totalPages": {
+      "semantic_type": "metric.pagination.totalPages",
+      "token_mapping": "computed",
+      "ui_hints": {
+        "component": "PaginationBar",
+        "description": "Computed from totalItems and pageSize."
+      }
+    },
+    "claim": {
+      "semantic_type": "text.label",
+      "token_mapping": "tokenMap(text.label.*)"
+    },
+    "project_id": {
+      "semantic_type": "research.evidence.project_id",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "workspace_id": {
+      "semantic_type": "research.evidence.workspace_id",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "source_url": {
+      "semantic_type": "research.evidence.source_url",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "source_sighting_count": {
+      "semantic_type": "research.evidence.source_sighting_count",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "disposition": {
+      "semantic_type": "research.evidence.disposition",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "id": {
+      "semantic_type": "research.evidence.id",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "mission_id": {
+      "semantic_type": "research.evidence.mission_id",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "session_key": {
+      "semantic_type": "research.evidence.session_key",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "origin": {
+      "semantic_type": "research.evidence.origin",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "summary": {
+      "semantic_type": "research.evidence.summary",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "source_id": {
+      "semantic_type": "research.evidence.source_id",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "snippet": {
+      "semantic_type": "research.evidence.snippet",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "query": {
+      "semantic_type": "research.evidence.query",
+      "token_mapping": "tokenMap(text.body.*)"
+    }
+  },
+  "viewExtensions": {
+    "list": [
+      {
+        "component": "LabelCell",
+        "priority": 100,
+        "props": {
+          "field": "label",
+          "descriptionField": "description",
+          "truncate": true,
+          "maxLengthParameter": "maxLabelLength"
+        }
+      },
+      {
+        "component": "SearchInput",
+        "position": "header",
+        "priority": 10,
+        "props": {
+          "field": "searchQuery",
+          "placeholderParameter": "placeholder",
+          "debounceParameter": "debounceMs",
+          "minQueryLengthParameter": "minQueryLength",
+          "clearableParameter": "clearable"
+        }
+      },
+      {
+        "component": "PaginationBar",
+        "position": "footer",
+        "priority": 10,
+        "props": {
+          "pageField": "page",
+          "pageSizeField": "pageSize",
+          "totalItemsField": "totalItems",
+          "totalPagesField": "totalPages",
+          "pageSizeOptionsParameter": "pageSizeOptions",
+          "showPageSizeSelectorParameter": "showPageSizeSelector",
+          "showGotoPageParameter": "showGotoPage",
+          "showItemRangeParameter": "showItemRange"
+        }
+      },
+      {
+        "component": "FilterPanel",
+        "position": "sidebar",
+        "priority": 8,
+        "props": {
+          "field": "filters",
+          "activeField": "activeFilters",
+          "modeParameter": "filterMode",
+          "maxActiveParameter": "maxActiveFilters",
+          "collapsibleParameter": "collapsible"
+        }
+      },
+      {
+        "component": "RelativeTimestamp",
+        "props": {
+          "field": "updated_at",
+          "fallbackField": "created_at",
+          "timezoneParameter": "timezone"
+        }
+      },
+      {
+        "component": "OwnerBadge",
+        "props": {
+          "ownerIdField": "owner_id",
+          "ownerTypeField": "owner_type"
+        }
+      },
+      {
+        "component": "ClassificationBadge",
+        "position": "after",
+        "props": {
+          "mode": "{classification_mode}",
+          "primaryCategoryField": "primary_category_id",
+          "tagPreviewField": "tag_preview"
+        }
+      }
+    ],
+    "detail": [
+      {
+        "component": "DetailHeader",
+        "position": "top",
+        "priority": 100,
+        "props": {
+          "titleField": "label",
+          "subtitleField": "description",
+          "headingLevel": 1
+        }
+      },
+      {
+        "component": "ClassificationPanel",
+        "position": "sidebar",
+        "priority": 40,
+        "props": {
+          "categoriesField": "categories",
+          "tagsField": "tags",
+          "metadataField": "classification_metadata",
+          "modeParameter": "classification_mode"
+        }
+      },
+      {
+        "component": "SearchInput",
+        "position": "header",
+        "priority": 10,
+        "props": {
+          "field": "searchQuery",
+          "placeholderParameter": "placeholder",
+          "clearableParameter": "clearable"
+        }
+      },
+      {
+        "component": "FilterPanel",
+        "position": "sidebar",
+        "priority": 8,
+        "props": {
+          "field": "filters",
+          "activeField": "activeFilters",
+          "modeParameter": "filterMode",
+          "collapsibleParameter": "collapsible"
+        }
+      },
+      {
+        "component": "AuditTimeline",
+        "position": "bottom",
+        "props": {
+          "createdField": "created_at",
+          "updatedField": "updated_at",
+          "eventField": "last_event",
+          "eventTimestampField": "last_event_at",
+          "eventOptionsParameter": "recordedEvents"
+        }
+      },
+      {
+        "component": "OwnershipSummary",
+        "position": "top",
+        "props": {
+          "ownerIdField": "owner_id",
+          "ownerTypeField": "owner_type",
+          "roleField": "ownership_role",
+          "transferredAtField": "ownership_transferred_at",
+          "allowTransferParameter": "allowTransfer"
+        }
+      }
+    ],
+    "form": [
+      {
+        "component": "FormLabelGroup",
+        "position": "before",
+        "priority": 100,
+        "props": {
+          "labelField": "label",
+          "descriptionField": "description",
+          "placeholderField": "placeholder",
+          "maxLabelLengthParameter": "maxLabelLength",
+          "maxDescriptionLengthParameter": "maxDescriptionLength",
+          "requireDescriptionParameter": "requireDescription"
+        }
+      },
+      {
+        "component": "ClassificationEditor",
+        "position": "main",
+        "props": {
+          "modeParameter": "classification_mode",
+          "tagPolicyParameter": "tag_policy",
+          "maxTagsParameter": "max_tags"
+        }
+      }
+    ],
+    "card": [
+      {
+        "component": "CardHeader",
+        "position": "top",
+        "priority": 100,
+        "props": {
+          "titleField": "label",
+          "supportingField": "description"
+        }
+      },
+      {
+        "component": "OwnershipMeta",
+        "position": "after",
+        "props": {
+          "ownerTypeField": "owner_type",
+          "roleField": "ownership_role"
+        }
+      }
+    ],
+    "timeline": [
+      {
+        "component": "TimelineEntryLabel",
+        "props": {
+          "field": "label",
+          "compact": true
+        }
+      },
+      {
+        "component": "AuditEvent",
+        "props": {
+          "typeField": "last_event",
+          "timestampField": "last_event_at",
+          "timezoneParameter": "timezone"
+        }
+      }
+    ],
+    "inline": [
+      {
+        "component": "InlineLabel",
+        "props": {
+          "field": "label",
+          "maxLength": 40
+        }
+      }
+    ]
+  },
+  "tokens": {
+    "text.label.color": "var(--sys-text-strong)",
+    "text.label.font-weight": "var(--sys-font-weight-semibold)",
+    "text.label.font-size": "var(--sys-font-size-lg)",
+    "text.label.line-height": "var(--sys-line-height-tight)",
+    "text.body.color": "var(--sys-text-subtle)",
+    "text.body.font-weight": "var(--sys-font-weight-regular)",
+    "text.body.font-size": "var(--sys-font-size-sm)",
+    "text.body.line-height": "var(--sys-line-height-relaxed)",
+    "text.placeholder.color": "var(--sys-text-muted)",
+    "text.placeholder.font-weight": "var(--sys-font-weight-regular)",
+    "text.placeholder.font-size": "var(--sys-font-size-sm)",
+    "text.placeholder.line-height": "var(--sys-line-height-normal)",
+    "audit.created.badge.text": "var(--text-subtle)",
+    "audit.updated.badge.text": "var(--text-subtle)",
+    "audit.event.badge.bg": "var(--surface-muted)",
+    "ownership.owner.badge.bg": "var(--surface-subtle)",
+    "ownership.owner.badge.text": "var(--text-default)",
+    "ownership.owner.role.text": "var(--text-muted)",
+    "classification": {
+      "category": {
+        "badge": {
+          "bg": "var(--sys-surface-raised)",
+          "border": "var(--sys-border-strong)"
+        }
+      },
+      "tag": {
+        "chip": {
+          "bg": "var(--sys-surface-muted)",
+          "text": "var(--sys-text-strong)"
+        }
+      }
+    },
+    "search.input.bg": "var(--sys-surface-default)",
+    "search.input.text": "var(--sys-text-primary)",
+    "search.input.placeholder": "var(--sys-text-subtle)",
+    "search.input.border": "var(--sys-border-default)",
+    "search.input.focus.border": "var(--sys-border-focus)",
+    "search.input.focus.ring": "var(--sys-focus-ring)",
+    "search.input.icon": "var(--sys-icon-subtle)",
+    "search.input.clear.hover": "var(--sys-surface-hover)",
+    "filter.panel.bg": "var(--sys-surface-secondary)",
+    "filter.panel.border": "var(--sys-border-default)",
+    "filter.panel.header.text": "var(--sys-text-primary)",
+    "filter.panel.section.divider": "var(--sys-border-subtle)",
+    "filter.chip.bg": "var(--sys-surface-accent)",
+    "filter.chip.text": "var(--sys-text-on-accent)",
+    "filter.chip.remove.hover": "var(--sys-surface-hover)",
+    "filter.badge.bg": "var(--sys-surface-accent)",
+    "filter.badge.text": "var(--sys-text-on-accent)",
+    "filter.apply.bg": "var(--sys-action-primary)",
+    "filter.apply.text": "var(--sys-text-on-action)",
+    "filter.clear.text": "var(--sys-text-subtle)",
+    "pagination.bar.bg": "var(--sys-surface-secondary)",
+    "pagination.bar.border": "var(--sys-border-default)",
+    "pagination.button.bg": "var(--sys-surface-default)",
+    "pagination.button.text": "var(--sys-text-primary)",
+    "pagination.button.hover.bg": "var(--sys-surface-hover)",
+    "pagination.button.active.bg": "var(--sys-surface-accent)",
+    "pagination.button.active.text": "var(--sys-text-on-accent)",
+    "pagination.button.disabled.text": "var(--sys-text-disabled)",
+    "pagination.info.text": "var(--sys-text-subtle)",
+    "pagination.selector.border": "var(--sys-border-default)"
+  },
+  "warnings": [
+    "Field collision: \"tags\" in object schema overrides trait definition",
+    "Field collision: \"owner_id\" in object schema overrides trait definition",
+    "Field collision: \"created_at\" in object schema overrides trait definition",
+    "Field collision: \"updated_at\" in object schema overrides trait definition",
+    "Field collision: \"label\" in object schema overrides trait definition",
+    "Field collision: \"description\" in object schema overrides trait definition",
+    "Field collision: \"owner_type\" in object schema overrides trait definition",
+    "Field collision: \"last_event\" in object schema overrides trait definition",
+    "Field collision: \"primary_category_id\" in object schema overrides trait definition",
+    "Field collision: \"categories\" in object schema overrides trait definition"
+  ],
+  "filePath": "/private/tmp/tracelab-ux1-forge/objects/research/Evidence.object.yaml"
+}

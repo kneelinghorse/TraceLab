@@ -1,0 +1,372 @@
+{
+  "version": "1.1",
+  "theme": "dark",
+  "brand": "A",
+  "framework": "react",
+  "compose": {
+    "object": "Mission",
+    "context": "timeline",
+    "preferences": {
+      "theme": "dark"
+    }
+  },
+  "schemaHash": "sha256:92b185a29f46affbcb8fafa5c55c36a1e2e967bdad1c015646d827aba0a202f6",
+  "artifactContentHash": "sha256:a7e73e6867af85da98d0114aa4ef769bf1870accbc743b717497d5af7578835f",
+  "files": [
+    {
+      "path": "src/GeneratedUI.tsx",
+      "contentHash": "sha256:9770490586faaec091e9c6e93bbca98bbbcae1ed8583999a9da9ab0dca150d8f"
+    }
+  ],
+  "sourceHead": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+  "model": {
+    "activeFilters": [],
+    "allowedTransitions": [],
+    "background": "Consumer background",
+    "cancelAtPeriodEnd": false,
+    "cancellationReason": "Consumer cancellation reason",
+    "cancellationReasonCode": "Consumer cancellation reason code",
+    "cancellationRequestedAt": "2026-09-05T12:00:00.000Z",
+    "completedAt": "2026-09-05T12:00:00.000Z",
+    "constraints": [],
+    "context": {},
+    "coverageThresholds": {},
+    "createdAt": "2026-09-05T12:00:00.000Z",
+    "createdBy": "Consumer created by",
+    "currentPhase": "Consumer current phase",
+    "deepsearchAttemptCount": 0,
+    "deepsearchJobId": "consumer-deepsearch-job-id",
+    "deliverableFormat": "Consumer deliverable format",
+    "deliverables": [],
+    "description": "Consumer description",
+    "errorMessage": "Consumer error message",
+    "excludedEntities": [],
+    "executionMetadata": {},
+    "expectedOutputSchema": {},
+    "filterCount": 0,
+    "filters": [],
+    "focus": "Consumer focus",
+    "id": "Consumer id",
+    "label": "Consumer label",
+    "lastEvent": "Consumer last event",
+    "lastEventAt": "2026-09-05T12:00:00.000Z",
+    "leaseExpiresAt": "2026-09-05T12:00:00.000Z",
+    "materializationAttemptCount": 0,
+    "materializationError": "Consumer materialization error",
+    "materializationPending": false,
+    "materializationStatus": "Consumer materialization status",
+    "maxLoops": 0,
+    "metadata": {},
+    "minLoops": 0,
+    "missionId": "consumer-mission-id",
+    "objective": "Consumer objective",
+    "ownerId": "consumer-owner-id",
+    "ownerType": "user",
+    "ownershipRole": "Consumer ownership role",
+    "ownershipTransferredAt": "2026-09-05T12:00:00.000Z",
+    "page": 0,
+    "pageSize": 0,
+    "placeholder": "Consumer placeholder",
+    "progressPercent": 0,
+    "projectId": "consumer-project-id",
+    "projectName": "Consumer project name",
+    "queuedAt": "2026-09-05T12:00:00.000Z",
+    "references": [],
+    "requiredEntities": [],
+    "researchPhases": {},
+    "resultDocumentIds": [],
+    "resultMarkdown": "Consumer result markdown",
+    "resultProtocol": {},
+    "resultReportId": "consumer-result-report-id",
+    "searchReady": false,
+    "searchActive": false,
+    "searchQuery": "Consumer searchQuery",
+    "startedAt": "2026-09-05T12:00:00.000Z",
+    "stateHistory": [],
+    "status": "draft",
+    "successCriteria": [],
+    "tagCount": 0,
+    "tagMetadata": [],
+    "tags": [],
+    "title": "Consumer title",
+    "totalItems": 0,
+    "totalPages": 0,
+    "updatedAt": "2026-09-05T12:00:00.000Z",
+    "validationThresholds": {},
+    "events": [
+      {
+        "id": "consumer-event-1",
+        "kind": "state",
+        "at": "2026-09-05T12:00:00Z",
+        "title": "Created",
+        "description": "Initial state"
+      },
+      {
+        "id": "consumer-event-2",
+        "kind": "state",
+        "at": "2026-09-06T12:00:00Z",
+        "title": "Updated",
+        "description": "Next state"
+      }
+    ]
+  },
+  "steps": [],
+  "clock": "2026-09-08T12:00:00.000Z",
+  "clockStepMs": 1,
+  "locale": "en-US",
+  "timezone": "UTC",
+  "packages": [
+    {
+      "name": "@oods/tokens",
+      "version": "0.1.0",
+      "installSpec": "file:./tarballs/oods-tokens-0.1.0.tgz",
+      "sha256": "sha256:69422edecf1d2853a844003bebbe2e4b514987e86a9fa1d860946f873c1c28c5",
+      "bytes": 238478
+    },
+    {
+      "name": "@oods/component-contracts",
+      "version": "0.1.0",
+      "installSpec": "file:./tarballs/oods-component-contracts-0.1.0.tgz",
+      "sha256": "sha256:b4bdbfccf2cea62f728e4f8123ad4bb7d8a4cdb42767e3395445694724e45381",
+      "bytes": 197852
+    },
+    {
+      "name": "@oods/component-styles",
+      "version": "0.1.0",
+      "installSpec": "file:./tarballs/oods-component-styles-0.1.0.tgz",
+      "sha256": "sha256:0f012b95395e8a70a2fb787580ab363af2e5e15940e7d13e3b255b71c143a9df",
+      "bytes": 12894
+    },
+    {
+      "name": "@oods/components-react",
+      "version": "0.1.0",
+      "installSpec": "file:./tarballs/oods-components-react-0.1.0.tgz",
+      "sha256": "sha256:02036aecde76093980d8e4e93bb3458c60a96009ee4b1d8c523b621e32a308e2",
+      "bytes": 95069
+    }
+  ],
+  "views": [
+    {
+      "width": 390,
+      "accessibility": "- text: Consumer title\n- list \"Lifecycle history\":\n  - listitem:\n    - text: Consumer label\n    - strong: Created\n    - time: Sep 5, 2026, 12:00 PM\n    - paragraph: Initial state\n  - listitem:\n    - text: Consumer label\n    - strong: Updated\n    - time: Sep 6, 2026, 12:00 PM\n    - paragraph: Next state\n- article \"State transitions\":\n  - heading \"State transitions\" [level=3]\n  - paragraph: No events recorded.\n- article \"Cancellation event\":\n  - heading \"Cancellation event\" [level=3]\n  - list:\n    - listitem:\n      - strong: Cancellation requested\n      - paragraph:\n        - time: Sep 5, 2026, 12:00 PM\n      - paragraph: \"Reason: Consumer cancellation reason\"\n      - paragraph: \"Code: Consumer cancellation reason code\"",
+      "visibleText": "Consumer title\nConsumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state\n\nConsumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state\n\nState transitions\n\nNo events recorded.\n\nCancellation event\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code",
+      "measurements": {
+        "bodyBackground": "oklch(0.18 0.05 45)",
+        "chartCanvasFills": [],
+        "viewportWidth": 390,
+        "documentWidth": 390,
+        "elementCount": 31,
+        "overflow": [],
+        "glyphWraps": []
+      },
+      "values": [],
+      "regions": [
+        {
+          "id": "screen-timeline-14",
+          "component": "Stack",
+          "text": "Consumer title\nConsumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state\n\nConsumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state\n\nState transitions\n\nNo events recorded.\n\nCancellation event\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        },
+        {
+          "id": "timeline-header-1",
+          "component": "Stack",
+          "text": "Consumer title"
+        },
+        {
+          "id": "timeline-header-1-title",
+          "component": "Text",
+          "text": "Consumer title"
+        },
+        {
+          "id": "timeline-entries-13-entry-0",
+          "component": "Card",
+          "text": "Consumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state"
+        },
+        {
+          "id": "ve-entry-0-15-0",
+          "component": "TimelineEntryLabel",
+          "text": "Consumer label"
+        },
+        {
+          "id": "timeline-entries-13-entry-1",
+          "component": "Card",
+          "text": "Consumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state"
+        },
+        {
+          "id": "ve-entry-0-15-1",
+          "component": "TimelineEntryLabel",
+          "text": "Consumer label"
+        },
+        {
+          "id": "timeline-entries-13-trait-events",
+          "component": "Stack",
+          "text": "State transitions\n\nNo events recorded.\n\nCancellation event\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        },
+        {
+          "id": "ve-entry-0-16",
+          "component": "StateTransitionEvent",
+          "text": "State transitions\n\nNo events recorded."
+        },
+        {
+          "id": "ve-entry-0-17",
+          "component": "CancellationEvent",
+          "text": "Cancellation event\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        }
+      ],
+      "screenshot": "390.png",
+      "screenshotHash": "sha256:6fe210e60a3bfc8adcaef1d4b29ab8809369dde620dea37746042edc2dd34b33",
+      "dump": "390.a11y.txt"
+    },
+    {
+      "width": 820,
+      "accessibility": "- text: Consumer title\n- list \"Lifecycle history\":\n  - listitem:\n    - text: Consumer label\n    - strong: Created\n    - time: Sep 5, 2026, 12:00 PM\n    - paragraph: Initial state\n  - listitem:\n    - text: Consumer label\n    - strong: Updated\n    - time: Sep 6, 2026, 12:00 PM\n    - paragraph: Next state\n- article \"State transitions\":\n  - heading \"State transitions\" [level=3]\n  - paragraph: No events recorded.\n- article \"Cancellation event\":\n  - heading \"Cancellation event\" [level=3]\n  - list:\n    - listitem:\n      - strong: Cancellation requested\n      - paragraph:\n        - time: Sep 5, 2026, 12:00 PM\n      - paragraph: \"Reason: Consumer cancellation reason\"\n      - paragraph: \"Code: Consumer cancellation reason code\"",
+      "visibleText": "Consumer title\nConsumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state\n\nConsumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state\n\nState transitions\n\nNo events recorded.\n\nCancellation event\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code",
+      "measurements": {
+        "bodyBackground": "oklch(0.18 0.05 45)",
+        "chartCanvasFills": [],
+        "viewportWidth": 820,
+        "documentWidth": 820,
+        "elementCount": 31,
+        "overflow": [],
+        "glyphWraps": []
+      },
+      "values": [],
+      "regions": [
+        {
+          "id": "screen-timeline-14",
+          "component": "Stack",
+          "text": "Consumer title\nConsumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state\n\nConsumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state\n\nState transitions\n\nNo events recorded.\n\nCancellation event\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        },
+        {
+          "id": "timeline-header-1",
+          "component": "Stack",
+          "text": "Consumer title"
+        },
+        {
+          "id": "timeline-header-1-title",
+          "component": "Text",
+          "text": "Consumer title"
+        },
+        {
+          "id": "timeline-entries-13-entry-0",
+          "component": "Card",
+          "text": "Consumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state"
+        },
+        {
+          "id": "ve-entry-0-15-0",
+          "component": "TimelineEntryLabel",
+          "text": "Consumer label"
+        },
+        {
+          "id": "timeline-entries-13-entry-1",
+          "component": "Card",
+          "text": "Consumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state"
+        },
+        {
+          "id": "ve-entry-0-15-1",
+          "component": "TimelineEntryLabel",
+          "text": "Consumer label"
+        },
+        {
+          "id": "timeline-entries-13-trait-events",
+          "component": "Stack",
+          "text": "State transitions\n\nNo events recorded.\n\nCancellation event\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        },
+        {
+          "id": "ve-entry-0-16",
+          "component": "StateTransitionEvent",
+          "text": "State transitions\n\nNo events recorded."
+        },
+        {
+          "id": "ve-entry-0-17",
+          "component": "CancellationEvent",
+          "text": "Cancellation event\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        }
+      ],
+      "screenshot": "820.png",
+      "screenshotHash": "sha256:8324a13c13e680addf5f926716c2759168029ff1e2cc088e9212082080d7d595",
+      "dump": "820.a11y.txt"
+    },
+    {
+      "width": 1440,
+      "accessibility": "- text: Consumer title\n- list \"Lifecycle history\":\n  - listitem:\n    - text: Consumer label\n    - strong: Created\n    - time: Sep 5, 2026, 12:00 PM\n    - paragraph: Initial state\n  - listitem:\n    - text: Consumer label\n    - strong: Updated\n    - time: Sep 6, 2026, 12:00 PM\n    - paragraph: Next state\n- article \"State transitions\":\n  - heading \"State transitions\" [level=3]\n  - paragraph: No events recorded.\n- article \"Cancellation event\":\n  - heading \"Cancellation event\" [level=3]\n  - list:\n    - listitem:\n      - strong: Cancellation requested\n      - paragraph:\n        - time: Sep 5, 2026, 12:00 PM\n      - paragraph: \"Reason: Consumer cancellation reason\"\n      - paragraph: \"Code: Consumer cancellation reason code\"",
+      "visibleText": "Consumer title\nConsumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state\n\nConsumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state\n\nState transitions\n\nNo events recorded.\n\nCancellation event\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code",
+      "measurements": {
+        "bodyBackground": "oklch(0.18 0.05 45)",
+        "chartCanvasFills": [],
+        "viewportWidth": 1440,
+        "documentWidth": 1440,
+        "elementCount": 31,
+        "overflow": [],
+        "glyphWraps": []
+      },
+      "values": [],
+      "regions": [
+        {
+          "id": "screen-timeline-14",
+          "component": "Stack",
+          "text": "Consumer title\nConsumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state\n\nConsumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state\n\nState transitions\n\nNo events recorded.\n\nCancellation event\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        },
+        {
+          "id": "timeline-header-1",
+          "component": "Stack",
+          "text": "Consumer title"
+        },
+        {
+          "id": "timeline-header-1-title",
+          "component": "Text",
+          "text": "Consumer title"
+        },
+        {
+          "id": "timeline-entries-13-entry-0",
+          "component": "Card",
+          "text": "Consumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state"
+        },
+        {
+          "id": "ve-entry-0-15-0",
+          "component": "TimelineEntryLabel",
+          "text": "Consumer label"
+        },
+        {
+          "id": "timeline-entries-13-entry-1",
+          "component": "Card",
+          "text": "Consumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state"
+        },
+        {
+          "id": "ve-entry-0-15-1",
+          "component": "TimelineEntryLabel",
+          "text": "Consumer label"
+        },
+        {
+          "id": "timeline-entries-13-trait-events",
+          "component": "Stack",
+          "text": "State transitions\n\nNo events recorded.\n\nCancellation event\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        },
+        {
+          "id": "ve-entry-0-16",
+          "component": "StateTransitionEvent",
+          "text": "State transitions\n\nNo events recorded."
+        },
+        {
+          "id": "ve-entry-0-17",
+          "component": "CancellationEvent",
+          "text": "Cancellation event\nCancellation requested\n\nSep 5, 2026, 12:00 PM\n\nReason: Consumer cancellation reason\n\nCode: Consumer cancellation reason code"
+        }
+      ],
+      "screenshot": "1440.png",
+      "screenshotHash": "sha256:03195b3c3a0337a1856e28bffecf30576330f2f167620730158a83a5097fff5a",
+      "dump": "1440.a11y.txt"
+    }
+  ],
+  "errors": [],
+  "timings": {
+    "composeMs": 65.56108299999994,
+    "generateMs": 7.584625000000074,
+    "captureMs": 807.2884590000031
+  },
+  "output": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-preview-XIe5WQ/receipt/react",
+  "consumer": {
+    "root": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-loop-react-POjCrt",
+    "port": 4478,
+    "pid": 15831
+  }
+}

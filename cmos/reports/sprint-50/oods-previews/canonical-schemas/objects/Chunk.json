@@ -1,0 +1,210 @@
+{
+  "name": "Chunk",
+  "version": "0.1.0",
+  "domain": "research.data",
+  "description": "TraceLab chunk: data in the research notebook. An excerpt shown inline within its source document; no standalone page.",
+  "tags": [
+    "research",
+    "tracelab",
+    "data"
+  ],
+  "maturity": "alpha",
+  "traits": [
+    {
+      "name": "content/Labelled",
+      "alias": null,
+      "parameters": {
+        "maxLabelLength": 255,
+        "maxDescriptionLength": 1000
+      }
+    }
+  ],
+  "schema": {
+    "label": {
+      "type": "string",
+      "required": true,
+      "description": "Display projection of content; retain the complete source field."
+    },
+    "description": {
+      "type": "string",
+      "required": false,
+      "requiredFromParameter": "requireDescription",
+      "description": "Supporting description used in detail and card contexts.",
+      "validation": {
+        "maxLengthFromParameter": "maxDescriptionLength"
+      }
+    },
+    "placeholder": {
+      "type": "string",
+      "required": false,
+      "description": "Hint copy surfaced in form fields when the label is empty.",
+      "validation": {
+        "maxLength": 80
+      }
+    },
+    "document_id": {
+      "type": "uuid",
+      "required": true,
+      "description": "Document id.",
+      "validation": {
+        "format": "uuid"
+      }
+    },
+    "chunk_index": {
+      "type": "number",
+      "required": true,
+      "description": "Chunk index."
+    },
+    "content": {
+      "type": "string",
+      "required": true,
+      "description": "Content."
+    },
+    "embedding_id": {
+      "type": "string",
+      "required": false,
+      "description": "Embedding id."
+    },
+    "token_count": {
+      "type": "number",
+      "required": false,
+      "description": "Token count."
+    },
+    "start_char": {
+      "type": "number",
+      "required": false,
+      "description": "Start char."
+    },
+    "end_char": {
+      "type": "number",
+      "required": false,
+      "description": "End char."
+    },
+    "prev_chunk_id": {
+      "type": "uuid",
+      "required": false,
+      "description": "Prev chunk id."
+    },
+    "next_chunk_id": {
+      "type": "uuid",
+      "required": false,
+      "description": "Next chunk id."
+    },
+    "id": {
+      "type": "uuid",
+      "required": true,
+      "description": "Id.",
+      "validation": {
+        "format": "uuid"
+      }
+    },
+    "created_at": {
+      "type": "datetime",
+      "required": true,
+      "description": "Created at.",
+      "validation": {
+        "format": "date-time"
+      }
+    }
+  },
+  "semantics": {
+    "label": {
+      "semantic_type": "text.label",
+      "token_mapping": "tokenMap(text.label.*)",
+      "ui_hints": {
+        "component": "TextHeading",
+        "maxLengthParameter": "maxLabelLength",
+        "headingLevel": 2
+      }
+    },
+    "description": {
+      "semantic_type": "text.description",
+      "token_mapping": "tokenMap(text.body.*)",
+      "ui_hints": {
+        "component": "TextBody",
+        "maxLengthParameter": "maxDescriptionLength"
+      }
+    },
+    "placeholder": {
+      "semantic_type": "text.placeholder",
+      "token_mapping": "tokenMap(text.placeholder.*)",
+      "ui_hints": {
+        "component": "FormHint",
+        "maxLength": 80
+      }
+    },
+    "content": {
+      "semantic_type": "text.label",
+      "token_mapping": "tokenMap(text.label.*)"
+    },
+    "document_id": {
+      "semantic_type": "research.chunk.document_id",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "chunk_index": {
+      "semantic_type": "research.chunk.chunk_index",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "embedding_id": {
+      "semantic_type": "research.chunk.embedding_id",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "token_count": {
+      "semantic_type": "research.chunk.token_count",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "start_char": {
+      "semantic_type": "research.chunk.start_char",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "end_char": {
+      "semantic_type": "research.chunk.end_char",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "prev_chunk_id": {
+      "semantic_type": "research.chunk.prev_chunk_id",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "next_chunk_id": {
+      "semantic_type": "research.chunk.next_chunk_id",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "id": {
+      "semantic_type": "research.chunk.id",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "created_at": {
+      "semantic_type": "research.chunk.created_at",
+      "token_mapping": "tokenMap(text.body.*)"
+    }
+  },
+  "viewExtensions": {
+    "inline": [
+      {
+        "component": "InlineLabel",
+        "props": {
+          "field": "label",
+          "maxLength": 40
+        }
+      }
+    ]
+  },
+  "tokens": {
+    "text.label.color": "var(--sys-text-strong)",
+    "text.label.font-weight": "var(--sys-font-weight-semibold)",
+    "text.label.font-size": "var(--sys-font-size-lg)",
+    "text.label.line-height": "var(--sys-line-height-tight)",
+    "text.body.color": "var(--sys-text-subtle)",
+    "text.body.font-weight": "var(--sys-font-weight-regular)",
+    "text.body.font-size": "var(--sys-font-size-sm)",
+    "text.body.line-height": "var(--sys-line-height-relaxed)",
+    "text.placeholder.color": "var(--sys-text-muted)",
+    "text.placeholder.font-weight": "var(--sys-font-weight-regular)",
+    "text.placeholder.font-size": "var(--sys-font-size-sm)",
+    "text.placeholder.line-height": "var(--sys-line-height-normal)"
+  },
+  "warnings": [
+    "Field collision: \"label\" in object schema overrides trait definition"
+  ],
+  "filePath": "/private/tmp/tracelab-ux1-forge/objects/research/Chunk.object.yaml"
+}

@@ -1,0 +1,387 @@
+{
+  "mission": "UX-1",
+  "status": "blocked; GitHub Actions billing/capacity prevents final CI before merge and registry activation",
+  "updated_at": "2026-09-13T00:47:48.283405+00:00",
+  "forge": {
+    "base": "114a268ea10b9141bc96925c69132179c7c4b334",
+    "implementation_head": "a6c845163368af3e21fff61c88b75a1823448871",
+    "pull_request": "https://github.com/kneelinghorse/OODS-Forge/pull/105",
+    "backlog_request": "f091c849-fe1a-49d5-93ee-b8029219685a",
+    "current_ci_run": 34728733886,
+    "canonical_registry_activation": "pending merge and native worker refresh",
+    "ci_merge_base": "e9f15a4a586921ce8c68dd3d24f5a01d0b24a281",
+    "upstream_change": "Roadmap-only Sprint196 review closure; merged locally and source tree equality with tested CI revision verified before retaining receipts.",
+    "bundled_runtime": {
+      "status": "passed",
+      "cells": 42,
+      "failures": 0,
+      "typed_gaps": 0,
+      "replay_tests_passed": 26,
+      "head": "a7ef99a21c303e3ef66f57845e9f2b52475f79a3",
+      "archive_sha256": "f1126be2a97839f3bb6098c95ba1f24f833ef1d6195c4f4267a468aa527d31e1",
+      "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/release-ci-34725928271"
+    },
+    "runtime_attempts": [
+      {
+        "run": 34722431783,
+        "job": 103630675634,
+        "head": "a1b7763da69732d6e22593fc6d9c74406bdfa753",
+        "summary": {
+          "cells": 240,
+          "pass": 228,
+          "typedGap": 0,
+          "fail": 12
+        },
+        "disposition": "rejected; not retained as canonical proof",
+        "cause": "Six research objects used different collection row and workflow-store keys. Canonical id precedence is now aligned; six intent regressions failed before the fix.",
+        "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/diagnostics/runtime-ci-34722431783"
+      }
+    ],
+    "runtime_job": 103639903728,
+    "release_job": 103639903681,
+    "catalog_runtime": {
+      "status": "passed",
+      "run": 34725928271,
+      "job": 103639903728,
+      "head": "a7ef99a21c303e3ef66f57845e9f2b52475f79a3",
+      "run_id": "edadede9-db2d-4a7a-83df-14048d51ccd0",
+      "cells": 240,
+      "passed": 240,
+      "failed": 0,
+      "typed_gaps": 0,
+      "workflow_cells": 34,
+      "dashboard_cells_passed": 4,
+      "chart_theme_scopes_passed": 48,
+      "pack_count": 1,
+      "browser": "pinned Linux Chromium 141.0.7390.37",
+      "emitter_mutation": "rejected; byte-identical restored source passes",
+      "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/runtime",
+      "receipt_heads_modified": false,
+      "runtime_job_seconds": 3539,
+      "next_job_budget_minutes": 75
+    },
+    "final_ci": {
+      "head": "a6c845163368af3e21fff61c88b75a1823448871",
+      "run": 34728733886,
+      "status": "jobs not started",
+      "reason": "GitHub account payments failed or spending limit needs increasing",
+      "url": "https://github.com/kneelinghorse/OODS-Forge/actions/runs/34728733886",
+      "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/local-portable/ci-34728733886-billing-block.json"
+    },
+    "prior_ci_coverage": {
+      "passed": 7163,
+      "failed": 5,
+      "skipped": 16,
+      "total": 7184,
+      "failures": [
+        "2 generated Tool-Specs freshness tests; regenerated document committed locally at ce2239c, 19 contract tests now pass",
+        "3 retained runtime-ledger tests await fresh 240-cell proof"
+      ],
+      "run": 34725928271,
+      "resolution": "Docs and canonical proof refreshed; all 61 targeted regression tests pass, including dist-only health after removing its authoring-file dependency."
+    },
+    "prior_ci_mcp_suite": {
+      "job": 103639903791,
+      "passed": 6834,
+      "failed": 6,
+      "skipped": 16,
+      "total": 6856,
+      "unhandled_errors": [
+        "Vitest worker onTaskUpdate communication timeout"
+      ],
+      "failures": [
+        "2 generated Tool-Specs freshness tests fixed locally at ce2239c",
+        "4 runtime-ledger and portable-health tests await fresh valid 240-cell evidence"
+      ],
+      "run": 34725928271,
+      "resolution": "Docs and canonical proof refreshed; all 61 targeted regression tests pass, including dist-only health after removing its authoring-file dependency."
+    },
+    "prior_ci_consumer_suite": {
+      "job": 103639903737,
+      "passed": 304,
+      "failed": 1,
+      "skipped": 0,
+      "failure": "Portable-health assertion against old canonical ledger; fixed proof is now retained, regression validation running.",
+      "run": 34725928271,
+      "resolution": "Docs and canonical proof refreshed; all 61 targeted regression tests pass, including dist-only health after removing its authoring-file dependency."
+    },
+    "retained_proof_ci_merge_revision": "a7ef99a21c303e3ef66f57845e9f2b52475f79a3"
+  },
+  "mapping": {
+    "objects": 7,
+    "model_field_mappings": 522,
+    "nested_field_mappings": 10,
+    "traceLab_tests": "18 passed, no skips; five dependency deprecation warnings. Includes native Forge composed-schema parity for every mapped field constraint.",
+    "foundational_references": "passed"
+  },
+  "local_forge_checks": {
+    "initial_regression_suites": "157 passed, no skips",
+    "expanded_census_and_research_suites": "69 passed; 2 retained-current-ledger tests fail pending real 240-cell CI evidence; no skips",
+    "research_workflows": "All six actual packed React/Vue workflow consumers passed at 2a277133: 192 state observations, 144 screenshots, zero failed runtime gates.",
+    "component_styles": "47 passed including 29 browser tests; no skips",
+    "mcp_build": "passed",
+    "object_type_generation": "7 objects passed",
+    "schema_type_generation": "passed",
+    "targeted_lint": "zero errors; one pre-existing warning in design.compose.ts",
+    "coverage_regression_fixes": "48 passed: current claim counts, historical source-byte qualification and exact temporal SVG assets",
+    "tool_reference_index": "31 passed after regeneration at e9cf5a1824f26d357570f6e76be0221bbdb0500b",
+    "identity_regressions": "All six intent regressions passed after failing before the correction.",
+    "declared_filter_regressions": "2 failed before the fix; 2 passed afterward (22 other tests excluded by focused selection). Non-status enum filters must target their declared field.",
+    "research_object_tests": "24 passed, no skips in the full run.",
+    "collection_regressions": "41 passed, 1 Vue compilation timeout and 1 worker communication timeout under host memory pressure; isolated Vue retry passed in 8.6 seconds (11 unrelated tests excluded by name selection).",
+    "research_worker_scheduling": "24 passed, no skips or unhandled errors after yielding between synchronous compiler calls; lint passed. Full CI confirmation pending.",
+    "retained_proof_replay": "61 passed, zero skipped or unhandled errors after fixing dist-only census file dependence; generated docs and targeted lint pass.",
+    "package_build": "All packages passed after wiring the existing playground dependency link in the temporary worktree.",
+    "portable_archive": {
+      "status": "passed",
+      "tools": 19,
+      "node": "v24.6.0",
+      "head": "a6c845163368af3e21fff61c88b75a1823448871",
+      "manifest_dirty": true,
+      "note": "Untracked temporary node_modules links; no tracked source changes when assembled. This is a local development smoke, not clean --final release certification.",
+      "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/local-portable/e2e.json",
+      "extraction_tree_unchanged": true,
+      "bridge_parity": true,
+      "runtime_cells": 240,
+      "release_cells": 42
+    }
+  },
+  "saved_schemas": {
+    "count": 20,
+    "zero_validation_errors": true,
+    "summary": "oods-previews/schema-summary.json",
+    "store": "canonical Forge schema store; 20 TraceLab schemas visible through the provided public schema(list) tool, 36 total, original 16 metadata records unchanged",
+    "canonical_persistence": "oods-previews/canonical-schemas/persistence.json",
+    "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+    "canonical_version": 2
+  },
+  "previews": [
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/evidence-detail-dark/react/receipt.json",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "object": "Evidence",
+      "context": "detail",
+      "theme": "dark",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/evidence-detail-light/react/receipt.json",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "object": "Evidence",
+      "context": "detail",
+      "theme": "light",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/evidence-list-dark/react/receipt.json",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "object": "Evidence",
+      "context": "list",
+      "theme": "dark",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/evidence-list-light/react/receipt.json",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "object": "Evidence",
+      "context": "list",
+      "theme": "light",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/mission-detail-dark/react/receipt.json",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "object": "Mission",
+      "context": "detail",
+      "theme": "dark",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 1
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/mission-detail-light/react/receipt.json",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "object": "Mission",
+      "context": "detail",
+      "theme": "light",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 1
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/mission-list-dark/react/receipt.json",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "object": "Mission",
+      "context": "list",
+      "theme": "dark",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/mission-list-light/react/receipt.json",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "object": "Mission",
+      "context": "list",
+      "theme": "light",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/mission-timeline-dark/react/receipt.json",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "object": "Mission",
+      "context": "timeline",
+      "theme": "dark",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "path": "cmos/reports/sprint-50/oods-previews/mission-timeline-light/react/receipt.json",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "object": "Mission",
+      "context": "timeline",
+      "theme": "light",
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    }
+  ],
+  "visual_review": {
+    "phone": "Evidence list/light, Mission detail/dark, Mission workflow/dark and Chunk inline/light visually reviewed at 390. Sidebars stack below main content. Native select values truncate, pagination wraps, and long workflow identifiers wrap inside their cards. Chunk remains an inline structural prototype using generic controls; it is not a standalone page.",
+    "text_wrapping": "58 observations across the full 120-viewport matrix, including 14 in the original 30-viewport Mission/Evidence subset. Ordinary pagination, long workflow identifier and cancellation text wrapping remain visible in telemetry.",
+    "limitations": [
+      "Synthetic Forge consumer fixtures; no production TraceLab data is shown.",
+      "Generic consumer labels, serif default typography and generated actions are structural prototypes, not the final frontend design.",
+      "Missing ownership, history, source counts and classification content must remain unavailable when later bound to the real API."
+    ]
+  },
+  "pending": [
+    "Restore GitHub Actions billing/capacity, rerun final Forge CI and merge PR105",
+    "Refresh canonical Forge worker and verify the seven research objects through the provided connection",
+    "Attach landed commit to the roadmap-required backlog request",
+    "Pass TraceLab PR checks and merge mapping/evidence changes",
+    "CMOS health and final status verification"
+  ],
+  "traceLab_ci": {
+    "head": "e3952e471d457966528286e9bc6f92e740c69b7b",
+    "pull_request": "https://github.com/kneelinghorse/TraceLab/pull/257",
+    "required_checks": "passed at full 120-viewport preview head; draft pending Forge activation",
+    "backend": {
+      "run": 34727448769,
+      "passed": 2409,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 47
+    },
+    "integration": {
+      "run": 34727448767,
+      "passed": 125,
+      "skipped": 4,
+      "warnings": 17
+    },
+    "frontend_production_build": {
+      "run": 34727448766,
+      "status": "passed",
+      "browser_tests_passed": 8
+    },
+    "frontend_unit_and_types": {
+      "run": 34727448771,
+      "status": "passed"
+    },
+    "secret_scan": "passed",
+    "changed_file_ruff": "passed",
+    "advisory_failures": [
+      "ruff-full",
+      "mypy",
+      "frontend lint"
+    ]
+  },
+  "handoff_references": {
+    "UX-2": "CMOS referenceDocs includes contract, schema index, Mission list/detail light/dark receipts and full 120-viewport preview index",
+    "UX-3": "CMOS referenceDocs includes contract, schema index, Evidence list/detail light/dark receipts and full 120-viewport preview index",
+    "Sprint51": "No missions instantiated yet; planned UX-6/UX-7/UX-8 entries in the guiding roadmap now reference the saved schema index and structural preview receipts. The full 120-viewport index is also linked."
+  },
+  "full_preview_matrix": {
+    "saved_compositions": 20,
+    "receipt_sets": 40,
+    "width_observations": 120,
+    "framework": "react",
+    "widths": [
+      390,
+      820,
+      1440
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "browser_error_count": 0,
+    "overflow_count": 0,
+    "text_wrap_observations": 58,
+    "implementation_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+    "additional_preview_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+    "head_difference": "Generated tool-reference documentation only; composition, code generation and style sources unchanged.",
+    "summary": "oods-previews/preview-summary.json"
+  }
+}

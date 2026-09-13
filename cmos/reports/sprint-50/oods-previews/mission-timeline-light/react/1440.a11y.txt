@@ -1,0 +1,24 @@
+- text: Consumer title
+- list "Lifecycle history":
+  - listitem:
+    - text: Consumer label
+    - strong: Created
+    - time: Sep 5, 2026, 12:00 PM
+    - paragraph: Initial state
+  - listitem:
+    - text: Consumer label
+    - strong: Updated
+    - time: Sep 6, 2026, 12:00 PM
+    - paragraph: Next state
+- article "State transitions":
+  - heading "State transitions" [level=3]
+  - paragraph: No events recorded.
+- article "Cancellation event":
+  - heading "Cancellation event" [level=3]
+  - list:
+    - listitem:
+      - strong: Cancellation requested
+      - paragraph:
+        - time: Sep 5, 2026, 12:00 PM
+      - paragraph: "Reason: Consumer cancellation reason"
+      - paragraph: "Code: Consumer cancellation reason code"

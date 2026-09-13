@@ -1,0 +1,424 @@
+{
+  "status": "ok",
+  "layout": "list",
+  "schema": {
+    "version": "2026.02",
+    "theme": "light",
+    "screens": [
+      {
+        "id": "screen-list-9",
+        "component": "Stack",
+        "layout": {
+          "type": "stack",
+          "gapToken": "cluster-default"
+        },
+        "children": [
+          {
+            "id": "list-toolbar-4",
+            "component": "Stack",
+            "layout": {
+              "type": "inline",
+              "align": "space-between"
+            },
+            "style": {
+              "spacingToken": "inset-default"
+            },
+            "children": [
+              {
+                "id": "slot-search-1",
+                "component": "SearchInput",
+                "meta": {
+                  "intent": "slot:search",
+                  "label": "search",
+                  "confidence": 1,
+                  "confidenceLevel": "low"
+                },
+                "bindings": {
+                  "onUpdate": "handleUpdate_embedding_id"
+                },
+                "props": {
+                  "field": "embedding_id",
+                  "label": "Embedding id",
+                  "placeholder": "Enter embedding id"
+                }
+              },
+              {
+                "id": "slot-filters-2",
+                "component": "Input",
+                "meta": {
+                  "intent": "slot:filters",
+                  "label": "filters",
+                  "confidence": 0.67,
+                  "confidenceLevel": "low"
+                },
+                "props": {
+                  "type": "number",
+                  "field": "chunk_index",
+                  "label": "Chunk index",
+                  "placeholder": "Enter chunk index"
+                },
+                "bindings": {
+                  "onChange": "handleChange_chunk_index"
+                }
+              },
+              {
+                "id": "slot-toolbar-actions-3",
+                "component": "Button",
+                "meta": {
+                  "intent": "slot:toolbar-actions",
+                  "label": "toolbar-actions",
+                  "confidence": 1,
+                  "confidenceLevel": "low"
+                }
+              }
+            ]
+          },
+          {
+            "id": "list-items-5",
+            "component": "Stack",
+            "layout": {
+              "type": "stack",
+              "gapToken": "cluster-tight"
+            },
+            "children": [
+              {
+                "id": "slot-items-6",
+                "component": "InlineLabel",
+                "meta": {
+                  "intent": "slot:items",
+                  "label": "items"
+                },
+                "props": {
+                  "field": "label",
+                  "maxLength": 40,
+                  "label": "Label"
+                }
+              }
+            ]
+          },
+          {
+            "id": "list-pagination-7",
+            "component": "Stack",
+            "layout": {
+              "type": "inline",
+              "align": "center"
+            },
+            "style": {
+              "spacingToken": "inset-default"
+            },
+            "children": [
+              {
+                "id": "slot-pagination-8",
+                "component": "PaginationBar",
+                "meta": {
+                  "intent": "slot:pagination",
+                  "label": "pagination",
+                  "confidence": 0.77,
+                  "confidenceLevel": "low"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "objectSchema": {
+      "label": {
+        "type": "string",
+        "required": true,
+        "description": "Display projection of content; retain the complete source field.",
+        "semanticType": "text.label"
+      },
+      "description": {
+        "type": "string",
+        "required": false,
+        "description": "Supporting description used in detail and card contexts.",
+        "semanticType": "text.description"
+      },
+      "placeholder": {
+        "type": "string",
+        "required": false,
+        "description": "Hint copy surfaced in form fields when the label is empty.",
+        "semanticType": "text.placeholder"
+      },
+      "document_id": {
+        "type": "uuid",
+        "required": true,
+        "description": "Document id.",
+        "semanticType": "research.chunk.document_id"
+      },
+      "chunk_index": {
+        "type": "number",
+        "required": true,
+        "description": "Chunk index.",
+        "semanticType": "research.chunk.chunk_index"
+      },
+      "content": {
+        "type": "string",
+        "required": true,
+        "description": "Content.",
+        "semanticType": "text.label"
+      },
+      "embedding_id": {
+        "type": "string",
+        "required": false,
+        "description": "Embedding id.",
+        "semanticType": "research.chunk.embedding_id"
+      },
+      "token_count": {
+        "type": "number",
+        "required": false,
+        "description": "Token count.",
+        "semanticType": "research.chunk.token_count"
+      },
+      "start_char": {
+        "type": "number",
+        "required": false,
+        "description": "Start char.",
+        "semanticType": "research.chunk.start_char"
+      },
+      "end_char": {
+        "type": "number",
+        "required": false,
+        "description": "End char.",
+        "semanticType": "research.chunk.end_char"
+      },
+      "prev_chunk_id": {
+        "type": "uuid",
+        "required": false,
+        "description": "Prev chunk id.",
+        "semanticType": "research.chunk.prev_chunk_id"
+      },
+      "next_chunk_id": {
+        "type": "uuid",
+        "required": false,
+        "description": "Next chunk id.",
+        "semanticType": "research.chunk.next_chunk_id"
+      },
+      "id": {
+        "type": "uuid",
+        "required": true,
+        "description": "Id.",
+        "semanticType": "research.chunk.id"
+      },
+      "created_at": {
+        "type": "datetime",
+        "required": true,
+        "description": "Created at.",
+        "semanticType": "research.chunk.created_at"
+      }
+    }
+  },
+  "schemaRef": "compose-6e78f243",
+  "schemaRefCreatedAt": "2026-09-13T00:00:07.377Z",
+  "schemaRefExpiresAt": "2026-09-13T00:30:07.377Z",
+  "selections": [
+    {
+      "slotName": "items",
+      "intent": "data-list",
+      "selectedComponent": "InlineLabel",
+      "confidence": 0.95,
+      "confidenceLevel": "high",
+      "explanation": "InlineLabel was selected for slot \"items\" because view_extension placement. Confidence is high (0.95).",
+      "candidates": [
+        {
+          "name": "InlineLabel",
+          "confidence": 0.95,
+          "reason": "view_extension placement"
+        }
+      ]
+    },
+    {
+      "slotName": "search",
+      "intent": "search-input",
+      "selectedComponent": "SearchInput",
+      "confidence": 1,
+      "confidenceLevel": "high",
+      "explanation": "SearchInput was selected for slot \"search\" because preferred for \"search-input\" (rank 1); 2 tag match(es); tag match (search); 1 context match(es); 1 category match(es); 1 trait(s); name contains \"search\"; position affinity: SearchInput fits well in header; search intent bias. Confidence is high (1.00).",
+      "candidates": [
+        {
+          "name": "SearchInput",
+          "confidence": 1,
+          "reason": "preferred for \"search-input\" (rank 1); 2 tag match(es); tag match (search); 1 context match(es); 1 category match(es); 1 trait(s); name contains \"search\"; position affinity: SearchInput fits well in header; search intent bias",
+          "keywordTagMatches": 1,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 1,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Input",
+          "confidence": 1,
+          "reason": "preferred for \"search-input\" (rank 2); 1 tag match(es); tag match (input); 1 context match(es); 1 region match(es); 1 category match(es); name contains \"input\"; position affinity: Input fits well in header",
+          "keywordTagMatches": 1,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 1,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "DatePicker",
+          "confidence": 0.47,
+          "reason": "1 tag match(es); tag match (input); 1 context match(es); 1 region match(es); 1 category match(es); position affinity: DatePicker fits well in header",
+          "keywordTagMatches": 1,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 1,
+          "contextTraitMatches": 0
+        }
+      ]
+    },
+    {
+      "slotName": "filters",
+      "intent": "filter-control",
+      "selectedComponent": "Select",
+      "confidence": 0.67,
+      "confidenceLevel": "medium",
+      "explanation": "Select was selected for slot \"filters\" because preferred for \"filter-control\" (rank 1); 1 tag match(es); 1 context match(es); position affinity: Select fits well in sidebar. Confidence is medium (0.67).",
+      "candidates": [
+        {
+          "name": "Select",
+          "confidence": 1,
+          "reason": "preferred for \"filter-control\" (rank 1); 1 tag match(es); 1 context match(es); position affinity: Select fits well in sidebar",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Input",
+          "confidence": 0.9,
+          "reason": "preferred for \"filter-control\" (rank 2); 1 tag match(es); 1 context match(es); position affinity: Input fits well in sidebar",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "StatusBadge",
+          "confidence": 0.52,
+          "reason": "2 context match(es); 1 region match(es); 2 trait(s); position affinity: StatusBadge fits well in sidebar",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        }
+      ]
+    },
+    {
+      "slotName": "toolbar-actions",
+      "intent": "action-button",
+      "selectedComponent": "Button",
+      "confidence": 1,
+      "confidenceLevel": "high",
+      "explanation": "Button was selected for slot \"toolbar-actions\" because preferred for \"action-button\" (rank 1); 2 tag match(es); tag match (action); 1 region match(es); 1 category match(es); name contains \"button\"; position affinity: Button fits well in header. Confidence is high (1.00).",
+      "candidates": [
+        {
+          "name": "Button",
+          "confidence": 1,
+          "reason": "preferred for \"action-button\" (rank 1); 2 tag match(es); tag match (action); 1 region match(es); 1 category match(es); name contains \"button\"; position affinity: Button fits well in header",
+          "keywordTagMatches": 1,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 1,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "InlineLabel",
+          "confidence": 0.29,
+          "reason": "context match (inline); 1 trait(s); name contains \"inline\"",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "DatePicker",
+          "confidence": 0.15,
+          "reason": "1 tag match(es); 1 category match(es); position affinity: DatePicker fits well in header",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        }
+      ]
+    },
+    {
+      "slotName": "pagination",
+      "intent": "pagination-control",
+      "selectedComponent": "PaginationBar",
+      "confidence": 0.77,
+      "confidenceLevel": "medium",
+      "explanation": "PaginationBar was selected for slot \"pagination\" because 2 tag match(es); tag match (pagination, navigation); 1 context match(es); 1 trait(s); name contains \"pagination\"; position affinity: PaginationBar fits well in footer. Confidence is medium (0.77).",
+      "candidates": [
+        {
+          "name": "PaginationBar",
+          "confidence": 1,
+          "reason": "2 tag match(es); tag match (pagination, navigation); 1 context match(es); 1 trait(s); name contains \"pagination\"; position affinity: PaginationBar fits well in footer",
+          "keywordTagMatches": 2,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 1,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Button",
+          "confidence": 0.75,
+          "reason": "preferred for \"pagination-control\" (rank 2); 1 context match(es); 1 region match(es); position affinity: Button fits well in footer",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Text",
+          "confidence": 0.65,
+          "reason": "preferred for \"pagination-control\" (rank 1); 1 context match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        }
+      ]
+    }
+  ],
+  "validation": {
+    "status": "ok",
+    "errors": [],
+    "warnings": []
+  },
+  "warnings": [
+    {
+      "code": "OODS-V121",
+      "message": "Object 'Chunk' has maturity 'alpha' — composed output may change.",
+      "hint": "Consider using stable objects for production compositions."
+    },
+    {
+      "code": "OODS-V117",
+      "message": "Field collision: \"label\" in object schema overrides trait definition"
+    }
+  ],
+  "objectUsed": {
+    "name": "Chunk",
+    "version": "0.1.0",
+    "traits": [
+      "content/Labelled"
+    ],
+    "fieldsComposed": 14,
+    "viewExtensionsApplied": {
+      "inline": 1
+    }
+  },
+  "meta": {
+    "intentParsed": "Chunk inline view",
+    "layoutDetected": "context-inferred: list (from context=\"inline\")",
+    "slotCount": 5,
+    "nodeCount": 9,
+    "intentSynthetic": true,
+    "warnings": [
+      "Object 'Chunk' has maturity 'alpha' — composed output may change.",
+      "Field collision: \"label\" in object schema overrides trait definition"
+    ],
+    "intelligence": {
+      "fieldsExpanded": false,
+      "positionAffinityUsed": true,
+      "fieldAffinityUsed": true,
+      "compositionConfidence": 0.88
+    }
+  }
+}

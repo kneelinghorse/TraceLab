@@ -1,0 +1,1372 @@
+{
+  "name": "Mission",
+  "version": "0.1.0",
+  "domain": "research.job",
+  "description": "TraceLab mission: job in the research notebook. API provenance and unavailable trait fields are specified in the TraceLab OODS mapping contract.",
+  "tags": [
+    "research",
+    "tracelab",
+    "job"
+  ],
+  "maturity": "alpha",
+  "traits": [
+    {
+      "name": "content/Labelled",
+      "alias": null,
+      "parameters": {
+        "maxLabelLength": 255,
+        "maxDescriptionLength": 1000
+      }
+    },
+    {
+      "name": "lifecycle/Stateful",
+      "alias": null,
+      "parameters": {
+        "states": [
+          "draft",
+          "queued",
+          "in_progress",
+          "completed",
+          "blocked",
+          "cancelled",
+          "validation_failed"
+        ],
+        "initialState": "draft"
+      }
+    },
+    {
+      "name": "lifecycle/Timestampable",
+      "alias": null,
+      "parameters": {
+        "recordedEvents": [
+          "created",
+          "queued",
+          "started",
+          "completed",
+          "updated"
+        ],
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "structural/Ownerable",
+      "alias": null,
+      "parameters": {
+        "ownerTypes": [
+          "user"
+        ],
+        "primaryOwnerType": "user",
+        "allowTransfer": false
+      }
+    },
+    {
+      "name": "behavioral/Taggable",
+      "alias": null,
+      "parameters": {
+        "maxTags": 50,
+        "allowCustomTags": true,
+        "caseSensitive": true
+      }
+    },
+    {
+      "name": "lifecycle/Cancellable",
+      "alias": null,
+      "parameters": {
+        "allowCancellationAfterStart": true,
+        "requireReason": false
+      }
+    },
+    {
+      "name": "behavioral/Searchable",
+      "alias": null,
+      "parameters": {
+        "placeholder": "Search missions"
+      }
+    },
+    {
+      "name": "behavioral/Filterable",
+      "alias": null,
+      "parameters": null
+    },
+    {
+      "name": "behavioral/Pageable",
+      "alias": null,
+      "parameters": {
+        "defaultPageSize": 20,
+        "pageSizeOptions": [
+          10,
+          20,
+          50,
+          100
+        ]
+      }
+    }
+  ],
+  "schema": {
+    "label": {
+      "type": "string",
+      "required": true,
+      "description": "Display projection of title; retain the complete source field.",
+      "validation": {
+        "maxLength": 255,
+        "minLength": 3
+      }
+    },
+    "description": {
+      "type": "string",
+      "required": true,
+      "description": "Display projection of objective; never truncates persisted content.",
+      "validation": {
+        "minLength": 10
+      }
+    },
+    "placeholder": {
+      "type": "string",
+      "required": false,
+      "description": "Hint copy surfaced in form fields when the label is empty.",
+      "validation": {
+        "maxLength": 80
+      }
+    },
+    "status": {
+      "type": "string",
+      "required": true,
+      "description": "Canonical research lifecycle. The API remains authoritative; do not coerce an unknown server value.",
+      "validation": {
+        "enum": [
+          "draft",
+          "queued",
+          "in_progress",
+          "completed",
+          "blocked",
+          "cancelled",
+          "validation_failed"
+        ]
+      }
+    },
+    "state_history": {
+      "type": "StateTransition[]",
+      "required": false,
+      "description": "Chronological log of state transitions. Each entry records the before/after states,\ntimestamp, and (when governance is enabled) the actor, reason, and transition metadata.\nRendered by StatusTimeline in the detail and timeline views.\n\nEntry structure:\n  - from: string (previous state)\n  - to: string (new state)\n  - timestamp: ISO 8601 datetime\n  - actor_id: string (user/system who triggered the transition, optional)\n  - reason: string (human-readable justification, required when requireTransitionReason is true)\n  - transition_metadata: Record<string, unknown> (arbitrary context, optional)\n",
+      "default": []
+    },
+    "allowed_transitions": {
+      "type": "string[]",
+      "required": false,
+      "description": "Materialized list of valid next states from the current status, computed from the\ntransitionRules parameter. When transitionRules is null (open model), this contains\nall states except the current one. Used by StatusSelector to disable invalid options\nand by StatusBadge to indicate available paths.\n",
+      "default": []
+    },
+    "created_at": {
+      "type": "datetime",
+      "required": true,
+      "description": "Created at.",
+      "validation": {
+        "format": "date-time"
+      }
+    },
+    "updated_at": {
+      "type": "datetime",
+      "required": true,
+      "description": "Updated at.",
+      "validation": {
+        "format": "date-time"
+      }
+    },
+    "last_event": {
+      "type": "string",
+      "required": false,
+      "description": "Only from an explicit event or timestamp projection; absence is unknown, not a fabricated audit event."
+    },
+    "last_event_at": {
+      "type": "datetime",
+      "required": false,
+      "description": "Timestamp for the lifecycle event captured in last_event."
+    },
+    "owner_id": {
+      "type": "uuid",
+      "required": false,
+      "description": "Authoritative nullable server owner_id. Not exposed by the current response; unavailable until the API exposes it. Never derive from created_by, user_id, or project owner."
+    },
+    "owner_type": {
+      "type": "string",
+      "required": false,
+      "description": "user only when an authoritative owner_id is present.",
+      "validation": {
+        "enum": [
+          "user"
+        ]
+      }
+    },
+    "ownership_role": {
+      "type": "string",
+      "required": false,
+      "description": "Optional role name describing how the owner governs the entity.",
+      "validation": {
+        "maxLength": 80
+      }
+    },
+    "ownership_transferred_at": {
+      "type": "datetime",
+      "required": false,
+      "description": "Timestamp recording when ownership was last transferred."
+    },
+    "tags": {
+      "type": "string[]",
+      "required": false,
+      "description": "Tags."
+    },
+    "tag_count": {
+      "type": "number",
+      "required": true,
+      "description": "Computed number of tags assigned to the entity.",
+      "default": 0,
+      "validation": {
+        "minimum": 0
+      }
+    },
+    "tag_metadata": {
+      "type": "object[]",
+      "required": false,
+      "description": "Per-tag governance metadata. Each entry corresponds to a tag in the tags array and\ntracks provenance and usage for taxonomy health monitoring.\n\nEntry structure:\n  - tag: string (the tag value, matches entry in tags array)\n  - created_at: ISO 8601 datetime\n  - created_by: string (user ID or \"system\" for allow-list tags)\n  - usage_count: number (how many entities use this tag, computed)\n  - moderation_status: \"approved\" | \"pending\" | \"rejected\" (when allowTagModeration is true)\n  - canonical_form: string (resolved synonym target, when synonymResolution is enabled)\n",
+      "default": []
+    },
+    "cancel_at_period_end": {
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "TraceLab cancellation is immediate; no billing period exists. Period-end controls must not be used."
+    },
+    "cancellation_reason": {
+      "type": "string",
+      "required": false,
+      "description": "Free-form detail describing why cancellation occurred.",
+      "validation": {
+        "maxLength": 160
+      }
+    },
+    "cancellation_reason_code": {
+      "type": "string",
+      "required": false,
+      "description": "Structured reason code chosen from the allowedReasons parameter.",
+      "validation": {
+        "enumFromParameter": "allowedReasons"
+      }
+    },
+    "cancellation_requested_at": {
+      "type": "datetime",
+      "required": false,
+      "description": "Timestamp capturing when the cancellation workflow was initiated."
+    },
+    "searchQuery": {
+      "type": "string",
+      "required": false,
+      "description": "The current search query string entered by the user.",
+      "default": "",
+      "validation": {
+        "maxLength": 256
+      }
+    },
+    "searchActive": {
+      "type": "boolean",
+      "required": false,
+      "description": "Whether the search input is currently focused or has a non-empty query.",
+      "default": false
+    },
+    "filters": {
+      "type": "object[]",
+      "required": false,
+      "description": "Array of available filter descriptors. Each entry defines a filterable dimension:\n  - field: string (the schema field to filter on)\n  - label: string (display label)\n  - type: \"select\" | \"multi-select\" | \"range\" | \"boolean\" | \"date-range\"\n  - options: array of { value, label } for select/multi-select types\n",
+      "default": []
+    },
+    "activeFilters": {
+      "type": "object[]",
+      "required": false,
+      "description": "Array of currently applied filter values:\n  - field: string (matches a filter descriptor field)\n  - operator: \"eq\" | \"in\" | \"range\" | \"gt\" | \"lt\" | \"between\"\n  - value: unknown (the selected filter value or values)\n",
+      "default": []
+    },
+    "filterCount": {
+      "type": "number",
+      "required": true,
+      "description": "Computed count of currently active filters.",
+      "default": 0,
+      "validation": {
+        "minimum": 0
+      }
+    },
+    "page": {
+      "type": "number",
+      "required": true,
+      "description": "Current page number (1-based).",
+      "default": 1,
+      "validation": {
+        "minimum": 1
+      }
+    },
+    "pageSize": {
+      "type": "number",
+      "required": true,
+      "description": "Number of items displayed per page.",
+      "default": 25,
+      "validation": {
+        "minimum": 1,
+        "maximum": 500
+      }
+    },
+    "totalItems": {
+      "type": "number",
+      "required": false,
+      "description": "Total number of items across all pages. Used to compute total page count.",
+      "default": 0,
+      "validation": {
+        "minimum": 0
+      }
+    },
+    "totalPages": {
+      "type": "number",
+      "required": false,
+      "description": "Computed total number of pages (ceil(totalItems / pageSize)).",
+      "default": 0,
+      "validation": {
+        "minimum": 0
+      }
+    },
+    "mission_id": {
+      "type": "string",
+      "required": true,
+      "description": "Human-readable mission identifier (e.g., B16.1)",
+      "validation": {
+        "maxLength": 50,
+        "minLength": 1
+      }
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "description": "Mission title",
+      "validation": {
+        "maxLength": 255,
+        "minLength": 3
+      }
+    },
+    "objective": {
+      "type": "string",
+      "required": true,
+      "description": "What this mission aims to achieve (minimum 10 characters)",
+      "validation": {
+        "minLength": 10
+      }
+    },
+    "success_criteria": {
+      "type": "string[]",
+      "required": true,
+      "description": "Array of measurable success conditions",
+      "validation": {
+        "minItems": 1
+      }
+    },
+    "id": {
+      "type": "uuid",
+      "required": true,
+      "description": "Id.",
+      "validation": {
+        "format": "uuid"
+      }
+    },
+    "project_id": {
+      "type": "uuid",
+      "required": false,
+      "description": "Project id."
+    },
+    "project_name": {
+      "type": "string",
+      "required": false,
+      "description": "Name of the associated project"
+    },
+    "context": {
+      "type": "object",
+      "required": false,
+      "description": "Context."
+    },
+    "deliverables": {
+      "type": "string[]",
+      "required": false,
+      "description": "Deliverables."
+    },
+    "research_phases": {
+      "type": "object",
+      "required": false,
+      "description": "Research phases."
+    },
+    "metadata": {
+      "type": "object",
+      "required": false,
+      "description": "Metadata."
+    },
+    "background": {
+      "type": "string",
+      "required": false,
+      "description": "Background."
+    },
+    "focus": {
+      "type": "string",
+      "required": false,
+      "description": "Focus."
+    },
+    "references": {
+      "type": "object[]",
+      "required": false,
+      "description": "References."
+    },
+    "required_entities": {
+      "type": "string[]",
+      "required": false,
+      "description": "Required entities."
+    },
+    "excluded_entities": {
+      "type": "string[]",
+      "required": false,
+      "description": "Excluded entities."
+    },
+    "expected_output_schema": {
+      "type": "object",
+      "required": false,
+      "description": "Expected output schema."
+    },
+    "coverage_thresholds": {
+      "type": "object",
+      "required": false,
+      "description": "Coverage thresholds."
+    },
+    "validation_thresholds": {
+      "type": "object",
+      "required": false,
+      "description": "Validation thresholds."
+    },
+    "deliverable_format": {
+      "type": "string",
+      "required": false,
+      "description": "Deliverable format."
+    },
+    "max_loops": {
+      "type": "number",
+      "required": false,
+      "description": "Max loops."
+    },
+    "min_loops": {
+      "type": "number",
+      "required": false,
+      "description": "Min loops."
+    },
+    "constraints": {
+      "type": "string[]",
+      "required": false,
+      "description": "Constraints."
+    },
+    "queued_at": {
+      "type": "datetime",
+      "required": false,
+      "description": "Queued at."
+    },
+    "started_at": {
+      "type": "datetime",
+      "required": false,
+      "description": "Started at."
+    },
+    "completed_at": {
+      "type": "datetime",
+      "required": false,
+      "description": "Completed at."
+    },
+    "deepsearch_job_id": {
+      "type": "string",
+      "required": false,
+      "description": "Deepsearch job id."
+    },
+    "execution_metadata": {
+      "type": "object",
+      "required": false,
+      "description": "Execution metadata."
+    },
+    "result_document_ids": {
+      "type": "uuid[]",
+      "required": false,
+      "description": "Result document ids."
+    },
+    "result_report_id": {
+      "type": "uuid",
+      "required": false,
+      "description": "Result report id."
+    },
+    "result_markdown": {
+      "type": "string",
+      "required": false,
+      "description": "Result markdown."
+    },
+    "result_protocol": {
+      "type": "object",
+      "required": false,
+      "description": "Result protocol."
+    },
+    "error_message": {
+      "type": "string",
+      "required": false,
+      "description": "Error message."
+    },
+    "created_by": {
+      "type": "string",
+      "required": false,
+      "description": "Created by."
+    },
+    "progress_percent": {
+      "type": "number",
+      "required": false,
+      "description": "Progress percent."
+    },
+    "current_phase": {
+      "type": "string",
+      "required": false,
+      "description": "Current phase."
+    },
+    "deepsearch_attempt_count": {
+      "type": "number",
+      "required": false,
+      "description": "Deepsearch attempt count.",
+      "default": 0
+    },
+    "lease_expires_at": {
+      "type": "datetime",
+      "required": false,
+      "description": "Lease expires at."
+    },
+    "materialization_pending": {
+      "type": "boolean",
+      "required": true,
+      "description": "Materialization pending."
+    },
+    "materialization_status": {
+      "type": "string",
+      "required": false,
+      "description": "Materialization status."
+    },
+    "materialization_attempt_count": {
+      "type": "number",
+      "required": false,
+      "description": "Materialization attempt count.",
+      "default": 0
+    },
+    "materialization_error": {
+      "type": "string",
+      "required": false,
+      "description": "Materialization error."
+    },
+    "search_ready": {
+      "type": "boolean",
+      "required": true,
+      "description": "Search ready."
+    }
+  },
+  "semantics": {
+    "label": {
+      "semantic_type": "text.label",
+      "token_mapping": "tokenMap(text.label.*)",
+      "ui_hints": {
+        "component": "TextHeading",
+        "maxLengthParameter": "maxLabelLength",
+        "headingLevel": 2
+      }
+    },
+    "description": {
+      "semantic_type": "text.description",
+      "token_mapping": "tokenMap(text.body.*)",
+      "ui_hints": {
+        "component": "TextBody",
+        "maxLengthParameter": "maxDescriptionLength"
+      }
+    },
+    "placeholder": {
+      "semantic_type": "text.placeholder",
+      "token_mapping": "tokenMap(text.placeholder.*)",
+      "ui_hints": {
+        "component": "FormHint",
+        "maxLength": 80
+      }
+    },
+    "status": {
+      "semantic_type": "status.state",
+      "token_mapping": "tokenMap(status.state.*)",
+      "ui_hints": {
+        "component": "StatusBadge",
+        "showIcon": true
+      }
+    },
+    "state_history": {
+      "semantic_type": "timeline.state_transition",
+      "token_mapping": "tokenMap(timeline.status.*)",
+      "ui_hints": {
+        "component": "StatusTimeline",
+        "collapseWhenEmpty": true
+      }
+    },
+    "allowed_transitions": {
+      "semantic_type": "status.navigation",
+      "token_mapping": "computed",
+      "ui_hints": {
+        "component": "StatusSelector",
+        "description": "Drives the set of enabled options in the state transition UI."
+      }
+    },
+    "created_at": {
+      "semantic_type": "audit.created_at",
+      "token_mapping": "tokenMap(audit.created)",
+      "ui_hints": {
+        "component": "TimelineTimestamp",
+        "timezoneParameter": "timezone"
+      }
+    },
+    "updated_at": {
+      "semantic_type": "audit.updated_at",
+      "token_mapping": "tokenMap(audit.updated)",
+      "ui_hints": {
+        "component": "TimelineTimestamp",
+        "timezoneParameter": "timezone",
+        "allowNullParameter": "allowNullUpdatedAt"
+      }
+    },
+    "last_event": {
+      "semantic_type": "audit.event.type",
+      "token_mapping": "tokenMap(audit.event.*)",
+      "ui_hints": {
+        "component": "AuditBadge",
+        "parameterSource": "recordedEvents"
+      }
+    },
+    "last_event_at": {
+      "semantic_type": "audit.event.timestamp",
+      "token_mapping": "tokenMap(audit.event.timestamp)",
+      "ui_hints": {
+        "component": "TimelineTimestamp",
+        "timezoneParameter": "timezone"
+      }
+    },
+    "owner_id": {
+      "semantic_type": "ownership.owner.id",
+      "token_mapping": "tokenMap(ownership.owner.id)",
+      "ui_hints": {
+        "component": "OwnerReference",
+        "ownerTypeField": "owner_type"
+      }
+    },
+    "owner_type": {
+      "semantic_type": "ownership.owner.type",
+      "token_mapping": "tokenMap(ownership.owner.type)",
+      "ui_hints": {
+        "component": "OwnerTypeBadge",
+        "parameterSource": "ownerTypes"
+      }
+    },
+    "ownership_role": {
+      "semantic_type": "ownership.owner.role",
+      "token_mapping": "tokenMap(ownership.owner.role)",
+      "ui_hints": {
+        "component": "OwnerRolePill"
+      }
+    },
+    "ownership_transferred_at": {
+      "semantic_type": "ownership.owner.transferred_at",
+      "token_mapping": "tokenMap(ownership.owner.timestamp)",
+      "ui_hints": {
+        "component": "TimelineTimestamp"
+      }
+    },
+    "tags": {
+      "semantic_type": "taxonomy.tag.collection",
+      "token_mapping": "tokenMap(taxonomy.tag.*)",
+      "ui_hints": {
+        "component": "TagCollection",
+        "allowCreateParameter": "allowCustomTags",
+        "allowListParameter": "allowedTags",
+        "caseSensitiveParameter": "caseSensitive"
+      }
+    },
+    "tag_count": {
+      "semantic_type": "metric.collection.count",
+      "token_mapping": "tokenMap(taxonomy.tag.count)",
+      "ui_hints": {
+        "component": "MetricBadge",
+        "format": "integer"
+      }
+    },
+    "tag_metadata": {
+      "semantic_type": "taxonomy.tag.governance",
+      "token_mapping": "computed",
+      "ui_hints": {
+        "component": "TagGovernancePanel",
+        "description": "Admin panel for reviewing tag health, moderation queue, and synonym resolution."
+      }
+    },
+    "cancel_at_period_end": {
+      "semantic_type": "status.cancel.deferred",
+      "token_mapping": "tokenMap(status.cancel.*)",
+      "ui_hints": {
+        "component": "CancellationToggle",
+        "emphasizeWhenTrue": true
+      }
+    },
+    "cancellation_reason": {
+      "semantic_type": "status.cancel.reason",
+      "token_mapping": "tokenMap(status.cancel.reason)",
+      "ui_hints": {
+        "component": "CancellationReason",
+        "multiline": true,
+        "maxLength": 160
+      }
+    },
+    "cancellation_reason_code": {
+      "semantic_type": "status.cancel.reason_code",
+      "token_mapping": "tokenMap(status.cancel.code.*)",
+      "ui_hints": {
+        "component": "ReasonPicker",
+        "parameterSource": "allowedReasons"
+      }
+    },
+    "cancellation_requested_at": {
+      "semantic_type": "status.cancel.timestamp",
+      "token_mapping": "tokenMap(status.cancel.timestamp)",
+      "ui_hints": {
+        "component": "TimelineTimestamp"
+      }
+    },
+    "searchQuery": {
+      "semantic_type": "input.search.query",
+      "token_mapping": "tokenMap(search.input.*)",
+      "ui_hints": {
+        "component": "SearchInput",
+        "placeholderParameter": "placeholder",
+        "debounceParameter": "debounceMs"
+      }
+    },
+    "searchActive": {
+      "semantic_type": "state.search.active",
+      "token_mapping": "computed",
+      "ui_hints": {
+        "component": "SearchInput",
+        "description": "Drives visual active/inactive state of the search region."
+      }
+    },
+    "filters": {
+      "semantic_type": "input.filter.descriptors",
+      "token_mapping": "tokenMap(filter.panel.*)",
+      "ui_hints": {
+        "component": "FilterPanel",
+        "modeParameter": "filterMode"
+      }
+    },
+    "activeFilters": {
+      "semantic_type": "state.filter.active",
+      "token_mapping": "computed",
+      "ui_hints": {
+        "component": "FilterPanel",
+        "description": "Drives active filter chip display and clear actions."
+      }
+    },
+    "filterCount": {
+      "semantic_type": "metric.filter.count",
+      "token_mapping": "tokenMap(filter.badge.*)",
+      "ui_hints": {
+        "component": "MetricBadge",
+        "format": "integer"
+      }
+    },
+    "page": {
+      "semantic_type": "state.pagination.page",
+      "token_mapping": "computed",
+      "ui_hints": {
+        "component": "PaginationBar",
+        "description": "Current active page, drives page button highlight state."
+      }
+    },
+    "pageSize": {
+      "semantic_type": "state.pagination.pageSize",
+      "token_mapping": "computed",
+      "ui_hints": {
+        "component": "PaginationBar",
+        "defaultParameter": "defaultPageSize"
+      }
+    },
+    "totalItems": {
+      "semantic_type": "metric.pagination.totalItems",
+      "token_mapping": "tokenMap(pagination.info.*)",
+      "ui_hints": {
+        "component": "PaginationBar",
+        "format": "integer"
+      }
+    },
+    "totalPages": {
+      "semantic_type": "metric.pagination.totalPages",
+      "token_mapping": "computed",
+      "ui_hints": {
+        "component": "PaginationBar",
+        "description": "Computed from totalItems and pageSize."
+      }
+    },
+    "title": {
+      "semantic_type": "text.label",
+      "token_mapping": "tokenMap(text.label.*)"
+    },
+    "project_id": {
+      "semantic_type": "research.mission.project_id",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "mission_id": {
+      "semantic_type": "research.mission.mission_id",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "objective": {
+      "semantic_type": "research.mission.objective",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "success_criteria": {
+      "semantic_type": "research.mission.success_criteria",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "id": {
+      "semantic_type": "research.mission.id",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "project_name": {
+      "semantic_type": "research.mission.project_name",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "context": {
+      "semantic_type": "research.mission.context",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "deliverables": {
+      "semantic_type": "research.mission.deliverables",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "research_phases": {
+      "semantic_type": "research.mission.research_phases",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "metadata": {
+      "semantic_type": "research.mission.metadata",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "background": {
+      "semantic_type": "research.mission.background",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "focus": {
+      "semantic_type": "research.mission.focus",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "references": {
+      "semantic_type": "research.mission.references",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "required_entities": {
+      "semantic_type": "research.mission.required_entities",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "excluded_entities": {
+      "semantic_type": "research.mission.excluded_entities",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "expected_output_schema": {
+      "semantic_type": "research.mission.expected_output_schema",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "coverage_thresholds": {
+      "semantic_type": "research.mission.coverage_thresholds",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "validation_thresholds": {
+      "semantic_type": "research.mission.validation_thresholds",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "deliverable_format": {
+      "semantic_type": "research.mission.deliverable_format",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "max_loops": {
+      "semantic_type": "research.mission.max_loops",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "min_loops": {
+      "semantic_type": "research.mission.min_loops",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "constraints": {
+      "semantic_type": "research.mission.constraints",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "queued_at": {
+      "semantic_type": "research.mission.queued_at",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "started_at": {
+      "semantic_type": "research.mission.started_at",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "completed_at": {
+      "semantic_type": "research.mission.completed_at",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "deepsearch_job_id": {
+      "semantic_type": "research.mission.deepsearch_job_id",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "execution_metadata": {
+      "semantic_type": "research.mission.execution_metadata",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "result_document_ids": {
+      "semantic_type": "research.mission.result_document_ids",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "result_report_id": {
+      "semantic_type": "research.mission.result_report_id",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "result_markdown": {
+      "semantic_type": "research.mission.result_markdown",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "result_protocol": {
+      "semantic_type": "research.mission.result_protocol",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "error_message": {
+      "semantic_type": "research.mission.error_message",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "created_by": {
+      "semantic_type": "research.mission.created_by",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "progress_percent": {
+      "semantic_type": "research.mission.progress_percent",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "current_phase": {
+      "semantic_type": "research.mission.current_phase",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "deepsearch_attempt_count": {
+      "semantic_type": "research.mission.deepsearch_attempt_count",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "lease_expires_at": {
+      "semantic_type": "research.mission.lease_expires_at",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "materialization_pending": {
+      "semantic_type": "research.mission.materialization_pending",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "materialization_status": {
+      "semantic_type": "research.mission.materialization_status",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "materialization_attempt_count": {
+      "semantic_type": "research.mission.materialization_attempt_count",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "materialization_error": {
+      "semantic_type": "research.mission.materialization_error",
+      "token_mapping": "tokenMap(text.body.*)"
+    },
+    "search_ready": {
+      "semantic_type": "research.mission.search_ready",
+      "token_mapping": "tokenMap(text.body.*)"
+    }
+  },
+  "viewExtensions": {
+    "list": [
+      {
+        "component": "LabelCell",
+        "priority": 100,
+        "props": {
+          "field": "label",
+          "descriptionField": "description",
+          "truncate": true,
+          "maxLengthParameter": "maxLabelLength"
+        }
+      },
+      {
+        "component": "SearchInput",
+        "position": "header",
+        "priority": 10,
+        "props": {
+          "field": "searchQuery",
+          "placeholderParameter": "placeholder",
+          "debounceParameter": "debounceMs",
+          "minQueryLengthParameter": "minQueryLength",
+          "clearableParameter": "clearable"
+        }
+      },
+      {
+        "component": "PaginationBar",
+        "position": "footer",
+        "priority": 10,
+        "props": {
+          "pageField": "page",
+          "pageSizeField": "pageSize",
+          "totalItemsField": "totalItems",
+          "totalPagesField": "totalPages",
+          "pageSizeOptionsParameter": "pageSizeOptions",
+          "showPageSizeSelectorParameter": "showPageSizeSelector",
+          "showGotoPageParameter": "showGotoPage",
+          "showItemRangeParameter": "showItemRange"
+        }
+      },
+      {
+        "component": "FilterPanel",
+        "position": "sidebar",
+        "priority": 8,
+        "props": {
+          "field": "filters",
+          "activeField": "activeFilters",
+          "modeParameter": "filterMode",
+          "maxActiveParameter": "maxActiveFilters",
+          "collapsibleParameter": "collapsible"
+        }
+      },
+      {
+        "component": "StatusBadge",
+        "props": {
+          "field": "status",
+          "tone": "lifecycle"
+        }
+      },
+      {
+        "component": "RelativeTimestamp",
+        "props": {
+          "field": "updated_at",
+          "fallbackField": "created_at",
+          "timezoneParameter": "timezone"
+        }
+      },
+      {
+        "component": "OwnerBadge",
+        "props": {
+          "ownerIdField": "owner_id",
+          "ownerTypeField": "owner_type"
+        }
+      },
+      {
+        "component": "TagPills",
+        "props": {
+          "field": "tags",
+          "maxVisible": 3,
+          "overflowLabel": "+{{ tag_count }}"
+        }
+      }
+    ],
+    "detail": [
+      {
+        "component": "DetailHeader",
+        "position": "top",
+        "priority": 100,
+        "props": {
+          "titleField": "label",
+          "subtitleField": "description",
+          "headingLevel": 1
+        }
+      },
+      {
+        "component": "StatusTimeline",
+        "position": "top",
+        "priority": 40,
+        "props": {
+          "field": "status",
+          "historyField": "state_history",
+          "statesParameter": "states",
+          "showActorId": true,
+          "showReason": true
+        }
+      },
+      {
+        "component": "SearchInput",
+        "position": "header",
+        "priority": 10,
+        "props": {
+          "field": "searchQuery",
+          "placeholderParameter": "placeholder",
+          "clearableParameter": "clearable"
+        }
+      },
+      {
+        "component": "FilterPanel",
+        "position": "sidebar",
+        "priority": 8,
+        "props": {
+          "field": "filters",
+          "activeField": "activeFilters",
+          "modeParameter": "filterMode",
+          "collapsibleParameter": "collapsible"
+        }
+      },
+      {
+        "component": "AuditTimeline",
+        "position": "bottom",
+        "props": {
+          "createdField": "created_at",
+          "updatedField": "updated_at",
+          "eventField": "last_event",
+          "eventTimestampField": "last_event_at",
+          "eventOptionsParameter": "recordedEvents"
+        }
+      },
+      {
+        "component": "OwnershipSummary",
+        "position": "top",
+        "props": {
+          "ownerIdField": "owner_id",
+          "ownerTypeField": "owner_type",
+          "roleField": "ownership_role",
+          "transferredAtField": "ownership_transferred_at",
+          "allowTransferParameter": "allowTransfer"
+        }
+      },
+      {
+        "component": "TagSummary",
+        "position": "top",
+        "props": {
+          "field": "tags",
+          "countField": "tag_count"
+        }
+      },
+      {
+        "component": "CancellationEvent",
+        "position": "top",
+        "props": {
+          "title": "Cancellation",
+          "timestampField": "cancellation_requested_at",
+          "labelField": "cancellation_reason",
+          "codeField": "cancellation_reason_code"
+        }
+      }
+    ],
+    "form": [
+      {
+        "component": "FormLabelGroup",
+        "position": "before",
+        "priority": 100,
+        "props": {
+          "labelField": "label",
+          "descriptionField": "description",
+          "placeholderField": "placeholder",
+          "maxLabelLengthParameter": "maxLabelLength",
+          "maxDescriptionLengthParameter": "maxDescriptionLength",
+          "requireDescriptionParameter": "requireDescription"
+        }
+      },
+      {
+        "component": "StatusSelector",
+        "position": "top",
+        "props": {
+          "field": "status",
+          "optionsParameter": "states",
+          "initialParameter": "initialState",
+          "allowedTransitionsField": "allowed_transitions",
+          "requireReasonParameter": "requireTransitionReason"
+        }
+      },
+      {
+        "component": "TagInput",
+        "position": "top",
+        "props": {
+          "field": "tags",
+          "maxTagsParameter": "maxTags",
+          "allowCustomParameter": "allowCustomTags",
+          "allowListParameter": "allowedTags",
+          "minLengthParameter": "tagMinLength",
+          "maxLengthParameter": "tagMaxLength",
+          "synonymParameter": "synonymResolution"
+        }
+      },
+      {
+        "component": "CancellationForm",
+        "position": "top",
+        "props": {
+          "reasonField": "cancellation_reason",
+          "codeField": "cancellation_reason_code",
+          "requireReasonParameter": "requireReason",
+          "allowedReasonsParameter": "allowedReasons",
+          "windowParameter": "cancellationWindowHours"
+        }
+      }
+    ],
+    "card": [
+      {
+        "component": "CardHeader",
+        "position": "top",
+        "priority": 100,
+        "props": {
+          "titleField": "label",
+          "supportingField": "description"
+        }
+      },
+      {
+        "component": "StatusBadge",
+        "position": "before",
+        "props": {
+          "field": "status",
+          "variant": "subtle"
+        }
+      },
+      {
+        "component": "OwnershipMeta",
+        "position": "after",
+        "props": {
+          "ownerTypeField": "owner_type",
+          "roleField": "ownership_role"
+        }
+      },
+      {
+        "component": "TagSummary",
+        "position": "after",
+        "props": {
+          "field": "tags",
+          "countField": "tag_count"
+        }
+      },
+      {
+        "component": "CancellationBadge",
+        "position": "before",
+        "props": {
+          "field": "cancel_at_period_end"
+        }
+      }
+    ],
+    "timeline": [
+      {
+        "component": "TimelineEntryLabel",
+        "props": {
+          "field": "label",
+          "compact": true
+        }
+      },
+      {
+        "component": "StateTransitionEvent",
+        "props": {
+          "historyField": "state_history",
+          "labelField": "status",
+          "showActor": true,
+          "showReason": true
+        }
+      },
+      {
+        "component": "AuditEvent",
+        "props": {
+          "typeField": "last_event",
+          "timestampField": "last_event_at",
+          "timezoneParameter": "timezone"
+        }
+      },
+      {
+        "component": "CancellationEvent",
+        "props": {
+          "timestampField": "cancellation_requested_at",
+          "labelField": "cancellation_reason",
+          "codeField": "cancellation_reason_code"
+        }
+      }
+    ],
+    "inline": [
+      {
+        "component": "InlineLabel",
+        "props": {
+          "field": "label",
+          "maxLength": 40
+        }
+      }
+    ]
+  },
+  "tokens": {
+    "text.label.color": "var(--sys-text-strong)",
+    "text.label.font-weight": "var(--sys-font-weight-semibold)",
+    "text.label.font-size": "var(--sys-font-size-lg)",
+    "text.label.line-height": "var(--sys-line-height-tight)",
+    "text.body.color": "var(--sys-text-subtle)",
+    "text.body.font-weight": "var(--sys-font-weight-regular)",
+    "text.body.font-size": "var(--sys-font-size-sm)",
+    "text.body.line-height": "var(--sys-line-height-relaxed)",
+    "text.placeholder.color": "var(--sys-text-muted)",
+    "text.placeholder.font-weight": "var(--sys-font-weight-regular)",
+    "text.placeholder.font-size": "var(--sys-font-size-sm)",
+    "text.placeholder.line-height": "var(--sys-line-height-normal)",
+    "status.state.default.bg": "var(--status-neutral-bg)",
+    "status.state.default.text": "var(--status-neutral-text)",
+    "status.timeline.connector": "var(--border-subtle)",
+    "status.timeline.node.bg": "var(--sys-surface-raised)",
+    "status.timeline.node.border": "var(--sys-border-default)",
+    "status.timeline.actor.text": "var(--sys-text-secondary)",
+    "status.timeline.reason.text": "var(--sys-text-tertiary)",
+    "status.timeline.reason.bg": "var(--sys-surface-neutral)",
+    "audit.created.badge.text": "var(--text-subtle)",
+    "audit.updated.badge.text": "var(--text-subtle)",
+    "audit.event.badge.bg": "var(--surface-muted)",
+    "ownership.owner.badge.bg": "var(--surface-subtle)",
+    "ownership.owner.badge.text": "var(--text-default)",
+    "ownership.owner.role.text": "var(--text-muted)",
+    "taxonomy.tag.chip.bg": "var(--surface-tag-bg)",
+    "taxonomy.tag.chip.text": "var(--surface-tag-text)",
+    "taxonomy.tag.chip.border": "var(--sys-border-default)",
+    "taxonomy.tag.chip.hover.bg": "var(--sys-surface-hover)",
+    "taxonomy.tag.chip.pending.bg": "var(--sys-status-warning-surface)",
+    "taxonomy.tag.chip.pending.text": "var(--sys-status-warning-text)",
+    "taxonomy.tag.summary.count": "var(--text-subtle)",
+    "taxonomy.tag.input.border": "var(--sys-border-default)",
+    "taxonomy.tag.input.focus.border": "var(--sys-border-focus)",
+    "status.cancel.primary.bg": "var(--status-cancel-bg)",
+    "status.cancel.primary.text": "var(--status-cancel-text)",
+    "status.cancel.reason.text": "var(--text-default)",
+    "status.cancel.timestamp.text": "var(--text-subtle)",
+    "search.input.bg": "var(--sys-surface-default)",
+    "search.input.text": "var(--sys-text-primary)",
+    "search.input.placeholder": "var(--sys-text-subtle)",
+    "search.input.border": "var(--sys-border-default)",
+    "search.input.focus.border": "var(--sys-border-focus)",
+    "search.input.focus.ring": "var(--sys-focus-ring)",
+    "search.input.icon": "var(--sys-icon-subtle)",
+    "search.input.clear.hover": "var(--sys-surface-hover)",
+    "filter.panel.bg": "var(--sys-surface-secondary)",
+    "filter.panel.border": "var(--sys-border-default)",
+    "filter.panel.header.text": "var(--sys-text-primary)",
+    "filter.panel.section.divider": "var(--sys-border-subtle)",
+    "filter.chip.bg": "var(--sys-surface-accent)",
+    "filter.chip.text": "var(--sys-text-on-accent)",
+    "filter.chip.remove.hover": "var(--sys-surface-hover)",
+    "filter.badge.bg": "var(--sys-surface-accent)",
+    "filter.badge.text": "var(--sys-text-on-accent)",
+    "filter.apply.bg": "var(--sys-action-primary)",
+    "filter.apply.text": "var(--sys-text-on-action)",
+    "filter.clear.text": "var(--sys-text-subtle)",
+    "pagination.bar.bg": "var(--sys-surface-secondary)",
+    "pagination.bar.border": "var(--sys-border-default)",
+    "pagination.button.bg": "var(--sys-surface-default)",
+    "pagination.button.text": "var(--sys-text-primary)",
+    "pagination.button.hover.bg": "var(--sys-surface-hover)",
+    "pagination.button.active.bg": "var(--sys-surface-accent)",
+    "pagination.button.active.text": "var(--sys-text-on-accent)",
+    "pagination.button.disabled.text": "var(--sys-text-disabled)",
+    "pagination.info.text": "var(--sys-text-subtle)",
+    "pagination.selector.border": "var(--sys-border-default)"
+  },
+  "warnings": [
+    "Field collision: \"tags\" in object schema overrides trait definition",
+    "Field collision: \"status\" in object schema overrides trait definition",
+    "Field collision: \"created_at\" in object schema overrides trait definition",
+    "Field collision: \"updated_at\" in object schema overrides trait definition",
+    "Field collision: \"label\" in object schema overrides trait definition",
+    "Field collision: \"description\" in object schema overrides trait definition",
+    "Field collision: \"owner_id\" in object schema overrides trait definition",
+    "Field collision: \"owner_type\" in object schema overrides trait definition",
+    "Field collision: \"last_event\" in object schema overrides trait definition",
+    "Field collision: \"cancel_at_period_end\" in object schema overrides trait definition"
+  ],
+  "filePath": "/private/tmp/tracelab-ux1-forge/objects/research/Mission.object.yaml"
+}

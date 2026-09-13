@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "framework": "react",
+  "files": [
+    {
+      "path": "src/GeneratedUI.tsx",
+      "contents": "import React from 'react';\nimport { Button, InlineLabel, Input, PaginationBar, SearchInput, Stack } from '@oods/components-react';\nimport '@oods/component-styles/css';\n\nexport interface PageProps {\n  /** Chunk index. */\n  chunkIndex: number;\n  /** Content. */\n  content: string;\n  /** Created at. */\n  createdAt: string;\n  /** Supporting description used in detail and card contexts. */\n  description?: string;\n  /** Document id. */\n  documentId: string;\n  /** Embedding id. */\n  embeddingId?: string;\n  /** End char. */\n  endChar?: number;\n  /** Id. */\n  id: string;\n  /** Display projection of content; retain the complete source field. */\n  label: string;\n  /** Next chunk id. */\n  nextChunkId?: string;\n  /** Hint copy surfaced in form fields when the label is empty. */\n  placeholder?: string;\n  /** Prev chunk id. */\n  prevChunkId?: string;\n  /** Start char. */\n  startChar?: number;\n  /** Token count. */\n  tokenCount?: number;\n}\n\ntype ButtonProps = React.ComponentPropsWithoutRef<typeof Button>;\ntype InlineLabelProps = React.ComponentPropsWithoutRef<typeof InlineLabel>;\ntype InputProps = React.ComponentPropsWithoutRef<typeof Input>;\ntype PaginationBarProps = React.ComponentPropsWithoutRef<typeof PaginationBar>;\ntype SearchInputProps = React.ComponentPropsWithoutRef<typeof SearchInput>;\ntype StackProps = React.ComponentPropsWithoutRef<typeof Stack>;\n\nexport const GeneratedUI: React.FC<PageProps> = ({ chunkIndex, content, createdAt, description, documentId, embeddingId, endChar, id, label, nextChunkId, placeholder, prevChunkId, startChar, tokenCount }) => {\n  const [handleChange_chunk_indexState, setHandleChange_chunk_indexState] = React.useState<string>(String(chunkIndex ?? ''));\n  /* @oods-local-binding handleChange_chunk_index */ const handleChange_chunk_index = (event: React.ChangeEvent<HTMLInputElement>) => { setHandleChange_chunk_indexState(event.currentTarget.value); };\n  const [handleUpdate_embedding_idState, setHandleUpdate_embedding_idState] = React.useState<string>(String(embeddingId ?? ''));\n  /* @oods-local-binding handleUpdate_embedding_id */ const handleUpdate_embedding_id = (value: string) => { setHandleUpdate_embedding_idState(value); };\n\n  return (\n    <>\n      <Stack id=\"screen-list-9\" data-oods-component=\"Stack\" data-layout=\"stack\" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ref-space-cluster-default)' }}>\n            <Stack id=\"list-toolbar-4\" data-oods-component=\"Stack\" data-layout=\"inline\" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: 'var(--ref-space-inset-default)' }}>\n                    <SearchInput id=\"slot-search-1\" data-oods-component=\"SearchInput\" label=\"Embedding id\" placeholder=\"Enter embedding id\" value={handleUpdate_embedding_idState} onUpdate={handleUpdate_embedding_id} />\n                    <Input id=\"slot-filters-2\" data-oods-component=\"Input\" label=\"Chunk index\" placeholder=\"Enter chunk index\" required type=\"number\" value={handleChange_chunk_indexState} onChange={handleChange_chunk_index} />\n                    <Button id=\"slot-toolbar-actions-3\" data-oods-component=\"Button\" />\n                  </Stack>\n            <Stack id=\"list-items-5\" data-oods-component=\"Stack\" data-layout=\"stack\" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ref-space-cluster-tight)' }}>\n                    <InlineLabel id=\"slot-items-6\" data-oods-component=\"InlineLabel\" maxLength={40} label={label} />\n                  </Stack>\n            <Stack id=\"list-pagination-7\" data-oods-component=\"Stack\" data-layout=\"inline\" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', padding: 'var(--ref-space-inset-default)' }}>\n                    <PaginationBar id=\"slot-pagination-8\" data-oods-component=\"PaginationBar\" />\n                  </Stack>\n          </Stack>\n    </>\n  );\n};\n",
+      "contentHash": "sha256:ec83c7ac27d1f9c6be5a8ee0dc6e6c530f0a235d83c35d05c3fc5206867d9d42"
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "@oods/component-styles",
+      "version": "0.1.0",
+      "kind": "dependency"
+    },
+    {
+      "name": "@oods/components-react",
+      "version": "0.1.0",
+      "kind": "dependency"
+    },
+    {
+      "name": "react",
+      "version": "19.2.0",
+      "kind": "peerDependency"
+    },
+    {
+      "name": "react-dom",
+      "version": "19.2.0",
+      "kind": "peerDependency"
+    }
+  ],
+  "actions": [],
+  "contentHash": "sha256:f562cb6450e3cba0a8c8fa53a530654f24886b0dc889653687a87af00434996e"
+}

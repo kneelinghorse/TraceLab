@@ -1,0 +1,317 @@
+{
+  "tool": "schema(action=list)",
+  "totalSavedSchemas": 36,
+  "existingSchemaMetadataUnchanged": true,
+  "schemas": [
+    {
+      "name": "tracelab-evidence-timeline-v1",
+      "schemaRef": "compose-47f9edd0",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.340Z",
+      "updatedAt": "2026-09-12T23:38:44.818Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "timeline"
+      ],
+      "object": "Evidence",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-evidence-detail-v1",
+      "schemaRef": "compose-78119b44",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.312Z",
+      "updatedAt": "2026-09-12T23:38:44.806Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "detail"
+      ],
+      "object": "Evidence",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-evidence-list-v1",
+      "schemaRef": "compose-3d987cee",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.276Z",
+      "updatedAt": "2026-09-12T23:38:44.794Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "list"
+      ],
+      "object": "Evidence",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-report-timeline-v1",
+      "schemaRef": "compose-77eaa4fa",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.253Z",
+      "updatedAt": "2026-09-12T23:38:44.782Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "timeline"
+      ],
+      "object": "Report",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-report-detail-v1",
+      "schemaRef": "compose-00bf5286",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.241Z",
+      "updatedAt": "2026-09-12T23:38:44.769Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "detail"
+      ],
+      "object": "Report",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-report-list-v1",
+      "schemaRef": "compose-e1c6f0f4",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.226Z",
+      "updatedAt": "2026-09-12T23:38:44.757Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "list"
+      ],
+      "object": "Report",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-mission-workflow-v1",
+      "schemaRef": "compose-c95c87c9",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.206Z",
+      "updatedAt": "2026-09-12T23:38:44.742Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "workflow"
+      ],
+      "object": "Mission",
+      "context": "timeline",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-mission-timeline-v1",
+      "schemaRef": "compose-e2f1f3e6",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.155Z",
+      "updatedAt": "2026-09-12T23:38:44.693Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "timeline"
+      ],
+      "object": "Mission",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-mission-detail-v1",
+      "schemaRef": "compose-770957aa",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.141Z",
+      "updatedAt": "2026-09-12T23:38:44.681Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "detail"
+      ],
+      "object": "Mission",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-mission-list-v1",
+      "schemaRef": "compose-dfed40fa",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.124Z",
+      "updatedAt": "2026-09-12T23:38:44.666Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "list"
+      ],
+      "object": "Mission",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-collection-timeline-v1",
+      "schemaRef": "compose-4cf61a4d",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.109Z",
+      "updatedAt": "2026-09-12T23:38:44.652Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "timeline"
+      ],
+      "object": "Collection",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-collection-detail-v1",
+      "schemaRef": "compose-44cf9d3a",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.095Z",
+      "updatedAt": "2026-09-12T23:38:44.641Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "detail"
+      ],
+      "object": "Collection",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-collection-list-v1",
+      "schemaRef": "compose-473c2196",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.076Z",
+      "updatedAt": "2026-09-12T23:38:44.628Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "list"
+      ],
+      "object": "Collection",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-chunk-inline-v1",
+      "schemaRef": "compose-e3c1f90c",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.063Z",
+      "updatedAt": "2026-09-12T23:38:44.615Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "inline"
+      ],
+      "object": "Chunk",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-document-timeline-v1",
+      "schemaRef": "compose-5097771b",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.050Z",
+      "updatedAt": "2026-09-12T23:38:44.598Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "timeline"
+      ],
+      "object": "Document",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-document-detail-v1",
+      "schemaRef": "compose-4c990592",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.038Z",
+      "updatedAt": "2026-09-12T23:38:44.584Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "detail"
+      ],
+      "object": "Document",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-document-list-v1",
+      "schemaRef": "compose-7c80ce07",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:15.015Z",
+      "updatedAt": "2026-09-12T23:38:44.569Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "list"
+      ],
+      "object": "Document",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-project-timeline-v1",
+      "schemaRef": "compose-19e9e2b8",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:14.989Z",
+      "updatedAt": "2026-09-12T23:38:44.556Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "timeline"
+      ],
+      "object": "Project",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-project-detail-v1",
+      "schemaRef": "compose-f16ce601",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:14.971Z",
+      "updatedAt": "2026-09-12T23:38:44.541Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "detail"
+      ],
+      "object": "Project",
+      "author": "TraceLab UX-1"
+    },
+    {
+      "name": "tracelab-project-list-v1",
+      "schemaRef": "compose-66573bb7",
+      "version": 2,
+      "createdAt": "2026-09-12T23:09:14.936Z",
+      "updatedAt": "2026-09-12T23:38:44.517Z",
+      "tags": [
+        "tracelab",
+        "research",
+        "ux-1",
+        "list"
+      ],
+      "object": "Project",
+      "author": "TraceLab UX-1"
+    }
+  ],
+  "sourceWorkspaceHead": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+  "storeDir": "/Users/systemsystems/portfolio/Design-Tools/OODS-Forge/packages/mcp-server/.oods/schemas",
+  "registryActivation": "pending",
+  "initialPersistence": {
+    "version": 1,
+    "implementationHead": "20e2539695c69a08e47c5ff6d5f568cb23f8af27",
+    "receiptCommit": "93ccc76"
+  },
+  "refreshReason": "Canonical collection IDs and declared enum filter fields now match generated workflow execution."
+}

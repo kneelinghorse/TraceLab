@@ -1,0 +1,33 @@
+- banner:
+  - heading "Consumer label" [level=1]
+  - text: Consumer description
+- log "Status Timeline":
+  - heading "Status Timeline" [level=3]
+  - paragraph: "Current status: Pending"
+  - list:
+    - listitem: No events
+- search "Search Query":
+  - text: Search Query
+  - searchbox "Search Query": Consumer searchQuery
+  - button "Clear search": ×
+- heading "Ownership Summary" [level=3]
+- term: Owner ID
+- definition: consumer-owner-id
+- term: Owner Type
+- definition: user
+- term: Role
+- definition: Consumer ownership role
+- tablist "Record details":
+  - tab "Details" [selected]
+- tabpanel "Details":
+  - log "Status Timeline":
+    - heading "Status Timeline" [level=3]
+    - text: pending
+  - text: "0"
+- complementary:
+  - heading "Classification" [level=3]
+  - region "Filters"
+- group "Screen actions":
+  - button "Delete"
+  - button "Edit"
+  - button "View timeline"
