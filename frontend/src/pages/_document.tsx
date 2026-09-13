@@ -4,7 +4,7 @@ import { themeBootstrapScript } from "@/lib/theme";
 
 export default function Document() {
   return (
-    <Html lang="en" data-brand="A" data-theme="light" suppressHydrationWarning>
+    <Html lang="en" data-brand="A" suppressHydrationWarning>
       <Head>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
       </Head>

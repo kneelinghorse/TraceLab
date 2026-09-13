@@ -112,7 +112,7 @@ export default function DocumentDetailPage() {
 
   return (
     <AuthGate>
-      <div className="min-h-screen bg-background dark:bg-background">
+      <div className="min-h-screen bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {actionError && !deleteOpen && <p role="alert" className="mb-4 break-words rounded bg-danger-surface p-4 text-danger">{actionError}</p>}
           <Dialog open={deleteOpen} title="Delete document" onClose={() => { if (!deleting) setDeleteOpen(false); }}>
@@ -123,7 +123,7 @@ export default function DocumentDetailPage() {
           {/* Back Link */}
           <Link
             href="/documents"
-            className="text-accent-text dark:text-accent-text underline underline-offset-4 mb-4 inline-block"
+            className="text-accent-text underline underline-offset-4 mb-4 inline-block"
           >
             ← Back to Documents
           </Link>
@@ -131,8 +131,8 @@ export default function DocumentDetailPage() {
           <EvidencePanel projectId={document.project_id} filters={{ document_id: document.id }} />
 
           {/* Header */}
-          <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6 mb-6">
-            <h1 className="text-2xl font-bold text-foreground dark:text-foreground mb-4">
+          <div className="bg-surface rounded-lg border border-line p-6 mb-6">
+            <h1 className="text-2xl font-bold text-foreground mb-4">
               {document.name}
             </h1>
 
@@ -140,27 +140,27 @@ export default function DocumentDetailPage() {
             {document.chunked && (document.chunk_count || document.word_count || document.total_tokens) && (
               <div className="mb-6 flex flex-wrap gap-4">
                 {document.chunk_count !== undefined && document.chunk_count > 0 && (
-                  <div className="bg-info-surface dark:bg-info-surface border border-info-line dark:border-info-line rounded-lg px-4 py-3">
-                    <div className="text-2xl font-bold text-accent-text dark:text-accent-text">
+                  <div className="bg-info-surface border border-info-line rounded-lg px-4 py-3">
+                    <div className="text-2xl font-bold text-accent-text">
                       {document.chunk_count}
                     </div>
-                    <div className="text-sm text-accent-text dark:text-accent-text">Chunks</div>
+                    <div className="text-sm text-accent-text">Chunks</div>
                   </div>
                 )}
                 {document.word_count !== undefined && document.word_count > 0 && (
-                  <div className="bg-success-surface dark:bg-success-surface border border-success-line dark:border-success-line rounded-lg px-4 py-3">
-                    <div className="text-2xl font-bold text-success dark:text-success">
+                  <div className="bg-success-surface border border-success-line rounded-lg px-4 py-3">
+                    <div className="text-2xl font-bold text-success">
                       {document.word_count.toLocaleString()}
                     </div>
-                    <div className="text-sm text-success dark:text-success">Words</div>
+                    <div className="text-sm text-success">Words</div>
                   </div>
                 )}
                 {document.total_tokens !== undefined && document.total_tokens > 0 && (
-                  <div className="bg-info-surface dark:bg-info-surface border border-info-line dark:border-info-line rounded-lg px-4 py-3">
-                    <div className="text-2xl font-bold text-accent-text dark:text-accent-text">
+                  <div className="bg-info-surface border border-info-line rounded-lg px-4 py-3">
+                    <div className="text-2xl font-bold text-accent-text">
                       {document.total_tokens.toLocaleString()}
                     </div>
-                    <div className="text-sm text-accent-text dark:text-accent-text">Tokens</div>
+                    <div className="text-sm text-accent-text">Tokens</div>
                   </div>
                 )}
               </div>
@@ -168,11 +168,11 @@ export default function DocumentDetailPage() {
 
             {/* Content Preview */}
             {document.preview && (
-              <div className="mb-6 bg-background dark:bg-surface-alt rounded-lg p-4">
-                <h3 className="text-sm font-medium text-foreground dark:text-foreground mb-2">
+              <div className="mb-6 bg-background rounded-lg p-4">
+                <h3 className="text-sm font-medium text-foreground mb-2">
                   Content Preview
                 </h3>
-                <p className="text-sm text-secondary dark:text-secondary whitespace-pre-wrap">
+                <p className="text-sm text-secondary whitespace-pre-wrap">
                   {document.preview}
                 </p>
               </div>
@@ -181,31 +181,31 @@ export default function DocumentDetailPage() {
             {/* Metadata */}
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-muted dark:text-muted">File Type:</span>
-                <span className="ml-2 text-foreground dark:text-foreground">
+                <span className="text-muted">File Type:</span>
+                <span className="ml-2 text-foreground">
                   {document.file_type || document.mime_type || "Unknown"}
                 </span>
               </div>
               {document.file_size && (
                 <div>
-                  <span className="text-muted dark:text-muted">File Size:</span>
-                  <span className="ml-2 text-foreground dark:text-foreground">
+                  <span className="text-muted">File Size:</span>
+                  <span className="ml-2 text-foreground">
                     {(document.file_size / 1024).toFixed(2)} KB
                   </span>
                 </div>
               )}
               {document.uploaded_at && (
                 <div>
-                  <span className="text-muted dark:text-muted">Uploaded:</span>
-                  <span className="ml-2 text-foreground dark:text-foreground">
+                  <span className="text-muted">Uploaded:</span>
+                  <span className="ml-2 text-foreground">
                     {formatDistanceToNow(new Date(document.uploaded_at), { addSuffix: true })}
                   </span>
                 </div>
               )}
               {document.source_type && (
                 <div>
-                  <span className="text-muted dark:text-muted">Source:</span>
-                  <span className="ml-2 text-foreground dark:text-foreground">
+                  <span className="text-muted">Source:</span>
+                  <span className="ml-2 text-foreground">
                     {document.source_type}
                   </span>
                 </div>
@@ -214,7 +214,7 @@ export default function DocumentDetailPage() {
 
             {/* Processing Status */}
             <div className="mt-6">
-              <h3 className="text-sm font-medium text-foreground dark:text-foreground mb-3">
+              <h3 className="text-sm font-medium text-foreground mb-3">
                 Processing Status
               </h3>
               <div className="space-y-2">
@@ -224,9 +224,9 @@ export default function DocumentDetailPage() {
               </div>
               {document.validation_status && (
                 <div className="mt-4">
-                  <span className="text-sm text-muted dark:text-muted">Validation Status: </span>
+                  <span className="text-sm text-muted">Validation Status: </span>
                   <span className={`text-sm font-medium ${
-                    document.validation_status === "completed" ? "text-success dark:text-success" : "text-warning dark:text-warning"
+                    document.validation_status === "completed" ? "text-success" : "text-warning"
                   }`}>
                     {document.validation_status}
                   </span>
@@ -254,7 +254,7 @@ export default function DocumentDetailPage() {
               )}
               <button
                 onClick={() => { setActionError(null); setDeleteOpen(true); }}
-                className="px-4 py-2 border border-danger-line text-danger dark:text-danger rounded-lg hover:bg-danger-surface dark:hover:bg-surface-alt transition-colors"
+                className="px-4 py-2 border border-danger-line text-danger rounded-lg hover:bg-danger-surface transition-colors"
               >
                 Delete Document
               </button>
@@ -263,8 +263,8 @@ export default function DocumentDetailPage() {
 
           {/* Processing Events */}
           {document.processing_events && document.processing_events.length > 0 && (
-            <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6 mb-6">
-              <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
+            <div className="bg-surface rounded-lg border border-line p-6 mb-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4">
                 Processing History
               </h2>
               <div className="space-y-3">
@@ -274,23 +274,23 @@ export default function DocumentDetailPage() {
                     className="border-l-4 border-info-line pl-4 py-2"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-foreground dark:text-foreground">
+                      <span className="font-medium text-foreground">
                         {event.stage}
                       </span>
                       <span className={`text-sm ${
-                        event.status === "succeeded" ? "text-success dark:text-success" :
-                        event.status === "failed" ? "text-danger dark:text-danger" :
-                        "text-warning dark:text-warning"
+                        event.status === "succeeded" ? "text-success" :
+                        event.status === "failed" ? "text-danger" :
+                        "text-warning"
                       }`}>
                         {event.status}
                       </span>
                     </div>
                     {event.message && (
-                      <p className="text-sm text-secondary dark:text-muted mt-1">
+                      <p className="text-sm text-secondary mt-1">
                         {event.message}
                       </p>
                     )}
-                    <p className="text-xs text-muted dark:text-muted mt-1">
+                    <p className="text-xs text-muted mt-1">
                       {formatDistanceToNow(new Date(event.created_at), { addSuffix: true })}
                     </p>
                   </div>
@@ -301,18 +301,18 @@ export default function DocumentDetailPage() {
 
           {/* Document Chunks */}
           {document.chunked && (
-            <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
-              <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
+            <div className="bg-surface rounded-lg border border-line p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4">
                 Document Chunks
                 {chunksResponse && (
-                  <span className="ml-2 text-sm font-normal text-muted dark:text-muted">
+                  <span className="ml-2 text-sm font-normal text-muted">
                     ({chunksResponse.pagination.total} total)
                   </span>
                 )}
               </h2>
 
               {chunksLoading && (
-                <p className="text-muted dark:text-muted">Loading chunks...</p>
+                <p className="text-muted">Loading chunks...</p>
               )}
 
               {chunksResponse && chunksResponse.data.length > 0 && (
@@ -321,18 +321,18 @@ export default function DocumentDetailPage() {
                     {chunksResponse.data.map((chunk) => (
                       <div
                         key={chunk.id}
-                        className="border border-line dark:border-line-strong rounded-lg overflow-hidden"
+                        className="border border-line rounded-lg overflow-hidden"
                       >
-                        <div className="px-4 py-3 flex items-center justify-between bg-background dark:bg-surface-alt">
+                        <div className="px-4 py-3 flex items-center justify-between bg-background">
                           <button
                             onClick={() => toggleChunk(chunk.id)}
-                            className="flex items-center gap-4 hover:text-accent-text dark:hover:text-accent-text transition-colors"
+                            className="flex items-center gap-4 hover:text-accent-text transition-colors"
                           >
-                            <span className="font-mono text-sm text-accent-text dark:text-accent-text">
+                            <span className="font-mono text-sm text-accent-text">
                               #{chunk.chunk_index}
                             </span>
                             {chunk.token_count && (
-                              <span className="text-xs text-muted dark:text-muted bg-surface-alt dark:bg-surface-alt px-2 py-0.5 rounded">
+                              <span className="text-xs text-muted bg-surface-alt px-2 py-0.5 rounded">
                                 {chunk.token_count} tokens
                               </span>
                             )}
@@ -343,8 +343,8 @@ export default function DocumentDetailPage() {
                           <AddToCollection chunkId={chunk.id} variant="compact" />
                         </div>
                         {expandedChunks.has(chunk.id) && (
-                          <div className="px-4 py-3 bg-surface dark:bg-surface">
-                            <pre className="text-sm text-secondary dark:text-secondary whitespace-pre-wrap font-mono overflow-x-auto">
+                          <div className="px-4 py-3 bg-surface">
+                            <pre className="text-sm text-secondary whitespace-pre-wrap font-mono overflow-x-auto">
                               {chunk.content}
                             </pre>
                           </div>
@@ -359,7 +359,7 @@ export default function DocumentDetailPage() {
               )}
 
               {chunksResponse && chunksResponse.data.length === 0 && (
-                <p className="text-muted dark:text-muted">No chunks available.</p>
+                <p className="text-muted">No chunks available.</p>
               )}
             </div>
           )}
@@ -373,10 +373,10 @@ function StatusRow({ label, status }: { label: string; status: boolean }) {
   return (
     <div className="flex items-center gap-3">
       <div className={`w-4 h-4 rounded-full ${
-        status ? "bg-success" : "bg-surface-alt dark:bg-surface-alt"
+        status ? "bg-success" : "bg-surface-alt"
       }`} />
-      <span className="text-sm text-foreground dark:text-foreground">{label}</span>
-      <span className="text-sm text-muted dark:text-muted">
+      <span className="text-sm text-foreground">{label}</span>
+      <span className="text-sm text-muted">
         {status ? "Complete" : "Pending"}
       </span>
     </div>

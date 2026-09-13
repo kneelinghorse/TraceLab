@@ -11,33 +11,33 @@ interface RunningMissionCardProps {
 
 export function RunningMissionCard({ mission }: RunningMissionCardProps) {
   return (
-    <div className="bg-surface dark:bg-surface border-2 border-info-line dark:border-info-line rounded-xl p-6 shadow-sm">
+    <div className="bg-surface border-2 border-info-line rounded-xl p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="relative flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
             <span className="relative inline-flex rounded-full h-3 w-3 bg-accent" />
           </span>
-          <span className="text-sm font-semibold text-accent-text dark:text-accent-text uppercase tracking-wide">
+          <span className="text-sm font-semibold text-accent-text uppercase tracking-wide">
             Running
           </span>
         </div>
         <Link
           href={`/missions/${mission.id}`}
-          className="text-sm text-muted dark:text-muted hover:text-accent-text dark:hover:text-accent-text transition-colors"
+          className="text-sm text-muted hover:text-accent-text transition-colors"
         >
           View Details
         </Link>
       </div>
 
-      <h2 className="text-xl font-bold text-foreground dark:text-foreground mb-1">
+      <h2 className="text-xl font-bold text-foreground mb-1">
         {mission.title}
       </h2>
-      <p className="text-sm font-mono text-muted dark:text-muted mb-4">
+      <p className="text-sm font-mono text-muted mb-4">
         {mission.mission_id}
       </p>
 
-      <p className="text-secondary dark:text-secondary text-sm mb-6 line-clamp-2">
+      <p className="text-secondary text-sm mb-6 line-clamp-2">
         {mission.objective}
       </p>
 
@@ -48,7 +48,7 @@ export function RunningMissionCard({ mission }: RunningMissionCardProps) {
       />
 
       {mission.started_at && (
-        <p className="mt-4 text-xs text-muted dark:text-muted">
+        <p className="mt-4 text-xs text-muted">
           Started {formatDistanceToNow(new Date(mission.started_at), { addSuffix: true })}
         </p>
       )}
@@ -70,36 +70,36 @@ export function QueuedMissionCard({
   onCancel,
 }: QueuedMissionCardProps) {
   return (
-    <div className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-4 hover:border-warning-line dark:hover:border-warning-line transition-colors">
+    <div className="bg-surface border border-line rounded-lg p-4 hover:border-warning-line transition-colors">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-warning-surface dark:bg-warning-surface flex items-center justify-center">
-            <span className="text-lg font-bold text-warning dark:text-warning">
+          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-warning-surface flex items-center justify-center">
+            <span className="text-lg font-bold text-warning">
               {position}
             </span>
           </div>
           <div className="min-w-0">
             <Link
               href={`/missions/${mission.id}`}
-              className="font-semibold text-foreground dark:text-foreground hover:text-accent-text dark:hover:text-accent-text transition-colors truncate block"
+              className="font-semibold text-foreground hover:text-accent-text transition-colors truncate block"
             >
               {mission.title}
             </Link>
-            <p className="text-xs font-mono text-muted dark:text-muted">
+            <p className="text-xs font-mono text-muted">
               {mission.mission_id}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {estimatedWait && (
-            <span className="text-xs text-muted dark:text-muted">
+            <span className="text-xs text-muted">
               ~{estimatedWait}
             </span>
           )}
           {onCancel && (
             <button
               onClick={() => onCancel(mission.id)}
-              className="text-xs text-danger dark:text-danger hover:text-danger dark:hover:text-danger transition-colors px-2 py-1 rounded hover:bg-danger-surface dark:hover:bg-danger-surface"
+              className="text-xs text-danger hover:text-danger transition-colors px-2 py-1 rounded hover:bg-danger-surface"
             >
               Cancel
             </button>
@@ -107,12 +107,12 @@ export function QueuedMissionCard({
         </div>
       </div>
 
-      <p className="mt-2 text-sm text-secondary dark:text-secondary line-clamp-1 pl-13">
+      <p className="mt-2 text-sm text-secondary line-clamp-1 pl-13">
         {mission.objective}
       </p>
 
       {mission.queued_at && (
-        <p className="mt-2 text-xs text-muted dark:text-muted pl-13">
+        <p className="mt-2 text-xs text-muted pl-13">
           Queued {formatDistanceToNow(new Date(mission.queued_at), { addSuffix: true })}
         </p>
       )}
@@ -122,8 +122,8 @@ export function QueuedMissionCard({
 
 export function EmptyQueueState() {
   return (
-    <div className="bg-surface dark:bg-surface border border-line dark:border-line rounded-xl p-12 text-center">
-      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-surface dark:bg-surface-alt flex items-center justify-center">
+    <div className="bg-surface border border-line rounded-xl p-12 text-center">
+      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-surface flex items-center justify-center">
         <svg
           className="w-8 h-8 text-muted"
           fill="none"
@@ -138,10 +138,10 @@ export function EmptyQueueState() {
           />
         </svg>
       </div>
-      <h3 className="text-lg font-semibold text-foreground dark:text-foreground mb-2">
+      <h3 className="text-lg font-semibold text-foreground mb-2">
         No Active Missions
       </h3>
-      <p className="text-muted dark:text-muted max-w-sm mx-auto">
+      <p className="text-muted max-w-sm mx-auto">
         There are no missions currently running or waiting in the queue.
         Create a new mission to get started.
       </p>
@@ -162,7 +162,7 @@ interface RefreshIndicatorProps {
 
 export function RefreshIndicator({ lastRefresh, isRefreshing }: RefreshIndicatorProps) {
   return (
-    <div className="flex items-center gap-2 text-xs text-muted dark:text-muted">
+    <div className="flex items-center gap-2 text-xs text-muted">
       {isRefreshing ? (
         <>
           <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">

@@ -27,10 +27,10 @@ const routes=['/','/projects',`/projects/${ids.project}`,'/documents',`/document
 const selected=process.env.UI_ROUTE?[process.env.UI_ROUTE]:process.env.UI_PROBE?['/missions','/search','/settings','/admin/users','/evidence']:routes;
 browser=await chromium.launch({headless:true});
 const results=[];
-for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'])) {
+for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark','hc'])) {
  for (const width of (process.env.UI_WIDTH?[Number(process.env.UI_WIDTH)]:[1440,390])) {
   let transportErrors=[]; let navigationCancellations=[];
-  const context=await browser.newContext({viewport:{width,height:1000},colorScheme:theme});
+  const context=await browser.newContext({viewport:{width,height:1000},colorScheme:theme === 'dark' ? 'dark' : 'light'});
   await context.route(/https?:\/\/(api\.tracelab\.aquex\.ai|localhost:8000|127\.0\.0\.1:8103)\/.*/, async route => {
     const incoming = new URL(route.request().url());
     try {
@@ -74,6 +74,12 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
      overflow:[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width>0&&(r.right>innerWidth+1||r.left < -1)&&getComputedStyle(e).visibility!=='hidden'&&e.getClientRects().length}).slice(0,15).map(e=>({tag:e.tagName,class:e.className,text:e.textContent?.slice(0,45)})),
      violations:axe.violations.filter(v=>rules.includes(v.id)||['critical','serious'].includes(v.impact)).map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>({target:n.target,html:n.html.slice(0,400),summary:n.failureSummary}))}))};
    });
+   // Settings contains live invite codes and key prefixes. Preserve selectors
+   // and contrast measurements, but never retain its literal HTML or text.
+   if (page.url().includes('/settings')) {
+     for (const violation of measured.violations) for (const node of violation.nodes) node.html = '[settings content omitted]';
+     for (const node of measured.overflow) node.text = '[settings content omitted]';
+   }
    const shot=`${theme}-${width}-${slug}.png`;
    await page.screenshot({path:path.join(out,shot),fullPage:true, mask:page.url().includes('/settings')?[page.locator('code')]:[]});
    const result={route,themeRequested:theme,theme,width,status:response.status(),finalUrl:page.url(),...measured,errors,transportErrors:[...transportErrors],navigationCancellations:[...navigationCancellations],screenshot:shot};

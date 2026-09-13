@@ -83,7 +83,7 @@ function MissionQueueContent() {
   const hasActiveMissions = inProgressMissions.length > 0 || sortedQueuedMissions.length > 0;
 
   return (
-    <div className="min-h-screen bg-background dark:bg-background">
+    <div className="min-h-screen bg-background">
       {feedback}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
@@ -92,19 +92,19 @@ function MissionQueueContent() {
             <div className="flex items-center gap-3 mb-1">
               <Link
                 href="/missions"
-                className="text-sm text-muted dark:text-muted hover:text-secondary dark:hover:text-secondary transition-colors"
+                className="text-sm text-muted hover:text-secondary transition-colors"
               >
                 Missions
               </Link>
-              <span className="text-secondary dark:text-secondary">/</span>
-              <span className="text-sm font-medium text-foreground dark:text-foreground">
+              <span className="text-secondary">/</span>
+              <span className="text-sm font-medium text-foreground">
                 Queue
               </span>
             </div>
-            <h1 className="text-3xl font-bold text-foreground dark:text-foreground">
+            <h1 className="text-3xl font-bold text-foreground">
               Mission Queue
             </h1>
-            <p className="mt-1 text-secondary dark:text-muted">
+            <p className="mt-1 text-secondary">
               {hasActiveMissions
                 ? `${inProgressMissions.length} running, ${sortedQueuedMissions.length} waiting`
                 : "No active missions"}
@@ -115,7 +115,7 @@ function MissionQueueContent() {
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="px-3 py-1.5 text-sm font-medium text-secondary dark:text-muted hover:text-foreground dark:hover:text-foreground border border-line-strong dark:border-line-strong rounded-lg hover:bg-background dark:hover:bg-surface-alt transition-colors disabled:opacity-50"
+              className="px-3 py-1.5 text-sm font-medium text-secondary hover:text-foreground border border-line-strong rounded-lg hover:bg-background transition-colors disabled:opacity-50"
             >
               Refresh
             </button>
@@ -124,7 +124,7 @@ function MissionQueueContent() {
 
         {runningError || queuedError ? <PageState state="error" title="Mission queue could not load." onRetry={() => void handleRefresh()} /> : isLoading && !hasActiveMissions ? (
           <div className="py-12 text-center">
-            <p className="text-muted dark:text-muted">Loading queue...</p>
+            <p className="text-muted">Loading queue...</p>
           </div>
         ) : !hasActiveMissions ? (
           <EmptyQueueState />
@@ -133,7 +133,7 @@ function MissionQueueContent() {
             {/* Running Missions Section */}
             {inProgressMissions.length > 0 && (
               <section>
-                <h2 className="text-sm font-semibold text-secondary dark:text-secondary uppercase tracking-wide mb-4">
+                <h2 className="text-sm font-semibold text-secondary uppercase tracking-wide mb-4">
                   Currently Running
                 </h2>
                 <div className="space-y-4">
@@ -147,7 +147,7 @@ function MissionQueueContent() {
             {/* Queued Missions Section */}
             {sortedQueuedMissions.length > 0 && (
               <section>
-                <h2 className="text-sm font-semibold text-secondary dark:text-secondary uppercase tracking-wide mb-4">
+                <h2 className="text-sm font-semibold text-secondary uppercase tracking-wide mb-4">
                   Waiting in Queue ({sortedQueuedMissions.length})
                 </h2>
                 <div className="space-y-3">

@@ -19,8 +19,8 @@ import type { MissionStatus, ReportPromotionResponse, ApiMissionUpdate } from "@
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="p-6 border-b border-line dark:border-line last:border-b-0">
-      <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">{title}</h2>
+    <div className="p-6 border-b border-line last:border-b-0">
+      <h2 className="text-lg font-semibold text-foreground mb-4">{title}</h2>
       {children}
     </div>
   );
@@ -291,9 +291,9 @@ function MissionDetailContent() {
 
   if (!missionId) {
     return (
-      <div className="min-h-screen bg-background dark:bg-background py-8">
+      <div className="min-h-screen bg-background py-8">
         <div className="max-w-4xl mx-auto px-4">
-          <p className="text-secondary dark:text-muted">Select a mission to view details.</p>
+          <p className="text-secondary">Select a mission to view details.</p>
         </div>
       </div>
     );
@@ -301,9 +301,9 @@ function MissionDetailContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background dark:bg-background py-8">
+      <div className="min-h-screen bg-background py-8">
         <div className="max-w-4xl mx-auto px-4">
-          <p className="text-secondary dark:text-muted">Loading mission...</p>
+          <p className="text-secondary">Loading mission...</p>
         </div>
       </div>
     );
@@ -311,15 +311,15 @@ function MissionDetailContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background dark:bg-background py-8">
+      <div className="min-h-screen bg-background py-8">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg p-6">
-            <p className="text-danger dark:text-danger">
+          <div className="bg-danger-surface border border-danger-line rounded-lg p-6">
+            <p className="text-danger">
               Failed to load mission: {error.message}
             </p>
             <button
               onClick={refresh}
-              className="mt-2 text-sm font-medium text-danger dark:text-danger underline"
+              className="mt-2 text-sm font-medium text-danger underline"
             >
               Retry
             </button>
@@ -331,9 +331,9 @@ function MissionDetailContent() {
 
   if (!mission) {
     return (
-      <div className="min-h-screen bg-background dark:bg-background py-8">
+      <div className="min-h-screen bg-background py-8">
         <div className="max-w-4xl mx-auto px-4">
-          <p className="text-secondary dark:text-muted">Mission not found.</p>
+          <p className="text-secondary">Mission not found.</p>
         </div>
       </div>
     );
@@ -346,7 +346,7 @@ function MissionDetailContent() {
   const hasResearchPhases = Object.keys(mission.research_phases).length > 0;
 
   return (
-    <div className="min-h-screen bg-background dark:bg-background py-8">
+    <div className="min-h-screen bg-background py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {actionError && !deleteOpen && <p role="alert" className="mb-4 break-words rounded bg-danger-surface p-4 text-danger">{actionError}</p>}
           <Dialog open={deleteOpen} title="Delete mission" onClose={() => { if (!deleting) setDeleteOpen(false); }}>
@@ -357,66 +357,66 @@ function MissionDetailContent() {
         <div className="mb-6 flex items-center justify-between">
           <Link
             href="/missions"
-            className="inline-flex items-center text-sm text-accent-text dark:text-accent-text hover:text-accent-text"
+            className="inline-flex items-center text-sm text-accent-text hover:text-accent-text"
           >
             &larr; Back to missions
           </Link>
           <div className="flex items-center gap-2">
             <button
               onClick={refresh}
-              className="px-3 py-1.5 text-sm text-secondary dark:text-muted hover:text-foreground dark:hover:text-foreground border border-line-strong dark:border-line-strong rounded-lg"
+              className="px-3 py-1.5 text-sm text-secondary hover:text-foreground border border-line-strong rounded-lg"
             >
               Refresh
             </button>
           </div>
         </div>
 
-        <div className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg overflow-hidden">
+        <div className="bg-surface border border-line rounded-lg overflow-hidden">
           {/* Header Section */}
-          <div className="p-6 border-b border-line dark:border-line">
+          <div className="p-6 border-b border-line">
             {isEditing ? (
               /* Edit Mode Form */
               <div className="space-y-6">
                 <div className="flex items-center gap-3 mb-4">
                   <StatusBadge status={mission.status} />
-                  <span className="text-sm font-mono text-muted dark:text-muted">
+                  <span className="text-sm font-mono text-muted">
                     {mission.mission_id}
                   </span>
-                  <span className="px-2 py-1 text-xs bg-info-surface dark:bg-info-surface text-accent-text dark:text-accent-text rounded">
+                  <span className="px-2 py-1 text-xs bg-info-surface text-accent-text rounded">
                     Editing
                   </span>
                 </div>
 
                 {/* Title */}
                 <div>
-                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">
+                  <label className="block text-sm font-medium text-secondary mb-1">
                     Title *
                   </label>
                   <input
                     type="text"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground focus:ring-2 focus:ring-focus focus:border-transparent"
+                    className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground focus:ring-2 focus:ring-focus focus:border-transparent"
                     autoFocus
                   />
                 </div>
 
                 {/* Objective */}
                 <div>
-                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">
+                  <label className="block text-sm font-medium text-secondary mb-1">
                     Objective *
                   </label>
                   <textarea
                     value={editObjective}
                     onChange={(e) => setEditObjective(e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground focus:ring-2 focus:ring-focus focus:border-transparent"
+                    className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground focus:ring-2 focus:ring-focus focus:border-transparent"
                   />
                 </div>
 
                 {/* Success Criteria */}
                 <div>
-                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">
+                  <label className="block text-sm font-medium text-secondary mb-1">
                     Success Criteria
                   </label>
                   <div className="space-y-2">
@@ -426,13 +426,13 @@ function MissionDetailContent() {
                           type="text"
                           value={criterion}
                           onChange={(e) => handleUpdateListItem(setEditSuccessCriteria, index, e.target.value)}
-                          className="flex-1 px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground text-sm"
+                          className="flex-1 px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground text-sm"
                           placeholder="Enter success criterion"
                         />
                         <button
                           type="button"
                           onClick={() => handleRemoveListItem(setEditSuccessCriteria, index)}
-                          className="px-3 py-2 text-danger dark:text-danger hover:bg-danger-surface dark:hover:bg-danger-surface rounded-lg"
+                          className="px-3 py-2 text-danger hover:bg-danger-surface rounded-lg"
                         >
                           Remove
                         </button>
@@ -441,7 +441,7 @@ function MissionDetailContent() {
                     <button
                       type="button"
                       onClick={() => handleAddListItem(setEditSuccessCriteria)}
-                      className="px-3 py-2 text-sm text-accent-text dark:text-accent-text hover:bg-info-surface dark:hover:bg-info-surface rounded-lg"
+                      className="px-3 py-2 text-sm text-accent-text hover:bg-info-surface rounded-lg"
                     >
                       + Add Criterion
                     </button>
@@ -450,7 +450,7 @@ function MissionDetailContent() {
 
                 {/* Deliverables */}
                 <div>
-                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">
+                  <label className="block text-sm font-medium text-secondary mb-1">
                     Deliverables
                   </label>
                   <div className="space-y-2">
@@ -460,13 +460,13 @@ function MissionDetailContent() {
                           type="text"
                           value={deliverable}
                           onChange={(e) => handleUpdateListItem(setEditDeliverables, index, e.target.value)}
-                          className="flex-1 px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground text-sm"
+                          className="flex-1 px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground text-sm"
                           placeholder="Enter deliverable"
                         />
                         <button
                           type="button"
                           onClick={() => handleRemoveListItem(setEditDeliverables, index)}
-                          className="px-3 py-2 text-danger dark:text-danger hover:bg-danger-surface dark:hover:bg-danger-surface rounded-lg"
+                          className="px-3 py-2 text-danger hover:bg-danger-surface rounded-lg"
                         >
                           Remove
                         </button>
@@ -475,7 +475,7 @@ function MissionDetailContent() {
                     <button
                       type="button"
                       onClick={() => handleAddListItem(setEditDeliverables)}
-                      className="px-3 py-2 text-sm text-accent-text dark:text-accent-text hover:bg-info-surface dark:hover:bg-info-surface rounded-lg"
+                      className="px-3 py-2 text-sm text-accent-text hover:bg-info-surface rounded-lg"
                     >
                       + Add Deliverable
                     </button>
@@ -484,7 +484,7 @@ function MissionDetailContent() {
 
                 {/* Tags */}
                 <div>
-                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">
+                  <label className="block text-sm font-medium text-secondary mb-1">
                     Tags
                   </label>
                   <div className="space-y-2">
@@ -494,13 +494,13 @@ function MissionDetailContent() {
                           type="text"
                           value={tag}
                           onChange={(e) => handleUpdateListItem(setEditTags, index, e.target.value)}
-                          className="flex-1 px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground text-sm"
+                          className="flex-1 px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground text-sm"
                           placeholder="Enter tag"
                         />
                         <button
                           type="button"
                           onClick={() => handleRemoveListItem(setEditTags, index)}
-                          className="px-3 py-2 text-danger dark:text-danger hover:bg-danger-surface dark:hover:bg-danger-surface rounded-lg"
+                          className="px-3 py-2 text-danger hover:bg-danger-surface rounded-lg"
                         >
                           Remove
                         </button>
@@ -509,7 +509,7 @@ function MissionDetailContent() {
                     <button
                       type="button"
                       onClick={() => handleAddListItem(setEditTags)}
-                      className="px-3 py-2 text-sm text-accent-text dark:text-accent-text hover:bg-info-surface dark:hover:bg-info-surface rounded-lg"
+                      className="px-3 py-2 text-sm text-accent-text hover:bg-info-surface rounded-lg"
                     >
                       + Add Tag
                     </button>
@@ -517,26 +517,26 @@ function MissionDetailContent() {
                 </div>
 
                 {/* Research Contract — authoring fields (T40.2) */}
-                <details className="rounded-lg border border-line dark:border-line bg-background dark:bg-background">
-                  <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-foreground dark:text-secondary">
+                <details className="rounded-lg border border-line bg-background">
+                  <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-foreground">
                     Research Contract (optional — DeepSearch authoring fields)
                   </summary>
                   <div className="p-4 space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Background</label>
+                      <label className="block text-sm font-medium text-secondary mb-1">Background</label>
                       <textarea
                         value={editBackground}
                         onChange={(e) => setEditBackground(e.target.value)}
-                        className="w-full px-3 py-2 min-h-[70px] border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground"
+                        className="w-full px-3 py-2 min-h-[70px] border border-line-strong rounded-lg bg-surface text-foreground"
                         placeholder="Free-form prose orienting the research"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Focus</label>
+                      <label className="block text-sm font-medium text-secondary mb-1">Focus</label>
                       <textarea
                         value={editFocus}
                         onChange={(e) => setEditFocus(e.target.value)}
-                        className="w-full px-3 py-2 min-h-[60px] border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground"
+                        className="w-full px-3 py-2 min-h-[60px] border border-line-strong rounded-lg bg-surface text-foreground"
                         placeholder="Narrow framing for the research question"
                       />
                     </div>
@@ -547,44 +547,44 @@ function MissionDetailContent() {
                       { label: "Constraints", value: editConstraints, setter: setEditConstraints, placeholder: "Constraint (e.g. 'no paywalled sources')..." },
                     ] as const).map(({ label, value, setter, placeholder }) => (
                       <div key={label}>
-                        <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">{label}</label>
+                        <label className="block text-sm font-medium text-secondary mb-1">{label}</label>
                         <textarea
                           value={value.join("\n")}
                           onChange={(e) => setter(e.target.value.split("\n"))}
-                          className="w-full px-3 py-2 min-h-[70px] border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground font-mono text-xs"
+                          className="w-full px-3 py-2 min-h-[70px] border border-line-strong rounded-lg bg-surface text-foreground font-mono text-xs"
                           placeholder={placeholder}
                         />
                       </div>
                     ))}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Deliverable format</label>
+                        <label className="block text-sm font-medium text-secondary mb-1">Deliverable format</label>
                         <input
                           type="text"
                           value={editDeliverableFormat}
                           onChange={(e) => setEditDeliverableFormat(e.target.value)}
-                          className="w-full px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground"
+                          className="w-full px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
                           placeholder="e.g. markdown report"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Min loops</label>
+                        <label className="block text-sm font-medium text-secondary mb-1">Min loops</label>
                         <input
                           type="number"
                           min={1}
                           value={editMinLoops}
                           onChange={(e) => setEditMinLoops(e.target.value)}
-                          className="w-full px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground"
+                          className="w-full px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Max loops</label>
+                        <label className="block text-sm font-medium text-secondary mb-1">Max loops</label>
                         <input
                           type="number"
                           min={1}
                           value={editMaxLoops}
                           onChange={(e) => setEditMaxLoops(e.target.value)}
-                          className="w-full px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground"
+                          className="w-full px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
                         />
                       </div>
                     </div>
@@ -594,7 +594,7 @@ function MissionDetailContent() {
                       { key: "validation_thresholds" as const, label: "Validation thresholds (JSON object)", value: editValidationThresholds, setter: setEditValidationThresholds },
                     ]).map(({ key, label, value, setter }) => (
                       <div key={key}>
-                        <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">{label}</label>
+                        <label className="block text-sm font-medium text-secondary mb-1">{label}</label>
                         <textarea
                           value={value}
                           onChange={(e) => {
@@ -607,11 +607,11 @@ function MissionDetailContent() {
                               });
                             }
                           }}
-                          className="w-full px-3 py-2 min-h-[100px] border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground font-mono text-xs"
+                          className="w-full px-3 py-2 min-h-[100px] border border-line-strong rounded-lg bg-surface text-foreground font-mono text-xs"
                           placeholder='{"key": "value"}'
                         />
                         {editJsonErrors[key] && (
-                          <p className="mt-1 text-xs text-danger dark:text-danger">{editJsonErrors[key]}</p>
+                          <p className="mt-1 text-xs text-danger">{editJsonErrors[key]}</p>
                         )}
                       </div>
                     ))}
@@ -620,7 +620,7 @@ function MissionDetailContent() {
 
                 {/* Error Display */}
                 {editError && (
-                  <p className="text-sm text-danger dark:text-danger">{editError}</p>
+                  <p className="text-sm text-danger">{editError}</p>
                 )}
 
                 {/* Save/Cancel Buttons */}
@@ -635,7 +635,7 @@ function MissionDetailContent() {
                   <button
                     onClick={handleCancelEdit}
                     disabled={isSaving}
-                    className="px-4 py-2 text-secondary dark:text-muted hover:text-foreground dark:hover:text-foreground transition-colors"
+                    className="px-4 py-2 text-secondary hover:text-foreground transition-colors"
                   >
                     Cancel
                   </button>
@@ -648,34 +648,34 @@ function MissionDetailContent() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-2">
                       <StatusBadge status={mission.status} />
-                      <span className="text-sm font-mono text-muted dark:text-muted">
+                      <span className="text-sm font-mono text-muted">
                         {mission.mission_id}
                       </span>
                     </div>
-                    <h1 className="text-2xl font-bold text-foreground dark:text-foreground">
+                    <h1 className="text-2xl font-bold text-foreground">
                       {mission.title}
                     </h1>
-                    <div className="mt-1 flex items-center gap-3 text-sm text-muted dark:text-muted">
+                    <div className="mt-1 flex items-center gap-3 text-sm text-muted">
                       {mission.project_id && mission.project_name ? (
                         <Link
                           href={`/projects/${mission.project_id}`}
-                          className="text-accent-text dark:text-accent-text underline underline-offset-4"
+                          className="text-accent-text underline underline-offset-4"
                         >
                           {mission.project_name}
                         </Link>
                       ) : mission.project_id ? (
                         <Link
                           href={`/projects/${mission.project_id}`}
-                          className="text-accent-text dark:text-accent-text underline underline-offset-4"
+                          className="text-accent-text underline underline-offset-4"
                         >
                           View Project
                         </Link>
                       ) : (
-                        <span className="text-muted dark:text-muted">No project</span>
+                        <span className="text-muted">No project</span>
                       )}
                       {createdAt && (
                         <>
-                          <span className="text-secondary dark:text-secondary">&bull;</span>
+                          <span className="text-secondary">&bull;</span>
                           <span>Created {createdAt}</span>
                         </>
                       )}
@@ -688,7 +688,7 @@ function MissionDetailContent() {
                   {mission.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-1 text-xs bg-surface dark:bg-surface-alt text-secondary dark:text-secondary rounded"
+                      className="px-2 py-1 text-xs bg-surface text-secondary rounded"
                     >
                       {tag}
                     </span>
@@ -718,7 +718,7 @@ function MissionDetailContent() {
                   {promotionResult && (
                     <Link
                       href={`/documents/${promotionResult.document_id}`}
-                      className="px-4 py-2 bg-success-surface dark:bg-success-surface text-success dark:text-success rounded-lg hover:bg-success-surface dark:hover:bg-success-surface transition-colors font-medium text-sm"
+                      className="px-4 py-2 bg-success-surface text-success rounded-lg hover:bg-success-surface transition-colors font-medium text-sm"
                     >
                       View Promoted Document
                     </Link>
@@ -726,20 +726,20 @@ function MissionDetailContent() {
                   {!promotionResult && mission.result_document_ids.length > 0 && (
                     <Link
                       href={`/documents/${mission.result_document_ids[0]}`}
-                      className="px-4 py-2 bg-success-surface dark:bg-success-surface text-success dark:text-success rounded-lg hover:bg-success-surface dark:hover:bg-success-surface transition-colors font-medium text-sm"
+                      className="px-4 py-2 bg-success-surface text-success rounded-lg hover:bg-success-surface transition-colors font-medium text-sm"
                     >
                       View Promoted Document
                     </Link>
                   )}
                   <button
                     onClick={handleStartEdit}
-                    className="px-4 py-2 border border-line-strong dark:border-line-strong text-secondary dark:text-secondary rounded-lg hover:bg-background dark:hover:bg-surface-alt transition-colors font-medium text-sm"
+                    className="px-4 py-2 border border-line-strong text-secondary rounded-lg hover:bg-background transition-colors font-medium text-sm"
                   >
                     Edit Mission
                   </button>
                   <button
                     onClick={() => { setActionError(null); setDeleteOpen(true); }}
-                    className="px-4 py-2 border border-danger-line dark:border-danger-line text-danger dark:text-danger rounded-lg hover:bg-danger-surface dark:hover:bg-danger-surface transition-colors font-medium text-sm"
+                    className="px-4 py-2 border border-danger-line text-danger rounded-lg hover:bg-danger-surface transition-colors font-medium text-sm"
                   >
                     Delete
                   </button>
@@ -748,13 +748,13 @@ function MissionDetailContent() {
             )}
 
             {submitError && (
-              <p className="mt-3 text-sm text-danger dark:text-danger">{submitError}</p>
+              <p className="mt-3 text-sm text-danger">{submitError}</p>
             )}
             {promotionError && (
-              <p className="mt-3 text-sm text-danger dark:text-danger">{promotionError}</p>
+              <p className="mt-3 text-sm text-danger">{promotionError}</p>
             )}
             {promotionResult && (
-              <p className="mt-3 text-sm text-success dark:text-success">
+              <p className="mt-3 text-sm text-success">
                 {promotionResult.message}
                 {promotionResult.chunk_count !== null && ` (${promotionResult.chunk_count} chunks created)`}
               </p>
@@ -768,7 +768,7 @@ function MissionDetailContent() {
           <div role="tabpanel" id="mission-panel-overview" aria-labelledby="mission-tab-overview" hidden={detailTab !== 'overview'}>
           {/* Objective Section */}
           <Section title="Objective">
-            <p className="text-secondary dark:text-secondary whitespace-pre-wrap">
+            <p className="text-secondary whitespace-pre-wrap">
               {mission.objective}
             </p>
           </Section>
@@ -780,7 +780,7 @@ function MissionDetailContent() {
                 {mission.success_criteria.map((criterion, index) => (
                   <li key={index} className="flex items-start gap-2">
                     <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-surface-alt flex-shrink-0" />
-                    <span className="text-secondary dark:text-secondary">{criterion}</span>
+                    <span className="text-secondary">{criterion}</span>
                   </li>
                 ))}
               </ul>
@@ -794,7 +794,7 @@ function MissionDetailContent() {
                 {mission.deliverables.map((deliverable, index) => (
                   <li key={index} className="flex items-start gap-2">
                     <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
-                    <span className="text-secondary dark:text-secondary">{deliverable}</span>
+                    <span className="text-secondary">{deliverable}</span>
                   </li>
                 ))}
               </ul>
@@ -811,8 +811,8 @@ function MissionDetailContent() {
           {/* Error Message Section */}
           {mission.error_message && (
             <Section title="Error">
-              <div className="bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg p-4">
-                <p className="text-danger dark:text-danger">{mission.error_message}</p>
+              <div className="bg-danger-surface border border-danger-line rounded-lg p-4">
+                <p className="text-danger">{mission.error_message}</p>
               </div>
             </Section>
           )}
@@ -827,12 +827,12 @@ function MissionDetailContent() {
                     `${mission.mission_id}-results.md`,
                     "text/markdown"
                   )}
-                  className="px-3 py-1.5 text-xs font-medium text-accent-text dark:text-accent-text hover:bg-info-surface dark:hover:bg-surface-alt rounded transition-colors"
+                  className="px-3 py-1.5 text-xs font-medium text-accent-text hover:bg-info-surface rounded transition-colors"
                 >
                   Export as .md
                 </button>
               </div>
-              <div className="bg-background dark:bg-background rounded-lg p-4 overflow-x-auto">
+              <div className="bg-background rounded-lg p-4 overflow-x-auto">
                 <MarkdownRenderer content={mission.result_markdown} />
               </div>
             </Section>
@@ -840,7 +840,7 @@ function MissionDetailContent() {
 
           {/* Contract Preview Panel (T40.4) */}
           {missionId && (
-            <div className="p-6 border-b border-line dark:border-line">
+            <div className="p-6 border-b border-line">
               <ContractPreviewPanel missionId={missionId} />
             </div>
           )}
@@ -866,21 +866,21 @@ function MissionDetailContent() {
             />
 
             {mission.deepsearch_job_id && (
-              <div className="mt-6 pt-6 border-t border-line dark:border-line">
-                <h3 className="text-sm font-semibold text-secondary dark:text-secondary uppercase tracking-wide mb-3">
+              <div className="mt-6 pt-6 border-t border-line">
+                <h3 className="text-sm font-semibold text-secondary uppercase tracking-wide mb-3">
                   Job Details
                 </h3>
                 <div className="grid gap-4 sm:grid-cols-2 text-sm">
                   <div>
-                    <p className="text-muted dark:text-muted">DeepSearch Job ID</p>
-                    <p className="font-mono text-foreground dark:text-foreground break-all">
+                    <p className="text-muted">DeepSearch Job ID</p>
+                    <p className="font-mono text-foreground break-all">
                       {mission.deepsearch_job_id}
                     </p>
                   </div>
                   {mission.created_by && (
                     <div>
-                      <p className="text-muted dark:text-muted">Created By</p>
-                      <p className="text-foreground dark:text-foreground">{mission.created_by}</p>
+                      <p className="text-muted">Created By</p>
+                      <p className="text-foreground">{mission.created_by}</p>
                     </div>
                   )}
                 </div>
@@ -912,11 +912,11 @@ type LogEntry = {
 const ACTIVE_STATUSES = new Set(["queued", "in_progress"]);
 const POLL_INTERVAL_MS = 5000;
 const LOG_LEVEL_COLORS: Record<string, string> = {
-  ERROR: "text-danger dark:text-danger",
-  WARNING: "text-warning dark:text-warning",
-  WARN: "text-warning dark:text-warning",
-  INFO: "text-secondary dark:text-muted",
-  DEBUG: "text-muted dark:text-muted",
+  ERROR: "text-danger",
+  WARNING: "text-warning",
+  WARN: "text-warning",
+  INFO: "text-secondary",
+  DEBUG: "text-muted",
 };
 
 function MissionLogTail({ missionId, status }: { missionId: string; status: MissionStatus | undefined }) {
@@ -940,14 +940,14 @@ function MissionLogTail({ missionId, status }: { missionId: string; status: Miss
   if (!isLoading && !error && logs.length === 0 && !isActive) return null;
 
   return (
-    <div className="border-t border-line dark:border-line mt-0">
+    <div className="border-t border-line mt-0">
       <div className="p-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold text-foreground dark:text-foreground">
+          <h2 className="text-lg font-semibold text-foreground">
             Runner Logs
           </h2>
           {isActive && (
-            <span className="flex items-center gap-1.5 text-xs text-accent-text dark:text-accent-text">
+            <span className="flex items-center gap-1.5 text-xs text-accent-text">
               <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
               Live
             </span>
@@ -956,25 +956,25 @@ function MissionLogTail({ missionId, status }: { missionId: string; status: Miss
 
         {error && <p role="alert" className="mb-3 text-sm text-danger">Unable to load runner logs. <button className="underline" onClick={() => void mutate()}>Retry logs</button></p>}
         {isLoading ? <p role="status">Loading logs…</p> : logs.length === 0 ? (
-          <p className="text-sm text-muted dark:text-muted font-mono">
+          <p className="text-sm text-muted font-mono">
             {isActive ? "Waiting for logs..." : "No logs recorded."}
           </p>
         ) : (
-          <div tabIndex={0} role="region" aria-label="Execution log" className="bg-background dark:bg-background rounded-lg p-4 overflow-y-auto max-h-96 font-mono text-xs space-y-0.5">
+          <div tabIndex={0} role="region" aria-label="Execution log" className="bg-background rounded-lg p-4 overflow-y-auto max-h-96 font-mono text-xs space-y-0.5">
             {logs.map((log) => (
               <div key={log.id} className="flex flex-wrap gap-x-3 gap-y-1 leading-5">
-                <span className="shrink-0 text-muted dark:text-secondary w-[180px]">
+                <span className="shrink-0 text-muted w-[180px]">
                   {new Date(log.logged_at).toISOString().replace("T", " ").slice(0, 19)}
                 </span>
                 <span className={`shrink-0 w-14 ${LOG_LEVEL_COLORS[log.level] ?? LOG_LEVEL_COLORS.INFO}`}>
                   {log.level}
                 </span>
                 {log.source && (
-                  <span className="shrink-0 text-muted dark:text-secondary max-w-[120px] truncate">
+                  <span className="shrink-0 text-muted max-w-[120px] truncate">
                     {log.source}
                   </span>
                 )}
-                <span className="text-secondary dark:text-foreground break-words min-w-0">
+                <span className="text-secondary break-words min-w-0">
                   {log.message}
                 </span>
               </div>

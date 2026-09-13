@@ -32,7 +32,7 @@ function ChevronIcon({ isOpen }: { isOpen: boolean }) {
 function TaskStatusIcon({ status }: { status?: string }) {
   if (status === "completed") {
     return (
-      <span className="w-4 h-4 rounded-full bg-success-surface dark:bg-success-surface flex items-center justify-center">
+      <span className="w-4 h-4 rounded-full bg-success-surface flex items-center justify-center">
         <svg className="w-2.5 h-2.5 text-success" fill="currentColor" viewBox="0 0 20 20">
           <path
             fillRule="evenodd"
@@ -46,7 +46,7 @@ function TaskStatusIcon({ status }: { status?: string }) {
   if (status === "in_progress") {
     return <span className="w-4 h-4 rounded-full bg-accent animate-pulse" />;
   }
-  return <span className="w-4 h-4 rounded-full bg-surface-alt dark:bg-surface-alt" />;
+  return <span className="w-4 h-4 rounded-full bg-surface-alt" />;
 }
 
 function PhaseSection({ phase, index }: { phase: ResearchPhase; index: number }) {
@@ -54,18 +54,18 @@ function PhaseSection({ phase, index }: { phase: ResearchPhase; index: number })
   const tasks = phase.tasks ?? [];
 
   return (
-    <div className="border border-line dark:border-line rounded-lg overflow-hidden">
+    <div className="border border-line rounded-lg overflow-hidden">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 bg-background dark:bg-surface hover:bg-surface dark:hover:bg-surface-alt transition-colors text-left"
+        className="w-full flex items-center justify-between p-4 bg-background hover:bg-surface transition-colors text-left"
       >
         <div className="flex items-center gap-3">
-          <span className="w-6 h-6 rounded-full bg-info-surface dark:bg-info-surface text-accent-text dark:text-accent-text flex items-center justify-center text-xs font-bold">
+          <span className="w-6 h-6 rounded-full bg-info-surface text-accent-text flex items-center justify-center text-xs font-bold">
             {index + 1}
           </span>
-          <span className="font-medium text-foreground dark:text-foreground">{phase.name}</span>
+          <span className="font-medium text-foreground">{phase.name}</span>
           {tasks.length > 0 && (
-            <span className="text-xs text-muted dark:text-muted">
+            <span className="text-xs text-muted">
               ({tasks.length} task{tasks.length !== 1 ? "s" : ""})
             </span>
           )}
@@ -74,9 +74,9 @@ function PhaseSection({ phase, index }: { phase: ResearchPhase; index: number })
       </button>
 
       {isOpen && (
-        <div className="p-4 bg-surface dark:bg-background">
+        <div className="p-4 bg-surface">
           {phase.description && (
-            <p className="text-secondary dark:text-secondary text-sm mb-4">{phase.description}</p>
+            <p className="text-secondary text-sm mb-4">{phase.description}</p>
           )}
 
           {tasks.length > 0 ? (
@@ -85,16 +85,16 @@ function PhaseSection({ phase, index }: { phase: ResearchPhase; index: number })
                 <li key={taskIndex} className="flex items-start gap-3">
                   <TaskStatusIcon status={task.status} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-foreground dark:text-foreground text-sm">{task.name}</p>
+                    <p className="text-foreground text-sm">{task.name}</p>
                     {task.description && (
-                      <p className="text-muted dark:text-muted text-xs mt-0.5">{task.description}</p>
+                      <p className="text-muted text-xs mt-0.5">{task.description}</p>
                     )}
                   </div>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-muted dark:text-muted text-sm">No tasks defined for this phase.</p>
+            <p className="text-muted text-sm">No tasks defined for this phase.</p>
           )}
         </div>
       )}
@@ -141,7 +141,7 @@ export function ResearchPhases({ phases }: ResearchPhasesProps) {
 
   if (parsedPhases.length === 0) {
     return (
-      <div className="text-muted dark:text-muted text-sm py-2">
+      <div className="text-muted text-sm py-2">
         No research phases defined.
       </div>
     );

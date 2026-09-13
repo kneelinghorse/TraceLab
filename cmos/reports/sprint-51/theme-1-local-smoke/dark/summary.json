@@ -1,0 +1,10 @@
+{
+  "base": "http://127.0.0.1:3105",
+  "checkedAt": "2026-09-13T17:44:01.405Z",
+  "checks": 62,
+  "routes": 31,
+  "failures": [],
+  "readOnly": true,
+  "directProductionApi": false,
+  "readOnlyApiProxy": true
+}

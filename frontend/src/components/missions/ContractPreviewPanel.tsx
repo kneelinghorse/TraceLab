@@ -34,13 +34,13 @@ export function ContractPreviewPanel({ missionId }: ContractPreviewPanelProps) {
   }, [missionId]);
 
   return (
-    <section className="rounded-lg border border-line dark:border-line bg-surface dark:bg-surface p-6 space-y-4">
+    <section className="rounded-lg border border-line bg-surface p-6 space-y-4">
       <header className="flex items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-foreground dark:text-foreground">
+          <h2 className="text-lg font-semibold text-foreground">
             Contract preview
           </h2>
-          <p className="text-sm text-muted dark:text-muted">
+          <p className="text-sm text-muted">
             See the compiled DeepSearch contract — named entities, evidence slots,
             acceptance checks — before submitting.
           </p>
@@ -56,7 +56,7 @@ export function ContractPreviewPanel({ missionId }: ContractPreviewPanelProps) {
       </header>
 
       {error && (
-        <div className="p-3 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg text-sm text-danger dark:text-danger">
+        <div className="p-3 bg-danger-surface border border-danger-line rounded-lg text-sm text-danger">
           {error}
         </div>
       )}
@@ -85,7 +85,7 @@ export function ContractPreviewPanel({ missionId }: ContractPreviewPanelProps) {
                 {preview.named_entities.map((entity) => (
                   <li
                     key={entity}
-                    className="px-2.5 py-1 rounded-full bg-info-surface dark:bg-info-surface text-info dark:text-accent-text text-xs"
+                    className="px-2.5 py-1 rounded-full bg-info-surface text-info text-xs"
                   >
                     {entity}
                   </li>
@@ -96,7 +96,7 @@ export function ContractPreviewPanel({ missionId }: ContractPreviewPanelProps) {
 
           {preview.deliverable_schemas.length > 0 && (
             <PreviewSection title="Deliverable schemas">
-              <pre className="p-3 bg-background dark:bg-background rounded-lg text-xs overflow-x-auto">
+              <pre className="p-3 bg-background rounded-lg text-xs overflow-x-auto">
                 {JSON.stringify(preview.deliverable_schemas, null, 2)}
               </pre>
             </PreviewSection>
@@ -104,7 +104,7 @@ export function ContractPreviewPanel({ missionId }: ContractPreviewPanelProps) {
 
           {(preview.coverage_thresholds && Object.keys(preview.coverage_thresholds).length > 0) && (
             <PreviewSection title="Coverage thresholds">
-              <pre className="p-3 bg-background dark:bg-background rounded-lg text-xs overflow-x-auto">
+              <pre className="p-3 bg-background rounded-lg text-xs overflow-x-auto">
                 {JSON.stringify(preview.coverage_thresholds, null, 2)}
               </pre>
             </PreviewSection>
@@ -112,17 +112,17 @@ export function ContractPreviewPanel({ missionId }: ContractPreviewPanelProps) {
 
           {(preview.validation_thresholds && Object.keys(preview.validation_thresholds).length > 0) && (
             <PreviewSection title="Validation thresholds">
-              <pre className="p-3 bg-background dark:bg-background rounded-lg text-xs overflow-x-auto">
+              <pre className="p-3 bg-background rounded-lg text-xs overflow-x-auto">
                 {JSON.stringify(preview.validation_thresholds, null, 2)}
               </pre>
             </PreviewSection>
           )}
 
-          <details className="rounded-lg border border-line dark:border-line">
-            <summary className="px-3 py-2 cursor-pointer text-sm text-secondary dark:text-secondary">
+          <details className="rounded-lg border border-line">
+            <summary className="px-3 py-2 cursor-pointer text-sm text-secondary">
               Full compiled contract (raw JSON)
             </summary>
-            <pre className="p-3 bg-background dark:bg-background text-xs overflow-x-auto">
+            <pre className="p-3 bg-background text-xs overflow-x-auto">
               {JSON.stringify(preview, null, 2)}
             </pre>
           </details>
@@ -134,11 +134,11 @@ export function ContractPreviewPanel({ missionId }: ContractPreviewPanelProps) {
 
 function PreviewStat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-lg bg-background dark:bg-background p-3">
-      <dt className="text-xs uppercase tracking-wide text-muted dark:text-muted">
+    <div className="rounded-lg bg-background p-3">
+      <dt className="text-xs uppercase tracking-wide text-muted">
         {label}
       </dt>
-      <dd className="mt-1 text-xl font-semibold text-foreground dark:text-foreground">
+      <dd className="mt-1 text-xl font-semibold text-foreground">
         {value}
       </dd>
     </div>
@@ -154,7 +154,7 @@ function PreviewSection({
 }) {
   return (
     <div>
-      <h3 className="text-sm font-semibold text-secondary dark:text-secondary mb-2">
+      <h3 className="text-sm font-semibold text-secondary mb-2">
         {title}
       </h3>
       {children}

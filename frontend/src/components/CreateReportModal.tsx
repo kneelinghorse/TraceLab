@@ -63,7 +63,7 @@ export function CreateReportModal({
 
   return (
     <Dialog open={isOpen} title="Create Report" onClose={handleClose}>
-            <p className="mt-1 text-sm text-secondary dark:text-muted">
+            <p className="mt-1 text-sm text-secondary">
               Synthesize content from &quot;{collectionName}&quot;
             </p>
 
@@ -74,7 +74,7 @@ export function CreateReportModal({
               <div>
                 <label
                   htmlFor="report-title"
-                  className="block text-sm font-medium text-secondary dark:text-secondary mb-1"
+                  className="block text-sm font-medium text-secondary mb-1"
                 >
                   Title *
                 </label>
@@ -84,7 +84,7 @@ export function CreateReportModal({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g., Research Summary - Q4 Findings"
-                  className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground focus:ring-2 focus:ring-focus focus:border-transparent"
+                  className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground focus:ring-2 focus:ring-focus focus:border-transparent"
                   disabled={isCreating}
                   autoFocus
                 />
@@ -94,7 +94,7 @@ export function CreateReportModal({
               <div>
                 <label
                   htmlFor="report-format"
-                  className="block text-sm font-medium text-secondary dark:text-secondary mb-1"
+                  className="block text-sm font-medium text-secondary mb-1"
                 >
                   Format
                 </label>
@@ -102,7 +102,7 @@ export function CreateReportModal({
                   id="report-format"
                   value={format}
                   onChange={(e) => setFormat(e.target.value as ReportFormat)}
-                  className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground focus:ring-2 focus:ring-focus focus:border-transparent"
+                  className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground focus:ring-2 focus:ring-focus focus:border-transparent"
                   disabled={isCreating}
                 >
                   <option value="summary">Summary - Concise overview</option>
@@ -116,7 +116,7 @@ export function CreateReportModal({
               <div>
                 <label
                   htmlFor="report-prompt"
-                  className="block text-sm font-medium text-secondary dark:text-secondary mb-1"
+                  className="block text-sm font-medium text-secondary mb-1"
                 >
                   Custom Prompt (optional)
                 </label>
@@ -126,29 +126,29 @@ export function CreateReportModal({
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder="e.g., Focus on technical implementation details..."
                   rows={3}
-                  className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground focus:ring-2 focus:ring-focus focus:border-transparent resize-none"
+                  className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground focus:ring-2 focus:ring-focus focus:border-transparent resize-none"
                   disabled={isCreating}
                 />
-                <p className="mt-1 text-xs text-muted dark:text-muted">
+                <p className="mt-1 text-xs text-muted">
                   Add specific instructions for the AI synthesis
                 </p>
               </div>
 
               {/* Error */}
               {error && (
-                <div role="alert" className="p-3 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg">
-                  <p className="text-sm text-danger dark:text-danger">{error}</p>
+                <div role="alert" className="p-3 bg-danger-surface border border-danger-line rounded-lg">
+                  <p className="text-sm text-danger">{error}</p>
                 </div>
               )}
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-line dark:border-line flex justify-end gap-3">
+            <div className="px-6 py-4 border-t border-line flex justify-end gap-3">
               <button
                 type="button"
                 onClick={handleClose}
                 disabled={isCreating}
-                className="px-4 py-2 text-secondary dark:text-muted hover:text-foreground dark:hover:text-foreground transition-colors disabled:opacity-50"
+                className="px-4 py-2 text-secondary hover:text-foreground transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>

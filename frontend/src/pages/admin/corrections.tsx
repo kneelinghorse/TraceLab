@@ -84,25 +84,25 @@ export function CorrectionsContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background dark:bg-background py-8">
+    <div className="min-h-screen bg-background py-8">
       <Head><title>Corrections · TraceLab</title></Head>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
-        <nav className="text-sm text-muted dark:text-muted mb-4">
-          <Link href="/admin/observability" className="hover:text-secondary dark:hover:text-secondary">
+        <nav className="text-sm text-muted mb-4">
+          <Link href="/admin/observability" className="hover:text-secondary">
             Observability
           </Link>
           {" / "}
-          <span className="text-foreground dark:text-foreground">Corrections</span>
+          <span className="text-foreground">Corrections</span>
         </nav>
 
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground dark:text-foreground">
+            <h1 className="text-3xl font-bold text-foreground">
               Correction Queue
             </h1>
-            <p className="mt-2 text-secondary dark:text-muted">
+            <p className="mt-2 text-secondary">
               Manage auto-linking corrections and webhook delivery. This queue belongs to the current API process and resets on restart.
             </p>
           </div>
@@ -117,7 +117,7 @@ export function CorrectionsContent() {
             <button
               onClick={loadData}
               disabled={isValidating}
-              className="px-4 py-2 border border-line-strong dark:border-line-strong text-secondary dark:text-secondary rounded-lg hover:bg-background dark:hover:bg-surface-alt disabled:opacity-50"
+              className="px-4 py-2 border border-line-strong text-secondary rounded-lg hover:bg-background disabled:opacity-50"
             >
               {isValidating ? "Refreshing…" : "Refresh"}
             </button>
@@ -126,7 +126,7 @@ export function CorrectionsContent() {
 
         {/* Error Alert */}
         {error && (
-          <div role="alert" className="mb-6 p-4 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg text-danger dark:text-danger">
+          <div role="alert" className="mb-6 p-4 bg-danger-surface border border-danger-line rounded-lg text-danger">
             {error}
           </div>
         )}
@@ -135,7 +135,7 @@ export function CorrectionsContent() {
         <p className="mb-4 text-sm text-muted">Refreshes every 30s{status ? ` · Updated ${new Date(status.last_updated).toLocaleString()}` : ""}</p>
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="text-muted dark:text-muted">Loading corrections...</div>
+            <div className="text-muted">Loading corrections...</div>
           </div>
         ) : data ? (
           <>
@@ -173,14 +173,14 @@ export function CorrectionsContent() {
             )}
 
             {/* Tabs */}
-            <div className="flex flex-wrap gap-4 mb-6 border-b border-line dark:border-line" aria-label="Correction views">
+            <div className="flex flex-wrap gap-4 mb-6 border-b border-line" aria-label="Correction views">
               <button
                 aria-pressed={activeTab === "queue"}
                 onClick={() => setActiveTab("queue")}
                 className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === "queue"
-                    ? "border-info-line text-accent-text dark:text-accent-text"
-                    : "border-transparent text-muted dark:text-muted hover:text-secondary dark:hover:text-secondary"
+                    ? "border-info-line text-accent-text"
+                    : "border-transparent text-muted hover:text-secondary"
                 }`}
               >
                 Queue
@@ -190,8 +190,8 @@ export function CorrectionsContent() {
                 onClick={() => setActiveTab("telemetry")}
                 className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === "telemetry"
-                    ? "border-info-line text-accent-text dark:text-accent-text"
-                    : "border-transparent text-muted dark:text-muted hover:text-secondary dark:hover:text-secondary"
+                    ? "border-info-line text-accent-text"
+                    : "border-transparent text-muted hover:text-secondary"
                 }`}
               >
                 Telemetry
@@ -201,13 +201,13 @@ export function CorrectionsContent() {
                 onClick={() => setActiveTab("deadletter")}
                 className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
                   activeTab === "deadletter"
-                    ? "border-info-line text-accent-text dark:text-accent-text"
-                    : "border-transparent text-muted dark:text-muted hover:text-secondary dark:hover:text-secondary"
+                    ? "border-info-line text-accent-text"
+                    : "border-transparent text-muted hover:text-secondary"
                 }`}
               >
                 Dead Letter
                 {deadLetterCount > 0 && (
-                  <span className="px-1.5 py-0.5 text-xs bg-danger-surface text-danger dark:bg-danger-surface dark:text-danger rounded-full">
+                  <span className="px-1.5 py-0.5 text-xs bg-danger-surface text-danger rounded-full">
                     {deadLetterCount}
                   </span>
                 )}
@@ -226,34 +226,34 @@ export function CorrectionsContent() {
 
             {/* Telemetry Tab */}
             {activeTab === "telemetry" && telemetry && (
-              <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
-                <h3 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
+              <div className="bg-surface rounded-lg border border-line p-6">
+                <h3 className="text-lg font-semibold text-foreground mb-4">
                   Grafana-Ready Telemetry
                 </h3>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <h4 className="text-sm font-medium text-secondary dark:text-secondary mb-2">
+                    <h4 className="text-sm font-medium text-secondary mb-2">
                       Queue Counts
                     </h4>
-                    <div className="bg-background dark:bg-surface-alt rounded-lg p-4">
-                      <pre className="text-sm text-secondary dark:text-secondary overflow-x-auto">
+                    <div className="bg-background rounded-lg p-4">
+                      <pre className="text-sm text-secondary overflow-x-auto">
                         {JSON.stringify(telemetry.queue_counts, null, 2)}
                       </pre>
                     </div>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-secondary dark:text-secondary mb-2">
+                    <h4 className="text-sm font-medium text-secondary mb-2">
                       Webhook Stats
                     </h4>
-                    <div className="bg-background dark:bg-surface-alt rounded-lg p-4">
-                      <pre className="text-sm text-secondary dark:text-secondary overflow-x-auto">
+                    <div className="bg-background rounded-lg p-4">
+                      <pre className="text-sm text-secondary overflow-x-auto">
                         {JSON.stringify(telemetry.webhook_stats ?? { message: "No webhook data" }, null, 2)}
                       </pre>
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-line dark:border-line">
-                  <p className="text-sm text-muted dark:text-muted">
+                <div className="mt-4 pt-4 border-t border-line">
+                  <p className="text-sm text-muted">
                     Success Rate: {Math.round(telemetry.success_rate * 100)}% |
                     Last Updated: {new Date(telemetry.last_updated).toLocaleString()}
                   </p>
@@ -263,9 +263,9 @@ export function CorrectionsContent() {
 
             {/* Dead Letter Tab */}
             {activeTab === "deadletter" && (
-              <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
+              <div className="bg-surface rounded-lg border border-line p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-foreground dark:text-foreground">
+                  <h3 className="text-lg font-semibold text-foreground">
                     Dead Letter Queue ({deadLetterCount})
                   </h3>
 
@@ -273,7 +273,7 @@ export function CorrectionsContent() {
 
                 {deadLetterCount > deadLetter.length && <p className="mb-4 text-sm text-muted">Showing {deadLetter.length} of {deadLetterCount} failed deliveries.</p>}
                 {deadLetter.length === 0 ? (
-                  <p className="text-center text-muted dark:text-muted py-8">
+                  <p className="text-center text-muted py-8">
                     No failed webhook deliveries.
                   </p>
                 ) : (
@@ -281,28 +281,28 @@ export function CorrectionsContent() {
                     {deadLetter.map((item, idx) => (
                       <div
                         key={idx}
-                        className="p-4 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg"
+                        className="p-4 bg-danger-surface border border-danger-line rounded-lg"
                       >
                         <div className="flex items-start justify-between mb-2">
-                          <span className="font-medium text-foreground dark:text-foreground text-sm truncate max-w-[60%]">
+                          <span className="font-medium text-foreground text-sm truncate max-w-[60%]">
                             {item.url}
                           </span>
-                          <span className="text-xs text-muted dark:text-muted">
+                          <span className="text-xs text-muted">
                             {item.attempts} attempts
                           </span>
                         </div>
-                        <p className="text-sm text-danger dark:text-danger mb-2 break-words">
+                        <p className="text-sm text-danger mb-2 break-words">
                           {item.error}
                         </p>
                         <details className="text-xs">
-                          <summary className="cursor-pointer text-muted dark:text-muted">
+                          <summary className="cursor-pointer text-muted">
                             View Payload
                           </summary>
-                          <pre className="mt-2 p-2 bg-surface dark:bg-surface-alt rounded overflow-x-auto text-secondary dark:text-secondary">
+                          <pre className="mt-2 p-2 bg-surface rounded overflow-x-auto text-secondary">
                             {JSON.stringify(item.payload, null, 2)}
                           </pre>
                         </details>
-                        <p className="text-xs text-muted dark:text-muted mt-2">
+                        <p className="text-xs text-muted mt-2">
                           Last attempt: {new Date(item.last_attempt).toLocaleString()}
                         </p>
                       </div>

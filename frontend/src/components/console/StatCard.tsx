@@ -15,21 +15,21 @@ interface StatCardProps {
 }
 
 const COLOR_CLASSES = {
-  default: "bg-surface dark:bg-surface border-line dark:border-line",
-  blue: "bg-info-surface dark:bg-info-surface border-info-line dark:border-info-line",
-  green: "bg-success-surface dark:bg-success-surface border-success-line dark:border-success-line",
-  yellow: "bg-warning-surface dark:bg-warning-surface border-warning-line dark:border-warning-line",
-  red: "bg-danger-surface dark:bg-danger-surface border-danger-line dark:border-danger-line",
-  purple: "bg-info-surface dark:bg-info-surface border-info-line dark:border-info-line",
+  default: "bg-surface border-line",
+  blue: "bg-info-surface border-info-line",
+  green: "bg-success-surface border-success-line",
+  yellow: "bg-warning-surface border-warning-line",
+  red: "bg-danger-surface border-danger-line",
+  purple: "bg-info-surface border-info-line",
 };
 
 const VALUE_COLORS = {
-  default: "text-foreground dark:text-foreground",
-  blue: "text-info dark:text-accent-text",
-  green: "text-success dark:text-success",
-  yellow: "text-warning dark:text-warning",
-  red: "text-danger dark:text-danger",
-  purple: "text-info dark:text-accent-text",
+  default: "text-foreground",
+  blue: "text-info",
+  green: "text-success",
+  yellow: "text-warning",
+  red: "text-danger",
+  purple: "text-info",
 };
 
 const SIZE_CLASSES = {
@@ -52,7 +52,7 @@ export function StatCard({
     <div
       className={`rounded-lg border ${COLOR_CLASSES[color]} ${sizeClasses.container}`}
     >
-      <div className={`${sizeClasses.label} font-medium text-secondary dark:text-secondary mb-1`}>
+      <div className={`${sizeClasses.label} font-medium text-secondary mb-1`}>
         {label}
       </div>
       <div className="flex items-end gap-2">
@@ -63,10 +63,10 @@ export function StatCard({
           <span
             className={`text-sm ${
               trend.direction === "up"
-                ? "text-success dark:text-success"
+                ? "text-success"
                 : trend.direction === "down"
-                ? "text-danger dark:text-danger"
-                : "text-secondary dark:text-secondary"
+                ? "text-danger"
+                : "text-secondary"
             }`}
           >
             {trend.direction === "up" ? "↑" : trend.direction === "down" ? "↓" : "→"}
@@ -75,7 +75,7 @@ export function StatCard({
         )}
       </div>
       {sublabel && (
-        <div className="text-xs text-secondary dark:text-secondary mt-1">
+        <div className="text-xs text-secondary mt-1">
           {sublabel}
         </div>
       )}

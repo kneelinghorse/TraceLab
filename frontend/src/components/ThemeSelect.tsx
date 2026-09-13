@@ -1,8 +1,9 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import type { ThemeChoice } from "@/lib/theme";
+import { THEME_LABELS } from "@/lib/theme";
 
 export function ThemeSelect() {
-  const { choice, setChoice } = useTheme();
+  const { choice, resolved, setChoice } = useTheme();
   return (
     <label className="flex items-center justify-between gap-3 text-sm text-muted">
       <span>Appearance</span>
@@ -12,9 +13,8 @@ export function ThemeSelect() {
         value={choice}
         onChange={(event) => setChoice(event.target.value as ThemeChoice)}
       >
-        <option value="system">System</option>
-        <option value="light">Light</option>
-        <option value="dark">Dark</option>
+        <option value="system">{choice === "system" ? `System (${THEME_LABELS[resolved]})` : "System"}</option>
+        {Object.entries(THEME_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
       </select>
     </label>
   );

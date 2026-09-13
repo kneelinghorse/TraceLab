@@ -1,4 +1,6 @@
-export type ThemeChoice = "system" | "light" | "dark";
+export const THEME_LABELS = { light: "Light", "dark": "Dark", hc: "High contrast" } as const;
+export type ThemeName = keyof typeof THEME_LABELS;
+export type ThemeChoice = "system" | ThemeName;
 
 export const THEME_EVENT = "tracelab:theme-change";
 export const themeStorageKey = (userId?: string | null) => `tracelab.theme.v1:${userId || "guest"}`;
@@ -13,7 +15,7 @@ export function readThemeChoice(userId?: string | null): ThemeChoice {
   } catch {
     value = transientChoices.get(key);
   }
-  return value === "light" || value === "dark" ? value : "system";
+  return value === "light" || value === "dark" || value === "hc" ? value : "system";
 }
 
 export function writeThemeChoice(choice: ThemeChoice, userId?: string | null) {
@@ -43,10 +45,12 @@ export const themeBootstrapScript = `(() => {
     try { auth = JSON.parse(localStorage.getItem("tracelab.auth.v2") || "null"); } catch {}
     choice = localStorage.getItem("tracelab.theme.v1:" + (auth?.user_id || "guest")) || "system";
   } catch {}
-  const dark = choice === "dark" || (choice !== "light" && typeof matchMedia === "function" && matchMedia("(prefers-color-scheme: dark)").matches);
+  const resolved = ${JSON.stringify(Object.keys(THEME_LABELS))}.includes(choice) ? choice :
+    (typeof matchMedia === "function" && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const dark = resolved === "dark";
   const root = document.documentElement;
   root.dataset.brand = "A";
-  root.dataset.theme = dark ? "dark" : "light";
+  root.dataset.theme = resolved;
   root.classList.toggle("dark", dark);
   root.style.colorScheme = dark ? "dark" : "light";
 })();`;

@@ -19,10 +19,10 @@ import { projectsApi } from "@/lib/api/projects";
 import type { Project } from "@/types/document";
 
 const errorBox =
-  "rounded-lg bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line px-4 py-3 text-sm text-danger dark:text-danger";
+  "rounded-lg bg-danger-surface border border-danger-line px-4 py-3 text-sm text-danger";
 const successBox =
-  "rounded-lg bg-success-surface dark:bg-success-surface border border-success-line dark:border-success-line px-4 py-3 text-sm text-success dark:text-success";
-const cardClass = "rounded-lg bg-surface dark:bg-surface border border-line dark:border-line p-6";
+  "rounded-lg bg-success-surface border border-success-line px-4 py-3 text-sm text-success";
+const cardClass = "rounded-lg bg-surface border border-line p-6";
 
 export function SpacesAdmin() {
   const [spaces, setSpaces] = useState<AdminSpace[] | null>(null);
@@ -169,9 +169,9 @@ export function SpacesAdmin() {
   const selectedSpace = spaces?.find((s) => s.id === selectedSpaceId) ?? null;
 
   return (
-    <div className="min-h-screen bg-background dark:bg-background">
+    <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        <h1 className="text-2xl font-bold text-foreground dark:text-foreground">Spaces</h1>
+        <h1 className="text-2xl font-bold text-foreground">Spaces</h1>
 
         {loadError && <p className={errorBox}>{loadError}</p>}
         {/* Action errors (member add/remove/load, project assignment) — page-level
@@ -179,7 +179,7 @@ export function SpacesAdmin() {
         {actionError && <p className={errorBox}>{actionError}</p>}
 
         <section className={cardClass}>
-          <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">Create space</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-4">Create space</h2>
           {createError && <p className={`mb-4 ${errorBox}`}>{createError}</p>}
           {createSuccess && <p className={`mb-4 ${successBox}`}>{createSuccess}</p>}
           <form onSubmit={createSpace} className="flex flex-col sm:flex-row gap-3" noValidate>
@@ -202,22 +202,22 @@ export function SpacesAdmin() {
         </section>
 
         <section className={cardClass}>
-          <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">Spaces</h2>
+          <h2 className="text-lg font-semibold text-foreground mb-4">Spaces</h2>
           {spaces === null ? (
-            <p className="text-sm text-muted dark:text-muted">Loading spaces…</p>
+            <p className="text-sm text-muted">Loading spaces…</p>
           ) : spaces.length === 0 ? (
-            <p className="text-sm text-muted dark:text-muted">No spaces yet.</p>
+            <p className="text-sm text-muted">No spaces yet.</p>
           ) : (
-            <ul className="divide-y divide-line dark:divide-line">
+            <ul className="divide-y divide-line">
               {spaces.map((s) => (
                 <li key={s.id} className="flex items-center justify-between py-3">
-                  <span className="text-foreground dark:text-foreground">{s.name}</span>
+                  <span className="text-foreground">{s.name}</span>
                   <button
                     type="button"
                     onClick={() => setSelectedSpaceId(s.id)}
                     className={`text-sm font-medium ${
                       s.id === selectedSpaceId
-                        ? "text-accent-text dark:text-accent-text"
+                        ? "text-accent-text"
                         : "text-accent-text hover:text-accent-text"
                     }`}
                   >
@@ -231,7 +231,7 @@ export function SpacesAdmin() {
 
         {selectedSpace && (
           <section className={cardClass}>
-            <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
+            <h2 className="text-lg font-semibold text-foreground mb-4">
               Members of “{selectedSpace.name}”
             </h2>
 
@@ -260,14 +260,14 @@ export function SpacesAdmin() {
             </div>
 
             {members === null ? (
-              <p className="text-sm text-muted dark:text-muted">Loading members…</p>
+              <p className="text-sm text-muted">Loading members…</p>
             ) : members.length === 0 ? (
-              <p className="text-sm text-muted dark:text-muted">No members in this Space.</p>
+              <p className="text-sm text-muted">No members in this Space.</p>
             ) : (
-              <ul className="divide-y divide-line dark:divide-line">
+              <ul className="divide-y divide-line">
                 {members.map((m) => (
                   <li key={m.user_id} className="flex items-center justify-between py-3 text-sm">
-                    <span className="text-foreground dark:text-foreground">
+                    <span className="text-foreground">
                       {m.display_name} <span className="text-muted">({m.email})</span>
                       {!m.is_active && <span className="ml-2 text-xs text-warning">disabled</span>}
                     </span>
@@ -287,27 +287,27 @@ export function SpacesAdmin() {
         )}
 
         <section className={cardClass}>
-          <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
+          <h2 className="text-lg font-semibold text-foreground mb-4">
             Project assignment
           </h2>
           {projectTotal > projects.length && (
-            <p className="mb-4 text-sm text-warning dark:text-warning">
+            <p className="mb-4 text-sm text-warning">
               Showing the first {projects.length} of {projectTotal} projects. Use search on the
               Projects page to assign the rest.
             </p>
           )}
           {projects.length === 0 ? (
-            <p className="text-sm text-muted dark:text-muted">No projects.</p>
+            <p className="text-sm text-muted">No projects.</p>
           ) : (
-            <ul className="divide-y divide-line dark:divide-line">
+            <ul className="divide-y divide-line">
               {projects.map((p) => (
                 <li key={p.id} className="flex items-center justify-between py-3 text-sm">
-                  <span className="text-foreground dark:text-foreground">{p.name}</span>
+                  <span className="text-foreground">{p.name}</span>
                   <select
                     aria-label={`Space for ${p.name}`}
                     value={p.workspace_id ?? ""}
                     onChange={(e) => assignProject(p, e.target.value)}
-                    className="rounded-md border border-line-strong dark:border-line-strong bg-surface dark:bg-surface-alt px-2 py-1 text-sm text-foreground dark:text-foreground"
+                    className="rounded-md border border-line-strong bg-surface px-2 py-1 text-sm text-foreground"
                   >
                     <option value="">— No Space —</option>
                     {(spaces ?? []).map((s) => (

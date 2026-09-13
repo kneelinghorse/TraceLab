@@ -1,0 +1,321 @@
+{
+  "base": "http://127.0.0.1:3105",
+  "checkedAt": "2026-09-13T17:44:01.419Z",
+  "checks": 62,
+  "routes": 31,
+  "failures": [
+    {
+      "route": "/",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/projects",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/documents",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/documents/upload",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/collections",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/collections/ca279662-9224-47b7-80d6-341aeda41540",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/reports",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/missions",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/missions/new",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/missions/queue",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/search",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/search/results",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/saved-searches",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/settings",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/invites",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/device",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/admin/users",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/admin/spaces",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/console",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/console/missions",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/console/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/console/corrections",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/404",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/evidence",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/admin/observability",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/admin/corrections",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/evidence/b00789cf-42d7-481d-b751-d7ed6a914067",
+      "theme": "hc",
+      "width": 1440
+    },
+    {
+      "route": "/",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/projects",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/documents",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/documents/upload",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/collections",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/collections/ca279662-9224-47b7-80d6-341aeda41540",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/reports",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/missions",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/missions/new",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/missions/queue",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/search",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/search/results",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/saved-searches",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/settings",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/invites",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/device",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/admin/users",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/admin/spaces",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/console",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/console/missions",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/console/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/console/corrections",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/404",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/evidence",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/admin/observability",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/admin/corrections",
+      "theme": "hc",
+      "width": 390
+    },
+    {
+      "route": "/evidence/b00789cf-42d7-481d-b751-d7ed6a914067",
+      "theme": "hc",
+      "width": 390
+    }
+  ],
+  "readOnly": true,
+  "directProductionApi": false,
+  "readOnlyApiProxy": true
+}
