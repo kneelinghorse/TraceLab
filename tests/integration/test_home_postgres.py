@@ -24,6 +24,7 @@ def test_postgres_home_counts_and_per_result_review(db_session, monkeypatch):
         id=uuid4(), email=f"{uuid4()}@example.test", display_name="Home reviewer", password_hash=_HASH, role="member"
     )
     db_session.add(user)
+    db_session.flush()
     rows = [
         Mission(
             mission_id=uuid4().hex,
