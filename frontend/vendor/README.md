@@ -33,9 +33,13 @@ Forge owns review and fixes; TraceLab owns the consumer install and smoke.
 4. Run `npm install` in `frontend/`, commit the lockfile with the tarballs and
    provenance, then run unit tests, `check:tokens`, lint, and the production build.
 5. Run `scripts/ui-shell-smoke.mjs` against the built app and deployed site in
-   light/dark/hc at 1440/390. Archive screenshots and results with the mission.
+   the supported light/dark themes at 1440/390. Before exposing hc in THEME-2,
+   require all three themes to pass. Archive screenshots and results with the mission.
 
-THEME-1 keeps `hc` on a light native `color-scheme` so system colors do not
-silently follow the OS. Only the Dark theme sets the compatibility `.dark` class;
+High contrast is deferred to Sprint 54 (THEME-2, decision #408): the current and
+prepared replacement tokens fail active-text contrast. THEME-1 exposes System,
+Light and Dark; stored `hc` preferences fall back to System. The failed HC baseline
+remains in `cmos/reports/sprint-51/theme-1-local-smoke/hc/` for the follow-up.
+Only the Dark theme sets the compatibility `.dark` class;
 Tailwind color variants are retired and `check:tokens` rejects new ones. Markdown
 typography uses semantic prose variables, with no inversion exception.

@@ -42,8 +42,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     root.dataset.brand = "A";
     root.dataset.theme = currentResolved;
     root.classList.toggle("dark", currentResolved === "dark");
-    // hc uses the shipped system colors on a light native canvas; it never
-    // inherits the dark compatibility class or an OS-dependent native palette.
     root.style.colorScheme = currentResolved === "dark" ? "dark" : "light";
   }, [resolved, userId]);
 

@@ -47,16 +47,17 @@ describe("theme preference contract", () => {
     expect(document.documentElement.dataset.theme).toBe("dark");
   });
 
-  it.each([false, true])("preserves high contrast independently of the OS scheme (dark=%s)", (dark) => {
+  it.each([false, true])("falls back from deferred high contrast to the OS scheme before first paint (dark=%s)", (dark) => {
     systemTheme(dark);
     localStorage.setItem("tracelab.auth.v2", JSON.stringify({ user_id: "alice" }));
     localStorage.setItem(themeStorageKey("alice"), "hc");
-    expect(readThemeChoice("alice")).toBe("hc");
-    expect(themeSnapshot("alice")).toBe("hc:hc");
+    const resolved = dark ? "dark" : "light";
+    expect(readThemeChoice("alice")).toBe("system");
+    expect(themeSnapshot("alice")).toBe(`system:${resolved}`);
     window.eval(themeBootstrapScript);
-    expect(document.documentElement.dataset.theme).toBe("hc");
-    expect(document.documentElement.classList.contains("dark")).toBe(false);
-    expect(document.documentElement.style.colorScheme).toBe("light");
+    expect(document.documentElement.dataset.theme).toBe(resolved);
+    expect(document.documentElement.classList.contains("dark")).toBe(dark);
+    expect(document.documentElement.style.colorScheme).toBe(resolved);
   });
 
   it("keeps first paint and user controls usable when storage is disabled", () => {

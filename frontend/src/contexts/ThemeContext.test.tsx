@@ -16,24 +16,27 @@ beforeEach(() => {
 const picker = () => <ThemeProvider><ThemeSelect /></ThemeProvider>;
 
 describe("per-user appearance", () => {
-  it("offers exactly the palettes shipped in the vendored Brand A tokens, plus System", () => {
+  it("offers the accepted shipped palettes and explicitly defers High contrast", () => {
     const css = readFileSync("node_modules/@oods/tokens/dist/css/tokens.css", "utf8");
     // `base` is an alias in the same selector block as light, not another palette.
     expect(css).toMatch(/\[data-brand='A'\]\[data-theme='base'\],\s*\[data-brand='A'\]\[data-theme='light'\] \{/);
     const themes = [...new Set([...css.matchAll(/\[data-brand='A'\]\[data-theme='([^']+)'\]/g)].map(match => match[1]))].filter(theme => theme !== "base");
     render(picker());
     const choices = screen.getAllByRole("option").map(option => (option as HTMLOptionElement).value);
-    expect(choices.sort()).toEqual([...themes, "system"].sort());
+    expect(choices.sort()).toEqual(["dark", "light", "system"]);
+    // Decision #408 defers the failing hc palette. New upstream palettes still
+    // require review instead of silently becoming available to users.
+    expect(themes.sort()).toEqual([...choices.filter(choice => choice !== "system"), "hc"].sort());
   });
-  it("keeps High contrast selected across OS changes and persisted for the user", () => {
+  it("treats a stored deferred High contrast choice as System across OS changes", () => {
+    localStorage.setItem(themeStorageKey("alice"), "hc");
     render(picker());
-    fireEvent.change(screen.getByLabelText("Color theme"), { target: { value: "hc" } });
-    expect(document.documentElement.dataset.theme).toBe("hc");
-    expect(document.documentElement.classList.contains("dark")).toBe(false);
-    expect(document.documentElement.style.colorScheme).toBe("light");
+    expect(document.documentElement.dataset.theme).toBe("dark");
+    expect((screen.getByLabelText("Color theme") as HTMLSelectElement).value).toBe("system");
+    expect(screen.queryByRole("option", { name: "High contrast" })).toBeNull();
     act(() => { media.matches = false; media.dispatchEvent(new Event("change")); });
-    expect(document.documentElement.dataset.theme).toBe("hc");
-    expect(localStorage.getItem(themeStorageKey("alice"))).toBe("hc");
+    expect(document.documentElement.dataset.theme).toBe("light");
+    expect(screen.getByRole("option", { name: "System (Light)" })).toBeTruthy();
   });
   it("follows OS changes only while System is selected", () => {
     render(picker());

@@ -75,36 +75,41 @@ test("theme persists through hydration and OS changes without a wrong-color fram
   expect(errors).toEqual([]);
 });
 
-test("the head bootstrap paints System dark before delayed hydration", async ({ page }) => {
-  let releaseHydration!: () => void;
-  const hydration = new Promise<void>(resolve => { releaseHydration = resolve; });
-  await page.route("**/_next/**/*.js", async route => { await hydration; await route.continue(); });
-  try {
-    await page.goto("/missions", { waitUntil: "commit" });
-    await expect(page.getByText("Loading workspace…")).toBeVisible();
+for (const storedChoice of ["system", "hc"]) {
+  test(`the head bootstrap resolves stored ${storedChoice} to System dark before delayed hydration`, async ({ page }) => {
+    await page.addInitScript(choice => localStorage.setItem("tracelab.theme.v1:alice", choice), storedChoice);
+    let releaseHydration!: () => void;
+    const hydration = new Promise<void>(resolve => { releaseHydration = resolve; });
+    await page.route("**/_next/**/*.js", async route => { await hydration; await route.continue(); });
+    try {
+      await page.goto("/missions", { waitUntil: "commit" });
+      await expect(page.getByText("Loading workspace…")).toBeVisible();
+      await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+      expect(await page.locator("body").evaluate(node => getComputedStyle(node).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
+    } finally {
+      releaseHydration();
+    }
+    await expect(page.getByRole("heading", { name: "Missions", exact: true })).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-    expect(await page.locator("body").evaluate(node => getComputedStyle(node).backgroundColor)).not.toBe("rgba(0, 0, 0, 0)");
-  } finally {
-    releaseHydration();
-  }
-  await expect(page.getByRole("heading", { name: "Missions", exact: true })).toBeVisible();
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-});
+    await expect(page.getByRole("combobox", { name: "Color theme" })).toHaveValue("system");
+    await expect(page.getByRole("option", { name: "High contrast" })).toHaveCount(0);
+  });
+}
 
-test("High contrast persists across reload and OS changes with native keyboard focus", async ({ page }) => {
+test("Light persists across reload and OS changes with native keyboard focus", async ({ page }) => {
   await page.goto("/missions");
   const selector = page.getByRole("combobox", { name: "Color theme" });
   await selector.focus();
-  // Native type-ahead selects High contrast, then Enter commits it.
-  await selector.press("h");
+  // Native type-ahead selects Light, then Enter commits it.
+  await selector.press("l");
   await selector.press("Enter");
-  await expect(selector).toHaveValue("hc");
+  await expect(selector).toHaveValue("light");
   await expect(selector).toBeFocused();
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "hc");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await page.reload();
-  await expect(selector).toHaveValue("hc");
+  await expect(selector).toHaveValue("light");
   await page.emulateMedia({ colorScheme: "light" });
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "hc");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   expect(await page.locator("html").evaluate(node => ({ dark: node.classList.contains("dark"), scheme: node.style.colorScheme }))).toEqual({ dark: false, scheme: "light" });
 });
 

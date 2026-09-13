@@ -27,7 +27,7 @@ const routes=['/','/projects',`/projects/${ids.project}`,'/documents',`/document
 const selected=process.env.UI_ROUTE?[process.env.UI_ROUTE]:process.env.UI_PROBE?['/missions','/search','/settings','/admin/users','/evidence']:routes;
 browser=await chromium.launch({headless:true});
 const results=[];
-for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark','hc'])) {
+for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'])) {
  for (const width of (process.env.UI_WIDTH?[Number(process.env.UI_WIDTH)]:[1440,390])) {
   let transportErrors=[]; let navigationCancellations=[];
   const context=await browser.newContext({viewport:{width,height:1000},colorScheme:theme === 'dark' ? 'dark' : 'light'});

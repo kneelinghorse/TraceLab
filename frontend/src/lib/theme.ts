@@ -1,4 +1,5 @@
-export const THEME_LABELS = { light: "Light", "dark": "Dark", hc: "High contrast" } as const;
+// High contrast is deferred until certified tokens pass consumer acceptance (THEME-2).
+export const THEME_LABELS = { light: "Light", "dark": "Dark" } as const;
 export type ThemeName = keyof typeof THEME_LABELS;
 export type ThemeChoice = "system" | ThemeName;
 
@@ -15,7 +16,7 @@ export function readThemeChoice(userId?: string | null): ThemeChoice {
   } catch {
     value = transientChoices.get(key);
   }
-  return value === "light" || value === "dark" || value === "hc" ? value : "system";
+  return value === "light" || value === "dark" ? value : "system";
 }
 
 export function writeThemeChoice(choice: ThemeChoice, userId?: string | null) {
