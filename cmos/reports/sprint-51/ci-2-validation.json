@@ -1,6 +1,6 @@
 {
   "mission": "CI-2",
-  "status": "awaiting-ci",
+  "status": "completed",
   "base_commit": "d51ed2c3151e40b1f8017464dcf9b12406dcfaf2",
   "disposition": {
     "ruff_full": "drop",
@@ -152,13 +152,85 @@
     }
   ],
   "promotion": "No new lane. Existing required ruff-diff has five original-attempt main push successes. Dropped lanes are absent, not promoted or represented as fixed.",
-  "pull_request": null,
-  "ci_after": null,
-  "main_after": null,
-  "branch_protection": null,
-  "remaining": [
-    "PR checks, merge, first post-change main Backend Lint success, branch-protection readback."
-  ],
+  "pull_request": 267,
+  "merge_commit": "28747385491f5ade099c6d7b692d19fc52da17cb",
+  "ci_after": {
+    "source_commit": "b84728890723b91344c9b84894ba332c98502519",
+    "all_jobs": "passed",
+    "lint_run": 34772727238,
+    "frontend_checks_run": 34772727149,
+    "frontend_build_run": 34772727178,
+    "backend": {
+      "run": 34772727181,
+      "passed": 2427,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 48
+    },
+    "postgres": {
+      "run": 34772727150,
+      "passed": 129,
+      "skipped": 4,
+      "warnings": 17
+    },
+    "secret_scan_run": 34772727171
+  },
+  "main_after": {
+    "attempt": 1,
+    "conclusion": "success",
+    "databaseId": 34773146752,
+    "event": "push",
+    "headSha": "28747385491f5ade099c6d7b692d19fc52da17cb",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "databaseId": 103766309155,
+        "name": "ruff-diff",
+        "status": "completed"
+      }
+    ],
+    "status": "completed"
+  },
+  "branch_protection": {
+    "url": "https://api.github.com/repos/kneelinghorse/TraceLab/branches/main/protection/required_status_checks",
+    "strict": true,
+    "contexts": [
+      "backend-suite",
+      "vitest",
+      "type-check",
+      "ruff-diff",
+      "build-frontend-production",
+      "Secret Scan"
+    ],
+    "contexts_url": "https://api.github.com/repos/kneelinghorse/TraceLab/branches/main/protection/required_status_checks/contexts",
+    "checks": [
+      {
+        "context": "backend-suite",
+        "app_id": 15368
+      },
+      {
+        "context": "vitest",
+        "app_id": 15368
+      },
+      {
+        "context": "type-check",
+        "app_id": 15368
+      },
+      {
+        "context": "ruff-diff",
+        "app_id": 15368
+      },
+      {
+        "context": "build-frontend-production",
+        "app_id": 15368
+      },
+      {
+        "context": "Secret Scan",
+        "app_id": 15368
+      }
+    ]
+  },
+  "remaining": [],
   "limitations": [
     "Repository-wide Ruff and Python type findings remain unfixed. No replacement Python type-checking CI gate is introduced."
   ]
