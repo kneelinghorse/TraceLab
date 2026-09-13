@@ -14,6 +14,7 @@ from sqlalchemy import (
     Table,
     Text,
     UniqueConstraint,
+    event,
 )
 
 from app.core.database import engine
@@ -157,6 +158,52 @@ def test_bfs_respects_depth_limit(db_session, graph_layer):
 
     assert mid in urns
     assert leaf not in urns
+
+
+@pytest.mark.parametrize("max_depth", [1, 2])
+def test_depth_boundary_keeps_candidates_without_reading_their_edges(
+    db_session, graph_layer, max_depth
+):
+    """Depth limits bound database work as well as the returned graph horizon."""
+    seed = "urn:research:project:boundary-seed"
+    mids = [f"urn:research:document:boundary-mid-{index}" for index in range(201)]
+    leaves = [f"urn:research:document:boundary-leaf-{index}" for index in range(201)]
+    outside = [f"urn:research:document:boundary-outside-{index}" for index in range(201)]
+    db_session.add_all(
+        GraphEdge(from_urn=source, to_urn=target, edge_type="contains", direction="out")
+        for sources, targets in [([seed] * 201, mids), (mids, leaves), (leaves, outside)]
+        for source, target in zip(sources, targets, strict=True)
+    )
+    db_session.commit()
+    adjacency_reads = []
+
+    def capture_adjacency_reads(conn, cursor, statement, parameters, context, executemany):
+        if "FROM graph_edges" in statement and statement.lstrip().startswith("SELECT"):
+            adjacency_reads.append(parameters)
+
+    bind = db_session.get_bind()
+    event.listen(bind, "before_cursor_execute", capture_adjacency_reads)
+    try:
+        layer = graph_layer.search(
+            [seed],
+            config=GraphLayerConfig(max_depth=max_depth, max_candidates=1000),
+        )
+    finally:
+        event.remove(bind, "before_cursor_execute", capture_adjacency_reads)
+
+    expected = set(mids) | (set(leaves) if max_depth == 2 else set())
+    assert {entry["urn"] for entry in layer.results} == expected
+    for entry in layer.results:
+        depth = 1 if entry["urn"] in mids else 2
+        assert entry["depth"] == depth
+        assert entry["score"] == pytest.approx(0.7**depth)
+        assert entry["seed_urn"] == seed
+    # A frontier larger than one batch must never fetch terminal adjacency.
+    queried_urns = {urn for parameters in adjacency_reads for urn in parameters}
+    assert queried_urns == {seed} | (set(mids) if max_depth == 2 else set())
+    assert len(adjacency_reads) <= (3 if max_depth == 2 else 1)
+    assert layer.metadata["total_candidates"] == len(expected)
+    assert layer.metadata["edge_type_usage"] == {"contains": len(expected)}
 
 
 def test_decay_scoring_from_seed_score(db_session, graph_layer, project):
