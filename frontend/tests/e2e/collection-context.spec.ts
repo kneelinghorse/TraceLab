@@ -29,13 +29,15 @@ for (const theme of ["light", "dark"] as const) for (const width of [390, 820, 1
     const mission = { id: "seeded", mission_id: "", title: "", objective: "", success_criteria: [], project_id: project, status: "draft", context: {}, tags: [], deliverables: [], metadata: {}, research_phases: {}, execution_metadata: {}, created_at: stamp, updated_at: stamp };
     let submitted = 0;
     let created = 0;
+    let releaseProjects!: () => void;
+    const projectsReady = new Promise<void>(resolve => { releaseProjects = resolve; });
     await page.route("**/api/v1/**", async route => {
       const request = route.request(); const url = new URL(request.url()); const endpoint = url.pathname; const method = request.method();
       const body = method === "GET" ? null : request.postDataJSON();
       let result: unknown = {};
       if (endpoint.endsWith("/auth/me")) result = { user_id: "reader", email: "reader@example.test", role: "admin" };
       else if (endpoint.endsWith("/home")) result = { missions: { total: 0 }, attention: { total: 0 } };
-      else if (endpoint.endsWith("/projects")) result = { data: [{ id: project, name: "Research" }], pagination: { page: 1, pages: 1, total: 1 } };
+      else if (endpoint.endsWith("/projects")) { await projectsReady; result = { data: [{ id: project, name: "Research" }], pagination: { page: 1, pages: 1, total: 1 } }; }
       else if (endpoint.endsWith("/mission-seed")) result = { collection_id: collection.id, title: `Research: ${collection.name}`, project_id: project, background: collection.instructions, references, context };
       else if (endpoint.endsWith("/collections/collection/documents")) { const current = Number(url.searchParams.get("page") || 1); result = { items: documents.slice((current - 1) * 20, current * 20), total: 123, page: current, page_size: 20 }; }
       else if (endpoint.endsWith("/collections/collection")) { if (method === "PUT") Object.assign(collection, body); result = collection; }
@@ -74,6 +76,9 @@ for (const theme of ["light", "dark"] as const) for (const width of [390, 820, 1
     await accessible(page); await page.screenshot({ path: info.outputPath("collection-context.png"), fullPage: true });
     await page.getByRole("link", { name: "Seed mission" }).click();
     await expect(page.getByText("Review 123 source documents", { exact: true })).toBeVisible();
+    await expect(page.getByLabel("Project", { exact: false })).toBeVisible();
+    releaseProjects();
+    await expect(page.getByLabel("Project", { exact: false })).toHaveValue(project);
     expect(created).toBe(0); expect(submitted).toBe(0);
     await page.getByLabel("Objective", { exact: false }).fill("Compare the evidence for the stated research question.");
     await page.getByRole("textbox", { name: "Success Criteria 1", exact: true }).fill("Cite a primary source and preserve competing claims.");

@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, expect, it, vi } from "vitest";
 import { SWRConfig } from "swr";
 import { MissionForm } from "@/components/missions/MissionForm";
@@ -117,6 +117,21 @@ it("seeds collection instructions and document references into a reviewed draft 
   expect(mocks.create).toHaveBeenCalledWith(expect.objectContaining({ status: "draft", background: seed.background, context: seed.context, references: seed.references }));
   expect(mocks.create.mock.calls[0][0]).not.toHaveProperty("collection_id");
   expect(mocks.submitToDeepSearch).toHaveBeenCalledWith("saved");
+});
+
+it.each(["collection", "rerun"])("shows the %s destination after project options load and retains user changes", async kind => {
+  let resolveProjects!: (projects: { id: string; name: string }[]) => void;
+  mocks.listAllProjects.mockReturnValue(new Promise(resolve => { resolveProjects = resolve; }));
+  form(kind === "collection" ? { source: undefined, seed: { collection_id: "context", title: "Sources", project_id: projectId, background: "Instructions", references: [], context: {} } } : {});
+  const select = screen.getByLabelText(/Project/);
+  expect(screen.queryByRole("option", { name: "Research" })).not.toBeInTheDocument();
+  const otherProject = "10000000-0000-4000-8000-000000000002";
+  await act(async () => resolveProjects([{ id: projectId, name: "Research" }, { id: otherProject, name: "Other destination" }]));
+  await screen.findByRole("option", { name: "Research" });
+  expect(select).toHaveValue(projectId);
+  fireEvent.change(select, { target: { value: otherProject } });
+  expect(select).toHaveValue(otherProject);
+  expect(mocks.create).not.toHaveBeenCalled();
 });
 
 it("does not choose a destination project for mixed-project collection context", async () => {
