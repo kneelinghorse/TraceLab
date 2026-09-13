@@ -34,11 +34,7 @@
       "readOnlyApiProxy": true
     }
   },
-  "remaining": [
-    "Required CI at final PR revision",
-    "Merge and deployed 31-route baseline",
-    "Archive production screenshots and close CMOS mission/sprint"
-  ],
+  "remaining": [],
   "test_setup_corrections": [
     "Report dialog fixture initially had no collection chunks, correctly disabling report creation. Corrected fixture to contain one real-shaped chunk.",
     "Browser tests exposed focus restoration lost by conditionally mounting autofocus modal content. Retaining closed native dialogs fixes report and user-delete focus restoration.",
@@ -47,5 +43,64 @@
   "limitations": [
     "Production browser validation is read-only; explicit mutation acceptance, cancellation and failures use mocked HTTP unit/browser tests.",
     "The local 124-route pass predates the final modal focus fixes and collection card layout adjustment; targeted built-browser checks cover those changes, followed by the complete deployed baseline."
-  ]
+  ],
+  "production_smoke": {
+    "base": "https://tracelab.aquex.ai",
+    "checkedAt": "2026-09-13T14:58:54.516Z",
+    "checks": 124,
+    "routes": 31,
+    "failures": [],
+    "readOnly": true,
+    "directProductionApi": true,
+    "readOnlyApiProxy": false,
+    "parallel_theme_width_runs": 4
+  },
+  "ci": {
+    "head": "4541e27432359314240f8d572672179de7cdad15",
+    "pull_request": 263,
+    "required": "all passed",
+    "frontend_unit": {
+      "passed": 115,
+      "skipped": 0
+    },
+    "frontend_lint": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "backend": {
+      "passed": 2427,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 48,
+      "run": 34763640145
+    },
+    "postgres": {
+      "passed": 129,
+      "skipped": 4,
+      "warnings": 17,
+      "version": 15,
+      "run": 34763640156
+    },
+    "frontend_checks_run": 34763640161,
+    "frontend_build_run": 34763640142,
+    "advisory_failures": [
+      "ruff-full",
+      "mypy"
+    ]
+  },
+  "deployments": {
+    "merge_commit": "8da544d91571f64ba845b27eb12a6d461f20fa88",
+    "frontend": {
+      "id": "4524ccbe-e170-4e3a-a5db-e5347ec39430",
+      "status": "SUCCESS",
+      "commit": "8da544d91571f64ba845b27eb12a6d461f20fa88"
+    },
+    "backend": {
+      "id": "88cb1511-aa63-4b1c-bd19-0de1fe9641e6",
+      "status": "SUCCESS",
+      "commit": "8da544d91571f64ba845b27eb12a6d461f20fa88"
+    }
+  },
+  "accepted_deploy": "8da544d91571f64ba845b27eb12a6d461f20fa88",
+  "accepted_at": "2026-09-13T14:58:54.516Z"
 }
