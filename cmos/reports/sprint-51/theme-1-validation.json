@@ -82,9 +82,30 @@
   "blockers": [
     "The shipped hc palette maps active secondary/muted text to GrayText on Canvas. Chromium resolves #808080 on #ffffff, 3.94:1 instead of 4.5. Every one of 62 hc route/viewport checks fails serious contrast.",
     "Need certified Forge tokens that pass the full consumer baseline, or an explicit change to defer hc. No Forge modifications/messages authorized.",
-    "CI and deployed verification remain outstanding; failing hc has not been published."
+    "Both Railway SUCCESS deployment IDs and direct-production baseline remain outstanding; failing hc has not been merged or published."
   ],
-  "ci": null,
+  "ci": {
+    "source_commit": "a4fe8ee372def8d0c54eabfaacffbf480abb637f",
+    "required": "all passed",
+    "frontend_checks_run": 34772575795,
+    "frontend_build_run": 34772575823,
+    "backend": {
+      "run": 34772575830,
+      "passed": 2427,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 48
+    },
+    "postgres": {
+      "run": 34772575780,
+      "passed": 129,
+      "skipped": 4,
+      "warnings": 17
+    },
+    "secret_scan_run": 34772575868,
+    "lint_run": 34772575773,
+    "note": "This source predates CI-2. Its required ruff-diff passed; the two old optional repository-wide lint jobs failed and are separately retired by PR267. Receipt-only follow-up does not change the validated frontend."
+  },
   "deployments": null,
   "limitations": [
     "Local built app uses read-only real production data through the existing API proxy; this is not a deployed frontend acceptance test.",
@@ -136,5 +157,6 @@
     "frontend/tests/e2e/app-shell.spec.ts": "dded682b8f55dbb38fabdfca20f2e73312e68b022be6ca0d335578ca82b8132e",
     "frontend/vendor/README.md": "e23fe3bef10cb7d30c09a8fac467bd9389db33cbd82d250d0dd6b4ff9eab6a7c",
     "frontend/scripts/check-token-colors.test.ts": "3cd554a68fe57583ba1986fa7e782f51bed4394c7ea0220f3fc35b3ae2cd4db2"
-  }
+  },
+  "pull_request": 266
 }
