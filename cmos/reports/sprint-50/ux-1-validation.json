@@ -1,14 +1,14 @@
 {
   "mission": "UX-1",
-  "status": "blocked; GitHub Actions billing/capacity prevents final CI before merge and registry activation",
-  "updated_at": "2026-09-13T00:47:48.283405+00:00",
+  "status": "in_progress; paused for user-requested handoff; Forge-owned completion evidence and TraceLab PR merge outstanding",
+  "updated_at": "2026-09-13T01:25:03.172632+00:00",
   "forge": {
     "base": "114a268ea10b9141bc96925c69132179c7c4b334",
     "implementation_head": "a6c845163368af3e21fff61c88b75a1823448871",
     "pull_request": "https://github.com/kneelinghorse/OODS-Forge/pull/105",
     "backlog_request": "f091c849-fe1a-49d5-93ee-b8029219685a",
-    "current_ci_run": 34728733886,
-    "canonical_registry_activation": "pending merge and native worker refresh",
+    "current_ci_run": 34728936186,
+    "canonical_registry_activation": "Not performed by this session. Forge-owned dependency; explicit user delegation required for any TraceLab agent action in Forge.",
     "ci_merge_base": "e9f15a4a586921ce8c68dd3d24f5a01d0b24a281",
     "upstream_change": "Roadmap-only Sprint196 review closure; merged locally and source tree equality with tested CI revision verified before retaining receipts.",
     "bundled_runtime": {
@@ -60,14 +60,6 @@
       "runtime_job_seconds": 3539,
       "next_job_budget_minutes": 75
     },
-    "final_ci": {
-      "head": "a6c845163368af3e21fff61c88b75a1823448871",
-      "run": 34728733886,
-      "status": "jobs not started",
-      "reason": "GitHub account payments failed or spending limit needs increasing",
-      "url": "https://github.com/kneelinghorse/OODS-Forge/actions/runs/34728733886",
-      "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/local-portable/ci-34728733886-billing-block.json"
-    },
     "prior_ci_coverage": {
       "passed": 7163,
       "failed": 5,
@@ -103,9 +95,66 @@
       "skipped": 0,
       "failure": "Portable-health assertion against old canonical ledger; fixed proof is now retained, regression validation running.",
       "run": 34725928271,
-      "resolution": "Docs and canonical proof refreshed; all 61 targeted regression tests pass, including dist-only health after removing its authoring-file dependency."
+      "resolution": "Docs and canonical proof refreshed; all 61 targeted regression tests pass, including dist-only health after removing its authoring-file dependency.",
+      "diagnostic_correction": "Initial stale-proof-only explanation was incomplete. Dist-only B-12 also needed a census implementation independent of authoring YAML; see learning 154 and the later 61 passing focused regressions."
     },
-    "retained_proof_ci_merge_revision": "a7ef99a21c303e3ef66f57845e9f2b52475f79a3"
+    "retained_proof_ci_merge_revision": "a7ef99a21c303e3ef66f57845e9f2b52475f79a3",
+    "refused_ci": {
+      "head": "a6c845163368af3e21fff61c88b75a1823448871",
+      "run": 34728733886,
+      "status": "jobs not started",
+      "reason": "GitHub account payments failed or spending limit needs increasing",
+      "url": "https://github.com/kneelinghorse/OODS-Forge/actions/runs/34728733886",
+      "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/local-portable/ci-34728733886-billing-block.json"
+    },
+    "final_ci": {
+      "head": "af277eaa87e3d44a1388ae5da2ae88af26bb44be",
+      "run": 34728936186,
+      "status": "last observed partially passed; coverage, full MCP and runtime catalog outcomes unknown after user stopped work",
+      "runtime_job": 103648041176,
+      "url": "https://github.com/kneelinghorse/OODS-Forge/actions/runs/34728936186",
+      "note": "GitHub accepted the next push; no billing settings changed by the agent.",
+      "ci_merge_revision": "58d88da97dbd3d120aefb70fb3a913ec90fdc46b",
+      "portable_runtime": {
+        "status": "passed",
+        "node_versions": [
+          "v24.20.0",
+          "v20.11.1"
+        ],
+        "clean_assemblies": true,
+        "tools": 19,
+        "payload_sha256": "901a43a9be26532f4d358794be6860fbc7a0bb8f9ac1d2a8e8c88b167b6d3aa3",
+        "evidence": "forge-final-ci/acquisition.json"
+      },
+      "last_observed_at": "2026-09-13T01:05:56Z",
+      "observation_scope": "Historical snapshot from before the user stop; not refreshed during this handoff.",
+      "release_runtime": {
+        "status": "passed",
+        "job": 103648041114,
+        "cells": 42,
+        "passed": 42,
+        "failed": 0,
+        "bundle_head": "58d88da97dbd3d120aefb70fb3a913ec90fdc46b",
+        "archive_sha256": "3b50f551c455588f0e92b1171e75b9ce4b71de9be6a8fc85e785227e462cdbe8",
+        "evidence": "forge-final-ci/release/acquisition.json"
+      },
+      "consumer_suite": {
+        "status": "passed",
+        "job": 103648041105,
+        "stages_passed": [
+          13,
+          2,
+          305
+        ],
+        "skipped": 0,
+        "local_log": "/tmp/ux1-final-consumers-ci.log"
+      },
+      "unverified_final_jobs": {
+        "coverage": 103648041094,
+        "full_mcp_viz_determinism": 103648041126,
+        "runtime_cells": 103648041176
+      }
+    }
   },
   "mapping": {
     "objects": 7,
@@ -317,11 +366,11 @@
     ]
   },
   "pending": [
-    "Restore GitHub Actions billing/capacity, rerun final Forge CI and merge PR105",
-    "Refresh canonical Forge worker and verify the seven research objects through the provided connection",
-    "Attach landed commit to the roadmap-required backlog request",
-    "Pass TraceLab PR checks and merge mapping/evidence changes",
-    "CMOS health and final status verification"
+    "Next session reads the handoff and decision 391; resume TraceLab UX-1 with no inferred cross-repo authorization.",
+    "Receive Forge-owned landed revision, final checks and canonical registry activation evidence, or obtain explicit user delegation before any Forge action.",
+    "Verify all seven research objects and zero-error Mission workflow composition against the intended activated registry within authorized scope.",
+    "Reconcile and finish TraceLab PR257 checks/merge and retained evidence after the external dependency is satisfied.",
+    "Record actual success-criteria evidence, complete UX-1 only then, and verify CMOS status."
   ],
   "traceLab_ci": {
     "head": "e3952e471d457966528286e9bc6f92e740c69b7b",
@@ -383,5 +432,30 @@
     "additional_preview_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
     "head_difference": "Generated tool-reference documentation only; composition, code generation and style sources unchanged.",
     "summary": "oods-previews/preview-summary.json"
+  },
+  "session_handoff": {
+    "session_id": "PS-2026-09-12-005",
+    "document": "ux-1-session-handoff.md",
+    "scope_correction_decision": 391,
+    "evergreen_learning": 155,
+    "cross_repository_permission": "Explicit user permission required; Forge owns review, fixes, CI, merge and registry activation. No Forge actions or new messages during this handoff.",
+    "traceLab_head_before_local_handoff_commit": "c9e924c51fd773a705bc7a1120a9d68684fdde8a",
+    "publication": "Local handoff checkpoint only; no push or PR operation during closeout."
+  },
+  "traceLab_ci_latest_observed": {
+    "head": "c9e924c51fd773a705bc7a1120a9d68684fdde8a",
+    "required_checks": "passed before user stop; not a claim about the new local handoff commit",
+    "backend_run": 34728938305,
+    "frontend_production_run": 34728938338,
+    "frontend_checks_run": 34728938311,
+    "changed_file_ruff_run": 34728938306,
+    "secret_scan": "passed",
+    "integration_run": 34728938307,
+    "integration_final_status": "not finally rechecked at this head; previous e3952e4 run passed 125 with 4 skipped",
+    "advisory_baseline_failures": [
+      "ruff-full",
+      "mypy",
+      "frontend lint"
+    ]
   }
 }

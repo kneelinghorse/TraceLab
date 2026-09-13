@@ -1,0 +1,458 @@
+{
+  "calls": {
+    "bridge": {
+      "parity": true,
+      "revision": {
+        "commit": "58d88da97dbd3d120aefb70fb3a913ec90fdc46b",
+        "structuredDataManifestHash": "sha256:993644cc01a5f150ea42d2882a953577a0066a6cecb3f74032e1877d6e4e620d"
+      },
+      "svgHash": "e90d64c9f458b166d5919d59904fe0b6371613709a18855b7e19f5b73e0471d2",
+      "termination": {
+        "code": 0,
+        "signal": null
+      },
+      "tools": [
+        "artifact_certify",
+        "brand_apply",
+        "brand_intake",
+        "catalog_list",
+        "code_generate",
+        "dashboard_render",
+        "design_compose",
+        "design_preview",
+        "fidelity_preview",
+        "health",
+        "map",
+        "object",
+        "pipeline",
+        "registry_snapshot",
+        "repl",
+        "schema",
+        "structuredData_fetch",
+        "tokens_build",
+        "viz_render"
+      ]
+    },
+    "certify": {
+      "conformant": true,
+      "coverage": "certified",
+      "negativeCode": "OODS-V126",
+      "pillars": {
+        "a11yEquivalence": "pass",
+        "accuracy": "pass",
+        "contrast": "pass",
+        "determinism": "pass"
+      }
+    },
+    "dashboards": {
+      "fourPanelHtmlSha256": "00b1df879b163369913d9504e1f3ae82d2444598133f1217ab80971cdcb17132",
+      "repeatsIdentical": true,
+      "twoPanelHtmlSha256": "732b4c3107acee107c7bb5ea662dd9df884b4f9c0cdbb3ecd05af283fa54c519"
+    },
+    "fixturePins": [
+      {
+        "bytes": 60,
+        "fixture": "s194-health.json",
+        "sha256": "edae244bb0ec90acec8538028f5735e1591d1e9aa3bb6ee0f4cfcd3364f5ac59",
+        "tool": "health"
+      },
+      {
+        "bytes": 127,
+        "fixture": "s194-tokens-build.json",
+        "sha256": "262634f01345c74f9fe4d09dded5fe7b85cda4ffe417161cb20d7b067ac7fb46",
+        "tool": "tokens.build"
+      },
+      {
+        "bytes": 105,
+        "fixture": "s194-structuredData-fetch.json",
+        "sha256": "25cb7457d33291a4cee539358c3673cfc305c1ba11c3eff71fd9e31efe35b437",
+        "tool": "structuredData.fetch"
+      },
+      {
+        "bytes": 122,
+        "fixture": "s194-brand-apply.json",
+        "sha256": "7bd21cd811cb7e11a171be6ba10383ac3c90ffc574bbe890c8174d02c7d68b47",
+        "tool": "brand.apply"
+      },
+      {
+        "bytes": 908,
+        "fixture": "s194-brand-intake.json",
+        "sha256": "2c0d689f7e933a18cc48ebfb549b60b0112ffd7a41c61058c7359f2f445a4109",
+        "tool": "brand.intake"
+      },
+      {
+        "bytes": 111,
+        "fixture": "s194-catalog-list.json",
+        "sha256": "1fe037984ba4864821d3545a1d2d4d828570bb25a2839d88af7dc0fc6f87428d",
+        "tool": "catalog.list"
+      },
+      {
+        "bytes": 123,
+        "fixture": "s194-design-compose.json",
+        "sha256": "0224a94436ee2a8e13a7a1b28a89aff6fcd4ff0548cc00d3bbf321e038ddee00",
+        "tool": "design.compose"
+      },
+      {
+        "bytes": 123,
+        "fixture": "s194-design-preview.json",
+        "sha256": "b0d35ed84035b22aa164e4e26821fb4b30e7f4be2e81947dc78d0055f76c790c",
+        "tool": "design.preview"
+      },
+      {
+        "bytes": 143,
+        "fixture": "s194-pipeline.json",
+        "sha256": "04022a6046c39f0bec88c42cf71a59afa8ed5dd39ec7909b392faa7a2b0b47cb",
+        "tool": "pipeline"
+      },
+      {
+        "bytes": 71,
+        "fixture": "s194-registry-snapshot.json",
+        "sha256": "1979a3750c28176cbcbdb56b73f2add4c650b3cde4b6ce3f3841fbff5795e3ed",
+        "tool": "registry.snapshot"
+      },
+      {
+        "bytes": 809,
+        "fixture": "s194-viz-render.json",
+        "sha256": "2a850687881667f403f5a554ce2baa462bcefc4dc88e4d7f3e67d8873b7b8286",
+        "tool": "viz.render"
+      },
+      {
+        "bytes": 1482,
+        "fixture": "s194-dashboard-render.json",
+        "sha256": "1e66463fa39c7da75b9a017dcf0d7a357b6f3a0a184f2231d64118b3e639a854",
+        "tool": "dashboard.render"
+      },
+      {
+        "bytes": 106,
+        "fixture": "s194-artifact-certify.json",
+        "sha256": "de6959711792d74b068724bd860effaabe73d96b29f5fd64bc2105f2a6253a91",
+        "tool": "artifact.certify"
+      },
+      {
+        "bytes": 159,
+        "fixture": "s194-code-generate.json",
+        "sha256": "7257a1995526a8aaeeed8002ce592b052e6e6c417b34f918bb9fb4d992921a9a",
+        "tool": "code.generate"
+      },
+      {
+        "bytes": 3777,
+        "fixture": "s194-fidelity-preview.json",
+        "sha256": "79a38181c6b593d3e14adc9bc9462493f27045167d2934ae616c87bfe8ab05dc",
+        "tool": "fidelity.preview"
+      },
+      {
+        "bytes": 458,
+        "fixture": "s194-map.json",
+        "sha256": "8d3350cc21ddf3ad1fa1658850b0e4918ba584cabe108ad5dd0b54d3c548a6c0",
+        "tool": "map"
+      },
+      {
+        "bytes": 393,
+        "fixture": "s194-schema.json",
+        "sha256": "0d4c4b37fbae4e653a4492cf7a1fe47905bc2c5821a188cd3c10b605afb2277f",
+        "tool": "schema"
+      },
+      {
+        "bytes": 135,
+        "fixture": "s194-object.json",
+        "sha256": "0cdd899351e9bd9a6fa3ee7a21d5a33dce16c9d2c2c44c9a482f2022e3df9e9c",
+        "tool": "object"
+      },
+      {
+        "bytes": 193,
+        "fixture": "s194-repl.json",
+        "sha256": "73dbeaafc7be460a95e3d63bfdb18d17a25ab373af44416a84e5e14ca5ba2fe1",
+        "tool": "repl"
+      }
+    ],
+    "health": {
+      "registry": {
+        "components": 109,
+        "lastSync": "2026-09-11T05:30:00Z",
+        "objects": 18,
+        "traits": 45
+      },
+      "release": {
+        "apps": [
+          "Organization",
+          "Subscription",
+          "User"
+        ],
+        "archiveSha256": "f1126be2a97839f3bb6098c95ba1f24f833ef1d6195c4f4267a468aa527d31e1",
+        "bundleHead": "a7ef99a21c303e3ef66f57845e9f2b52475f79a3",
+        "cells": 42,
+        "fail": 0,
+        "frameworks": [
+          "react",
+          "vue"
+        ],
+        "pass": 42,
+        "typedGap": 0
+      },
+      "status": "ok",
+      "viz": {
+        "classified": 34,
+        "coreCells": 20,
+        "coreSurfaceComplete": 13,
+        "families": 8,
+        "patterns": 21,
+        "typedGaps": 7,
+        "types": 13
+      },
+      "warnings": []
+    },
+    "outcomes": {
+      "artifact.certify": {
+        "negativeCode": "OODS-V126",
+        "outcome": "pass",
+        "pillars": {
+          "a11yEquivalence": "pass",
+          "accuracy": "pass",
+          "contrast": "pass",
+          "determinism": "pass"
+        }
+      },
+      "brand.apply": {
+        "apply": false,
+        "code": "OODS-N020",
+        "data": {
+          "dependency": "canonical-brand-source",
+          "path": "/home/runner/work/_temp/forge-e2e-2007/packages/tokens/src/tokens/brands",
+          "tool": "brand.apply"
+        },
+        "details": {
+          "category": "not_found",
+          "context": {
+            "dependency": "canonical-brand-source",
+            "path": "/home/runner/work/_temp/forge-e2e-2007/packages/tokens/src/tokens/brands",
+            "tool": "brand.apply"
+          },
+          "retryable": false
+        },
+        "gap": "portable-brand-source-absent",
+        "incidentId": "b7e797f2-d5e6-4ed3-9647-58af53936c3e",
+        "isError": true,
+        "message": "brand.apply: canonical brand source is not shipped in this runtime.",
+        "outcome": "typed",
+        "retryable": false
+      },
+      "brand.intake": {
+        "envelopeHash": "13aba5930282af4858e7ab72dbfc1f5df7cd74c417a3bd62b9fdbabf5c4be941",
+        "outcome": "pass"
+      },
+      "catalog.list": {
+        "count": 109,
+        "outcome": "pass"
+      },
+      "code.generate": {
+        "outcome": "pass",
+        "reactHash": "sha256:1099163b8e9cd64b8aa9451c5b54bee2250734bce44a5e2d7064cf5dd192ecf4",
+        "vueHash": "sha256:226729bc403920b1b4b1e4df9468931c2bb400294b0d1d3e453817cab71c478c"
+      },
+      "dashboard.render": {
+        "outcome": "pass",
+        "repeated": true
+      },
+      "design.compose": {
+        "outcome": "pass",
+        "schemaHash": "64f4c206a2636ca8ccc87e2c3615215cb0049b26deacc79ffc0d5cf5d3803dbf"
+      },
+      "design.preview": {
+        "adapterCodePreserved": true,
+        "code": "OODS-N019",
+        "data": {
+          "command": "pnpm design:loop serve",
+          "cwd": "/home/runner/work/_temp/forge-e2e-2007"
+        },
+        "details": {
+          "category": "not_found",
+          "context": {
+            "command": "pnpm design:loop serve",
+            "cwd": "/home/runner/work/_temp/forge-e2e-2007"
+          },
+          "retryable": true
+        },
+        "gap": "portable-design-loop-unavailable",
+        "incidentId": "15634bed-8261-4ca2-a9db-17170bf290ad",
+        "isError": true,
+        "message": "Design loop server not running in this checkout. Start it with pnpm design:loop serve.",
+        "outcome": "typed",
+        "retryable": true
+      },
+      "fidelity.preview": {
+        "htmlHash": "46c9c31460e6260e1db618b8d9beddd06090e865d0f583b26c4c100b81a6730e",
+        "outcome": "pass"
+      },
+      "health": {
+        "outcome": "pass",
+        "release": {
+          "apps": [
+            "Organization",
+            "Subscription",
+            "User"
+          ],
+          "archiveSha256": "f1126be2a97839f3bb6098c95ba1f24f833ef1d6195c4f4267a468aa527d31e1",
+          "bundleHead": "a7ef99a21c303e3ef66f57845e9f2b52475f79a3",
+          "cells": 42,
+          "fail": 0,
+          "frameworks": [
+            "react",
+            "vue"
+          ],
+          "pass": 42,
+          "typedGap": 0
+        },
+        "tokens": {
+          "brands": [
+            "A",
+            "B"
+          ],
+          "built": true,
+          "defaultScope": {
+            "brand": "A",
+            "source": "default",
+            "theme": "light"
+          },
+          "scopes": {
+            "A": [
+              "dark",
+              "hc",
+              "light"
+            ],
+            "B": [
+              "dark",
+              "hc",
+              "light"
+            ]
+          },
+          "themes": [
+            "dark",
+            "hc",
+            "light"
+          ]
+        },
+        "viz": {
+          "classified": 34,
+          "coreCells": 20,
+          "coreSurfaceComplete": 13,
+          "families": 8,
+          "patterns": 21,
+          "typedGaps": 7,
+          "types": 13
+        }
+      },
+      "map": {
+        "createdResolvedDeleted": true,
+        "outcome": "pass"
+      },
+      "object": {
+        "name": "Subscription",
+        "outcome": "pass"
+      },
+      "pipeline": {
+        "contentHash": "sha256:1099163b8e9cd64b8aa9451c5b54bee2250734bce44a5e2d7064cf5dd192ecf4",
+        "outcome": "pass"
+      },
+      "registry.snapshot": {
+        "etag": "8a042fbf4d1401d6595ae7e0bd6e8e47bf64343434fc1273024c943607cb1bcd",
+        "outcome": "pass"
+      },
+      "repl": {
+        "htmlHash": "b020e735745a77bcfe441541c3ca9a9974fdb4a7c88e5a5a35eff6762bb923d5",
+        "outcome": "pass"
+      },
+      "schema": {
+        "outcome": "pass",
+        "savedLoadedDeleted": true
+      },
+      "structuredData.fetch": {
+        "etag": "6de1e1666456a9cc0205514a64fdcebe67b60f96ef5fad94663aab25dd6009cc",
+        "outcome": "pass"
+      },
+      "tokens.build": {
+        "apply": true,
+        "artifacts": 5,
+        "outcome": "pass",
+        "preview": "Preview only: would return 5 token artifacts for brand B (dark theme)."
+      },
+      "viz.render": {
+        "contentHash": "2f192cce0365b6baae9c8ff41db0cc1bccd1cb1edc948683da8590e3f2b2442e",
+        "outcome": "pass"
+      }
+    },
+    "primarySequenceCount": 29,
+    "totalAcrossProcesses": 30,
+    "viz": {
+      "chartType": "bar",
+      "contentHash": "2f192cce0365b6baae9c8ff41db0cc1bccd1cb1edc948683da8590e3f2b2442e"
+    }
+  },
+  "extractionTree": {
+    "after": "f848ad0c5c52e877d530df4f1d84e380ba40c3a41cf385c4f9d323fe22745b49",
+    "before": "f848ad0c5c52e877d530df4f1d84e380ba40c3a41cf385c4f9d323fe22745b49",
+    "restoredAfterScopedWrites": true,
+    "unchanged": true
+  },
+  "healthPort": {
+    "canaryPort": 33611,
+    "inherited": false,
+    "listenerAbsent": true
+  },
+  "lifecycle": {
+    "primaryTermination": {
+      "code": 0,
+      "exited": true,
+      "method": "stdin-close",
+      "signal": null
+    },
+    "restart": {
+      "initialized": true,
+      "nativeHealth": "ok",
+      "sigterm": {
+        "alreadyExited": false,
+        "code": 0,
+        "forcedKill": false,
+        "requestedSignal": "SIGTERM",
+        "signal": null
+      }
+    },
+    "stdinClose": {
+      "code": 0,
+      "exited": true,
+      "signal": null
+    }
+  },
+  "manifest": {
+    "commit": "58d88da97dbd3d120aefb70fb3a913ec90fdc46b",
+    "dirty": false,
+    "file": "forge-runtime.manifest.json",
+    "payloadTreeSha256": "901a43a9be26532f4d358794be6860fbc7a0bb8f9ac1d2a8e8c88b167b6d3aa3",
+    "thirdPartyCount": 283
+  },
+  "nodeVersion": "v20.11.1",
+  "status": "pass",
+  "tools": {
+    "count": 19,
+    "names": [
+      "tokens_build",
+      "structuredData_fetch",
+      "brand_apply",
+      "brand_intake",
+      "catalog_list",
+      "code_generate",
+      "design_compose",
+      "design_preview",
+      "pipeline",
+      "health",
+      "registry_snapshot",
+      "viz_render",
+      "dashboard_render",
+      "artifact_certify",
+      "fidelity_preview",
+      "map",
+      "schema",
+      "object",
+      "repl"
+    ]
+  }
+}

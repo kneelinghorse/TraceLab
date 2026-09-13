@@ -1,0 +1,11 @@
+{
+  "run": 34728936186,
+  "job": 103648041114,
+  "artifact": "release-runtime",
+  "bundleHead": "58d88da97dbd3d120aefb70fb3a913ec90fdc46b",
+  "archiveSha256": "3b50f551c455588f0e92b1171e75b9ce4b71de9be6a8fc85e785227e462cdbe8",
+  "status": "All 42 cell rows match their original passing receipts and host artifacts.",
+  "full_download": "/tmp/ux1-final-ci-release",
+  "scope": "Retained ledger and validation metadata only; generated packages remain outside CMOS.",
+  "original_files_modified": false
+}
