@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import type { FormEvent, KeyboardEvent as ReactKeyboardEvent, ReactNode } from "react";
+import type { FormEvent, ReactNode } from "react";
 
 import { AuthGate } from "@/components/AuthGate";
 import { Navigation, NavigationIcon, activeNavigationItem, navigationGroups } from "@/components/Navigation";
 import { ThemeSelect } from "@/components/ThemeSelect";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRole } from "@/contexts/RoleContext";
+import { keepDialogFocus } from "@/lib/dialog-focus";
 import { OPEN_COMMAND_PALETTE_EVENT } from "@/lib/command-palette";
 
 function Brand() {
@@ -18,20 +19,6 @@ const subscribeHydration = () => () => {};
 const clientSnapshot = () => true;
 const serverSnapshot = () => false;
 
-function keepDialogFocus(event: ReactKeyboardEvent<HTMLDialogElement>) {
-  if (event.key !== "Tab") return;
-  const controls = Array.from(event.currentTarget.querySelectorAll<HTMLElement>("a[href], button:not(:disabled), input:not(:disabled), select:not(:disabled), [tabindex='0']"))
-    .filter((element) => element.getClientRects().length > 0);
-  const first = controls[0];
-  const last = controls[controls.length - 1];
-  if (event.shiftKey && document.activeElement === first) {
-    event.preventDefault();
-    last?.focus();
-  } else if (!event.shiftKey && document.activeElement === last) {
-    event.preventDefault();
-    first?.focus();
-  }
-}
 
 export function AppShell({ children }: { children: ReactNode }) {
   const hydrated = useSyncExternalStore(subscribeHydration, clientSnapshot, serverSnapshot);

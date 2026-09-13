@@ -1,0 +1,21 @@
+{
+  "checked_at": "2026-09-13T13:51:37.745Z",
+  "base": "http://127.0.0.1:3103",
+  "api": "http://127.0.0.1:8103",
+  "fixture": true,
+  "checks": 36,
+  "failures": 0,
+  "ledger_total": 50,
+  "supporting": 44,
+  "background": 6,
+  "search_total": 50,
+  "report_evidence": 50,
+  "document_evidence": 50,
+  "ids": {
+    "project": "b17c4eef-4e09-457a-873f-22915d8fcdbb",
+    "mission": "eadd3430-1180-4d39-96cb-c06ba277d2f9",
+    "report": "1c89ab89-f017-4471-b09b-0a2d9859a16c",
+    "document": "ef26dea0-e43f-43ce-9f1c-60659ab855df",
+    "session": "ux3-research-session"
+  }
+}

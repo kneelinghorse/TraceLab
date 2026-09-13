@@ -1,0 +1,86 @@
+[
+  {
+    "theme": "light",
+    "width": 390,
+    "kind": "report",
+    "writes": 0,
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "width": 390,
+    "kind": "document",
+    "writes": 0,
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "width": 390,
+    "kind": "mission",
+    "writes": 0,
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "kind": "report",
+    "writes": 0,
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "kind": "document",
+    "writes": 0,
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "width": 1440,
+    "kind": "mission",
+    "writes": 0,
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 390,
+    "kind": "report",
+    "writes": 0,
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 390,
+    "kind": "document",
+    "writes": 0,
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 390,
+    "kind": "mission",
+    "writes": 0,
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "kind": "report",
+    "writes": 0,
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "kind": "document",
+    "writes": 0,
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "width": 1440,
+    "kind": "mission",
+    "writes": 0,
+    "violations": []
+  }
+]

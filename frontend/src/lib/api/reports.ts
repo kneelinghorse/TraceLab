@@ -17,7 +17,7 @@ export type Citation = {
 export type ReportSource = {
   id: string;
   report_id: string;
-  source_type: "collection" | "chunk";
+  source_type: "collection" | "chunk" | "ledger_entry" | "ledger_note";
   source_id: string;
   added_at: string;
 };

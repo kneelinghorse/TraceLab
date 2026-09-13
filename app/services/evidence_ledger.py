@@ -9,6 +9,7 @@ import uuid
 from collections import Counter
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from datetime import date
 from typing import Any, Literal, cast
 from uuid import UUID
 
@@ -32,6 +33,7 @@ from app.models.mission import Mission
 from app.models.project import Project
 from app.models.report import Report, ReportSource
 from app.schemas.evidence_ledger import CaptureItem, CaptureRequest, NoteUpsertRequest
+from app.services.evidence_browser import filter_entries
 from app.services.report_promotion import ReportPromotionService
 
 MCP_AGENT_ORIGIN = "mcp-agent"
@@ -1108,6 +1110,11 @@ class EvidenceLedgerService:
         entry_access_filter: Any | None,
         note_access_filter: Any | None,
         allowed_project_ids: list[UUID] | None = None,
+        tag: str | None = None,
+        created_from: date | None = None,
+        created_until: date | None = None,
+        source_id: UUID | None = None,
+        related_filter: Any | None = None,
     ) -> tuple[list[LedgerEntry], list[LedgerNote], int, int]:
         """List accessible entries and notes before applying pagination."""
         if allowed_project_ids is not None and project_id not in allowed_project_ids:
@@ -1131,6 +1138,15 @@ class EvidenceLedgerService:
             note_query = note_query.filter(LedgerNote.mission_id == mission_id)
         if disposition is not None:
             entry_query = entry_query.filter(LedgerEntry.disposition == disposition)
+        entry_query = filter_entries(
+            entry_query,
+            db,
+            tag=tag,
+            created_from=created_from,
+            created_until=created_until,
+            source_id=source_id,
+            related_filter=related_filter,
+        )
         entry_total = entry_query.count()
         note_total = note_query.count()
         offset = (page - 1) * page_size
@@ -1161,6 +1177,11 @@ class EvidenceLedgerService:
         page_size: int,
         access_filter: Any | None,
         allowed_project_ids: list[UUID] | None = None,
+        tag: str | None = None,
+        created_from: date | None = None,
+        created_until: date | None = None,
+        source_id: UUID | None = None,
+        related_filter: Any | None = None,
     ) -> tuple[list[LedgerEntry], int]:
         """Run ranked PostgreSQL FTS with literal ILIKE fallback."""
         if allowed_project_ids is not None and project_id not in allowed_project_ids:
@@ -1197,6 +1218,15 @@ class EvidenceLedgerService:
             query = query.filter(LedgerEntry.mission_id == mission_id)
         if disposition is not None:
             query = query.filter(LedgerEntry.disposition == disposition)
+        query = filter_entries(
+            query,
+            db,
+            tag=tag,
+            created_from=created_from,
+            created_until=created_until,
+            source_id=source_id,
+            related_filter=related_filter,
+        )
         total = query.count()
         if rank is not None:
             query = query.order_by(

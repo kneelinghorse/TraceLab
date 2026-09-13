@@ -213,6 +213,8 @@ def _seed_specs(prefix: str, *, run_tag: str | None = None) -> list[SeedSpec]:
             routes=[
                 ("get", f"{api}/projects/{{id}}"),
                 ("get", f"{api}/projects/{{id}}/stats"),
+                ("get", f"{api}/evidence?project_id={{id}}"),
+                ("get", f"{api}/evidence/search?project_id={{id}}&q=rbac"),
                 ("put", f"{api}/projects/{{id}}"),
                 ("patch", f"{api}/projects/{{id}}"),
                 ("post", f"{api}/projects/{{id}}/restore"),

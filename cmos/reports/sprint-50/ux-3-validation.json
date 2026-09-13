@@ -1,0 +1,98 @@
+{
+  "mission": "UX-3",
+  "status": "implementation and local acceptance passed; CI and deployment pending",
+  "checked_at": "2026-09-13T13:51:37.745Z",
+  "contract": "cmos/contracts/evidence-browser.md",
+  "validation": {
+    "backend_regressions": {
+      "passed": 62,
+      "skipped": 0,
+      "warnings": 17
+    },
+    "rbac_harness_and_browser": {
+      "passed": 43,
+      "skipped": 0,
+      "warnings": 15
+    },
+    "postgres_filters": {
+      "passed": 1,
+      "skipped": 0,
+      "version": "14.19 local isolated PostgreSQL; CI targets PostgreSQL15"
+    },
+    "frontend_unit": {
+      "passed": 99,
+      "files": 14,
+      "skipped": 0
+    },
+    "shell_e2e": {
+      "passed": 13,
+      "skipped": 0,
+      "includes": "four retained native dialog keyboard regressions"
+    },
+    "browser_smoke": {
+      "checked_at": "2026-09-13T13:51:37.745Z",
+      "base": "http://127.0.0.1:3103",
+      "api": "http://127.0.0.1:8103",
+      "fixture": true,
+      "checks": 36,
+      "failures": 0,
+      "ledger_total": 50,
+      "supporting": 44,
+      "background": 6,
+      "search_total": 50,
+      "report_evidence": 50,
+      "document_evidence": 50,
+      "ids": {
+        "project": "b17c4eef-4e09-457a-873f-22915d8fcdbb",
+        "mission": "eadd3430-1180-4d39-96cb-c06ba277d2f9",
+        "report": "1c89ab89-f017-4471-b09b-0a2d9859a16c",
+        "document": "ef26dea0-e43f-43ce-9f1c-60659ab855df",
+        "session": "ux3-research-session"
+      }
+    },
+    "production_build": "passed",
+    "changed_file_ruff": "passed",
+    "changed_file_eslint": "passed",
+    "new_browser_modules_mypy": "passed",
+    "foundational_references": "passed",
+    "delete_dialogs": {
+      "checks": 12,
+      "failures": 0,
+      "write_requests": 0,
+      "receipt": "ux-3-delete-dialogs.json"
+    }
+  },
+  "production_inventory": {
+    "mission": "7b847edd-5433-4237-a899-57b47e6edf0a",
+    "entry_total": 370,
+    "supporting": 191,
+    "background": 170,
+    "rejected": 9,
+    "note": "Replaces the historical50-entry44/6 example for live acceptance; that example remains a synthetic fixture."
+  },
+  "limitations": [
+    "Source grouping is explicitly for the current result page; source detail has independently paginated accessible sightings.",
+    "Output links describe persisted or exact-URL provenance matches; they do not assert independent verification.",
+    "Production smoke is read-only and does not create promoted artifacts; promotion success/failure is covered by existing API regressions and frontend confirmation/retry tests."
+  ],
+  "remaining": [
+    "Required CI on the proposed revision",
+    "Merge and post-deploy read-only smoke on all five touched routes and promotion dialog, both themes"
+  ],
+  "resolved_findings": [
+    "Playwright exact select labels exposed ambiguous names; Project and Disposition now have explicit accessible names.",
+    "Temporary PostgreSQL fixture lacked the existing mission_logs table; created that model table and reran all36 measurements. Earlier failure receipts retained separately.",
+    "New PostgreSQL test fixture must populate the required user display_name.",
+    "Mission runner logs now use the shared authenticated HTTP client and SWR, clearing the existing legacy storage-key read and effect-state lint error on this touched route.",
+    "Native confirmation dialogs allowed Tab to leave the dialog. Extracted and reused the existing shell focus handler;13 retained browser tests and12 deletion-dialog focus/axe/cancel checks now pass. No-enabled-control busy states keep focus in the dialog."
+  ],
+  "ci_initial": {
+    "head": "01a22b6b579ebc34559af35a091c8d1cb70a4aa3",
+    "required": "all passed",
+    "postgres": {
+      "passed": 128,
+      "skipped": 4
+    },
+    "note": "Final CI reruns after the frontend dialog focus correction."
+  }
+}
