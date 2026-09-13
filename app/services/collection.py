@@ -7,13 +7,15 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session, noload
+from sqlalchemy.orm import Query, Session, noload
+from sqlalchemy.sql.elements import ColumnElement
 
 from app.core.database import SessionLocal
 from app.models.chunk import DocumentChunk
 from app.models.collection import Collection, CollectionItem
+from app.models.collection_document import CollectionDocument
 from app.models.document import Document
 from app.models.project import Project
 
@@ -100,7 +102,8 @@ class CollectionService:
             if access_filter is not None:
                 query = query.filter(access_filter)
             if project_id is not None:
-                query = query.filter(counts.c.item_count > 0)
+                direct_context = select(CollectionDocument.collection_id).where(CollectionDocument.document_id.in_(documents))
+                query = query.filter(or_(counts.c.item_count > 0, Collection.id.in_(direct_context)))
             total = query.count()
             rows = query.order_by(Collection.updated_at.desc(), Collection.id).offset((page - 1) * page_size).limit(page_size).all()
             return rows, total
@@ -112,6 +115,7 @@ class CollectionService:
         *,
         name: str,
         description: str | None = None,
+        instructions: str | None = None,
         owner_id: UUID | None = None,
         workspace_id: UUID | None = None,
     ) -> Collection:
@@ -130,6 +134,7 @@ class CollectionService:
             entry = Collection(
                 name=name_value,
                 description=self._clean_description(description),
+                instructions=instructions.strip() or None if instructions else None,
                 owner_id=owner_id,
                 workspace_id=workspace_id,
             )
@@ -167,6 +172,8 @@ class CollectionService:
                 entry.name = next_name
             if "description" in updates:
                 entry.description = self._clean_description(updates.get("description"))
+            if "instructions" in updates:
+                entry.instructions = (updates["instructions"] or "").strip() or None
 
             session.commit()
             session.refresh(entry)
@@ -207,6 +214,7 @@ class CollectionService:
         chunk_id: UUID | str,
         notes: str | None = None,
         accessible_project_ids: list[UUID] | None = None,
+        document_filter: ColumnElement[bool] | None = None,
     ) -> CollectionItem:
         """Add a live chunk to a collection within the caller's project scope."""
         session = self.session_factory()
@@ -261,6 +269,12 @@ class CollectionService:
                     raise CollectionChunkForbiddenError(
                         "You do not have access to this chunk."
                     )
+
+            if document_filter is not None:
+                readable = select(Document.id).where(document_filter)
+                allowed = session.query(DocumentChunk.id).filter(DocumentChunk.id == str(chunk_id), DocumentChunk.document_id.in_(readable)).first()
+                if allowed is None:
+                    raise CollectionChunkNotFoundError("Chunk not found.")
 
             # Check limit
             item_count = (
@@ -346,11 +360,24 @@ class CollectionService:
         finally:
             session.close()
 
+    @staticmethod
+    def _items_with_document_policy(
+        session: Session, collection_id: UUID, document_filter: ColumnElement[bool],
+        project_scope: list[UUID] | None,
+    ) -> Query[CollectionItem]:
+        documents = select(Document.id).where(document_filter)
+        if project_scope is not None:
+            documents = documents.where(Document.project_id.in_(project_scope))
+        return session.query(CollectionItem).join(DocumentChunk, CollectionItem.chunk_id == DocumentChunk.id).filter(
+            CollectionItem.collection_id == str(collection_id), DocumentChunk.document_id.in_(documents),
+        )
+
     def get_items(
         self,
         collection_id: UUID | str,
         *,
         accessible_project_ids: list[UUID] | None = None,
+        document_filter: ColumnElement[bool] | None = None,
     ) -> list[CollectionItem]:
         """Get all items in a collection with chunk data."""
         if accessible_project_ids == []:
@@ -358,6 +385,8 @@ class CollectionService:
 
         session = self.session_factory()
         try:
+            if document_filter is not None:
+                return self._items_with_document_policy(session, collection_id, document_filter, accessible_project_ids).order_by(CollectionItem.added_at.desc()).all()
             if accessible_project_ids is not None:
                 return (
                     session.query(CollectionItem)
@@ -389,6 +418,7 @@ class CollectionService:
         collection_id: UUID | str,
         *,
         accessible_project_ids: list[UUID] | None = None,
+        document_filter: ColumnElement[bool] | None = None,
     ) -> int:
         """Get count of items in a collection."""
         if accessible_project_ids == []:
@@ -396,6 +426,8 @@ class CollectionService:
 
         session = self.session_factory()
         try:
+            if document_filter is not None:
+                return self._items_with_document_policy(session, collection_id, document_filter, accessible_project_ids).count()
             if accessible_project_ids is not None:
                 return (
                     session.query(CollectionItem)
@@ -428,6 +460,7 @@ class CollectionService:
         collection_id: UUID | str,
         *,
         accessible_project_ids: list[UUID] | None = None,
+        document_filter: ColumnElement[bool] | None = None,
     ) -> str | None:
         """Export collection as markdown bundle for agent synthesis.
 
@@ -445,7 +478,9 @@ class CollectionService:
 
             # Keep the unrestricted query byte-identical. Scoped reads instead
             # resolve each child through its live document and project grant.
-            if accessible_project_ids is None:
+            if document_filter is not None:
+                items = self._items_with_document_policy(session, collection_id, document_filter, accessible_project_ids).order_by(CollectionItem.added_at.asc()).all()
+            elif accessible_project_ids is None:
                 items = (
                     session.query(CollectionItem)
                     .filter(CollectionItem.collection_id == str(collection_id))

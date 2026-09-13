@@ -15,6 +15,7 @@ from app.core.config import settings
 from app.ports.external import EmbeddingPort, LLMPort, VectorDBPort
 from app.ports.repositories import DocumentRepository, MissionRepository, ProjectRepository
 from app.services.admin_stats import AdminStatsService
+from app.services.collection_context import CollectionContextService
 from app.services.home import HomeService
 
 logger = logging.getLogger(__name__)
@@ -33,6 +34,13 @@ def get_project_repository() -> ProjectRepository:
 def get_mission_repository() -> MissionRepository:
     """Provide a MissionRepository backed by SQLAlchemy."""
     return SQLAlchemyMissionRepository()
+
+
+def get_collection_context_service() -> CollectionContextService:
+    """Wire complete readable collection context to authoring projection."""
+    from app.adapters.repositories.sqlalchemy_collection_context_repo import SQLAlchemyCollectionContextRepository
+
+    return CollectionContextService(SQLAlchemyCollectionContextRepository())
 
 
 def get_home_service() -> HomeService:

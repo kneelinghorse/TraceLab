@@ -7,13 +7,16 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
+from sqlalchemy.sql.elements import ColumnElement
 
 from app.core.authorization import (
     accessible_filter,
     accessible_project_ids,
     authorize_or_403,
 )
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.collection import Collection
@@ -39,24 +42,43 @@ from app.services.ownership import default_workspace_id
 router = APIRouter()
 
 
+def _document_policy(user: AuthenticatedUser, db: Session) -> ColumnElement[bool] | None:
+    if not settings.rbac_enabled:
+        return None
+    clauses = [Document.deleted_at.is_(None), Document.project_id.in_(select(Project.id).where(Project.deleted_at.is_(None)))]
+    scope = accessible_filter(user, Document, db)
+    if scope is not None:
+        clauses.append(scope)
+    return and_(*clauses)
+
+
+def _policy_kwargs(user: AuthenticatedUser, db: Session) -> dict:
+    policy = _document_policy(user, db)
+    return {"document_filter": policy} if policy is not None else {}
+
+
 def _build_collection_response(
     collection,
     service: CollectionService,
     *,
     project_scope: list[UUID] | None = None,
+    document_filter: ColumnElement[bool] | None = None,
 ) -> CollectionResponse:
     """Build a CollectionResponse with item count."""
+    child_kwargs = {"document_filter": document_filter} if document_filter is not None else {}
     if project_scope is None:
-        item_count = service.get_item_count(collection.id)
+        item_count = service.get_item_count(collection.id, **child_kwargs)
     else:
         item_count = service.get_item_count(
             collection.id,
             accessible_project_ids=project_scope,
+            **child_kwargs,
         )
     return CollectionResponse(
         id=collection.id,
         name=collection.name,
         description=collection.description,
+        instructions=getattr(collection, "instructions", None),
         created_at=collection.created_at,
         updated_at=collection.updated_at,
         item_count=item_count,
@@ -112,13 +134,14 @@ def list_collections(
         )
         return CollectionListResponse(data=[CollectionResponse(
             id=row.id, name=row.name, description=row.description, created_at=row.created_at,
-            updated_at=row.updated_at, item_count=count,
+            updated_at=row.updated_at, item_count=count, instructions=row.instructions,
         ) for row, count in rows], total=total)
     entries = service.list_collections(
         access_filter=accessible_filter(current_user, Collection, db)
     )
+    child_policy = _policy_kwargs(current_user, db)
     payload = [
-        _build_collection_response(entry, service, project_scope=project_scope)
+        _build_collection_response(entry, service, project_scope=project_scope, **child_policy)
         for entry in entries
     ]
     return CollectionListResponse(data=payload, total=len(payload))
@@ -144,12 +167,13 @@ def create_collection(
             description=request.description,
             owner_id=current_user.user_id,
             workspace_id=default_workspace_id(db),
+            **({"instructions": request.instructions} if request.instructions is not None else {}),
         )
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
         ) from exc
-    return _build_collection_response(entry, service, project_scope=project_scope)
+    return _build_collection_response(entry, service, project_scope=project_scope, **_policy_kwargs(current_user, db))
 
 
 @router.get("/{collection_id}", response_model=CollectionDetailResponse)
@@ -169,11 +193,12 @@ def get_collection(
 
     project_scope = accessible_project_ids(current_user, db)
     if project_scope is None:
-        items = service.get_items(collection_id)
+        items = service.get_items(collection_id, **_policy_kwargs(current_user, db))
     else:
         items = service.get_items(
             collection_id,
             accessible_project_ids=project_scope,
+            **_policy_kwargs(current_user, db),
         )
     item_responses = [_build_item_response(item) for item in items]
 
@@ -181,6 +206,7 @@ def get_collection(
         id=entry.id,
         name=entry.name,
         description=entry.description,
+        instructions=getattr(entry, "instructions", None),
         created_at=entry.created_at,
         updated_at=entry.updated_at,
         item_count=len(item_responses),
@@ -209,11 +235,12 @@ def export_collection(
 
     project_scope = accessible_project_ids(current_user, db)
     if project_scope is None:
-        markdown = service.export_markdown(collection_id)
+        markdown = service.export_markdown(collection_id, **_policy_kwargs(current_user, db))
     else:
         markdown = service.export_markdown(
             collection_id,
             accessible_project_ids=project_scope,
+            **_policy_kwargs(current_user, db),
         )
     if markdown is None:
         raise HTTPException(
@@ -268,7 +295,7 @@ def update_collection(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Collection not found."
         )
-    return _build_collection_response(entry, service, project_scope=project_scope)
+    return _build_collection_response(entry, service, project_scope=project_scope, **_policy_kwargs(current_user, db))
 
 
 @router.delete("/{collection_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -319,12 +346,14 @@ def add_chunk_to_collection(
                 collection_id,
                 chunk_id=request.chunk_id,
                 notes=request.notes,
+                **_policy_kwargs(current_user, db),
             )
         else:
             item = service.add_chunk(
                 collection_id,
                 chunk_id=request.chunk_id,
                 notes=request.notes,
+                **_policy_kwargs(current_user, db),
                 accessible_project_ids=project_scope,
             )
     except CollectionChunkNotFoundError as exc:

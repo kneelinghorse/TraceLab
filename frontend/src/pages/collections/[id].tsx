@@ -12,9 +12,15 @@ import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { parseApiTimestamp } from "@/lib/api/timestamps";
+import { CollectionDocuments } from "@/components/collections/CollectionDocuments";
 import useSWR from "swr";
 
 export default function CollectionDetailPage() {
+  const { user } = useAuth();
+  const [editInstructions, setEditInstructions] = useState("");
+  const [saving, setSaving] = useState(false);
   const { askConfirmation, notify, feedback } = useFeedback();
   const router = useRouter();
   const { id } = router.query;
@@ -26,7 +32,7 @@ export default function CollectionDetailPage() {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   const { data: collection, mutate, isLoading, error } = useSWR<CollectionDetail>(
-    id ? `collection-${id}` : null,
+    id ? ["collection", user?.user_id, id] : null,
     () => collectionsApi.get(id as string)
   );
 
@@ -34,6 +40,7 @@ export default function CollectionDetailPage() {
     if (!collection) return;
     setEditName(collection.name);
     setEditDescription(collection.description || "");
+    setEditInstructions(collection.instructions || "");
     setIsEditing(true);
   };
 
@@ -44,22 +51,26 @@ export default function CollectionDetailPage() {
     }
 
     setEditError(null);
+    setSaving(true);
     try {
       await collectionsApi.update(collection.id, {
         name: editName.trim(),
-        description: editDescription.trim() || undefined,
+        description: editDescription.trim() || null,
+        instructions: editInstructions.trim() || null,
       });
       setIsEditing(false);
       mutate();
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to update collection";
       setEditError(message);
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleDelete = async () => {
     if (!collection) return;
-    if (!await askConfirmation(`Delete collection "${collection.name}"? This will not delete the chunks themselves.`)) {
+    if (!await askConfirmation(`Delete collection "${collection.name}"? The documents and excerpts will remain available.`)) {
       return;
     }
 
@@ -145,17 +156,20 @@ export default function CollectionDetailPage() {
                     className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
                   />
                 </div>
+                <label className="block text-sm font-medium text-secondary">Instructions<textarea value={editInstructions} onChange={event => setEditInstructions(event.target.value)} maxLength={20000} rows={5} className="mt-1 w-full rounded-lg border border-line-strong bg-surface px-4 py-2 text-foreground" /></label>
                 {editError && (
                   <p className="text-sm text-danger">{editError}</p>
                 )}
                 <div className="flex gap-3">
                   <button
+                    disabled={saving}
                     onClick={handleSaveEdit}
                     className="px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent transition-colors"
                   >
-                    Save
+                    {saving ? "Saving…" : "Save"}
                   </button>
                   <button
+                    disabled={saving}
                     onClick={() => {
                       setIsEditing(false);
                       setEditError(null);
@@ -170,7 +184,7 @@ export default function CollectionDetailPage() {
               <>
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div>
-                    <h1 className="text-2xl font-bold text-foreground">
+                    <h1 className="break-words text-2xl font-bold text-foreground">
                       {collection.name}
                     </h1>
                     {collection.description && (
@@ -180,6 +194,7 @@ export default function CollectionDetailPage() {
                     )}
                   </div>
                   <div className="flex max-w-full flex-wrap gap-2">
+                    <Link href={`/missions/new?collection=${collection.id}`} className="rounded bg-accent px-4 py-2 text-sm text-on-accent">Seed mission</Link>
                     <button
                       onClick={() => setIsReportModalOpen(true)}
                       disabled={collection.item_count === 0}
@@ -209,6 +224,7 @@ export default function CollectionDetailPage() {
                   </div>
                 </div>
 
+                <section className="mt-5 space-y-2" aria-label="Collection instructions"><h2 className="font-semibold">Instructions</h2><p className="whitespace-pre-wrap break-words text-sm text-secondary">{collection.instructions || "Add instructions to guide missions seeded from this collection."}</p></section>
                 <div className="mt-4 flex flex-wrap gap-4 text-sm text-secondary">
                   <span className="inline-flex items-center gap-1">
                     <span className="font-medium text-accent-text">
@@ -217,13 +233,14 @@ export default function CollectionDetailPage() {
                     {collection.item_count === 1 ? "chunk" : "chunks"}
                   </span>
                   <span>
-                    Created {formatDistanceToNow(new Date(collection.created_at), { addSuffix: true })}
+                    Created {formatDistanceToNow(parseApiTimestamp(collection.created_at), { addSuffix: true })}
                   </span>
                 </div>
               </>
             )}
           </div>
 
+          <CollectionDocuments collectionId={collection.id} onChange={() => mutate()} />
           {/* Collection Items */}
           <div className="bg-surface rounded-lg border border-line p-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">
@@ -274,7 +291,7 @@ export default function CollectionDetailPage() {
                         )}
 
                         <p className="mt-2 text-xs text-muted">
-                          Added {formatDistanceToNow(new Date(item.added_at), { addSuffix: true })}
+                          Added {formatDistanceToNow(parseApiTimestamp(item.added_at), { addSuffix: true })}
                         </p>
                       </div>
 

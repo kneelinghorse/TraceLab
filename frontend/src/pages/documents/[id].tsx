@@ -148,6 +148,7 @@ function DocumentDetail() {
               {document.name}
             </h1>
             <div className="mb-4 flex flex-wrap items-center gap-4"><StatusBadge {...documentState(document)} /><Link className="text-sm text-accent-text underline" href={`/projects/${document.project_id}`}>Open project</Link></div>
+            <div className="mb-4"><AddToCollection documentId={document.id} /></div>
 
             {/* Document Stats - Prominently displayed */}
             {(document.chunk_count != null || document.word_count != null || document.total_tokens != null) && (

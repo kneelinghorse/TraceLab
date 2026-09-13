@@ -1,0 +1,104 @@
+{
+  "mission": "UX-8",
+  "status": "local_verified_awaiting_ci_and_production",
+  "checked_at": "2026-09-13T22:25:38.670832+00:00",
+  "base_commit": "7350425249d393725b325715a3add581389fe1fd",
+  "decisions": [
+    411,
+    412,
+    413
+  ],
+  "changes": [
+    "Nullable collection instructions and direct document membership with PostgreSQL/SQLite migration 046",
+    "Complete authorized document context, server pagination and per-document removal; excerpt limit unchanged",
+    "Reviewed collection seed through existing mission background/references/context and save/preview/submit",
+    "Scoped report citation pages, report totals/status/project filters, unchanged md/json/txt content bytes and Unicode-safe download headers",
+    "RBAC collection child reads/export/additions and report synthesis resolve document policy before provider/cache use; legacy flag-off/internal signatures retained"
+  ],
+  "validation": {
+    "backend": {
+      "passed": 221,
+      "skipped": 0,
+      "warnings": 17,
+      "seconds": 42.63,
+      "suites": [
+        "collection_context",
+        "evidence_ledger_api",
+        "pedr_report_scope",
+        "reports_api",
+        "pedr_collection_scope",
+        "collections",
+        "project_hub",
+        "create_ownership_parity",
+        "missions_api",
+        "unit/test_oods_object_contract"
+      ]
+    },
+    "postgres": {
+      "passed": 5,
+      "skipped": 0,
+      "warnings": 14,
+      "seconds": 6.6,
+      "suites": [
+        "collection_context_postgres",
+        "project_favorites_postgres",
+        "evidence_browser_postgres"
+      ]
+    },
+    "frontend_unit": {
+      "passed": 184,
+      "skipped": 0,
+      "files": 28
+    },
+    "mcp": {
+      "passed": 77,
+      "skipped": 0,
+      "files": 3,
+      "built_first": true,
+      "guard": "actual handleGetMission -> TraceLabClient GET preserves all 123 structured refs/context/background"
+    },
+    "built_browser": {
+      "passed": 39,
+      "skipped": 0,
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "ux8_widths": [
+        390,
+        820,
+        1440
+      ],
+      "critical_serious_axe_findings": 0,
+      "horizontal_overflow": 0
+    },
+    "frontend_lint": "passed",
+    "frontend_types": "passed",
+    "frontend_production_build": "passed",
+    "ruff_all_changed_python": "passed",
+    "foundational_refs": "passed",
+    "git_diff_check": "passed"
+  },
+  "before": "ux-8-before/ (24 clean direct-production captures before implementation)",
+  "local_previews": {
+    "path": "ux-8-local-previews/",
+    "screenshots": 24
+  },
+  "visual_review": [
+    "Desktop Light collection document page, instructions and focus restoration",
+    "Mobile Dark report citations, source content, pagination and export controls"
+  ],
+  "limitations": [
+    "High contrast remains deferred under THEME-2; Light/Dark accepted token artifacts unchanged.",
+    "Document references are authored context, not a worker-enforced access boundary.",
+    "Source MCP schema/runtime is unchanged; this mission adds a client regression test.",
+    "Existing tests expose deprecation warnings, recorded above."
+  ],
+  "remaining": [
+    "Source CI and merge",
+    "Railway SUCCESS for both services",
+    "Actual production seed/save/submit and MCP read; authorized report citation navigation and byte exports",
+    "124 direct-production route/theme/viewport checks",
+    "Receipt publication and CMOS completion"
+  ]
+}

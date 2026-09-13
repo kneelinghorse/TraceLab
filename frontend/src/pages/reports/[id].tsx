@@ -2,7 +2,9 @@ import { HttpError } from "@/lib/api/http";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PageState } from "@/components/ui/PageState";
 import { Dialog } from "@/components/ui/Dialog";
-import { EvidencePanel } from "@/components/evidence/EvidencePanel";
+import { ReportCitations } from "@/components/evidence/ReportCitations";
+import { useAuth } from "@/contexts/AuthContext";
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 /**
  * Report detail page
  */
@@ -18,6 +20,7 @@ import useSWR from "swr";
 
 export default function ReportDetailPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const { id } = router.query;
   const [actionError, setActionError] = useState<string | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -41,7 +44,7 @@ export default function ReportDetailPage() {
   }, []);
 
   const { data: report, mutate, isLoading, error: loadError } = useSWR<ReportDetail>(
-    id ? `report-${id}` : null,
+    id ? ["report", user?.user_id, id] : null,
     () => reportsApi.get(id as string)
   );
 
@@ -205,7 +208,7 @@ export default function ReportDetailPage() {
               <>
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div className="flex flex-wrap items-center gap-3">
-                    <h1 className="text-2xl font-bold text-foreground">
+                    <h1 className="break-words text-2xl font-bold text-foreground">
                       {report.title}
                     </h1>
                     <button type="button" onClick={handleToggleStatus} title={report.status === "final" ? "Click to change to draft" : "Click to finalize"}><StatusBadge status={report.status} /></button>
@@ -275,11 +278,11 @@ export default function ReportDetailPage() {
                     Tokens: <span className="font-medium">{report.tokens_used.toLocaleString()}</span>
                   </span>
                   <span>
-                    Created {formatDistanceToNow(new Date(report.created_at), { addSuffix: true })}
+                    Created {formatDistanceToNow(parseApiTimestamp(report.created_at), { addSuffix: true })}
                   </span>
                   {report.updated_at !== report.created_at && (
                     <span>
-                      Updated {formatDistanceToNow(new Date(report.updated_at), { addSuffix: true })}
+                      Updated {formatDistanceToNow(parseApiTimestamp(report.updated_at), { addSuffix: true })}
                     </span>
                   )}
                 </div>
@@ -298,7 +301,7 @@ export default function ReportDetailPage() {
             )}
           </div>
 
-          <EvidencePanel projectId={report.project_id} filters={{ report_id: report.id }} />
+          <ReportCitations key={report.id} projectId={report.project_id} reportId={report.id} />
 
           {/* Report Content */}
           <div className="bg-surface rounded-lg border border-line p-6 mb-6">
@@ -312,7 +315,7 @@ export default function ReportDetailPage() {
           {report.citations && report.citations.length > 0 && (
             <div className="bg-surface rounded-lg border border-line p-6 mb-6">
               <h2 className="text-lg font-semibold text-foreground mb-4">
-                Citations ({report.citations.length})
+                Source excerpts ({report.citations.length})
               </h2>
               <div className="space-y-3">
                 {report.citations.map((citation, index) => (
@@ -349,7 +352,7 @@ export default function ReportDetailPage() {
           {report.sources && report.sources.length > 0 && (
             <div className="bg-surface rounded-lg border border-line p-6">
               <h2 className="text-lg font-semibold text-foreground mb-4">
-                Sources ({report.sources.length})
+                Source records ({report.sources.length})
               </h2>
               <div className="space-y-2">
                 {report.sources.map((source) => (
@@ -365,13 +368,12 @@ export default function ReportDetailPage() {
                       }`}>
                         {source.source_type}
                       </span>
-                      {source.source_type === "ledger_entry" && <Link className="text-sm text-accent-text underline" href={`/evidence/${source.source_id}`}>Open evidence</Link>}
                       <code className="text-sm text-secondary">
                         {source.source_id.slice(0, 8)}...
                       </code>
                     </div>
                     <span className="text-xs text-muted">
-                      {formatDistanceToNow(new Date(source.added_at), { addSuffix: true })}
+                      {formatDistanceToNow(parseApiTimestamp(source.added_at), { addSuffix: true })}
                     </span>
                   </div>
                 ))}

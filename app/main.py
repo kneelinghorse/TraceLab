@@ -17,6 +17,7 @@ from app.api.v1 import (
     auth,
     auth_device,
     cache,
+    collection_context,
     collections,
     corrections,
     decision_links,
@@ -321,6 +322,7 @@ app.include_router(
     tags=["saved-searches"],
     dependencies=protected_dependencies,
 )
+app.include_router(collection_context.router, prefix=f"{settings.api_v1_prefix}/collections", tags=["collections"])
 app.include_router(
     collections.router,
     prefix=f"{settings.api_v1_prefix}/collections",

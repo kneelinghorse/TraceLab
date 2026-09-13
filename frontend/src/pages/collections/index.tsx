@@ -10,9 +10,12 @@ import { collectionsApi, type Collection } from "@/lib/api/collections";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import useSWR from "swr";
 
 export default function CollectionsPage() {
+  const { user } = useAuth();
   const { askConfirmation, notify, feedback } = useFeedback();
   const [page, setPage] = useState(1);
   const [isCreating, setIsCreating] = useState(false);
@@ -21,14 +24,12 @@ export default function CollectionsPage() {
   const [createError, setCreateError] = useState<string | null>(null);
 
   const { data: response, mutate, isLoading, error } = useSWR(
-    "collections",
-    () => collectionsApi.list()
+    ["collections", user?.user_id, page],
+    () => collectionsApi.list({ page, page_size: 20 })
   );
 
-  const allCollections = response?.data ?? [];
-  const pages = Math.ceil(allCollections.length / 20);
-  const currentPage = Math.min(page, Math.max(1, pages));
-  const collections = allCollections.slice((currentPage - 1) * 20, currentPage * 20);
+  const collections = response?.data ?? [];
+  const pages = Math.ceil((response?.total ?? 0) / 20);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +55,7 @@ export default function CollectionsPage() {
   };
 
   const handleDelete = async (collection: Collection) => {
-    if (!await askConfirmation(`Delete collection "${collection.name}"? This will not delete the chunks themselves.`)) {
+    if (!await askConfirmation(`Delete collection "${collection.name}"? The documents and excerpts will remain available.`)) {
       return;
     }
 
@@ -76,7 +77,7 @@ export default function CollectionsPage() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground">Collections</h1>
             <p className="mt-2 text-secondary">
-              Organize chunks from searches and documents for later export or analysis
+              Keep instructions, documents and excerpts together to guide your next mission
             </p>
           </div>
 
@@ -148,6 +149,7 @@ export default function CollectionsPage() {
             )}
           </div>
 
+          {response && !error && <p className="mb-4 text-sm text-secondary">{response.total.toLocaleString()} collections</p>}
           {/* Collections List */}
           {error ? <PageState state="error" title="Collections could not load." onRetry={() => void mutate()} /> : isLoading ? (
             <PageState state="loading" title="Loading collections…" />
@@ -155,7 +157,7 @@ export default function CollectionsPage() {
             <div className="text-center py-12 bg-surface rounded-lg border border-line">
               <p className="text-muted mb-4">No collections yet</p>
               <p className="text-sm text-muted">
-                Create a collection to start organizing chunks from your searches and documents.
+                Create a collection, then add documents or excerpts from their detail pages.
               </p>
             </div>
           ) : (
@@ -169,7 +171,7 @@ export default function CollectionsPage() {
                     <div className="min-w-0 flex-1">
                       <Link
                         href={`/collections/${collection.id}`}
-                        className="text-lg font-semibold text-foreground hover:text-accent-text"
+                        className="break-words text-lg font-semibold text-foreground hover:text-accent-text"
                       >
                         {collection.name}
                       </Link>
@@ -188,11 +190,11 @@ export default function CollectionsPage() {
                           {collection.item_count === 1 ? "chunk" : "chunks"}
                         </span>
                         <span>
-                          Created {formatDistanceToNow(new Date(collection.created_at), { addSuffix: true })}
+                          Created {formatDistanceToNow(parseApiTimestamp(collection.created_at), { addSuffix: true })}
                         </span>
                         {collection.updated_at !== collection.created_at && (
                           <span>
-                            Updated {formatDistanceToNow(new Date(collection.updated_at), { addSuffix: true })}
+                            Updated {formatDistanceToNow(parseApiTimestamp(collection.updated_at), { addSuffix: true })}
                           </span>
                         )}
                       </div>
@@ -217,7 +219,7 @@ export default function CollectionsPage() {
               ))}
             </div>
           )}
-          {!error && <PaginationBar page={currentPage} pages={pages} total={response?.total} onChange={setPage} />}
+          {!error && <PaginationBar page={page} pages={pages} total={response?.total} onChange={setPage} />}
         </div>
       </div>
     </AuthGate>

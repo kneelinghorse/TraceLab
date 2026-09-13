@@ -1,0 +1,294 @@
+[
+  {
+    "route": "/collections",
+    "themeRequested": "light",
+    "theme": "light",
+    "width": 1440,
+    "status": 200,
+    "finalUrl": "https://tracelab.aquex.ai/collections",
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "shellPresent": true,
+    "background": "lab(96.2886 0.862062 11.5833)",
+    "overflow": [],
+    "violations": [],
+    "errors": [],
+    "transportErrors": [],
+    "navigationCancellations": [],
+    "screenshot": "light-1440-_collections.png"
+  },
+  {
+    "route": "/collections/ca279662-9224-47b7-80d6-341aeda41540",
+    "themeRequested": "light",
+    "theme": "light",
+    "width": 1440,
+    "status": 200,
+    "finalUrl": "https://tracelab.aquex.ai/collections/ca279662-9224-47b7-80d6-341aeda41540",
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "shellPresent": true,
+    "background": "lab(96.2886 0.862062 11.5833)",
+    "overflow": [],
+    "violations": [],
+    "errors": [],
+    "transportErrors": [],
+    "navigationCancellations": [],
+    "screenshot": "light-1440-_collections_ca279662-9224-47b7-80d6-341aeda41540.png"
+  },
+  {
+    "route": "/reports",
+    "themeRequested": "light",
+    "theme": "light",
+    "width": 1440,
+    "status": 200,
+    "finalUrl": "https://tracelab.aquex.ai/reports",
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "shellPresent": true,
+    "background": "lab(96.2886 0.862062 11.5833)",
+    "overflow": [],
+    "violations": [],
+    "errors": [],
+    "transportErrors": [],
+    "navigationCancellations": [],
+    "screenshot": "light-1440-_reports.png"
+  },
+  {
+    "route": "/reports/c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+    "themeRequested": "light",
+    "theme": "light",
+    "width": 1440,
+    "status": 200,
+    "finalUrl": "https://tracelab.aquex.ai/reports/c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+    "scrollWidth": 1440,
+    "mainCount": 1,
+    "shellPresent": true,
+    "background": "lab(96.2886 0.862062 11.5833)",
+    "overflow": [],
+    "violations": [],
+    "errors": [],
+    "transportErrors": [],
+    "navigationCancellations": [],
+    "screenshot": "light-1440-_reports_c2b3bc43-b25c-481e-80d7-02a6afc76e27.png"
+  },
+  {
+    "route": "/collections",
+    "themeRequested": "light",
+    "theme": "light",
+    "width": 820,
+    "status": 200,
+    "finalUrl": "https://tracelab.aquex.ai/collections",
+    "scrollWidth": 820,
+    "mainCount": 1,
+    "shellPresent": true,
+    "background": "lab(96.2886 0.862062 11.5833)",
+    "overflow": [],
+    "violations": [],
+    "errors": [],
+    "transportErrors": [],
+    "navigationCancellations": [],
+    "screenshot": "light-820-_collections.png"
+  },
+  {
+    "route": "/collections/ca279662-9224-47b7-80d6-341aeda41540",
+    "themeRequested": "light",
+    "theme": "light",
+    "width": 820,
+    "status": 200,
+    "finalUrl": "https://tracelab.aquex.ai/collections/ca279662-9224-47b7-80d6-341aeda41540",
+    "scrollWidth": 820,
+    "mainCount": 1,
+    "shellPresent": true,
+    "background": "lab(96.2886 0.862062 11.5833)",
+    "overflow": [],
+    "violations": [],
+    "errors": [],
+    "transportErrors": [],
+    "navigationCancellations": [],
+    "screenshot": "light-820-_collections_ca279662-9224-47b7-80d6-341aeda41540.png"
+  },
+  {
+    "route": "/reports",
+    "themeRequested": "light",
+    "theme": "light",
+    "width": 820,
+    "status": 200,
+    "finalUrl": "https://tracelab.aquex.ai/reports",
+    "scrollWidth": 820,
+    "mainCount": 1,
+    "shellPresent": true,
+    "background": "lab(96.2886 0.862062 11.5833)",
+    "overflow": [],
+    "violations": [],
+    "errors": [],
+    "transportErrors": [],
+    "navigationCancellations": [],
+    "screenshot": "light-820-_reports.png"
+  },
+  {
+    "route": "/reports/c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+    "themeRequested": "light",
+    "theme": "light",
+    "width": 820,
+    "status": 200,
+    "finalUrl": "https://tracelab.aquex.ai/reports/c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+    "scrollWidth": 820,
+    "mainCount": 1,
+    "shellPresent": true,
+    "background": "lab(96.2886 0.862062 11.5833)",
+    "overflow": [],
+    "violations": [],
+    "errors": [],
+    "transportErrors": [],
+    "navigationCancellations": [],
+    "screenshot": "light-820-_reports_c2b3bc43-b25c-481e-80d7-02a6afc76e27.png"
+  },
+  {
+    "route": "/collections",
+    "themeRequested": "light",
+    "theme": "light",
+    "width": 390,
+    "status": 200,
+    "finalUrl": "https://tracelab.aquex.ai/collections",
+    "scrollWidth": 390,
+    "mainCount": 1,
+    "shellPresent": true,
+    "background": "lab(96.2886 0.862062 11.5833)",
+    "overflow": [],
+    "violations": [],
+    "errors": [],
+    "transportErrors": [],
+    "navigationCancellations": [],
+    "screenshot": "light-390-_collections.png"
+  },
+  {
+    "route": "/collections/ca279662-9224-47b7-80d6-341aeda41540",
+    "themeRequested": "light",
+    "theme": "light",
+    "width": 390,
+    "status": 200,
+    "finalUrl": "https://tracelab.aquex.ai/collections/ca279662-9224-47b7-80d6-341aeda41540",
+    "scrollWidth": 390,
+    "mainCount": 1,
+    "shellPresent": true,
+    "background": "lab(96.2886 0.862062 11.5833)",
+    "overflow": [],
+    "violations": [],
+    "errors": [],
+    "transportErrors": [],
+    "navigationCancellations": [],
+    "screenshot": "light-390-_collections_ca279662-9224-47b7-80d6-341aeda41540.png"
+  },
+  {
+    "route": "/reports",
+    "themeRequested": "light",
+    "theme": "light",
+    "width": 390,
+    "status": 200,
+    "finalUrl": "https://tracelab.aquex.ai/reports",
+    "scrollWidth": 390,
+    "mainCount": 1,
+    "shellPresent": true,
+    "background": "lab(96.2886 0.862062 11.5833)",
+    "overflow": [
+      {
+        "tag": "TABLE",
+        "class": "min-w-full divide-y divide-line",
+        "text": "TitleStatusTypeChunksTokensCreatedResearch: U"
+      },
+      {
+        "tag": "THEAD",
+        "class": "bg-background",
+        "text": "TitleStatusTypeChunksTokensCreated"
+      },
+      {
+        "tag": "TR",
+        "class": "",
+        "text": "TitleStatusTypeChunksTokensCreated"
+      },
+      {
+        "tag": "TH",
+        "class": "px-6 py-3 text-left text-xs font-medium text-muted uppercase tracking-wider",
+        "text": "Created"
+      },
+      {
+        "tag": "TBODY",
+        "class": "bg-surface divide-y divide-line",
+        "text": "Research: UX-6 live audit: asynchronous job s"
+      },
+      {
+        "tag": "TR",
+        "class": "hover:bg-background cursor-pointer",
+        "text": "Research: UX-6 live audit: asynchronous job s"
+      },
+      {
+        "tag": "TD",
+        "class": "px-6 py-4 text-sm text-muted",
+        "text": "in about 4 hours"
+      },
+      {
+        "tag": "TR",
+        "class": "hover:bg-background cursor-pointer",
+        "text": "Research: UX patterns for AI-native research "
+      },
+      {
+        "tag": "TD",
+        "class": "px-6 py-4 text-sm text-muted",
+        "text": "1 day ago"
+      },
+      {
+        "tag": "TR",
+        "class": "hover:bg-background cursor-pointer",
+        "text": "Chicago Public Data Products: Verified Shortl"
+      },
+      {
+        "tag": "TD",
+        "class": "px-6 py-4 text-sm text-muted",
+        "text": "7 days ago"
+      },
+      {
+        "tag": "TR",
+        "class": "hover:bg-background cursor-pointer",
+        "text": "Financial & Wealth Planning Baseline Synthesi"
+      },
+      {
+        "tag": "TD",
+        "class": "px-6 py-4 text-sm text-muted",
+        "text": "10 days ago"
+      },
+      {
+        "tag": "TR",
+        "class": "hover:bg-background cursor-pointer",
+        "text": "Research: AI Review and Provenance Controls f"
+      },
+      {
+        "tag": "TD",
+        "class": "px-6 py-4 text-sm text-muted",
+        "text": "10 days ago"
+      }
+    ],
+    "violations": [],
+    "errors": [],
+    "transportErrors": [],
+    "navigationCancellations": [],
+    "screenshot": "light-390-_reports.png"
+  },
+  {
+    "route": "/reports/c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+    "themeRequested": "light",
+    "theme": "light",
+    "width": 390,
+    "status": 200,
+    "finalUrl": "https://tracelab.aquex.ai/reports/c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+    "scrollWidth": 390,
+    "mainCount": 1,
+    "shellPresent": true,
+    "background": "lab(96.2886 0.862062 11.5833)",
+    "overflow": [],
+    "violations": [],
+    "errors": [],
+    "transportErrors": [],
+    "navigationCancellations": [],
+    "screenshot": "light-390-_reports_c2b3bc43-b25c-481e-80d7-02a6afc76e27.png"
+  }
+]

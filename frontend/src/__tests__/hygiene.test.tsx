@@ -88,13 +88,15 @@ describe("shared feedback and page state", () => {
     expect(await screen.findByText(new RegExp(kind + " not found", "i"))).toBeVisible();
     expect(screen.queryByText(/Loading/)).toBeNull();
   });
-  it("pages a complete collection response without hiding its total", async () => {
-    mocks.collections.mockResolvedValue({ total: 25, data: Array.from({length:25},(_,i)=>({ id:String(i), name:"Collection " + (i+1), item_count:0, created_at:"2026-09-13T00:00:00Z", updated_at:"2026-09-13T00:00:00Z" })) });
+  it("requests each server collection page without hiding its scoped total", async () => {
+    const rows = Array.from({length:25},(_,i)=>({ id:String(i), name:"Collection " + (i+1), item_count:0, created_at:"2026-09-13T00:00:00Z", updated_at:"2026-09-13T00:00:00Z" }));
+    mocks.collections.mockImplementation(({page, page_size}) => Promise.resolve({ total: 25, data: rows.slice((page-1)*page_size, page*page_size) }));
     await browser(<CollectionsPage />);
     expect(await screen.findByText("Page 1 of 2 (25 total)")).toBeVisible();
     expect(screen.queryByRole("link", { name:"Collection 25", exact:true })).toBeNull();
     fireEvent.click(screen.getByRole("button", {name:"Next",exact:true}));
-    expect(screen.getByRole("link", {name:"Collection 25",exact:true})).toBeVisible();
+    expect(await screen.findByRole("link", {name:"Collection 25",exact:true})).toBeVisible();
+    expect(mocks.collections).toHaveBeenLastCalledWith({ page: 2, page_size: 20 });
   });
   it("device deep links fetch a preview only; a click is required to approve", async () => {
     mocks.router.query = { code:"BCDF-GHJK" };

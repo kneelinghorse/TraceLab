@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from urllib.parse import quote
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
@@ -13,9 +14,11 @@ from app.core.authorization import (
     accessible_project_ids,
     authorize_or_403,
 )
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.collection import Collection
+from app.models.document import Document
 from app.models.project import Project
 from app.schemas.report import (
     CitationSchema,
@@ -155,6 +158,11 @@ def create_report(
         )
         if project_scope is not None:
             create_kwargs["accessible_project_ids"] = project_scope
+        if settings.rbac_enabled:
+            document_scope = accessible_filter(current_user, Document, db)
+            create_kwargs["document_filter"] = (
+                document_scope if document_scope is not None else Document.deleted_at.is_(None)
+            )
         report, citations = service.create_report(**create_kwargs)
     except ValueError as exc:
         raise HTTPException(
@@ -261,11 +269,12 @@ def export_report(
         media_type = "text/markdown"
         filename = f"{safe_title}.md"
 
-    return Response(
-        content=content,
-        media_type=media_type,
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
-    )
+    # ASCII fallback keeps headers valid; UTF-8 titles retain a standards-based name.
+    fallback = "".join(char if 32 <= ord(char) < 127 and char not in '\\"' else "-" for char in filename)
+    disposition = f'attachment; filename="{fallback}"'
+    if fallback != filename:
+        disposition += "; filename*=UTF-8''" + quote(filename, safe="")
+    return Response(content=content, media_type=media_type, headers={"Content-Disposition": disposition})
 
 
 @router.put("/{report_id}", response_model=ReportDetailResponse)

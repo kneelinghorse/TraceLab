@@ -22,6 +22,7 @@ for (const theme of ["light","dark"] as const) for (const width of [390,1440]) {
       const collection={id:"collection",name:"Auditable research",description:"Preserve original sources",created_at:"2026-09-13T00:00:00Z",updated_at:"2026-09-13T00:00:00Z",item_count:1,items:[{id:"item",collection_id:"collection",chunk_id:"chunk",notes:null,added_at:"2026-09-13T00:00:00Z",chunk_content:"Original research finding",document_id:"doc"}]};
       if(pathname.endsWith("/auth/me"))body={user_id:"operator",email:"operator@example.test",display_name:"Operator",role:"admin"};
       else if(pathname.endsWith("/admin/users"))body=[{id:"member",email:"member@example.test",display_name:"Member",role:"member",is_active:true,created_at:"2026-09-13T00:00:00Z",last_login_at:null}];
+      else if(pathname.endsWith("/collections/collection/documents"))body={items:[],total:0,page:1,page_size:20};
       else if(pathname.endsWith("/collections/collection"))body=collection;
       else if(pathname.endsWith("/collections"))body={data:[collection],total:1};
       else if(pathname.endsWith("/documents"))body={data:[{id:"doc",name:"Source document",project_id:"project",file_type:"txt",processed:true,chunked:false,embedded:false}],pagination:{page:1,pages:1,total:1}};

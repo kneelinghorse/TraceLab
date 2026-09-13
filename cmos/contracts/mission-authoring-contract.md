@@ -96,6 +96,28 @@ Regression coverage: `tests/test_mission_views.py`,
 `TestMissionVerbContract` / MCP client suites, and the frontend mission unit and
 built-browser flows. No DB migration or worker SELECT change is needed.
 
+## Collection context seed (UX-8, 2026-09-13)
+
+`GET /collections/{id}/mission-seed` is a read-only projection of the collection's
+instructions and complete, currently readable document context. It independently
+checks the collection, documents and their non-deleted parent projects. Direct
+document membership and collected excerpts produce one reference per document;
+the projection is not limited to the first UI page.
+
+The seed uses existing authoring fields: `background` carries instructions and a
+named document inventory with UUIDs; `references` retains `{title, document_id,
+href}` objects; `context.collection_id` and `context.document_ids` retain source
+identity. The historical context object is used only for that provenance, not
+as a replacement for top-level compiler fields. A single source project may be
+preselected; mixed-project context leaves project selection to the author.
+
+Document references are authored context, not a worker-enforced authorization
+boundary or a promise that every referenced document was retrieved. Every later
+resource access retains its own policy check. The seed adds no top-level MCP
+parameter, mission DB column, compiler version or worker SELECT field. Authors
+review the objective, criteria and project before the existing draft, preview
+and submit lifecycle. Execution state is never seeded.
+
 ## Top-level field map
 
 RECOVER-1 (2026-09-12) restores the legacy protocol adapter boundary: YAML
