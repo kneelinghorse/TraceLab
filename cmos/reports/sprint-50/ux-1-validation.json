@@ -1,14 +1,14 @@
 {
   "mission": "UX-1",
-  "status": "blocked; TraceLab PR257 merged; awaiting Forge-owned landed revision, final CI and intended registry/workflow acceptance evidence",
-  "updated_at": "2026-09-13T01:37:58.095144+00:00",
+  "status": "in_progress; Forge merge and current installed registry/workflow verified; recording final acceptance",
+  "updated_at": "2026-09-13T02:12:23.341033+00:00",
   "forge": {
     "base": "114a268ea10b9141bc96925c69132179c7c4b334",
     "implementation_head": "a6c845163368af3e21fff61c88b75a1823448871",
     "pull_request": "https://github.com/kneelinghorse/OODS-Forge/pull/105",
     "backlog_request": "f091c849-fe1a-49d5-93ee-b8029219685a",
     "current_ci_run": 34728936186,
-    "canonical_registry_activation": "Not performed by this session. Forge-owned dependency; explicit user delegation required for any TraceLab agent action in Forge.",
+    "canonical_registry_activation": "Verified through a fresh actual MCP client against the already-built canonical adapter at bc12723e9: 18 unique objects including all seven alpha research objects. Existing task connection retains a stale 11-object in-memory worker; no existing worker was restarted.",
     "ci_merge_base": "e9f15a4a586921ce8c68dd3d24f5a01d0b24a281",
     "upstream_change": "Roadmap-only Sprint196 review closure; merged locally and source tree equality with tested CI revision verified before retaining receipts.",
     "bundled_runtime": {
@@ -154,6 +154,35 @@
         "full_mcp_viz_determinism": 103648041126,
         "runtime_cells": 103648041176
       }
+    },
+    "landed_commit": "2017548c2a490dfff349aa55960dbdace0f50c45",
+    "current_installed_build": "bc12723e9b7a42a4790a98f5d2a0dc4a1f970b99",
+    "acceptance": {
+      "observed_at": "2026-09-13T02:10:31.504Z",
+      "pull_request": "ux-1-forge-acceptance.json",
+      "fresh_client": "ux-1-forge-fresh-client.json",
+      "stale_connection": "ux-1-forge-stale-connection.json",
+      "forge_review_decision": 1980,
+      "latest_ci_run": 34730227443,
+      "latest_ci_status": "coverage, viz/MCP, consumers, portable Node 24 and 20.11.1, release, build/lint/types passed; runtime-cells still running at observation; optional echarts-render-soak skipped",
+      "superseded_run": 34728936186,
+      "superseded_outcome": "coverage and viz/MCP failed on stale generated tool-capability ledger; runtime cancelled; regenerated ledger is sole af277eaa\u21925e556da26 source diff",
+      "workflow": {
+        "status": "ok",
+        "screens": 4,
+        "validation": {
+          "status": "ok",
+          "errors": [],
+          "warnings": []
+        },
+        "composition_advisory_count": 46,
+        "composition_advisory_codes": [
+          "OODS-V117",
+          "OODS-V120",
+          "OODS-V121"
+        ]
+      },
+      "message_policy": "Forge decision 1980 explicitly leaves TraceLab backlog requests pending because Forge sends no cross-project notices. Pending inbox status is not an acceptance failure."
     }
   },
   "mapping": {
@@ -366,9 +395,7 @@
     ]
   },
   "pending": [
-    "Receive Forge-owned landed revision, final checks and canonical registry activation evidence. Explicit user delegation is required before any TraceLab agent action in Forge or another cross-project message.",
-    "Verify all seven research objects and zero-error Mission workflow composition against the intended activated registry within authorized scope.",
-    "Record actual success-criteria evidence and ownership acceptance; complete UX-1 only then and verify CMOS status."
+    "Finish TraceLab evidence checkpoint and record UX-1 completion against verified Forge merge, registry/workflow and existing saved schemas/previews."
   ],
   "traceLab_ci": {
     "head": "e3952e471d457966528286e9bc6f92e740c69b7b",
@@ -487,5 +514,9 @@
       "cmos/reports/sprint-38/semantic-edge-e2e-validation.json": "b36ecf0d52638eddb7bac4707e682c1bbd899b62c278a9b51f2729ee7d07c3d4"
     },
     "closure": "TraceLab reconciliation checkpoint; UX-1 blocked through CMOS. UX-2 through UX-5 remain queued; no successor implementation started."
+  },
+  "acceptance_session": {
+    "session_id": "PS-2026-09-13-002",
+    "authorization": "User: \"jfc yes, that's done. feel free to check\". Read-only Forge verification authorized; no Forge source edits/builds/merges/worker refreshes/messages performed."
   }
 }
