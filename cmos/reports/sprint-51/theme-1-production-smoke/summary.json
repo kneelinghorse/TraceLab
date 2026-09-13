@@ -1,0 +1,21 @@
+{
+  "base": "https://tracelab.aquex.ai",
+  "checked_at": "2026-09-13T19:29:36.196Z",
+  "checks": 124,
+  "routes": 31,
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "widths": [
+    1440,
+    390
+  ],
+  "failures": [],
+  "overflow": 0,
+  "critical_serious_axe": 0,
+  "browser_errors": 0,
+  "api_errors": 0,
+  "directProductionApi": true,
+  "readOnlyApiProxy": false
+}
