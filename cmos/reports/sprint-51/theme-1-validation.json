@@ -5,7 +5,7 @@
   "implementation": "Truthful System label, explicit hc selection, authoritative head bootstrap, preserved hydration snapshot, semantic prose, no dark utilities, three-theme route harness.",
   "local": {
     "frontend_unit": {
-      "passed": 125,
+      "passed": 127,
       "skipped": 0
     },
     "browser": {
@@ -58,6 +58,12 @@
       "contrast_node_occurrences": 4323,
       "readOnlyApiProxy": true,
       "directProductionApi": false
+    },
+    "guard_followup": {
+      "scope": "Extend the existing scanner to CSS so @apply cannot reintroduce a dark utility.",
+      "tdd": "New CSS rejection test failed first; all127 unit tests then passed, zero skips. Lint, types and check:tokens passed.",
+      "application_source": "Byte-identical to a4fe8ee under frontend/src and tailwind.config.ts; retained build/browser/baseline proof applies to the same application.",
+      "new_browser_run": false
     }
   },
   "dark_occurrences": {
@@ -67,7 +73,7 @@
     "before_other": "one TypeScript parameter named dark (renamed to prefersDark)",
     "after_literal": 0,
     "after_utilities": 0,
-    "guard_tests": 6
+    "guard_tests": 8
   },
   "tokens": {
     "repinned": false,
@@ -77,7 +83,16 @@
     "upstream_pr": 107,
     "upstream_merge": "2ea59fe9cf7f3d0fbfa05ee50ef920815defe1bb",
     "upstream_merged_at": "2026-09-13T17:25:00Z",
-    "certification": "Not established. PR107 merged, but m07/session/handoff retain accessibility blockers, no PR reviews or non-bot acceptance comments, prepared m06 provenance has builderSelfCertified:false."
+    "certification": "Not established. PR107 merged, but m07/session/handoff retain accessibility blockers, no PR reviews or non-bot acceptance comments, prepared m06 provenance has builderSelfCertified:false.",
+    "installed_css_sha256": "2e6dc3d04a97860b6ec8ad6d27d498c3878d40c75d83447410a4225635904d5e",
+    "installed_css_matches_tarball": true,
+    "prepared_bundle_hc": {
+      "sha256": "9796f2d3301ca0dfafef5e24d374db7581330e5c067e3f4a47ad0fdeae0f6798",
+      "surface_canvas": "Canvas",
+      "text_secondary": "GrayText",
+      "text_muted": "GrayText",
+      "conclusion": "The prepared m06 replacement retains the same failing hc values. A re-pin alone does not fix this blocker."
+    }
   },
   "blockers": [
     "The shipped hc palette maps active secondary/muted text to GrayText on Canvas. Chromium resolves #808080 on #ffffff, 3.94:1 instead of 4.5. Every one of 62 hc route/viewport checks fails serious contrast.",
@@ -104,7 +119,7 @@
     },
     "secret_scan_run": 34772575868,
     "lint_run": 34772575773,
-    "note": "This source predates CI-2. Its required ruff-diff passed; the two old optional repository-wide lint jobs failed and are separately retired by PR267. Receipt-only follow-up does not change the validated frontend."
+    "note": "Passing CI is for the recorded application source a4fe8ee. Later changes add validation receipts and CSS coverage to the build guard; application source is unchanged. Latest follow-up CI is not claimed complete. CI-2 separately retires the old optional lint jobs."
   },
   "deployments": null,
   "limitations": [
@@ -114,7 +129,7 @@
     "CMOS mirror reconciliation is incomplete after file upload HTTP 413 and cursor replay timeout. SQLite remains healthy and authoritative."
   ],
   "frontend_sha256": {
-    "frontend/scripts/check-token-colors.mjs": "e2255a90ab2fc5da64e132ec6b1ac9aad9f732a0c02940b99c5dd93fad99c3ed",
+    "frontend/scripts/check-token-colors.mjs": "caaddc2fa4600af96eeef3320e1095d1ef4c5637654011a027cfe7899c10419d",
     "frontend/scripts/ui-shell-smoke.mjs": "de4f3b551c5f0c2c42415594852f8015bc2ec6b8c06a8bbfc3b1376273a5d788",
     "frontend/src/components/AddToCollection.tsx": "bf9dc12a3f8d2199e28e2ed22c727c165a9e4d99857e8cb65bb0a70501a1fbff",
     "frontend/src/components/CreateReportModal.tsx": "deb77cb97d76f134e68085bd34a57f7253cc06e03dcceab8a2c00a40411b7a6a",
@@ -156,7 +171,7 @@
     "frontend/tailwind.config.ts": "6ec039b2aef632496f4472e119c98627b338288d5001338a6a81aff1e32443eb",
     "frontend/tests/e2e/app-shell.spec.ts": "dded682b8f55dbb38fabdfca20f2e73312e68b022be6ca0d335578ca82b8132e",
     "frontend/vendor/README.md": "e23fe3bef10cb7d30c09a8fac467bd9389db33cbd82d250d0dd6b4ff9eab6a7c",
-    "frontend/scripts/check-token-colors.test.ts": "3cd554a68fe57583ba1986fa7e782f51bed4394c7ea0220f3fc35b3ae2cd4db2"
+    "frontend/scripts/check-token-colors.test.ts": "4ebeb4bacb7d0b49b09d759b40a8d57b9136ca2e5259117acd6ee7b8446139a4"
   },
   "pull_request": 266
 }

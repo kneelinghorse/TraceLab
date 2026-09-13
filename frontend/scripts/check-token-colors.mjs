@@ -13,7 +13,7 @@ async function scan(dir) {
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     const file = path.join(dir, entry.name);
     if (entry.isDirectory()) await scan(file);
-    else if (/\.[jt]sx?$/.test(file) && !/\.test\./.test(file)) {
+    else if (/\.(?:[jt]sx?|css)$/.test(file) && !/\.test\./.test(file)) {
       const lines = (await readFile(file, "utf8")).split("\n");
       lines.forEach((line, index) => {
         const matches = [...line.matchAll(palette), ...line.matchAll(darkUtilities)].map(match => match[0]);
