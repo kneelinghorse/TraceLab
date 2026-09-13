@@ -14,7 +14,7 @@ this stops being something we discover via paid smoke regressions."*
 
 | Project | Commit | Branch | Date |
 | --- | --- | --- | --- |
-| TraceLab | sprint-49 T49.1 working tree (lease-v2 runtime boundary in migration 039; commit pending) | `RBAC-updates` | 2026-08-14 |
+| TraceLab | `21271b5` (lease-v2 runtime boundary in migration 039, landed on main; attribution in CMOS decision #328) | `main` | 2026-08-14 |
 | DeepSearch.alpha | `b7009c6` + uncommitted Sprint 91 lease-v2 working tree (evidence pending) | `contract-driven-pipeline` | 2026-08-14 |
 
 The vendored DS contract compiler at `app/services/contract_compiler/` is
