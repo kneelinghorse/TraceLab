@@ -1,4 +1,5 @@
 import useSWR, { mutate } from "swr";
+import { useAuth } from "@/contexts/AuthContext";
 
 import { fetchMission, fetchMissions, fetchQualityReport, missionsApi } from "@/lib/api/missions";
 import type { ApiMission, Mission, MissionListParams, MissionStatus, QualityGateReport } from "@/types/mission";
@@ -15,25 +16,29 @@ interface UseApiMissionsOptions {
   pageSize?: number;
   status?: MissionStatus;
   projectId?: string;
+  view?: MissionListParams["view"];
 }
 
 export function useApiMissions(options: UseApiMissionsOptions = {}) {
-  const { page = 1, pageSize = 20, status, projectId } = options;
+  const { user } = useAuth();
+  const { page = 1, pageSize = 20, status, projectId, view } = options;
 
   const params: MissionListParams = {
     page,
     page_size: pageSize,
     status,
     project_id: projectId,
+    view,
   };
 
-  const key = [API_MISSIONS_KEY, page, pageSize, status ?? "all", projectId ?? "all"];
+  const key = [API_MISSIONS_KEY, user?.user_id, page, pageSize, status ?? "all", projectId ?? "all", view];
 
   const { data, error, isLoading, mutate: mutateList } = useSWR<PaginatedResponse<ApiMission>>(
     key,
     () => missionsApi.list(params),
     {
-      revalidateOnFocus: false,
+      revalidateOnFocus: true,
+      refreshInterval: 15000,
     },
   );
 
@@ -47,13 +52,15 @@ export function useApiMissions(options: UseApiMissionsOptions = {}) {
 }
 
 export function useApiMission(missionId?: string) {
-  const key = missionId ? [`${API_MISSIONS_KEY}-detail`, missionId] : null;
+  const { user } = useAuth();
+  const key = missionId ? [`${API_MISSIONS_KEY}-detail`, user?.user_id, missionId] : null;
 
   const { data, error, isLoading, mutate: mutateMission } = useSWR<ApiMission>(
     key,
     () => missionsApi.get(missionId as string),
     {
-      revalidateOnFocus: false,
+      revalidateOnFocus: true,
+      refreshInterval: mission => mission && ["queued", "in_progress"].includes(mission.status) ? 5000 : 0,
     },
   );
 
@@ -63,28 +70,6 @@ export function useApiMission(missionId?: string) {
     error,
     refresh: () => mutateMission(),
   };
-}
-
-/**
- * Calculate queue position for a mission.
- * Returns the position (1-indexed) if the mission is queued, or null otherwise.
- */
-export function calculateQueuePosition(mission: ApiMission, allMissions: ApiMission[]): number | null {
-  if (mission.status !== "queued") {
-    return null;
-  }
-
-  // Filter to only queued missions and sort by queued_at
-  const queuedMissions = allMissions
-    .filter((m) => m.status === "queued")
-    .sort((a, b) => {
-      const aTime = a.queued_at ? new Date(a.queued_at).getTime() : 0;
-      const bTime = b.queued_at ? new Date(b.queued_at).getTime() : 0;
-      return aTime - bTime;
-    });
-
-  const index = queuedMissions.findIndex((m) => m.id === mission.id);
-  return index >= 0 ? index + 1 : null;
 }
 
 // ============================================

@@ -28,6 +28,17 @@ export const projectsApi = {
     return httpClient.get("/projects", { params: query });
   },
 
+  /** Complete project options for mission authoring and filtering. */
+  async listAllProjects(): Promise<Project[]> {
+    const first = await projectsApi.listProjects({ page: 1, pageSize: 100 });
+    const projects = [...first.data];
+    for (let page = 2; page <= first.pagination.pages; page += 1) {
+      const next = await projectsApi.listProjects({ page, pageSize: 100 });
+      projects.push(...next.data);
+    }
+    return projects;
+  },
+
   getProject(projectId: string): Promise<Project> {
     return httpClient.get(`/projects/${projectId}`);
   },

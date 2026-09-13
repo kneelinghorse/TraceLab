@@ -1,0 +1,78 @@
+{
+  "mission": "UX-6",
+  "status": "implementation_validated_awaiting_ci_and_production",
+  "checked_at": "2026-09-13T20:11:14.608497+00:00",
+  "base_commit": "1f494cac0e3d0732735916c99ea8c442fcc02c4c",
+  "decisions": [
+    409
+  ],
+  "changes": [
+    "Shared Home attention SQL predicates applied before scoped mission count and pagination; optional views preserve default API/MCP ordering.",
+    "Mission-scoped bounded activity history with RBAC and UUID alias protection.",
+    "Unified draft authoring/editing, inline structural preview identity, per-field errors, saved-ID retries and existing submit endpoint.",
+    "Run activity with observed phase/steps only, unavailable logs, separate results/evidence tabs, shared cancel/new-ID re-run confirmations.",
+    "Queue route permanent redirect, folded navigation, UTC timestamp handling and truthful cancellation timeline."
+  ],
+  "validation": {
+    "python": {
+      "command": ".venv/bin/pytest tests/test_mission_views.py tests/test_home_api.py tests/test_mission_events.py tests/test_missions_api.py tests/test_mission_contract_preview.py tests/mcp_tools/test_mcp_missions_unit.py tests/unit/test_oods_object_contract.py -q",
+      "passed": 173,
+      "skipped": 0,
+      "warnings": 14
+    },
+    "postgres": {
+      "command": ".venv/bin/pytest tests/integration/test_home_postgres.py -q",
+      "passed": 2,
+      "skipped": 0,
+      "warnings": 14,
+      "real_postgresql": true
+    },
+    "frontend_unit": {
+      "passed": 152,
+      "skipped": 0
+    },
+    "mcp_package": {
+      "passed": 76,
+      "skipped": 0,
+      "surface_changed": false
+    },
+    "built_browser": {
+      "passed": 32,
+      "skipped": 0,
+      "mission_flow_scenarios": 6,
+      "permanent_redirect_checks": 1,
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "fixture_api": true,
+      "critical_or_serious_axe": 0,
+      "overflow": 0
+    },
+    "lint": "passed",
+    "typecheck": "passed in production build",
+    "production_build": "passed",
+    "foundational_refs": "passed",
+    "targeted_ruff": "passed",
+    "git_diff_check": "passed"
+  },
+  "local_previews": "ux-6-local-previews/summary.json",
+  "limitations": [
+    "DeepSearch log streaming remains dormant; empty or failed logs are explicitly unavailable.",
+    "Recent activity is the bounded server event window, not a durable audit history.",
+    "Contract preview fidelity remains structural_only; compiler resync is separately parked.",
+    "Historical full-suite quarantine remains unchanged: CI must disclose its skips/deselections."
+  ],
+  "remaining": [
+    "Required PR CI and merge",
+    "Both Railway services SUCCESS with deployment IDs",
+    "Direct-production author-submit-terminal-evidence UI flow",
+    "31-route Light/Dark x 1440/390 production baseline",
+    "Final receipt merge and CMOS completion"
+  ]
+}

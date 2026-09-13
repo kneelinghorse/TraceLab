@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
@@ -274,6 +274,9 @@ def list_missions(
         None,
         description="Filter by project UUID",
     ),
+    view: Literal["all", "attention", "queue"] | None = Query(
+        None, description="Exceptions-first view; queue includes queued and running missions",
+    ),
     db: Session = Depends(get_db),
     user: AuthenticatedUser = Depends(require_authenticated_user),
 ) -> PaginatedResponse[MissionResponse]:
@@ -297,6 +300,8 @@ def list_missions(
             status=status,
             project_id=project_id,
             access_filter=accessible_filter(user, Mission, db),
+            view=view,
+            user_id=user.user_id,
         )
         return PaginatedResponse(
             data=[_to_response(m) for m in missions],

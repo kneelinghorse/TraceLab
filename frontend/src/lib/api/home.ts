@@ -38,5 +38,5 @@ export interface HomeSnapshot {
 }
 export const homeApi = {
   get: () => httpClient.get<HomeSnapshot>("/home"),
-  review: (mission: HomeMission) => httpClient.put<void>(`/home/missions/${mission.id}/review`, { updated_at: mission.updated_at }),
+  review: (mission: Pick<HomeMission, "id" | "updated_at">) => httpClient.put<void>(`/home/missions/${mission.id}/review`, { updated_at: mission.updated_at }),
 };

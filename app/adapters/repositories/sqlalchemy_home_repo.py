@@ -1,11 +1,11 @@
 """Scoped COUNT queries and bounded summaries for Home, on PostgreSQL and SQLite."""
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any
 from urllib.parse import urlencode
 from uuid import UUID
 
-from sqlalchemy import and_, case, func, or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.orm import Query, Session, load_only, noload
@@ -26,9 +26,9 @@ from app.schemas.home import (
     HomeSection,
 )
 from app.services.home import observed_progress
+from app.services.mission_attention import STALLED_AFTER_SECONDS, attention_predicates
 
 SECTION_LIMIT = 6
-STALLED_AFTER_SECONDS = 3600
 
 
 def _scoped(db: Session, user: AuthenticatedUser, model: type) -> Query[Any]:
@@ -83,27 +83,8 @@ class SQLAlchemyHomeRepository:
                 .all()
             }
         )
-        reviewed = (
-            select(MissionReview.mission_id)
-            .where(
-                MissionReview.user_id == user.user_id,
-                MissionReview.mission_id == Mission.id,
-                MissionReview.mission_updated_at == Mission.updated_at,
-            )
-            .exists()
-        )
-        stale = and_(
-            Mission.status == "queued",
-            func.coalesce(Mission.queued_at, Mission.created_at) <= now - timedelta(seconds=STALLED_AFTER_SECONDS),
-        )
-        attention = missions.filter(
-            or_(
-                Mission.status.in_(["validation_failed", "blocked"]),
-                stale,
-                and_(Mission.status == "completed", ~reviewed),
-            )
-        )
-        rank = case((Mission.status == "validation_failed", 0), (Mission.status == "blocked", 1), (stale, 2), else_=3)
+        predicate, rank = attention_predicates(user.user_id, now=now)
+        attention = missions.filter(predicate)
         active = missions.filter(Mission.status == "in_progress")
         columns: list[Any] = [
             Mission.id,

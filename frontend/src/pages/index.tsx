@@ -105,7 +105,7 @@ function HomeContent() {
           {data.attention.total === 0 && <div className="p-6"><p className="font-medium">You’re up to date.</p><p className="mt-1 text-sm text-secondary">No missions need your attention right now.</p></div>}
           {data.attention.total > data.attention.items.length && <p className="border-t border-line px-5 py-3 text-xs text-muted">Showing the first {data.attention.items.length} of {data.attention.total.toLocaleString()} items. Reviewed completions leave this queue.</p>}
         </Section>
-        <Section title="Active missions" count={data.active_runs.total} link={{ href: "/missions/queue", label: "Open queue" }}>
+        <Section title="Active missions" count={data.active_runs.total} link={{ href: "/missions?view=queue", label: "Open queue" }}>
           <ul className="divide-y divide-line">{data.active_runs.items.map((mission) => <li key={mission.id} className="space-y-3 p-5">
             <Link href={`/missions/${mission.id}`} className="block break-words font-semibold hover:text-accent-text">{mission.title}</Link>
             <p className="text-sm text-secondary">{mission.progress.phase ? mission.progress.phase.replaceAll("_", " ") : "Phase not reported"}</p>

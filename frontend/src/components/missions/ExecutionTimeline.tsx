@@ -1,8 +1,10 @@
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import { formatDistanceToNow, format } from "date-fns";
 
-import type { MissionReportMetadata } from "@/types/mission";
+import type { MissionReportMetadata, MissionStatus } from "@/types/mission";
 
 interface ExecutionTimelineProps {
+  status: MissionStatus;
   createdAt: string | null;
   queuedAt: string | null;
   startedAt: string | null;
@@ -23,7 +25,7 @@ interface ExecutionTimelineProps {
 interface TimelineEvent {
   label: string;
   timestamp: string;
-  icon: "create" | "queue" | "start" | "complete";
+  icon: "create" | "queue" | "start" | "complete" | "end";
 }
 
 const ICON_CLASSES: Record<TimelineEvent["icon"], { bg: string; icon: string }> = {
@@ -31,11 +33,12 @@ const ICON_CLASSES: Record<TimelineEvent["icon"], { bg: string; icon: string }> 
   queue: { bg: "bg-warning", icon: "Q" },
   start: { bg: "bg-accent", icon: "S" },
   complete: { bg: "bg-success", icon: "C" },
+  end: { bg: "bg-surface-alt", icon: "•" },
 };
 
 function TimelineItem({ event, isLast }: { event: TimelineEvent; isLast: boolean }) {
   const styles = ICON_CLASSES[event.icon];
-  const date = new Date(event.timestamp);
+  const date = parseApiTimestamp(event.timestamp);
   const relative = formatDistanceToNow(date, { addSuffix: true });
   const absolute = format(date, "MMM d, yyyy 'at' h:mm a");
 
@@ -77,6 +80,7 @@ function formatRuntime(seconds: number): string {
 }
 
 export function ExecutionTimeline({
+  status,
   createdAt,
   queuedAt,
   startedAt,
@@ -95,7 +99,7 @@ export function ExecutionTimeline({
     events.push({ label: "Execution Started", timestamp: startedAt, icon: "start" });
   }
   if (completedAt) {
-    events.push({ label: "Execution Completed", timestamp: completedAt, icon: "complete" });
+    events.push({ label: status === "completed" ? "Execution Completed" : `Run ended (${status.replaceAll("_", " ")})`, timestamp: completedAt, icon: status === "completed" ? "complete" : "end" });
   }
 
   const sources = reportMetadata?.sources_collected;

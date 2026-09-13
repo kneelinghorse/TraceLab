@@ -65,6 +65,37 @@ Field shapes are unchanged: every parameter listed below is passed as a
 top-level key alongside `action` in the cluster call. The Pydantic /
 DB / REST / DS-worker columns are unaffected by the cluster refactor.
 
+## UI authoring and run boundaries (UX-6, 2026-09-13)
+
+The UI uses this same field map, including all twelve compiler fields. **Save
+and preview** creates a pristine draft via `POST /missions`, then reads
+`GET /missions/{id}/contract-preview` inline with `contract_version`,
+`compiler_revision` and `fidelity`. Subsequent saves use `PATCH` on that draft;
+clearing optional fields sends `null`. Unchanged structured references, context,
+research phases and custom metadata survive edit and re-run preparation.
+Submission always calls `POST /missions/{id}/submit` after saving, so the existing
+linter and one-execution guard run. It does not create a queued record directly.
+
+A failed preview or submit keeps the saved draft ID and a link to it. Before
+retrying a saved draft, the UI re-reads its state; it never resets an already
+queued or terminal run. Re-run opens a new-ID authoring form with only authored
+inputs copied. Lease proofs, execution metadata and results are not copied.
+Validation violations attach to their named form field. Research depth remains
+removed; this work does not reintroduce it or change MCP schemas/serializers.
+
+`GET /missions` also accepts optional `view=all|attention|queue` for the UI:
+Home's shared attention predicate orders exceptions before pagination; queue
+contains queued and running missions. Status/project filters and RBAC apply
+before totals. Omitting `view` preserves existing newest-first API/MCP ordering.
+Recent activity uses `GET /missions/events/recent?mission_id=<uuid>` and is a
+bounded server history, not a durable audit trail. Logs without records are
+shown as unavailable while production streaming remains dormant.
+
+Regression coverage: `tests/test_mission_views.py`,
+`tests/integration/test_home_postgres.py`, the existing
+`TestMissionVerbContract` / MCP client suites, and the frontend mission unit and
+built-browser flows. No DB migration or worker SELECT change is needed.
+
 ## Top-level field map
 
 RECOVER-1 (2026-09-12) restores the legacy protocol adapter boundary: YAML

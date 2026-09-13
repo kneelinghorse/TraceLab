@@ -16,6 +16,7 @@ from app.core.mission_events import emit_mission_status_change
 from app.models.mission import MISSION_STATUSES, Mission
 from app.schemas.mission import MissionCreate, MissionUpdate
 from app.schemas.pagination import PaginationMeta
+from app.services.mission_attention import attention_predicates
 from app.services.ownership import project_owner_workspace
 
 
@@ -99,6 +100,8 @@ class MissionService:
         status: str | None = None,
         project_id: UUID | None = None,
         access_filter=None,
+        view: str | None = None,
+        user_id: UUID | None = None,
     ) -> tuple[list[Mission], PaginationMeta]:
         """Return paginated missions with optional filtering.
 
@@ -131,8 +134,18 @@ class MissionService:
         if access_filter is not None:
             query = query.filter(access_filter)
 
-        # Order by creation time (most recent first)
-        query = query.order_by(Mission.created_at.desc())
+        if view is not None:
+            if view not in {"all", "attention", "queue"}:
+                raise MissionValidationError("Invalid mission view")
+            attention, rank = attention_predicates(user_id, now=datetime.utcnow())
+            if view == "attention":
+                query = query.filter(attention)
+            elif view == "queue":
+                query = query.filter(Mission.status.in_(["queued", "in_progress"]))
+            query = query.order_by(rank, Mission.updated_at.desc(), Mission.id)
+        else:
+            # Preserve the established order for existing API/MCP callers.
+            query = query.order_by(Mission.created_at.desc(), Mission.id)
 
         # Get total count for pagination
         total = query.count()

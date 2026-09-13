@@ -1,21 +1,25 @@
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { httpClient } from "@/lib/api/http";
+import { HttpError } from "@/lib/api/http";
+import { PageState } from "@/components/ui/PageState";
+import { useFeedback } from "@/components/ui/useFeedback";
+import { MissionRunActivity } from "@/components/missions/MissionRunActivity";
+import { homeApi } from "@/lib/api/home";
+import { apiErrorMessage } from "@/lib/api/errors";
 import { Dialog } from "@/components/ui/Dialog";
 import { EvidencePanel } from "@/components/evidence/EvidencePanel";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import useSWR from "swr";
-import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
 import { formatDistanceToNow } from "date-fns";
 
 import { AuthGate } from "@/components/AuthGate";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
-import { ContractPreviewPanel, ExecutionTimeline, ResearchPhases, ResultLinks } from "@/components/missions";
+import { ContractPreviewPanel, ExecutionTimeline, ResearchPhases, ResultLinks, MissionForm } from "@/components/missions";
 import { downloadFile } from "@/lib/api/console";
 import { missionsApi } from "@/lib/api/missions";
 import { useApiMission } from "@/lib/hooks/useMissions";
-import type { MissionStatus, ReportPromotionResponse, ApiMissionUpdate } from "@/types/mission";
+import type { ReportPromotionResponse } from "@/types/mission";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -39,37 +43,9 @@ function MissionDetailContent() {
   const [promotionResult, setPromotionResult] = useState<ReportPromotionResponse | null>(null);
   const [promotionError, setPromotionError] = useState<string | null>(null);
 
-  // Edit mode state
   const [isEditing, setIsEditing] = useState(false);
-  const [editTitle, setEditTitle] = useState("");
-  const [editObjective, setEditObjective] = useState("");
-  const [editSuccessCriteria, setEditSuccessCriteria] = useState<string[]>([]);
-  const [editDeliverables, setEditDeliverables] = useState<string[]>([]);
-  const [editTags, setEditTags] = useState<string[]>([]);
-  const [editError, setEditError] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-
-  // Authoring fields (T40.2) — string-form for prose/ints, arrays for lists, raw
-  // JSON strings for the three structured fields so mid-edit invalid JSON
-  // doesn't wipe the draft.
-  const [editBackground, setEditBackground] = useState("");
-  const [editFocus, setEditFocus] = useState("");
-  const [editReferences, setEditReferences] = useState<string[]>([]);
-  const [editRequiredEntities, setEditRequiredEntities] = useState<string[]>([]);
-  const [editExcludedEntities, setEditExcludedEntities] = useState<string[]>([]);
-  const [editConstraints, setEditConstraints] = useState<string[]>([]);
-  const [editDeliverableFormat, setEditDeliverableFormat] = useState("");
-  const [editMaxLoops, setEditMaxLoops] = useState<string>("");
-  const [editMinLoops, setEditMinLoops] = useState<string>("");
-  const [editExpectedOutputSchema, setEditExpectedOutputSchema] = useState("");
-  const [editCoverageThresholds, setEditCoverageThresholds] = useState("");
-  const [editValidationThresholds, setEditValidationThresholds] = useState("");
-  const [editJsonErrors, setEditJsonErrors] = useState<{
-    expected_output_schema?: string;
-    coverage_thresholds?: string;
-    validation_thresholds?: string;
-  }>({});
-
+  const [acting, setActing] = useState(false);
+  const { askConfirmation, notify, feedback } = useFeedback();
   const { mission, isLoading, error, refresh } = useApiMission(missionId);
 
   const handleSubmitToDeepSearch = async () => {
@@ -82,7 +58,7 @@ function MissionDetailContent() {
       await missionsApi.submitToDeepSearch(missionId);
       refresh();
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Failed to submit mission");
+      setSubmitError(apiErrorMessage(err, "Failed to submit mission"));
     } finally {
       setIsSubmitting(false);
     }
@@ -127,166 +103,24 @@ function MissionDetailContent() {
     }
   };
 
-  // Edit mode handlers
-  const handleStartEdit = () => {
-    if (!mission) return;
-    setEditTitle(mission.title);
-    setEditObjective(mission.objective);
-    setEditSuccessCriteria([...mission.success_criteria]);
-    setEditDeliverables([...mission.deliverables]);
-    setEditTags([...mission.tags]);
-    setEditError(null);
-    // Hydrate authoring fields from the current mission.
-    setEditBackground(mission.background ?? "");
-    setEditFocus(mission.focus ?? "");
-    setEditReferences((mission.references ?? []).map((r) => r?.title ?? ""));
-    setEditRequiredEntities([...(mission.required_entities ?? [])]);
-    setEditExcludedEntities([...(mission.excluded_entities ?? [])]);
-    setEditConstraints([...(mission.constraints ?? [])]);
-    setEditDeliverableFormat(mission.deliverable_format ?? "");
-    setEditMaxLoops(mission.max_loops != null ? String(mission.max_loops) : "");
-    setEditMinLoops(mission.min_loops != null ? String(mission.min_loops) : "");
-    setEditExpectedOutputSchema(
-      mission.expected_output_schema ? JSON.stringify(mission.expected_output_schema, null, 2) : ""
-    );
-    setEditCoverageThresholds(
-      mission.coverage_thresholds ? JSON.stringify(mission.coverage_thresholds, null, 2) : ""
-    );
-    setEditValidationThresholds(
-      mission.validation_thresholds ? JSON.stringify(mission.validation_thresholds, null, 2) : ""
-    );
-    setEditJsonErrors({});
-    setIsEditing(true);
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-    setEditError(null);
-  };
-
-  const handleSaveEdit = async () => {
-    if (!missionId || !mission) return;
-
-    if (!editTitle.trim()) {
-      setEditError("Title is required");
-      return;
-    }
-    if (!editObjective.trim()) {
-      setEditError("Objective is required");
-      return;
-    }
-
-    setEditError(null);
-
-    // Parse the three JSON authoring fields. Invalid JSON blocks the save and
-    // surfaces inline errors without losing the user's draft.
-    const parseJson = (raw: string): { value?: Record<string, unknown>; error?: string } => {
-      const trimmed = raw.trim();
-      if (!trimmed) return {};
-      try {
-        const parsed = JSON.parse(trimmed);
-        if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-          return { error: "Must be a JSON object." };
-        }
-        return { value: parsed as Record<string, unknown> };
-      } catch (err) {
-        return { error: `Invalid JSON: ${(err as Error).message}` };
-      }
-    };
-
-    const schemaParse = parseJson(editExpectedOutputSchema);
-    const coverageParse = parseJson(editCoverageThresholds);
-    const validationParse = parseJson(editValidationThresholds);
-
-    const jsonErrs: typeof editJsonErrors = {};
-    if (schemaParse.error) jsonErrs.expected_output_schema = schemaParse.error;
-    if (coverageParse.error) jsonErrs.coverage_thresholds = coverageParse.error;
-    if (validationParse.error) jsonErrs.validation_thresholds = validationParse.error;
-    setEditJsonErrors(jsonErrs);
-    if (Object.keys(jsonErrs).length > 0) {
-      setEditError("Fix JSON errors below before saving.");
-      return;
-    }
-
-    const parseLoopBound = (raw: string): number | undefined => {
-      const trimmed = raw.trim();
-      if (!trimmed) return undefined;
-      const n = Number(trimmed);
-      return Number.isInteger(n) && n >= 1 ? n : undefined;
-    };
-
-    setIsSaving(true);
-
+  const handleCancelRun = async () => {
+    if (!mission || !await askConfirmation("Cancel this mission? Existing results and evidence will remain available.")) return;
+    setActing(true);
     try {
-      const references = editReferences
-        .map((title) => title.trim())
-        .filter((title) => title !== "")
-        .map((title) => ({ title }));
-
-      const updateData: ApiMissionUpdate = {
-        title: editTitle.trim(),
-        objective: editObjective.trim(),
-        success_criteria: editSuccessCriteria.filter(c => c.trim() !== ""),
-        deliverables: editDeliverables.filter(d => d.trim() !== ""),
-        tags: editTags.filter(t => t.trim() !== ""),
-        background: editBackground.trim() || null,
-        focus: editFocus.trim() || null,
-        references: references.length > 0 ? references : null,
-        required_entities:
-          editRequiredEntities.filter((x) => x.trim() !== "").length > 0
-            ? editRequiredEntities.filter((x) => x.trim() !== "")
-            : null,
-        excluded_entities:
-          editExcludedEntities.filter((x) => x.trim() !== "").length > 0
-            ? editExcludedEntities.filter((x) => x.trim() !== "")
-            : null,
-        constraints:
-          editConstraints.filter((x) => x.trim() !== "").length > 0
-            ? editConstraints.filter((x) => x.trim() !== "")
-            : null,
-        deliverable_format: editDeliverableFormat.trim() || null,
-        max_loops: parseLoopBound(editMaxLoops) ?? null,
-        min_loops: parseLoopBound(editMinLoops) ?? null,
-        expected_output_schema: schemaParse.value ?? null,
-        coverage_thresholds: coverageParse.value ?? null,
-        validation_thresholds: validationParse.value ?? null,
-      };
-
-      await missionsApi.update(missionId, updateData);
-      setIsEditing(false);
-      refresh();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to update mission";
-      setEditError(message);
-    } finally {
-      setIsSaving(false);
-    }
+      await missionsApi.update(mission.id, { status: "cancelled" });
+      await refresh();
+      notify("Mission cancelled", "success");
+    } catch (err) { notify(err); } finally { setActing(false); }
   };
-
-  // List editing helpers
-  const handleAddListItem = (
-    setter: React.Dispatch<React.SetStateAction<string[]>>
-  ) => {
-    setter(prev => [...prev, ""]);
+  const handleRerun = async () => {
+    if (!mission || !await askConfirmation("Prepare another run with a new mission ID? Review the copied inputs before submitting; this run stays unchanged.")) return;
+    void router.push({ pathname: "/missions/new", query: { from: mission.id } });
   };
-
-  const handleUpdateListItem = (
-    setter: React.Dispatch<React.SetStateAction<string[]>>,
-    index: number,
-    value: string
-  ) => {
-    setter(prev => {
-      const updated = [...prev];
-      updated[index] = value;
-      return updated;
-    });
-  };
-
-  const handleRemoveListItem = (
-    setter: React.Dispatch<React.SetStateAction<string[]>>,
-    index: number
-  ) => {
-    setter(prev => prev.filter((_, i) => i !== index));
+  const handleReview = async () => {
+    if (!mission) return;
+    setActing(true);
+    try { await homeApi.review(mission); notify("Result marked reviewed", "success"); }
+    catch (err) { notify(err); } finally { setActing(false); }
   };
 
   if (!missionId) {
@@ -299,55 +133,21 @@ function MissionDetailContent() {
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background py-8">
-        <div className="max-w-4xl mx-auto px-4">
-          <p className="text-secondary">Loading mission...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background py-8">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-danger-surface border border-danger-line rounded-lg p-6">
-            <p className="text-danger">
-              Failed to load mission: {error.message}
-            </p>
-            <button
-              onClick={refresh}
-              className="mt-2 text-sm font-medium text-danger underline"
-            >
-              Retry
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!mission) {
-    return (
-      <div className="min-h-screen bg-background py-8">
-        <div className="max-w-4xl mx-auto px-4">
-          <p className="text-secondary">Mission not found.</p>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <PageState state="loading" title="Loading mission…" />;
+  if (error instanceof HttpError && error.status === 404) return <PageState state="empty" title="Mission not found."><Link href="/missions">Back to missions</Link></PageState>;
+  if (error) return <PageState state="error" title="Mission could not load." onRetry={() => void refresh()} />;
+  if (!mission) return <PageState state="empty" title="Mission not found." />;
 
   const createdAt = mission.created_at
-    ? formatDistanceToNow(new Date(mission.created_at), { addSuffix: true })
+    ? formatDistanceToNow(parseApiTimestamp(mission.created_at), { addSuffix: true })
     : null;
   const isDraft = mission.status === "draft";
   const hasResearchPhases = Object.keys(mission.research_phases).length > 0;
 
   return (
     <div className="min-h-screen bg-background py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {feedback}
           {actionError && !deleteOpen && <p role="alert" className="mb-4 break-words rounded bg-danger-surface p-4 text-danger">{actionError}</p>}
           <Dialog open={deleteOpen} title="Delete mission" onClose={() => { if (!deleting) setDeleteOpen(false); }}>
             <p className="mb-4">Delete this mission? This cannot be undone.</p>
@@ -375,287 +175,22 @@ function MissionDetailContent() {
           {/* Header Section */}
           <div className="p-6 border-b border-line">
             {isEditing ? (
-              /* Edit Mode Form */
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <StatusBadge status={mission.status} />
-                  <span className="text-sm font-mono text-muted">
-                    {mission.mission_id}
-                  </span>
-                  <span className="px-2 py-1 text-xs bg-info-surface text-accent-text rounded">
-                    Editing
-                  </span>
-                </div>
-
-                {/* Title */}
-                <div>
-                  <label className="block text-sm font-medium text-secondary mb-1">
-                    Title *
-                  </label>
-                  <input
-                    type="text"
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                    className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground focus:ring-2 focus:ring-focus focus:border-transparent"
-                    autoFocus
-                  />
-                </div>
-
-                {/* Objective */}
-                <div>
-                  <label className="block text-sm font-medium text-secondary mb-1">
-                    Objective *
-                  </label>
-                  <textarea
-                    value={editObjective}
-                    onChange={(e) => setEditObjective(e.target.value)}
-                    rows={3}
-                    className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground focus:ring-2 focus:ring-focus focus:border-transparent"
-                  />
-                </div>
-
-                {/* Success Criteria */}
-                <div>
-                  <label className="block text-sm font-medium text-secondary mb-1">
-                    Success Criteria
-                  </label>
-                  <div className="space-y-2">
-                    {editSuccessCriteria.map((criterion, index) => (
-                      <div key={index} className="flex gap-2">
-                        <input
-                          type="text"
-                          value={criterion}
-                          onChange={(e) => handleUpdateListItem(setEditSuccessCriteria, index, e.target.value)}
-                          className="flex-1 px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground text-sm"
-                          placeholder="Enter success criterion"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveListItem(setEditSuccessCriteria, index)}
-                          className="px-3 py-2 text-danger hover:bg-danger-surface rounded-lg"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => handleAddListItem(setEditSuccessCriteria)}
-                      className="px-3 py-2 text-sm text-accent-text hover:bg-info-surface rounded-lg"
-                    >
-                      + Add Criterion
-                    </button>
-                  </div>
-                </div>
-
-                {/* Deliverables */}
-                <div>
-                  <label className="block text-sm font-medium text-secondary mb-1">
-                    Deliverables
-                  </label>
-                  <div className="space-y-2">
-                    {editDeliverables.map((deliverable, index) => (
-                      <div key={index} className="flex gap-2">
-                        <input
-                          type="text"
-                          value={deliverable}
-                          onChange={(e) => handleUpdateListItem(setEditDeliverables, index, e.target.value)}
-                          className="flex-1 px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground text-sm"
-                          placeholder="Enter deliverable"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveListItem(setEditDeliverables, index)}
-                          className="px-3 py-2 text-danger hover:bg-danger-surface rounded-lg"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => handleAddListItem(setEditDeliverables)}
-                      className="px-3 py-2 text-sm text-accent-text hover:bg-info-surface rounded-lg"
-                    >
-                      + Add Deliverable
-                    </button>
-                  </div>
-                </div>
-
-                {/* Tags */}
-                <div>
-                  <label className="block text-sm font-medium text-secondary mb-1">
-                    Tags
-                  </label>
-                  <div className="space-y-2">
-                    {editTags.map((tag, index) => (
-                      <div key={index} className="flex gap-2">
-                        <input
-                          type="text"
-                          value={tag}
-                          onChange={(e) => handleUpdateListItem(setEditTags, index, e.target.value)}
-                          className="flex-1 px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground text-sm"
-                          placeholder="Enter tag"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveListItem(setEditTags, index)}
-                          className="px-3 py-2 text-danger hover:bg-danger-surface rounded-lg"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => handleAddListItem(setEditTags)}
-                      className="px-3 py-2 text-sm text-accent-text hover:bg-info-surface rounded-lg"
-                    >
-                      + Add Tag
-                    </button>
-                  </div>
-                </div>
-
-                {/* Research Contract — authoring fields (T40.2) */}
-                <details className="rounded-lg border border-line bg-background">
-                  <summary className="cursor-pointer px-4 py-3 text-sm font-semibold text-foreground">
-                    Research Contract (optional — DeepSearch authoring fields)
-                  </summary>
-                  <div className="p-4 space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-secondary mb-1">Background</label>
-                      <textarea
-                        value={editBackground}
-                        onChange={(e) => setEditBackground(e.target.value)}
-                        className="w-full px-3 py-2 min-h-[70px] border border-line-strong rounded-lg bg-surface text-foreground"
-                        placeholder="Free-form prose orienting the research"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-secondary mb-1">Focus</label>
-                      <textarea
-                        value={editFocus}
-                        onChange={(e) => setEditFocus(e.target.value)}
-                        className="w-full px-3 py-2 min-h-[60px] border border-line-strong rounded-lg bg-surface text-foreground"
-                        placeholder="Narrow framing for the research question"
-                      />
-                    </div>
-                    {([
-                      { label: "References (one title per line)", value: editReferences, setter: setEditReferences, placeholder: "Reference title..." },
-                      { label: "Required entities", value: editRequiredEntities, setter: setEditRequiredEntities, placeholder: "Entity that MUST appear..." },
-                      { label: "Excluded entities", value: editExcludedEntities, setter: setEditExcludedEntities, placeholder: "Entity that MUST NOT appear..." },
-                      { label: "Constraints", value: editConstraints, setter: setEditConstraints, placeholder: "Constraint (e.g. 'no paywalled sources')..." },
-                    ] as const).map(({ label, value, setter, placeholder }) => (
-                      <div key={label}>
-                        <label className="block text-sm font-medium text-secondary mb-1">{label}</label>
-                        <textarea
-                          value={value.join("\n")}
-                          onChange={(e) => setter(e.target.value.split("\n"))}
-                          className="w-full px-3 py-2 min-h-[70px] border border-line-strong rounded-lg bg-surface text-foreground font-mono text-xs"
-                          placeholder={placeholder}
-                        />
-                      </div>
-                    ))}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-secondary mb-1">Deliverable format</label>
-                        <input
-                          type="text"
-                          value={editDeliverableFormat}
-                          onChange={(e) => setEditDeliverableFormat(e.target.value)}
-                          className="w-full px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
-                          placeholder="e.g. markdown report"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-secondary mb-1">Min loops</label>
-                        <input
-                          type="number"
-                          min={1}
-                          value={editMinLoops}
-                          onChange={(e) => setEditMinLoops(e.target.value)}
-                          className="w-full px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-secondary mb-1">Max loops</label>
-                        <input
-                          type="number"
-                          min={1}
-                          value={editMaxLoops}
-                          onChange={(e) => setEditMaxLoops(e.target.value)}
-                          className="w-full px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
-                        />
-                      </div>
-                    </div>
-                    {([
-                      { key: "expected_output_schema" as const, label: "Expected output schema (JSON object)", value: editExpectedOutputSchema, setter: setEditExpectedOutputSchema },
-                      { key: "coverage_thresholds" as const, label: "Coverage thresholds (JSON object)", value: editCoverageThresholds, setter: setEditCoverageThresholds },
-                      { key: "validation_thresholds" as const, label: "Validation thresholds (JSON object)", value: editValidationThresholds, setter: setEditValidationThresholds },
-                    ]).map(({ key, label, value, setter }) => (
-                      <div key={key}>
-                        <label className="block text-sm font-medium text-secondary mb-1">{label}</label>
-                        <textarea
-                          value={value}
-                          onChange={(e) => {
-                            setter(e.target.value);
-                            if (editJsonErrors[key]) {
-                              setEditJsonErrors((prev) => {
-                                const next = { ...prev };
-                                delete next[key];
-                                return next;
-                              });
-                            }
-                          }}
-                          className="w-full px-3 py-2 min-h-[100px] border border-line-strong rounded-lg bg-surface text-foreground font-mono text-xs"
-                          placeholder='{"key": "value"}'
-                        />
-                        {editJsonErrors[key] && (
-                          <p className="mt-1 text-xs text-danger">{editJsonErrors[key]}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </details>
-
-                {/* Error Display */}
-                {editError && (
-                  <p className="text-sm text-danger">{editError}</p>
-                )}
-
-                {/* Save/Cancel Buttons */}
-                <div className="flex gap-3 pt-2">
-                  <button
-                    onClick={handleSaveEdit}
-                    disabled={isSaving}
-                    className="px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-                  >
-                    {isSaving ? "Saving..." : "Save Changes"}
-                  </button>
-                  <button
-                    onClick={handleCancelEdit}
-                    disabled={isSaving}
-                    className="px-4 py-2 text-secondary hover:text-foreground transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
+              <div><h1 className="mb-4 text-2xl font-semibold">Edit mission</h1><MissionForm source={mission} mode="edit" onCancel={() => { setIsEditing(false); void refresh(); }} onSuccess={() => { setIsEditing(false); void refresh(); }} /></div>
             ) : (
               /* View Mode */
               <>
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-2">
+                    <div className="flex flex-wrap items-center gap-3 mb-2">
                       <StatusBadge status={mission.status} />
-                      <span className="text-sm font-mono text-muted">
+                      <span className="break-all text-sm font-mono text-muted">
                         {mission.mission_id}
                       </span>
                     </div>
-                    <h1 className="text-2xl font-bold text-foreground">
+                    <h1 className="break-words text-2xl font-bold text-foreground">
                       {mission.title}
                     </h1>
-                    <div className="mt-1 flex items-center gap-3 text-sm text-muted">
+                    <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-muted">
                       {mission.project_id && mission.project_name ? (
                         <Link
                           href={`/projects/${mission.project_id}`}
@@ -688,7 +223,7 @@ function MissionDetailContent() {
                   {mission.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-1 text-xs bg-surface text-secondary rounded"
+                      className="max-w-full break-words px-2 py-1 text-xs bg-surface text-secondary rounded"
                     >
                       {tag}
                     </span>
@@ -697,6 +232,10 @@ function MissionDetailContent() {
 
                 {/* Action Buttons */}
                 <div className="mt-6 flex flex-wrap gap-3">
+                  {["queued", "in_progress"].includes(mission.status) && <button disabled={acting} className="rounded-lg border border-danger-line px-4 py-2 text-sm text-danger" onClick={() => void handleCancelRun()}>Cancel run</button>}
+                  {["completed", "blocked", "cancelled", "validation_failed"].includes(mission.status) && <button disabled={acting} className="rounded-lg border border-line px-4 py-2 text-sm" onClick={() => void handleRerun()}>Re-run</button>}
+                  {mission.status === "completed" && <button disabled={acting} className="rounded-lg border border-line px-4 py-2 text-sm" onClick={() => void handleReview()}>Mark reviewed</button>}
+
                   {isDraft && (
                     <button
                       onClick={handleSubmitToDeepSearch}
@@ -731,12 +270,14 @@ function MissionDetailContent() {
                       View Promoted Document
                     </Link>
                   )}
+                  {isDraft && (
                   <button
-                    onClick={handleStartEdit}
+                    onClick={() => setIsEditing(true)}
                     className="px-4 py-2 border border-line-strong text-secondary rounded-lg hover:bg-background transition-colors font-medium text-sm"
                   >
                     Edit Mission
                   </button>
+                  )}
                   <button
                     onClick={() => { setActionError(null); setDeleteOpen(true); }}
                     className="px-4 py-2 border border-danger-line text-danger rounded-lg hover:bg-danger-surface transition-colors font-medium text-sm"
@@ -761,11 +302,53 @@ function MissionDetailContent() {
             )}
           </div>
 
-          <div className="flex gap-3 border-b border-line p-4" role="tablist" aria-label="Mission detail">
-            {['overview', 'evidence'].map(tab => <button key={tab} id={`mission-tab-${tab}`} role="tab" aria-selected={detailTab === tab} aria-controls={`mission-panel-${tab}`} tabIndex={detailTab === tab ? 0 : -1} onKeyDown={event => { if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) { event.preventDefault(); const next = event.key === "Home" ? "overview" : event.key === "End" ? "evidence" : tab === "overview" ? "evidence" : "overview"; setDetailTab(next); document.getElementById(`mission-tab-${next}`)?.focus(); } }} onClick={() => setDetailTab(tab)} className={`rounded px-4 py-2 ${detailTab === tab ? 'bg-accent text-on-accent' : 'border border-line'}`}>{tab === 'overview' ? 'Overview' : 'Evidence'}</button>)}
+          <div className="flex flex-wrap gap-3 border-b border-line p-4" role="tablist" aria-label="Mission detail">
+            {["overview", "results", "evidence"].map((tab, index, tabs) => <button key={tab} id={`mission-tab-${tab}`} role="tab" aria-selected={detailTab === tab} aria-controls={`mission-panel-${tab}`} tabIndex={detailTab === tab ? 0 : -1} onKeyDown={event => {
+              if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
+                event.preventDefault();
+                const next = event.key === "Home" ? tabs[0] : event.key === "End" ? tabs[tabs.length - 1] : tabs[(index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length];
+                setDetailTab(next); document.getElementById(`mission-tab-${next}`)?.focus();
+              }
+            }} onClick={() => setDetailTab(tab)} className={`rounded px-4 py-2 ${detailTab === tab ? "bg-accent text-on-accent" : "border border-line"}`}>{tab === "overview" ? "Run" : tab === "results" ? "Results" : "Evidence"}</button>)}
+          </div>
+          <div role="tabpanel" id="mission-panel-results" aria-labelledby="mission-tab-results" hidden={detailTab !== "results"}>
+          {/* Results Markdown Section */}
+          {mission.result_markdown && (
+            <Section title="Results">
+              <div className="flex justify-end mb-2">
+                <button
+                  onClick={() => downloadFile(
+                    mission.result_markdown!,
+                    `${mission.mission_id}-results.md`,
+                    "text/markdown"
+                  )}
+                  className="px-3 py-1.5 text-xs font-medium text-accent-text hover:bg-info-surface rounded transition-colors"
+                >
+                  Export as .md
+                </button>
+              </div>
+              <div className="bg-background rounded-lg p-4 overflow-x-auto">
+                <MarkdownRenderer content={mission.result_markdown} />
+              </div>
+            </Section>
+          )}
+
+          {/* Result Links Section */}
+          {(mission.result_document_ids.length > 0 || mission.result_report_id) && (
+            <Section title="Result Artifacts">
+              <ResultLinks
+                documentIds={mission.result_document_ids}
+                reportId={mission.result_report_id}
+              />
+            </Section>
+          )}
+
+
+            {!mission.result_markdown && !mission.result_report_id && !mission.result_document_ids.length && <PageState state="empty" title="No results recorded yet." />}
           </div>
           {detailTab === 'evidence' && <div role="tabpanel" id="mission-panel-evidence" aria-labelledby="mission-tab-evidence" className="px-4"><EvidencePanel projectId={mission.project_id} filters={{ mission_id: mission.id }} /></div>}
           <div role="tabpanel" id="mission-panel-overview" aria-labelledby="mission-tab-overview" hidden={detailTab !== 'overview'}>
+          <MissionRunActivity mission={mission} />
           {/* Objective Section */}
           <Section title="Objective">
             <p className="text-secondary whitespace-pre-wrap">
@@ -803,7 +386,7 @@ function MissionDetailContent() {
 
           {/* Research Phases Section */}
           {hasResearchPhases && (
-            <Section title="Research Phases">
+            <Section title="Research plan">
               <ResearchPhases phases={mission.research_phases} />
             </Section>
           )}
@@ -817,27 +400,6 @@ function MissionDetailContent() {
             </Section>
           )}
 
-          {/* Results Markdown Section */}
-          {mission.result_markdown && (
-            <Section title="Results">
-              <div className="flex justify-end mb-2">
-                <button
-                  onClick={() => downloadFile(
-                    mission.result_markdown!,
-                    `${mission.mission_id}-results.md`,
-                    "text/markdown"
-                  )}
-                  className="px-3 py-1.5 text-xs font-medium text-accent-text hover:bg-info-surface rounded transition-colors"
-                >
-                  Export as .md
-                </button>
-              </div>
-              <div className="bg-background rounded-lg p-4 overflow-x-auto">
-                <MarkdownRenderer content={mission.result_markdown} />
-              </div>
-            </Section>
-          )}
-
           {/* Contract Preview Panel (T40.4) */}
           {missionId && (
             <div className="p-6 border-b border-line">
@@ -845,19 +407,10 @@ function MissionDetailContent() {
             </div>
           )}
 
-          {/* Result Links Section */}
-          {(mission.result_document_ids.length > 0 || mission.result_report_id) && (
-            <Section title="Result Artifacts">
-              <ResultLinks
-                documentIds={mission.result_document_ids}
-                reportId={mission.result_report_id}
-              />
-            </Section>
-          )}
-
           {/* Execution Timeline & Metadata Section */}
           <Section title="Execution">
             <ExecutionTimeline
+              status={mission.status}
               createdAt={mission.created_at}
               queuedAt={mission.queued_at}
               startedAt={mission.started_at}
@@ -888,100 +441,9 @@ function MissionDetailContent() {
             )}
           </Section>
 
-          {/* Runner logs */}
-          {missionId && <MissionLogTail missionId={missionId} status={mission?.status} />}
+
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Log tail component — polls while mission is active, shows last N lines
-// ---------------------------------------------------------------------------
-
-type LogEntry = {
-  id: string;
-  level: string;
-  message: string;
-  source: string | null;
-  logged_at: string;
-};
-
-const ACTIVE_STATUSES = new Set(["queued", "in_progress"]);
-const POLL_INTERVAL_MS = 5000;
-const LOG_LEVEL_COLORS: Record<string, string> = {
-  ERROR: "text-danger",
-  WARNING: "text-warning",
-  WARN: "text-warning",
-  INFO: "text-secondary",
-  DEBUG: "text-muted",
-};
-
-function MissionLogTail({ missionId, status }: { missionId: string; status: MissionStatus | undefined }) {
-  const { user } = useAuth();
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const isActive = status ? ACTIVE_STATUSES.has(status) : false;
-  const { data: logs = [], error, isLoading, mutate } = useSWR(
-    ["mission-logs", user?.user_id, missionId],
-    () => httpClient.get<LogEntry[]>(`/missions/${missionId}/logs`, { params: { limit: 100 } }),
-    { refreshInterval: isActive ? POLL_INTERVAL_MS : 0 },
-  );
-
-  // Auto-scroll to bottom when new logs arrive while active
-  useEffect(() => {
-    if (isActive && bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [logs, isActive]);
-
-  // Don't render if we've confirmed there are no logs
-  if (!isLoading && !error && logs.length === 0 && !isActive) return null;
-
-  return (
-    <div className="border-t border-line mt-0">
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold text-foreground">
-            Runner Logs
-          </h2>
-          {isActive && (
-            <span className="flex items-center gap-1.5 text-xs text-accent-text">
-              <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-              Live
-            </span>
-          )}
-        </div>
-
-        {error && <p role="alert" className="mb-3 text-sm text-danger">Unable to load runner logs. <button className="underline" onClick={() => void mutate()}>Retry logs</button></p>}
-        {isLoading ? <p role="status">Loading logs…</p> : logs.length === 0 ? (
-          <p className="text-sm text-muted font-mono">
-            {isActive ? "Waiting for logs..." : "No logs recorded."}
-          </p>
-        ) : (
-          <div tabIndex={0} role="region" aria-label="Execution log" className="bg-background rounded-lg p-4 overflow-y-auto max-h-96 font-mono text-xs space-y-0.5">
-            {logs.map((log) => (
-              <div key={log.id} className="flex flex-wrap gap-x-3 gap-y-1 leading-5">
-                <span className="shrink-0 text-muted w-[180px]">
-                  {new Date(log.logged_at).toISOString().replace("T", " ").slice(0, 19)}
-                </span>
-                <span className={`shrink-0 w-14 ${LOG_LEVEL_COLORS[log.level] ?? LOG_LEVEL_COLORS.INFO}`}>
-                  {log.level}
-                </span>
-                {log.source && (
-                  <span className="shrink-0 text-muted max-w-[120px] truncate">
-                    {log.source}
-                  </span>
-                )}
-                <span className="text-secondary break-words min-w-0">
-                  {log.message}
-                </span>
-              </div>
-            ))}
-            <div ref={bottomRef} />
-          </div>
-        )}
       </div>
     </div>
   );

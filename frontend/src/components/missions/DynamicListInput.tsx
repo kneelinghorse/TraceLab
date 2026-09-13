@@ -65,10 +65,11 @@ export function DynamicListInput({
           <div key={index} className="flex gap-2">
             <input
               type="text"
+              aria-label={`${label} ${index + 1}`}
               value={item}
               onChange={(e) => handleChange(index, e.target.value)}
               placeholder={placeholder}
-              className="form-input flex-1"
+              className="form-input flex-1 min-w-0"
             />
             {items.length > minItems && (
               <button

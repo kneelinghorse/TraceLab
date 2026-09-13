@@ -1,4 +1,8 @@
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
+import { apiErrorMessage } from "@/lib/api/errors";
+import { ContractPreviewPanel } from "./ContractPreviewPanel";
 import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import useSWR from "swr";
@@ -10,15 +14,17 @@ import {
   defaultApiMissionFormValues,
   type ApiMissionFormValues,
 } from "@/lib/schemas/apiMissionForm";
-import type { ApiMission, ApiMissionCreate } from "@/types/mission";
+import type { ApiMission, ApiMissionCreate, ApiMissionUpdate, MissionContractPreview } from "@/types/mission";
 import type { Project } from "@/types/document";
-import type { PaginatedResponse } from "@/types/pagination";
+import { PageState } from "@/components/ui/PageState";
 import { DynamicListInput } from "./DynamicListInput";
 
 const SECTION_CLASS =
   "rounded-2xl border border-line bg-surface p-6 shadow-sm";
 
 interface MissionFormProps {
+  source?: ApiMission;
+  mode?: "create" | "edit";
   onSuccess?: (mission: ApiMission) => void;
   onCancel?: () => void;
 }
@@ -63,33 +69,51 @@ function parseJsonField(
 
 /**
  * Form for creating a new DeepSearch mission.
- * Supports "Save as Draft" and "Submit Immediately" actions.
+ * Supports "Save and preview" and "Submit Immediately" actions.
  */
-export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
+export function MissionForm({ onSuccess, onCancel, source, mode = "create" }: MissionFormProps) {
+  const { user } = useAuth();
+  const [initialValues] = useState<ApiMissionFormValues>(() => {
+    const authored = Object.fromEntries(Object.keys(apiMissionFormSchema.shape)
+      .filter(key => source && source[key as keyof ApiMission] != null)
+      .map(key => [key, source![key as keyof ApiMission]]));
+    const priority = source?.metadata?.priority;
+    return { ...defaultApiMissionFormValues, ...authored, status: "draft",
+      priority: priority === "low" || priority === "high" ? priority : "normal",
+      mission_id: mode === "edit" ? source?.mission_id ?? "" : source ? `RUN-${crypto.randomUUID()}` : "",
+    } as ApiMissionFormValues;
+  });
+  const [saved, setSaved] = useState<ApiMission | null>(mode === "edit" ? source ?? null : null);
+  const [preview, setPreview] = useState<MissionContractPreview | null>(null);
+  const [previewRevision, setPreviewRevision] = useState(0);
+  const [jsonDirty, setJsonDirty] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showProjectRequiredTooltip, setShowProjectRequiredTooltip] = useState(false);
   const [jsonFields, setJsonFields] = useState<JsonFieldState>({
-    expected_output_schema: "",
-    coverage_thresholds: "",
-    validation_thresholds: "",
+    expected_output_schema: source?.expected_output_schema ? JSON.stringify(source.expected_output_schema, null, 2) : "",
+    coverage_thresholds: source?.coverage_thresholds ? JSON.stringify(source.coverage_thresholds, null, 2) : "",
+    validation_thresholds: source?.validation_thresholds ? JSON.stringify(source.validation_thresholds, null, 2) : "",
   });
   const [jsonErrors, setJsonErrors] = useState<JsonFieldErrors>({});
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   // Fetch projects for dropdown
-  const { data: projectsData } = useSWR<PaginatedResponse<Project>>(
-    ["projects-list"],
-    () => projectsApi.listProjects({ page: 1, pageSize: 100 })
+  const { data: projectsData, error: projectsError, mutate: reloadProjects } = useSWR<Project[]>(
+    ["projects-list", user?.user_id],
+    () => projectsApi.listAllProjects()
   );
-  const projects = projectsData?.data ?? [];
+  const projects = projectsData ?? [];
 
   const {
     control,
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    setError,
+    clearErrors,
+    reset,
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<ApiMissionFormValues>({
-    defaultValues: defaultApiMissionFormValues,
+    defaultValues: initialValues,
     resolver: zodResolver(apiMissionFormSchema),
     mode: "onBlur",
   });
@@ -122,6 +146,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
     submitStatus: "draft" | "queued"
   ) => {
     setSubmitError(null);
+    clearErrors();
 
     // Validate the three JSON textareas up-front; block submit if any is malformed.
     const parsedJson: Partial<Record<JsonFieldName, Record<string, unknown>>> = {};
@@ -151,39 +176,73 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
         deliverables: values.deliverables?.filter((d) => d.trim() !== "") || [],
         tags: values.tags?.filter((t) => t.trim() !== "") || [],
         metadata: {
-          priority: values.priority,
           ...values.metadata,
+          priority: values.priority,
         },
-        status: submitStatus,
-        // Authoring fields — send only those the author actually filled in.
-        background: values.background?.trim() || undefined,
-        focus: values.focus?.trim() || undefined,
-        references: references.length > 0 ? references : undefined,
+        status: "draft",
+        context: values.context,
+        research_phases: values.research_phases,
+        // Empty optional fields explicitly clear an earlier saved draft value.
+        background: values.background?.trim() || null,
+        focus: values.focus?.trim() || null,
+        references: references.length > 0 ? references : null,
         required_entities:
           values.required_entities && values.required_entities.filter((x) => x.trim() !== "").length > 0
             ? values.required_entities.filter((x) => x.trim() !== "")
-            : undefined,
+            : null,
         excluded_entities:
           values.excluded_entities && values.excluded_entities.filter((x) => x.trim() !== "").length > 0
             ? values.excluded_entities.filter((x) => x.trim() !== "")
-            : undefined,
+            : null,
         constraints:
           values.constraints && values.constraints.filter((x) => x.trim() !== "").length > 0
             ? values.constraints.filter((x) => x.trim() !== "")
-            : undefined,
-        deliverable_format: values.deliverable_format?.trim() || undefined,
-        max_loops: values.max_loops,
-        min_loops: values.min_loops,
-        expected_output_schema: parsedJson.expected_output_schema,
-        coverage_thresholds: parsedJson.coverage_thresholds,
-        validation_thresholds: parsedJson.validation_thresholds,
+            : null,
+        deliverable_format: values.deliverable_format?.trim() || null,
+        max_loops: values.max_loops ?? null,
+        min_loops: values.min_loops ?? null,
+        expected_output_schema: parsedJson.expected_output_schema ?? null,
+        coverage_thresholds: parsedJson.coverage_thresholds ?? null,
+        validation_thresholds: parsedJson.validation_thresholds ?? null,
       };
 
-      const mission = await missionsApi.create(payload);
-      onSuccess?.(mission);
+      // Save once; retry a failed preview/submit against this same draft.
+      let mission: ApiMission;
+      if (saved) {
+        const latest = await missionsApi.get(saved.id);
+        if (latest.status !== "draft") throw new Error(`This mission is already ${latest.status.replaceAll("_", " ")}. Open the saved mission to inspect it.`);
+        const changes = Object.fromEntries(Object.entries(payload).filter(([key]) => key !== "mission_id" && key !== "status")) as ApiMissionUpdate;
+        mission = await missionsApi.update(saved.id, changes);
+      } else {
+        mission = await missionsApi.create(payload);
+      }
+      setSaved(mission);
+      reset(values);
+      setJsonDirty(false);
+      setPreview(null);
+      if (submitStatus === "queued") {
+        const submitted = await missionsApi.submitToDeepSearch(mission.id);
+        onSuccess?.({ ...mission, status: submitted.status as ApiMission["status"] });
+      } else {
+        const compiled = await missionsApi.previewContract(mission.id);
+        setPreview(compiled);
+        setPreviewRevision(value => value + 1);
+      }
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to create mission";
-      setSubmitError(message);
+      setSubmitError(apiErrorMessage(err, "Mission could not be saved or submitted"));
+      try {
+        const detail = JSON.parse((err as Error).message).detail;
+        const violations = Array.isArray(detail) ? detail : detail?.errors ?? [];
+        if (typeof detail?.message === "string") setSubmitError(detail.message);
+        for (const violation of violations) {
+          const field = violation.field ?? violation.loc?.find((key: string) => key in apiMissionFormSchema.shape);
+          const message = violation.message ?? violation.msg;
+          if (field in apiMissionFormSchema.shape && typeof message === "string") {
+            setError(field as keyof ApiMissionFormValues, { type: "server", message });
+            if (field in JSON_FIELD_LABELS) setJsonErrors(previous => ({ ...previous, [field]: message }));
+          }
+        }
+      } catch { /* Non-validation errors stay in the form-level alert. */ }
     }
   };
 
@@ -191,7 +250,8 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
   const onSubmitQueued = handleSubmit((values) => handleFormSubmit(values, "queued"));
 
   return (
-    <form className="space-y-6">
+    <form className="space-y-6" onSubmit={event => event.preventDefault()}>
+      {projectsError && <PageState state="error" title="Projects could not load." onRetry={() => void reloadProjects()} />}
       {/* Basic Information */}
       <section className={`${SECTION_CLASS} space-y-4`}>
         <header>
@@ -210,6 +270,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
             </label>
             <input id="mission-mission_id"
               {...register("mission_id")}
+              readOnly={Boolean(saved)}
               placeholder="e.g., M-2024-001"
               className="form-input"
             />
@@ -327,6 +388,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
             placeholder="Free-form prose orienting the research (e.g., what prior work is this building on?)"
             className="form-input min-h-[80px]"
           />
+          {errors.background && <p className="form-error">{errors.background.message}</p>}
         </div>
 
         <div>
@@ -336,6 +398,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
             placeholder="Narrow framing for the research question"
             className="form-input min-h-[60px]"
           />
+          {errors.focus && <p className="form-error">{errors.focus.message}</p>}
         </div>
 
         <Controller
@@ -347,7 +410,8 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
               items={(field.value ?? []).map((r) =>
                 typeof r === "string" ? r : (r?.title ?? "")
               )}
-              onChange={(items) => field.onChange(items.map((title) => ({ title })))}
+              onChange={(items) => field.onChange(items.map((title) => field.value?.find(reference => reference.title === title) ?? { title }))}
+              error={errors.references?.message}
               placeholder="Seed reference title (e.g. 'Burns et al. 2022')"
               minItems={0}
             />
@@ -363,6 +427,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
               items={field.value ?? []}
               onChange={field.onChange}
               placeholder="Entity that MUST appear in results..."
+              error={errors.required_entities?.message}
               minItems={0}
             />
           )}
@@ -377,6 +442,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
               items={field.value ?? []}
               onChange={field.onChange}
               placeholder="Entity that MUST NOT appear in results..."
+              error={errors.excluded_entities?.message}
               minItems={0}
             />
           )}
@@ -391,6 +457,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
               items={field.value ?? []}
               onChange={field.onChange}
               placeholder="Add a constraint (e.g. 'no paywalled sources')..."
+              error={errors.constraints?.message}
               minItems={0}
             />
           )}
@@ -404,14 +471,15 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
               placeholder="e.g. markdown report, comparison table"
               className="form-input"
             />
-          </div>
+            {errors.deliverable_format && <p className="form-error">{errors.deliverable_format.message}</p>}
+        </div>
           <div>
             <label htmlFor="mission-min_loops" className="form-label">Min loops</label>
             <input id="mission-min_loops"
               type="number"
               min={1}
               max={50}
-              {...register("min_loops", { valueAsNumber: true })}
+              {...register("min_loops", { setValueAs: value => value === "" ? undefined : Number(value) })}
               className="form-input"
             />
             {errors.min_loops && (
@@ -424,7 +492,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
               type="number"
               min={1}
               max={50}
-              {...register("max_loops", { valueAsNumber: true })}
+              {...register("max_loops", { setValueAs: value => value === "" ? undefined : Number(value) })}
               className="form-input"
             />
             {errors.max_loops && (
@@ -441,6 +509,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
               value={jsonFields[key]}
               onChange={(e) => {
                 setJsonFields((prev) => ({ ...prev, [key]: e.target.value }));
+                setJsonDirty(true);
                 if (jsonErrors[key]) {
                   setJsonErrors((prev) => {
                     const next = { ...prev };
@@ -479,6 +548,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
               items={field.value ?? []}
               onChange={field.onChange}
               placeholder="Define an expected deliverable..."
+              error={errors.deliverables?.message}
               minItems={0}
             />
           )}
@@ -493,15 +563,22 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
               items={field.value ?? []}
               onChange={field.onChange}
               placeholder="Add a tag..."
+              error={errors.tags?.message}
               minItems={0}
             />
           )}
         />
       </section>
 
+      {saved && <section className="space-y-3" aria-label="Saved draft preview">
+        <p className="text-sm text-secondary">Draft saved. <Link className="underline" href={`/missions/${saved.id}`}>Open saved draft</Link></p>
+        {(isDirty || jsonDirty) && <p role="status" className="text-sm text-warning">Unsaved changes — save again to update the preview.</p>}
+        {preview && <ContractPreviewPanel key={previewRevision} missionId={saved.id} initialPreview={preview} />}
+      </section>}
+
       {/* Error Display */}
       {submitError && (
-        <div className="p-4 bg-danger-surface border border-danger-line rounded-lg">
+        <div role="alert" className="p-4 bg-danger-surface border border-danger-line rounded-lg">
           <p className="text-sm text-danger">{submitError}</p>
         </div>
       )}
@@ -515,11 +592,11 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
               onClick={onCancel}
               className="px-4 py-2.5 text-sm font-medium text-secondary hover:bg-surface rounded-lg transition-colors"
             >
-              Cancel
+              {mode === "edit" ? "Close editor" : "Back to missions"}
             </button>
           )}
 
-          <div className="flex gap-3 sm:ml-auto">
+          <div className="flex flex-wrap gap-3 sm:ml-auto">
             <button
               type="button"
               onClick={isProjectSelected ? onSubmitDraft : handleDisabledSubmitClick}
@@ -531,7 +608,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
               }`}
               title={isProjectSelected ? undefined : "Select a project to save"}
             >
-              {isSubmitting ? "Saving..." : "Save as Draft"}
+              {isSubmitting ? "Saving..." : "Save and preview"}
             </button>
 
             <div className="relative">
@@ -550,9 +627,9 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
                 {isSubmitting ? "Submitting..." : "Submit to DeepSearch"}
               </button>
               {showProjectRequiredTooltip && !isProjectSelected && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-background text-foreground text-xs rounded-lg whitespace-nowrap shadow-lg z-10">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-background text-foreground text-xs rounded-lg w-52 max-w-full shadow-lg z-10">
                   Select a project to submit to DeepSearch
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-line-strong" />
                 </div>
               )}
             </div>
