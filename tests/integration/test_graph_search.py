@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import gc
+import time
+
 import pytest
 from sqlalchemy import (
     CheckConstraint,
@@ -12,6 +15,7 @@ from sqlalchemy import (
     Table,
     Text,
     UniqueConstraint,
+    event,
 )
 
 from app.core.database import engine
@@ -389,10 +393,38 @@ def test_graph_layer_depth2_performance_under_200ms(db_session):
     db_session.commit()
 
     service = GraphLayerService(session=db_session)
-    result = service.search(
-        [seed_urn],
-        config=GraphLayerConfig(max_depth=2, max_candidates=2000),
-    )
+    sql_ms = []
+    gc_ms = []
+    started = {}
+    gc_counts = gc.get_count()
+
+    def before_sql(conn, cursor, statement, parameters, context, executemany):
+        started["sql"] = time.perf_counter()
+
+    def after_sql(conn, cursor, statement, parameters, context, executemany):
+        sql_ms.append(round((time.perf_counter() - started["sql"]) * 1000, 2))
+
+    def observe_gc(phase, info):
+        if phase == "start":
+            started["gc"] = time.perf_counter()
+        else:
+            gc_ms.append((info["generation"], round((time.perf_counter() - started["gc"]) * 1000, 2)))
+
+    bind = db_session.get_bind()
+    event.listen(bind, "before_cursor_execute", before_sql)
+    event.listen(bind, "after_cursor_execute", after_sql)
+    gc.callbacks.append(observe_gc)
+    try:
+        result = service.search(
+            [seed_urn],
+            config=GraphLayerConfig(max_depth=2, max_candidates=2000),
+        )
+    finally:
+        gc.callbacks.remove(observe_gc)
+        event.remove(bind, "before_cursor_execute", before_sql)
+        event.remove(bind, "after_cursor_execute", after_sql)
 
     assert result.latency_ms is not None
-    assert result.latency_ms < 200
+    diagnostics = {"latency_ms": result.latency_ms, "sql_ms": sql_ms, "gc_ms": gc_ms, "gc_counts_before": gc_counts}
+    print(f"Graph timing diagnostics: {diagnostics}")
+    assert result.latency_ms < 200, diagnostics
