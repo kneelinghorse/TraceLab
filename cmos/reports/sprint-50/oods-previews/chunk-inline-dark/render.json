@@ -1,0 +1,342 @@
+{
+  "schemaHash": "sha256:8c080a2a1d3a36173445f4e6bf65deda3d3e8eaf9591f222367328dd0d7f7d0b",
+  "receipts": [
+    {
+      "version": "1.1",
+      "theme": "dark",
+      "brand": "A",
+      "framework": "react",
+      "compose": {
+        "object": "Chunk",
+        "context": "inline",
+        "preferences": {
+          "theme": "dark"
+        }
+      },
+      "schemaHash": "sha256:8c080a2a1d3a36173445f4e6bf65deda3d3e8eaf9591f222367328dd0d7f7d0b",
+      "artifactContentHash": "sha256:f562cb6450e3cba0a8c8fa53a530654f24886b0dc889653687a87af00434996e",
+      "files": [
+        {
+          "path": "src/GeneratedUI.tsx",
+          "contentHash": "sha256:ec83c7ac27d1f9c6be5a8ee0dc6e6c530f0a235d83c35d05c3fc5206867d9d42"
+        }
+      ],
+      "sourceHead": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "model": {
+        "chunkIndex": 0,
+        "content": "Consumer content",
+        "createdAt": "2026-09-05T12:00:00.000Z",
+        "description": "Consumer description",
+        "documentId": "consumer-document-id",
+        "embeddingId": "consumer-embedding-id",
+        "endChar": 0,
+        "id": "Consumer id",
+        "label": "Consumer label",
+        "nextChunkId": "consumer-next-chunk-id",
+        "placeholder": "Consumer placeholder",
+        "prevChunkId": "consumer-prev-chunk-id",
+        "startChar": 0,
+        "tokenCount": 0
+      },
+      "steps": [],
+      "clock": "2026-09-08T12:00:00.000Z",
+      "clockStepMs": 1,
+      "locale": "en-US",
+      "timezone": "UTC",
+      "packages": [
+        {
+          "name": "@oods/tokens",
+          "version": "0.1.0",
+          "installSpec": "file:./tarballs/oods-tokens-0.1.0.tgz",
+          "sha256": "sha256:69422edecf1d2853a844003bebbe2e4b514987e86a9fa1d860946f873c1c28c5",
+          "bytes": 238478
+        },
+        {
+          "name": "@oods/component-contracts",
+          "version": "0.1.0",
+          "installSpec": "file:./tarballs/oods-component-contracts-0.1.0.tgz",
+          "sha256": "sha256:b4bdbfccf2cea62f728e4f8123ad4bb7d8a4cdb42767e3395445694724e45381",
+          "bytes": 197852
+        },
+        {
+          "name": "@oods/component-styles",
+          "version": "0.1.0",
+          "installSpec": "file:./tarballs/oods-component-styles-0.1.0.tgz",
+          "sha256": "sha256:0f012b95395e8a70a2fb787580ab363af2e5e15940e7d13e3b255b71c143a9df",
+          "bytes": 12894
+        },
+        {
+          "name": "@oods/components-react",
+          "version": "0.1.0",
+          "installSpec": "file:./tarballs/oods-components-react-0.1.0.tgz",
+          "sha256": "sha256:02036aecde76093980d8e4e93bb3458c60a96009ee4b1d8c523b621e32a308e2",
+          "bytes": 95069
+        }
+      ],
+      "views": [
+        {
+          "width": 390,
+          "accessibility": "- search \"Embedding id\":\n  - text: Embedding id\n  - searchbox \"Embedding id\": consumer-embedding-id\n  - button \"Clear search\": ×\n- text: Chunk index\n- spinbutton \"Chunk index\": \"0\"\n- button\n- text: Consumer label\n- navigation \"Pagination\":\n  - text: 0 records\n  - button \"Previous page\" [disabled]: ‹\n  - list\n  - button \"Next page\" [disabled]: ›\n  - text: Page 1 of 1",
+          "visibleText": "Embedding id\n×\nChunk index*\nConsumer label\n0 records\n‹\n›\nPage 1 of 1",
+          "measurements": {
+            "bodyBackground": "oklch(0.18 0.05 45)",
+            "chartCanvasFills": [],
+            "viewportWidth": 390,
+            "documentWidth": 390,
+            "elementCount": 26,
+            "overflow": [],
+            "glyphWraps": []
+          },
+          "values": [
+            {
+              "element": "slot-search-1",
+              "name": "Embedding id",
+              "value": "consumer-embedding-id",
+              "checked": false
+            },
+            {
+              "element": "slot-filters-2",
+              "name": "Chunk index*",
+              "value": "0",
+              "checked": false
+            }
+          ],
+          "regions": [
+            {
+              "id": "screen-list-9",
+              "component": "Stack",
+              "text": "Embedding id\n×\nChunk index*\nConsumer label\n0 records\n‹\n›\nPage 1 of 1"
+            },
+            {
+              "id": "list-toolbar-4",
+              "component": "Stack",
+              "text": "Embedding id\n×\nChunk index*"
+            },
+            {
+              "id": "",
+              "component": "SearchInput",
+              "text": "Embedding id\n×"
+            },
+            {
+              "id": "slot-search-1",
+              "component": "SearchInput",
+              "text": ""
+            },
+            {
+              "id": "slot-filters-2",
+              "component": "Input",
+              "text": ""
+            },
+            {
+              "id": "slot-toolbar-actions-3",
+              "component": "Button",
+              "text": ""
+            },
+            {
+              "id": "list-items-5",
+              "component": "Stack",
+              "text": "Consumer label"
+            },
+            {
+              "id": "slot-items-6",
+              "component": "InlineLabel",
+              "text": "Consumer label"
+            },
+            {
+              "id": "list-pagination-7",
+              "component": "Stack",
+              "text": "0 records\n‹\n›\nPage 1 of 1"
+            },
+            {
+              "id": "slot-pagination-8",
+              "component": "PaginationBar",
+              "text": "0 records\n‹\n›\nPage 1 of 1"
+            }
+          ],
+          "screenshot": "390.png",
+          "screenshotHash": "sha256:0c7503c7bf5e9954f641c683b56988a3b274501b11770b8f83cf1e6e961e16af",
+          "dump": "390.a11y.txt"
+        },
+        {
+          "width": 820,
+          "accessibility": "- search \"Embedding id\":\n  - text: Embedding id\n  - searchbox \"Embedding id\": consumer-embedding-id\n  - button \"Clear search\": ×\n- text: Chunk index\n- spinbutton \"Chunk index\": \"0\"\n- button\n- text: Consumer label\n- navigation \"Pagination\":\n  - text: 0 records\n  - button \"Previous page\" [disabled]: ‹\n  - list\n  - button \"Next page\" [disabled]: ›\n  - text: Page 1 of 1",
+          "visibleText": "Embedding id\n×\nChunk index*\nConsumer label\n0 records\n‹\n›\nPage 1 of 1",
+          "measurements": {
+            "bodyBackground": "oklch(0.18 0.05 45)",
+            "chartCanvasFills": [],
+            "viewportWidth": 820,
+            "documentWidth": 820,
+            "elementCount": 26,
+            "overflow": [],
+            "glyphWraps": []
+          },
+          "values": [
+            {
+              "element": "slot-search-1",
+              "name": "Embedding id",
+              "value": "consumer-embedding-id",
+              "checked": false
+            },
+            {
+              "element": "slot-filters-2",
+              "name": "Chunk index*",
+              "value": "0",
+              "checked": false
+            }
+          ],
+          "regions": [
+            {
+              "id": "screen-list-9",
+              "component": "Stack",
+              "text": "Embedding id\n×\nChunk index*\nConsumer label\n0 records\n‹\n›\nPage 1 of 1"
+            },
+            {
+              "id": "list-toolbar-4",
+              "component": "Stack",
+              "text": "Embedding id\n×\nChunk index*"
+            },
+            {
+              "id": "",
+              "component": "SearchInput",
+              "text": "Embedding id\n×"
+            },
+            {
+              "id": "slot-search-1",
+              "component": "SearchInput",
+              "text": ""
+            },
+            {
+              "id": "slot-filters-2",
+              "component": "Input",
+              "text": ""
+            },
+            {
+              "id": "slot-toolbar-actions-3",
+              "component": "Button",
+              "text": ""
+            },
+            {
+              "id": "list-items-5",
+              "component": "Stack",
+              "text": "Consumer label"
+            },
+            {
+              "id": "slot-items-6",
+              "component": "InlineLabel",
+              "text": "Consumer label"
+            },
+            {
+              "id": "list-pagination-7",
+              "component": "Stack",
+              "text": "0 records\n‹\n›\nPage 1 of 1"
+            },
+            {
+              "id": "slot-pagination-8",
+              "component": "PaginationBar",
+              "text": "0 records\n‹\n›\nPage 1 of 1"
+            }
+          ],
+          "screenshot": "820.png",
+          "screenshotHash": "sha256:5538def4a56acef36534868011d31454912c7f4e4d898db2231c79daf49f6de3",
+          "dump": "820.a11y.txt"
+        },
+        {
+          "width": 1440,
+          "accessibility": "- search \"Embedding id\":\n  - text: Embedding id\n  - searchbox \"Embedding id\": consumer-embedding-id\n  - button \"Clear search\": ×\n- text: Chunk index\n- spinbutton \"Chunk index\": \"0\"\n- button\n- text: Consumer label\n- navigation \"Pagination\":\n  - text: 0 records\n  - button \"Previous page\" [disabled]: ‹\n  - list\n  - button \"Next page\" [disabled]: ›\n  - text: Page 1 of 1",
+          "visibleText": "Embedding id\n×\nChunk index*\nConsumer label\n0 records\n‹\n›\nPage 1 of 1",
+          "measurements": {
+            "bodyBackground": "oklch(0.18 0.05 45)",
+            "chartCanvasFills": [],
+            "viewportWidth": 1440,
+            "documentWidth": 1440,
+            "elementCount": 26,
+            "overflow": [],
+            "glyphWraps": []
+          },
+          "values": [
+            {
+              "element": "slot-search-1",
+              "name": "Embedding id",
+              "value": "consumer-embedding-id",
+              "checked": false
+            },
+            {
+              "element": "slot-filters-2",
+              "name": "Chunk index*",
+              "value": "0",
+              "checked": false
+            }
+          ],
+          "regions": [
+            {
+              "id": "screen-list-9",
+              "component": "Stack",
+              "text": "Embedding id\n×\nChunk index*\nConsumer label\n0 records\n‹\n›\nPage 1 of 1"
+            },
+            {
+              "id": "list-toolbar-4",
+              "component": "Stack",
+              "text": "Embedding id\n×\nChunk index*"
+            },
+            {
+              "id": "",
+              "component": "SearchInput",
+              "text": "Embedding id\n×"
+            },
+            {
+              "id": "slot-search-1",
+              "component": "SearchInput",
+              "text": ""
+            },
+            {
+              "id": "slot-filters-2",
+              "component": "Input",
+              "text": ""
+            },
+            {
+              "id": "slot-toolbar-actions-3",
+              "component": "Button",
+              "text": ""
+            },
+            {
+              "id": "list-items-5",
+              "component": "Stack",
+              "text": "Consumer label"
+            },
+            {
+              "id": "slot-items-6",
+              "component": "InlineLabel",
+              "text": "Consumer label"
+            },
+            {
+              "id": "list-pagination-7",
+              "component": "Stack",
+              "text": "0 records\n‹\n›\nPage 1 of 1"
+            },
+            {
+              "id": "slot-pagination-8",
+              "component": "PaginationBar",
+              "text": "0 records\n‹\n›\nPage 1 of 1"
+            }
+          ],
+          "screenshot": "1440.png",
+          "screenshotHash": "sha256:561a8b2a51c58c7d1bfd1021054295d2dd144c95eed0ca885c6f4104867f0014",
+          "dump": "1440.a11y.txt"
+        }
+      ],
+      "errors": [],
+      "timings": {
+        "composeMs": 77.041292,
+        "generateMs": 6.944500000000062,
+        "captureMs": 943.6881670000148
+      },
+      "output": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-preview-ijxdLp/receipt/react",
+      "consumer": {
+        "root": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-loop-react-QHpBOL",
+        "port": 4478,
+        "pid": 24016
+      }
+    }
+  ],
+  "durationMs": 1065.36575
+}

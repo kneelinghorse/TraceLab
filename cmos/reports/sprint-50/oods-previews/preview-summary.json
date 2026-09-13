@@ -1,0 +1,423 @@
+{
+  "saved_compositions": 20,
+  "receipt_sets": 40,
+  "width_observations": 120,
+  "framework": "react",
+  "widths": [
+    390,
+    820,
+    1440
+  ],
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "browser_error_count": 0,
+  "overflow_count": 0,
+  "text_wrap_observations": 58,
+  "implementation_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+  "additional_preview_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+  "head_difference": "Generated tool-reference documentation only; composition, code generation and style sources unchanged.",
+  "receipts": [
+    {
+      "object": "Project",
+      "context": "list",
+      "theme": "light",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "project-list-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "object": "Project",
+      "context": "list",
+      "theme": "dark",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "project-list-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "object": "Project",
+      "context": "detail",
+      "theme": "light",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "project-detail-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Project",
+      "context": "detail",
+      "theme": "dark",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "project-detail-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Project",
+      "context": "timeline",
+      "theme": "light",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "project-timeline-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Project",
+      "context": "timeline",
+      "theme": "dark",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "project-timeline-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Document",
+      "context": "list",
+      "theme": "light",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "document-list-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "object": "Document",
+      "context": "list",
+      "theme": "dark",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "document-list-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "object": "Document",
+      "context": "detail",
+      "theme": "light",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "document-detail-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Document",
+      "context": "detail",
+      "theme": "dark",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "document-detail-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Document",
+      "context": "timeline",
+      "theme": "light",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "document-timeline-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Document",
+      "context": "timeline",
+      "theme": "dark",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "document-timeline-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Chunk",
+      "context": "inline",
+      "theme": "light",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "chunk-inline-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Chunk",
+      "context": "inline",
+      "theme": "dark",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "chunk-inline-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Collection",
+      "context": "list",
+      "theme": "light",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "collection-list-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "object": "Collection",
+      "context": "list",
+      "theme": "dark",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "collection-list-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "object": "Collection",
+      "context": "detail",
+      "theme": "light",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "collection-detail-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Collection",
+      "context": "detail",
+      "theme": "dark",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "collection-detail-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Collection",
+      "context": "timeline",
+      "theme": "light",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "collection-timeline-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Collection",
+      "context": "timeline",
+      "theme": "dark",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "collection-timeline-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Mission",
+      "context": "list",
+      "theme": "light",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "receipt": "mission-list-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "object": "Mission",
+      "context": "list",
+      "theme": "dark",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "receipt": "mission-list-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "object": "Mission",
+      "context": "detail",
+      "theme": "light",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "receipt": "mission-detail-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 1
+    },
+    {
+      "object": "Mission",
+      "context": "detail",
+      "theme": "dark",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "receipt": "mission-detail-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 1
+    },
+    {
+      "object": "Mission",
+      "context": "timeline",
+      "theme": "light",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "receipt": "mission-timeline-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Mission",
+      "context": "timeline",
+      "theme": "dark",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "receipt": "mission-timeline-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Mission",
+      "context": "workflow",
+      "theme": "light",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "mission-workflow-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 10
+    },
+    {
+      "object": "Mission",
+      "context": "workflow",
+      "theme": "dark",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "mission-workflow-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 10
+    },
+    {
+      "object": "Report",
+      "context": "list",
+      "theme": "light",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "report-list-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "object": "Report",
+      "context": "list",
+      "theme": "dark",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "report-list-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "object": "Report",
+      "context": "detail",
+      "theme": "light",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "report-detail-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Report",
+      "context": "detail",
+      "theme": "dark",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "report-detail-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Report",
+      "context": "timeline",
+      "theme": "light",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "report-timeline-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Report",
+      "context": "timeline",
+      "theme": "dark",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "report-timeline-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Evidence",
+      "context": "list",
+      "theme": "light",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "receipt": "evidence-list-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "object": "Evidence",
+      "context": "list",
+      "theme": "dark",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "receipt": "evidence-list-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 3
+    },
+    {
+      "object": "Evidence",
+      "context": "detail",
+      "theme": "light",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "receipt": "evidence-detail-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Evidence",
+      "context": "detail",
+      "theme": "dark",
+      "source_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+      "receipt": "evidence-detail-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Evidence",
+      "context": "timeline",
+      "theme": "light",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "evidence-timeline-light/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    },
+    {
+      "object": "Evidence",
+      "context": "timeline",
+      "theme": "dark",
+      "source_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "receipt": "evidence-timeline-dark/react/receipt.json",
+      "browser_errors": [],
+      "overflow_count": 0,
+      "reported_text_wraps": 0
+    }
+  ]
+}

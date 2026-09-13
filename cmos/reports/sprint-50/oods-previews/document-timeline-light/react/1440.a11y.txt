@@ -1,0 +1,15 @@
+- text: Consumer name
+- list "Lifecycle history":
+  - listitem:
+    - text: Consumer label
+    - strong: Created
+    - time: Sep 5, 2026, 12:00 PM
+    - paragraph: Initial state
+  - listitem:
+    - text: Consumer label
+    - strong: Updated
+    - time: Sep 6, 2026, 12:00 PM
+    - paragraph: Next state
+- article "State transitions":
+  - heading "State transitions" [level=3]
+  - paragraph: No events recorded.

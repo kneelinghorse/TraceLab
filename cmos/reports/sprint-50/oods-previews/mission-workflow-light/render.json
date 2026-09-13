@@ -1,0 +1,1709 @@
+{
+  "schemaHash": "sha256:247bde9d6a0ed6f0c48d6d0d239278739b37c37a6ce19eb2499fe48cd46fcd68",
+  "receipts": [
+    {
+      "version": "1.1",
+      "theme": "light",
+      "brand": "A",
+      "framework": "react",
+      "compose": {
+        "object": "Mission",
+        "context": "workflow",
+        "preferences": {
+          "theme": "light"
+        }
+      },
+      "schemaHash": "sha256:247bde9d6a0ed6f0c48d6d0d239278739b37c37a6ce19eb2499fe48cd46fcd68",
+      "artifactContentHash": "sha256:2f4d280527505556d7fc4f132db0d0d71f243f3f73516a67a32000ce23afe1bb",
+      "files": [
+        {
+          "path": "index.html",
+          "contentHash": "sha256:73e4e65a1a8bd82b64b65db714b92e0c075bd7635dffa486ecd17ed28c193f66"
+        },
+        {
+          "path": "package.json",
+          "contentHash": "sha256:43cc988ad35182b1acdac9d5dc3a24bf90dab1e349ab32745fb08bbcc6481892"
+        },
+        {
+          "path": "src/App.tsx",
+          "contentHash": "sha256:8289638efbcf017ddbbfb36e573cd0571139d4f2a151ba293d28fd308854951c"
+        },
+        {
+          "path": "src/actions.ts",
+          "contentHash": "sha256:7885a54420c4faa0f50c1926de2469fca71ade8bda029b87618003a0572ddbee"
+        },
+        {
+          "path": "src/app.css",
+          "contentHash": "sha256:1a9b40d35531079fde5342f8c72f57a9538edf031280103c595cc40c5cd87aa8"
+        },
+        {
+          "path": "src/application.ts",
+          "contentHash": "sha256:d4cf2a45ece031a0ea923639f6ef67915c9193f082f02407b907645a22a0989b"
+        },
+        {
+          "path": "src/main.tsx",
+          "contentHash": "sha256:70300b214bc7e8ef4133a2583793961a135b1664755398589797921653d0be90"
+        },
+        {
+          "path": "src/sample-data.ts",
+          "contentHash": "sha256:889dca431186d132a5b6e43c2d853039b48d3945f0279fdaab236310721b07d2"
+        },
+        {
+          "path": "src/screens/Detail.tsx",
+          "contentHash": "sha256:f7dbf760f6632d786387240bd02a5e145f4781eee237cb59f2953e90660e2fad"
+        },
+        {
+          "path": "src/screens/Form.tsx",
+          "contentHash": "sha256:9081fe678faafa70740d0b14fc0da9a620a757afb5f00c765ce04214b4d54a4d"
+        },
+        {
+          "path": "src/screens/List.tsx",
+          "contentHash": "sha256:301670be47370f1cf68d74b9fd9e360b7f6a5988c5780ebc65276ea6205c6dfb"
+        },
+        {
+          "path": "src/screens/Timeline.tsx",
+          "contentHash": "sha256:d743982a34dae6455a3bc9cd9d592556a38e841c10e540c19a5acf79a24f8112"
+        },
+        {
+          "path": "src/ssr.tsx",
+          "contentHash": "sha256:955f316df646abe4cc9ef0ec3ee7d9b8dc6f38e68dd78bf5837b387bf3c839a0"
+        },
+        {
+          "path": "src/store.ts",
+          "contentHash": "sha256:412c106114284516066d37a45c2dbe68efbfacf4be68faed21582144d3b96839"
+        },
+        {
+          "path": "tsconfig.json",
+          "contentHash": "sha256:a0c6dad213106eebefcf5e817d07e31a8b6666e4bc678a449b7c578f62f6fb3a"
+        }
+      ],
+      "sourceHead": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+      "model": {
+        "activeFilters": [],
+        "allowedTransitions": [],
+        "background": "Consumer background",
+        "cancelAtPeriodEnd": false,
+        "cancellationReason": "Consumer cancellation reason",
+        "cancellationReasonCode": "Consumer cancellation reason code",
+        "cancellationRequestedAt": "2026-09-05T12:00:00.000Z",
+        "completedAt": "2026-09-05T12:00:00.000Z",
+        "constraints": [],
+        "context": {},
+        "coverageThresholds": {},
+        "createdAt": "2026-09-05T12:00:00.000Z",
+        "createdBy": "Consumer created by",
+        "currentPhase": "Consumer current phase",
+        "deepsearchAttemptCount": 0,
+        "deepsearchJobId": "consumer-deepsearch-job-id",
+        "deliverableFormat": "Consumer deliverable format",
+        "deliverables": [],
+        "description": "Consumer description",
+        "errorMessage": "Consumer error message",
+        "excludedEntities": [],
+        "executionMetadata": {},
+        "expectedOutputSchema": {},
+        "filterCount": 0,
+        "filters": [],
+        "focus": "Consumer focus",
+        "id": "Consumer id",
+        "label": "Consumer label",
+        "lastEvent": "Consumer last event",
+        "lastEventAt": "2026-09-05T12:00:00.000Z",
+        "leaseExpiresAt": "2026-09-05T12:00:00.000Z",
+        "materializationAttemptCount": 0,
+        "materializationError": "Consumer materialization error",
+        "materializationPending": false,
+        "materializationStatus": "Consumer materialization status",
+        "maxLoops": 0,
+        "metadata": {},
+        "minLoops": 0,
+        "missionId": "consumer-mission-id",
+        "objective": "Consumer objective",
+        "ownerId": "consumer-owner-id",
+        "ownerType": "user",
+        "ownershipRole": "Consumer ownership role",
+        "ownershipTransferredAt": "2026-09-05T12:00:00.000Z",
+        "page": 0,
+        "pageSize": 0,
+        "placeholder": "Consumer placeholder",
+        "progressPercent": 0,
+        "projectId": "consumer-project-id",
+        "projectName": "Consumer project name",
+        "queuedAt": "2026-09-05T12:00:00.000Z",
+        "references": [],
+        "requiredEntities": [],
+        "researchPhases": {},
+        "resultDocumentIds": [],
+        "resultMarkdown": "Consumer result markdown",
+        "resultProtocol": {},
+        "resultReportId": "consumer-result-report-id",
+        "searchReady": false,
+        "searchActive": false,
+        "searchQuery": "Consumer searchQuery",
+        "startedAt": "2026-09-05T12:00:00.000Z",
+        "stateHistory": [],
+        "status": "draft",
+        "successCriteria": [],
+        "tagCount": 0,
+        "tagMetadata": [],
+        "tags": [
+          "Consumer tag"
+        ],
+        "title": "Consumer title",
+        "totalItems": 0,
+        "totalPages": 0,
+        "updatedAt": "2026-09-05T12:00:00.000Z",
+        "validationThresholds": {},
+        "rows": [
+          {
+            "activeFilters": [],
+            "allowedTransitions": [],
+            "background": "Consumer background",
+            "cancelAtPeriodEnd": false,
+            "cancellationReason": "Consumer cancellation reason",
+            "cancellationReasonCode": "Consumer cancellation reason code",
+            "cancellationRequestedAt": "2026-09-05T12:00:00.000Z",
+            "completedAt": "2026-09-05T12:00:00.000Z",
+            "constraints": [],
+            "context": {},
+            "coverageThresholds": {},
+            "createdAt": "2026-09-05T12:00:00.000Z",
+            "createdBy": "Consumer created by",
+            "currentPhase": "Consumer current phase",
+            "deepsearchAttemptCount": 0,
+            "deepsearchJobId": "consumer-deepsearch-job-id",
+            "deliverableFormat": "Consumer deliverable format",
+            "deliverables": [],
+            "description": "Consumer description",
+            "errorMessage": "Consumer error message",
+            "excludedEntities": [],
+            "executionMetadata": {},
+            "expectedOutputSchema": {},
+            "filterCount": 0,
+            "filters": [],
+            "focus": "Consumer focus",
+            "id": "Consumer id",
+            "label": "Consumer label",
+            "lastEvent": "Consumer last event",
+            "lastEventAt": "2026-09-05T12:00:00.000Z",
+            "leaseExpiresAt": "2026-09-05T12:00:00.000Z",
+            "materializationAttemptCount": 0,
+            "materializationError": "Consumer materialization error",
+            "materializationPending": false,
+            "materializationStatus": "Consumer materialization status",
+            "maxLoops": 0,
+            "metadata": {},
+            "minLoops": 0,
+            "missionId": "consumer-mission-id",
+            "objective": "Consumer objective",
+            "ownerId": "consumer-owner-id",
+            "ownerType": "user",
+            "ownershipRole": "Consumer ownership role",
+            "ownershipTransferredAt": "2026-09-05T12:00:00.000Z",
+            "page": 0,
+            "pageSize": 0,
+            "placeholder": "Consumer placeholder",
+            "progressPercent": 0,
+            "projectId": "consumer-project-id",
+            "projectName": "Consumer project name",
+            "queuedAt": "2026-09-05T12:00:00.000Z",
+            "references": [],
+            "requiredEntities": [],
+            "researchPhases": {},
+            "resultDocumentIds": [],
+            "resultMarkdown": "Consumer result markdown",
+            "resultProtocol": {},
+            "resultReportId": "consumer-result-report-id",
+            "searchReady": false,
+            "searchActive": false,
+            "searchQuery": "Consumer searchQuery",
+            "startedAt": "2026-09-05T12:00:00.000Z",
+            "stateHistory": [],
+            "status": "draft",
+            "successCriteria": [],
+            "tagCount": 0,
+            "tagMetadata": [],
+            "tags": [
+              "Consumer tag"
+            ],
+            "title": "Consumer title",
+            "totalItems": 0,
+            "totalPages": 0,
+            "updatedAt": "2026-09-05T12:00:00.000Z",
+            "validationThresholds": {}
+          }
+        ],
+        "collectionQuery": {
+          "page": 1,
+          "pageSize": 10,
+          "total": 20
+        },
+        "events": [
+          {
+            "id": "consumer-event-1",
+            "kind": "state",
+            "at": "2026-09-05T12:00:00Z",
+            "title": "Created",
+            "description": "Initial state"
+          },
+          {
+            "id": "consumer-event-2",
+            "kind": "state",
+            "at": "2026-09-06T12:00:00Z",
+            "title": "Updated",
+            "description": "Next state"
+          }
+        ],
+        "uiState": "success"
+      },
+      "steps": [],
+      "clock": "2026-09-08T12:00:00.000Z",
+      "clockStepMs": 1,
+      "locale": "en-US",
+      "timezone": "UTC",
+      "packages": [
+        {
+          "name": "@oods/tokens",
+          "version": "0.1.0",
+          "installSpec": "file:./tarballs/oods-tokens-0.1.0.tgz",
+          "sha256": "sha256:69422edecf1d2853a844003bebbe2e4b514987e86a9fa1d860946f873c1c28c5",
+          "bytes": 238478
+        },
+        {
+          "name": "@oods/component-contracts",
+          "version": "0.1.0",
+          "installSpec": "file:./tarballs/oods-component-contracts-0.1.0.tgz",
+          "sha256": "sha256:b4bdbfccf2cea62f728e4f8123ad4bb7d8a4cdb42767e3395445694724e45381",
+          "bytes": 197852
+        },
+        {
+          "name": "@oods/component-styles",
+          "version": "0.1.0",
+          "installSpec": "file:./tarballs/oods-component-styles-0.1.0.tgz",
+          "sha256": "sha256:0f012b95395e8a70a2fb787580ab363af2e5e15940e7d13e3b255b71c143a9df",
+          "bytes": 12894
+        },
+        {
+          "name": "@oods/components-react",
+          "version": "0.1.0",
+          "installSpec": "file:./tarballs/oods-components-react-0.1.0.tgz",
+          "sha256": "sha256:02036aecde76093980d8e4e93bb3458c60a96009ee4b1d8c523b621e32a308e2",
+          "bytes": 95069
+        }
+      ],
+      "views": [
+        {
+          "width": 390,
+          "accessibility": "- main:\n  - paragraph: MISSION WORKSPACE\n  - heading \"Missions\" [level=1]\n  - navigation \"Workflow screens\":\n    - button \"List\"\n    - button \"Detail\"\n    - button \"Edit\"\n    - button \"Timeline\"\n  - region \"Mission screen\":\n    - search \"Search\":\n      - text: Search\n      - searchbox \"Search\"\n    - text: Status\n    - combobox \"Status\":\n      - option \"All states\" [selected]\n      - option \"draft\"\n      - option \"queued\"\n      - option \"in progress\"\n      - option \"completed\"\n      - option \"blocked\"\n      - option \"cancelled\"\n      - option \"validation failed\"\n    - text: Sort\n    - combobox \"Sort\":\n      - option \"Name A–Z\" [selected]\n      - option \"Name Z–A\"\n    - list \"Records\":\n      - listitem:\n        - 'button \"Mission 01 label sample 1 description sample 1 Status: Draft Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000001\"':\n          - text: Mission 01 label sample 1 description sample 1 Draft\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000001\n      - listitem:\n        - 'button \"Mission 02 label sample 2 description sample 2 Status: Queued Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000002\"':\n          - text: Mission 02 label sample 2 description sample 2 Queued\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000002\n      - listitem:\n        - 'button \"Mission 03 label sample 3 description sample 3 Status: In Progress Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000003\"':\n          - text: Mission 03 label sample 3 description sample 3 In Progress\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000003\n      - listitem:\n        - 'button \"Mission 04 label sample 4 description sample 4 Status: Completed Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000004\"':\n          - text: Mission 04 label sample 4 description sample 4 Completed\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000004\n      - listitem:\n        - 'button \"Mission 05 label sample 5 description sample 5 Status: Blocked Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000005\"':\n          - text: Mission 05 label sample 5 description sample 5 Blocked\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000005\n      - listitem:\n        - 'button \"Mission 06 label sample 6 description sample 6 Status: Cancelled Aug 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000006\"':\n          - text: Mission 06 label sample 6 description sample 6 Cancelled\n          - time: Aug 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000006\n      - listitem:\n        - 'button \"Mission 07 label sample 7 description sample 7 Status: Validation Failed Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000007\"':\n          - text: Mission 07 label sample 7 description sample 7 Validation Failed\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000007\n      - listitem:\n        - 'button \"Mission 08 label sample 8 description sample 8 Status: Draft Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000008\"':\n          - text: Mission 08 label sample 8 description sample 8 Draft\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000008\n      - listitem:\n        - 'button \"Mission 09 label sample 9 description sample 9 Status: Queued Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000009\"':\n          - text: Mission 09 label sample 9 description sample 9 Queued\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000009\n      - listitem:\n        - 'button \"Mission 10 label sample 10 description sample 10 Status: In Progress Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000010\"':\n          - text: Mission 10 label sample 10 description sample 10 In Progress\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000010\n    - navigation \"Pagination\":\n      - text: 10 records Showing 1–10 of 10\n      - button \"Previous page\" [disabled]: ‹\n      - list:\n        - listitem:\n          - button \"Page 1\": \"1\"\n      - button \"Next page\" [disabled]: ›\n      - text: Page 1 of 1\n  - status",
+          "visibleText": "MISSION WORKSPACE\n\nMissions\nList\nDetail\nEdit\nTimeline\nSearch\nStatus\nAll states\ndraft\nqueued\nin progress\ncompleted\nblocked\ncancelled\nvalidation failed\nSort\nName A–Z\nName Z–A\nMission 01\nlabel sample 1\ndescription sample 1\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000001\nMission 02\nlabel sample 2\ndescription sample 2\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000002\nMission 03\nlabel sample 3\ndescription sample 3\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000003\nMission 04\nlabel sample 4\ndescription sample 4\nCompleted\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000004\nMission 05\nlabel sample 5\ndescription sample 5\nBlocked\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000005\nMission 06\nlabel sample 6\ndescription sample 6\nCancelled\nAug 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000006\nMission 07\nlabel sample 7\ndescription sample 7\nValidation Failed\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000007\nMission 08\nlabel sample 8\ndescription sample 8\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000008\nMission 09\nlabel sample 9\ndescription sample 9\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000009\nMission 10\nlabel sample 10\ndescription sample 10\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000010\n10 records\nShowing 1–10 of 10\n‹\n1\n›\nPage 1 of 1",
+          "measurements": {
+            "bodyBackground": "oklch(0.967 0.03 86)",
+            "chartCanvasFills": [],
+            "viewportWidth": 390,
+            "documentWidth": 390,
+            "elementCount": 174,
+            "overflow": [],
+            "glyphWraps": [
+              {
+                "element": "span",
+                "text": "00000000-0000-4000-8000-000000000001",
+                "lines": [
+                  "00000000-0000-4000-8000-",
+                  "000000000001"
+                ]
+              },
+              {
+                "element": "span",
+                "text": "00000000-0000-4000-8000-000000000002",
+                "lines": [
+                  "00000000-0000-4000-8000-",
+                  "000000000002"
+                ]
+              },
+              {
+                "element": "span",
+                "text": "00000000-0000-4000-8000-000000000003",
+                "lines": [
+                  "00000000-0000-4000-8000-",
+                  "000000000003"
+                ]
+              },
+              {
+                "element": "span",
+                "text": "00000000-0000-4000-8000-000000000004",
+                "lines": [
+                  "00000000-0000-4000-8000-",
+                  "000000000004"
+                ]
+              },
+              {
+                "element": "span",
+                "text": "00000000-0000-4000-8000-000000000005",
+                "lines": [
+                  "00000000-0000-4000-8000-",
+                  "000000000005"
+                ]
+              },
+              {
+                "element": "span",
+                "text": "00000000-0000-4000-8000-000000000006",
+                "lines": [
+                  "00000000-0000-4000-8000-",
+                  "000000000006"
+                ]
+              },
+              {
+                "element": "span",
+                "text": "00000000-0000-4000-8000-000000000007",
+                "lines": [
+                  "00000000-0000-4000-8000-",
+                  "000000000007"
+                ]
+              },
+              {
+                "element": "span",
+                "text": "00000000-0000-4000-8000-000000000008",
+                "lines": [
+                  "00000000-0000-4000-8000-",
+                  "000000000008"
+                ]
+              },
+              {
+                "element": "span",
+                "text": "00000000-0000-4000-8000-000000000009",
+                "lines": [
+                  "00000000-0000-4000-8000-",
+                  "000000000009"
+                ]
+              },
+              {
+                "element": "span",
+                "text": "00000000-0000-4000-8000-000000000010",
+                "lines": [
+                  "00000000-0000-4000-8000-",
+                  "000000000010"
+                ]
+              }
+            ]
+          },
+          "values": [
+            {
+              "element": "list-slot-search-1",
+              "name": "Search",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "list-slot-filters-2",
+              "name": "Status",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "list-list-toolbar-4-sort",
+              "name": "Sort",
+              "value": "asc",
+              "checked": false
+            }
+          ],
+          "regions": [
+            {
+              "id": "list-screen",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\ndraft\nqueued\nin progress\ncompleted\nblocked\ncancelled\nvalidation failed\nSort\nName A–Z\nName Z–A\nMission 01\nlabel sample 1\ndescription sample 1\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000001\nMission 02\nlabel sample 2\ndescription sample 2\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000002\nMission 03\nlabel sample 3\ndescription sample 3\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000003\nMission 04\nlabel sample 4\ndescription sample 4\nCompleted\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000004\nMission 05\nlabel sample 5\ndescription sample 5\nBlocked\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000005\nMission 06\nlabel sample 6\ndescription sample 6\nCancelled\nAug 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000006\nMission 07\nlabel sample 7\ndescription sample 7\nValidation Failed\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000007\nMission 08\nlabel sample 8\ndescription sample 8\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000008\nMission 09\nlabel sample 9\ndescription sample 9\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000009\nMission 10\nlabel sample 10\ndescription sample 10\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000010\n10 records\nShowing 1–10 of 10\n‹\n1\n›\nPage 1 of 1"
+            },
+            {
+              "id": "list-screen-list-9-success",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\ndraft\nqueued\nin progress\ncompleted\nblocked\ncancelled\nvalidation failed\nSort\nName A–Z\nName Z–A\nMission 01\nlabel sample 1\ndescription sample 1\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000001\nMission 02\nlabel sample 2\ndescription sample 2\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000002\nMission 03\nlabel sample 3\ndescription sample 3\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000003\nMission 04\nlabel sample 4\ndescription sample 4\nCompleted\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000004\nMission 05\nlabel sample 5\ndescription sample 5\nBlocked\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000005\nMission 06\nlabel sample 6\ndescription sample 6\nCancelled\nAug 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000006\nMission 07\nlabel sample 7\ndescription sample 7\nValidation Failed\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000007\nMission 08\nlabel sample 8\ndescription sample 8\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000008\nMission 09\nlabel sample 9\ndescription sample 9\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000009\nMission 10\nlabel sample 10\ndescription sample 10\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000010\n10 records\nShowing 1–10 of 10\n‹\n1\n›\nPage 1 of 1"
+            },
+            {
+              "id": "list-list-toolbar-4",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\ndraft\nqueued\nin progress\ncompleted\nblocked\ncancelled\nvalidation failed\nSort\nName A–Z\nName Z–A"
+            },
+            {
+              "id": "",
+              "component": "SearchInput",
+              "text": "Search"
+            },
+            {
+              "id": "list-slot-search-1",
+              "component": "Input",
+              "text": ""
+            },
+            {
+              "id": "list-slot-filters-2",
+              "component": "Select",
+              "text": "All states\ndraft\nqueued\nin progress\ncompleted\nblocked\ncancelled\nvalidation failed"
+            },
+            {
+              "id": "list-list-toolbar-4-sort",
+              "component": "Select",
+              "text": "Name A–Z\nName Z–A"
+            },
+            {
+              "id": "list-list-items-5",
+              "component": "section",
+              "text": "Mission 01\nlabel sample 1\ndescription sample 1\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000001\nMission 02\nlabel sample 2\ndescription sample 2\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000002\nMission 03\nlabel sample 3\ndescription sample 3\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000003\nMission 04\nlabel sample 4\ndescription sample 4\nCompleted\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000004\nMission 05\nlabel sample 5\ndescription sample 5\nBlocked\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000005\nMission 06\nlabel sample 6\ndescription sample 6\nCancelled\nAug 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000006\nMission 07\nlabel sample 7\ndescription sample 7\nValidation Failed\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000007\nMission 08\nlabel sample 8\ndescription sample 8\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000008\nMission 09\nlabel sample 9\ndescription sample 9\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000009\nMission 10\nlabel sample 10\ndescription sample 10\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000010"
+            },
+            {
+              "id": "list-list-items-5-row-0",
+              "component": "Button",
+              "text": "Mission 01\nlabel sample 1\ndescription sample 1\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000001"
+            },
+            {
+              "id": "list-list-items-5-title-0",
+              "component": "Text",
+              "text": "Mission 01"
+            },
+            {
+              "id": "list-ve-items-10-0",
+              "component": "LabelCell",
+              "text": "label sample 1\ndescription sample 1"
+            },
+            {
+              "id": "list-ve-items-14-0",
+              "component": "StatusBadge",
+              "text": "Draft"
+            },
+            {
+              "id": "list-ve-items-15-0",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-0",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000001"
+            },
+            {
+              "id": "list-ve-items-17-0",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-1",
+              "component": "Button",
+              "text": "Mission 02\nlabel sample 2\ndescription sample 2\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000002"
+            },
+            {
+              "id": "list-list-items-5-title-1",
+              "component": "Text",
+              "text": "Mission 02"
+            },
+            {
+              "id": "list-ve-items-10-1",
+              "component": "LabelCell",
+              "text": "label sample 2\ndescription sample 2"
+            },
+            {
+              "id": "list-ve-items-14-1",
+              "component": "StatusBadge",
+              "text": "Queued"
+            },
+            {
+              "id": "list-ve-items-15-1",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-1",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000002"
+            },
+            {
+              "id": "list-ve-items-17-1",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-2",
+              "component": "Button",
+              "text": "Mission 03\nlabel sample 3\ndescription sample 3\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000003"
+            },
+            {
+              "id": "list-list-items-5-title-2",
+              "component": "Text",
+              "text": "Mission 03"
+            },
+            {
+              "id": "list-ve-items-10-2",
+              "component": "LabelCell",
+              "text": "label sample 3\ndescription sample 3"
+            },
+            {
+              "id": "list-ve-items-14-2",
+              "component": "StatusBadge",
+              "text": "In Progress"
+            },
+            {
+              "id": "list-ve-items-15-2",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-2",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000003"
+            },
+            {
+              "id": "list-ve-items-17-2",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-3",
+              "component": "Button",
+              "text": "Mission 04\nlabel sample 4\ndescription sample 4\nCompleted\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000004"
+            },
+            {
+              "id": "list-list-items-5-title-3",
+              "component": "Text",
+              "text": "Mission 04"
+            },
+            {
+              "id": "list-ve-items-10-3",
+              "component": "LabelCell",
+              "text": "label sample 4\ndescription sample 4"
+            },
+            {
+              "id": "list-ve-items-14-3",
+              "component": "StatusBadge",
+              "text": "Completed"
+            },
+            {
+              "id": "list-ve-items-15-3",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-3",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000004"
+            },
+            {
+              "id": "list-ve-items-17-3",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-4",
+              "component": "Button",
+              "text": "Mission 05\nlabel sample 5\ndescription sample 5\nBlocked\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000005"
+            },
+            {
+              "id": "list-list-items-5-title-4",
+              "component": "Text",
+              "text": "Mission 05"
+            },
+            {
+              "id": "list-ve-items-10-4",
+              "component": "LabelCell",
+              "text": "label sample 5\ndescription sample 5"
+            },
+            {
+              "id": "list-ve-items-14-4",
+              "component": "StatusBadge",
+              "text": "Blocked"
+            },
+            {
+              "id": "list-ve-items-15-4",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-4",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000005"
+            },
+            {
+              "id": "list-ve-items-17-4",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-5",
+              "component": "Button",
+              "text": "Mission 06\nlabel sample 6\ndescription sample 6\nCancelled\nAug 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000006"
+            },
+            {
+              "id": "list-list-items-5-title-5",
+              "component": "Text",
+              "text": "Mission 06"
+            },
+            {
+              "id": "list-ve-items-10-5",
+              "component": "LabelCell",
+              "text": "label sample 6\ndescription sample 6"
+            },
+            {
+              "id": "list-ve-items-14-5",
+              "component": "StatusBadge",
+              "text": "Cancelled"
+            },
+            {
+              "id": "list-ve-items-15-5",
+              "component": "RelativeTimestamp",
+              "text": "Aug 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-5",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000006"
+            },
+            {
+              "id": "list-ve-items-17-5",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-6",
+              "component": "Button",
+              "text": "Mission 07\nlabel sample 7\ndescription sample 7\nValidation Failed\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000007"
+            },
+            {
+              "id": "list-list-items-5-title-6",
+              "component": "Text",
+              "text": "Mission 07"
+            },
+            {
+              "id": "list-ve-items-10-6",
+              "component": "LabelCell",
+              "text": "label sample 7\ndescription sample 7"
+            },
+            {
+              "id": "list-ve-items-14-6",
+              "component": "StatusBadge",
+              "text": "Validation Failed"
+            },
+            {
+              "id": "list-ve-items-15-6",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-6",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000007"
+            },
+            {
+              "id": "list-ve-items-17-6",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-7",
+              "component": "Button",
+              "text": "Mission 08\nlabel sample 8\ndescription sample 8\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000008"
+            },
+            {
+              "id": "list-list-items-5-title-7",
+              "component": "Text",
+              "text": "Mission 08"
+            },
+            {
+              "id": "list-ve-items-10-7",
+              "component": "LabelCell",
+              "text": "label sample 8\ndescription sample 8"
+            },
+            {
+              "id": "list-ve-items-14-7",
+              "component": "StatusBadge",
+              "text": "Draft"
+            },
+            {
+              "id": "list-ve-items-15-7",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-7",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000008"
+            },
+            {
+              "id": "list-ve-items-17-7",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-8",
+              "component": "Button",
+              "text": "Mission 09\nlabel sample 9\ndescription sample 9\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000009"
+            },
+            {
+              "id": "list-list-items-5-title-8",
+              "component": "Text",
+              "text": "Mission 09"
+            },
+            {
+              "id": "list-ve-items-10-8",
+              "component": "LabelCell",
+              "text": "label sample 9\ndescription sample 9"
+            },
+            {
+              "id": "list-ve-items-14-8",
+              "component": "StatusBadge",
+              "text": "Queued"
+            },
+            {
+              "id": "list-ve-items-15-8",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-8",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000009"
+            },
+            {
+              "id": "list-ve-items-17-8",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-9",
+              "component": "Button",
+              "text": "Mission 10\nlabel sample 10\ndescription sample 10\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000010"
+            },
+            {
+              "id": "list-list-items-5-title-9",
+              "component": "Text",
+              "text": "Mission 10"
+            },
+            {
+              "id": "list-ve-items-10-9",
+              "component": "LabelCell",
+              "text": "label sample 10\ndescription sample 10"
+            },
+            {
+              "id": "list-ve-items-14-9",
+              "component": "StatusBadge",
+              "text": "In Progress"
+            },
+            {
+              "id": "list-ve-items-15-9",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-9",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000010"
+            },
+            {
+              "id": "list-ve-items-17-9",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-pagination-7",
+              "component": "Stack",
+              "text": "10 records\nShowing 1–10 of 10\n‹\n1\n›\nPage 1 of 1"
+            },
+            {
+              "id": "list-slot-pagination-8",
+              "component": "PaginationBar",
+              "text": "10 records\nShowing 1–10 of 10\n‹\n1\n›\nPage 1 of 1"
+            }
+          ],
+          "screenshot": "390.png",
+          "screenshotHash": "sha256:f350bc0f3cf1d16c5586347b018a7da97ec5bacbd94fc59e52967f9e5452a0cd",
+          "dump": "390.a11y.txt"
+        },
+        {
+          "width": 820,
+          "accessibility": "- main:\n  - paragraph: MISSION WORKSPACE\n  - heading \"Missions\" [level=1]\n  - text: Local workspace\n  - navigation \"Workflow screens\":\n    - button \"List\"\n    - button \"Detail\"\n    - button \"Edit\"\n    - button \"Timeline\"\n  - region \"Mission screen\":\n    - search \"Search\":\n      - text: Search\n      - searchbox \"Search\"\n    - text: Status\n    - combobox \"Status\":\n      - option \"All states\" [selected]\n      - option \"draft\"\n      - option \"queued\"\n      - option \"in progress\"\n      - option \"completed\"\n      - option \"blocked\"\n      - option \"cancelled\"\n      - option \"validation failed\"\n    - text: Sort\n    - combobox \"Sort\":\n      - option \"Name A–Z\" [selected]\n      - option \"Name Z–A\"\n    - list \"Records\":\n      - listitem:\n        - 'button \"Mission 01 label sample 1 description sample 1 Status: Draft Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000001\"':\n          - text: Mission 01 label sample 1 description sample 1 Draft\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000001\n      - listitem:\n        - 'button \"Mission 02 label sample 2 description sample 2 Status: Queued Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000002\"':\n          - text: Mission 02 label sample 2 description sample 2 Queued\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000002\n      - listitem:\n        - 'button \"Mission 03 label sample 3 description sample 3 Status: In Progress Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000003\"':\n          - text: Mission 03 label sample 3 description sample 3 In Progress\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000003\n      - listitem:\n        - 'button \"Mission 04 label sample 4 description sample 4 Status: Completed Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000004\"':\n          - text: Mission 04 label sample 4 description sample 4 Completed\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000004\n      - listitem:\n        - 'button \"Mission 05 label sample 5 description sample 5 Status: Blocked Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000005\"':\n          - text: Mission 05 label sample 5 description sample 5 Blocked\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000005\n      - listitem:\n        - 'button \"Mission 06 label sample 6 description sample 6 Status: Cancelled Aug 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000006\"':\n          - text: Mission 06 label sample 6 description sample 6 Cancelled\n          - time: Aug 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000006\n      - listitem:\n        - 'button \"Mission 07 label sample 7 description sample 7 Status: Validation Failed Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000007\"':\n          - text: Mission 07 label sample 7 description sample 7 Validation Failed\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000007\n      - listitem:\n        - 'button \"Mission 08 label sample 8 description sample 8 Status: Draft Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000008\"':\n          - text: Mission 08 label sample 8 description sample 8 Draft\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000008\n      - listitem:\n        - 'button \"Mission 09 label sample 9 description sample 9 Status: Queued Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000009\"':\n          - text: Mission 09 label sample 9 description sample 9 Queued\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000009\n      - listitem:\n        - 'button \"Mission 10 label sample 10 description sample 10 Status: In Progress Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000010\"':\n          - text: Mission 10 label sample 10 description sample 10 In Progress\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000010\n    - navigation \"Pagination\":\n      - text: 10 records Showing 1–10 of 10\n      - button \"Previous page\" [disabled]: ‹\n      - list:\n        - listitem:\n          - button \"Page 1\": \"1\"\n      - button \"Next page\" [disabled]: ›\n      - text: Page 1 of 1\n  - status",
+          "visibleText": "MISSION WORKSPACE\n\nMissions\nLocal workspace\nList\nDetail\nEdit\nTimeline\nSearch\nStatus\nAll states\ndraft\nqueued\nin progress\ncompleted\nblocked\ncancelled\nvalidation failed\nSort\nName A–Z\nName Z–A\nMission 01\nlabel sample 1\ndescription sample 1\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000001\nMission 02\nlabel sample 2\ndescription sample 2\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000002\nMission 03\nlabel sample 3\ndescription sample 3\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000003\nMission 04\nlabel sample 4\ndescription sample 4\nCompleted\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000004\nMission 05\nlabel sample 5\ndescription sample 5\nBlocked\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000005\nMission 06\nlabel sample 6\ndescription sample 6\nCancelled\nAug 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000006\nMission 07\nlabel sample 7\ndescription sample 7\nValidation Failed\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000007\nMission 08\nlabel sample 8\ndescription sample 8\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000008\nMission 09\nlabel sample 9\ndescription sample 9\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000009\nMission 10\nlabel sample 10\ndescription sample 10\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000010\n10 records\nShowing 1–10 of 10\n‹\n1\n›\nPage 1 of 1",
+          "measurements": {
+            "bodyBackground": "oklch(0.967 0.03 86)",
+            "chartCanvasFills": [],
+            "viewportWidth": 820,
+            "documentWidth": 820,
+            "elementCount": 175,
+            "overflow": [],
+            "glyphWraps": []
+          },
+          "values": [
+            {
+              "element": "list-slot-search-1",
+              "name": "Search",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "list-slot-filters-2",
+              "name": "Status",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "list-list-toolbar-4-sort",
+              "name": "Sort",
+              "value": "asc",
+              "checked": false
+            }
+          ],
+          "regions": [
+            {
+              "id": "list-screen",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\ndraft\nqueued\nin progress\ncompleted\nblocked\ncancelled\nvalidation failed\nSort\nName A–Z\nName Z–A\nMission 01\nlabel sample 1\ndescription sample 1\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000001\nMission 02\nlabel sample 2\ndescription sample 2\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000002\nMission 03\nlabel sample 3\ndescription sample 3\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000003\nMission 04\nlabel sample 4\ndescription sample 4\nCompleted\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000004\nMission 05\nlabel sample 5\ndescription sample 5\nBlocked\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000005\nMission 06\nlabel sample 6\ndescription sample 6\nCancelled\nAug 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000006\nMission 07\nlabel sample 7\ndescription sample 7\nValidation Failed\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000007\nMission 08\nlabel sample 8\ndescription sample 8\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000008\nMission 09\nlabel sample 9\ndescription sample 9\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000009\nMission 10\nlabel sample 10\ndescription sample 10\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000010\n10 records\nShowing 1–10 of 10\n‹\n1\n›\nPage 1 of 1"
+            },
+            {
+              "id": "list-screen-list-9-success",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\ndraft\nqueued\nin progress\ncompleted\nblocked\ncancelled\nvalidation failed\nSort\nName A–Z\nName Z–A\nMission 01\nlabel sample 1\ndescription sample 1\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000001\nMission 02\nlabel sample 2\ndescription sample 2\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000002\nMission 03\nlabel sample 3\ndescription sample 3\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000003\nMission 04\nlabel sample 4\ndescription sample 4\nCompleted\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000004\nMission 05\nlabel sample 5\ndescription sample 5\nBlocked\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000005\nMission 06\nlabel sample 6\ndescription sample 6\nCancelled\nAug 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000006\nMission 07\nlabel sample 7\ndescription sample 7\nValidation Failed\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000007\nMission 08\nlabel sample 8\ndescription sample 8\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000008\nMission 09\nlabel sample 9\ndescription sample 9\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000009\nMission 10\nlabel sample 10\ndescription sample 10\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000010\n10 records\nShowing 1–10 of 10\n‹\n1\n›\nPage 1 of 1"
+            },
+            {
+              "id": "list-list-toolbar-4",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\ndraft\nqueued\nin progress\ncompleted\nblocked\ncancelled\nvalidation failed\nSort\nName A–Z\nName Z–A"
+            },
+            {
+              "id": "",
+              "component": "SearchInput",
+              "text": "Search"
+            },
+            {
+              "id": "list-slot-search-1",
+              "component": "Input",
+              "text": ""
+            },
+            {
+              "id": "list-slot-filters-2",
+              "component": "Select",
+              "text": "All states\ndraft\nqueued\nin progress\ncompleted\nblocked\ncancelled\nvalidation failed"
+            },
+            {
+              "id": "list-list-toolbar-4-sort",
+              "component": "Select",
+              "text": "Name A–Z\nName Z–A"
+            },
+            {
+              "id": "list-list-items-5",
+              "component": "section",
+              "text": "Mission 01\nlabel sample 1\ndescription sample 1\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000001\nMission 02\nlabel sample 2\ndescription sample 2\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000002\nMission 03\nlabel sample 3\ndescription sample 3\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000003\nMission 04\nlabel sample 4\ndescription sample 4\nCompleted\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000004\nMission 05\nlabel sample 5\ndescription sample 5\nBlocked\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000005\nMission 06\nlabel sample 6\ndescription sample 6\nCancelled\nAug 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000006\nMission 07\nlabel sample 7\ndescription sample 7\nValidation Failed\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000007\nMission 08\nlabel sample 8\ndescription sample 8\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000008\nMission 09\nlabel sample 9\ndescription sample 9\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000009\nMission 10\nlabel sample 10\ndescription sample 10\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000010"
+            },
+            {
+              "id": "list-list-items-5-row-0",
+              "component": "Button",
+              "text": "Mission 01\nlabel sample 1\ndescription sample 1\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000001"
+            },
+            {
+              "id": "list-list-items-5-title-0",
+              "component": "Text",
+              "text": "Mission 01"
+            },
+            {
+              "id": "list-ve-items-10-0",
+              "component": "LabelCell",
+              "text": "label sample 1\ndescription sample 1"
+            },
+            {
+              "id": "list-ve-items-14-0",
+              "component": "StatusBadge",
+              "text": "Draft"
+            },
+            {
+              "id": "list-ve-items-15-0",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-0",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000001"
+            },
+            {
+              "id": "list-ve-items-17-0",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-1",
+              "component": "Button",
+              "text": "Mission 02\nlabel sample 2\ndescription sample 2\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000002"
+            },
+            {
+              "id": "list-list-items-5-title-1",
+              "component": "Text",
+              "text": "Mission 02"
+            },
+            {
+              "id": "list-ve-items-10-1",
+              "component": "LabelCell",
+              "text": "label sample 2\ndescription sample 2"
+            },
+            {
+              "id": "list-ve-items-14-1",
+              "component": "StatusBadge",
+              "text": "Queued"
+            },
+            {
+              "id": "list-ve-items-15-1",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-1",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000002"
+            },
+            {
+              "id": "list-ve-items-17-1",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-2",
+              "component": "Button",
+              "text": "Mission 03\nlabel sample 3\ndescription sample 3\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000003"
+            },
+            {
+              "id": "list-list-items-5-title-2",
+              "component": "Text",
+              "text": "Mission 03"
+            },
+            {
+              "id": "list-ve-items-10-2",
+              "component": "LabelCell",
+              "text": "label sample 3\ndescription sample 3"
+            },
+            {
+              "id": "list-ve-items-14-2",
+              "component": "StatusBadge",
+              "text": "In Progress"
+            },
+            {
+              "id": "list-ve-items-15-2",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-2",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000003"
+            },
+            {
+              "id": "list-ve-items-17-2",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-3",
+              "component": "Button",
+              "text": "Mission 04\nlabel sample 4\ndescription sample 4\nCompleted\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000004"
+            },
+            {
+              "id": "list-list-items-5-title-3",
+              "component": "Text",
+              "text": "Mission 04"
+            },
+            {
+              "id": "list-ve-items-10-3",
+              "component": "LabelCell",
+              "text": "label sample 4\ndescription sample 4"
+            },
+            {
+              "id": "list-ve-items-14-3",
+              "component": "StatusBadge",
+              "text": "Completed"
+            },
+            {
+              "id": "list-ve-items-15-3",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-3",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000004"
+            },
+            {
+              "id": "list-ve-items-17-3",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-4",
+              "component": "Button",
+              "text": "Mission 05\nlabel sample 5\ndescription sample 5\nBlocked\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000005"
+            },
+            {
+              "id": "list-list-items-5-title-4",
+              "component": "Text",
+              "text": "Mission 05"
+            },
+            {
+              "id": "list-ve-items-10-4",
+              "component": "LabelCell",
+              "text": "label sample 5\ndescription sample 5"
+            },
+            {
+              "id": "list-ve-items-14-4",
+              "component": "StatusBadge",
+              "text": "Blocked"
+            },
+            {
+              "id": "list-ve-items-15-4",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-4",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000005"
+            },
+            {
+              "id": "list-ve-items-17-4",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-5",
+              "component": "Button",
+              "text": "Mission 06\nlabel sample 6\ndescription sample 6\nCancelled\nAug 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000006"
+            },
+            {
+              "id": "list-list-items-5-title-5",
+              "component": "Text",
+              "text": "Mission 06"
+            },
+            {
+              "id": "list-ve-items-10-5",
+              "component": "LabelCell",
+              "text": "label sample 6\ndescription sample 6"
+            },
+            {
+              "id": "list-ve-items-14-5",
+              "component": "StatusBadge",
+              "text": "Cancelled"
+            },
+            {
+              "id": "list-ve-items-15-5",
+              "component": "RelativeTimestamp",
+              "text": "Aug 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-5",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000006"
+            },
+            {
+              "id": "list-ve-items-17-5",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-6",
+              "component": "Button",
+              "text": "Mission 07\nlabel sample 7\ndescription sample 7\nValidation Failed\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000007"
+            },
+            {
+              "id": "list-list-items-5-title-6",
+              "component": "Text",
+              "text": "Mission 07"
+            },
+            {
+              "id": "list-ve-items-10-6",
+              "component": "LabelCell",
+              "text": "label sample 7\ndescription sample 7"
+            },
+            {
+              "id": "list-ve-items-14-6",
+              "component": "StatusBadge",
+              "text": "Validation Failed"
+            },
+            {
+              "id": "list-ve-items-15-6",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-6",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000007"
+            },
+            {
+              "id": "list-ve-items-17-6",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-7",
+              "component": "Button",
+              "text": "Mission 08\nlabel sample 8\ndescription sample 8\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000008"
+            },
+            {
+              "id": "list-list-items-5-title-7",
+              "component": "Text",
+              "text": "Mission 08"
+            },
+            {
+              "id": "list-ve-items-10-7",
+              "component": "LabelCell",
+              "text": "label sample 8\ndescription sample 8"
+            },
+            {
+              "id": "list-ve-items-14-7",
+              "component": "StatusBadge",
+              "text": "Draft"
+            },
+            {
+              "id": "list-ve-items-15-7",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-7",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000008"
+            },
+            {
+              "id": "list-ve-items-17-7",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-8",
+              "component": "Button",
+              "text": "Mission 09\nlabel sample 9\ndescription sample 9\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000009"
+            },
+            {
+              "id": "list-list-items-5-title-8",
+              "component": "Text",
+              "text": "Mission 09"
+            },
+            {
+              "id": "list-ve-items-10-8",
+              "component": "LabelCell",
+              "text": "label sample 9\ndescription sample 9"
+            },
+            {
+              "id": "list-ve-items-14-8",
+              "component": "StatusBadge",
+              "text": "Queued"
+            },
+            {
+              "id": "list-ve-items-15-8",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-8",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000009"
+            },
+            {
+              "id": "list-ve-items-17-8",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-9",
+              "component": "Button",
+              "text": "Mission 10\nlabel sample 10\ndescription sample 10\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000010"
+            },
+            {
+              "id": "list-list-items-5-title-9",
+              "component": "Text",
+              "text": "Mission 10"
+            },
+            {
+              "id": "list-ve-items-10-9",
+              "component": "LabelCell",
+              "text": "label sample 10\ndescription sample 10"
+            },
+            {
+              "id": "list-ve-items-14-9",
+              "component": "StatusBadge",
+              "text": "In Progress"
+            },
+            {
+              "id": "list-ve-items-15-9",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-9",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000010"
+            },
+            {
+              "id": "list-ve-items-17-9",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-pagination-7",
+              "component": "Stack",
+              "text": "10 records\nShowing 1–10 of 10\n‹\n1\n›\nPage 1 of 1"
+            },
+            {
+              "id": "list-slot-pagination-8",
+              "component": "PaginationBar",
+              "text": "10 records\nShowing 1–10 of 10\n‹\n1\n›\nPage 1 of 1"
+            }
+          ],
+          "screenshot": "820.png",
+          "screenshotHash": "sha256:32c4915fe383bc67b89e378f88830ecc6827dc581ae1a448fb5107859ed5a9a2",
+          "dump": "820.a11y.txt"
+        },
+        {
+          "width": 1440,
+          "accessibility": "- main:\n  - paragraph: MISSION WORKSPACE\n  - heading \"Missions\" [level=1]\n  - text: Local workspace\n  - navigation \"Workflow screens\":\n    - button \"List\"\n    - button \"Detail\"\n    - button \"Edit\"\n    - button \"Timeline\"\n  - region \"Mission screen\":\n    - search \"Search\":\n      - text: Search\n      - searchbox \"Search\"\n    - text: Status\n    - combobox \"Status\":\n      - option \"All states\" [selected]\n      - option \"draft\"\n      - option \"queued\"\n      - option \"in progress\"\n      - option \"completed\"\n      - option \"blocked\"\n      - option \"cancelled\"\n      - option \"validation failed\"\n    - text: Sort\n    - combobox \"Sort\":\n      - option \"Name A–Z\" [selected]\n      - option \"Name Z–A\"\n    - list \"Records\":\n      - listitem:\n        - 'button \"Mission 01 label sample 1 description sample 1 Status: Draft Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000001\"':\n          - text: Mission 01 label sample 1 description sample 1 Draft\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000001\n      - listitem:\n        - 'button \"Mission 02 label sample 2 description sample 2 Status: Queued Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000002\"':\n          - text: Mission 02 label sample 2 description sample 2 Queued\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000002\n      - listitem:\n        - 'button \"Mission 03 label sample 3 description sample 3 Status: In Progress Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000003\"':\n          - text: Mission 03 label sample 3 description sample 3 In Progress\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000003\n      - listitem:\n        - 'button \"Mission 04 label sample 4 description sample 4 Status: Completed Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000004\"':\n          - text: Mission 04 label sample 4 description sample 4 Completed\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000004\n      - listitem:\n        - 'button \"Mission 05 label sample 5 description sample 5 Status: Blocked Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000005\"':\n          - text: Mission 05 label sample 5 description sample 5 Blocked\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000005\n      - listitem:\n        - 'button \"Mission 06 label sample 6 description sample 6 Status: Cancelled Aug 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000006\"':\n          - text: Mission 06 label sample 6 description sample 6 Cancelled\n          - time: Aug 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000006\n      - listitem:\n        - 'button \"Mission 07 label sample 7 description sample 7 Status: Validation Failed Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000007\"':\n          - text: Mission 07 label sample 7 description sample 7 Validation Failed\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000007\n      - listitem:\n        - 'button \"Mission 08 label sample 8 description sample 8 Status: Draft Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000008\"':\n          - text: Mission 08 label sample 8 description sample 8 Draft\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000008\n      - listitem:\n        - 'button \"Mission 09 label sample 9 description sample 9 Status: Queued Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000009\"':\n          - text: Mission 09 label sample 9 description sample 9 Queued\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000009\n      - listitem:\n        - 'button \"Mission 10 label sample 10 description sample 10 Status: In Progress Sep 1, 2026, 12:00 PM 00000000-0000-4000-8000-000000000010\"':\n          - text: Mission 10 label sample 10 description sample 10 In Progress\n          - time: Sep 1, 2026, 12:00 PM\n          - text: 00000000-0000-4000-8000-000000000010\n    - navigation \"Pagination\":\n      - text: 10 records Showing 1–10 of 10\n      - button \"Previous page\" [disabled]: ‹\n      - list:\n        - listitem:\n          - button \"Page 1\": \"1\"\n      - button \"Next page\" [disabled]: ›\n      - text: Page 1 of 1\n  - status",
+          "visibleText": "MISSION WORKSPACE\n\nMissions\nLocal workspace\nList\nDetail\nEdit\nTimeline\nSearch\nStatus\nAll states\ndraft\nqueued\nin progress\ncompleted\nblocked\ncancelled\nvalidation failed\nSort\nName A–Z\nName Z–A\nMission 01\nlabel sample 1\ndescription sample 1\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000001\nMission 02\nlabel sample 2\ndescription sample 2\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000002\nMission 03\nlabel sample 3\ndescription sample 3\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000003\nMission 04\nlabel sample 4\ndescription sample 4\nCompleted\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000004\nMission 05\nlabel sample 5\ndescription sample 5\nBlocked\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000005\nMission 06\nlabel sample 6\ndescription sample 6\nCancelled\nAug 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000006\nMission 07\nlabel sample 7\ndescription sample 7\nValidation Failed\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000007\nMission 08\nlabel sample 8\ndescription sample 8\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000008\nMission 09\nlabel sample 9\ndescription sample 9\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000009\nMission 10\nlabel sample 10\ndescription sample 10\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000010\n10 records\nShowing 1–10 of 10\n‹\n1\n›\nPage 1 of 1",
+          "measurements": {
+            "bodyBackground": "oklch(0.967 0.03 86)",
+            "chartCanvasFills": [],
+            "viewportWidth": 1440,
+            "documentWidth": 1440,
+            "elementCount": 175,
+            "overflow": [],
+            "glyphWraps": []
+          },
+          "values": [
+            {
+              "element": "list-slot-search-1",
+              "name": "Search",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "list-slot-filters-2",
+              "name": "Status",
+              "value": "",
+              "checked": false
+            },
+            {
+              "element": "list-list-toolbar-4-sort",
+              "name": "Sort",
+              "value": "asc",
+              "checked": false
+            }
+          ],
+          "regions": [
+            {
+              "id": "list-screen",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\ndraft\nqueued\nin progress\ncompleted\nblocked\ncancelled\nvalidation failed\nSort\nName A–Z\nName Z–A\nMission 01\nlabel sample 1\ndescription sample 1\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000001\nMission 02\nlabel sample 2\ndescription sample 2\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000002\nMission 03\nlabel sample 3\ndescription sample 3\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000003\nMission 04\nlabel sample 4\ndescription sample 4\nCompleted\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000004\nMission 05\nlabel sample 5\ndescription sample 5\nBlocked\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000005\nMission 06\nlabel sample 6\ndescription sample 6\nCancelled\nAug 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000006\nMission 07\nlabel sample 7\ndescription sample 7\nValidation Failed\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000007\nMission 08\nlabel sample 8\ndescription sample 8\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000008\nMission 09\nlabel sample 9\ndescription sample 9\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000009\nMission 10\nlabel sample 10\ndescription sample 10\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000010\n10 records\nShowing 1–10 of 10\n‹\n1\n›\nPage 1 of 1"
+            },
+            {
+              "id": "list-screen-list-9-success",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\ndraft\nqueued\nin progress\ncompleted\nblocked\ncancelled\nvalidation failed\nSort\nName A–Z\nName Z–A\nMission 01\nlabel sample 1\ndescription sample 1\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000001\nMission 02\nlabel sample 2\ndescription sample 2\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000002\nMission 03\nlabel sample 3\ndescription sample 3\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000003\nMission 04\nlabel sample 4\ndescription sample 4\nCompleted\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000004\nMission 05\nlabel sample 5\ndescription sample 5\nBlocked\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000005\nMission 06\nlabel sample 6\ndescription sample 6\nCancelled\nAug 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000006\nMission 07\nlabel sample 7\ndescription sample 7\nValidation Failed\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000007\nMission 08\nlabel sample 8\ndescription sample 8\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000008\nMission 09\nlabel sample 9\ndescription sample 9\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000009\nMission 10\nlabel sample 10\ndescription sample 10\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000010\n10 records\nShowing 1–10 of 10\n‹\n1\n›\nPage 1 of 1"
+            },
+            {
+              "id": "list-list-toolbar-4",
+              "component": "Stack",
+              "text": "Search\nStatus\nAll states\ndraft\nqueued\nin progress\ncompleted\nblocked\ncancelled\nvalidation failed\nSort\nName A–Z\nName Z–A"
+            },
+            {
+              "id": "",
+              "component": "SearchInput",
+              "text": "Search"
+            },
+            {
+              "id": "list-slot-search-1",
+              "component": "Input",
+              "text": ""
+            },
+            {
+              "id": "list-slot-filters-2",
+              "component": "Select",
+              "text": "All states\ndraft\nqueued\nin progress\ncompleted\nblocked\ncancelled\nvalidation failed"
+            },
+            {
+              "id": "list-list-toolbar-4-sort",
+              "component": "Select",
+              "text": "Name A–Z\nName Z–A"
+            },
+            {
+              "id": "list-list-items-5",
+              "component": "section",
+              "text": "Mission 01\nlabel sample 1\ndescription sample 1\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000001\nMission 02\nlabel sample 2\ndescription sample 2\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000002\nMission 03\nlabel sample 3\ndescription sample 3\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000003\nMission 04\nlabel sample 4\ndescription sample 4\nCompleted\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000004\nMission 05\nlabel sample 5\ndescription sample 5\nBlocked\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000005\nMission 06\nlabel sample 6\ndescription sample 6\nCancelled\nAug 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000006\nMission 07\nlabel sample 7\ndescription sample 7\nValidation Failed\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000007\nMission 08\nlabel sample 8\ndescription sample 8\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000008\nMission 09\nlabel sample 9\ndescription sample 9\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000009\nMission 10\nlabel sample 10\ndescription sample 10\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000010"
+            },
+            {
+              "id": "list-list-items-5-row-0",
+              "component": "Button",
+              "text": "Mission 01\nlabel sample 1\ndescription sample 1\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000001"
+            },
+            {
+              "id": "list-list-items-5-title-0",
+              "component": "Text",
+              "text": "Mission 01"
+            },
+            {
+              "id": "list-ve-items-10-0",
+              "component": "LabelCell",
+              "text": "label sample 1\ndescription sample 1"
+            },
+            {
+              "id": "list-ve-items-14-0",
+              "component": "StatusBadge",
+              "text": "Draft"
+            },
+            {
+              "id": "list-ve-items-15-0",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-0",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000001"
+            },
+            {
+              "id": "list-ve-items-17-0",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-1",
+              "component": "Button",
+              "text": "Mission 02\nlabel sample 2\ndescription sample 2\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000002"
+            },
+            {
+              "id": "list-list-items-5-title-1",
+              "component": "Text",
+              "text": "Mission 02"
+            },
+            {
+              "id": "list-ve-items-10-1",
+              "component": "LabelCell",
+              "text": "label sample 2\ndescription sample 2"
+            },
+            {
+              "id": "list-ve-items-14-1",
+              "component": "StatusBadge",
+              "text": "Queued"
+            },
+            {
+              "id": "list-ve-items-15-1",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-1",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000002"
+            },
+            {
+              "id": "list-ve-items-17-1",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-2",
+              "component": "Button",
+              "text": "Mission 03\nlabel sample 3\ndescription sample 3\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000003"
+            },
+            {
+              "id": "list-list-items-5-title-2",
+              "component": "Text",
+              "text": "Mission 03"
+            },
+            {
+              "id": "list-ve-items-10-2",
+              "component": "LabelCell",
+              "text": "label sample 3\ndescription sample 3"
+            },
+            {
+              "id": "list-ve-items-14-2",
+              "component": "StatusBadge",
+              "text": "In Progress"
+            },
+            {
+              "id": "list-ve-items-15-2",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-2",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000003"
+            },
+            {
+              "id": "list-ve-items-17-2",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-3",
+              "component": "Button",
+              "text": "Mission 04\nlabel sample 4\ndescription sample 4\nCompleted\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000004"
+            },
+            {
+              "id": "list-list-items-5-title-3",
+              "component": "Text",
+              "text": "Mission 04"
+            },
+            {
+              "id": "list-ve-items-10-3",
+              "component": "LabelCell",
+              "text": "label sample 4\ndescription sample 4"
+            },
+            {
+              "id": "list-ve-items-14-3",
+              "component": "StatusBadge",
+              "text": "Completed"
+            },
+            {
+              "id": "list-ve-items-15-3",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-3",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000004"
+            },
+            {
+              "id": "list-ve-items-17-3",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-4",
+              "component": "Button",
+              "text": "Mission 05\nlabel sample 5\ndescription sample 5\nBlocked\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000005"
+            },
+            {
+              "id": "list-list-items-5-title-4",
+              "component": "Text",
+              "text": "Mission 05"
+            },
+            {
+              "id": "list-ve-items-10-4",
+              "component": "LabelCell",
+              "text": "label sample 5\ndescription sample 5"
+            },
+            {
+              "id": "list-ve-items-14-4",
+              "component": "StatusBadge",
+              "text": "Blocked"
+            },
+            {
+              "id": "list-ve-items-15-4",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-4",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000005"
+            },
+            {
+              "id": "list-ve-items-17-4",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-5",
+              "component": "Button",
+              "text": "Mission 06\nlabel sample 6\ndescription sample 6\nCancelled\nAug 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000006"
+            },
+            {
+              "id": "list-list-items-5-title-5",
+              "component": "Text",
+              "text": "Mission 06"
+            },
+            {
+              "id": "list-ve-items-10-5",
+              "component": "LabelCell",
+              "text": "label sample 6\ndescription sample 6"
+            },
+            {
+              "id": "list-ve-items-14-5",
+              "component": "StatusBadge",
+              "text": "Cancelled"
+            },
+            {
+              "id": "list-ve-items-15-5",
+              "component": "RelativeTimestamp",
+              "text": "Aug 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-5",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000006"
+            },
+            {
+              "id": "list-ve-items-17-5",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-6",
+              "component": "Button",
+              "text": "Mission 07\nlabel sample 7\ndescription sample 7\nValidation Failed\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000007"
+            },
+            {
+              "id": "list-list-items-5-title-6",
+              "component": "Text",
+              "text": "Mission 07"
+            },
+            {
+              "id": "list-ve-items-10-6",
+              "component": "LabelCell",
+              "text": "label sample 7\ndescription sample 7"
+            },
+            {
+              "id": "list-ve-items-14-6",
+              "component": "StatusBadge",
+              "text": "Validation Failed"
+            },
+            {
+              "id": "list-ve-items-15-6",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-6",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000007"
+            },
+            {
+              "id": "list-ve-items-17-6",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-7",
+              "component": "Button",
+              "text": "Mission 08\nlabel sample 8\ndescription sample 8\nDraft\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000008"
+            },
+            {
+              "id": "list-list-items-5-title-7",
+              "component": "Text",
+              "text": "Mission 08"
+            },
+            {
+              "id": "list-ve-items-10-7",
+              "component": "LabelCell",
+              "text": "label sample 8\ndescription sample 8"
+            },
+            {
+              "id": "list-ve-items-14-7",
+              "component": "StatusBadge",
+              "text": "Draft"
+            },
+            {
+              "id": "list-ve-items-15-7",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-7",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000008"
+            },
+            {
+              "id": "list-ve-items-17-7",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-8",
+              "component": "Button",
+              "text": "Mission 09\nlabel sample 9\ndescription sample 9\nQueued\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000009"
+            },
+            {
+              "id": "list-list-items-5-title-8",
+              "component": "Text",
+              "text": "Mission 09"
+            },
+            {
+              "id": "list-ve-items-10-8",
+              "component": "LabelCell",
+              "text": "label sample 9\ndescription sample 9"
+            },
+            {
+              "id": "list-ve-items-14-8",
+              "component": "StatusBadge",
+              "text": "Queued"
+            },
+            {
+              "id": "list-ve-items-15-8",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-8",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000009"
+            },
+            {
+              "id": "list-ve-items-17-8",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-items-5-row-9",
+              "component": "Button",
+              "text": "Mission 10\nlabel sample 10\ndescription sample 10\nIn Progress\nSep 1, 2026, 12:00 PM\n00000000-0000-4000-8000-000000000010"
+            },
+            {
+              "id": "list-list-items-5-title-9",
+              "component": "Text",
+              "text": "Mission 10"
+            },
+            {
+              "id": "list-ve-items-10-9",
+              "component": "LabelCell",
+              "text": "label sample 10\ndescription sample 10"
+            },
+            {
+              "id": "list-ve-items-14-9",
+              "component": "StatusBadge",
+              "text": "In Progress"
+            },
+            {
+              "id": "list-ve-items-15-9",
+              "component": "RelativeTimestamp",
+              "text": "Sep 1, 2026, 12:00 PM"
+            },
+            {
+              "id": "list-ve-items-16-9",
+              "component": "OwnerBadge",
+              "text": "00000000-0000-4000-8000-000000000010"
+            },
+            {
+              "id": "list-ve-items-17-9",
+              "component": "TagPills",
+              "text": ""
+            },
+            {
+              "id": "list-list-pagination-7",
+              "component": "Stack",
+              "text": "10 records\nShowing 1–10 of 10\n‹\n1\n›\nPage 1 of 1"
+            },
+            {
+              "id": "list-slot-pagination-8",
+              "component": "PaginationBar",
+              "text": "10 records\nShowing 1–10 of 10\n‹\n1\n›\nPage 1 of 1"
+            }
+          ],
+          "screenshot": "1440.png",
+          "screenshotHash": "sha256:af92fedcd04978388f3b690a2167d4647404c016bbf6e381413b482d7f67c7be",
+          "dump": "1440.a11y.txt"
+        }
+      ],
+      "errors": [],
+      "timings": {
+        "composeMs": 104.65200000000004,
+        "generateMs": 24.464958000000024,
+        "captureMs": 1217.4906250000058
+      },
+      "output": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-preview-MopmxQ/receipt/react",
+      "consumer": {
+        "root": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-loop-react-QHpBOL",
+        "port": 4478,
+        "pid": 24016
+      }
+    }
+  ],
+  "durationMs": 1385.374792
+}

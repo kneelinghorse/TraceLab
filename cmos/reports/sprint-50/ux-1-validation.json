@@ -1,7 +1,7 @@
 {
   "mission": "UX-1",
   "status": "in_progress; Forge runtime CI and canonical registry activation pending",
-  "updated_at": "2026-09-12T23:42:19.160144+00:00",
+  "updated_at": "2026-09-13T00:13:36.926080+00:00",
   "forge": {
     "base": "114a268ea10b9141bc96925c69132179c7c4b334",
     "implementation_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
@@ -18,9 +18,9 @@
       "failures": 0,
       "typed_gaps": 0,
       "replay_tests_passed": 26,
-      "head": "a1b7763da69732d6e22593fc6d9c74406bdfa753",
-      "archive_sha256": "60aab21dbade6f2dbef5ea252ca0cbd523bb8c91d6593261e630e2aa5a93c53c",
-      "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/release"
+      "head": "a7ef99a21c303e3ef66f57845e9f2b52475f79a3",
+      "archive_sha256": "f1126be2a97839f3bb6098c95ba1f24f833ef1d6195c4f4267a468aa527d31e1",
+      "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/release-ci-34725928271"
     },
     "runtime_attempts": [
       {
@@ -39,7 +39,31 @@
       }
     ],
     "runtime_job": 103639903728,
-    "release_job": 103639903681
+    "release_job": 103639903681,
+    "current_ci_coverage": {
+      "passed": 7163,
+      "failed": 5,
+      "skipped": 16,
+      "total": 7184,
+      "failures": [
+        "2 generated Tool-Specs freshness tests; regenerated document committed locally at ce2239c, 19 contract tests now pass",
+        "3 retained runtime-ledger tests await fresh 240-cell proof"
+      ]
+    },
+    "current_ci_mcp_suite": {
+      "job": 103639903791,
+      "passed": 6834,
+      "failed": 6,
+      "skipped": 16,
+      "total": 6856,
+      "unhandled_errors": [
+        "Vitest worker onTaskUpdate communication timeout"
+      ],
+      "failures": [
+        "2 generated Tool-Specs freshness tests fixed locally at ce2239c",
+        "4 runtime-ledger and portable-health tests await fresh valid 240-cell evidence"
+      ]
+    }
   },
   "mapping": {
     "objects": 7,
@@ -226,8 +250,8 @@
     }
   ],
   "visual_review": {
-    "phone": "Fresh Evidence list/light and Mission detail/dark images visually reviewed at 390. Sidebars remain below the main content; native select values truncate and pagination wraps in the generic prototype.",
-    "text_wrapping": "14 telemetry observations retain ordinary word wrapping in phone pagination labels and cancellation reason text. They are recorded, not relabeled as zero.",
+    "phone": "Evidence list/light, Mission detail/dark, Mission workflow/dark and Chunk inline/light visually reviewed at 390. Sidebars stack below main content. Native select values truncate, pagination wraps, and long workflow identifiers wrap inside their cards. Chunk remains an inline structural prototype using generic controls; it is not a standalone page.",
+    "text_wrapping": "58 observations across the full 120-viewport matrix, including 14 in the original 30-viewport Mission/Evidence subset. Ordinary pagination, long workflow identifier and cancellation text wrapping remain visible in telemetry.",
     "limitations": [
       "Synthetic Forge consumer fixtures; no production TraceLab data is shown.",
       "Generic consumer labels, serif default typography and generated actions are structural prototypes, not the final frontend design.",
@@ -243,29 +267,29 @@
     "CMOS health and final status verification"
   ],
   "traceLab_ci": {
-    "head": "9df87f610087e3f75f3e96cc126ccdd876a27ced",
+    "head": "00500e7f524cb8b7e6bef32993f04c0b4c80075e",
     "pull_request": "https://github.com/kneelinghorse/TraceLab/pull/257",
-    "required_checks": "passed at this head; draft pending Forge activation",
+    "required_checks": "passed at refreshed schema/preview head; draft pending Forge activation",
     "backend": {
-      "run": 34723462099,
+      "run": 34726168534,
       "passed": 2409,
       "skipped": 3,
       "deselected": 12,
       "warnings": 47
     },
     "integration": {
-      "run": 34723462107,
+      "run": 34726168520,
       "passed": 125,
       "skipped": 4,
       "warnings": 17
     },
     "frontend_production_build": {
-      "run": 34723462116,
+      "run": 34726168552,
       "status": "passed",
       "browser_tests_passed": 8
     },
     "frontend_unit_and_types": {
-      "run": 34723462097,
+      "run": 34726168554,
       "status": "passed"
     },
     "secret_scan": "passed",
@@ -277,8 +301,30 @@
     ]
   },
   "handoff_references": {
-    "UX-2": "CMOS referenceDocs includes contract, schema index, Mission list/detail light/dark receipts",
-    "UX-3": "CMOS referenceDocs includes contract, schema index, Evidence list/detail light/dark receipts",
-    "Sprint51": "No missions instantiated yet; planned UX-6/UX-7/UX-8 entries in the guiding roadmap now reference the saved schema index and structural preview receipts."
+    "UX-2": "CMOS referenceDocs includes contract, schema index, Mission list/detail light/dark receipts and full 120-viewport preview index",
+    "UX-3": "CMOS referenceDocs includes contract, schema index, Evidence list/detail light/dark receipts and full 120-viewport preview index",
+    "Sprint51": "No missions instantiated yet; planned UX-6/UX-7/UX-8 entries in the guiding roadmap now reference the saved schema index and structural preview receipts. The full 120-viewport index is also linked."
+  },
+  "full_preview_matrix": {
+    "saved_compositions": 20,
+    "receipt_sets": 40,
+    "width_observations": 120,
+    "framework": "react",
+    "widths": [
+      390,
+      820,
+      1440
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "browser_error_count": 0,
+    "overflow_count": 0,
+    "text_wrap_observations": 58,
+    "implementation_head": "335664b5875981f1a3ec0a9635263d17e40bfe42",
+    "additional_preview_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+    "head_difference": "Generated tool-reference documentation only; composition, code generation and style sources unchanged.",
+    "summary": "oods-previews/preview-summary.json"
   }
 }

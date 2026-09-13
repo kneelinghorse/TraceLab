@@ -1,0 +1,317 @@
+{
+  "version": "1.1",
+  "theme": "light",
+  "brand": "A",
+  "framework": "react",
+  "compose": {
+    "object": "Report",
+    "context": "timeline",
+    "preferences": {
+      "theme": "light"
+    }
+  },
+  "schemaHash": "sha256:2811a0e23778eebdb43f4d0d9cd8e13a077bc63bcd2d2b441e88305e75c02953",
+  "artifactContentHash": "sha256:672d3dd55a8c9d64c72c74247dfee57e8f4ec9c0750a94acda5552e3ee661aad",
+  "files": [
+    {
+      "path": "src/GeneratedUI.tsx",
+      "contentHash": "sha256:a065b3e18f98a5a1e03aa86707bf89c9423373b353635608f0802ea71aa72fa9"
+    }
+  ],
+  "sourceHead": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
+  "model": {
+    "activeFilters": [],
+    "allowedTransitions": [],
+    "chunkCount": 0,
+    "citations": [],
+    "content": "Consumer content",
+    "createdAt": "2026-09-05T12:00:00.000Z",
+    "description": "Consumer description",
+    "filterCount": 0,
+    "filters": [],
+    "id": "Consumer id",
+    "label": "Consumer label",
+    "lastEvent": "Consumer last event",
+    "lastEventAt": "2026-09-05T12:00:00.000Z",
+    "ownerId": "consumer-owner-id",
+    "ownerType": "user",
+    "ownershipRole": "Consumer ownership role",
+    "ownershipTransferredAt": "2026-09-05T12:00:00.000Z",
+    "page": 0,
+    "pageSize": 0,
+    "placeholder": "Consumer placeholder",
+    "projectId": "consumer-project-id",
+    "prompt": "Consumer prompt",
+    "reportType": "Consumer report type",
+    "searchActive": false,
+    "searchQuery": "Consumer searchQuery",
+    "sources": [],
+    "stateHistory": [],
+    "status": "draft",
+    "title": "Consumer title",
+    "tokensUsed": 0,
+    "totalItems": 0,
+    "totalPages": 0,
+    "updatedAt": "2026-09-05T12:00:00.000Z",
+    "events": [
+      {
+        "id": "consumer-event-1",
+        "kind": "state",
+        "at": "2026-09-05T12:00:00Z",
+        "title": "Created",
+        "description": "Initial state"
+      },
+      {
+        "id": "consumer-event-2",
+        "kind": "state",
+        "at": "2026-09-06T12:00:00Z",
+        "title": "Updated",
+        "description": "Next state"
+      }
+    ]
+  },
+  "steps": [],
+  "clock": "2026-09-08T12:00:00.000Z",
+  "clockStepMs": 1,
+  "locale": "en-US",
+  "timezone": "UTC",
+  "packages": [
+    {
+      "name": "@oods/tokens",
+      "version": "0.1.0",
+      "installSpec": "file:./tarballs/oods-tokens-0.1.0.tgz",
+      "sha256": "sha256:69422edecf1d2853a844003bebbe2e4b514987e86a9fa1d860946f873c1c28c5",
+      "bytes": 238478
+    },
+    {
+      "name": "@oods/component-contracts",
+      "version": "0.1.0",
+      "installSpec": "file:./tarballs/oods-component-contracts-0.1.0.tgz",
+      "sha256": "sha256:b4bdbfccf2cea62f728e4f8123ad4bb7d8a4cdb42767e3395445694724e45381",
+      "bytes": 197852
+    },
+    {
+      "name": "@oods/component-styles",
+      "version": "0.1.0",
+      "installSpec": "file:./tarballs/oods-component-styles-0.1.0.tgz",
+      "sha256": "sha256:0f012b95395e8a70a2fb787580ab363af2e5e15940e7d13e3b255b71c143a9df",
+      "bytes": 12894
+    },
+    {
+      "name": "@oods/components-react",
+      "version": "0.1.0",
+      "installSpec": "file:./tarballs/oods-components-react-0.1.0.tgz",
+      "sha256": "sha256:02036aecde76093980d8e4e93bb3458c60a96009ee4b1d8c523b621e32a308e2",
+      "bytes": 95069
+    }
+  ],
+  "views": [
+    {
+      "width": 390,
+      "accessibility": "- text: Consumer title\n- list \"Lifecycle history\":\n  - listitem:\n    - text: Consumer label\n    - strong: Created\n    - time: Sep 5, 2026, 12:00 PM\n    - paragraph: Initial state\n  - listitem:\n    - text: Consumer label\n    - strong: Updated\n    - time: Sep 6, 2026, 12:00 PM\n    - paragraph: Next state\n- article \"State transitions\":\n  - heading \"State transitions\" [level=3]\n  - paragraph: No events recorded.",
+      "visibleText": "Consumer title\nConsumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state\n\nConsumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state\n\nState transitions\n\nNo events recorded.",
+      "measurements": {
+        "bodyBackground": "oklch(0.967 0.03 86)",
+        "chartCanvasFills": [],
+        "viewportWidth": 390,
+        "documentWidth": 390,
+        "elementCount": 22,
+        "overflow": [],
+        "glyphWraps": []
+      },
+      "values": [],
+      "regions": [
+        {
+          "id": "screen-timeline-14",
+          "component": "Stack",
+          "text": "Consumer title\nConsumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state\n\nConsumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state\n\nState transitions\n\nNo events recorded."
+        },
+        {
+          "id": "timeline-header-1",
+          "component": "Stack",
+          "text": "Consumer title"
+        },
+        {
+          "id": "timeline-header-1-title",
+          "component": "Text",
+          "text": "Consumer title"
+        },
+        {
+          "id": "timeline-entries-13-entry-0",
+          "component": "Card",
+          "text": "Consumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state"
+        },
+        {
+          "id": "ve-entry-0-15-0",
+          "component": "TimelineEntryLabel",
+          "text": "Consumer label"
+        },
+        {
+          "id": "timeline-entries-13-entry-1",
+          "component": "Card",
+          "text": "Consumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state"
+        },
+        {
+          "id": "ve-entry-0-15-1",
+          "component": "TimelineEntryLabel",
+          "text": "Consumer label"
+        },
+        {
+          "id": "timeline-entries-13-trait-events",
+          "component": "Stack",
+          "text": "State transitions\n\nNo events recorded."
+        },
+        {
+          "id": "ve-entry-0-16",
+          "component": "StateTransitionEvent",
+          "text": "State transitions\n\nNo events recorded."
+        }
+      ],
+      "screenshot": "390.png",
+      "screenshotHash": "sha256:8e2d361bd70ab6abd425a6d3087620a0b7b821afd2010485c3fe48b8d9c7a58e",
+      "dump": "390.a11y.txt"
+    },
+    {
+      "width": 820,
+      "accessibility": "- text: Consumer title\n- list \"Lifecycle history\":\n  - listitem:\n    - text: Consumer label\n    - strong: Created\n    - time: Sep 5, 2026, 12:00 PM\n    - paragraph: Initial state\n  - listitem:\n    - text: Consumer label\n    - strong: Updated\n    - time: Sep 6, 2026, 12:00 PM\n    - paragraph: Next state\n- article \"State transitions\":\n  - heading \"State transitions\" [level=3]\n  - paragraph: No events recorded.",
+      "visibleText": "Consumer title\nConsumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state\n\nConsumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state\n\nState transitions\n\nNo events recorded.",
+      "measurements": {
+        "bodyBackground": "oklch(0.967 0.03 86)",
+        "chartCanvasFills": [],
+        "viewportWidth": 820,
+        "documentWidth": 820,
+        "elementCount": 22,
+        "overflow": [],
+        "glyphWraps": []
+      },
+      "values": [],
+      "regions": [
+        {
+          "id": "screen-timeline-14",
+          "component": "Stack",
+          "text": "Consumer title\nConsumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state\n\nConsumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state\n\nState transitions\n\nNo events recorded."
+        },
+        {
+          "id": "timeline-header-1",
+          "component": "Stack",
+          "text": "Consumer title"
+        },
+        {
+          "id": "timeline-header-1-title",
+          "component": "Text",
+          "text": "Consumer title"
+        },
+        {
+          "id": "timeline-entries-13-entry-0",
+          "component": "Card",
+          "text": "Consumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state"
+        },
+        {
+          "id": "ve-entry-0-15-0",
+          "component": "TimelineEntryLabel",
+          "text": "Consumer label"
+        },
+        {
+          "id": "timeline-entries-13-entry-1",
+          "component": "Card",
+          "text": "Consumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state"
+        },
+        {
+          "id": "ve-entry-0-15-1",
+          "component": "TimelineEntryLabel",
+          "text": "Consumer label"
+        },
+        {
+          "id": "timeline-entries-13-trait-events",
+          "component": "Stack",
+          "text": "State transitions\n\nNo events recorded."
+        },
+        {
+          "id": "ve-entry-0-16",
+          "component": "StateTransitionEvent",
+          "text": "State transitions\n\nNo events recorded."
+        }
+      ],
+      "screenshot": "820.png",
+      "screenshotHash": "sha256:f26fcf406d8678865a475c45946bb73219cdec0d7ac58564f48ed126e1f3b6ce",
+      "dump": "820.a11y.txt"
+    },
+    {
+      "width": 1440,
+      "accessibility": "- text: Consumer title\n- list \"Lifecycle history\":\n  - listitem:\n    - text: Consumer label\n    - strong: Created\n    - time: Sep 5, 2026, 12:00 PM\n    - paragraph: Initial state\n  - listitem:\n    - text: Consumer label\n    - strong: Updated\n    - time: Sep 6, 2026, 12:00 PM\n    - paragraph: Next state\n- article \"State transitions\":\n  - heading \"State transitions\" [level=3]\n  - paragraph: No events recorded.",
+      "visibleText": "Consumer title\nConsumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state\n\nConsumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state\n\nState transitions\n\nNo events recorded.",
+      "measurements": {
+        "bodyBackground": "oklch(0.967 0.03 86)",
+        "chartCanvasFills": [],
+        "viewportWidth": 1440,
+        "documentWidth": 1440,
+        "elementCount": 22,
+        "overflow": [],
+        "glyphWraps": []
+      },
+      "values": [],
+      "regions": [
+        {
+          "id": "screen-timeline-14",
+          "component": "Stack",
+          "text": "Consumer title\nConsumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state\n\nConsumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state\n\nState transitions\n\nNo events recorded."
+        },
+        {
+          "id": "timeline-header-1",
+          "component": "Stack",
+          "text": "Consumer title"
+        },
+        {
+          "id": "timeline-header-1-title",
+          "component": "Text",
+          "text": "Consumer title"
+        },
+        {
+          "id": "timeline-entries-13-entry-0",
+          "component": "Card",
+          "text": "Consumer labelCreated\nSep 5, 2026, 12:00 PM\n\nInitial state"
+        },
+        {
+          "id": "ve-entry-0-15-0",
+          "component": "TimelineEntryLabel",
+          "text": "Consumer label"
+        },
+        {
+          "id": "timeline-entries-13-entry-1",
+          "component": "Card",
+          "text": "Consumer labelUpdated\nSep 6, 2026, 12:00 PM\n\nNext state"
+        },
+        {
+          "id": "ve-entry-0-15-1",
+          "component": "TimelineEntryLabel",
+          "text": "Consumer label"
+        },
+        {
+          "id": "timeline-entries-13-trait-events",
+          "component": "Stack",
+          "text": "State transitions\n\nNo events recorded."
+        },
+        {
+          "id": "ve-entry-0-16",
+          "component": "StateTransitionEvent",
+          "text": "State transitions\n\nNo events recorded."
+        }
+      ],
+      "screenshot": "1440.png",
+      "screenshotHash": "sha256:5559e1a2e32c8ca397e8b6c4041adbf897f1ee967d82d5a5965d77c02c19c78d",
+      "dump": "1440.a11y.txt"
+    }
+  ],
+  "errors": [],
+  "timings": {
+    "composeMs": 62.94200000000001,
+    "generateMs": 6.607958999999937,
+    "captureMs": 833.7167080000509
+  },
+  "output": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-preview-JfayNA/receipt/react",
+  "consumer": {
+    "root": "/private/var/folders/gd/rty3217130vdbr9_q713nvg80000gn/T/oods-design-loop-react-QHpBOL",
+    "port": 4478,
+    "pid": 24016
+  }
+}

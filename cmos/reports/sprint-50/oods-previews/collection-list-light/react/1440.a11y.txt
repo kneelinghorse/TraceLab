@@ -1,0 +1,27 @@
+- search "Search":
+  - text: Search
+  - searchbox "Search"
+- text: Owner type
+- combobox "Owner type":
+  - option "All states" [selected]
+  - option "user"
+- text: Sort
+- combobox "Sort":
+  - option "Name A–Z" [selected]
+  - option "Name Z–A"
+- list "Records":
+  - listitem:
+    - button "Consumer name Consumer label Consumer description Sep 5, 2026, 12:00 PM consumer-owner-id":
+      - text: Consumer name Consumer label Consumer description
+      - time: Sep 5, 2026, 12:00 PM
+      - text: consumer-owner-id
+- navigation "Pagination":
+  - text: 20 records Showing 1–10 of 20
+  - button "Previous page" [disabled]: ‹
+  - list:
+    - listitem:
+      - button "Page 1": "1"
+    - listitem:
+      - button "Page 2": "2"
+  - button "Next page": ›
+  - text: Page 1 of 2

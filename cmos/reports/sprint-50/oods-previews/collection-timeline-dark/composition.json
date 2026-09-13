@@ -1,0 +1,523 @@
+{
+  "status": "ok",
+  "layout": "timeline",
+  "schema": {
+    "version": "2026.02",
+    "theme": "dark",
+    "screens": [
+      {
+        "id": "screen-timeline-14",
+        "component": "Stack",
+        "layout": {
+          "type": "stack",
+          "gapToken": "cluster-default"
+        },
+        "children": [
+          {
+            "id": "timeline-header-1",
+            "component": "Stack",
+            "layout": {
+              "type": "inline",
+              "align": "space-between"
+            },
+            "style": {
+              "spacingToken": "inset-default"
+            },
+            "children": [
+              {
+                "id": "timeline-header-1-title",
+                "component": "Text",
+                "props": {
+                  "field": "name"
+                }
+              }
+            ]
+          },
+          {
+            "id": "timeline-entries-13",
+            "component": "Stack",
+            "layout": {
+              "type": "stack",
+              "gapToken": "cluster-default"
+            },
+            "children": [
+              {
+                "id": "timeline-entries-13-entry",
+                "component": "Card",
+                "collectionControl": "event",
+                "children": [
+                  {
+                    "id": "slot-entry-0-4",
+                    "component": "TimelineEntryLabel",
+                    "meta": {
+                      "intent": "slot:entry-0",
+                      "label": "entry-0"
+                    },
+                    "props": {
+                      "field": "label",
+                      "compact": true,
+                      "label": "Label"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "timeline-entries-13-empty",
+                "component": "Banner",
+                "props": {
+                  "message": "No events yet."
+                },
+                "collectionControl": "empty"
+              }
+            ],
+            "collection": {
+              "source": "events",
+              "keyField": "id",
+              "labelField": "title"
+            }
+          }
+        ]
+      }
+    ],
+    "objectSchema": {
+      "label": {
+        "type": "string",
+        "required": true,
+        "description": "Display projection of name; retain the complete source field.",
+        "semanticType": "text.label"
+      },
+      "description": {
+        "type": "string",
+        "required": false,
+        "description": "Display projection of description; never truncates persisted content.",
+        "semanticType": "text.description"
+      },
+      "placeholder": {
+        "type": "string",
+        "required": false,
+        "description": "Hint copy surfaced in form fields when the label is empty.",
+        "semanticType": "text.placeholder"
+      },
+      "created_at": {
+        "type": "datetime",
+        "required": true,
+        "description": "Created at.",
+        "semanticType": "audit.created_at"
+      },
+      "updated_at": {
+        "type": "datetime",
+        "required": true,
+        "description": "Updated at.",
+        "semanticType": "audit.updated_at"
+      },
+      "last_event": {
+        "type": "string",
+        "required": false,
+        "description": "Only from an explicit event or timestamp projection; absence is unknown, not a fabricated audit event.",
+        "semanticType": "audit.event.type"
+      },
+      "last_event_at": {
+        "type": "datetime",
+        "required": false,
+        "description": "Timestamp for the lifecycle event captured in last_event.",
+        "semanticType": "audit.event.timestamp"
+      },
+      "owner_id": {
+        "type": "uuid",
+        "required": false,
+        "description": "Authoritative nullable server owner_id. Not exposed by the current response; unavailable until the API exposes it. Never derive from created_by, user_id, or project owner.",
+        "semanticType": "ownership.owner.id"
+      },
+      "owner_type": {
+        "type": "string",
+        "required": false,
+        "description": "user only when an authoritative owner_id is present.",
+        "enum": [
+          "user"
+        ],
+        "semanticType": "ownership.owner.type"
+      },
+      "ownership_role": {
+        "type": "string",
+        "required": false,
+        "description": "Optional role name describing how the owner governs the entity.",
+        "semanticType": "ownership.owner.role"
+      },
+      "ownership_transferred_at": {
+        "type": "datetime",
+        "required": false,
+        "description": "Timestamp recording when ownership was last transferred.",
+        "semanticType": "ownership.owner.transferred_at"
+      },
+      "tags": {
+        "type": "string[]",
+        "required": false,
+        "description": "Ordered list of tags assigned to the entity.",
+        "semanticType": "taxonomy.tag.collection"
+      },
+      "tag_count": {
+        "type": "number",
+        "required": true,
+        "description": "Computed number of tags assigned to the entity.",
+        "semanticType": "metric.collection.count"
+      },
+      "tag_metadata": {
+        "type": "object[]",
+        "required": false,
+        "description": "Per-tag governance metadata. Each entry corresponds to a tag in the tags array and\ntracks provenance and usage for taxonomy health monitoring.\n\nEntry structure:\n  - tag: string (the tag value, matches entry in tags array)\n  - created_at: ISO 8601 datetime\n  - created_by: string (user ID or \"system\" for allow-list tags)\n  - usage_count: number (how many entities use this tag, computed)\n  - moderation_status: \"approved\" | \"pending\" | \"rejected\" (when allowTagModeration is true)\n  - canonical_form: string (resolved synonym target, when synonymResolution is enabled)\n",
+        "semanticType": "taxonomy.tag.governance"
+      },
+      "searchQuery": {
+        "type": "string",
+        "required": false,
+        "description": "The current search query string entered by the user.",
+        "semanticType": "input.search.query"
+      },
+      "searchActive": {
+        "type": "boolean",
+        "required": false,
+        "description": "Whether the search input is currently focused or has a non-empty query.",
+        "semanticType": "state.search.active"
+      },
+      "filters": {
+        "type": "object[]",
+        "required": false,
+        "description": "Array of available filter descriptors. Each entry defines a filterable dimension:\n  - field: string (the schema field to filter on)\n  - label: string (display label)\n  - type: \"select\" | \"multi-select\" | \"range\" | \"boolean\" | \"date-range\"\n  - options: array of { value, label } for select/multi-select types\n",
+        "semanticType": "input.filter.descriptors"
+      },
+      "activeFilters": {
+        "type": "object[]",
+        "required": false,
+        "description": "Array of currently applied filter values:\n  - field: string (matches a filter descriptor field)\n  - operator: \"eq\" | \"in\" | \"range\" | \"gt\" | \"lt\" | \"between\"\n  - value: unknown (the selected filter value or values)\n",
+        "semanticType": "state.filter.active"
+      },
+      "filterCount": {
+        "type": "number",
+        "required": true,
+        "description": "Computed count of currently active filters.",
+        "semanticType": "metric.filter.count"
+      },
+      "page": {
+        "type": "number",
+        "required": true,
+        "description": "Current page number (1-based).",
+        "semanticType": "state.pagination.page"
+      },
+      "pageSize": {
+        "type": "number",
+        "required": true,
+        "description": "Number of items displayed per page.",
+        "semanticType": "state.pagination.pageSize"
+      },
+      "totalItems": {
+        "type": "number",
+        "required": false,
+        "description": "Total number of items across all pages. Used to compute total page count.",
+        "semanticType": "metric.pagination.totalItems"
+      },
+      "totalPages": {
+        "type": "number",
+        "required": false,
+        "description": "Computed total number of pages (ceil(totalItems / pageSize)).",
+        "semanticType": "metric.pagination.totalPages"
+      },
+      "name": {
+        "type": "string",
+        "required": true,
+        "description": "Name.",
+        "semanticType": "text.label"
+      },
+      "id": {
+        "type": "uuid",
+        "required": true,
+        "description": "Id.",
+        "semanticType": "research.collection.id"
+      },
+      "item_count": {
+        "type": "number",
+        "required": false,
+        "description": "Number of chunks in collection",
+        "semanticType": "research.collection.item_count"
+      },
+      "items": {
+        "type": "CollectionItemResponse[]",
+        "required": false,
+        "description": "Items.",
+        "semanticType": "research.collection.items"
+      }
+    }
+  },
+  "schemaRef": "compose-0b921038",
+  "schemaRefCreatedAt": "2026-09-13T00:02:45.764Z",
+  "schemaRefExpiresAt": "2026-09-13T00:32:45.764Z",
+  "selections": [
+    {
+      "slotName": "entry-0",
+      "intent": "timeline-entry",
+      "selectedComponent": "TimelineEntryLabel",
+      "confidence": 0.95,
+      "confidenceLevel": "high",
+      "explanation": "TimelineEntryLabel was selected for slot \"entry-0\" because view_extension placement. Confidence is high (0.95).",
+      "candidates": [
+        {
+          "name": "TimelineEntryLabel",
+          "confidence": 0.95,
+          "reason": "view_extension placement"
+        }
+      ]
+    },
+    {
+      "slotName": "header",
+      "intent": "page-header",
+      "selectedComponent": "Text",
+      "confidence": 0.5,
+      "confidenceLevel": "medium",
+      "explanation": "Text was selected for slot \"header\" because fallback placement. Confidence is medium (0.50).",
+      "candidates": [
+        {
+          "name": "Text",
+          "confidence": 0.5,
+          "reason": "fallback placement"
+        }
+      ]
+    },
+    {
+      "slotName": "entry-1",
+      "intent": "timeline-entry",
+      "selectedComponent": "Stack",
+      "confidence": 0.74,
+      "confidenceLevel": "medium",
+      "explanation": "Stack was selected for slot \"entry-1\" because preferred for \"data-list\" (rank 1); 1 context match(es); context match (timeline); 2 region match(es). Confidence is medium (0.74).",
+      "candidates": [
+        {
+          "name": "Stack",
+          "confidence": 1,
+          "reason": "preferred for \"data-list\" (rank 1); 1 context match(es); context match (timeline); 2 region match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Table",
+          "confidence": 0.86,
+          "reason": "preferred for \"data-list\" (rank 2); 1 tag match(es); 1 context match(es); 2 region match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "AuditTimeline",
+          "confidence": 0.5,
+          "reason": "context match (timeline); 1 region match(es); 2 trait(s); name contains \"timeline\"",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        }
+      ]
+    },
+    {
+      "slotName": "entry-2",
+      "intent": "timeline-entry",
+      "selectedComponent": "Stack",
+      "confidence": 0.74,
+      "confidenceLevel": "medium",
+      "explanation": "Stack was selected for slot \"entry-2\" because preferred for \"data-list\" (rank 1); 1 context match(es); context match (timeline); 2 region match(es). Confidence is medium (0.74).",
+      "candidates": [
+        {
+          "name": "Stack",
+          "confidence": 1,
+          "reason": "preferred for \"data-list\" (rank 1); 1 context match(es); context match (timeline); 2 region match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Table",
+          "confidence": 0.86,
+          "reason": "preferred for \"data-list\" (rank 2); 1 tag match(es); 1 context match(es); 2 region match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "AuditTimeline",
+          "confidence": 0.5,
+          "reason": "context match (timeline); 1 region match(es); 2 trait(s); name contains \"timeline\"",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        }
+      ]
+    },
+    {
+      "slotName": "entry-3",
+      "intent": "timeline-entry",
+      "selectedComponent": "Stack",
+      "confidence": 0.74,
+      "confidenceLevel": "medium",
+      "explanation": "Stack was selected for slot \"entry-3\" because preferred for \"data-list\" (rank 1); 1 context match(es); context match (timeline); 2 region match(es). Confidence is medium (0.74).",
+      "candidates": [
+        {
+          "name": "Stack",
+          "confidence": 1,
+          "reason": "preferred for \"data-list\" (rank 1); 1 context match(es); context match (timeline); 2 region match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Table",
+          "confidence": 0.86,
+          "reason": "preferred for \"data-list\" (rank 2); 1 tag match(es); 1 context match(es); 2 region match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "AuditTimeline",
+          "confidence": 0.5,
+          "reason": "context match (timeline); 1 region match(es); 2 trait(s); name contains \"timeline\"",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        }
+      ]
+    },
+    {
+      "slotName": "entry-4",
+      "intent": "timeline-entry",
+      "selectedComponent": "Stack",
+      "confidence": 0.74,
+      "confidenceLevel": "medium",
+      "explanation": "Stack was selected for slot \"entry-4\" because preferred for \"data-list\" (rank 1); 1 context match(es); context match (timeline); 2 region match(es). Confidence is medium (0.74).",
+      "candidates": [
+        {
+          "name": "Stack",
+          "confidence": 1,
+          "reason": "preferred for \"data-list\" (rank 1); 1 context match(es); context match (timeline); 2 region match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "Table",
+          "confidence": 0.86,
+          "reason": "preferred for \"data-list\" (rank 2); 1 tag match(es); 1 context match(es); 2 region match(es)",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        },
+        {
+          "name": "AuditTimeline",
+          "confidence": 0.5,
+          "reason": "context match (timeline); 1 region match(es); 2 trait(s); name contains \"timeline\"",
+          "keywordTagMatches": 0,
+          "keywordTraitMatches": 0,
+          "contextTagMatches": 0,
+          "contextTraitMatches": 0
+        }
+      ]
+    }
+  ],
+  "validation": {
+    "status": "ok",
+    "errors": [],
+    "warnings": []
+  },
+  "warnings": [
+    {
+      "code": "OODS-V121",
+      "message": "Object 'Collection' has maturity 'alpha' — composed output may change.",
+      "hint": "Consider using stable objects for production compositions."
+    },
+    {
+      "code": "OODS-V117",
+      "message": "Field collision: \"description\" in object schema overrides trait definition"
+    },
+    {
+      "code": "OODS-V117",
+      "message": "Field collision: \"created_at\" in object schema overrides trait definition"
+    },
+    {
+      "code": "OODS-V117",
+      "message": "Field collision: \"updated_at\" in object schema overrides trait definition"
+    },
+    {
+      "code": "OODS-V117",
+      "message": "Field collision: \"label\" in object schema overrides trait definition"
+    },
+    {
+      "code": "OODS-V117",
+      "message": "Field collision: \"owner_id\" in object schema overrides trait definition"
+    },
+    {
+      "code": "OODS-V117",
+      "message": "Field collision: \"owner_type\" in object schema overrides trait definition"
+    },
+    {
+      "code": "OODS-V117",
+      "message": "Field collision: \"last_event\" in object schema overrides trait definition"
+    },
+    {
+      "code": "OODS-V120",
+      "message": "No matching slot for position \"main\" from lifecycle/Timestampable/AuditEvent."
+    }
+  ],
+  "objectUsed": {
+    "name": "Collection",
+    "version": "0.1.0",
+    "traits": [
+      "content/Labelled",
+      "lifecycle/Timestampable",
+      "structural/Ownerable",
+      "behavioral/Taggable",
+      "behavioral/Searchable",
+      "behavioral/Filterable",
+      "behavioral/Pageable"
+    ],
+    "fieldsComposed": 27,
+    "viewExtensionsApplied": {
+      "list": 7,
+      "detail": 6,
+      "form": 2,
+      "card": 3,
+      "timeline": 2,
+      "inline": 1
+    }
+  },
+  "meta": {
+    "intentParsed": "Collection timeline view",
+    "layoutDetected": "context-inferred: timeline (from context=\"timeline\")",
+    "slotCount": 6,
+    "nodeCount": 7,
+    "intentSynthetic": true,
+    "warnings": [
+      "Object 'Collection' has maturity 'alpha' — composed output may change.",
+      "Field collision: \"description\" in object schema overrides trait definition",
+      "Field collision: \"created_at\" in object schema overrides trait definition",
+      "Field collision: \"updated_at\" in object schema overrides trait definition",
+      "Field collision: \"label\" in object schema overrides trait definition",
+      "Field collision: \"owner_id\" in object schema overrides trait definition",
+      "Field collision: \"owner_type\" in object schema overrides trait definition",
+      "Field collision: \"last_event\" in object schema overrides trait definition",
+      "No matching slot for position \"main\" from lifecycle/Timestampable/AuditEvent."
+    ],
+    "intelligence": {
+      "fieldsExpanded": false,
+      "positionAffinityUsed": true,
+      "fieldAffinityUsed": true,
+      "compositionConfidence": 0.74
+    }
+  }
+}
