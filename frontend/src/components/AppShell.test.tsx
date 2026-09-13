@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
@@ -14,6 +14,7 @@ vi.mock("@/components/RegisterPanel", () => ({ RegisterPanel: () => <p>Registrat
 
 import { AppShell } from "@/components/AppShell";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { openCommandPalette } from "@/lib/command-palette";
 
 beforeEach(() => {
   localStorage.clear();
@@ -27,6 +28,12 @@ beforeEach(() => {
 function shell() { return render(<ThemeProvider><AppShell><h1>Queue work</h1></AppShell></ThemeProvider>); }
 
 describe("the shared shell", () => {
+  it("opens focused search from the Home entry point", () => {
+    shell();
+    act(openCommandPalette);
+    expect(screen.getByRole("dialog", { name: "Search and navigation" })).toBeTruthy();
+    expect(document.activeElement).toBe(screen.getByRole("textbox", { name: "Search research or find a section" }));
+  });
   it("provides one main and banner, and marks only the deepest navigation route current", () => {
     shell();
     expect(screen.getAllByRole("main")).toHaveLength(1);

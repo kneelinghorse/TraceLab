@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useSWR from "swr";
+import { useRouter } from "next/router";
 
 import { AuthGate } from "@/components/AuthGate";
 import { evidenceApi } from "@/lib/api/evidence";
@@ -10,16 +11,21 @@ export default function EvidencePage() {
 }
 
 function EvidenceBrowser() {
-  const [projectId, setProjectId] = useState("");
+  const router = useRouter();
+  const [selectedProject, setProjectId] = useState<string | null>(null);
+  const projectId = selectedProject ?? (typeof router.query.project_id === "string" ? router.query.project_id : "");
+  const missionId = selectedProject === null && typeof router.query.mission_id === "string" ? router.query.mission_id : undefined;
+  const sessionKey = selectedProject === null && typeof router.query.session_key === "string" ? router.query.session_key : undefined;
   const [projectSearch, setProjectSearch] = useState("");
   const [projectPage, setProjectPage] = useState(1);
   const [page, setPage] = useState(1);
-  const projects = useSWR(["evidence-projects", projectSearch, projectPage], () => projectsApi.listProjects({ search: projectSearch, page: projectPage, pageSize: 20 }));
-  const ledger = useSWR(projectId ? ["evidence", projectId, page] : null, () => evidenceApi.list(projectId, page));
+  const projects = useSWR(["evidence-projects", projectSearch, projectPage], () => projectsApi.listProjects({ search: projectSearch.trim() || undefined, page: projectPage, pageSize: 20 }));
+  const ledger = useSWR(projectId ? ["evidence", projectId, missionId, sessionKey, page] : null, () => evidenceApi.list(projectId, page, { mission_id: missionId, session_key: sessionKey }));
   const error = projects.error || ledger.error;
 
   return <div className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6">
     <header><h1 className="text-3xl font-semibold">Evidence</h1><p className="mt-2 text-secondary">Sourced claims and research context, organized by project.</p></header>
+    {(missionId || sessionKey) && <p className="break-words text-sm text-secondary">Showing evidence for {sessionKey ? `session ${sessionKey}` : "the selected mission"}. Choose a project below to browse without these filters.</p>}
     <section className="panel space-y-4 p-5" aria-label="Choose a project">
       <label className="form-label">Find a project<input className="form-input mt-2" value={projectSearch} onChange={(event) => { setProjectSearch(event.target.value); setProjectPage(1); }} placeholder="Search project names" /></label>
       <label className="form-label">Project<select aria-label="Project" className="form-input mt-2" value={projectId} onChange={(event) => { setProjectId(event.target.value); setPage(1); }}>

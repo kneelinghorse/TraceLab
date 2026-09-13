@@ -1,0 +1,21 @@
+# Home aggregate contract (UX-2)
+
+Guiding plan: [Sprint 50–53 UX overhaul](../foundational-docs/roadmap-sprints-50-53-ux-overhaul.md). Presentation reference: [OODS object mapping](oods-object-model.md), especially the Mission list/detail compositions. This document describes the new operator aggregate; it does not change mission authoring or the DeepSearch worker contract.
+
+`GET /api/v1/home` requires an authenticated human principal, including a human-owned API key. Service-role credentials are rejected. Responses are private and non-cacheable. REST is the agent equivalent; no new MCP tool is introduced.
+
+The response includes `generated_at`, `refresh_seconds` (30), `stalled_after_seconds` (3600), mission totals by the seven real statuses, and bounded sections. Every section contains a database `total` and at most six `items`. The client must never use the item length as the total.
+
+Attention is ordered by validation failure, blocked, queued for at least one hour, then completed and unreviewed by this caller. Within a priority, most recently updated missions appear first, with UUID as a stable tie-breaker. Queued age uses `queued_at`, falling back to `created_at` only when it is missing. Cancelled and draft missions are absent from attention. Active runs contain only `in_progress` missions.
+
+Completion review is explicit: `PUT /api/v1/home/missions/{uuid}/review` with `{ "updated_at": "<the displayed mission revision>" }` returns 204. It acknowledges that revision for the caller only. Repeated writes are idempotent. An inaccessible/missing mission returns 404; a changed revision or non-completed mission returns 409. Opening Home or following a result link does not mark anything reviewed. Any later mission update conservatively restores attention, including a subsequent completed run. The table `user_mission_reviews` is introduced by migration `044_home_mission_reviews`; PostgreSQL row locking and a native upsert protect concurrent review writes. SQLite uses its corresponding upsert.
+
+All mission, project and report queries use `accessible_filter` before counts and limits. Recent projects omit soft-deleted rows, matching the project list. Evidence additionally requires a readable, non-deleted project and matches the ledger's project-owner allow path. Entries referring to an unreadable mission are excluded from Home's mission-linked activity. Result report IDs are only returned when independently readable; evidence links and counts use scoped ledger rows. No ownership is inferred from `created_by`.
+
+Recent projects and reports are ordered by their server `updated_at`, then UUID. They are recently updated entities, not a fabricated personal browsing history. Favorites are explicitly deferred under UX-2's allowed scope option (CMOS decision 395).
+
+Evidence activity groups all accessible entries by project, mission, session key and origin, orders groups by the latest creation time, and returns the group's full entry count. Links target `/evidence` with encoded project/mission/session filters. The existing evidence browser honors those filters through pagination; choosing another project clears the incoming mission/session scope.
+
+Progress preserves explicit `execution_metadata.current_phase`, `progress_percent`, and a valid `current_step`/`total_steps` pair. Missing, malformed and out-of-range values remain null. Loop counts never estimate a percentage. Legacy source/loop/coverage fields retired in T42.3 remain unused. A current production read on 2026-09-13 found no active missions; live step telemetry therefore remains unverified. Terminal statistics continue to belong to `result_protocol.report_metadata` on mission detail, not to this Home projection.
+
+The page uses the existing OODS token layer and shell primitives, following the retained UX-1 structural compositions. The session's Forge tool returned OODS-S004 (cached registry omits Mission) and OODS-N019 (preview server unavailable). These are recorded validation gaps; local browser receipts do not claim to be fresh Forge composition receipts or deployed screenshots.

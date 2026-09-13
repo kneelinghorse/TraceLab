@@ -1,0 +1,92 @@
+{
+  "mission": "UX-2",
+  "checked_at": "2026-09-13T03:13:53.915284+00:00",
+  "status": "local implementation verified; fresh Forge preview and production acceptance pending",
+  "base_revision": "7623ced",
+  "contract": "cmos/contracts/home-api.md",
+  "changes": [
+    "RBAC-scoped Home COUNT aggregates and bounded attention, active runs, recents and ledger activity",
+    "Per-user explicit completion review with stale revision conflict and migration 044",
+    "Root Home, shared command palette entry, token progress, evidence deep links preserved through pagination"
+  ],
+  "validation": {
+    "backend_regressions": {
+      "passed": 133,
+      "skipped": 0,
+      "warnings": 16,
+      "command": ".venv/bin/pytest tests/test_home_api.py tests/test_evidence_ledger_api.py tests/test_missions_api.py tests/unit/test_oods_object_contract.py -q --no-header --show-capture=no"
+    },
+    "frontend_unit": {
+      "passed": 95,
+      "files": 14,
+      "skipped": 0,
+      "command": "cd frontend && npm run test:unit -- --run"
+    },
+    "browser": {
+      "passed": 9,
+      "skipped": 0,
+      "command": "production Next build + playwright tests/e2e/app-shell.spec.ts"
+    },
+    "postgres": {
+      "passed": 2,
+      "skipped": 0,
+      "version": "14.19 (local Homebrew)",
+      "method": "isolated temporary cluster on 127.0.0.1:55432; existing integration tests with temporary fixture replacing unavailable Docker testcontainer",
+      "covers": [
+        "143-row aggregate",
+        "idempotent review upsert and changed-result attention",
+        "full Alembic chain to 044, downgrade to 043 and re-upgrade"
+      ],
+      "ci_target": "existing PostgreSQL 15 testcontainer workflow; pending"
+    },
+    "production_build": "passed",
+    "typescript": "passed",
+    "changed_file_eslint": "passed",
+    "changed_file_ruff": "passed",
+    "home_mypy": "passed, five modules, follow-imports=silent",
+    "full_app_ruff": "43 findings in unchanged files; existing advisory baseline, not a clean full-app lint claim",
+    "foundational_references": "passed",
+    "responsive_axe": {
+      "summary": "ux-2-local-smoke/summary.json",
+      "results": "ux-2-local-smoke/results.json",
+      "fixtures": true,
+      "home_viewports": 6,
+      "evidence_viewports": 6,
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "critical_serious": 0,
+      "horizontal_overflow": 0,
+      "browser_errors": 0,
+      "transport_errors": 0,
+      "mission_total": 143,
+      "all_seven_status_totals_match_list_endpoint": true
+    }
+  },
+  "resolved_findings": [
+    "Empty project search on incoming evidence links caused API 422; now omitted and regression tested",
+    "Native progress used browser default green; now uses semantic OODS accent with accessible progressbar semantics"
+  ],
+  "acceptance_gaps": [
+    "Fresh Mission composition/preview: current MCP worker returns OODS-S004; preview returns OODS-N019. See ux-2-forge-gaps.json. No Forge checkout, source, build or existing worker modified.",
+    "Draft PR review and required CI still required before merge",
+    "Post-merge deploy/migration and real tracelab.aquex.ai smoke in both themes at 1440 and 390 required; local fixtures do not satisfy this gate",
+    "Production had zero active missions at read-only preflight; live current-step telemetry not verified"
+  ],
+  "decisions": {
+    "cmos_decision": 395,
+    "learning": 157,
+    "favorites": "Explicitly deferred; recently updated reports/projects only",
+    "review": "Personal acknowledgement of mission.updated_at; later updates conservatively restore attention"
+  },
+  "preserved_preexisting_changes": [
+    "cmos/reports/sprint-37/graph-search-e2e-validation.json",
+    "cmos/reports/sprint-38/semantic-edge-e2e-validation.json"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "compose": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"status\": \"error\",\n  \"layout\": \"\",\n  \"schema\": {\n    \"version\": \"2026.02\",\n    \"screens\": [\n      {\n        \"id\": \"err-0\",\n        \"component\": \"Box\"\n      }\n    ]\n  },\n  \"selections\": [],\n  \"warnings\": [],\n  \"errors\": [\n    {\n      \"code\": \"OODS-S004\",\n      \"message\": \"Failed to load object \\\"Mission\\\": Object \\\"Mission\\\" not found. Available: Article, Invoice, Media, Organization, Plan, Product, Relationship, Subscription, Transaction, Usage, User\",\n      \"hint\": \"Check the object name or verify objects/ directory.\"\n    }\n  ]\n}"
+      }
+    ],
+    "isError": false
+  },
+  "preview": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\n  \"error\": {\n    \"code\": \"OODS-N019\",\n    \"message\": \"Design loop server not running in this checkout. Start it with pnpm design:loop serve.\",\n    \"details\": {\n      \"category\": \"not_found\",\n      \"retryable\": true,\n      \"context\": {\n        \"command\": \"pnpm design:loop serve\",\n        \"cwd\": \"/Users/systemsystems/portfolio/Design-Tools/OODS-Forge\"\n      }\n    },\n    \"incidentId\": \"d6e2a59f-b19e-4632-a256-539d3296cb78\",\n    \"retryable\": true,\n    \"data\": {\n      \"command\": \"pnpm design:loop serve\",\n      \"cwd\": \"/Users/systemsystems/portfolio/Design-Tools/OODS-Forge\"\n    }\n  }\n}"
+      }
+    ],
+    "isError": true
+  }
+}
