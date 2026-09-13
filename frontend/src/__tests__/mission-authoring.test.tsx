@@ -125,3 +125,14 @@ it("does not choose a destination project for mixed-project collection context",
   expect(screen.getByLabelText(/Project/)).toHaveValue("");
   expect(mocks.create).not.toHaveBeenCalled();
 });
+
+it("preserves document identity when editing or removing references with duplicate filenames", async () => {
+  const refs = ["first", "second", "third"].map(id => ({ title: "report.md", document_id: id, href: `/documents/${id}` }));
+  form({ source: { ...source, references: refs } });
+  await screen.findByRole("option", { name: "Research" });
+  fireEvent.change(screen.getByRole("textbox", { name: "References 1", exact: true }), { target: { value: "Renamed source" } });
+  fireEvent.click(screen.getByRole("button", { name: "Remove item 2", exact: true }));
+  fireEvent.click(screen.getByRole("button", { name: "Save and preview" }));
+  await screen.findByText("revision-1");
+  expect(mocks.create.mock.calls[0][0].references).toEqual([{ ...refs[0], title: "Renamed source" }, refs[2]]);
+});

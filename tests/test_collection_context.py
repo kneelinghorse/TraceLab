@@ -225,3 +225,15 @@ def test_unicode_report_title_exports_without_invalid_response_headers(context_f
     assert response.status_code == 200
     assert response.content == "# Café 研究\n\nOriginal café text\n".encode()
     assert "filename*=UTF-8''Caf%C3%A9-%E7%A0%94%E7%A9%B6.md" in response.headers["content-disposition"]
+
+
+@pytest.mark.parametrize("method,suffix,body", [
+    ("GET", "/documents", None),
+    ("POST", "/documents", {"document_id": "80000000-0000-4000-8000-000000000008"}),
+    ("DELETE", "/documents/80000000-0000-4000-8000-000000000008", None),
+    ("GET", "/mission-seed", None),
+])
+def test_collection_context_requires_auth_before_reads_or_mutations(context_fixture, method, suffix, body):
+    client, _, _, _, collection, _, _ = context_fixture
+    response = client.request(method, f"{API}/collections/{collection.id}{suffix}", json=body)
+    assert response.status_code == 401

@@ -174,6 +174,10 @@ def pedr1c_anon_routes(
     return [
         ("get", f"{prefix}/collections", None),
         ("post", f"{prefix}/collections", {}),
+        ("get", f"{prefix}/collections/{resource_id}/documents", None),
+        ("post", f"{prefix}/collections/{resource_id}/documents", {"document_id": resource_id}),
+        ("delete", f"{prefix}/collections/{resource_id}/documents/{resource_id}", None),
+        ("get", f"{prefix}/collections/{resource_id}/mission-seed", None),
         ("get", f"{prefix}/saved-searches", None),
         ("post", f"{prefix}/saved-searches", {}),
         ("put", f"{prefix}/saved-searches/{resource_id}", {}),

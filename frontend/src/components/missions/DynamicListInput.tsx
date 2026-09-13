@@ -1,9 +1,11 @@
 import { useCallback } from "react";
 
+type ListChange = { kind: "add" } | { kind: "remove"; index: number } | { kind: "edit"; index: number; value: string };
+
 interface DynamicListInputProps {
   label: string;
   items: string[];
-  onChange: (items: string[]) => void;
+  onChange: (items: string[], change: ListChange) => void;
   placeholder?: string;
   minItems?: number;
   error?: string;
@@ -24,14 +26,14 @@ export function DynamicListInput({
   required = false,
 }: DynamicListInputProps) {
   const handleAdd = useCallback(() => {
-    onChange([...items, ""]);
+    onChange([...items, ""], { kind: "add" });
   }, [items, onChange]);
 
   const handleRemove = useCallback(
     (index: number) => {
       if (items.length <= minItems) return;
       const updated = items.filter((_, i) => i !== index);
-      onChange(updated);
+      onChange(updated, { kind: "remove", index });
     },
     [items, minItems, onChange]
   );
@@ -39,7 +41,7 @@ export function DynamicListInput({
   const handleChange = useCallback(
     (index: number, value: string) => {
       const updated = items.map((item, i) => (i === index ? value : item));
-      onChange(updated);
+      onChange(updated, { kind: "edit", index, value });
     },
     [items, onChange]
   );

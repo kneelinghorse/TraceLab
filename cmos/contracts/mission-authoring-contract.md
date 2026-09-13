@@ -98,6 +98,8 @@ built-browser flows. No DB migration or worker SELECT change is needed.
 
 ## Collection context seed (UX-8, 2026-09-13)
 
+Reference edits preserve each row’s structured document identity when titles change or duplicate filenames are removed; title matching must not substitute another document.
+
 `GET /collections/{id}/mission-seed` is a read-only projection of the collection's
 instructions and complete, currently readable document context. It independently
 checks the collection, documents and their non-deleted parent projects. Direct

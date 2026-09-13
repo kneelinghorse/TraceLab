@@ -412,7 +412,12 @@ export function MissionForm({ onSuccess, onCancel, source, seed, mode = "create"
               items={(field.value ?? []).map((r) =>
                 typeof r === "string" ? r : (r?.title ?? "")
               )}
-              onChange={(items) => field.onChange(items.map((title) => field.value?.find(reference => reference.title === title) ?? { title }))}
+              onChange={(_items, change) => {
+                const references = field.value ?? [];
+                if (change.kind === "add") field.onChange([...references, { title: "" }]);
+                else if (change.kind === "remove") field.onChange(references.filter((_, index) => index !== change.index));
+                else field.onChange(references.map((reference, index) => index === change.index ? { ...reference, title: change.value } : reference));
+              }}
               error={errors.references?.message}
               placeholder="Seed reference title (e.g. 'Burns et al. 2022')"
               minItems={0}

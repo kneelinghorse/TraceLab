@@ -17,10 +17,10 @@
   ],
   "validation": {
     "backend": {
-      "passed": 221,
+      "passed": 225,
       "skipped": 0,
       "warnings": 17,
-      "seconds": 42.63,
+      "seconds": 71.94,
       "suites": [
         "collection_context",
         "evidence_ledger_api",
@@ -46,7 +46,7 @@
       ]
     },
     "frontend_unit": {
-      "passed": 184,
+      "passed": 185,
       "skipped": 0,
       "files": 28
     },
@@ -77,7 +77,22 @@
     "frontend_production_build": "passed",
     "ruff_all_changed_python": "passed",
     "foundational_refs": "passed",
-    "git_diff_check": "passed"
+    "git_diff_check": "passed",
+    "correction_tests": {
+      "passed": 36,
+      "deselected": 1,
+      "excluded": "Live deployed RBAC matrix marked e2e_prod; not run locally",
+      "warnings": 15,
+      "seconds": 10.8
+    },
+    "ast_commit_guard": "passed",
+    "full_integration": {
+      "passed": 133,
+      "skipped": 4,
+      "warnings": 15,
+      "seconds": 145.03,
+      "execution": "Sequential after the 225-test backend run; includes unchanged graph performance and harness route lockstep guards."
+    }
   },
   "before": "ux-8-before/ (24 clean direct-production captures before implementation)",
   "local_previews": {
@@ -92,7 +107,8 @@
     "High contrast remains deferred under THEME-2; Light/Dark accepted token artifacts unchanged.",
     "Document references are authored context, not a worker-enforced access boundary.",
     "Source MCP schema/runtime is unchanged; this mission adds a client regression test.",
-    "Existing tests expose deprecation warnings, recorded above."
+    "Existing tests expose deprecation warnings, recorded above.",
+    "Full integration suite retains four existing conditional skips; isolated mission PostgreSQL tests had no skips."
   ],
   "remaining": [
     "Source CI and merge",
@@ -100,5 +116,36 @@
     "Actual production seed/save/submit and MCP read; authorized report citation navigation and byte exports",
     "124 direct-production route/theme/viewport checks",
     "Receipt publication and CMOS completion"
+  ],
+  "ci_initial": {
+    "head": "570e9362ef01ea0c4b3fd289a8defb60bfefdac5",
+    "backend": {
+      "run_id": 34786770584,
+      "passed": 2449,
+      "skipped": 3,
+      "quarantined": 12,
+      "warnings": 48,
+      "seconds": 536.26
+    },
+    "production_build": {
+      "run_id": 34786770606,
+      "browser_passed": 31
+    },
+    "integration": {
+      "run_id": 34786770601,
+      "passed": 131,
+      "failed": 2,
+      "skipped": 4,
+      "warnings": 17,
+      "seconds": 86.98,
+      "failures": [
+        "Live RBAC harness was missing four new collection context routes; all four probes plus auth-first tests added.",
+        "Unchanged graph depth-two performance test measured 211.68ms against 200ms. Targeted local rerun passed without threshold changes."
+      ]
+    }
+  },
+  "validation_notes": [
+    "Two concurrent local pytest processes reset the same SQLite fixture database; both interrupted and excluded from acceptance. Sequential reruns are authoritative.",
+    "Structured references retain row identity on rename/removal, including duplicate document filenames."
   ]
 }
