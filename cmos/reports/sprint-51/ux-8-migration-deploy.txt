@@ -1,0 +1,3 @@
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade 045_user_favorites -> 046_collection_context, Add collection instructions and direct document context.

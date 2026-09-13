@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-09-13T23:05:40.004Z",
+  "deployment": "fc6050f9-ab2d-4e08-9d91-434b1e2fdf2f",
+  "unauthenticated": [
+    {
+      "method": "GET",
+      "path": "/collections/{id}/documents",
+      "status": 401
+    },
+    {
+      "method": "POST",
+      "path": "/collections/{id}/documents",
+      "status": 401
+    },
+    {
+      "method": "DELETE",
+      "path": "/collections/{id}/documents/{document_id}",
+      "status": 401
+    },
+    {
+      "method": "GET",
+      "path": "/collections/{id}/mission-seed",
+      "status": 401
+    }
+  ]
+}

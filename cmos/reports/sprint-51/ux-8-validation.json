@@ -1,7 +1,7 @@
 {
   "mission": "UX-8",
-  "status": "local_verified_awaiting_ci_and_production",
-  "checked_at": "2026-09-13T22:25:38.670832+00:00",
+  "status": "passed",
+  "checked_at": "2026-09-13T23:58:12.278877+00:00",
   "base_commit": "7350425249d393725b325715a3add581389fe1fd",
   "decisions": [
     411,
@@ -92,6 +92,18 @@
       "warnings": 15,
       "seconds": 145.03,
       "execution": "Sequential after the 225-test backend run; includes unchanged graph performance and harness route lockstep guards."
+    },
+    "final_graph_harness": {
+      "passed": 65,
+      "skipped": 0,
+      "warnings": 14,
+      "seconds": 78.02
+    },
+    "final_integration": {
+      "passed": 133,
+      "skipped": 4,
+      "warnings": 15,
+      "seconds": 258.38
     }
   },
   "before": "ux-8-before/ (24 clean direct-production captures before implementation)",
@@ -100,23 +112,19 @@
     "screenshots": 24
   },
   "visual_review": [
-    "Desktop Light collection document page, instructions and focus restoration",
-    "Mobile Dark report citations, source content, pagination and export controls"
+    "Production desktop Light collection instructions/documents and correctly selected seed project",
+    "Production mobile Dark collection actions, wrapped document links and counts",
+    "Production mobile Dark report header, exports and authorized citation links"
   ],
   "limitations": [
     "High contrast remains deferred under THEME-2; Light/Dark accepted token artifacts unchanged.",
     "Document references are authored context, not a worker-enforced access boundary.",
     "Source MCP schema/runtime is unchanged; this mission adds a client regression test.",
     "Existing tests expose deprecation warnings, recorded above.",
-    "Full integration suite retains four existing conditional skips; isolated mission PostgreSQL tests had no skips."
+    "Full integration suite retains four existing conditional skips; isolated mission PostgreSQL tests had no skips.",
+    "Seeded job was still in_progress at acceptance end; the UX8 success criterion requires successful submission, not worker completion. The retained mission can be audited by its recorded UUID."
   ],
-  "remaining": [
-    "Source CI and merge",
-    "Railway SUCCESS for both services",
-    "Actual production seed/save/submit and MCP read; authorized report citation navigation and byte exports",
-    "124 direct-production route/theme/viewport checks",
-    "Receipt publication and CMOS completion"
-  ],
+  "remaining": [],
   "ci_initial": {
     "head": "570e9362ef01ea0c4b3fd289a8defb60bfefdac5",
     "backend": {
@@ -146,6 +154,267 @@
   },
   "validation_notes": [
     "Two concurrent local pytest processes reset the same SQLite fixture database; both interrupted and excluded from acceptance. Sequential reruns are authoritative.",
-    "Structured references retain row identity on rename/removal, including duplicate document filenames."
-  ]
+    "Structured references retain row identity on rename/removal, including duplicate document filenames.",
+    "Live acceptance first exposed a delayed project-options select mismatch; PR275 fixes it. Both earlier live attempts are archived; the same collection was resumed and exactly one UX8 mission was created/submitted."
+  ],
+  "ci_corrected": {
+    "head": "bb9e1e2fdb0df9dc11df0598013d53c52218d298",
+    "backend": {
+      "run_id": 34787434690,
+      "passed": 2452,
+      "failed": 1,
+      "skipped": 3,
+      "quarantined": 12,
+      "warnings": 48,
+      "seconds": 405.21,
+      "failure": "Expected anonymous route list did not include the four new collection context probes; corrected in 8be268a."
+    },
+    "integration": {
+      "run_id": 34787434672,
+      "passed": 132,
+      "failed": 1,
+      "skipped": 4,
+      "warnings": 17,
+      "seconds": 95.94,
+      "failure": "Graph depth-two benchmark repeated at 258.84 ms against unchanged 200 ms limit. Focused dependency CI-3 removes terminal-node adjacency reads."
+    },
+    "production_build": {
+      "run_id": 34787434782,
+      "status": "passed"
+    }
+  },
+  "source_pr": {
+    "number": 274,
+    "head": "440a509e45ae0b0d82f731524e1a04c272edbe4c",
+    "merge_commit": "501268f40562b5c3c6994962a9e58df5b6f566a2",
+    "merged_at": "2026-09-13T23:00:14Z"
+  },
+  "ci_final": {
+    "backend": {
+      "run_id": 34788007798,
+      "passed": 2455,
+      "skipped": 3,
+      "quarantined": 12,
+      "warnings": 48,
+      "seconds": 415.9
+    },
+    "integration": {
+      "run_id": 34788007802,
+      "passed": 133,
+      "skipped": 4,
+      "warnings": 17,
+      "seconds": 96.67
+    },
+    "production_build": {
+      "run_id": 34788007829,
+      "browser_passed": 31
+    },
+    "frontend": {
+      "run_id": 34788007933,
+      "passed": 185,
+      "lint": "passed",
+      "types": "passed"
+    },
+    "ruff_diff": {
+      "run_id": 34788007804,
+      "status": "passed"
+    },
+    "secrets": {
+      "run_ids": [
+        34788007810,
+        34788005365
+      ],
+      "status": "passed"
+    }
+  },
+  "deployments": {
+    "api": {
+      "deployment_id": "fc6050f9-ab2d-4e08-9d91-434b1e2fdf2f",
+      "commit": "501268f40562b5c3c6994962a9e58df5b6f566a2",
+      "status": "SUCCESS",
+      "verified_at": "2026-09-13T23:03:54.706277+00:00"
+    },
+    "frontend": {
+      "deployment_id": "bd348edf-06c1-42ba-a820-8468372a22db",
+      "commit": "501268f40562b5c3c6994962a9e58df5b6f566a2",
+      "status": "SUCCESS",
+      "verified_at": "2026-09-13T23:03:54.707169+00:00"
+    }
+  },
+  "prefill_correction": {
+    "source_commit": "362334b26d3d91dfcbef1e78bc1330f15a464e9f",
+    "problem": "Project options arriving after MissionForm mount leave the uncontrolled select blank while form state holds the seed/rerun project UUID. Found by live acceptance before any mission create/submit.",
+    "fix": "Bind the visible select to the watched project value; preserve later user selection.",
+    "red_tests": "Two delayed-option tests failed at the expected project-value assertion before the fix.",
+    "frontend_unit": {
+      "passed": 187,
+      "skipped": 0,
+      "files": 28
+    },
+    "lint": "passed",
+    "types": "passed",
+    "production_build": "passed",
+    "browser": {
+      "passed": 31,
+      "skipped": 0,
+      "seconds_approx": 72
+    },
+    "ci": "passed",
+    "pr": 275,
+    "head_with_ci_diagnostics": "8a9240bcda9e643abf2eea7c5d4808e4f40114eb",
+    "ci_integration": {
+      "run_id": 34789402382,
+      "attempts": 2,
+      "last_passed": 133,
+      "last_skipped": 4,
+      "warnings": 17,
+      "seconds": 87.56
+    },
+    "live_data_artifact_probe": {
+      "status": "passed",
+      "ui": "local production build",
+      "api": "production read-only",
+      "project_id": "0afcc588-e722-45bd-8320-f486601b877c",
+      "references": 2,
+      "api_writes": 0,
+      "does_not_replace_direct_production_acceptance": true
+    }
+  },
+  "pre_correction_baseline": {
+    "path": "ux-8-pre-correction-smoke",
+    "cases": 124,
+    "overflow": 0,
+    "serious_critical_axe": 0,
+    "browser_api_errors": 0,
+    "commit": "501268f40562b5c3c6994962a9e58df5b6f566a2",
+    "acceptance": "Not the final close baseline; repeat after project-prefill correction deploy."
+  },
+  "live_checkpoint": {
+    "collection_id": "a3e6d809-af90-4652-903f-5ce5c8842bf8",
+    "documents_attached": 2,
+    "instructions_persisted": true,
+    "detach_preserves_document": true,
+    "mission_created": true,
+    "mission_submitted": true
+  },
+  "learnings": [
+    168,
+    169,
+    170
+  ],
+  "correction_pr": {
+    "number": 275,
+    "head": "8a9240bcda9e643abf2eea7c5d4808e4f40114eb",
+    "merge_commit": "16a05c092aace752f720f7f253cc9ae391ae7eb5",
+    "merged_at": "2026-09-13T23:50:39Z"
+  },
+  "correction_ci": {
+    "head": "8a9240bcda9e643abf2eea7c5d4808e4f40114eb",
+    "backend": {
+      "run_id": 34789402372,
+      "passed": 2455,
+      "skipped": 3,
+      "quarantined": 12,
+      "warnings": 48,
+      "seconds": 1733.03
+    },
+    "integration": {
+      "run_id": 34789402382,
+      "attempt": 2,
+      "passed": 133,
+      "skipped": 4,
+      "warnings": 17,
+      "seconds": 87.56
+    },
+    "production_build": {
+      "run_id": 34789402389,
+      "browser_passed": 31
+    },
+    "frontend": {
+      "run_id": 34789402399,
+      "passed": 187,
+      "lint": "passed",
+      "types": "passed"
+    },
+    "ruff_diff": {
+      "run_id": 34789402388,
+      "status": "passed"
+    },
+    "secrets": {
+      "run_ids": [
+        34789402383,
+        34789399675
+      ],
+      "status": "passed"
+    }
+  },
+  "correction_deployments": {
+    "api": {
+      "deployment_id": "0ccdeef8-d519-4cac-bd7b-b2fbe84ec065",
+      "commit": "16a05c092aace752f720f7f253cc9ae391ae7eb5",
+      "status": "SUCCESS",
+      "verified_at": "2026-09-13T23:53:25.613342+00:00"
+    },
+    "frontend": {
+      "deployment_id": "f3667b42-59a5-4d2b-8be3-dd9ce12c8e29",
+      "commit": "16a05c092aace752f720f7f253cc9ae391ae7eb5",
+      "status": "SUCCESS",
+      "verified_at": "2026-09-13T23:53:25.613999+00:00"
+    }
+  },
+  "production_baseline": {
+    "summary": "ux-8-production-smoke/summary.json",
+    "checks": 124,
+    "routes": 31,
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "widths": [
+      1440,
+      390
+    ],
+    "passed": true,
+    "overflow": 0,
+    "serious_critical_axe": 0,
+    "browser_api_errors": 0
+  },
+  "live_flow": {
+    "receipt": "ux-8-live-flow/receipt.json",
+    "passed": true,
+    "completed_at": "2026-09-13T23:54:52.391Z",
+    "collection_id": "a3e6d809-af90-4652-903f-5ce5c8842bf8",
+    "mission_id": "39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+    "submitted": true,
+    "actual_mcp_client_parity": true,
+    "citations": {
+      "total": 44,
+      "pages": 3,
+      "distinctLinkedEntries": 44,
+      "firstId": "07ed4147-8c4c-4d47-b2c1-90568111322a"
+    },
+    "totals": {
+      "collections": 53,
+      "reports": 482
+    },
+    "export_bytes_unchanged": true,
+    "screenshots": 20,
+    "additional_visual_captures": [
+      "ux-8-live-flow/dark-390-report-top-viewport.png",
+      "ux-8-live-flow/dark-390-citation-viewport.png"
+    ],
+    "latest_job": {
+      "id": "39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+      "status": "in_progress",
+      "result_report_id": null,
+      "result_document_ids": []
+    }
+  },
+  "cmos_health": {
+    "checked_at": "2026-09-13T23:58:12.278877+00:00",
+    "connected": true,
+    "wal": true,
+    "missions": 351,
+    "sessions": 129
+  }
 }
