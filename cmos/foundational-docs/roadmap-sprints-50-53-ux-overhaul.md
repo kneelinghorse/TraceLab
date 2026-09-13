@@ -143,19 +143,33 @@ Key decisions carried forward: hexagonal boundaries stay (routers → services �
 
 **Moved:** no unfinished Sprint 50 mission is carried. Sprint 51 remains planned and unopened: job run views, project bundles, deeper document/collection/report workflows, search and route migration retain their original scope below. Closing the foundation does not claim the entire four-sprint redesign is finished.
 
-### Sprint 51 — The Working Surfaces
+### Sprint 51 — The Working Surfaces (opened 2026-09-13)
 
-**Goal:** rebuild the pages people and agents live in, on the object model and the shell.
+**Goal:** rebuild the pages people and agents live in, on the object model and the shell, and make the theme selector truthful.
 
 **UX-1 implementation references:** use the [API-to-object contract](../contracts/oods-object-model.md) and [saved-schema index](../reports/sprint-50/oods-previews/schema-summary.json), with [all 20 compositions in both themes at 390/820/1440](../reports/sprint-50/oods-previews/preview-summary.json). UX-6 starts from Mission list/detail/timeline/workflow; UX-7 from Project, Document and inline Chunk; UX-8 from Collection and Report. The retained [Mission detail preview](../reports/sprint-50/oods-previews/mission-detail-light/react/receipt.json) and [Evidence detail preview](../reports/sprint-50/oods-previews/evidence-detail-light/react/receipt.json), with adjacent dark-theme receipts, establish the structural references. These use synthetic fixtures; bind real API data and regenerate phone/tablet/desktop previews before implementing each surface.
 
-- **UX-6 Missions as inspectable jobs.** New authoring flow (contract preview inline), run view with named steps from DeepSearch phases, live logs, results and evidence tab, exceptions-first list with the queue folded in, cancel and re-run.
-- **UX-7 Projects as bundles and Documents.** Project hub with Overview, Documents, Evidence, Collections, Missions, Reports tabs; upload with per-file progress; document detail with chunks and evidence references.
+| Mission | Deliverable | Depends on |
+|---|---|---|
+| THEME-1 | Truthful theme selector: wire the `hc` theme the tokens already ship, show what System resolved to, fix the hard-coded light first paint, strip the no-op `dark:` utilities, re-pin Forge tokens only from a certified bundle | — (first; enables UX-6..UX-9) |
+| UX-6 | Missions as inspectable jobs: exceptions-first list with the queue folded in, run view with named phases and truthful logs, authoring with inline contract preview, cancel and re-run | THEME-1 |
+| UX-7 | Projects as bundles + Documents: hub tabs, upload with per-file progress, document detail with chunks and evidence; per-user favorites on Home (closes the decision #395 deferral) | THEME-1 |
+| UX-8 | Collections as context spaces + Reports: instructions, seed a mission, citations resolve to evidence, export retained | THEME-1, UX-6 |
+| UX-9 | Search + command palette: one search surface, palette reaches every entity, recent and saved searches, actions, keyboard navigation documented | THEME-1 |
+| UX-10 | Route migration: every pre-overhaul URL redirects, MCP links canonical, map maintained here, deprecated aliases listed for Sprint 53 | UX-6, UX-7, UX-8, UX-9 |
+| CI-2 | Honest lint lanes: fix, ratchet or drop the perpetually red advisory ruff-full and mypy jobs | — |
+
+- **THEME-1 Truthful themes.** The selector offers System / Light / Dark today; System resolves to the OS preference through `matchMedia` with a change listener, so on a light-mode OS System and Light are identical by design and nothing says so. The vendored tokens already scope a third theme, `hc`, that no code sets. Wire it, show the resolved theme next to System, remove the hard-coded light first paint in `_document.tsx`, strip the 987 no-op `dark:` utilities across 31 files, and re-pin Forge tokens only from Forge's certified sprint-197 re-pin bundle (the vendored `114a268` tokens are byte-identical to Forge HEAD `bc12723e9`; the palette rework is on an unmerged, uncertified branch). Palette quality is Forge's reset work; if the bundle is not certified within Sprint 51 it defers to Sprint 54.
+- **UX-6 Missions as inspectable jobs.** New authoring flow (contract preview inline), run view with named steps from DeepSearch phases, logs that state unavailability truthfully while live streaming stays dormant, results and evidence tab, exceptions-first list with the queue folded in, cancel and re-run.
+- **UX-7 Projects as bundles and Documents.** Project hub with Overview, Documents, Evidence, Collections, Missions, Reports tabs; upload with per-file progress; document detail with chunks and evidence references; per-user favorites surfaced on Home.
 - **UX-8 Collections as context spaces and Reports.** Collections carry instructions and documents and can seed a mission; report detail whose citations resolve to evidence; export retained.
 - **UX-9 Search and the command palette.** Search rebuilt on tokens; palette reaches every entity, recent searches, saved searches and actions; keyboard navigation documented.
-- **UX-10 Route migration.** Every pre-overhaul URL redirects to its successor; MCP responses carry the new canonical links; a mapping table lives in this document.
+- **UX-10 Route migration.** Every pre-overhaul URL redirects to its successor; MCP responses carry the new canonical links; a mapping table lives in this document; deprecated aliases listed for Sprint 53.
+- **CI-2 Honest lint lanes.** No lane stays red as "advisory"; each is required and green, ratcheted with a shrinking count, or removed with the reason recorded.
 
-**Exit criteria:** no page under `src/pages` uses the pre-overhaul shell or palette; a mission can be authored, watched to completion and audited to evidence without leaving the UI; the Playwright baseline shows zero overflow and zero critical or serious axe findings on all routes.
+**Definition of Done additions (decision #400):** re-run the 31-route direct-browser production baseline at every UI mission close (three themes once THEME-1 lands); deployed smoke is accepted only after Railway reports SUCCESS for both services, with deployment ids in the receipt under `cmos/reports/sprint-51/`.
+
+**Exit criteria:** no page under `src/pages` uses the pre-overhaul shell or palette; the theme selector lists exactly the themes the tokens define and System reports what it resolved to; a mission can be authored, watched to completion and audited to evidence without leaving the UI; the Playwright baseline shows zero overflow and zero critical or serious axe findings on all routes.
 
 ### Sprint 52 — Relationships, Attention and Parity
 
@@ -277,5 +291,6 @@ A UI mission is not done until all of the following are true. Each rule exists b
 - **2026-09-13 UTC, acceptance reconciled** — UX-1's subsequent acceptance and final Forge runtime success resolve the earlier handoff dependency. Accepted retained schemas/previews support TraceLab implementation without a new setup authorization. Home, Evidence and admin observability are deployed and production-verified; UX-5 closes after its own deployment checks.
 
 - **2026-09-13 UTC, Sprint 50 close** — Recorded deployed recovery and UX-0–5 outcomes, exact validation receipts, and no unfinished carryover. Sprint 51 remains planned.
+- **2026-09-13 UTC, Sprint 51 open** — Sprint 51 created in CMOS (THEME-1, UX-6..UX-10, CI-2; identity synced to `sprint-51-active`) and this section re-planned from it: THEME-1 added at open on Derek's direction, favorites carried from decision #395 into UX-7, CI-2 from learning #165. Sprint 50 close hygiene: regenerated sprint-37/38 e2e receipts discarded (timing-only reruns over recorded evidence), merged local branches pruned, `cmos/context/MASTER_CONTEXT.json` export refreshed from the CMOS database and its `.backup-*` files removed, mission-authoring contract commit pin set to `21271b5`.
 
 _Truth in data, evidence as the connective tissue, one system._

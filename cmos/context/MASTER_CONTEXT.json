@@ -1,9 +1,9 @@
 {
   "project_identity": {
-    "name": "CMOS Starter Template",
+    "name": "TraceLab",
     "version": "0.0.0",
-    "description": "Blank master context for new CMOS starter projects.",
-    "status": "sprint-18-completed",
+    "description": "Research knowledge management platform with PEDR search pipeline, mission orchestration, and DeepSearch integration.",
+    "status": "sprint-51-active",
     "start_date": "2025-01-01",
     "deployment": {
       "platform": "FastAPI + PostgreSQL + Qdrant",
@@ -16,15 +16,6 @@
       "active_domain": "main"
     },
     "achievements": [
-      "Completed Sprint 00 strategic research artifacts.",
-      "Completed Sprint 01: all 11 missions delivered (B1.1-B1.9, R1.1-R1.2).",
-      "Achieved all Sprint 01 success criteria: Presidio recall 0.9829, format coverage 5/5, Qdrant latency 9.6ms.",
-      "Established automated sprint evaluation mission (B1.6) and generated Sprint 01 efficacy report.",
-      "Completed Sprint 01 gap-filling missions (B1.7-B1.9) to close all unmet criteria.",
-      "Completed Sprint 02 research (R2.1): comprehensive quality assessment heuristics framework with three-pillar approach.",
-      "Completed Sprint 02 ingestion research (R2.2 Markdown service, R2.3 onboarding workflow) defining architecture for B2.3 sub-missions.",
-      "Planned Sprint 02: all 5 build missions (B2.1-B2.5) defined with success criteria and dependencies.",
-      "Updated B2.3b onboarding mission for single-user deployment and realigned backlog sequencing (B2.3b Current, B2.3d Queued).",
       "Completed Sprint 10: PEDR quality-aware ranking, DeepSearch ingestion + auto-linking, schema package, relationship API, and integration telemetry all shipped with retrospective + backlog updates.",
       "Sprint 10 completed: PEDR quality-aware ranking (212% boost for validated research), DeepSearch ingestion with 100% auto-linking, schema package, relationship API, and 24-test integration suite.",
       "Sprint 11 completed: correction loops, PEDR delta sync, console UI, schema distribution (v1.0.0), pre-flight queries",
@@ -36,263 +27,8 @@
       "Sprint 18 planned: PEDR Validation Sprint - prove 6-layer search delivers measurably better results.",
       "Sprint 18 completed: PEDR Validation Sprint - 6 missions delivered (R18.0, B18.1-B18.6). PEDR SCOPED decision: Not for interactive search (1.5s P50 vs 200ms target), approved for deep research, MCP, and batch processing."
     ],
-    "files_created": [
-      "cmos/missions/sprint-01/B1.1_Core-Service-Bootstrap.yaml",
-      "cmos/missions/sprint-01/B1.2_Synthetic-Corpus-Pipeline.yaml",
-      "cmos/missions/sprint-01/B1.3_Presidio-Redaction-Service.yaml",
-      "cmos/missions/sprint-01/B1.4_Document-Ingestion-Pipeline.yaml",
-      "cmos/missions/sprint-01/B1.5_Embedding-and-Qdrant-Bootstrap.yaml",
-      "cmos/missions/sprint-01/B1.6_Sprint-Efficacy-Evaluator.yaml",
-      "cmos/missions/sprint-01/B1.7_Presidio-Recall-Tuning.yaml",
-      "cmos/missions/sprint-01/B1.8_Format-Coverage-Completion.yaml",
-      "cmos/missions/sprint-01/B1.9_Qdrant-Latency-Optimization.yaml",
-      "cmos/missions/sprint-02/B2.1_RAG-Query-API.yaml",
-      "cmos/missions/sprint-02/B2.2_Context-Compression-Pipeline.yaml",
-      "cmos/missions/sprint-02/B2.3_Semantic-Cache-Layer.yaml",
-      "cmos/missions/sprint-02/B2.3a_Markdown-Ingestion-Pipeline.yaml",
-      "cmos/missions/sprint-02/B2.3b_Onboarding-API.yaml",
-      "cmos/missions/sprint-02/B2.3c_Ingestion-Integration-Parity.yaml",
-      "cmos/missions/sprint-02/B2.3d_Semantic-Cache-Implementation.yaml",
-      "cmos/missions/sprint-02/B2.4_Tiered-LLM-Routing.yaml",
-      "cmos/missions/sprint-02/B2.5_Sprint-Efficacy-Evaluator.yaml",
-      "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md",
-      "cmos/missions/research/R2.3_Bootstrap-Workflow.md",
-      "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md",
-      "cmos/missions/backlog.yaml",
-      "cmos/docs/sprint-01_metrics_plan.md",
-      "cmos/reports/README.md",
-      "cmos/reports/sprint-01/sprint-01-summary.md",
-      "cmos/reports/sprint-01/SPRINT-01-DELTA-ANALYSIS.md",
-      "cmos/reports/sprint-02/.gitkeep"
-    ],
-    "planning_overview": {
-      "current_sprint": "Sprint 12 Complete - Sprint 13 Draft Ready",
-      "session_summaries": [
-        {
-          "session_date": "2025-11-10",
-          "agent": "Claude",
-          "focus": "Unblocking Sprint 06 development - API URL and auth issues",
-          "key_discoveries": [
-            "Production API is at https://api.tracelab.aquex.ai (root), NOT https://api.tracelab.aquex.ai/api/v1",
-            "All frontend configs and docs have wrong URL with /api/v1 suffix",
-            "Local development blocked due to missing .env setup and auth configuration",
-            "B6.3 (RAG Search UI) blocked by API connectivity issues"
-          ],
-          "decisions_made": [
-            "Renumbered missions to fix linear progression: B6.3-5 are now fix missions, original B6.3-7 moved to B6.6-10",
-            "B6.3: API URL Configuration Fix - remove /api/v1 suffix everywhere",
-            "B6.4: Local Development Environment Setup - create proper dev docs and scripts",
-            "B6.5: Authentication Documentation Testing - document auth flow and credentials",
-            "B6.6 (formerly B6.3) remains blocked until fixes complete"
-          ],
-          "mistakes_made": [
-            "Made unauthorized ad-hoc changes to auth config without understanding impact",
-            "Created frontend/.env.local with wrong API URL",
-            "Failed to recognize production API doesn't use /api/v1 path despite user insisting",
-            "Attempted to fix issues directly instead of creating proper missions"
-          ],
-          "files_modified": [
-            "cmos/missions/sprint-06/* - Renumbered all missions",
-            "cmos/missions/backlog.yaml - Updated mission order and statuses",
-            "app/core/config.py - Reverted unauthorized changes",
-            "app/main.py - Reverted unauthorized changes"
-          ],
-          "blockers_identified": {
-            "api_url_mismatch": {
-              "issue": "Frontend configured for https://api.tracelab.aquex.ai/api/v1 but API serves at root",
-              "impact": "Complete connectivity failure in production and local",
-              "fix": "Mission B6.3 to update all URL references"
-            },
-            "local_dev_setup": {
-              "issue": "No documentation or scripts for local development",
-              "impact": "Developers cannot run application locally",
-              "fix": "Mission B6.4 to create setup guide and automation"
-            },
-            "auth_confusion": {
-              "issue": "No documentation of auth credentials or flow",
-              "impact": "Cannot test authenticated endpoints",
-              "fix": "Mission B6.5 to document authentication"
-            }
-          }
-        },
-        {
-          "session_date": "2025-12-04",
-          "agent": "Claude",
-          "focus": "Sprint 10 Review & Sprint 11 Planning",
-          "key_discoveries": [
-            "Sprint 10 delivered all 6 missions with 100% auto-linking success and 212% quality boost for validated vs draft research",
-            "Comprehensive PEDR documentation exists - no research missions needed for Sprint 11",
-            "Correction loop architecture decided: async with webhook notifications"
-          ],
-          "decisions_made": [
-            "Sprint 11 order approved as drafted: B11.1-B11.6",
-            "Correction loop: async with webhook notifications (not blocking endpoint)",
-            "PEDR sync: event-driven (not hourly batch)",
-            "Console UI: extend existing Next.js bundle",
-            "Package index: GitHub Packages for tracelab_schemas distribution",
-            "B11.1 kept combined (not split into sub-missions)",
-            "B6.6 Integration API archived as superseded"
-          ],
-          "mistakes_made": [],
-          "files_modified": [
-            "cmos/db/cmos.sqlite - Sprint 11 missions seeded",
-            "cmos/missions/backlog.yaml - Sprint 11 backlog synced"
-          ],
-          "blockers_identified": {}
-        },
-        {
-          "session_date": "2025-12-05",
-          "agent": "Claude Opus 4.5",
-          "focus": "Sprint 12 planning and DeepSearch integration unblocking",
-          "key_discoveries": [
-            "Sprint 11 completed all 6 missions (B11.1-B11.6) with 63 tests passing",
-            "DeepSearch blocked on P0 credentials - resolved by creating deepsearch-service account",
-            "Auth architecture is simple (single shared service account) which is appropriate for internal project",
-            "Sprint 11 retrospective identified 4 follow-up areas: load testing, telemetry rotation, console auth, schema evolution"
-          ],
-          "decisions_made": [
-            "B12.4 (DeepSearch Service Account) completed during planning to unblock DeepSearch Sprint 05",
-            "Auth risk assessed as LOW - single shared account, JWT with 24h expiry, no user management",
-            "Sprint 12 scope: 6 missions (B12.1-B12.6) focused on production hardening",
-            "Full mission YAML files created for each Sprint 12 mission for agent execution clarity"
-          ],
-          "mistakes_made": [],
-          "files_modified": [
-            "TraceLab/.env - Updated with deepsearch-service credentials",
-            "DeepSearch.alpha/cmos/planning/Answers-from-tracelab-sprint12.md - Full integration answers",
-            "cmos/missions/sprint-12/*.yaml - 6 mission protocol files",
-            "cmos/reports/sprint-11/sprint-12-backlog-draft.md - Sprint 12 backlog",
-            "cmos/db/cmos.sqlite - Sprint 12 missions seeded"
-          ],
-          "blockers_identified": {}
-        },
-        {
-          "session_date": "2025-12-05",
-          "agent": "Claude Opus 4.5",
-          "focus": "CRITICAL: Sprint 12 backlog review - fundamentally misaligned with project needs",
-          "key_discoveries": [
-            "Sprint 12 backlog was built from 'retrospective follow-ups' - infrastructure work for scale problems that don't exist",
-            "TraceLab is a SINGLE BUILDER, SINGLE USER internal tool - not a production system with users",
-            "B12.1 (Load Testing): Tests for traffic volume that doesn't exist",
-            "B12.2 (Telemetry Rotation): Solves storage problem that can be fixed with 'rm'",
-            "B12.3 (Console Auth): Protects against users that don't exist",
-            "B12.5 (Schema Evolution): Process documentation for a team that doesn't exist",
-            "Only B12.4 (DeepSearch credentials) was valuable - and it's already done",
-            "DeepSearch integration uses JWT login flow when simple API key would reduce friction for the ONE real integration"
-          ],
-          "decisions_made": [
-            "SPRINT 12 BACKLOG IS WRONG - must be revised by next agent",
-            "B12.1, B12.2, B12.3, B12.5 should be scrapped - infrastructure theater for nonexistent scale",
-            "B12.4 is the only salvageable mission (already completed)",
-            "Next sprint should focus on: API key support for DeepSearch, actual features that help real workflows",
-            "Stop building for imaginary production load - build for actual single-user internal tool use case"
-          ],
-          "mistakes_made": [
-            "Proposed infrastructure/hardening work because retrospective mentioned it as 'follow-ups'",
-            "Failed to question whether follow-ups for production system apply to single-builder tool",
-            "Prioritized 'sensible defaults' and 'hardening' over actual user value",
-            "Made DeepSearch use JWT login dance instead of simple API key - added friction to key integration",
-            "Created 6 detailed mission YAML files for work that shouldn't be done"
-          ],
-          "files_modified": [
-            "cmos/missions/sprint-12/*.yaml - 6 mission files created (most should be deleted)",
-            "cmos/db/cmos.sqlite - Sprint 12 missions seeded (need revision)"
-          ],
-          "blockers_identified": {
-            "sprint_12_misalignment": {
-              "issue": "Entire sprint backlog optimizes for nonexistent scale instead of actual use case",
-              "impact": "Would waste effort on infrastructure theater instead of real value",
-              "fix": "Next agent must: 1) Scrap B12.1/B12.2/B12.3/B12.5, 2) Add API key support, 3) Focus on actual needs"
-            }
-          }
-        },
-        {
-          "session_date": "2025-12-05",
-          "agent": "Claude Opus 4.5",
-          "focus": "Sprint 12 Finalization - Database update and DeepSearch coordination",
-          "key_discoveries": [
-            "Production API diagnosis: missions endpoint 500 error, HTTPS redirects drop auth headers, service account missing",
-            "Search/retrieval works - 20 documents, 191+ chunks indexed and searchable",
-            "Previous Sprint 12 backlog was infrastructure theater - completely revised",
-            "DeepSearch answers doc was incorrect - claimed 'ready' but blockers exist"
-          ],
-          "decisions_made": [
-            "Sprint 12 completely revised with 6 new missions focused on making system usable",
-            "B12.1: Fix missions endpoint 500 error (CRITICAL)",
-            "B12.2: Fix HTTPS redirects dropping auth headers (CRITICAL)",
-            "B12.3: Create service account in production (CRITICAL)",
-            "B12.4: Standardize API response structure (HIGH)",
-            "B12.5: End-to-end integration verification (HIGH)",
-            "B12.6: Sprint retrospective",
-            "Service account credentials standardized: [REDACTED 2026-08-19: service-account credential pair removed; flagged by DeepSearch s92 audit, rotation pending]",
-            "DeepSearch answers doc updated with honest status and workarounds"
-          ],
-          "mistakes_made": [],
-          "files_modified": [
-            "cmos/missions/sprint-12/*.yaml - All 6 mission files replaced with actual fixes",
-            "cmos/db/cmos.sqlite - Sprint 12 missions updated in database",
-            "cmos/missions/backlog.yaml - Exported with revised missions",
-            "cmos/reports/sprint-11/sprint-12-backlog-draft.md - Updated with revised backlog",
-            "DeepSearch.alpha/cmos/planning/Answers-from-tracelab-sprint12.md - Honest status update",
-            "docs/authentication.md - Added service account section"
-          ],
-          "blockers_identified": {}
-        },
-        {
-          "session_date": "2025-12-05",
-          "agent": "Claude Opus 4.5",
-          "focus": "Sprint 12 Build & Retrospective - Making TraceLab Actually Usable",
-          "key_discoveries": [
-            "Missions endpoint 500 caused by schema serialization mismatch",
-            "HTTPS redirects dropped auth headers due to missing proxy middleware",
-            "Pre-flight discovery limitation: ingested missions not immediately searchable",
-            "Quality gates require minimum evidence thresholds (1 source per insight)"
-          ],
-          "decisions_made": [
-            "Added ProxyHeadersMiddleware for X-Forwarded header support",
-            "Shared credentials (kneelinghorse/[REDACTED: credential rotated 2026-08-14]) for single-user architecture",
-            "ListResponse schema for consistent pagination",
-            "Pre-flight limitation accepted as LOW impact (missions still retrievable)"
-          ],
-          "mistakes_made": [],
-          "files_modified": [
-            "app/main.py - Added ProxyHeadersMiddleware",
-            "app/schemas/pagination.py - Added ListResponse schema",
-            "tests/integration/test_e2e_production.py - E2E verification script",
-            "cmos/reports/sprint-12/retrospective.md",
-            "cmos/reports/sprint-12/sprint-13-backlog-draft.md"
-          ],
-          "blockers_identified": {}
-        },
-        {
-          "session_date": "2025-12-10",
-          "agent": "Claude Opus 4.5",
-          "focus": "Sprint 18 Retrospective - PEDR Validation Results",
-          "key_discoveries": [
-            "PEDR delivers 25x latency cost (1,501ms P50 vs 60ms baseline)",
-            "Semantic layer (Qdrant) accounts for 60-80% of query latency",
-            "Precision improvements significant for conceptual queries, marginal for exact-match",
-            "Cold start penalty severe (~60s for first query)",
-            "RRF fusion algorithm works correctly for combining heterogeneous rankers"
-          ],
-          "decisions_made": [
-            "PEDR SCOPED - Not for primary interactive search",
-            "PEDR approved for: deep research, MCP integration, batch processing, quality-aware queries",
-            "Recommended dual-path architecture: FTS (fast) + PEDR (deep)",
-            "Sprint 19 should focus on latency optimization or alternative PEDR use cases"
-          ],
-          "mistakes_made": [],
-          "files_modified": [
-            "app/services/pedr/*.py - 5-layer PEDR implementation",
-            "tests/test_pedr_*.py - Comprehensive test coverage",
-            "cmos/reports/sprint-18/retrospective.md",
-            "cmos/reports/sprint-18/pedr-evaluation.md",
-            "cmos/reports/sprint-18/sprint-19-backlog-draft.md"
-          ],
-          "blockers_identified": {}
-        }
-      ]
-    }
+    "planning_overview": "See cmos/foundational-docs/roadmap-sprints-31-34.md for current planning.",
+    "last_sync_at": "2026-09-13T15:00:08.387Z"
   },
   "technical_foundation": {
     "critical_facts": [
@@ -356,260 +92,23 @@
     },
     "research_findings": {}
   },
-  "decisions_made": [
-    {
-      "decision": "Adopt FastAPI + PostgreSQL + Alembic for core service bootstrapping.",
-      "source": "working_memory",
-      "date": null
-    },
-    {
-      "decision": "Leverage Fake PII generation and presidio-research evaluator for regression testing.",
-      "source": "working_memory",
-      "date": null
-    },
-    {
-      "decision": "Prioritize .pdf (text-based), .docx, .pptx, .csv, .xlsx ingestion in Sprint 01.",
-      "source": "working_memory",
-      "date": null
-    },
-    {
-      "decision": "Use GPT-4o-mini as default LLM for RAG queries (per TR-03 research).",
-      "source": "working_memory",
-      "date": null
-    },
-    {
-      "decision": "Implement rule-based quality assessment heuristics (not ML-based) per R2.1 research.",
-      "source": "working_memory",
-      "date": null
-    },
-    {
-      "decision": "Adaptive Qdrant hnsw_ef tiers (96/108/120) based on top_k for latency optimization.",
-      "source": "working_memory",
-      "date": null
-    },
-    {
-      "decision": "Three-pillar quality assessment framework: Linguistic Uncertainty, Answer Integrity, Source Provenance.",
-      "source": "working_memory",
-      "date": null
-    },
-    {
-      "decision": "Onboarding workflow operates in trusted single-user mode; authentication deferred indefinitely (no device flow or CLI mandate).",
-      "source": "working_memory",
-      "date": null
-    },
-    {
-      "decision": "Cloudflare vanity (tracelab.aquex.ai / api.tracelab.aquex.ai) now fronts the Railway UI/API with Full (Strict) TLS; env templates pin NEXT_PUBLIC_API_BASE_URL=https://api.tracelab.aquex.ai/api/v1 and CORS_ALLOWED_ORIGINS_PROD includes https://tracelab.aquex.ai + https://www.tracelab.aquex.ai.",
-      "source": "working_memory",
-      "date": null
-    },
-    {
-      "decision": "B6.4c: Documented JWT auth flows end-to-end (docs/authentication.md), added sample script, Postman collection, and pytest coverage for login/refresh to unblock downstream teams.",
-      "source": "working_memory",
-      "date": null
-    },
-    {
-      "decision": "Sprint 07 focuses on reliability: B7.1 read APIs, B7.2 integration runbook, B7.3 ingest CLI auth, B7.4 Presidio/cache stabilization.",
-      "source": "working_memory",
-      "date": null
-    },
-    {
-      "decision": "Renumbered missions to fix linear progression: B6.3-5 are now fix missions, original B6.3-7 moved to B6.6-10",
-      "source": "Unblocking Sprint 06 development - API URL and auth issues (2025-11-10)",
-      "date": "2025-11-10"
-    },
-    {
-      "decision": "B6.3: API URL Configuration Fix - remove /api/v1 suffix everywhere",
-      "source": "Unblocking Sprint 06 development - API URL and auth issues (2025-11-10)",
-      "date": "2025-11-10"
-    },
-    {
-      "decision": "B6.4: Local Development Environment Setup - create proper dev docs and scripts",
-      "source": "Unblocking Sprint 06 development - API URL and auth issues (2025-11-10)",
-      "date": "2025-11-10"
-    },
-    {
-      "decision": "B6.5: Authentication Documentation Testing - document auth flow and credentials",
-      "source": "Unblocking Sprint 06 development - API URL and auth issues (2025-11-10)",
-      "date": "2025-11-10"
-    },
-    {
-      "decision": "B6.6 (formerly B6.3) remains blocked until fixes complete",
-      "source": "Unblocking Sprint 06 development - API URL and auth issues (2025-11-10)",
-      "date": "2025-11-10"
-    },
-    {
-      "date": "2025-11-15",
-      "decision": "Sprint 08 planned with performance optimization focus: telemetry automation, database query optimization, query result caching, Qdrant tuning, and cost monitoring dashboard. No research missions needed - all build missions based on established roadmap Week 14.",
-      "source": "Sprint 08 planning session"
-    },
-    {
-      "date": "2025-11-15",
-      "decision": "Sprint 09 planned with advanced search features focus per roadmap Week 15: hybrid search backend, faceted filters, search page UX fixes (project dropdown, remove RAG Control Room, simplify controls), search history, and saved searches. No research missions needed - all standard implementations. Key UX decision: collapse extra filters until core search workflow is solid.",
-      "source": "Sprint 09 planning session"
-    },
-    "Sprint 08 planned with 6 missions: telemetry automation, database query optimization, query result caching, Qdrant tuning, cost monitoring dashboard, and retrospective. Roadmap Week 14 alignment. (from PS-2025-11-15-001)",
-    "Sprint 08 tech: in-memory caching (cachetools) over Redis for single-user simplicity. Backend-rendered dashboard (FastAPI + Jinja2) over React SPA. Pytest plugin + Playwright reporter for telemetry automation. (from PS-2025-11-15-001)",
-    "Sprint 09 planned with 6 missions: hybrid search backend, faceted filters backend, search page UX fixes, search history, saved searches, and retrospective. Roadmap Week 15 alignment. (from PS-2025-11-15-001)",
-    "Sprint 09 UX fixes priority: project dropdown broken (shows 0), remove RAG Control Room section (missions don't apply), simplify controls to search box + project + results count (max 25), collapse extra filters into advanced panel. (from PS-2025-11-15-001)",
-    "Sprint 09 tech: hybrid search weights 0.7 semantic / 0.3 keyword (configurable). PostgreSQL full-text + Qdrant metadata filters. Search history retention 100 entries or 30 days. Saved search limit 50 per user. (from PS-2025-11-15-001)",
-    "Sprint 08 closed with telemetry automation, TTL cache evidence (75% RAG hits / 80% doc hits), and Qdrant tuned to 9.4 ms p99; ready to start B9.1 Hybrid Search next.",
-    {
-      "date": "2025-11-16",
-      "decision": "Sprint 09 closed with hybrid search, faceted filters, search history, and saved searches. Sprint 10 now focuses on DeepSearch ingestion, PEDR connector, Mission Protocol UI, and the agent correction loop.",
-      "source": "B9.6 retrospective"
-    },
-    "Sprint 09 evidence: precision@5 +19% vs semantic-only (cmos/telemetry/events/sprint-09-hybrid-search.jsonl) and saved-search replay rate 25% (cmos/reports/sprint-09/search-metrics.json).",
-    {
-      "decision": "Sprint 11 will focus on the correction loop, PEDR delta sync, and Mission Protocol Console per B10.6 retro.",
-      "source": "mission_B10.6",
-      "date": "2025-11-18"
-    },
-    {
-      "decision": "Relationship Context API is the single data source for the Mission Protocol Console and PEDR exports; no bespoke queries.",
-      "source": "mission_B10.6",
-      "date": "2025-11-18"
-    },
-    {
-      "date": "2025-12-04",
-      "decision": "Sprint 11 correction loop: async with webhook notifications for retry queue",
-      "source": "Sprint 11 planning session"
-    },
-    {
-      "date": "2025-12-04",
-      "decision": "PEDR sync cadence: event-driven (not hourly batch)",
-      "source": "Sprint 11 planning session"
-    },
-    {
-      "date": "2025-12-04",
-      "decision": "Mission Protocol Console extends Next.js (not separate FastAPI SSR)",
-      "source": "Sprint 11 planning session"
-    },
-    {
-      "date": "2025-12-04",
-      "decision": "tracelab_schemas distributed via GitHub Packages",
-      "source": "Sprint 11 planning session"
-    },
-    "Sprint 11 order approved as drafted: B11.1-B11.6 (from PS-2025-12-05-001)",
-    "Correction loop: async with webhook notifications (not blocking endpoint) (from PS-2025-12-05-001)",
-    "PEDR sync: event-driven (not hourly batch) (from PS-2025-12-05-001)",
-    "Console UI: extend existing Next.js bundle (from PS-2025-12-05-001)",
-    "Package index: GitHub Packages for tracelab_schemas distribution (from PS-2025-12-05-001)",
-    "B11.1 kept combined (not split into sub-missions) (from PS-2025-12-05-001)",
-    "B6.6 Integration API archived as superseded (from PS-2025-12-05-001)",
-    "Correction loop uses async webhooks with exponential backoff (5s, 30s)",
-    "PEDR sync is event-driven via SyncEventEmitter with priority ordering",
-    "Pre-flight thresholds: 85%+4 gates for reuse, 70% for review",
-    "Schema package published to GitHub Packages with semver validation",
-    "Console extends existing Next.js bundle",
-    "Sprint 12 Theme: Production Hardening & Integration Polish - focus on load testing, telemetry rotation, console auth, and DeepSearch integration support (from PS-2025-12-05-002)",
-    "B12.4 (DeepSearch Service Account) completed early - credentials created and documented in DeepSearch.alpha/cmos/planning/Answers-from-tracelab-sprint12.md. TraceLab .env updated with deepsearch-service account. (from PS-2025-12-05-002)",
-    "Auth risk is LOW: single shared service account via env vars, JWT with 24h expiry, no user management complexity. DeepSearch unblocked immediately. (from PS-2025-12-05-002)",
-    {
-      "decision": "Sprint 12 uses production hardening theme: load testing, telemetry rotation, console auth, schema evolution",
-      "source": "PS-2025-12-05-002",
-      "date": "2025-12-05"
-    },
-    {
-      "decision": "Auth architecture: single shared service account (deepsearch-service) for internal project simplicity",
-      "source": "PS-2025-12-05-002",
-      "date": "2025-12-05"
-    },
-    {
-      "decision": "Full mission YAML protocol files required for all Sprint 12 missions to ensure agent execution clarity",
-      "source": "PS-2025-12-05-002",
-      "date": "2025-12-05"
-    },
-    {
-      "decision": "DeepSearch credentials: deepsearch-service with 24h JWT expiry, documented in DeepSearch.alpha planning repo",
-      "source": "PS-2025-12-05-002",
-      "date": "2025-12-05"
-    },
-    {
-      "decision": "SPRINT 12 REQUIRES REVISION: Backlog was infrastructure theater for nonexistent scale. Only B12.4 (credentials) was valuable. Next agent must rebuild sprint around actual single-user use case needs, starting with API key support for DeepSearch.",
-      "source": "PS-2025-12-05-002 review",
-      "date": "2025-12-05",
-      "priority": "CRITICAL"
-    },
-    "Sprint 12 priority order confirmed: B12.1 (Load Testing) -> B12.2 (Telemetry) -> B12.3 (Console Auth) -> B12.5 (Schema Evolution) -> B12.6 (Retro) (from PS-2025-12-05-003)",
-    "CRITICAL: Sprint 12 backlog is completely wrong. System is not usable - it's an empty library with no way to populate knowledge. (from PS-2025-12-05-004)",
-    "Sprint 12 must focus on MAKING THE SYSTEM WORK: 1) Fix missions endpoint (500 error), 2) Create service account in production, 3) Verify end-to-end flow actually works (from PS-2025-12-05-004)",
-    "Sprint 12 REVISED: Focus on making system usable - fix missions endpoint, fix HTTP redirects, create service account, standardize API responses (from PS-2025-12-05-004)",
-    "Sprint 12 backlog updated in database. All 6 missions revised to focus on making system usable: B12.1 Fix missions 500, B12.2 Fix HTTPS redirects, B12.3 Create service account, B12.4 Standardize API, B12.5 E2E verification, B12.6 Retro. Each mission notes field points to full YAML spec. (from PS-2025-12-05-005)",
-    {
-      "decision": "Sprint 12 FINALIZED: B12.1 Fix missions 500, B12.2 Fix HTTPS redirects, B12.3 Create service account, B12.4 Standardize API, B12.5 E2E verification, B12.6 Retro",
-      "source": "Sprint 12 finalization session",
-      "date": "2025-12-05"
-    },
-    {
-      "decision": "Service account credentials standardized across projects: [REDACTED 2026-08-19: service-account credential pair removed; flagged by DeepSearch s92 audit, rotation pending]",
-      "source": "Sprint 12 finalization session",
-      "date": "2025-12-05"
-    },
-    {
-      "decision": "DeepSearch integration answers updated with honest blockers and ETA (end of Sprint 12)",
-      "source": "Sprint 12 finalization session",
-      "date": "2025-12-05"
-    },
-    {
-      "decision": "Sprint 12 database and YAML files are in sync - agents can begin execution",
-      "source": "Sprint 12 finalization session",
-      "date": "2025-12-05"
-    },
-    {
-      "decision": "Sprint 12 completed: DeepSearch integration verified E2E. Pre-flight discovery limitation is architectural (missions found via chunks, not direct mission table). Workaround: missions still retrievable via GET /missions.",
-      "source": "B12.6 Retrospective",
-      "date": "2025-12-05"
-    },
-    {
-      "decision": "Sprint 13 draft: Focus on integration refinement - pre-flight enhancement, evidence documentation, error consistency. Avoid over-engineering for single-user tool.",
-      "source": "B12.6 Retrospective",
-      "date": "2025-12-05"
-    },
-    "Sprint 12: Simple solutions work - shared credentials for single-user tool, ProxyHeadersMiddleware vs complex proxy config",
-    "Sprint 12: Pre-flight discovery gap is LOW impact - missions stored and queryable, just not in recommendations",
-    "Sprint 13: Focus on UI usability - Documents, Collections, Search fixes",
-    "Sprint 13: Collections feature replaces dead 'add to mission' workflow",
-    "Sprint 13: 10 missions scoped for document visibility, chunk collection, search UX",
-    "Sprint 12 completed 6/6 missions. DeepSearch integration verified end-to-end. System is production-ready for primary use case. (from PS-2025-12-05-006)",
-    "Sprint 13 focus: Search UI usability fixes - layout, simplified filters, proper endpoint wiring (from PS-2025-12-05-006)",
-    "Sprint 13 expanded scope: Documents UX, Collections, Search fixes, Report generation - ~10 missions for high-value UI improvements (from PS-2025-12-05-006)",
-    "2025-12-05: TraceLab original design was manual chunk-to-mission attachment; pivoted to mission-as-contract for agent research",
-    "2025-12-05: 'Add to Mission' workflow in search UI is dead - replaced by Collections feature",
-    "2025-12-05: Collections = shopping cart for chunks that persists across queries, exportable for agent synthesis",
-    "2025-12-05: Document detail page currently shows only metadata - need to expose actual chunk content",
-    "2025-12-05: Project-Mission relationship is loose: Project contains Documents and Missions, but linkage is weak",
-    "2025-12-05: Search UI priorities: search bar top, stats sidebar, only 2 filters (project dropdown, chunks 10/15/20/25/35)",
-    "2025-12-05: Format support expansion: add JSON, XML, YAML to existing pdf/docx/md/txt support",
-    "2025-12-05: Sprint 13 theme is making TraceLab data *accessible* through UI, not just stored",
-    {
-      "decision": "PEDR SCOPED: Not for interactive search (1.5s P50 vs 200ms target), approved for deep research, MCP, batch processing",
-      "source": "B18.6 Decision Gate",
-      "date": "2025-12-10"
-    },
-    {
-      "decision": "Recommended dual-path architecture: Fast FTS path (60ms) for interactive, Slow PEDR path (1.5s) for deep research",
-      "source": "B18.6 Decision Gate",
-      "date": "2025-12-10"
-    },
-    {
-      "decision": "Semantic layer (Qdrant) is latency bottleneck at 60-80% of query time - optimization focus for Sprint 19",
-      "source": "B18.6 Benchmark Analysis",
-      "date": "2025-12-10"
-    },
-    {
-      "decision": "Sprint 18 completed 8/8 missions: R18.0 baseline, B18.1-B18.6 PEDR layers + decision gate, B18.7 retrospective",
-      "source": "B18.7 Retrospective",
-      "date": "2025-12-10"
-    }
-  ],
   "constraints": [
     "All document processing workflows must execute redaction prior to persistence or embedding.",
     "Synthetic data only for evaluation until governance approves real corpus usage.",
     "Local developer environment must function offline except for OpenAI API calls.",
     "Tiered LLM routing escalation rate must stay <10% to meet cost targets.",
     "Semantic cache hit rate target: 15-20% for cost optimization.",
-    "CMOS packaging removed from Sprint 08 scope - CMOS is project management tool for TraceLab, not a deliverable itself.",
-    "No research missions needed for Sprint 08 or 09 - all features follow established patterns from roadmap and technical architecture."
+    "No new Railway services or volumes needed. AUTH_USERNAME/AUTH_PASSWORD env vars become obsolete after DB-backed auth ships — keep as bootstrap seed only. No email service for invites.",
+    "5 of 6 post-S40 batch items remain externally gated on aquex.ai site work: domain migration to tracelab.aquex.ai, RBAC research, device-code auth port from cmos-mcp, outbound HMAC sender (DS→TL), DS→TL service-account API key. Only npm-publish is unblocked. Next-sprint planning should assume these 5 stay deferred and plan scope from the set of *internally* unblocked work (MCP quality, design-system pre-work pending dark-mode resolution, sync-health/graph follow-ups from sprints 35-38).",
+    "DS commitments from message 3cf143ee reply (2026-04-27 06:40Z): T41.2 (MCP serializer fix) within 24h; T41.1 (vendor compiler) + T41.3 (boundary contract doc) by sprint close. Send status_update to cmos://derek/deepsearch when each lands. DS will update their worker SELECT to pick up the 14 T40.1 columns once they confirm column visibility via direct DB read (they don't depend on T41.2 for that — only on column names which were provided in the reply).",
+    "TraceLab is in maintenance mode as of 2026-04-30, post-Sprint 42 close. No internally-unblocked build scope exists until the aquex.ai domain cutover unblocks the externally-gated post-S40 batch (domain migration to tracelab.aquex.ai, RBAC research, DS→TL HMAC sender, DS→TL service-account API key, etc.). Inter-sprint maintenance work (DS coordination requests, inbox triage, codebase hygiene) is carried as loose next-steps rather than under a named sprint. The next named sprint will be triggered by either (a) the aquex.ai cutover unblocking, or (b) user signal to start the site redesign initiative (the next substantive TL build scope identified post-S42).",
+    "RBAC rollout MUST be backward-compatible and non-breaking. Hard requirements from user 2026-05-28: (a) never lock out the owner (Derek) — admin bootstrap must happen before any access tightening; (b) preserve every existing user account and their current ability to access the data they have today; (c) default state after the migration = current behavior (everyone keeps full access), then tighten incrementally/opt-in rather than denying-by-default on day one; (d) \"RBAC almost always complicates things and breaks everything\" — design for additive, reversible, flag-gated rollout. Resource scoping targets: projects (missions already inherit from projects), collections (currently cross-project), and the future project-grouping primitive.",
+    "SCOPE CORRECTION (Derek, firm): this is a PLAN-ONLY session that hands off to a separate BUILD mission — do NOT assign Derek build/ops tasks or manufacture owner prerequisites. Scrubbing the bogus \"Derek-actions\" I wrongly extracted from the scoping briefs: (a) TRACELAB_BASE_URL is ALREADY SET + DEPLOYED in prod — not a pending step; (b) TRACELAB_DEEPSEARCH_SERVICE_SECRET is ALREADY IN PLACE in both services and is load-bearing for the live results webhook TODAY — it is a given, never \"reconfirm\"; (c) the RL-1 trusted-hop count N is a BUILD-MISSION implementation detail (resolve from prod request data + fail-safe fallback so a wrong N degrades safe), NOT an owner CLI task. T48.4 background-doc attribution LOCKED to the parent project's owner/workspace (revisitable at build time). NET: there are NO owner prerequisites to start the build — the 7-mission plan + grounded briefs + sequence IS the complete handoff. Planner lesson: filter the briefs' \"derek_dependencies\" as a planner; don't relay them as homework.",
+    "Cross-system acceptance remains gated on DeepSearch acknowledging the lease-v2/job-correlation/HMAC rollout contract and providing its own commit/test/deploy evidence. TraceLab must not treat a DeepSearch working tree or unacknowledged CMOS message as shipped evidence; no paid dispatch is authorized.",
+    "Keep T48.4, T48.8, and T48.6 In Progress until their remaining deployed acceptance criteria are exercised. Successful Alembic apply and health endpoints prove deployment recovery, not authenticated create-to-scoped-list parity or end-to-end live-log convergence.",
+    "cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md is the authoritative statement of INTENT for the d592c92 recovery and the UX overhaul (vision, sprint plan S50–S53, UI definition of done, route migration map, design-system strategy); CMOS sprint/mission records remain authoritative for STATUS. It must be updated at every sprint open and close (alongside the Sprint-Boundary Identity Sync runbook): the closing sprint's section records what shipped and what moved, the next sprint's section is re-planned, and the change log gets a dated entry. A sprint may not be closed with the roadmap's section for it still describing plan rather than outcome. Registered in project_identity.foundational_docs.",
+    "Production baseline RBAC matrix using existing MCP admin credential found no deny leaks and no teardown failures, but exited 1 with NO-DISPOSABLE-OWNER: POST /admin/users correctly denies an admin granting the owner role. Full rbac_verify requires a true owner credential to provision its mandatory second-owner fixture. Existing MCP admin credential is sufficient for RECOVER-1 deployment/ingestion/search/router smoke, not the entire matrix. Owner source request remains pending; do not alter role restrictions or omit this matrix cell to claim success.",
+    "Explicit user instruction, 2026-09-12 local: no cross-repository work without explicit permission. Stop Forge actions and let Forge own its implementation/review/merge/activation. UX-1's dependency, roadmap text, an unanswered backlog request, or a general request to resume TraceLab does not authorize editing/accessing Forge, managing its PR/CI, refreshing its workers, or sending new messages. Preserve existing work; no cleanup/revert requested. Current handoff authorizes TraceLab CMOS capture only. See decision #391 and cmos/reports/sprint-50/ux-1-session-handoff.md."
   ],
   "quality_standards": {
     "ai_instructions": {
@@ -650,20 +149,8 @@
     }
   },
   "roadmap": {
-    "status": {
-      "sprint_01": "Completed",
-      "sprint_02": "Planned",
-      "sprint_03": "Completed",
-      "sprint_04": "Planning",
-      "sprint_05": "Planned",
-      "sprint_08": "Planned - 6 missions",
-      "sprint_09": "Completed - hybrid search, faceted filters, search history, saved searches shipped",
-      "sprint_10": "Completed - DeepSearch ingestion + PEDR Phase 1 delivered",
-      "sprint_11": "Completed - correction loop, PEDR sync, console, schema distribution, pre-flight delivered",
-      "sprint_12": "Planned - production hardening & load testing",
-      "sprint_18": "Completed - PEDR validation, decision: SCOPED"
-    },
-    "current_focus": "Sprint 18 Complete - Sprint 19 Planning",
+    "status": "Sprint 31 active. Sprints 32-34 planned in roadmap-sprints-31-34.md.",
+    "current_focus": "Sprint 31 — MCP Descriptions, Login & Export Polish",
     "next_checkpoint": "Sprint 19: PEDR latency optimization or alternative use cases",
     "research_completed": [
       {
@@ -678,7 +165,7 @@
         "name": "Markdown Ingestion Service Design",
         "status": "Completed",
         "reference": "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md",
-        "deliverable": "Architecture for chokidar \u2192 queue \u2192 unified/remark ingestion pipeline, Qdrant payload schema, telemetry, and resilience patterns"
+        "deliverable": "Architecture for chokidar → queue → unified/remark ingestion pipeline, Qdrant payload schema, telemetry, and resilience patterns"
       },
       {
         "id": "R2.3",
@@ -688,180 +175,27 @@
         "deliverable": "FastAPI onboarding API design with idempotency keys, async ingestion jobs, and optional auth seams (device flow deferred for single-user deployment)"
       }
     ],
-    "queued_build_missions": [
-      {
-        "id": "B2.1",
-        "name": "RAG Query API",
-        "status": "Completed",
-        "focus": "Core RAG functionality: query embedding, vector search, GPT-4o-mini generation, citations"
-      },
-      {
-        "id": "B2.2",
-        "name": "Context Compression Pipeline",
-        "status": "Completed",
-        "focus": "Embedding-based filtering to reduce tokens 60-70% (3000\u21921000 tokens)"
-      },
-      {
-        "id": "B2.3",
-        "name": "Semantic Cache Layer",
-        "status": "Blocked",
-        "focus": "Qdrant-based cache with 0.90-0.95 similarity threshold, target 15-20% hit rate; unblocked by sub-missions B2.3a\u2013B2.3d"
-      },
-      {
-        "id": "B2.3a",
-        "name": "Markdown Ingestion Pipeline",
-        "status": "In Progress",
-        "focus": "Implement chokidar \u2192 queue \u2192 unified/remark ingestion service per R2.2 research"
-      },
-      {
-        "id": "B2.3b",
-        "name": "Onboarding API",
-        "status": "Current",
-        "focus": "FastAPI onboarding service with idempotent endpoints and async ingestion jobs (trusted single-user, no auth)."
-      },
-      {
-        "id": "B2.3c",
-        "name": "Ingestion Integration & Parity",
-        "status": "Queued",
-        "focus": "End-to-end validation, parity reporting, and observability for ingestion workflow"
-      },
-      {
-        "id": "B2.3d",
-        "name": "Semantic Cache Implementation",
-        "status": "Queued",
-        "focus": "Integrate cache service with RAG pipeline and achieve 15\u201320% hit rate"
-      },
-      {
-        "id": "B2.4",
-        "name": "Tiered LLM Routing",
-        "status": "Queued",
-        "focus": "R2.1 quality assessment + escalation logic, target <10% escalation rate"
-      },
-      {
-        "id": "B2.5",
-        "name": "Sprint Efficacy Evaluator",
-        "status": "Queued",
-        "focus": "Sprint 02 metrics evaluation: RAG performance, cache hit rate, compression, routing, cost"
-      }
-    ],
     "success_criteria": [
       "RAG query API successfully retrieves relevant chunks and generates answers with citations",
       "Context compression reduces input tokens by 60-70% (from ~3000 to ~1000 tokens)",
-      "Semantic cache achieves hit rate \u2265 15% (target 15-20%)",
+      "Semantic cache achieves hit rate ≥ 15% (target 15-20%)",
       "Tiered routing escalation rate < 10% (90%+ queries handled by GPT-4o-mini)",
       "Average cost per query < $0.0003 (with all optimizations applied)",
       "Query latency < 5 seconds end-to-end for RAG queries",
       "Sprint evaluation script executes and produces retrospective report"
     ],
-    "session_summaries": [
-      {
-        "session_date": "2025-11-10",
-        "agent": "Claude",
-        "focus": "Unblocking Sprint 06 development - API URL and auth issues",
-        "key_discoveries": [
-          "Production API is at https://api.tracelab.aquex.ai (root), NOT https://api.tracelab.aquex.ai/api/v1",
-          "All frontend configs and docs have wrong URL with /api/v1 suffix",
-          "Local development blocked due to missing .env setup and auth configuration",
-          "B6.3 (RAG Search UI) blocked by API connectivity issues"
-        ],
-        "decisions_made": [
-          "Renumbered missions to fix linear progression: B6.3-5 are now fix missions, original B6.3-7 moved to B6.6-10",
-          "B6.3: API URL Configuration Fix - remove /api/v1 suffix everywhere",
-          "B6.4: Local Development Environment Setup - create proper dev docs and scripts",
-          "B6.5: Authentication Documentation Testing - document auth flow and credentials",
-          "B6.6 (formerly B6.3) remains blocked until fixes complete"
-        ],
-        "mistakes_made": [
-          "Made unauthorized ad-hoc changes to auth config without understanding impact",
-          "Created frontend/.env.local with wrong API URL",
-          "Failed to recognize production API doesn't use /api/v1 path despite user insisting",
-          "Attempted to fix issues directly instead of creating proper missions"
-        ],
-        "files_modified": [
-          "cmos/missions/sprint-06/* - Renumbered all missions",
-          "cmos/missions/backlog.yaml - Updated mission order and statuses",
-          "app/core/config.py - Reverted unauthorized changes",
-          "app/main.py - Reverted unauthorized changes"
-        ],
-        "blockers_identified": {
-          "api_url_mismatch": {
-            "issue": "Frontend configured for https://api.tracelab.aquex.ai/api/v1 but API serves at root",
-            "impact": "Complete connectivity failure in production and local",
-            "fix": "Mission B6.3 to update all URL references"
-          },
-          "local_dev_setup": {
-            "issue": "No documentation or scripts for local development",
-            "impact": "Developers cannot run application locally",
-            "fix": "Mission B6.4 to create setup guide and automation"
-          },
-          "auth_confusion": {
-            "issue": "No documentation of auth credentials or flow",
-            "impact": "Cannot test authenticated endpoints",
-            "fix": "Mission B6.5 to document authentication"
-          }
-        }
-      }
-    ],
-    "research_links": [
-      {
-        "research": "cmos/missions/research/TR-03.RAG-Cost-Optimization.md",
-        "build": "B2.1, B2.2, B2.3, B2.4"
-      },
-      {
-        "research": "cmos/missions/research/R2.1_Heuristics-for-Tiered-LLM-Routing.md",
-        "build": "B2.4"
-      },
-      {
-        "research": "cmos/missions/research/R2.2_markdown-ingestion-service-design-spec.md",
-        "build": "B2.3a, B2.3c, B2.3d"
-      },
-      {
-        "research": "cmos/missions/research/R2.3_Bootstrap-Workflow.md",
-        "build": "B2.3b, B2.3c, B2.3d"
-      }
-    ],
-    "sprint_close_process": [
-      "Run scripts/evaluate_sprint.py with --sprint 2 to generate report in cmos/reports/sprint-02/",
-      "Verify all Sprint 02 success criteria metrics collected (cache hit rate, escalation rate, compression ratio, cost per query)",
-      "Update cmos/missions/backlog.yaml with mission statuses and completion notes",
-      "Capture retrospective highlights in MASTER_CONTEXT.json under working_memory.domains.main.achievements",
-      "Review telemetry artifacts: RAG performance metrics, semantic cache stats, tiered routing logs, cost analysis"
-    ],
-    "important_for_review": [
-      "Telemetry artifacts needed: RAG query performance logs, semantic cache hit/miss statistics, context compression metrics, tiered routing escalation events, cost tracking data",
-      "Key metrics to validate: cache hit rate (target \u226515%), escalation rate (target <10%), token compression ratio (target 60-70%), average cost per query (target <$0.0003)",
-      "R2.1 research provides complete implementation blueprint: pattern libraries, scoring algorithms, escalation decision tree - ready for B2.4 implementation",
-      "All Sprint 02 missions have clear dependencies: B2.1 \u2192 B2.2 \u2192 B2.3 \u2192 B2.4 \u2192 B2.5",
-      "Qdrant infrastructure from B1.5 is operational: 12,800 chunks indexed, <10ms latency, ready for RAG queries"
-    ],
     "sprint_focus": "Hosted Next.js deployment, JWT/CORS hardening, and Cloudflare wiring with telemetry.",
-    "sprint_reports": {
-      "sprint_01": "cmos/reports/sprint-01/sprint-01-summary.md",
-      "sprint_02": "cmos/reports/sprint-02/sprint-02-summary.md"
-    },
-    "tracking": {},
     "architectural_pivot": {
       "date": "2025-11-15",
-      "summary": "Autonomous Knowledge System architecture: DeepSearch (agent researcher) \u2192 TraceLab (validation API + repository) \u2192 PEDR (governance search)",
+      "summary": "Autonomous Knowledge System architecture: DeepSearch (agent researcher) → TraceLab (validation API + repository) → PEDR (governance search)",
       "key_insight": "Mission Protocol repurposed from human forms to agent output validation. Quality gates enforce structure on autonomous research outputs.",
-      "integration_flow": "DeepSearch generates structured JSON \u2192 TraceLab validates via Pydantic \u2192 stores in PostgreSQL/Qdrant \u2192 PEDR indexes for internal search \u2192 agents query PEDR before external research",
+      "integration_flow": "DeepSearch generates structured JSON → TraceLab validates via Pydantic → stores in PostgreSQL/Qdrant → PEDR indexes for internal search → agents query PEDR before external research",
       "traceLab_role": [
         "Validation API for agent outputs",
         "Knowledge repository (validated research storage)",
         "RAG synthesis engine (meta-analysis across corpus)",
         "Data source for agents (via PEDR)"
       ]
-    },
-    "sprint_10_plus_direction": {
-      "focus": "DeepSearch \u2192 TraceLab \u2192 PEDR integration",
-      "key_missions": [
-        "Auto-link correction loop & telemetry observability",
-        "PEDR delta sync + catalog export",
-        "Mission Protocol Console (read-only operator UI)",
-        "Schema distribution + contract hardening",
-        "PEDR pre-flight query service"
-      ],
-      "details": "Phase 2 (Sprint 11) locks in correction loop, PEDR sync, and operator console deliverables captured in cmos/reports/sprint-10/sprint-11-backlog-draft.md."
     },
     "deepsearch_integration": {
       "status": "100% aligned",
@@ -873,13 +207,13 @@
         "week_8": "Production validation"
       },
       "key_decisions": {
-        "output_format": "Markdown (Sprint 1-2) \u2192 JSON (Sprint 3+)",
+        "output_format": "Markdown (Sprint 1-2) → JSON (Sprint 3+)",
         "evidence_linking": "Post-processing auto-linking via similarity (TraceLab responsibility)",
         "schema_sharing": "Pydantic package for DeepSearch pre-validation",
         "authentication": "24-hour JWT with retry-on-401",
         "project_management": "Config-based mapping with auto-create fallback"
       },
-      "integration_flow": "DeepSearch generates JSON \u2192 TraceLab validates/stores \u2192 PEDR indexes \u2192 agents query"
+      "integration_flow": "DeepSearch generates JSON → TraceLab validates/stores → PEDR indexes → agents query"
     },
     "pedr_integration": {
       "approach": "Phased - Start as TraceLab module, extract later if needed",
@@ -891,335 +225,6 @@
   },
   "operational_memory": {
     "session_history": [
-      {
-        "mission": "B4.1",
-        "agent": "",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-08T20:31:17Z"
-      },
-      {
-        "mission": "B4.1",
-        "agent": "codex",
-        "summary": "Playwright suite replaces Cypress for Mission Protocol UI",
-        "action": "complete",
-        "ts": "2025-11-08T20:48:34Z"
-      },
-      {
-        "mission": "B4.2",
-        "agent": "",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-08T21:12:15Z"
-      },
-      {
-        "mission": "B4.2",
-        "agent": "codex",
-        "summary": "Quality automation delivered",
-        "action": "complete",
-        "ts": "2025-11-08T21:27:25Z"
-      },
-      {
-        "mission": "B4.3",
-        "agent": "codex",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-08T22:56:33Z"
-      },
-      {
-        "mission": "B4.3",
-        "agent": "codex",
-        "summary": "Cost telemetry wired into RAG service",
-        "action": "complete",
-        "ts": "2025-11-09T01:01:33Z"
-      },
-      {
-        "mission": "B4.4",
-        "agent": "codex",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-09T02:33:21Z"
-      },
-      {
-        "mission": "B4.4",
-        "agent": "codex",
-        "summary": "Testing & documentation consolidation delivered",
-        "action": "complete",
-        "ts": "2025-11-09T04:01:16Z"
-      },
-      {
-        "mission": "B4.5",
-        "agent": "assistant",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-09T04:45:29Z"
-      },
-      {
-        "mission": "B4.5",
-        "agent": "assistant",
-        "summary": "Sprint 04 efficacy evaluator + telemetry delivered",
-        "action": "complete",
-        "ts": "2025-11-09T04:52:44Z"
-      },
-      {
-        "mission": "B5.1",
-        "agent": "codex",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-09T21:04:12Z"
-      },
-      {
-        "mission": "B5.1",
-        "agent": "codex",
-        "summary": "Standalone Railway frontend is live",
-        "action": "complete",
-        "ts": "2025-11-09T23:48:47Z"
-      },
-      {
-        "mission": "B5.2",
-        "agent": "",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-10T00:00:23Z"
-      },
-      {
-        "mission": "B5.2",
-        "agent": "codex",
-        "summary": "JWT auth + CORS hardening delivered",
-        "action": "complete",
-        "ts": "2025-11-10T00:20:47Z"
-      },
-      {
-        "mission": "B5.3",
-        "agent": "codex",
-        "summary": "Starting Domain Wiring & Telemetry Validation",
-        "action": "start",
-        "ts": "2025-11-10T04:35:54Z"
-      },
-      {
-        "mission": "B5.3",
-        "agent": "codex",
-        "summary": "Cloudflare vanity paths + API wiring validated",
-        "action": "complete",
-        "ts": "2025-11-10T04:57:46Z"
-      },
-      {
-        "mission": "B5.3",
-        "agent": "codex",
-        "summary": "Domain wiring and telemetry validation complete",
-        "action": "complete",
-        "ts": "2025-11-10T05:49:28Z"
-      },
-      {
-        "mission": "B6.1",
-        "agent": "codex",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-10T06:27:29Z"
-      },
-      {
-        "mission": "B6.1",
-        "agent": "codex",
-        "summary": "CLI functionality verified",
-        "action": "complete",
-        "ts": "2025-11-10T06:48:08Z"
-      },
-      {
-        "mission": "B6.2",
-        "agent": "codex",
-        "summary": "Starting Document Library UI scope for Sprint 6.2",
-        "action": "start",
-        "ts": "2025-11-10T15:04:25Z"
-      },
-      {
-        "mission": "B6.2",
-        "agent": "codex",
-        "summary": "Document Library UI verified",
-        "action": "complete",
-        "ts": "2025-11-10T15:06:56Z"
-      },
-      {
-        "mission": "B6.3",
-        "agent": "",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-10T15:52:53Z"
-      },
-      {
-        "mission": "B6.3",
-        "agent": "codex",
-        "summary": "RAG search UI delivered with semantic + synthesis views.",
-        "action": "complete",
-        "ts": "2025-11-10T16:08:06Z"
-      },
-      {
-        "mission": "B6.3",
-        "agent": "codex",
-        "summary": "Unable to validate RAG search UI styling in production",
-        "action": "blocked",
-        "ts": "2025-11-10T21:47:19Z"
-      },
-      {
-        "mission": "B6.4",
-        "agent": "",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-10T23:00:57Z"
-      },
-      {
-        "mission": "B6.4",
-        "agent": "codex",
-        "summary": "Mission UI overhauled with readable layouts and evidence workflows",
-        "action": "complete",
-        "ts": "2025-11-10T23:18:12Z"
-      },
-      {
-        "mission": "B6.4a",
-        "agent": "assistant",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-10T23:58:27Z"
-      },
-      {
-        "mission": "B6.4a",
-        "agent": "assistant",
-        "summary": "Frontend API base URL corrected",
-        "action": "complete",
-        "ts": "2025-11-11T00:02:38Z"
-      },
-      {
-        "mission": "B6.4b",
-        "agent": "assistant",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-11T00:20:58Z"
-      },
-      {
-        "mission": "B6.4b",
-        "agent": "codex",
-        "summary": "Local dev environment documented and scripted",
-        "action": "complete",
-        "ts": "2025-11-11T00:32:32Z"
-      },
-      {
-        "mission": "B6.4c",
-        "agent": "codex",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-11T05:39:06Z"
-      },
-      {
-        "mission": "B6.4c",
-        "agent": "codex",
-        "summary": "Auth docs + coverage delivered",
-        "action": "complete",
-        "ts": "2025-11-11T05:48:21Z"
-      },
-      {
-        "mission": "B6.4d",
-        "agent": "codex",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-11T06:27:53Z"
-      },
-      {
-        "mission": "B6.4d",
-        "agent": "codex",
-        "summary": "Pre-flight guardrails + telemetry review for Protocol Engine session",
-        "action": "complete",
-        "ts": "2025-11-11T06:30:33Z"
-      },
-      {
-        "mission": "B6.5",
-        "agent": "assistant",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-11T15:18:35Z"
-      },
-      {
-        "mission": "B6.5",
-        "agent": "assistant",
-        "summary": "Multi-format report exports delivered",
-        "action": "complete",
-        "ts": "2025-11-11T15:51:12Z"
-      },
-      {
-        "mission": "B6.7",
-        "agent": "assistant",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-11T17:03:26Z"
-      },
-      {
-        "mission": "B6.7",
-        "agent": "assistant",
-        "summary": "Sprint 06 retrospective + telemetry delivered; Sprint 07 backlog seeded",
-        "action": "complete",
-        "ts": "2025-11-11T17:22:06Z"
-      },
-      {
-        "mission": "B7.1",
-        "agent": "assistant",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-11T19:09:13Z"
-      },
-      {
-        "mission": "B7.1",
-        "agent": "assistant",
-        "summary": "Document & Project read APIs + CLI/UI shipped",
-        "action": "complete",
-        "ts": "2025-11-11T20:22:14Z"
-      },
-      {
-        "mission": "B7.1",
-        "agent": "assistant",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-11T20:24:28Z"
-      },
-      {
-        "mission": "B7.2",
-        "agent": "assistant",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-11T20:28:12Z"
-      },
-      {
-        "mission": "B7.2",
-        "agent": "assistant",
-        "summary": "Integration guardrails documented and runner passing",
-        "action": "complete",
-        "ts": "2025-11-11T20:37:13Z"
-      },
-      {
-        "mission": "B7.3",
-        "agent": "codex",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-11T20:53:00Z"
-      },
-      {
-        "mission": "B7.3",
-        "agent": "codex",
-        "summary": "CLI auth + ingestion workflow verified",
-        "action": "complete",
-        "ts": "2025-11-11T21:05:10Z"
-      },
-      {
-        "mission": "B7.5",
-        "agent": "assistant",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-12T01:32:20Z"
-      },
-      {
-        "mission": "B7.5",
-        "agent": "assistant",
-        "summary": "Starting Protocol Engine",
-        "action": "start",
-        "ts": "2025-11-12T01:32:26Z"
-      },
       {
         "mission": "B7.5",
         "agent": "codex",
@@ -1254,667 +259,133 @@
     ],
     "active_mission": null,
     "last_completed_mission": "B9.5",
-    "last_blocked_mission": "B6.3",
-    "next_session_context": {
-      "key_reference_documents": [
-        "foundational-docs/roadmap_template.md",
-        "foundational-docs/tech_arch_template.md",
-        "docs/frontend_deployment_decisions.md",
-        "docs/auth_and_cors_guidance.md",
-        "cmos/missions/sprint-06/B6.3_API-URL-Configuration-Fix.yaml",
-        "cmos/missions/sprint-06/B6.4_Local-Development-Environment-Setup.yaml",
-        "cmos/missions/sprint-06/B6.5_Authentication-Documentation-Testing.yaml"
-      ],
-      "upcoming_missions": [
-        {
-          "id": "B5.1",
-          "summary": "Stand up dedicated Railway Next.js service with build/start commands and env var runbook.",
-          "links": [
-            "cmos/missions/sprint-05/B5.1_Railway-Frontend-Service.yaml"
-          ]
-        },
-        {
-          "id": "B5.2",
-          "summary": "Implement JWT auth + restrictive CORS per docs/auth_and_cors_guidance.md.",
-          "links": [
-            "cmos/missions/sprint-05/B5.2_FastAPI-Auth-CORS-Hardening.yaml"
-          ]
-        },
-        {
-          "id": "B5.3",
-          "summary": "Cloudflare DNS + telemetry validation for hosted UI/API.",
-          "links": [
-            "cmos/missions/sprint-05/B5.3_Domain-Wiring-Telemetry.yaml"
-          ]
-        }
-      ],
-      "open_questions": [
-        "Confirm whether API will live on api.<domain> or be proxied through the UI.",
-        "Decide on storage for Railway JWT secrets (env panel vs secret manager)."
-      ],
-      "when_we_resume": [
-        "Check if B6.3 (API URL fix) is complete",
-        "Verify frontend can connect to production API",
-        "If all fixes complete, B6.6 (RAG Search UI) can proceed",
-        "Pick up B6.6",
-        "Pick up B7.4",
-        "Pick up B7.6",
-        "Pick up B7.7"
-      ],
-      "blockers": [
-        {
-          "mission": "B6.3",
-          "recorded_at": "2025-11-10T21:47:19Z",
-          "summary": "Unable to validate RAG search UI styling in production",
-          "reason": "Frontend depends on GET /api/v1/documents and /projects, but production API only allows POST (405). UI keeps retrying and appears unstyled because SWR never hydrates. Need backend redeploy or configuration change to enable GET before frontend can be validated.",
-          "needs": [
-            "Deploy backend with GET handlers for /api/v1/documents and /projects matching local FastAPI routes",
-            "Re-run frontend verification against API that supports required endpoints"
-          ]
-        }
-      ],
-      "important_reminders": [
-        "B6.3: Frontend depends on GET /api/v1/documents and /projects, but production API only allows POST (405). UI keeps retrying and appears unstyled because SWR never hydrates. Need backend redeploy or configuration change to enable GET before frontend can be validated."
-      ],
-      "critical_context": {
-        "api_endpoint": "https://api.tracelab.aquex.ai (NO /api/v1 suffix)",
-        "frontend_env_var": "NEXT_PUBLIC_API_BASE_URL=https://api.tracelab.aquex.ai",
-        "local_backend": "http://localhost:8000",
-        "local_frontend": "http://localhost:3000"
-      }
-    },
-    "sprint_08_planned": {
-      "date": "2025-11-15",
-      "missions": 6,
-      "focus": "performance_optimization_and_monitoring",
-      "roadmap_alignment": "Week 14 - Performance Optimization",
-      "key_goals": [
-        "Automate telemetry generation",
-        "Optimize database queries with indexes",
-        "Implement application-level caching",
-        "Tune Qdrant parameters for production",
-        "Build cost monitoring dashboard"
-      ],
-      "technology_decisions": {
-        "caching": "in-memory (cachetools) over Redis for single-user simplicity",
-        "dashboard": "backend-rendered (FastAPI + Jinja2) over React SPA",
-        "telemetry": "pytest plugin + Playwright reporter + aggregator"
-      }
-    },
-    "sprint_09_planned": {
-      "date": "2025-11-15",
-      "missions": 6,
-      "focus": "advanced_search_features",
-      "roadmap_alignment": "Week 15 - Advanced Search Features",
-      "key_goals": [
-        "Implement hybrid search (semantic + keyword)",
-        "Add faceted filtering backend",
-        "Fix search page UX (project dropdown, simplified controls)",
-        "Add search history tracking",
-        "Enable saved searches bookmarking"
-      ],
-      "ux_decisions": {
-        "search_controls": "Simplified to search box, project selector, results count (max 25)",
-        "filters": "Collapsed into advanced panel - not prominent until workflow clarity",
-        "rag_control_room": "Removed - missions concept not applicable to search page",
-        "project_dropdown": "Must be wired to GET /api/v1/projects (currently broken)"
-      },
-      "technical_decisions": {
-        "hybrid_weights": "Default 0.7 semantic / 0.3 keyword, configurable",
-        "max_top_k": "Increased from 10 to 25",
-        "filter_backend": "PostgreSQL full-text + Qdrant metadata filters",
-        "history_retention": "100 searches or 30 days",
-        "saved_search_limit": "50 per user"
-      }
-    }
+    "last_blocked_mission": "B6.3"
   },
   "metadata": {
-    "migrated_at": "2025-11-15T16:19:59.621008+00:00",
-    "source_version": "cmos-v1",
-    "upgraded_at": "2025-11-14T17:16:19Z",
-    "upgraded_with": "upgrade_master_context.py"
+    "last_condensation": "2026-03-08T22:28:45.820723Z",
+    "condensation_note": "T31.5: Heavy manual pruning of stale fields, old sprint data, and planning text.",
+    "current_sprint": "sprint-51",
+    "sprint_status": "Active"
   },
   "working_memory": {
     "session_history": [
       {
-        "mission": "B8.5",
-        "agent": "codex",
-        "summary": "Delivered /admin/dashboard experience with live metrics and exports",
+        "mission": "B19.5",
+        "agent": "assistant",
+        "summary": "Wire PEDR to main search page UI",
         "action": "complete",
-        "ts": "2025-11-15T16:45:47Z"
+        "ts": "2025-12-10T18:46:51Z"
       },
       {
-        "mission": "B8.6",
-        "agent": "codex",
-        "summary": "Starting Sprint 08 retrospective documentation",
+        "mission": "B19.6",
+        "agent": "assistant",
+        "summary": "Creating PEDR Latency Benchmark Suite",
         "action": "start",
-        "ts": "2025-11-15T20:25:53Z"
+        "ts": "2025-12-10T19:04:43Z"
       },
       {
-        "mission": "B8.6",
+        "mission": "B19.6",
         "agent": "assistant",
-        "summary": "Sprint 08 retrospective + metrics docs delivered with telemetry + dashboard evidence",
+        "summary": "PEDR Latency Benchmark Suite created",
         "action": "complete",
-        "ts": "2025-11-15T20:41:00Z"
+        "ts": "2025-12-10T19:09:25Z"
       },
       {
-        "mission": "B9.1",
-        "agent": "codex",
-        "summary": "Kicking off hybrid search backend work",
-        "action": "start",
-        "ts": "2025-11-15T22:49:31Z"
-      },
-      {
-        "mission": "B9.1",
-        "agent": "codex",
-        "summary": "Hybrid search backend shipped with weighted semantic+keyword retrieval",
-        "action": "complete",
-        "ts": "2025-11-15T23:28:43Z"
-      },
-      {
-        "mission": "B9.2",
-        "agent": "assistant",
-        "summary": "Starting faceted search backend implementation",
-        "action": "start",
-        "ts": "2025-11-16T00:00:51Z"
-      },
-      {
-        "mission": "B9.2",
-        "agent": "assistant",
-        "summary": "Faceted search backend, facets API, and filter-aware caching delivered",
-        "action": "complete",
-        "ts": "2025-11-16T00:21:53Z"
-      },
-      {
-        "mission": "B9.4",
-        "agent": "assistant",
-        "summary": "Implementing search history backend + UI logging",
-        "action": "start",
-        "ts": "2025-11-16T00:51:36Z"
-      },
-      {
-        "mission": "B9.4",
-        "agent": "assistant",
-        "summary": "Search history logging, replay APIs, and UI delivered with parity + tests.",
-        "action": "complete",
-        "ts": "2025-11-16T01:06:40Z"
-      },
-      {
-        "mission": "B9.5",
-        "agent": "codex",
-        "summary": "Starting saved searches mission: scoping requirements and implementation plan.",
-        "action": "start",
-        "ts": "2025-11-16T01:35:45Z"
-      },
-      {
-        "mission": "B9.5",
-        "agent": "codex",
-        "summary": "Shipped saved searches across backend, API, and UI.",
-        "action": "complete",
-        "ts": "2025-11-16T02:03:55Z"
-      },
-      {
-        "mission": "B9.6",
-        "agent": "assistant",
-        "summary": "Kicking off Sprint 09 retrospective deliverables",
-        "action": "start",
-        "ts": "2025-11-16T02:22:51Z"
-      },
-      {
-        "mission": "B9.6",
-        "agent": "assistant",
-        "summary": "Sprint 09 retrospective, search metrics, telemetry, and Sprint 10 backlog delivered",
-        "action": "complete",
-        "ts": "2025-11-16T02:35:30Z"
-      },
-      {
-        "mission": "B10.1",
-        "agent": "assistant",
-        "summary": "Starting quality-aware search service enhancements",
-        "action": "start",
-        "ts": "2025-11-17T22:49:04Z"
-      },
-      {
-        "mission": "B10.1",
-        "agent": "assistant",
-        "summary": "Quality-aware hybrid search shipped with PEDR filters + docs",
-        "action": "complete",
-        "ts": "2025-11-17T23:08:14Z"
-      },
-      {
-        "mission": "B10.2",
-        "agent": "codex",
-        "summary": "Starting DeepSearch ingestion endpoint implementation",
-        "action": "start",
-        "ts": "2025-11-17T23:38:57Z"
-      },
-      {
-        "mission": "B10.2",
-        "agent": "codex",
-        "summary": "Delivered DeepSearch ingestion endpoint with auto-linking + telemetry",
-        "action": "complete",
-        "ts": "2025-11-18T00:31:01Z"
-      },
-      {
-        "mission": "B10.3",
-        "agent": "codex",
-        "summary": "Packaging Pydantic schema library for DeepSearch",
-        "action": "start",
-        "ts": "2025-11-18T03:41:01Z"
-      },
-      {
-        "mission": "B10.3",
-        "agent": "codex",
-        "summary": "Mission Protocol schemas packaged for DeepSearch and TraceLab now imports them from the shared library.",
-        "action": "complete",
-        "ts": "2025-11-18T03:59:47Z"
-      },
-      {
-        "mission": "B10.4",
-        "agent": "assistant",
-        "summary": "Kicking off Relationship Context API build",
-        "action": "start",
-        "ts": "2025-11-18T04:17:49Z"
-      },
-      {
-        "mission": "B10.4",
-        "agent": "assistant",
-        "summary": "Relationship context API implemented with caching + docs",
-        "action": "complete",
-        "ts": "2025-11-18T04:30:02Z"
-      },
-      {
-        "mission": "B10.5",
-        "agent": "assistant",
-        "summary": "Kicking off DeepSearch integration testing suite build",
-        "action": "start",
-        "ts": "2025-11-18T05:16:12Z"
-      },
-      {
-        "mission": "B10.5",
-        "agent": "assistant",
-        "summary": "DeepSearch integration fixtures, tests, docs, and telemetry delivered",
-        "action": "complete",
-        "ts": "2025-11-18T05:45:07Z"
-      },
-      {
-        "mission": "B10.6",
-        "agent": "assistant",
-        "summary": "Kicking off Sprint 10 retrospective + planning deliverables",
-        "action": "start",
-        "ts": "2025-11-18T13:39:09Z"
-      },
-      {
-        "mission": "B10.6",
-        "agent": "assistant",
-        "summary": "Sprint 10 retro delivered metrics, telemetry, and Sprint 11 backlog.",
-        "action": "complete",
-        "ts": "2025-11-18T13:54:42Z"
-      },
-      {
-        "mission": "B11.1",
-        "agent": "assistant",
-        "summary": "Starting auto-link correction loop implementation",
-        "action": "start",
-        "ts": "2025-12-05T01:34:36Z"
-      },
-      {
-        "mission": "B11.1",
-        "agent": "assistant",
-        "summary": "Auto-link correction loop with webhooks and telemetry implemented",
-        "action": "complete",
-        "ts": "2025-12-05T02:00:28Z"
-      },
-      {
-        "mission": "B11.2",
-        "agent": "assistant",
-        "summary": "Starting PEDR Delta Sync Service implementation",
-        "action": "start",
-        "ts": "2025-12-05T02:04:11Z"
-      },
-      {
-        "mission": "B11.2",
-        "agent": "assistant",
-        "summary": "PEDR Delta Sync Service implemented with event-driven architecture",
-        "action": "complete",
-        "ts": "2025-12-05T02:13:36Z"
-      },
-      {
-        "mission": "B11.3",
-        "agent": "claude-opus-4-5",
-        "summary": "Building Mission Protocol Console read-only UI with dashboard, relationships, corrections, and export",
-        "action": "start",
-        "ts": "2025-12-05T02:33:10Z"
-      },
-      {
-        "mission": "B11.3",
-        "agent": "claude-opus-4-5",
-        "summary": "Delivered Mission Protocol Console with dashboard, mission list, detail view, corrections queue, and export functionality",
-        "action": "complete",
-        "ts": "2025-12-05T02:46:18Z"
-      },
-      {
-        "mission": "B11.4",
-        "agent": "assistant",
-        "summary": "Starting schema distribution and contract hardening",
-        "action": "start",
-        "ts": "2025-12-05T03:26:56Z"
-      },
-      {
-        "mission": "B11.4",
-        "agent": "assistant",
-        "summary": "Schema distribution and contract hardening complete",
-        "action": "complete",
-        "ts": "2025-12-05T03:37:54Z"
-      },
-      {
-        "mission": "B11.5",
-        "agent": "assistant",
-        "summary": "Implementing PEDR pre-flight query service",
-        "action": "start",
-        "ts": "2025-12-05T03:44:00Z"
-      },
-      {
-        "mission": "B11.5",
-        "agent": "assistant",
-        "summary": "Implemented PEDR pre-flight query service for duplicate research prevention",
-        "action": "complete",
-        "ts": "2025-12-05T03:55:49Z"
-      },
-      {
-        "mission": "B11.6",
-        "agent": "claude-opus",
-        "summary": "Starting Sprint 11 retrospective",
-        "action": "start",
-        "ts": "2025-12-05T03:58:41Z"
-      },
-      {
-        "mission": "B11.6",
-        "agent": "claude-opus",
-        "summary": "Sprint 11 retrospective completed",
-        "action": "complete",
-        "ts": "2025-12-05T14:19:07Z"
-      },
-      {
-        "mission": "B12.1",
+        "mission": "B19.7",
         "agent": "opus-4.5",
-        "summary": "Starting investigation of /api/v1/missions/ 500 error",
+        "summary": "Starting Sprint 19 retrospective - documenting outcomes and PEDR decision",
         "action": "start",
-        "ts": "2025-12-05T16:39:49Z"
+        "ts": "2025-12-10T19:16:00Z"
       },
       {
-        "mission": "B12.1",
+        "mission": "B19.7",
         "agent": "opus-4.5",
-        "summary": "Fixed missions endpoint 500 error with improved error handling",
+        "summary": "Sprint 19 retrospective completed - documented 97% latency improvement, PEDR approved for main search",
         "action": "complete",
-        "ts": "2025-12-05T16:58:47Z"
-      },
-      {
-        "mission": "B12.2",
-        "agent": "assistant",
-        "summary": "Starting fix for HTTPS redirect issue",
-        "action": "start",
-        "ts": "2025-12-05T17:26:34Z"
-      },
-      {
-        "mission": "B12.2",
-        "agent": "assistant",
-        "summary": "Fixed HTTPS redirects by adding ProxyHeadersMiddleware",
-        "action": "complete",
-        "ts": "2025-12-05T17:31:23Z"
-      },
-      {
-        "mission": "B12.3",
-        "agent": "assistant",
-        "summary": "Starting service account production setup - using shared credentials approach",
-        "action": "start",
-        "ts": "2025-12-05T17:38:52Z"
-      },
-      {
-        "mission": "B12.3",
-        "agent": "assistant",
-        "summary": "Configured DeepSearch with shared TraceLab credentials",
-        "action": "complete",
-        "ts": "2025-12-05T17:45:04Z"
-      },
-      {
-        "mission": "B12.4",
-        "agent": "assistant",
-        "summary": "Standardizing API response structures for consistency",
-        "action": "start",
-        "ts": "2025-12-05T17:48:02Z"
-      },
-      {
-        "mission": "B12.4",
-        "agent": "assistant",
-        "summary": "Standardized API response structures for consistency",
-        "action": "complete",
-        "ts": "2025-12-05T17:53:02Z"
-      },
-      {
-        "mission": "B12.5",
-        "agent": "assistant",
-        "summary": "Starting End-to-End Integration Verification",
-        "action": "start",
-        "ts": "2025-12-05T18:10:27Z"
-      },
-      {
-        "mission": "B12.5",
-        "agent": "assistant",
-        "summary": "E2E integration verified - all critical tests pass",
-        "action": "complete",
-        "ts": "2025-12-05T18:31:04Z"
-      },
-      {
-        "mission": "B12.6",
-        "agent": "assistant",
-        "summary": "Sprint 12 Retrospective - documenting outcomes and drafting Sprint 13",
-        "action": "start",
-        "ts": "2025-12-05T18:41:50Z"
-      },
-      {
-        "mission": "B12.6",
-        "agent": "assistant",
-        "summary": "Sprint 12 Retrospective completed",
-        "action": "complete",
-        "ts": "2025-12-05T19:30:11Z"
-      },
-      {
-        "mission": "B13.1",
-        "agent": "assistant",
-        "summary": "Starting Document Detail: Show Chunks - adding endpoint and UI for chunk display",
-        "action": "start",
-        "ts": "2025-12-06T00:44:34Z"
+        "ts": "2025-12-10T19:18:12Z"
       }
     ],
-    "last_session": "2025-12-06T00:44:34Z",
-    "session_count": 63,
-    "active_mission": "B13.1",
+    "last_session": "2025-12-10T19:18:12Z",
+    "session_count": 78,
+    "active_mission": null,
     "blocked_missions": [],
-    "last_completed_mission": "B12.6"
+    "last_completed_mission": "B19.7"
   },
   "next_session_context": {
     "when_we_resume": [
-      "PS-2025-12-05-001: Review cmos/planning/DeepSearch-TraceLab-Integration-Contract.md Phase 2 section before implementing",
-      "PS-2025-12-05-003: Benchmark correction loop at 100+ concurrent items",
-      "PS-2025-12-05-003: Validate PEDR sync handles 500+ mission delta in <60s"
+      "PS-2026-09-13-004: After fresh OODS composition is accepted and required CI passes, merge/deploy migration044 and run frontend/scripts/home-smoke.mjs against tracelab.aquex.ai in both themes; verify real totals and close UX-2 only after those gates.",
+      "PS-2026-09-13-004: Resume the mission loop with UX-3, then UX-4 and UX-5 after the pause is resolved.",
+      "PS-2026-09-13-006: Open Sprint 51 at a Derek-confirmed planning session: create sprint-51 in CMOS from the roadmap's UX-6..UX-10 table (Missions rebuild as inspectable jobs, Projects-as-bundles + Documents/Collections/Reports, Search + command palette, old-route redirects), run the Sprint-Boundary Identity Sync runbook to sprint-51-active, re-plan the roadmap's Sprint 51 section and add a change-log line (decision #400).",
+      "PS-2026-09-13-006: Sprint 51 planning decisions (decision #401): where Home favorites land (deferred under #395: with the Missions/Projects rebuild or Sprint 52), and fix-or-drop for the advisory ruff-full/mypy CI lanes (own small mission vs removal) so receipts stop re-disclosing them.",
+      "PS-2026-09-13-006: Update the TraceLab UX Baseline artifact (claude.ai/code/artifact/c0767cdf-97e0-4d16-a750-029ceb09ba8e) with the Sprint 50 outcomes and the 31-route production baseline so it stays the shareable status page (replaces dropped #221).",
+      "PS-2026-09-13-006: Derek working tree: local main is 53 commits behind origin/main (fast-forward to 244e1b6); merged local branches fix/project-stats-cache-key, docs/sprint-50-roadmap-and-d592c92-audit and the codex/recover-*/ux-* branches can be pruned; the sprint-37/38 e2e JSON commit-or-discard call stays open as #206.",
+      "PS-2026-09-13-006: Finding for hygiene #182/#208: the on-disk cmos/context/MASTER_CONTEXT.json is a stale 2026-08-20 export (92KB, still names sprint-18 as current) plus three .backup-* files, while the DB master_context is current at 61KB — regenerate or delete the file and backups; also triage the 9 learnings the context view flags as stale at S51 open.",
+      "PS-2026-09-13-007: BUILD HANDOFF (Sprint 51): run the mission loop from cmos_mission(action=\"status\") — THEME-1 first (every UX mission Requires it), CI-2 may interleave, UX-10 last; open and close a CMOS session per mission (decision #402); receipts under cmos/reports/sprint-51/ with CI run ids and Railway deployment ids for both services; re-run the 31-route direct-browser baseline (three themes once THEME-1 lands) at every close; consume Forge outputs only, never implement in Forge (decision #391).",
+      "PS-2026-09-13-007: DEREK: credential history — git-filter-repo purge of pre-179ae60 history vs accept rotation-only (#178; all exposed values verified rotated/dead, history still serves them).",
+      "PS-2026-09-13-007: DEREK: research sprint sprint-research-01 disposition — keep it as a recurring paid DeepSearch research program (then #171 Qdrant keep-alive cron, #172 topic-mining helper, #173 automation host become real work), fold only the Qdrant keep-alive into an ops item and drop the rest, or drop it entirely; RES-001 is already Dropped and nothing has run under it since 2026-08-13.",
+      "PS-2026-09-13-007: DEREK: authorize or decline ONE outbound backlog_request to cmos://derek/cmos-mcp asking for sprint-open/complete identity-sync automation (#131); outbound messages need explicit authorization, so this stays pending until you say so.",
+      "PS-2026-09-13-007: DEREK: #192 — confirm the 10 production tombstone deletions were intentional and the veto window closed at the joint dispatch (then #192 is dropped), or name any document to restore via restore_document.",
+      "PS-2026-09-13-007: DEREK: #189 — is the DeepSearch compiler resync (1.0/24e8810 → 1.1/rev2 against the 690fab16 golden+manifest) still a live DS acceptance commitment, or retired? If live it becomes an S51 backlog mission outside the UX slate.",
+      "PS-2026-09-13-007: Watch Forge for the certified sprint-197 re-pin bundle (Forge mission m06); THEME-1 re-pins tokens only from it — no TraceLab-side Forge action.",
+      "PS-2026-09-13-007: Update the TraceLab UX Baseline artifact (claude.ai/code/artifact/c0767cdf-97e0-4d16-a750-029ceb09ba8e) with the Sprint 50 outcomes and the Sprint 51 slate so it stays the shareable status page (carried from the S50 review)."
     ]
   },
   "context_health": {
-    "sessions_since_reset": 79,
-    "last_update": "2025-12-06T00:44:34Z",
-    "size_kb": 69.12,
-    "size_limit_kb": 100
+    "sessions_since_reset": 177,
+    "last_update": "2026-09-13T16:22:01.101Z",
+    "size_kb": 60.44,
+    "size_limit_kb": 100,
+    "warning_threshold_percent": 75,
+    "retention_keep_sprints": 3
   },
-  "learnings": [
-    "TTL caches cut repeated RAG latency from 22.23 ms to 0.008 ms and drop repeated OpenAI cost to ~$0.000071; monitoring dashboard now surfaces these metrics alongside cost telemetry.",
-    "Sprint 09 metrics: hybrid precision +0.12 vs semantic-only, avg search durations 419 ms, saved-search replay 25% (see cmos/reports/sprint-09/search-metrics-report.md).",
-    "Auto-link telemetry hit 100% success on the customer onboarding payload; treat telemetry deltas as the trigger for correction-loop retries.",
-    "Sprint 10 delivered all 6 missions: PEDR quality scoring (212% boost for complete vs draft), DeepSearch ingestion with 100% auto-linking success, schema package, relationship API, and integration test suite (24 tests passing) (from PS-2025-12-05-001)",
-    "DeepSearch team has questions ready for integration - answered in DeepSearch.alpha/cmos/planning/Answers-from-tracelab-sprint12.md. Key items: API URLs, auth flow, PEDR preflight endpoint, ingest endpoint status. (from PS-2025-12-05-002)",
-    "Sprint 11 achieved 100% mission completion (6/6) with 63 tests passing across correction loop, PEDR sync, and pre-flight modules (from PS-2025-12-05-003)",
-    "B12.4 (DeepSearch Service Account) completed early during planning, enabling DeepSearch Sprint 05 to proceed immediately (from PS-2025-12-05-003)",
-    "Ingest endpoint saves mission metadata but does NOT embed evidence into vector store. Pre-flight will always return 'proceed' because there are no chunks to match against. (from PS-2025-12-05-004)",
-    "CONFIRMED: Production database has 0 DocumentChunks, 0 Documents, 0 Missions. The system is completely empty. All search endpoints will return nothing. (from PS-2025-12-05-004)",
-    "Sprint 12 demonstrated the importance of production testing early - multiple critical issues were only discovered when testing against production (from PS-2025-12-05-006)",
-    "Simple solutions work - ProxyHeadersMiddleware for HTTPS redirects, shared credentials for single-user tool. Avoid over-engineering. (from PS-2025-12-05-006)"
-  ],
   "context_notes": [
-    "B7.7 validated ingestion flow end-to-end; prod + local confirmed, only residual issue is local hydration warnings but no blocking impact.",
-    "B6.3 not actually blocked - project dropdown shows 0 but actual functionality works. B7.1 resolved the blocker by adding GET endpoints. Database blocker record needs cleanup.",
-    "Publish tracelab_schemas to the internal index and wire CI guards so DeepSearch + TraceLab pin the same schema version before Sprint 11 starts.",
-    "Current branch: sprint-10-quality-aware-search. No active missions in backlog. Sprint 11 draft exists with 6 missions covering correction loops, PEDR sync, operator console, schema publishing, and pre-flight queries.",
-    "Sprint 11 completed all 6 missions: B11.1 (Correction Loop), B11.2 (PEDR Delta Sync), B11.3 (Console UI), B11.4 (Schema Distribution), B11.5 (Pre-Flight Query), B11.6 (Retrospective). 63 tests passing, schema at v1.0.0."
-  ],
-  "recent_sessions": [
-    {
-      "id": "PS-2025-11-15-001",
-      "session_type": "review",
-      "type": "review",
-      "title": "B7.7 validation recap",
-      "summary": "Reviewed B7.7 validation evidence, confirmed ingestion/auth stability in prod/local, and noted UI hydration warnings as the only follow-up.",
-      "completed_at": "2025-11-15T01:30:06Z",
-      "capture_count": 2,
-      "captures": {
-        "context": 1,
-        "next-step": 1
-      }
-    },
-    {
-      "id": "PS-2025-11-15-001",
-      "session_type": "planning",
-      "type": "planning",
-      "title": "Sprint 08 & 09 Planning",
-      "summary": "Sprint 08 & 09 fully planned: 12 missions total. Sprint 08 focuses on performance optimization (Week 14). Sprint 09 focuses on advanced search with critical UX fixes (Week 15). All missions created, backlog updated, database seeded, parity validated.",
-      "completed_at": "2025-11-15T04:43:10Z",
-      "capture_count": 8,
-      "captures": {
-        "decision": 5,
-        "constraint": 2,
-        "context": 1
-      }
-    },
-    {
-      "id": "PS-2025-12-05-001",
-      "session_type": "review",
-      "type": "review",
-      "title": "Sprint 10 Review & Sprint 11 Planning",
-      "summary": "Sprint 10 review completed (6/6 missions, 100% auto-linking, 212% quality boost). Sprint 11 planned with 6 missions focused on correction loops, PEDR delta sync, and operator tooling. Key architecture decisions captured: async webhooks for corrections, event-driven PEDR sync, Next.js for console, GitHub Packages for schema distribution.",
-      "completed_at": "2025-12-05T01:21:15Z",
-      "capture_count": 11,
-      "captures": {
-        "learning": 1,
-        "context": 1,
-        "decision": 7,
-        "next-step": 2
-      }
-    },
-    {
-      "id": "PS-2025-12-05-002",
-      "session_type": "planning",
-      "type": "planning",
-      "title": "Sprint 12 Planning",
-      "summary": "Sprint 12 planned: 6 missions (B12.1-B12.6) focused on production hardening. B12.4 (DeepSearch Service Account) completed early - credentials created and documented. Auth risk assessed as LOW. DeepSearch unblocked for their Sprint 05.",
-      "completed_at": "2025-12-05T14:50:48Z",
-      "capture_count": 6,
-      "captures": {
-        "context": 1,
-        "learning": 1,
-        "decision": 3,
-        "next-step": 1
-      }
-    },
-    {
-      "id": "PS-2025-12-05-003",
-      "session_type": "review",
-      "type": "review",
-      "title": "Sprint 11 Review & Sprint 12 Planning Finalization",
-      "summary": "Sprint 11 review confirmed: 6/6 missions complete (100%), 63 tests passing, DeepSearch integration fully documented. Sprint 12 ready with B12.4 already complete. Priority: B12.1 (Load Testing) is next up.",
-      "completed_at": "2025-12-05T15:15:11Z",
-      "capture_count": 3,
-      "captures": {
-        "learning": 2,
-        "decision": 1
-      }
-    },
-    {
-      "id": "PS-2025-12-05-004",
-      "session_type": "review",
-      "type": "review",
-      "title": "Critical System Assessment - What Actually Works",
-      "summary": "CRITICAL: Sprint 12 backlog completely revised. Previous backlog was infrastructure theater. Actual issues found: 1) Missions endpoint 500 error, 2) HTTPS redirects drop auth headers, 3) Service account not in production, 4) API response inconsistency. Created 6 new mission YAMLs focused on making system actually work.",
-      "completed_at": "2025-12-05T16:01:30Z",
-      "capture_count": 5,
-      "captures": {
-        "decision": 3,
-        "learning": 2
-      }
-    },
-    {
-      "id": "PS-2025-12-05-005",
-      "session_type": "planning",
-      "type": "planning",
-      "title": "Sprint 12 Database Update",
-      "summary": "Sprint 12 database fully updated. Removed old infrastructure theater missions. Added 6 missions focused on making TraceLab actually usable. Mission YAML files created with full specs. Agents can now pick up queued missions.",
-      "completed_at": "2025-12-05T16:17:13Z",
-      "capture_count": 1,
-      "captures": {
-        "decision": 1
-      }
-    },
-    {
-      "id": "PS-2025-12-05-006",
-      "session_type": "review",
-      "type": "review",
-      "title": "Sprint 12 Review & Sprint 13 Planning",
-      "summary": "Sprint 12 review complete. Sprint 13 planned with 10 missions: Documents (show chunks, preview, download), Collections (backend, UI, export), Search (layout, wiring), Format support. YAML files created, database updated, MASTER_CONTEXT updated.",
-      "completed_at": "2025-12-06T00:18:57Z",
-      "capture_count": 6,
-      "captures": {
-        "learning": 2,
-        "decision": 3,
-        "next-step": 1
-      }
-    }
+    "Grounded current-state map (workflow wrrljhze2, 10 agents, file:line-cited) for the RBAC + org-model effort. AUTH: single gate require_authenticated_user (app/core/security.py:252) accepts X-API-Key OR JWT; AuthenticatedUser dataclass (security.py:36) carries user_id/email/display_name but DROPS role. KEY: users.role String(50) default 'admin' (user.py:21) ALREADY EXISTS but is write-only/dead — set at register (auth.py:89) + migration 023, never read for authz. ZERO authorization: no 403s, no require_admin/require_role anywhere; admin router (admin.py) gated only by the same auth dep → every authenticated user is effectively admin. OWNERSHIP GAP (the real work): projects.user_id is a bare GUID 'Placeholder for auth' (project.py:26), populated from REQUEST BODY not the caller (project_query_service.py:93), never filtered; tags.user_id same. missions.created_by / reports.created_by are free-text String(100) ('agent or user'), NOT FKs — must NOT be reused as owner FK. documents: only project_id, no owner. collections: NO owner column AND no project link — orphan many-to-many bundle of document CHUNKS (cap 100, cross-project) = the main cross-project leak path. Real user FKs exist only on api_keys.user_id, invite_codes.created_by/used_by, device_authorization.user_id; saved_searches.owner = mutable display_name string. SCOPE ROOT: Project is de-facto root (missions/documents/reports/insights carry project_id FK → project-inherited access natural); collections are the exception. TENANCY: NO org/tenant/workspace concept anywhere (grep-confirmed) → multi-tenant is from-scratch. GROUPING: Project is FLAT — no parent/child, no project_groups, no project_tags (only document_tags). FRONTEND: AuthContext + localStorage 'tracelab.auth.v2'; AuthGate checks only isAuthenticated; no role in frontend types; per-page opt-in guarding (invites.tsx unguarded); Settings page (S39) for profile/api-keys/invite-codes; NO admin UI; Console visible to all. MCP/agent: API keys user-bound (agents inherit that user's scope); webhooks signature-auth (bypass user ctx); SSE via ?token=. RECOMMENDED ARCH (pending user confirm; convergent across 3 research agents): hybrid RBAC (roles owner/admin/member/viewer on users.role) + per-resource owner_id FK + a unifying 'Space' container above Project that doubles as (a) project-grouping for sprawl, (b) access-grant unit via space_members(space_id,user_id,role) with downward inheritance, (c) dormant workspace_id multi-tenant seam (name workspace_id, nullable, lead composite indexes) — keeps multi-tenant a 2-way door. Cross-cutting themes via project_tags many-to-many, NOT nesting. Keep existing 'Collection' as-is (chunk bundle) — do NOT overload. Defer per-resource resource_grants ACL to a later phase. Rollout: additive nullable cols → backfill all rows to bootstrap owner (Derek) → centralized authorize() behind rbac_enabled flag default OFF → bootstrap owner FIRST → flip (deny-by-default). OWASP BOLA/IDOR is #1 risk; re-check every client-supplied ID server-side; never reuse created_by free-text; block last-owner demotion/deletion.",
+    "S46 grounded current-state map (file:line, from Explore pass 2026-05-31): authorize() at app/core/authorization.py:89 (no-op returning True when rbac_enabled False — config.py:75 default False; when True: owner/admin allow → resource.owner_id==user.user_id → space membership via _effective_space_id which uses project_id→space_id, fail-closed without db session). ZERO authorize() call sites in app/api (confirmed). require_admin/require_role at app/core/security.py:329/344 (applied at router level to admin_users, spaces, project_admin). Ownership: app/services/ownership.py ensure_owner_bootstrap:70 (idempotent, called main.py:150), is_last_owner:97 (counts ALL owners incl disabled — must become active-only for gate 4). is_active column app/models/user.py:24 (dormant; login auth.py:39-54 issues token regardless). ProjectRead app/schemas/project.py:43 (owner_id intentionally omitted). Per-id routes & guards: projects.py GET/PUT/{project_id}+stats = NO authn; DELETE/restore = authn only; missions.py GET/PATCH/DELETE/submit/contract-preview/promote-report = NO authn; documents.py all per-id = NO authn; collections.py + reports.py per-id = authn yes/authz no; onboarding PATCH /projects/{project_id} = router-level authn only. Collection model collection.py:28 has workspace_id+owner_id, NO project_id. Mission/report project_id nullable; document project_id NOT NULL. Webhooks HMAC-SHA256 (webhooks.py:34-127); MCP standalone stdio no-auth (mcp_server/server.py:44); API keys inherit user role (security.py:194), no service-role concept.",
+    "T46.1 technical work (DONE OUT OF PROCESS, being REVERTED — recorded for review). authorize() in app/core/authorization.py was found ALREADY correct for owner/admin/owner-id allow paths and for collections (no project_id -> own workspace_id). The only gap: _effective_space_id used getattr(resource,'project_id',None), conflating 'no project_id column' (top-level Project/Collection) with 'project_id present but NULL' (orphan mission/report) — the orphan case would leak access via the child's own workspace_id. Fix made (now reverted): a sentinel (_NO_PROJECT_FK) distinguishing the two; orphan -> return None -> fail-closed (owner+admin only). Added 4 unit tests; full authz suite 28 green; mutation contrast confirmed old=ALLOW / new=DENY for the orphan; ruff clean; 20 space-mgmt API tests green. Separately surfaced a PRE-EXISTING (not-mine) failure: tests/unit/test_missions_agent_ux.py::test_get_mission_allows_human_readable_id (SimpleNamespace mock lacks .constraints, read at app/api/v1/missions.py:66). Full detail + reviewer questions in the post-mortem at cmos/reports/S46-T46.1-postmortem.md. Recorded here because CMOS is the source of truth and the code is being reverted.",
+    "S48 review — record-vs-reality corrections found by repo verification (NOT auto-applied; flagged for Derek to action, per the forward-only-status and transparency conventions): (1) T48.4 is code-complete in-tree (HEAD 9f6a7eb; mutation-checked per-site wiring tests + Postgres-tested migration 037 all green) but its CMOS blocker/blockers field is STALE — still describes the pre-fix \"NOT done / 5 unaddressed issues\" state. It is correctly held short of Completed only pending prod-apply of 037 + deploy-verify (per the new DoD) — do NOT auto-advance it. (2) T48.8's scope understates the work: mission_protocol_service.py:77 is LIVE (called from deepsearch.py:77 + mcp_server/tools/missions.py:427), not the recorded \"dead or live?\" — owner-wiring covers THREE create sites (mission_service:154, mission_protocol_service:77, auto_report:217) plus the 038 backfill. (3) Decision #315 records the zombie-auth + in-app-retry fast-follows as DEFERRED low-severity, but BOTH are already implemented in the working tree (http.ts AUTH_EXPIRED_EVENT → AuthContext.logout; RoleContext.refetch + RequireAdmin Retry button) — the actual posture is safer than the log; reconcile the record.",
+    "CLOSEOUT 2026-08-14 — SHIPPED: TraceLab integration stabilization merged as PR #223. It includes owner/workspace migration 038, lease schema migration 039, guarded resubmit semantics, result materialization/reconciliation, webhook/job correlation, status/MCP readiness fields, log payload compatibility, contract updates, and regression coverage. DeepSearch repository was not modified.",
+    "CLOSEOUT 2026-08-14 — PRODUCTION RECOVERY: PR #223 initially crashed Railway because Alembic 039 rejected the deployed legacy missions_deepsearch_claim_scan_idx=(project_id,status,deepsearch_lease_expires_at,queued_at). PR #224 added exact transactional convergence plus regression coverage. Railway deployment f2f2739d-21bf-4201-9ead-4564669aa9a6 succeeded; /api/v1/health/ready reported database and Qdrant healthy.",
+    "CLOSEOUT 2026-08-14 — PEDR STATE: product retrieval surfaces diverge (UI graph PEDR plus /search, REST search_mode metadata does not select a different algorithm, MCP bypasses PEDR through /retrieval/search). CI benchmark is offline TF-IDF+BM25 with title-leaking queries and exact ties; Sprint-27 controlled evidence favored hybrid nDCG 0.813 over PEDR 0.643. Re-evaluate later on real orchestrator/Qdrant with leakage-free shared judgments.",
+    "CLOSEOUT 2026-08-14 — RESEARCH MATERIALIZATION: pedr-retrieval-evaluation-R001 completed usable_with_warning but attached no result documents or report. PR #223 adds recovery machinery, but deploy a recurring reconciler and run a one-time backfill before claiming terminal results automatically become searchable evidence.",
+    "CLOSEOUT 2026-08-14 — BOUNDARY: TraceLab owns TraceLab code/deploy. DeepSearch owns its repository, worker merge/deploy, and paid execution; coordinate by CMOS. No secret rotation was authorized or performed. Await explicit DeepSearch acknowledgment and committed lease-v2 evidence before unpaid lifecycle acceptance; paid CAT remains separately gated.",
+    "CLOSEOUT 2026-08-14 — CMOS DEFECT: cmos_session start failed with NOT NULL constraint failed: sessions.project_id while onboarding/health/project identity succeeded. This handoff was captured with supported context and mission updates plus a snapshot; no direct SQLite write.",
+    "CMOS CLOSEOUT CORRECTION 2026-08-14: no formal review session or new master snapshot was created. cmos_session start failed on sessions.project_id NOT NULL; master snapshot failed on context_snapshots.project_id NOT NULL; project_context snapshot returned existing duplicate #928 because that context was unchanged. The authoritative successful captures are the master-context handoff field/context notes/constraints and appended notes on T48.4, T48.6, T48.8, and T48.9.",
+    "Pre-build aggregate-only production audit confirmed the OPS-3 defect shape exactly: 10 terminal missions with 10 deleted linked documents; all ten are single-link tombstones and all ten persisted materialization status=failed. There are zero tombstone+missing, tombstone+unready, or unlinked-tombstone cases. No identifiers were selected/emitted and the read-only transaction was rolled back.",
+    "RECOVER-1 checkpoint: frontend 66 tests, type-check and production build passed; changed-file Ruff, credential scan and foundational refs passed. 24 repaired backend quarantine nodes removed (46→22). Legacy cmos/context/integration_test_runner.js: 13/15 passed; missing cmos/runtime/boomerang and old root-heading checks against cmos/agents.md fail unchanged on origin/main (baseline additionally lacks an ignored PROJECT_CONTEXT mirror). These are pre-existing v1 asset-runner drift, not new runtime failures; no stub directories or manual JSON context edits were introduced. Full backend run and deployed verification still pending.",
+    "Correction to checkpoint #2: the baseline asset runner's third failure was the security fixture flagging macOS /private/tmp as a sensitive path, not a missing PROJECT_CONTEXT mirror. The two relevant failures (missing Boomerang directory and obsolete heading assertions) are identical between baseline and working tree.",
+    "Production precheck: OpenAPI has neither mission-events nor decision-links routes; /api/v1/graph/stats returns 60,301 edges including co_occurs=6,300 and topic_similar=19,102. One attempt with the checkout's configured AUTH_USERNAME/AUTH_PASSWORD returned 401, so authenticated post-deploy checks need a working production owner session/credential source. Code review caught MissionService emitting human mission_id strings (not only UUIDs); event filtering now resolves both through RBAC and prevents UUID-shaped human-name alias collisions.",
+    "Draft PR https://github.com/kneelinghorse/TraceLab/pull/254 contains recovery commit 2f9c183, per-finding evidence 66d0252, and typed adapter follow-up 7496f24. Hosted PostgreSQL integration passed 125 tests with 4 explicit skips. First hosted mypy comparison found 2 new Column-vs-UUID errors; follow-up uses typed mission_id and local mypy returns to the exact 1,039-error main baseline, with no new changed-file errors. Required CI is running against final head; no deploy or mission completion yet.",
+    "Resolved production credential blocker without needing user input: the configured TraceLab MCP authenticates with its existing ~/.config/tracelab-mcp/credentials.json key. Read-only HTTP /auth/me confirms admin, /admin/rbac-status confirms RBAC enabled. No secrets printed. The checkout .env login remains stale, but is no longer necessary for production smoke.",
+    "Resolved the full live RBAC credential requirement: connected Railway CLI can read the existing production TraceLab bootstrap AUTH_USERNAME/AUTH_PASSWORD in memory. Verified login 200 and /auth/me role owner. No secrets printed or persisted. No new credential/user-role modification needed. Full post-deploy RBAC matrix is ready in /tmp/recover1-rbac-owner.py; recovery smoke in /tmp/recover1-smoke.py. Final CI head is 83b3c4f, including real service-auth mount correction.",
+    "Hosted backend on 83b3c4f completed: 2,351 passed, one test-only failure, three explicit skips, 22 deselections. CI FastAPI 0.141.1 uses lazy included routers; duplicate-route guard now uses iter_route_contexts when available, mirroring tests/integration/test_e2e_rbac_live.py. All 18 recovery-route tests pass both local FastAPI 0.135.1 and isolated CI-exact FastAPI 0.141.1/Starlette 1.6.0. Pushed follow-up 7ca1d7c; final hosted CI running.",
+    "Pre-deploy full live RBAC baseline PASSED using the production owner login from Railway. All member/viewer/second-owner/service principals provisioned; role×route matrix (projects, collections, missions, PEDR, RAG, synthesis, facets, saved search/history, reports, collection children) clean, with no teardown failures or leaked fixtures. Existing harness notes remain explicit: owner preflight has zero matches (smoke only for that cell), project DELETE local-only, 14 per-id document/job routes anonymous-only. Log: /tmp/recover1-rbac-owner-baseline.log. Will rerun after deployment.",
+    "Final hosted backend run 34713561751 is slower than prior run; logs unavailable until completion. Diagnosing with a detached local worktree (7ca1d7c) and full-suite faulthandler output. All 24 recovery + real service-boundary tests also pass with CI-exact FastAPI 0.141.1, Starlette 1.6.0, SSE-Starlette 3.4.11, Pydantic 2.13.5, AnyIO 4.15.1, pytest 9.1.1 and pytest-asyncio 1.4.0 (18.97s). No additional code change needed so far; merge remains gated on all six hosted checks.",
+    "All six required checks GREEN on 7ca1d7c; hosted backend 2,352 passed, 3 explicit skips, 22 deselections (381.57s), PostgreSQL integration green. PR #254 merged at 2026-09-12T19:43:41Z as 429ac59a3de06e635cff70246804a750b3f99d4f. Production deployment and smoke now underway. Local latest-framework full reproduction had 2,351 passes and only the 5ms graph latency assertion failure; this threshold also fails on isolated baseline main (6.91ms), so no unrelated performance-test relaxation was made.",
+    "Production RECOVER-1 smoke PASSED on deployed 429ac59 (Railway backend deployment 9cfe4c58-bc30-4918-8d0c-9497536fc2fc): 30 HTTP checks; graph total 60,301 -> 60,305, ingest Stage6 inserted 4 edges; document-related route proves chunk linkage; full PEDR returns 6 diagnostics and degraded=false; OpenAPI exposes all restored routes; member/viewer cannot read foreign mission events or global decisions, service bridge publishes successfully while service reads are denied. Smoke mission hard-deleted, document/project soft-deleted via supported APIs, throwaway users purged, no cleanup errors. API health and frontend each HTTP 200. Full post-deploy owner matrix running next.",
+    "UX-0 implementation committed as 346bfc6c13cf7a8827ab0cf4715306781c5e5b94 in PR #256 (draft). All 112 local production-build route/theme/width checks pass: 28 routes at 390/1440 in light/dark, zero overflow, required axe rules, serious/critical findings, JS errors, or API transport failures. 88 unit and eight browser interaction tests pass; required CI production build including browser tests, type-check, vitest, changed-file Ruff, secrets and PostgreSQL integration passed. Backend-suite is still running; do not cancel. Next: wait for required CI, merge, verify Railway frontend commit, run direct-browser deployed matrix, then complete UX-0 and start UX-1. Local screenshots/metrics are kept in ignored artifacts/ux-0/local.",
+    "UX-1 checkpoint: Forge PR105 source head 20e2539695c69a08e47c5ff6d5f568cb23f8af27 expands 18-object runtime to 240 declared cells and fixes phone sidebar overlap. Initial157 regressions and style47 tests pass; expanded suite69 pass/2 fail only because canonical receipt is still historical154. All6 research workflows strictly compile in both frameworks. Saved20 native schemas and recaptured30 React previews at20e253, no browser errors/overflow;14 ordinary word-wrap observations retained. TraceLab PR257 draft at7f0e907 carries522 field mappings+10 nested fields,11 passing tests and source receipts; Forge activation/CI/landed provenance pending. Full Forge CI34722431783 still executes runtime/release browser sweeps. Portable smoke reaches health then correctly rejects degraded old receipt. No mission marked complete.",
+    "Checkpoint: all 20 TraceLab schemas saved through the native schema tool into the canonical Forge store and verified via the provided public schema(action=list) connection: 36 total; original 16 schema metadata records unchanged. Native composition validation zero errors for all 20. Receipt cmos/reports/sprint-50/oods-previews/canonical-schemas/persistence.json. Canonical registry still intentionally on 11 objects pending Forge PR105 merge/activation; long CI 34722431783 runtime sweep remains active. TraceLab required checks at 9df87f6 all pass; Forge 42-cell release proof passes and is retained. Next: retain actual 240-cell runtime proof, resolve remaining ledger-dependent checks, merge and activate.",
+    "Checkpoint: all six research workflows pass actual packed React/Vue build/SSR/hydration/navigation/edit/save/filter/cancellation/history gates locally at Forge 2a277133: 192 state observations and 144 screenshots, zero failed gates. All 24 research tests passed in the broader run; broader result 41 passed plus one Vue compiler deadline/worker RPC failure under host memory pressure, isolated Vue retry passed in 8.6s. Fixes committed ed2ddaa7 (canonical collection identity) and 8d189f38 (declared enum-field filtering). Forge PR105 pushed through 335664b5 including authentic 42-cell release proof and explicitly rejected 228/240 catalog diagnostics. Next full pinned Linux run starts now. Refreshing saved schemas/preview receipts to current source; canonical registry remains on old checkout pending full proof and merge.",
+    "Checkpoint: all 20 saved research compositions now have both-theme React previews at 390/820/1440 (40 receipt sets, 120 observations), zero browser errors/overflow and 58 retained text-wrap observations. Committed e3952e4 with full index linked from UX-2/UX-3 referenceDocs and Sprint51 roadmap. Visual review includes Mission workflow and inline Chunk; synthetic controls/fixtures are not final API-bound UI. User reports remain byte-identical. Forge run34725928271 remains active: 42/42 bundle cells passed; full catalog pending. The MCP suite reported 6834 pass,6 fail,16 skip plus one worker RPC timeout: 2 docs freshness failures already fixed locally; 4 canonical runtime/portable-health failures await authentic 240-cell proof. No mission completion or Forge push while that runtime job runs.",
+    "External blocker on final Forge CI run34728733886 at a6c845163368af3e21fff61c88b75a1823448871: GitHub refused every job before steps began, stating recent account payments failed or the spending limit needs increasing. Requested user restore Actions capacity; no billing settings changed and no green result claimed. Earlier run34725928271 has authentic 240/240 catalog,4 dashboards,48 chart scopes and42/42 release proof. Final local proof regressions61/61 and docs checks pass. Full package build now passes after fixing only temporary worktree dependency links; portable archive assembled with dirty=true from untracked dependency links, extracted E2E underway. Merge and public canonical activation remain pending final CI.",
+    "External blocker cleared by observed state: immediately after recording run34728733886's billing refusal and pushing final evidence, new Forge run34728936186 (af277eaa) actually began checkout/setup/install, and TraceLab final evidence CI also executes. UX-1 was briefly Blocked then explicitly unblocked back to In Progress. Session remains active. Do not stop or cancel current runtime job103648041176. No billing/account settings were changed. Final local archive at a6c8451 passed 19 exposed tool paths, health240+42, bridge parity, lifecycle, unchanged extraction tree; retained under Forge local-portable/. Last source changes remove census YAML dependence; all61 targeted tests pass. Wait appropriate final CI, then merge/activate canonical Forge, finish TraceLab PR and resume mission loop.",
+    "Final CI update: Forge run34728936186 on actual PR merge58d88da97dbd3d120aefb70fb3a913ec90fdc46b has passed build/lint/types/components/a11y/tenancy/tokens and BOTH clean --final portable-runtime jobs (Nodev24.20.0 andv20.11.1). Both report dirty=false,19 tool paths,bridge parity,unchanged extraction tree and identical payload901a43a9be26532f4d358794be6860fbc7a0bb8f9ac1d2a8e8c88b167b6d3aa3. Exact downloaded receipts now in TraceLab cmos/reports/sprint-50/forge-final-ci/ (uncommitted until closure). TraceLab PR257 required checks all pass at c9e924c. Forge full suites and240/42browser sweeps remain active; no failed current checks and no push while runtime job103648041176 runs.",
+    "Uncaptured final CI observations, not a fresh Forge status check: by 2026-09-13 01:05:56 UTC before the user stop, Forge run 34728936186 at CI merge 58d88da97dbd3d120aefb70fb3a913ec90fdc46b passed release job 103648041114, 42/42 cells, archive SHA 3b50f551c455588f0e92b1171e75b9ce4b71de9be6a8fc85e785227e462cdbe8; original rows/receipts/host hashes matched and validation issues were empty. Consumer job 103648041105 also passed stages of 13, 2 and 305 tests with no skips. Both clean portable Node v24.20.0/v20.11.1 jobs were already captured as passing 19 actual tool paths with identical payload 901a43a9be26532f4d358794be6860fbc7a0bb8f9ac1d2a8e8c88b167b6d3aa3. Coverage 103648041094, MCP/viz 103648041126 and runtime 103648041176 were still executing at the last observation; final outcomes unknown. Small original receipts are retained under cmos/reports/sprint-50/forge-final-ci/, full release download /tmp/ux1-final-ci-release. Remote CI may continue independently. No Forge actions are authorized by this capture.",
+    "TraceLab handoff inventory: local/remote-tracking head c9e924c51fd773a705bc7a1120a9d68684fdde8a on codex/ux-1 before the local documentation checkpoint; PR257 draft/unmerged at last observation. Required CI passed there; integration run 34728938307 not finally rechecked. Earlier e3952e4 backend 2409 passed/3 skipped/12 deselected and integration 125 passed/4 skipped; full Ruff/mypy/frontend lint had advisory baseline failures. UX-1 contract maps 522 model fields plus 10 nested fields, 18 tests passed without skips, and 20 saved schema-v2 compositions feed 40 React receipts/120 viewport observations, zero browser errors/overflow and 58 wraps. Previews are synthetic structural prototypes, not deployed screens. Source heads and historical failures are preserved in ux-1-validation.json. UX-2/3 and the Sprint 51 roadmap reference the previews. Newly preserved local notes are ux-1-session-handoff.md and ux-2-preparation-notes.md; UX-2 remains queued and those preparation proposals are unaccepted.",
+    "Preservation and session closeout: Sprint 50 is Active, RECOVER-1/RECOVER-2/UX-0 Completed, UX-1 In Progress, UX-2 through UX-5 Queued. User's sprint-37 graph-search and sprint-38 semantic-edge reports still match /tmp/recover1-preserved byte-for-byte and are excluded from the handoff commit. Forge state is historical, not rechecked: PR105 branch codex/tracelab-ux-1 head af277eaa87e3d44a1388ae5da2ae88af26bb44be, temp worktree /tmp/tracelab-ux1-forge; canonical checkout still 114a268, public registry still old 11 objects/154 cells, no worker activation. Forge's four unrelated delivery files were preserved. No additional messages, merge, refresh, cleanup or cancellation occurred after the user's stop. Old next steps 217/218/223/225/226 for starting now-completed recovery/shell work were completed; conflicting Forge-authoring steps 219/227 dropped under decision 391. Key-rotation approval remains unanswered (learning 150); no rotation/revocation occurred and no secret is included in handoff artifacts.",
+    "Closeout checkpoint committed locally as bb0b9af on TraceLab codex/ux-1 (not pushed): cmos/reports/sprint-50/ux-1-session-handoff.md, preserved UX-2 preparation notes, updated UX-1 validation summary, and 15 original final-CI metadata files. Two readiness attestations are copied byte-for-byte to node-24/readiness-attestation.v1.json and node-20.11.1/readiness-attestation.v1.json to keep report metadata outside ignored dist directories. No executable packages were added. JSON parsing, local handoff links, foundational references and staged whitespace checks passed. Original user sprint-37/38 report bytes are unchanged and remain the only unrelated tracked modifications. No runtime code changed or tests rerun during this documentation-only handoff. No Forge access, messages, PR operations, push, merge, worker refresh or CI cancellation occurred.",
+    "Resumed PS-2026-09-13-001 after review/rules/health. start(UX-1) returned MISSION_INVALID_STATE because already In Progress; no duplicate mission created. GitHub TraceLab PR257 is merged at bbfc5185c66150a4b4c19ebc030c16361a8c003e (2026-09-13T01:08:05Z), required checks including integration SUCCESS at c9e924c. Local mapping suite: 18 passed, no skips, 5 warnings. TraceLab inbox has no Forge completion update; request f091c849 remains pending with no response/evidence. No Forge operations/messages performed. Next: reconcile TraceLab evidence and authoritative ownership fallback, then assess dependency gate.",
+    "Final status check: no child/subagents in this task; no other active CMOS session before this check-in. Forge runtime-cells job103651591255 in run34730227443 finished SUCCESS at 2026-09-13T02:26:54Z, resolving the last running-job caveat from UX-1 closure. TraceLab HEAD7623ced contains merged PR258 acceptance evidence. Sprint50 remains Active: RECOVER-1, RECOVER-2, UX-0, UX-1 Completed; UX-2 Home, UX-3 Evidence UI, UX-4 Admin observability, UX-5 Frontend hygiene Queued. No Current/In Progress/Blocked missions. Two unrelated sprint37/38 user report edits remain unstaged and preserved.",
+    "UX-2 implementation committed and pushed as 45898c4f7c7d2fe5484518606c35bd8889cc1fff, draft TraceLab PR259 https://github.com/kneelinghorse/TraceLab/pull/259. Local gates: 133 backend, 95 frontend unit, 9 browser, 2 PostgreSQL14 checks; 6 Home and 6 evidence viewports (both themes at390/820/1440) zero overflow/critical-serious axe/errors. Required CI running. Fresh Forge gate unavailable (OODS-S004 cached registry; OODS-N019 server absent). Asked user authorization via pending task question to start existing preview server and use fresh client; no Forge source/build/checkout/worker actions taken. Next hint: inspect PR259 CI; finish allowed TraceLab fixes; wait for explicit permission before Forge setup; preserve production smoke/merge gates and do not mark UX-2 complete.",
+    "Corrected current PR259 head 97fd25c359dc4a164b0a9ea3f9da21e0bb0bf70d now passes PostgreSQL15 integration CI: 127 passed, 4 skipped, 17 warnings (run34735229762). Production frontend build, vitest, TypeScript, changed-file Ruff, secret scans passed. Existing full Ruff/mypy/frontend lint jobs remain advisory failures. Backend suite still running (run34735229736). Stopped only this task's local Next/API/PostgreSQL processes and removed the synthetic local auth token file; archived screenshots remain available. No Forge actions or cross-project messages taken while user authorization is pending.",
+    "Sprint-close retrospective reviewed after all missions completed:8/8 complete,0 blocked,0 parked,no mission carry-forwards,21 decisions and17 learnings. Product acceptance is deployed at8da544d;124 direct-browser checks pass. UX-5 acceptance/roadmap commit5d1190f is in docs-only PR264. Optional Home favorites remain explicitly deferred under UX-2's accepted option; Sprint51 deeper workflows remain planned/unopened. Local API8103, Next3103 and isolated PostgreSQL55432 are stopped; synthetic browser credential file removed; two pre-existing user report edits preserved."
   ],
   "current_focus": "Sprint 12 - Phase 3: Production hardening, load testing, telemetry aggregation",
-  "completed_sprints": [
-    {
-      "sprint": "Sprint 12",
-      "theme": "Make TraceLab Actually Usable",
-      "completed": "2025-12-05",
-      "missions_completed": 6,
-      "key_outcomes": [
-        "Fixed missions endpoint 500 error",
-        "Added ProxyHeadersMiddleware for HTTPS redirects",
-        "Created service account for DeepSearch integration",
-        "Standardized API response structure",
-        "Verified E2E DeepSearch integration (5/6 steps pass)",
-        "Documented pre-flight discovery limitation"
-      ]
-    },
-    {
-      "sprint": "Sprint 17",
-      "theme": "Data Protection, Stability & Architecture Research",
-      "completed": "2025-12-09",
-      "missions_completed": 11,
-      "key_outcomes": [
-        "DELETE endpoints require auth + confirm=true",
-        "Soft delete for projects/documents (recoverable)",
-        "Qdrant recovery script (reprocess_embeddings.py)",
-        "Report promotion to document for knowledge loop",
-        "Audit metadata: updated_at, created_by, timestamps",
-        "Architecture health: 8/10, N+1 risks identified"
-      ]
-    }
-  ],
   "current_sprint": {
-    "id": "sprint-18",
-    "name": "Sprint 18",
-    "theme": "PEDR Validation Sprint",
-    "status": "Planned",
-    "missions": 8,
-    "planned_date": "2025-12-10"
+    "id": "sprint-51",
+    "name": "Sprint 51 — The Working Surfaces (Sprint 2 of the UX overhaul) + theme truth",
+    "status": "Active",
+    "focus": "Rebuild Missions, Projects/Documents, Collections/Reports, Search + command palette and route migration (UX-6..UX-10) on the S50 shell and object model; plus THEME-1 (truthful theme selector on the latest stable Forge tokens) and CI-2 (fix-or-drop the red advisory lint lanes). Roadmap: cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md"
   },
   "strategic_context": {
     "sprint_13": {
@@ -2005,19 +476,130 @@
       }
     }
   },
-  "session_summaries": [
+  "current_phase": "Sprint 31 — MCP Descriptions, Login & Export Polish",
+  "sprint_history": [
     {
-      "date": "2025-12-05",
-      "session_id": "PS-2025-12-05-006",
-      "type": "Sprint Review & Planning",
-      "summary": "Sprint 12 review (6/6 complete, DeepSearch verified). Sprint 13 planned with 10 missions across Documents, Collections, Search, and Polish. Key pivot: Collections feature replaces dead add-to-mission workflow.",
-      "outcomes": [
-        "Sprint 12 retrospective documented",
-        "Sprint 13 backlog defined (10 missions)",
-        "Mission YAML files created in cmos/missions/sprint-13/",
-        "Database updated with sprint and missions",
-        "Architecture clarified: missions vs collections vs documents"
+      "sprint": "Sprint 19",
+      "theme": "PEDR Latency Optimization",
+      "status": "Completed",
+      "completion_date": "2025-12-10",
+      "key_outcome": "97% latency reduction in Qdrant semantic layer; PEDR enabled for main search",
+      "missions_completed": [
+        "R19.0",
+        "B19.1",
+        "B19.2",
+        "B19.3",
+        "B19.4",
+        "B19.5",
+        "B19.6",
+        "B19.7"
+      ]
+    },
+    {
+      "sprint": "Sprint 25",
+      "theme": "L6 Graph Layer",
+      "status": "Completed",
+      "completion_date": "2025-12-21",
+      "key_outcome": "PEDR L6 graph layer delivered with API + RAG integration and test coverage",
+      "missions_completed": [
+        "B25.1",
+        "B25.2",
+        "B25.3",
+        "B25.4",
+        "B25.5",
+        "B25.6"
       ]
     }
-  ]
+  ],
+  "next_steps": [
+    "Run materialize_edges --full on production data to populate graph edges, then re-validate Graph L6 quality",
+    "Bridge TraceLab mission events into CMOS transitions (top ecosystem finding)",
+    "Resolve persistent sync drift: sessions delta=11, strategic_decisions delta=29; implement auto-backfill threshold",
+    "Migrate remaining telemetry emitters to emit_telemetry(): evidence_auto_linking, correction_queue, webhook_client, sync_events, preflight, delta_sync",
+    "Disable Graph L6 by default until edge materialization proves quality improvement on production data",
+    "Consider merging sprint-33 branch to main"
+  ],
+  "archived_sprint_summaries": [
+    {
+      "sprint_id": "sprint-28",
+      "archived_at": "2026-03-12T00:16:07.917Z",
+      "keep_detail_sprints": 3,
+      "snapshot_id": 726,
+      "detail_counts": {
+        "session_history": 0,
+        "recent_sessions": 1,
+        "next_steps": 0,
+        "total": 1
+      },
+      "summary": "Detailed session history for this completed sprint was condensed and preserved in context snapshots."
+    },
+    {
+      "sprint_id": "sprint-24",
+      "archived_at": "2026-04-27T06:52:04.907Z",
+      "keep_detail_sprints": 3,
+      "snapshot_id": 821,
+      "detail_counts": {
+        "session_history": 0,
+        "recent_sessions": 0,
+        "next_steps": 14,
+        "total": 14
+      },
+      "summary": "Detailed session history for this completed sprint was condensed and preserved in context snapshots."
+    },
+    {
+      "sprint_id": "sprint-40",
+      "archived_at": "2026-04-27T06:52:04.907Z",
+      "keep_detail_sprints": 3,
+      "snapshot_id": 821,
+      "detail_counts": {
+        "session_history": 0,
+        "recent_sessions": 0,
+        "next_steps": 3,
+        "total": 3
+      },
+      "summary": "Detailed session history for this completed sprint was condensed and preserved in context snapshots."
+    }
+  ],
+  "recent_sessions": [],
+  "completed_missions": [
+    {
+      "mission_id": "T42.1",
+      "mission_name": "T42.1 — Decide preview-path fate (keep vs kill)",
+      "objective": "Determine whether `tracelab_mission_execution(action=\"preview\")` stays or goes. The 10 T40.1 columns (background, focus, references, expected_output_schema, coverage_thresholds, validation_thresholds, deliverable_format, max_loops, min_loops, constraints) feed the vendored contract compiler at app/services/contract_compiler/ via app/services/deepsearch_preview_client.py:81-93. DS confirmed their post-rebuild worker doesn't read them, but TL's preview path does. Decision needed: (a) KEEP preview = keep all 10 columns + maintain compiler-resync ritual at cmos/contracts/deepsearch-compiler-vendor.md (compiler stays vendored, fields stay authored, preview keeps producing useful output for authors even though it's no longer wire-coupled to DS execution), OR (b) KILL preview = drop the 10 columns + delete app/services/contract_compiler/ + remove tracelab_mission_execution action=\"preview\" + remove deepsearch_preview_client.py. Drives downstream cleanup scope. Investigation needed: who/what calls preview today (any agent workflow, any frontend surface, any test fixtures other than smoke), and is the user-facing value of preview still real post-rebuild given DS no longer uses the contract output.",
+      "notes": "KEEP preview decision per user directive 2026-04-29. Preserves tracelab_mission_execution(action='preview') via vendored compiler at app/services/contract_compiler/. The 10 T40.1 columns (background, focus, references, expected_output_schema, coverage_thresholds, validation_thresholds, deliverable_format, max_loops, min_loops, constraints) stay nullable in DB. Vendored compiler stays pinned to DS@24e8810; resync ritual at cmos/contracts/deepsearch-compiler-vendor.md remains live. DS's 'dead-surface' framing applies to their worker SELECT only, not to TL's preview path. No column-drop scope in S42 from this mission. DS notified in clean status update.",
+      "completed_at": "2026-04-29T12:49:12.928Z",
+      "sprint_id": "sprint-42"
+    }
+  ],
+  "completed_sprints": [],
+  "handoff_2026_08_14": {
+    "status": "production_recovered_handoff_ready",
+    "traceLabMainCommit": "24cda06591a36fe721a78279ad85a7462448b10f",
+    "pullRequests": [
+      "#223 integration stabilization",
+      "#224 production migration hotfix"
+    ],
+    "railwayDeployment": "f2f2739d-21bf-4201-9ead-4564669aa9a6 SUCCESS",
+    "liveVerification": "/api/v1/health/ready => ready; database healthy; Qdrant healthy",
+    "nextSession": [
+      "Deploy the recurring result reconciler and run a bounded one-time historical backfill; verify pedr-retrieval-evaluation-R001 materializes exactly once and is searchable.",
+      "Run authenticated production create-to-scoped-list smokes for T48.4 and T48.8, then reconcile mission status.",
+      "Await DeepSearch-owned acknowledgment/commit/deploy evidence, then run unpaid published-MCP lifecycle acceptance; do not edit the DeepSearch repository from TraceLab.",
+      "Resume leakage-free PEDR versus modern hybrid/vector/graph evaluation only after integration acceptance.",
+      "Repair the CMOS session-start project_id write path."
+    ],
+    "captureVerification": {
+      "masterContextUpdated": true,
+      "missionNotesUpdated": [
+        "T48.4",
+        "T48.6",
+        "T48.8",
+        "T48.9"
+      ],
+      "formalSessionCreated": false,
+      "masterSnapshotCreated": false,
+      "projectSnapshot": "existing duplicate #928; no new snapshot",
+      "blocker": "CMOS MCP handlers omit required project_id on session start and master snapshot"
+    }
+  }
 }
