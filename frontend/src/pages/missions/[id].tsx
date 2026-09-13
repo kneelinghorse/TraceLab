@@ -1,5 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { httpClient } from "@/lib/api/http";
+import { Dialog } from "@/components/ui/Dialog";
+import { EvidencePanel } from "@/components/evidence/EvidencePanel";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import useSWR from "swr";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
 import { formatDistanceToNow } from "date-fns";
 
@@ -45,6 +50,10 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function MissionDetailContent() {
   const router = useRouter();
   const missionId = typeof router.query.id === "string" ? router.query.id : undefined;
+  const [detailTab, setDetailTab] = useState("overview");
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isPromoting, setIsPromoting] = useState(false);
@@ -102,13 +111,16 @@ function MissionDetailContent() {
 
   const handleDelete = async () => {
     if (!missionId) return;
-    if (!confirm("Are you sure you want to delete this mission?")) return;
+    setDeleting(true);
+    setActionError(null);
 
     try {
       await missionsApi.delete(missionId);
       router.push("/missions");
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to delete mission");
+      setActionError(err instanceof Error ? err.message : "Failed to delete mission");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -357,6 +369,12 @@ function MissionDetailContent() {
   return (
     <div className="min-h-screen bg-background dark:bg-background py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {actionError && !deleteOpen && <p role="alert" className="mb-4 break-words rounded bg-danger-surface p-4 text-danger">{actionError}</p>}
+          <Dialog open={deleteOpen} title="Delete mission" onClose={() => { if (!deleting) setDeleteOpen(false); }}>
+            <p className="mb-4">Delete this mission? This cannot be undone.</p>
+            {actionError && <p role="alert" className="mb-4 break-words text-danger">{actionError}</p>}
+            <div className="flex gap-3"><button disabled={deleting} className="rounded border border-line px-3 py-2" onClick={() => setDeleteOpen(false)}>Cancel</button><button disabled={deleting} className="rounded bg-danger-surface px-3 py-2 text-danger" onClick={() => void handleDelete()}>{deleting ? "Deleting…" : "Delete mission"}</button></div>
+          </Dialog>
         <div className="mb-6 flex items-center justify-between">
           <Link
             href="/missions"
@@ -741,7 +759,7 @@ function MissionDetailContent() {
                     Edit Mission
                   </button>
                   <button
-                    onClick={handleDelete}
+                    onClick={() => { setActionError(null); setDeleteOpen(true); }}
                     className="px-4 py-2 border border-danger-line dark:border-danger-line text-danger dark:text-danger rounded-lg hover:bg-danger-surface dark:hover:bg-danger-surface transition-colors font-medium text-sm"
                   >
                     Delete
@@ -764,6 +782,11 @@ function MissionDetailContent() {
             )}
           </div>
 
+          <div className="flex gap-3 border-b border-line p-4" role="tablist" aria-label="Mission detail">
+            {['overview', 'evidence'].map(tab => <button key={tab} id={`mission-tab-${tab}`} role="tab" aria-selected={detailTab === tab} aria-controls={`mission-panel-${tab}`} tabIndex={detailTab === tab ? 0 : -1} onKeyDown={event => { if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) { event.preventDefault(); const next = event.key === "Home" ? "overview" : event.key === "End" ? "evidence" : tab === "overview" ? "evidence" : "overview"; setDetailTab(next); document.getElementById(`mission-tab-${next}`)?.focus(); } }} onClick={() => setDetailTab(tab)} className={`rounded px-4 py-2 ${detailTab === tab ? 'bg-accent text-on-accent' : 'border border-line'}`}>{tab === 'overview' ? 'Overview' : 'Evidence'}</button>)}
+          </div>
+          {detailTab === 'evidence' && <div role="tabpanel" id="mission-panel-evidence" aria-labelledby="mission-tab-evidence" className="px-4"><EvidencePanel projectId={mission.project_id} filters={{ mission_id: mission.id }} /></div>}
+          <div role="tabpanel" id="mission-panel-overview" aria-labelledby="mission-tab-overview" hidden={detailTab !== 'overview'}>
           {/* Objective Section */}
           <Section title="Objective">
             <p className="text-secondary dark:text-secondary whitespace-pre-wrap">
@@ -888,6 +911,7 @@ function MissionDetailContent() {
 
           {/* Runner logs */}
           {missionId && <MissionLogTail missionId={missionId} status={mission?.status} />}
+          </div>
         </div>
       </div>
     </div>
@@ -917,39 +941,14 @@ const LOG_LEVEL_COLORS: Record<string, string> = {
 };
 
 function MissionLogTail({ missionId, status }: { missionId: string; status: MissionStatus | undefined }) {
-  const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [hasLogs, setHasLogs] = useState<boolean | null>(null); // null = not yet checked
+  const { user } = useAuth();
   const bottomRef = useRef<HTMLDivElement>(null);
   const isActive = status ? ACTIVE_STATUSES.has(status) : false;
-
-  const fetchLogs = useCallback(async () => {
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000"}/api/v1/missions/${missionId}/logs?limit=100`,
-        {
-          headers: {
-            Authorization: `Bearer ${typeof window !== "undefined" ? JSON.parse(localStorage.getItem("tracelab_auth") ?? "{}").token ?? "" : ""}`,
-          },
-        }
-      );
-      if (!res.ok) return;
-      const data: LogEntry[] = await res.json();
-      setLogs(data);
-      if (hasLogs === null) setHasLogs(data.length > 0);
-    } catch {
-      // non-fatal
-    }
-  }, [missionId, hasLogs]);
-
-  useEffect(() => {
-    fetchLogs();
-  }, [fetchLogs]);
-
-  useEffect(() => {
-    if (!isActive) return;
-    const id = setInterval(fetchLogs, POLL_INTERVAL_MS);
-    return () => clearInterval(id);
-  }, [isActive, fetchLogs]);
+  const { data: logs = [], error, isLoading, mutate } = useSWR(
+    ["mission-logs", user?.user_id, missionId],
+    () => httpClient.get<LogEntry[]>(`/missions/${missionId}/logs`, { params: { limit: 100 } }),
+    { refreshInterval: isActive ? POLL_INTERVAL_MS : 0 },
+  );
 
   // Auto-scroll to bottom when new logs arrive while active
   useEffect(() => {
@@ -959,7 +958,7 @@ function MissionLogTail({ missionId, status }: { missionId: string; status: Miss
   }, [logs, isActive]);
 
   // Don't render if we've confirmed there are no logs
-  if (hasLogs === false && !isActive) return null;
+  if (!isLoading && !error && logs.length === 0 && !isActive) return null;
 
   return (
     <div className="border-t border-line dark:border-line mt-0">
@@ -976,14 +975,15 @@ function MissionLogTail({ missionId, status }: { missionId: string; status: Miss
           )}
         </div>
 
-        {logs.length === 0 ? (
+        {error && <p role="alert" className="mb-3 text-sm text-danger">Unable to load runner logs. <button className="underline" onClick={() => void mutate()}>Retry logs</button></p>}
+        {isLoading ? <p role="status">Loading logs…</p> : logs.length === 0 ? (
           <p className="text-sm text-muted dark:text-muted font-mono">
             {isActive ? "Waiting for logs..." : "No logs recorded."}
           </p>
         ) : (
           <div tabIndex={0} role="region" aria-label="Execution log" className="bg-background dark:bg-background rounded-lg p-4 overflow-y-auto max-h-96 font-mono text-xs space-y-0.5">
             {logs.map((log) => (
-              <div key={log.id} className="flex gap-3 leading-5">
+              <div key={log.id} className="flex flex-wrap gap-x-3 gap-y-1 leading-5">
                 <span className="shrink-0 text-muted dark:text-secondary w-[180px]">
                   {new Date(log.logged_at).toISOString().replace("T", " ").slice(0, 19)}
                 </span>

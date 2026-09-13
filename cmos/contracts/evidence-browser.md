@@ -1,0 +1,22 @@
+# Evidence browser (UX-3)
+
+Guiding plan: [Sprint 50–53 UX overhaul](../foundational-docs/roadmap-sprints-50-53-ux-overhaul.md). The [OODS object contract](oods-object-model.md) and accepted Evidence list/detail compositions supply the presentation reference. This browser binds those structures to the existing ledger; it does not change the MCP capture, search, note or promotion contracts.
+
+The existing `GET /api/v1/evidence` and `/evidence/search` endpoints accept additional optional `tag`, `created_from`, `created_until`, `source_id`, `report_id` and `document_id` filters. Tags match an exact JSON-array element. Dates are inclusive UTC calendar days; reversed ranges and an unrepresentable exclusive upper bound return 422. Filters apply before SQL counts, sorting and pagination in PostgreSQL and SQLite. Report and document filters are mutually exclusive and independently authorized within the selected project.
+
+`GET /api/v1/evidence/{id}` returns the unchanged `LedgerEntryRead` object plus authorized output links. The parent project must be readable and not soft-deleted. A member outside the project's Space receives no entry or sightings; a guessed entry ID returns 404. Human authentication is required, including human-owned API keys; service-role callers are denied.
+
+Relationships are derived from persisted `ReportSource(source_type=ledger_entry)`, readable missions whose result report matches, and exact literal HTTP(S) URLs in an authorized report's content. A document inherits evidence through its readable source mission/report, or an exact source URL in its provenance metadata (`source_url`, `url`, `original_url`). Sources are never fetched by the API. These are provenance matches, not an assertion that a claim was independently verified. Entry detail shows its readable source mission and at most 50 explicitly related reports; unknown relationships remain absent. Merely sharing a project does not create a provenance link or authorize an output.
+
+The list supports project, mission, session, disposition, tag and date filters and the existing search endpoint. Changing project clears incoming filters. The source-grouping option is explicitly for the current result page; it never claims those page counts are global source totals. Entry detail has a separate, server-paginated view of accessible sightings of the same project-local canonical source. The older `source_sighting_count` field remains intact, but the UI uses the authorized sightings query's total.
+
+Session working notes have their own pagination and remain separate from sourced claims. Promotion opens a modal confirmation, explains that all session entries and notes are included regardless of current filters, then invokes the existing promotion endpoint. A failed request remains visible and retryable; cancel and Escape do not create artifacts. Report/document/mission deletion dialogs on the touched routes also use the shared modal, and errors remain inline. Runner logs use the shared authenticated client and SWR refresh rather than a legacy storage key.
+
+Production inventory on 2026-09-13: TL-UX-R001 (`7b847edd-5433-4237-a899-57b47e6edf0a`) has **370** ledger entries in `deepsearch:64ff9dac-d043-4f74-8645-612cecc58d79`: **191 supporting, 170 background, 9 rejected**. The project's earlier 50-entry / 44-supporting / 6-background acceptance example is stale. Tests retain that distribution as a synthetic workflow fixture and add a 123-row exact-filter regression; live acceptance uses current API totals.
+
+Validation entry points:
+
+- `tests/test_evidence_ledger_api.py::TestEvidenceBrowser`: exact filters across pages, denied cross-Space access, hidden output links and deleted projects.
+- `tests/integration/test_evidence_browser_postgres.py`: JSONB tag containment and ranked FTS with date filtering before count/page.
+- `frontend/src/__tests__/evidence.test.tsx`: search/filter/pagination, failure/retry, detail/sightings, explicit promotion and inbound links.
+- `frontend/scripts/evidence-smoke.mjs`: read-only built-app and deployed checks for list/detail, promotion dialog and report/document/mission links in both themes at390/820/1440. Defaults to production; an explicit local auth file selects an isolated fixture API. Credentials remain in the Node process, with a placeholder in browser storage. No paid mission or production promotion is submitted.

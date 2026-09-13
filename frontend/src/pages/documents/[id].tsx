@@ -1,3 +1,5 @@
+import { Dialog } from "@/components/ui/Dialog";
+import { EvidencePanel } from "@/components/evidence/EvidencePanel";
 /**
  * Document detail page
  */
@@ -16,12 +18,15 @@ import useSWR from "swr";
 export default function DocumentDetailPage() {
   const router = useRouter();
   const { id } = router.query;
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [chunksPage, setChunksPage] = useState(1);
   const [expandedChunks, setExpandedChunks] = useState<Set<string>>(new Set());
 
-  const { data: document, mutate } = useSWR<Document>(
+  const { data: document, mutate, error: loadError } = useSWR<Document>(
     id ? `document-${id}` : null,
     () => documentsApi.getDocument(id as string)
   );
@@ -53,21 +58,25 @@ export default function DocumentDetailPage() {
       setTimeout(() => mutate(), 2000);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to process document";
-      alert(message);
+      setActionError(message);
     } finally {
       setProcessing(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!id || !confirm("Are you sure you want to delete this document?")) return;
+    if (!id) return;
+    setDeleting(true);
+    setActionError(null);
 
     try {
       await documentsApi.deleteDocument(id as string);
       router.push("/documents");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to delete document";
-      alert(message);
+      setActionError(message);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -87,11 +96,13 @@ export default function DocumentDetailPage() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to download document";
-      alert(message);
+      setActionError(message);
     } finally {
       setDownloading(false);
     }
   };
+
+  if (loadError) return <AuthGate><div role="alert" className="p-6">Document could not be loaded. <button className="underline" onClick={() => void mutate()}>Retry</button></div></AuthGate>;
 
   if (!document) {
     return (
@@ -107,6 +118,12 @@ export default function DocumentDetailPage() {
     <AuthGate>
       <div className="min-h-screen bg-background dark:bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {actionError && !deleteOpen && <p role="alert" className="mb-4 break-words rounded bg-danger-surface p-4 text-danger">{actionError}</p>}
+          <Dialog open={deleteOpen} title="Delete document" onClose={() => { if (!deleting) setDeleteOpen(false); }}>
+            <p className="mb-4">Delete this document? This cannot be undone.</p>
+            {actionError && <p role="alert" className="mb-4 break-words text-danger">{actionError}</p>}
+            <div className="flex gap-3"><button disabled={deleting} className="rounded border border-line px-3 py-2" onClick={() => setDeleteOpen(false)}>Cancel</button><button disabled={deleting} className="rounded bg-danger-surface px-3 py-2 text-danger" onClick={() => void handleDelete()}>{deleting ? "Deleting…" : "Delete document"}</button></div>
+          </Dialog>
           {/* Back Link */}
           <Link
             href="/documents"
@@ -114,6 +131,8 @@ export default function DocumentDetailPage() {
           >
             ← Back to Documents
           </Link>
+
+          <EvidencePanel projectId={document.project_id} filters={{ document_id: document.id }} />
 
           {/* Header */}
           <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6 mb-6">
@@ -238,7 +257,7 @@ export default function DocumentDetailPage() {
                 </button>
               )}
               <button
-                onClick={handleDelete}
+                onClick={() => { setActionError(null); setDeleteOpen(true); }}
                 className="px-4 py-2 border border-danger-line text-danger dark:text-danger rounded-lg hover:bg-danger-surface dark:hover:bg-surface-alt transition-colors"
               >
                 Delete Document

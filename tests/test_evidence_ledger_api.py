@@ -1821,3 +1821,149 @@ class TestPromotion:
         assert db_session.query(Report).count() == 0
         assert db_session.query(ReportSource).count() == 0
         assert db_session.query(Document).count() == 0
+
+
+class TestEvidenceBrowser:
+    def test_filters_count_all_matching_rows_and_keep_exact_tags(self, client, db_session, rbac_on):
+        from datetime import datetime
+
+        member = _user(db_session, "browser-filter@example.com")
+        _, project = _space_project(db_session, member)
+        headers = _bearer(member)
+        for batch in (100, 23):
+            response = _capture(
+                client,
+                headers,
+                project,
+                session_key="browser",
+                entries=[
+                    {
+                        "claim": "Needle supports the finding",
+                        "source_url": "https://example.test/shared",
+                        "disposition": "supporting",
+                        "tags": ["exact%tag"],
+                    }
+                    for _ in range(batch)
+                ],
+            )
+            assert response.status_code == 201, response.text
+        for row in db_session.query(LedgerEntry).filter(LedgerEntry.project_id == project.id):
+            row.created_at = datetime(2026, 9, 12, 23, 59, 59)
+        db_session.commit()
+        response = _capture(
+            client,
+            headers,
+            project,
+            session_key="browser",
+            entries=[
+                {
+                    "claim": "Needle is irrelevant",
+                    "source_url": "https://example.test/other",
+                    "disposition": "background",
+                    "tags": ["exactXtag"],
+                }
+            ],
+        )
+        assert response.status_code == 201
+        params = {
+            "project_id": str(project.id),
+            "tag": "exact%tag",
+            "created_from": "2026-09-12",
+            "created_until": "2026-09-12",
+            "page_size": 20,
+            "page": 7,
+        }
+        for path in (API, f"{API}/search"):
+            response = client.get(
+                path, params={**params, **({"q": "Needle"} if path.endswith("search") else {})}, headers=headers
+            )
+            assert response.status_code == 200, response.text
+            body = response.json()
+            assert body.get("entry_total", body.get("total")) == 123
+            assert len(body["entries"]) == 3, "Filtering a fetched page would lose matching evidence"
+        for extra in ({"created_from": "2026-09-13"}, {"created_until": "9999-12-31"}, {"tag": " "}):
+            assert client.get(API, params={**params, **extra}, headers=headers).status_code == 422
+
+    def test_detail_and_sightings_deny_a_member_outside_the_project(self, client, db_session, rbac_on):
+        member = _user(db_session, "browser-reader@example.com")
+        outsider = _user(db_session, "browser-outsider@example.com")
+        _, project = _space_project(db_session, member)
+        created = _capture(
+            client,
+            _bearer(member),
+            project,
+            session_key="shared-source",
+            entries=[
+                {
+                    "claim": "Visible evidence",
+                    "source_url": "https://example.test/source",
+                    "snippet": "Original passage",
+                    "disposition": "supporting",
+                },
+                {"claim": "Second sighting", "source_url": "https://example.test/source", "disposition": "background"},
+            ],
+        )
+        assert created.status_code == 201, created.text
+        entry = created.json()["entries"][0]
+        assert client.get(f"{API}/{entry['id']}").status_code == 401
+        service = _user(db_session, "browser-service@example.com", ROLE_SERVICE)
+        assert client.get(f"{API}/{entry['id']}", headers=_bearer(service)).status_code == 403
+        response = client.get(f"{API}/{entry['id']}", headers=_bearer(member))
+        assert response.status_code == 200, response.text
+        assert response.json()["entry"]["snippet"] == "Original passage"
+        params = {"project_id": str(project.id), "source_id": entry["source_id"], "page_size": 1}
+        body = client.get(API, params=params, headers=_bearer(member)).json()
+        assert body["entry_total"] == 2 and len(body["entries"]) == 1
+        assert client.get(f"{API}/{entry['id']}", headers=_bearer(outsider)).status_code == 404
+        assert client.get(API, params=params, headers=_bearer(outsider)).status_code == 403
+        project.soft_delete()
+        db_session.commit()
+        assert client.get(f"{API}/{entry['id']}", headers=_bearer(member)).status_code == 404
+
+    def test_output_links_resolve_only_authorized_provenance(self, client, db_session, rbac_on):
+        member = _user(db_session, "browser-links@example.com")
+        project = Project(name="Personally owned evidence context", owner_id=member.id)
+        db_session.add(project)
+        db_session.commit()
+        mission = _mission(db_session, project)
+        mission.owner_id = member.id
+        report = Report(
+            project_id=project.id,
+            title="Readable result",
+            content="Finding [source](https://example.test/link)",
+            owner_id=member.id,
+        )
+        hidden = Report(
+            project_id=project.id, title="Hidden result", content="Secret", owner_id=None, workspace_id=None
+        )
+        db_session.add_all([report, hidden])
+        db_session.flush()
+        mission.result_report_id = report.id
+        db_session.commit()
+        captured = _capture(
+            client,
+            _bearer(member),
+            project,
+            session_key="provenance",
+            mission=mission,
+            entries=[{"claim": "Linked claim", "source_url": "https://example.test/link", "disposition": "supporting"}],
+        )
+        assert captured.status_code == 201, captured.text
+        entry = captured.json()["entries"][0]
+        db_session.add(ReportSource(report_id=hidden.id, source_type="ledger_entry", source_id=UUID(entry["id"])))
+        document = Document(
+            project_id=project.id, name="Result document", source_report_id=report.id, owner_id=member.id
+        )
+        db_session.add(document)
+        db_session.commit()
+        params = {"project_id": str(project.id)}
+        for key, entity_id in (("report_id", report.id), ("document_id", document.id)):
+            response = client.get(API, params={**params, key: str(entity_id)}, headers=_bearer(member))
+            assert response.status_code == 200, response.text
+            assert response.json()["entry_total"] == 1
+        assert (
+            client.get(API, params={**params, "report_id": str(hidden.id)}, headers=_bearer(member)).status_code == 404
+        )
+        detail = client.get(f"{API}/{entry['id']}", headers=_bearer(member)).json()
+        assert {link["id"] for link in detail["links"]} == {str(mission.id), str(report.id)}
+        assert "Hidden result" not in str(detail)

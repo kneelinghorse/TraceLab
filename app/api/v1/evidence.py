@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
@@ -16,13 +17,17 @@ from app.core.authorization import (
 )
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
+from app.models.document import Document
 from app.models.evidence_ledger import LedgerEntry, LedgerNote
 from app.models.mission import Mission
 from app.models.project import Project
+from app.models.report import Report
+from app.schemas.evidence_browser import EvidenceDetail
 from app.schemas.evidence_ledger import (
     CaptureRequest,
     CaptureResponse,
     LedgerDisposition,
+    LedgerEntryRead,
     LedgerListResponse,
     LedgerNoteRead,
     LedgerSearchResponse,
@@ -30,6 +35,7 @@ from app.schemas.evidence_ledger import (
     PromotionRequest,
     PromotionResponse,
 )
+from app.services.evidence_browser import document_evidence_filter, entry_links, readable_query, report_evidence_filter
 from app.services.evidence_ledger import (
     EvidenceLedgerService,
     get_evidence_ledger_service,
@@ -113,6 +119,33 @@ def _evidence_access_filter(
     return or_(base_filter, model.project_id.in_(owned_projects))
 
 
+def _browser_filter(
+    db: Session,
+    user: AuthenticatedUser,
+    project_id: UUID,
+    report_id: UUID | None,
+    document_id: UUID | None,
+    created_from: date | None,
+    created_until: date | None,
+):
+    if created_from and created_until and created_from > created_until:
+        raise HTTPException(status_code=422, detail="Start date must not follow end date.")
+    if created_until == date.max:
+        raise HTTPException(status_code=422, detail="End date is out of range.")
+    if report_id and document_id:
+        raise HTTPException(status_code=422, detail="Choose one report or document filter.")
+    if report_id or document_id:
+        model, entity_id = (Report, report_id) if report_id else (Document, document_id)
+        query = readable_query(db, user, model).filter(model.id == entity_id, model.project_id == project_id)
+        if model is Document:
+            query = query.filter(Document.deleted_at.is_(None))
+        entity = query.first()
+        if entity is None:
+            raise HTTPException(status_code=404, detail="Evidence context not found.")
+        return report_evidence_filter(db, user, entity) if report_id else document_evidence_filter(db, user, entity)
+    return None
+
+
 @router.post(
     "/capture",
     response_model=CaptureResponse,
@@ -181,6 +214,12 @@ def list_evidence(
     session_key: str | None = Query(default=None, min_length=1, max_length=255),
     mission_id: UUID | None = None,
     disposition: LedgerDisposition | None = None,
+    tag: str | None = Query(default=None, min_length=1, max_length=64),
+    created_from: date | None = None,
+    created_until: date | None = None,
+    source_id: UUID | None = None,
+    report_id: UUID | None = None,
+    document_id: UUID | None = None,
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
@@ -190,6 +229,7 @@ def list_evidence(
     """List accessible evidence and notes for one project."""
     _load_project(db, current_user, project_id, "read")
     _authorize_mission(db, current_user, mission_id, project_id, "read")
+    related_filter = _browser_filter(db, current_user, project_id, report_id, document_id, created_from, created_until)
     project_scope = accessible_project_ids(current_user, db)
     normalized_session = _normalize_optional_filter(session_key, "session_key")
     entries, notes, entry_total, note_total = service.list_ledger(
@@ -203,6 +243,11 @@ def list_evidence(
         entry_access_filter=_evidence_access_filter(current_user, LedgerEntry, db),
         note_access_filter=_evidence_access_filter(current_user, LedgerNote, db),
         allowed_project_ids=project_scope,
+        tag=_normalize_optional_filter(tag, "tag"),
+        created_from=created_from,
+        created_until=created_until,
+        source_id=source_id,
+        related_filter=related_filter,
     )
     return LedgerListResponse(
         entries=entries,
@@ -221,6 +266,12 @@ def search_evidence(
     session_key: str | None = Query(default=None, min_length=1, max_length=255),
     mission_id: UUID | None = None,
     disposition: LedgerDisposition | None = None,
+    tag: str | None = Query(default=None, min_length=1, max_length=64),
+    created_from: date | None = None,
+    created_until: date | None = None,
+    source_id: UUID | None = None,
+    report_id: UUID | None = None,
+    document_id: UUID | None = None,
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
@@ -230,6 +281,7 @@ def search_evidence(
     """Search accessible claims with PostgreSQL FTS or literal ILIKE."""
     _load_project(db, current_user, project_id, "read")
     _authorize_mission(db, current_user, mission_id, project_id, "read")
+    related_filter = _browser_filter(db, current_user, project_id, report_id, document_id, created_from, created_until)
     project_scope = accessible_project_ids(current_user, db)
     keyword = _normalize_required_filter(q, "q")
     normalized_session = _normalize_optional_filter(session_key, "session_key")
@@ -244,6 +296,11 @@ def search_evidence(
         page_size=page_size,
         access_filter=_evidence_access_filter(current_user, LedgerEntry, db),
         allowed_project_ids=project_scope,
+        tag=_normalize_optional_filter(tag, "tag"),
+        created_from=created_from,
+        created_until=created_until,
+        source_id=source_id,
+        related_filter=related_filter,
     )
     return LedgerSearchResponse(
         entries=entries,
@@ -299,3 +356,22 @@ def promote_evidence(
         note_count=note_count,
         status="completed" if document is not None else "created",
     )
+
+
+@router.get("/{entry_id}", response_model=EvidenceDetail)
+def get_evidence_entry(
+    entry_id: UUID,
+    current_user: AuthenticatedUser = Depends(require_authenticated_user),
+    db: Session = Depends(get_db),
+) -> EvidenceDetail:
+    if is_service_principal(current_user):
+        raise HTTPException(status_code=403, detail="Evidence Ledger routes require a human user principal.")
+    query = db.query(LedgerEntry).filter(LedgerEntry.id == entry_id)
+    scope = _evidence_access_filter(current_user, LedgerEntry, db)
+    if scope is not None:
+        query = query.filter(scope)
+    entry = query.first()
+    if entry is None:
+        raise HTTPException(status_code=404, detail="Evidence entry not found.")
+    _load_project(db, current_user, entry.project_id, "read")
+    return EvidenceDetail(entry=LedgerEntryRead.model_validate(entry), links=entry_links(db, current_user, entry))

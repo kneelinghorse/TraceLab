@@ -1,3 +1,5 @@
+import { Dialog } from "@/components/ui/Dialog";
+import { EvidencePanel } from "@/components/evidence/EvidencePanel";
 /**
  * Report detail page
  */
@@ -14,6 +16,9 @@ import useSWR from "swr";
 export default function ReportDetailPage() {
   const router = useRouter();
   const { id } = router.query;
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editError, setEditError] = useState<string | null>(null);
@@ -32,7 +37,7 @@ export default function ReportDetailPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const { data: report, mutate, isLoading } = useSWR<ReportDetail>(
+  const { data: report, mutate, isLoading, error: loadError } = useSWR<ReportDetail>(
     id ? `report-${id}` : null,
     () => reportsApi.get(id as string)
   );
@@ -68,22 +73,23 @@ export default function ReportDetailPage() {
       mutate();
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to update status";
-      alert(message);
+      setActionError(message);
     }
   };
 
   const handleDelete = async () => {
     if (!report) return;
-    if (!confirm(`Delete report "${report.title}"? This cannot be undone.`)) {
-      return;
-    }
+    setDeleting(true);
+    setActionError(null);
 
     try {
       await reportsApi.delete(report.id);
       router.push("/reports");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to delete report";
-      alert(message);
+      setActionError(message);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -93,8 +99,8 @@ export default function ReportDetailPage() {
       await navigator.clipboard.writeText(report.content);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
-    } catch (error) {
-      alert("Failed to copy to clipboard");
+    } catch {
+      setActionError("Failed to copy to clipboard");
     }
   };
 
@@ -115,7 +121,7 @@ export default function ReportDetailPage() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Export failed";
-      alert(message);
+      setActionError(message);
     } finally {
       setIsExporting(false);
     }
@@ -145,6 +151,8 @@ export default function ReportDetailPage() {
     );
   };
 
+  if (loadError) return <AuthGate><div role="alert" className="p-6">Report could not be loaded. <button className="underline" onClick={() => void mutate()}>Retry</button></div></AuthGate>;
+
   if (isLoading || !report) {
     return (
       <AuthGate>
@@ -159,6 +167,12 @@ export default function ReportDetailPage() {
     <AuthGate>
       <div className="min-h-screen bg-background dark:bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {actionError && !deleteOpen && <p role="alert" className="mb-4 break-words rounded bg-danger-surface p-4 text-danger">{actionError}</p>}
+          <Dialog open={deleteOpen} title="Delete report" onClose={() => { if (!deleting) setDeleteOpen(false); }}>
+            <p className="mb-4">Delete this report? This cannot be undone.</p>
+            {actionError && <p role="alert" className="mb-4 break-words text-danger">{actionError}</p>}
+            <div className="flex gap-3"><button disabled={deleting} className="rounded border border-line px-3 py-2" onClick={() => setDeleteOpen(false)}>Cancel</button><button disabled={deleting} className="rounded bg-danger-surface px-3 py-2 text-danger" onClick={() => void handleDelete()}>{deleting ? "Deleting…" : "Delete report"}</button></div>
+          </Dialog>
           {/* Back Link */}
           <Link
             href="/reports"
@@ -177,6 +191,7 @@ export default function ReportDetailPage() {
                   </label>
                   <input
                     type="text"
+                    aria-label="Report title"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
                     className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground"
@@ -258,7 +273,7 @@ export default function ReportDetailPage() {
                       Edit
                     </button>
                     <button
-                      onClick={handleDelete}
+                      onClick={() => { setActionError(null); setDeleteOpen(true); }}
                       className="px-4 py-2 text-sm text-danger dark:text-danger hover:bg-danger-surface dark:hover:bg-surface-alt rounded"
                     >
                       Delete
@@ -301,6 +316,8 @@ export default function ReportDetailPage() {
             )}
           </div>
 
+          <EvidencePanel projectId={report.project_id} filters={{ report_id: report.id }} />
+
           {/* Report Content */}
           <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6 mb-6">
             <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
@@ -325,6 +342,7 @@ export default function ReportDetailPage() {
                       <code className="text-xs bg-surface dark:bg-surface-alt px-2 py-0.5 rounded text-secondary dark:text-secondary">
                         {citation.chunk_id.slice(0, 8)}...
                       </code>
+                      {citation.document_id && report.project_id && <Link className="text-xs text-accent-text underline" href={`/evidence?project_id=${report.project_id}&document_id=${citation.document_id}`}>Find evidence</Link>}
                       {citation.document_id && (
                         <Link
                           href={`/documents/${citation.document_id}`}
@@ -365,6 +383,7 @@ export default function ReportDetailPage() {
                       }`}>
                         {source.source_type}
                       </span>
+                      {source.source_type === "ledger_entry" && <Link className="text-sm text-accent-text underline" href={`/evidence/${source.source_id}`}>Open evidence</Link>}
                       <code className="text-sm text-secondary dark:text-muted">
                         {source.source_id.slice(0, 8)}...
                       </code>

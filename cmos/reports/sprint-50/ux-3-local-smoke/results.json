@@ -1,0 +1,362 @@
+[
+  {
+    "name": "list",
+    "theme": "light",
+    "width": 390,
+    "scrollWidth": 390,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-390-list.png"
+  },
+  {
+    "name": "promotion-dialog",
+    "theme": "light",
+    "width": 390,
+    "scrollWidth": 390,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-390-promotion-dialog.png"
+  },
+  {
+    "name": "detail",
+    "theme": "light",
+    "width": 390,
+    "scrollWidth": 390,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-390-detail.png"
+  },
+  {
+    "name": "report",
+    "theme": "light",
+    "width": 390,
+    "scrollWidth": 390,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-390-report.png"
+  },
+  {
+    "name": "document",
+    "theme": "light",
+    "width": 390,
+    "scrollWidth": 390,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-390-document.png"
+  },
+  {
+    "name": "mission",
+    "theme": "light",
+    "width": 390,
+    "scrollWidth": 390,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-390-mission.png"
+  },
+  {
+    "name": "list",
+    "theme": "light",
+    "width": 820,
+    "scrollWidth": 820,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-820-list.png"
+  },
+  {
+    "name": "promotion-dialog",
+    "theme": "light",
+    "width": 820,
+    "scrollWidth": 820,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-820-promotion-dialog.png"
+  },
+  {
+    "name": "detail",
+    "theme": "light",
+    "width": 820,
+    "scrollWidth": 820,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-820-detail.png"
+  },
+  {
+    "name": "report",
+    "theme": "light",
+    "width": 820,
+    "scrollWidth": 820,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-820-report.png"
+  },
+  {
+    "name": "document",
+    "theme": "light",
+    "width": 820,
+    "scrollWidth": 820,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-820-document.png"
+  },
+  {
+    "name": "mission",
+    "theme": "light",
+    "width": 820,
+    "scrollWidth": 820,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-820-mission.png"
+  },
+  {
+    "name": "list",
+    "theme": "light",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-1440-list.png"
+  },
+  {
+    "name": "promotion-dialog",
+    "theme": "light",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-1440-promotion-dialog.png"
+  },
+  {
+    "name": "detail",
+    "theme": "light",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-1440-detail.png"
+  },
+  {
+    "name": "report",
+    "theme": "light",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-1440-report.png"
+  },
+  {
+    "name": "document",
+    "theme": "light",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-1440-document.png"
+  },
+  {
+    "name": "mission",
+    "theme": "light",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "light-1440-mission.png"
+  },
+  {
+    "name": "list",
+    "theme": "dark",
+    "width": 390,
+    "scrollWidth": 390,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-390-list.png"
+  },
+  {
+    "name": "promotion-dialog",
+    "theme": "dark",
+    "width": 390,
+    "scrollWidth": 390,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-390-promotion-dialog.png"
+  },
+  {
+    "name": "detail",
+    "theme": "dark",
+    "width": 390,
+    "scrollWidth": 390,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-390-detail.png"
+  },
+  {
+    "name": "report",
+    "theme": "dark",
+    "width": 390,
+    "scrollWidth": 390,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-390-report.png"
+  },
+  {
+    "name": "document",
+    "theme": "dark",
+    "width": 390,
+    "scrollWidth": 390,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-390-document.png"
+  },
+  {
+    "name": "mission",
+    "theme": "dark",
+    "width": 390,
+    "scrollWidth": 390,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-390-mission.png"
+  },
+  {
+    "name": "list",
+    "theme": "dark",
+    "width": 820,
+    "scrollWidth": 820,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-820-list.png"
+  },
+  {
+    "name": "promotion-dialog",
+    "theme": "dark",
+    "width": 820,
+    "scrollWidth": 820,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-820-promotion-dialog.png"
+  },
+  {
+    "name": "detail",
+    "theme": "dark",
+    "width": 820,
+    "scrollWidth": 820,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-820-detail.png"
+  },
+  {
+    "name": "report",
+    "theme": "dark",
+    "width": 820,
+    "scrollWidth": 820,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-820-report.png"
+  },
+  {
+    "name": "document",
+    "theme": "dark",
+    "width": 820,
+    "scrollWidth": 820,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-820-document.png"
+  },
+  {
+    "name": "mission",
+    "theme": "dark",
+    "width": 820,
+    "scrollWidth": 820,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-820-mission.png"
+  },
+  {
+    "name": "list",
+    "theme": "dark",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-1440-list.png"
+  },
+  {
+    "name": "promotion-dialog",
+    "theme": "dark",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-1440-promotion-dialog.png"
+  },
+  {
+    "name": "detail",
+    "theme": "dark",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-1440-detail.png"
+  },
+  {
+    "name": "report",
+    "theme": "dark",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-1440-report.png"
+  },
+  {
+    "name": "document",
+    "theme": "dark",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-1440-document.png"
+  },
+  {
+    "name": "mission",
+    "theme": "dark",
+    "width": 1440,
+    "scrollWidth": 1440,
+    "violations": [],
+    "transportErrors": [],
+    "pageErrors": [],
+    "screenshot": "dark-1440-mission.png"
+  }
+]
