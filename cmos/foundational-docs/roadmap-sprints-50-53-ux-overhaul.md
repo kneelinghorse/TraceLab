@@ -233,7 +233,7 @@ A UI mission is not done until all of the following are true. Each rule exists b
 - **Risk:** "Full overhaul" scope expands without bound. **Mitigation:** sprint gates with exit criteria above; the shell ships around existing pages before any page is rewritten; Sprint 51 is scoped now, Sprint 52 and 53 are re-planned at Sprint 51 close.
 - **Risk:** Regressions while rebuilding pages that agents rely on. **Mitigation:** the Playwright baseline runs per mission; MCP contract tests remain required; route redirects ship with each rebuild.
 - **Risk:** Another silent mass loss like d592c92. **Mitigation:** RECOVER-2 adds a guard that flags formatting-labeled commits with net logic deletions; quarantined tests need a cited reason; learnings #142 and #144 are evergreen.
-- **Risk:** The Forge object model is a cross-repo dependency. **Mitigation:** if the Forge project does not pick up the backlog request, TraceLab authors the YAML and opens the Forge PR itself (UX-1 fallback).
+- **Risk:** The Forge object model is a cross-repo dependency. **Mitigation:** Forge owns its review, fixes, CI, merge and registry activation. TraceLab retains the mapping, tests, previews and acceptance evidence, and records a dependency blocker until Forge supplies completion evidence. Any TraceLab agent action in Forge, or another cross-project message, requires explicit user authorization. Decision #391 and evergreen learning #155 supersede the original self-authoring fallback; see the [UX-1 handoff](../reports/sprint-50/ux-1-session-handoff.md).
 - **Risk:** Research evidence is thin where vendors block crawlers (Perplexity, NotebookLM). **Mitigation:** those cells are marked as secondary in the ledger; decisions cite the primary-source patterns (Condens, Dovetail, Linear, Notion, Elicit) first.
 
 ---
@@ -265,5 +265,6 @@ A UI mission is not done until all of the following are true. Each rule exists b
 ## Change Log
 
 - **2026-09-12** — Created at Sprint 50 open from the UX Baseline, TL-UX-R001, the d592c92 audit, and Derek's seven redesign decisions (decision #379). Sprint 50 missions RECOVER-1/2 and UX-0 through UX-5 recorded in CMOS.
+- **2026-09-13 UTC** — Removed the stale cross-repository fallback to match the user's ownership correction (decision #391, learning #155). Forge completion evidence remains an acceptance dependency; TraceLab PR257's merge alone does not close UX-1.
 
 _Truth in data, evidence as the connective tissue, one system._

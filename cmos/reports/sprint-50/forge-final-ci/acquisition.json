@@ -1,0 +1,16 @@
+{
+  "forge_pr": 105,
+  "run": 34728936186,
+  "head": "58d88da97dbd3d120aefb70fb3a913ec90fdc46b",
+  "branch_head": "af277eaa87e3d44a1388ae5da2ae88af26bb44be",
+  "artifacts": [
+    "portable-runtime-e2e-node-24",
+    "portable-runtime-e2e-node-20.11.1"
+  ],
+  "jobs": [
+    103648041257,
+    103648041213
+  ],
+  "status": "Both clean final assemblies passed 19 exposed tool paths, bridge parity and lifecycle; extraction trees unchanged.",
+  "original_files_modified": false
+}

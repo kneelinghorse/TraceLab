@@ -1,14 +1,14 @@
 {
   "mission": "UX-1",
-  "status": "blocked; GitHub Actions billing/capacity prevents final CI before merge and registry activation",
-  "updated_at": "2026-09-13T00:47:48.283405+00:00",
+  "status": "in_progress; Forge merge and current installed registry/workflow verified; recording final acceptance",
+  "updated_at": "2026-09-13T02:12:23.341033+00:00",
   "forge": {
     "base": "114a268ea10b9141bc96925c69132179c7c4b334",
     "implementation_head": "a6c845163368af3e21fff61c88b75a1823448871",
     "pull_request": "https://github.com/kneelinghorse/OODS-Forge/pull/105",
     "backlog_request": "f091c849-fe1a-49d5-93ee-b8029219685a",
-    "current_ci_run": 34728733886,
-    "canonical_registry_activation": "pending merge and native worker refresh",
+    "current_ci_run": 34728936186,
+    "canonical_registry_activation": "Verified through a fresh actual MCP client against the already-built canonical adapter at bc12723e9: 18 unique objects including all seven alpha research objects. Existing task connection retains a stale 11-object in-memory worker; no existing worker was restarted.",
     "ci_merge_base": "e9f15a4a586921ce8c68dd3d24f5a01d0b24a281",
     "upstream_change": "Roadmap-only Sprint196 review closure; merged locally and source tree equality with tested CI revision verified before retaining receipts.",
     "bundled_runtime": {
@@ -60,14 +60,6 @@
       "runtime_job_seconds": 3539,
       "next_job_budget_minutes": 75
     },
-    "final_ci": {
-      "head": "a6c845163368af3e21fff61c88b75a1823448871",
-      "run": 34728733886,
-      "status": "jobs not started",
-      "reason": "GitHub account payments failed or spending limit needs increasing",
-      "url": "https://github.com/kneelinghorse/OODS-Forge/actions/runs/34728733886",
-      "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/local-portable/ci-34728733886-billing-block.json"
-    },
     "prior_ci_coverage": {
       "passed": 7163,
       "failed": 5,
@@ -103,9 +95,95 @@
       "skipped": 0,
       "failure": "Portable-health assertion against old canonical ledger; fixed proof is now retained, regression validation running.",
       "run": 34725928271,
-      "resolution": "Docs and canonical proof refreshed; all 61 targeted regression tests pass, including dist-only health after removing its authoring-file dependency."
+      "resolution": "Docs and canonical proof refreshed; all 61 targeted regression tests pass, including dist-only health after removing its authoring-file dependency.",
+      "diagnostic_correction": "Initial stale-proof-only explanation was incomplete. Dist-only B-12 also needed a census implementation independent of authoring YAML; see learning 154 and the later 61 passing focused regressions."
     },
-    "retained_proof_ci_merge_revision": "a7ef99a21c303e3ef66f57845e9f2b52475f79a3"
+    "retained_proof_ci_merge_revision": "a7ef99a21c303e3ef66f57845e9f2b52475f79a3",
+    "refused_ci": {
+      "head": "a6c845163368af3e21fff61c88b75a1823448871",
+      "run": 34728733886,
+      "status": "jobs not started",
+      "reason": "GitHub account payments failed or spending limit needs increasing",
+      "url": "https://github.com/kneelinghorse/OODS-Forge/actions/runs/34728733886",
+      "evidence": "OODS-Forge/artifacts/product-reality/tracelab-ux-1/local-portable/ci-34728733886-billing-block.json"
+    },
+    "final_ci": {
+      "head": "af277eaa87e3d44a1388ae5da2ae88af26bb44be",
+      "run": 34728936186,
+      "status": "last observed partially passed; coverage, full MCP and runtime catalog outcomes unknown after user stopped work",
+      "runtime_job": 103648041176,
+      "url": "https://github.com/kneelinghorse/OODS-Forge/actions/runs/34728936186",
+      "note": "GitHub accepted the next push; no billing settings changed by the agent.",
+      "ci_merge_revision": "58d88da97dbd3d120aefb70fb3a913ec90fdc46b",
+      "portable_runtime": {
+        "status": "passed",
+        "node_versions": [
+          "v24.20.0",
+          "v20.11.1"
+        ],
+        "clean_assemblies": true,
+        "tools": 19,
+        "payload_sha256": "901a43a9be26532f4d358794be6860fbc7a0bb8f9ac1d2a8e8c88b167b6d3aa3",
+        "evidence": "forge-final-ci/acquisition.json"
+      },
+      "last_observed_at": "2026-09-13T01:05:56Z",
+      "observation_scope": "Historical snapshot from before the user stop; not refreshed during this handoff.",
+      "release_runtime": {
+        "status": "passed",
+        "job": 103648041114,
+        "cells": 42,
+        "passed": 42,
+        "failed": 0,
+        "bundle_head": "58d88da97dbd3d120aefb70fb3a913ec90fdc46b",
+        "archive_sha256": "3b50f551c455588f0e92b1171e75b9ce4b71de9be6a8fc85e785227e462cdbe8",
+        "evidence": "forge-final-ci/release/acquisition.json"
+      },
+      "consumer_suite": {
+        "status": "passed",
+        "job": 103648041105,
+        "stages_passed": [
+          13,
+          2,
+          305
+        ],
+        "skipped": 0,
+        "local_log": "/tmp/ux1-final-consumers-ci.log"
+      },
+      "unverified_final_jobs": {
+        "coverage": 103648041094,
+        "full_mcp_viz_determinism": 103648041126,
+        "runtime_cells": 103648041176
+      }
+    },
+    "landed_commit": "2017548c2a490dfff349aa55960dbdace0f50c45",
+    "current_installed_build": "bc12723e9b7a42a4790a98f5d2a0dc4a1f970b99",
+    "acceptance": {
+      "observed_at": "2026-09-13T02:10:31.504Z",
+      "pull_request": "ux-1-forge-acceptance.json",
+      "fresh_client": "ux-1-forge-fresh-client.json",
+      "stale_connection": "ux-1-forge-stale-connection.json",
+      "forge_review_decision": 1980,
+      "latest_ci_run": 34730227443,
+      "latest_ci_status": "coverage, viz/MCP, consumers, portable Node 24 and 20.11.1, release, build/lint/types passed; runtime-cells still running at observation; optional echarts-render-soak skipped",
+      "superseded_run": 34728936186,
+      "superseded_outcome": "coverage and viz/MCP failed on stale generated tool-capability ledger; runtime cancelled; regenerated ledger is sole af277eaa\u21925e556da26 source diff",
+      "workflow": {
+        "status": "ok",
+        "screens": 4,
+        "validation": {
+          "status": "ok",
+          "errors": [],
+          "warnings": []
+        },
+        "composition_advisory_count": 46,
+        "composition_advisory_codes": [
+          "OODS-V117",
+          "OODS-V120",
+          "OODS-V121"
+        ]
+      },
+      "message_policy": "Forge decision 1980 explicitly leaves TraceLab backlog requests pending because Forge sends no cross-project notices. Pending inbox status is not an acceptance failure."
+    }
   },
   "mapping": {
     "objects": 7,
@@ -317,11 +395,7 @@
     ]
   },
   "pending": [
-    "Restore GitHub Actions billing/capacity, rerun final Forge CI and merge PR105",
-    "Refresh canonical Forge worker and verify the seven research objects through the provided connection",
-    "Attach landed commit to the roadmap-required backlog request",
-    "Pass TraceLab PR checks and merge mapping/evidence changes",
-    "CMOS health and final status verification"
+    "Finish TraceLab evidence checkpoint and record UX-1 completion against verified Forge merge, registry/workflow and existing saved schemas/previews."
   ],
   "traceLab_ci": {
     "head": "e3952e471d457966528286e9bc6f92e740c69b7b",
@@ -383,5 +457,66 @@
     "additional_preview_head": "ce2239c062d93dbd0f7fdc70e648e24bb99e39fb",
     "head_difference": "Generated tool-reference documentation only; composition, code generation and style sources unchanged.",
     "summary": "oods-previews/preview-summary.json"
+  },
+  "session_handoff": {
+    "session_id": "PS-2026-09-12-005",
+    "document": "ux-1-session-handoff.md",
+    "scope_correction_decision": 391,
+    "evergreen_learning": 155,
+    "cross_repository_permission": "Explicit user permission required; Forge owns review, fixes, CI, merge and registry activation. No Forge actions or new messages during this handoff.",
+    "traceLab_head_before_local_handoff_commit": "c9e924c51fd773a705bc7a1120a9d68684fdde8a",
+    "publication": "Local handoff checkpoint only; no push or PR operation during closeout."
+  },
+  "traceLab_ci_latest_observed": {
+    "head": "c9e924c51fd773a705bc7a1120a9d68684fdde8a",
+    "required_checks": "passed at c9e924c; PR257 merged at bbfc5185c66150a4b4c19ebc030c16361a8c003e; these are not checks of later handoff/reconciliation commits",
+    "backend_run": 34728938305,
+    "frontend_production_run": 34728938338,
+    "frontend_checks_run": 34728938311,
+    "changed_file_ruff_run": 34728938306,
+    "secret_scan": "passed",
+    "integration_run": 34728938307,
+    "integration_final_status": "SUCCESS; verified through TraceLab PR257 check metadata on resumed session",
+    "advisory_baseline_failures": [
+      "ruff-full",
+      "mypy",
+      "frontend lint"
+    ],
+    "observed_at": "2026-09-13T01:36:43.121670+00:00",
+    "pull_request_state": "MERGED",
+    "merge_commit": "bbfc5185c66150a4b4c19ebc030c16361a8c003e",
+    "merged_at": "2026-09-13T01:08:05Z",
+    "evidence": "ux-1-tracelab-acceptance.json"
+  },
+  "resumed_session": {
+    "session_id": "PS-2026-09-13-001",
+    "observed_at": "2026-09-13T01:36:43.121670+00:00",
+    "branch": "codex/ux-1-acceptance",
+    "base": "bbfc5185c66150a4b4c19ebc030c16361a8c003e",
+    "prior_handoff_cherry_pick": "e3277c3",
+    "mapping_tests": {
+      "command": ".venv/bin/python -m pytest tests/unit/test_oods_object_contract.py -q",
+      "passed": 18,
+      "skipped": 0,
+      "warnings": 5
+    },
+    "foundational_references": "passed",
+    "forge_dependency_request": {
+      "id": "f091c849-fe1a-49d5-93ee-b8029219685a",
+      "status": "pending",
+      "responded_at": null,
+      "response_notes": null,
+      "evidence": null
+    },
+    "ownership": "No Forge operations or new messages. Removed stale roadmap self-authoring fallback per decision 391 and learning 155.",
+    "preserved_user_reports_sha256": {
+      "cmos/reports/sprint-37/graph-search-e2e-validation.json": "27a943a97df946ecda320f6678a76ef53120dd37f0160b8ee56e46161be6e6f8",
+      "cmos/reports/sprint-38/semantic-edge-e2e-validation.json": "b36ecf0d52638eddb7bac4707e682c1bbd899b62c278a9b51f2729ee7d07c3d4"
+    },
+    "closure": "TraceLab reconciliation checkpoint; UX-1 blocked through CMOS. UX-2 through UX-5 remain queued; no successor implementation started."
+  },
+  "acceptance_session": {
+    "session_id": "PS-2026-09-13-002",
+    "authorization": "User: \"jfc yes, that's done. feel free to check\". Read-only Forge verification authorized; no Forge source edits/builds/merges/worker refreshes/messages performed."
   }
 }
