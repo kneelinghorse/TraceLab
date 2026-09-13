@@ -1,0 +1,87 @@
+{
+  "mission": "UX-7",
+  "status": "local_validation_passed",
+  "checked_at": "2026-09-13T21:21:18.950298+00:00",
+  "base_commit": "71cca0633aa47c43fd0d3a628731ebfa7b597734",
+  "decisions": [
+    410
+  ],
+  "changes": [
+    "Project resource tabs use scoped server pages and totals; scoped stats bypass cache and document mutations invalidate aggregates.",
+    "Independent upload byte progress, saved-document processing retry and rejection isolation; project authorization happens before upload storage writes.",
+    "Per-user project favorites via revision 045_user_favorites, scoped idempotent endpoints and Home aggregate.",
+    "Document lists/detail retain CRUD, processing, download and AddToCollection; chunks and evidence are inspectable tabs; missing state remains unknown."
+  ],
+  "validation": {
+    "python": {
+      "command": ".venv/bin/pytest tests/test_pedr_collection_scope.py tests/test_project_hub.py tests/test_home_api.py tests/test_collections.py tests/test_project_management_api.py tests/test_project_document_read_api.py tests/test_document_chunks_api.py tests/test_document_download_api.py tests/test_rbac_route_enforcement_api.py tests/test_create_ownership_parity.py -q",
+      "passed": 144,
+      "skipped": 0,
+      "warnings": 14
+    },
+    "postgres": {
+      "command": ".venv/bin/pytest tests/integration/test_project_favorites_postgres.py tests/integration/test_home_postgres.py -q",
+      "passed": 4,
+      "skipped": 0,
+      "real_postgresql": true,
+      "migration": "upgrade head, downgrade 044_home_mission_reviews, re-upgrade; composite primary key and cascade verified"
+    },
+    "frontend_unit": {
+      "passed": 174,
+      "skipped": 0
+    },
+    "mcp_package": {
+      "command": "npm test -- --run",
+      "passed": 76,
+      "skipped": 0,
+      "surface_changed": false
+    },
+    "built_browser": {
+      "passed": 38,
+      "skipped": 0,
+      "new_project_flow_scenarios": 6,
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "fixture_api": true,
+      "critical_or_serious_axe": 0,
+      "overflow": 0
+    },
+    "lint": "passed",
+    "typecheck": "passed in production build",
+    "production_build": "passed",
+    "foundational_refs": "passed",
+    "targeted_ruff": "passed",
+    "git_diff_check": "passed"
+  },
+  "before": "ux-7-before/ (30 direct-production checks before implementation)",
+  "local_previews": "ux-7-local-previews/summary.json",
+  "limitations": [
+    "Legacy collection listing remains complete when no new paging/filter options are supplied.",
+    "Project collections represent readable chunk relationships rather than collection ownership.",
+    "Existing backend quarantine and integration skips must be disclosed in CI acceptance."
+  ],
+  "remaining": [
+    "Required CI and source merge",
+    "Both Railway services SUCCESS with deployment IDs",
+    "Production counts, two-file upload and two-user favorite isolation",
+    "124-check direct-production baseline and visual review",
+    "Receipt publication and CMOS completion"
+  ],
+  "ci_initial_failure": {
+    "run_id": 34783099090,
+    "passed": 2436,
+    "failed": 1,
+    "skipped": 3,
+    "deselected_quarantine": 12,
+    "warnings": 48,
+    "test": "tests/test_pedr_collection_scope.py::test_unrestricted_routes_preserve_legacy_child_service_call_shapes",
+    "resolution": "Use Annotated query validation with ordinary scalar defaults, preserving direct legacy Python callers. Existing regression now passes in the 144-test targeted suite."
+  }
+}

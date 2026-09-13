@@ -29,7 +29,7 @@ for (const theme of ["light","dark"] as const) for (const width of [390,1440]) {
       await route.fulfill({json:body});
     });
     await page.goto("/documents");
-    const remove=page.getByRole("button",{name:"Delete",exact:true});
+    const remove=page.getByRole("button",{name:"Delete Source document",exact:true});
     await remove.click();
     const dialog=page.getByRole("dialog",{name:"Confirm action"});
     await expect(dialog).toBeVisible();

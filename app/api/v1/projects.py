@@ -12,7 +12,9 @@ from sqlalchemy.orm import Session
 from app.core.authorization import accessible_filter, authorize_or_403
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
+from app.models.document import Document
 from app.models.project import Project
+from app.models.report import Report
 from app.onboarding.idempotency import IdempotencyService
 from app.schemas.pagination import PaginatedResponse
 from app.schemas.project import ProjectCreate, ProjectRead, ProjectStats, ProjectUpdate
@@ -252,12 +254,18 @@ def get_project_stats(
     authorize_or_403(user, "read", project, db)
 
     cache_key = _cache_manager.project_metadata_key(kind="stats", identifier=str(project_id))
+    document_scope = accessible_filter(user, Document, db)
+    report_scope = accessible_filter(user, Report, db)
 
     def _loader() -> ProjectStats:
-        stats = _service.get_project_stats(db, project_id)
+        stats = _service.get_project_stats(db, project_id, document_filter=document_scope, report_filter=report_scope)
         if not stats:
             raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
         return stats
 
+    # Scoped totals must reflect revoked memberships immediately; a user-only
+    # cache key can retain permissions the user no longer has.
+    if document_scope is not None or report_scope is not None:
+        return _loader()
     result, _ = _cache_manager.cached_value("project_metadata", cache_key, _loader)
     return result

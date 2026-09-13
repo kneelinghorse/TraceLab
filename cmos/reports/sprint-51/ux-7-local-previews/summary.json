@@ -1,0 +1,42 @@
+{
+  "checked_at": "2026-09-13T21:11:09.266992+00:00",
+  "source": "Built frontend with fixture API; production acceptance is separate.",
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "widths": [
+    390,
+    820,
+    1440
+  ],
+  "scenarios_passed": 6,
+  "critical_or_serious_axe": 0,
+  "overflow": 0,
+  "screenshots": [
+    "dark-1440-document-chunks.png",
+    "dark-1440-home-favorites.png",
+    "dark-1440-project-overview.png",
+    "dark-1440-project-uploads.png",
+    "dark-390-document-chunks.png",
+    "dark-390-home-favorites.png",
+    "dark-390-project-overview.png",
+    "dark-390-project-uploads.png",
+    "dark-820-document-chunks.png",
+    "dark-820-home-favorites.png",
+    "dark-820-project-overview.png",
+    "dark-820-project-uploads.png",
+    "light-1440-document-chunks.png",
+    "light-1440-home-favorites.png",
+    "light-1440-project-overview.png",
+    "light-1440-project-uploads.png",
+    "light-390-document-chunks.png",
+    "light-390-home-favorites.png",
+    "light-390-project-overview.png",
+    "light-390-project-uploads.png",
+    "light-820-document-chunks.png",
+    "light-820-home-favorites.png",
+    "light-820-project-overview.png",
+    "light-820-project-uploads.png"
+  ]
+}

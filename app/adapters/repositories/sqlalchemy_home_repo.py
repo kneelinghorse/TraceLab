@@ -17,6 +17,7 @@ from app.models.mission import MISSION_STATUSES, Mission
 from app.models.mission_review import MissionReview
 from app.models.project import Project
 from app.models.report import Report
+from app.models.user_favorite import UserFavorite
 from app.schemas.home import (
     HomeEvidenceActivity,
     HomeMission,
@@ -47,6 +48,34 @@ def _evidence_href(project_id, mission_id=None, session_key=None):
 
 
 class SQLAlchemyHomeRepository:
+    def favorites(
+        self, db: Session, user: AuthenticatedUser, *, page: int = 1, page_size: int = SECTION_LIMIT,
+        project_id: UUID | None = None,
+    ) -> HomeSection[HomeRecent]:
+        query = _scoped(db, user, Project).join(UserFavorite, UserFavorite.entity_id == Project.id).filter(
+            Project.deleted_at.is_(None), UserFavorite.user_id == user.user_id, UserFavorite.entity_type == "project",
+        )
+        if project_id is not None:
+            query = query.filter(Project.id == project_id)
+        total = query.count()
+        rows = query.order_by(UserFavorite.created_at.desc(), Project.id).offset((page - 1) * page_size).limit(page_size).all()
+        return HomeSection(total=total, items=[
+            HomeRecent(id=row.id, title=row.name, updated_at=row.updated_at, href=f"/projects/{row.id}") for row in rows
+        ])
+
+    def set_favorite(self, db: Session, user: AuthenticatedUser, project_id: UUID, *, favorite: bool) -> None:
+        if favorite:
+            project = _scoped(db, user, Project).filter(Project.id == project_id, Project.deleted_at.is_(None)).first()
+            if project is None:
+                raise LookupError("Project not found.")
+            insert = pg_insert(UserFavorite) if db.get_bind().dialect.name == "postgresql" else sqlite_insert(UserFavorite)
+            db.execute(insert.values(user_id=user.user_id, entity_type="project", entity_id=project_id).on_conflict_do_nothing())
+        else:
+            db.query(UserFavorite).filter(
+                UserFavorite.user_id == user.user_id, UserFavorite.entity_type == "project", UserFavorite.entity_id == project_id,
+            ).delete(synchronize_session=False)
+        db.commit()
+
     def snapshot(self, db: Session, user: AuthenticatedUser, *, now: datetime) -> HomeResponse:
         missions = _scoped(db, user, Mission)
         reports = _scoped(db, user, Report)
@@ -173,6 +202,7 @@ class SQLAlchemyHomeRepository:
         )
         return HomeResponse(
             generated_at=now,
+            favorites=self.favorites(db, user),
             stalled_after_seconds=STALLED_AFTER_SECONDS,
             missions=HomeMissionTotals(total=sum(by_status.values()), by_status=by_status),
             attention=HomeSection(

@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import re
+from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.core.authorization import (
@@ -16,6 +17,8 @@ from app.core.authorization import (
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.collection import Collection
+from app.models.document import Document
+from app.models.project import Project
 from app.schemas.collection import (
     CollectionCreate,
     CollectionDetailResponse,
@@ -81,6 +84,9 @@ def _build_item_response(item) -> CollectionItemResponse:
 
 @router.get("", response_model=CollectionListResponse)
 def list_collections(
+    project_id: UUID | None = None,
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int | None, Query(ge=1, le=100)] = None,
     current_user: AuthenticatedUser = Depends(require_authenticated_user),
     db: Session = Depends(get_db),
     service: CollectionService = Depends(get_collection_service),
@@ -94,6 +100,20 @@ def list_collections(
     with what authorize() returns for the same collection per-id (fail-closed).
     """
     project_scope = accessible_project_ids(current_user, db)
+    if project_id is not None:
+        project = db.query(Project).filter(Project.id == project_id, Project.deleted_at.is_(None)).first()
+        if project is None or (project_scope is not None and project_id not in project_scope):
+            raise HTTPException(status_code=404, detail="Project not found.")
+    if project_id is not None or page_size is not None or page != 1:
+        rows, total = service.list_collections_page(
+            page=page, page_size=page_size or 20, project_id=project_id,
+            access_filter=accessible_filter(current_user, Collection, db),
+            document_filter=accessible_filter(current_user, Document, db), project_scope=project_scope,
+        )
+        return CollectionListResponse(data=[CollectionResponse(
+            id=row.id, name=row.name, description=row.description, created_at=row.created_at,
+            updated_at=row.updated_at, item_count=count,
+        ) for row, count in rows], total=total)
     entries = service.list_collections(
         access_filter=accessible_filter(current_user, Collection, db)
     )

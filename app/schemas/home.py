@@ -67,6 +67,7 @@ class HomeResponse(BaseModel):
     active_runs: HomeSection[HomeMission]
     recent_reports: HomeSection[HomeRecent]
     recent_projects: HomeSection[HomeRecent]
+    favorites: HomeSection[HomeRecent]
     evidence_activity: HomeSection[HomeEvidenceActivity]
 
 

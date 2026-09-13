@@ -1,4 +1,5 @@
-import { StatusBadge } from "@/components/ui/StatusBadge";
+import { DocumentRows } from "@/components/documents/DocumentRows";
+import { useAuth } from "@/contexts/AuthContext";
 import { PaginationBar } from "@/components/ui/PaginationBar";
 import { PageState } from "@/components/ui/PageState";
 import { useFeedback } from "@/components/ui/useFeedback";
@@ -11,7 +12,6 @@ import { documentsApi } from "@/lib/api/documents";
 import { projectsApi } from "@/lib/api/projects";
 import type { Document, Project } from "@/types/document";
 import type { PaginatedResponse } from "@/types/pagination";
-import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
@@ -19,26 +19,27 @@ import useSWR from "swr";
 const PAGE_SIZE = 10;
 
 export default function DocumentsPage() {
+  const { user } = useAuth();
   const { askConfirmation, notify, feedback } = useFeedback();
   const [selectedProject, setSelectedProject] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [page, setPage] = useState<number>(1);
 
-  const { data: projectResponse } = useSWR<PaginatedResponse<Project>>(
-    ["projects", "selector"],
-    () => projectsApi.listProjects({ pageSize: 100 }),
+  const { data: projectResponse, error: projectsError, isLoading: projectsLoading, mutate: refreshProjects } = useSWR<Project[]>(
+    ["projects", "selector", user?.user_id],
+    projectsApi.listAllProjects,
     { revalidateOnMount: true }
   );
-  const projects = useMemo(() => projectResponse?.data ?? [], [projectResponse]);
+  const projects = useMemo(() => projectResponse ?? [], [projectResponse]);
 
   const { data: documentsResponse, mutate, isLoading, isValidating, error } = useSWR<PaginatedResponse<Document>>(
-    ["documents", selectedProject, statusFilter, searchTerm, page],
+    ["documents", user?.user_id, selectedProject, statusFilter, searchTerm, page],
     () =>
       documentsApi.listDocuments({
         projectId: selectedProject || undefined,
         processed: statusFilter === "processed" ? true : statusFilter === "processing" ? false : undefined,
-        search: searchTerm || undefined,
+        search: searchTerm.trim() || undefined,
         page,
         pageSize: PAGE_SIZE,
       }),
@@ -84,10 +85,12 @@ export default function DocumentsPage() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground">Documents</h1>
             <p className="mt-2 text-secondary">
-              Browse and manage documents across all projects. For project-specific management, use the project detail page.
+              Original sources, processing history and the chunks behind your research.
             </p>
           </div>
 
+          {projectsError && <PageState state="error" title="Project filters could not load." onRetry={() => void refreshProjects()} />}
+          {projectsLoading && <p role="status" className="mb-3 text-sm text-secondary">Loading project filters…</p>}
           {/* Actions & Filters */}
           <div className="mb-6 flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             <div className="flex max-w-full gap-4 items-center flex-wrap">
@@ -115,7 +118,7 @@ export default function DocumentsPage() {
               >
                 <option value="all">All Status</option>
                 <option value="processed">Processed</option>
-                <option value="processing">Processing</option>
+                <option value="processing">Not processed</option>
               </select>
 
               {/* Keyword Filter */}
@@ -154,6 +157,7 @@ export default function DocumentsPage() {
             </Link>
           </div>
 
+          {pagination && <p className="mb-4 text-sm text-secondary">{pagination.total.toLocaleString()} matching documents</p>}
           {/* Documents List */}
           {error ? <PageState state="error" title="Documents could not load." onRetry={() => void mutate()} /> : isLoading && !documentsResponse ? (
             <PageState state="loading" title="Loading documents…" />
@@ -168,81 +172,11 @@ export default function DocumentsPage() {
               </Link>
             </div>
           ) : (
-            <div className="grid gap-4">
-              {documents.map((document) => (
-                <div
-                  key={document.id}
-                  className="bg-surface rounded-lg border border-line p-6 hover:shadow-lg transition-shadow"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <Link
-                        href={`/documents/${document.id}`}
-                        className="text-lg font-semibold text-foreground hover:text-accent-text"
-                      >
-                        {document.name}
-                      </Link>
-
-                      <div className="mt-2 flex flex-wrap gap-4 text-sm text-secondary">
-                        <Link
-                          href={`/projects/${document.project_id}`}
-                          className="hover:text-accent-text"
-                        >
-                          Project: {projectLookup.get(document.project_id) ?? "Unknown"}
-                        </Link>
-                        <span>
-                          Type: {document.file_type || document.mime_type?.split("/")[1] || "Unknown"}
-                        </span>
-                        {document.file_size && (
-                          <span>
-                            Size: {(document.file_size / 1024).toFixed(2)} KB
-                          </span>
-                        )}
-                        {document.uploaded_at && (
-                          <span>
-                            Uploaded {formatDistanceToNow(new Date(document.uploaded_at), { addSuffix: true })}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Processing Status */}
-                      <div className="mt-3 flex gap-2">
-                        <StatusBadge
-                          label="Processed"
-                          status={document.processed}
-                        />
-                        <StatusBadge
-                          label="Chunked"
-                          status={document.chunked}
-                        />
-                        <StatusBadge
-                          label="Embedded"
-                          status={document.embedded}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="ml-4 flex gap-2">
-                      <Link
-                        href={`/documents/${document.id}`}
-                        className="px-4 py-2 text-sm text-accent-text hover:bg-info-surface rounded"
-                      >
-                        View
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(document.id)}
-                        className="px-4 py-2 text-sm text-danger hover:bg-danger-surface rounded"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="panel space-y-4 p-5">
+              <DocumentRows documents={documents} projects={projectLookup} onDelete={id => void handleDelete(id)} />
               <PaginationBar
                 page={resolvedPage}
-                pages={totalPages || (documents.length > 0 ? 1 : 0)}
+                pages={totalPages}
                 onChange={setPage}
               />
             </div>

@@ -7,13 +7,15 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, noload
 
 from app.core.database import SessionLocal
 from app.models.chunk import DocumentChunk
 from app.models.collection import Collection, CollectionItem
 from app.models.document import Document
+from app.models.project import Project
 
 SessionFactory = Callable[[], Session]
 
@@ -69,6 +71,39 @@ class CollectionService:
                 .filter(Collection.id == str(collection_id))
                 .one_or_none()
             )
+        finally:
+            session.close()
+
+    def list_collections_page(
+        self, *, page: int, page_size: int, access_filter=None, document_filter=None,
+        project_scope: list[UUID] | None = None, project_id: UUID | None = None,
+    ) -> tuple[list[tuple[Collection, int]], int]:
+        """Page collections containing readable project chunks; count before limiting."""
+        session = self.session_factory()
+        try:
+            documents = select(Document.id).join(Project, Project.id == Document.project_id).where(Document.deleted_at.is_(None), Project.deleted_at.is_(None))
+            if document_filter is not None:
+                documents = documents.where(document_filter)
+            if project_scope is not None:
+                documents = documents.where(Document.project_id.in_(project_scope))
+            if project_id is not None:
+                documents = documents.where(Document.project_id == project_id)
+            counts = (
+                select(CollectionItem.collection_id, func.count(CollectionItem.id).label("item_count"))
+                .join(DocumentChunk, CollectionItem.chunk_id == DocumentChunk.id)
+                .where(DocumentChunk.document_id.in_(documents))
+                .group_by(CollectionItem.collection_id).subquery()
+            )
+            query = session.query(Collection, func.coalesce(counts.c.item_count, 0)).outerjoin(
+                counts, counts.c.collection_id == Collection.id,
+            ).options(noload("*"))
+            if access_filter is not None:
+                query = query.filter(access_filter)
+            if project_id is not None:
+                query = query.filter(counts.c.item_count > 0)
+            total = query.count()
+            rows = query.order_by(Collection.updated_at.desc(), Collection.id).offset((page - 1) * page_size).limit(page_size).all()
+            return rows, total
         finally:
             session.close()
 

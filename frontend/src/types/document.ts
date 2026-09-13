@@ -63,12 +63,7 @@ export interface DocumentUploadResponse {
 export interface DocumentProcessResult {
   status: string;
   document_id: string;
-  stages?: {
-    parsing?: string;
-    redaction?: string;
-    chunking?: string;
-    embedding?: string;
-  };
+  stages?: Record<string, { status?: string; error?: string; reason?: string }>;
   error?: string;
 }
 
