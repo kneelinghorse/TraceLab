@@ -100,6 +100,11 @@ built-browser flows. No DB migration or worker SELECT change is needed.
 
 Reference edits preserve each row’s structured document identity when titles change or duplicate filenames are removed; title matching must not substitute another document.
 
+The mission form keeps its project selector controlled by the authored `project_id`.
+When project options arrive asynchronously, the visible selection must match the
+seed or rerun destination and must retain any subsequent user choice. A hidden
+form value with a blank visible selector is not an accepted prefill.
+
 `GET /collections/{id}/mission-seed` is a read-only projection of the collection's
 instructions and complete, currently readable document context. It independently
 checks the collection, documents and their non-deleted parent projects. Direct

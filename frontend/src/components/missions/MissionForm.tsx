@@ -340,7 +340,7 @@ export function MissionForm({ onSuccess, onCancel, source, seed, mode = "create"
           <label htmlFor="mission-project_id" className="form-label">
             Project <span className="text-danger">*</span>
           </label>
-          <select id="mission-project_id" {...register("project_id")} className="form-input">
+          <select id="mission-project_id" {...register("project_id")} value={projectId ?? ""} className="form-input">
             <option value="">Select a project</option>
             {projects.map((p) => (
               <option key={p.id} value={p.id}>
