@@ -222,7 +222,7 @@ export default function ReportDetailPage() {
             ) : (
               <>
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-3">
                     <h1 className="text-2xl font-bold text-foreground dark:text-foreground">
                       {report.title}
                     </h1>
