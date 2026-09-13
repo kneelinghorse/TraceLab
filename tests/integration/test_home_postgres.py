@@ -8,6 +8,7 @@ from sqlalchemy import create_engine, inspect
 
 from alembic import command
 from app.adapters.repositories.sqlalchemy_home_repo import SQLAlchemyHomeRepository
+from app.core.config import settings
 from app.core.security import AuthenticatedUser
 from app.models.mission import Mission
 from app.models.mission_review import MissionReview
@@ -17,9 +18,10 @@ pytestmark = pytest.mark.integration
 _HASH = "placeholder-not-a-real-hash"
 
 
-def test_postgres_home_counts_and_per_result_review(db_session):
+def test_postgres_home_counts_and_per_result_review(db_session, monkeypatch):
+    monkeypatch.setattr(settings, "rbac_enabled", True)
     user = User(
-        id=uuid4(), email=f"{uuid4()}@example.test", display_name="Home reviewer", password_hash=_HASH, role="admin"
+        id=uuid4(), email=f"{uuid4()}@example.test", display_name="Home reviewer", password_hash=_HASH, role="member"
     )
     db_session.add(user)
     rows = [
@@ -29,12 +31,24 @@ def test_postgres_home_counts_and_per_result_review(db_session):
             objective="Count all missions",
             success_criteria=["No page truncation"],
             status="completed",
+            owner_id=user.id,
         )
         for _ in range(143)
     ]
     db_session.add_all(rows)
+    # The shared integration database may already contain other fixtures. A
+    # caller's total must include every owned row and exclude unrelated ones.
+    db_session.add(
+        Mission(
+            mission_id=uuid4().hex,
+            title="Another caller's result",
+            objective="Keep ownership scoped",
+            success_criteria=["Hidden from this reviewer"],
+            status="completed",
+        )
+    )
     db_session.commit()
-    principal = AuthenticatedUser(user_id=user.id, email=user.email, display_name=user.display_name, role="admin")
+    principal = AuthenticatedUser(user_id=user.id, email=user.email, display_name=user.display_name, role="member")
     repository = SQLAlchemyHomeRepository()
     body = repository.snapshot(db_session, principal, now=datetime.utcnow())
     assert body.missions.total == 143
@@ -43,7 +57,7 @@ def test_postgres_home_counts_and_per_result_review(db_session):
     row = rows[0]
     for _ in range(2):
         repository.review_completion(db_session, principal, row.id, row.updated_at)
-    assert db_session.query(MissionReview).count() == 1
+    assert db_session.query(MissionReview).filter(MissionReview.user_id == user.id).count() == 1
     assert repository.snapshot(db_session, principal, now=datetime.utcnow()).attention.total == 142
     row.updated_at += timedelta(seconds=1)
     db_session.commit()

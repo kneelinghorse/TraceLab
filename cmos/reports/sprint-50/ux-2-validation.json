@@ -71,7 +71,8 @@
   },
   "resolved_findings": [
     "Empty project search on incoming evidence links caused API 422; now omitted and regression tested",
-    "Native progress used browser default green; now uses semantic OODS accent with accessible progressbar semantics"
+    "Native progress used browser default green; now uses semantic OODS accent with accessible progressbar semantics",
+    "Shared PostgreSQL integration fixtures may leave unrelated missions; Home test now asserts exact per-caller counts with explicit unrelated-row coverage."
   ],
   "acceptance_gaps": [
     "Fresh Mission composition/preview: current MCP worker returns OODS-S004; preview returns OODS-N019. See ux-2-forge-gaps.json. No Forge checkout, source, build or existing worker modified.",
@@ -88,5 +89,29 @@
   "preserved_preexisting_changes": [
     "cmos/reports/sprint-37/graph-search-e2e-validation.json",
     "cmos/reports/sprint-38/semantic-edge-e2e-validation.json"
-  ]
+  ],
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/259",
+  "ci_initial": {
+    "head": "45898c4f7c7d2fe5484518606c35bd8889cc1fff",
+    "passed": [
+      "ruff-diff",
+      "vitest",
+      "type-check",
+      "build-frontend-production",
+      "Secret Scan"
+    ],
+    "postgres": {
+      "passed": 126,
+      "failed": 1,
+      "skipped": 4,
+      "failure": "Home PG test assumed an empty shared database: observed 144 vs 143. Corrected fixture uses a member principal and 143 owned missions plus an unrelated mission, preserving exact scoped-count and review assertions. Local PostgreSQL rerun passes.",
+      "run": "https://github.com/kneelinghorse/TraceLab/actions/runs/34734987504"
+    },
+    "advisory_failures": [
+      "ruff-full",
+      "mypy",
+      "frontend lint"
+    ],
+    "backend_suite": "still running before corrective push"
+  }
 }
