@@ -14,6 +14,7 @@ from app.adapters.repositories.sqlalchemy_project_repo import SQLAlchemyProjectR
 from app.core.config import settings
 from app.ports.external import EmbeddingPort, LLMPort, VectorDBPort
 from app.ports.repositories import DocumentRepository, MissionRepository, ProjectRepository
+from app.services.admin_stats import AdminStatsService
 from app.services.home import HomeService
 
 logger = logging.getLogger(__name__)
@@ -37,6 +38,7 @@ def get_mission_repository() -> MissionRepository:
 def get_home_service() -> HomeService:
     """Wire Home's scoped aggregate repository to its service."""
     from app.adapters.repositories.sqlalchemy_home_repo import SQLAlchemyHomeRepository
+
     return HomeService(SQLAlchemyHomeRepository())
 
 
@@ -73,3 +75,11 @@ def get_llm_port() -> LLMPort | None:
     except Exception:
         logger.warning("LLMPort unavailable: OpenAI not configured", exc_info=True)
         return None
+
+
+def get_admin_stats_service() -> AdminStatsService:
+    """Wire persisted counts and external worker health without contacting it yet."""
+    from app.adapters.external.worker_probe import HTTPWorkerProbe
+    from app.adapters.repositories.sqlalchemy_admin_stats_repo import SQLAlchemyAdminStatsRepository
+
+    return AdminStatsService(SQLAlchemyAdminStatsRepository(), HTTPWorkerProbe())

@@ -2,7 +2,11 @@
  * Console Corrections Queue - View and manage pending corrections.
  */
 
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
+import useSWR from "swr";
+import Head from "next/head";
+import { RequireAdmin } from "@/components/RequireAdmin";
+import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 
 import { AuthGate } from "@/components/AuthGate";
@@ -16,47 +20,31 @@ import {
   processCorrections,
   getDeadLetterQueue,
 } from "@/lib/api/console";
-import type { CorrectionStatusResponse, CorrectionTelemetry } from "@/types/console";
-import type { DeadLetterItem } from "@/lib/api/console";
 
-function CorrectionsContent() {
-  const [status, setStatus] = useState<CorrectionStatusResponse | null>(null);
-  const [telemetry, setTelemetry] = useState<CorrectionTelemetry | null>(null);
-  const [deadLetter, setDeadLetter] = useState<DeadLetterItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export function CorrectionsContent() {
+  const { user } = useAuth();
+  const { data, error: readError, isLoading, isValidating, mutate } = useSWR(["admin-corrections", user?.user_id], async () => {
+    const [status, telemetry, deadLetter] = await Promise.all([getCorrectionStatus(50), getCorrectionTelemetry(), getDeadLetterQueue()]);
+    return { status, telemetry, deadLetter };
+  }, { refreshInterval: 30000 });
+  const status = data?.status;
+  const telemetry = data?.telemetry;
+  const deadLetter = data?.deadLetter.items ?? [];
+  const deadLetterCount = data?.deadLetter.count ?? 0;
   const [actionLoading, setActionLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [actionError, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const error = actionError || (readError ? (data ? "Refresh failed. Showing the last successful snapshot." : "Corrections could not load. Try Refresh to retry.") : null);
   const [activeTab, setActiveTab] = useState<"queue" | "telemetry" | "deadletter">("queue");
-
-  const loadData = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const [statusData, telemetryData, dlqData] = await Promise.all([
-        getCorrectionStatus(50),
-        getCorrectionTelemetry(),
-        getDeadLetterQueue(),
-      ]);
-
-      setStatus(statusData);
-      setTelemetry(telemetryData);
-      setDeadLetter(dlqData.items);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load corrections data");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  const loadData = () => mutate();
 
   const handleTriggerRetry = async () => {
     try {
       setActionLoading(true);
-      await triggerCorrections();
+      setError(null);
+      setNotice(null);
+      const result = await triggerCorrections();
+      setNotice(result.message);
       await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to trigger retries");
@@ -68,7 +56,10 @@ function CorrectionsContent() {
   const handleClearCompleted = async () => {
     try {
       setActionLoading(true);
-      await clearCompletedCorrections();
+      setError(null);
+      setNotice(null);
+      const result = await clearCompletedCorrections();
+      setNotice(result.message);
       await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to clear completed");
@@ -80,7 +71,10 @@ function CorrectionsContent() {
   const handleProcessNow = async () => {
     try {
       setActionLoading(true);
-      await processCorrections();
+      setError(null);
+      setNotice(null);
+      const result = await processCorrections();
+      setNotice(result.message);
       await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to process corrections");
@@ -91,56 +85,59 @@ function CorrectionsContent() {
 
   return (
     <div className="min-h-screen bg-background dark:bg-background py-8">
+      <Head><title>Corrections · TraceLab</title></Head>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="text-sm text-muted dark:text-muted mb-4">
-          <Link href="/console" className="hover:text-secondary dark:hover:text-secondary">
-            Console
+          <Link href="/admin/observability" className="hover:text-secondary dark:hover:text-secondary">
+            Observability
           </Link>
           {" / "}
           <span className="text-foreground dark:text-foreground">Corrections</span>
         </nav>
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground dark:text-foreground">
               Correction Queue
             </h1>
             <p className="mt-2 text-secondary dark:text-muted">
-              Manage auto-linking corrections and webhook delivery
+              Manage auto-linking corrections and webhook delivery. This queue belongs to the current API process and resets on restart.
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={handleProcessNow}
-              disabled={isLoading || actionLoading}
+              disabled={isLoading || actionLoading || !status}
               className="px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent disabled:opacity-50"
             >
               Process Now
             </button>
             <button
               onClick={loadData}
-              disabled={isLoading}
+              disabled={isValidating}
               className="px-4 py-2 border border-line-strong dark:border-line-strong text-secondary dark:text-secondary rounded-lg hover:bg-background dark:hover:bg-surface-alt disabled:opacity-50"
             >
-              Refresh
+              {isValidating ? "Refreshing…" : "Refresh"}
             </button>
           </div>
         </div>
 
         {/* Error Alert */}
         {error && (
-          <div className="mb-6 p-4 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg text-danger dark:text-danger">
+          <div role="alert" className="mb-6 p-4 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg text-danger dark:text-danger">
             {error}
           </div>
         )}
 
+        {notice && <p role="status" className="mb-4 rounded-lg bg-success-surface p-4 text-success">{notice}</p>}
+        <p className="mb-4 text-sm text-muted">Refreshes every 30s{status ? ` · Updated ${new Date(status.last_updated).toLocaleString()}` : ""}</p>
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-muted dark:text-muted">Loading corrections...</div>
           </div>
-        ) : (
+        ) : data ? (
           <>
             {/* Summary Stats */}
             {status && (
@@ -168,7 +165,7 @@ function CorrectionsContent() {
                   />
                   <StatCard
                     label="Success Rate"
-                    value={`${telemetry?.success_rate ? Math.round(telemetry.success_rate * 100) : 0}%`}
+                    value={status.stats.completed + status.stats.failed ? `${Math.round((telemetry?.success_rate ?? 0) * 100)}%` : "No attempts"}
                     color="purple"
                   />
                 </StatGrid>
@@ -176,8 +173,9 @@ function CorrectionsContent() {
             )}
 
             {/* Tabs */}
-            <div className="flex gap-4 mb-6 border-b border-line dark:border-line">
+            <div className="flex flex-wrap gap-4 mb-6 border-b border-line dark:border-line" aria-label="Correction views">
               <button
+                aria-pressed={activeTab === "queue"}
                 onClick={() => setActiveTab("queue")}
                 className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === "queue"
@@ -188,6 +186,7 @@ function CorrectionsContent() {
                 Queue
               </button>
               <button
+                aria-pressed={activeTab === "telemetry"}
                 onClick={() => setActiveTab("telemetry")}
                 className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === "telemetry"
@@ -198,6 +197,7 @@ function CorrectionsContent() {
                 Telemetry
               </button>
               <button
+                aria-pressed={activeTab === "deadletter"}
                 onClick={() => setActiveTab("deadletter")}
                 className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
                   activeTab === "deadletter"
@@ -206,9 +206,9 @@ function CorrectionsContent() {
                 }`}
               >
                 Dead Letter
-                {deadLetter.length > 0 && (
+                {deadLetterCount > 0 && (
                   <span className="px-1.5 py-0.5 text-xs bg-danger-surface text-danger dark:bg-danger-surface dark:text-danger rounded-full">
-                    {deadLetter.length}
+                    {deadLetterCount}
                   </span>
                 )}
               </button>
@@ -266,21 +266,12 @@ function CorrectionsContent() {
               <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-foreground dark:text-foreground">
-                    Dead Letter Queue ({deadLetter.length})
+                    Dead Letter Queue ({deadLetterCount})
                   </h3>
-                  {deadLetter.length > 0 && (
-                    <button
-                      onClick={async () => {
-                        // Implement clear dead letter
-                        setError("Clear dead letter not yet implemented");
-                      }}
-                      className="text-sm px-3 py-1.5 text-danger dark:text-danger border border-danger-line dark:border-danger-line rounded hover:bg-danger-surface dark:hover:bg-danger-surface"
-                    >
-                      Clear All
-                    </button>
-                  )}
+
                 </div>
 
+                {deadLetterCount > deadLetter.length && <p className="mb-4 text-sm text-muted">Showing {deadLetter.length} of {deadLetterCount} failed deliveries.</p>}
                 {deadLetter.length === 0 ? (
                   <p className="text-center text-muted dark:text-muted py-8">
                     No failed webhook deliveries.
@@ -300,7 +291,7 @@ function CorrectionsContent() {
                             {item.attempts} attempts
                           </span>
                         </div>
-                        <p className="text-sm text-danger dark:text-danger mb-2">
+                        <p className="text-sm text-danger dark:text-danger mb-2 break-words">
                           {item.error}
                         </p>
                         <details className="text-xs">
@@ -321,7 +312,7 @@ function CorrectionsContent() {
               </div>
             )}
           </>
-        )}
+        ) : null}
       </div>
     </div>
   );
@@ -330,7 +321,7 @@ function CorrectionsContent() {
 export default function CorrectionsPage() {
   return (
     <AuthGate>
-      <CorrectionsContent />
+      <RequireAdmin><CorrectionsContent /></RequireAdmin>
     </AuthGate>
   );
 }

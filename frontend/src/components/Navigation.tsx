@@ -30,7 +30,7 @@ export const navigationGroups: { label: string; admin?: boolean; items: Navigati
   { label: "Admin", admin: true, items: [
     { label: "Users", href: "/admin/users", icon: "users" },
     { label: "Spaces", href: "/admin/spaces", icon: "spaces" },
-    { label: "Observability", href: "/console", icon: "activity" },
+    { label: "Observability", href: "/admin/observability", icon: "activity" },
   ] },
 ];
 

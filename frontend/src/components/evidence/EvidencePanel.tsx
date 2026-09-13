@@ -14,7 +14,7 @@ export function EvidencePanel({ projectId, filters }: { projectId: string | null
     {ledger.error && <div role="alert"><p>Unable to load evidence.</p><button className="text-accent-text underline" onClick={() => void ledger.mutate()}>Retry evidence</button></div>}
     {ledger.data && <>
       <Link href={evidenceHref(projectId!, filters)} className="text-accent-text underline">Browse evidence ({ledger.data.entry_total.toLocaleString()})</Link>
-      {ledger.data.entry_total === 0 ? <p className="text-secondary">No accessible evidence is linked to this output.</p> : <ul className="space-y-2">{ledger.data.entries.slice(0, 3).map(entry => <li key={entry.id}><Link className="break-words text-sm text-accent-text underline" href={`/evidence/${entry.id}`}>{entry.claim}</Link></li>)}</ul>}
+      {ledger.data.entry_total === 0 ? <p className="text-secondary">No accessible evidence is linked to this output.</p> : <ul className="space-y-2">{ledger.data.entries.slice(0, 3).map(entry => <li key={entry.id}><Link className="line-clamp-3 break-words text-sm text-accent-text underline" href={`/evidence/${entry.id}`}>{entry.claim}</Link></li>)}</ul>}
     </>}
   </section>;
 }

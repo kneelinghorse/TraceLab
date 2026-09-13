@@ -1,0 +1,21 @@
+{
+  "checked_at": "2026-09-13T14:07:11.199Z",
+  "base": "https://tracelab.aquex.ai",
+  "api": "https://api.tracelab.aquex.ai",
+  "fixture": false,
+  "checks": 36,
+  "failures": 0,
+  "ledger_total": 370,
+  "supporting": 191,
+  "background": 170,
+  "search_total": 173,
+  "report_evidence": 370,
+  "document_evidence": 370,
+  "ids": {
+    "project": "0afcc588-e722-45bd-8320-f486601b877c",
+    "mission": "7b847edd-5433-4237-a899-57b47e6edf0a",
+    "report": "f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+    "document": "e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+    "session": "deepsearch:64ff9dac-d043-4f74-8645-612cecc58d79"
+  }
+}
