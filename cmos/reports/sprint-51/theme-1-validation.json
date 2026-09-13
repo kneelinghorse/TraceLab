@@ -61,7 +61,7 @@
     },
     "guard_followup": {
       "scope": "Extend the existing scanner to CSS so @apply cannot reintroduce a dark utility.",
-      "tdd": "New CSS rejection test failed first; all127 unit tests then passed, zero skips. Lint, types and check:tokens passed.",
+      "tdd": "New CSS rejection test failed first; all 127 unit tests then passed, zero skips. Lint, types and check:tokens passed.",
       "application_source": "Byte-identical to a4fe8ee under frontend/src and tailwind.config.ts; retained build/browser/baseline proof applies to the same application.",
       "new_browser_run": false
     }
@@ -100,26 +100,26 @@
     "Both Railway SUCCESS deployment IDs and direct-production baseline remain outstanding; failing hc has not been merged or published."
   ],
   "ci": {
-    "source_commit": "a4fe8ee372def8d0c54eabfaacffbf480abb637f",
-    "required": "all passed",
-    "frontend_checks_run": 34772575795,
-    "frontend_build_run": 34772575823,
+    "source_commit": "db69cb462fe53c2a54ce0eafd02e652f53370992",
+    "all_jobs": "passed",
+    "frontend_checks_run": 34774282426,
+    "frontend_build_run": 34774282456,
     "backend": {
-      "run": 34772575830,
+      "run": 34774282529,
       "passed": 2427,
       "skipped": 3,
       "deselected": 12,
       "warnings": 48
     },
     "postgres": {
-      "run": 34772575780,
+      "run": 34774282425,
       "passed": 129,
       "skipped": 4,
       "warnings": 17
     },
-    "secret_scan_run": 34772575868,
-    "lint_run": 34772575773,
-    "note": "Passing CI is for the recorded application source a4fe8ee. Later changes add validation receipts and CSS coverage to the build guard; application source is unchanged. Latest follow-up CI is not claimed complete. CI-2 separately retires the old optional lint jobs."
+    "secret_scan_run": 34774282428,
+    "lint_run": 34774282421,
+    "note": "All checks passed for db69cb4, including the CSS guard follow-up. Application source remains unchanged from the built browser baseline at a4fe8ee. The PR merge checks include CI-2's removal of the old optional lint jobs. Later receipt-only changes do not alter the tested application."
   },
   "deployments": null,
   "limitations": [
