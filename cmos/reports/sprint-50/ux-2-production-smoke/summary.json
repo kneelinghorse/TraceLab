@@ -1,0 +1,12 @@
+{
+  "checked_at": "2026-09-13T13:16:43.846Z",
+  "base": "https://tracelab.aquex.ai",
+  "api": "https://api.tracelab.aquex.ai",
+  "fixture": false,
+  "viewport_checks": 6,
+  "failures": 0,
+  "mission_total": 433,
+  "project_total": 51,
+  "report_total": 481,
+  "all_status_totals_match": true
+}
