@@ -44,20 +44,20 @@ function CorrectionItemRow({ item }: { item: CorrectionItem }) {
   };
 
   return (
-    <div className="flex items-center justify-between py-2 border-b border-line dark:border-line last:border-0">
+    <div className="flex items-center justify-between py-2 border-b border-line last:border-0">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <StatusBadge status={item.status} />
-          <span className="text-sm font-medium text-foreground dark:text-foreground truncate">
+          <span className="text-sm font-medium text-foreground truncate">
             {item.evidence_id}
           </span>
         </div>
-        <div className="text-xs text-muted dark:text-muted mt-1">
+        <div className="text-xs text-muted mt-1">
           {ERROR_TYPE_LABELS[item.error_type] ?? item.error_type} • Retry {item.retry_count}/{item.max_retries}
           {item.best_similarity != null && ` • Best: ${Math.round(item.best_similarity * 100)}%`}
         </div>
       </div>
-      <div className="text-xs text-muted dark:text-muted ml-4">
+      <div className="text-xs text-muted ml-4">
         {timeSince(item.updated_at)}
       </div>
     </div>
@@ -76,9 +76,9 @@ export function CorrectionStatusCard({
     : null;
 
   return (
-    <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
+    <div className="bg-surface rounded-lg border border-line p-6">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <h3 className="text-lg font-semibold text-foreground dark:text-foreground">
+        <h3 className="text-lg font-semibold text-foreground">
           Correction Queue
         </h3>
         <div className="flex flex-wrap gap-2">
@@ -95,7 +95,7 @@ export function CorrectionStatusCard({
             <button
               onClick={onClearCompleted}
               disabled={isLoading}
-              className="text-sm px-3 py-1.5 border border-line-strong dark:border-line-strong text-secondary dark:text-secondary rounded hover:bg-background dark:hover:bg-surface-alt disabled:opacity-50"
+              className="text-sm px-3 py-1.5 border border-line-strong text-secondary rounded hover:bg-background disabled:opacity-50"
             >
               Clear Completed
             </button>
@@ -108,41 +108,41 @@ export function CorrectionStatusCard({
         <StatBox
           label="Pending"
           value={stats.pending}
-          color="bg-warning-surface text-warning dark:bg-warning-surface dark:text-warning"
+          color="bg-warning-surface text-warning"
         />
         <StatBox
           label="In Progress"
           value={stats.in_progress}
-          color="bg-info-surface text-info dark:bg-info-surface dark:text-accent-text"
+          color="bg-info-surface text-info"
         />
         <StatBox
           label="Completed"
           value={stats.completed}
-          color="bg-success-surface text-success dark:bg-success-surface dark:text-success"
+          color="bg-success-surface text-success"
         />
         <StatBox
           label="Failed"
           value={stats.failed}
-          color="bg-danger-surface text-danger dark:bg-danger-surface dark:text-danger"
+          color="bg-danger-surface text-danger"
         />
         <StatBox
           label="Success Rate"
           value={successRate == null ? "No attempts" : `${successRate}%`}
-          color="bg-info-surface text-info dark:bg-info-surface dark:text-accent-text"
+          color="bg-info-surface text-info"
         />
       </div>
 
       {/* Error Distribution */}
       {Object.keys(error_distribution).length > 0 && (
         <div className="mb-6">
-          <h4 className="text-sm font-medium text-secondary dark:text-secondary mb-3">
+          <h4 className="text-sm font-medium text-secondary mb-3">
             Error Distribution
           </h4>
           <div className="flex flex-wrap gap-2">
             {Object.entries(error_distribution).map(([type, count]) => (
               <span
                 key={type}
-                className="text-xs px-2 py-1 bg-surface dark:bg-surface-alt text-secondary dark:text-secondary rounded"
+                className="text-xs px-2 py-1 bg-surface text-secondary rounded"
               >
                 {ERROR_TYPE_LABELS[type] ?? type}: {count}
               </span>
@@ -154,7 +154,7 @@ export function CorrectionStatusCard({
       {/* Recent Items */}
       {recent_items.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-secondary dark:text-secondary mb-3">
+          <h4 className="text-sm font-medium text-secondary mb-3">
             Recent Items
           </h4>
           <div className="max-h-64 overflow-y-auto">
@@ -167,13 +167,13 @@ export function CorrectionStatusCard({
 
       {/* Empty State */}
       {stats.total === 0 && (
-        <p className="text-center text-muted dark:text-muted py-4">
+        <p className="text-center text-muted py-4">
           No corrections in queue.
         </p>
       )}
 
       {/* Last Updated */}
-      <div className="mt-4 pt-4 border-t border-line dark:border-line text-xs text-muted dark:text-muted">
+      <div className="mt-4 pt-4 border-t border-line text-xs text-muted">
         Last updated: {new Date(status.last_updated).toLocaleString()}
       </div>
     </div>

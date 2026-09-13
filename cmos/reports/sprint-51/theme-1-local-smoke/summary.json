@@ -1,0 +1,26 @@
+{
+  "base": "http://127.0.0.1:3105",
+  "checked_at": "2026-09-13T17:45:16.792562+00:00",
+  "checks": 186,
+  "routes": 31,
+  "themes": [
+    "light",
+    "dark",
+    "hc"
+  ],
+  "viewports": [
+    1440,
+    390
+  ],
+  "failures": {
+    "light": 0,
+    "dark": 0,
+    "hc": 62
+  },
+  "overflow_checks": 0,
+  "browser_errors": 0,
+  "api_errors": 0,
+  "contrast_node_occurrences": 4323,
+  "readOnlyApiProxy": true,
+  "directProductionApi": false
+}

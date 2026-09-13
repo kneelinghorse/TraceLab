@@ -107,30 +107,30 @@ export default function DocumentUploadPage() {
   return (
     <AuthGate>
       {feedback}
-      <div className="min-h-screen bg-background dark:bg-background">
+      <div className="min-h-screen bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Upload Documents</h1>
-            <p className="mt-2 text-secondary dark:text-muted">
+            <h1 className="text-3xl font-bold text-foreground">Upload Documents</h1>
+            <p className="mt-2 text-secondary">
               Upload research documents to a project. For project-specific uploads, use the project detail page.
             </p>
           </div>
 
           {/* Upload Form */}
-          <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-8">
+          <div className="bg-surface rounded-lg border border-line p-8">
             {uploadComplete ? (
               // Success State
               <div className="text-center py-8">
-                <div className="w-16 h-16 bg-success-surface dark:bg-success-surface rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-success dark:text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 bg-success-surface rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h2 className="text-xl font-semibold text-foreground dark:text-foreground mb-2">
+                <h2 className="text-xl font-semibold text-foreground mb-2">
                   Upload Complete
                 </h2>
-                <p className="text-secondary dark:text-muted mb-6">
+                <p className="text-secondary mb-6">
                   Successfully uploaded {uploadedCount} document{uploadedCount !== 1 ? "s" : ""} to{" "}
                   <span className="font-medium">{selectedProjectName}</span>
                 </p>
@@ -143,13 +143,13 @@ export default function DocumentUploadPage() {
                   </button>
                   <Link
                     href={`/projects/${selectedProject}`}
-                    className="px-6 py-2 border border-line-strong dark:border-line-strong rounded-lg hover:bg-background dark:hover:bg-surface-alt text-center"
+                    className="px-6 py-2 border border-line-strong rounded-lg hover:bg-background text-center"
                   >
                     Go to Project
                   </Link>
                   <Link
                     href="/documents"
-                    className="px-6 py-2 border border-line-strong dark:border-line-strong rounded-lg hover:bg-background dark:hover:bg-surface-alt text-center"
+                    className="px-6 py-2 border border-line-strong rounded-lg hover:bg-background text-center"
                   >
                     View All Documents
                   </Link>
@@ -159,14 +159,14 @@ export default function DocumentUploadPage() {
               <>
                 {/* Project Selection */}
                 <div className="mb-6">
-                  <label htmlFor="project-select" className="block text-sm font-medium text-foreground dark:text-foreground mb-2">
+                  <label htmlFor="project-select" className="block text-sm font-medium text-foreground mb-2">
                     Select Project *
                   </label>
                   <select
                     id="project-select"
                     value={selectedProject}
                     onChange={(e) => setSelectedProject(e.target.value)}
-                    className="w-full px-4 py-2 border border-line-strong dark:border-line rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground"
+                    className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
                     disabled={uploading}
                     aria-label="Select project"
                   >
@@ -181,7 +181,7 @@ export default function DocumentUploadPage() {
 
                 {/* File Drop Zone */}
                 <div
-                  className="mb-6 border-2 border-dashed border-line-strong dark:border-line rounded-lg p-12 text-center hover:border-info-line dark:hover:border-info-line transition-colors cursor-pointer"
+                  className="mb-6 border-2 border-dashed border-line-strong rounded-lg p-12 text-center hover:border-info-line transition-colors cursor-pointer"
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                   onClick={() => document.getElementById("file-input")?.click()}
@@ -212,21 +212,21 @@ export default function DocumentUploadPage() {
                           strokeLinejoin="round"
                         />
                       </svg>
-                      <p className="mt-2 text-sm text-secondary dark:text-muted">
+                      <p className="mt-2 text-sm text-secondary">
                         Drag and drop files here, or click to select files
                       </p>
-                      <p className="mt-1 text-xs text-muted dark:text-muted">
+                      <p className="mt-1 text-xs text-muted">
                         Supported: PDF, DOCX, PPTX, CSV, XLSX, MD, TXT
                       </p>
                     </>
                   ) : (
                     <div>
-                      <p className="text-sm text-secondary dark:text-muted mb-2">
+                      <p className="text-sm text-secondary mb-2">
                         {files.length} file(s) selected:
                       </p>
                       <ul className="text-left max-w-md mx-auto">
                         {files.map((file, idx) => (
-                          <li key={idx} className="text-sm text-foreground dark:text-foreground py-1 flex justify-between items-center">
+                          <li key={idx} className="text-sm text-foreground py-1 flex justify-between items-center">
                             <span>{file.name}</span>
                             <button
                               onClick={(e) => {
@@ -247,7 +247,7 @@ export default function DocumentUploadPage() {
 
                 {/* Options */}
                 <div className="mb-6">
-                  <label className="flex items-center gap-2 text-sm text-foreground dark:text-foreground">
+                  <label className="flex items-center gap-2 text-sm text-foreground">
                     <input
                       type="checkbox"
                       checked={autoProcess}
@@ -261,9 +261,9 @@ export default function DocumentUploadPage() {
 
                 {/* Progress */}
                 {progress.length > 0 && (
-                  <div className="mb-6 p-4 bg-background dark:bg-background rounded border border-line dark:border-line max-h-48 overflow-y-auto">
+                  <div className="mb-6 p-4 bg-background rounded border border-line max-h-48 overflow-y-auto">
                     {progress.map((msg, idx) => (
-                      <div key={idx} className="text-sm text-foreground dark:text-foreground py-1">
+                      <div key={idx} className="text-sm text-foreground py-1">
                         {msg}
                       </div>
                     ))}
@@ -282,7 +282,7 @@ export default function DocumentUploadPage() {
                   <button
                     onClick={() => router.push("/documents")}
                     disabled={uploading}
-                    className="px-6 py-3 border border-line-strong dark:border-line text-foreground dark:text-foreground rounded-lg hover:bg-background dark:hover:bg-surface-alt transition-colors"
+                    className="px-6 py-3 border border-line-strong text-foreground rounded-lg hover:bg-background transition-colors"
                   >
                     Cancel
                   </button>

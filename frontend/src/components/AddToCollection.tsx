@@ -143,7 +143,7 @@ export function AddToCollection({
   };
 
   const buttonClass = variant === "compact"
-    ? "text-xs px-2 py-1 border border-line-strong dark:border-line-strong rounded text-secondary dark:text-muted hover:bg-surface dark:hover:bg-surface-alt"
+    ? "text-xs px-2 py-1 border border-line-strong rounded text-secondary hover:bg-surface"
     : "px-3 py-1.5 text-sm border border-line rounded-lg text-secondary hover:border-info-line hover:text-accent-text";
 
   // Only render portal after mount (SSR safety) and when position is calculated
@@ -157,18 +157,18 @@ export function AddToCollection({
 
       {/* Menu */}
       <div
-        className="fixed w-64 z-[9999] bg-surface dark:bg-surface border border-line dark:border-line rounded-lg shadow-xl"
+        className="fixed w-64 z-[9999] bg-surface border border-line rounded-lg shadow-xl"
         style={{ top: menuPosition.top, left: menuPosition.left }}
       >
         <div className="p-2">
-          <p className="text-xs font-medium text-muted dark:text-muted px-2 py-1">
+          <p className="text-xs font-medium text-muted px-2 py-1">
             Add to collection
           </p>
 
           {/* Existing collections */}
           <div className="max-h-48 overflow-y-auto">
             {collections.length === 0 ? (
-              <p className="px-2 py-2 text-sm text-muted dark:text-muted">
+              <p className="px-2 py-2 text-sm text-muted">
                 No collections yet
               </p>
             ) : (
@@ -177,10 +177,10 @@ export function AddToCollection({
                   key={collection.id}
                   onClick={() => handleAddToCollection(collection)}
                   disabled={isAdding}
-                  className="w-full text-left px-2 py-2 text-sm text-secondary dark:text-secondary hover:bg-surface dark:hover:bg-surface-alt rounded disabled:opacity-50"
+                  className="w-full text-left px-2 py-2 text-sm text-secondary hover:bg-surface rounded disabled:opacity-50"
                 >
                   <span className="block truncate">{collection.name}</span>
-                  <span className="text-xs text-muted dark:text-muted">
+                  <span className="text-xs text-muted">
                     {collection.item_count} {collection.item_count === 1 ? "chunk" : "chunks"}
                   </span>
                 </button>
@@ -189,7 +189,7 @@ export function AddToCollection({
           </div>
 
           {/* Divider */}
-          <div className="border-t border-line dark:border-line my-2" />
+          <div className="border-t border-line my-2" />
 
           {/* Create new */}
           {isCreating ? (
@@ -199,7 +199,7 @@ export function AddToCollection({
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="Collection name..."
-                className="w-full px-2 py-1 text-sm border border-line-strong dark:border-line-strong rounded bg-surface dark:bg-surface-alt text-foreground dark:text-foreground"
+                className="w-full px-2 py-1 text-sm border border-line-strong rounded bg-surface text-foreground"
                 autoFocus
               />
               <div className="flex gap-2 mt-2">
@@ -216,7 +216,7 @@ export function AddToCollection({
                     setIsCreating(false);
                     setNewName("");
                   }}
-                  className="px-2 py-1 text-xs text-secondary dark:text-muted"
+                  className="px-2 py-1 text-xs text-secondary"
                 >
                   Cancel
                 </button>
@@ -225,7 +225,7 @@ export function AddToCollection({
           ) : (
             <button
               onClick={() => setIsCreating(true)}
-              className="w-full text-left px-2 py-2 text-sm text-accent-text dark:text-accent-text hover:bg-surface dark:hover:bg-surface-alt rounded"
+              className="w-full text-left px-2 py-2 text-sm text-accent-text hover:bg-surface rounded"
             >
               + New Collection
             </button>
@@ -255,8 +255,8 @@ export function AddToCollection({
         <div
           className={`absolute right-0 mt-1 px-3 py-1.5 text-xs rounded-lg whitespace-nowrap z-50 ${
             feedback.type === "success"
-              ? "bg-success-surface text-success dark:bg-success-surface dark:text-success"
-              : "bg-danger-surface text-danger dark:bg-danger-surface dark:text-danger"
+              ? "bg-success-surface text-success"
+              : "bg-danger-surface text-danger"
           }`}
         >
           {feedback.message}

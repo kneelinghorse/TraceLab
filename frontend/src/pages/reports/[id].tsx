@@ -138,7 +138,7 @@ export default function ReportDetailPage() {
   if (isLoading || !report) {
     return (
       <AuthGate>
-        <div className="min-h-screen bg-background dark:bg-background flex items-center justify-center">
+        <div className="min-h-screen bg-background flex items-center justify-center">
           <p className="text-muted">Loading report...</p>
         </div>
       </AuthGate>
@@ -147,7 +147,7 @@ export default function ReportDetailPage() {
 
   return (
     <AuthGate>
-      <div className="min-h-screen bg-background dark:bg-background">
+      <div className="min-h-screen bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {actionError && !deleteOpen && <p role="alert" className="mb-4 break-words rounded bg-danger-surface p-4 text-danger">{actionError}</p>}
           <Dialog open={deleteOpen} title="Delete report" onClose={() => { if (!deleting) setDeleteOpen(false); }}>
@@ -158,17 +158,17 @@ export default function ReportDetailPage() {
           {/* Back Link */}
           <Link
             href="/reports"
-            className="text-accent-text dark:text-accent-text underline underline-offset-4 mb-4 inline-block"
+            className="text-accent-text underline underline-offset-4 mb-4 inline-block"
           >
             &larr; Back to Reports
           </Link>
 
           {/* Header */}
-          <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6 mb-6">
+          <div className="bg-surface rounded-lg border border-line p-6 mb-6">
             {isEditing ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">
+                  <label className="block text-sm font-medium text-secondary mb-1">
                     Title *
                   </label>
                   <input
@@ -176,12 +176,12 @@ export default function ReportDetailPage() {
                     aria-label="Report title"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground"
+                    className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
                     autoFocus
                   />
                 </div>
                 {editError && (
-                  <p className="text-sm text-danger dark:text-danger">{editError}</p>
+                  <p className="text-sm text-danger">{editError}</p>
                 )}
                 <div className="flex gap-3">
                   <button
@@ -195,7 +195,7 @@ export default function ReportDetailPage() {
                       setIsEditing(false);
                       setEditError(null);
                     }}
-                    className="px-4 py-2 text-secondary dark:text-muted hover:text-foreground dark:hover:text-foreground transition-colors"
+                    className="px-4 py-2 text-secondary hover:text-foreground transition-colors"
                   >
                     Cancel
                   </button>
@@ -205,7 +205,7 @@ export default function ReportDetailPage() {
               <>
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div className="flex flex-wrap items-center gap-3">
-                    <h1 className="text-2xl font-bold text-foreground dark:text-foreground">
+                    <h1 className="text-2xl font-bold text-foreground">
                       {report.title}
                     </h1>
                     <button type="button" onClick={handleToggleStatus} title={report.status === "final" ? "Click to change to draft" : "Click to finalize"}><StatusBadge status={report.status} /></button>
@@ -215,27 +215,27 @@ export default function ReportDetailPage() {
                       <button
                         onClick={() => setShowExportMenu((v) => !v)}
                         disabled={isExporting}
-                        className="px-4 py-2 text-sm text-accent-text dark:text-accent-text hover:bg-info-surface dark:hover:bg-surface-alt rounded disabled:opacity-50"
+                        className="px-4 py-2 text-sm text-accent-text hover:bg-info-surface rounded disabled:opacity-50"
                       >
                         {isExporting ? "Exporting..." : "Export ▾"}
                       </button>
                       {showExportMenu && (
-                        <div className="absolute right-0 top-full mt-1 bg-surface dark:bg-surface border border-line dark:border-line-strong rounded-lg shadow-lg z-10 min-w-[140px]">
+                        <div className="absolute right-0 top-full mt-1 bg-surface border border-line rounded-lg shadow-lg z-10 min-w-[140px]">
                           <button
                             onClick={() => { handleExport("md"); setShowExportMenu(false); }}
-                            className="block w-full text-left px-4 py-2 text-sm text-secondary dark:text-secondary hover:bg-surface dark:hover:bg-surface-alt rounded-t-lg"
+                            className="block w-full text-left px-4 py-2 text-sm text-secondary hover:bg-surface rounded-t-lg"
                           >
                             Markdown (.md)
                           </button>
                           <button
                             onClick={() => { handleExport("json"); setShowExportMenu(false); }}
-                            className="block w-full text-left px-4 py-2 text-sm text-secondary dark:text-secondary hover:bg-surface dark:hover:bg-surface-alt"
+                            className="block w-full text-left px-4 py-2 text-sm text-secondary hover:bg-surface"
                           >
                             JSON (.json)
                           </button>
                           <button
                             onClick={() => { handleExport("txt"); setShowExportMenu(false); }}
-                            className="block w-full text-left px-4 py-2 text-sm text-secondary dark:text-secondary hover:bg-surface dark:hover:bg-surface-alt rounded-b-lg"
+                            className="block w-full text-left px-4 py-2 text-sm text-secondary hover:bg-surface rounded-b-lg"
                           >
                             Plain text (.txt)
                           </button>
@@ -244,19 +244,19 @@ export default function ReportDetailPage() {
                     </div>
                     <button
                       onClick={handleCopy}
-                      className="px-4 py-2 text-sm text-success dark:text-success hover:bg-success-surface dark:hover:bg-surface-alt rounded"
+                      className="px-4 py-2 text-sm text-success hover:bg-success-surface rounded"
                     >
                       {isCopied ? "Copied!" : "Copy"}
                     </button>
                     <button
                       onClick={handleStartEdit}
-                      className="px-4 py-2 text-sm text-accent-text dark:text-accent-text hover:bg-info-surface dark:hover:bg-surface-alt rounded"
+                      className="px-4 py-2 text-sm text-accent-text hover:bg-info-surface rounded"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => { setActionError(null); setDeleteOpen(true); }}
-                      className="px-4 py-2 text-sm text-danger dark:text-danger hover:bg-danger-surface dark:hover:bg-surface-alt rounded"
+                      className="px-4 py-2 text-sm text-danger hover:bg-danger-surface rounded"
                     >
                       Delete
                     </button>
@@ -264,12 +264,12 @@ export default function ReportDetailPage() {
                 </div>
 
                 {/* Metadata */}
-                <div className="mt-4 flex flex-wrap gap-4 text-sm text-secondary dark:text-muted">
+                <div className="mt-4 flex flex-wrap gap-4 text-sm text-secondary">
                   <span>
                     Type: <span className="font-medium">{report.report_type}</span>
                   </span>
                   <span>
-                    Chunks: <span className="font-medium text-accent-text dark:text-accent-text">{report.chunk_count}</span>
+                    Chunks: <span className="font-medium text-accent-text">{report.chunk_count}</span>
                   </span>
                   <span>
                     Tokens: <span className="font-medium">{report.tokens_used.toLocaleString()}</span>
@@ -285,11 +285,11 @@ export default function ReportDetailPage() {
                 </div>
 
                 {report.prompt && (
-                  <div className="mt-4 p-3 bg-background dark:bg-surface-alt rounded-lg">
-                    <span className="text-xs text-muted dark:text-muted uppercase tracking-wider">
+                  <div className="mt-4 p-3 bg-background rounded-lg">
+                    <span className="text-xs text-muted uppercase tracking-wider">
                       Custom Prompt
                     </span>
-                    <p className="mt-1 text-sm text-secondary dark:text-secondary italic">
+                    <p className="mt-1 text-sm text-secondary italic">
                       {report.prompt}
                     </p>
                   </div>
@@ -301,8 +301,8 @@ export default function ReportDetailPage() {
           <EvidencePanel projectId={report.project_id} filters={{ report_id: report.id }} />
 
           {/* Report Content */}
-          <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6 mb-6">
-            <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
+          <div className="bg-surface rounded-lg border border-line p-6 mb-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">
               Content
             </h2>
             <MarkdownRenderer content={report.content} />
@@ -310,32 +310,32 @@ export default function ReportDetailPage() {
 
           {/* Citations */}
           {report.citations && report.citations.length > 0 && (
-            <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6 mb-6">
-              <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
+            <div className="bg-surface rounded-lg border border-line p-6 mb-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4">
                 Citations ({report.citations.length})
               </h2>
               <div className="space-y-3">
                 {report.citations.map((citation, index) => (
                   <div
                     key={`${citation.chunk_id}-${index}`}
-                    className="border border-line dark:border-line-strong rounded-lg p-4"
+                    className="border border-line rounded-lg p-4"
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <code className="text-xs bg-surface dark:bg-surface-alt px-2 py-0.5 rounded text-secondary dark:text-secondary">
+                      <code className="text-xs bg-surface px-2 py-0.5 rounded text-secondary">
                         {citation.chunk_id.slice(0, 8)}...
                       </code>
                       {citation.document_id && report.project_id && <Link className="text-xs text-accent-text underline" href={`/evidence?project_id=${report.project_id}&document_id=${citation.document_id}`}>Find evidence</Link>}
                       {citation.document_id && (
                         <Link
                           href={`/documents/${citation.document_id}`}
-                          className="text-xs text-accent-text dark:text-accent-text underline underline-offset-4"
+                          className="text-xs text-accent-text underline underline-offset-4"
                         >
                           View document
                         </Link>
                       )}
                     </div>
                     {citation.excerpt && (
-                      <p className="text-sm text-secondary dark:text-muted italic">
+                      <p className="text-sm text-secondary italic">
                         &quot;{citation.excerpt}&quot;
                       </p>
                     )}
@@ -347,30 +347,30 @@ export default function ReportDetailPage() {
 
           {/* Sources */}
           {report.sources && report.sources.length > 0 && (
-            <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
-              <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
+            <div className="bg-surface rounded-lg border border-line p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4">
                 Sources ({report.sources.length})
               </h2>
               <div className="space-y-2">
                 {report.sources.map((source) => (
                   <div
                     key={source.id}
-                    className="flex items-center justify-between py-2 border-b border-line dark:border-line last:border-0"
+                    className="flex items-center justify-between py-2 border-b border-line last:border-0"
                   >
                     <div className="flex items-center gap-3">
                       <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                         source.source_type === "collection"
-                          ? "bg-info-surface dark:bg-info-surface text-accent-text dark:text-accent-text"
-                          : "bg-info-surface dark:bg-info-surface text-accent-text dark:text-accent-text"
+                          ? "bg-info-surface text-accent-text"
+                          : "bg-info-surface text-accent-text"
                       }`}>
                         {source.source_type}
                       </span>
                       {source.source_type === "ledger_entry" && <Link className="text-sm text-accent-text underline" href={`/evidence/${source.source_id}`}>Open evidence</Link>}
-                      <code className="text-sm text-secondary dark:text-muted">
+                      <code className="text-sm text-secondary">
                         {source.source_id.slice(0, 8)}...
                       </code>
                     </div>
-                    <span className="text-xs text-muted dark:text-muted">
+                    <span className="text-xs text-muted">
                       {formatDistanceToNow(new Date(source.added_at), { addSuffix: true })}
                     </span>
                   </div>

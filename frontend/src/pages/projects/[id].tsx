@@ -193,7 +193,7 @@ export default function ProjectDetailPage() {
     return (
       <AuthGate>
       {feedback}
-        <div className="min-h-screen bg-background dark:bg-background flex items-center justify-center">
+        <div className="min-h-screen bg-background flex items-center justify-center">
           <p className="text-muted">Loading project...</p>
         </div>
       </AuthGate>
@@ -204,7 +204,7 @@ export default function ProjectDetailPage() {
     return (
       <AuthGate>
       {feedback}
-        <div className="min-h-screen bg-background dark:bg-background flex items-center justify-center">
+        <div className="min-h-screen bg-background flex items-center justify-center">
           <div className="text-center">
             <p className="text-muted mb-4">Project not found</p>
             <Link href="/projects" className="text-accent-text hover:text-accent-text">
@@ -219,48 +219,48 @@ export default function ProjectDetailPage() {
   return (
     <AuthGate>
       {feedback}
-      <div className="min-h-screen bg-background dark:bg-background">
+      <div className="min-h-screen bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Breadcrumb */}
           <nav className="mb-6">
-            <Link href="/projects" className="text-accent-text dark:text-accent-text underline underline-offset-4">
+            <Link href="/projects" className="text-accent-text underline underline-offset-4">
               Projects
             </Link>
             <span className="mx-2 text-muted">/</span>
-            <span className="text-secondary dark:text-secondary">{project.name}</span>
+            <span className="text-secondary">{project.name}</span>
           </nav>
 
           {/* Project Header */}
-          <div className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-6 mb-6">
+          <div className="bg-surface border border-line rounded-lg p-6 mb-6">
             {editing ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Name *</label>
+                  <label className="block text-sm font-medium text-secondary mb-1">Name *</label>
                   <input
                     aria-label="Project name"
                     type="text"
                     value={editForm.name}
                     onChange={(e) => setEditForm((prev) => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground"
+                    className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Description</label>
+                  <label className="block text-sm font-medium text-secondary mb-1">Description</label>
                   <textarea
                     aria-label="Project description"
                     value={editForm.description}
                     onChange={(e) => setEditForm((prev) => ({ ...prev, description: e.target.value }))}
                     rows={3}
-                    className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground"
+                    className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Research Type</label>
+                  <label className="block text-sm font-medium text-secondary mb-1">Research Type</label>
                   <select
                     aria-label="Research type"
                     value={editForm.research_type}
                     onChange={(e) => setEditForm((prev) => ({ ...prev, research_type: e.target.value }))}
-                    className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground"
+                    className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
                   >
                     <option value="">Select...</option>
                     {RESEARCH_TYPES.map((type) => (
@@ -281,7 +281,7 @@ export default function ProjectDetailPage() {
                   <button
                     onClick={cancelEditing}
                     disabled={saving}
-                    className="px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg hover:bg-background dark:hover:bg-surface-alt"
+                    className="px-4 py-2 border border-line-strong rounded-lg hover:bg-background"
                   >
                     Cancel
                   </button>
@@ -291,11 +291,11 @@ export default function ProjectDetailPage() {
               <div>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <h1 className="text-2xl font-bold text-foreground dark:text-foreground">{project.name}</h1>
+                    <h1 className="text-2xl font-bold text-foreground">{project.name}</h1>
                     {project.description && (
-                      <p className="mt-2 text-secondary dark:text-muted">{project.description}</p>
+                      <p className="mt-2 text-secondary">{project.description}</p>
                     )}
-                    <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted dark:text-muted">
+                    <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted">
                       <span>Research Type: {project.research_type || "Not set"}</span>
                       <span>Status: {project.status || "active"}</span>
                       {project.created_at && (
@@ -306,13 +306,13 @@ export default function ProjectDetailPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={startEditing}
-                      className="px-4 py-2 text-sm border border-line-strong dark:border-line-strong rounded-lg hover:bg-background dark:hover:bg-surface-alt"
+                      className="px-4 py-2 text-sm border border-line-strong rounded-lg hover:bg-background"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => setShowDeleteConfirm(true)}
-                      className="px-4 py-2 text-sm text-danger border border-danger-line dark:border-danger-line rounded-lg hover:bg-danger-surface dark:hover:bg-danger-surface"
+                      className="px-4 py-2 text-sm text-danger border border-danger-line rounded-lg hover:bg-danger-surface"
                     >
                       Delete
                     </button>
@@ -334,14 +334,14 @@ export default function ProjectDetailPage() {
 
           {/* Delete Confirmation Modal */}
           <Dialog open={showDeleteConfirm} title="Delete project" onClose={() => { if (!deleting) setShowDeleteConfirm(false); }}>
-                <p className="text-secondary dark:text-muted mb-4">
+                <p className="text-secondary mb-4">
                   This will delete <strong>{project.name}</strong> and all its documents, chunks, and associated data.
                 </p>
                 <div className="flex gap-3 justify-end">
                   <button
                     onClick={() => setShowDeleteConfirm(false)}
                     disabled={deleting}
-                    className="px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg hover:bg-background dark:hover:bg-surface-alt"
+                    className="px-4 py-2 border border-line-strong rounded-lg hover:bg-background"
                   >
                     Cancel
                   </button>
@@ -359,31 +359,31 @@ export default function ProjectDetailPage() {
             {/* Documents List */}
             <section className="lg:col-span-2 space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-foreground dark:text-foreground">Documents</h2>
+                <h2 className="text-lg font-semibold text-foreground">Documents</h2>
               </div>
 
               {docsError ? <PageState state="error" title="Documents could not load." onRetry={() => void mutateDocuments()} /> : docsLoading && !documentsResponse ? (
                 <p className="text-muted">Loading documents...</p>
               ) : documents.length === 0 ? (
-                <div className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-8 text-center">
-                  <p className="text-muted dark:text-muted">No documents yet. Upload some using the panel on the right.</p>
+                <div className="bg-surface border border-line rounded-lg p-8 text-center">
+                  <p className="text-muted">No documents yet. Upload some using the panel on the right.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {documents.map((doc) => (
                     <div
                       key={doc.id}
-                      className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-4"
+                      className="bg-surface border border-line rounded-lg p-4"
                     >
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <Link
                             href={`/documents/${doc.id}`}
-                            className="font-medium text-foreground dark:text-foreground hover:text-accent-text dark:hover:text-accent-text truncate block"
+                            className="font-medium text-foreground hover:text-accent-text truncate block"
                           >
                             {doc.name}
                           </Link>
-                          <div className="mt-1 flex flex-wrap gap-3 text-xs text-muted dark:text-muted">
+                          <div className="mt-1 flex flex-wrap gap-3 text-xs text-muted">
                             <span>{doc.file_type || doc.mime_type?.split("/")[1] || "Unknown"}</span>
                             {doc.file_size && <span>{(doc.file_size / 1024).toFixed(1)} KB</span>}
                             {doc.uploaded_at && (
@@ -398,7 +398,7 @@ export default function ProjectDetailPage() {
                         </div>
                         <button
                           onClick={() => handleDeleteDocument(doc.id)}
-                          className="ml-4 text-sm text-danger dark:text-danger hover:text-danger"
+                          className="ml-4 text-sm text-danger hover:text-danger"
                         >
                           Delete
                         </button>
@@ -414,12 +414,12 @@ export default function ProjectDetailPage() {
 
             {/* Upload Panel */}
             <aside className="space-y-4">
-              <div className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">Upload Documents</h3>
+              <div className="bg-surface border border-line rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Upload Documents</h3>
 
                 {/* Drop Zone */}
                 <div
-                  className="border-2 border-dashed border-line-strong dark:border-line-strong rounded-lg p-6 text-center hover:border-info-line dark:hover:border-info-line transition-colors cursor-pointer"
+                  className="border-2 border-dashed border-line-strong rounded-lg p-6 text-center hover:border-info-line transition-colors cursor-pointer"
                   onDrop={handleDrop}
                   onDragOver={(e) => e.preventDefault()}
                   onClick={() => document.getElementById("file-input-detail")?.click()}
@@ -436,7 +436,7 @@ export default function ProjectDetailPage() {
 
                   {files.length === 0 ? (
                     <>
-                      <p className="text-sm text-secondary dark:text-muted">
+                      <p className="text-sm text-secondary">
                         Drop files here or click to select
                       </p>
                       <p className="mt-1 text-xs text-muted">
@@ -445,13 +445,13 @@ export default function ProjectDetailPage() {
                     </>
                   ) : (
                     <div className="text-left">
-                      <p className="text-sm text-secondary dark:text-muted mb-2">
+                      <p className="text-sm text-secondary mb-2">
                         {files.length} file(s) selected:
                       </p>
                       <ul className="space-y-1">
                         {files.map((file, idx) => (
                           <li key={idx} className="text-sm flex justify-between items-center">
-                            <span className="truncate text-foreground dark:text-foreground">{file.name}</span>
+                            <span className="truncate text-foreground">{file.name}</span>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -470,7 +470,7 @@ export default function ProjectDetailPage() {
                 </div>
 
                 {/* Auto-process option */}
-                <label className="flex items-center gap-2 mt-4 text-sm text-secondary dark:text-secondary">
+                <label className="flex items-center gap-2 mt-4 text-sm text-secondary">
                   <input
                     type="checkbox"
                     checked={autoProcess}
@@ -483,9 +483,9 @@ export default function ProjectDetailPage() {
 
                 {/* Progress */}
                 {uploadProgress.length > 0 && (
-                  <div className="mt-4 p-3 bg-background dark:bg-background rounded border text-sm max-h-32 overflow-y-auto">
+                  <div className="mt-4 p-3 bg-background rounded border text-sm max-h-32 overflow-y-auto">
                     {uploadProgress.map((msg, idx) => (
-                      <div key={idx} className="text-secondary dark:text-secondary">{msg}</div>
+                      <div key={idx} className="text-secondary">{msg}</div>
                     ))}
                   </div>
                 )}
@@ -509,9 +509,9 @@ export default function ProjectDetailPage() {
 
 function StatCard({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="bg-background dark:bg-background rounded-lg p-3 text-center">
-      <p className="text-2xl font-bold text-foreground dark:text-foreground">{value}</p>
-      <p className="text-xs text-muted dark:text-muted">{label}</p>
+    <div className="bg-background rounded-lg p-3 text-center">
+      <p className="text-2xl font-bold text-foreground">{value}</p>
+      <p className="text-xs text-muted">{label}</p>
     </div>
   );
 }

@@ -1,0 +1,199 @@
+{
+  "mission": "THEME-1",
+  "status": "in_progress",
+  "base_commit": "d51ed2c3151e40b1f8017464dcf9b12406dcfaf2",
+  "implementation": "System / Light / Dark with resolved System label, authoritative head bootstrap, preserved hydration, semantic prose and no dark utilities. Stored hc falls back to System.",
+  "local": {
+    "frontend_unit": {
+      "passed": 127,
+      "skipped": 0
+    },
+    "browser": {
+      "passed": 25,
+      "skipped": 0,
+      "suites": [
+        "app-shell",
+        "console",
+        "evidence",
+        "hygiene"
+      ],
+      "note": "Built Chromium; deterministic API fixtures for mutation/focus coverage."
+    },
+    "pytest": {
+      "passed": 25,
+      "skipped": 0,
+      "warnings": 5,
+      "suites": [
+        "tests/unit/test_oods_object_contract.py",
+        "tests/unit/test_format_only_guard.py"
+      ]
+    },
+    "eslint": "passed; zero errors/warnings",
+    "type_check": "passed",
+    "production_build": "passed",
+    "foundational_refs": "passed",
+    "token_guard": "passed; rejects new dark variants; no intentional exceptions",
+    "deferral_tdd": "Four assertions failed before removal of hc support; all 127 unit tests then passed. Built-browser delayed-hydration test verifies stored hc falls back to System before first paint."
+  },
+  "dark_occurrences": {
+    "before_literal": 987,
+    "before_utilities": 986,
+    "utility_files": 30,
+    "before_other": "one TypeScript parameter named dark (renamed to prefersDark)",
+    "after_literal": 0,
+    "after_utilities": 0,
+    "guard_tests": 8
+  },
+  "tokens": {
+    "repinned": false,
+    "vendored_commit": "114a268ea10b9141bc96925c69132179c7c4b334",
+    "comparison_commit": "bc12723e9b7a42a4790a98f5d2a0dc4a1f970b99",
+    "comparison": "No tracked changes under packages/tokens or packages/tw-variants; both tarball hashes match frontend/vendor/oods-provenance.json.",
+    "upstream_pr": 107,
+    "upstream_merge": "2ea59fe9cf7f3d0fbfa05ee50ef920815defe1bb",
+    "upstream_merged_at": "2026-09-13T17:25:00Z",
+    "certification": "Not established. PR107 merged, but m07/session/handoff retain accessibility blockers, no PR reviews or non-bot acceptance comments, prepared m06 provenance has builderSelfCertified:false.",
+    "installed_css_sha256": "2e6dc3d04a97860b6ec8ad6d27d498c3878d40c75d83447410a4225635904d5e",
+    "installed_css_matches_tarball": true,
+    "prepared_bundle_hc": {
+      "sha256": "9796f2d3301ca0dfafef5e24d374db7581330e5c067e3f4a47ad0fdeae0f6798",
+      "surface_canvas": "Canvas",
+      "text_secondary": "GrayText",
+      "text_muted": "GrayText",
+      "conclusion": "The prepared m06 replacement retains the same failing hc values. A re-pin alone does not fix this blocker."
+    }
+  },
+  "deployments": null,
+  "limitations": [
+    "Local built app uses read-only real production data through the existing API proxy; this is not a deployed frontend acceptance test.",
+    "Existing mission-protocol and production-smoke suites were not part of the four deterministic browser suites.",
+    "Initial tests used an unsupported matcher/native arrow behavior; corrected to existing assertion conventions and native type-ahead. An initial pytest invocation had a mistyped file path; the corrected suites pass.",
+    "CMOS mirror reconciliation is incomplete after file upload HTTP 413 and cursor replay timeout. SQLite remains healthy and authoritative."
+  ],
+  "frontend_sha256": {
+    "frontend/scripts/check-token-colors.mjs": "caaddc2fa4600af96eeef3320e1095d1ef4c5637654011a027cfe7899c10419d",
+    "frontend/scripts/ui-shell-smoke.mjs": "0a7e5d3d020e8f88e0210506d7af5fb3c9bc1d9ada15576e57a5a943047e70f9",
+    "frontend/src/components/AddToCollection.tsx": "bf9dc12a3f8d2199e28e2ed22c727c165a9e4d99857e8cb65bb0a70501a1fbff",
+    "frontend/src/components/CreateReportModal.tsx": "deb77cb97d76f134e68085bd34a57f7253cc06e03dcceab8a2c00a40411b7a6a",
+    "frontend/src/components/MarkdownRenderer.tsx": "8a8301f20511984e26c17a98b9b6a4165d914cddd4c6a6be6ae98aacc140d60b",
+    "frontend/src/components/ThemeSelect.tsx": "1ed6cca5a53220214204cdc0c55f0a1ac1c842af7052661a35b625bc74afb593",
+    "frontend/src/components/console/CorrectionStatusCard.tsx": "d0f6849c9db26a7ddbc042cf309d3ec13bbe5d2e380874bb080010736deaabf0",
+    "frontend/src/components/console/ExportButtons.tsx": "b0dd3a6d6b26bcf458fe7a1bb08b7edca90e250c89ccec3b3d8d3d9e4b51593a",
+    "frontend/src/components/console/StatCard.tsx": "b4c92ca0784523d467987d344c19408d4a7b9d56a94e572482038a484ce70861",
+    "frontend/src/components/missions/ContractPreviewPanel.tsx": "32361663e1055b649439aceb0d30a1dfdbd5bc3b851cc6695aa23ba81836a57e",
+    "frontend/src/components/missions/ExecutionTimeline.tsx": "3858b830f2012fc712f89917b468a82d1204d913a7921eb98e2db3c45976f7d8",
+    "frontend/src/components/missions/MissionForm.tsx": "f37e72e14419e6895a728dd20a28e102550b9b682f53e482609de8b346bc21d1",
+    "frontend/src/components/missions/ResearchPhases.tsx": "96bc496c3a7fe72ef8cc66b524fd3d3c479bfc193b986c7f8b40b58c488e6f03",
+    "frontend/src/components/missions/ResultLinks.tsx": "df0bc4be42405e652f3b5d7b9297c03c6dd2c7a1375aca8ba43e69cbf0edf341",
+    "frontend/src/components/queue/ExecutionProgress.tsx": "5cb51bfc1f4fcb6ed7d1d0324d21a669b4ab7869ef8ce4ebdad9a565b6bc66ad",
+    "frontend/src/components/queue/QueueCard.tsx": "f7977c1295f277170a37831494c04cba2ad092919bc719990982160ecc583532",
+    "frontend/src/contexts/ThemeContext.test.tsx": "7dcb620abbec8dc0d59c1c27c57588f025a94fe2e2bdb51ebced8be321e8a4ad",
+    "frontend/src/contexts/ThemeContext.tsx": "366199e81de5b615eeeabbba653e08c2e4675002e98042c559a9315e30694a05",
+    "frontend/src/lib/theme.test.ts": "59ed09f2b2778b27b2114df2b22a10b053c1b7ef21a7a454cfa829f246af6260",
+    "frontend/src/lib/theme.ts": "ea83944eca0acc8c309124e67b308c421f84b3dd168f71d3d0f7cebdd13c3f5c",
+    "frontend/src/pages/_document.tsx": "f5b0b2c04b694f910003c6bd00dac0fbc29eb588e371a566ab2be8858caf7eba",
+    "frontend/src/pages/admin/corrections.tsx": "dc0d54beba18052da9d0f649e78eeb63985c2596b2e2328fdcdfea591663d70b",
+    "frontend/src/pages/admin/spaces.tsx": "4fdaa31301bb13e9aaea9e57ee331badce66248fa98a166a92b904fc3111576a",
+    "frontend/src/pages/admin/users.tsx": "5d79eaa227dced4979576fbd9ed9f4a1c5a2f40c7c92ec60886bddfe7e2a5a08",
+    "frontend/src/pages/collections/[id].tsx": "720efbd3aa4a17379a1d55d6d77960d77d0a6f0bf29436159a2716c5948e3edf",
+    "frontend/src/pages/collections/index.tsx": "5c68ad28682d8e6027f660615a08029128d3eed5ba32877f4da4356f9b895cb5",
+    "frontend/src/pages/documents/[id].tsx": "1f62a3b46d28a24fb0efdd8c60d33059304dfd731b575d20f68b513dd74f4f2b",
+    "frontend/src/pages/documents/index.tsx": "7fc787c32d558413f497b00d7836b8b1fce7722e2b7ce922fe51a38461c65cfe",
+    "frontend/src/pages/documents/upload.tsx": "11bc0f5850960413db33e285cebc89d7a384c2df77f37a20461f4714db669144",
+    "frontend/src/pages/missions/[id].tsx": "8bbc25556fd21e005c22123f3ffbe74955d248ae136125379c8c19f76a8d3702",
+    "frontend/src/pages/missions/index.tsx": "65e5273c8c5fc563fadc10e88b6115b0ef745db35ab6e7d8a28beeb5176a9ab3",
+    "frontend/src/pages/missions/new.tsx": "80f45eefce0e69e6ba09a18ef71e79d18e00e179809bb9f0cbdaf2ef0d3f171d",
+    "frontend/src/pages/missions/queue.tsx": "575ebb31cb79fdb5c57dd1bf71dc5b5f2557ef256d85433be291d50969c57107",
+    "frontend/src/pages/projects/[id].tsx": "b857b3cf25b0ba409bfdee20b9be203b896cad5cf779ca572019d33df711fc9e",
+    "frontend/src/pages/projects/index.tsx": "84fdb63c4432c81e9f3f3d78426c50475327377c539695d8e8348397e63cf9c0",
+    "frontend/src/pages/reports/[id].tsx": "614efcd9a57c58955867c6b97cdd65d306bc18eb93237bcb65c03c219ba3dea0",
+    "frontend/src/pages/reports/index.tsx": "5246b43dd8c7e7b93bf16fb14579ca7a881f9ad4f2615676abae02a1f4f47195",
+    "frontend/src/pages/settings.tsx": "e74c65f647be2247375a7871f992918c72654b2d267612e5bf35cf85f7f0272b",
+    "frontend/src/styles/globals.css": "b1fdee43c744d103a8eaba07dcdd708786e608a66398b374cb09dd53676e6993",
+    "frontend/tailwind.config.ts": "6ec039b2aef632496f4472e119c98627b338288d5001338a6a81aff1e32443eb",
+    "frontend/tests/e2e/app-shell.spec.ts": "6575345dcd4ae5ade0afba2850660fa0b98db00d6f05aba6a9457a8e9609c733",
+    "frontend/vendor/README.md": "3f15554d4022886a4f2b431e0201ba1d02d79b0dca918f8a8ea0d2902ca629fa",
+    "frontend/scripts/check-token-colors.test.ts": "4ebeb4bacb7d0b49b09d759b40a8d57b9136ca2e5259117acd6ee7b8446139a4"
+  },
+  "pull_request": 266,
+  "scope": {
+    "decision": 408,
+    "authorized_by": "Derek, 2026-09-13: defer high contrast so we can move on.",
+    "supported_themes": [
+      "light",
+      "dark"
+    ],
+    "deferred_mission": "THEME-2",
+    "defer_until": "Sprint 54 after certified Forge tokens pass consumer acceptance",
+    "required_baseline_checks": 124
+  },
+  "pre_deferral_validation": {
+    "ci": {
+      "source_commit": "db69cb462fe53c2a54ce0eafd02e652f53370992",
+      "all_jobs": "passed",
+      "frontend_checks_run": 34774282426,
+      "frontend_build_run": 34774282456,
+      "backend": {
+        "run": 34774282529,
+        "passed": 2427,
+        "skipped": 3,
+        "deselected": 12,
+        "warnings": 48
+      },
+      "postgres": {
+        "run": 34774282425,
+        "passed": 129,
+        "skipped": 4,
+        "warnings": 17
+      },
+      "secret_scan_run": 34774282428,
+      "lint_run": 34774282421,
+      "note": "All checks passed for db69cb4, including the CSS guard follow-up. Application source remains unchanged from the built browser baseline at a4fe8ee. The PR merge checks include CI-2's removal of the old optional lint jobs. Later receipt-only changes do not alter the tested application."
+    },
+    "route_smoke": {
+      "base": "http://127.0.0.1:3105",
+      "checked_at": "2026-09-13T17:45:16.792562+00:00",
+      "checks": 186,
+      "routes": 31,
+      "themes": [
+        "light",
+        "dark",
+        "hc"
+      ],
+      "viewports": [
+        1440,
+        390
+      ],
+      "failures": {
+        "light": 0,
+        "dark": 0,
+        "hc": 62
+      },
+      "overflow_checks": 0,
+      "browser_errors": 0,
+      "api_errors": 0,
+      "contrast_node_occurrences": 4323,
+      "readOnlyApiProxy": true,
+      "directProductionApi": false
+    },
+    "guard_followup": {
+      "scope": "Extend the existing scanner to CSS so @apply cannot reintroduce a dark utility.",
+      "tdd": "New CSS rejection test failed first; all 127 unit tests then passed, zero skips. Lint, types and check:tokens passed.",
+      "application_source": "Byte-identical to a4fe8ee under frontend/src and tailwind.config.ts; retained build/browser/baseline proof applies to the same application.",
+      "new_browser_run": false
+    },
+    "blockers": [
+      "The shipped hc palette maps active secondary/muted text to GrayText on Canvas. Chromium resolves #808080 on #ffffff, 3.94:1 instead of 4.5. Every one of 62 hc route/viewport checks fails serious contrast.",
+      "Need certified Forge tokens that pass the full consumer baseline, or an explicit change to defer hc. No Forge modifications/messages authorized.",
+      "Both Railway SUCCESS deployment IDs and direct-production baseline remain outstanding; failing hc has not been merged or published."
+    ],
+    "note": "Historical evidence for the earlier three-theme implementation; HC failures remain preserved, not accepted as passing."
+  },
+  "ci": null,
+  "blockers": [],
+  "remaining": [
+    "CI for the deferral implementation",
+    "Merge then both Railway services SUCCESS at the merged commit",
+    "124 direct-production route/theme/viewport checks and screenshots"
+  ]
+}

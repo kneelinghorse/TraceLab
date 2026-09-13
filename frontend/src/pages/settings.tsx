@@ -13,9 +13,9 @@ import { useCallback, useEffect, useState } from "react";
 export default function SettingsPage() {
   return (
     <AuthGate>
-      <div className="min-h-screen bg-background dark:bg-background">
+      <div className="min-h-screen bg-background">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-          <h1 className="text-2xl font-bold text-foreground dark:text-foreground">Settings</h1>
+          <h1 className="text-2xl font-bold text-foreground">Settings</h1>
           <ProfileSection />
           <APIKeysSection />
           <InviteCodesSection />
@@ -80,65 +80,65 @@ function ProfileSection() {
   };
 
   return (
-    <section className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
-      <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">Profile</h2>
+    <section className="bg-surface rounded-lg border border-line p-6">
+      <h2 className="text-lg font-semibold text-foreground mb-4">Profile</h2>
       <form onSubmit={handleSave} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">
+          <label className="block text-sm font-medium text-secondary mb-1">
             Email
           </label>
-          <p className="text-sm text-muted dark:text-muted">{user?.email}</p>
+          <p className="text-sm text-muted">{user?.email}</p>
         </div>
         <div>
-          <label htmlFor="display-name" className="block text-sm font-medium text-secondary dark:text-secondary mb-1">
+          <label htmlFor="display-name" className="block text-sm font-medium text-secondary mb-1">
             Display name
           </label>
           <input id="display-name"
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground text-sm"
+            className="w-full px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground text-sm"
           />
         </div>
 
-        <div className="pt-2 border-t border-line dark:border-line">
-          <p className="text-sm font-medium text-secondary dark:text-secondary mb-3">Change password</p>
+        <div className="pt-2 border-t border-line">
+          <p className="text-sm font-medium text-secondary mb-3">Change password</p>
           <div className="space-y-3">
             <div>
-              <label htmlFor="current-password" className="block text-xs text-secondary dark:text-muted mb-1">Current password</label>
+              <label htmlFor="current-password" className="block text-xs text-secondary mb-1">Current password</label>
               <input id="current-password"
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 autoComplete="current-password"
-                className="w-full px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground text-sm"
+                className="w-full px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground text-sm"
               />
             </div>
             <div>
-              <label htmlFor="new-password" className="block text-xs text-secondary dark:text-muted mb-1">New password</label>
+              <label htmlFor="new-password" className="block text-xs text-secondary mb-1">New password</label>
               <input id="new-password"
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 autoComplete="new-password"
-                className="w-full px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground text-sm"
+                className="w-full px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground text-sm"
               />
             </div>
             <div>
-              <label htmlFor="confirm-password" className="block text-xs text-secondary dark:text-muted mb-1">Confirm new password</label>
+              <label htmlFor="confirm-password" className="block text-xs text-secondary mb-1">Confirm new password</label>
               <input id="confirm-password"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 autoComplete="new-password"
-                className="w-full px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground text-sm"
+                className="w-full px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground text-sm"
               />
             </div>
           </div>
         </div>
 
         {message && (
-          <p className={`text-sm ${message.type === "success" ? "text-success dark:text-success" : "text-danger dark:text-danger"}`}>
+          <p className={`text-sm ${message.type === "success" ? "text-success" : "text-danger"}`}>
             {message.text}
           </p>
         )}
@@ -223,25 +223,25 @@ function APIKeysSection() {
   };
 
   return (
-    <section className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
+    <section className="bg-surface rounded-lg border border-line p-6">
       {feedback}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-foreground dark:text-foreground">API Keys</h2>
-        <span className="text-xs text-muted dark:text-muted">Used by MCP and external integrations</span>
+        <h2 className="text-lg font-semibold text-foreground">API Keys</h2>
+        <span className="text-xs text-muted">Used by MCP and external integrations</span>
       </div>
 
       {error && (
-        <p className="mb-4 text-sm text-danger dark:text-danger">{error}</p>
+        <p className="mb-4 text-sm text-danger">{error}</p>
       )}
 
       {/* New key created — show full key once */}
       {createdKey && (
-        <div className="mb-4 p-4 bg-success-surface dark:bg-success-surface border border-success-line dark:border-success-line rounded-lg">
-          <p className="text-sm font-medium text-success dark:text-success mb-2">
+        <div className="mb-4 p-4 bg-success-surface border border-success-line rounded-lg">
+          <p className="text-sm font-medium text-success mb-2">
             API key created — copy it now, it won&apos;t be shown again.
           </p>
           <div className="flex items-center gap-3">
-            <code className="text-sm font-mono bg-success-surface dark:bg-success-surface px-3 py-1.5 rounded text-success dark:text-success break-all">
+            <code className="text-sm font-mono bg-success-surface px-3 py-1.5 rounded text-success break-all">
               {createdKey.key}
             </code>
             <button
@@ -261,7 +261,7 @@ function APIKeysSection() {
           value={newKeyName}
           onChange={(e) => setNewKeyName(e.target.value)}
           placeholder="Key name (e.g. MCP local)"
-          className="flex-1 px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground text-sm"
+          className="flex-1 px-3 py-2 border border-line-strong rounded-lg bg-surface text-foreground text-sm"
         />
         <button
           type="submit"
@@ -274,25 +274,25 @@ function APIKeysSection() {
 
       {/* Key list */}
       {isLoading ? (
-        <p className="text-sm text-muted dark:text-muted">Loading...</p>
+        <p className="text-sm text-muted">Loading...</p>
       ) : keys.length === 0 ? (
-        <p className="text-sm text-muted dark:text-muted">No API keys yet.</p>
+        <p className="text-sm text-muted">No API keys yet.</p>
       ) : (
         <ul className="space-y-2">
           {keys.map((key) => (
             <li
               key={key.id}
-              className="flex items-center justify-between py-3 px-4 bg-background dark:bg-surface-alt rounded-lg"
+              className="flex items-center justify-between py-3 px-4 bg-background rounded-lg"
             >
               <div className="min-w-0">
-                <p className="text-sm font-medium text-foreground dark:text-foreground">{key.name}</p>
+                <p className="text-sm font-medium text-foreground">{key.name}</p>
                 <div className="flex items-center gap-3 mt-0.5">
-                  <code className="text-xs text-muted dark:text-muted font-mono">{key.key_prefix}…</code>
-                  <span className="text-xs text-muted dark:text-muted">
+                  <code className="text-xs text-muted font-mono">{key.key_prefix}…</code>
+                  <span className="text-xs text-muted">
                     Created {formatDistanceToNow(new Date(key.created_at), { addSuffix: true })}
                   </span>
                   {key.last_used_at && (
-                    <span className="text-xs text-muted dark:text-muted">
+                    <span className="text-xs text-muted">
                       Last used {formatDistanceToNow(new Date(key.last_used_at), { addSuffix: true })}
                     </span>
                   )}
@@ -300,7 +300,7 @@ function APIKeysSection() {
               </div>
               <button
                 onClick={() => handleDelete(key.id, key.name)}
-                className="ml-4 px-3 py-1 text-xs text-danger dark:text-danger hover:bg-danger-surface dark:hover:bg-danger-surface rounded transition-colors"
+                className="ml-4 px-3 py-1 text-xs text-danger hover:bg-danger-surface rounded transition-colors"
               >
                 Revoke
               </button>
@@ -375,9 +375,9 @@ function InviteCodesSection() {
   };
 
   return (
-    <section id="invites" className="scroll-mt-20 bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
+    <section id="invites" className="scroll-mt-20 bg-surface rounded-lg border border-line p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-foreground dark:text-foreground">Invite Codes</h2>
+        <h2 className="text-lg font-semibold text-foreground">Invite Codes</h2>
         <button
           onClick={handleGenerate}
           disabled={isCreating}
@@ -388,19 +388,19 @@ function InviteCodesSection() {
       </div>
 
       {error && (
-        <p className="mb-4 text-sm text-danger dark:text-danger">{error}</p>
+        <p className="mb-4 text-sm text-danger">{error}</p>
       )}
 
       {newCode && (
-        <div className="mb-4 p-4 bg-success-surface dark:bg-success-surface border border-success-line dark:border-success-line rounded-lg">
-          <p className="text-sm text-success dark:text-success mb-2">New invite code:</p>
+        <div className="mb-4 p-4 bg-success-surface border border-success-line rounded-lg">
+          <p className="text-sm text-success mb-2">New invite code:</p>
           <div className="flex items-center gap-3">
-            <code className="text-xl font-mono font-bold tracking-[0.25em] text-success dark:text-success">
+            <code className="text-xl font-mono font-bold tracking-[0.25em] text-success">
               {newCode}
             </code>
             <button
               onClick={() => handleCopy(newCode)}
-              className="px-3 py-1 text-sm bg-success-surface dark:bg-success-surface text-success dark:text-success rounded hover:bg-success-surface dark:hover:bg-success-surface transition-colors"
+              className="px-3 py-1 text-sm bg-success-surface text-success rounded hover:bg-success-surface transition-colors"
             >
               {copied ? "Copied!" : "Copy"}
             </button>
@@ -409,47 +409,47 @@ function InviteCodesSection() {
       )}
 
       {isLoading ? (
-        <p className="text-sm text-muted dark:text-muted">Loading...</p>
+        <p className="text-sm text-muted">Loading...</p>
       ) : codes.length === 0 ? (
-        <p className="text-sm text-muted dark:text-muted">No invite codes yet.</p>
+        <p className="text-sm text-muted">No invite codes yet.</p>
       ) : (
         <ul className="space-y-2">
           {codes.map((code) => (
             <li
               key={code.id}
-              className="flex items-center justify-between py-2.5 px-4 bg-background dark:bg-surface-alt rounded-lg"
+              className="flex items-center justify-between py-2.5 px-4 bg-background rounded-lg"
             >
               <div className="flex items-center gap-4">
-                <code className="font-mono text-base tracking-widest text-foreground dark:text-foreground">
+                <code className="font-mono text-base tracking-widest text-foreground">
                   {code.code}
                 </code>
                 <span
                   className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                     code.status === "unused"
-                      ? "bg-success-surface dark:bg-success-surface text-success dark:text-success"
+                      ? "bg-success-surface text-success"
                       : code.status === "used"
-                      ? "bg-surface dark:bg-surface-alt text-secondary dark:text-muted"
-                      : "bg-warning-surface dark:bg-warning-surface text-warning dark:text-warning"
+                      ? "bg-surface text-secondary"
+                      : "bg-warning-surface text-warning"
                   }`}
                 >
                   {code.status}
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs text-muted dark:text-muted">
+                <span className="text-xs text-muted">
                   {new Date(code.created_at).toLocaleDateString()}
                 </span>
                 {code.status === "unused" && (
                   <>
                     <button
                       onClick={() => handleCopy(code.code)}
-                      className="text-xs text-accent-text dark:text-accent-text underline underline-offset-4"
+                      className="text-xs text-accent-text underline underline-offset-4"
                     >
                       Copy
                     </button>
                     <button
                       onClick={() => handleDelete(code.id)}
-                      className="text-xs text-danger dark:text-danger underline underline-offset-4"
+                      className="text-xs text-danger underline underline-offset-4"
                     >
                       Delete
                     </button>

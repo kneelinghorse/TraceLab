@@ -33,6 +33,30 @@ img, video, svg { max-width: 100%; }
 .markdown-preview ol { padding-left: 1.25rem; list-style: decimal; }
 .markdown-preview code { background: var(--theme-surface-subtle); border-radius: 0.35rem; padding: 0.1rem 0.35rem; }
 
+/* Typography's generated elements (list markers, captions, rules) follow the
+   same palette as explicit MarkdownRenderer elements in all three themes. */
+.prose-tokens {
+  --tw-prose-body: var(--theme-text-secondary);
+  --tw-prose-headings: var(--theme-text-primary);
+  --tw-prose-lead: var(--theme-text-secondary);
+  --tw-prose-links: var(--theme-text-accent);
+  --tw-prose-bold: var(--theme-text-primary);
+  --tw-prose-counters: var(--theme-text-secondary);
+  --tw-prose-bullets: var(--theme-text-secondary);
+  --tw-prose-hr: var(--theme-border-subtle);
+  --tw-prose-quotes: var(--theme-text-secondary);
+  --tw-prose-quote-borders: var(--theme-border-strong);
+  --tw-prose-captions: var(--theme-text-muted);
+  --tw-prose-kbd: var(--theme-text-primary);
+  --tw-prose-kbd-shadows: transparent;
+  --tw-prose-code: var(--theme-text-primary);
+  --tw-prose-pre-code: var(--theme-text-primary);
+  --tw-prose-pre-bg: var(--theme-surface-raised);
+  --tw-prose-th-borders: var(--theme-border-strong);
+  --tw-prose-td-borders: var(--theme-border-subtle);
+}
+.prose-tokens :where(kbd) { box-shadow: none; border: 1px solid var(--theme-border-strong); }
+
 .skip-link { position: fixed; left: 1rem; top: -6rem; z-index: 100; padding: 0.7rem 1rem; border-radius: 0.5rem; background: var(--theme-surface-inverse); color: var(--theme-text-inverse); }
 .skip-link:focus { top: 1rem; }
 .app-sidebar { position: fixed; inset: 0 auto 0 0; z-index: 30; width: 248px; display: flex; flex-direction: column; border-right: 1px solid var(--theme-border-subtle); background: var(--theme-surface-raised); }

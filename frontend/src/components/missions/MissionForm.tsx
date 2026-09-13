@@ -16,7 +16,7 @@ import type { PaginatedResponse } from "@/types/pagination";
 import { DynamicListInput } from "./DynamicListInput";
 
 const SECTION_CLASS =
-  "rounded-2xl border border-line dark:border-line bg-surface dark:bg-surface p-6 shadow-sm";
+  "rounded-2xl border border-line bg-surface p-6 shadow-sm";
 
 interface MissionFormProps {
   onSuccess?: (mission: ApiMission) => void;
@@ -195,10 +195,10 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
       {/* Basic Information */}
       <section className={`${SECTION_CLASS} space-y-4`}>
         <header>
-          <p className="text-xs uppercase tracking-widest text-muted dark:text-muted">
+          <p className="text-xs uppercase tracking-widest text-muted">
             Required
           </p>
-          <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
+          <h2 className="text-xl font-semibold text-foreground">
             Mission Details
           </h2>
         </header>
@@ -265,10 +265,10 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
       {/* Project & Configuration */}
       <section className={`${SECTION_CLASS} space-y-4`}>
         <header>
-          <p className="text-xs uppercase tracking-widest text-muted dark:text-muted">
+          <p className="text-xs uppercase tracking-widest text-muted">
             Configuration
           </p>
-          <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
+          <h2 className="text-xl font-semibold text-foreground">
             Project & Settings
           </h2>
         </header>
@@ -286,7 +286,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
             ))}
           </select>
           {!isProjectSelected && (
-            <p className="mt-1 text-xs text-warning dark:text-warning">
+            <p className="mt-1 text-xs text-warning">
               Required — missions must belong to a project
             </p>
           )}
@@ -308,13 +308,13 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
       {/* Research Contract — authoring fields consumed by DeepSearch */}
       <section className={`${SECTION_CLASS} space-y-4`}>
         <header>
-          <p className="text-xs uppercase tracking-widest text-muted dark:text-muted">
+          <p className="text-xs uppercase tracking-widest text-muted">
             Authoring Contract
           </p>
-          <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
+          <h2 className="text-xl font-semibold text-foreground">
             Research Contract
           </h2>
-          <p className="mt-1 text-sm text-muted dark:text-muted">
+          <p className="mt-1 text-sm text-muted">
             Optional fields the DeepSearch contract compiler reads when shaping
             retrieval and synthesis. Skip any that don&apos;t apply.
           </p>
@@ -462,10 +462,10 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
       {/* Deliverables & Tags */}
       <section className={`${SECTION_CLASS} space-y-4`}>
         <header>
-          <p className="text-xs uppercase tracking-widest text-muted dark:text-muted">
+          <p className="text-xs uppercase tracking-widest text-muted">
             Optional
           </p>
-          <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
+          <h2 className="text-xl font-semibold text-foreground">
             Deliverables & Tags
           </h2>
         </header>
@@ -501,8 +501,8 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
 
       {/* Error Display */}
       {submitError && (
-        <div className="p-4 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg">
-          <p className="text-sm text-danger dark:text-danger">{submitError}</p>
+        <div className="p-4 bg-danger-surface border border-danger-line rounded-lg">
+          <p className="text-sm text-danger">{submitError}</p>
         </div>
       )}
 
@@ -513,7 +513,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2.5 text-sm font-medium text-secondary dark:text-secondary hover:bg-surface dark:hover:bg-surface-alt rounded-lg transition-colors"
+              className="px-4 py-2.5 text-sm font-medium text-secondary hover:bg-surface rounded-lg transition-colors"
             >
               Cancel
             </button>
@@ -526,8 +526,8 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
               disabled={isSubmitting}
               className={`px-4 py-2.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 ${
                 isProjectSelected
-                  ? "text-secondary dark:text-secondary bg-surface dark:bg-surface-alt hover:bg-surface-alt dark:hover:bg-surface-alt"
-                  : "text-muted bg-surface-alt dark:bg-surface-alt cursor-not-allowed"
+                  ? "text-secondary bg-surface hover:bg-surface-alt"
+                  : "text-muted bg-surface-alt cursor-not-allowed"
               }`}
               title={isProjectSelected ? undefined : "Select a project to save"}
             >
@@ -543,16 +543,16 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
                 className={`px-4 py-2.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 ${
                   isProjectSelected
                     ? "text-on-accent bg-accent hover:bg-accent"
-                    : "text-muted bg-surface-alt dark:bg-surface-alt cursor-not-allowed"
+                    : "text-muted bg-surface-alt cursor-not-allowed"
                 }`}
                 title={isProjectSelected ? undefined : "Select a project to submit to DeepSearch"}
               >
                 {isSubmitting ? "Submitting..." : "Submit to DeepSearch"}
               </button>
               {showProjectRequiredTooltip && !isProjectSelected && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-background dark:bg-surface-alt text-foreground text-xs rounded-lg whitespace-nowrap shadow-lg z-10">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-background text-foreground text-xs rounded-lg whitespace-nowrap shadow-lg z-10">
                   Select a project to submit to DeepSearch
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900 dark:border-t-gray-700" />
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
                 </div>
               )}
             </div>

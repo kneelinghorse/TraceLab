@@ -52,7 +52,7 @@ export function ExecutionProgress({
   return (
     <div className="space-y-3">
       {/* Progress bar */}
-      <div className="h-2 bg-surface-alt dark:bg-surface-alt rounded-full overflow-hidden">
+      <div className="h-2 bg-surface-alt rounded-full overflow-hidden">
         {status === "in_progress" ? (
           <div
             className="h-full bg-accent rounded-full transition-all duration-500"
@@ -68,47 +68,47 @@ export function ExecutionProgress({
         {status === "in_progress" && (
           <>
             {currentLoop !== undefined && (
-              <span className="text-secondary dark:text-secondary">
+              <span className="text-secondary">
                 Loop{" "}
-                <span className="font-medium text-foreground dark:text-foreground">
+                <span className="font-medium text-foreground">
                   {currentLoop}
                   {totalLoops !== undefined && ` / ${totalLoops}`}
                 </span>
               </span>
             )}
             {currentPhase && (
-              <span className="text-secondary dark:text-secondary">
+              <span className="text-secondary">
                 Phase{" "}
-                <span className="font-medium text-foreground dark:text-foreground capitalize">
+                <span className="font-medium text-foreground capitalize">
                   {currentPhase.replace(/_/g, " ")}
                 </span>
               </span>
             )}
             {elapsedTime && (
-              <span className="text-secondary dark:text-secondary">
+              <span className="text-secondary">
                 Elapsed{" "}
-                <span className="font-medium text-foreground dark:text-foreground">
+                <span className="font-medium text-foreground">
                   {elapsedTime}
                 </span>
               </span>
             )}
             {sources !== undefined && (
-              <span className="text-secondary dark:text-secondary">
+              <span className="text-secondary">
                 Sources{" "}
-                <span className="font-medium text-foreground dark:text-foreground">
+                <span className="font-medium text-foreground">
                   {sources}
                 </span>
               </span>
             )}
             {model && (
-              <span className="text-muted dark:text-muted text-xs">
+              <span className="text-muted text-xs">
                 {model}
               </span>
             )}
           </>
         )}
         {status === "queued" && (
-          <span className="text-warning dark:text-warning text-sm">
+          <span className="text-warning text-sm">
             Waiting in queue...
           </span>
         )}

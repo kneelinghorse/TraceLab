@@ -106,22 +106,22 @@ export default function CollectionDetailPage() {
   return (
     <AuthGate>
       {feedback}
-      <div className="min-h-screen bg-background dark:bg-background">
+      <div className="min-h-screen bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Back Link */}
           <Link
             href="/collections"
-            className="text-accent-text dark:text-accent-text underline underline-offset-4 mb-4 inline-block"
+            className="text-accent-text underline underline-offset-4 mb-4 inline-block"
           >
             &larr; Back to Collections
           </Link>
 
           {/* Header */}
-          <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6 mb-6">
+          <div className="bg-surface rounded-lg border border-line p-6 mb-6">
             {isEditing ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">
+                  <label className="block text-sm font-medium text-secondary mb-1">
                     Name *
                   </label>
                   <input
@@ -129,12 +129,12 @@ export default function CollectionDetailPage() {
                     aria-label="Collection name"
                       value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground"
+                    className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
                     autoFocus
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">
+                  <label className="block text-sm font-medium text-secondary mb-1">
                     Description
                   </label>
                   <textarea
@@ -142,11 +142,11 @@ export default function CollectionDetailPage() {
                       value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
                     rows={2}
-                    className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground"
+                    className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
                   />
                 </div>
                 {editError && (
-                  <p className="text-sm text-danger dark:text-danger">{editError}</p>
+                  <p className="text-sm text-danger">{editError}</p>
                 )}
                 <div className="flex gap-3">
                   <button
@@ -160,7 +160,7 @@ export default function CollectionDetailPage() {
                       setIsEditing(false);
                       setEditError(null);
                     }}
-                    className="px-4 py-2 text-secondary dark:text-muted hover:text-foreground dark:hover:text-foreground transition-colors"
+                    className="px-4 py-2 text-secondary hover:text-foreground transition-colors"
                   >
                     Cancel
                   </button>
@@ -170,11 +170,11 @@ export default function CollectionDetailPage() {
               <>
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div>
-                    <h1 className="text-2xl font-bold text-foreground dark:text-foreground">
+                    <h1 className="text-2xl font-bold text-foreground">
                       {collection.name}
                     </h1>
                     {collection.description && (
-                      <p className="mt-2 text-secondary dark:text-muted">
+                      <p className="mt-2 text-secondary">
                         {collection.description}
                       </p>
                     )}
@@ -190,28 +190,28 @@ export default function CollectionDetailPage() {
                     <button
                       onClick={handleExport}
                       disabled={isExporting || collection.item_count === 0}
-                      className="px-4 py-2 text-sm text-success dark:text-success hover:bg-success-surface dark:hover:bg-surface-alt rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2 text-sm text-success hover:bg-success-surface rounded disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isExporting ? "Exporting..." : "Export"}
                     </button>
                     <button
                       onClick={handleStartEdit}
-                      className="px-4 py-2 text-sm text-accent-text dark:text-accent-text hover:bg-info-surface dark:hover:bg-surface-alt rounded"
+                      className="px-4 py-2 text-sm text-accent-text hover:bg-info-surface rounded"
                     >
                       Edit
                     </button>
                     <button
                       onClick={handleDelete}
-                      className="px-4 py-2 text-sm text-danger dark:text-danger hover:bg-danger-surface dark:hover:bg-surface-alt rounded"
+                      className="px-4 py-2 text-sm text-danger hover:bg-danger-surface rounded"
                     >
                       Delete
                     </button>
                   </div>
                 </div>
 
-                <div className="mt-4 flex flex-wrap gap-4 text-sm text-secondary dark:text-muted">
+                <div className="mt-4 flex flex-wrap gap-4 text-sm text-secondary">
                   <span className="inline-flex items-center gap-1">
-                    <span className="font-medium text-accent-text dark:text-accent-text">
+                    <span className="font-medium text-accent-text">
                       {collection.item_count}
                     </span>
                     {collection.item_count === 1 ? "chunk" : "chunks"}
@@ -225,15 +225,15 @@ export default function CollectionDetailPage() {
           </div>
 
           {/* Collection Items */}
-          <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
-            <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">
+          <div className="bg-surface rounded-lg border border-line p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">
               Chunks in Collection
             </h2>
 
             {collection.items.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-muted dark:text-muted mb-2">No chunks in this collection yet</p>
-                <p className="text-sm text-muted dark:text-muted">
+                <p className="text-muted mb-2">No chunks in this collection yet</p>
+                <p className="text-sm text-muted">
                   Add chunks from search results or document views using the &quot;Add to Collection&quot; button.
                 </p>
               </div>
@@ -242,18 +242,18 @@ export default function CollectionDetailPage() {
                 {collection.items.map((item) => (
                   <div
                     key={item.id}
-                    className="border border-line dark:border-line-strong rounded-lg p-4"
+                    className="border border-line rounded-lg p-4"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
-                          <code className="text-xs bg-surface dark:bg-surface-alt px-2 py-0.5 rounded text-secondary dark:text-secondary">
+                          <code className="text-xs bg-surface px-2 py-0.5 rounded text-secondary">
                             {item.chunk_id.slice(0, 8)}...
                           </code>
                           {item.document_id && (
                             <Link
                               href={`/documents/${item.document_id}`}
-                              className="text-xs text-accent-text dark:text-accent-text underline underline-offset-4"
+                              className="text-xs text-accent-text underline underline-offset-4"
                             >
                               View document
                             </Link>
@@ -261,26 +261,26 @@ export default function CollectionDetailPage() {
                         </div>
 
                         {item.chunk_content && (
-                          <p className="text-sm text-secondary dark:text-secondary whitespace-pre-wrap">
+                          <p className="text-sm text-secondary whitespace-pre-wrap">
                             {item.chunk_content}
                             {item.chunk_content.length >= 200 && "..."}
                           </p>
                         )}
 
                         {item.notes && (
-                          <p className="mt-2 text-sm text-muted dark:text-muted italic">
+                          <p className="mt-2 text-sm text-muted italic">
                             Note: {item.notes}
                           </p>
                         )}
 
-                        <p className="mt-2 text-xs text-muted dark:text-muted">
+                        <p className="mt-2 text-xs text-muted">
                           Added {formatDistanceToNow(new Date(item.added_at), { addSuffix: true })}
                         </p>
                       </div>
 
                       <button
                         onClick={() => handleRemoveChunk(item)}
-                        className="px-3 py-1 text-sm text-danger dark:text-danger hover:bg-danger-surface dark:hover:bg-surface-alt rounded flex-shrink-0"
+                        className="px-3 py-1 text-sm text-danger hover:bg-danger-surface rounded flex-shrink-0"
                       >
                         Remove
                       </button>

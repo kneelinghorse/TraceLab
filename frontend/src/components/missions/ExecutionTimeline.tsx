@@ -45,11 +45,11 @@ function TimelineItem({ event, isLast }: { event: TimelineEvent; isLast: boolean
         <div className={`w-8 h-8 rounded-full ${styles.bg} flex items-center justify-center text-foreground text-xs font-bold`}>
           {styles.icon}
         </div>
-        {!isLast && <div className="w-0.5 h-full bg-surface-alt dark:bg-surface-alt min-h-[24px]" />}
+        {!isLast && <div className="w-0.5 h-full bg-surface-alt min-h-[24px]" />}
       </div>
       <div className="pb-4">
-        <p className="font-medium text-foreground dark:text-foreground">{event.label}</p>
-        <p className="text-sm text-muted dark:text-muted" title={absolute}>
+        <p className="font-medium text-foreground">{event.label}</p>
+        <p className="text-sm text-muted" title={absolute}>
           {relative}
         </p>
       </div>
@@ -59,10 +59,10 @@ function TimelineItem({ event, isLast }: { event: TimelineEvent; isLast: boolean
 
 function MetadataCard({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
   return (
-    <div className="bg-background dark:bg-background rounded-lg p-3">
-      <p className="text-xs text-muted dark:text-muted mb-1">{label}</p>
-      <p className="font-medium text-foreground dark:text-foreground">{String(value)}</p>
-      {hint && <p className="mt-1 text-[11px] text-muted dark:text-muted">{hint}</p>}
+    <div className="bg-background rounded-lg p-3">
+      <p className="text-xs text-muted mb-1">{label}</p>
+      <p className="font-medium text-foreground">{String(value)}</p>
+      {hint && <p className="mt-1 text-[11px] text-muted">{hint}</p>}
     </div>
   );
 }
@@ -123,7 +123,7 @@ export function ExecutionTimeline({
     <div className="space-y-6">
       {events.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-secondary dark:text-secondary uppercase tracking-wide mb-4">
+          <h3 className="text-sm font-semibold text-secondary uppercase tracking-wide mb-4">
             Timeline
           </h3>
           <div className="space-y-0">
@@ -136,7 +136,7 @@ export function ExecutionTimeline({
 
       {hasMetadata && (
         <div>
-          <h3 className="text-sm font-semibold text-secondary dark:text-secondary uppercase tracking-wide mb-4">
+          <h3 className="text-sm font-semibold text-secondary uppercase tracking-wide mb-4">
             Execution Details
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -173,7 +173,7 @@ export function ExecutionTimeline({
       )}
 
       {events.length === 0 && !hasMetadata && (
-        <p className="text-muted dark:text-muted text-sm">No execution data available yet.</p>
+        <p className="text-muted text-sm">No execution data available yet.</p>
       )}
     </div>
   );

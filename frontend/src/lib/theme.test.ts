@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { readThemeChoice, themeBootstrapScript, themeSnapshot, themeStorageKey, writeThemeChoice } from "./theme";
 
-function systemTheme(dark: boolean) {
-  vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: dark })));
+function systemTheme(prefersDark: boolean) {
+  vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: prefersDark })));
 }
 
 beforeEach(() => {
@@ -45,6 +45,19 @@ describe("theme preference contract", () => {
     systemTheme(true);
     window.eval(themeBootstrapScript);
     expect(document.documentElement.dataset.theme).toBe("dark");
+  });
+
+  it.each([false, true])("falls back from deferred high contrast to the OS scheme before first paint (dark=%s)", (dark) => {
+    systemTheme(dark);
+    localStorage.setItem("tracelab.auth.v2", JSON.stringify({ user_id: "alice" }));
+    localStorage.setItem(themeStorageKey("alice"), "hc");
+    const resolved = dark ? "dark" : "light";
+    expect(readThemeChoice("alice")).toBe("system");
+    expect(themeSnapshot("alice")).toBe(`system:${resolved}`);
+    window.eval(themeBootstrapScript);
+    expect(document.documentElement.dataset.theme).toBe(resolved);
+    expect(document.documentElement.classList.contains("dark")).toBe(dark);
+    expect(document.documentElement.style.colorScheme).toBe(resolved);
   });
 
   it("keeps first paint and user controls usable when storage is disabled", () => {

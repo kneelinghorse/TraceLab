@@ -62,41 +62,41 @@ export default function ProjectsPage() {
 
   return (
     <AuthGate>
-      <div className="min-h-screen bg-background dark:bg-background">
+      <div className="min-h-screen bg-background">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <header className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground dark:text-foreground">Projects</h1>
-            <p className="mt-2 text-secondary dark:text-muted">
+            <h1 className="text-3xl font-bold text-foreground">Projects</h1>
+            <p className="mt-2 text-secondary">
               Create and manage research projects. Click a project to view details and upload documents.
             </p>
           </header>
 
           <div className="space-y-6">
             {/* Create Form */}
-            <form onSubmit={handleCreate} className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-6 space-y-4">
+            <form onSubmit={handleCreate} className="bg-surface border border-line rounded-lg p-6 space-y-4">
               <div>
-                <h2 className="text-lg font-semibold text-foreground dark:text-foreground">Create Project</h2>
-                <p className="text-sm text-muted dark:text-muted">Required for document uploads and mission tracking.</p>
+                <h2 className="text-lg font-semibold text-foreground">Create Project</h2>
+                <p className="text-sm text-muted">Required for document uploads and mission tracking.</p>
               </div>
               <div className="grid gap-4 sm:grid-cols-3">
                 <div>
-                  <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Name *</label>
+                  <label className="block text-sm font-medium text-secondary mb-1">Name *</label>
                   <input
                     type="text"
                     aria-label="Project name"
                     value={formState.name}
                     onChange={(e) => setFormState((prev) => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground"
+                    className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
                     placeholder="E.g., 2025 Field Insights"
                     required
                   />
                 </div>
                 <div>
-                  <label htmlFor="project-research-type" className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Research Type</label>
+                  <label htmlFor="project-research-type" className="block text-sm font-medium text-secondary mb-1">Research Type</label>
                   <select id="project-research-type"
                     value={formState.research_type}
                     onChange={(e) => setFormState((prev) => ({ ...prev, research_type: e.target.value }))}
-                    className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground"
+                    className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
                   >
                     <option value="">Select...</option>
                     {RESEARCH_TYPES.map((type) => (
@@ -117,12 +117,12 @@ export default function ProjectsPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Description (optional)</label>
+                <label className="block text-sm font-medium text-secondary mb-1">Description (optional)</label>
                 <textarea
                   aria-label="Project description"
                     value={formState.description}
                   onChange={(e) => setFormState((prev) => ({ ...prev, description: e.target.value }))}
-                  className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground"
+                  className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
                   rows={2}
                   placeholder="Brief description of the project..."
                 />
@@ -131,11 +131,11 @@ export default function ProjectsPage() {
             </form>
 
             {/* Project List */}
-            <div className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-6 space-y-4">
+            <div className="bg-surface border border-line rounded-lg p-6 space-y-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h2 className="text-lg font-semibold text-foreground dark:text-foreground">Project Library</h2>
-                  <p className="text-sm text-muted dark:text-muted">Click a project to manage documents and settings.</p>
+                  <h2 className="text-lg font-semibold text-foreground">Project Library</h2>
+                  <p className="text-sm text-muted">Click a project to manage documents and settings.</p>
                 </div>
                 <input
                   type="search"
@@ -143,7 +143,7 @@ export default function ProjectsPage() {
                   aria-label="Search projects"
                     value={search}
                   onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                  className="px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground"
+                  className="px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
                 />
               </div>
 
@@ -157,19 +157,19 @@ export default function ProjectsPage() {
                     <Link
                       key={project.id}
                       href={`/projects/${project.id}`}
-                      className="block border border-line dark:border-line rounded-lg p-4 hover:border-info-line hover:shadow-md transition-all group"
+                      className="block border border-line rounded-lg p-4 hover:border-info-line hover:shadow-md transition-all group"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-foreground dark:text-foreground group-hover:text-accent-text dark:group-hover:text-accent-text truncate">
+                          <p className="font-semibold text-foreground group-hover:text-accent-text truncate">
                             {project.name}
                           </p>
                           {project.description && (
-                            <p className="text-sm text-muted dark:text-muted mt-1 line-clamp-2">{project.description}</p>
+                            <p className="text-sm text-muted mt-1 line-clamp-2">{project.description}</p>
                           )}
                         </div>
                         {project.research_type && (
-                          <span className="ml-2 px-2 py-1 text-xs rounded bg-surface dark:bg-surface-alt text-secondary dark:text-secondary">
+                          <span className="ml-2 px-2 py-1 text-xs rounded bg-surface text-secondary">
                             {project.research_type}
                           </span>
                         )}
@@ -178,7 +178,7 @@ export default function ProjectsPage() {
                         <span>
                           Updated {project.updated_at ? formatDistanceToNow(new Date(project.updated_at), { addSuffix: true }) : "recently"}
                         </span>
-                        <span className={`px-2 py-0.5 rounded ${project.status === "active" ? "bg-success-surface text-success dark:bg-success-surface dark:text-success" : "bg-surface text-secondary"}`}>
+                        <span className={`px-2 py-0.5 rounded ${project.status === "active" ? "bg-success-surface text-success" : "bg-surface text-secondary"}`}>
                           {project.status || "active"}
                         </span>
                       </div>

@@ -37,7 +37,7 @@ export function ResultLinks({ documentIds, reportId }: ResultLinksProps) {
 
   if (!hasDocuments && !hasReport) {
     return (
-      <div className="text-muted dark:text-muted text-sm py-2">
+      <div className="text-muted text-sm py-2">
         No results available yet. Results will appear after mission execution.
       </div>
     );
@@ -47,7 +47,7 @@ export function ResultLinks({ documentIds, reportId }: ResultLinksProps) {
     <div className="space-y-4">
       {hasDocuments && (
         <div>
-          <h3 className="text-sm font-semibold text-secondary dark:text-secondary uppercase tracking-wide mb-3">
+          <h3 className="text-sm font-semibold text-secondary uppercase tracking-wide mb-3">
             Result Documents ({documentIds.length})
           </h3>
           <div className="space-y-2">
@@ -55,12 +55,12 @@ export function ResultLinks({ documentIds, reportId }: ResultLinksProps) {
               <Link
                 key={docId}
                 href={`/documents/${docId}`}
-                className="flex items-center gap-3 p-3 bg-background dark:bg-background rounded-lg hover:bg-surface dark:hover:bg-surface transition-colors group"
+                className="flex items-center gap-3 p-3 bg-background rounded-lg hover:bg-surface transition-colors group"
               >
                 <span className="text-muted group-hover:text-accent-text transition-colors">
                   <DocumentIcon />
                 </span>
-                <span className="font-mono text-sm text-secondary dark:text-secondary truncate">
+                <span className="font-mono text-sm text-secondary truncate">
                   {docId}
                 </span>
                 <span className="ml-auto text-muted group-hover:text-accent-text transition-colors">
@@ -74,19 +74,19 @@ export function ResultLinks({ documentIds, reportId }: ResultLinksProps) {
 
       {hasReport && (
         <div>
-          <h3 className="text-sm font-semibold text-secondary dark:text-secondary uppercase tracking-wide mb-3">
+          <h3 className="text-sm font-semibold text-secondary uppercase tracking-wide mb-3">
             Generated Report
           </h3>
           <Link
             href={`/reports/${reportId}`}
-            className="flex items-center gap-3 p-4 bg-success-surface dark:bg-success-surface border border-success-line dark:border-success-line rounded-lg hover:bg-success-surface dark:hover:bg-success-surface transition-colors group"
+            className="flex items-center gap-3 p-4 bg-success-surface border border-success-line rounded-lg hover:bg-success-surface transition-colors group"
           >
             <span className="text-success">
               <ReportIcon />
             </span>
             <div className="flex-1">
-              <p className="font-medium text-success dark:text-success">View Synthesis Report</p>
-              <p className="text-sm text-success dark:text-success font-mono truncate">{reportId}</p>
+              <p className="font-medium text-success">View Synthesis Report</p>
+              <p className="text-sm text-success font-mono truncate">{reportId}</p>
             </div>
             <span className="text-success group-hover:text-success transition-colors">
               &rarr;

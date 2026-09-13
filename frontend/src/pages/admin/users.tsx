@@ -117,35 +117,35 @@ export function UsersAdmin() {
   };
 
   return (
-    <div className="min-h-screen bg-background dark:bg-background">
+    <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        <h1 className="text-2xl font-bold text-foreground dark:text-foreground">User management</h1>
+        <h1 className="text-2xl font-bold text-foreground">User management</h1>
 
         <CreateUserForm isOwnerCaller={isOwnerCaller} onCreated={reload} />
 
-        <section className="rounded-lg bg-surface dark:bg-surface border border-line dark:border-line p-6">
-          <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">Users</h2>
+        <section className="rounded-lg bg-surface border border-line p-6">
+          <h2 className="text-lg font-semibold text-foreground mb-4">Users</h2>
 
           {actionError && (
-            <p className="mb-4 rounded-lg bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line px-4 py-3 text-sm text-danger dark:text-danger">
+            <p className="mb-4 rounded-lg bg-danger-surface border border-danger-line px-4 py-3 text-sm text-danger">
               {actionError}
             </p>
           )}
           {loadError && (
-            <p className="rounded-lg bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line px-4 py-3 text-sm text-danger dark:text-danger">
+            <p className="rounded-lg bg-danger-surface border border-danger-line px-4 py-3 text-sm text-danger">
               {loadError}
             </p>
           )}
 
           {loadError ? null : users === null ? (
-            <p className="text-sm text-muted dark:text-muted">Loading users…</p>
+            <p className="text-sm text-muted">Loading users…</p>
           ) : users.length === 0 ? (
-            <p className="text-sm text-muted dark:text-muted">No users.</p>
+            <p className="text-sm text-muted">No users.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs uppercase tracking-wide text-muted dark:text-muted border-b border-line dark:border-line">
+                  <tr className="text-left text-xs uppercase tracking-wide text-muted border-b border-line">
                     <th className="py-2 pr-4 font-medium">Email</th>
                     <th className="py-2 pr-4 font-medium">Name</th>
                     <th className="py-2 pr-4 font-medium">Role</th>
@@ -158,19 +158,19 @@ export function UsersAdmin() {
                     const isSelf = u.id === selfId;
                     const rowBusy = busyId === u.id;
                     return (
-                      <tr key={u.id} className="border-b border-line dark:border-line">
-                        <td className="py-3 pr-4 text-foreground dark:text-foreground">
+                      <tr key={u.id} className="border-b border-line">
+                        <td className="py-3 pr-4 text-foreground">
                           {u.email}
                           {isSelf && <span className="ml-2 text-xs text-muted">(you)</span>}
                         </td>
-                        <td className="py-3 pr-4 text-secondary dark:text-secondary">{u.display_name}</td>
+                        <td className="py-3 pr-4 text-secondary">{u.display_name}</td>
                         <td className="py-3 pr-4">
                           <select
                             aria-label={`Role for ${u.email}`}
                             value={u.role}
                             disabled={rowBusy}
                             onChange={(e) => changeRole(u, e.target.value as Role)}
-                            className="rounded-md border border-line-strong dark:border-line-strong bg-surface dark:bg-surface-alt px-2 py-1 text-sm text-foreground dark:text-foreground disabled:opacity-50"
+                            className="rounded-md border border-line-strong bg-surface px-2 py-1 text-sm text-foreground disabled:opacity-50"
                           >
                             {roleOptions(u.role, isOwnerCaller).map((r) => (
                               <option key={r} value={r}>
@@ -188,7 +188,7 @@ export function UsersAdmin() {
                               type="button"
                               onClick={() => toggleActive(u)}
                               disabled={rowBusy}
-                              className="text-secondary dark:text-secondary hover:text-foreground dark:hover:text-foreground disabled:opacity-40"
+                              className="text-secondary hover:text-foreground disabled:opacity-40"
                             >
                               {u.is_active ? "Disable" : "Enable"}
                             </button>
@@ -214,7 +214,7 @@ export function UsersAdmin() {
       </div>
 
         <Dialog open={Boolean(pendingDelete)} title={pendingDelete ? `Delete ${pendingDelete.email}?` : "Delete user"} onClose={() => { if (busyId !== pendingDelete?.id) setPendingDelete(null); }}>
-            <p className="mt-2 text-sm text-secondary dark:text-secondary">
+            <p className="mt-2 text-sm text-secondary">
               This permanently deletes the account along with its API keys and invite codes. Any
               projects, collections, documents, missions, and reports they own are kept, but their
               owner is cleared (set to no owner). This cannot be undone.
@@ -226,7 +226,7 @@ export function UsersAdmin() {
                 type="button"
                 disabled={Boolean(pendingDelete && busyId === pendingDelete.id)}
                 onClick={() => setPendingDelete(null)}
-                className="px-4 py-2 text-sm font-medium text-secondary dark:text-secondary hover:text-foreground dark:hover:text-foreground"
+                className="px-4 py-2 text-sm font-medium text-secondary hover:text-foreground"
               >
                 Cancel
               </button>
@@ -276,16 +276,16 @@ function CreateUserForm({
   });
 
   return (
-    <section className="rounded-lg bg-surface dark:bg-surface border border-line dark:border-line p-6">
-      <h2 className="text-lg font-semibold text-foreground dark:text-foreground mb-4">Create user</h2>
+    <section className="rounded-lg bg-surface border border-line p-6">
+      <h2 className="text-lg font-semibold text-foreground mb-4">Create user</h2>
 
       {createError && (
-        <p className="mb-4 rounded-lg bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line px-4 py-3 text-sm text-danger dark:text-danger">
+        <p className="mb-4 rounded-lg bg-danger-surface border border-danger-line px-4 py-3 text-sm text-danger">
           {createError}
         </p>
       )}
       {createSuccess && (
-        <p className="mb-4 rounded-lg bg-success-surface dark:bg-success-surface border border-success-line dark:border-success-line px-4 py-3 text-sm text-success dark:text-success">
+        <p className="mb-4 rounded-lg bg-success-surface border border-success-line px-4 py-3 text-sm text-success">
           {createSuccess}
         </p>
       )}

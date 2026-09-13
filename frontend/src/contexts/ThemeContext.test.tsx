@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { readFileSync } from "node:fs";
 const mocks = vi.hoisted(() => ({ user: { user_id: "alice" } as { user_id: string } | null }));
 vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => ({ user: mocks.user }) }));
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -15,11 +16,35 @@ beforeEach(() => {
 const picker = () => <ThemeProvider><ThemeSelect /></ThemeProvider>;
 
 describe("per-user appearance", () => {
+  it("offers the accepted shipped palettes and explicitly defers High contrast", () => {
+    const css = readFileSync("node_modules/@oods/tokens/dist/css/tokens.css", "utf8");
+    // `base` is an alias in the same selector block as light, not another palette.
+    expect(css).toMatch(/\[data-brand='A'\]\[data-theme='base'\],\s*\[data-brand='A'\]\[data-theme='light'\] \{/);
+    const themes = [...new Set([...css.matchAll(/\[data-brand='A'\]\[data-theme='([^']+)'\]/g)].map(match => match[1]))].filter(theme => theme !== "base");
+    render(picker());
+    const choices = screen.getAllByRole("option").map(option => (option as HTMLOptionElement).value);
+    expect(choices.sort()).toEqual(["dark", "light", "system"]);
+    // Decision #408 defers the failing hc palette. New upstream palettes still
+    // require review instead of silently becoming available to users.
+    expect(themes.sort()).toEqual([...choices.filter(choice => choice !== "system"), "hc"].sort());
+  });
+  it("treats a stored deferred High contrast choice as System across OS changes", () => {
+    localStorage.setItem(themeStorageKey("alice"), "hc");
+    render(picker());
+    expect(document.documentElement.dataset.theme).toBe("dark");
+    expect((screen.getByLabelText("Color theme") as HTMLSelectElement).value).toBe("system");
+    expect(screen.queryByRole("option", { name: "High contrast" })).toBeNull();
+    act(() => { media.matches = false; media.dispatchEvent(new Event("change")); });
+    expect(document.documentElement.dataset.theme).toBe("light");
+    expect(screen.getByRole("option", { name: "System (Light)" })).toBeTruthy();
+  });
   it("follows OS changes only while System is selected", () => {
     render(picker());
     expect(document.documentElement.dataset.theme).toBe("dark");
+    expect(screen.getByRole("option", { name: "System (Dark)" })).toBeTruthy();
     act(() => { media.matches = false; media.dispatchEvent(new Event("change")); });
     expect(document.documentElement.dataset.theme).toBe("light");
+    expect(screen.getByRole("option", { name: "System (Light)" })).toBeTruthy();
     fireEvent.change(screen.getByLabelText("Color theme"), { target: { value: "dark" } });
     act(() => { media.dispatchEvent(new Event("change")); });
     expect(document.documentElement.dataset.theme).toBe("dark");

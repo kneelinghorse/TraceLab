@@ -6,7 +6,6 @@ import path from "node:path";
 const tokenColor = (name: string) => `color-mix(in srgb, var(--theme-${name}) calc(<alpha-value> * 100%), transparent)`;
 
 const config: Config = {
-  darkMode: "class",
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
