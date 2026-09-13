@@ -1,3 +1,7 @@
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { PaginationBar } from "@/components/ui/PaginationBar";
+import { PageState } from "@/components/ui/PageState";
+import { useFeedback } from "@/components/ui/useFeedback";
 /**
  * Documents list page - cross-project document browser
  */
@@ -9,12 +13,13 @@ import type { Document, Project } from "@/types/document";
 import type { PaginatedResponse } from "@/types/pagination";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import useSWR from "swr";
 
 const PAGE_SIZE = 10;
 
 export default function DocumentsPage() {
+  const { askConfirmation, notify, feedback } = useFeedback();
   const [selectedProject, setSelectedProject] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -25,9 +30,9 @@ export default function DocumentsPage() {
     () => projectsApi.listProjects({ pageSize: 100 }),
     { revalidateOnMount: true }
   );
-  const projects = projectResponse?.data ?? [];
+  const projects = useMemo(() => projectResponse?.data ?? [], [projectResponse]);
 
-  const { data: documentsResponse, mutate, isLoading, isValidating } = useSWR<PaginatedResponse<Document>>(
+  const { data: documentsResponse, mutate, isLoading, isValidating, error } = useSWR<PaginatedResponse<Document>>(
     ["documents", selectedProject, statusFilter, searchTerm, page],
     () =>
       documentsApi.listDocuments({
@@ -53,19 +58,16 @@ export default function DocumentsPage() {
     return map;
   }, [projects]);
 
-  useEffect(() => {
-    setPage(1);
-  }, [selectedProject, statusFilter, searchTerm]);
 
   const handleDelete = async (documentId: string) => {
-    if (!confirm("Are you sure you want to delete this document?")) return;
+    if (!await askConfirmation("Are you sure you want to delete this document?")) return;
 
     try {
       await documentsApi.deleteDocument(documentId);
       mutate();
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to delete document";
-      alert(message);
+      notify(message);
     }
   };
 
@@ -75,6 +77,7 @@ export default function DocumentsPage() {
 
   return (
     <AuthGate>
+      {feedback}
       <div className="min-h-screen bg-background dark:bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
@@ -91,7 +94,7 @@ export default function DocumentsPage() {
               {/* Project Filter */}
               <select
                 value={selectedProject}
-                onChange={(e) => setSelectedProject(e.target.value)}
+                onChange={(e) => { setSelectedProject(e.target.value); setPage(1); }}
                 className="px-4 py-2 border border-line-strong dark:border-line rounded-lg bg-surface dark:bg-surface text-foreground dark:text-foreground"
                 aria-label="Filter by project"
               >
@@ -106,7 +109,7 @@ export default function DocumentsPage() {
               {/* Status Filter */}
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
                 className="px-4 py-2 border border-line-strong dark:border-line rounded-lg bg-surface dark:bg-surface text-foreground dark:text-foreground"
                 aria-label="Filter by status"
               >
@@ -120,7 +123,7 @@ export default function DocumentsPage() {
                 type="search"
                 placeholder="Search name..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
                 className="px-4 py-2 border border-line-strong dark:border-line rounded-lg bg-surface dark:bg-surface text-foreground dark:text-foreground"
                 aria-label="Search documents"
               />
@@ -152,10 +155,8 @@ export default function DocumentsPage() {
           </div>
 
           {/* Documents List */}
-          {isLoading && !documentsResponse ? (
-            <div className="text-center py-12">
-              <p className="text-muted">Loading documents...</p>
-            </div>
+          {error ? <PageState state="error" title="Documents could not load." onRetry={() => void mutate()} /> : isLoading && !documentsResponse ? (
+            <PageState state="loading" title="Loading documents…" />
           ) : documents.length === 0 ? (
             <div className="text-center py-12 bg-surface dark:bg-surface rounded-lg border border-line dark:border-line">
               <p className="text-muted dark:text-muted mb-4">No documents found</p>
@@ -239,7 +240,7 @@ export default function DocumentsPage() {
                   </div>
                 </div>
               ))}
-              <PaginationControls
+              <PaginationBar
                 page={resolvedPage}
                 pages={totalPages || (documents.length > 0 ? 1 : 0)}
                 onChange={setPage}
@@ -249,57 +250,5 @@ export default function DocumentsPage() {
         </div>
       </div>
     </AuthGate>
-  );
-}
-
-type PaginationControlsProps = {
-  page: number;
-  pages: number;
-  onChange: (page: number) => void;
-};
-
-function PaginationControls({ page, pages, onChange }: PaginationControlsProps) {
-  if (!pages || pages <= 1) {
-    return null;
-  }
-
-  return (
-    <div className="flex flex-col sm:flex-row items-center justify-between pt-4">
-      <p className="text-sm text-secondary dark:text-muted mb-2 sm:mb-0">
-        Page {page} of {pages}
-      </p>
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={() => onChange(Math.max(1, page - 1))}
-          disabled={page === 1}
-          className="px-4 py-2 border border-line-strong dark:border-line rounded-lg disabled:opacity-50"
-        >
-          Previous
-        </button>
-        <button
-          type="button"
-          onClick={() => onChange(Math.min(pages, page + 1))}
-          disabled={page >= pages}
-          className="px-4 py-2 border border-line-strong dark:border-line rounded-lg disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function StatusBadge({ label, status }: { label: string; status: boolean }) {
-  return (
-    <span
-      className={`px-2 py-1 text-xs rounded ${
-        status
-          ? "bg-success-surface text-success dark:bg-success-surface dark:text-success"
-          : "bg-surface text-secondary dark:bg-surface-alt dark:text-muted"
-      }`}
-    >
-      {status ? "✓" : "○"} {label}
-    </span>
   );
 }

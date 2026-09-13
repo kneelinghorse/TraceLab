@@ -1,3 +1,7 @@
+import { useRouter } from "next/router";
+import { PaginationBar } from "@/components/ui/PaginationBar";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { PageState } from "@/components/ui/PageState";
 /**
  * Reports list page
  */
@@ -12,11 +16,12 @@ import useSWR from "swr";
 type StatusFilter = "all" | ReportStatus;
 
 export default function ReportsPage() {
+  const router = useRouter();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [page, setPage] = useState(1);
   const pageSize = 20;
 
-  const { data: response, isLoading } = useSWR(
+  const { data: response, isLoading, error, mutate } = useSWR(
     ["reports", statusFilter, page],
     () =>
       reportsApi.list({
@@ -30,21 +35,7 @@ export default function ReportsPage() {
   const total = response?.total ?? 0;
   const totalPages = Math.ceil(total / pageSize);
 
-  const getStatusBadge = (status: ReportStatus) => {
-    const baseClasses = "px-2 py-0.5 rounded-full text-xs font-medium";
-    if (status === "final") {
-      return (
-        <span className={`${baseClasses} bg-success-surface dark:bg-success-surface text-success dark:text-success`}>
-          Final
-        </span>
-      );
-    }
-    return (
-      <span className={`${baseClasses} bg-warning-surface dark:bg-warning-surface text-warning dark:text-warning`}>
-        Draft
-      </span>
-    );
-  };
+
 
   return (
     <AuthGate>
@@ -59,7 +50,7 @@ export default function ReportsPage() {
           </div>
 
           {/* Filters */}
-          <div className="mb-6 flex items-center gap-4">
+          <div className="mb-6 flex flex-wrap items-center gap-4">
             <span className="text-sm text-secondary dark:text-muted">Filter by status:</span>
             <div className="flex gap-2">
               {(["all", "draft", "final"] as const).map((status) => (
@@ -82,10 +73,8 @@ export default function ReportsPage() {
           </div>
 
           {/* Reports List */}
-          {isLoading ? (
-            <div className="text-center py-12">
-              <p className="text-muted">Loading reports...</p>
-            </div>
+          {error ? <PageState state="error" title="Reports could not load." onRetry={() => void mutate()} /> : isLoading ? (
+            <PageState state="loading" title="Loading reports…" />
           ) : reports.length === 0 ? (
             <div className="text-center py-12 bg-surface dark:bg-surface rounded-lg border border-line dark:border-line">
               <p className="text-muted dark:text-muted mb-4">No reports yet</p>
@@ -101,7 +90,7 @@ export default function ReportsPage() {
             </div>
           ) : (
             <>
-              <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line overflow-hidden">
+              <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line overflow-x-auto">
                 <table className="min-w-full divide-y divide-line dark:divide-line">
                   <thead className="bg-background dark:bg-surface-alt">
                     <tr>
@@ -130,7 +119,7 @@ export default function ReportsPage() {
                       <tr
                         key={report.id}
                         className="hover:bg-background dark:hover:bg-surface-alt cursor-pointer"
-                        onClick={() => (window.location.href = `/reports/${report.id}`)}
+                        onClick={() => void router.push(`/reports/${report.id}`)}
                       >
                         <td className="px-6 py-4">
                           <Link
@@ -141,7 +130,7 @@ export default function ReportsPage() {
                             {report.title}
                           </Link>
                         </td>
-                        <td className="px-6 py-4">{getStatusBadge(report.status)}</td>
+                        <td className="px-6 py-4"><StatusBadge status={report.status} /></td>
                         <td className="px-6 py-4 text-sm text-secondary dark:text-muted">
                           {report.report_type}
                         </td>
@@ -161,27 +150,7 @@ export default function ReportsPage() {
               </div>
 
               {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="mt-4 flex items-center justify-between">
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    className="px-4 py-2 text-sm border border-line-strong dark:border-line-strong rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface dark:hover:bg-surface-alt"
-                  >
-                    Previous
-                  </button>
-                  <span className="text-sm text-secondary dark:text-muted">
-                    Page {page} of {totalPages} ({total} total)
-                  </span>
-                  <button
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page >= totalPages}
-                    className="px-4 py-2 text-sm border border-line-strong dark:border-line-strong rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface dark:hover:bg-surface-alt"
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
+              <PaginationBar page={page} pages={totalPages} total={total} onChange={setPage} />
             </>
           )}
         </div>

@@ -1,4 +1,4 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig, devices, type ReporterDescription } from "@playwright/test";
 import path from "path";
 
 const port = Number(process.env.PLAYWRIGHT_PORT || 3100);
@@ -11,7 +11,7 @@ const telemetryOutputPath = process.env.PLAYWRIGHT_TELEMETRY_OUTPUT
   ? path.resolve(process.env.PLAYWRIGHT_TELEMETRY_OUTPUT)
   : path.resolve(repoRoot, "telemetry/events/.artifacts/playwright-latest.json");
 const baseReporter = process.env.CI ? "github" : "list";
-const reporters: any = [
+const reporters: ReporterDescription[] = [
   [baseReporter],
   [telemetryReporterPath, { output: telemetryOutputPath, repoRoot }],
 ];

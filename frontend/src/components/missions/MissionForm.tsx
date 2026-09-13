@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import useSWR from "swr";
 
@@ -87,7 +87,6 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
     control,
     register,
     handleSubmit,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<ApiMissionFormValues>({
     defaultValues: defaultApiMissionFormValues,
@@ -96,7 +95,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
   });
 
   // Watch project_id to enable/disable Submit button
-  const projectId = watch("project_id");
+  const projectId = useWatch({ control, name: "project_id" });
   const isProjectSelected = Boolean(projectId && projectId.trim() !== "");
 
   // Hide tooltip when clicking outside the submit button
@@ -317,7 +316,7 @@ export function MissionForm({ onSuccess, onCancel }: MissionFormProps) {
           </h2>
           <p className="mt-1 text-sm text-muted dark:text-muted">
             Optional fields the DeepSearch contract compiler reads when shaping
-            retrieval and synthesis. Skip any that don't apply.
+            retrieval and synthesis. Skip any that don&apos;t apply.
           </p>
         </header>
 

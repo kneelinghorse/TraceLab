@@ -1,3 +1,6 @@
+import { HttpError } from "@/lib/api/http";
+import { PaginationBar } from "@/components/ui/PaginationBar";
+import { PageState } from "@/components/ui/PageState";
 import { Dialog } from "@/components/ui/Dialog";
 import { EvidencePanel } from "@/components/evidence/EvidencePanel";
 /**
@@ -26,7 +29,7 @@ export default function DocumentDetailPage() {
   const [chunksPage, setChunksPage] = useState(1);
   const [expandedChunks, setExpandedChunks] = useState<Set<string>>(new Set());
 
-  const { data: document, mutate, error: loadError } = useSWR<Document>(
+  const { data: document, mutate, error: loadError, isLoading } = useSWR<Document>(
     id ? `document-${id}` : null,
     () => documentsApi.getDocument(id as string)
   );
@@ -102,17 +105,10 @@ export default function DocumentDetailPage() {
     }
   };
 
-  if (loadError) return <AuthGate><div role="alert" className="p-6">Document could not be loaded. <button className="underline" onClick={() => void mutate()}>Retry</button></div></AuthGate>;
-
-  if (!document) {
-    return (
-      <AuthGate>
-        <div className="min-h-screen bg-background dark:bg-background flex items-center justify-center">
-          <p className="text-muted">Loading document...</p>
-        </div>
-      </AuthGate>
-    );
-  }
+  if (loadError instanceof HttpError && loadError.status === 404) return <AuthGate><PageState state="empty" title="Document not found." /></AuthGate>;
+  if (loadError) return <AuthGate><PageState state="error" title="Document could not be loaded." onRetry={() => void mutate()} /></AuthGate>;
+  if (!router.isReady || isLoading) return <AuthGate><PageState state="loading" title="Loading document…" /></AuthGate>;
+  if (!document) return <AuthGate><PageState state="empty" title="Document not found." /></AuthGate>;
 
   return (
     <AuthGate>
@@ -358,27 +354,7 @@ export default function DocumentDetailPage() {
                   </div>
 
                   {/* Pagination */}
-                  {chunksResponse.pagination.pages > 1 && (
-                    <div className="mt-4 flex items-center justify-between">
-                      <button
-                        onClick={() => setChunksPage((p) => Math.max(1, p - 1))}
-                        disabled={chunksPage === 1}
-                        className="px-3 py-1 text-sm border border-line-strong dark:border-line-strong rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface dark:hover:bg-surface-alt"
-                      >
-                        Previous
-                      </button>
-                      <span className="text-sm text-secondary dark:text-muted">
-                        Page {chunksResponse.pagination.page} of {chunksResponse.pagination.pages}
-                      </span>
-                      <button
-                        onClick={() => setChunksPage((p) => Math.min(chunksResponse.pagination.pages, p + 1))}
-                        disabled={chunksPage >= chunksResponse.pagination.pages}
-                        className="px-3 py-1 text-sm border border-line-strong dark:border-line-strong rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-surface dark:hover:bg-surface-alt"
-                      >
-                        Next
-                      </button>
-                    </div>
-                  )}
+                  <PaginationBar page={chunksPage} pages={chunksResponse.pagination.pages} onChange={setChunksPage} label="Document chunk pages" />
                 </>
               )}
 

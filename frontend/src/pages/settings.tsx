@@ -1,3 +1,4 @@
+import { useFeedback } from "@/components/ui/useFeedback";
 /**
  * User settings page — profile, API keys, invite codes
  */
@@ -159,6 +160,7 @@ function ProfileSection() {
 // ---------------------------------------------------------------------------
 
 function APIKeysSection() {
+  const { askConfirmation, feedback } = useFeedback();
   const [keys, setKeys] = useState<APIKeyInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [newKeyName, setNewKeyName] = useState("");
@@ -201,7 +203,7 @@ function APIKeysSection() {
   };
 
   const handleDelete = async (keyId: string, name: string) => {
-    if (!confirm(`Revoke API key "${name}"? Any integrations using it will stop working.`)) return;
+    if (!await askConfirmation(`Revoke API key "${name}"? Any integrations using it will stop working.`)) return;
     try {
       await apiKeysApi.delete(keyId);
       await fetchKeys();
@@ -222,6 +224,7 @@ function APIKeysSection() {
 
   return (
     <section className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
+      {feedback}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground dark:text-foreground">API Keys</h2>
         <span className="text-xs text-muted dark:text-muted">Used by MCP and external integrations</span>

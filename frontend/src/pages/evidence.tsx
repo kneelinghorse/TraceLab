@@ -1,3 +1,4 @@
+import { PaginationBar } from "@/components/ui/PaginationBar";
 import { useState, type FormEvent } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/router";
@@ -48,7 +49,7 @@ function EvidenceBrowser({ initial }: { initial: Record<string, string | string[
         {projects.data?.data.map(project => <option key={project.id} value={project.id}>{project.name}</option>)}
       </select></label>
       {projects.isLoading && <p role="status">Loading projects…</p>}
-      {projects.data && projects.data.pagination.pages > 1 && <nav aria-label="Project pages" className="flex flex-wrap items-center gap-3 text-sm"><button disabled={projectPage === 1} onClick={() => setProjectPage(projectPage - 1)} className="rounded border border-line px-3 py-2 disabled:opacity-50">Previous projects</button><span>Page {projectPage} of {projects.data.pagination.pages}</span><button disabled={projectPage >= projects.data.pagination.pages} onClick={() => setProjectPage(projectPage + 1)} className="rounded border border-line px-3 py-2 disabled:opacity-50">Next projects</button></nav>}
+      {projects.data && projects.data.pagination.pages > 1 && <PaginationBar label="Project pages" page={projectPage} pages={projects.data.pagination.pages} onChange={setProjectPage} previousLabel="Previous projects" nextLabel="Next projects" />}
     </section>
     {projectId && <form onSubmit={apply} className="panel space-y-4 p-5" aria-label="Evidence filters">
       <label className="form-label">Search evidence<input className="form-input mt-2" type="search" value={draftQuery} onChange={e => setDraftQuery(e.target.value)} placeholder="Search claims, snippets and sources" /></label>
@@ -66,7 +67,7 @@ function EvidenceBrowser({ initial }: { initial: Record<string, string | string[
       <div className="flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-muted">{ledger.data.entry_total} evidence entries</p><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={grouped} onChange={e => setGrouped(e.target.checked)} />Group this page by source</label></div>
       {Array.from(groups, ([key, entries]) => <div key={key} className="space-y-4">{grouped && <h2 className="break-all text-lg font-semibold">{sourceDomain(entries[0].source_url)} <span className="text-sm font-normal text-secondary">· {entries.length} on this page</span></h2>}{entries.map(entry => <EntryCard key={entry.id} entry={entry} />)}</div>)}
       {ledger.data.entry_total === 0 && <p>No evidence matches these filters.</p>}
-      {ledger.data.entry_total > ledger.data.page_size && <nav aria-label="Evidence pages" className="flex flex-wrap items-center gap-3 text-sm"><button disabled={page === 1} onClick={() => setPage(page - 1)} className="rounded border border-line px-3 py-2 disabled:opacity-50">Previous</button><span>Page {page} of {Math.ceil(ledger.data.entry_total / ledger.data.page_size)}</span><button disabled={page * ledger.data.page_size >= ledger.data.entry_total} onClick={() => setPage(page + 1)} className="rounded border border-line px-3 py-2 disabled:opacity-50">Next</button></nav>}
+      {ledger.data.entry_total > ledger.data.page_size && <PaginationBar label="Evidence pages" page={page} pages={Math.ceil(ledger.data.entry_total / ledger.data.page_size)} onChange={setPage} />}
     </section>}
     {projectId && filters.session_key && <SessionNotes key={`${projectId}:${filters.session_key}`} projectId={projectId} sessionKey={filters.session_key} />}
   </div>;

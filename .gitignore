@@ -73,3 +73,8 @@ cmos/db/cmos.sqlite-shm
 cmos/db/cmos.sqlite-wal
 cmos/context/master_context.json
 cmos/context/project_context.json
+
+# Local validation outputs; canonical receipts are copied into cmos/reports.
+telemetry/events/*.jsonl
+cmos/telemetry/**
+tests/test_ingestion.db-journal

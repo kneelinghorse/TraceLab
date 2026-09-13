@@ -1,3 +1,4 @@
+import { PageState } from "@/components/ui/PageState";
 import { useState } from "react";
 import type { ReactNode } from "react";
 
@@ -15,9 +16,7 @@ export function AuthGate({ children }: AuthGateProps) {
 
   if (!isReady) {
     return (
-      <div className="grid place-items-center py-12 text-muted">
-        Verifying session…
-      </div>
+      <PageState state="loading" title="Verifying session…" />
     );
   }
 

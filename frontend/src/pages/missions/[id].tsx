@@ -1,3 +1,4 @@
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { httpClient } from "@/lib/api/http";
 import { Dialog } from "@/components/ui/Dialog";
 import { EvidencePanel } from "@/components/evidence/EvidencePanel";
@@ -15,28 +16,6 @@ import { downloadFile } from "@/lib/api/console";
 import { missionsApi } from "@/lib/api/missions";
 import { useApiMission } from "@/lib/hooks/useMissions";
 import type { MissionStatus, ReportPromotionResponse, ApiMissionUpdate } from "@/types/mission";
-
-const STATUS_COLORS: Record<MissionStatus, { bg: string; text: string; dot: string }> = {
-  draft: { bg: "bg-surface dark:bg-surface-alt", text: "text-secondary dark:text-secondary", dot: "bg-surface-alt" },
-  queued: { bg: "bg-warning-surface dark:bg-warning-surface", text: "text-warning dark:text-warning", dot: "bg-warning" },
-  in_progress: { bg: "bg-info-surface dark:bg-info-surface", text: "text-accent-text dark:text-accent-text", dot: "bg-accent" },
-  completed: { bg: "bg-success-surface dark:bg-success-surface", text: "text-success dark:text-success", dot: "bg-success" },
-  blocked: { bg: "bg-danger-surface dark:bg-danger-surface", text: "text-danger dark:text-danger", dot: "bg-danger" },
-  cancelled: { bg: "bg-surface dark:bg-surface-alt", text: "text-muted dark:text-muted", dot: "bg-surface-alt" },
-  validation_failed: { bg: "bg-warning-surface dark:bg-warning-surface", text: "text-warning dark:text-warning", dot: "bg-warning" },
-};
-
-function StatusBadge({ status }: { status: MissionStatus }) {
-  const colors = STATUS_COLORS[status] ?? STATUS_COLORS.draft;
-  const label = status.replace("_", " ");
-
-  return (
-    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium ${colors.bg} ${colors.text}`}>
-      <span className={`w-2 h-2 rounded-full ${colors.dot}`} />
-      {label.charAt(0).toUpperCase() + label.slice(1)}
-    </span>
-  );
-}
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (

@@ -1,0 +1,69 @@
+
+> frontend@0.1.0 build
+> npm run check:tokens && next build
+
+
+> frontend@0.1.0 check:tokens
+> node scripts/check-token-colors.mjs
+
+OODS color gate passed: no fixed palette colors in rendered source.
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Environments: .env.production.local, .env.local
+
+   Running TypeScript ...
+   Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ Compiled successfully in 2.1s
+   Collecting page data using 7 workers ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   Generating static pages using 7 workers (0/27) ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   Generating static pages using 7 workers (6/27) 
+   Generating static pages using 7 workers (13/27) 
+   Generating static pages using 7 workers (20/27) 
+ ✓ Generating static pages using 7 workers (27/27) in 321.8ms
+   Finalizing page optimization ...
+
+Route (pages)
+┌ ○ /
+├   /_app
+├ ○ /404
+├ ○ /admin/corrections
+├ ○ /admin/observability
+├ ○ /admin/spaces
+├ ○ /admin/users
+├ ○ /collections
+├ ○ /collections/[id]
+├ ○ /device
+├ ○ /documents
+├ ○ /documents/[id]
+├ ○ /documents/upload
+├ ○ /evidence
+├ ○ /evidence/[id]
+├ ○ /missions
+├ ○ /missions/[id]
+├ ○ /missions/new
+├ ○ /missions/queue
+├ ○ /projects
+├ ○ /projects/[id]
+├ ○ /reports
+├ ○ /reports/[id]
+├ ○ /saved-searches
+├ ○ /search
+├ ○ /search/results
+└ ○ /settings
+
+○  (Static)  prerendered as static content
+

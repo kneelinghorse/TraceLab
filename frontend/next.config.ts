@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   async redirects() {
     return [
+      { source: "/invites", destination: "/settings#invites", permanent: true },
       { source: "/console", destination: "/admin/observability", permanent: true },
       { source: "/console/corrections", destination: "/admin/corrections", permanent: true },
       { source: "/console/missions", destination: "/missions", permanent: true },

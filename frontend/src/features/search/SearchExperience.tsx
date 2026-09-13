@@ -67,7 +67,7 @@ function SearchExperience({ initialSection }: SearchPageProps) {
   const [searchError, setSearchError] = useState<string | null>(null);
   const [ragError, setRagError] = useState<string | null>(null);
   const [highlightedChunkId, setHighlightedChunkId] = useState<string | null>(null);
-  const [usePedr, setUsePedr] = useState(true); // Default to PEDR for main search
+  const usePedr = true; // Default to PEDR for main search
   const [graphEnabled, setGraphEnabled] = useState(true);
 
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -77,7 +77,7 @@ function SearchExperience({ initialSection }: SearchPageProps) {
     ["search-projects"],
     () => projectsApi.listProjects({ pageSize: 100 })
   );
-  const projects = projectResponse?.data ?? [];
+  const projects = useMemo(() => projectResponse?.data ?? [], [projectResponse]);
   const { data: documentResponse, error: documentError } = useSWR<PaginatedResponse<Document>>(
     ["search-documents", filters.projectId || "all"],
     () =>
@@ -86,7 +86,7 @@ function SearchExperience({ initialSection }: SearchPageProps) {
         pageSize: 100,
       }),
   );
-  const documents = documentResponse?.data ?? [];
+  const documents = useMemo(() => documentResponse?.data ?? [], [documentResponse]);
 
   // Debug logging for API errors
   useEffect(() => {

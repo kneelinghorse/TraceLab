@@ -1,8 +1,9 @@
+import { StatusBadge } from "@/components/ui/StatusBadge";
 /**
  * CorrectionStatusCard - Displays correction queue statistics and recent items.
  */
 
-import type { CorrectionStatusResponse, CorrectionItem, CorrectionStatus } from "@/types/console";
+import type { CorrectionStatusResponse, CorrectionItem } from "@/types/console";
 
 interface CorrectionStatusCardProps {
   status: CorrectionStatusResponse;
@@ -10,14 +11,6 @@ interface CorrectionStatusCardProps {
   onClearCompleted?: () => void;
   isLoading?: boolean;
 }
-
-const STATUS_COLORS: Record<CorrectionStatus, string> = {
-  pending: "bg-warning-surface text-warning dark:bg-warning-surface dark:text-warning",
-  in_progress: "bg-info-surface text-info dark:bg-info-surface dark:text-info",
-  completed: "bg-success-surface text-success dark:bg-success-surface dark:text-success",
-  failed: "bg-danger-surface text-danger dark:bg-danger-surface dark:text-danger",
-  skipped: "bg-surface text-foreground dark:bg-surface-alt dark:text-secondary",
-};
 
 const ERROR_TYPE_LABELS: Record<string, string> = {
   no_embedding: "No Embedding",
@@ -54,9 +47,7 @@ function CorrectionItemRow({ item }: { item: CorrectionItem }) {
     <div className="flex items-center justify-between py-2 border-b border-line dark:border-line last:border-0">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className={`text-xs px-2 py-0.5 rounded-full ${STATUS_COLORS[item.status]}`}>
-            {item.status}
-          </span>
+          <StatusBadge status={item.status} />
           <span className="text-sm font-medium text-foreground dark:text-foreground truncate">
             {item.evidence_id}
           </span>

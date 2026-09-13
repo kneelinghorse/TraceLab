@@ -1,3 +1,6 @@
+import { PageState } from "@/components/ui/PageState";
+import { PaginationBar } from "@/components/ui/PaginationBar";
+import { useFeedback } from "@/components/ui/useFeedback";
 /**
  * Collections list page
  */
@@ -10,17 +13,22 @@ import { useState } from "react";
 import useSWR from "swr";
 
 export default function CollectionsPage() {
+  const { askConfirmation, notify, feedback } = useFeedback();
+  const [page, setPage] = useState(1);
   const [isCreating, setIsCreating] = useState(false);
   const [newName, setNewName] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [createError, setCreateError] = useState<string | null>(null);
 
-  const { data: response, mutate, isLoading } = useSWR(
+  const { data: response, mutate, isLoading, error } = useSWR(
     "collections",
     () => collectionsApi.list()
   );
 
-  const collections = response?.data ?? [];
+  const allCollections = response?.data ?? [];
+  const pages = Math.ceil(allCollections.length / 20);
+  const currentPage = Math.min(page, Math.max(1, pages));
+  const collections = allCollections.slice((currentPage - 1) * 20, currentPage * 20);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +54,7 @@ export default function CollectionsPage() {
   };
 
   const handleDelete = async (collection: Collection) => {
-    if (!confirm(`Delete collection "${collection.name}"? This will not delete the chunks themselves.`)) {
+    if (!await askConfirmation(`Delete collection "${collection.name}"? This will not delete the chunks themselves.`)) {
       return;
     }
 
@@ -55,12 +63,13 @@ export default function CollectionsPage() {
       mutate();
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to delete collection";
-      alert(message);
+      notify(message);
     }
   };
 
   return (
     <AuthGate>
+      {feedback}
       <div className="min-h-screen bg-background dark:bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
@@ -90,6 +99,7 @@ export default function CollectionsPage() {
                     </label>
                     <input
                       type="text"
+                      aria-label="Collection name"
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
                       placeholder="e.g., Key Research Findings"
@@ -102,6 +112,7 @@ export default function CollectionsPage() {
                       Description
                     </label>
                     <textarea
+                      aria-label="Collection description"
                       value={newDescription}
                       onChange={(e) => setNewDescription(e.target.value)}
                       placeholder="Optional description..."
@@ -138,10 +149,8 @@ export default function CollectionsPage() {
           </div>
 
           {/* Collections List */}
-          {isLoading ? (
-            <div className="text-center py-12">
-              <p className="text-muted">Loading collections...</p>
-            </div>
+          {error ? <PageState state="error" title="Collections could not load." onRetry={() => void mutate()} /> : isLoading ? (
+            <PageState state="loading" title="Loading collections…" />
           ) : collections.length === 0 ? (
             <div className="text-center py-12 bg-surface dark:bg-surface rounded-lg border border-line dark:border-line">
               <p className="text-muted dark:text-muted mb-4">No collections yet</p>
@@ -156,8 +165,8 @@ export default function CollectionsPage() {
                   key={collection.id}
                   className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6 hover:shadow-lg transition-shadow"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0 flex-1">
                       <Link
                         href={`/collections/${collection.id}`}
                         className="text-lg font-semibold text-foreground dark:text-foreground hover:text-accent-text dark:hover:text-accent-text"
@@ -166,7 +175,7 @@ export default function CollectionsPage() {
                       </Link>
 
                       {collection.description && (
-                        <p className="mt-1 text-sm text-secondary dark:text-muted">
+                        <p className="mt-1 line-clamp-3 text-sm text-secondary dark:text-muted">
                           {collection.description}
                         </p>
                       )}
@@ -189,7 +198,7 @@ export default function CollectionsPage() {
                       </div>
                     </div>
 
-                    <div className="ml-4 flex gap-2">
+                    <div className="flex shrink-0 gap-2">
                       <Link
                         href={`/collections/${collection.id}`}
                         className="px-4 py-2 text-sm text-accent-text dark:text-accent-text hover:bg-info-surface dark:hover:bg-surface-alt rounded"
@@ -208,6 +217,7 @@ export default function CollectionsPage() {
               ))}
             </div>
           )}
+          {!error && <PaginationBar page={currentPage} pages={pages} total={response?.total} onChange={setPage} />}
         </div>
       </div>
     </AuthGate>
