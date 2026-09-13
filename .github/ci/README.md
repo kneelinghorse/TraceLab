@@ -25,9 +25,10 @@ The four PostgreSQL-lane skips are also explicit: one live RBAC matrix needs
 `RBAC_VERIFY_BASE_URL`, one CLI flow needs a running authenticated server, and
 two RAG pipeline cases retain an OpenAI/httpx compatibility skip.
 
-Advisory baselines remain intentionally visible: frontend lint reports 12
-errors and 13 warnings, full-repository Ruff 0.8.0 reports 1,893 findings, and
-mypy reports 970 errors. They are not silently treated as passing gates.
+At that historical baseline, frontend lint reported 12
+errors and 13 warnings, full-repository Ruff 0.8.0 reported 1,893 findings, and
+mypy reported 970 errors. These were not passing gates. UX-5 subsequently made
+frontend lint blocking; CI-2's current disposition for Ruff/mypy is below.
 
 ## Quarantine contract
 
@@ -51,14 +52,39 @@ nor resets it.
 - ESLint first reaches zero errors and zero warnings in its separate
   deploy-verified cleanup mission. Its advisory job then needs five consecutive
   qualifying green runs before promotion.
-- Full-repository Ruff first reaches zero findings without a mechanical
-  repository-wide rewrite. Its advisory job then needs five consecutive
-  qualifying green runs before promotion.
+- Any future full-repository Ruff or Python type-checking lane must first have
+  a scoped remediation plan and reach a green baseline without a mechanical
+  repository-wide rewrite. It then needs five consecutive qualifying green
+  runs before promotion; CI-2 removes the existing never-green advisory jobs.
 
 Until promoted, the day-one required contexts are `backend-suite`, `vitest`,
 `type-check`, `ruff-diff`, `build-frontend-production`, and `Secret Scan`.
 Production smoke, `backend-integration`, Playwright, ESLint, full-repository
 Ruff, and mypy are not day-one required contexts.
+
+## CI-2 lint-lane disposition (2026-09-13)
+
+Measured on `d51ed2c` with Python 3.11.9. These findings remain diagnostic debt;
+removing the jobs does not fix them or claim repository-wide lint/type safety.
+
+| Lane | Current command and version | Findings | Disposition |
+| --- | --- | --- | --- |
+| `ruff-full` | Ruff 0.8.0, `ruff check .` | 1,635 findings in 139 files | **Drop** the advisory job. Changed-file Ruff remains required and checks each touched Python file in full. A blanket cleanup would exceed this mission and risk another formatting-loss incident; a large grandfathered baseline would add maintenance without establishing a clean repository. |
+| `mypy` | mypy 2.3.1, `mypy app/ --config-file pyproject.toml` | 1,043 errors in 124 files, 237 files checked | **Drop** the advisory job. It has no passing baseline and no working promotion path. Type remediation needs its own scoped mission; `pyproject.toml` retains the configuration and dev dependency for local diagnostics. There is no replacement Python type-checking CI gate. |
+
+`Backend Lint` now contains only `ruff-diff`, with no `continue-on-error`. Its
+pinned Ruff version, changed-file selection, and per-commit logic-deletion guard
+are unchanged. Do not run `ruff format` for this work. No application code or
+test quarantine is changed.
+
+The retained lane is already required in `main` branch protection. Its five
+consecutive original-attempt `push` runs on `main` were verified green:
+`34761469702`, `34762305255`, `34764003123`, `34764874442`, `34768817913`.
+The same runs show the retired jobs failing; their overall workflow success
+was due to advisory handling and is not presented as all-jobs-green evidence.
+The CI-2 receipt records the first post-change run and branch-protection readback.
+No new lane is introduced or promoted, so the five-run promotion requirement
+does not apply to the removed jobs. Future lanes still follow the ratchet above.
 
 ## RECOVER-1 restoration (2026-09-12)
 
