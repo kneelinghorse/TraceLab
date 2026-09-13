@@ -1,0 +1,23 @@
+{
+  "checked_at": "2026-09-13T14:24:49.506Z",
+  "base": "https://tracelab.aquex.ai",
+  "api": "https://api.tracelab.aquex.ai",
+  "fixture": false,
+  "checks": 24,
+  "failures": 0,
+  "mission_total": 433,
+  "mission_statuses": {
+    "draft": 0,
+    "queued": 0,
+    "in_progress": 0,
+    "completed": 424,
+    "blocked": 1,
+    "cancelled": 0,
+    "validation_failed": 8
+  },
+  "projects": 51,
+  "documents": 1584,
+  "chunks": 16431,
+  "worker_status": "healthy",
+  "write_requests": 0
+}

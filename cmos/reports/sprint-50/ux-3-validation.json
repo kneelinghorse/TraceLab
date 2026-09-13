@@ -75,9 +75,7 @@
     "Output links describe persisted or exact-URL provenance matches; they do not assert independent verification.",
     "Production smoke is read-only and does not create promoted artifacts; promotion success/failure is covered by existing API regressions and frontend confirmation/retry tests."
   ],
-  "remaining": [
-    "Deploy the visual follow-up (bound related-evidence previews and wrap report header badge) with UX-4 and rerun production smoke."
-  ],
+  "remaining": [],
   "resolved_findings": [
     "Playwright exact select labels exposed ambiguous names; Project and Disposition now have explicit accessible names.",
     "Temporary PostgreSQL fixture lacked the existing mission_logs table; created that model table and reran all36 measurements. Earlier failure receipts retained separately.",
@@ -96,7 +94,7 @@
     "note": "Final CI reruns after the frontend dialog focus correction."
   },
   "production_smoke": {
-    "checked_at": "2026-09-13T14:07:11.199Z",
+    "checked_at": "2026-09-13T14:25:39.907Z",
     "base": "https://tracelab.aquex.ai",
     "api": "https://api.tracelab.aquex.ai",
     "fixture": false,
@@ -135,5 +133,8 @@
       "frontend lint"
     ]
   },
-  "merge_commit": "2a18eae086d88382c0fb1de7af9a8753d2237dd7"
+  "merge_commit": "2a18eae086d88382c0fb1de7af9a8753d2237dd7",
+  "accepted_deploy": "416d68070fd69f81368ca4870511e2607e05a106",
+  "accepted_at": "2026-09-13T14:25:39.907Z",
+  "deploy_transition_note": "Initial checks overlapped rollout (old route404 / transient API502); rerun after Railway reported SUCCESS passed every measurement."
 }
