@@ -1,0 +1,102 @@
+{
+  "startedAt": "2026-09-13T20:21:32.521Z",
+  "projectId": "0afcc588-e722-45bd-8320-f486601b877c",
+  "humanId": "UX6-LIVE-20260913",
+  "steps": [
+    {
+      "name": "authored-and-previewed-in-production-ui",
+      "at": "2026-09-13T20:21:39.830Z"
+    },
+    {
+      "name": "submitted-through-production-ui",
+      "at": "2026-09-13T20:21:43.222Z"
+    },
+    {
+      "name": "terminal-state-observed-in-production-ui",
+      "at": "2026-09-13T20:25:44.961Z"
+    },
+    {
+      "name": "opened-this-missions-evidence-in-production-ui",
+      "at": "2026-09-13T20:25:46.326Z"
+    },
+    {
+      "name": "terminal-state-observed-in-production-ui",
+      "at": "2026-09-13T20:29:23.284Z"
+    },
+    {
+      "name": "opened-this-missions-evidence-in-production-ui",
+      "at": "2026-09-13T20:29:25.667Z"
+    }
+  ],
+  "observations": [
+    {
+      "name": "saved authoring preview",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "at": "2026-09-13T20:21:46.713Z",
+      "status": "in_progress"
+    },
+    {
+      "at": "2026-09-13T20:25:43.929Z",
+      "status": "completed"
+    },
+    {
+      "name": "terminal run",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "linked evidence",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "at": "2026-09-13T20:29:22.147Z",
+      "status": "completed"
+    },
+    {
+      "name": "terminal run",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "linked evidence",
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "screenshots": [
+    "authoring-preview.png",
+    "terminal-run.png",
+    "results.png",
+    "evidence-entry.png",
+    "terminal-run.png",
+    "results.png",
+    "evidence-entry.png"
+  ],
+  "missionId": "952cc1de-688c-415b-bee9-ce143a753af2",
+  "preview": {
+    "contract_version": "1.0",
+    "compiler_revision": "24e88100624e6221e5fa957508ab77c4b0f519f9",
+    "fidelity": "structural_only"
+  },
+  "terminalStatus": "completed",
+  "evidenceHref": "/evidence/07ed4147-8c4c-4d47-b2c1-90568111322a",
+  "totals": {
+    "list": 433,
+    "home": 433
+  },
+  "pageErrors": [],
+  "completedAt": "2026-09-13T20:29:29.349Z",
+  "status": "passed",
+  "directProductionApi": true,
+  "evidenceProof": {
+    "entryId": "07ed4147-8c4c-4d47-b2c1-90568111322a",
+    "missionId": "952cc1de-688c-415b-bee9-ce143a753af2",
+    "sourceUrl": "https://www.rfc-editor.org/rfc/rfc9110.txt",
+    "claimRendered": true,
+    "missionBacklink": true
+  }
+}

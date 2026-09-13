@@ -1,7 +1,7 @@
 {
   "mission": "UX-6",
-  "status": "implementation_validated_awaiting_ci_and_production",
-  "checked_at": "2026-09-13T20:11:14.608497+00:00",
+  "status": "production_acceptance_passed",
+  "checked_at": "2026-09-13T20:29:54.680953+00:00",
   "base_commit": "1f494cac0e3d0732735916c99ea8c442fcc02c4c",
   "decisions": [
     409
@@ -69,10 +69,114 @@
     "Historical full-suite quarantine remains unchanged: CI must disclose its skips/deselections."
   ],
   "remaining": [
-    "Required PR CI and merge",
-    "Both Railway services SUCCESS with deployment IDs",
-    "Direct-production author-submit-terminal-evidence UI flow",
-    "31-route Light/Dark x 1440/390 production baseline",
-    "Final receipt merge and CMOS completion"
-  ]
+    "Receipt publication and CMOS completion"
+  ],
+  "source_commit": "84ff90ca48ad57bb1700e6e6951036a1a1404bc6",
+  "source_pr": {
+    "number": 270,
+    "url": "https://github.com/kneelinghorse/TraceLab/pull/270",
+    "merge_commit": "35a875de13b2ec613c10c51f243bbcfa3cc19465",
+    "merged_at": "2026-09-13T20:19:08Z"
+  },
+  "ci": {
+    "all_checks": "passed",
+    "backend": {
+      "run_id": 34780012599,
+      "passed": 2432,
+      "skipped": 3,
+      "deselected_quarantine": 12,
+      "warnings": 48
+    },
+    "postgres": {
+      "run_id": 34780012413,
+      "passed": 129,
+      "skipped": 4,
+      "warnings": 17
+    },
+    "frontend": {
+      "run_id": 34780012438,
+      "lint": "passed",
+      "typecheck": "passed",
+      "unit_tests": 152
+    },
+    "production_build": {
+      "run_id": 34780012414,
+      "built_browser_passed": 19
+    },
+    "ruff_diff": {
+      "run_id": 34780012504,
+      "result": "passed"
+    },
+    "secret_scan": {
+      "run_ids": [
+        34780010344,
+        34780012376
+      ],
+      "result": "passed"
+    }
+  },
+  "deployments": {
+    "checked_at": "2026-09-13T20:21:07.373307+00:00",
+    "project": "TraceLab",
+    "services": [
+      {
+        "name": "TraceLab",
+        "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+        "deployment_id": "93072f77-21c6-4a22-bb5a-719bd3a19fbf",
+        "status": "SUCCESS",
+        "commit": "35a875de13b2ec613c10c51f243bbcfa3cc19465",
+        "created_at": "2026-09-13T20:19:10.495Z"
+      },
+      {
+        "name": "frontend",
+        "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+        "deployment_id": "5e5874af-eaf1-4b2b-926d-f524a507c57d",
+        "status": "SUCCESS",
+        "commit": "35a875de13b2ec613c10c51f243bbcfa3cc19465",
+        "created_at": "2026-09-13T20:19:10.495Z"
+      }
+    ]
+  },
+  "production_baseline": {
+    "summary": "ux-6-production-smoke/summary.json",
+    "checks": 124,
+    "routes": 31,
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "widths": [
+      1440,
+      390
+    ],
+    "passed": true
+  },
+  "live_flow": {
+    "receipt": "ux-6-live-flow/receipt.json",
+    "passed": true,
+    "mission_id": "952cc1de-688c-415b-bee9-ce143a753af2",
+    "human_id": "UX6-LIVE-20260913",
+    "terminal_status": "completed",
+    "evidence": {
+      "entryId": "07ed4147-8c4c-4d47-b2c1-90568111322a",
+      "missionId": "952cc1de-688c-415b-bee9-ce143a753af2",
+      "sourceUrl": "https://www.rfc-editor.org/rfc/rfc9110.txt",
+      "claimRendered": true,
+      "missionBacklink": true
+    },
+    "api_totals": {
+      "list": 433,
+      "home": 433
+    },
+    "completed_at": "2026-09-13T20:29:29.349Z"
+  },
+  "visual_review": {
+    "passed": true,
+    "surfaces": [
+      "production mission list at 390 light and 1440 dark",
+      "production terminal run",
+      "production evidence claim and provenance"
+    ],
+    "note": "Evidence capture repeated read-only after waiting for the actual claim/source region; the original screenshot captured a loading state."
+  }
 }
