@@ -1,4 +1,3 @@
-
 Running 22 tests using 4 workers
 
 (node:56292) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.

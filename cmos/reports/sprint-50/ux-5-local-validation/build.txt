@@ -1,4 +1,3 @@
-
 > frontend@0.1.0 build
 > npm run check:tokens && next build
 
@@ -30,9 +29,9 @@ Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
    Generating static pages using 7 workers (0/27) ...
 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
 [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
-   Generating static pages using 7 workers (6/27) 
-   Generating static pages using 7 workers (13/27) 
-   Generating static pages using 7 workers (20/27) 
+   Generating static pages using 7 workers (6/27)
+   Generating static pages using 7 workers (13/27)
+   Generating static pages using 7 workers (20/27)
  ✓ Generating static pages using 7 workers (27/27) in 321.8ms
    Finalizing page optimization ...
 
@@ -66,4 +65,3 @@ Route (pages)
 └ ○ /settings
 
 ○  (Static)  prerendered as static content
-
