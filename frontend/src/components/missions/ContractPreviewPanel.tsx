@@ -5,17 +5,18 @@ import type { MissionContractPreview } from "@/types/mission";
 
 interface ContractPreviewPanelProps {
   missionId: string;
+  initialPreview?: MissionContractPreview;
 }
 
 /**
  * Mission contract preview panel (T40.4).
  *
  * Fetches the compiled DeepSearch contract on demand and renders the
- * summary counts + the full payload. Button-triggered rather than
- * live-as-you-edit so each click corresponds to one upstream preview call.
+ * summary counts + the full payload. Authoring passes the just-saved preview;
+ * manual refresh reads the saved mission through the vendored compiler.
  */
-export function ContractPreviewPanel({ missionId }: ContractPreviewPanelProps) {
-  const [preview, setPreview] = useState<MissionContractPreview | null>(null);
+export function ContractPreviewPanel({ missionId, initialPreview }: ContractPreviewPanelProps) {
+  const [preview, setPreview] = useState<MissionContractPreview | null>(initialPreview ?? null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,7 +36,7 @@ export function ContractPreviewPanel({ missionId }: ContractPreviewPanelProps) {
 
   return (
     <section className="rounded-lg border border-line bg-surface p-6 space-y-4">
-      <header className="flex items-center justify-between gap-4">
+      <header className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold text-foreground">
             Contract preview
@@ -62,7 +63,11 @@ export function ContractPreviewPanel({ missionId }: ContractPreviewPanelProps) {
       )}
 
       {preview && (
-        <div className="space-y-4">
+        <div className="space-y-4 min-w-0">
+          <dl className="grid gap-3 sm:grid-cols-3 text-sm">
+            {[["Contract version", preview.contract_version], ["Compiler revision", preview.compiler_revision], ["Fidelity", preview.fidelity]].map(([label, value]) => <div key={label} className="min-w-0"><dt className="text-muted">{label}</dt><dd className="break-all font-mono">{value ?? "Unknown"}</dd></div>)}
+          </dl>
+          <p className="text-sm text-secondary">Preview reflects the saved draft. Structural validation does not guarantee research quality.</p>
           <dl className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
             <PreviewStat label="Named entities" value={preview.named_entities.length} />
             <PreviewStat label="Objectives" value={preview.objectives.length} />

@@ -1,0 +1,40 @@
+{
+  "source": "Built frontend against explicit API fixtures; not production acceptance",
+  "viewports": [
+    390,
+    820,
+    1440
+  ],
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "surfaces": [
+    "list",
+    "authoring",
+    "run"
+  ],
+  "screenshots": [
+    "dark-1440-authoring.png",
+    "dark-1440-list.png",
+    "dark-1440-run.png",
+    "dark-390-authoring.png",
+    "dark-390-list.png",
+    "dark-390-run.png",
+    "dark-820-authoring.png",
+    "dark-820-list.png",
+    "dark-820-run.png",
+    "light-1440-authoring.png",
+    "light-1440-list.png",
+    "light-1440-run.png",
+    "light-390-authoring.png",
+    "light-390-list.png",
+    "light-390-run.png",
+    "light-820-authoring.png",
+    "light-820-list.png",
+    "light-820-run.png"
+  ],
+  "browser_scenarios": 6,
+  "serious_or_critical_axe_findings": 0,
+  "horizontal_overflow": 0
+}

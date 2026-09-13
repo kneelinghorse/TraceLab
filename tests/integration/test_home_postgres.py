@@ -8,11 +8,13 @@ from sqlalchemy import create_engine, inspect
 
 from alembic import command
 from app.adapters.repositories.sqlalchemy_home_repo import SQLAlchemyHomeRepository
+from app.core.authorization import accessible_filter
 from app.core.config import settings
 from app.core.security import AuthenticatedUser
 from app.models.mission import Mission
 from app.models.mission_review import MissionReview
 from app.models.user import User
+from app.services.mission_service import MissionService
 
 pytestmark = pytest.mark.integration
 _HASH = "placeholder-not-a-real-hash"
@@ -63,6 +65,23 @@ def test_postgres_home_counts_and_per_result_review(db_session, monkeypatch):
     row.updated_at += timedelta(seconds=1)
     db_session.commit()
     assert repository.snapshot(db_session, principal, now=datetime.utcnow()).attention.total == 143
+
+    # The job list uses the same predicate over the full scope, not Home's six rows.
+    rows[1].status = "validation_failed"
+    rows[2].status = "blocked"
+    rows[3].status = "queued"
+    rows[3].queued_at = datetime.utcnow() - timedelta(hours=2)
+    rows[4].status = "in_progress"
+    db_session.commit()
+    service = MissionService()
+    scope = accessible_filter(principal, Mission, db_session)
+    first, meta = service.list_missions(db_session, view="all", page_size=3, user_id=user.id, access_filter=scope)
+    assert meta.total == 143
+    assert [item.id for item in first] == [rows[index].id for index in (1, 2, 3)]
+    _, attention_meta = service.list_missions(db_session, view="attention", user_id=user.id, access_filter=scope)
+    assert attention_meta.total == repository.snapshot(db_session, principal, now=datetime.utcnow()).attention.total == 142
+    _, queue_meta = service.list_missions(db_session, view="queue", user_id=user.id, access_filter=scope)
+    assert queue_meta.total == 2
 
 
 def test_review_migration_chain_is_reversible_and_cascades(alembic_cfg, migration_db_url):

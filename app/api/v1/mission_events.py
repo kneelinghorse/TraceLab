@@ -16,7 +16,7 @@ import logging
 from contextlib import aclosing
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import or_
@@ -154,6 +154,7 @@ def ingest_cmos_mission_event(
 @router.get("/events/recent", response_model=list[dict])
 def get_recent_events(
     limit: int = Query(50, ge=1, le=200, description="Number of recent events"),
+    mission_id: UUID | None = Query(None, description="Filter to one readable mission"),
     _user: AuthenticatedUser = Depends(require_authenticated_user),
     db: Session = Depends(get_db),
 ):
@@ -162,7 +163,18 @@ def get_recent_events(
     Useful for initial page load before SSE connection is established.
     """
     bus = get_mission_event_bus()
-    events = _visible_events(bus.get_recent_events(limit=200), _user, db)[-limit:]
+    events = _visible_events(bus.get_recent_events(limit=200), _user, db)
+    if mission_id is not None:
+        mission = db.get(Mission, mission_id)
+        if mission is None or not authorize(_user, "read", mission, db):
+            raise HTTPException(status_code=404, detail="Mission not found")
+        references = {str(mission.id)}
+        try:
+            UUID(mission.mission_id)
+        except ValueError:
+            references.add(mission.mission_id)
+        events = [event for event in events if event.mission_id in references and not event.event_type.startswith("cmos.")]
+    events = events[-limit:]
     return [
         {k: v for k, v in event.__dict__.items() if v is not None} for event in events
     ]

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   auth: { isAuthenticated: true, isReady: true, user: { user_id: "alice", display_name: "Alice", email: "alice@example.test" }, logout: vi.fn() },
   role: { isAdmin: false },
-  router: { pathname: "/missions/queue", push: vi.fn() },
+  router: { pathname: "/missions/[id]", push: vi.fn() },
 }));
 vi.mock("next/router", () => ({ useRouter: () => mocks.router }));
 vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => mocks.auth }));
@@ -39,8 +39,8 @@ describe("the shared shell", () => {
     expect(screen.getAllByRole("main")).toHaveLength(1);
     expect(screen.getAllByRole("banner")).toHaveLength(1);
     const nav = screen.getByRole("navigation", { name: "Main navigation" });
-    expect(within(nav).getByRole("link", { name: "Queue" }).getAttribute("aria-current")).toBe("page");
-    expect(within(nav).getByRole("link", { name: "Missions", exact: true }).hasAttribute("aria-current")).toBe(false);
+    expect(within(nav).queryByRole("link", { name: "Queue" })).toBeNull();
+    expect(within(nav).getByRole("link", { name: "Missions", exact: true }).getAttribute("aria-current")).toBe("page");
     expect(screen.getByRole("link", { name: "Skip to content" }).getAttribute("href")).toBe("#main-content");
     expect(screen.getByRole("link", { name: "Saved searches" })).toBeTruthy();
   });

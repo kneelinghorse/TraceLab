@@ -3,10 +3,14 @@ import Link from "next/link";
 
 import { AuthGate } from "@/components/AuthGate";
 import { MissionForm } from "@/components/missions";
+import { useApiMission } from "@/lib/hooks/useMissions";
+import { PageState } from "@/components/ui/PageState";
 import type { ApiMission } from "@/types/mission";
 
 function NewMissionContent() {
   const router = useRouter();
+  const sourceId = typeof router.query.from === "string" ? router.query.from : undefined;
+  const { mission: source, isLoading, error, refresh } = useApiMission(sourceId);
 
   const handleSuccess = (mission: ApiMission) => {
     // Redirect to the mission detail page
@@ -38,7 +42,10 @@ function NewMissionContent() {
           </p>
         </header>
 
-        <MissionForm onSuccess={handleSuccess} onCancel={handleCancel} />
+        {sourceId && isLoading ? <PageState state="loading" title="Loading inputs for the new run…" /> : sourceId && (error || !source) ? <PageState state="error" title="The original mission could not load." onRetry={() => void refresh()} /> : <>
+          {source && <p className="mb-4 text-sm text-secondary">New run from <Link className="underline" href={`/missions/${source.id}`}>{source.mission_id}</Link>. Review the inputs before submitting.</p>}
+          <MissionForm key={source?.id ?? "new"} source={source} onSuccess={handleSuccess} onCancel={handleCancel} />
+        </>}
       </div>
     </div>
   );

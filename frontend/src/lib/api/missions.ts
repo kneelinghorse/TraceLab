@@ -31,6 +31,7 @@ export const missionsApi = {
         page_size: params.page_size,
         status: params.status,
         project_id: params.project_id,
+        view: params.view,
       },
     });
   },

@@ -18,7 +18,6 @@ export const navigationGroups: { label: string; admin?: boolean; items: Navigati
   ] },
   { label: "Jobs", items: [
     { label: "Missions", href: "/missions", icon: "mission" },
-    { label: "Queue", href: "/missions/queue", icon: "queue" },
   ] },
   { label: "Synthesis", items: [
     { label: "Reports", href: "/reports", icon: "report" },

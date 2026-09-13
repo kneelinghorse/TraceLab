@@ -252,6 +252,7 @@ export interface ApiMissionCreate extends MissionAuthoringFields {
 }
 
 export interface ApiMissionUpdate extends MissionAuthoringFields {
+  project_id?: string;
   title?: string;
   objective?: string;
   success_criteria?: string[];
@@ -271,6 +272,7 @@ export interface ApiMissionUpdate extends MissionAuthoringFields {
 }
 
 export interface MissionListParams {
+  view?: "all" | "attention" | "queue";
   page?: number;
   page_size?: number;
   status?: MissionStatus;
@@ -296,6 +298,9 @@ export interface ReportPromotionResponse {
 
 /** Compiled DeepSearch contract preview (T40.4). */
 export interface MissionContractPreview {
+  contract_version: string;
+  compiler_revision: string;
+  fidelity: string;
   mission_id: string;
   mission_uuid: string;
   project_id?: string | null;

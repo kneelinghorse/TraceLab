@@ -270,7 +270,7 @@ A UI mission is not done until all of the following are true. Each rule exists b
 | `/console/corrections` | `/admin/corrections` | 50 (UX-4) |
 | `/invites` | `/settings#invites` | 50 (UX-0 shell, UX-5 permanent redirect) |
 | `/search/results` | `/search` | 51 (UX-9) |
-| `/missions/queue` | `/missions?view=queue` or the missions list's queue section | 51 (UX-6) |
+| `/missions/queue` | `/missions?view=queue` (permanent 308; query filters retained) | 51 (UX-6) |
 
 ---
 
