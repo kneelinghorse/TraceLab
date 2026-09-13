@@ -1,3 +1,9 @@
+import { HttpError } from "@/lib/api/http";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { PaginationBar } from "@/components/ui/PaginationBar";
+import { PageState } from "@/components/ui/PageState";
+import { Dialog } from "@/components/ui/Dialog";
+import { useFeedback } from "@/components/ui/useFeedback";
 /**
  * Project detail page - view/edit project, manage documents
  */
@@ -17,12 +23,13 @@ const RESEARCH_TYPES = ["strategic", "tactical", "generative", "evaluative"] as 
 const PAGE_SIZE = 10;
 
 export default function ProjectDetailPage() {
+  const { askConfirmation, notify, feedback } = useFeedback();
   const router = useRouter();
   const { id } = router.query;
   const projectId = typeof id === "string" ? id : "";
 
   // Project data
-  const { data: project, mutate: mutateProject, isLoading: projectLoading } = useSWR<Project>(
+  const { data: project, mutate: mutateProject, isLoading: projectLoading, error: projectError } = useSWR<Project>(
     projectId ? ["project", projectId] : null,
     () => projectsApi.getProject(projectId)
   );
@@ -35,7 +42,7 @@ export default function ProjectDetailPage() {
 
   // Documents for this project
   const [docPage, setDocPage] = useState(1);
-  const { data: documentsResponse, mutate: mutateDocuments, isLoading: docsLoading } = useSWR<PaginatedResponse<Document>>(
+  const { data: documentsResponse, mutate: mutateDocuments, isLoading: docsLoading, error: docsError } = useSWR<PaginatedResponse<Document>>(
     projectId ? ["documents", projectId, "", "", docPage] : null,
     () => documentsApi.listDocuments({ projectId, page: docPage, pageSize: PAGE_SIZE })
   );
@@ -89,7 +96,7 @@ export default function ProjectDetailPage() {
       setEditing(false);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to save";
-      alert(message);
+      notify(message);
     } finally {
       setSaving(false);
     }
@@ -106,14 +113,14 @@ export default function ProjectDetailPage() {
       router.push("/projects");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to delete";
-      alert(message);
+      notify(message);
       setDeleting(false);
       setShowDeleteConfirm(false);
     }
   };
 
   const handleDeleteDocument = async (documentId: string) => {
-    if (!confirm("Delete this document?")) return;
+    if (!await askConfirmation("Delete this document?")) return;
 
     try {
       await documentsApi.deleteDocument(documentId);
@@ -121,7 +128,7 @@ export default function ProjectDetailPage() {
       await mutateStats();
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to delete";
-      alert(message);
+      notify(message);
     }
   };
 
@@ -179,9 +186,13 @@ export default function ProjectDetailPage() {
     return null;
   }
 
+  if (projectError instanceof HttpError && projectError.status === 404) return <AuthGate><PageState state="empty" title="Project not found." /></AuthGate>;
+  if (projectError) return <AuthGate><PageState state="error" title="Project could not load." onRetry={() => void mutateProject()} /></AuthGate>;
+
   if (projectLoading) {
     return (
       <AuthGate>
+      {feedback}
         <div className="min-h-screen bg-background dark:bg-background flex items-center justify-center">
           <p className="text-muted">Loading project...</p>
         </div>
@@ -192,6 +203,7 @@ export default function ProjectDetailPage() {
   if (!project) {
     return (
       <AuthGate>
+      {feedback}
         <div className="min-h-screen bg-background dark:bg-background flex items-center justify-center">
           <div className="text-center">
             <p className="text-muted mb-4">Project not found</p>
@@ -206,6 +218,7 @@ export default function ProjectDetailPage() {
 
   return (
     <AuthGate>
+      {feedback}
       <div className="min-h-screen bg-background dark:bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Breadcrumb */}
@@ -224,6 +237,7 @@ export default function ProjectDetailPage() {
                 <div>
                   <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Name *</label>
                   <input
+                    aria-label="Project name"
                     type="text"
                     value={editForm.name}
                     onChange={(e) => setEditForm((prev) => ({ ...prev, name: e.target.value }))}
@@ -233,6 +247,7 @@ export default function ProjectDetailPage() {
                 <div>
                   <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Description</label>
                   <textarea
+                    aria-label="Project description"
                     value={editForm.description}
                     onChange={(e) => setEditForm((prev) => ({ ...prev, description: e.target.value }))}
                     rows={3}
@@ -242,6 +257,7 @@ export default function ProjectDetailPage() {
                 <div>
                   <label className="block text-sm font-medium text-secondary dark:text-secondary mb-1">Research Type</label>
                   <select
+                    aria-label="Research type"
                     value={editForm.research_type}
                     onChange={(e) => setEditForm((prev) => ({ ...prev, research_type: e.target.value }))}
                     className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground"
@@ -273,7 +289,7 @@ export default function ProjectDetailPage() {
               </div>
             ) : (
               <div>
-                <div className="flex items-start justify-between">
+                <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <h1 className="text-2xl font-bold text-foreground dark:text-foreground">{project.name}</h1>
                     {project.description && (
@@ -317,12 +333,9 @@ export default function ProjectDetailPage() {
           </div>
 
           {/* Delete Confirmation Modal */}
-          {showDeleteConfirm && (
-            <div className="fixed inset-0 bg-backdrop/50 flex items-center justify-center z-50">
-              <div className="bg-surface dark:bg-surface rounded-lg p-6 max-w-md w-full mx-4">
-                <h3 className="text-lg font-semibold text-foreground dark:text-foreground mb-2">Delete Project?</h3>
+          <Dialog open={showDeleteConfirm} title="Delete project" onClose={() => { if (!deleting) setShowDeleteConfirm(false); }}>
                 <p className="text-secondary dark:text-muted mb-4">
-                  This will permanently delete <strong>{project.name}</strong> and all its documents, chunks, and associated data. This action cannot be undone.
+                  This will delete <strong>{project.name}</strong> and all its documents, chunks, and associated data.
                 </p>
                 <div className="flex gap-3 justify-end">
                   <button
@@ -340,9 +353,7 @@ export default function ProjectDetailPage() {
                     {deleting ? "Deleting..." : "Delete Project"}
                   </button>
                 </div>
-              </div>
-            </div>
-          )}
+          </Dialog>
 
           <div className="grid gap-6 lg:grid-cols-3">
             {/* Documents List */}
@@ -351,7 +362,7 @@ export default function ProjectDetailPage() {
                 <h2 className="text-lg font-semibold text-foreground dark:text-foreground">Documents</h2>
               </div>
 
-              {docsLoading && !documentsResponse ? (
+              {docsError ? <PageState state="error" title="Documents could not load." onRetry={() => void mutateDocuments()} /> : docsLoading && !documentsResponse ? (
                 <p className="text-muted">Loading documents...</p>
               ) : documents.length === 0 ? (
                 <div className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-8 text-center">
@@ -364,7 +375,7 @@ export default function ProjectDetailPage() {
                       key={doc.id}
                       className="bg-surface dark:bg-surface border border-line dark:border-line rounded-lg p-4"
                     >
-                      <div className="flex items-start justify-between">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <Link
                             href={`/documents/${doc.id}`}
@@ -396,29 +407,7 @@ export default function ProjectDetailPage() {
                   ))}
 
                   {/* Pagination */}
-                  {docPagination && docPagination.pages > 1 && (
-                    <div className="flex items-center justify-between pt-2 text-sm">
-                      <span className="text-muted">
-                        Page {docPagination.page} of {docPagination.pages}
-                      </span>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setDocPage((p) => Math.max(1, p - 1))}
-                          disabled={docPage === 1}
-                          className="px-3 py-1 border border-line-strong dark:border-line-strong rounded disabled:opacity-40"
-                        >
-                          Prev
-                        </button>
-                        <button
-                          onClick={() => setDocPage((p) => Math.min(docPagination.pages, p + 1))}
-                          disabled={docPage >= docPagination.pages}
-                          className="px-3 py-1 border border-line-strong dark:border-line-strong rounded disabled:opacity-40"
-                        >
-                          Next
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                  <PaginationBar page={docPage} pages={docPagination?.pages ?? 0} onChange={setDocPage} label="Project document pages" />
                 </div>
               )}
             </section>
@@ -524,19 +513,5 @@ function StatCard({ label, value }: { label: string; value: number | string }) {
       <p className="text-2xl font-bold text-foreground dark:text-foreground">{value}</p>
       <p className="text-xs text-muted dark:text-muted">{label}</p>
     </div>
-  );
-}
-
-function StatusBadge({ label, status }: { label: string; status: boolean }) {
-  return (
-    <span
-      className={`px-2 py-0.5 text-xs rounded ${
-        status
-          ? "bg-success-surface text-success dark:bg-success-surface dark:text-success"
-          : "bg-surface text-secondary dark:bg-surface-alt dark:text-muted"
-      }`}
-    >
-      {status ? "✓" : "○"} {label}
-    </span>
   );
 }

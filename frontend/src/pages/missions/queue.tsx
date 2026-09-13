@@ -1,3 +1,5 @@
+import { PageState } from "@/components/ui/PageState";
+import { useFeedback } from "@/components/ui/useFeedback";
 import { useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 
@@ -8,14 +10,14 @@ import {
   EmptyQueueState,
   RefreshIndicator,
 } from "@/components/queue";
-import { useApiMissions, calculateQueuePosition } from "@/lib/hooks/useMissions";
+import { useApiMissions } from "@/lib/hooks/useMissions";
 import { useInterval } from "@/lib/hooks/useInterval";
 import { missionsApi } from "@/lib/api/missions";
-import type { ApiMission } from "@/types/mission";
 
 const REFRESH_INTERVAL = 30000; // 30 seconds
 
 function MissionQueueContent() {
+  const { askConfirmation, notify, feedback } = useFeedback();
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -23,12 +25,14 @@ function MissionQueueContent() {
   const {
     missions: inProgressMissions,
     isLoading: loadingInProgress,
+    error: runningError,
     refresh: refreshInProgress,
   } = useApiMissions({ status: "in_progress", pageSize: 100 });
 
   const {
     missions: queuedMissions,
     isLoading: loadingQueued,
+    error: queuedError,
     refresh: refreshQueued,
   } = useApiMissions({ status: "queued", pageSize: 100 });
 
@@ -56,13 +60,13 @@ function MissionQueueContent() {
 
   // Cancel mission handler
   const handleCancelMission = async (missionId: string) => {
-    if (!confirm("Are you sure you want to cancel this mission?")) return;
+    if (!await askConfirmation("Are you sure you want to cancel this mission?")) return;
 
     try {
       await missionsApi.update(missionId, { status: "cancelled" });
       handleRefresh();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to cancel mission");
+      notify(err instanceof Error ? err.message : "Failed to cancel mission");
     }
   };
 
@@ -80,6 +84,7 @@ function MissionQueueContent() {
 
   return (
     <div className="min-h-screen bg-background dark:bg-background">
+      {feedback}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
@@ -117,7 +122,7 @@ function MissionQueueContent() {
           </div>
         </header>
 
-        {isLoading && !hasActiveMissions ? (
+        {runningError || queuedError ? <PageState state="error" title="Mission queue could not load." onRetry={() => void handleRefresh()} /> : isLoading && !hasActiveMissions ? (
           <div className="py-12 text-center">
             <p className="text-muted dark:text-muted">Loading queue...</p>
           </div>

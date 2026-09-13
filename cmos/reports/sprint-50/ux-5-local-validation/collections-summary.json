@@ -1,0 +1,8 @@
+{
+  "base": "http://127.0.0.1:3103",
+  "checkedAt": "2026-09-13T14:41:05.846Z",
+  "checks": 4,
+  "routes": 1,
+  "failures": [],
+  "readOnlyApiProxy": true
+}

@@ -1,3 +1,4 @@
+import { useFeedback } from "@/components/ui/useFeedback";
 /**
  * Document upload page - standalone upload for cross-project uploads
  */
@@ -13,6 +14,7 @@ import { useState } from "react";
 import useSWR, { mutate as globalMutate } from "swr";
 
 export default function DocumentUploadPage() {
+  const { notify, feedback } = useFeedback();
   const router = useRouter();
   const [selectedProject, setSelectedProject] = useState<string>("");
   const [files, setFiles] = useState<File[]>([]);
@@ -51,12 +53,12 @@ export default function DocumentUploadPage() {
 
   const handleUpload = async () => {
     if (!selectedProject) {
-      alert("Please select a project");
+      notify("Please select a project");
       return;
     }
 
     if (files.length === 0) {
-      alert("Please select files to upload");
+      notify("Please select files to upload");
       return;
     }
 
@@ -104,6 +106,7 @@ export default function DocumentUploadPage() {
 
   return (
     <AuthGate>
+      {feedback}
       <div className="min-h-screen bg-background dark:bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}

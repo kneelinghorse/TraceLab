@@ -1,3 +1,6 @@
+import { HttpError } from "@/lib/api/http";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { PageState } from "@/components/ui/PageState";
 import { Dialog } from "@/components/ui/Dialog";
 import { EvidencePanel } from "@/components/evidence/EvidencePanel";
 /**
@@ -127,31 +130,10 @@ export default function ReportDetailPage() {
     }
   };
 
-  const getStatusBadge = (status: ReportStatus) => {
-    const baseClasses = "px-3 py-1 rounded-full text-sm font-medium cursor-pointer transition-colors";
-    if (status === "final") {
-      return (
-        <button
-          onClick={handleToggleStatus}
-          className={`${baseClasses} bg-success-surface dark:bg-success-surface text-success dark:text-success hover:bg-success-surface dark:hover:bg-success-surface`}
-          title="Click to change to draft"
-        >
-          Final
-        </button>
-      );
-    }
-    return (
-      <button
-        onClick={handleToggleStatus}
-        className={`${baseClasses} bg-warning-surface dark:bg-warning-surface text-warning dark:text-warning hover:bg-warning-surface dark:hover:bg-warning-surface`}
-        title="Click to finalize"
-      >
-        Draft
-      </button>
-    );
-  };
 
-  if (loadError) return <AuthGate><div role="alert" className="p-6">Report could not be loaded. <button className="underline" onClick={() => void mutate()}>Retry</button></div></AuthGate>;
+
+  if (loadError instanceof HttpError && loadError.status === 404) return <AuthGate><PageState state="empty" title="Report not found." /></AuthGate>;
+  if (loadError) return <AuthGate><PageState state="error" title="Report could not be loaded." onRetry={() => void mutate()} /></AuthGate>;
 
   if (isLoading || !report) {
     return (
@@ -226,7 +208,7 @@ export default function ReportDetailPage() {
                     <h1 className="text-2xl font-bold text-foreground dark:text-foreground">
                       {report.title}
                     </h1>
-                    {getStatusBadge(report.status)}
+                    <button type="button" onClick={handleToggleStatus} title={report.status === "final" ? "Click to change to draft" : "Click to finalize"}><StatusBadge status={report.status} /></button>
                   </div>
                   <div className="flex max-w-full flex-wrap gap-2">
                     <div className="relative" ref={exportRef}>

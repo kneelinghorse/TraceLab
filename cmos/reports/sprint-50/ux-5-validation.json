@@ -1,0 +1,51 @@
+{
+  "mission": "UX-5",
+  "local": {
+    "frontend_unit": {
+      "passed": 115,
+      "skipped": 0
+    },
+    "browser": {
+      "passed": 22,
+      "skipped": 0,
+      "note": "All four browser suites ran together against the final production build."
+    },
+    "eslint": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "type_check": "passed",
+    "foundational_refs": "passed",
+    "route_smoke": {
+      "base": "http://127.0.0.1:3103",
+      "checkedAt": "2026-09-13T14:38:35.414Z",
+      "checks": 124,
+      "routes": 31,
+      "failures": [],
+      "readOnlyApiProxy": true
+    },
+    "build": "passed",
+    "collection_layout_smoke": {
+      "base": "http://127.0.0.1:3103",
+      "checkedAt": "2026-09-13T14:41:05.846Z",
+      "checks": 4,
+      "routes": 1,
+      "failures": [],
+      "readOnlyApiProxy": true
+    }
+  },
+  "remaining": [
+    "Required CI at final PR revision",
+    "Merge and deployed 31-route baseline",
+    "Archive production screenshots and close CMOS mission/sprint"
+  ],
+  "test_setup_corrections": [
+    "Report dialog fixture initially had no collection chunks, correctly disabling report creation. Corrected fixture to contain one real-shaped chunk.",
+    "Browser tests exposed focus restoration lost by conditionally mounting autofocus modal content. Retaining closed native dialogs fixes report and user-delete focus restoration.",
+    "Earlier all-route run counted an aborted navigation request as a transport failure. The harness now records only net::ERR_ABORTED separately; final 124 measurements passed."
+  ],
+  "limitations": [
+    "Production browser validation is read-only; explicit mutation acceptance, cancellation and failures use mocked HTTP unit/browser tests.",
+    "The local 124-route pass predates the final modal focus fixes and collection card layout adjustment; targeted built-browser checks cover those changes, followed by the complete deployed baseline."
+  ]
+}

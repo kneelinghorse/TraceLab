@@ -1,3 +1,6 @@
+import { HttpError } from "@/lib/api/http";
+import { PageState } from "@/components/ui/PageState";
+import { useFeedback } from "@/components/ui/useFeedback";
 /**
  * Collection detail page
  */
@@ -12,6 +15,7 @@ import { useState } from "react";
 import useSWR from "swr";
 
 export default function CollectionDetailPage() {
+  const { askConfirmation, notify, feedback } = useFeedback();
   const router = useRouter();
   const { id } = router.query;
   const [isEditing, setIsEditing] = useState(false);
@@ -21,7 +25,7 @@ export default function CollectionDetailPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
-  const { data: collection, mutate, isLoading } = useSWR<CollectionDetail>(
+  const { data: collection, mutate, isLoading, error } = useSWR<CollectionDetail>(
     id ? `collection-${id}` : null,
     () => collectionsApi.get(id as string)
   );
@@ -55,7 +59,7 @@ export default function CollectionDetailPage() {
 
   const handleDelete = async () => {
     if (!collection) return;
-    if (!confirm(`Delete collection "${collection.name}"? This will not delete the chunks themselves.`)) {
+    if (!await askConfirmation(`Delete collection "${collection.name}"? This will not delete the chunks themselves.`)) {
       return;
     }
 
@@ -64,20 +68,20 @@ export default function CollectionDetailPage() {
       router.push("/collections");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to delete collection";
-      alert(message);
+      notify(message);
     }
   };
 
   const handleRemoveChunk = async (item: CollectionItem) => {
     if (!collection) return;
-    if (!confirm("Remove this chunk from the collection?")) return;
+    if (!await askConfirmation("Remove this chunk from the collection?")) return;
 
     try {
       await collectionsApi.removeChunk(collection.id, item.chunk_id);
       mutate();
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to remove chunk";
-      alert(message);
+      notify(message);
     }
   };
 
@@ -88,24 +92,20 @@ export default function CollectionDetailPage() {
       await collectionsApi.exportMarkdown(collection.id);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to export collection";
-      alert(message);
+      notify(message);
     } finally {
       setIsExporting(false);
     }
   };
 
-  if (isLoading || !collection) {
-    return (
-      <AuthGate>
-        <div className="min-h-screen bg-background dark:bg-background flex items-center justify-center">
-          <p className="text-muted">Loading collection...</p>
-        </div>
-      </AuthGate>
-    );
-  }
+  if (error instanceof HttpError && error.status === 404) return <AuthGate><PageState state="empty" title="Collection not found." /></AuthGate>;
+  if (error) return <AuthGate><PageState state="error" title="Collection could not load." onRetry={() => void mutate()} /></AuthGate>;
+  if (!router.isReady || isLoading) return <AuthGate><PageState state="loading" title="Loading collection…" /></AuthGate>;
+  if (!collection) return <AuthGate><PageState state="empty" title="Collection not found." /></AuthGate>;
 
   return (
     <AuthGate>
+      {feedback}
       <div className="min-h-screen bg-background dark:bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Back Link */}
@@ -126,7 +126,8 @@ export default function CollectionDetailPage() {
                   </label>
                   <input
                     type="text"
-                    value={editName}
+                    aria-label="Collection name"
+                      value={editName}
                     onChange={(e) => setEditName(e.target.value)}
                     className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground"
                     autoFocus
@@ -137,7 +138,8 @@ export default function CollectionDetailPage() {
                     Description
                   </label>
                   <textarea
-                    value={editDescription}
+                    aria-label="Collection description"
+                      value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
                     rows={2}
                     className="w-full px-4 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-surface-alt text-foreground dark:text-foreground"

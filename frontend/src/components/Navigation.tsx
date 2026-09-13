@@ -57,6 +57,7 @@ export function NavigationIcon({ name }: { name: string }) {
 }
 
 export function activeNavigationItem(path: string, items: NavigationItem[]) {
+  if (path === "/admin/corrections") path = "/admin/observability";
   return [...items].sort((a, b) => b.href.length - a.href.length).find((item) => path === item.href || (item.href !== "/" && path.startsWith(`${item.href}/`)));
 }
 

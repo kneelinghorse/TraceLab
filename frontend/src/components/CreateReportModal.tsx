@@ -1,3 +1,4 @@
+import { Dialog } from "@/components/ui/Dialog";
 /**
  * Modal for creating a new report from a collection
  */
@@ -60,28 +61,11 @@ export function CreateReportModal({
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-backdrop bg-opacity-50 transition-opacity"
-        onClick={handleClose}
-      />
-
-      {/* Modal */}
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative w-full max-w-lg bg-surface dark:bg-surface rounded-lg shadow-xl">
-          {/* Header */}
-          <div className="px-6 py-4 border-b border-line dark:border-line">
-            <h2 className="text-xl font-semibold text-foreground dark:text-foreground">
-              Create Report
-            </h2>
+    <Dialog open={isOpen} title="Create Report" onClose={handleClose}>
             <p className="mt-1 text-sm text-secondary dark:text-muted">
               Synthesize content from &quot;{collectionName}&quot;
             </p>
-          </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit}>
@@ -152,7 +136,7 @@ export function CreateReportModal({
 
               {/* Error */}
               {error && (
-                <div className="p-3 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg">
+                <div role="alert" className="p-3 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg">
                   <p className="text-sm text-danger dark:text-danger">{error}</p>
                 </div>
               )}
@@ -203,8 +187,6 @@ export function CreateReportModal({
               </button>
             </div>
           </form>
-        </div>
-      </div>
-    </div>
+    </Dialog>
   );
 }

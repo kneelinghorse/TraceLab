@@ -1,3 +1,5 @@
+import { Dialog } from "@/components/ui/Dialog";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 /**
  * Admin → Users management (T48.2).
  *
@@ -31,16 +33,6 @@ function roleOptions(currentRole: Role | null, isOwnerCaller: boolean): Role[] {
   return ROLE_ORDER.filter((r) => r !== "owner" || isOwnerCaller || currentRole === "owner");
 }
 
-function StatusBadge({ active }: { active: boolean }) {
-  const classes = active
-    ? "bg-success-surface text-success dark:bg-success-surface dark:text-success"
-    : "bg-surface-alt text-secondary dark:bg-surface-alt dark:text-secondary";
-  return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${classes}`}>
-      {active ? "Active" : "Disabled"}
-    </span>
-  );
-}
 
 export function UsersAdmin() {
   const { role: callerRole } = useRole();
@@ -188,7 +180,7 @@ export function UsersAdmin() {
                           </select>
                         </td>
                         <td className="py-3 pr-4">
-                          <StatusBadge active={u.is_active} />
+                          <StatusBadge status={u.is_active} label={u.is_active ? "Active" : "Disabled"} />
                         </td>
                         <td className="py-3 pr-4">
                           <div className="flex items-center gap-3">
@@ -221,22 +213,7 @@ export function UsersAdmin() {
         </section>
       </div>
 
-      {pendingDelete && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="delete-dialog-title"
-          onKeyDown={(e) => {
-            if (e.key === "Escape") {
-              setPendingDelete(null);
-            }
-          }}
-          className="fixed inset-0 z-30 grid place-items-center bg-backdrop/50 px-4"
-        >
-          <div className="max-w-md w-full rounded-lg bg-surface dark:bg-surface border border-line dark:border-line p-6">
-            <h2 id="delete-dialog-title" className="text-lg font-semibold text-foreground dark:text-foreground">
-              Delete {pendingDelete.email}?
-            </h2>
+        <Dialog open={Boolean(pendingDelete)} title={pendingDelete ? `Delete ${pendingDelete.email}?` : "Delete user"} onClose={() => { if (busyId !== pendingDelete?.id) setPendingDelete(null); }}>
             <p className="mt-2 text-sm text-secondary dark:text-secondary">
               This permanently deletes the account along with its API keys and invite codes. Any
               projects, collections, documents, missions, and reports they own are kept, but their
@@ -245,7 +222,9 @@ export function UsersAdmin() {
             <div className="mt-5 flex justify-end gap-3">
               <button
                 ref={cancelDeleteRef}
+                autoFocus
                 type="button"
+                disabled={Boolean(pendingDelete && busyId === pendingDelete.id)}
                 onClick={() => setPendingDelete(null)}
                 className="px-4 py-2 text-sm font-medium text-secondary dark:text-secondary hover:text-foreground dark:hover:text-foreground"
               >
@@ -254,15 +233,13 @@ export function UsersAdmin() {
               <button
                 type="button"
                 onClick={confirmDelete}
-                disabled={busyId === pendingDelete.id}
+                disabled={!pendingDelete || busyId === pendingDelete.id}
                 className="px-4 py-2 text-sm font-medium bg-danger-surface text-danger rounded-lg hover:bg-danger-surface disabled:opacity-50"
               >
                 Delete user
               </button>
             </div>
-          </div>
-        </div>
-      )}
+        </Dialog>
     </div>
   );
 }

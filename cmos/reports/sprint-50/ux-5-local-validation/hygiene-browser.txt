@@ -1,0 +1,24 @@
+Running 4 tests using 4 workers
+
+(node:54605) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54604) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54606) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54607) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54606) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54607) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54605) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54604) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › tests/e2e/hygiene.spec.ts:13:7 › shared confirmations and collection forms are accessible in dark at 1440 (2.2s)
+  ✓  4 [chromium] › tests/e2e/hygiene.spec.ts:13:7 › shared confirmations and collection forms are accessible in light at 390 (2.2s)
+  ✓  3 [chromium] › tests/e2e/hygiene.spec.ts:13:7 › shared confirmations and collection forms are accessible in dark at 390 (2.2s)
+  ✓  2 [chromium] › tests/e2e/hygiene.spec.ts:13:7 › shared confirmations and collection forms are accessible in light at 1440 (2.2s)
+
+  4 passed (2.9s)

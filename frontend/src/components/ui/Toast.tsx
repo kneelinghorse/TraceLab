@@ -1,0 +1,3 @@
+export function Toast({ message, onDismiss, tone = "error" }: { message: string; onDismiss: () => void; tone?: "error" | "success" }) {
+  return <div role={tone === "error" ? "alert" : "status"} className={`fixed bottom-4 right-4 z-50 flex max-h-[50vh] w-[calc(100%-2rem)] max-w-md items-start gap-3 overflow-auto rounded-xl border p-4 shadow-lg ${tone === "error" ? "border-danger-line bg-danger-surface text-danger" : "border-success-line bg-success-surface text-success"}`}><p className="min-w-0 flex-1 break-words text-sm">{message}</p><button type="button" onClick={onDismiss} aria-label="Dismiss notification" className="shrink-0 rounded border border-current px-2 py-1 text-xs">Dismiss</button></div>;
+}

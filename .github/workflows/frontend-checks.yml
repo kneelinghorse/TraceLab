@@ -1,5 +1,5 @@
 # ABOUTME: Runs blocking frontend unit tests and TypeScript checks in CI.
-# ABOUTME: Keeps ESLint visible as an advisory while its baseline is cleaned up.
+# ABOUTME: Enforces the shared frontend hygiene baseline.
 
 name: Frontend Checks
 
@@ -53,8 +53,7 @@ jobs:
         run: npm run type-check
 
   lint:
-    name: lint (advisory)
-    continue-on-error: true
+    name: lint
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

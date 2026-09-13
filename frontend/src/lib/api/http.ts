@@ -78,6 +78,10 @@ export const buildApiUrl = (path: string, params?: RequestParams): string => {
   return `${API_BASE_URL}${buildRelativePath(path, params)}`;
 };
 
+export class HttpError extends Error {
+  constructor(message: string, readonly status: number) { super(message); this.name = "HttpError"; }
+}
+
 export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
   const { skipAuth = false, headers, params, ...rest } = options;
   const resolvedHeaders = new Headers(headers ?? undefined);
@@ -104,12 +108,12 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
       window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
     }
     const detail = await response.text();
-    throw new Error(detail || "Unauthorized – please sign in again.");
+    throw new HttpError(detail || "Unauthorized – please sign in again.", 401);
   }
 
   if (!response.ok) {
     const detail = await response.text();
-    throw new Error(detail || `Request to ${path} failed with status ${response.status}`);
+    throw new HttpError(detail || `Request to ${path} failed with status ${response.status}`, response.status);
   }
 
   if (response.status === 204) {

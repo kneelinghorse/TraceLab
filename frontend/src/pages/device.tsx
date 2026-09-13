@@ -22,9 +22,13 @@ import {
 } from "@/lib/api/deviceAuth";
 
 export default function DeviceApprovalPage() {
+  const router = useRouter();
+  const incoming = router.query.code;
+  const value = Array.isArray(incoming) ? incoming[0] : incoming;
+  const initialCode = router.isReady && typeof value === "string" && value.length >= 4 ? formatUserCode(value) : "";
   return (
     <AuthGate>
-      <DeviceApproval />
+      <DeviceApproval key={initialCode} initialCode={initialCode} />
     </AuthGate>
   );
 }
@@ -37,23 +41,22 @@ type Outcome =
   | { kind: "denied" }
   | { kind: "error"; message: string };
 
-function DeviceApproval() {
-  const router = useRouter();
-  const [code, setCode] = useState<string>("");
+function DeviceApproval({ initialCode }: { initialCode: string }) {
+  const [code, setCode] = useState(initialCode);
   const [labelOverride, setLabelOverride] = useState<string>("");
-  const [outcome, setOutcome] = useState<Outcome>({ kind: "idle" });
+  const [outcome, setOutcome] = useState<Outcome>({ kind: initialCode ? "loading" : "idle" });
 
-  // Pre-fill from ?code=ABCD-EFGH and auto-fetch the preview.
+  // Only the read preview runs automatically; approval always requires a click.
   useEffect(() => {
-    if (!router.isReady) return;
-    const incoming = router.query.code;
-    const value = Array.isArray(incoming) ? incoming[0] : incoming;
-    if (typeof value === "string" && value.length >= 4) {
-      const normalized = formatUserCode(value);
-      setCode(normalized);
-      void loadPreview(normalized);
-    }
-  }, [router.isReady, router.query.code]);
+    if (!initialCode) return;
+    let active = true;
+    previewDeviceGrant(initialCode).then(grant => {
+      if (active) setOutcome({ kind: "preview", grant });
+    }).catch(err => {
+      if (active) setOutcome({ kind: "error", message: err instanceof Error ? err.message : "Could not look up that code." });
+    });
+    return () => { active = false; };
+  }, [initialCode]);
 
   async function loadPreview(userCode: string): Promise<void> {
     setOutcome({ kind: "loading" });
@@ -232,8 +235,10 @@ function PreviewPanel({
   onDeny,
   onChangeCode,
 }: PreviewPanelProps) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 15000); return () => clearInterval(timer); }, []);
   const expiresAt = new Date(grant.expires_at);
-  const minutesLeft = Math.max(0, Math.round((expiresAt.getTime() - Date.now()) / 60_000));
+  const minutesLeft = Math.max(0, Math.round((expiresAt.getTime() - now) / 60_000));
 
   if (grant.status !== "pending") {
     return (
@@ -278,7 +283,7 @@ function PreviewPanel({
         />
         <p className="mt-1 text-xs text-muted">
           Defaults to the client name. Override if you want to label this key
-          (e.g. "Work laptop", "CI runner").
+          (e.g. &quot;Work laptop&quot;, &quot;CI runner&quot;).
         </p>
       </div>
 

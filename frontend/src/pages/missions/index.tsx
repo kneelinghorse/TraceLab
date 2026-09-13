@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { PaginationBar } from "@/components/ui/PaginationBar";
+import { PageState } from "@/components/ui/PageState";
+import { useState } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 
@@ -22,28 +25,6 @@ const MISSION_STATUSES: { value: MissionStatus | "all"; label: string }[] = [
   { value: "cancelled", label: "Cancelled" },
   { value: "validation_failed", label: "Validation Failed" },
 ];
-
-const STATUS_COLORS: Record<MissionStatus, { bg: string; text: string; dot: string }> = {
-  draft: { bg: "bg-surface dark:bg-surface-alt", text: "text-secondary dark:text-secondary", dot: "bg-surface-alt" },
-  queued: { bg: "bg-warning-surface dark:bg-warning-surface", text: "text-warning dark:text-warning", dot: "bg-warning" },
-  in_progress: { bg: "bg-info-surface dark:bg-info-surface", text: "text-accent-text dark:text-accent-text", dot: "bg-accent" },
-  completed: { bg: "bg-success-surface dark:bg-success-surface", text: "text-success dark:text-success", dot: "bg-success" },
-  blocked: { bg: "bg-danger-surface dark:bg-danger-surface", text: "text-danger dark:text-danger", dot: "bg-danger" },
-  cancelled: { bg: "bg-surface dark:bg-surface-alt", text: "text-muted dark:text-muted", dot: "bg-surface-alt" },
-  validation_failed: { bg: "bg-warning-surface dark:bg-warning-surface", text: "text-warning dark:text-warning", dot: "bg-warning" },
-};
-
-function StatusBadge({ status }: { status: MissionStatus }) {
-  const colors = STATUS_COLORS[status] ?? STATUS_COLORS.draft;
-  const label = status.replace("_", " ");
-
-  return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${colors.bg} ${colors.text}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${colors.dot}`} />
-      {label.charAt(0).toUpperCase() + label.slice(1)}
-    </span>
-  );
-}
 
 function QueuePosition({ position }: { position: number | null }) {
   if (position === null) return null;
@@ -113,40 +94,6 @@ function MissionCard({ mission, queuePosition }: MissionCardProps) {
   );
 }
 
-interface PaginationProps {
-  page: number;
-  totalPages: number;
-  onChange: (page: number) => void;
-}
-
-function Pagination({ page, totalPages, onChange }: PaginationProps) {
-  if (totalPages <= 1) return null;
-
-  return (
-    <div className="flex items-center justify-between pt-4 text-sm text-secondary dark:text-muted">
-      <span>
-        Page {page} of {totalPages}
-      </span>
-      <div className="flex gap-2">
-        <button
-          onClick={() => onChange(Math.max(1, page - 1))}
-          disabled={page === 1}
-          className="px-3 py-1.5 border border-line-strong dark:border-line-strong rounded-lg disabled:opacity-40 hover:bg-background dark:hover:bg-surface-alt transition-colors"
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => onChange(Math.min(totalPages, page + 1))}
-          disabled={page >= totalPages}
-          className="px-3 py-1.5 border border-line-strong dark:border-line-strong rounded-lg disabled:opacity-40 hover:bg-background dark:hover:bg-surface-alt transition-colors"
-        >
-          Next
-        </button>
-      </div>
-    </div>
-  );
-}
-
 function MissionsContent() {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<MissionStatus | "all">("all");
@@ -168,9 +115,6 @@ function MissionsContent() {
   });
 
   // Reset page when filters change
-  useEffect(() => {
-    setPage(1);
-  }, [statusFilter, projectFilter]);
 
   const totalPages = pagination?.pages ?? 0;
 
@@ -202,7 +146,7 @@ function MissionsContent() {
                 <select
                   id="status-filter"
                   value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value as MissionStatus | "all")}
+                  onChange={(e) => { setStatusFilter(e.target.value as MissionStatus | "all"); setPage(1); }}
                   className="px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground text-sm"
                 >
                   {MISSION_STATUSES.map((s) => (
@@ -220,7 +164,7 @@ function MissionsContent() {
                 <select
                   id="project-filter"
                   value={projectFilter}
-                  onChange={(e) => setProjectFilter(e.target.value)}
+                  onChange={(e) => { setProjectFilter(e.target.value); setPage(1); }}
                   className="px-3 py-2 border border-line-strong dark:border-line-strong rounded-lg bg-surface dark:bg-background text-foreground dark:text-foreground text-sm"
                 >
                   <option value="all">All Projects</option>
@@ -241,18 +185,8 @@ function MissionsContent() {
             </button>
           </div>
 
-          {error && (
-            <div className="mb-4 p-4 bg-danger-surface dark:bg-danger-surface border border-danger-line dark:border-danger-line rounded-lg">
-              <p className="text-sm text-danger dark:text-danger">
-                Failed to load missions: {error.message}
-              </p>
-            </div>
-          )}
-
-          {isLoading && !missions.length ? (
-            <div className="py-12 text-center">
-              <p className="text-muted dark:text-muted">Loading missions...</p>
-            </div>
+          {error ? <PageState state="error" title="Missions could not load." onRetry={() => void refresh()} /> : isLoading && !missions.length ? (
+            <PageState state="loading" title="Loading missions…" />
           ) : missions.length === 0 ? (
             <div className="py-12 text-center">
               <p className="text-muted dark:text-muted">
@@ -276,7 +210,7 @@ function MissionsContent() {
                   />
                 ))}
               </div>
-              <Pagination page={page} totalPages={totalPages} onChange={setPage} />
+              <PaginationBar page={page} pages={totalPages} onChange={setPage} />
             </>
           )}
         </div>
