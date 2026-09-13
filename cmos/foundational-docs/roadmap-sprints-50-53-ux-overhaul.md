@@ -118,7 +118,7 @@ Key decisions carried forward: hexagonal boundaries stay (routers → services �
 
 ## Implementation Plan
 
-### Sprint 50 — Recovery and Redesign Foundation (open 2026-09-12 → 2026-09-26)
+### Sprint 50 — Recovery and Redesign Foundation (completed 2026-09-13)
 
 **Goal:** restore what was lost, then ship the foundation every later surface builds on, visible in production on every route.
 
@@ -134,6 +134,14 @@ Key decisions carried forward: hexagonal boundaries stay (routers → services �
 | UX-5 | Shared primitives, state handling, dead-code sweep, ESLint zero, test side-effect hygiene | alongside UX-0 |
 
 **Exit criteria:** every route renders inside the new shell in both themes on `tracelab.aquex.ai`; Home is the first screen; admin stats equal database counts; evidence has a page; the 29 missing behaviors are restored or explicitly declined with a reason.
+
+**Shipped:** all eight Sprint 50 missions are implemented and production-verified. RECOVER-1/2 account for all 51 audit findings (43 restored, seven superseded with reasons, one declined against schema evidence), restore ingestion edges/PEDR diagnostics/router boundaries/telemetry, and add the formatting-loss guard. UX-0/1 establish the responsive OODS shell, themes, object contract and accepted retained previews. UX-2 delivers Home; UX-3 adds evidence browsing, detail and inbound links; UX-4 replaces the console with admin observability/corrections and server-side totals; UX-5 shares controls, fixes request/empty/not-found states, removes unused components and makes ESLint a failing CI check.
+
+**Production evidence:** the final [31-route baseline](../reports/sprint-50/ux-5-production-smoke/summary.json) passed all 124 light/dark × phone/desktop measurements through direct browser requests to the deployed API, with no critical/serious axe findings, horizontal overflow or browser/API errors. Screenshots are adjacent to that receipt. Home/admin counts were checked against production: 433 missions (424 completed, one blocked, eight validation failures), 51 projects, 1,584 documents and 16,431 chunks. The research evidence session has 370 entries (191 supporting, 170 background, nine rejected); the original 50-entry research baseline above is historical. See the [UX-3 receipt](../reports/sprint-50/ux-3-validation.json), [UX-4 receipt](../reports/sprint-50/ux-4-validation.json) and [UX-5 receipt](../reports/sprint-50/ux-5-validation.json) for exact revisions and observations.
+
+**Validation and limits:** the final frontend has 115 passing unit tests, 22 passing browser tests, zero ESLint errors/warnings and a passing production build. The required backend suite and PostgreSQL 15 integration pass; their explicit skips/quarantine counts and the existing advisory full-Ruff/mypy failures remain recorded in the UX-5 receipt. Production UI smokes are read-only; mutations are exercised through deterministic unit/browser/API tests.
+
+**Moved:** no unfinished Sprint 50 mission is carried. Sprint 51 remains planned and unopened: job run views, project bundles, deeper document/collection/report workflows, search and route migration retain their original scope below. Closing the foundation does not claim the entire four-sprint redesign is finished.
 
 ### Sprint 51 — The Working Surfaces
 
@@ -246,7 +254,7 @@ A UI mission is not done until all of the following are true. Each rule exists b
 | `/console` | `/admin/observability` | 50 (UX-4) |
 | `/console/missions`, `/console/missions/{id}` | `/missions`, `/missions/{id}` | 50 (UX-4) |
 | `/console/corrections` | `/admin/corrections` | 50 (UX-4) |
-| `/invites` | `/settings#invites` | 50 (UX-0) |
+| `/invites` | `/settings#invites` | 50 (UX-0 shell, UX-5 permanent redirect) |
 | `/search/results` | `/search` | 51 (UX-9) |
 | `/missions/queue` | `/missions?view=queue` or the missions list's queue section | 51 (UX-6) |
 
@@ -267,5 +275,7 @@ A UI mission is not done until all of the following are true. Each rule exists b
 - **2026-09-12** — Created at Sprint 50 open from the UX Baseline, TL-UX-R001, the d592c92 audit, and Derek's seven redesign decisions (decision #379). Sprint 50 missions RECOVER-1/2 and UX-0 through UX-5 recorded in CMOS.
 - **2026-09-13 UTC** — Removed the stale cross-repository fallback to match the user's ownership correction (decision #391, learning #155). Forge completion evidence remains an acceptance dependency; TraceLab PR257's merge alone does not close UX-1.
 - **2026-09-13 UTC, acceptance reconciled** — UX-1's subsequent acceptance and final Forge runtime success resolve the earlier handoff dependency. Accepted retained schemas/previews support TraceLab implementation without a new setup authorization. Home, Evidence and admin observability are deployed and production-verified; UX-5 closes after its own deployment checks.
+
+- **2026-09-13 UTC, Sprint 50 close** — Recorded deployed recovery and UX-0–5 outcomes, exact validation receipts, and no unfinished carryover. Sprint 51 remains planned.
 
 _Truth in data, evidence as the connective tissue, one system._
