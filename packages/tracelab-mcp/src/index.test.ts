@@ -676,6 +676,25 @@ describe('MCP handlers — T40.1 mission-authoring fields surface through MCP', 
     vi.restoreAllMocks();
   });
 
+  it('collection seed instructions and all document references survive the actual MCP read path', async () => {
+    const references = Array.from({ length: 123 }, (_, index) => ({
+      title: `Source ${index}`, document_id: `document-${index}`, href: `/documents/document-${index}`,
+    }));
+    const context = { collection_id: 'source-collection', document_ids: references.map(ref => ref.document_id) };
+    const background = 'Compare primary sources and preserve contradictions.';
+    mockFetch.mockResolvedValueOnce({
+      ok: true, headers: new Headers({ 'content-type': 'application/json' }),
+      json: () => Promise.resolve({ ...fullMissionFixture, context, references, background }),
+    });
+    const { handleGetMission } = await import('./index.js');
+    const response = await handleGetMission({ mission_id: TEST_UUID });
+    const payload = JSON.parse(response.content[0].text);
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining(`/missions/${TEST_UUID}`), expect.objectContaining({ method: 'GET' }));
+    expect(payload.background).toBe(background);
+    expect(payload.context).toEqual(context);
+    expect(payload.references).toEqual(references);
+  });
+
   it('handleGetMission emits all 12 T40.1 mission-authoring fields', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,

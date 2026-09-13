@@ -1967,3 +1967,46 @@ class TestEvidenceBrowser:
         detail = client.get(f"{API}/{entry['id']}", headers=_bearer(member)).json()
         assert {link["id"] for link in detail["links"]} == {str(mission.id), str(report.id)}
         assert "Hidden result" not in str(detail)
+
+
+def test_report_citations_resolve_each_source_kind_before_counting_and_paging(client, db_session, rbac_on):
+    """Ledger IDs, result missions and literal URLs each resolve; hidden matches never inflate totals."""
+    member = _user(db_session, "ux8-citations@example.test")
+    other = _user(db_session, "ux8-hidden-citations@example.test")
+    _, project = _space_project(db_session, member)
+    # This actor is a Space member, not the project owner (who may read all project evidence).
+    project.owner_id = other.id
+    db_session.commit()
+    report = Report(project_id=project.id, owner_id=member.id, title="All citation paths", content="[Primary source](https://example.test/literal)")
+    db_session.add(report)
+    db_session.flush()
+    mission = _mission(db_session, project)
+    mission.owner_id = member.id
+    mission.result_report_id = report.id
+    db_session.commit()
+    entries = []
+    for kind in ("ledger", "mission", "literal", "hidden"):
+        response = _capture(client, _bearer(member), project, session_key=f"ux8-{kind}", mission=mission if kind == "mission" else None,
+                            entries=[{"claim": f"{kind} finding", "source_url": f"https://example.test/{kind}", "disposition": "supporting"}])
+        assert response.status_code == 201, response.text
+        entries.append(response.json()["entries"][0])
+    for entry in (entries[0], entries[3]):
+        db_session.add(ReportSource(report_id=report.id, source_type="ledger_entry", source_id=entry["id"]))
+    hidden = db_session.get(LedgerEntry, UUID(entries[3]["id"]))
+    foreign_project = Project(name="Outside the reader Space", owner_id=other.id)
+    db_session.add(foreign_project)
+    db_session.flush()
+    hidden.project_id = foreign_project.id
+    hidden.owner_id = other.id
+    hidden.workspace_id = None
+    db_session.commit()
+    found = []
+    for page in (1, 2, 3):
+        response = client.get(API, headers=_bearer(member), params={"project_id": str(project.id), "report_id": str(report.id), "page": page, "page_size": 1})
+        assert response.status_code == 200, response.text
+        assert response.json()["entry_total"] == 3
+        found.extend(response.json()["entries"])
+    assert {entry["id"] for entry in found} == {entry["id"] for entry in entries[:3]}
+    for entry in found:
+        assert client.get(f"{API}/{entry['id']}", headers=_bearer(member)).status_code == 200
+    assert client.get(f"{API}/{entries[3]['id']}", headers=_bearer(member)).status_code == 404

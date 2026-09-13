@@ -10,9 +10,13 @@ from typing import Any, Literal
 from uuid import UUID
 
 from sqlalchemy.orm import Session
+from sqlalchemy.sql.elements import ColumnElement
 
 from app.core.database import SessionLocal
+from app.models.chunk import DocumentChunk
 from app.models.collection import CollectionItem
+from app.models.document import Document
+from app.models.project import Project
 from app.models.report import Report, ReportSource
 from app.services.synthesis import SynthesisService, get_synthesis_service
 
@@ -52,6 +56,7 @@ class ReportService:
         owner_id: UUID | None = None,
         workspace_id: UUID | None = None,
         accessible_project_ids: list[UUID] | None = None,
+        document_filter: ColumnElement[bool] | None = None,
     ) -> tuple[Report, list[dict[str, Any]]]:
         """Create a new report by synthesizing content.
 
@@ -80,7 +85,33 @@ class ReportService:
 
         # Perform synthesis. Omit the scope keyword on the unrestricted path so
         # legacy collaborators and cache identities retain their exact call shape.
-        if accessible_project_ids == []:
+        if document_filter is not None:
+            # Resolve document access before any provider/cache call. Never hand a
+            # readable collection back to synthesis for an unscoped re-expansion.
+            with self.session_factory() as session:
+                query = session.query(DocumentChunk.id, Document.project_id).join(
+                    Document, Document.id == DocumentChunk.document_id
+                ).join(Project, Project.id == Document.project_id).filter(
+                    document_filter, Document.deleted_at.is_(None), Project.deleted_at.is_(None)
+                )
+                if accessible_project_ids is not None:
+                    query = query.filter(Document.project_id.in_(accessible_project_ids))
+                if collection_id is not None:
+                    query = query.join(CollectionItem, CollectionItem.chunk_id == DocumentChunk.id).filter(
+                        CollectionItem.collection_id == collection_id
+                    ).order_by(CollectionItem.added_at, DocumentChunk.id)
+                else:
+                    query = query.filter(DocumentChunk.id.in_(chunk_ids or [])).order_by(DocumentChunk.id)
+                readable = query.all()
+            if readable:
+                synthesis_result = self.synthesis_service.synthesize(
+                    chunk_ids=[row.id for row in readable], prompt=prompt,
+                    output_format=output_format,
+                    accessible_project_ids=sorted({row.project_id for row in readable}, key=str),
+                )
+            else:
+                synthesis_result = SynthesisService._empty_result(include_effective_chunk_ids=True)
+        elif accessible_project_ids == []:
             synthesis_result = SynthesisService._empty_result(
                 include_effective_chunk_ids=True
             )
@@ -109,7 +140,7 @@ class ReportService:
                 chunk_id if isinstance(chunk_id, UUID) else UUID(str(chunk_id))
                 for chunk_id in synthesis_result.get("effective_chunk_ids", [])
             ]
-            if accessible_project_ids is not None
+            if accessible_project_ids is not None or document_filter is not None
             else None
         )
 

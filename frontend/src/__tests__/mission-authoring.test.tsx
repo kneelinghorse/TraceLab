@@ -100,3 +100,39 @@ it("does not reset a run after an ambiguous submission response", async () => {
   expect(mocks.submitToDeepSearch).toHaveBeenCalledTimes(1);
   expect(mocks.create).toHaveBeenCalledTimes(1);
 });
+
+it("seeds collection instructions and document references into a reviewed draft before submission", async () => {
+  const seed = { collection_id: "context", title: "Research: Source context", project_id: projectId,
+    background: "Compare the original sources.\nDocument doc-1", references: [{ title: "Original source", document_id: "doc-1", href: "/documents/doc-1" }],
+    context: { collection_id: "context", document_ids: ["doc-1"] } };
+  const onSuccess = form({ source: undefined, seed });
+  await screen.findByRole("option", { name: "Research" });
+  expect(screen.getByLabelText(/Title/)).toHaveValue(seed.title);
+  expect(screen.getByLabelText("Background")).toHaveValue(seed.background);
+  expect(mocks.create).not.toHaveBeenCalled();
+  fireEvent.change(screen.getByLabelText(/Objective/), { target: { value: "Compare the supplied primary research sources" } });
+  fireEvent.change(screen.getByRole("textbox", { name: "Success Criteria 1" }), { target: { value: "Preserve contradictions and cite the original documents" } });
+  fireEvent.click(screen.getByRole("button", { name: "Submit to DeepSearch" }));
+  await waitFor(() => expect(onSuccess).toHaveBeenCalled());
+  expect(mocks.create).toHaveBeenCalledWith(expect.objectContaining({ status: "draft", background: seed.background, context: seed.context, references: seed.references }));
+  expect(mocks.create.mock.calls[0][0]).not.toHaveProperty("collection_id");
+  expect(mocks.submitToDeepSearch).toHaveBeenCalledWith("saved");
+});
+
+it("does not choose a destination project for mixed-project collection context", async () => {
+  form({ source: undefined, seed: { collection_id: "context", title: "Mixed sources", project_id: null, background: "Instructions", references: [], context: { document_ids: ["a", "b"] } } });
+  await screen.findByRole("option", { name: "Research" });
+  expect(screen.getByLabelText(/Project/)).toHaveValue("");
+  expect(mocks.create).not.toHaveBeenCalled();
+});
+
+it("preserves document identity when editing or removing references with duplicate filenames", async () => {
+  const refs = ["first", "second", "third"].map(id => ({ title: "report.md", document_id: id, href: `/documents/${id}` }));
+  form({ source: { ...source, references: refs } });
+  await screen.findByRole("option", { name: "Research" });
+  fireEvent.change(screen.getByRole("textbox", { name: "References 1", exact: true }), { target: { value: "Renamed source" } });
+  fireEvent.click(screen.getByRole("button", { name: "Remove item 2", exact: true }));
+  fireEvent.click(screen.getByRole("button", { name: "Save and preview" }));
+  await screen.findByText("revision-1");
+  expect(mocks.create.mock.calls[0][0].references).toEqual([{ ...refs[0], title: "Renamed source" }, refs[2]]);
+});

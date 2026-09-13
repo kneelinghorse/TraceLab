@@ -130,6 +130,7 @@ Source: `app.schemas.collection`. Traits: `content/Labelled`, `lifecycle/Timesta
 | `document_id` | `CollectionItemResponse` | Collection.items[].document_id |
 | `name` | `CollectionBase`, `CollectionCreate`, `CollectionUpdate`, `CollectionResponse`, `CollectionDetailResponse` | Collection.name → Labelled.label (display alias) |
 | `description` | `CollectionBase`, `CollectionCreate`, `CollectionUpdate`, `CollectionResponse`, `CollectionDetailResponse` | Collection.description |
+| `instructions` | `CollectionBase`, `CollectionCreate`, `CollectionUpdate`, `CollectionResponse`, `CollectionDetailResponse` | Collection context instructions (UX-8 consumer extension; no Forge registry mutation). |
 | `id` | `CollectionResponse`, `CollectionDetailResponse` | Collection.id |
 | `created_at` | `CollectionResponse`, `CollectionDetailResponse` | Collection.created_at → Timestampable.created_at |
 | `updated_at` | `CollectionResponse`, `CollectionDetailResponse` | Collection.updated_at → Timestampable.updated_at |

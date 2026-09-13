@@ -273,6 +273,8 @@ def _chunk(
     document = Document(
         project_id=project_id,
         name=f"{content} document",
+        # Project visibility alone must not grant child-document access.
+        owner_id=db.get(Project, project_id).owner_id,
         file_type="report",
         source_type="report",
         deleted_at=datetime.now(UTC).replace(tzinfo=None) if deleted else None,

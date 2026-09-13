@@ -57,7 +57,7 @@ export function ProjectResources({ projectId, tab, refreshStats, onBusyChange }:
     {feedback}
     <section className="panel p-5">
       <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-semibold">{tab}</h2>{data && <p className="text-sm text-secondary">{data.total.toLocaleString()} {tab.toLowerCase()}</p>}<button className="rounded border border-line px-3 py-2 text-sm" onClick={() => void refresh().catch(() => {})}>Refresh {tab.toLowerCase()}</button></div>
-      {tab === "Collections" && <p className="mt-2 text-sm text-secondary">Collections containing readable chunks from this project.</p>}
+      {tab === "Collections" && <p className="mt-2 text-sm text-secondary">Collections containing readable documents or excerpts from this project.</p>}
       {response.error ? <PageState state="error" title={`${tab} could not load.`} onRetry={() => void response.mutate()} /> : response.isLoading ? <PageState state="loading" title={`Loading ${tab.toLowerCase()}…`} /> : data?.total === 0 ? <PageState state="empty" title={`No accessible ${tab.toLowerCase()} in this project.`} /> : data && <>
         {data.documents && <DocumentRows documents={data.documents} onDelete={id => void remove(id)} />}
         {data.evidence && <div className="mt-4 space-y-4">{data.evidence.map(entry => <EntryCard key={entry.id} entry={entry} />)}</div>}

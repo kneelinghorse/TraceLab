@@ -7,6 +7,7 @@ import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import useSWR from "swr";
 
+import type { CollectionMissionSeed } from "@/lib/api/collections";
 import { missionsApi } from "@/lib/api/missions";
 import { projectsApi } from "@/lib/api/projects";
 import {
@@ -24,6 +25,7 @@ const SECTION_CLASS =
 
 interface MissionFormProps {
   source?: ApiMission;
+  seed?: CollectionMissionSeed;
   mode?: "create" | "edit";
   onSuccess?: (mission: ApiMission) => void;
   onCancel?: () => void;
@@ -71,16 +73,16 @@ function parseJsonField(
  * Form for creating a new DeepSearch mission.
  * Supports "Save and preview" and "Submit Immediately" actions.
  */
-export function MissionForm({ onSuccess, onCancel, source, mode = "create" }: MissionFormProps) {
+export function MissionForm({ onSuccess, onCancel, source, seed, mode = "create" }: MissionFormProps) {
   const { user } = useAuth();
   const [initialValues] = useState<ApiMissionFormValues>(() => {
     const authored = Object.fromEntries(Object.keys(apiMissionFormSchema.shape)
       .filter(key => source && source[key as keyof ApiMission] != null)
       .map(key => [key, source![key as keyof ApiMission]]));
     const priority = source?.metadata?.priority;
-    return { ...defaultApiMissionFormValues, ...authored, status: "draft",
+    return { ...defaultApiMissionFormValues, ...(seed ? { title: seed.title, project_id: seed.project_id ?? "", background: seed.background, references: seed.references, context: seed.context } : {}), ...authored, status: "draft",
       priority: priority === "low" || priority === "high" ? priority : "normal",
-      mission_id: mode === "edit" ? source?.mission_id ?? "" : source ? `RUN-${crypto.randomUUID()}` : "",
+      mission_id: mode === "edit" ? source?.mission_id ?? "" : source ? `RUN-${crypto.randomUUID()}` : seed ? `COLL-${crypto.randomUUID()}` : "",
     } as ApiMissionFormValues;
   });
   const [saved, setSaved] = useState<ApiMission | null>(mode === "edit" ? source ?? null : null);
@@ -410,7 +412,12 @@ export function MissionForm({ onSuccess, onCancel, source, mode = "create" }: Mi
               items={(field.value ?? []).map((r) =>
                 typeof r === "string" ? r : (r?.title ?? "")
               )}
-              onChange={(items) => field.onChange(items.map((title) => field.value?.find(reference => reference.title === title) ?? { title }))}
+              onChange={(_items, change) => {
+                const references = field.value ?? [];
+                if (change.kind === "add") field.onChange([...references, { title: "" }]);
+                else if (change.kind === "remove") field.onChange(references.filter((_, index) => index !== change.index));
+                else field.onChange(references.map((reference, index) => index === change.index ? { ...reference, title: change.value } : reference));
+              }}
               error={errors.references?.message}
               placeholder="Seed reference title (e.g. 'Burns et al. 2022')"
               minItems={0}

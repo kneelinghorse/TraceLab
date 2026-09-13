@@ -248,7 +248,8 @@ class GraphLayerService:
 
         while queue:
             batch = _drain_queue(queue, self.PREFETCH_BATCH_SIZE)
-            urns = [item[0] for item in batch]
+            # Terminal candidates remain results, but their edges cannot expand.
+            urns = [urn for urn, depth, _ in batch if depth < config.max_depth]
             self._prefetch_edges(
                 session=session,
                 from_urns=urns,
@@ -280,13 +281,12 @@ class GraphLayerService:
                             decay_factor=config.decay_factor,
                             max_candidates=config.max_candidates,
                         )
-                    if next_urn not in visited:
-                        if (
-                            len(candidates) < config.max_candidates
-                            or next_urn in candidates
-                        ):
-                            visited.add(next_urn)
-                            queue.append((next_urn, hop_depth, seed_urn))
+                    if next_urn not in visited and (
+                        len(candidates) < config.max_candidates
+                        or next_urn in candidates
+                    ):
+                        visited.add(next_urn)
+                        queue.append((next_urn, hop_depth, seed_urn))
 
         results = self._build_results(session, candidates, config.max_candidates)
         depth_stats = _build_depth_stats(candidates)

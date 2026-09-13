@@ -1,0 +1,151 @@
+{
+  "mission": "UX-8",
+  "status": "local_verified_awaiting_ci_and_production",
+  "checked_at": "2026-09-13T22:25:38.670832+00:00",
+  "base_commit": "7350425249d393725b325715a3add581389fe1fd",
+  "decisions": [
+    411,
+    412,
+    413
+  ],
+  "changes": [
+    "Nullable collection instructions and direct document membership with PostgreSQL/SQLite migration 046",
+    "Complete authorized document context, server pagination and per-document removal; excerpt limit unchanged",
+    "Reviewed collection seed through existing mission background/references/context and save/preview/submit",
+    "Scoped report citation pages, report totals/status/project filters, unchanged md/json/txt content bytes and Unicode-safe download headers",
+    "RBAC collection child reads/export/additions and report synthesis resolve document policy before provider/cache use; legacy flag-off/internal signatures retained"
+  ],
+  "validation": {
+    "backend": {
+      "passed": 225,
+      "skipped": 0,
+      "warnings": 17,
+      "seconds": 71.94,
+      "suites": [
+        "collection_context",
+        "evidence_ledger_api",
+        "pedr_report_scope",
+        "reports_api",
+        "pedr_collection_scope",
+        "collections",
+        "project_hub",
+        "create_ownership_parity",
+        "missions_api",
+        "unit/test_oods_object_contract"
+      ]
+    },
+    "postgres": {
+      "passed": 5,
+      "skipped": 0,
+      "warnings": 14,
+      "seconds": 6.6,
+      "suites": [
+        "collection_context_postgres",
+        "project_favorites_postgres",
+        "evidence_browser_postgres"
+      ]
+    },
+    "frontend_unit": {
+      "passed": 185,
+      "skipped": 0,
+      "files": 28
+    },
+    "mcp": {
+      "passed": 77,
+      "skipped": 0,
+      "files": 3,
+      "built_first": true,
+      "guard": "actual handleGetMission -> TraceLabClient GET preserves all 123 structured refs/context/background"
+    },
+    "built_browser": {
+      "passed": 39,
+      "skipped": 0,
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "ux8_widths": [
+        390,
+        820,
+        1440
+      ],
+      "critical_serious_axe_findings": 0,
+      "horizontal_overflow": 0
+    },
+    "frontend_lint": "passed",
+    "frontend_types": "passed",
+    "frontend_production_build": "passed",
+    "ruff_all_changed_python": "passed",
+    "foundational_refs": "passed",
+    "git_diff_check": "passed",
+    "correction_tests": {
+      "passed": 36,
+      "deselected": 1,
+      "excluded": "Live deployed RBAC matrix marked e2e_prod; not run locally",
+      "warnings": 15,
+      "seconds": 10.8
+    },
+    "ast_commit_guard": "passed",
+    "full_integration": {
+      "passed": 133,
+      "skipped": 4,
+      "warnings": 15,
+      "seconds": 145.03,
+      "execution": "Sequential after the 225-test backend run; includes unchanged graph performance and harness route lockstep guards."
+    }
+  },
+  "before": "ux-8-before/ (24 clean direct-production captures before implementation)",
+  "local_previews": {
+    "path": "ux-8-local-previews/",
+    "screenshots": 24
+  },
+  "visual_review": [
+    "Desktop Light collection document page, instructions and focus restoration",
+    "Mobile Dark report citations, source content, pagination and export controls"
+  ],
+  "limitations": [
+    "High contrast remains deferred under THEME-2; Light/Dark accepted token artifacts unchanged.",
+    "Document references are authored context, not a worker-enforced access boundary.",
+    "Source MCP schema/runtime is unchanged; this mission adds a client regression test.",
+    "Existing tests expose deprecation warnings, recorded above.",
+    "Full integration suite retains four existing conditional skips; isolated mission PostgreSQL tests had no skips."
+  ],
+  "remaining": [
+    "Source CI and merge",
+    "Railway SUCCESS for both services",
+    "Actual production seed/save/submit and MCP read; authorized report citation navigation and byte exports",
+    "124 direct-production route/theme/viewport checks",
+    "Receipt publication and CMOS completion"
+  ],
+  "ci_initial": {
+    "head": "570e9362ef01ea0c4b3fd289a8defb60bfefdac5",
+    "backend": {
+      "run_id": 34786770584,
+      "passed": 2449,
+      "skipped": 3,
+      "quarantined": 12,
+      "warnings": 48,
+      "seconds": 536.26
+    },
+    "production_build": {
+      "run_id": 34786770606,
+      "browser_passed": 31
+    },
+    "integration": {
+      "run_id": 34786770601,
+      "passed": 131,
+      "failed": 2,
+      "skipped": 4,
+      "warnings": 17,
+      "seconds": 86.98,
+      "failures": [
+        "Live RBAC harness was missing four new collection context routes; all four probes plus auth-first tests added.",
+        "Unchanged graph depth-two performance test measured 211.68ms against 200ms. Targeted local rerun passed without threshold changes."
+      ]
+    }
+  },
+  "validation_notes": [
+    "Two concurrent local pytest processes reset the same SQLite fixture database; both interrupted and excluded from acceptance. Sequential reruns are authoritative.",
+    "Structured references retain row identity on rename/removal, including duplicate document filenames."
+  ]
+}

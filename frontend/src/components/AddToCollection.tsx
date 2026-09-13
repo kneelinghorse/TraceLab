@@ -1,267 +1,69 @@
-/**
- * AddToCollection - Dropdown component for adding chunks to collections
- * Uses portal to escape backdrop-blur stacking contexts
- */
-
-import { collectionsApi, type Collection } from "@/lib/api/collections";
-import { useState, useEffect, useRef, useCallback } from "react";
-import { createPortal } from "react-dom";
+import Link from "next/link";
+import { useState } from "react";
 import useSWR from "swr";
+import { useAuth } from "@/contexts/AuthContext";
+import { collectionsApi, type Collection } from "@/lib/api/collections";
+import { Dialog } from "@/components/ui/Dialog";
+import { PageState } from "@/components/ui/PageState";
+import { PaginationBar } from "@/components/ui/PaginationBar";
 
-type AddToCollectionProps = {
-  chunkId: string;
-  onAdded?: () => void;
+type AddToCollectionProps = ({ chunkId: string; documentId?: never } | { documentId: string; chunkId?: never }) & {
+  onAdded?: () => void | Promise<void>;
   className?: string;
   variant?: "default" | "compact";
 };
 
-export function AddToCollection({
-  chunkId,
-  onAdded,
-  className = "",
-  variant = "default",
-}: AddToCollectionProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
-  const [newName, setNewName] = useState("");
-  const [isAdding, setIsAdding] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
-  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+/** Documents and excerpts share a complete, scoped collection picker. */
+export function AddToCollection({ chunkId, documentId, onAdded, className = "", variant = "default" }: AddToCollectionProps) {
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [busy, setBusy] = useState(false);
+  const [name, setName] = useState("");
+  const [created, setCreated] = useState<Collection | null>(null);
+  const [failure, setFailure] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const response = useSWR(open ? ["collections-picker", user?.user_id, page] : null, () => collectionsApi.list({ page, page_size: 20 }));
 
-  const { data: response, mutate } = useSWR(
-    isOpen ? "collections-dropdown" : null,
-    () => collectionsApi.list()
-  );
-  const collections = response?.data ?? [];
-
-  // Track client-side mount for SSR hydration safety
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  // Calculate menu position
-  const updatePosition = useCallback(() => {
-    if (!buttonRef.current) return;
-
-    const rect = buttonRef.current.getBoundingClientRect();
-    const menuWidth = 256; // w-64 (16rem)
-    const menuHeight = 300; // approximate max height
-
-    // Calculate left position, ensuring menu stays on screen
-    let leftPos = rect.right - menuWidth;
-    if (leftPos < 8) {
-      leftPos = rect.left;
-    }
-    if (leftPos + menuWidth > window.innerWidth - 8) {
-      leftPos = window.innerWidth - menuWidth - 8;
-    }
-
-    // Calculate top position - prefer below button, but flip above if not enough space
-    let topPos = rect.bottom + 4;
-    if (topPos + menuHeight > window.innerHeight - 8) {
-      topPos = rect.top - menuHeight - 4;
-      if (topPos < 8) {
-        topPos = rect.bottom + 4;
-      }
-    }
-
-    setMenuPosition({ top: topPos, left: leftPos });
-  }, []);
-
-  // Update position when opening and on scroll/resize
-  useEffect(() => {
-    if (!isOpen) {
-      setMenuPosition(null);
-      return;
-    }
-
-    // Calculate initial position
-    updatePosition();
-
-    // Recalculate on scroll or resize
-    window.addEventListener("scroll", updatePosition, true);
-    window.addEventListener("resize", updatePosition);
-
-    return () => {
-      window.removeEventListener("scroll", updatePosition, true);
-      window.removeEventListener("resize", updatePosition);
-    };
-  }, [isOpen, updatePosition]);
-
-  // Clear feedback after 3 seconds
-  useEffect(() => {
-    if (feedback) {
-      const timer = setTimeout(() => setFeedback(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [feedback]);
-
-  const handleAddToCollection = async (collection: Collection) => {
-    setIsAdding(true);
-    setFeedback(null);
+  async function attach(collection: Collection) {
+    if (documentId) await collectionsApi.addDocument(collection.id, documentId);
+    else await collectionsApi.addChunk(collection.id, { chunk_id: chunkId! });
+    setOpen(false); setCreated(null); setName(""); setMessage(`Added to ${collection.name}.`);
+    try { await onAdded?.(); } catch { setMessage(`Added to ${collection.name}. Refresh the collection to see its current contents.`); }
+  }
+  async function add(collection: Collection) {
+    if (busy) return;
+    setBusy(true); setFailure(null);
+    try { await attach(collection); }
+    catch (error) { setFailure(error instanceof Error ? error.message : "Source could not be added."); }
+    finally { setBusy(false); }
+  }
+  async function createAndAdd(event: React.FormEvent) {
+    event.preventDefault();
+    if (busy || !name.trim()) return;
+    setBusy(true); setFailure(null);
     try {
-      await collectionsApi.addChunk(collection.id, { chunk_id: chunkId });
-      setFeedback({ type: "success", message: `Added to "${collection.name}"` });
-      setIsOpen(false);
-      onAdded?.();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to add to collection";
-      setFeedback({ type: "error", message });
-    } finally {
-      setIsAdding(false);
-    }
-  };
-
-  const handleCreateAndAdd = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newName.trim()) return;
-
-    setIsAdding(true);
-    setFeedback(null);
-    try {
-      const collection = await collectionsApi.create({ name: newName.trim() });
-      await collectionsApi.addChunk(collection.id, { chunk_id: chunkId });
-      setFeedback({ type: "success", message: `Created "${collection.name}" and added chunk` });
-      setNewName("");
-      setIsCreating(false);
-      setIsOpen(false);
-      mutate();
-      onAdded?.();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to create collection";
-      setFeedback({ type: "error", message });
-    } finally {
-      setIsAdding(false);
-    }
-  };
-
-  const closeMenu = () => {
-    setIsOpen(false);
-    setIsCreating(false);
-  };
-
-  const buttonClass = variant === "compact"
-    ? "text-xs px-2 py-1 border border-line-strong rounded text-secondary hover:bg-surface"
-    : "px-3 py-1.5 text-sm border border-line rounded-lg text-secondary hover:border-info-line hover:text-accent-text";
-
-  // Only render portal after mount (SSR safety) and when position is calculated
-  const dropdownMenu = isMounted && isOpen && menuPosition ? createPortal(
-    <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-[9998]"
-        onClick={closeMenu}
-      />
-
-      {/* Menu */}
-      <div
-        className="fixed w-64 z-[9999] bg-surface border border-line rounded-lg shadow-xl"
-        style={{ top: menuPosition.top, left: menuPosition.left }}
-      >
-        <div className="p-2">
-          <p className="text-xs font-medium text-muted px-2 py-1">
-            Add to collection
-          </p>
-
-          {/* Existing collections */}
-          <div className="max-h-48 overflow-y-auto">
-            {collections.length === 0 ? (
-              <p className="px-2 py-2 text-sm text-muted">
-                No collections yet
-              </p>
-            ) : (
-              collections.map((collection) => (
-                <button
-                  key={collection.id}
-                  onClick={() => handleAddToCollection(collection)}
-                  disabled={isAdding}
-                  className="w-full text-left px-2 py-2 text-sm text-secondary hover:bg-surface rounded disabled:opacity-50"
-                >
-                  <span className="block truncate">{collection.name}</span>
-                  <span className="text-xs text-muted">
-                    {collection.item_count} {collection.item_count === 1 ? "chunk" : "chunks"}
-                  </span>
-                </button>
-              ))
-            )}
-          </div>
-
-          {/* Divider */}
-          <div className="border-t border-line my-2" />
-
-          {/* Create new */}
-          {isCreating ? (
-            <form onSubmit={handleCreateAndAdd} className="p-2">
-              <input
-                type="text"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder="Collection name..."
-                className="w-full px-2 py-1 text-sm border border-line-strong rounded bg-surface text-foreground"
-                autoFocus
-              />
-              <div className="flex gap-2 mt-2">
-                <button
-                  type="submit"
-                  disabled={!newName.trim() || isAdding}
-                  className="flex-1 px-2 py-1 text-xs bg-accent text-on-accent rounded hover:bg-accent disabled:opacity-50"
-                >
-                  Create & Add
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsCreating(false);
-                    setNewName("");
-                  }}
-                  className="px-2 py-1 text-xs text-secondary"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          ) : (
-            <button
-              onClick={() => setIsCreating(true)}
-              className="w-full text-left px-2 py-2 text-sm text-accent-text hover:bg-surface rounded"
-            >
-              + New Collection
-            </button>
-          )}
-        </div>
+      const collection = created ?? await collectionsApi.create({ name: name.trim() });
+      setCreated(collection); // An attachment retry must not create a duplicate collection.
+      await attach(collection);
+    } catch (error) { setFailure(error instanceof Error ? error.message : "Collection could not be created or populated."); }
+    finally { setBusy(false); }
+  }
+  return <div className={`min-w-0 ${className}`}>
+    <button type="button" aria-label={documentId ? "Add document to collection" : "Add excerpt to collection"} onClick={() => { setOpen(true); setFailure(null); setMessage(null); }} className={`rounded-lg border border-line-strong text-secondary hover:text-accent-text ${variant === "compact" ? "px-2 py-1 text-xs" : "px-3 py-2 text-sm"}`}>+ Collection</button>
+    {message && <p role="status" className="mt-2 break-words text-sm text-secondary">{message}</p>}
+    <Dialog open={open} title="Add to collection" onClose={() => { if (!busy) setOpen(false); }}>
+      <div className="max-h-[70vh] space-y-4 overflow-y-auto">
+        {failure && <p role="alert" className="break-words text-sm text-danger">{failure}</p>}
+        {created && <div className="panel space-y-2 p-3 text-sm"><p>Created <Link className="underline" href={`/collections/${created.id}`}>{created.name}</Link>. Its source still needs to be added.</p><button disabled={busy} className="text-accent-text underline" onClick={() => void add(created)}>Retry adding to {created.name}</button></div>}
+        {response.error ? <PageState state="error" title="Collections could not load." onRetry={() => void response.mutate().catch(() => {})} /> : response.isLoading ? <PageState state="loading" title="Loading collections…" /> : response.data && <>
+          <p className="text-sm text-secondary">{response.data.total.toLocaleString()} collections</p>
+          {response.data.total === 0 ? <PageState state="empty" title="No collections available." /> : <ul className="divide-y divide-line">{response.data.data.map(collection => <li key={collection.id}><button disabled={busy} type="button" aria-label={`Add to ${collection.name}`} className="w-full break-words py-3 text-left font-medium hover:text-accent-text disabled:opacity-50" onClick={() => void add(collection)}>{collection.name}</button></li>)}</ul>}
+          <PaginationBar label="Collection picker pages" page={page} pages={Math.ceil(response.data.total / 20)} onChange={next => { if (!busy) setPage(next); }} />
+        </>}
+        {!created && <details className="panel p-3"><summary className="cursor-pointer font-medium">Create a collection</summary><form className="mt-3 space-y-3" onSubmit={event => void createAndAdd(event)}><label className="block space-y-1 text-sm"><span>New collection name</span><input className="w-full rounded border border-line-strong bg-background px-3 py-2" value={name} disabled={busy} maxLength={255} onChange={event => setName(event.target.value)} /></label><button disabled={busy || !name.trim()} className="rounded bg-accent px-3 py-2 text-on-accent disabled:opacity-50">Create and add</button></form></details>}
+        <button type="button" disabled={busy} className="rounded border border-line-strong px-3 py-2 disabled:opacity-50" onClick={() => setOpen(false)}>Cancel</button>
       </div>
-    </>,
-    document.body
-  ) : null;
-
-  return (
-    <div className={`relative ${className}`}>
-      <button
-        ref={buttonRef}
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className={buttonClass}
-        disabled={isAdding}
-      >
-        {isAdding ? "Adding..." : "+ Collection"}
-      </button>
-
-      {dropdownMenu}
-
-      {/* Feedback */}
-      {feedback && (
-        <div
-          className={`absolute right-0 mt-1 px-3 py-1.5 text-xs rounded-lg whitespace-nowrap z-50 ${
-            feedback.type === "success"
-              ? "bg-success-surface text-success"
-              : "bg-danger-surface text-danger"
-          }`}
-        >
-          {feedback.message}
-        </div>
-      )}
-    </div>
-  );
+    </Dialog>
+  </div>;
 }

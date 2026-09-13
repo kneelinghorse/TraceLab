@@ -9,6 +9,7 @@ export type Collection = {
   id: string;
   name: string;
   description: string | null;
+  instructions?: string | null;
   created_at: string;
   updated_at: string;
   item_count: number;
@@ -35,12 +36,14 @@ export type CollectionListResponse = {
 
 export type CreateCollectionParams = {
   name: string;
-  description?: string;
+  description?: string | null;
+  instructions?: string | null;
 };
 
 export type UpdateCollectionParams = {
   name?: string;
-  description?: string;
+  description?: string | null;
+  instructions?: string | null;
 };
 
 export type AddChunkParams = {
@@ -48,7 +51,31 @@ export type AddChunkParams = {
   notes?: string;
 };
 
+export type CollectionDocument = {
+  id: string; name: string; project_id: string; file_type: string | null;
+  processed: boolean | null; chunked: boolean | null; embedded: boolean | null;
+};
+export type CollectionDocumentPage = { items: CollectionDocument[]; total: number; page: number; page_size: number };
+export type CollectionMissionSeed = {
+  collection_id: string; title: string; project_id: string | null; background: string;
+  references: { title: string; document_id: string; href: string }[];
+  context: Record<string, unknown>;
+};
+
 export const collectionsApi = {
+  documents(collectionId: string, page = 1, pageSize = 20): Promise<CollectionDocumentPage> {
+    return httpClient.get(`/collections/${collectionId}/documents`, { params: { page, page_size: pageSize } });
+  },
+  addDocument(collectionId: string, documentId: string): Promise<CollectionDocument> {
+    return httpClient.post(`/collections/${collectionId}/documents`, { document_id: documentId });
+  },
+  removeDocument(collectionId: string, documentId: string): Promise<void> {
+    return httpClient.delete(`/collections/${collectionId}/documents/${documentId}`);
+  },
+  missionSeed(collectionId: string): Promise<CollectionMissionSeed> {
+    return httpClient.get(`/collections/${collectionId}/mission-seed`);
+  },
+
   /**
    * List all collections
    */
