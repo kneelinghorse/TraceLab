@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import useSWR from "swr";
 
 import { AuthGate } from "@/components/AuthGate";
+import { FavoriteProjects } from "@/components/projects/FavoriteProjects";
 import { NavigationIcon } from "@/components/Navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { homeApi } from "@/lib/api/home";
@@ -86,6 +87,7 @@ function HomeContent() {
     {error && <div role="alert" className="rounded-lg border border-line bg-danger-surface p-5 text-danger"><p>{data ? "Home could not refresh. The last successful snapshot is shown below." : "Home could not load. Try again to retrieve your workspace."}</p><button type="button" onClick={() => void mutate()} className="mt-3 rounded border border-current px-3 py-2 text-sm">Try again</button></div>}
     {reviewError && <p role="alert" className="rounded-lg bg-danger-surface p-4 text-danger">{reviewError}</p>}
     {data && <>
+      {data.favorites && <FavoriteProjects key={user?.user_id} initial={data.favorites} />}
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted">
         <p><Link href="/missions" className="font-medium text-accent-text underline underline-offset-4">{data.missions.total.toLocaleString()} missions</Link> in your workspace · {data.missions.by_status.completed.toLocaleString()} completed</p>
         <div className="flex flex-wrap items-center gap-3"><p>Updated <time dateTime={data.generated_at}>{updated(data.generated_at)}</time> · refreshes every {data.refresh_seconds}s</p><button type="button" onClick={() => void mutate()} disabled={isValidating} className="rounded border border-line px-3 py-1.5 text-secondary disabled:opacity-50">{isValidating ? "Refreshing…" : "Refresh"}</button></div>

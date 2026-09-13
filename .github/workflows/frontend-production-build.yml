@@ -88,4 +88,4 @@ jobs:
           shell_server_pid=$!
           trap 'kill "$shell_server_pid" 2>/dev/null || true' EXIT
           curl --fail --silent --retry 30 --retry-connrefused --retry-delay 1 http://127.0.0.1:3100/missions > /dev/null
-          npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/mission-protocol.spec.ts --workers=1
+          npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/mission-protocol.spec.ts tests/e2e/project-bundles.spec.ts --workers=1

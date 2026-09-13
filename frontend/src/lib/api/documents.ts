@@ -4,8 +4,8 @@
 
 import type { Document, DocumentChunk, DocumentProcessResult, DocumentUploadResponse } from "@/types/document";
 import type { PaginatedResponse } from "@/types/pagination";
-import { buildApiUrl, httpClient } from "./http";
-import { getStoredAuth } from "@/lib/auth/storage";
+import { AUTH_EXPIRED_EVENT, buildApiUrl, HttpError, httpClient } from "./http";
+import { clearStoredAuth, getStoredAuth } from "@/lib/auth/storage";
 
 export type ListDocumentsParams = {
   projectId?: string;
@@ -41,25 +41,34 @@ export const documentsApi = {
   /**
    * Upload a document
    */
-  async uploadDocument(projectId: string, file: File): Promise<DocumentUploadResponse> {
+  async uploadDocument(projectId: string, file: File, onProgress?: (loaded: number, total: number | null) => void): Promise<DocumentUploadResponse> {
     const formData = new FormData();
     formData.append("file", file);
 
     const auth = getStoredAuth();
     const token = auth?.token ?? "";
-    const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
-    const response = await fetch(buildApiUrl("/documents/upload", { project_id: projectId }), {
-      method: "POST",
-      headers,
-      body: formData,
+    return new Promise((resolve, reject) => {
+      const request = new XMLHttpRequest();
+      request.open("POST", buildApiUrl("/documents/upload", { project_id: projectId }));
+      if (token) request.setRequestHeader("Authorization", `Bearer ${token}`);
+      request.upload.onprogress = event => onProgress?.(event.loaded, event.lengthComputable ? event.total : null);
+      request.onerror = () => reject(new Error("Upload connection failed. Check the document list before retrying."));
+      request.onabort = () => reject(new Error("Upload interrupted."));
+      request.onload = () => {
+        if (request.status === 401) {
+          clearStoredAuth();
+          window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
+        }
+        let body;
+        try { body = JSON.parse(request.responseText); } catch { reject(new HttpError("Upload returned an unreadable response.", request.status)); return; }
+        if (request.status < 200 || request.status >= 300) {
+          reject(new HttpError(typeof body.detail === "string" ? body.detail : "Upload failed.", request.status));
+        } else if (!body.id) {
+          reject(new Error("Upload did not return a document ID. Check the document list before retrying."));
+        } else { resolve(body); }
+      };
+      request.send(formData);
     });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: "Upload failed" }));
-      throw new Error(error.detail || "Upload failed");
-    }
-
-    return response.json();
   },
 
   /**

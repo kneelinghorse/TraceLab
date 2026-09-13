@@ -199,7 +199,7 @@ class ProjectQueryService:
         db.commit()
         return True
 
-    def get_project_stats(self, db: Session, project_id: UUID) -> ProjectStats | None:
+    def get_project_stats(self, db: Session, project_id: UUID, *, document_filter=None, report_filter=None) -> ProjectStats | None:
         """Get aggregated statistics for a project.
 
         Only counts non-deleted documents in the statistics.
@@ -208,11 +208,18 @@ class ProjectQueryService:
         if not project:
             return None
 
+        # Reuse the child-list policies for every aggregate, including timestamps.
+        documents = db.query(Document).filter(Document.project_id == project_id, Document.deleted_at.is_(None))
+        reports = db.query(Report).filter(Report.project_id == project_id)
+        if document_filter is not None:
+            documents = documents.filter(document_filter)
+        if report_filter is not None:
+            reports = reports.filter(report_filter)
+        readable_document_ids = documents.with_entities(Document.id).statement
+
         # Count documents (exclude soft-deleted)
         document_count = (
-            db.query(func.count(Document.id))
-            .filter(Document.project_id == project_id)
-            .filter(Document.deleted_at.is_(None))
+            documents.with_entities(func.count(Document.id))
             .scalar()
             or 0
         )
@@ -223,25 +230,21 @@ class ProjectQueryService:
                 func.count(Chunk.id).label("chunk_count"),
                 func.coalesce(func.sum(Chunk.token_count), 0).label("total_tokens"),
             )
-            .join(Document, Chunk.document_id == Document.id)
-            .filter(Document.project_id == project_id)
-            .filter(Document.deleted_at.is_(None))
+            .filter(Chunk.document_id.in_(readable_document_ids))
             .first()
         )
         chunk_count = chunk_stats.chunk_count if chunk_stats else 0
         total_tokens = chunk_stats.total_tokens if chunk_stats else 0
 
         # Count reports
-        report_count = db.query(func.count(Report.id)).filter(Report.project_id == project_id).scalar() or 0
+        report_count = reports.with_entities(func.count(Report.id)).scalar() or 0
 
         # Get last updated timestamp (most recent non-deleted document or report)
         last_doc_update = (
-            db.query(func.max(Document.updated_at))
-            .filter(Document.project_id == project_id)
-            .filter(Document.deleted_at.is_(None))
+            documents.with_entities(func.max(Document.updated_at))
             .scalar()
         )
-        last_report_update = db.query(func.max(Report.updated_at)).filter(Report.project_id == project_id).scalar()
+        last_report_update = reports.with_entities(func.max(Report.updated_at)).scalar()
         last_updated = max(
             filter(None, [project.updated_at, last_doc_update, last_report_update]),
             default=project.updated_at,

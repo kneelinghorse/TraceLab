@@ -1,5 +1,8 @@
 import { PaginationBar } from "@/components/ui/PaginationBar";
 import { PageState } from "@/components/ui/PageState";
+import { useAuth } from "@/contexts/AuthContext";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import { AuthGate } from "@/components/AuthGate";
 import { projectsApi } from "@/lib/api/projects";
 import type { Project } from "@/types/document";
@@ -13,6 +16,7 @@ const PAGE_SIZE = 10;
 const RESEARCH_TYPES = ["strategic", "tactical", "generative", "evaluative"] as const;
 
 export default function ProjectsPage() {
+  const { user } = useAuth();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [formState, setFormState] = useState({ name: "", description: "", research_type: "" });
@@ -20,12 +24,12 @@ export default function ProjectsPage() {
   const [formError, setFormError] = useState<string | null>(null);
 
   const { data: projectResponse, mutate, isLoading, error } = useSWR<PaginatedResponse<Project>>(
-    ["projects", page, search],
+    ["projects", user?.user_id, page, search],
     () =>
       projectsApi.listProjects({
         page,
         pageSize: PAGE_SIZE,
-        search: search ? search.trim() : undefined,
+        search: search.trim() || undefined,
       }),
   );
 
@@ -67,12 +71,12 @@ export default function ProjectsPage() {
           <header className="mb-8">
             <h1 className="text-3xl font-bold text-foreground">Projects</h1>
             <p className="mt-2 text-secondary">
-              Create and manage research projects. Click a project to view details and upload documents.
+              Research bundles bring sources, evidence, context and results together.
             </p>
           </header>
 
           <div className="space-y-6">
-            {/* Create Form */}
+            <details className="panel p-5"><summary className="cursor-pointer font-semibold">Create a project</summary>
             <form onSubmit={handleCreate} className="bg-surface border border-line rounded-lg p-6 space-y-4">
               <div>
                 <h2 className="text-lg font-semibold text-foreground">Create Project</h2>
@@ -127,14 +131,16 @@ export default function ProjectsPage() {
                   placeholder="Brief description of the project..."
                 />
               </div>
-              {formError && <p className="text-sm text-danger">{formError}</p>}
+              {formError && <p role="alert" className="text-sm text-danger">{formError}</p>}
             </form>
+            </details>
 
             {/* Project List */}
             <div className="bg-surface border border-line rounded-lg p-6 space-y-4">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h2 className="text-lg font-semibold text-foreground">Project Library</h2>
+                  <h2 className="text-lg font-semibold text-foreground">Project library</h2>
+                  {pagination && <p className="mt-1 text-sm text-secondary">{pagination.total.toLocaleString()} matching projects</p>}
                   <p className="text-sm text-muted">Click a project to manage documents and settings.</p>
                 </div>
                 <input
@@ -152,16 +158,16 @@ export default function ProjectsPage() {
               ) : projects.length === 0 ? (
                 <PageState state="empty" title="No projects found. Create one to begin." />
               ) : (
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="divide-y divide-line">
                   {projects.map((project) => (
                     <Link
                       key={project.id}
                       href={`/projects/${project.id}`}
-                      className="block border border-line rounded-lg p-4 hover:border-info-line hover:shadow-md transition-all group"
+                      className="group block py-5"
                     >
-                      <div className="flex items-start justify-between">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-foreground group-hover:text-accent-text truncate">
+                          <p className="break-words font-semibold text-foreground group-hover:text-accent-text">
                             {project.name}
                           </p>
                           {project.description && (
@@ -174,13 +180,11 @@ export default function ProjectsPage() {
                           </span>
                         )}
                       </div>
-                      <div className="mt-3 flex items-center gap-4 text-xs text-muted">
+                      <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-muted">
                         <span>
-                          Updated {project.updated_at ? formatDistanceToNow(new Date(project.updated_at), { addSuffix: true }) : "recently"}
+                          {project.updated_at ? `Updated ${formatDistanceToNow(parseApiTimestamp(project.updated_at), { addSuffix: true })}` : "Update time unavailable"}
                         </span>
-                        <span className={`px-2 py-0.5 rounded ${project.status === "active" ? "bg-success-surface text-success" : "bg-surface text-secondary"}`}>
-                          {project.status || "active"}
-                        </span>
+                        <StatusBadge status={project.status || "unknown"} />
                       </div>
                     </Link>
                   ))}

@@ -148,9 +148,11 @@ async def upload_document(
     or can be done asynchronously in the background.
     """
     # Verify project exists
-    project = db.query(Project).filter(Project.id == project_id).first()
+    project = db.query(Project).filter(Project.id == project_id, Project.deleted_at.is_(None)).first()
     if not project:
         raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+
+    authorize_or_403(user, "upload", project, db)
 
     # Validate file format
     file_path = Path(file.filename)
@@ -248,6 +250,7 @@ async def upload_document(
 
     response = DocumentRead.model_validate(document)
     _cache_manager.invalidate_document_lists(str(project_id))
+    _cache_manager.invalidate_project_metadata(str(project_id))
     return response
 
 
@@ -307,6 +310,7 @@ async def process_document(
         )
 
     _cache_manager.invalidate_document_lists(str(document.project_id))
+    _cache_manager.invalidate_project_metadata(str(document.project_id))
     return result
 
 
@@ -483,6 +487,7 @@ async def delete_document(
     )
     project_id = str(document.project_id) if document and document.project_id else None
     _cache_manager.invalidate_document_lists(project_id)
+    _cache_manager.invalidate_project_metadata(project_id)
     return {
         "status": "deleted",
         "id": str(document_id),
@@ -519,6 +524,7 @@ async def restore_document(
     document = _document_query_service.get_document(db, document_id)
     project_id = str(document.project_id) if document and document.project_id else None
     _cache_manager.invalidate_document_lists(project_id)
+    _cache_manager.invalidate_project_metadata(project_id)
     return {"status": "restored", "id": str(document_id)}
 
 

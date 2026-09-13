@@ -4,7 +4,8 @@ Implements the shared-surface requirements in the [UX roadmap](../foundational-d
 
 ## Shared controls
 
-- `PaginationBar` owns page navigation for documents, projects, reports, missions, collections, evidence and session notes. Server-paginated endpoints retain their total/page metadata. Collections alone paginate the complete scoped response returned by their existing API. Changing a filter resets the page in the same event, avoiding a request for an old page with new filters.
+- `PaginationBar` owns page navigation for documents, projects, reports, missions, collections, evidence and session notes. Server-paginated endpoints retain their total/page metadata. The standalone Collections page still pages the complete legacy response; UX-7 project collection tabs request optional server pagination and the project filter. Changing a filter resets the page in the same event, avoiding a request for an old page with new filters.
+- `TabList` supplies wrapping, keyboard-accessible project and document sections. Arrow keys, Home and End select and focus tabs; their panel has the matching labelled relationship.
 - `StatusBadge` owns the status-to-semantic-token map for mission, document, report, user and correction states. Labels supplement color, including document processing booleans.
 - `Dialog` supplies native modal semantics and the existing keyboard focus loop. Modal elements remain mounted while closed so their autofocus controls do not steal focus before `showModal` records the opener. Cancel/Escape restore focus. Busy destructive actions disable dismissal.
 - `useFeedback` presents confirmation through `Dialog` and failures through `Toast`. Cancellation, Escape and component unmount resolve confirmation as false. Callers await an explicit acceptance before mutation; a failed API action stays visible and dismissible.

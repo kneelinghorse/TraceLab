@@ -7,7 +7,7 @@ const mocks = vi.hoisted(() => ({ documents: vi.fn(), removeDocument: vi.fn(), g
 vi.mock("next/router", () => ({ useRouter: () => mocks.router }));
 vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => ({ isReady: true, isAuthenticated: true, user: { user_id: "reviewer" } }) }));
 vi.mock("@/lib/api/documents", () => ({ documentsApi: { listDocuments: mocks.documents, deleteDocument: mocks.removeDocument, getDocument: mocks.getDocument, getDocumentChunks: vi.fn().mockResolvedValue({ data: [], pagination: { pages: 1 } }) } }));
-vi.mock("@/lib/api/projects", () => ({ projectsApi: { listProjects: mocks.projects } }));
+vi.mock("@/lib/api/projects", () => ({ projectsApi: { listProjects: mocks.projects, listAllProjects: async () => (await mocks.projects()).data } }));
 vi.mock("@/lib/api/collections", () => ({ collectionsApi: { list: mocks.collections, get: mocks.getCollection } }));
 vi.mock("@/lib/api/reports", () => ({ reportsApi: { list: mocks.reports } }));
 vi.mock("@/lib/api/deviceAuth", async original => ({ ...await original<typeof import("@/lib/api/deviceAuth")>(), previewDeviceGrant: mocks.preview, approveDeviceGrant: mocks.approve }));
@@ -36,18 +36,18 @@ describe("shared feedback and page state", () => {
   it("requires explicit acceptance before deletion, preserves failure, and retries through the same confirmation", async () => {
     mocks.removeDocument.mockRejectedValueOnce(new Error('{"detail":"Deletion unavailable"}')).mockResolvedValueOnce(undefined);
     await browser(<DocumentsPage />); await screen.findByText(doc.name);
-    fireEvent.click(screen.getByRole("button", { name: "Delete", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Delete Auditable research", exact: true }));
     let modal = within(screen.getByRole("dialog", { name: "Confirm action" }));
     fireEvent.click(modal.getByRole("button", { name: "Cancel" }));
     expect(mocks.removeDocument).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Delete", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Delete Auditable research", exact: true }));
     modal = within(screen.getByRole("dialog", { name: "Confirm action" }));
     fireEvent.click(modal.getByRole("button", { name: "Continue" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("Deletion unavailable");
     expect(mocks.removeDocument).toHaveBeenCalledTimes(1);
     fireEvent.click(screen.getByRole("button", { name: "Dismiss notification" }));
     expect(screen.queryByRole("alert")).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Delete", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Delete Auditable research", exact: true }));
     fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Continue" }));
     await waitFor(() => expect(mocks.removeDocument).toHaveBeenCalledTimes(2));
   });

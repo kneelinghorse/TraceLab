@@ -32,6 +32,7 @@ from app.models.sync_state import SyncState
 from app.models.synthesis_cache import SynthesisCache
 from app.models.tag import DocumentTag, Tag
 from app.models.user import User
+from app.models.user_favorite import UserFavorite
 from app.models.workspace import Workspace
 
 __all__ = [
@@ -65,6 +66,7 @@ __all__ = [
     "SynthesisCache",
     "GraphEdge",
     "User",
+    "UserFavorite",
     "InviteCode",
     "DeviceAuthorizationGrant",
     "Workspace",

@@ -52,8 +52,8 @@ export const collectionsApi = {
   /**
    * List all collections
    */
-  async list(): Promise<CollectionListResponse> {
-    return httpClient.get("/collections");
+  async list(params?: { project_id?: string; page?: number; page_size?: number }): Promise<CollectionListResponse> {
+    return httpClient.get("/collections", { params });
   },
 
   /**

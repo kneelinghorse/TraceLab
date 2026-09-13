@@ -3,6 +3,11 @@ import { PaginationBar } from "@/components/ui/PaginationBar";
 import { PageState } from "@/components/ui/PageState";
 import { Dialog } from "@/components/ui/Dialog";
 import { EvidencePanel } from "@/components/evidence/EvidencePanel";
+import { TabList } from "@/components/ui/TabList";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { useAuth } from "@/contexts/AuthContext";
+import { documentState } from "@/lib/document-state";
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 /**
  * Document detail page
  */
@@ -19,6 +24,12 @@ import { useState } from "react";
 import useSWR from "swr";
 
 export default function DocumentDetailPage() {
+  const { query } = useRouter();
+  return <DocumentDetail key={typeof query.id === "string" ? query.id : "loading"} />;
+}
+
+function DocumentDetail() {
+  const { user } = useAuth();
   const router = useRouter();
   const { id } = router.query;
   const [actionError, setActionError] = useState<string | null>(null);
@@ -28,14 +39,15 @@ export default function DocumentDetailPage() {
   const [downloading, setDownloading] = useState(false);
   const [chunksPage, setChunksPage] = useState(1);
   const [expandedChunks, setExpandedChunks] = useState<Set<string>>(new Set());
+  const [tab, setTab] = useState<"Overview" | "Chunks" | "Evidence">("Overview");
 
   const { data: document, mutate, error: loadError, isLoading } = useSWR<Document>(
-    id ? `document-${id}` : null,
+    id ? ["document", user?.user_id, id] : null,
     () => documentsApi.getDocument(id as string)
   );
 
-  const { data: chunksResponse, isLoading: chunksLoading } = useSWR<PaginatedResponse<DocumentChunk>>(
-    document?.chunked && id ? `chunks-${id}-${chunksPage}` : null,
+  const { data: chunksResponse, isLoading: chunksLoading, error: chunksError, mutate: mutateChunks } = useSWR<PaginatedResponse<DocumentChunk>>(
+    document && id ? ["chunks", user?.user_id, id, chunksPage] : null,
     () => documentsApi.listChunks(id as string, { page: chunksPage, pageSize: 10 })
   );
 
@@ -55,10 +67,12 @@ export default function DocumentDetailPage() {
     if (!id) return;
 
     setProcessing(true);
+    setActionError(null);
     try {
-      await documentsApi.processDocument(id as string);
-      // Poll for updated status
-      setTimeout(() => mutate(), 2000);
+      const result = await documentsApi.processDocument(id as string);
+      const failed = Object.entries(result.stages ?? {}).filter(([, stage]) => stage.status === "failed").map(([name]) => name);
+      if (result.status !== "completed" || failed.length) setActionError(`Processing needs attention: ${failed.join(", ") || result.status || "unknown"}.`);
+      await Promise.all([mutate(), mutateChunks()]);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to process document";
       setActionError(message);
@@ -116,7 +130,7 @@ export default function DocumentDetailPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {actionError && !deleteOpen && <p role="alert" className="mb-4 break-words rounded bg-danger-surface p-4 text-danger">{actionError}</p>}
           <Dialog open={deleteOpen} title="Delete document" onClose={() => { if (!deleting) setDeleteOpen(false); }}>
-            <p className="mb-4">Delete this document? This cannot be undone.</p>
+            <p className="mb-4">Remove this document from active lists? It is retained for recovery.</p>
             {actionError && <p role="alert" className="mb-4 break-words text-danger">{actionError}</p>}
             <div className="flex gap-3"><button disabled={deleting} className="rounded border border-line px-3 py-2" onClick={() => setDeleteOpen(false)}>Cancel</button><button disabled={deleting} className="rounded bg-danger-surface px-3 py-2 text-danger" onClick={() => void handleDelete()}>{deleting ? "Deleting…" : "Delete document"}</button></div>
           </Dialog>
@@ -128,18 +142,17 @@ export default function DocumentDetailPage() {
             ← Back to Documents
           </Link>
 
-          <EvidencePanel projectId={document.project_id} filters={{ document_id: document.id }} />
-
           {/* Header */}
           <div className="bg-surface rounded-lg border border-line p-6 mb-6">
-            <h1 className="text-2xl font-bold text-foreground mb-4">
+            <h1 className="break-words text-2xl font-bold text-foreground mb-4">
               {document.name}
             </h1>
+            <div className="mb-4 flex flex-wrap items-center gap-4"><StatusBadge {...documentState(document)} /><Link className="text-sm text-accent-text underline" href={`/projects/${document.project_id}`}>Open project</Link></div>
 
             {/* Document Stats - Prominently displayed */}
-            {document.chunked && (document.chunk_count || document.word_count || document.total_tokens) && (
+            {(document.chunk_count != null || document.word_count != null || document.total_tokens != null) && (
               <div className="mb-6 flex flex-wrap gap-4">
-                {document.chunk_count !== undefined && document.chunk_count > 0 && (
+                {document.chunk_count != null && (
                   <div className="bg-info-surface border border-info-line rounded-lg px-4 py-3">
                     <div className="text-2xl font-bold text-accent-text">
                       {document.chunk_count}
@@ -147,7 +160,7 @@ export default function DocumentDetailPage() {
                     <div className="text-sm text-accent-text">Chunks</div>
                   </div>
                 )}
-                {document.word_count !== undefined && document.word_count > 0 && (
+                {document.word_count != null && (
                   <div className="bg-success-surface border border-success-line rounded-lg px-4 py-3">
                     <div className="text-2xl font-bold text-success">
                       {document.word_count.toLocaleString()}
@@ -155,7 +168,7 @@ export default function DocumentDetailPage() {
                     <div className="text-sm text-success">Words</div>
                   </div>
                 )}
-                {document.total_tokens !== undefined && document.total_tokens > 0 && (
+                {document.total_tokens != null && (
                   <div className="bg-info-surface border border-info-line rounded-lg px-4 py-3">
                     <div className="text-2xl font-bold text-accent-text">
                       {document.total_tokens.toLocaleString()}
@@ -179,7 +192,7 @@ export default function DocumentDetailPage() {
             )}
 
             {/* Metadata */}
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid gap-4 break-words text-sm sm:grid-cols-2">
               <div>
                 <span className="text-muted">File Type:</span>
                 <span className="ml-2 text-foreground">
@@ -198,7 +211,7 @@ export default function DocumentDetailPage() {
                 <div>
                   <span className="text-muted">Uploaded:</span>
                   <span className="ml-2 text-foreground">
-                    {formatDistanceToNow(new Date(document.uploaded_at), { addSuffix: true })}
+                  {formatDistanceToNow(parseApiTimestamp(document.uploaded_at), { addSuffix: true })}
                   </span>
                 </div>
               )}
@@ -235,7 +248,7 @@ export default function DocumentDetailPage() {
             </div>
 
             {/* Actions */}
-            <div className="mt-6 flex gap-4">
+            <div className="mt-6 flex flex-wrap gap-4">
               <button
                 onClick={handleDownload}
                 disabled={downloading}
@@ -243,7 +256,7 @@ export default function DocumentDetailPage() {
               >
                 {downloading ? "Downloading..." : "Download Original"}
               </button>
-              {!document.processed && (
+              {document.processed !== true && (
                 <button
                   onClick={handleProcess}
                   disabled={processing}
@@ -261,8 +274,13 @@ export default function DocumentDetailPage() {
             </div>
           </div>
 
+          <TabList id="document" label="Document sections" tabs={["Overview", "Chunks", "Evidence"] as const} value={tab} onChange={setTab} />
+          <div id="document-panel" role="tabpanel" aria-labelledby={`document-${tab}`} className="mt-6">
+          {tab === "Evidence" && <EvidencePanel projectId={document.project_id} filters={{ document_id: document.id }} />}
+          {tab === "Overview" && !document.processing_events?.length && <p className="panel p-5 text-secondary">No processing history has been recorded.</p>}
+
           {/* Processing Events */}
-          {document.processing_events && document.processing_events.length > 0 && (
+          {tab === "Overview" && document.processing_events && document.processing_events.length > 0 && (
             <div className="bg-surface rounded-lg border border-line p-6 mb-6">
               <h2 className="text-lg font-semibold text-foreground mb-4">
                 Processing History
@@ -291,7 +309,7 @@ export default function DocumentDetailPage() {
                       </p>
                     )}
                     <p className="text-xs text-muted mt-1">
-                      {formatDistanceToNow(new Date(event.created_at), { addSuffix: true })}
+                      {formatDistanceToNow(parseApiTimestamp(event.created_at), { addSuffix: true })}
                     </p>
                   </div>
                 ))}
@@ -300,7 +318,7 @@ export default function DocumentDetailPage() {
           )}
 
           {/* Document Chunks */}
-          {document.chunked && (
+          {tab === "Chunks" && (
             <div className="bg-surface rounded-lg border border-line p-6">
               <h2 className="text-lg font-semibold text-foreground mb-4">
                 Document Chunks
@@ -312,8 +330,9 @@ export default function DocumentDetailPage() {
               </h2>
 
               {chunksLoading && (
-                <p className="text-muted">Loading chunks...</p>
+                <p role="status" className="text-muted">Loading chunks...</p>
               )}
+              {chunksError && <PageState state="error" title="Chunks could not load." onRetry={() => void mutateChunks()} />}
 
               {chunksResponse && chunksResponse.data.length > 0 && (
                 <>
@@ -326,7 +345,9 @@ export default function DocumentDetailPage() {
                         <div className="px-4 py-3 flex items-center justify-between bg-background">
                           <button
                             onClick={() => toggleChunk(chunk.id)}
-                            className="flex items-center gap-4 hover:text-accent-text transition-colors"
+                            aria-expanded={expandedChunks.has(chunk.id)}
+                            aria-controls={`chunk-${chunk.id}`}
+                            className="flex flex-wrap items-center gap-4 hover:text-accent-text transition-colors"
                           >
                             <span className="font-mono text-sm text-accent-text">
                               #{chunk.chunk_index}
@@ -343,8 +364,9 @@ export default function DocumentDetailPage() {
                           <AddToCollection chunkId={chunk.id} variant="compact" />
                         </div>
                         {expandedChunks.has(chunk.id) && (
-                          <div className="px-4 py-3 bg-surface">
-                            <pre className="text-sm text-secondary whitespace-pre-wrap font-mono overflow-x-auto">
+                          <div id={`chunk-${chunk.id}`} className="px-4 py-3 bg-surface">
+                            {(chunk.start_char != null || chunk.end_char != null) && <p className="mb-2 text-xs text-muted">Source characters: {chunk.start_char ?? "unknown"}–{chunk.end_char ?? "unknown"}</p>}
+                            <pre className="whitespace-pre-wrap text-sm text-secondary [overflow-wrap:anywhere]">
                               {chunk.content}
                             </pre>
                           </div>
@@ -363,13 +385,14 @@ export default function DocumentDetailPage() {
               )}
             </div>
           )}
+          </div>
         </div>
       </div>
     </AuthGate>
   );
 }
 
-function StatusRow({ label, status }: { label: string; status: boolean }) {
+function StatusRow({ label, status }: { label: string; status: boolean | null | undefined }) {
   return (
     <div className="flex items-center gap-3">
       <div className={`w-4 h-4 rounded-full ${
@@ -377,7 +400,7 @@ function StatusRow({ label, status }: { label: string; status: boolean }) {
       }`} />
       <span className="text-sm text-foreground">{label}</span>
       <span className="text-sm text-muted">
-        {status ? "Complete" : "Pending"}
+        {status === true ? "Complete" : status === false ? "Pending" : "Unknown"}
       </span>
     </div>
   );

@@ -34,9 +34,13 @@ export interface HomeSnapshot {
   active_runs: HomeSection<HomeMission>;
   recent_reports: HomeSection<HomeRecent>;
   recent_projects: HomeSection<HomeRecent>;
+  favorites: HomeSection<HomeRecent>;
   evidence_activity: HomeSection<HomeEvidenceActivity>;
 }
 export const homeApi = {
+  favorites: (params: { page?: number; page_size?: number; project_id?: string } = {}) => httpClient.get<HomeSection<HomeRecent>>("/home/favorites", { params }),
+  pinProject: (id: string) => httpClient.put<void>(`/home/favorites/projects/${id}`),
+  unpinProject: (id: string) => httpClient.delete<void>(`/home/favorites/projects/${id}`),
   get: () => httpClient.get<HomeSnapshot>("/home"),
   review: (mission: Pick<HomeMission, "id" | "updated_at">) => httpClient.put<void>(`/home/missions/${mission.id}/review`, { updated_at: mission.updated_at }),
 };

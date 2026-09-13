@@ -26,7 +26,7 @@ function snapshot(): HomeSnapshot {
     missions: { total: 433, by_status: { completed: 401 } }, attention: { total: 32, items: [item] },
     active_runs: { total: 1, items: [{ ...item, id: "mission-2", title: "Research in progress", status: "in_progress", reason: null }] },
     recent_reports: { total: 201, items: [{ id: "report-1", title: "Research report", href: "/reports/report-1", updated_at: item.updated_at }] },
-    recent_projects: { total: 0, items: [] }, evidence_activity: { total: 0, items: [] },
+    recent_projects: { total: 0, items: [] }, favorites: { total: 0, items: [] }, evidence_activity: { total: 0, items: [] },
   };
 }
 function home() {
