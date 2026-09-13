@@ -1,0 +1,165 @@
+{
+  "mission": "CI-2",
+  "status": "awaiting-ci",
+  "base_commit": "d51ed2c3151e40b1f8017464dcf9b12406dcfaf2",
+  "disposition": {
+    "ruff_full": "drop",
+    "mypy": "drop",
+    "ruff_diff": "retain unchanged; already required"
+  },
+  "baseline": {
+    "ruff": {
+      "version": "0.8.0",
+      "command": "ruff check .",
+      "findings": 1635,
+      "files": 139
+    },
+    "mypy": {
+      "version": "2.3.1",
+      "command": "mypy app/ --config-file pyproject.toml",
+      "errors": 1043,
+      "files_with_errors": 124,
+      "checked_files": 237
+    }
+  },
+  "local": {
+    "workflow": "Parsed YAML: only ruff-diff remains, its job equals the original, no continue-on-error, per-commit guard retained.",
+    "foundational_refs": "passed",
+    "diff_check": "passed",
+    "application_changes": false,
+    "formatting_run": false
+  },
+  "retained_lane_main_streak": [
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34768817913,
+      "event": "push",
+      "headSha": "d51ed2c3151e40b1f8017464dcf9b12406dcfaf2",
+      "jobs": [
+        {
+          "conclusion": "success",
+          "databaseId": 103754526504,
+          "name": "ruff-diff"
+        },
+        {
+          "conclusion": "failure",
+          "databaseId": 103754526627,
+          "name": "mypy (advisory)"
+        },
+        {
+          "conclusion": "failure",
+          "databaseId": 103754526670,
+          "name": "ruff-full (advisory)"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34764874442,
+      "event": "push",
+      "headSha": "244e1b6fd72f9720c3a673e026dfda4cecf4f9b9",
+      "jobs": [
+        {
+          "conclusion": "failure",
+          "databaseId": 103743955512,
+          "name": "mypy (advisory)"
+        },
+        {
+          "conclusion": "success",
+          "databaseId": 103743955583,
+          "name": "ruff-diff"
+        },
+        {
+          "conclusion": "failure",
+          "databaseId": 103743955696,
+          "name": "ruff-full (advisory)"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34764003123,
+      "event": "push",
+      "headSha": "8da544d91571f64ba845b27eb12a6d461f20fa88",
+      "jobs": [
+        {
+          "conclusion": "failure",
+          "databaseId": 103741623365,
+          "name": "ruff-full (advisory)"
+        },
+        {
+          "conclusion": "success",
+          "databaseId": 103741623438,
+          "name": "ruff-diff"
+        },
+        {
+          "conclusion": "failure",
+          "databaseId": 103741623503,
+          "name": "mypy (advisory)"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34762305255,
+      "event": "push",
+      "headSha": "416d68070fd69f81368ca4870511e2607e05a106",
+      "jobs": [
+        {
+          "conclusion": "success",
+          "databaseId": 103737153136,
+          "name": "ruff-diff"
+        },
+        {
+          "conclusion": "failure",
+          "databaseId": 103737153189,
+          "name": "ruff-full (advisory)"
+        },
+        {
+          "conclusion": "failure",
+          "databaseId": 103737153277,
+          "name": "mypy (advisory)"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34761469702,
+      "event": "push",
+      "headSha": "2a18eae086d88382c0fb1de7af9a8753d2237dd7",
+      "jobs": [
+        {
+          "conclusion": "failure",
+          "databaseId": 103734945056,
+          "name": "mypy (advisory)"
+        },
+        {
+          "conclusion": "success",
+          "databaseId": 103734945066,
+          "name": "ruff-diff"
+        },
+        {
+          "conclusion": "failure",
+          "databaseId": 103734945122,
+          "name": "ruff-full (advisory)"
+        }
+      ]
+    }
+  ],
+  "promotion": "No new lane. Existing required ruff-diff has five original-attempt main push successes. Dropped lanes are absent, not promoted or represented as fixed.",
+  "pull_request": null,
+  "ci_after": null,
+  "main_after": null,
+  "branch_protection": null,
+  "remaining": [
+    "PR checks, merge, first post-change main Backend Lint success, branch-protection readback."
+  ],
+  "limitations": [
+    "Repository-wide Ruff and Python type findings remain unfixed. No replacement Python type-checking CI gate is introduced."
+  ]
+}
