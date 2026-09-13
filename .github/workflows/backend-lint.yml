@@ -1,5 +1,5 @@
 # ABOUTME: Blocks on Ruff regressions in changed Python files only.
-# ABOUTME: Reports the repository-wide Ruff and mypy baselines as advisory jobs.
+# ABOUTME: Repository-wide diagnostic debt is documented in .github/ci/README.md.
 
 name: Backend Lint
 
@@ -65,33 +65,3 @@ jobs:
 
           printf 'Checking %s\n' "${python_files[@]}"
           ruff check -- "${python_files[@]}"
-
-  ruff-full:
-    name: ruff-full (advisory)
-    continue-on-error: true
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Install pinned Ruff
-        run: pip install ruff==0.8.0
-      - name: Check the full repository
-        run: ruff check .
-
-  mypy:
-    name: mypy (advisory)
-    continue-on-error: true
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Install dependencies
-        run: pip install -e '.[dev]'
-      - name: Type check
-        run: mypy app/ --config-file pyproject.toml

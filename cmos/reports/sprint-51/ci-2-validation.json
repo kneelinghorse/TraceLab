@@ -1,0 +1,237 @@
+{
+  "mission": "CI-2",
+  "status": "completed",
+  "base_commit": "d51ed2c3151e40b1f8017464dcf9b12406dcfaf2",
+  "disposition": {
+    "ruff_full": "drop",
+    "mypy": "drop",
+    "ruff_diff": "retain unchanged; already required"
+  },
+  "baseline": {
+    "ruff": {
+      "version": "0.8.0",
+      "command": "ruff check .",
+      "findings": 1635,
+      "files": 139
+    },
+    "mypy": {
+      "version": "2.3.1",
+      "command": "mypy app/ --config-file pyproject.toml",
+      "errors": 1043,
+      "files_with_errors": 124,
+      "checked_files": 237
+    }
+  },
+  "local": {
+    "workflow": "Parsed YAML: only ruff-diff remains, its job equals the original, no continue-on-error, per-commit guard retained.",
+    "foundational_refs": "passed",
+    "diff_check": "passed",
+    "application_changes": false,
+    "formatting_run": false
+  },
+  "retained_lane_main_streak": [
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34768817913,
+      "event": "push",
+      "headSha": "d51ed2c3151e40b1f8017464dcf9b12406dcfaf2",
+      "jobs": [
+        {
+          "conclusion": "success",
+          "databaseId": 103754526504,
+          "name": "ruff-diff"
+        },
+        {
+          "conclusion": "failure",
+          "databaseId": 103754526627,
+          "name": "mypy (advisory)"
+        },
+        {
+          "conclusion": "failure",
+          "databaseId": 103754526670,
+          "name": "ruff-full (advisory)"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34764874442,
+      "event": "push",
+      "headSha": "244e1b6fd72f9720c3a673e026dfda4cecf4f9b9",
+      "jobs": [
+        {
+          "conclusion": "failure",
+          "databaseId": 103743955512,
+          "name": "mypy (advisory)"
+        },
+        {
+          "conclusion": "success",
+          "databaseId": 103743955583,
+          "name": "ruff-diff"
+        },
+        {
+          "conclusion": "failure",
+          "databaseId": 103743955696,
+          "name": "ruff-full (advisory)"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34764003123,
+      "event": "push",
+      "headSha": "8da544d91571f64ba845b27eb12a6d461f20fa88",
+      "jobs": [
+        {
+          "conclusion": "failure",
+          "databaseId": 103741623365,
+          "name": "ruff-full (advisory)"
+        },
+        {
+          "conclusion": "success",
+          "databaseId": 103741623438,
+          "name": "ruff-diff"
+        },
+        {
+          "conclusion": "failure",
+          "databaseId": 103741623503,
+          "name": "mypy (advisory)"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34762305255,
+      "event": "push",
+      "headSha": "416d68070fd69f81368ca4870511e2607e05a106",
+      "jobs": [
+        {
+          "conclusion": "success",
+          "databaseId": 103737153136,
+          "name": "ruff-diff"
+        },
+        {
+          "conclusion": "failure",
+          "databaseId": 103737153189,
+          "name": "ruff-full (advisory)"
+        },
+        {
+          "conclusion": "failure",
+          "databaseId": 103737153277,
+          "name": "mypy (advisory)"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34761469702,
+      "event": "push",
+      "headSha": "2a18eae086d88382c0fb1de7af9a8753d2237dd7",
+      "jobs": [
+        {
+          "conclusion": "failure",
+          "databaseId": 103734945056,
+          "name": "mypy (advisory)"
+        },
+        {
+          "conclusion": "success",
+          "databaseId": 103734945066,
+          "name": "ruff-diff"
+        },
+        {
+          "conclusion": "failure",
+          "databaseId": 103734945122,
+          "name": "ruff-full (advisory)"
+        }
+      ]
+    }
+  ],
+  "promotion": "No new lane. Existing required ruff-diff has five original-attempt main push successes. Dropped lanes are absent, not promoted or represented as fixed.",
+  "pull_request": 267,
+  "merge_commit": "28747385491f5ade099c6d7b692d19fc52da17cb",
+  "ci_after": {
+    "source_commit": "b84728890723b91344c9b84894ba332c98502519",
+    "all_jobs": "passed",
+    "lint_run": 34772727238,
+    "frontend_checks_run": 34772727149,
+    "frontend_build_run": 34772727178,
+    "backend": {
+      "run": 34772727181,
+      "passed": 2427,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 48
+    },
+    "postgres": {
+      "run": 34772727150,
+      "passed": 129,
+      "skipped": 4,
+      "warnings": 17
+    },
+    "secret_scan_run": 34772727171
+  },
+  "main_after": {
+    "attempt": 1,
+    "conclusion": "success",
+    "databaseId": 34773146752,
+    "event": "push",
+    "headSha": "28747385491f5ade099c6d7b692d19fc52da17cb",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "databaseId": 103766309155,
+        "name": "ruff-diff",
+        "status": "completed"
+      }
+    ],
+    "status": "completed"
+  },
+  "branch_protection": {
+    "url": "https://api.github.com/repos/kneelinghorse/TraceLab/branches/main/protection/required_status_checks",
+    "strict": true,
+    "contexts": [
+      "backend-suite",
+      "vitest",
+      "type-check",
+      "ruff-diff",
+      "build-frontend-production",
+      "Secret Scan"
+    ],
+    "contexts_url": "https://api.github.com/repos/kneelinghorse/TraceLab/branches/main/protection/required_status_checks/contexts",
+    "checks": [
+      {
+        "context": "backend-suite",
+        "app_id": 15368
+      },
+      {
+        "context": "vitest",
+        "app_id": 15368
+      },
+      {
+        "context": "type-check",
+        "app_id": 15368
+      },
+      {
+        "context": "ruff-diff",
+        "app_id": 15368
+      },
+      {
+        "context": "build-frontend-production",
+        "app_id": 15368
+      },
+      {
+        "context": "Secret Scan",
+        "app_id": 15368
+      }
+    ]
+  },
+  "remaining": [],
+  "limitations": [
+    "Repository-wide Ruff and Python type findings remain unfixed. No replacement Python type-checking CI gate is introduced."
+  ]
+}
