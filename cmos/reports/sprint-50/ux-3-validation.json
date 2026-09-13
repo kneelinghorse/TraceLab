@@ -1,7 +1,7 @@
 {
   "mission": "UX-3",
   "status": "implementation and local acceptance passed; CI and deployment pending",
-  "checked_at": "2026-09-13T13:42:44.586Z",
+  "checked_at": "2026-09-13T13:51:37.745Z",
   "contract": "cmos/contracts/evidence-browser.md",
   "validation": {
     "backend_regressions": {
@@ -25,11 +25,12 @@
       "skipped": 0
     },
     "shell_e2e": {
-      "passed": 9,
-      "skipped": 0
+      "passed": 13,
+      "skipped": 0,
+      "includes": "four retained native dialog keyboard regressions"
     },
     "browser_smoke": {
-      "checked_at": "2026-09-13T13:42:44.586Z",
+      "checked_at": "2026-09-13T13:51:37.745Z",
       "base": "http://127.0.0.1:3103",
       "api": "http://127.0.0.1:8103",
       "fixture": true,
@@ -53,7 +54,13 @@
     "changed_file_ruff": "passed",
     "changed_file_eslint": "passed",
     "new_browser_modules_mypy": "passed",
-    "foundational_references": "passed"
+    "foundational_references": "passed",
+    "delete_dialogs": {
+      "checks": 12,
+      "failures": 0,
+      "write_requests": 0,
+      "receipt": "ux-3-delete-dialogs.json"
+    }
   },
   "production_inventory": {
     "mission": "7b847edd-5433-4237-a899-57b47e6edf0a",
@@ -76,6 +83,16 @@
     "Playwright exact select labels exposed ambiguous names; Project and Disposition now have explicit accessible names.",
     "Temporary PostgreSQL fixture lacked the existing mission_logs table; created that model table and reran all36 measurements. Earlier failure receipts retained separately.",
     "New PostgreSQL test fixture must populate the required user display_name.",
-    "Mission runner logs now use the shared authenticated HTTP client and SWR, clearing the existing legacy storage-key read and effect-state lint error on this touched route."
-  ]
+    "Mission runner logs now use the shared authenticated HTTP client and SWR, clearing the existing legacy storage-key read and effect-state lint error on this touched route.",
+    "Native confirmation dialogs allowed Tab to leave the dialog. Extracted and reused the existing shell focus handler;13 retained browser tests and12 deletion-dialog focus/axe/cancel checks now pass. No-enabled-control busy states keep focus in the dialog."
+  ],
+  "ci_initial": {
+    "head": "01a22b6b579ebc34559af35a091c8d1cb70a4aa3",
+    "required": "all passed",
+    "postgres": {
+      "passed": 128,
+      "skipped": 4
+    },
+    "note": "Final CI reruns after the frontend dialog focus correction."
+  }
 }
