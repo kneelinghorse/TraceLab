@@ -1,6 +1,6 @@
 {
   "mission": "THEME-1",
-  "status": "in_progress",
+  "status": "completed",
   "base_commit": "d51ed2c3151e40b1f8017464dcf9b12406dcfaf2",
   "implementation": "System / Light / Dark with resolved System label, authoritative head bootstrap, preserved hydration, semantic prose and no dark utilities. Stored hc falls back to System.",
   "local": {
@@ -63,10 +63,31 @@
       "conclusion": "The prepared m06 replacement retains the same failing hc values. A re-pin alone does not fix this blocker."
     }
   },
-  "deployments": null,
+  "deployments": {
+    "checked_at": "2026-09-13T19:26:19.597603+00:00",
+    "project": "TraceLab",
+    "services": [
+      {
+        "name": "TraceLab",
+        "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+        "deployment_id": "de5aee35-4be4-4f5b-8830-58cff54161fe",
+        "status": "SUCCESS",
+        "commit": "3237267f257afb726d5ae7ae77f2905681b14cb8",
+        "created_at": "2026-09-13T19:23:16.542Z"
+      },
+      {
+        "name": "frontend",
+        "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+        "deployment_id": "f7e8045f-04cd-4535-8c00-b9d5e0a46e7b",
+        "status": "SUCCESS",
+        "commit": "3237267f257afb726d5ae7ae77f2905681b14cb8",
+        "created_at": "2026-09-13T19:23:16.542Z"
+      }
+    ]
+  },
   "limitations": [
-    "Local built app uses read-only real production data through the existing API proxy; this is not a deployed frontend acceptance test.",
-    "Existing mission-protocol and production-smoke suites were not part of the four deterministic browser suites.",
+    "High contrast is deferred by explicit user direction (decision #408, THEME-2). The historical local baseline retains all 62 failing HC measurements.",
+    "The full legacy mission-protocol suite was not rerun for this theme-only change; 25 deterministic built-browser tests and the 124-check direct-production route baseline passed.",
     "Initial tests used an unsupported matcher/native arrow behavior; corrected to existing assertion conventions and native type-ahead. An initial pytest invocation had a mistyped file path; the corrected suites pass.",
     "CMOS mirror reconciliation is incomplete after file upload HTTP 413 and cursor replay timeout. SQLite remains healthy and authoritative."
   ],
@@ -189,11 +210,49 @@
     ],
     "note": "Historical evidence for the earlier three-theme implementation; HC failures remain preserved, not accepted as passing."
   },
-  "ci": null,
+  "ci": {
+    "source_commit": "2b5c587fa33e97c19cb734af8c92d7b4bc3c6ef5",
+    "all_jobs": "passed",
+    "frontend_checks_run": 34777131850,
+    "frontend_build_run": 34777131820,
+    "backend": {
+      "run": 34777131801,
+      "passed": 2427,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 48
+    },
+    "postgres": {
+      "run": 34777131822,
+      "passed": 129,
+      "skipped": 4,
+      "warnings": 17
+    },
+    "secret_scan_run": 34777131826,
+    "lint_run": 34777131848
+  },
   "blockers": [],
-  "remaining": [
-    "CI for the deferral implementation",
-    "Merge then both Railway services SUCCESS at the merged commit",
-    "124 direct-production route/theme/viewport checks and screenshots"
-  ]
+  "remaining": [],
+  "merge_commit": "3237267f257afb726d5ae7ae77f2905681b14cb8",
+  "production_baseline": {
+    "base": "https://tracelab.aquex.ai",
+    "checked_at": "2026-09-13T19:29:36.196Z",
+    "checks": 124,
+    "routes": 31,
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "widths": [
+      1440,
+      390
+    ],
+    "failures": [],
+    "overflow": 0,
+    "critical_serious_axe": 0,
+    "browser_errors": 0,
+    "api_errors": 0,
+    "directProductionApi": true,
+    "readOnlyApiProxy": false
+  }
 }
