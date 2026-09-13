@@ -11,7 +11,6 @@ import type {
   WorkerHealthResponse,
 } from "@/types/console";
 import type { ApiMission } from "@/types/mission";
-import type { PaginatedResponse } from "@/types/pagination";
 
 // ==================== Relationships API ====================
 
@@ -116,59 +115,6 @@ export async function getDeadLetterQueue(
   return httpClient.get("/deepsearch/corrections/dead-letter", {
     params: { limit },
   });
-}
-
-// ==================== Console Dashboard API ====================
-
-/**
- * Fetch missions with computed console metrics.
- * Uses existing mission API (paginated response).
- */
-export async function getConsoleMissions(): Promise<ApiMission[]> {
-  const response = await httpClient.get<PaginatedResponse<ApiMission>>("/missions", {
-    params: { page_size: 100 },
-  });
-  return response.data;
-}
-
-/**
- * Compute dashboard stats from missions and corrections data.
- * Uses ApiMission schema where status is directly on the mission object.
- */
-export function computeDashboardStats(
-  missions: ApiMission[],
-  corrections: CorrectionStatusResponse
-): {
-  missionsByStatus: Record<string, number>;
-  qualityDistribution: { excellent: number; good: number; fair: number; poor: number };
-  totalMissions: number;
-} {
-  const missionsByStatus: Record<string, number> = {};
-  const qualityDistribution = { excellent: 0, good: 0, fair: 0, poor: 0 };
-
-  for (const mission of missions) {
-    // Count by status - status is directly on ApiMission
-    const status = mission.status ?? "draft";
-    missionsByStatus[status] = (missionsByStatus[status] ?? 0) + 1;
-
-    // Quality distribution based on success criteria completion
-    // Since we don't have completion_percentage, use whether mission is completed
-    if (mission.status === "completed") {
-      qualityDistribution.excellent++;
-    } else if (mission.status === "in_progress") {
-      qualityDistribution.good++;
-    } else if (mission.status === "queued") {
-      qualityDistribution.fair++;
-    } else {
-      qualityDistribution.poor++;
-    }
-  }
-
-  return {
-    missionsByStatus,
-    qualityDistribution,
-    totalMissions: missions.length,
-  };
 }
 
 // ==================== Export Utilities ====================

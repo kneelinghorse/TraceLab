@@ -29,7 +29,7 @@ const ERROR_TYPE_LABELS: Record<string, string> = {
   database_error: "Database Error",
 };
 
-function StatBox({ label, value, color }: { label: string; value: number; color: string }) {
+function StatBox({ label, value, color }: { label: string; value: number | string; color: string }) {
   return (
     <div className={`px-4 py-3 rounded-lg ${color}`}>
       <div className="text-2xl font-bold">{value}</div>
@@ -82,15 +82,15 @@ export function CorrectionStatusCard({
   const { stats, error_distribution, recent_items } = status;
   const successRate = stats.completed + stats.failed > 0
     ? Math.round((stats.completed / (stats.completed + stats.failed)) * 100)
-    : 0;
+    : null;
 
   return (
     <div className="bg-surface dark:bg-surface rounded-lg border border-line dark:border-line p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h3 className="text-lg font-semibold text-foreground dark:text-foreground">
           Correction Queue
         </h3>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {onTriggerRetry && stats.pending > 0 && (
             <button
               onClick={onTriggerRetry}
@@ -136,7 +136,7 @@ export function CorrectionStatusCard({
         />
         <StatBox
           label="Success Rate"
-          value={successRate}
+          value={successRate == null ? "No attempts" : `${successRate}%`}
           color="bg-info-surface text-info dark:bg-info-surface dark:text-accent-text"
         />
       </div>

@@ -8,7 +8,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Any, Literal
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request, Response, status
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -18,7 +18,10 @@ from app.core.authorization import POLICY_VERSION
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import ROLE_OWNER, AuthenticatedUser, require_admin
+from app.dependencies import get_admin_stats_service
 from app.models.user import User
+from app.schemas.admin_stats import AdminStatsResponse
+from app.services.admin_stats import AdminStatsService
 from app.services.metrics_aggregator import MetricsAggregator, get_metrics_aggregator
 from app.services.qdrant_service import QdrantService, get_qdrant_service
 
@@ -265,3 +268,15 @@ def rbac_status(
         your_role=caller.role,
         policy_version=POLICY_VERSION,
     )
+
+
+@router.get("/stats", response_model=AdminStatsResponse)
+async def system_stats(
+    response: Response,
+    caller: AuthenticatedUser = Depends(require_admin),
+    db: Session = Depends(get_db),
+    service: AdminStatsService = Depends(get_admin_stats_service),
+) -> AdminStatsResponse:
+    """Admin-only whole-system totals, independent of mission-list pagination."""
+    response.headers["Cache-Control"] = "private, no-store"
+    return await service.snapshot(db)

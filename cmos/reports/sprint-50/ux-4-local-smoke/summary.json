@@ -1,0 +1,23 @@
+{
+  "checked_at": "2026-09-13T14:07:48.123Z",
+  "base": "http://127.0.0.1:3103",
+  "api": "http://127.0.0.1:8103",
+  "fixture": true,
+  "checks": 24,
+  "failures": 0,
+  "mission_total": 144,
+  "mission_statuses": {
+    "draft": 135,
+    "queued": 1,
+    "in_progress": 2,
+    "completed": 4,
+    "blocked": 1,
+    "cancelled": 0,
+    "validation_failed": 1
+  },
+  "projects": 2,
+  "documents": 1,
+  "chunks": 0,
+  "worker_status": "unavailable",
+  "write_requests": 0
+}

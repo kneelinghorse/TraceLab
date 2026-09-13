@@ -1,0 +1,68 @@
+{
+  "mission": "UX-4",
+  "local": {
+    "admin_api": {
+      "passed": 9,
+      "skipped": 0
+    },
+    "home_regression": {
+      "passed": 6,
+      "skipped": 0
+    },
+    "postgres": {
+      "passed": 1,
+      "skipped": 0,
+      "version": 14,
+      "note": "Isolated local cluster; required CI runs PostgreSQL15."
+    },
+    "frontend_unit": {
+      "passed": 105,
+      "skipped": 0
+    },
+    "browser": {
+      "passed": 18,
+      "skipped": 0
+    },
+    "build": "passed",
+    "changed_file_eslint": "passed",
+    "changed_file_ruff": "passed",
+    "new_backend_modules_mypy": "passed",
+    "foundational_refs": "passed",
+    "smoke": {
+      "checked_at": "2026-09-13T14:07:48.123Z",
+      "base": "http://127.0.0.1:3103",
+      "api": "http://127.0.0.1:8103",
+      "fixture": true,
+      "checks": 24,
+      "failures": 0,
+      "mission_total": 144,
+      "mission_statuses": {
+        "draft": 135,
+        "queued": 1,
+        "in_progress": 2,
+        "completed": 4,
+        "blocked": 1,
+        "cancelled": 0,
+        "validation_failed": 1
+      },
+      "projects": 2,
+      "documents": 1,
+      "chunks": 0,
+      "worker_status": "unavailable",
+      "write_requests": 0
+    }
+  },
+  "remaining": [
+    "Required CI",
+    "Deploy and production smoke"
+  ],
+  "limitations": [
+    "No production correction queue writes in smoke; explicit correction success/failure/retry is covered in frontend tests and existing API suite.",
+    "Runtime observations describe their current process, not historical uptime across deployments."
+  ],
+  "test_setup_corrections": [
+    "Test fixture used unsupported failed mission status; corrected to the persisted validation_failed vocabulary.",
+    "Initial Playwright command was launched from repository root, so six axe imports could not resolve frontend/node_modules. Reran from frontend:18passed.",
+    "Regenerated Next build types after removing old console routes."
+  ]
+}
