@@ -12,6 +12,7 @@ let browser;
 async function run() {
 const base=process.env.UI_BASE || 'http://localhost:3100';
 const directProduction = new URL(base).origin === 'https://tracelab.aquex.ai';
+const timezoneId=process.env.UI_TIMEZONE || 'America/Chicago';
 const out=process.env.UI_OUT || path.join(os.tmpdir(), 'tracelab-ui-shell');
 await fs.mkdir(out,{recursive:true});
 const creds=JSON.parse(await fs.readFile(path.join(os.homedir(),'.config/tracelab-mcp/credentials.json'),'utf8'));
@@ -24,14 +25,14 @@ const mission=missions.data.find(m=>m.mission_id==='TL-UX-R001')||missions.data[
 const ids={project:project.id,document:documents.data[0].id,mission:mission.id,report:reports.items[0].id,collection:collections.data[0]?.id};
 await fs.writeFile(out+'/inventory.json',JSON.stringify({ids,projectName:project.name,missionName:mission.mission_id,role:me.role},null,2));
 const evidence = await get('/evidence?project_id='+project.id);
-const routes=['/','/projects',`/projects/${ids.project}`,'/documents',`/documents/${ids.document}`,'/documents/upload','/collections',`/collections/${ids.collection}`,'/reports',`/reports/${ids.report}`,'/missions',`/missions/${ids.mission}`,'/missions/new','/missions/queue','/search','/search/results','/saved-searches','/settings','/invites','/device','/admin/users','/admin/spaces','/console','/console/missions',`/console/missions/${ids.mission}`,'/console/corrections','/404','/evidence','/admin/observability','/admin/corrections',...(evidence.entries[0]?['/evidence/'+evidence.entries[0].id]:[])];
+const routes=['/','/graph',`/graph?root=project:${ids.project}`,'/projects',`/projects/${ids.project}`,'/documents',`/documents/${ids.document}`,'/documents/upload','/collections',`/collections/${ids.collection}`,'/reports',`/reports/${ids.report}`,'/missions',`/missions/${ids.mission}`,'/missions/new','/missions/queue','/search','/search/results','/saved-searches','/settings','/invites','/device','/admin/users','/admin/spaces','/console','/console/missions',`/console/missions/${ids.mission}`,'/console/corrections','/404','/evidence','/admin/observability','/admin/corrections',...(evidence.entries[0]?['/evidence/'+evidence.entries[0].id]:[])];
 const selected=process.env.UI_ROUTE?[process.env.UI_ROUTE]:process.env.UI_PROBE?['/missions','/search','/settings','/admin/users','/evidence']:routes;
 browser=await chromium.launch({headless:true});
 const results=[];
 for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'])) {
  for (const width of (process.env.UI_WIDTH?[Number(process.env.UI_WIDTH)]:[1440,390])) {
   let transportErrors=[]; let navigationCancellations=[];
-  const context=await browser.newContext({viewport:{width,height:1000},colorScheme:theme === 'dark' ? 'dark' : 'light'});
+  const context=await browser.newContext({timezoneId,viewport:{width,height:1000},colorScheme:theme === 'dark' ? 'dark' : 'light'});
   await context.route(/https?:\/\/(api\.tracelab\.aquex\.ai|localhost:8000|127\.0\.0\.1:8103)\/.*/, async route => {
     const incoming = new URL(route.request().url());
     const method = route.request().method();
@@ -98,7 +99,7 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
 await browser.close();
 browser=undefined;
 const failures=results.filter(r => r.scrollWidth > r.width+1 || r.violations.length || r.errors.length || r.transportErrors.length || r.legacyInternalLinks.length || r.mainCount !== 1 || !r.shellPresent || r.theme !== r.themeRequested || r.status !== (r.route === '/404' ? 404 : 200));
-await fs.writeFile(out+'/summary.json', JSON.stringify({base, checkedAt:new Date().toISOString(), checks:results.length, routes:[...new Set(results.map(r=>r.route))].length, failures:failures.map(r=>({route:r.route,theme:r.theme,width:r.width})), internalLinkPaths:[...new Set(results.flatMap(r=>r.internalLinks))].sort(), legacyInternalLinks:results.flatMap(r=>r.legacyInternalLinks), readOnly:true, directProductionApi:directProduction, readOnlyApiProxy:!directProduction},null,2));
+await fs.writeFile(out+'/summary.json', JSON.stringify({base, timezoneId, checkedAt:new Date().toISOString(), checks:results.length, routes:[...new Set(results.map(r=>r.route))].length, failures:failures.map(r=>({route:r.route,theme:r.theme,width:r.width})), internalLinkPaths:[...new Set(results.flatMap(r=>r.internalLinks))].sort(), legacyInternalLinks:results.flatMap(r=>r.legacyInternalLinks), readOnly:true, directProductionApi:directProduction, readOnlyApiProxy:!directProduction},null,2));
 if(failures.length)process.exitCode=1;
 
 }

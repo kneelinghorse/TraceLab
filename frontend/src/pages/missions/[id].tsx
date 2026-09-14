@@ -1,3 +1,4 @@
+import { RelationshipLink } from "@/components/graph/RelationshipLink";
 import { parseApiTimestamp } from "@/lib/api/timestamps";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { HttpError } from "@/lib/api/http";
@@ -190,6 +191,7 @@ function MissionDetailContent() {
                     <h1 className="break-words text-2xl font-bold text-foreground">
                       {mission.title}
                     </h1>
+                    <div className="mt-3"><RelationshipLink type="mission" id={mission.id} /></div>
                     <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-muted">
                       {mission.project_id && mission.project_name ? (
                         <Link

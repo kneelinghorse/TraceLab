@@ -46,6 +46,7 @@ describe("the shared shell", () => {
     expect(within(nav).getByRole("link", { name: "Missions", exact: true }).getAttribute("aria-current")).toBe("page");
     expect(screen.getByRole("link", { name: "Skip to content" }).getAttribute("href")).toBe("#main-content");
     expect(screen.getByRole("link", { name: "Saved searches" })).toBeTruthy();
+    expect(within(nav).getByRole("link", { name: "Relationships" }).getAttribute("href")).toBe("/graph");
   });
 
   it("keeps admin destinations out of both navigation and command search for non-admins", () => {
