@@ -1,0 +1,2621 @@
+{
+  "mission_id": "SEC-1",
+  "sprint_id": "sprint-52",
+  "generated_at": "2026-09-14T12:34:37.045276+00:00",
+  "status": "validated_pending_receipt_merge",
+  "source": {
+    "pr": 288,
+    "url": "https://github.com/kneelinghorse/TraceLab/pull/288",
+    "head_commit": "e3dbf304d72176fe12bacd483ef318300c07f79b",
+    "merge_commit": "eab45dcaec04a81b6b1169677f8a1a2775e2f443",
+    "merged_at": "2026-09-14T12:24:48Z"
+  },
+  "scope": {
+    "decisions": [
+      423,
+      426,
+      428,
+      429,
+      430
+    ],
+    "fifth_replay_path_approved": true,
+    "handlers": [
+      "POST /api/v1/documents",
+      "PATCH /api/v1/projects/{id}",
+      "PATCH /api/v1/documents/{id}",
+      "POST /api/v1/jobs?document_id={id}",
+      "POST /api/v1/projects (cached original project)"
+    ],
+    "schema_migration": false,
+    "ui_mission": false
+  },
+  "implementation": {
+    "registration": "Authenticate; load a non-deleted parent project; authorize upload; check idempotency; resolve and confine path; require a regular file; persist canonical path and inherited owner/Space.",
+    "replay": "Four onboarding handlers authorize before replay. Project creation loads the original cached project and checks current read access before returning its response; missing/deleted projects return 404. Method/path mismatches return 409 before payload comparison.",
+    "path_resolution": "os.path.realpath resolves symlinks before containment. Python 3.11 Path.resolve(strict=False) performs a final stat; the candidate resolver avoids that final stat until containment is checked.",
+    "harness": "Anonymous registration 401 plus existing throwaway member/viewer exact-403 probes against an existing owner project using deliberately absent ingest paths. Coverage and integration route guards remain in lockstep; five-login budget preserved."
+  },
+  "local_validation": {
+    "backend": {
+      "exit_code": 0,
+      "passed": 2533,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 47,
+      "duration_seconds": 350.66,
+      "skipped_nodes": [
+        "tests/test_auto_ingest.py::TestAutoIngestIntegration::test_auto_ingest_full_pipeline",
+        "tests/test_pedr_unified_search.py::TestPEDRIntegration::test_create_orchestrator_factory",
+        "tests/test_pedr_unified_search.py::TestPEDRIntegration::test_full_search_pipeline"
+      ],
+      "quarantine": [
+        "tests/sprint_03/test_api_stability.py::test_api_uptime_and_latency_meet_targets # Historical Sprint-03 evaluator reads unwrapped telemetry and finds no uptime data points.",
+        "tests/sprint_03/test_evidence_integrity.py::test_evidence_integrity_checks_detect_missing_chunks # Historical Sprint-03 evaluator reads unwrapped telemetry and reports zero relevance.",
+        "tests/sprint_03/test_quality_gate_effectiveness.py::test_quality_gate_failures_blocked_with_actionable_feedback # Historical Sprint-03 evaluator does not unwrap the preserved TelemetryEnvelope; actionable_ratio is zero.",
+        "tests/sprint_03/test_validation_coverage.py::test_validation_rate_exceeds_target # Historical Sprint-03 evaluator does not unwrap telemetry; mission_id and validation layers are missing.",
+        "tests/sprint_04/test_coverage_metric.py::test_coverage_threshold_exceeded # Historical Sprint-04 coverage evaluator finds no coverage event in its telemetry fixture.",
+        "tests/sprint_04/test_performance_metrics.py::test_latency_stays_under_two_seconds # Historical Sprint-04 evaluator raises Latency telemetry missing; it does not unwrap envelopes.",
+        "tests/sprint_04/test_performance_metrics.py::test_cost_profile_within_budget # Historical Sprint-04 evaluator raises Cost telemetry missing; it does not unwrap envelopes.",
+        "tests/sprint_04/test_quality_and_load.py::test_quality_checks_block_and_pass # Historical Sprint-04 evaluator cannot find the enveloped quality event in its fixture.",
+        "tests/sprint_04/test_quality_and_load.py::test_load_test_supports_target_concurrency # Historical Sprint-04 evaluator raises Load test telemetry missing; it does not unwrap envelopes.",
+        "tests/sprint_04/test_tech_debt.py::test_playwright_migration_eliminates_cypress_cost # Historical Sprint-04 evaluator cannot find the enveloped tech-debt event in its fixture.",
+        "tests/test_admin_dashboard.py::test_metrics_aggregator_generates_sections # Fixed 2025 cost-event timestamps fall outside the current rolling retention window; expected 0.45 is zero.",
+        "tests/test_document_ingestion.py::test_upload_and_process_endpoints_record_statuses # Document detail fixture expects processing_events, which the current DocumentResponse does not expose (KeyError)."
+      ],
+      "console_summary_is_authoritative": true,
+      "raw_telemetry_summary": {
+        "total": 2536,
+        "passed": 2536,
+        "failed": 0,
+        "skipped": 0,
+        "xfailed": 0,
+        "xpassed": 0,
+        "error": 0
+      },
+      "telemetry_limitation": "Plugin marks setup-skipped/teardown-passed tests as passed; raw per-phase evidence confirms three skips."
+    },
+    "targeted": {
+      "passed": 183,
+      "skipped": 1,
+      "skip_reason": "Production-only rbac_verify wrapper; live run requires SEC-2 authorization.",
+      "warnings": 14,
+      "duration_seconds": 74.98
+    },
+    "additional_relative_path_regression": {
+      "passed": 1,
+      "warnings": 14,
+      "duration_seconds": 2.55
+    },
+    "lint": {
+      "command": "ruff check on all 11 changed Python files",
+      "passed": true,
+      "ruff_format_run": false
+    },
+    "foundational_references": {
+      "command": "python cmos/scripts/validate_foundational_refs.py",
+      "passed": true
+    },
+    "pytest_serialized": true,
+    "telemetry_caveat_learning": 180
+  },
+  "regression_red_phase": {
+    "mounted_app_reproductions": [
+      "Outsider registration returned 201 instead of 403.",
+      "Soft-deleted parent still accepted registration.",
+      "Stored file path was not canonical.",
+      "Outsider project-creation replay returned another owner's cached 201."
+    ],
+    "path_guard_initial_failures": 4,
+    "path_guard_resolution": "Changed candidate resolution to avoid Path.resolve implicit final stat; all path guard cases passed.",
+    "fixture_setup_error": "A missing test User.display_name was corrected before counting the security regressions.",
+    "harness_goes_red_on_status": [
+      201,
+      404,
+      400,
+      422
+    ]
+  },
+  "alternate_caller_sweep": {
+    "transport": "TestClient(app.main.app), real JWT and X-API-Key authentication; no auth dependency overrides",
+    "combinations": 24,
+    "replay_cells": 120,
+    "fresh_registration_cells": 24,
+    "anonymous_replay_checks": 120,
+    "row_delta_tables": [
+      "projects",
+      "documents",
+      "document_processing_statuses",
+      "idempotency_records",
+      "ingestion_jobs"
+    ],
+    "all_replay_row_deltas_zero": true,
+    "service_principals_create_no_rows": true,
+    "results": [
+      {
+        "rbac": true,
+        "role": "member",
+        "credential": "jwt",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/5956d544-6f15-4e18-87b6-a02935dc2645",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/68ca263e-5faf-4edf-abb2-6c30c977a928",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=68ca263e-5faf-4edf-abb2-6c30c977a928",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 403,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": false,
+        "role": "member",
+        "credential": "jwt",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/b38c667f-6ffd-4182-9d9e-ce31a92fc762",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/9ea6f496-c6bd-48b5-84b2-1a2a75a0935f",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=9ea6f496-c6bd-48b5-84b2-1a2a75a0935f",
+            "status": 202,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 201,
+            "row_delta": {
+              "projects": 0,
+              "documents": 1,
+              "document_processing_statuses": 1,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": true,
+        "role": "member",
+        "credential": "api_key",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/ad249a1f-8313-46a4-909e-d678ae5112ab",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/d35d89d1-983e-4dd7-ac8a-2136f816a0d4",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=d35d89d1-983e-4dd7-ac8a-2136f816a0d4",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 403,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": false,
+        "role": "member",
+        "credential": "api_key",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/bf99870e-491d-4dc6-94ef-d17dd03ab5bd",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/99b1fdf7-ddf1-462f-bebb-598a0db2e3c8",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=99b1fdf7-ddf1-462f-bebb-598a0db2e3c8",
+            "status": 202,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 201,
+            "row_delta": {
+              "projects": 0,
+              "documents": 1,
+              "document_processing_statuses": 1,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": true,
+        "role": "viewer",
+        "credential": "jwt",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/fe2fa17b-01e5-4e92-8cc8-678127bc04e4",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/695bed39-9f68-4d01-b849-04b3b660cfae",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=695bed39-9f68-4d01-b849-04b3b660cfae",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 403,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": false,
+        "role": "viewer",
+        "credential": "jwt",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/4ac6106b-c9fc-4e49-9a1e-f8d87e6157a8",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/ac40f1fa-bf9f-4f19-b7a6-fe726f16cc69",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=ac40f1fa-bf9f-4f19-b7a6-fe726f16cc69",
+            "status": 202,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 201,
+            "row_delta": {
+              "projects": 0,
+              "documents": 1,
+              "document_processing_statuses": 1,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": true,
+        "role": "viewer",
+        "credential": "api_key",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/a576b6e0-1779-4ec5-be74-77d04841f3a7",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/52d6864d-487d-4a4b-91c5-d979d2fd3def",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=52d6864d-487d-4a4b-91c5-d979d2fd3def",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 403,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": false,
+        "role": "viewer",
+        "credential": "api_key",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/a27d4842-886f-4ed1-b083-0b450eac7358",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/eb2ed1a7-eb05-47aa-ab60-e1d3e4015251",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=eb2ed1a7-eb05-47aa-ab60-e1d3e4015251",
+            "status": 202,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 201,
+            "row_delta": {
+              "projects": 0,
+              "documents": 1,
+              "document_processing_statuses": 1,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": true,
+        "role": "project_owner",
+        "credential": "jwt",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/1cb44ca2-68da-449a-918a-ba7b019bc14b",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/aefacd8a-d7a6-4b88-8d6c-522c4a9a5b70",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=aefacd8a-d7a6-4b88-8d6c-522c4a9a5b70",
+            "status": 202,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 201,
+            "row_delta": {
+              "projects": 0,
+              "documents": 1,
+              "document_processing_statuses": 1,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": false,
+        "role": "project_owner",
+        "credential": "jwt",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/911b5607-92a7-4232-a8ce-737638a1935a",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/331b5ae7-2c1a-4a6d-afb3-dcddbab2debe",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=331b5ae7-2c1a-4a6d-afb3-dcddbab2debe",
+            "status": 202,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 201,
+            "row_delta": {
+              "projects": 0,
+              "documents": 1,
+              "document_processing_statuses": 1,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": true,
+        "role": "project_owner",
+        "credential": "api_key",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/ce212a92-433a-4b78-80c5-e599bc4b30d2",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/07e28bc8-7b45-40f5-8788-bbf1053cb413",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=07e28bc8-7b45-40f5-8788-bbf1053cb413",
+            "status": 202,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 201,
+            "row_delta": {
+              "projects": 0,
+              "documents": 1,
+              "document_processing_statuses": 1,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": false,
+        "role": "project_owner",
+        "credential": "api_key",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/1fcd112e-5b51-4ec4-b577-7be49c05797c",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/7154d422-930d-4df6-b645-046b48986bb1",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=7154d422-930d-4df6-b645-046b48986bb1",
+            "status": 202,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 201,
+            "row_delta": {
+              "projects": 0,
+              "documents": 1,
+              "document_processing_statuses": 1,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": true,
+        "role": "admin",
+        "credential": "jwt",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/4dc46c14-4560-4875-855b-f92bf4fc61a5",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/d2d76644-90c9-454d-9775-e9128dd3cbdf",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=d2d76644-90c9-454d-9775-e9128dd3cbdf",
+            "status": 202,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 201,
+            "row_delta": {
+              "projects": 0,
+              "documents": 1,
+              "document_processing_statuses": 1,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": false,
+        "role": "admin",
+        "credential": "jwt",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/2aae1fa5-c516-4ec7-b5f1-d0019f29dc69",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/2d6aa930-6466-456b-b1eb-ebbfb7142680",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=2d6aa930-6466-456b-b1eb-ebbfb7142680",
+            "status": 202,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 201,
+            "row_delta": {
+              "projects": 0,
+              "documents": 1,
+              "document_processing_statuses": 1,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": true,
+        "role": "admin",
+        "credential": "api_key",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/34567c79-8507-4157-baf1-9f7d60e3a11e",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/100df1cf-1dae-4d0a-b770-db556d2b97d0",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=100df1cf-1dae-4d0a-b770-db556d2b97d0",
+            "status": 202,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 201,
+            "row_delta": {
+              "projects": 0,
+              "documents": 1,
+              "document_processing_statuses": 1,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": false,
+        "role": "admin",
+        "credential": "api_key",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/0de725bf-dbd4-4109-99c6-88854e7f6e73",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/def67e91-554b-4e68-aee6-97f4b22a9efb",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=def67e91-554b-4e68-aee6-97f4b22a9efb",
+            "status": 202,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 201,
+            "row_delta": {
+              "projects": 0,
+              "documents": 1,
+              "document_processing_statuses": 1,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": true,
+        "role": "owner",
+        "credential": "jwt",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/ff40d60c-4d19-40d4-9154-e95c445d23f1",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/e6f9c2c7-66b7-4249-b31f-ebcb2ae159f8",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=e6f9c2c7-66b7-4249-b31f-ebcb2ae159f8",
+            "status": 202,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 201,
+            "row_delta": {
+              "projects": 0,
+              "documents": 1,
+              "document_processing_statuses": 1,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": false,
+        "role": "owner",
+        "credential": "jwt",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/a0075bc8-b4d9-4383-a95e-924b2a006db6",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/6cf3c76c-a3b6-4314-8d67-5f529270516c",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=6cf3c76c-a3b6-4314-8d67-5f529270516c",
+            "status": 202,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 201,
+            "row_delta": {
+              "projects": 0,
+              "documents": 1,
+              "document_processing_statuses": 1,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": true,
+        "role": "owner",
+        "credential": "api_key",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/49f42be2-f92e-4663-9fde-7963d52af37a",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/ea94b2db-cb44-40f7-8886-eb6f77acd4e4",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=ea94b2db-cb44-40f7-8886-eb6f77acd4e4",
+            "status": 202,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 201,
+            "row_delta": {
+              "projects": 0,
+              "documents": 1,
+              "document_processing_statuses": 1,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": false,
+        "role": "owner",
+        "credential": "api_key",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/f526793e-ad14-4414-a1e4-3cc4339ad1ed",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/edcbb49e-37b2-4350-a8d3-e1c8c6e09b5a",
+            "status": 200,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=edcbb49e-37b2-4350-a8d3-e1c8c6e09b5a",
+            "status": 202,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 201,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 201,
+            "row_delta": {
+              "projects": 0,
+              "documents": 1,
+              "document_processing_statuses": 1,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": true,
+        "role": "service",
+        "credential": "jwt",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/ab316f23-f9a3-4218-881f-2556ef572763",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/b47d31ee-4198-4557-b771-d3c30c4df3bb",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=b47d31ee-4198-4557-b771-d3c30c4df3bb",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 403,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": false,
+        "role": "service",
+        "credential": "jwt",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/2601fd82-e54b-492c-be59-bff04e27e591",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/4b061b3e-7332-42f1-a306-9800e9c4f8f8",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=4b061b3e-7332-42f1-a306-9800e9c4f8f8",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 403,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": true,
+        "role": "service",
+        "credential": "api_key",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/36311ebc-b151-46a1-94bd-d562e227b4c0",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/7db8253e-8e50-45a0-818e-0414ed7c0376",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=7db8253e-8e50-45a0-818e-0414ed7c0376",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 403,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      },
+      {
+        "rbac": false,
+        "role": "service",
+        "credential": "api_key",
+        "cells": [
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/projects/8c216e4b-3e7c-4ab2-b251-7345e61a19dd",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "patch",
+            "path": "/api/v1/documents/53b2d47e-088c-46d5-8d88-39373fe245d2",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/jobs?document_id=53b2d47e-088c-46d5-8d88-39373fe245d2",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/projects",
+            "status": 403,
+            "anonymous_status": 401,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          },
+          {
+            "method": "post",
+            "path": "/api/v1/documents",
+            "replay": false,
+            "status": 403,
+            "row_delta": {
+              "projects": 0,
+              "documents": 0,
+              "document_processing_statuses": 0,
+              "idempotency_records": 0,
+              "ingestion_jobs": 0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "post_merge_main_push_ci": {
+    "accepted_commit": "eab45dcaec04a81b6b1169677f8a1a2775e2f443",
+    "all_required_and_advisory_checks_passed": true,
+    "required_contexts": [
+      "Secret Scan",
+      "backend-integration",
+      "backend-suite",
+      "build-frontend-production",
+      "lint",
+      "ruff-diff",
+      "type-check",
+      "vitest"
+    ],
+    "advisory_contexts": [
+      "mcp-package"
+    ],
+    "advisory_failures": [],
+    "runs": [
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34843284356,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "eab45dcaec04a81b6b1169677f8a1a2775e2f443",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34843284356",
+        "workflowName": "Backend Lint",
+        "jobs": [
+          {
+            "databaseId": 103973047791,
+            "name": "ruff-diff",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34843284356/job/103973047791",
+            "startedAt": "2026-09-14T12:24:57Z",
+            "completedAt": "2026-09-14T12:25:16Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34843284535,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "eab45dcaec04a81b6b1169677f8a1a2775e2f443",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34843284535",
+        "workflowName": "MCP Package",
+        "jobs": [
+          {
+            "databaseId": 103973047461,
+            "name": "mcp-package",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34843284535/job/103973047461",
+            "startedAt": "2026-09-14T12:24:57Z",
+            "completedAt": "2026-09-14T12:25:37Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34843284734,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "eab45dcaec04a81b6b1169677f8a1a2775e2f443",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34843284734",
+        "workflowName": "Frontend Checks",
+        "jobs": [
+          {
+            "databaseId": 103973048689,
+            "name": "vitest",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34843284734/job/103973048689",
+            "startedAt": "2026-09-14T12:24:57Z",
+            "completedAt": "2026-09-14T12:26:06Z"
+          },
+          {
+            "databaseId": 103973048940,
+            "name": "type-check",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34843284734/job/103973048940",
+            "startedAt": "2026-09-14T12:24:57Z",
+            "completedAt": "2026-09-14T12:25:47Z"
+          },
+          {
+            "databaseId": 103973049073,
+            "name": "lint",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34843284734/job/103973049073",
+            "startedAt": "2026-09-14T12:24:57Z",
+            "completedAt": "2026-09-14T12:25:48Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34843284452,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "eab45dcaec04a81b6b1169677f8a1a2775e2f443",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34843284452",
+        "workflowName": "Secret Scan",
+        "jobs": [
+          {
+            "databaseId": 103973047452,
+            "name": "Secret Scan",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34843284452/job/103973047452",
+            "startedAt": "2026-09-14T12:24:57Z",
+            "completedAt": "2026-09-14T12:25:24Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34843284405,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "eab45dcaec04a81b6b1169677f8a1a2775e2f443",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34843284405",
+        "workflowName": "Backend Integration",
+        "jobs": [
+          {
+            "databaseId": 103973047729,
+            "name": "backend-integration",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34843284405/job/103973047729",
+            "startedAt": "2026-09-14T12:24:57Z",
+            "completedAt": "2026-09-14T12:27:38Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34843284502,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "eab45dcaec04a81b6b1169677f8a1a2775e2f443",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34843284502",
+        "workflowName": "Frontend Production Build",
+        "jobs": [
+          {
+            "databaseId": 103973046972,
+            "name": "build-frontend-production",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34843284502/job/103973046972",
+            "startedAt": "2026-09-14T12:24:58Z",
+            "completedAt": "2026-09-14T12:28:44Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34843284444,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "eab45dcaec04a81b6b1169677f8a1a2775e2f443",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34843284444",
+        "workflowName": "Backend Tests",
+        "jobs": [
+          {
+            "databaseId": 103973047564,
+            "name": "backend-suite",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34843284444/job/103973047564",
+            "startedAt": "2026-09-14T12:24:57Z",
+            "completedAt": "2026-09-14T12:33:31Z"
+          }
+        ]
+      }
+    ],
+    "counts": {
+      "backend": {
+        "run_id": 34843284444,
+        "attempt": 1,
+        "event": "push",
+        "branch": "main",
+        "commit": "eab45dcaec04a81b6b1169677f8a1a2775e2f443",
+        "summary_line": "backend-suite\tRun serialized backend suite\t2026-09-14T12:33:27.3934905Z === 2533 passed, 3 skipped, 12 deselected, 48 warnings in 448.33s (0:07:28) ===="
+      },
+      "integration": {
+        "run_id": 34843284405,
+        "attempt": 1,
+        "event": "push",
+        "branch": "main",
+        "commit": "eab45dcaec04a81b6b1169677f8a1a2775e2f443",
+        "summary_line": "backend-integration\tRun integration tests with testcontainers\t2026-09-14T12:27:31.8256461Z ============ 134 passed, 4 skipped, 17 warnings in 88.58s (0:01:28) ============"
+      }
+    },
+    "evidence_rule": "Learning #177: these are main push runs for the merged source commit, not PR-head runs."
+  },
+  "deployment": {
+    "checkedAt": "2026-09-14T12:27:59.443511+00:00",
+    "commit": "eab45dcaec04a81b6b1169677f8a1a2775e2f443",
+    "api": {
+      "id": "bf2abf57-57b0-43e4-8f20-9b38a6215b75",
+      "status": "SUCCESS",
+      "commit": "eab45dcaec04a81b6b1169677f8a1a2775e2f443"
+    },
+    "frontend": {
+      "id": "233264f2-d4ed-43c0-b265-a2ad1b61effa",
+      "status": "SUCCESS",
+      "commit": "eab45dcaec04a81b6b1169677f8a1a2775e2f443"
+    }
+  },
+  "production_validation": {
+    "positive_registration": {
+      "commit": "eab45dcaec04a81b6b1169677f8a1a2775e2f443",
+      "started_at": "2026-09-14T12:28:38.897485+00:00",
+      "deployment_ids": {
+        "TraceLab": "bf2abf57-57b0-43e4-8f20-9b38a6215b75",
+        "frontend": "233264f2-d4ed-43c0-b265-a2ad1b61effa"
+      },
+      "approved_by": "Derek: yes, proceed (2026-09-14)",
+      "marker": "sec-1-validation-1abd8ee4742d40abbcae89aab120d1bd",
+      "events": [
+        {
+          "action": "register",
+          "status": 201
+        }
+      ],
+      "cleanup": {
+        "delete_status": 200,
+        "active_tagged_documents": 0,
+        "document_read_status": 404,
+        "retained_soft_deleted_rows": 1,
+        "soft_delete_verified_by": "default list excludes row; include_deleted list retains it; per-id GET returns 404",
+        "file_removed": true,
+        "file_path": "/app/data/ingest/sec-1-validation-1abd8ee4742d40abbcae89aab120d1bd.md"
+      },
+      "runtime_configuration": {
+        "cwd": "/app",
+        "ingest_root": "data/ingest",
+        "resolved_root": "/app/data/ingest",
+        "deployment_id": "bf2abf57-57b0-43e4-8f20-9b38a6215b75",
+        "commit": "eab45dcaec04a81b6b1169677f8a1a2775e2f443"
+      },
+      "project": {
+        "id": "8a5e3763-8249-4194-97d0-cda0e5ff0672",
+        "name": "Chicago Public Data Products",
+        "owner_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+        "workspace_id": "00000000-0000-0000-0000-000000000001"
+      },
+      "credential": "existing local MCP API key (kept in memory)",
+      "principal_role": "admin",
+      "file_path": "/app/data/ingest/sec-1-validation-1abd8ee4742d40abbcae89aab120d1bd.md",
+      "file_created": {
+        "file_path": "/app/data/ingest/sec-1-validation-1abd8ee4742d40abbcae89aab120d1bd.md",
+        "size_bytes": 94,
+        "regular_file": true
+      },
+      "registration_status": 201,
+      "document_id": "9910e3f1-e6ee-4ed2-b5b7-c12c8353eec9",
+      "registered_path_is_canonical": true,
+      "read_status": 200,
+      "active_tagged_documents_before_cleanup": 1,
+      "passed": true,
+      "completed_at": "2026-09-14T12:28:50.087328+00:00"
+    },
+    "boundary_probes": {
+      "commit": "eab45dcaec04a81b6b1169677f8a1a2775e2f443",
+      "checked_at": "2026-09-14T12:29:08.118037+00:00",
+      "deployment_ids": {
+        "TraceLab": "bf2abf57-57b0-43e4-8f20-9b38a6215b75",
+        "frontend": "233264f2-d4ed-43c0-b265-a2ad1b61effa"
+      },
+      "api": "https://api.tracelab.aquex.ai",
+      "credential": "existing local MCP API key; kept in memory",
+      "role": "admin",
+      "project_id": "8a5e3763-8249-4194-97d0-cda0e5ff0672",
+      "document_count_before": 0,
+      "document_count_after": 0,
+      "probes": [
+        {
+          "probe": "anonymous_registration",
+          "authenticated": false,
+          "expected": 401,
+          "status": 401,
+          "response": {
+            "detail": "Missing Authorization bearer token or X-API-Key header"
+          }
+        },
+        {
+          "probe": "authorized_missing_in_root",
+          "authenticated": true,
+          "expected": 404,
+          "status": 404,
+          "response": {
+            "detail": "File not found in onboarding ingest root"
+          }
+        },
+        {
+          "probe": "authorized_outside_root",
+          "authenticated": true,
+          "expected": 400,
+          "status": 400,
+          "response": {
+            "detail": "file_path must be inside the onboarding ingest root"
+          }
+        },
+        {
+          "probe": "authorized_traversal",
+          "authenticated": true,
+          "expected": 400,
+          "status": 400,
+          "response": {
+            "detail": "file_path must be inside the onboarding ingest root"
+          }
+        }
+      ],
+      "authenticated_outsider_deny": "pending_production_rbac_verify in SEC-2",
+      "non_mutating": true,
+      "limitation": "This boundary-only run uses deliberately absent paths. The separately recorded positive_registration run exercises successful production registration and cleanup."
+    },
+    "public_smoke": {
+      "generated_at": "2026-09-14T12:29:06.776Z",
+      "completed_at": "2026-09-14T12:29:10.450Z",
+      "summary": {
+        "total": 5,
+        "expected": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "durationSeconds": 3.674,
+        "retries": 0
+      },
+      "route_migration": {
+        "map_rows": 8,
+        "covered_rows": 8,
+        "checks": 16,
+        "passed": 16
+      },
+      "deployment_ids": {
+        "TraceLab": "bf2abf57-57b0-43e4-8f20-9b38a6215b75",
+        "frontend": "233264f2-d4ed-43c0-b265-a2ad1b61effa"
+      }
+    },
+    "new_environment_setting": {
+      "before": {
+        "service": "TraceLab",
+        "environment": "production",
+        "variable": "ONBOARDING_INGEST_ROOT",
+        "present": false,
+        "value": null
+      },
+      "configured": {
+        "service": "TraceLab",
+        "environment": "production",
+        "variable": "ONBOARDING_INGEST_ROOT",
+        "present": true,
+        "value": "data/ingest",
+        "skip_deploys": true
+      },
+      "live_runtime": {
+        "cwd": "/app",
+        "ingest_root": "data/ingest",
+        "resolved_root": "/app/data/ingest",
+        "deployment_id": "bf2abf57-57b0-43e4-8f20-9b38a6215b75",
+        "commit": "eab45dcaec04a81b6b1169677f8a1a2775e2f443"
+      }
+    },
+    "authenticated_outsider_registration_deny": {
+      "status": "pending_production_rbac_verify",
+      "closing_mission": "SEC-2",
+      "reason": "Decision #426 / SEC-1 specification schedule the complete authenticated production harness in SEC-2, with separate owner-credential authorization."
+    }
+  },
+  "success_criteria_evidence": [
+    {
+      "criterion": 1,
+      "evidence": "Mounted-app outsider registration regression: identical 403 bodies for existing, missing, blank and absent paths; document/status/idempotency row counts unchanged."
+    },
+    {
+      "criterion": 2,
+      "evidence": "Owner and outsider get 404 for missing/deleted projects before the file resolver can run."
+    },
+    {
+      "criterion": 3,
+      "evidence": "Member project owner, admin and owner role each get 201; canonical path and inherited owner/Space asserted. Production happy path also returned 201."
+    },
+    {
+      "criterion": 4,
+      "evidence": "Absolute escape, traversal, symlink escape and absent outside target return 400; Path.stat/Path.open guards reject reads of the external target. Directory/blank/None rejected; missing in-root path 404; internal symlink and cwd-relative root accepted."
+    },
+    {
+      "criterion": 5,
+      "evidence": "All five replay handlers covered for both credentials/flags/roles; authorized replay preserves body and jobs Location header, unauthorized replay denies without writes. Missing/deleted original create-project resource 404; cross-method/path key reuse 409."
+    },
+    {
+      "criterion": 6,
+      "evidence": "RBAC-off authenticated fresh registration 201, anonymous 401, service 403; both existing onboarding tests retain assertions with a configured tmp_path root."
+    },
+    {
+      "criterion": 7,
+      "evidence": "24 combinations / 144 handler probes with every status and row delta recorded below; 120 additional anonymous replay checks return 401."
+    },
+    {
+      "criterion": 8,
+      "evidence": "Full mounted-app harness passes with five logins. Leaky transport rejects 201/404/400/422; registration route is in both coverage and wired-route guards."
+    },
+    {
+      "criterion": 9,
+      "evidence": "Full local backend counts and merged main push backend/integration runs are recorded above; quarantine remains exactly 12."
+    },
+    {
+      "criterion": 10,
+      "evidence": "Both exact-commit Railway deployments SUCCESS before production probes. Anonymous 401, authorized boundary probes, approved 201 registration and cleanup, public smoke 5/5 and route migration 16/16."
+    },
+    {
+      "criterion": 11,
+      "evidence": "This receipt must merge on main before completion. Its own PR/merge SHA and its carrier main CI/deploy verification belong in the CMOS completion note (a receipt cannot contain its own merge SHA)."
+    }
+  ],
+  "limitations": [
+    "Production host registration accepts only files pre-placed in the API container under /app/data/ingest; Railway has no persistent volume for this path.",
+    "The approved positive smoke leaves one soft-deleted test document/audit row; its file was removed. The exact ID and cleanup evidence are recorded above.",
+    "The authenticated production outsider deny harness remains explicitly pending SEC-2 as specified.",
+    "The existing pytest telemetry summary misclassifies setup-skipped tests; console and per-phase results were used (learning #180).",
+    "The 31-route Light/Dark 124-check UI baseline is not claimed for this backend-only mission."
+  ],
+  "receipt_completion_rule": {
+    "learning": 176,
+    "required": "Merge this validation receipt to main, then cite its PR and merge SHA in mission completion. Verify main push CI and both Railway deployments for the receipt carrier as well."
+  }
+}
