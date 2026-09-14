@@ -3,7 +3,7 @@
     "name": "TraceLab",
     "version": "0.0.0",
     "description": "Research knowledge management platform with PEDR search pipeline, mission orchestration, and DeepSearch integration.",
-    "status": "sprint-51-complete",
+    "status": "sprint-52-active",
     "start_date": "2025-01-01",
     "deployment": {
       "platform": "FastAPI + PostgreSQL + Qdrant",
@@ -150,7 +150,7 @@
   },
   "roadmap": {
     "status": "Sprint 31 active. Sprints 32-34 planned in roadmap-sprints-31-34.md.",
-    "current_focus": "Sprint 52 planned: graph, attention inbox, MCP parity, documentation rewrite (see cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md)",
+    "current_focus": "Sprint 52 active: graph, attention inbox, MCP parity, documentation rewrite, with security residue first (see cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md)",
     "next_checkpoint": "Sprint 19: PEDR latency optimization or alternative use cases",
     "research_completed": [
       {
@@ -264,8 +264,8 @@
   "metadata": {
     "last_condensation": "2026-03-08T22:28:45.820723Z",
     "condensation_note": "T31.5: Heavy manual pruning of stale fields, old sprint data, and planning text.",
-    "current_sprint": "sprint-51",
-    "sprint_status": "Completed"
+    "current_sprint": "sprint-52",
+    "sprint_status": "Active"
   },
   "working_memory": {
     "session_history": [
@@ -313,8 +313,6 @@
   },
   "next_session_context": {
     "when_we_resume": [
-      "PS-2026-09-14-006: Sprint 52 security (decision #423): in app/onboarding/api.py register_document, require an authenticated user, filter the project on deleted_at, and call authorize_or_403(user, 'upload', project, db) before the file_path check, since that path is also a file-existence oracle. Add a 403-and-zero-rows regression test and a route-enforcement matrix row. No first-party client uses the route, so gating it to admins or removing it is also acceptable.",
-      "PS-2026-09-14-006: Derek authorization decision needed (decision #422): does owning a project without Space membership grant read access to every document in it? Then either add a project-owner allow path to the Document policy, or thread collections._document_policy into POST /synthesize for both the collection_id and chunk_ids paths. Sprint 53, or Sprint 52 if MCP parity touches synthesize first.",
       "PS-2026-09-14-006: Sprint 53: extend scripts/rbac_verify.py with authenticated cross-tenant rows for POST /api/v1/documents, POST /synthesize with a private sibling document, collection context and favorites. Then record a production rbac_verify run, since none has been recorded since Sprint 49.",
       "PS-2026-09-14-006: Sprint 53: fix Settings timestamps. frontend/src/pages/settings.tsx lines 292, 296 and 440 parse offset-free UTC with new Date(), so API-key and invite times shift outside UTC. Route them through parseApiTimestamp, add an America/Chicago fixed-clock browser test, and audit the other new Date(<api field>) sites. Do this with next-step #275 and add the invite date cell to its scope.",
       "PS-2026-09-14-006: Rewrite or retire the TraceLab UX Baseline artifact (claude.ai/code/artifact/c0767cdf-97e0-4d16-a750-029ceb09ba8e). It still publishes the post-Sprint-49 state: no sprint open, 27 of 27 routes overflowing, 12 ESLint errors, the stats fix unmerged. Rewrite it from the roadmap's Sprint 50 and 51 outcomes or add a superseded banner. This replaces dropped next-step #253.",
@@ -327,13 +325,15 @@
       "PS-2026-09-14-006: Sprint 53: whenever a backend CI run exceeds about 800 seconds or hits the 45-minute ceiling, archive its --durations and faulthandler output in the receipt. Cross-run variance from 375 to 1733 seconds is unexplained under decisions #415 and #417.",
       "PS-2026-09-14-006: Move THEME-2 into Sprint 54 when that sprint is created. It is Deferred inside closed sprint-51, and no sprint-52, -53 or -54 exists yet.",
       "PS-2026-09-14-006: Sprint 53 hygiene: triage the remaining untagged active decisions. The staleness review structurally skips untagged decisions and tagged ones younger than 20 sprints.",
-      "PS-2026-09-14-006: Open Sprint 52 from the roadmap's Sprint 52 bullets (graph, attention inbox, MCP parity, documentation rewrite). Run the Sprint-Boundary Identity Sync and regenerate cmos/context/MASTER_CONTEXT.json per decision #420."
+      "PS-2026-09-14-006: Open Sprint 52 from the roadmap's Sprint 52 bullets (graph, attention inbox, MCP parity, documentation rewrite). Run the Sprint-Boundary Identity Sync and regenerate cmos/context/MASTER_CONTEXT.json per decision #420.",
+      "PS-2026-09-14-007: Start a fresh Sprint 52 build session: onboard, then run missions in CMOS build order starting with CI-5, which is Current: CI-5, SEC-1, SEC-2, MCP-1, GRAPH-1, UX-11, UX-12, UX-13, MCP-2, MCP-3, DOC-1.",
+      "PS-2026-09-14-007: Derek questions from decision #426, needed before the missions that use them: (1) email completion notifications in a later sprint, and with which provider and sender domain; (2) whether the MCP may delete, which MCP-2 treats as REST/UI-only unless authorized; (3) who runs the 1.2.0 npm publish for MCP-3, since npm whoami returned 401; (4) whether the build agent may use the bootstrap owner credentials for SEC-2's production rbac_verify run, or Derek runs it and hands back the output."
     ]
   },
   "context_health": {
-    "sessions_since_reset": 190,
-    "last_update": "2026-09-14T04:36:38.886Z",
-    "size_kb": 59.16,
+    "sessions_since_reset": 191,
+    "last_update": "2026-09-14T05:54:41.771Z",
+    "size_kb": 57.02,
     "size_limit_kb": 100,
     "warning_threshold_percent": 75,
     "retention_keep_sprints": 3
@@ -380,12 +380,12 @@
     "UX-10 PR281 merged as2081c73ddbf1ad826e061bbc9512e887591febae after all10 checks passed on54333f9c55a24e1e657df9796a06a8d79044a337. CI:2484 backend passes/3 existing skips/12 quarantines;134 PostgreSQL passes/4 existing skips;208 frontend unit;47 built-browser;90 package unit and clean-tarball29-action/31-link contract. Local31-route baseline124/124,129 distinct internal paths,zero legacy links or failures. Installed package read-only production MCP15 actions/95 generated routes allHTTP200. Railway deploy watch active; final production map/scheduled smoke/baseline and receipt PR still pending.",
     "Sprint-close hygiene: resolve fulfilled THEME-1, CI-2/3/4 and UX-6/7/8/9 handoff next steps. User deferral and decision408 supersede the older186-check/three-theme wording: accepted Light/Dark scope has124 production checks, with THEME-2 retaining HC certification/wiring. Drop stale next step252's THEME-1 re-pin instruction because the current deferred THEME-2 condition is preserved by next step262. Leave external status artifact253, CMOS handler reply254 and dashboard-sync413 gap260 open; no claim of dashboard mirror parity and no unauthorized cross-project messages. Build-loop/UX-10 handoffs will resolve after PR282 merges."
   ],
-  "current_focus": "Between sprints: Sprint 51 (The Working Surfaces, UX overhaul 2 of 4) completed 2026-09-14; Sprint 52 not yet opened",
+  "current_focus": "Sprint 52 active: security residue and CI lane promotion first, then MCP parity audit, relationship graph, saved exception views and priority inbox, with the documentation refresh last",
   "current_sprint": {
-    "id": "sprint-51",
-    "name": "Sprint 51 — The Working Surfaces (Sprint 2 of the UX overhaul) + theme truth",
-    "status": "Completed",
-    "focus": "Rebuild the pages people and agents live in, on the UX-1 object model and the UX-0 shell (living roadmap cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md is authoritative for intent; CMOS for status). SLATE: UX-6 Missions as inspectable background jobs (authoring with inline contract preview, run view with named DeepSearch phases, live logs, results + evidence tab, exceptions-first list with the queue folded in, cancel/re-run); UX-7 Projects as bundles + Documents (project hub with Overview/Documents/Evidence/Collections/Missions/Reports tabs, per-file upload progress, document detail with chunks + evidence references; absorbs the per-user favorites deferred under decision #395); UX-8 Collections as context spaces + Reports (instructions + documents, seed a mission from a collection, report citations resolve to evidence, export retained); UX-9 Search + command palette (rebuilt on tokens, palette reaches every entity plus recent/saved searches and actions, keyboard navigation documented); UX-10 Route migration (every pre-overhaul URL redirects to its successor, MCP responses carry canonical links, mapping table maintained in the roadmap). ADDED AT OPEN (Derek, 2026-09-13): THEME-1 — the theme selector must be truthful: show only the themes that actually exist, and 'system' must follow the OS preference (today system and light render identically); run on the latest STABLE Forge tokens (Forge is resetting its baseline CSS themes — consume, never implement in Forge, decision #391); palette aesthetics may defer to S54. CI-2 — fix-or-drop the perpetually red advisory ruff-full/mypy lanes so 'required: all passed' means CI green (learning #165). DEFINITION OF DONE for every UI mission = roadmap §Definition of Done + S50 additions (decision #400): re-run the 31-route direct-browser production baseline at close; deployed smoke accepted only after Railway reports SUCCESS for both services, deployment ids in the receipt under cmos/reports/sprint-51/. EXIT: no page under src/pages uses the pre-overhaul shell or palette; a mission can be authored, watched to completion and audited to evidence without leaving the UI; the baseline shows zero overflow and zero critical/serious axe findings on all routes. Sprint 52 (graph, attention, MCP parity, doc rewrite) and S53 (hardening) stay planned in the roadmap."
+    "id": "sprint-52",
+    "name": "Sprint 52 — Relationships, Attention and Parity (Sprint 3 of the UX overhaul) + security residue",
+    "status": "Active",
+    "focus": "Relationship graph, saved exception views, priority inbox, MCP parity audit and documentation refresh, after security residue (owner read access #422, onboarding authorization #423) and CI lane promotion (#421)"
   },
   "strategic_context": {
     "sprint_13": {
@@ -476,7 +476,7 @@
       }
     }
   },
-  "current_phase": "Between sprints: Sprint 51 (The Working Surfaces, UX overhaul 2 of 4) completed 2026-09-14; Sprint 52 not yet opened",
+  "current_phase": "Sprint 52 — Relationships, Attention and Parity (UX overhaul 3 of 4), opened 2026-09-14",
   "sprint_history": [
     {
       "sprint": "Sprint 19",
