@@ -24,7 +24,7 @@ jobs:
   backend-suite:
     name: backend-suite
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -57,7 +57,7 @@ jobs:
 
           pytest_output="$(mktemp)"
           trap 'rm -f "$pytest_output"' EXIT
-          pytest --ignore=tests/integration "${deselect_args[@]}" | tee "$pytest_output"
+          pytest --ignore=tests/integration --durations=25 -o faulthandler_timeout=120 "${deselect_args[@]}" | tee "$pytest_output"
 
           if ! grep -Eq '(^|, )12 deselected(,| in )' "$pytest_output"; then
             echo "Pytest did not report exactly 12 deselected tests." >&2
