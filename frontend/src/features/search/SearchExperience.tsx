@@ -21,6 +21,7 @@ import { projectsApi } from "@/lib/api/projects";
 import type { PaginatedResponse } from "@/types/pagination";
 import { searchApi } from "@/lib/api/search";
 import { savedSearchesApi } from "@/lib/api/savedSearches";
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import type { Document, Project } from "@/types/document";
 import type {
   PEDRSearchMetadata,
@@ -454,7 +455,7 @@ function SearchExperience() {
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-sm text-foreground">{entry.query_text}</p>
                             <p className="text-xs text-secondary">
-                              {formatDistanceToNow(new Date(entry.created_at), {
+                              {formatDistanceToNow(parseApiTimestamp(entry.created_at), {
                                 addSuffix: true,
                               })}
                             </p>

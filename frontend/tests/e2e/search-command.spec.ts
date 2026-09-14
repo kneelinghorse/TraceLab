@@ -1,13 +1,15 @@
 import { expect, test, type Page } from "@playwright/test";
 import path from "node:path";
 
+test.use({ timezoneId: "America/Chicago" });
+
 const projectId = "00000000-0000-4000-8000-000000000001";
 const documentId = "00000000-0000-4000-8000-000000000002";
 const chunkIds = ["00000000-0000-4000-8000-000000000003", "00000000-0000-4000-8000-000000000004"];
 const kinds = ["project", "document", "mission", "report", "collection", "evidence"];
 const entityPath = (kind: string) => `/${kind === "evidence" ? "evidence" : `${kind}s`}/${projectId}`;
 const results = chunkIds.map((chunk_id, index) => ({ chunk_id, document_id: documentId, project_id: projectId, content: `Authorized result ${index + 1}`, source_type: "transcript", rrf_score: 0.1 - index * 0.01, score: 0.1, chunk_index: index }));
-const rag = { answer: "An answer supported by the authorized results. https://example.test/evidence/" + "provenance".repeat(15), citations: [{ chunk_id: chunkIds[0], document_id: documentId, snippet: "Authorized support", score: 0.1 }], sources: [], latency_ms: 12, quality: { composite_score: 0.9, threshold: 0.8 }, routing: { selected_model: "test-model" }, cache: { hit: false } };
+const rag = { answer: "An answer supported by the authorized results. https://example.test/evidence/" + "provenance".repeat(15), citations: [{ chunk_id: chunkIds[0], document_id: documentId, snippet: "Authorized support for research workflows and preservation of provenance. ".repeat(5), score: 0.1 }], sources: [], latency_ms: 12, quality: { composite_score: 0.9, threshold: 0.8 }, routing: { selected_model: "test-model" }, cache: { hit: false } };
 const entry = { id: projectId, name: "Saved scope", query_text: "saved scope", filters: { project_id: projectId, source_type: "transcript" }, top_k: 7, search_mode: "semantic", owner: "member", use_count: 0, created_at: "2026-09-13T00:00:00Z", updated_at: "2026-09-13T00:00:00Z" };
 
 async function fixture(page: Page) {
@@ -126,6 +128,10 @@ for (const theme of ["light", "dark"] as const) {
       expect(requests.find(item => item.pathname === "/api/v1/search")?.body).toMatchObject({ source_type: "transcript", date_from: "2026-01-01", date_to: "2026-09-13" });
       const answerPanel = page.locator("section").filter({ has: page.getByRole("heading", { name: "Synthesized response with citations", exact: true }) });
       expect(await answerPanel.evaluate(node => node.getBoundingClientRect().bottom - node.lastElementChild!.getBoundingClientRect().bottom), "The answer panel fits its content so history and mobile stats follow in document order").toBeLessThan(40);
+      const focusResult = page.getByRole("button", { name: "Focus result", exact: true });
+      const focusSize = await focusResult.evaluate(node => ({ width: node.getBoundingClientRect().width, height: node.getBoundingClientRect().height }));
+      expect(focusSize.width, "Long citations must not squeeze the action into a vertical label").toBeGreaterThan(60);
+      expect(focusSize.height).toBeLessThan(30);
       await audit(page, `search-results-${theme}-${width}`);
       await page.getByRole("button", { name: "Focus result", exact: true }).click();
       await page.getByRole("button", { name: "Save current search", exact: true }).click();
@@ -149,6 +155,17 @@ for (const theme of ["light", "dark"] as const) {
     });
   }
 }
+
+test("recent and saved search times use UTC even outside the UTC timezone", async ({ page }) => {
+  await fixture(page);
+  await page.clock.setFixedTime("2026-09-14T01:44:00Z");
+  const timestamp = "2026-09-14T01:43:00";
+  await page.route("**/api/v1/search/history*", route => route.fulfill({ json: { entries: [{ ...entry, created_at: timestamp }] } }));
+  await page.route("**/api/v1/saved-searches", route => route.fulfill({ json: { items: [{ ...entry, last_used_at: timestamp }], limit_per_user: 50 } }));
+  await page.goto("/search");
+  await expect.soft(page.getByText("1 minute ago", { exact: true })).toBeVisible();
+  await expect.soft(page.getByText("Last run 1 minute ago", { exact: true })).toBeVisible();
+});
 
 test("legacy search URL permanently redirects with its query intact", async ({ request }) => {
   const response = await request.get("/search/results?q=scope%20%26%20provenance", { maxRedirects: 0 });

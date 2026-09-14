@@ -1,0 +1,50 @@
+{
+  "mission": "UX-9",
+  "status": "local_verified_awaiting_ci_and_production",
+  "base_commit": "d7e253b6ae852163e02465dd14c9ff5c23cfebdd",
+  "observed_in": "ux-9-live-flow/attempt-3-visual-corrections/receipt.json",
+  "changes": [
+    "Responsive citation rows place the focus action below the snippet on phones and prevent its label from shrinking",
+    "Saved and recent times use the existing parseApiTimestamp UTC helper"
+  ],
+  "red_tests": {
+    "failed": 2,
+    "citation_button_width_px": 7.046875,
+    "timestamps": "Both recent and saved 1-minute-ago labels fail in America/Chicago before parsing fix"
+  },
+  "validation": {
+    "frontend_unit": {
+      "passed": 204,
+      "skipped": 0
+    },
+    "browser": {
+      "passed": 46,
+      "skipped": 0,
+      "failed": 0,
+      "retries": 0,
+      "seconds": 91.007,
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "fixed_clock_timezone": "America/Chicago"
+    },
+    "lint": "passed",
+    "types": "passed",
+    "production_build": "passed",
+    "foundational_refs": "passed",
+    "visual_review": "Phone Light long-citation preview: readable horizontal Focus result action; content follows in document order."
+  },
+  "remaining": [
+    "All source CI checks",
+    "Both exact Railway deployments SUCCESS",
+    "Real production saved replay, action layout, UTC relative times and six-type keyboard/scoped search checks",
+    "Repeat124 direct production route checks",
+    "Final receipt publication and CMOS closure"
+  ]
+}

@@ -1,5 +1,6 @@
 import { formatDistanceToNow } from "date-fns";
 
+import { parseApiTimestamp } from "@/lib/api/timestamps";
 import type { SavedSearch } from "@/types/saved-searches";
 
 type SavedSearchesListProps = {
@@ -46,7 +47,7 @@ export function SavedSearchesList({
             </button>
             <span className="text-xs text-secondary">
               {entry.last_used_at
-                ? `Last run ${formatDistanceToNow(new Date(entry.last_used_at), { addSuffix: true })}`
+                ? `Last run ${formatDistanceToNow(parseApiTimestamp(entry.last_used_at), { addSuffix: true })}`
                 : "Never run"}
             </span>
           </div>
