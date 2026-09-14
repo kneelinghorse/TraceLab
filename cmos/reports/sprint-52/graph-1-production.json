@@ -1,0 +1,2065 @@
+{
+  "checked_at": "2026-09-14T18:05:01.009479+00:00",
+  "commit": "56bc07d6243e41a078b1f2bbb9406d7989d2509a",
+  "deployments": {
+    "TraceLab": {
+      "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+      "deployment_id": "94ac6bd3-2e3f-4db3-90c7-b9ca0fa09ea2",
+      "status": "SUCCESS",
+      "commit": "56bc07d6243e41a078b1f2bbb9406d7989d2509a",
+      "created_at": "2026-09-14T17:58:33.245Z"
+    },
+    "frontend": {
+      "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+      "deployment_id": "f8e60bf9-7431-4ccf-a4bd-26c3843aac81",
+      "status": "SUCCESS",
+      "commit": "56bc07d6243e41a078b1f2bbb9406d7989d2509a",
+      "created_at": "2026-09-14T17:58:33.245Z"
+    }
+  },
+  "read_only": true,
+  "root_type": "project",
+  "root_id": "0afcc588-e722-45bd-8320-f486601b877c",
+  "credential_type": "human X-API-Key",
+  "samples_per_depth": 20,
+  "samples": [
+    {
+      "depth": 1,
+      "sample": 1,
+      "latency_ms": 294.505,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 2,
+      "latency_ms": 265.828,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 3,
+      "latency_ms": 259.286,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 4,
+      "latency_ms": 263.674,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 5,
+      "latency_ms": 260.05,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 6,
+      "latency_ms": 268.063,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 7,
+      "latency_ms": 281.581,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 8,
+      "latency_ms": 287.8,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 9,
+      "latency_ms": 276.264,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 10,
+      "latency_ms": 276.13,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 11,
+      "latency_ms": 263.411,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 12,
+      "latency_ms": 262.646,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 13,
+      "latency_ms": 275.459,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 14,
+      "latency_ms": 266.846,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 15,
+      "latency_ms": 267.342,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 16,
+      "latency_ms": 275.301,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 17,
+      "latency_ms": 268.911,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 18,
+      "latency_ms": 265.681,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 19,
+      "latency_ms": 269.572,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 1,
+      "sample": 20,
+      "latency_ms": 274.452,
+      "nodes": 31,
+      "edges": 30,
+      "groups": 4,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 1,
+      "latency_ms": 379.644,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 2,
+      "latency_ms": 356.383,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 3,
+      "latency_ms": 338.686,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 4,
+      "latency_ms": 359.774,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 5,
+      "latency_ms": 355.837,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 6,
+      "latency_ms": 366.224,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 7,
+      "latency_ms": 338.295,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 8,
+      "latency_ms": 335.802,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 9,
+      "latency_ms": 342.99,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 10,
+      "latency_ms": 374.007,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 11,
+      "latency_ms": 563.843,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 12,
+      "latency_ms": 354.492,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 13,
+      "latency_ms": 344.323,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 14,
+      "latency_ms": 393.678,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 15,
+      "latency_ms": 420.923,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 16,
+      "latency_ms": 381.107,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 17,
+      "latency_ms": 366.611,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 18,
+      "latency_ms": 376.926,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 19,
+      "latency_ms": 355.436,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    },
+    {
+      "depth": 2,
+      "sample": 20,
+      "latency_ms": 353.539,
+      "nodes": 58,
+      "edges": 123,
+      "groups": 76,
+      "truncated": true,
+      "totals": {
+        "documents": 23,
+        "missions": 3,
+        "reports": 3,
+        "evidence": 547
+      }
+    }
+  ],
+  "totals_comparisons": [
+    {
+      "from_key": "document:16bad45e-c426-46bb-8f04-d30a0e94efff",
+      "relation": "evidence",
+      "graph_total": 0,
+      "rest_total": 0,
+      "passed": true
+    },
+    {
+      "from_key": "document:471f28f5-7cd3-4b7f-a973-0108f7f7cebd",
+      "relation": "evidence",
+      "graph_total": 0,
+      "rest_total": 0,
+      "passed": true
+    },
+    {
+      "from_key": "document:7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+      "relation": "evidence",
+      "graph_total": 0,
+      "rest_total": 0,
+      "passed": true
+    },
+    {
+      "from_key": "document:9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+      "relation": "evidence",
+      "graph_total": 0,
+      "rest_total": 0,
+      "passed": true
+    },
+    {
+      "from_key": "document:9124e081-59ba-47bb-b34d-96273bd1140a",
+      "relation": "evidence",
+      "graph_total": 0,
+      "rest_total": 0,
+      "passed": true
+    },
+    {
+      "from_key": "document:a28eab37-03f3-492e-83fe-f48e502fc223",
+      "relation": "evidence",
+      "graph_total": 0,
+      "rest_total": 0,
+      "passed": true
+    },
+    {
+      "from_key": "document:a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+      "relation": "evidence",
+      "graph_total": 0,
+      "rest_total": 0,
+      "passed": true
+    },
+    {
+      "from_key": "document:b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+      "relation": "evidence",
+      "graph_total": 0,
+      "rest_total": 0,
+      "passed": true
+    },
+    {
+      "from_key": "document:d8c50c51-11f7-4649-b214-6aff8ed92521",
+      "relation": "evidence",
+      "graph_total": 0,
+      "rest_total": 0,
+      "passed": true
+    },
+    {
+      "from_key": "document:e4f32d07-e596-4c8b-9712-5717a13595ce",
+      "relation": "evidence",
+      "graph_total": 0,
+      "rest_total": 0,
+      "passed": true
+    },
+    {
+      "from_key": "document:f40c4015-87d8-461f-80b5-4b9b653e0efb",
+      "relation": "evidence",
+      "graph_total": 0,
+      "rest_total": 0,
+      "passed": true
+    },
+    {
+      "from_key": "document:f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+      "relation": "evidence",
+      "graph_total": 0,
+      "rest_total": 0,
+      "passed": true
+    },
+    {
+      "from_key": "mission:39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+      "relation": "evidence",
+      "graph_total": 133,
+      "rest_total": 133,
+      "passed": true
+    },
+    {
+      "from_key": "mission:7b847edd-5433-4237-a899-57b47e6edf0a",
+      "relation": "evidence",
+      "graph_total": 370,
+      "rest_total": 370,
+      "passed": true
+    },
+    {
+      "from_key": "mission:952cc1de-688c-415b-bee9-ce143a753af2",
+      "relation": "evidence",
+      "graph_total": 44,
+      "rest_total": 44,
+      "passed": true
+    },
+    {
+      "from_key": "report:0613ab1a-1ae7-4784-bf03-579023d4a20f",
+      "relation": "evidence",
+      "graph_total": 133,
+      "rest_total": 133,
+      "passed": true
+    },
+    {
+      "from_key": "report:c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+      "relation": "evidence",
+      "graph_total": 44,
+      "rest_total": 44,
+      "passed": true
+    },
+    {
+      "from_key": "report:f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+      "relation": "evidence",
+      "graph_total": 370,
+      "rest_total": 370,
+      "passed": true
+    }
+  ],
+  "checks": [
+    {
+      "check": "Anonymous graph request returns 401",
+      "passed": true
+    },
+    {
+      "check": "GET /projects/0afcc588-e722-45bd-8320-f486601b877c/stats: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "GET /missions: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 1 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "GET /graph/neighborhood: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Private/no-store header",
+      "passed": true
+    },
+    {
+      "check": "Requested root identity",
+      "passed": true
+    },
+    {
+      "check": "Unique bounded nodes",
+      "passed": true
+    },
+    {
+      "check": "Edges reference shown nodes",
+      "passed": true
+    },
+    {
+      "check": "Groups reference shown nodes and retain full totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 project totals equal canonical REST totals",
+      "passed": true
+    },
+    {
+      "check": "Depth 2 expands only depth 1 shown nodes",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for document:16bad45e-c426-46bb-8f04-d30a0e94efff",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for document:471f28f5-7cd3-4b7f-a973-0108f7f7cebd",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for document:7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for document:9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for document:9124e081-59ba-47bb-b34d-96273bd1140a",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for document:a28eab37-03f3-492e-83fe-f48e502fc223",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for document:a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for document:b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for document:d8c50c51-11f7-4649-b214-6aff8ed92521",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for document:e4f32d07-e596-4c8b-9712-5717a13595ce",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for document:f40c4015-87d8-461f-80b5-4b9b653e0efb",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for document:f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for mission:39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for mission:7b847edd-5433-4237-a899-57b47e6edf0a",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for mission:952cc1de-688c-415b-bee9-ce143a753af2",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for report:0613ab1a-1ae7-4784-bf03-579023d4a20f",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for report:c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+      "passed": true
+    },
+    {
+      "check": "GET /evidence: HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "Evidence total parity for report:f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+      "passed": true
+    }
+  ],
+  "failures": [],
+  "canonical_project_totals": {
+    "documents": 23,
+    "reports": 3,
+    "missions": 3,
+    "evidence": 547
+  },
+  "latency": {
+    "1": {
+      "calls": 20,
+      "p50_ms": 268.48699999999997,
+      "p95_ms": 288.13525000000004,
+      "min_ms": 259.286,
+      "max_ms": 294.505
+    },
+    "2": {
+      "calls": 20,
+      "p50_ms": 358.07849999999996,
+      "p95_ms": 428.06899999999996,
+      "min_ms": 335.802,
+      "max_ms": 563.843
+    }
+  },
+  "passed": true
+}

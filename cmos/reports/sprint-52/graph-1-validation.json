@@ -1,0 +1,1812 @@
+{
+  "mission_id": "GRAPH-1",
+  "sprint_id": "sprint-52",
+  "generated_at": "2026-09-14T18:09:20.291481+00:00",
+  "status": "validated_pending_receipt_merge",
+  "source": {
+    "base_commit": "9f706abac90191491feb05aaedd9ade7e2689b20",
+    "pr": 296,
+    "url": "https://github.com/kneelinghorse/TraceLab/pull/296",
+    "head_commit": "59d204aba6a237a35ca3e241fd15bd43bca6b2c3",
+    "merge_commit": "56bc07d6243e41a078b1f2bbb9406d7989d2509a",
+    "merged_at": "2026-09-14T17:58:31Z"
+  },
+  "decisions": [
+    421,
+    423,
+    424,
+    439,
+    440
+  ],
+  "learnings_applied": [
+    167,
+    168,
+    176,
+    177,
+    184
+  ],
+  "scope": {
+    "ui_mission": false,
+    "mcp_surface_changed": false,
+    "migration_added": false,
+    "new_environment_variables": [],
+    "endpoint": "GET /api/v1/graph/neighborhood",
+    "root_types": [
+      "project",
+      "document",
+      "collection",
+      "mission",
+      "report",
+      "evidence"
+    ],
+    "root_status_exception": "Decision439: deleted parent project makes document root404 with RBAC on or off.",
+    "legacy_pedr_files_unchanged": true,
+    "legacy_graph_stats_unchanged": true
+  },
+  "local_validation": {
+    "initial_absent_route_red": {
+      "summary": "1 failed, 14 warnings in 3.04s",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "deselected": 0,
+      "log_sha256": "226ff4166ef9d9ffe50fdf239ebe86f92d3667a05b07f135acc2f0d3e88d7aba"
+    },
+    "related_api": {
+      "summary": "183 passed, 17 warnings in 109.23s (0:01:49)",
+      "passed": 183,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 0,
+      "log_sha256": "5bcad56f717ec40d54d69366fe925cddda9b29d8ead86c239f840202fc7a0a6e"
+    },
+    "final_graph_api": {
+      "summary": "36 passed, 14 warnings in 46.36s",
+      "passed": 36,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 0,
+      "log_sha256": "1fd349362ab19efc53142915d407be9cf874f1c937724c0ea7eb8f1825ea22ae"
+    },
+    "initial_overstrict_budget_assertion": {
+      "summary": "1 failed, 14 warnings in 6.67s",
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0,
+      "deselected": 0,
+      "log_sha256": "e526baa36665eaea3defcea525940fff22f9b702bf79f2172ba545805ca88498"
+    },
+    "postgres_final": {
+      "summary": "1 passed, 14 warnings in 6.93s",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 0,
+      "log_sha256": "8a95b7d3d79638708d40c72d6c52628e7edd0d10fd1fec42ed3177c5d4ad3cf1"
+    },
+    "related_postgres_and_legacy_graph": {
+      "summary": "22 passed, 1 skipped, 15 warnings in 4.88s",
+      "passed": 22,
+      "failed": 0,
+      "skipped": 1,
+      "deselected": 0,
+      "log_sha256": "1fcc746e94e241a7a1eeed31235055310f74866c44cb38dbf926cc4dfe27b85c"
+    }
+  },
+  "validation_notes": [
+    "Initial route test failed as expected before implementation.",
+    "Initial SQL equality assertion incorrectly compared different admitted type sets under the global cap. Corrected test preserves fixed budgets and scale equality; learning184.",
+    "The one local integration skip is the separately configured live RBAC harness; the mounted harness and alternate-caller matrix passed.",
+    "Changed-file Ruff, git diff --check and foundational-reference validation passed; ruff format was never run."
+  ],
+  "alternate_caller_sweep": {
+    "cells": 20,
+    "graph_requests": 120,
+    "canonical_detail_requests": 120,
+    "observations": [
+      {
+        "role": "admin",
+        "credential": "api_key",
+        "rbac": false,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "document",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "report",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 200,
+            "graph_status": 200
+          }
+        ]
+      },
+      {
+        "role": "admin",
+        "credential": "api_key",
+        "rbac": true,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "document",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "report",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 200,
+            "graph_status": 200
+          }
+        ]
+      },
+      {
+        "role": "admin",
+        "credential": "jwt",
+        "rbac": false,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "document",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "report",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 200,
+            "graph_status": 200
+          }
+        ]
+      },
+      {
+        "role": "admin",
+        "credential": "jwt",
+        "rbac": true,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "document",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "report",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 200,
+            "graph_status": 200
+          }
+        ]
+      },
+      {
+        "role": "non_member",
+        "credential": "api_key",
+        "rbac": false,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "document",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "report",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 200,
+            "graph_status": 200
+          }
+        ]
+      },
+      {
+        "role": "non_member",
+        "credential": "api_key",
+        "rbac": true,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "document",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "report",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 404,
+            "graph_status": 404
+          }
+        ]
+      },
+      {
+        "role": "non_member",
+        "credential": "jwt",
+        "rbac": false,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "document",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "report",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 200,
+            "graph_status": 200
+          }
+        ]
+      },
+      {
+        "role": "non_member",
+        "credential": "jwt",
+        "rbac": true,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "document",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "report",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 404,
+            "graph_status": 404
+          }
+        ]
+      },
+      {
+        "role": "resource_owner",
+        "credential": "api_key",
+        "rbac": false,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "document",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "report",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 200,
+            "graph_status": 200
+          }
+        ]
+      },
+      {
+        "role": "resource_owner",
+        "credential": "api_key",
+        "rbac": true,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "document",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "report",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 200,
+            "graph_status": 200
+          }
+        ]
+      },
+      {
+        "role": "resource_owner",
+        "credential": "jwt",
+        "rbac": false,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "document",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "report",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 200,
+            "graph_status": 200
+          }
+        ]
+      },
+      {
+        "role": "resource_owner",
+        "credential": "jwt",
+        "rbac": true,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "document",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "report",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 200,
+            "graph_status": 200
+          }
+        ]
+      },
+      {
+        "role": "service",
+        "credential": "api_key",
+        "rbac": false,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "document",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "report",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 403,
+            "graph_status": 403
+          }
+        ]
+      },
+      {
+        "role": "service",
+        "credential": "api_key",
+        "rbac": true,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "document",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "report",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 403,
+            "graph_status": 403
+          }
+        ]
+      },
+      {
+        "role": "service",
+        "credential": "jwt",
+        "rbac": false,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "document",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "report",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 403,
+            "graph_status": 403
+          }
+        ]
+      },
+      {
+        "role": "service",
+        "credential": "jwt",
+        "rbac": true,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "document",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "report",
+            "detail_status": 403,
+            "graph_status": 403
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 403,
+            "graph_status": 403
+          }
+        ]
+      },
+      {
+        "role": "space_member",
+        "credential": "api_key",
+        "rbac": false,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "document",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "report",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 200,
+            "graph_status": 200
+          }
+        ]
+      },
+      {
+        "role": "space_member",
+        "credential": "api_key",
+        "rbac": true,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "document",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "report",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 200,
+            "graph_status": 200
+          }
+        ]
+      },
+      {
+        "role": "space_member",
+        "credential": "jwt",
+        "rbac": false,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "document",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "report",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 200,
+            "graph_status": 200
+          }
+        ]
+      },
+      {
+        "role": "space_member",
+        "credential": "jwt",
+        "rbac": true,
+        "observations": [
+          {
+            "root_type": "project",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "document",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "collection",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "mission",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "report",
+            "detail_status": 200,
+            "graph_status": 200
+          },
+          {
+            "root_type": "evidence",
+            "detail_status": 200,
+            "graph_status": 200
+          }
+        ]
+      }
+    ]
+  },
+  "postgres_performance": {
+    "fixture": {
+      "projects": 1,
+      "documents": 1000,
+      "ledger_entries": 800,
+      "missions": 100,
+      "reports": 100
+    },
+    "samples": [
+      {
+        "scale": 1,
+        "per_relation_limit": 3,
+        "depth": 1,
+        "statements": 16,
+        "latency_ms": 82.61937485076487,
+        "nodes": 13,
+        "node_types": [
+          "document",
+          "evidence",
+          "mission",
+          "project",
+          "report"
+        ],
+        "edges": 12,
+        "totals": {
+          "documents": 500,
+          "missions": 50,
+          "reports": 50,
+          "evidence": 400
+        }
+      },
+      {
+        "scale": 1,
+        "per_relation_limit": 3,
+        "depth": 2,
+        "statements": 32,
+        "latency_ms": 95.03708290867507,
+        "nodes": 26,
+        "node_types": [
+          "collection",
+          "document",
+          "evidence",
+          "mission",
+          "project",
+          "report"
+        ],
+        "edges": 83,
+        "totals": {
+          "documents": 500,
+          "missions": 50,
+          "reports": 50,
+          "evidence": 400
+        }
+      },
+      {
+        "scale": 1,
+        "per_relation_limit": 6,
+        "depth": 1,
+        "statements": 16,
+        "latency_ms": 18.30454100854695,
+        "nodes": 25,
+        "node_types": [
+          "document",
+          "evidence",
+          "mission",
+          "project",
+          "report"
+        ],
+        "edges": 24,
+        "totals": {
+          "documents": 500,
+          "missions": 50,
+          "reports": 50,
+          "evidence": 400
+        }
+      },
+      {
+        "scale": 1,
+        "per_relation_limit": 6,
+        "depth": 2,
+        "statements": 32,
+        "latency_ms": 95.53849999792874,
+        "nodes": 86,
+        "node_types": [
+          "collection",
+          "document",
+          "evidence",
+          "mission",
+          "project",
+          "report"
+        ],
+        "edges": 275,
+        "totals": {
+          "documents": 500,
+          "missions": 50,
+          "reports": 50,
+          "evidence": 400
+        }
+      },
+      {
+        "scale": 1,
+        "per_relation_limit": 12,
+        "depth": 1,
+        "statements": 16,
+        "latency_ms": 18.21512496098876,
+        "nodes": 49,
+        "node_types": [
+          "document",
+          "evidence",
+          "mission",
+          "project",
+          "report"
+        ],
+        "edges": 48,
+        "totals": {
+          "documents": 500,
+          "missions": 50,
+          "reports": 50,
+          "evidence": 400
+        }
+      },
+      {
+        "scale": 1,
+        "per_relation_limit": 12,
+        "depth": 2,
+        "statements": 31,
+        "latency_ms": 137.578499969095,
+        "nodes": 150,
+        "node_types": [
+          "document",
+          "evidence",
+          "mission",
+          "project",
+          "report"
+        ],
+        "edges": 482,
+        "totals": {
+          "documents": 500,
+          "missions": 50,
+          "reports": 50,
+          "evidence": 400
+        }
+      },
+      {
+        "scale": 2,
+        "per_relation_limit": 3,
+        "depth": 1,
+        "statements": 16,
+        "latency_ms": 18.372540827840567,
+        "nodes": 13,
+        "node_types": [
+          "document",
+          "evidence",
+          "mission",
+          "project",
+          "report"
+        ],
+        "edges": 12,
+        "totals": {
+          "documents": 1000,
+          "missions": 100,
+          "reports": 100,
+          "evidence": 800
+        }
+      },
+      {
+        "scale": 2,
+        "per_relation_limit": 3,
+        "depth": 2,
+        "statements": 32,
+        "latency_ms": 175.1859171781689,
+        "nodes": 26,
+        "node_types": [
+          "collection",
+          "document",
+          "evidence",
+          "mission",
+          "project",
+          "report"
+        ],
+        "edges": 83,
+        "totals": {
+          "documents": 1000,
+          "missions": 100,
+          "reports": 100,
+          "evidence": 800
+        }
+      },
+      {
+        "scale": 2,
+        "per_relation_limit": 6,
+        "depth": 1,
+        "statements": 16,
+        "latency_ms": 22.27149996906519,
+        "nodes": 25,
+        "node_types": [
+          "document",
+          "evidence",
+          "mission",
+          "project",
+          "report"
+        ],
+        "edges": 24,
+        "totals": {
+          "documents": 1000,
+          "missions": 100,
+          "reports": 100,
+          "evidence": 800
+        }
+      },
+      {
+        "scale": 2,
+        "per_relation_limit": 6,
+        "depth": 2,
+        "statements": 32,
+        "latency_ms": 240.77141610905528,
+        "nodes": 86,
+        "node_types": [
+          "collection",
+          "document",
+          "evidence",
+          "mission",
+          "project",
+          "report"
+        ],
+        "edges": 275,
+        "totals": {
+          "documents": 1000,
+          "missions": 100,
+          "reports": 100,
+          "evidence": 800
+        }
+      },
+      {
+        "scale": 2,
+        "per_relation_limit": 12,
+        "depth": 1,
+        "statements": 16,
+        "latency_ms": 21.576040890067816,
+        "nodes": 49,
+        "node_types": [
+          "document",
+          "evidence",
+          "mission",
+          "project",
+          "report"
+        ],
+        "edges": 48,
+        "totals": {
+          "documents": 1000,
+          "missions": 100,
+          "reports": 100,
+          "evidence": 800
+        }
+      },
+      {
+        "scale": 2,
+        "per_relation_limit": 12,
+        "depth": 2,
+        "statements": 31,
+        "latency_ms": 246.2433751206845,
+        "nodes": 150,
+        "node_types": [
+          "document",
+          "evidence",
+          "mission",
+          "project",
+          "report"
+        ],
+        "edges": 482,
+        "totals": {
+          "documents": 1000,
+          "missions": 100,
+          "reports": 100,
+          "evidence": 800
+        }
+      }
+    ],
+    "reverse_lookup_explain": {
+      "documents.source_mission_id": [
+        {
+          "Plan": {
+            "Node Type": "Seq Scan",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Relation Name": "documents",
+            "Alias": "documents",
+            "Startup Cost": 0.0,
+            "Total Cost": 33.75,
+            "Plan Rows": 2,
+            "Plan Width": 16,
+            "Actual Startup Time": 0.004,
+            "Actual Total Time": 0.12,
+            "Actual Rows": 10,
+            "Actual Loops": 1,
+            "Filter": "(source_mission_id = '7a13c40f-6af2-4b72-be28-d6c2b9ca7e94'::uuid)",
+            "Rows Removed by Filter": 990,
+            "Shared Hit Blocks": 30,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.026,
+          "Triggers": [],
+          "Execution Time": 0.127
+        }
+      ],
+      "documents.source_report_id": [
+        {
+          "Plan": {
+            "Node Type": "Seq Scan",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Relation Name": "documents",
+            "Alias": "documents",
+            "Startup Cost": 0.0,
+            "Total Cost": 33.75,
+            "Plan Rows": 2,
+            "Plan Width": 16,
+            "Actual Startup Time": 0.004,
+            "Actual Total Time": 0.1,
+            "Actual Rows": 10,
+            "Actual Loops": 1,
+            "Filter": "(source_report_id = '339d29a6-fc06-415e-bee3-cf26d1056009'::uuid)",
+            "Rows Removed by Filter": 990,
+            "Shared Hit Blocks": 30,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning": {
+            "Shared Hit Blocks": 0,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.017,
+          "Triggers": [],
+          "Execution Time": 0.104
+        }
+      ],
+      "missions.result_report_id": [
+        {
+          "Plan": {
+            "Node Type": "Seq Scan",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Relation Name": "missions",
+            "Alias": "missions",
+            "Startup Cost": 0.0,
+            "Total Cost": 13.49,
+            "Plan Rows": 1,
+            "Plan Width": 16,
+            "Actual Startup Time": 0.014,
+            "Actual Total Time": 0.032,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Filter": "(result_report_id = '339d29a6-fc06-415e-bee3-cf26d1056009'::uuid)",
+            "Rows Removed by Filter": 99,
+            "Shared Hit Blocks": 13,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning": {
+            "Shared Hit Blocks": 2,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.044,
+          "Triggers": [],
+          "Execution Time": 0.035
+        }
+      ],
+      "collection_documents.document_id": [
+        {
+          "Plan": {
+            "Node Type": "Seq Scan",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Relation Name": "collection_documents",
+            "Alias": "collection_documents",
+            "Startup Cost": 0.0,
+            "Total Cost": 25.0,
+            "Plan Rows": 6,
+            "Plan Width": 16,
+            "Actual Startup Time": 0.005,
+            "Actual Total Time": 0.046,
+            "Actual Rows": 1,
+            "Actual Loops": 1,
+            "Filter": "(document_id = 'c082ee11-31ab-48ad-b7cc-d293e18e1ff6'::uuid)",
+            "Rows Removed by Filter": 999,
+            "Shared Hit Blocks": 9,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning": {
+            "Shared Hit Blocks": 5,
+            "Shared Read Blocks": 0,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          },
+          "Planning Time": 0.045,
+          "Triggers": [],
+          "Execution Time": 0.049
+        }
+      ]
+    }
+  },
+  "index_decision": "No migration: reverse lookup sequential scans measured 0.035\u20130.127 ms at the doubled PostgreSQL fixture. New endpoint latencies are diagnostics, separate from the untouched legacy200ms gate.",
+  "post_merge_main_push_ci": [
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34877970506,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "56bc07d6243e41a078b1f2bbb9406d7989d2509a",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970506",
+      "workflowName": "MCP Package",
+      "jobs": [
+        {
+          "databaseId": 104089804333,
+          "name": "mcp-package",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970506/job/104089804333",
+          "startedAt": "2026-09-14T17:58:40Z",
+          "completedAt": "2026-09-14T17:59:20Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34877970483,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "56bc07d6243e41a078b1f2bbb9406d7989d2509a",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970483",
+      "workflowName": "Secret Scan",
+      "jobs": [
+        {
+          "databaseId": 104089804314,
+          "name": "Secret Scan",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970483/job/104089804314",
+          "startedAt": "2026-09-14T17:58:40Z",
+          "completedAt": "2026-09-14T17:59:10Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34877970502,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "56bc07d6243e41a078b1f2bbb9406d7989d2509a",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970502",
+      "workflowName": "Backend Lint",
+      "jobs": [
+        {
+          "databaseId": 104089804197,
+          "name": "ruff-diff",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970502/job/104089804197",
+          "startedAt": "2026-09-14T17:58:40Z",
+          "completedAt": "2026-09-14T17:59:02Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34877970565,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "56bc07d6243e41a078b1f2bbb9406d7989d2509a",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970565",
+      "workflowName": "Frontend Checks",
+      "jobs": [
+        {
+          "databaseId": 104089804460,
+          "name": "vitest",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970565/job/104089804460",
+          "startedAt": "2026-09-14T17:58:39Z",
+          "completedAt": "2026-09-14T17:59:50Z"
+        },
+        {
+          "databaseId": 104089804799,
+          "name": "type-check",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970565/job/104089804799",
+          "startedAt": "2026-09-14T17:58:40Z",
+          "completedAt": "2026-09-14T17:59:31Z"
+        },
+        {
+          "databaseId": 104089804820,
+          "name": "lint",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970565/job/104089804820",
+          "startedAt": "2026-09-14T17:58:39Z",
+          "completedAt": "2026-09-14T17:59:33Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34877970537,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "56bc07d6243e41a078b1f2bbb9406d7989d2509a",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970537",
+      "workflowName": "Backend Integration",
+      "jobs": [
+        {
+          "databaseId": 104089804839,
+          "name": "backend-integration",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970537/job/104089804839",
+          "startedAt": "2026-09-14T17:58:39Z",
+          "completedAt": "2026-09-14T18:01:16Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34877970345,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "56bc07d6243e41a078b1f2bbb9406d7989d2509a",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970345",
+      "workflowName": "Frontend Production Build",
+      "jobs": [
+        {
+          "databaseId": 104089804097,
+          "name": "build-frontend-production",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970345/job/104089804097",
+          "startedAt": "2026-09-14T17:58:39Z",
+          "completedAt": "2026-09-14T18:02:20Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34877970348,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "56bc07d6243e41a078b1f2bbb9406d7989d2509a",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970348",
+      "workflowName": "Backend Tests",
+      "jobs": [
+        {
+          "databaseId": 104089804149,
+          "name": "backend-suite",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970348/job/104089804149",
+          "startedAt": "2026-09-14T17:58:39Z",
+          "completedAt": "2026-09-14T18:08:59Z"
+        }
+      ]
+    }
+  ],
+  "ci_test_summaries": [
+    {
+      "workflow": "Backend Integration",
+      "run_id": 34877970537,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970537",
+      "event": "push",
+      "head_sha": "56bc07d6243e41a078b1f2bbb9406d7989d2509a",
+      "attempt": 1,
+      "console_summary": "135 passed, 4 skipped, 17 warnings in 90.45s (0:01:30)",
+      "counts": {
+        "passed": 135,
+        "failed": 0,
+        "skipped": 4,
+        "deselected": 0
+      },
+      "log_sha256": "7b7596099c6c474cab47da7a855c9180e770b3b4b6e877125cdf9e5435769d51"
+    },
+    {
+      "workflow": "Backend Tests",
+      "run_id": 34877970348,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970348",
+      "event": "push",
+      "head_sha": "56bc07d6243e41a078b1f2bbb9406d7989d2509a",
+      "attempt": 1,
+      "console_summary": "2647 passed, 3 skipped, 12 deselected, 48 warnings in 550.31s (0:09:10)",
+      "counts": {
+        "passed": 2647,
+        "failed": 0,
+        "skipped": 3,
+        "deselected": 12
+      },
+      "log_sha256": "4f37eb24aae81c82285402080084e3f46a54f8623e33da9849df77475fe720c7"
+    }
+  ],
+  "legacy_performance_gate": {
+    "test": "tests/integration/test_graph_search.py::test_graph_layer_depth2_performance_under_200ms",
+    "run_id": 34877970537,
+    "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34877970537",
+    "passed": true,
+    "log_line": "backend-integration\tRun integration tests with testcontainers\t2026-09-14T18:00:00.4180770Z tests/integration/test_graph_search.py::test_graph_layer_depth2_performance_under_200ms PASSED [ 32%]"
+  },
+  "deployments": {
+    "checked_at": "2026-09-14T18:04:43.508984+00:00",
+    "commit": "56bc07d6243e41a078b1f2bbb9406d7989d2509a",
+    "services": {
+      "TraceLab": {
+        "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+        "deployment_id": "94ac6bd3-2e3f-4db3-90c7-b9ca0fa09ea2",
+        "status": "SUCCESS",
+        "commit": "56bc07d6243e41a078b1f2bbb9406d7989d2509a",
+        "created_at": "2026-09-14T17:58:33.245Z"
+      },
+      "frontend": {
+        "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+        "deployment_id": "f8e60bf9-7431-4ccf-a4bd-26c3843aac81",
+        "status": "SUCCESS",
+        "commit": "56bc07d6243e41a078b1f2bbb9406d7989d2509a",
+        "created_at": "2026-09-14T17:58:33.245Z"
+      }
+    },
+    "both_success_for_commit": true
+  },
+  "production_receipt": "cmos/reports/sprint-52/graph-1-production.json",
+  "production_summary": {
+    "passed": true,
+    "canonical_project_totals": {
+      "documents": 23,
+      "reports": 3,
+      "missions": 3,
+      "evidence": 547
+    },
+    "samples_per_depth": 20,
+    "latency": {
+      "1": {
+        "calls": 20,
+        "p50_ms": 268.48699999999997,
+        "p95_ms": 288.13525000000004,
+        "min_ms": 259.286,
+        "max_ms": 294.505
+      },
+      "2": {
+        "calls": 20,
+        "p50_ms": 358.07849999999996,
+        "p95_ms": 428.06899999999996,
+        "min_ms": 335.802,
+        "max_ms": 563.843
+      }
+    }
+  },
+  "public_smoke": {
+    "tool": "playwright",
+    "generatedAt": "2026-09-14T18:05:01.843Z",
+    "completedAt": "2026-09-14T18:05:06.620Z",
+    "status": "passed",
+    "summary": {
+      "total": 5,
+      "expected": 5,
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "interrupted": 0,
+      "durationSeconds": 4.777,
+      "retries": 0
+    },
+    "environment": {
+      "node": "v24.6.0",
+      "ci": {
+        "provider": null
+      },
+      "projects": [
+        "chromium"
+      ],
+      "browsers": []
+    },
+    "tests": [
+      {
+        "title": "missions route responds at the public domain",
+        "file": "frontend/tests/e2e/production-smoke.spec.ts",
+        "line": 17,
+        "column": 7,
+        "status": "passed",
+        "durationMs": 795,
+        "annotations": [],
+        "attachments": [],
+        "errors": []
+      },
+      {
+        "title": "/admin/users is deployed as its own Next page",
+        "file": "frontend/tests/e2e/production-smoke.spec.ts",
+        "line": 23,
+        "column": 9,
+        "status": "passed",
+        "durationMs": 369,
+        "annotations": [],
+        "attachments": [],
+        "errors": []
+      },
+      {
+        "title": "/admin/spaces is deployed as its own Next page",
+        "file": "frontend/tests/e2e/production-smoke.spec.ts",
+        "line": 23,
+        "column": 9,
+        "status": "passed",
+        "durationMs": 292,
+        "annotations": [],
+        "attachments": [],
+        "errors": []
+      },
+      {
+        "title": "API health endpoint confirms production authorization and reconciler freshness",
+        "file": "frontend/tests/e2e/production-smoke.spec.ts",
+        "line": 33,
+        "column": 7,
+        "status": "passed",
+        "durationMs": 243,
+        "annotations": [],
+        "attachments": [],
+        "errors": []
+      },
+      {
+        "title": "every maintained migration preserves its destination and query parameters",
+        "file": "frontend/tests/e2e/route-migration.spec.ts",
+        "line": 5,
+        "column": 5,
+        "status": "passed",
+        "durationMs": 2458,
+        "annotations": [],
+        "attachments": [
+          {
+            "name": "route-migration-coverage",
+            "contentType": "application/json",
+            "path": "/tmp/tracelab-s52-graph1/source-smoke-artifacts/route-migration-every-main-a90a2-nation-and-query-parameters-chromium/attachments/route-migration-coverage-08c75d0c23a79e6158ae332a54f5ed7d223fe4d1.json"
+          }
+        ],
+        "errors": []
+      }
+    ],
+    "artifactPath": "/tmp/tracelab-s52-graph1/source-public-smoke.json"
+  },
+  "route_migration_coverage": {
+    "baseURL": "https://tracelab.aquex.ai",
+    "checkedAt": "2026-09-14T18:05:06.592Z",
+    "mapRows": 8,
+    "coveredRows": 8,
+    "checks": 16,
+    "passed": 16,
+    "results": [
+      {
+        "source": "/",
+        "requested": "/",
+        "status": 200,
+        "actual": "https://tracelab.aquex.ai/",
+        "expected": "https://tracelab.aquex.ai/",
+        "passed": true
+      },
+      {
+        "source": "/",
+        "requested": "/?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+        "status": 200,
+        "actual": "https://tracelab.aquex.ai/?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+        "expected": "https://tracelab.aquex.ai/?q=scope+%26+provenance&tag=first&tag=second&view=all",
+        "passed": true
+      },
+      {
+        "source": "/console",
+        "requested": "/console",
+        "status": 308,
+        "actual": "https://tracelab.aquex.ai/admin/observability",
+        "expected": "https://tracelab.aquex.ai/admin/observability",
+        "passed": true
+      },
+      {
+        "source": "/console",
+        "requested": "/console?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+        "status": 308,
+        "actual": "https://tracelab.aquex.ai/admin/observability?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+        "expected": "https://tracelab.aquex.ai/admin/observability?q=scope+%26+provenance&tag=first&tag=second&view=all",
+        "passed": true
+      },
+      {
+        "source": "/console/missions",
+        "requested": "/console/missions",
+        "status": 308,
+        "actual": "https://tracelab.aquex.ai/missions",
+        "expected": "https://tracelab.aquex.ai/missions",
+        "passed": true
+      },
+      {
+        "source": "/console/missions",
+        "requested": "/console/missions?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+        "status": 308,
+        "actual": "https://tracelab.aquex.ai/missions?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+        "expected": "https://tracelab.aquex.ai/missions?q=scope+%26+provenance&tag=first&tag=second&view=all",
+        "passed": true
+      },
+      {
+        "source": "/console/missions/:id",
+        "requested": "/console/missions/00000000-0000-4000-8000-000000000001",
+        "status": 308,
+        "actual": "https://tracelab.aquex.ai/missions/00000000-0000-4000-8000-000000000001",
+        "expected": "https://tracelab.aquex.ai/missions/00000000-0000-4000-8000-000000000001",
+        "passed": true
+      },
+      {
+        "source": "/console/missions/:id",
+        "requested": "/console/missions/00000000-0000-4000-8000-000000000001?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+        "status": 308,
+        "actual": "https://tracelab.aquex.ai/missions/00000000-0000-4000-8000-000000000001?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+        "expected": "https://tracelab.aquex.ai/missions/00000000-0000-4000-8000-000000000001?q=scope+%26+provenance&tag=first&tag=second&view=all",
+        "passed": true
+      },
+      {
+        "source": "/console/corrections",
+        "requested": "/console/corrections",
+        "status": 308,
+        "actual": "https://tracelab.aquex.ai/admin/corrections",
+        "expected": "https://tracelab.aquex.ai/admin/corrections",
+        "passed": true
+      },
+      {
+        "source": "/console/corrections",
+        "requested": "/console/corrections?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+        "status": 308,
+        "actual": "https://tracelab.aquex.ai/admin/corrections?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+        "expected": "https://tracelab.aquex.ai/admin/corrections?q=scope+%26+provenance&tag=first&tag=second&view=all",
+        "passed": true
+      },
+      {
+        "source": "/invites",
+        "requested": "/invites",
+        "status": 308,
+        "actual": "https://tracelab.aquex.ai/settings#invites",
+        "expected": "https://tracelab.aquex.ai/settings#invites",
+        "passed": true
+      },
+      {
+        "source": "/invites",
+        "requested": "/invites?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+        "status": 308,
+        "actual": "https://tracelab.aquex.ai/settings?q=scope%20%26%20provenance&tag=first&tag=second&view=all#invites",
+        "expected": "https://tracelab.aquex.ai/settings?q=scope+%26+provenance&tag=first&tag=second&view=all#invites",
+        "passed": true
+      },
+      {
+        "source": "/search/results",
+        "requested": "/search/results",
+        "status": 308,
+        "actual": "https://tracelab.aquex.ai/search",
+        "expected": "https://tracelab.aquex.ai/search",
+        "passed": true
+      },
+      {
+        "source": "/search/results",
+        "requested": "/search/results?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+        "status": 308,
+        "actual": "https://tracelab.aquex.ai/search?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+        "expected": "https://tracelab.aquex.ai/search?q=scope+%26+provenance&tag=first&tag=second&view=all",
+        "passed": true
+      },
+      {
+        "source": "/missions/queue",
+        "requested": "/missions/queue",
+        "status": 308,
+        "actual": "https://tracelab.aquex.ai/missions?view=queue",
+        "expected": "https://tracelab.aquex.ai/missions?view=queue",
+        "passed": true
+      },
+      {
+        "source": "/missions/queue",
+        "requested": "/missions/queue?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+        "status": 308,
+        "actual": "https://tracelab.aquex.ai/missions?q=scope%20%26%20provenance&tag=first&tag=second&view=queue",
+        "expected": "https://tracelab.aquex.ai/missions?view=queue&q=scope+%26+provenance&tag=first&tag=second",
+        "passed": true
+      }
+    ]
+  },
+  "limitations": [
+    "Production checks are read-only; scope-denial and revocation mutations are verified in local mounted-app tests.",
+    "No UI runtime changed; the full UI Definition of Done baseline is required for UX-11.",
+    "Existing unauthenticated graph stats remains deferred to Sprint53 as specified."
+  ],
+  "closure_gate": "Complete only after this mission's receipt is merged on main. Record its own PR and merge SHA in CMOS, with receipt-carrier main push CI, both SUCCESS deployments and public smoke."
+}
