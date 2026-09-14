@@ -13,6 +13,7 @@ from app.adapters.repositories.sqlalchemy_mission_repo import SQLAlchemyMissionR
 from app.adapters.repositories.sqlalchemy_project_repo import SQLAlchemyProjectRepository
 from app.core.config import settings
 from app.ports.external import EmbeddingPort, LLMPort, VectorDBPort
+from app.ports.graph_neighborhood import GraphNeighborhoodRepository
 from app.ports.navigation_search import NavigationSearchRepository
 from app.ports.repositories import DocumentRepository, MissionRepository, ProjectRepository
 from app.services.admin_stats import AdminStatsService
@@ -56,6 +57,13 @@ def get_navigation_search_repository() -> NavigationSearchRepository:
     from app.adapters.repositories.sqlalchemy_navigation_search_repo import SQLAlchemyNavigationSearchRepository
 
     return SQLAlchemyNavigationSearchRepository()
+
+
+def get_graph_neighborhood_repository() -> GraphNeighborhoodRepository:
+    """Provide live scoped relationships without sharing request state."""
+    from app.adapters.repositories.sqlalchemy_graph_neighborhood_repo import SQLAlchemyGraphNeighborhoodRepository
+
+    return SQLAlchemyGraphNeighborhoodRepository()
 
 
 def get_embedding_port() -> EmbeddingPort | None:

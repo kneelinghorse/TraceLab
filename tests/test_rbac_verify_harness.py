@@ -48,6 +48,7 @@ from scripts.rbac_verify import (
     HarnessError,
     RbacVerifier,
     _seed_specs,
+    graph_scope_routes,
     pedr1b_scope_routes,
     pedr1c_anon_routes,
     pedr_scope_routes,
@@ -132,6 +133,7 @@ def test_harness_passes_against_enforced_app(
     assert not leaks, f"unexpected BOLA leaks: {[str(g) for g in leaks]}"
     assert code == 0, f"gaps: {[str(g) for g in verifier.gaps]}\nnotes: {verifier.notes}"
     assert pedr1c_calls, "run() skipped the PEDR-1C matrix"
+    assert verifier.graph_checks and all(row["passed"] for row in verifier.graph_checks)
     assert len(login_calls) == 5, "live harness must stay within the five-login/minute budget"
     assert len(verifier.registration_checks) == 2
     assert len(verifier.document_checks) == 6
@@ -535,6 +537,7 @@ def test_pedr1c_anon_routes_cover_exact_alternate_surface():
     routes = pedr1c_anon_routes("/api/v1", resource_id)
 
     assert [(method, path) for method, path, _body in routes] == [
+        ("get", f"/api/v1/graph/neighborhood?root_type=project&root_id={resource_id}"),
         ("get", "/api/v1/navigation/search?q=rbac"),
         ("get", "/api/v1/collections"),
         ("post", "/api/v1/collections"),
@@ -603,6 +606,7 @@ def _silence_run_matrices(verifier, monkeypatch):
         "seeded_matrix",
         "list_isolation_check",
         "pedr_scope_matrix",
+        "graph_scope_matrix",
         "pedr1b_scope_matrix",
         "pedr1c_scope_matrix",
         "service_log_write_matrix",
@@ -612,6 +616,34 @@ def _silence_run_matrices(verifier, monkeypatch):
             method_name,
             lambda *args, **kwargs: None,
         )
+
+
+@pytest.mark.parametrize("status_code", [200, 401, 404, 422, 500])
+def test_graph_matrix_requires_exact_cross_tenant_403(status_code):
+    class Transport:
+        def request(self, _method, _path, **_kwargs):
+            return _StubResponse(status_code, {})
+
+    verifier = RbacVerifier(Transport(), log=lambda _message: None)
+    verifier.graph_scope_matrix(str(uuid4()), {"member": "test-token"})
+    assert len(verifier.gaps) == 1 and verifier.gaps[0].kind == "GRAPH-SCOPE-DENY"
+
+
+def test_graph_matrix_rejects_vacuous_owner_success():
+    class Transport:
+        def request(self, _method, _path, **_kwargs):
+            return _StubResponse(200, {})
+
+    verifier = RbacVerifier(Transport(), log=lambda _message: None)
+    verifier.graph_scope_matrix(str(uuid4()), {"owner": "test-token"})
+    assert len(verifier.gaps) == 1 and verifier.gaps[0].kind == "GRAPH-OWNER-OVERBLOCK"
+
+
+def test_graph_scope_is_authenticated_and_accounted_for():
+    project_id = str(uuid4())
+    routes = graph_scope_routes("/api/v1", project_id)
+    assert routes == [("get", f"/api/v1/graph/neighborhood?root_type=project&root_id={project_id}", None)]
+    assert all(route in pedr1c_anon_routes("/api/v1", project_id) for route in routes)
 
 
 def test_run_reconciles_api_key_when_committed_response_is_lost(

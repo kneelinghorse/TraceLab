@@ -59,28 +59,40 @@ def content_urls(content: str | None) -> set[str]:
 
 
 def report_evidence_filter(db: Session, user: AuthenticatedUser, report: Report) -> ColumnElement[bool]:
-    missions = readable_query(db, user, Mission).filter(Mission.result_report_id == report.id)
+    missions = readable_query(db, user, Mission).with_entities(Mission.id).statement
+    return report_evidence_condition(report, missions)
+
+
+def report_evidence_condition(report: Report, readable_mission_ids: Any) -> ColumnElement[bool]:
+    """Build the shared citation predicate from a precomputed mission scope."""
+    missions = select(Mission.id).where(Mission.id.in_(readable_mission_ids), Mission.result_report_id == report.id)
     return or_(
         LedgerEntry.id.in_(
             select(ReportSource.source_id).where(
                 ReportSource.report_id == report.id, ReportSource.source_type == "ledger_entry"
             )
         ),
-        LedgerEntry.mission_id.in_(missions.with_entities(Mission.id).statement),
+        LedgerEntry.mission_id.in_(missions),
         LedgerEntry.source_url.in_(content_urls(type_cast(str | None, report.content))),
     )
 
 
 def document_evidence_filter(db: Session, user: AuthenticatedUser, document: Document) -> ColumnElement[bool]:
+    mission = readable_query(db, user, Mission).filter(Mission.id == document.source_mission_id).first() if document.source_mission_id else None
+    report = readable_query(db, user, Report).filter(Report.id == document.source_report_id).first() if document.source_report_id else None
+    missions = readable_query(db, user, Mission).with_entities(Mission.id).statement if report is not None else select(Mission.id).where(false())
+    return document_evidence_condition(document, mission, report, missions)
+
+
+def document_evidence_condition(
+    document: Document, mission: Mission | None, report: Report | None, readable_mission_ids: Any,
+) -> ColumnElement[bool]:
+    """Use caller-readable sources loaded individually or in one graph batch."""
     conditions = []
-    if document.source_mission_id:
-        mission = readable_query(db, user, Mission).filter(Mission.id == document.source_mission_id).first()
-        if mission is not None:
-            conditions.append(LedgerEntry.mission_id == mission.id)
-    if document.source_report_id:
-        report = readable_query(db, user, Report).filter(Report.id == document.source_report_id).first()
-        if report is not None:
-            conditions.append(report_evidence_filter(db, user, report))
+    if mission is not None:
+        conditions.append(LedgerEntry.mission_id == mission.id)
+    if report is not None:
+        conditions.append(report_evidence_condition(report, readable_mission_ids))
     metadata: dict[str, Any] = document.document_metadata if isinstance(document.document_metadata, dict) else {}
     urls = {
         metadata[key]
