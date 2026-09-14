@@ -33,6 +33,7 @@ import {
   type TraceLabConfig,
 } from './api-client.js';
 import { CredentialStore, type StoredCredential } from './auth/credential-store.js';
+import { canonicalFrontendOrigin, canonicalLink } from './canonical-link.js';
 import {
   DeviceCodeError,
   runDeviceCodeFlow,
@@ -1004,6 +1005,7 @@ async function handleSearchKnowledge(args: unknown) {
     score: chunk.score.toFixed(3),
     content_preview: chunk.content.substring(0, 500) + (chunk.content.length > 500 ? '...' : ''),
     document_id: chunk.document_id,
+    document_url: canonicalLink('document', chunk.document_id),
     source_type: chunk.source_type,
     tags: chunk.tags,
   }));
@@ -1042,6 +1044,7 @@ async function handleListProjects(args: unknown) {
           {
             projects: result.data.map((p) => ({
               id: p.id,
+              url: canonicalLink('project', p.id),
               name: p.name,
               description: p.description,
               status: p.status,
@@ -1075,6 +1078,7 @@ async function handleCreateProject(args: unknown) {
             message: `Project "${result.name}" created successfully`,
             project: {
               id: result.id,
+              url: canonicalLink('project', result.id),
               name: result.name,
               description: result.description,
               status: result.status,
@@ -1109,6 +1113,7 @@ async function handleUpdateProject(args: unknown) {
             message: `Project "${result.name}" updated successfully`,
             project: {
               id: result.id,
+              url: canonicalLink('project', result.id),
               name: result.name,
               description: result.description,
               status: result.status,
@@ -1135,6 +1140,7 @@ async function handleGetProjectStats(args: unknown) {
         text: JSON.stringify(
           {
             project_id: result.project_id,
+            url: canonicalLink('project', result.project_id),
             name: result.name,
             document_count: result.document_count,
             chunk_count: result.chunk_count,
@@ -1161,6 +1167,7 @@ async function handleListCollections() {
           {
             collections: result.data.map((c) => ({
               id: c.id,
+              url: canonicalLink('collection', c.id),
               name: c.name,
               description: c.description,
               item_count: c.item_count,
@@ -1187,6 +1194,7 @@ async function handleGetCollection(args: unknown) {
         text: JSON.stringify(
           {
             id: result.id,
+            url: canonicalLink('collection', result.id),
             name: result.name,
             description: result.description,
             item_count: result.item_count,
@@ -1196,6 +1204,7 @@ async function handleGetCollection(args: unknown) {
               notes: item.notes,
               chunk_content: item.chunk_content,
               document_id: item.document_id,
+              document_url: canonicalLink('document', item.document_id),
               added_at: item.added_at,
             })),
           },
@@ -1237,6 +1246,7 @@ async function handleCreateCollection(args: unknown) {
             message: `Collection "${result.name}" created successfully`,
             collection: {
               id: result.id,
+              url: canonicalLink('collection', result.id),
               name: result.name,
               description: result.description,
               created_at: result.created_at,
@@ -1264,6 +1274,7 @@ async function handleAddToCollection(args: unknown) {
         text: JSON.stringify(
           {
             message: 'Chunk added to collection successfully',
+            collection_url: canonicalLink('collection', input.collection_id),
             item: {
               id: result.id,
               chunk_id: result.chunk_id,
@@ -1295,12 +1306,14 @@ async function handleSynthesize(args: unknown) {
 
     const response: Record<string, unknown> = {
       synthesis: result.content,
+      collection_url: canonicalLink('collection', input.collection_id),
       citations: result.citations,
     };
 
     // Include report_id if saved as report
     if (result.report_id) {
       response.report_id = result.report_id;
+      response.report_url = canonicalLink('report', result.report_id);
       response.message = `Synthesis saved as report "${input.report_title}"`;
     }
 
@@ -1378,6 +1391,7 @@ async function handleCreateReport(args: unknown) {
             message: `Report "${result.title}" created successfully`,
             report: {
               id: result.id,
+              url: canonicalLink('report', result.id),
               title: result.title,
               status: result.status,
               tokens_used: result.tokens_used,
@@ -1411,6 +1425,7 @@ async function handleListReports(args: unknown) {
           {
             reports: result.items.map((r) => ({
               id: r.id,
+              url: canonicalLink('report', r.id),
               title: r.title,
               status: r.status,
               report_type: r.report_type,
@@ -1444,6 +1459,7 @@ async function handleGetReport(args: unknown) {
         text: JSON.stringify(
           {
             id: result.id,
+            url: canonicalLink('report', result.id),
             title: result.title,
             content: result.content,
             status: result.status,
@@ -1544,6 +1560,7 @@ async function handleUploadDocument(args: unknown) {
             message: `Document "${result.name}" uploaded successfully`,
             document: {
               id: result.id,
+              url: canonicalLink('document', result.id),
               name: result.name,
               project_id: result.project_id,
               file_type: result.file_type,
@@ -1598,6 +1615,7 @@ async function handleGetDocumentContent(args: unknown) {
 
   const response: Record<string, unknown> = {
     document_id: input.document_id,
+    url: canonicalLink('document', input.document_id),
     content,
     pagination: {
       page: chunksResponse.pagination.page,
@@ -1679,6 +1697,7 @@ async function handleCreateMission(args: unknown) {
             message: `Mission "${result.mission_id}" created successfully`,
             mission: {
               id: result.id,
+              url: canonicalLink('mission', result.id),
               mission_id: result.mission_id,
               title: result.title,
               objective: result.objective,
@@ -1767,6 +1786,7 @@ export async function handleListMissions(args: unknown) {
           {
             missions: result.data.map((m) => ({
               id: m.id,
+              url: canonicalLink('mission', m.id),
               mission_id: m.mission_id,
               title: m.title,
               status: m.status,
@@ -1824,6 +1844,7 @@ export async function handleGetMission(args: unknown) {
         text: JSON.stringify(
           {
             id: result.id,
+            url: canonicalLink('mission', result.id),
             mission_id: result.mission_id,
             title: result.title,
             objective: result.objective,
@@ -1899,6 +1920,7 @@ async function handleUpdateMission(args: unknown) {
             message: `Mission "${result.mission_id}" updated successfully`,
             mission: {
               id: result.id,
+              url: canonicalLink('mission', result.id),
               mission_id: result.mission_id,
               title: result.title,
               objective: result.objective,
@@ -1930,6 +1952,7 @@ async function handlePreviewMissionContract(args: unknown) {
             message: `Contract preview for mission "${preview.mission_id}"`,
             preview: {
               mission_id: preview.mission_id,
+              url: canonicalLink('mission', preview.mission_uuid),
               mission_uuid: preview.mission_uuid,
               project_id: preview.project_id ?? null,
               contract_version: preview.contract_version,
@@ -1969,6 +1992,7 @@ async function handleSubmitMission(args: unknown) {
             mode: result.mode,
             mission_id: result.mission_id,
             uuid: result.uuid,
+            url: canonicalLink('mission', result.uuid),
             job_id: result.job_id,
           },
           null,
@@ -1990,6 +2014,7 @@ async function handleGetMissionStatus(args: unknown) {
         text: JSON.stringify(
           {
             mission_id: input.mission_id,
+            url: canonicalLink('mission', input.mission_id),
             status: result.status,
             progress: result.progress_percent,
             current_phase: result.current_phase,
@@ -2028,28 +2053,33 @@ function rawJsonResponse(result: unknown) {
 
 async function handleCaptureEvidence(args: unknown) {
   const input = CaptureEvidenceInput.parse(args);
-  return rawJsonResponse(await client.captureEvidence(input));
+  const result = await client.captureEvidence(input);
+  return rawJsonResponse({ ...result, entries: result.entries.map(entry => ({ ...entry, url: canonicalLink('evidence', entry.id) })) });
 }
 
 async function handlePutEvidenceNote(args: unknown) {
   const input = PutEvidenceNoteInput.parse(args);
   const { note_key: noteKey, ...body } = input;
-  return rawJsonResponse(await client.putEvidenceNote(noteKey, body));
+  const result = await client.putEvidenceNote(noteKey, body);
+  return rawJsonResponse({ ...result, project_url: canonicalLink('project', result.project_id) });
 }
 
 async function handleListEvidence(args: unknown) {
   const input = ListEvidenceInput.parse(args);
-  return rawJsonResponse(await client.listEvidence(input));
+  const result = await client.listEvidence(input);
+  return rawJsonResponse({ ...result, entries: result.entries.map(entry => ({ ...entry, url: canonicalLink('evidence', entry.id) })), notes: result.notes.map(note => ({ ...note, project_url: canonicalLink('project', note.project_id) })) });
 }
 
 async function handleSearchEvidence(args: unknown) {
   const input = SearchEvidenceInput.parse(args);
-  return rawJsonResponse(await client.searchEvidence(input));
+  const result = await client.searchEvidence(input);
+  return rawJsonResponse({ ...result, entries: result.entries.map(entry => ({ ...entry, url: canonicalLink('evidence', entry.id) })) });
 }
 
 async function handlePromoteEvidence(args: unknown) {
   const input = PromoteEvidenceInput.parse(args);
-  return rawJsonResponse(await client.promoteEvidence(input));
+  const result = await client.promoteEvidence(input);
+  return rawJsonResponse({ ...result, report_url: canonicalLink('report', result.report_id), document_url: canonicalLink('document', result.document_id) });
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -2336,6 +2366,7 @@ async function resolveAuthConfig(
 
 // Create and run the server
 async function main() {
+  canonicalFrontendOrigin();
   const config = await resolveAuthConfig();
   client = new TraceLabClient(config);
 

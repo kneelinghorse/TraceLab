@@ -19,6 +19,7 @@ from __future__ import annotations
 import json
 import logging
 from typing import Any
+from urllib.parse import quote
 from uuid import UUID
 
 from mcp.server import Server
@@ -51,6 +52,13 @@ _mission_service = MissionService()
 # mission's execution_metadata weighs ~16KB on its own; that's well past
 # transports tuned for short MCP responses, hence the trim.
 _LARGE_BLOB_THRESHOLD_BYTES = 5_000
+
+
+def _mission_url(mission_id: UUID | str | None) -> str | None:
+    """Link to the canonical browser route using the resolved record identity."""
+    if mission_id is None:
+        return None
+    return f"{settings.frontend_url.rstrip('/')}/missions/{quote(str(mission_id), safe='')}"
 
 
 def _summarize_blob(value: Any, *, field_name: str) -> dict[str, Any]:
@@ -127,6 +135,7 @@ def _serialize_mission(mission, *, slim: bool = True) -> dict[str, Any]:
 
     return {
         "id": str(mission.id) if mission.id else None,
+        "url": _mission_url(mission.id),
         "project_id": str(mission.project_id) if mission.project_id else None,
         "project_name": mission.project.name
         if getattr(mission, "project", None)
@@ -682,6 +691,7 @@ async def handle_submit_mission(arguments: dict[str, Any]) -> list[TextContent]:
                 "mode": deepsearch_mode,
                 "mission_id": updated_mission.mission_id,
                 "uuid": str(updated_mission.id),
+                "url": _mission_url(updated_mission.id),
                 "message": message,
             }
             if job_id:
@@ -722,6 +732,7 @@ async def handle_get_mission_status(arguments: dict[str, Any]) -> list[TextConte
             result = {
                 "mission_id": mission.mission_id,
                 "uuid": str(mission.id),
+                "url": _mission_url(mission.id),
                 "status": mission.status,
                 "deepsearch_job_id": mission.deepsearch_job_id,
                 "timestamps": {

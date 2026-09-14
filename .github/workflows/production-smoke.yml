@@ -34,4 +34,11 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Run production smoke suite
         working-directory: frontend
-        run: npx playwright test tests/e2e/production-smoke.spec.ts
+        run: npx playwright test tests/e2e/production-smoke.spec.ts tests/e2e/route-migration.spec.ts
+      - name: Archive production route migration coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-route-migration-coverage
+          path: frontend/test-results/**/route-migration-coverage.json
+          if-no-files-found: error

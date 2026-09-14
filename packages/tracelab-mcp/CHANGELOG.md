@@ -5,6 +5,17 @@ All notable changes to `@aquex/tracelab-mcp` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- Canonical browser navigation metadata on every entity response through one
+  link helper, with an explicit `TRACELAB_FRONTEND_URL` override for custom
+  deployments. Authored URLs, source provenance and export content are preserved.
+- A real stdio MCP contract covering all 29 actions, HTTP verbs, authentication,
+  canonical links and content preservation. CI installs an `npm pack` tarball
+  in a clean directory and exercises its actual entrypoint.
+
 ## [1.1.1] — 2026-08-21
 
 ### Added

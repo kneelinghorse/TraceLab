@@ -1508,7 +1508,7 @@ describe('LEDGER-1 — tracelab_evidence published contract', () => {
     expect(mockFetch).not.toHaveBeenCalled();
   });
 
-  it('capture uses POST with API-key auth, exact body, and raw full-entry response', async () => {
+  it('capture uses POST with API-key auth, exact body, and full entry plus browser link', async () => {
     const apiResponse = { entries: [entryFixture], count: 1 };
     mockFetch.mockResolvedValueOnce(okJson(apiResponse));
     const { handleTracelabEvidence } = await import('./index.js');
@@ -1557,7 +1557,10 @@ describe('LEDGER-1 — tracelab_evidence published contract', () => {
         },
       ],
     });
-    expect(JSON.parse(result.content[0].text)).toEqual(apiResponse);
+    expect(JSON.parse(result.content[0].text)).toEqual({
+      ...apiResponse,
+      entries: [{ ...entryFixture, url: `http://localhost:3000/evidence/${entryFixture.id}` }],
+    });
   });
 
   it('rejects a non-HTTP source URL before issuing a capture request', async () => {
@@ -1580,7 +1583,7 @@ describe('LEDGER-1 — tracelab_evidence published contract', () => {
     expect(mockFetch).not.toHaveBeenCalled();
   });
 
-  it('note uses PUT with an encoded key, exact body, and raw full-note response', async () => {
+  it('note uses PUT with an encoded key, exact body, and full note plus project link', async () => {
     mockFetch.mockResolvedValueOnce(okJson(noteFixture));
     const { handleTracelabEvidence } = await import('./index.js');
 
@@ -1606,10 +1609,13 @@ describe('LEDGER-1 — tracelab_evidence published contract', () => {
       mission_id: MISSION_ID,
       tags: noteFixture.tags,
     });
-    expect(JSON.parse(result.content[0].text)).toEqual(noteFixture);
+    expect(JSON.parse(result.content[0].text)).toEqual({
+      ...noteFixture,
+      project_url: `http://localhost:3000/projects/${PROJECT_ID}`,
+    });
   });
 
-  it('list uses GET with exact encoded filters and returns entries and notes unchanged', async () => {
+  it('list uses GET with exact encoded filters and preserves entries and notes with browser links', async () => {
     const apiResponse = {
       entries: [entryFixture],
       notes: [noteFixture],
@@ -1639,10 +1645,14 @@ describe('LEDGER-1 — tracelab_evidence published contract', () => {
     );
     expect(request.method).toBe('GET');
     expect(request.body).toBeUndefined();
-    expect(JSON.parse(result.content[0].text)).toEqual(apiResponse);
+    expect(JSON.parse(result.content[0].text)).toEqual({
+      ...apiResponse,
+      entries: [{ ...entryFixture, url: `http://localhost:3000/evidence/${entryFixture.id}` }],
+      notes: [{ ...noteFixture, project_url: `http://localhost:3000/projects/${PROJECT_ID}` }],
+    });
   });
 
-  it('search uses GET with q plus exact encoded filters and returns entries unchanged', async () => {
+  it('search uses GET with q plus exact encoded filters and preserves entries with browser links', async () => {
     const apiResponse = { entries: [entryFixture], total: 1, page: 3, page_size: 7 };
     mockFetch.mockResolvedValueOnce(okJson(apiResponse));
     const { handleTracelabEvidence } = await import('./index.js');
@@ -1666,7 +1676,10 @@ describe('LEDGER-1 — tracelab_evidence published contract', () => {
     );
     expect(request.method).toBe('GET');
     expect(request.body).toBeUndefined();
-    expect(JSON.parse(result.content[0].text)).toEqual(apiResponse);
+    expect(JSON.parse(result.content[0].text)).toEqual({
+      ...apiResponse,
+      entries: [{ ...entryFixture, url: `http://localhost:3000/evidence/${entryFixture.id}` }],
+    });
   });
 
   it('promote defaults target to report, POSTs the exact body, and preserves every response field', async () => {
@@ -1700,7 +1713,10 @@ describe('LEDGER-1 — tracelab_evidence published contract', () => {
       title: 'Session evidence',
       target: 'report',
     });
-    expect(JSON.parse(result.content[0].text)).toEqual(apiResponse);
+    expect(JSON.parse(result.content[0].text)).toEqual({
+      ...apiResponse,
+      report_url: `http://localhost:3000/reports/${apiResponse.report_id}`,
+    });
   });
 
   it('returns an actionable error for an unknown evidence action without calling the API', async () => {

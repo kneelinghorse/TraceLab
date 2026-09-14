@@ -1,0 +1,10 @@
+[
+  { "source": "/", "destination": "/", "kind": "page", "sprint": "50 (UX-2)" },
+  { "source": "/console", "destination": "/admin/observability", "kind": "redirect", "sprint": "50 (UX-4)" },
+  { "source": "/console/missions", "destination": "/missions", "kind": "redirect", "sprint": "50 (UX-4)" },
+  { "source": "/console/missions/:id", "destination": "/missions/:id", "kind": "redirect", "sprint": "50 (UX-4)" },
+  { "source": "/console/corrections", "destination": "/admin/corrections", "kind": "redirect", "sprint": "50 (UX-4)" },
+  { "source": "/invites", "destination": "/settings#invites", "kind": "redirect", "sprint": "50 (UX-5)" },
+  { "source": "/search/results", "destination": "/search", "kind": "redirect", "sprint": "51 (UX-9)" },
+  { "source": "/missions/queue", "destination": "/missions?view=queue", "kind": "redirect", "sprint": "51 (UX-6)" }
+]

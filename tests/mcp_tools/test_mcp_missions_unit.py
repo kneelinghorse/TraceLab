@@ -788,3 +788,71 @@ class TestToolSchemaConstraints:
         assert page_size_schema["default"] == 20
         assert page_size_schema["minimum"] == 1
         assert page_size_schema["maximum"] == 100
+
+
+class TestCanonicalMissionLinks:
+    """Real MCP clients get browser navigation without altering authored evidence."""
+
+    def test_registered_client_preserves_authoring_and_links_every_projection(self):
+        from mcp.server import Server
+        from mcp.shared.memory import create_connected_server_and_client_session
+
+        from app.mcp_server.tools import missions
+
+        mission_id = "00000000-0000-4000-8000-000000000001"
+        legacy_url = "https://tracelab.aquex.ai/console/missions/ORIGINAL?q=kept"
+        references = [{"title": "Original", "url": legacy_url}]
+        mission = _make_mission_mock(
+            id=mission_id,
+            project_id="00000000-0000-4000-8000-000000000002",
+            references=references,
+            context={"references": references},
+            result_markdown=f"[Original]({legacy_url})",
+        )
+        server = Server("mission-link-contract")
+        missions.register_mission_tools(server)
+        db = MagicMock()
+        pagination = MagicMock(page=1, page_size=20, total=1, pages=1)
+
+        async def exercise():
+            async with create_connected_server_and_client_session(server) as client:
+                assert len((await client.list_tools()).tools) == 5
+                cases = [
+                    ("create_mission", {
+                        "mission_id": "MCP-TEST", "title": "Test mission",
+                        "objective": "Preserve authored evidence",
+                        "success_criteria": ["Canonical navigation"],
+                        "project_id": mission.project_id,
+                    }),
+                    ("list_missions", {}),
+                    ("get_mission", {"mission_id": "MCP-TEST"}),
+                    ("submit_mission", {"mission_id": mission_id}),
+                    ("get_mission_status", {"mission_id": "MCP-TEST"}),
+                ]
+                for name, arguments in cases:
+                    if name == "submit_mission":
+                        # A draft with results must be rejected by the real guard.
+                        # Only a pristine draft exercises the successful submit projection.
+                        mission.result_markdown = None
+                    response = await client.call_tool(name, arguments)
+                    assert not response.isError
+                    body = json.loads(response.content[0].text)
+                    assert "error" not in body, body
+                    item = body["data"][0] if name == "list_missions" else body
+                    assert item.get("url") == f"https://tracelab.aquex.ai/missions/{mission_id}", (name, item)
+                    if name in {"create_mission", "list_missions", "get_mission"}:
+                        assert item["references"] == references
+                        assert item["context"] == mission.context
+                        assert item["result_markdown"] == mission.result_markdown
+
+        with (
+            patch.object(missions, "get_db", side_effect=lambda: iter([db])),
+            patch.object(missions, "_get_mission_by_id_or_mission_id", return_value=mission),
+            patch.object(missions._mission_service, "create_mission", return_value=mission),
+            patch.object(missions._mission_service, "list_missions", return_value=([mission], pagination)),
+            patch.object(missions._mission_service, "update_mission", return_value=mission),
+            patch.object(missions.settings, "frontend_url", "https://tracelab.aquex.ai/"),
+            patch.object(missions.settings, "deepsearch_mode", "worker"),
+        ):
+            asyncio.run(exercise())
+        assert db.close.call_count == 5

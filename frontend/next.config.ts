@@ -1,16 +1,9 @@
 import type { NextConfig } from "next";
+import migrations from "./src/lib/route-migrations.json";
 
 const nextConfig: NextConfig = {
   async redirects() {
-    return [
-      { source: "/search/results", destination: "/search", permanent: true },
-      { source: "/missions/queue", destination: "/missions?view=queue", permanent: true },
-      { source: "/invites", destination: "/settings#invites", permanent: true },
-      { source: "/console", destination: "/admin/observability", permanent: true },
-      { source: "/console/corrections", destination: "/admin/corrections", permanent: true },
-      { source: "/console/missions", destination: "/missions", permanent: true },
-      { source: "/console/missions/:id", destination: "/missions/:id", permanent: true },
-    ];
+    return migrations.filter(row => row.kind === "redirect").map(({ source, destination }) => ({ source, destination, permanent: true }));
   },
   allowedDevOrigins: ["127.0.0.1", "localhost"],
   turbopack: {

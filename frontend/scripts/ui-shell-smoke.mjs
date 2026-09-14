@@ -5,6 +5,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {createRequire} from 'node:module';
+import {inspectInternalLinks} from './route-migration-links.mjs';
 const require=createRequire(new URL("../package.json", import.meta.url));
 const {chromium}=require('playwright');
 let browser;
@@ -84,8 +85,9 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
      for (const node of measured.overflow) node.text = '[settings content omitted]';
    }
    const shot=`${theme}-${width}-${slug}.png`;
+   const links=inspectInternalLinks(await page.locator('a[href]').evaluateAll(nodes=>nodes.map(node=>node.href)),page.url());
    await page.screenshot({path:path.join(out,shot),fullPage:true, mask:page.url().includes('/settings')?[page.locator('code')]:[]});
-   const result={route,themeRequested:theme,theme,width,status:response.status(),finalUrl:page.url(),...measured,errors,transportErrors:[...transportErrors],navigationCancellations:[...navigationCancellations],screenshot:shot};
+   const result={route,themeRequested:theme,theme,width,status:response.status(),finalUrl:page.url(),...measured,...links,errors,transportErrors:[...transportErrors],navigationCancellations:[...navigationCancellations],screenshot:shot};
    results.push(result);
    await fs.writeFile(out+'/results.json',JSON.stringify(results,null,2));
    console.log(JSON.stringify({route,theme,width,status:response.status(),overflow:measured.scrollWidth>width+1,violations:measured.violations.map(v=>v.id+':'+v.nodes.length),errors:errors.length}));
@@ -95,8 +97,8 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
 }
 await browser.close();
 browser=undefined;
-const failures=results.filter(r => r.scrollWidth > r.width+1 || r.violations.length || r.errors.length || r.transportErrors.length || r.mainCount !== 1 || !r.shellPresent || r.theme !== r.themeRequested || r.status !== (r.route === '/404' ? 404 : 200));
-await fs.writeFile(out+'/summary.json', JSON.stringify({base, checkedAt:new Date().toISOString(), checks:results.length, routes:[...new Set(results.map(r=>r.route))].length, failures:failures.map(r=>({route:r.route,theme:r.theme,width:r.width})), readOnly:true, directProductionApi:directProduction, readOnlyApiProxy:!directProduction},null,2));
+const failures=results.filter(r => r.scrollWidth > r.width+1 || r.violations.length || r.errors.length || r.transportErrors.length || r.legacyInternalLinks.length || r.mainCount !== 1 || !r.shellPresent || r.theme !== r.themeRequested || r.status !== (r.route === '/404' ? 404 : 200));
+await fs.writeFile(out+'/summary.json', JSON.stringify({base, checkedAt:new Date().toISOString(), checks:results.length, routes:[...new Set(results.map(r=>r.route))].length, failures:failures.map(r=>({route:r.route,theme:r.theme,width:r.width})), internalLinkPaths:[...new Set(results.flatMap(r=>r.internalLinks))].sort(), legacyInternalLinks:results.flatMap(r=>r.legacyInternalLinks), readOnly:true, directProductionApi:directProduction, readOnlyApiProxy:!directProduction},null,2));
 if(failures.length)process.exitCode=1;
 
 }

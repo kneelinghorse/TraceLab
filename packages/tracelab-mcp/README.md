@@ -81,6 +81,20 @@ credential file and relaunch.
 client appends `/api/v1` to each request itself. For production, use
 `https://api.tracelab.aquex.ai`; `https://tracelab.aquex.ai` is the browser UI.
 
+Generated browser navigation uses canonical `/projects/:id`, `/documents/:id`,
+`/collections/:id`, `/reports/:id`, `/missions/:id` and `/evidence/:id` routes.
+Entity projections carry `url`; related resources use named `document_url`,
+`collection_url`, `report_url` or `project_url` fields. Optional missing IDs do
+not produce links. Existing evidence `source_url`, authored references/context,
+full contract previews and Markdown exports retain their original values.
+
+The public API above uses `https://tracelab.aquex.ai` for browser links. Loopback
+API hosts use `http://localhost:3000`. For another deployment or local frontend
+port, set **`TRACELAB_FRONTEND_URL` in the MCP process environment** to the browser
+origin, for example `https://research.example.com`. It must be an HTTP(S) origin
+without credentials, a path, query or fragment. Configuration is checked before
+login and tool execution; custom API hosts require this explicit setting.
+
 ### Codex (desktop, CLI, and IDE)
 
 Add the stdio server to `~/.codex/config.toml`:
