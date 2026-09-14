@@ -12,6 +12,7 @@ from app.adapters.repositories.sqlalchemy_home_repo import SQLAlchemyHomeReposit
 from app.adapters.repositories.sqlalchemy_mission_views_repo import SQLAlchemyMissionViewRepository
 from app.core.security import AuthenticatedUser
 from app.models.mission import Mission
+from app.models.project import Project
 from app.models.user import User
 from app.models.user_saved_view import UserSavedView
 from app.schemas.mission_views import MissionViewCreate
@@ -53,16 +54,24 @@ def test_postgres_counts_and_saved_views_track_reviewed_result_versions(db_sessi
     db_session.add(user)
     db_session.flush()
     principal = AuthenticatedUser(user_id=user.id, email=user.email, display_name=user.display_name, role=user.role)
+    project = Project(name="Isolated review-version fixture", owner_id=user.id)
+    db_session.add(project)
+    db_session.flush()
+    # The complete suite may contain committed artifacts. Count only this fresh
+    # project, and prove that an unrelated completion cannot affect its view.
+    unrelated = Mission(mission_id=uuid4().hex, title="Outside this view", objective="Exclude unrelated work",
+                        success_criteria=["Stay outside the saved project filter"], status="completed", owner_id=user.id)
+    db_session.add(unrelated)
     done = Mission(mission_id=uuid4().hex, title="Research result", objective="Explicit result review",
-                   success_criteria=["Match live totals"], status="completed", owner_id=user.id)
+                   success_criteria=["Match live totals"], status="completed", owner_id=user.id, project_id=project.id)
     db_session.add(done)
     db_session.commit()
     home = SQLAlchemyHomeRepository()
     repository = SQLAlchemyMissionViewRepository()
-    view = repository.create(db_session, principal, MissionViewCreate(name="Unreviewed", filters={"view": "attention", "reason": ["unreviewed"]}))
-    assert home.attention(db_session, principal, now=datetime.utcnow()).by_reason["unreviewed"] == view.total == 1
+    view = repository.create(db_session, principal, MissionViewCreate(name="Unreviewed", filters={"view": "attention", "reason": ["unreviewed"], "project_id": project.id}))
+    assert home.attention(db_session, principal, now=datetime.utcnow(), project_id=project.id).by_reason["unreviewed"] == view.total == 1
     home.review_completion(db_session, principal, done.id, done.updated_at)
-    assert repository.list(db_session, principal)[0].total == home.attention(db_session, principal, now=datetime.utcnow()).total == 0
+    assert repository.list(db_session, principal)[0].total == home.attention(db_session, principal, now=datetime.utcnow(), project_id=project.id).total == 0
     done.updated_at += timedelta(seconds=1)
     db_session.commit()
-    assert repository.list(db_session, principal)[0].total == home.attention(db_session, principal, now=datetime.utcnow()).total == 1
+    assert repository.list(db_session, principal)[0].total == home.attention(db_session, principal, now=datetime.utcnow(), project_id=project.id).total == 1
