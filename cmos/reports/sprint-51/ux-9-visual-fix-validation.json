@@ -1,6 +1,6 @@
 {
   "mission": "UX-9",
-  "status": "local_verified_awaiting_ci_and_production",
+  "status": "passed",
   "base_commit": "d7e253b6ae852163e02465dd14c9ff5c23cfebdd",
   "observed_in": "ux-9-live-flow/attempt-3-visual-corrections/receipt.json",
   "changes": [
@@ -40,11 +40,55 @@
     "foundational_refs": "passed",
     "visual_review": "Phone Light long-citation preview: readable horizontal Focus result action; content follows in document order."
   },
-  "remaining": [
-    "All source CI checks",
-    "Both exact Railway deployments SUCCESS",
-    "Real production saved replay, action layout, UTC relative times and six-type keyboard/scoped search checks",
-    "Repeat124 direct production route checks",
-    "Final receipt publication and CMOS closure"
-  ]
+  "remaining": [],
+  "ci": {
+    "head": "a732d5eedaa75d7c0175255fec43d3643f354fa2",
+    "pull_request": 279,
+    "all_checks_passed": true,
+    "backend": {
+      "run_id": 34797206898,
+      "passed": 2483,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 48,
+      "seconds": 387.35
+    },
+    "postgres": {
+      "run_id": 34797206941,
+      "passed": 134,
+      "skipped": 4,
+      "warnings": 17,
+      "seconds": 108.97
+    },
+    "production_build": {
+      "run_id": 34797206992,
+      "browser_passed": 46
+    },
+    "frontend": {
+      "run_id": 34797206970,
+      "passed": 204,
+      "lint": "passed",
+      "types": "passed"
+    },
+    "ruff": 34797207002,
+    "secrets": [
+      34797207175,
+      34797204454
+    ]
+  },
+  "deployment": {
+    "checkedAt": "2026-09-14T02:01:01.033Z",
+    "commit": "91b592d40bd456820523100c8a4589a7589b69f5",
+    "api": {
+      "id": "3bb2ab8b-9a5f-4314-8078-126d0eab328a",
+      "status": "SUCCESS",
+      "commit": "91b592d40bd456820523100c8a4589a7589b69f5"
+    },
+    "frontend": {
+      "id": "8b64daec-7017-4109-bf42-f5624dc530cc",
+      "status": "SUCCESS",
+      "commit": "91b592d40bd456820523100c8a4589a7589b69f5"
+    }
+  },
+  "production_live": "ux-9-live-flow/receipt.json"
 }

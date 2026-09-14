@@ -1,6 +1,6 @@
 {
   "mission": "UX-9",
-  "status": "local_verified_awaiting_ci_and_production",
+  "status": "passed",
   "decision": 418,
   "observed_on_commit": "ed21f7c35ac2948fad0f52fd8aa989f50fdf7425",
   "production_failure_receipt": "ux-9-live-flow/attempt-2-cache-response-contract/receipt.json",
@@ -43,7 +43,56 @@
   "lint_compatibility": "Two pre-existing whole-file Ruff findings corrected minimally: index setup debug message and yield from.",
   "limitations": [
     "High contrast remains deferred; no Forge token changes.",
-    "No response contract weakening, schema migration, new env var, or authorization policy change.",
-    "Live flow and 124 route acceptance must be repeated after exact corrected deployments succeed."
-  ]
+    "No response contract weakening, schema migration, new env var, or authorization policy change."
+  ],
+  "ci": {
+    "head": "6ae59dcc9d8df720014677b4e95d66d1c72bf0ff",
+    "pull_request": 278,
+    "all_checks_passed": true,
+    "backend": {
+      "run_id": 34796224207,
+      "passed": 2483,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 48,
+      "seconds": 411.78
+    },
+    "postgres": {
+      "run_id": 34796224284,
+      "passed": 134,
+      "skipped": 4,
+      "warnings": 17,
+      "seconds": 128.12
+    },
+    "production_build": {
+      "run_id": 34796224211,
+      "browser_passed": 45
+    },
+    "frontend": {
+      "run_id": 34796224204,
+      "passed": 204,
+      "lint": "passed",
+      "types": "passed"
+    },
+    "ruff": 34796224206,
+    "secrets": [
+      34796224210,
+      34796222508
+    ]
+  },
+  "deployment": {
+    "checkedAt": "2026-09-14T02:01:01.033Z",
+    "commit": "91b592d40bd456820523100c8a4589a7589b69f5",
+    "api": {
+      "id": "3bb2ab8b-9a5f-4314-8078-126d0eab328a",
+      "status": "SUCCESS",
+      "commit": "91b592d40bd456820523100c8a4589a7589b69f5"
+    },
+    "frontend": {
+      "id": "8b64daec-7017-4109-bf42-f5624dc530cc",
+      "status": "SUCCESS",
+      "commit": "91b592d40bd456820523100c8a4589a7589b69f5"
+    }
+  },
+  "production_live": "ux-9-live-flow/receipt.json"
 }

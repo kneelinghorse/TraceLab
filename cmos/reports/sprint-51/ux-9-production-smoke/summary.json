@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-09-14T02:08:00.088400+00:00",
+  "commit": "91b592d40bd456820523100c8a4589a7589b69f5",
+  "base": "https://tracelab.aquex.ai",
+  "checks": 124,
+  "routes": 31,
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "widths": [
+    1440,
+    390
+  ],
+  "failures": [],
+  "readOnly": true,
+  "directProductionApi": true
+}
