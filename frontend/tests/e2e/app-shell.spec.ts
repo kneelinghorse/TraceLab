@@ -22,6 +22,8 @@ test.beforeEach(async ({ page }) => {
     else if (pathname.endsWith("/projects") || pathname.endsWith("/missions") || pathname.endsWith("/documents")) body = { data: [], pagination: { page: 1, page_size: 20, total: 0, pages: 1 } };
     else if (pathname.endsWith("/search/history")) body = { entries: [] };
     else if (pathname.endsWith("/saved-searches")) body = { items: [] };
+    else if (pathname.endsWith("/navigation/search")) body = { query: new URL(route.request().url()).searchParams.get("q"), groups: [] };
+    else if (pathname.endsWith("/facets")) body = { source_types: [], projects: [], document_types: [], tags: [], date_range: { min: null, max: null } };
     else if (pathname.endsWith("/pedr/search")) body = { results: [], metadata: null };
     else if (pathname.endsWith("/search")) body = { answer: "No matching sources", citations: [], sources: [], latency_ms: 12, quality: { composite_score: 0.9, threshold: 0.8 }, routing: { selected_model: "test" }, cache: { hit: false } };
     await route.fulfill({ json: body });

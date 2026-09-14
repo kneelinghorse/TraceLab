@@ -9,6 +9,9 @@ const mocks = vi.hoisted(() => ({
 vi.mock("next/router", () => ({ useRouter: () => mocks.router }));
 vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => mocks.auth }));
 vi.mock("@/contexts/RoleContext", () => ({ useRole: () => mocks.role }));
+vi.mock("@/lib/api/navigation", () => ({ navigationApi: { search: async () => ({ groups: [] }) } }));
+vi.mock("@/lib/api/search", () => ({ searchApi: { history: async () => ({ entries: [] }) } }));
+vi.mock("@/lib/api/savedSearches", () => ({ savedSearchesApi: { list: async () => ({ items: [] }) } }));
 vi.mock("@/components/LoginPanel", () => ({ LoginPanel: () => <p>Sign in form</p> }));
 vi.mock("@/components/RegisterPanel", () => ({ RegisterPanel: () => <p>Registration form</p> }));
 

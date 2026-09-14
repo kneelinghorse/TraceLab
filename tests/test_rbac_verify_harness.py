@@ -435,6 +435,7 @@ def test_pedr1c_anon_routes_cover_exact_alternate_surface():
     routes = pedr1c_anon_routes("/api/v1", resource_id)
 
     assert [(method, path) for method, path, _body in routes] == [
+        ("get", "/api/v1/navigation/search?q=rbac"),
         ("get", "/api/v1/collections"),
         ("post", "/api/v1/collections"),
         ("get", f"/api/v1/collections/{resource_id}/documents"),

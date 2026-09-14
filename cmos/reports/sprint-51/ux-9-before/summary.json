@@ -1,0 +1,174 @@
+{
+  "checkedAt": "2026-09-13T22:42:31.225Z",
+  "rows": [
+    {
+      "theme": "light",
+      "width": 390,
+      "label": "search",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "label": "search-results",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "label": "saved-searches",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "label": "command-palette",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "light",
+      "width": 820,
+      "label": "search",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "light",
+      "width": 820,
+      "label": "search-results",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "light",
+      "width": 820,
+      "label": "saved-searches",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "light",
+      "width": 820,
+      "label": "command-palette",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "label": "search",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "label": "search-results",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "label": "saved-searches",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "light",
+      "width": 1440,
+      "label": "command-palette",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "label": "search",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "label": "search-results",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "label": "saved-searches",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "label": "command-palette",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "dark",
+      "width": 820,
+      "label": "search",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "dark",
+      "width": 820,
+      "label": "search-results",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "dark",
+      "width": 820,
+      "label": "saved-searches",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "dark",
+      "width": 820,
+      "label": "command-palette",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "label": "search",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "label": "search-results",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "label": "saved-searches",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "label": "command-palette",
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "errors": []
+}

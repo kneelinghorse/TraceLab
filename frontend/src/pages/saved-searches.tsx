@@ -1,22 +1,28 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import useSWR from "swr";
+import { useRouter } from "next/router";
 
 import { AuthGate } from "@/components/AuthGate";
 import { SavedSearchesList } from "@/components/SavedSearchesList";
+import { PageState } from "@/components/ui/PageState";
+import { useAuth } from "@/contexts/AuthContext";
 import { savedSearchesApi } from "@/lib/api/savedSearches";
 import type { SavedSearch } from "@/types/saved-searches";
 
 export default function SavedSearchesPage() {
+  const { user } = useAuth();
   return (
     <AuthGate>
-      <SavedSearchesManager />
+      <SavedSearchesManager key={user?.user_id ?? "anonymous"} />
     </AuthGate>
   );
 }
 
 function SavedSearchesManager() {
-  const { data, mutate } = useSWR(["saved-searches"], () => savedSearchesApi.list());
+  const { user } = useAuth();
+  const router = useRouter();
+  const { data, error: loadError, mutate } = useSWR(user?.user_id ? ["saved-searches", user.user_id] : null, () => savedSearchesApi.list());
   const savedSearches = data?.items ?? [];
   const limit = data?.limit_per_user ?? 50;
 
@@ -37,19 +43,7 @@ function SavedSearchesManager() {
     setError(null);
   };
 
-  const handleExecute = async (entry: SavedSearch) => {
-    setMessage(null);
-    setError(null);
-    try {
-      await savedSearchesApi.execute(entry.id);
-      setMessage(`Executed "${entry.name}". View results on the main search page.`);
-    } catch (err) {
-      const detail = err instanceof Error ? err.message : "Unable to execute saved search.";
-      setError(detail);
-    } finally {
-      void mutate();
-    }
-  };
+  const handleExecute = (entry: SavedSearch) => void router.push(`/search?saved=${encodeURIComponent(entry.id)}`);
 
   const handleDelete = async (entry: SavedSearch) => {
     setMessage(null);
@@ -113,18 +107,18 @@ function SavedSearchesManager() {
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold text-foreground">Your saved searches</h2>
             <span className="text-sm text-muted">
-              {savedSearches.length}/{limit} used
+              {data ? `${savedSearches.length}/${limit} used` : "—"}
             </span>
           </div>
           <div className="mt-4">
-            <SavedSearchesList
+            {loadError ? <PageState state="error" title="Could not load saved searches" onRetry={() => void mutate()} /> : <SavedSearchesList
               items={savedSearches}
               limitPerUser={limit}
               isLoading={!data}
               onExecute={(entry) => void handleExecute(entry)}
               onDelete={(entry) => void handleDelete(entry)}
               onSelect={(entry) => handleSelect(entry)}
-            />
+            />}
           </div>
         </section>
 

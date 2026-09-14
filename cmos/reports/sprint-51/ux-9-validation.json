@@ -1,0 +1,108 @@
+{
+  "mission": "UX-9",
+  "status": "local_verified_awaiting_ci_and_production",
+  "checked_at": "2026-09-14T00:51:02.216369+00:00",
+  "base_commit": "f52088f6ffe0d89f3db856de6dbb282d527f998b",
+  "decisions": [
+    416
+  ],
+  "learnings": [
+    171
+  ],
+  "changes": [
+    "Human-authenticated, scoped and paginated name lookup for six entity types, selecting identifiers/titles only",
+    "Existing native shell palette extended with entities, per-group totals/pages, recent/saved commands, actions and keyboard help",
+    "Search source/date facets and API-authoritative result order/membership, account isolation and stale-response protection",
+    "Saved/recent executions render their actual returned result and metadata on the canonical search surface",
+    "Permanent query-preserving 308 /search/results redirect",
+    "RAG panel fits its contents and result identifiers wrap at phone width"
+  ],
+  "validation": {
+    "backend_targeted": {
+      "passed": 61,
+      "skipped": 0,
+      "warnings": 14,
+      "seconds": 31.13,
+      "suites": [
+        "test_navigation_search_api",
+        "test_rbac_verify_harness"
+      ]
+    },
+    "postgres_targeted": {
+      "passed": 1,
+      "skipped": 0,
+      "warnings": 14,
+      "seconds": 3.46
+    },
+    "full_integration": {
+      "passed": 134,
+      "skipped": 4,
+      "warnings": 15,
+      "seconds": 152.95
+    },
+    "frontend_unit": {
+      "passed": 204,
+      "skipped": 0,
+      "files": 29
+    },
+    "built_browser": {
+      "passed": 45,
+      "skipped": 0,
+      "ux9_tests": 14,
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        390,
+        820,
+        1440
+      ],
+      "serious_critical_axe_findings": 0,
+      "horizontal_overflow": 0
+    },
+    "frontend_lint": "passed",
+    "frontend_types": "passed",
+    "production_build": "passed",
+    "whole_changed_python_ruff": "passed",
+    "foundational_refs": "passed"
+  },
+  "regressions_observed_and_fixed": [
+    "Original navigation endpoint returned404 before implementation",
+    "Eight search-state/filter/replay tests failed before rewrite; final15 search tests pass",
+    "Oversized RAG panel left1419px blank space at390px; content-fit browser assertion failed before removal of h-full",
+    "Late native close event disabled a quickly reopened palette; unit reproduction failed before dialog.open guard",
+    "Integration route coverage assertion omitted new navigation family and compared query-bearing probes against path-only routing; updated exact coverage and reran full integration"
+  ],
+  "test_authoring_corrections": [
+    "Keyboard End expectation corrected to final evidence item; collection pagination precedes evidence in displayed order."
+  ],
+  "before": {
+    "path": "ux-9-before",
+    "screenshots": 24,
+    "source": "Direct production reads before implementation"
+  },
+  "local_previews": {
+    "path": "ux-9-local-previews",
+    "screenshots": 12,
+    "source": "Deterministic browser fixtures against the built production artifact"
+  },
+  "visual_review": [
+    "Phone Dark result cards, source/date controls, citation and history placement",
+    "Desktop Light answer panel, totals and save/replay controls",
+    "Phone Light open palette with scoped group totals/pagination and keyboard help"
+  ],
+  "limitations": [
+    "High contrast deferred under THEME-2; accepted Forge token artifacts unchanged.",
+    "Four existing conditional integration skips retained; targeted new tests have no skips.",
+    "Existing React act/dependency deprecation warnings remain; no failing test or lint warning is omitted.",
+    "No MCP surface, database schema, environment variable or PEDR authorization policy change."
+  ],
+  "remaining": [
+    "Source CI and merge",
+    "Both Railway deployments SUCCESS for the exact merged source",
+    "Real production six-type keyboard reach and non-admin API/UI scope equality; saved round trip",
+    "124 direct production Light/Dark route checks",
+    "Receipt publication and CMOS closure"
+  ]
+}

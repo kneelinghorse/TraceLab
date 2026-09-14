@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   async redirects() {
     return [
+      { source: "/search/results", destination: "/search", permanent: true },
       { source: "/missions/queue", destination: "/missions?view=queue", permanent: true },
       { source: "/invites", destination: "/settings#invites", permanent: true },
       { source: "/console", destination: "/admin/observability", permanent: true },

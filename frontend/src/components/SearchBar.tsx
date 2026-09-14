@@ -34,6 +34,7 @@ export function SearchBar({
   onSubmit,
   isSearching,
   projects,
+  documentTypes,
   topK,
   onTopKChange,
   graphEnabled,
@@ -57,6 +58,7 @@ export function SearchBar({
         {/* Search input row */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
           <div className="flex-1">
+            <label htmlFor="query-input" className="sr-only">Search query</label>
             <textarea
               id="query-input"
               value={query}
@@ -81,7 +83,7 @@ export function SearchBar({
 
         {/* Filters row */}
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">
             <label
               htmlFor="project-filter"
               className="text-sm text-muted"
@@ -94,7 +96,7 @@ export function SearchBar({
               onChange={(event) =>
                 onFiltersChange({ projectId: event.target.value })
               }
-              className="rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground focus:border-info-line focus:outline-none"
+              className="min-w-0 max-w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground focus:border-info-line focus:outline-none"
             >
               <option value="">All projects</option>
               {projects.map((project) => (
@@ -119,6 +121,7 @@ export function SearchBar({
               onChange={(event) => onTopKChange(Number(event.target.value))}
               className="rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground focus:border-info-line focus:outline-none"
             >
+              {!CHUNKS_PRESETS.some(preset => preset === topK) && <option value={topK}>{topK}</option>}
               {CHUNKS_PRESETS.map((preset) => (
                 <option
                   key={preset}
@@ -144,11 +147,22 @@ export function SearchBar({
             />
           </div>
 
-          {(filters.projectId || topK !== 10) && (
+          <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2">
+            <label htmlFor="source-filter" className="text-sm text-muted">Source type</label>
+            <select id="source-filter" value={filters.documentType} onChange={event => onFiltersChange({ documentType: event.target.value })} className="min-w-0 max-w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground">
+              <option value="">All source types</option>
+              {filters.documentType && !documentTypes.includes(filters.documentType) && <option value={filters.documentType}>{filters.documentType}</option>}
+              {documentTypes.map(type => <option key={type} value={type}>{type}</option>)}
+            </select>
+          </div>
+          <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2"><label htmlFor="search-date-from" className="text-sm text-muted">Collected from</label><input id="search-date-from" type="date" value={filters.startDate} onChange={event => onFiltersChange({ startDate: event.target.value })} className="min-w-0 max-w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground" /></div>
+          <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2"><label htmlFor="search-date-until" className="text-sm text-muted">Collected until</label><input id="search-date-until" type="date" value={filters.endDate} onChange={event => onFiltersChange({ endDate: event.target.value })} className="min-w-0 max-w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-foreground" /></div>
+
+          {(Object.values(filters).some(Boolean) || topK !== 10) && (
             <button
               type="button"
               onClick={() => {
-                onFiltersChange({ projectId: "" });
+                onFiltersChange({ projectId: "", documentType: "", startDate: "", endDate: "" });
                 onTopKChange(10);
               }}
               className="text-sm text-muted hover:text-foreground"

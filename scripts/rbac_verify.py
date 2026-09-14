@@ -172,6 +172,7 @@ def pedr1c_anon_routes(
 ) -> list[tuple[str, str, dict[str, Any] | None]]:
     """Alternate artifact routes that must reject anonymous callers."""
     return [
+        ("get", f"{prefix}/navigation/search?q=rbac", None),
         ("get", f"{prefix}/collections", None),
         ("post", f"{prefix}/collections", {}),
         ("get", f"{prefix}/collections/{resource_id}/documents", None),
