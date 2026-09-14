@@ -24,6 +24,24 @@ Authorization: Bearer <jwt_token>
 
 ## Search
 
+### Relationship Neighborhood
+
+`GET /api/v1/graph/neighborhood` returns a caller-scoped neighborhood over persisted relationships. It requires a human JWT or `X-API-Key`; anonymous requests return 401 and service principals return 403. Successful reads and scoped-root errors are uncached (`Cache-Control: private, no-store`).
+
+| Parameter | Values / bounds |
+|---|---|
+| `root_type` | Required: `project`, `document`, `collection`, `mission`, `report`, `evidence` |
+| `root_id` | Required UUID |
+| `depth` | 1–2; default 1 |
+| `per_relation_limit` | 1–50; default 12 |
+| `max_nodes` | 1–150, including the root; default 60 |
+
+The response contains `root`, `nodes`, `edges`, `groups`, and `truncated`. Nodes have a `<type>:<uuid>` key, type, UUID, title, canonical relative `href`, and attributes (UTC `updated_at`, status/disposition where applicable, and document `chunk_count`). Chunks are not separate nodes. Edges contain `from`, `to`, `relation`, and the persisted `basis` for that relationship. Each group contains `from_key`, `relation`, `target_type`, the full caller-scoped `total`, and the number `shown`; totals are computed before either cap. `truncated` means at least one group has hidden results. Depth 2 expands only nodes actually shown at depth 1.
+
+Relations include project documents/missions/reports/evidence; mission result reports/documents, source documents and evidence; document source mission/report and evidence; report source documents, collections, parent report and evidence; evidence mission; and collection documents (distinct union of direct documents and chunk membership). Report/document evidence groups share the evidence browser's citation filters. The neighborhood adds no similarity relationships.
+
+All members must pass their own read policy. Mission result documents stay in the mission's project, and a Space-owned collection's document members stay in that Space. Deleted documents and documents under deleted projects are excluded even when RBAC is off. Missing roots return 404; human authorization statuses follow canonical detail routes, except that a document under a deleted project always returns 404 here (decision #439). Denied nodes cannot be used as traversal intermediates. The existing `/api/v1/graph/stats` route is unchanged.
+
 ### PEDR Unified Search
 
 Primary search interface combining 6 layers (including optional L6 graph expansion) with RRF fusion.

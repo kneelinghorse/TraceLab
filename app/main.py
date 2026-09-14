@@ -25,6 +25,7 @@ from app.api.v1 import (
     documents,
     evidence,
     facets,
+    graph_neighborhood,
     health,
     home,
     mission_events,
@@ -303,6 +304,12 @@ app.include_router(
     navigation_search.router,
     prefix=f"{settings.api_v1_prefix}/navigation",
     tags=["navigation"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    graph_neighborhood.router,
+    prefix=f"{settings.api_v1_prefix}/graph",
+    tags=["graph"],
     dependencies=protected_dependencies,
 )
 app.include_router(

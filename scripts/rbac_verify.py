@@ -144,6 +144,11 @@ def pedr_scope_routes(prefix: str, project_id: str) -> list[tuple[str, str, dict
     ]
 
 
+def graph_scope_routes(prefix: str, project_id: str) -> list[tuple[str, str, None]]:
+    """Read-only owner-positive and cross-tenant probes for the graph root."""
+    return [("get", f"{prefix}/graph/neighborhood?root_type=project&root_id={project_id}", None)]
+
+
 def pedr1b_scope_routes(
     prefix: str,
     project_id: str,
@@ -177,6 +182,7 @@ def pedr1c_anon_routes(
 ) -> list[tuple[str, str, dict[str, Any] | None]]:
     """Alternate artifact routes that must reject anonymous callers."""
     return [
+        *graph_scope_routes(prefix, resource_id),
         ("get", f"{prefix}/navigation/search?q=rbac", None),
         ("get", f"{prefix}/collections", None),
         ("post", f"{prefix}/collections", {}),
@@ -362,6 +368,7 @@ class RbacVerifier:
         self.teardown_failures: list[str] = []  # leaked cruft -> non-zero exit
         self.registration_checks: list[dict[str, Any]] = []
         self.document_checks: list[dict[str, Any]] = []
+        self.graph_checks: list[dict[str, Any]] = []
         self._pedr1b_fixture: tuple[str, str] | None = None
         self._pedr1b_fixture_owner_role: str | None = None
         self._principal_ids: dict[str, str] = {}
@@ -607,6 +614,10 @@ class RbacVerifier:
         acknowledged = {(m, f"{self._prefix}{p}") for m, p in _ANON_ONLY_ROUTES}
         registration = {(m, f"{self._prefix}{p}") for m, p in _REGISTRATION_AUTHZ_ROUTES}
         documents = {(m, f"{self._prefix}{p}") for m, p in _DOCUMENT_AUTHZ_ROUTES}
+        anonymous = {(m, p) for m, p, _ in pedr1c_anon_routes(self._prefix, marker)}
+        for method, path, _ in graph_scope_routes(self._prefix, marker):
+            if (method, path) not in anonymous:
+                self.gaps.append(Gap("GRAPH-ANON-ROUTE-DRIFT", "coverage", method, path, "anonymous graph probe", "missing"))
         local_only = {
             (method, f"{self._prefix}{path}")
             for _name, method, path in _LOCAL_ONLY_AUTHZ_ROUTES
@@ -2348,6 +2359,34 @@ class RbacVerifier:
                 "scoped-empty checks are smoke only, not a non-vacuous isolation proof"
             )
 
+    def graph_scope_matrix(self, project_id: str, principals: dict[str, str]) -> None:
+        """Require exact tenant denials and a real owner root, without writes."""
+        for method, path, _ in graph_scope_routes(self._prefix, project_id):
+            for role in ("owner", "second_owner", "member", "viewer", "service"):
+                token = principals.get(role)
+                if not token:
+                    continue
+                response = self._call(method, path, token=token)
+                visible = role in {"owner", "second_owner"}
+                ok = response.status_code == (200 if visible else 403)
+                if visible and ok:
+                    try:
+                        payload = response.json()
+                        root = payload["root"]
+                        ok = (
+                            root["id"] == project_id and root["type"] == "project"
+                            and root["key"] == f"project:{project_id}"
+                            and any(n["key"] == root["key"] for n in payload["nodes"])
+                            and isinstance(payload["edges"], list)
+                            and isinstance(payload["groups"], list)
+                            and isinstance(payload["truncated"], bool)
+                        )
+                    except (KeyError, TypeError, ValueError):
+                        ok = False
+                self.graph_checks.append({"role": role, "method": method, "path": path, "status": response.status_code, "passed": ok})
+                self._record(ok, Gap("GRAPH-OWNER-OVERBLOCK" if visible else "GRAPH-SCOPE-DENY", role, method, path,
+                                     "200 with requested root" if visible else "403", str(response.status_code)))
+
     def pedr_scope_matrix(self, project_id: str, principals: dict[str, str]) -> None:
         """Prove related denial and search isolation with a known-positive corpus."""
         routes = pedr_scope_routes(self._prefix, project_id)
@@ -3142,6 +3181,8 @@ class RbacVerifier:
                     self.seeded_matrix(spec, rid, principals, live_safe=True)
 
                 self.list_isolation_check(ctx["project"], principals)
+                self._log("graph neighborhood tenant-scope matrix...")
+                self.graph_scope_matrix(ctx["project"], principals)
                 self._log("PEDR/retrieval tenant-scope matrix...")
                 self.pedr_scope_matrix(ctx["project"], principals)
 
