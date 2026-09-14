@@ -1,0 +1,311 @@
+{
+  "reviewed_at": "2026-09-14T19:36:04.119994+00:00",
+  "reviewer": "Codex direct screenshot inspection",
+  "base": "https://tracelab.aquex.ai",
+  "timezoneId": "America/Chicago",
+  "source_merge": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+  "reviewed": [
+    {
+      "route": "/graph",
+      "theme": "light",
+      "width": 1440,
+      "reviewed_files": [
+        "light-1440-_graph.png"
+      ],
+      "notes": "Root input, helper copy and no-root state are readable; selected Relationships navigation and theme match the shell."
+    },
+    {
+      "route": "/graph?root=project:0afcc588-e722-45bd-8320-f486601b877c",
+      "theme": "light",
+      "width": 1440,
+      "reviewed_files": [
+        "light-1440-graph-depth-1-viewport.png",
+        "light-1440-graph-depth-1-list-viewport.png",
+        "light-1440-graph-depth-2-diagram.png"
+      ],
+      "notes": "Full root/node titles and Center here controls remain readable in the list. Group totals are server totals. Diagram labels are abbreviated; depth2 uses an outer ring. At390px the diagram is a collapsed optional overview and the list is the primary surface. Chicago timestamps include correct previous-day conversion for summer UTC dates."
+    },
+    {
+      "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "theme": "light",
+      "width": 1440,
+      "reviewed_files": [
+        "light-1440-project-viewport.png"
+      ],
+      "notes": "Overview totals have clear labels; the relationships entry sits beside document/mission actions without squeezing them."
+    },
+    {
+      "route": "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+      "theme": "light",
+      "width": 1440,
+      "reviewed_files": [
+        "light-1440-document-viewport.png"
+      ],
+      "notes": "Header entry remains separate from collection controls. Stats wrap cleanly on phones; full document name stays readable."
+    },
+    {
+      "route": "/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+      "theme": "light",
+      "width": 1440,
+      "reviewed_files": [
+        "light-1440-collection-viewport.png"
+      ],
+      "notes": "Entry and Seed mission remain readable; action rows wrap on phones. Zero chunks and two documents remain distinct server totals."
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "theme": "light",
+      "width": 1440,
+      "reviewed_files": [
+        "light-1440-mission-viewport.png"
+      ],
+      "notes": "Long mission title wraps naturally; entry, review, rerun and result controls retain readable widths. Stored log count and Chicago timestamps are independently checked."
+    },
+    {
+      "route": "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+      "theme": "light",
+      "width": 1440,
+      "reviewed_files": [
+        "light-1440-report-viewport.png"
+      ],
+      "notes": "Long report title wraps with readable entry/export controls. Server token/chunk/citation totals remain visible; existing long evidence claims make the page tall."
+    },
+    {
+      "route": "/evidence/1da242cc-517e-4fcb-9850-3c620e2b484e",
+      "theme": "light",
+      "width": 1440,
+      "reviewed_files": [
+        "light-1440-evidence-viewport.png"
+      ],
+      "notes": "Full claim title wraps without squeezing the entry. Captured timestamp reads9/13/2026,6:59:19PM in Chicago, matching the UTC API instant."
+    },
+    {
+      "route": "/graph",
+      "theme": "light",
+      "width": 390,
+      "reviewed_files": [
+        "light-390-_graph.png"
+      ],
+      "notes": "Root input, helper copy and no-root state are readable; selected Relationships navigation and theme match the shell."
+    },
+    {
+      "route": "/graph?root=project:0afcc588-e722-45bd-8320-f486601b877c",
+      "theme": "light",
+      "width": 390,
+      "reviewed_files": [
+        "light-390-graph-depth-1-viewport.png",
+        "light-390-graph-depth-1-list-viewport.png",
+        "light-390-graph-depth-2-diagram.png",
+        "extra-light-390-graph-depth-1-list-viewport.png"
+      ],
+      "notes": "Full root/node titles and Center here controls remain readable in the list. Group totals are server totals. Diagram labels are abbreviated; depth2 uses an outer ring. At390px the diagram is a collapsed optional overview and the list is the primary surface. Chicago timestamps include correct previous-day conversion for summer UTC dates."
+    },
+    {
+      "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "theme": "light",
+      "width": 390,
+      "reviewed_files": [
+        "light-390-project-viewport.png"
+      ],
+      "notes": "Overview totals have clear labels; the relationships entry sits beside document/mission actions without squeezing them."
+    },
+    {
+      "route": "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+      "theme": "light",
+      "width": 390,
+      "reviewed_files": [
+        "light-390-document-viewport.png"
+      ],
+      "notes": "Header entry remains separate from collection controls. Stats wrap cleanly on phones; full document name stays readable."
+    },
+    {
+      "route": "/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+      "theme": "light",
+      "width": 390,
+      "reviewed_files": [
+        "light-390-collection-viewport.png"
+      ],
+      "notes": "Entry and Seed mission remain readable; action rows wrap on phones. Zero chunks and two documents remain distinct server totals."
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "theme": "light",
+      "width": 390,
+      "reviewed_files": [
+        "light-390-mission-viewport.png"
+      ],
+      "notes": "Long mission title wraps naturally; entry, review, rerun and result controls retain readable widths. Stored log count and Chicago timestamps are independently checked."
+    },
+    {
+      "route": "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+      "theme": "light",
+      "width": 390,
+      "reviewed_files": [
+        "light-390-report-viewport.png"
+      ],
+      "notes": "Long report title wraps with readable entry/export controls. Server token/chunk/citation totals remain visible; existing long evidence claims make the page tall."
+    },
+    {
+      "route": "/evidence/1da242cc-517e-4fcb-9850-3c620e2b484e",
+      "theme": "light",
+      "width": 390,
+      "reviewed_files": [
+        "light-390-evidence-viewport.png"
+      ],
+      "notes": "Full claim title wraps without squeezing the entry. Captured timestamp reads9/13/2026,6:59:19PM in Chicago, matching the UTC API instant."
+    },
+    {
+      "route": "/graph",
+      "theme": "dark",
+      "width": 1440,
+      "reviewed_files": [
+        "dark-1440-_graph.png"
+      ],
+      "notes": "Root input, helper copy and no-root state are readable; selected Relationships navigation and theme match the shell."
+    },
+    {
+      "route": "/graph?root=project:0afcc588-e722-45bd-8320-f486601b877c",
+      "theme": "dark",
+      "width": 1440,
+      "reviewed_files": [
+        "dark-1440-graph-depth-1-viewport.png",
+        "dark-1440-graph-depth-2-diagram.png"
+      ],
+      "notes": "Full root/node titles and Center here controls remain readable in the list. Group totals are server totals. Diagram labels are abbreviated; depth2 uses an outer ring. At390px the diagram is a collapsed optional overview and the list is the primary surface. Chicago timestamps include correct previous-day conversion for summer UTC dates."
+    },
+    {
+      "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "theme": "dark",
+      "width": 1440,
+      "reviewed_files": [
+        "dark-1440-project-viewport.png"
+      ],
+      "notes": "Overview totals have clear labels; the relationships entry sits beside document/mission actions without squeezing them."
+    },
+    {
+      "route": "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+      "theme": "dark",
+      "width": 1440,
+      "reviewed_files": [
+        "dark-1440-document-viewport.png"
+      ],
+      "notes": "Header entry remains separate from collection controls. Stats wrap cleanly on phones; full document name stays readable."
+    },
+    {
+      "route": "/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+      "theme": "dark",
+      "width": 1440,
+      "reviewed_files": [
+        "dark-1440-collection-viewport.png"
+      ],
+      "notes": "Entry and Seed mission remain readable; action rows wrap on phones. Zero chunks and two documents remain distinct server totals."
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "theme": "dark",
+      "width": 1440,
+      "reviewed_files": [
+        "dark-1440-mission-viewport.png"
+      ],
+      "notes": "Long mission title wraps naturally; entry, review, rerun and result controls retain readable widths. Stored log count and Chicago timestamps are independently checked."
+    },
+    {
+      "route": "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+      "theme": "dark",
+      "width": 1440,
+      "reviewed_files": [
+        "dark-1440-report-viewport.png"
+      ],
+      "notes": "Long report title wraps with readable entry/export controls. Server token/chunk/citation totals remain visible; existing long evidence claims make the page tall."
+    },
+    {
+      "route": "/evidence/1da242cc-517e-4fcb-9850-3c620e2b484e",
+      "theme": "dark",
+      "width": 1440,
+      "reviewed_files": [
+        "dark-1440-evidence-viewport.png"
+      ],
+      "notes": "Full claim title wraps without squeezing the entry. Captured timestamp reads9/13/2026,6:59:19PM in Chicago, matching the UTC API instant."
+    },
+    {
+      "route": "/graph",
+      "theme": "dark",
+      "width": 390,
+      "reviewed_files": [
+        "dark-390-_graph.png"
+      ],
+      "notes": "Root input, helper copy and no-root state are readable; selected Relationships navigation and theme match the shell."
+    },
+    {
+      "route": "/graph?root=project:0afcc588-e722-45bd-8320-f486601b877c",
+      "theme": "dark",
+      "width": 390,
+      "reviewed_files": [
+        "dark-390-graph-depth-1-viewport.png",
+        "dark-390-graph-depth-2-diagram.png",
+        "extra-dark-390-graph-depth-1-list-viewport.png"
+      ],
+      "notes": "Full root/node titles and Center here controls remain readable in the list. Group totals are server totals. Diagram labels are abbreviated; depth2 uses an outer ring. At390px the diagram is a collapsed optional overview and the list is the primary surface. Chicago timestamps include correct previous-day conversion for summer UTC dates."
+    },
+    {
+      "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "theme": "dark",
+      "width": 390,
+      "reviewed_files": [
+        "dark-390-project-viewport.png"
+      ],
+      "notes": "Overview totals have clear labels; the relationships entry sits beside document/mission actions without squeezing them."
+    },
+    {
+      "route": "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+      "theme": "dark",
+      "width": 390,
+      "reviewed_files": [
+        "dark-390-document-viewport.png"
+      ],
+      "notes": "Header entry remains separate from collection controls. Stats wrap cleanly on phones; full document name stays readable."
+    },
+    {
+      "route": "/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+      "theme": "dark",
+      "width": 390,
+      "reviewed_files": [
+        "dark-390-collection-viewport.png"
+      ],
+      "notes": "Entry and Seed mission remain readable; action rows wrap on phones. Zero chunks and two documents remain distinct server totals."
+    },
+    {
+      "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+      "theme": "dark",
+      "width": 390,
+      "reviewed_files": [
+        "dark-390-mission-viewport.png"
+      ],
+      "notes": "Long mission title wraps naturally; entry, review, rerun and result controls retain readable widths. Stored log count and Chicago timestamps are independently checked."
+    },
+    {
+      "route": "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+      "theme": "dark",
+      "width": 390,
+      "reviewed_files": [
+        "dark-390-report-viewport.png"
+      ],
+      "notes": "Long report title wraps with readable entry/export controls. Server token/chunk/citation totals remain visible; existing long evidence claims make the page tall."
+    },
+    {
+      "route": "/evidence/1da242cc-517e-4fcb-9850-3c620e2b484e",
+      "theme": "dark",
+      "width": 390,
+      "reviewed_files": [
+        "dark-390-evidence-viewport.png"
+      ],
+      "notes": "Full claim title wraps without squeezing the entry. Captured timestamp reads9/13/2026,6:59:19PM in Chicago, matching the UTC API instant."
+    }
+  ],
+  "unresolved_findings": [],
+  "limitations": [
+    "The dense mobile SVG is an overview; full titles and all interaction are in the primary list.",
+    "Existing long authored evidence titles are preserved, so some full-page screenshots are tall."
+  ],
+  "images_opened": 40
+}

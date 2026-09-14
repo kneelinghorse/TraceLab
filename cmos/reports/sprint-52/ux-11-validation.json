@@ -1,0 +1,1700 @@
+{
+  "mission": "UX-11",
+  "status": "validated",
+  "checked_at": "2026-09-14T19:37:27.740956+00:00",
+  "session_id": "PS-2026-09-14-013",
+  "base_commit": "13a811ffe48a03449b6641777f93266b4bd77ee9",
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/298",
+  "source_commit": "48195bc19c8db02394ffbac4d9fac29c8323a30b",
+  "merge_commit": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+  "decisions": [
+    442
+  ],
+  "learnings": [
+    173,
+    176,
+    177,
+    185
+  ],
+  "changes": [
+    "New /graph app-shell route: six-type root picker, depth1/2 and shallow push history.",
+    "Dependency-free token-themed radial SVG, role=img with no interactive descendants; complete node/edge list with full titles, canonical links, hops and Center here controls.",
+    "Mobile diagram disclosure keeps the list primary; one-hop viewBox tightened after real-data review; depth2 retains its outer ring.",
+    "Relationships in Discover and entry links on all six object detail pages.",
+    "Distinct loading, empty, invalid-link, missing-root, forbidden-root and retry states; API timestamps normalized through parseApiTimestamp, including the touched evidence header.",
+    "Graph Playwright spec added to the explicit production-build CI suite; baseline extended31→33 routes and124→132 checks.",
+    "Parity manifest recognizes the new graph read as deferred-MCP-2 and navigation search’s additional /graph consumer."
+  ],
+  "validation": {
+    "frontend": {
+      "unit_passed": 224,
+      "unit_skipped": 0,
+      "final_graph_unit_passed": 16,
+      "browser_passed": 58,
+      "browser_skipped": 0,
+      "new_graph_browser_passed": 7,
+      "lint": "passed",
+      "type_check": "passed",
+      "tokens": "passed inside production build",
+      "production_build": "passed"
+    },
+    "backend_local": {
+      "graph_api_passed": 36,
+      "skipped": 0,
+      "serialized_pytest": true,
+      "foundational_references": "passed"
+    },
+    "parity_guard": {
+      "regression_tests_passed": 4,
+      "regression_tests_skipped": 0,
+      "totals": {
+        "operations": 103,
+        "live": 96,
+        "dead": 7,
+        "tools": 9,
+        "actions": 40,
+        "classifications": {
+          "covered": 18,
+          "partial": 0,
+          "closed-MCP-1": 19,
+          "rest-only-by-design": 39,
+          "deferred-MCP-2": 13,
+          "needs-derek": 7,
+          "dead-client-code": 7
+        }
+      },
+      "errors": []
+    },
+    "ci_backend_console": [
+      {
+        "workflow": "Backend Integration",
+        "run_id": 34886580216,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580216",
+        "event": "push",
+        "head_sha": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+        "attempt": 1,
+        "console_summary": "135 passed, 4 skipped, 17 warnings in 157.75s (0:02:37)",
+        "counts": {
+          "passed": 135,
+          "failed": 0,
+          "skipped": 4,
+          "deselected": 0
+        },
+        "log_sha256": "7d7dc8ef473a6d583a7af53b21baf02663d704ff1b1be311db16de20e4a5f50c"
+      },
+      {
+        "workflow": "Backend Tests",
+        "run_id": 34886580355,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580355",
+        "event": "push",
+        "head_sha": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+        "attempt": 1,
+        "console_summary": "2647 passed, 3 skipped, 12 deselected, 48 warnings in 540.74s (0:09:00)",
+        "counts": {
+          "passed": 2647,
+          "failed": 0,
+          "skipped": 3,
+          "deselected": 12
+        },
+        "log_sha256": "a5f4e227b2a357124376f48bcd205f4e8d2b8aca1acdde011bbd3ee0c4ac7a6a"
+      }
+    ],
+    "ci_frontend_console": [
+      {
+        "workflow": "Frontend Checks",
+        "run_id": 34886580834,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580834",
+        "event": "push",
+        "head_sha": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+        "attempt": 1,
+        "graph_spec_in_executed_command": false,
+        "executed_graph_command": null,
+        "summaries": [
+          "✓ src/__tests__/graph.test.tsx (16 tests) 786ms",
+          "✓ src/__tests__/mission-authoring.test.tsx (9 tests) 1828ms",
+          "✓ src/features/search/SearchExperience.test.tsx (15 tests) 1319ms",
+          "✓ src/__tests__/admin/spaces.test.tsx (14 tests) 891ms",
+          "✓ src/__tests__/admin/users.test.tsx (15 tests) 1188ms",
+          "✓ src/__tests__/evidence.test.tsx (7 tests) 786ms",
+          "✓ src/__tests__/hygiene.test.tsx (10 tests) 823ms",
+          "✓ src/__tests__/admin/observability.test.tsx (6 tests) 603ms",
+          "✓ src/contexts/RoleContext.test.tsx (8 tests) 96ms",
+          "✓ src/components/CommandPalette.test.tsx (6 tests) 2971ms",
+          "✓ src/__tests__/project-bundles.test.tsx (9 tests) 456ms",
+          "✓ src/__tests__/home.test.tsx (5 tests) 577ms",
+          "✓ src/__tests__/collection-context.test.tsx (5 tests) 714ms",
+          "✓ src/components/AppShell.test.tsx (7 tests) 1085ms",
+          "✓ src/contexts/ThemeContext.test.tsx (5 tests) 277ms",
+          "✓ src/__tests__/missions.test.tsx (10 tests) 1391ms",
+          "✓ src/__tests__/document-upload.test.tsx (4 tests) 397ms",
+          "✓ src/components/RequireAdmin.test.tsx (12 tests) 193ms",
+          "✓ src/lib/api/admin.test.ts (12 tests) 13ms",
+          "✓ src/lib/theme.test.ts (7 tests) 21ms",
+          "✓ src/__tests__/collection-picker.test.tsx (3 tests) 489ms",
+          "✓ src/__tests__/document-upload-api.test.ts (3 tests) 24ms",
+          "✓ src/lib/route-migrations.test.ts (2 tests) 14ms",
+          "✓ src/__tests__/mission-run.test.tsx (9 tests) 419ms",
+          "✓ scripts/check-token-colors.test.ts (8 tests) 441ms",
+          "✓ src/lib/route-migration-links.test.ts (2 tests) 12ms",
+          "✓ src/components/MarkdownRenderer.test.tsx (2 tests) 195ms",
+          "✓ src/__tests__/document-state.test.ts (6 tests) 6ms",
+          "✓ src/lib/api/errors.test.ts (4 tests) 5ms",
+          " Test Files  32 passed (32)",
+          "      Tests  224 passed (224)"
+        ],
+        "log_sha256": "99673708017ddfb968d17a86139c09b48d5fa2135ffe941482f28d2eef7e9151"
+      },
+      {
+        "workflow": "MCP Package",
+        "run_id": 34886580232,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580232",
+        "event": "push",
+        "head_sha": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+        "attempt": 1,
+        "graph_spec_in_executed_command": false,
+        "executed_graph_command": null,
+        "summaries": [
+          "✓ src/auth/device-code.test.ts  (12 tests) 23ms",
+          "✓ src/read-parity.test.ts  (44 tests) 326ms",
+          "✓ src/index.test.ts  (59 tests) 347ms",
+          "✓ src/auth/credential-store.test.ts  (6 tests) 15ms",
+          "✓ src/canonical-link.test.ts  (13 tests) 6ms",
+          " Test Files  5 passed (5)",
+          "      Tests  134 passed (134)"
+        ],
+        "log_sha256": "7298d273f4b568df8ac057c71a74335335b0f1d5bdb3e6139f72a61d0037507f"
+      },
+      {
+        "workflow": "Frontend Production Build",
+        "run_id": 34886580231,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580231",
+        "event": "push",
+        "head_sha": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+        "attempt": 1,
+        "graph_spec_in_executed_command": true,
+        "executed_graph_command": "npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/mission-protocol.spec.ts tests/e2e/project-bundles.spec.ts tests/e2e/collection-context.spec.ts tests/e2e/search-command.spec.ts tests/e2e/route-migration.spec.ts tests/e2e/graph.spec.ts --workers=1 || exit $?",
+        "summaries": [
+          "##[notice]  54 passed (2.0m)"
+        ],
+        "log_sha256": "9f234111f9bb21805b78c7eb9aaa5d25200eaebcca4ca333342034d459a16451"
+      }
+    ],
+    "local_baseline": {
+      "base": "http://127.0.0.1:3111",
+      "timezoneId": "America/Chicago",
+      "checkedAt": "2026-09-14T19:13:49.266Z",
+      "checks": 132,
+      "routes": 33,
+      "failures": [],
+      "internalLinkPaths": [
+        "/",
+        "/404",
+        "/admin/corrections",
+        "/admin/observability",
+        "/admin/spaces",
+        "/admin/users",
+        "/collections",
+        "/collections/06ad13d9-2131-424c-9ca4-d9a11bc9a401",
+        "/collections/093190b6-dbd3-4a31-aa62-a67fab032e9a",
+        "/collections/18301f66-7cc8-405e-91a5-e03845d284e1",
+        "/collections/27fcefd3-a049-46c4-bf81-d5df8a1b0629",
+        "/collections/4af409b7-cb46-4c02-9aff-38b25376bf21",
+        "/collections/4f95814b-8416-473a-9632-bb1601f1a654",
+        "/collections/6680c114-dbce-45c9-9335-2a81a7c16b50",
+        "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+        "/collections/7acc9636-1988-4bd7-b68f-a91b0b862d93",
+        "/collections/7c1b78de-76ed-43a1-ac73-b8bbece848a8",
+        "/collections/907c8a7f-a083-49b0-8015-d5f0b4cfd316",
+        "/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+        "/collections/afac19c4-40f6-4471-bb42-c1a148b7620a",
+        "/collections/bef2b57c-3904-425d-b969-ca7cb8453adc",
+        "/collections/c4e663c6-5d38-4a82-9760-7412fb46a137",
+        "/collections/ca279662-9224-47b7-80d6-341aeda41540",
+        "/collections/df9c1b16-d0a7-401b-ab67-62921d260c05",
+        "/collections/e64e675e-d99f-48f1-9721-92e3f502e795",
+        "/collections/f044f358-49eb-4c6f-ada9-511e3e9abae9",
+        "/collections/f4912548-ce6a-43ba-941e-02c584050b92",
+        "/device",
+        "/documents",
+        "/documents/16bad45e-c426-46bb-8f04-d30a0e94efff",
+        "/documents/1e18775d-48e1-4e32-a59c-8188a176abb9",
+        "/documents/276d7724-d647-430c-9440-9c5b793de5d2",
+        "/documents/2f54e4ba-1ff2-4421-a632-172fe67e80a8",
+        "/documents/471f28f5-7cd3-4b7f-a973-0108f7f7cebd",
+        "/documents/7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+        "/documents/9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+        "/documents/9124e081-59ba-47bb-b34d-96273bd1140a",
+        "/documents/960c52f3-ae2f-4916-9112-51dcf781b470",
+        "/documents/980021d8-41f2-48a7-8731-f939a8f596d9",
+        "/documents/a28eab37-03f3-492e-83fe-f48e502fc223",
+        "/documents/a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+        "/documents/a8b7c2d0-283d-486e-a915-633ca251df29",
+        "/documents/ae3b3a88-b5dc-4130-ac77-a33cfcea388f",
+        "/documents/b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+        "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+        "/documents/d8c50c51-11f7-4649-b214-6aff8ed92521",
+        "/documents/e4f32d07-e596-4c8b-9712-5717a13595ce",
+        "/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+        "/documents/eb3074c0-f37e-4908-ac92-0d26d1882254",
+        "/documents/f40c4015-87d8-461f-80b5-4b9b653e0efb",
+        "/documents/f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+        "/documents/upload",
+        "/evidence",
+        "/evidence/110b0d64-80ca-4c6a-b283-e0e19d2e2063",
+        "/evidence/1aeff4dc-5ab9-4dae-ac6e-9a713b38bab9",
+        "/evidence/1da242cc-517e-4fcb-9850-3c620e2b484e",
+        "/evidence/1e634b05-e218-4c60-a245-b4ff51b785a3",
+        "/evidence/21d22f19-6873-49d2-b662-fdbb024fdc47",
+        "/evidence/2334c0a8-e336-413d-8d55-c69359e44c63",
+        "/evidence/252f4b6f-272b-47c6-9088-3c1708c9cbbb",
+        "/evidence/2e0276ba-e261-44b6-8e13-15091673eeb4",
+        "/evidence/2f6af96a-ccf0-4c2d-8b40-f7d1c396ee76",
+        "/evidence/3108e2b6-5182-495c-a6af-7155c0dcbecf",
+        "/evidence/31f2bf8c-b225-4916-91d4-63e1762447da",
+        "/evidence/362ae5f0-5461-46a1-b24f-676d1c2adfda",
+        "/evidence/3770d155-31a8-47e6-ba9a-54b544653827",
+        "/evidence/3ffa8783-4365-4fbe-84fe-f16c964a6d2f",
+        "/evidence/4671b863-3ff8-4424-941a-d250239aba14",
+        "/evidence/495dde76-f242-4681-90a9-980f82b06168",
+        "/evidence/5a526faf-92df-4956-b827-8c97f5c3a372",
+        "/evidence/5c26d8d2-8d59-4af1-8f92-8235ed6bd83b",
+        "/evidence/60e5d2dd-5814-4ef3-abdb-2269f1b85647",
+        "/evidence/650aafc0-b8cb-4b57-bfcc-5d3a34e3601d",
+        "/evidence/65df244e-9c69-47f9-864a-fa2cd3850783",
+        "/evidence/68ee91e6-7ea0-49e1-8336-84a4b1993565",
+        "/evidence/72314165-2633-46ba-a32a-922e2e8cbcfd",
+        "/evidence/73be8d80-0759-4eed-bbf9-e17ec1636e84",
+        "/evidence/75dfed70-b738-454e-b5b7-2b8b19939c90",
+        "/evidence/7be3e009-12c0-4e4c-b9f9-e4a7b83fd68c",
+        "/evidence/7ca6f0d0-8496-4a3a-805e-d197cf82b14c",
+        "/evidence/7ff28b40-7aeb-4cfe-88ec-6398b08afee8",
+        "/evidence/81d9fae0-03cd-4374-9998-c1d446a5122e",
+        "/evidence/8a8f917b-e654-4791-8c08-7b4c10592ef3",
+        "/evidence/915c6df5-13c4-450c-94a7-ce18662e2911",
+        "/evidence/91b240ec-fbe8-493d-9ddd-88187db132d6",
+        "/evidence/9d8a4b71-3b99-4bdd-86ea-ef1f75ed2d94",
+        "/evidence/a16a9d54-c956-40b7-8297-4f2b20755423",
+        "/evidence/a398d6e9-eba5-48e0-8e85-c7d94a67e9ee",
+        "/evidence/a4bf008f-4ebd-4555-9a61-a979dd0b04a6",
+        "/evidence/ab8cfebb-d898-4ac6-b393-e1c50edf9532",
+        "/evidence/adfe99f8-50e2-4908-b60f-be4afb7a4783",
+        "/evidence/b1f59d0a-9460-4b96-bccf-63ecdb8c6996",
+        "/evidence/ba9fe609-4ef1-4ef9-904f-0cfd703d0aba",
+        "/evidence/bdd6e865-dff9-4a6d-a612-394b13a737d2",
+        "/evidence/c7f090bf-cf77-477d-9b31-f939241a2245",
+        "/evidence/c8103bb0-4c39-49fc-8982-f4ba5245678a",
+        "/evidence/d25298ee-fda9-4930-ba5a-185e88a13aac",
+        "/evidence/d5e0c3c9-3d98-4e45-baf1-9e5a180c58db",
+        "/evidence/e4d1debb-7823-475c-adf0-be676eaa2e3a",
+        "/evidence/e531a960-984f-49f3-9256-9a223d3ee069",
+        "/evidence/ea2b962c-04fc-4eaa-9bca-88eaa0aa47c3",
+        "/evidence/f1e836de-0320-451f-a4f6-36b9df59f2a7",
+        "/evidence/f5c0950f-f5ec-46bc-a45e-4a575f53b3b1",
+        "/evidence/fb4075ee-24b9-43f7-9f38-ff1b1604ae90",
+        "/graph",
+        "/missions",
+        "/missions/0b074e6a-f859-444c-b748-fdd08387e384",
+        "/missions/0b5f8651-5d86-4968-bd98-e57ed7e84901",
+        "/missions/1d8e48d8-da57-48a8-a67c-1aef5f918a34",
+        "/missions/27cbe849-a801-49ef-8cb5-bfa891ade2bd",
+        "/missions/2fefe37d-3c77-4b67-805c-00b38aec6d7d",
+        "/missions/39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+        "/missions/54ca4557-763b-4091-a0bd-95b9f19e2132",
+        "/missions/57055608-4127-4dd6-914e-7fea6d4f9754",
+        "/missions/6a9c8707-dfe7-4cab-a9cf-d3b72b294a67",
+        "/missions/75b99744-6dfc-4533-af54-105980f38b04",
+        "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+        "/missions/83b9ee6e-f3af-4e7e-9515-d69d54fd47c0",
+        "/missions/9372bdee-eb7b-4cd3-9535-138a34ad3f62",
+        "/missions/952cc1de-688c-415b-bee9-ce143a753af2",
+        "/missions/aa403ba0-0e27-4872-8723-0716f2beb8f2",
+        "/missions/cbcd46bc-de17-4c6c-8391-b1669403fc74",
+        "/missions/cea71e51-a268-46c3-a2ba-84e2cf045217",
+        "/missions/d8340572-e8d2-47fe-a303-395f06f304c2",
+        "/missions/dd966b0c-a33c-4bb2-9dc2-195d0e0d6675",
+        "/missions/f99ea146-1b11-4bc3-9e36-0b35a03546a7",
+        "/missions/new",
+        "/projects",
+        "/projects/041489e1-bb62-4bbe-bb57-90a924fce867",
+        "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+        "/projects/0f5c295f-6ac0-4bc9-823f-32f2306d6f2d",
+        "/projects/1ca2ce70-e6c2-4593-aeb8-b4aa9f3fff01",
+        "/projects/4500cb98-7ca0-4703-b557-f9726c273f57",
+        "/projects/59f606db-9db8-4ba9-a200-c9b66c650f2a",
+        "/projects/5b03d540-3b3a-4762-819a-44dab5261da7",
+        "/projects/6dc4d8b7-06f0-48ba-a2bd-bcf60c6f75da",
+        "/projects/8a5e3763-8249-4194-97d0-cda0e5ff0672",
+        "/projects/959cfd13-fbd8-4277-beae-df57b3e68d0e",
+        "/projects/a38e85ca-5c94-44c7-a723-9b7ebf7fad59",
+        "/projects/b1983379-f0ab-4ea0-9645-f1e180342d72",
+        "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+        "/projects/fbdfcca1-fce5-447b-b081-17761e52b173",
+        "/reports",
+        "/reports/00b0e4ed-270f-40fd-b1c1-756d99415700",
+        "/reports/039d5c3d-7ad0-4936-9789-32d422a2bec6",
+        "/reports/0613ab1a-1ae7-4784-bf03-579023d4a20f",
+        "/reports/11823386-c4d7-4c3e-847e-365d464a8425",
+        "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+        "/reports/28b2a481-3d77-4659-8e46-ebd4dceceb1a",
+        "/reports/41fff966-1c62-4921-87b4-f8ec4f486927",
+        "/reports/470c666d-5274-4d40-9e0f-c55ed97740fd",
+        "/reports/489c778e-8f18-4b75-abd4-a75635feb8bf",
+        "/reports/56b700a2-35c4-465e-8125-e2a63e83c6f5",
+        "/reports/64dab59f-8684-42fe-93dd-03c62a255c64",
+        "/reports/65ce8a0b-17b2-4598-876a-9791a06adcbe",
+        "/reports/6636c940-ab9f-41a5-a84c-170d1bf9e609",
+        "/reports/8a519cd2-3e88-49a4-9c30-d74a8d62b89a",
+        "/reports/8af4f590-687e-4df5-919f-df6395bade33",
+        "/reports/8e0f2a64-a29b-4483-86b3-7479ff284d12",
+        "/reports/955eb67e-6142-4c91-80f9-dc411258f66d",
+        "/reports/964532c5-ea10-4fef-a164-697aef3881b4",
+        "/reports/b4279f55-2ec7-46c5-bed7-d7550e60464d",
+        "/reports/b7e144ca-a1c2-422a-84c8-59f35bf1d61b",
+        "/reports/c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+        "/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+        "/reports/fa1d8733-f7ea-4483-97d8-12693318b108",
+        "/reports/fb69cbfc-dd02-4167-a89a-ca9cfbb252b5",
+        "/reports/ffe8436e-3d95-42e4-be82-a45acec7dd78",
+        "/saved-searches",
+        "/search",
+        "/settings"
+      ],
+      "legacyInternalLinks": [],
+      "readOnly": true,
+      "directProductionApi": false,
+      "readOnlyApiProxy": true
+    },
+    "production_baseline": {
+      "base": "https://tracelab.aquex.ai",
+      "timezoneId": "America/Chicago",
+      "checkedAt": "2026-09-14T19:36:11.576Z",
+      "checks": 132,
+      "routes": 33,
+      "failures": [],
+      "internalLinkPaths": [
+        "/",
+        "/404",
+        "/admin/corrections",
+        "/admin/observability",
+        "/admin/spaces",
+        "/admin/users",
+        "/collections",
+        "/collections/06ad13d9-2131-424c-9ca4-d9a11bc9a401",
+        "/collections/093190b6-dbd3-4a31-aa62-a67fab032e9a",
+        "/collections/18301f66-7cc8-405e-91a5-e03845d284e1",
+        "/collections/27fcefd3-a049-46c4-bf81-d5df8a1b0629",
+        "/collections/4af409b7-cb46-4c02-9aff-38b25376bf21",
+        "/collections/4f95814b-8416-473a-9632-bb1601f1a654",
+        "/collections/6680c114-dbce-45c9-9335-2a81a7c16b50",
+        "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+        "/collections/7acc9636-1988-4bd7-b68f-a91b0b862d93",
+        "/collections/7c1b78de-76ed-43a1-ac73-b8bbece848a8",
+        "/collections/907c8a7f-a083-49b0-8015-d5f0b4cfd316",
+        "/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+        "/collections/afac19c4-40f6-4471-bb42-c1a148b7620a",
+        "/collections/bef2b57c-3904-425d-b969-ca7cb8453adc",
+        "/collections/c4e663c6-5d38-4a82-9760-7412fb46a137",
+        "/collections/ca279662-9224-47b7-80d6-341aeda41540",
+        "/collections/df9c1b16-d0a7-401b-ab67-62921d260c05",
+        "/collections/e64e675e-d99f-48f1-9721-92e3f502e795",
+        "/collections/f044f358-49eb-4c6f-ada9-511e3e9abae9",
+        "/collections/f4912548-ce6a-43ba-941e-02c584050b92",
+        "/device",
+        "/documents",
+        "/documents/16bad45e-c426-46bb-8f04-d30a0e94efff",
+        "/documents/1e18775d-48e1-4e32-a59c-8188a176abb9",
+        "/documents/276d7724-d647-430c-9440-9c5b793de5d2",
+        "/documents/2f54e4ba-1ff2-4421-a632-172fe67e80a8",
+        "/documents/471f28f5-7cd3-4b7f-a973-0108f7f7cebd",
+        "/documents/7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+        "/documents/9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+        "/documents/9124e081-59ba-47bb-b34d-96273bd1140a",
+        "/documents/960c52f3-ae2f-4916-9112-51dcf781b470",
+        "/documents/980021d8-41f2-48a7-8731-f939a8f596d9",
+        "/documents/a28eab37-03f3-492e-83fe-f48e502fc223",
+        "/documents/a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+        "/documents/a8b7c2d0-283d-486e-a915-633ca251df29",
+        "/documents/ae3b3a88-b5dc-4130-ac77-a33cfcea388f",
+        "/documents/b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+        "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+        "/documents/d8c50c51-11f7-4649-b214-6aff8ed92521",
+        "/documents/e4f32d07-e596-4c8b-9712-5717a13595ce",
+        "/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+        "/documents/eb3074c0-f37e-4908-ac92-0d26d1882254",
+        "/documents/f40c4015-87d8-461f-80b5-4b9b653e0efb",
+        "/documents/f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+        "/documents/upload",
+        "/evidence",
+        "/evidence/110b0d64-80ca-4c6a-b283-e0e19d2e2063",
+        "/evidence/1aeff4dc-5ab9-4dae-ac6e-9a713b38bab9",
+        "/evidence/1da242cc-517e-4fcb-9850-3c620e2b484e",
+        "/evidence/1e634b05-e218-4c60-a245-b4ff51b785a3",
+        "/evidence/21d22f19-6873-49d2-b662-fdbb024fdc47",
+        "/evidence/2334c0a8-e336-413d-8d55-c69359e44c63",
+        "/evidence/252f4b6f-272b-47c6-9088-3c1708c9cbbb",
+        "/evidence/2e0276ba-e261-44b6-8e13-15091673eeb4",
+        "/evidence/2f6af96a-ccf0-4c2d-8b40-f7d1c396ee76",
+        "/evidence/3108e2b6-5182-495c-a6af-7155c0dcbecf",
+        "/evidence/31f2bf8c-b225-4916-91d4-63e1762447da",
+        "/evidence/362ae5f0-5461-46a1-b24f-676d1c2adfda",
+        "/evidence/3770d155-31a8-47e6-ba9a-54b544653827",
+        "/evidence/3ffa8783-4365-4fbe-84fe-f16c964a6d2f",
+        "/evidence/4671b863-3ff8-4424-941a-d250239aba14",
+        "/evidence/495dde76-f242-4681-90a9-980f82b06168",
+        "/evidence/5a526faf-92df-4956-b827-8c97f5c3a372",
+        "/evidence/5c26d8d2-8d59-4af1-8f92-8235ed6bd83b",
+        "/evidence/60e5d2dd-5814-4ef3-abdb-2269f1b85647",
+        "/evidence/650aafc0-b8cb-4b57-bfcc-5d3a34e3601d",
+        "/evidence/65df244e-9c69-47f9-864a-fa2cd3850783",
+        "/evidence/68ee91e6-7ea0-49e1-8336-84a4b1993565",
+        "/evidence/72314165-2633-46ba-a32a-922e2e8cbcfd",
+        "/evidence/73be8d80-0759-4eed-bbf9-e17ec1636e84",
+        "/evidence/75dfed70-b738-454e-b5b7-2b8b19939c90",
+        "/evidence/7be3e009-12c0-4e4c-b9f9-e4a7b83fd68c",
+        "/evidence/7ca6f0d0-8496-4a3a-805e-d197cf82b14c",
+        "/evidence/7ff28b40-7aeb-4cfe-88ec-6398b08afee8",
+        "/evidence/81d9fae0-03cd-4374-9998-c1d446a5122e",
+        "/evidence/8a8f917b-e654-4791-8c08-7b4c10592ef3",
+        "/evidence/915c6df5-13c4-450c-94a7-ce18662e2911",
+        "/evidence/91b240ec-fbe8-493d-9ddd-88187db132d6",
+        "/evidence/9d8a4b71-3b99-4bdd-86ea-ef1f75ed2d94",
+        "/evidence/a16a9d54-c956-40b7-8297-4f2b20755423",
+        "/evidence/a398d6e9-eba5-48e0-8e85-c7d94a67e9ee",
+        "/evidence/a4bf008f-4ebd-4555-9a61-a979dd0b04a6",
+        "/evidence/ab8cfebb-d898-4ac6-b393-e1c50edf9532",
+        "/evidence/adfe99f8-50e2-4908-b60f-be4afb7a4783",
+        "/evidence/b1f59d0a-9460-4b96-bccf-63ecdb8c6996",
+        "/evidence/ba9fe609-4ef1-4ef9-904f-0cfd703d0aba",
+        "/evidence/bdd6e865-dff9-4a6d-a612-394b13a737d2",
+        "/evidence/c7f090bf-cf77-477d-9b31-f939241a2245",
+        "/evidence/c8103bb0-4c39-49fc-8982-f4ba5245678a",
+        "/evidence/d25298ee-fda9-4930-ba5a-185e88a13aac",
+        "/evidence/d5e0c3c9-3d98-4e45-baf1-9e5a180c58db",
+        "/evidence/e4d1debb-7823-475c-adf0-be676eaa2e3a",
+        "/evidence/e531a960-984f-49f3-9256-9a223d3ee069",
+        "/evidence/ea2b962c-04fc-4eaa-9bca-88eaa0aa47c3",
+        "/evidence/f1e836de-0320-451f-a4f6-36b9df59f2a7",
+        "/evidence/f5c0950f-f5ec-46bc-a45e-4a575f53b3b1",
+        "/evidence/fb4075ee-24b9-43f7-9f38-ff1b1604ae90",
+        "/graph",
+        "/missions",
+        "/missions/0b074e6a-f859-444c-b748-fdd08387e384",
+        "/missions/0b5f8651-5d86-4968-bd98-e57ed7e84901",
+        "/missions/1d8e48d8-da57-48a8-a67c-1aef5f918a34",
+        "/missions/27cbe849-a801-49ef-8cb5-bfa891ade2bd",
+        "/missions/2fefe37d-3c77-4b67-805c-00b38aec6d7d",
+        "/missions/39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+        "/missions/54ca4557-763b-4091-a0bd-95b9f19e2132",
+        "/missions/57055608-4127-4dd6-914e-7fea6d4f9754",
+        "/missions/6a9c8707-dfe7-4cab-a9cf-d3b72b294a67",
+        "/missions/75b99744-6dfc-4533-af54-105980f38b04",
+        "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+        "/missions/83b9ee6e-f3af-4e7e-9515-d69d54fd47c0",
+        "/missions/9372bdee-eb7b-4cd3-9535-138a34ad3f62",
+        "/missions/952cc1de-688c-415b-bee9-ce143a753af2",
+        "/missions/aa403ba0-0e27-4872-8723-0716f2beb8f2",
+        "/missions/cbcd46bc-de17-4c6c-8391-b1669403fc74",
+        "/missions/cea71e51-a268-46c3-a2ba-84e2cf045217",
+        "/missions/d8340572-e8d2-47fe-a303-395f06f304c2",
+        "/missions/dd966b0c-a33c-4bb2-9dc2-195d0e0d6675",
+        "/missions/f99ea146-1b11-4bc3-9e36-0b35a03546a7",
+        "/missions/new",
+        "/projects",
+        "/projects/041489e1-bb62-4bbe-bb57-90a924fce867",
+        "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+        "/projects/0f5c295f-6ac0-4bc9-823f-32f2306d6f2d",
+        "/projects/1ca2ce70-e6c2-4593-aeb8-b4aa9f3fff01",
+        "/projects/4500cb98-7ca0-4703-b557-f9726c273f57",
+        "/projects/59f606db-9db8-4ba9-a200-c9b66c650f2a",
+        "/projects/5b03d540-3b3a-4762-819a-44dab5261da7",
+        "/projects/6dc4d8b7-06f0-48ba-a2bd-bcf60c6f75da",
+        "/projects/8a5e3763-8249-4194-97d0-cda0e5ff0672",
+        "/projects/959cfd13-fbd8-4277-beae-df57b3e68d0e",
+        "/projects/a38e85ca-5c94-44c7-a723-9b7ebf7fad59",
+        "/projects/b1983379-f0ab-4ea0-9645-f1e180342d72",
+        "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+        "/projects/fbdfcca1-fce5-447b-b081-17761e52b173",
+        "/reports",
+        "/reports/00b0e4ed-270f-40fd-b1c1-756d99415700",
+        "/reports/039d5c3d-7ad0-4936-9789-32d422a2bec6",
+        "/reports/0613ab1a-1ae7-4784-bf03-579023d4a20f",
+        "/reports/11823386-c4d7-4c3e-847e-365d464a8425",
+        "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+        "/reports/28b2a481-3d77-4659-8e46-ebd4dceceb1a",
+        "/reports/41fff966-1c62-4921-87b4-f8ec4f486927",
+        "/reports/470c666d-5274-4d40-9e0f-c55ed97740fd",
+        "/reports/489c778e-8f18-4b75-abd4-a75635feb8bf",
+        "/reports/56b700a2-35c4-465e-8125-e2a63e83c6f5",
+        "/reports/64dab59f-8684-42fe-93dd-03c62a255c64",
+        "/reports/65ce8a0b-17b2-4598-876a-9791a06adcbe",
+        "/reports/6636c940-ab9f-41a5-a84c-170d1bf9e609",
+        "/reports/8a519cd2-3e88-49a4-9c30-d74a8d62b89a",
+        "/reports/8af4f590-687e-4df5-919f-df6395bade33",
+        "/reports/8e0f2a64-a29b-4483-86b3-7479ff284d12",
+        "/reports/955eb67e-6142-4c91-80f9-dc411258f66d",
+        "/reports/964532c5-ea10-4fef-a164-697aef3881b4",
+        "/reports/b4279f55-2ec7-46c5-bed7-d7550e60464d",
+        "/reports/b7e144ca-a1c2-422a-84c8-59f35bf1d61b",
+        "/reports/c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+        "/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+        "/reports/fa1d8733-f7ea-4483-97d8-12693318b108",
+        "/reports/fb69cbfc-dd02-4167-a89a-ca9cfbb252b5",
+        "/reports/ffe8436e-3d95-42e4-be82-a45acec7dd78",
+        "/saved-searches",
+        "/search",
+        "/settings"
+      ],
+      "legacyInternalLinks": [],
+      "readOnly": true,
+      "directProductionApi": true,
+      "readOnlyApiProxy": false
+    },
+    "active_data_audit": {
+      "checked_at": "2026-09-14T19:31:44.938Z",
+      "base": "https://tracelab.aquex.ai",
+      "directProductionApi": true,
+      "readOnly": true,
+      "timezoneId": "America/Chicago",
+      "ids": {
+        "project": "0afcc588-e722-45bd-8320-f486601b877c",
+        "document": "d44bec3e-f665-439d-bc78-bc5385a4610d",
+        "mission": "7b847edd-5433-4237-a899-57b47e6edf0a",
+        "report": "1ff22d77-fb90-4220-8d74-34fd5526dab7",
+        "collection": "a3e6d809-af90-4652-903f-5ce5c8842bf8",
+        "evidence": "1da242cc-517e-4fcb-9850-3c620e2b484e"
+      },
+      "totals": {
+        "documents": 23,
+        "reports": 3,
+        "missions": 3,
+        "evidence": 547
+      },
+      "checks": 1362,
+      "failures": []
+    },
+    "additional_log_and_list_audit": {
+      "checked_at": "2026-09-14T19:33:05.807Z",
+      "base": "https://tracelab.aquex.ai",
+      "directProductionApi": true,
+      "readOnly": true,
+      "timezoneId": "America/Chicago",
+      "ids": {
+        "project": "0afcc588-e722-45bd-8320-f486601b877c",
+        "document": "d44bec3e-f665-439d-bc78-bc5385a4610d",
+        "mission": "7b847edd-5433-4237-a899-57b47e6edf0a",
+        "report": "1ff22d77-fb90-4220-8d74-34fd5526dab7",
+        "collection": "a3e6d809-af90-4652-903f-5ce5c8842bf8",
+        "evidence": "1da242cc-517e-4fcb-9850-3c620e2b484e"
+      },
+      "totals": {
+        "documents": 23,
+        "reports": 3,
+        "missions": 3,
+        "evidence": 547
+      },
+      "checks": 407,
+      "failures": []
+    },
+    "public_smoke": {
+      "tool": "playwright",
+      "generatedAt": "2026-09-14T19:30:11.619Z",
+      "completedAt": "2026-09-14T19:30:16.751Z",
+      "status": "passed",
+      "summary": {
+        "total": 5,
+        "expected": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "durationSeconds": 5.132,
+        "retries": 0
+      },
+      "environment": {
+        "node": "v24.6.0",
+        "ci": {
+          "provider": null
+        },
+        "projects": [
+          "chromium"
+        ],
+        "browsers": []
+      },
+      "tests": [
+        {
+          "title": "missions route responds at the public domain",
+          "file": "frontend/tests/e2e/production-smoke.spec.ts",
+          "line": 17,
+          "column": 7,
+          "status": "passed",
+          "durationMs": 874,
+          "annotations": [],
+          "attachments": [],
+          "errors": []
+        },
+        {
+          "title": "/admin/users is deployed as its own Next page",
+          "file": "frontend/tests/e2e/production-smoke.spec.ts",
+          "line": 23,
+          "column": 9,
+          "status": "passed",
+          "durationMs": 321,
+          "annotations": [],
+          "attachments": [],
+          "errors": []
+        },
+        {
+          "title": "/admin/spaces is deployed as its own Next page",
+          "file": "frontend/tests/e2e/production-smoke.spec.ts",
+          "line": 23,
+          "column": 9,
+          "status": "passed",
+          "durationMs": 281,
+          "annotations": [],
+          "attachments": [],
+          "errors": []
+        },
+        {
+          "title": "API health endpoint confirms production authorization and reconciler freshness",
+          "file": "frontend/tests/e2e/production-smoke.spec.ts",
+          "line": 33,
+          "column": 7,
+          "status": "passed",
+          "durationMs": 1829,
+          "annotations": [],
+          "attachments": [],
+          "errors": []
+        },
+        {
+          "title": "every maintained migration preserves its destination and query parameters",
+          "file": "frontend/tests/e2e/route-migration.spec.ts",
+          "line": 5,
+          "column": 5,
+          "status": "passed",
+          "durationMs": 1049,
+          "annotations": [],
+          "attachments": [
+            {
+              "name": "route-migration-coverage",
+              "contentType": "application/json",
+              "path": "/tmp/tracelab-s52-ux11/source-smoke-artifacts/route-migration-every-main-a90a2-nation-and-query-parameters-chromium/attachments/route-migration-coverage-90d5031684199ec0022f754aa165af79d10e98d2.json"
+            }
+          ],
+          "errors": []
+        }
+      ],
+      "artifactPath": "/tmp/tracelab-s52-ux11/source-public-smoke.json"
+    },
+    "tested_source_files": {
+      "head": "48195bc19c8db02394ffbac4d9fac29c8323a30b",
+      "files": [
+        {
+          "path": ".github/workflows/frontend-production-build.yml",
+          "sha256": "9a1f76d4fca0cfecd8dd40e4177e9998424a0ee74c20852c40420f6855909827"
+        },
+        {
+          "path": "cmos/contracts/mcp-parity-manifest.json",
+          "sha256": "7bbc3953d16a3c415ea369d82aedaa3884dfee927bc9f0511b23536f57e975c6"
+        },
+        {
+          "path": "frontend/scripts/ui-shell-smoke.mjs",
+          "sha256": "ac827ebedfed517903feb3b4731ee2c1f699959d9033c739fd12cec54a05249d"
+        },
+        {
+          "path": "frontend/src/__tests__/graph.test.tsx",
+          "sha256": "bae098bf795c0fb48f0a22ea8730273f4ebad482b3ac701ca7236a7246740c6e"
+        },
+        {
+          "path": "frontend/src/components/AppShell.test.tsx",
+          "sha256": "59cdf4e4161e34c6f40e991761da8804f7b5c1169cd4fcca69895554708d6204"
+        },
+        {
+          "path": "frontend/src/components/Navigation.tsx",
+          "sha256": "55340b43993557069dc2dbaa29de1b470ecc1cf32ed331c3e7e3410e7b2db8b2"
+        },
+        {
+          "path": "frontend/src/components/graph/NeighborhoodDiagram.tsx",
+          "sha256": "c672a7f5bc48756c2f1fbe516631bf447fe0aa856131f12d7b728a4608268fb9"
+        },
+        {
+          "path": "frontend/src/components/graph/NeighborhoodList.tsx",
+          "sha256": "b0dca54ea52e95306ab14162b2d0788f5f58fba183fd89ad92f1ab8596461d03"
+        },
+        {
+          "path": "frontend/src/components/graph/RelationshipLink.tsx",
+          "sha256": "31f28b3db9f7cd586310075635a46a69f7cb2e8f0d785b3d79e42b36031d3d92"
+        },
+        {
+          "path": "frontend/src/lib/api/graph.ts",
+          "sha256": "6c44b9a88da56b4a36a49ae778cb8616458d95c5a1915bdd9e1678e187eb189c"
+        },
+        {
+          "path": "frontend/src/pages/collections/[id].tsx",
+          "sha256": "7f3d4fb5d6eea8d5d30b8f8cc6247d8021904121a0ad970faa3f85a45433e0b9"
+        },
+        {
+          "path": "frontend/src/pages/documents/[id].tsx",
+          "sha256": "58375875f01ea54af865bcd10b3e4e2a309957e42959e184e2afd0f2b0721eae"
+        },
+        {
+          "path": "frontend/src/pages/evidence/[id].tsx",
+          "sha256": "15cc57f653596a76cff8220f4c652004331c40fd3a83ed570283d30f491fb901"
+        },
+        {
+          "path": "frontend/src/pages/graph.tsx",
+          "sha256": "8afb4322d4b287a395d6723ea7085db0ea6638bd3e22a85f81c11f8707014119"
+        },
+        {
+          "path": "frontend/src/pages/missions/[id].tsx",
+          "sha256": "ba9134ece9093f224a59b50a50bf53ec1e16a6e1982ca080b8b5058247f2c743"
+        },
+        {
+          "path": "frontend/src/pages/projects/[id].tsx",
+          "sha256": "3c54704f8e91fabb4d9853563fbd283302d654dd5fdb7c8115ff9cb467e2bd84"
+        },
+        {
+          "path": "frontend/src/pages/reports/[id].tsx",
+          "sha256": "1b2aa302c6a803db54f11619d88cd9c300d232a3380f7bb96548b0a26caa37d6"
+        },
+        {
+          "path": "frontend/tests/e2e/graph.spec.ts",
+          "sha256": "5f390aaa49d8f984332e70ae622d97e18bb05c70ad91455df6edd5fdea1c7a92"
+        }
+      ]
+    },
+    "local_log_hashes": [
+      {
+        "path": "/tmp/tracelab-s52-ux11/unit-full-first.log",
+        "sha256": "16c8c5e4370f456026f7ce2aba4a47173ebbb16fe616ab021baebcad73b16d2a"
+      },
+      {
+        "path": "/tmp/tracelab-s52-ux11/unit-graph-final.log",
+        "sha256": "09800d4092556d1a37e25203b99ddaeb62b177ee96efba15bee67ebfdc466d03"
+      },
+      {
+        "path": "/tmp/tracelab-s52-ux11/browser-final.log",
+        "sha256": "16907bb4f439a9dd56960823fd21976fe8bd0a7fa86014d6af49e4e9fa757142"
+      },
+      {
+        "path": "/tmp/tracelab-s52-ux11/browser-final-remaining.log",
+        "sha256": "8f2b14469fe455bb786bed468042aa6d5a32723db457a8ba8895c2f9099c59bc"
+      },
+      {
+        "path": "/tmp/tracelab-s52-ux11/graph-api-regression.log",
+        "sha256": "627e7edd0bac78b17cb6d95909dc51994186bda47001ce531b90dd331e7ab498"
+      },
+      {
+        "path": "/tmp/tracelab-s52-ux11/build-final.log",
+        "sha256": "d84ccf3066fb3edbe0be2836ed06fb4472964d8329900e1e59a9c355cd0d4107"
+      },
+      {
+        "path": "/tmp/tracelab-s52-ux11/lint-final.log",
+        "sha256": "e4cad1ba08b5d8e7162c4200b4704727f6da145c85be9461ef2bd975f88d8fad"
+      },
+      {
+        "path": "/tmp/tracelab-s52-ux11/type-check-final.log",
+        "sha256": "6d4951ba1a71d3d3017ed1e5b1aae9c29aea7e9683caa8757f644226d98b6a52"
+      },
+      {
+        "path": "/tmp/tracelab-s52-ux11/parity-tests.log",
+        "sha256": "2cc09d09405cbd23277de95ff2300a88d667287f3e812fce084c03d4537a66c9"
+      }
+    ]
+  },
+  "ci_source": [
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34886580413,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580413",
+      "workflowName": "Backend Lint",
+      "jobs": [
+        {
+          "databaseId": 104118621770,
+          "name": "ruff-diff",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580413/job/104118621770",
+          "startedAt": "2026-09-14T19:23:25Z",
+          "completedAt": "2026-09-14T19:23:44Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34886580834,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580834",
+      "workflowName": "Frontend Checks",
+      "jobs": [
+        {
+          "databaseId": 104118624481,
+          "name": "type-check",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580834/job/104118624481",
+          "startedAt": "2026-09-14T19:23:26Z",
+          "completedAt": "2026-09-14T19:24:21Z"
+        },
+        {
+          "databaseId": 104118624740,
+          "name": "vitest",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580834/job/104118624740",
+          "startedAt": "2026-09-14T19:23:26Z",
+          "completedAt": "2026-09-14T19:24:33Z"
+        },
+        {
+          "databaseId": 104118624919,
+          "name": "lint",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580834/job/104118624919",
+          "startedAt": "2026-09-14T19:24:01Z",
+          "completedAt": "2026-09-14T19:24:55Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34886580369,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580369",
+      "workflowName": "Secret Scan",
+      "jobs": [
+        {
+          "databaseId": 104118620521,
+          "name": "Secret Scan",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580369/job/104118620521",
+          "startedAt": "2026-09-14T19:23:25Z",
+          "completedAt": "2026-09-14T19:23:52Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34886580232,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580232",
+      "workflowName": "MCP Package",
+      "jobs": [
+        {
+          "databaseId": 104118619965,
+          "name": "mcp-package",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580232/job/104118619965",
+          "startedAt": "2026-09-14T19:23:25Z",
+          "completedAt": "2026-09-14T19:24:12Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34886580231,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580231",
+      "workflowName": "Frontend Production Build",
+      "jobs": [
+        {
+          "databaseId": 104118619897,
+          "name": "build-frontend-production",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580231/job/104118619897",
+          "startedAt": "2026-09-14T19:23:25Z",
+          "completedAt": "2026-09-14T19:27:02Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34886580216,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580216",
+      "workflowName": "Backend Integration",
+      "jobs": [
+        {
+          "databaseId": 104118620678,
+          "name": "backend-integration",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580216/job/104118620678",
+          "startedAt": "2026-09-14T19:23:25Z",
+          "completedAt": "2026-09-14T19:27:29Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34886580355,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580355",
+      "workflowName": "Backend Tests",
+      "jobs": [
+        {
+          "databaseId": 104118621129,
+          "name": "backend-suite",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34886580355/job/104118621129",
+          "startedAt": "2026-09-14T19:23:25Z",
+          "completedAt": "2026-09-14T19:33:33Z"
+        }
+      ]
+    }
+  ],
+  "deployment": {
+    "checked_at": "2026-09-14T19:29:51.465296+00:00",
+    "commit": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+    "services": {
+      "TraceLab": {
+        "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+        "deployment_id": "7dbc772e-50e6-4853-bd12-ba57406cc583",
+        "status": "SUCCESS",
+        "commit": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+        "created_at": "2026-09-14T19:23:21.302Z"
+      },
+      "frontend": {
+        "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+        "deployment_id": "4790ff46-b5a9-46da-a85c-14e5045690c1",
+        "status": "SUCCESS",
+        "commit": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+        "created_at": "2026-09-14T19:23:21.302Z"
+      }
+    },
+    "both_success_for_commit": true
+  },
+  "visual_review": {
+    "reviewed_at": "2026-09-14T19:36:04.119994+00:00",
+    "reviewer": "Codex direct screenshot inspection",
+    "base": "https://tracelab.aquex.ai",
+    "timezoneId": "America/Chicago",
+    "source_merge": "fc4bf8605e198f87fb390c9518d92e832f2621eb",
+    "reviewed": [
+      {
+        "route": "/graph",
+        "theme": "light",
+        "width": 1440,
+        "reviewed_files": [
+          "light-1440-_graph.png"
+        ],
+        "notes": "Root input, helper copy and no-root state are readable; selected Relationships navigation and theme match the shell."
+      },
+      {
+        "route": "/graph?root=project:0afcc588-e722-45bd-8320-f486601b877c",
+        "theme": "light",
+        "width": 1440,
+        "reviewed_files": [
+          "light-1440-graph-depth-1-viewport.png",
+          "light-1440-graph-depth-1-list-viewport.png",
+          "light-1440-graph-depth-2-diagram.png"
+        ],
+        "notes": "Full root/node titles and Center here controls remain readable in the list. Group totals are server totals. Diagram labels are abbreviated; depth2 uses an outer ring. At390px the diagram is a collapsed optional overview and the list is the primary surface. Chicago timestamps include correct previous-day conversion for summer UTC dates."
+      },
+      {
+        "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+        "theme": "light",
+        "width": 1440,
+        "reviewed_files": [
+          "light-1440-project-viewport.png"
+        ],
+        "notes": "Overview totals have clear labels; the relationships entry sits beside document/mission actions without squeezing them."
+      },
+      {
+        "route": "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+        "theme": "light",
+        "width": 1440,
+        "reviewed_files": [
+          "light-1440-document-viewport.png"
+        ],
+        "notes": "Header entry remains separate from collection controls. Stats wrap cleanly on phones; full document name stays readable."
+      },
+      {
+        "route": "/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+        "theme": "light",
+        "width": 1440,
+        "reviewed_files": [
+          "light-1440-collection-viewport.png"
+        ],
+        "notes": "Entry and Seed mission remain readable; action rows wrap on phones. Zero chunks and two documents remain distinct server totals."
+      },
+      {
+        "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+        "theme": "light",
+        "width": 1440,
+        "reviewed_files": [
+          "light-1440-mission-viewport.png"
+        ],
+        "notes": "Long mission title wraps naturally; entry, review, rerun and result controls retain readable widths. Stored log count and Chicago timestamps are independently checked."
+      },
+      {
+        "route": "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+        "theme": "light",
+        "width": 1440,
+        "reviewed_files": [
+          "light-1440-report-viewport.png"
+        ],
+        "notes": "Long report title wraps with readable entry/export controls. Server token/chunk/citation totals remain visible; existing long evidence claims make the page tall."
+      },
+      {
+        "route": "/evidence/1da242cc-517e-4fcb-9850-3c620e2b484e",
+        "theme": "light",
+        "width": 1440,
+        "reviewed_files": [
+          "light-1440-evidence-viewport.png"
+        ],
+        "notes": "Full claim title wraps without squeezing the entry. Captured timestamp reads9/13/2026,6:59:19PM in Chicago, matching the UTC API instant."
+      },
+      {
+        "route": "/graph",
+        "theme": "light",
+        "width": 390,
+        "reviewed_files": [
+          "light-390-_graph.png"
+        ],
+        "notes": "Root input, helper copy and no-root state are readable; selected Relationships navigation and theme match the shell."
+      },
+      {
+        "route": "/graph?root=project:0afcc588-e722-45bd-8320-f486601b877c",
+        "theme": "light",
+        "width": 390,
+        "reviewed_files": [
+          "light-390-graph-depth-1-viewport.png",
+          "light-390-graph-depth-1-list-viewport.png",
+          "light-390-graph-depth-2-diagram.png",
+          "extra-light-390-graph-depth-1-list-viewport.png"
+        ],
+        "notes": "Full root/node titles and Center here controls remain readable in the list. Group totals are server totals. Diagram labels are abbreviated; depth2 uses an outer ring. At390px the diagram is a collapsed optional overview and the list is the primary surface. Chicago timestamps include correct previous-day conversion for summer UTC dates."
+      },
+      {
+        "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+        "theme": "light",
+        "width": 390,
+        "reviewed_files": [
+          "light-390-project-viewport.png"
+        ],
+        "notes": "Overview totals have clear labels; the relationships entry sits beside document/mission actions without squeezing them."
+      },
+      {
+        "route": "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+        "theme": "light",
+        "width": 390,
+        "reviewed_files": [
+          "light-390-document-viewport.png"
+        ],
+        "notes": "Header entry remains separate from collection controls. Stats wrap cleanly on phones; full document name stays readable."
+      },
+      {
+        "route": "/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+        "theme": "light",
+        "width": 390,
+        "reviewed_files": [
+          "light-390-collection-viewport.png"
+        ],
+        "notes": "Entry and Seed mission remain readable; action rows wrap on phones. Zero chunks and two documents remain distinct server totals."
+      },
+      {
+        "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+        "theme": "light",
+        "width": 390,
+        "reviewed_files": [
+          "light-390-mission-viewport.png"
+        ],
+        "notes": "Long mission title wraps naturally; entry, review, rerun and result controls retain readable widths. Stored log count and Chicago timestamps are independently checked."
+      },
+      {
+        "route": "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+        "theme": "light",
+        "width": 390,
+        "reviewed_files": [
+          "light-390-report-viewport.png"
+        ],
+        "notes": "Long report title wraps with readable entry/export controls. Server token/chunk/citation totals remain visible; existing long evidence claims make the page tall."
+      },
+      {
+        "route": "/evidence/1da242cc-517e-4fcb-9850-3c620e2b484e",
+        "theme": "light",
+        "width": 390,
+        "reviewed_files": [
+          "light-390-evidence-viewport.png"
+        ],
+        "notes": "Full claim title wraps without squeezing the entry. Captured timestamp reads9/13/2026,6:59:19PM in Chicago, matching the UTC API instant."
+      },
+      {
+        "route": "/graph",
+        "theme": "dark",
+        "width": 1440,
+        "reviewed_files": [
+          "dark-1440-_graph.png"
+        ],
+        "notes": "Root input, helper copy and no-root state are readable; selected Relationships navigation and theme match the shell."
+      },
+      {
+        "route": "/graph?root=project:0afcc588-e722-45bd-8320-f486601b877c",
+        "theme": "dark",
+        "width": 1440,
+        "reviewed_files": [
+          "dark-1440-graph-depth-1-viewport.png",
+          "dark-1440-graph-depth-2-diagram.png"
+        ],
+        "notes": "Full root/node titles and Center here controls remain readable in the list. Group totals are server totals. Diagram labels are abbreviated; depth2 uses an outer ring. At390px the diagram is a collapsed optional overview and the list is the primary surface. Chicago timestamps include correct previous-day conversion for summer UTC dates."
+      },
+      {
+        "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+        "theme": "dark",
+        "width": 1440,
+        "reviewed_files": [
+          "dark-1440-project-viewport.png"
+        ],
+        "notes": "Overview totals have clear labels; the relationships entry sits beside document/mission actions without squeezing them."
+      },
+      {
+        "route": "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+        "theme": "dark",
+        "width": 1440,
+        "reviewed_files": [
+          "dark-1440-document-viewport.png"
+        ],
+        "notes": "Header entry remains separate from collection controls. Stats wrap cleanly on phones; full document name stays readable."
+      },
+      {
+        "route": "/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+        "theme": "dark",
+        "width": 1440,
+        "reviewed_files": [
+          "dark-1440-collection-viewport.png"
+        ],
+        "notes": "Entry and Seed mission remain readable; action rows wrap on phones. Zero chunks and two documents remain distinct server totals."
+      },
+      {
+        "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+        "theme": "dark",
+        "width": 1440,
+        "reviewed_files": [
+          "dark-1440-mission-viewport.png"
+        ],
+        "notes": "Long mission title wraps naturally; entry, review, rerun and result controls retain readable widths. Stored log count and Chicago timestamps are independently checked."
+      },
+      {
+        "route": "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+        "theme": "dark",
+        "width": 1440,
+        "reviewed_files": [
+          "dark-1440-report-viewport.png"
+        ],
+        "notes": "Long report title wraps with readable entry/export controls. Server token/chunk/citation totals remain visible; existing long evidence claims make the page tall."
+      },
+      {
+        "route": "/evidence/1da242cc-517e-4fcb-9850-3c620e2b484e",
+        "theme": "dark",
+        "width": 1440,
+        "reviewed_files": [
+          "dark-1440-evidence-viewport.png"
+        ],
+        "notes": "Full claim title wraps without squeezing the entry. Captured timestamp reads9/13/2026,6:59:19PM in Chicago, matching the UTC API instant."
+      },
+      {
+        "route": "/graph",
+        "theme": "dark",
+        "width": 390,
+        "reviewed_files": [
+          "dark-390-_graph.png"
+        ],
+        "notes": "Root input, helper copy and no-root state are readable; selected Relationships navigation and theme match the shell."
+      },
+      {
+        "route": "/graph?root=project:0afcc588-e722-45bd-8320-f486601b877c",
+        "theme": "dark",
+        "width": 390,
+        "reviewed_files": [
+          "dark-390-graph-depth-1-viewport.png",
+          "dark-390-graph-depth-2-diagram.png",
+          "extra-dark-390-graph-depth-1-list-viewport.png"
+        ],
+        "notes": "Full root/node titles and Center here controls remain readable in the list. Group totals are server totals. Diagram labels are abbreviated; depth2 uses an outer ring. At390px the diagram is a collapsed optional overview and the list is the primary surface. Chicago timestamps include correct previous-day conversion for summer UTC dates."
+      },
+      {
+        "route": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+        "theme": "dark",
+        "width": 390,
+        "reviewed_files": [
+          "dark-390-project-viewport.png"
+        ],
+        "notes": "Overview totals have clear labels; the relationships entry sits beside document/mission actions without squeezing them."
+      },
+      {
+        "route": "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+        "theme": "dark",
+        "width": 390,
+        "reviewed_files": [
+          "dark-390-document-viewport.png"
+        ],
+        "notes": "Header entry remains separate from collection controls. Stats wrap cleanly on phones; full document name stays readable."
+      },
+      {
+        "route": "/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+        "theme": "dark",
+        "width": 390,
+        "reviewed_files": [
+          "dark-390-collection-viewport.png"
+        ],
+        "notes": "Entry and Seed mission remain readable; action rows wrap on phones. Zero chunks and two documents remain distinct server totals."
+      },
+      {
+        "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+        "theme": "dark",
+        "width": 390,
+        "reviewed_files": [
+          "dark-390-mission-viewport.png"
+        ],
+        "notes": "Long mission title wraps naturally; entry, review, rerun and result controls retain readable widths. Stored log count and Chicago timestamps are independently checked."
+      },
+      {
+        "route": "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+        "theme": "dark",
+        "width": 390,
+        "reviewed_files": [
+          "dark-390-report-viewport.png"
+        ],
+        "notes": "Long report title wraps with readable entry/export controls. Server token/chunk/citation totals remain visible; existing long evidence claims make the page tall."
+      },
+      {
+        "route": "/evidence/1da242cc-517e-4fcb-9850-3c620e2b484e",
+        "theme": "dark",
+        "width": 390,
+        "reviewed_files": [
+          "dark-390-evidence-viewport.png"
+        ],
+        "notes": "Full claim title wraps without squeezing the entry. Captured timestamp reads9/13/2026,6:59:19PM in Chicago, matching the UTC API instant."
+      }
+    ],
+    "unresolved_findings": [],
+    "limitations": [
+      "The dense mobile SVG is an overview; full titles and all interaction are in the primary list.",
+      "Existing long authored evidence titles are preserved, so some full-page screenshots are tall."
+    ],
+    "images_opened": 40
+  },
+  "retained_failures": {
+    "expected_red_test": {
+      "reason": "The initial graph unit suite failed because the new page did not exist yet.",
+      "failed_suites": 1,
+      "tests": 0,
+      "path": "/tmp/tracelab-s52-ux11/graph-red.log",
+      "sha256": "d1debf644c3ebf9bc3e22c0aa33daaf95088684203278fb8f75d2425886c10cc"
+    },
+    "first_local_baseline": {
+      "summary": {
+        "base": "http://127.0.0.1:3111",
+        "timezoneId": "America/Chicago",
+        "checkedAt": "2026-09-14T19:00:29.319Z",
+        "checks": 132,
+        "routes": 33,
+        "failures": [
+          {
+            "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+            "theme": "dark",
+            "width": 390
+          },
+          {
+            "route": "/settings",
+            "theme": "dark",
+            "width": 390
+          }
+        ],
+        "internalLinkPaths": [
+          "/",
+          "/404",
+          "/admin/corrections",
+          "/admin/observability",
+          "/admin/spaces",
+          "/admin/users",
+          "/collections",
+          "/collections/06ad13d9-2131-424c-9ca4-d9a11bc9a401",
+          "/collections/093190b6-dbd3-4a31-aa62-a67fab032e9a",
+          "/collections/18301f66-7cc8-405e-91a5-e03845d284e1",
+          "/collections/27fcefd3-a049-46c4-bf81-d5df8a1b0629",
+          "/collections/4af409b7-cb46-4c02-9aff-38b25376bf21",
+          "/collections/4f95814b-8416-473a-9632-bb1601f1a654",
+          "/collections/6680c114-dbce-45c9-9335-2a81a7c16b50",
+          "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+          "/collections/7acc9636-1988-4bd7-b68f-a91b0b862d93",
+          "/collections/7c1b78de-76ed-43a1-ac73-b8bbece848a8",
+          "/collections/907c8a7f-a083-49b0-8015-d5f0b4cfd316",
+          "/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+          "/collections/afac19c4-40f6-4471-bb42-c1a148b7620a",
+          "/collections/bef2b57c-3904-425d-b969-ca7cb8453adc",
+          "/collections/c4e663c6-5d38-4a82-9760-7412fb46a137",
+          "/collections/ca279662-9224-47b7-80d6-341aeda41540",
+          "/collections/df9c1b16-d0a7-401b-ab67-62921d260c05",
+          "/collections/e64e675e-d99f-48f1-9721-92e3f502e795",
+          "/collections/f044f358-49eb-4c6f-ada9-511e3e9abae9",
+          "/collections/f4912548-ce6a-43ba-941e-02c584050b92",
+          "/device",
+          "/documents",
+          "/documents/16bad45e-c426-46bb-8f04-d30a0e94efff",
+          "/documents/1e18775d-48e1-4e32-a59c-8188a176abb9",
+          "/documents/276d7724-d647-430c-9440-9c5b793de5d2",
+          "/documents/2f54e4ba-1ff2-4421-a632-172fe67e80a8",
+          "/documents/471f28f5-7cd3-4b7f-a973-0108f7f7cebd",
+          "/documents/7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+          "/documents/9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+          "/documents/9124e081-59ba-47bb-b34d-96273bd1140a",
+          "/documents/960c52f3-ae2f-4916-9112-51dcf781b470",
+          "/documents/980021d8-41f2-48a7-8731-f939a8f596d9",
+          "/documents/a28eab37-03f3-492e-83fe-f48e502fc223",
+          "/documents/a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+          "/documents/a8b7c2d0-283d-486e-a915-633ca251df29",
+          "/documents/ae3b3a88-b5dc-4130-ac77-a33cfcea388f",
+          "/documents/b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+          "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+          "/documents/d8c50c51-11f7-4649-b214-6aff8ed92521",
+          "/documents/e4f32d07-e596-4c8b-9712-5717a13595ce",
+          "/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+          "/documents/eb3074c0-f37e-4908-ac92-0d26d1882254",
+          "/documents/f40c4015-87d8-461f-80b5-4b9b653e0efb",
+          "/documents/f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+          "/documents/upload",
+          "/evidence",
+          "/evidence/110b0d64-80ca-4c6a-b283-e0e19d2e2063",
+          "/evidence/1aeff4dc-5ab9-4dae-ac6e-9a713b38bab9",
+          "/evidence/1da242cc-517e-4fcb-9850-3c620e2b484e",
+          "/evidence/1e634b05-e218-4c60-a245-b4ff51b785a3",
+          "/evidence/21d22f19-6873-49d2-b662-fdbb024fdc47",
+          "/evidence/2334c0a8-e336-413d-8d55-c69359e44c63",
+          "/evidence/252f4b6f-272b-47c6-9088-3c1708c9cbbb",
+          "/evidence/2e0276ba-e261-44b6-8e13-15091673eeb4",
+          "/evidence/2f6af96a-ccf0-4c2d-8b40-f7d1c396ee76",
+          "/evidence/3108e2b6-5182-495c-a6af-7155c0dcbecf",
+          "/evidence/31f2bf8c-b225-4916-91d4-63e1762447da",
+          "/evidence/362ae5f0-5461-46a1-b24f-676d1c2adfda",
+          "/evidence/3770d155-31a8-47e6-ba9a-54b544653827",
+          "/evidence/3ffa8783-4365-4fbe-84fe-f16c964a6d2f",
+          "/evidence/4671b863-3ff8-4424-941a-d250239aba14",
+          "/evidence/495dde76-f242-4681-90a9-980f82b06168",
+          "/evidence/5a526faf-92df-4956-b827-8c97f5c3a372",
+          "/evidence/5c26d8d2-8d59-4af1-8f92-8235ed6bd83b",
+          "/evidence/60e5d2dd-5814-4ef3-abdb-2269f1b85647",
+          "/evidence/650aafc0-b8cb-4b57-bfcc-5d3a34e3601d",
+          "/evidence/65df244e-9c69-47f9-864a-fa2cd3850783",
+          "/evidence/68ee91e6-7ea0-49e1-8336-84a4b1993565",
+          "/evidence/72314165-2633-46ba-a32a-922e2e8cbcfd",
+          "/evidence/73be8d80-0759-4eed-bbf9-e17ec1636e84",
+          "/evidence/75dfed70-b738-454e-b5b7-2b8b19939c90",
+          "/evidence/7be3e009-12c0-4e4c-b9f9-e4a7b83fd68c",
+          "/evidence/7ca6f0d0-8496-4a3a-805e-d197cf82b14c",
+          "/evidence/7ff28b40-7aeb-4cfe-88ec-6398b08afee8",
+          "/evidence/81d9fae0-03cd-4374-9998-c1d446a5122e",
+          "/evidence/8a8f917b-e654-4791-8c08-7b4c10592ef3",
+          "/evidence/915c6df5-13c4-450c-94a7-ce18662e2911",
+          "/evidence/91b240ec-fbe8-493d-9ddd-88187db132d6",
+          "/evidence/9d8a4b71-3b99-4bdd-86ea-ef1f75ed2d94",
+          "/evidence/a16a9d54-c956-40b7-8297-4f2b20755423",
+          "/evidence/a398d6e9-eba5-48e0-8e85-c7d94a67e9ee",
+          "/evidence/a4bf008f-4ebd-4555-9a61-a979dd0b04a6",
+          "/evidence/ab8cfebb-d898-4ac6-b393-e1c50edf9532",
+          "/evidence/adfe99f8-50e2-4908-b60f-be4afb7a4783",
+          "/evidence/b1f59d0a-9460-4b96-bccf-63ecdb8c6996",
+          "/evidence/ba9fe609-4ef1-4ef9-904f-0cfd703d0aba",
+          "/evidence/bdd6e865-dff9-4a6d-a612-394b13a737d2",
+          "/evidence/c7f090bf-cf77-477d-9b31-f939241a2245",
+          "/evidence/c8103bb0-4c39-49fc-8982-f4ba5245678a",
+          "/evidence/d25298ee-fda9-4930-ba5a-185e88a13aac",
+          "/evidence/d5e0c3c9-3d98-4e45-baf1-9e5a180c58db",
+          "/evidence/e4d1debb-7823-475c-adf0-be676eaa2e3a",
+          "/evidence/e531a960-984f-49f3-9256-9a223d3ee069",
+          "/evidence/ea2b962c-04fc-4eaa-9bca-88eaa0aa47c3",
+          "/evidence/f1e836de-0320-451f-a4f6-36b9df59f2a7",
+          "/evidence/f5c0950f-f5ec-46bc-a45e-4a575f53b3b1",
+          "/evidence/fb4075ee-24b9-43f7-9f38-ff1b1604ae90",
+          "/graph",
+          "/missions",
+          "/missions/0b074e6a-f859-444c-b748-fdd08387e384",
+          "/missions/0b5f8651-5d86-4968-bd98-e57ed7e84901",
+          "/missions/1d8e48d8-da57-48a8-a67c-1aef5f918a34",
+          "/missions/27cbe849-a801-49ef-8cb5-bfa891ade2bd",
+          "/missions/2fefe37d-3c77-4b67-805c-00b38aec6d7d",
+          "/missions/39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+          "/missions/54ca4557-763b-4091-a0bd-95b9f19e2132",
+          "/missions/57055608-4127-4dd6-914e-7fea6d4f9754",
+          "/missions/6a9c8707-dfe7-4cab-a9cf-d3b72b294a67",
+          "/missions/75b99744-6dfc-4533-af54-105980f38b04",
+          "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+          "/missions/83b9ee6e-f3af-4e7e-9515-d69d54fd47c0",
+          "/missions/9372bdee-eb7b-4cd3-9535-138a34ad3f62",
+          "/missions/952cc1de-688c-415b-bee9-ce143a753af2",
+          "/missions/aa403ba0-0e27-4872-8723-0716f2beb8f2",
+          "/missions/cbcd46bc-de17-4c6c-8391-b1669403fc74",
+          "/missions/cea71e51-a268-46c3-a2ba-84e2cf045217",
+          "/missions/d8340572-e8d2-47fe-a303-395f06f304c2",
+          "/missions/dd966b0c-a33c-4bb2-9dc2-195d0e0d6675",
+          "/missions/f99ea146-1b11-4bc3-9e36-0b35a03546a7",
+          "/missions/new",
+          "/projects",
+          "/projects/041489e1-bb62-4bbe-bb57-90a924fce867",
+          "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+          "/projects/0f5c295f-6ac0-4bc9-823f-32f2306d6f2d",
+          "/projects/1ca2ce70-e6c2-4593-aeb8-b4aa9f3fff01",
+          "/projects/4500cb98-7ca0-4703-b557-f9726c273f57",
+          "/projects/59f606db-9db8-4ba9-a200-c9b66c650f2a",
+          "/projects/5b03d540-3b3a-4762-819a-44dab5261da7",
+          "/projects/6dc4d8b7-06f0-48ba-a2bd-bcf60c6f75da",
+          "/projects/8a5e3763-8249-4194-97d0-cda0e5ff0672",
+          "/projects/959cfd13-fbd8-4277-beae-df57b3e68d0e",
+          "/projects/a38e85ca-5c94-44c7-a723-9b7ebf7fad59",
+          "/projects/b1983379-f0ab-4ea0-9645-f1e180342d72",
+          "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+          "/projects/fbdfcca1-fce5-447b-b081-17761e52b173",
+          "/reports",
+          "/reports/00b0e4ed-270f-40fd-b1c1-756d99415700",
+          "/reports/039d5c3d-7ad0-4936-9789-32d422a2bec6",
+          "/reports/0613ab1a-1ae7-4784-bf03-579023d4a20f",
+          "/reports/11823386-c4d7-4c3e-847e-365d464a8425",
+          "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+          "/reports/28b2a481-3d77-4659-8e46-ebd4dceceb1a",
+          "/reports/41fff966-1c62-4921-87b4-f8ec4f486927",
+          "/reports/470c666d-5274-4d40-9e0f-c55ed97740fd",
+          "/reports/489c778e-8f18-4b75-abd4-a75635feb8bf",
+          "/reports/56b700a2-35c4-465e-8125-e2a63e83c6f5",
+          "/reports/64dab59f-8684-42fe-93dd-03c62a255c64",
+          "/reports/65ce8a0b-17b2-4598-876a-9791a06adcbe",
+          "/reports/6636c940-ab9f-41a5-a84c-170d1bf9e609",
+          "/reports/8a519cd2-3e88-49a4-9c30-d74a8d62b89a",
+          "/reports/8af4f590-687e-4df5-919f-df6395bade33",
+          "/reports/8e0f2a64-a29b-4483-86b3-7479ff284d12",
+          "/reports/955eb67e-6142-4c91-80f9-dc411258f66d",
+          "/reports/964532c5-ea10-4fef-a164-697aef3881b4",
+          "/reports/b4279f55-2ec7-46c5-bed7-d7550e60464d",
+          "/reports/b7e144ca-a1c2-422a-84c8-59f35bf1d61b",
+          "/reports/c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+          "/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+          "/reports/fa1d8733-f7ea-4483-97d8-12693318b108",
+          "/reports/fb69cbfc-dd02-4167-a89a-ca9cfbb252b5",
+          "/reports/ffe8436e-3d95-42e4-be82-a45acec7dd78",
+          "/saved-searches",
+          "/search",
+          "/settings"
+        ],
+        "legacyInternalLinks": [],
+        "readOnly": true,
+        "directProductionApi": false,
+        "readOnlyApiProxy": true
+      },
+      "failed_rows": [
+        {
+          "route": "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+          "themeRequested": "dark",
+          "theme": "dark",
+          "width": 390,
+          "status": 200,
+          "finalUrl": "http://127.0.0.1:3111/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+          "scrollWidth": 390,
+          "mainCount": 1,
+          "shellPresent": true,
+          "background": "lab(4.99698 11.622 7.55533)",
+          "overflow": [],
+          "violations": [],
+          "internalLinks": [
+            "/",
+            "/admin/observability",
+            "/admin/spaces",
+            "/admin/users",
+            "/collections",
+            "/documents",
+            "/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+            "/evidence",
+            "/graph",
+            "/missions",
+            "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+            "/projects",
+            "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+            "/reports",
+            "/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+            "/saved-searches",
+            "/search",
+            "/settings"
+          ],
+          "legacyInternalLinks": [],
+          "errors": [],
+          "transportErrors": [
+            {
+              "path": "/api/v1/missions/events/recent",
+              "status": 502
+            }
+          ],
+          "navigationCancellations": [],
+          "screenshot": "dark-390-_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png"
+        },
+        {
+          "route": "/settings",
+          "themeRequested": "dark",
+          "theme": "dark",
+          "width": 390,
+          "status": 200,
+          "finalUrl": "http://127.0.0.1:3111/settings",
+          "scrollWidth": 390,
+          "mainCount": 1,
+          "shellPresent": true,
+          "background": "lab(4.99698 11.622 7.55533)",
+          "overflow": [],
+          "violations": [],
+          "internalLinks": [
+            "/",
+            "/admin/observability",
+            "/admin/spaces",
+            "/admin/users",
+            "/collections",
+            "/documents",
+            "/evidence",
+            "/graph",
+            "/missions",
+            "/projects",
+            "/reports",
+            "/saved-searches",
+            "/search",
+            "/settings"
+          ],
+          "legacyInternalLinks": [],
+          "errors": [],
+          "transportErrors": [
+            {
+              "path": "/api/v1/auth/invite-codes",
+              "status": 502
+            }
+          ],
+          "navigationCancellations": [],
+          "screenshot": "dark-390-_settings.png"
+        }
+      ],
+      "targeted_rechecks": [
+        {
+          "base": "http://127.0.0.1:3111",
+          "timezoneId": "America/Chicago",
+          "checkedAt": "2026-09-14T19:06:27.495Z",
+          "checks": 1,
+          "routes": 1,
+          "failures": [],
+          "internalLinkPaths": [
+            "/",
+            "/admin/observability",
+            "/admin/spaces",
+            "/admin/users",
+            "/collections",
+            "/documents",
+            "/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+            "/evidence",
+            "/graph",
+            "/missions",
+            "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+            "/projects",
+            "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+            "/reports",
+            "/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+            "/saved-searches",
+            "/search",
+            "/settings"
+          ],
+          "legacyInternalLinks": [],
+          "readOnly": true,
+          "directProductionApi": false,
+          "readOnlyApiProxy": true
+        },
+        {
+          "base": "http://127.0.0.1:3111",
+          "timezoneId": "America/Chicago",
+          "checkedAt": "2026-09-14T19:06:33.862Z",
+          "checks": 1,
+          "routes": 1,
+          "failures": [],
+          "internalLinkPaths": [
+            "/",
+            "/admin/observability",
+            "/admin/spaces",
+            "/admin/users",
+            "/collections",
+            "/documents",
+            "/evidence",
+            "/graph",
+            "/missions",
+            "/projects",
+            "/reports",
+            "/saved-searches",
+            "/search",
+            "/settings"
+          ],
+          "legacyInternalLinks": [],
+          "readOnly": true,
+          "directProductionApi": false,
+          "readOnlyApiProxy": true
+        }
+      ],
+      "final_full_rerun": "132 checks,33 routes,0 failures"
+    },
+    "audit_harness_authoring": [
+      "First card locator selected the Documents navigation item.",
+      "Second locator selected the document Chunks tab. Restricting metric-label matches to content P/DIV elements resolved both; no application mismatch was found."
+    ],
+    "first_pr_mcp_audit": {
+      "run_id": 34885095502,
+      "head_sha": "340e52972f21315f1b44c57c2144c2d3e60bddcf",
+      "errors": [
+        "Unclassified graphApi.neighborhood operation",
+        "Stale navigationApi.search consumer inventory"
+      ],
+      "resolution": "Reconciled the two manifest rows; the exact-main advisory and parity regression tests pass.",
+      "path": "/tmp/tracelab-s52-ux11/pr-mcp-failure.log",
+      "sha256": "ffb0ca9ce0c5f2ab0e0091c61ace0046940c01a60e5a4f0422998b35ab5a3f97"
+    }
+  },
+  "definition_of_done": {
+    "1": "Exact main-push production build and deployed public smoke pass.",
+    "2": "All132 baseline PNGs archived, including all8 touched routes at both widths/themes; extra diagram/viewport inspection images included.",
+    "3": "Zero baseline overflow, critical/serious axe findings, browser errors or API errors.",
+    "4": "Graph group totals checked against independent project stats, mission pagination and evidence totals; detail metric checks and node timestamps recorded in active-data-audit.json.",
+    "5": "Graph loading, empty, retry, missing and forbidden states tested; no alert/confirm in touched files.",
+    "6": "Semantic token classes/CSS variables only; check:tokens passes.",
+    "7": "New route; no migration required. Existing8-row route map unchanged and16 alias checks pass.",
+    "8": "Direct-browser baseline ran after both exact-SHA Railway deployments reported SUCCESS; deployment IDs above.",
+    "9": "All8 touched routes reviewed in Light/Dark at1440/390 under America/Chicago; full list titles, readable controls, clamped diagram labels and timestamp checks recorded."
+  },
+  "limitations": [
+    "High contrast remains out of scope under THEME-2/Sprint54.",
+    "Graph neighborhoods are capped at12 per relation and60 nodes in the UI. Full accessible totals remain visible; re-centering explores additional neighborhoods.",
+    "Long evidence titles remain complete in the list, so real-data pages can be tall. Diagram labels are intentionally abbreviated; the list provides full names and actions.",
+    "Existing backend skips/quarantines are explicitly listed in the cited CI console summaries; local/new frontend, browser, graph and parity tests have zero skips.",
+    "The new graph MCP read remains pending MCP-2 per the sprint plan. No npm publication occurred in this UI mission."
+  ],
+  "receipt_acceptance": "CMOS remains In Progress until this receipt is merged on main. Completion must cite this receipt’s own PR and merge SHA, then exact receipt-carrier main-push CI, both Railway SUCCESS deployment IDs and production smoke; those immutable post-merge facts are recorded in CMOS session closure."
+}

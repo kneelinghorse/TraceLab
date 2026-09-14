@@ -1,0 +1,3143 @@
+[
+  {
+    "stage": "preflight",
+    "name": "credential scope",
+    "passed": true
+  },
+  {
+    "stage": "preflight",
+    "name": "GET /missions",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "preflight",
+    "name": "GET /documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "preflight",
+    "name": "GET /projects/0afcc588-e722-45bd-8320-f486601b877c/stats",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "preflight",
+    "name": "GET /auth/me",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "preflight",
+    "name": "GET /missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "preflight",
+    "name": "GET /reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "preflight",
+    "name": "GET /evidence",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "preflight",
+    "name": "GET /collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "preflight",
+    "name": "GET /collections/a3e6d809-af90-4652-903f-5ce5c8842bf8/documents",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "preflight",
+    "name": "GET /evidence/1da242cc-517e-4fcb-9850-3c620e2b484e",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "preflight",
+    "name": "GET /evidence",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "preflight",
+    "name": "GET /evidence",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "preflight",
+    "name": "GET /evidence",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "preflight",
+    "name": "GET /missions/7b847edd-5433-4237-a899-57b47e6edf0a/logs",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "preflight",
+    "name": "GET /graph/neighborhood",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "one main",
+    "passed": true
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph server group totals",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c:documents",
+    "expected": {
+      "total": 23,
+      "shown": 12
+    },
+    "displayed": {
+      "total": 23,
+      "shown": 12,
+      "text": "12 of 23 shown"
+    }
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph independent aggregate documents",
+    "passed": true,
+    "value": 23
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph server group totals",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c:missions",
+    "expected": {
+      "total": 3,
+      "shown": 3
+    },
+    "displayed": {
+      "total": 3,
+      "shown": 3,
+      "text": "3 of 3 shown"
+    }
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph independent aggregate missions",
+    "passed": true,
+    "value": 3
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph server group totals",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c:reports",
+    "expected": {
+      "total": 3,
+      "shown": 3
+    },
+    "displayed": {
+      "total": 3,
+      "shown": 3,
+      "text": "3 of 3 shown"
+    }
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph independent aggregate reports",
+    "passed": true,
+    "value": 3
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph server group totals",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c:evidence",
+    "expected": {
+      "total": 547,
+      "shown": 12
+    },
+    "displayed": {
+      "total": 547,
+      "shown": 12,
+      "text": "12 of 547 shown"
+    }
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph independent aggregate evidence",
+    "passed": true,
+    "value": 547
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "diagram/list node equivalence",
+    "passed": true
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "every edge has list row",
+    "passed": true,
+    "edges": 30
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c",
+    "api": "2025-12-10T17:24:50.306282+00:00",
+    "displayed": "12/10/2025, 11:24:50 AM",
+    "expected": "12/10/2025, 11:24:50 AM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:16bad45e-c426-46bb-8f04-d30a0e94efff"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:16bad45e-c426-46bb-8f04-d30a0e94efff",
+    "value": 3
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:16bad45e-c426-46bb-8f04-d30a0e94efff",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:471f28f5-7cd3-4b7f-a973-0108f7f7cebd"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:471f28f5-7cd3-4b7f-a973-0108f7f7cebd",
+    "value": 20
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:471f28f5-7cd3-4b7f-a973-0108f7f7cebd",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+    "value": 17
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:9099ee49-43a8-44bd-a4c7-a779ce9cbee2"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+    "value": 19
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:9124e081-59ba-47bb-b34d-96273bd1140a"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:9124e081-59ba-47bb-b34d-96273bd1140a",
+    "value": 9
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:9124e081-59ba-47bb-b34d-96273bd1140a",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:a28eab37-03f3-492e-83fe-f48e502fc223"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:a28eab37-03f3-492e-83fe-f48e502fc223",
+    "value": 9
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:a28eab37-03f3-492e-83fe-f48e502fc223",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:a86d36c7-80ca-4753-91dd-6f92c5a81c47"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+    "value": 18
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+    "value": 26
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:d8c50c51-11f7-4649-b214-6aff8ed92521"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:d8c50c51-11f7-4649-b214-6aff8ed92521",
+    "value": 20
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:d8c50c51-11f7-4649-b214-6aff8ed92521",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:e4f32d07-e596-4c8b-9712-5717a13595ce"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:e4f32d07-e596-4c8b-9712-5717a13595ce",
+    "value": 21
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:e4f32d07-e596-4c8b-9712-5717a13595ce",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:f40c4015-87d8-461f-80b5-4b9b653e0efb"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:f40c4015-87d8-461f-80b5-4b9b653e0efb",
+    "value": 16
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:f40c4015-87d8-461f-80b5-4b9b653e0efb",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:f6c0f798-8c3a-4d1e-b8ea-0633a4d22801"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+    "value": 45
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "mission:39b44c86-2e2b-4d19-bf3f-e069db5f1a76"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "mission:39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+    "api": "2026-09-13T23:59:19.396824+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "mission:7b847edd-5433-4237-a899-57b47e6edf0a"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "mission:7b847edd-5433-4237-a899-57b47e6edf0a",
+    "api": "2026-09-12T15:42:11.563944+00:00",
+    "displayed": "9/12/2026, 10:42:11 AM",
+    "expected": "9/12/2026, 10:42:11 AM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "mission:952cc1de-688c-415b-bee9-ce143a753af2"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "mission:952cc1de-688c-415b-bee9-ce143a753af2",
+    "api": "2026-09-13T20:25:42.019326+00:00",
+    "displayed": "9/13/2026, 3:25:42 PM",
+    "expected": "9/13/2026, 3:25:42 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "report:0613ab1a-1ae7-4784-bf03-579023d4a20f"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "report:0613ab1a-1ae7-4784-bf03-579023d4a20f",
+    "api": "2026-09-13T23:59:19.196123+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "report:c2b3bc43-b25c-481e-80d7-02a6afc76e27"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "report:c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+    "api": "2026-09-13T20:25:41.967641+00:00",
+    "displayed": "9/13/2026, 3:25:41 PM",
+    "expected": "9/13/2026, 3:25:41 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "report:f4d46a82-2e25-4f5c-a2f8-68d565ad51be"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "report:f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+    "api": "2026-09-12T15:42:11.477630+00:00",
+    "displayed": "9/12/2026, 10:42:11 AM",
+    "expected": "9/12/2026, 10:42:11 AM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:1aeff4dc-5ab9-4dae-ac6e-9a713b38bab9"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:1aeff4dc-5ab9-4dae-ac6e-9a713b38bab9",
+    "api": "2026-09-13T23:59:19.777356+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:1da242cc-517e-4fcb-9850-3c620e2b484e"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:1da242cc-517e-4fcb-9850-3c620e2b484e",
+    "api": "2026-09-13T23:59:19.777593+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:2e0276ba-e261-44b6-8e13-15091673eeb4"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:2e0276ba-e261-44b6-8e13-15091673eeb4",
+    "api": "2026-09-13T23:59:19.777380+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:31f2bf8c-b225-4916-91d4-63e1762447da"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:31f2bf8c-b225-4916-91d4-63e1762447da",
+    "api": "2026-09-13T23:59:19.777360+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:60e5d2dd-5814-4ef3-abdb-2269f1b85647"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:60e5d2dd-5814-4ef3-abdb-2269f1b85647",
+    "api": "2026-09-13T20:25:42.945191+00:00",
+    "displayed": "9/13/2026, 3:25:42 PM",
+    "expected": "9/13/2026, 3:25:42 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:68ee91e6-7ea0-49e1-8336-84a4b1993565"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:68ee91e6-7ea0-49e1-8336-84a4b1993565",
+    "api": "2026-09-13T23:59:19.777591+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:75dfed70-b738-454e-b5b7-2b8b19939c90"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:75dfed70-b738-454e-b5b7-2b8b19939c90",
+    "api": "2026-09-13T23:59:19.777362+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:7be3e009-12c0-4e4c-b9f9-e4a7b83fd68c"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:7be3e009-12c0-4e4c-b9f9-e4a7b83fd68c",
+    "api": "2026-09-13T23:59:19.777365+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:ab8cfebb-d898-4ac6-b393-e1c50edf9532"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:ab8cfebb-d898-4ac6-b393-e1c50edf9532",
+    "api": "2026-09-13T23:59:19.777590+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:bdd6e865-dff9-4a6d-a612-394b13a737d2"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:bdd6e865-dff9-4a6d-a612-394b13a737d2",
+    "api": "2026-09-13T23:59:19.777588+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:c8103bb0-4c39-49fc-8982-f4ba5245678a"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:c8103bb0-4c39-49fc-8982-f4ba5245678a",
+    "api": "2026-09-13T23:59:19.777382+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:fb4075ee-24b9-43f7-9f38-ff1b1604ae90"
+  },
+  {
+    "stage": "light-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:fb4075ee-24b9-43f7-9f38-ff1b1604ae90",
+    "api": "2026-09-12T15:42:12.413901+00:00",
+    "displayed": "9/12/2026, 10:42:12 AM",
+    "expected": "9/12/2026, 10:42:12 AM"
+  },
+  {
+    "stage": "light-1440-mission",
+    "name": "one main",
+    "passed": true
+  },
+  {
+    "stage": "light-1440-mission",
+    "name": "canonical detail entry link",
+    "passed": true,
+    "type": "mission"
+  },
+  {
+    "stage": "light-1440-mission",
+    "name": "bounded mission log count",
+    "passed": true,
+    "expected": "Last 14 recorded lines"
+  },
+  {
+    "stage": "light-1440-mission",
+    "name": "Chicago mission log timestamps",
+    "passed": true,
+    "count": 14,
+    "expected": [
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:11 AM"
+    ],
+    "displayed": [
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:11 AM"
+    ]
+  },
+  {
+    "stage": "light-1440-mission",
+    "name": "Sources collected matches API",
+    "passed": true,
+    "expected": 178,
+    "displayed": "Sources collected\n\n178"
+  },
+  {
+    "stage": "light-1440-mission",
+    "name": "References matches API",
+    "passed": true,
+    "expected": 19,
+    "displayed": "References\n\n19"
+  },
+  {
+    "stage": "light-1440-mission",
+    "name": "Agent steps matches API",
+    "passed": true,
+    "expected": "37 / 40",
+    "displayed": "Agent steps\n\n37 / 40"
+  },
+  {
+    "stage": "light-1440-mission",
+    "name": "Distinct domains matches API",
+    "passed": true,
+    "expected": 108,
+    "displayed": "Distinct domains\n\n108"
+  },
+  {
+    "stage": "light-1440-mission",
+    "name": "Runtime matches API",
+    "passed": true,
+    "expected": "10m 23s",
+    "displayed": "Runtime\n\n10m 23s"
+  },
+  {
+    "stage": "light-1440-mission",
+    "name": "no invented mission steps",
+    "passed": true,
+    "expected": "Step progress unknown"
+  },
+  {
+    "stage": "light-1440-mission",
+    "name": "no invented mission percentage",
+    "passed": true,
+    "expected": "Percentage unknown"
+  },
+  {
+    "stage": "light-1440-mission",
+    "name": "no browser/API errors",
+    "passed": true,
+    "errors": []
+  },
+  {
+    "stage": "light-1440-mission",
+    "name": "GET /graph/neighborhood",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "one main",
+    "passed": true
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph server group totals",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c:documents",
+    "expected": {
+      "total": 23,
+      "shown": 12
+    },
+    "displayed": {
+      "total": 23,
+      "shown": 12,
+      "text": "12 of 23 shown"
+    }
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph independent aggregate documents",
+    "passed": true,
+    "value": 23
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph server group totals",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c:missions",
+    "expected": {
+      "total": 3,
+      "shown": 3
+    },
+    "displayed": {
+      "total": 3,
+      "shown": 3,
+      "text": "3 of 3 shown"
+    }
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph independent aggregate missions",
+    "passed": true,
+    "value": 3
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph server group totals",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c:reports",
+    "expected": {
+      "total": 3,
+      "shown": 3
+    },
+    "displayed": {
+      "total": 3,
+      "shown": 3,
+      "text": "3 of 3 shown"
+    }
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph independent aggregate reports",
+    "passed": true,
+    "value": 3
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph server group totals",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c:evidence",
+    "expected": {
+      "total": 547,
+      "shown": 12
+    },
+    "displayed": {
+      "total": 547,
+      "shown": 12,
+      "text": "12 of 547 shown"
+    }
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph independent aggregate evidence",
+    "passed": true,
+    "value": 547
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "diagram/list node equivalence",
+    "passed": true
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "every edge has list row",
+    "passed": true,
+    "edges": 30
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c",
+    "api": "2025-12-10T17:24:50.306282+00:00",
+    "displayed": "12/10/2025, 11:24:50 AM",
+    "expected": "12/10/2025, 11:24:50 AM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:16bad45e-c426-46bb-8f04-d30a0e94efff"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:16bad45e-c426-46bb-8f04-d30a0e94efff",
+    "value": 3
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:16bad45e-c426-46bb-8f04-d30a0e94efff",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:471f28f5-7cd3-4b7f-a973-0108f7f7cebd"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:471f28f5-7cd3-4b7f-a973-0108f7f7cebd",
+    "value": 20
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:471f28f5-7cd3-4b7f-a973-0108f7f7cebd",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+    "value": 17
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:9099ee49-43a8-44bd-a4c7-a779ce9cbee2"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+    "value": 19
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:9124e081-59ba-47bb-b34d-96273bd1140a"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:9124e081-59ba-47bb-b34d-96273bd1140a",
+    "value": 9
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:9124e081-59ba-47bb-b34d-96273bd1140a",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:a28eab37-03f3-492e-83fe-f48e502fc223"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:a28eab37-03f3-492e-83fe-f48e502fc223",
+    "value": 9
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:a28eab37-03f3-492e-83fe-f48e502fc223",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:a86d36c7-80ca-4753-91dd-6f92c5a81c47"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+    "value": 18
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+    "value": 26
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:d8c50c51-11f7-4649-b214-6aff8ed92521"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:d8c50c51-11f7-4649-b214-6aff8ed92521",
+    "value": 20
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:d8c50c51-11f7-4649-b214-6aff8ed92521",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:e4f32d07-e596-4c8b-9712-5717a13595ce"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:e4f32d07-e596-4c8b-9712-5717a13595ce",
+    "value": 21
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:e4f32d07-e596-4c8b-9712-5717a13595ce",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:f40c4015-87d8-461f-80b5-4b9b653e0efb"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:f40c4015-87d8-461f-80b5-4b9b653e0efb",
+    "value": 16
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:f40c4015-87d8-461f-80b5-4b9b653e0efb",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:f6c0f798-8c3a-4d1e-b8ea-0633a4d22801"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+    "value": 45
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "mission:39b44c86-2e2b-4d19-bf3f-e069db5f1a76"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "mission:39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+    "api": "2026-09-13T23:59:19.396824+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "mission:7b847edd-5433-4237-a899-57b47e6edf0a"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "mission:7b847edd-5433-4237-a899-57b47e6edf0a",
+    "api": "2026-09-12T15:42:11.563944+00:00",
+    "displayed": "9/12/2026, 10:42:11 AM",
+    "expected": "9/12/2026, 10:42:11 AM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "mission:952cc1de-688c-415b-bee9-ce143a753af2"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "mission:952cc1de-688c-415b-bee9-ce143a753af2",
+    "api": "2026-09-13T20:25:42.019326+00:00",
+    "displayed": "9/13/2026, 3:25:42 PM",
+    "expected": "9/13/2026, 3:25:42 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "report:0613ab1a-1ae7-4784-bf03-579023d4a20f"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "report:0613ab1a-1ae7-4784-bf03-579023d4a20f",
+    "api": "2026-09-13T23:59:19.196123+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "report:c2b3bc43-b25c-481e-80d7-02a6afc76e27"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "report:c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+    "api": "2026-09-13T20:25:41.967641+00:00",
+    "displayed": "9/13/2026, 3:25:41 PM",
+    "expected": "9/13/2026, 3:25:41 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "report:f4d46a82-2e25-4f5c-a2f8-68d565ad51be"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "report:f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+    "api": "2026-09-12T15:42:11.477630+00:00",
+    "displayed": "9/12/2026, 10:42:11 AM",
+    "expected": "9/12/2026, 10:42:11 AM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:1aeff4dc-5ab9-4dae-ac6e-9a713b38bab9"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:1aeff4dc-5ab9-4dae-ac6e-9a713b38bab9",
+    "api": "2026-09-13T23:59:19.777356+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:1da242cc-517e-4fcb-9850-3c620e2b484e"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:1da242cc-517e-4fcb-9850-3c620e2b484e",
+    "api": "2026-09-13T23:59:19.777593+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:2e0276ba-e261-44b6-8e13-15091673eeb4"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:2e0276ba-e261-44b6-8e13-15091673eeb4",
+    "api": "2026-09-13T23:59:19.777380+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:31f2bf8c-b225-4916-91d4-63e1762447da"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:31f2bf8c-b225-4916-91d4-63e1762447da",
+    "api": "2026-09-13T23:59:19.777360+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:60e5d2dd-5814-4ef3-abdb-2269f1b85647"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:60e5d2dd-5814-4ef3-abdb-2269f1b85647",
+    "api": "2026-09-13T20:25:42.945191+00:00",
+    "displayed": "9/13/2026, 3:25:42 PM",
+    "expected": "9/13/2026, 3:25:42 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:68ee91e6-7ea0-49e1-8336-84a4b1993565"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:68ee91e6-7ea0-49e1-8336-84a4b1993565",
+    "api": "2026-09-13T23:59:19.777591+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:75dfed70-b738-454e-b5b7-2b8b19939c90"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:75dfed70-b738-454e-b5b7-2b8b19939c90",
+    "api": "2026-09-13T23:59:19.777362+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:7be3e009-12c0-4e4c-b9f9-e4a7b83fd68c"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:7be3e009-12c0-4e4c-b9f9-e4a7b83fd68c",
+    "api": "2026-09-13T23:59:19.777365+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:ab8cfebb-d898-4ac6-b393-e1c50edf9532"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:ab8cfebb-d898-4ac6-b393-e1c50edf9532",
+    "api": "2026-09-13T23:59:19.777590+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:bdd6e865-dff9-4a6d-a612-394b13a737d2"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:bdd6e865-dff9-4a6d-a612-394b13a737d2",
+    "api": "2026-09-13T23:59:19.777588+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:c8103bb0-4c39-49fc-8982-f4ba5245678a"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:c8103bb0-4c39-49fc-8982-f4ba5245678a",
+    "api": "2026-09-13T23:59:19.777382+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:fb4075ee-24b9-43f7-9f38-ff1b1604ae90"
+  },
+  {
+    "stage": "light-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:fb4075ee-24b9-43f7-9f38-ff1b1604ae90",
+    "api": "2026-09-12T15:42:12.413901+00:00",
+    "displayed": "9/12/2026, 10:42:12 AM",
+    "expected": "9/12/2026, 10:42:12 AM"
+  },
+  {
+    "stage": "light-390-mission",
+    "name": "one main",
+    "passed": true
+  },
+  {
+    "stage": "light-390-mission",
+    "name": "canonical detail entry link",
+    "passed": true,
+    "type": "mission"
+  },
+  {
+    "stage": "light-390-mission",
+    "name": "bounded mission log count",
+    "passed": true,
+    "expected": "Last 14 recorded lines"
+  },
+  {
+    "stage": "light-390-mission",
+    "name": "Chicago mission log timestamps",
+    "passed": true,
+    "count": 14,
+    "expected": [
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:11 AM"
+    ],
+    "displayed": [
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:11 AM"
+    ]
+  },
+  {
+    "stage": "light-390-mission",
+    "name": "Sources collected matches API",
+    "passed": true,
+    "expected": 178,
+    "displayed": "Sources collected\n\n178"
+  },
+  {
+    "stage": "light-390-mission",
+    "name": "References matches API",
+    "passed": true,
+    "expected": 19,
+    "displayed": "References\n\n19"
+  },
+  {
+    "stage": "light-390-mission",
+    "name": "Agent steps matches API",
+    "passed": true,
+    "expected": "37 / 40",
+    "displayed": "Agent steps\n\n37 / 40"
+  },
+  {
+    "stage": "light-390-mission",
+    "name": "Distinct domains matches API",
+    "passed": true,
+    "expected": 108,
+    "displayed": "Distinct domains\n\n108"
+  },
+  {
+    "stage": "light-390-mission",
+    "name": "Runtime matches API",
+    "passed": true,
+    "expected": "10m 23s",
+    "displayed": "Runtime\n\n10m 23s"
+  },
+  {
+    "stage": "light-390-mission",
+    "name": "no invented mission steps",
+    "passed": true,
+    "expected": "Step progress unknown"
+  },
+  {
+    "stage": "light-390-mission",
+    "name": "no invented mission percentage",
+    "passed": true,
+    "expected": "Percentage unknown"
+  },
+  {
+    "stage": "light-390-mission",
+    "name": "no browser/API errors",
+    "passed": true,
+    "errors": []
+  },
+  {
+    "stage": "light-390-mission",
+    "name": "GET /graph/neighborhood",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "one main",
+    "passed": true
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph server group totals",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c:documents",
+    "expected": {
+      "total": 23,
+      "shown": 12
+    },
+    "displayed": {
+      "total": 23,
+      "shown": 12,
+      "text": "12 of 23 shown"
+    }
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph independent aggregate documents",
+    "passed": true,
+    "value": 23
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph server group totals",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c:missions",
+    "expected": {
+      "total": 3,
+      "shown": 3
+    },
+    "displayed": {
+      "total": 3,
+      "shown": 3,
+      "text": "3 of 3 shown"
+    }
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph independent aggregate missions",
+    "passed": true,
+    "value": 3
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph server group totals",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c:reports",
+    "expected": {
+      "total": 3,
+      "shown": 3
+    },
+    "displayed": {
+      "total": 3,
+      "shown": 3,
+      "text": "3 of 3 shown"
+    }
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph independent aggregate reports",
+    "passed": true,
+    "value": 3
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph server group totals",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c:evidence",
+    "expected": {
+      "total": 547,
+      "shown": 12
+    },
+    "displayed": {
+      "total": 547,
+      "shown": 12,
+      "text": "12 of 547 shown"
+    }
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph independent aggregate evidence",
+    "passed": true,
+    "value": 547
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "diagram/list node equivalence",
+    "passed": true
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "every edge has list row",
+    "passed": true,
+    "edges": 30
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c",
+    "api": "2025-12-10T17:24:50.306282+00:00",
+    "displayed": "12/10/2025, 11:24:50 AM",
+    "expected": "12/10/2025, 11:24:50 AM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:16bad45e-c426-46bb-8f04-d30a0e94efff"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:16bad45e-c426-46bb-8f04-d30a0e94efff",
+    "value": 3
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:16bad45e-c426-46bb-8f04-d30a0e94efff",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:471f28f5-7cd3-4b7f-a973-0108f7f7cebd"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:471f28f5-7cd3-4b7f-a973-0108f7f7cebd",
+    "value": 20
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:471f28f5-7cd3-4b7f-a973-0108f7f7cebd",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+    "value": 17
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:9099ee49-43a8-44bd-a4c7-a779ce9cbee2"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+    "value": 19
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:9124e081-59ba-47bb-b34d-96273bd1140a"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:9124e081-59ba-47bb-b34d-96273bd1140a",
+    "value": 9
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:9124e081-59ba-47bb-b34d-96273bd1140a",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:a28eab37-03f3-492e-83fe-f48e502fc223"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:a28eab37-03f3-492e-83fe-f48e502fc223",
+    "value": 9
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:a28eab37-03f3-492e-83fe-f48e502fc223",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:a86d36c7-80ca-4753-91dd-6f92c5a81c47"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+    "value": 18
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+    "value": 26
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:d8c50c51-11f7-4649-b214-6aff8ed92521"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:d8c50c51-11f7-4649-b214-6aff8ed92521",
+    "value": 20
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:d8c50c51-11f7-4649-b214-6aff8ed92521",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:e4f32d07-e596-4c8b-9712-5717a13595ce"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:e4f32d07-e596-4c8b-9712-5717a13595ce",
+    "value": 21
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:e4f32d07-e596-4c8b-9712-5717a13595ce",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:f40c4015-87d8-461f-80b5-4b9b653e0efb"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:f40c4015-87d8-461f-80b5-4b9b653e0efb",
+    "value": 16
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:f40c4015-87d8-461f-80b5-4b9b653e0efb",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:f6c0f798-8c3a-4d1e-b8ea-0633a4d22801"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+    "value": 45
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "mission:39b44c86-2e2b-4d19-bf3f-e069db5f1a76"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "mission:39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+    "api": "2026-09-13T23:59:19.396824+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "mission:7b847edd-5433-4237-a899-57b47e6edf0a"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "mission:7b847edd-5433-4237-a899-57b47e6edf0a",
+    "api": "2026-09-12T15:42:11.563944+00:00",
+    "displayed": "9/12/2026, 10:42:11 AM",
+    "expected": "9/12/2026, 10:42:11 AM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "mission:952cc1de-688c-415b-bee9-ce143a753af2"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "mission:952cc1de-688c-415b-bee9-ce143a753af2",
+    "api": "2026-09-13T20:25:42.019326+00:00",
+    "displayed": "9/13/2026, 3:25:42 PM",
+    "expected": "9/13/2026, 3:25:42 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "report:0613ab1a-1ae7-4784-bf03-579023d4a20f"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "report:0613ab1a-1ae7-4784-bf03-579023d4a20f",
+    "api": "2026-09-13T23:59:19.196123+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "report:c2b3bc43-b25c-481e-80d7-02a6afc76e27"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "report:c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+    "api": "2026-09-13T20:25:41.967641+00:00",
+    "displayed": "9/13/2026, 3:25:41 PM",
+    "expected": "9/13/2026, 3:25:41 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "report:f4d46a82-2e25-4f5c-a2f8-68d565ad51be"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "report:f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+    "api": "2026-09-12T15:42:11.477630+00:00",
+    "displayed": "9/12/2026, 10:42:11 AM",
+    "expected": "9/12/2026, 10:42:11 AM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:1aeff4dc-5ab9-4dae-ac6e-9a713b38bab9"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:1aeff4dc-5ab9-4dae-ac6e-9a713b38bab9",
+    "api": "2026-09-13T23:59:19.777356+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:1da242cc-517e-4fcb-9850-3c620e2b484e"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:1da242cc-517e-4fcb-9850-3c620e2b484e",
+    "api": "2026-09-13T23:59:19.777593+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:2e0276ba-e261-44b6-8e13-15091673eeb4"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:2e0276ba-e261-44b6-8e13-15091673eeb4",
+    "api": "2026-09-13T23:59:19.777380+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:31f2bf8c-b225-4916-91d4-63e1762447da"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:31f2bf8c-b225-4916-91d4-63e1762447da",
+    "api": "2026-09-13T23:59:19.777360+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:60e5d2dd-5814-4ef3-abdb-2269f1b85647"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:60e5d2dd-5814-4ef3-abdb-2269f1b85647",
+    "api": "2026-09-13T20:25:42.945191+00:00",
+    "displayed": "9/13/2026, 3:25:42 PM",
+    "expected": "9/13/2026, 3:25:42 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:68ee91e6-7ea0-49e1-8336-84a4b1993565"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:68ee91e6-7ea0-49e1-8336-84a4b1993565",
+    "api": "2026-09-13T23:59:19.777591+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:75dfed70-b738-454e-b5b7-2b8b19939c90"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:75dfed70-b738-454e-b5b7-2b8b19939c90",
+    "api": "2026-09-13T23:59:19.777362+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:7be3e009-12c0-4e4c-b9f9-e4a7b83fd68c"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:7be3e009-12c0-4e4c-b9f9-e4a7b83fd68c",
+    "api": "2026-09-13T23:59:19.777365+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:ab8cfebb-d898-4ac6-b393-e1c50edf9532"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:ab8cfebb-d898-4ac6-b393-e1c50edf9532",
+    "api": "2026-09-13T23:59:19.777590+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:bdd6e865-dff9-4a6d-a612-394b13a737d2"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:bdd6e865-dff9-4a6d-a612-394b13a737d2",
+    "api": "2026-09-13T23:59:19.777588+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:c8103bb0-4c39-49fc-8982-f4ba5245678a"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:c8103bb0-4c39-49fc-8982-f4ba5245678a",
+    "api": "2026-09-13T23:59:19.777382+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:fb4075ee-24b9-43f7-9f38-ff1b1604ae90"
+  },
+  {
+    "stage": "dark-1440-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:fb4075ee-24b9-43f7-9f38-ff1b1604ae90",
+    "api": "2026-09-12T15:42:12.413901+00:00",
+    "displayed": "9/12/2026, 10:42:12 AM",
+    "expected": "9/12/2026, 10:42:12 AM"
+  },
+  {
+    "stage": "dark-1440-mission",
+    "name": "one main",
+    "passed": true
+  },
+  {
+    "stage": "dark-1440-mission",
+    "name": "canonical detail entry link",
+    "passed": true,
+    "type": "mission"
+  },
+  {
+    "stage": "dark-1440-mission",
+    "name": "bounded mission log count",
+    "passed": true,
+    "expected": "Last 14 recorded lines"
+  },
+  {
+    "stage": "dark-1440-mission",
+    "name": "Chicago mission log timestamps",
+    "passed": true,
+    "count": 14,
+    "expected": [
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:11 AM"
+    ],
+    "displayed": [
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:11 AM"
+    ]
+  },
+  {
+    "stage": "dark-1440-mission",
+    "name": "Sources collected matches API",
+    "passed": true,
+    "expected": 178,
+    "displayed": "Sources collected\n\n178"
+  },
+  {
+    "stage": "dark-1440-mission",
+    "name": "References matches API",
+    "passed": true,
+    "expected": 19,
+    "displayed": "References\n\n19"
+  },
+  {
+    "stage": "dark-1440-mission",
+    "name": "Agent steps matches API",
+    "passed": true,
+    "expected": "37 / 40",
+    "displayed": "Agent steps\n\n37 / 40"
+  },
+  {
+    "stage": "dark-1440-mission",
+    "name": "Distinct domains matches API",
+    "passed": true,
+    "expected": 108,
+    "displayed": "Distinct domains\n\n108"
+  },
+  {
+    "stage": "dark-1440-mission",
+    "name": "Runtime matches API",
+    "passed": true,
+    "expected": "10m 23s",
+    "displayed": "Runtime\n\n10m 23s"
+  },
+  {
+    "stage": "dark-1440-mission",
+    "name": "no invented mission steps",
+    "passed": true,
+    "expected": "Step progress unknown"
+  },
+  {
+    "stage": "dark-1440-mission",
+    "name": "no invented mission percentage",
+    "passed": true,
+    "expected": "Percentage unknown"
+  },
+  {
+    "stage": "dark-1440-mission",
+    "name": "no browser/API errors",
+    "passed": true,
+    "errors": []
+  },
+  {
+    "stage": "dark-1440-mission",
+    "name": "GET /graph/neighborhood",
+    "passed": true,
+    "status": 200
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "one main",
+    "passed": true
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph server group totals",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c:documents",
+    "expected": {
+      "total": 23,
+      "shown": 12
+    },
+    "displayed": {
+      "total": 23,
+      "shown": 12,
+      "text": "12 of 23 shown"
+    }
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph independent aggregate documents",
+    "passed": true,
+    "value": 23
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph server group totals",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c:missions",
+    "expected": {
+      "total": 3,
+      "shown": 3
+    },
+    "displayed": {
+      "total": 3,
+      "shown": 3,
+      "text": "3 of 3 shown"
+    }
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph independent aggregate missions",
+    "passed": true,
+    "value": 3
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph server group totals",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c:reports",
+    "expected": {
+      "total": 3,
+      "shown": 3
+    },
+    "displayed": {
+      "total": 3,
+      "shown": 3,
+      "text": "3 of 3 shown"
+    }
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph independent aggregate reports",
+    "passed": true,
+    "value": 3
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph server group totals",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c:evidence",
+    "expected": {
+      "total": 547,
+      "shown": 12
+    },
+    "displayed": {
+      "total": 547,
+      "shown": 12,
+      "text": "12 of 547 shown"
+    }
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph independent aggregate evidence",
+    "passed": true,
+    "value": 547
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "diagram/list node equivalence",
+    "passed": true
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "every edge has list row",
+    "passed": true,
+    "edges": 30
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "project:0afcc588-e722-45bd-8320-f486601b877c",
+    "api": "2025-12-10T17:24:50.306282+00:00",
+    "displayed": "12/10/2025, 11:24:50 AM",
+    "expected": "12/10/2025, 11:24:50 AM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:16bad45e-c426-46bb-8f04-d30a0e94efff"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:16bad45e-c426-46bb-8f04-d30a0e94efff",
+    "value": 3
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:16bad45e-c426-46bb-8f04-d30a0e94efff",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:471f28f5-7cd3-4b7f-a973-0108f7f7cebd"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:471f28f5-7cd3-4b7f-a973-0108f7f7cebd",
+    "value": 20
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:471f28f5-7cd3-4b7f-a973-0108f7f7cebd",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+    "value": 17
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:9099ee49-43a8-44bd-a4c7-a779ce9cbee2"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+    "value": 19
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:9124e081-59ba-47bb-b34d-96273bd1140a"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:9124e081-59ba-47bb-b34d-96273bd1140a",
+    "value": 9
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:9124e081-59ba-47bb-b34d-96273bd1140a",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:a28eab37-03f3-492e-83fe-f48e502fc223"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:a28eab37-03f3-492e-83fe-f48e502fc223",
+    "value": 9
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:a28eab37-03f3-492e-83fe-f48e502fc223",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:a86d36c7-80ca-4753-91dd-6f92c5a81c47"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+    "value": 18
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+    "value": 26
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:d8c50c51-11f7-4649-b214-6aff8ed92521"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:d8c50c51-11f7-4649-b214-6aff8ed92521",
+    "value": 20
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:d8c50c51-11f7-4649-b214-6aff8ed92521",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:e4f32d07-e596-4c8b-9712-5717a13595ce"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:e4f32d07-e596-4c8b-9712-5717a13595ce",
+    "value": 21
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:e4f32d07-e596-4c8b-9712-5717a13595ce",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:f40c4015-87d8-461f-80b5-4b9b653e0efb"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:f40c4015-87d8-461f-80b5-4b9b653e0efb",
+    "value": 16
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:f40c4015-87d8-461f-80b5-4b9b653e0efb",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "document:f6c0f798-8c3a-4d1e-b8ea-0633a4d22801"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "graph node chunk count",
+    "passed": true,
+    "key": "document:f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+    "value": 45
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "document:f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+    "api": "2026-05-30T00:24:05.958422+00:00",
+    "displayed": "5/29/2026, 7:24:05 PM",
+    "expected": "5/29/2026, 7:24:05 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "mission:39b44c86-2e2b-4d19-bf3f-e069db5f1a76"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "mission:39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+    "api": "2026-09-13T23:59:19.396824+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "mission:7b847edd-5433-4237-a899-57b47e6edf0a"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "mission:7b847edd-5433-4237-a899-57b47e6edf0a",
+    "api": "2026-09-12T15:42:11.563944+00:00",
+    "displayed": "9/12/2026, 10:42:11 AM",
+    "expected": "9/12/2026, 10:42:11 AM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "mission:952cc1de-688c-415b-bee9-ce143a753af2"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "mission:952cc1de-688c-415b-bee9-ce143a753af2",
+    "api": "2026-09-13T20:25:42.019326+00:00",
+    "displayed": "9/13/2026, 3:25:42 PM",
+    "expected": "9/13/2026, 3:25:42 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "report:0613ab1a-1ae7-4784-bf03-579023d4a20f"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "report:0613ab1a-1ae7-4784-bf03-579023d4a20f",
+    "api": "2026-09-13T23:59:19.196123+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "report:c2b3bc43-b25c-481e-80d7-02a6afc76e27"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "report:c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+    "api": "2026-09-13T20:25:41.967641+00:00",
+    "displayed": "9/13/2026, 3:25:41 PM",
+    "expected": "9/13/2026, 3:25:41 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "report:f4d46a82-2e25-4f5c-a2f8-68d565ad51be"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "report:f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+    "api": "2026-09-12T15:42:11.477630+00:00",
+    "displayed": "9/12/2026, 10:42:11 AM",
+    "expected": "9/12/2026, 10:42:11 AM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:1aeff4dc-5ab9-4dae-ac6e-9a713b38bab9"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:1aeff4dc-5ab9-4dae-ac6e-9a713b38bab9",
+    "api": "2026-09-13T23:59:19.777356+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:1da242cc-517e-4fcb-9850-3c620e2b484e"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:1da242cc-517e-4fcb-9850-3c620e2b484e",
+    "api": "2026-09-13T23:59:19.777593+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:2e0276ba-e261-44b6-8e13-15091673eeb4"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:2e0276ba-e261-44b6-8e13-15091673eeb4",
+    "api": "2026-09-13T23:59:19.777380+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:31f2bf8c-b225-4916-91d4-63e1762447da"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:31f2bf8c-b225-4916-91d4-63e1762447da",
+    "api": "2026-09-13T23:59:19.777360+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:60e5d2dd-5814-4ef3-abdb-2269f1b85647"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:60e5d2dd-5814-4ef3-abdb-2269f1b85647",
+    "api": "2026-09-13T20:25:42.945191+00:00",
+    "displayed": "9/13/2026, 3:25:42 PM",
+    "expected": "9/13/2026, 3:25:42 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:68ee91e6-7ea0-49e1-8336-84a4b1993565"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:68ee91e6-7ea0-49e1-8336-84a4b1993565",
+    "api": "2026-09-13T23:59:19.777591+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:75dfed70-b738-454e-b5b7-2b8b19939c90"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:75dfed70-b738-454e-b5b7-2b8b19939c90",
+    "api": "2026-09-13T23:59:19.777362+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:7be3e009-12c0-4e4c-b9f9-e4a7b83fd68c"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:7be3e009-12c0-4e4c-b9f9-e4a7b83fd68c",
+    "api": "2026-09-13T23:59:19.777365+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:ab8cfebb-d898-4ac6-b393-e1c50edf9532"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:ab8cfebb-d898-4ac6-b393-e1c50edf9532",
+    "api": "2026-09-13T23:59:19.777590+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:bdd6e865-dff9-4a6d-a612-394b13a737d2"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:bdd6e865-dff9-4a6d-a612-394b13a737d2",
+    "api": "2026-09-13T23:59:19.777588+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:c8103bb0-4c39-49fc-8982-f4ba5245678a"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:c8103bb0-4c39-49fc-8982-f4ba5245678a",
+    "api": "2026-09-13T23:59:19.777382+00:00",
+    "displayed": "9/13/2026, 6:59:19 PM",
+    "expected": "9/13/2026, 6:59:19 PM"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "full title and canonical href",
+    "passed": true,
+    "key": "evidence:fb4075ee-24b9-43f7-9f38-ff1b1604ae90"
+  },
+  {
+    "stage": "dark-390-graph-depth-1",
+    "name": "Chicago graph timestamp",
+    "passed": true,
+    "key": "evidence:fb4075ee-24b9-43f7-9f38-ff1b1604ae90",
+    "api": "2026-09-12T15:42:12.413901+00:00",
+    "displayed": "9/12/2026, 10:42:12 AM",
+    "expected": "9/12/2026, 10:42:12 AM"
+  },
+  {
+    "stage": "dark-390-mission",
+    "name": "one main",
+    "passed": true
+  },
+  {
+    "stage": "dark-390-mission",
+    "name": "canonical detail entry link",
+    "passed": true,
+    "type": "mission"
+  },
+  {
+    "stage": "dark-390-mission",
+    "name": "bounded mission log count",
+    "passed": true,
+    "expected": "Last 14 recorded lines"
+  },
+  {
+    "stage": "dark-390-mission",
+    "name": "Chicago mission log timestamps",
+    "passed": true,
+    "count": 14,
+    "expected": [
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:11 AM"
+    ],
+    "displayed": [
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:05 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:29:13 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:08 AM",
+      "9/12/2026, 10:42:11 AM"
+    ]
+  },
+  {
+    "stage": "dark-390-mission",
+    "name": "Sources collected matches API",
+    "passed": true,
+    "expected": 178,
+    "displayed": "Sources collected\n\n178"
+  },
+  {
+    "stage": "dark-390-mission",
+    "name": "References matches API",
+    "passed": true,
+    "expected": 19,
+    "displayed": "References\n\n19"
+  },
+  {
+    "stage": "dark-390-mission",
+    "name": "Agent steps matches API",
+    "passed": true,
+    "expected": "37 / 40",
+    "displayed": "Agent steps\n\n37 / 40"
+  },
+  {
+    "stage": "dark-390-mission",
+    "name": "Distinct domains matches API",
+    "passed": true,
+    "expected": 108,
+    "displayed": "Distinct domains\n\n108"
+  },
+  {
+    "stage": "dark-390-mission",
+    "name": "Runtime matches API",
+    "passed": true,
+    "expected": "10m 23s",
+    "displayed": "Runtime\n\n10m 23s"
+  },
+  {
+    "stage": "dark-390-mission",
+    "name": "no invented mission steps",
+    "passed": true,
+    "expected": "Step progress unknown"
+  },
+  {
+    "stage": "dark-390-mission",
+    "name": "no invented mission percentage",
+    "passed": true,
+    "expected": "Percentage unknown"
+  },
+  {
+    "stage": "dark-390-mission",
+    "name": "no browser/API errors",
+    "passed": true,
+    "errors": []
+  }
+]
