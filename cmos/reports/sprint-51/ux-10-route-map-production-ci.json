@@ -1,0 +1,138 @@
+{
+  "baseURL": "https://tracelab.aquex.ai",
+  "checkedAt": "2026-09-14T03:04:52.763Z",
+  "mapRows": 8,
+  "coveredRows": 8,
+  "checks": 16,
+  "passed": 16,
+  "results": [
+    {
+      "source": "/",
+      "requested": "/",
+      "status": 200,
+      "actual": "https://tracelab.aquex.ai/",
+      "expected": "https://tracelab.aquex.ai/",
+      "passed": true
+    },
+    {
+      "source": "/",
+      "requested": "/?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "status": 200,
+      "actual": "https://tracelab.aquex.ai/?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "expected": "https://tracelab.aquex.ai/?q=scope+%26+provenance&tag=first&tag=second&view=all",
+      "passed": true
+    },
+    {
+      "source": "/console",
+      "requested": "/console",
+      "status": 308,
+      "actual": "https://tracelab.aquex.ai/admin/observability",
+      "expected": "https://tracelab.aquex.ai/admin/observability",
+      "passed": true
+    },
+    {
+      "source": "/console",
+      "requested": "/console?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "status": 308,
+      "actual": "https://tracelab.aquex.ai/admin/observability?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "expected": "https://tracelab.aquex.ai/admin/observability?q=scope+%26+provenance&tag=first&tag=second&view=all",
+      "passed": true
+    },
+    {
+      "source": "/console/missions",
+      "requested": "/console/missions",
+      "status": 308,
+      "actual": "https://tracelab.aquex.ai/missions",
+      "expected": "https://tracelab.aquex.ai/missions",
+      "passed": true
+    },
+    {
+      "source": "/console/missions",
+      "requested": "/console/missions?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "status": 308,
+      "actual": "https://tracelab.aquex.ai/missions?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "expected": "https://tracelab.aquex.ai/missions?q=scope+%26+provenance&tag=first&tag=second&view=all",
+      "passed": true
+    },
+    {
+      "source": "/console/missions/:id",
+      "requested": "/console/missions/00000000-0000-4000-8000-000000000001",
+      "status": 308,
+      "actual": "https://tracelab.aquex.ai/missions/00000000-0000-4000-8000-000000000001",
+      "expected": "https://tracelab.aquex.ai/missions/00000000-0000-4000-8000-000000000001",
+      "passed": true
+    },
+    {
+      "source": "/console/missions/:id",
+      "requested": "/console/missions/00000000-0000-4000-8000-000000000001?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "status": 308,
+      "actual": "https://tracelab.aquex.ai/missions/00000000-0000-4000-8000-000000000001?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "expected": "https://tracelab.aquex.ai/missions/00000000-0000-4000-8000-000000000001?q=scope+%26+provenance&tag=first&tag=second&view=all",
+      "passed": true
+    },
+    {
+      "source": "/console/corrections",
+      "requested": "/console/corrections",
+      "status": 308,
+      "actual": "https://tracelab.aquex.ai/admin/corrections",
+      "expected": "https://tracelab.aquex.ai/admin/corrections",
+      "passed": true
+    },
+    {
+      "source": "/console/corrections",
+      "requested": "/console/corrections?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "status": 308,
+      "actual": "https://tracelab.aquex.ai/admin/corrections?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "expected": "https://tracelab.aquex.ai/admin/corrections?q=scope+%26+provenance&tag=first&tag=second&view=all",
+      "passed": true
+    },
+    {
+      "source": "/invites",
+      "requested": "/invites",
+      "status": 308,
+      "actual": "https://tracelab.aquex.ai/settings#invites",
+      "expected": "https://tracelab.aquex.ai/settings#invites",
+      "passed": true
+    },
+    {
+      "source": "/invites",
+      "requested": "/invites?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "status": 308,
+      "actual": "https://tracelab.aquex.ai/settings?q=scope%20%26%20provenance&tag=first&tag=second&view=all#invites",
+      "expected": "https://tracelab.aquex.ai/settings?q=scope+%26+provenance&tag=first&tag=second&view=all#invites",
+      "passed": true
+    },
+    {
+      "source": "/search/results",
+      "requested": "/search/results",
+      "status": 308,
+      "actual": "https://tracelab.aquex.ai/search",
+      "expected": "https://tracelab.aquex.ai/search",
+      "passed": true
+    },
+    {
+      "source": "/search/results",
+      "requested": "/search/results?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "status": 308,
+      "actual": "https://tracelab.aquex.ai/search?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "expected": "https://tracelab.aquex.ai/search?q=scope+%26+provenance&tag=first&tag=second&view=all",
+      "passed": true
+    },
+    {
+      "source": "/missions/queue",
+      "requested": "/missions/queue",
+      "status": 308,
+      "actual": "https://tracelab.aquex.ai/missions?view=queue",
+      "expected": "https://tracelab.aquex.ai/missions?view=queue",
+      "passed": true
+    },
+    {
+      "source": "/missions/queue",
+      "requested": "/missions/queue?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "status": 308,
+      "actual": "https://tracelab.aquex.ai/missions?q=scope%20%26%20provenance&tag=first&tag=second&view=queue",
+      "expected": "https://tracelab.aquex.ai/missions?view=queue&q=scope+%26+provenance&tag=first&tag=second",
+      "passed": true
+    }
+  ]
+}

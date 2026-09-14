@@ -143,33 +143,27 @@ Key decisions carried forward: hexagonal boundaries stay (routers → services �
 
 **Moved:** no unfinished Sprint 50 mission is carried. Sprint 51 remains planned and unopened: job run views, project bundles, deeper document/collection/report workflows, search and route migration retain their original scope below. Closing the foundation does not claim the entire four-sprint redesign is finished.
 
-### Sprint 51 — The Working Surfaces (opened 2026-09-13)
+### Sprint 51 — The Working Surfaces (opened 2026-09-13; closed 2026-09-14 UTC)
 
-**Goal:** rebuild the pages people and agents live in, on the object model and the shell, and make the theme selector truthful.
+**Shipped:** the working surfaces now use the shared object model, shell and accepted Forge `114a268` tokens. Nine missions completed; THEME-2 remains explicitly deferred. Acceptance receipts below preserve each mission's source, CI, exact Railway deployments and production evidence.
 
-**UX-1 implementation references:** use the [API-to-object contract](../contracts/oods-object-model.md) and [saved-schema index](../reports/sprint-50/oods-previews/schema-summary.json), with [all 20 compositions in both themes at 390/820/1440](../reports/sprint-50/oods-previews/preview-summary.json). UX-6 starts from Mission list/detail/timeline/workflow; UX-7 from Project, Document and inline Chunk; UX-8 from Collection and Report. The retained [Mission detail preview](../reports/sprint-50/oods-previews/mission-detail-light/react/receipt.json) and [Evidence detail preview](../reports/sprint-50/oods-previews/evidence-detail-light/react/receipt.json), with adjacent dark-theme receipts, establish the structural references. These use synthetic fixtures; bind real API data and regenerate phone/tablet/desktop previews before implementing each surface.
-
-| Mission | Deliverable | Depends on |
+| Mission | Outcome | Receipt |
 |---|---|---|
-| THEME-1 | Truthful System / Light / Dark selector, resolved System label, correct first paint, semantic prose and removal of no-op `dark:` utilities; High contrast deferred to THEME-2 | — (first; enables UX-6..UX-9) |
-| UX-6 | Missions as inspectable jobs: exceptions-first list with the queue folded in, run view with named phases and truthful logs, authoring with inline contract preview, cancel and re-run | THEME-1 |
-| UX-7 | Projects as bundles + Documents: hub tabs, upload with per-file progress, document detail with chunks and evidence; per-user favorites on Home (closes the decision #395 deferral) | THEME-1 |
-| UX-8 | Collections as context spaces + Reports: instructions, seed a mission, citations resolve to evidence, export retained | THEME-1, UX-6 |
-| UX-9 | Search + command palette: one search surface, palette reaches every entity, recent and saved searches, actions, keyboard navigation documented | THEME-1 |
-| UX-10 | Route migration: every pre-overhaul URL redirects, MCP links canonical, map maintained here, deprecated aliases listed for Sprint 53 | UX-6, UX-7, UX-8, UX-9 |
-| CI-2 | Honest lint lanes: fix, ratchet or drop the perpetually red advisory ruff-full and mypy jobs | — |
+| THEME-1 | Truthful System / Light / Dark selector, resolved System label, first paint and hydration, semantic prose; removed 986 no-op `dark:` utilities across 30 files | [Theme acceptance](../reports/sprint-51/theme-1-validation.json) |
+| UX-6 | Exceptions-first mission list with queue view; draft save and inline contract preview; inspectable run phases, truthful unavailable logs, results/evidence, cancel and new-ID re-run | [Mission acceptance](../reports/sprint-51/ux-6-validation.json) |
+| UX-7 | Project hub tabs, per-file upload progress, documents with chunks and evidence, and per-user favorites on Home | [Project/document acceptance](../reports/sprint-51/ux-7-validation.json) |
+| UX-8 | Collection instructions and full readable document context seed a reviewed mission; report citations resolve to evidence and export retains its bytes | [Collection/report acceptance](../reports/sprint-51/ux-8-validation.json) |
+| UX-9 | Canonical search with source/date filters, API-authoritative scope, saved replay and real semantic-cache metadata; keyboard palette reaches all six entity types, history, saved searches and actions | [Search acceptance](../reports/sprint-51/ux-9-validation.json) |
+| UX-10 | One maintained eight-row migration map, seven query-preserving permanent aliases, canonical generated MCP browser links, 16 production map checks and a 31-route internal-link crawl | [Migration acceptance](../reports/sprint-51/ux-10-validation.json) |
+| CI-2 | Removed permanently red advisory lanes and kept required checks honest | [Lint acceptance](../reports/sprint-51/ci-2-validation.json) |
+| CI-3 | Removed unnecessary adjacency prefetch at the graph expansion depth boundary; retained the strict 200 ms performance contract | [Graph performance acceptance](../reports/sprint-51/ci-3-validation.json) |
+| CI-4 | Raised the backend-suite timeout to 45 minutes with duration and faulthandler diagnostics; retained quarantine and performance gates | [CI acceptance](../reports/sprint-51/ci-4-validation.json) |
 
-- **THEME-1 Truthful themes.** Ship System / Light / Dark with the resolved System label, authoritative head bootstrap and preserved hydration, semantic prose, and removal of 986 no-op `dark:` utilities across 30 files (987 literal occurrences included one TypeScript parameter). **Derek deferred High contrast on 2026-09-13, decision #408:** keep it out of the selector and resolve stored `hc` to System. Both the installed tokens and prepared replacement fail active-text contrast; preserve all 62 failed HC measurements. **THEME-2 is deferred to Sprint 54** for certified token acceptance, HC wiring and a clean three-theme baseline. Current verified `114a268` tarballs remain installed. Forge PR107 is merged, but consumer certification remains outstanding; merge alone does not establish acceptance.
-- **UX-6 Missions as inspectable jobs.** New authoring flow (contract preview inline), run view with named steps from DeepSearch phases, logs that state unavailability truthfully while live streaming stays dormant, results and evidence tab, exceptions-first list with the queue folded in, cancel and re-run.
-- **UX-7 Projects as bundles and Documents.** Project hub with Overview, Documents, Evidence, Collections, Missions, Reports tabs; upload with per-file progress; document detail with chunks and evidence references; per-user favorites surfaced on Home.
-- **UX-8 Collections as context spaces and Reports.** Collections carry instructions and documents and can seed a mission; report detail whose citations resolve to evidence; export retained.
-- **UX-9 Search and the command palette.** Search rebuilt on tokens; palette reaches every entity, recent searches, saved searches and actions; keyboard navigation documented.
-- **UX-10 Route migration.** Every pre-overhaul URL redirects to its successor; MCP responses carry the new canonical links; a mapping table lives in this document; deprecated aliases listed for Sprint 53.
-- **CI-2 Honest lint lanes.** No lane stays red as "advisory"; each is required and green, ratcheted with a shrinking count, or removed with the reason recorded.
+**Moved:** Derek deferred High contrast on 2026-09-13 (decision #408). THEME-2 remains deferred to **Sprint 54** for certified tokens, HC wiring and a clean three-theme baseline. The selector omits HC and stored `hc` resolves to System. All 62 failed HC measurements remain in the theme receipt. Current `114a268` tarballs remain installed: Forge PR107's merge did not establish consumer certification. This deferral takes precedence over the earlier Sprint 53 HC sweep.
 
-**Definition of Done additions (decisions #400, #408):** re-run the 31-route direct-browser production baseline at every UI mission close in Light and Dark at 1440/390 (124 checks); High contrast acceptance moves to THEME-2. Deployed smoke is accepted only after Railway reports SUCCESS for both services, with deployment ids in the receipt under `cmos/reports/sprint-51/`.
+**Verified at close:** production builds and required CI checks passed; both Railway services reported SUCCESS before direct production acceptance. Every UI mission reran the 31-route Light/Dark baseline at 1440/390 (124 checks). UX-10's final run has zero overflow, serious/critical axe findings, browser/API errors or internal links to the seven aliases. The scheduled production smoke covers all eight migration rows (Home is a 200 replacement, not a self-redirect). The real installed MCP tarball exercises production read-only actions and canonical pages; the package changes remain **Unreleased**, with no npm publication performed. Authored source URLs, references/context, full previews and export bytes remain unchanged.
 
-**Exit criteria:** no page under `src/pages` uses the pre-overhaul shell or palette; the theme selector lists exactly the themes the tokens define and System reports what it resolved to; a mission can be authored, watched to completion and audited to evidence without leaving the UI; the Playwright baseline shows zero overflow and zero critical or serious axe findings on all routes.
+**Remaining plan:** Sprint 52's relationship graph, attention views, MCP parity audit and documentation refresh remain planned. Sprint 53 keeps performance, accessibility in accepted Light/Dark themes, drift measurement, further smoke automation and the seven alias retirements listed below. Neither sprint is opened by this closeout. Live mission log streaming remains dormant and is labeled unavailable; CI receipts name existing skips and quarantines rather than counting them as passes.
 
 ### Sprint 52 — Relationships, Attention and Parity
 
@@ -185,10 +179,10 @@ Key decisions carried forward: hexagonal boundaries stay (routers → services �
 
 **Goal:** prove the overhaul holds and automate the proof.
 
-- Accessibility AA sweep including the high-contrast theme.
+- Accessibility AA sweep in accepted Light and Dark themes; High contrast acceptance is deferred under THEME-2 to Sprint54 (decision #408). Include the pre-existing phone Settings action-label wrapping recorded in UX-10 (Revoke/Copy/Delete and invite status; visible in the accepted UX-9 baseline too).
 - Performance budgets on Home, search and mission run view.
 - Stage1 drift scan against the April 2026 fingerprint baseline; results archived as the new baseline.
-- Post-deploy frontend smoke wired into CI (the S48 lesson), including a phone-width overflow check.
+- Extend the existing deployed frontend smoke and route-map coverage with automated phone-width overflow checks (the S48 lesson).
 - Retirement of every legacy component and route alias that Sprint 51 marked deprecated.
 
 ### Beyond Sprint 53 (not scheduled)
@@ -309,3 +303,5 @@ Keep these redirects active through Sprint 52. Canonical Home `/` is retained. S
 - **2026-09-13 UTC, Sprint 51 open** — Sprint 51 created in CMOS (THEME-1, UX-6..UX-10, CI-2; identity synced to `sprint-51-active`) and this section re-planned from it: THEME-1 added at open on Derek's direction, favorites carried from decision #395 into UX-7, CI-2 from learning #165. Sprint 50 close hygiene: regenerated sprint-37/38 e2e receipts discarded (timing-only reruns over recorded evidence), merged local branches pruned, `cmos/context/MASTER_CONTEXT.json` export refreshed from the CMOS database and its `.backup-*` files removed, mission-authoring contract commit pin set to `21271b5`.
 
 _Truth in data, evidence as the connective tissue, one system._
+
+- **2026-09-14 UTC, Sprint 51 close** — Nine missions accepted with CI, exact Railway SUCCESS deployments and production receipts. THEME-2 remains deferred to Sprint54; Sprint52/53 stay planned. UX-10 binds the eight-row route map to16 production checks, verifies canonical generated MCP links while preserving authored provenance, and records a clean124-check internal-link baseline. The package source/tarball is verified and remains Unreleased on npm.
