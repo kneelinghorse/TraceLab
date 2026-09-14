@@ -1,0 +1,30 @@
+[
+  {
+    "workflow": "Frontend Production Build",
+    "run_id": 34896852357,
+    "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852357",
+    "event": "push",
+    "head_sha": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+    "attempt": 1,
+    "console_summary": "build-frontend-production\tUNKNOWN STEP\t2026-09-14T21:10:22.1095265Z ##[notice]  59 passed (2.4m)",
+    "checks": {
+      "browser_passed": 59,
+      "dashboard_spec_in_explicit_command": true
+    },
+    "log_sha256": "ff79f64c5822f64b15760aa1face9a99a088f7957ac91b3df6b6328cdb341b84"
+  },
+  {
+    "workflow": "Frontend Checks",
+    "run_id": 34896852320,
+    "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852320",
+    "event": "push",
+    "head_sha": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+    "attempt": 1,
+    "console_summary": "vitest\tUNKNOWN STEP\t2026-09-14T21:07:07.2281415Z       Tests  230 passed (230)",
+    "checks": {
+      "unit_passed": 230,
+      "unhandled_errors": 0
+    },
+    "log_sha256": "1c6ea42881a36cc1fa2f2ea4510a7e2e67020ae524e51db578be3d40917c77f4"
+  }
+]

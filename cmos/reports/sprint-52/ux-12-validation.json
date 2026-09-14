@@ -1,0 +1,4190 @@
+{
+  "mission": "UX-12",
+  "status": "source validated in production; own receipt merge required before CMOS completion",
+  "checked_at": "2026-09-14T22:22:13.585782+00:00",
+  "session_id": "PS-2026-09-14-014",
+  "base_commit": "dadb1c97d71eb41b31a234a4d41e451304f8c0ca",
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/300",
+  "source_commit": "00bd176a592a9e1dedf144ae663e89a305c5cddc",
+  "merge_commit": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+  "decisions": [
+    426,
+    444
+  ],
+  "learnings": [
+    168,
+    176,
+    177,
+    185,
+    186,
+    187,
+    188,
+    189
+  ],
+  "changes": [
+    "Four shared mutually exclusive attention clauses, preserving existing attention ordering and per-result review semantics.",
+    "Repeatable reason filters on the attention mission view, applied after RBAC and before count/paging; invalid combinations return400.",
+    "One live scoped Home attention aggregate with all reason counts and built-in dashboard totals; private/no-store.",
+    "Migration047 user_saved_views with owner/name uniqueness, user cascade, per-user50 cap serialized on PostgreSQL, allowlisted filters and owner-onlyCRUD.",
+    "Saved-view totals reevaluate current mission access on read; unreadable saved projects report0 without names.",
+    "Live dashboard strip, URL reason checkboxes and personal save/rename/delete Dialogs; Home links and command-palette saved mission views.",
+    "HumanJWT/API-key authorization and service/anonymous rejection on every new route; exact rbac_verify route inventory extended.",
+    "MCP manifest records new reads for MCP-2, preferences as REST-only and existing mission reason forwarding as partial; no package publication."
+  ],
+  "validation": {
+    "local": {
+      "checked_at": "2026-09-14T20:33:08.799489+00:00",
+      "backend": {
+        "passed": 158,
+        "skipped": 0,
+        "log": "backend-final.log"
+      },
+      "postgres": [
+        {
+          "passed": 4,
+          "skipped": 0,
+          "log": "postgres.log",
+          "scope": "initial migration, favorites roundtrip/cascade and migration coverage"
+        },
+        {
+          "passed": 2,
+          "skipped": 0,
+          "log": "postgres-v2.log",
+          "scope": "final saved view migration and live review-version aggregates"
+        },
+        {
+          "passed": 7,
+          "skipped": 0,
+          "log": "postgres-final.log",
+          "scope": "final scoped PostgreSQL migration/count tests plus all5 route-harness lockstep tests"
+        }
+      ],
+      "frontend_unit": {
+        "passed": 230,
+        "skipped": 0,
+        "log": "frontend-unit-final.log"
+      },
+      "browser": {
+        "tool": "playwright",
+        "generatedAt": "2026-09-14T20:27:43.275Z",
+        "completedAt": "2026-09-14T20:30:51.225Z",
+        "status": "passed",
+        "summary": {
+          "total": 59,
+          "expected": 59,
+          "passed": 59,
+          "failed": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "durationSeconds": 187.95,
+          "retries": 0
+        },
+        "environment": {
+          "node": "v24.6.0",
+          "ci": {
+            "provider": null
+          },
+          "projects": [
+            "chromium"
+          ],
+          "browsers": []
+        },
+        "tests": [
+          {
+            "title": "Home stays at the root and its search opens the shell palette",
+            "file": "frontend/tests/e2e/app-shell.spec.ts",
+            "line": 35,
+            "column": 5,
+            "status": "passed",
+            "durationMs": 1187,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "theme persists through hydration and OS changes without a wrong-color frame",
+            "file": "frontend/tests/e2e/app-shell.spec.ts",
+            "line": 49,
+            "column": 5,
+            "status": "passed",
+            "durationMs": 1882,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "the head bootstrap resolves stored system to System dark before delayed hydration",
+            "file": "frontend/tests/e2e/app-shell.spec.ts",
+            "line": 83,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 951,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "the head bootstrap resolves stored hc to System dark before delayed hydration",
+            "file": "frontend/tests/e2e/app-shell.spec.ts",
+            "line": 83,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 571,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "Light persists across reload and OS changes with native keyboard focus",
+            "file": "frontend/tests/e2e/app-shell.spec.ts",
+            "line": 103,
+            "column": 5,
+            "status": "passed",
+            "durationMs": 884,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "mobile drawer traps focus, closes with Escape, and returns focus to its trigger",
+            "file": "frontend/tests/e2e/app-shell.spec.ts",
+            "line": 120,
+            "column": 5,
+            "status": "passed",
+            "durationMs": 1552,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "command palette submits a real search request and supports keyboard dismissal",
+            "file": "frontend/tests/e2e/app-shell.spec.ts",
+            "line": 141,
+            "column": 5,
+            "status": "passed",
+            "durationMs": 1787,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "open modal surfaces meet the same axe severity and landmark gates",
+            "file": "frontend/tests/e2e/app-shell.spec.ts",
+            "line": 169,
+            "column": 5,
+            "status": "passed",
+            "durationMs": 1669,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "login and registration share accessible light surfaces at 390px",
+            "file": "frontend/tests/e2e/app-shell.spec.ts",
+            "line": 186,
+            "column": 9,
+            "status": "passed",
+            "durationMs": 1249,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "login and registration share accessible light surfaces at 1440px",
+            "file": "frontend/tests/e2e/app-shell.spec.ts",
+            "line": 186,
+            "column": 9,
+            "status": "passed",
+            "durationMs": 1682,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "login and registration share accessible dark surfaces at 390px",
+            "file": "frontend/tests/e2e/app-shell.spec.ts",
+            "line": 186,
+            "column": 9,
+            "status": "passed",
+            "durationMs": 1563,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "login and registration share accessible dark surfaces at 1440px",
+            "file": "frontend/tests/e2e/app-shell.spec.ts",
+            "line": 186,
+            "column": 9,
+            "status": "passed",
+            "durationMs": 2164,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "collection context, reviewed seed and evidence citations in light at 390",
+            "file": "frontend/tests/e2e/collection-context.spec.ts",
+            "line": 15,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 7377,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "collection context, reviewed seed and evidence citations in light at 820",
+            "file": "frontend/tests/e2e/collection-context.spec.ts",
+            "line": 15,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 6267,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "collection context, reviewed seed and evidence citations in light at 1440",
+            "file": "frontend/tests/e2e/collection-context.spec.ts",
+            "line": 15,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 6530,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "collection context, reviewed seed and evidence citations in dark at 390",
+            "file": "frontend/tests/e2e/collection-context.spec.ts",
+            "line": 15,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 5385,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "collection context, reviewed seed and evidence citations in dark at 820",
+            "file": "frontend/tests/e2e/collection-context.spec.ts",
+            "line": 15,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 5474,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "collection context, reviewed seed and evidence citations in dark at 1440",
+            "file": "frontend/tests/e2e/collection-context.spec.ts",
+            "line": 15,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 5806,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "keyboard root selection, depth, every list control and browser Back preserve the neighborhood",
+            "file": "frontend/tests/e2e/graph.spec.ts",
+            "line": 79,
+            "column": 5,
+            "status": "passed",
+            "durationMs": 1622,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "the complete light graph and root picker remain accessible at 1440px",
+            "file": "frontend/tests/e2e/graph.spec.ts",
+            "line": 116,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 2069,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "the complete light graph and root picker remain accessible at 390px",
+            "file": "frontend/tests/e2e/graph.spec.ts",
+            "line": 116,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 2544,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "the complete dark graph and root picker remain accessible at 1440px",
+            "file": "frontend/tests/e2e/graph.spec.ts",
+            "line": 116,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 2018,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "the complete dark graph and root picker remain accessible at 390px",
+            "file": "frontend/tests/e2e/graph.spec.ts",
+            "line": 116,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 2552,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "all six URL root types reach the same graph endpoint and canonical object link",
+            "file": "frontend/tests/e2e/graph.spec.ts",
+            "line": 146,
+            "column": 5,
+            "status": "passed",
+            "durationMs": 1332,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "loading, empty, forbidden, missing and retriable failures have distinct states",
+            "file": "frontend/tests/e2e/graph.spec.ts",
+            "line": 156,
+            "column": 5,
+            "status": "passed",
+            "durationMs": 2599,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "dashboards and personal view workflow in light at 1440px",
+            "file": "frontend/tests/e2e/mission-dashboards.spec.ts",
+            "line": 54,
+            "column": 86,
+            "status": "passed",
+            "durationMs": 3352,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "dashboards and personal view workflow in light at 390px",
+            "file": "frontend/tests/e2e/mission-dashboards.spec.ts",
+            "line": 54,
+            "column": 86,
+            "status": "passed",
+            "durationMs": 3340,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "dashboards and personal view workflow in dark at 1440px",
+            "file": "frontend/tests/e2e/mission-dashboards.spec.ts",
+            "line": 54,
+            "column": 86,
+            "status": "passed",
+            "durationMs": 3076,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "dashboards and personal view workflow in dark at 390px",
+            "file": "frontend/tests/e2e/mission-dashboards.spec.ts",
+            "line": 54,
+            "column": 86,
+            "status": "passed",
+            "durationMs": 2817,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "loading and failed dashboard counts never render as zero",
+            "file": "frontend/tests/e2e/mission-dashboards.spec.ts",
+            "line": 107,
+            "column": 5,
+            "status": "passed",
+            "durationMs": 414,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "author, inspect, audit and prepare a new run in light at 390",
+            "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+            "line": 14,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 3965,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "author, inspect, audit and prepare a new run in light at 820",
+            "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+            "line": 14,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 3825,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "author, inspect, audit and prepare a new run in light at 1440",
+            "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+            "line": 14,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 4168,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "author, inspect, audit and prepare a new run in dark at 390",
+            "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+            "line": 14,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 3698,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "author, inspect, audit and prepare a new run in dark at 820",
+            "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+            "line": 14,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 3756,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "author, inspect, audit and prepare a new run in dark at 1440",
+            "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+            "line": 14,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 4121,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "queue bookmark permanently redirects and retains filters",
+            "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+            "line": 96,
+            "column": 5,
+            "status": "passed",
+            "durationMs": 35,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "project tabs, independent uploads, chunks and personal favorites in light at 390",
+            "file": "frontend/tests/e2e/project-bundles.spec.ts",
+            "line": 14,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 4931,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "project tabs, independent uploads, chunks and personal favorites in light at 820",
+            "file": "frontend/tests/e2e/project-bundles.spec.ts",
+            "line": 14,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 4918,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "project tabs, independent uploads, chunks and personal favorites in light at 1440",
+            "file": "frontend/tests/e2e/project-bundles.spec.ts",
+            "line": 14,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 5529,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "project tabs, independent uploads, chunks and personal favorites in dark at 390",
+            "file": "frontend/tests/e2e/project-bundles.spec.ts",
+            "line": 14,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 4696,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "project tabs, independent uploads, chunks and personal favorites in dark at 820",
+            "file": "frontend/tests/e2e/project-bundles.spec.ts",
+            "line": 14,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 4740,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "project tabs, independent uploads, chunks and personal favorites in dark at 1440",
+            "file": "frontend/tests/e2e/project-bundles.spec.ts",
+            "line": 14,
+            "column": 7,
+            "status": "passed",
+            "durationMs": 5200,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "every maintained migration preserves its destination and query parameters",
+            "file": "frontend/tests/e2e/route-migration.spec.ts",
+            "line": 5,
+            "column": 5,
+            "status": "passed",
+            "durationMs": 103,
+            "annotations": [],
+            "attachments": [
+              {
+                "name": "route-migration-coverage",
+                "contentType": "application/json",
+                "path": "/tmp/tracelab-s52-ux12/browser-final-v2-artifacts/route-migration-every-main-a90a2-nation-and-query-parameters-chromium/attachments/route-migration-coverage-160d1dcd980714aa2a29541d1dde4717ebaeb5ab.json"
+              }
+            ],
+            "errors": []
+          },
+          {
+            "title": "palette keyboard reach, paging and focus in light at 390px",
+            "file": "frontend/tests/e2e/search-command.spec.ts",
+            "line": 64,
+            "column": 9,
+            "status": "passed",
+            "durationMs": 4435,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "search preserves API results, filters and saved replay in light at 390px",
+            "file": "frontend/tests/e2e/search-command.spec.ts",
+            "line": 113,
+            "column": 9,
+            "status": "passed",
+            "durationMs": 1884,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "palette keyboard reach, paging and focus in light at 820px",
+            "file": "frontend/tests/e2e/search-command.spec.ts",
+            "line": 64,
+            "column": 9,
+            "status": "passed",
+            "durationMs": 4647,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "search preserves API results, filters and saved replay in light at 820px",
+            "file": "frontend/tests/e2e/search-command.spec.ts",
+            "line": 113,
+            "column": 9,
+            "status": "passed",
+            "durationMs": 2780,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "palette keyboard reach, paging and focus in light at 1440px",
+            "file": "frontend/tests/e2e/search-command.spec.ts",
+            "line": 64,
+            "column": 9,
+            "status": "passed",
+            "durationMs": 4525,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "search preserves API results, filters and saved replay in light at 1440px",
+            "file": "frontend/tests/e2e/search-command.spec.ts",
+            "line": 113,
+            "column": 9,
+            "status": "passed",
+            "durationMs": 3317,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "palette keyboard reach, paging and focus in dark at 390px",
+            "file": "frontend/tests/e2e/search-command.spec.ts",
+            "line": 64,
+            "column": 9,
+            "status": "passed",
+            "durationMs": 5674,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "search preserves API results, filters and saved replay in dark at 390px",
+            "file": "frontend/tests/e2e/search-command.spec.ts",
+            "line": 113,
+            "column": 9,
+            "status": "passed",
+            "durationMs": 3902,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "palette keyboard reach, paging and focus in dark at 820px",
+            "file": "frontend/tests/e2e/search-command.spec.ts",
+            "line": 64,
+            "column": 9,
+            "status": "passed",
+            "durationMs": 4530,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "search preserves API results, filters and saved replay in dark at 820px",
+            "file": "frontend/tests/e2e/search-command.spec.ts",
+            "line": 113,
+            "column": 9,
+            "status": "passed",
+            "durationMs": 3106,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "palette keyboard reach, paging and focus in dark at 1440px",
+            "file": "frontend/tests/e2e/search-command.spec.ts",
+            "line": 64,
+            "column": 9,
+            "status": "passed",
+            "durationMs": 5398,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "search preserves API results, filters and saved replay in dark at 1440px",
+            "file": "frontend/tests/e2e/search-command.spec.ts",
+            "line": 113,
+            "column": 9,
+            "status": "passed",
+            "durationMs": 2827,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "recent and saved search times use UTC even outside the UTC timezone",
+            "file": "frontend/tests/e2e/search-command.spec.ts",
+            "line": 160,
+            "column": 5,
+            "status": "passed",
+            "durationMs": 375,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "legacy search URL permanently redirects with its query intact",
+            "file": "frontend/tests/e2e/search-command.spec.ts",
+            "line": 171,
+            "column": 5,
+            "status": "passed",
+            "durationMs": 9,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          },
+          {
+            "title": "loading, no matches, service failure and missing saved search stay distinct",
+            "file": "frontend/tests/e2e/search-command.spec.ts",
+            "line": 177,
+            "column": 5,
+            "status": "passed",
+            "durationMs": 836,
+            "annotations": [],
+            "attachments": [],
+            "errors": []
+          }
+        ],
+        "artifactPath": "/tmp/tracelab-s52-ux12/browser-final-v2.json"
+      },
+      "other_checks": [
+        "ruff on changed Python files",
+        "frontend type check",
+        "frontend lint",
+        "production build with token check",
+        "MCP parity audit (108 operations,101 live,7 dead; partial mission reason forwarding explicitly retained for MCP-2)",
+        "MCP audit self-tests:4 passed",
+        "foundational references",
+        "git diff --check"
+      ],
+      "logs": [
+        {
+          "path": "backend-final.log",
+          "sha256": "8f21e37f3262467abd8c97c2862229e49efd9263a828467635dbf4a83b8dc58e"
+        },
+        {
+          "path": "postgres.log",
+          "sha256": "29fbbf773a62c43f083c9a22131cd57b97f2c3b7a8267b11e8d20dff70b1192e"
+        },
+        {
+          "path": "postgres-v2.log",
+          "sha256": "c1080999358c6bea23930c01b558a4cb0a1d09a8c264d35e8a63d2a7a5cde857"
+        },
+        {
+          "path": "frontend-unit-v2.log",
+          "sha256": "948f4c8a4faa293d34e7bc949d84caa0202016b94f3d9533c387a3a1b96bb843"
+        },
+        {
+          "path": "types-final.log",
+          "sha256": "6d4951ba1a71d3d3017ed1e5b1aae9c29aea7e9683caa8757f644226d98b6a52"
+        },
+        {
+          "path": "frontend-lint-final.log",
+          "sha256": "e4cad1ba08b5d8e7162c4200b4704727f6da145c85be9461ef2bd975f88d8fad"
+        },
+        {
+          "path": "backend-lint-v2.log",
+          "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18"
+        },
+        {
+          "path": "build-final.log",
+          "sha256": "f6911a21fd3465c52f6d195aaa7014b3431f6117c5fa065f12be610754dc4b10"
+        },
+        {
+          "path": "parity-final.log",
+          "sha256": "06077a21f41c107758210a75f139f5f6fb325b35354a15b13b0677d7ad9e7a9f"
+        },
+        {
+          "path": "browser-final-v2.json",
+          "sha256": "77cb5ba87a171f9c100138ce2c2fbfb82e1cc4b2b93bea12103ac3b0c47c5e51"
+        },
+        {
+          "path": "browser-final-v2.log",
+          "sha256": "007953131104a424221e461fac03d0a5b94ca6ba04daafb3c4a80cba688c8f82"
+        },
+        {
+          "path": "backend-red.log",
+          "sha256": "85413a84a978ab6e3a5c4338f1ebc8bb6d818b9b1149e96c93382b7e98f20081"
+        },
+        {
+          "path": "backend-targeted.log",
+          "sha256": "21d8bb467dc8904ee11e33c198cc66f663cdc8574b8d3a16562c0404a61288eb"
+        },
+        {
+          "path": "rbac-regression.log",
+          "sha256": "b87d17b463845e7b14f447287b439b6179eaffc25deb5fb9cb97de8b0ba543ad"
+        },
+        {
+          "path": "frontend-unit.log",
+          "sha256": "7d36a97d94aee697c1f36a8a00b068285a835bb3d3f91584dd6e53d8e8ee605a"
+        },
+        {
+          "path": "browser.log",
+          "sha256": "f3f827fd81f9098ee7571e70c0565d869f7291a8023d1198d343061d08d0049f"
+        },
+        {
+          "path": "browser-final.log",
+          "sha256": "8eee25db77cf6f415463a47eef962af12308caac6c0860aafb9b396f1504ec8a"
+        },
+        {
+          "path": "postgres-final.log",
+          "sha256": "c1ea9b75ec05d100b6d6a9208cdf2b45e8d8bc576917896b7b210be9d78d0080"
+        },
+        {
+          "path": "frontend-unit-final.log",
+          "sha256": "ca0ad15e86197aedfee353aea4f1f8349739312a9b516858456d62a33a90dd66"
+        },
+        {
+          "path": "frontend-lint-final-v2.log",
+          "sha256": "e4cad1ba08b5d8e7162c4200b4704727f6da145c85be9461ef2bd975f88d8fad"
+        }
+      ]
+    },
+    "ci_backend_console": [
+      {
+        "workflow": "Backend Integration",
+        "run_id": 34896852291,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852291",
+        "event": "push",
+        "head_sha": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+        "attempt": 1,
+        "console_summary": "137 passed, 4 skipped, 17 warnings in 95.12s (0:01:35)",
+        "counts": {
+          "passed": 137,
+          "failed": 0,
+          "skipped": 4,
+          "deselected": 0
+        },
+        "log_sha256": "0a94ffeaab7a5546001465beb20a612d93a967aa7e4cd059217aae147efb6dd1"
+      },
+      {
+        "workflow": "Backend Tests",
+        "run_id": 34896852263,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852263",
+        "event": "push",
+        "head_sha": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+        "attempt": 1,
+        "console_summary": "2659 passed, 3 skipped, 12 deselected, 48 warnings in 537.93s (0:08:57)",
+        "counts": {
+          "passed": 2659,
+          "failed": 0,
+          "skipped": 3,
+          "deselected": 12
+        },
+        "log_sha256": "5f4929ec672df8b2f43533f1d1a551956f85ae911aee0da32fb5480b409bb857"
+      }
+    ],
+    "ci_frontend_console": [
+      {
+        "workflow": "Frontend Production Build",
+        "run_id": 34896852357,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852357",
+        "event": "push",
+        "head_sha": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+        "attempt": 1,
+        "console_summary": "build-frontend-production\tUNKNOWN STEP\t2026-09-14T21:10:22.1095265Z ##[notice]  59 passed (2.4m)",
+        "checks": {
+          "browser_passed": 59,
+          "dashboard_spec_in_explicit_command": true
+        },
+        "log_sha256": "ff79f64c5822f64b15760aa1face9a99a088f7957ac91b3df6b6328cdb341b84"
+      },
+      {
+        "workflow": "Frontend Checks",
+        "run_id": 34896852320,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852320",
+        "event": "push",
+        "head_sha": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+        "attempt": 1,
+        "console_summary": "vitest\tUNKNOWN STEP\t2026-09-14T21:07:07.2281415Z       Tests  230 passed (230)",
+        "checks": {
+          "unit_passed": 230,
+          "unhandled_errors": 0
+        },
+        "log_sha256": "1c6ea42881a36cc1fa2f2ea4510a7e2e67020ae524e51db578be3d40917c77f4"
+      }
+    ],
+    "production_baseline": {
+      "base": "https://tracelab.aquex.ai",
+      "timezoneId": "America/Chicago",
+      "checkedAt": "2026-09-14T22:21:58.331Z",
+      "checks": 136,
+      "routes": 34,
+      "failures": [],
+      "internalLinkPaths": [
+        "/",
+        "/404",
+        "/admin/corrections",
+        "/admin/observability",
+        "/admin/spaces",
+        "/admin/users",
+        "/collections",
+        "/collections/06ad13d9-2131-424c-9ca4-d9a11bc9a401",
+        "/collections/093190b6-dbd3-4a31-aa62-a67fab032e9a",
+        "/collections/18301f66-7cc8-405e-91a5-e03845d284e1",
+        "/collections/27fcefd3-a049-46c4-bf81-d5df8a1b0629",
+        "/collections/4af409b7-cb46-4c02-9aff-38b25376bf21",
+        "/collections/4f95814b-8416-473a-9632-bb1601f1a654",
+        "/collections/6680c114-dbce-45c9-9335-2a81a7c16b50",
+        "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+        "/collections/7acc9636-1988-4bd7-b68f-a91b0b862d93",
+        "/collections/7c1b78de-76ed-43a1-ac73-b8bbece848a8",
+        "/collections/907c8a7f-a083-49b0-8015-d5f0b4cfd316",
+        "/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+        "/collections/afac19c4-40f6-4471-bb42-c1a148b7620a",
+        "/collections/bef2b57c-3904-425d-b969-ca7cb8453adc",
+        "/collections/c4e663c6-5d38-4a82-9760-7412fb46a137",
+        "/collections/ca279662-9224-47b7-80d6-341aeda41540",
+        "/collections/df9c1b16-d0a7-401b-ab67-62921d260c05",
+        "/collections/e64e675e-d99f-48f1-9721-92e3f502e795",
+        "/collections/f044f358-49eb-4c6f-ada9-511e3e9abae9",
+        "/collections/f4912548-ce6a-43ba-941e-02c584050b92",
+        "/device",
+        "/documents",
+        "/documents/16bad45e-c426-46bb-8f04-d30a0e94efff",
+        "/documents/1e18775d-48e1-4e32-a59c-8188a176abb9",
+        "/documents/276d7724-d647-430c-9440-9c5b793de5d2",
+        "/documents/2f54e4ba-1ff2-4421-a632-172fe67e80a8",
+        "/documents/471f28f5-7cd3-4b7f-a973-0108f7f7cebd",
+        "/documents/7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+        "/documents/9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+        "/documents/9124e081-59ba-47bb-b34d-96273bd1140a",
+        "/documents/960c52f3-ae2f-4916-9112-51dcf781b470",
+        "/documents/980021d8-41f2-48a7-8731-f939a8f596d9",
+        "/documents/a28eab37-03f3-492e-83fe-f48e502fc223",
+        "/documents/a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+        "/documents/a8b7c2d0-283d-486e-a915-633ca251df29",
+        "/documents/ae3b3a88-b5dc-4130-ac77-a33cfcea388f",
+        "/documents/b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+        "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+        "/documents/d8c50c51-11f7-4649-b214-6aff8ed92521",
+        "/documents/e4f32d07-e596-4c8b-9712-5717a13595ce",
+        "/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+        "/documents/eb3074c0-f37e-4908-ac92-0d26d1882254",
+        "/documents/f40c4015-87d8-461f-80b5-4b9b653e0efb",
+        "/documents/f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+        "/documents/upload",
+        "/evidence",
+        "/evidence/1aeff4dc-5ab9-4dae-ac6e-9a713b38bab9",
+        "/evidence/1da242cc-517e-4fcb-9850-3c620e2b484e",
+        "/evidence/1e634b05-e218-4c60-a245-b4ff51b785a3",
+        "/evidence/21d22f19-6873-49d2-b662-fdbb024fdc47",
+        "/evidence/2334c0a8-e336-413d-8d55-c69359e44c63",
+        "/evidence/2e0276ba-e261-44b6-8e13-15091673eeb4",
+        "/evidence/2f5ddc05-c6eb-48b9-b664-4c20f40f30ee",
+        "/evidence/2f6af96a-ccf0-4c2d-8b40-f7d1c396ee76",
+        "/evidence/31f2bf8c-b225-4916-91d4-63e1762447da",
+        "/evidence/34656428-9635-4b1c-96f8-f4bb51e643b7",
+        "/evidence/362ae5f0-5461-46a1-b24f-676d1c2adfda",
+        "/evidence/3770d155-31a8-47e6-ba9a-54b544653827",
+        "/evidence/3ffa8783-4365-4fbe-84fe-f16c964a6d2f",
+        "/evidence/4671b863-3ff8-4424-941a-d250239aba14",
+        "/evidence/56d05c22-f1fa-4a7a-ac84-676061f53e1f",
+        "/evidence/5b2b486e-0c9c-4b91-843c-0f3f425997c4",
+        "/evidence/5b985352-d0d6-4417-bacc-6fb3031baa3f",
+        "/evidence/5c26d8d2-8d59-4af1-8f92-8235ed6bd83b",
+        "/evidence/60e5d2dd-5814-4ef3-abdb-2269f1b85647",
+        "/evidence/650aafc0-b8cb-4b57-bfcc-5d3a34e3601d",
+        "/evidence/65df244e-9c69-47f9-864a-fa2cd3850783",
+        "/evidence/68ee91e6-7ea0-49e1-8336-84a4b1993565",
+        "/evidence/70140c24-4cf7-4b51-b8a1-14dc4430b233",
+        "/evidence/75dfed70-b738-454e-b5b7-2b8b19939c90",
+        "/evidence/7be3e009-12c0-4e4c-b9f9-e4a7b83fd68c",
+        "/evidence/8007e7f6-ee61-4d84-9e21-f2b9c47f91d4",
+        "/evidence/81d9fae0-03cd-4374-9998-c1d446a5122e",
+        "/evidence/91b240ec-fbe8-493d-9ddd-88187db132d6",
+        "/evidence/ab8cfebb-d898-4ac6-b393-e1c50edf9532",
+        "/evidence/b1f59d0a-9460-4b96-bccf-63ecdb8c6996",
+        "/evidence/bdd6e865-dff9-4a6d-a612-394b13a737d2",
+        "/evidence/c7f090bf-cf77-477d-9b31-f939241a2245",
+        "/evidence/c8103bb0-4c39-49fc-8982-f4ba5245678a",
+        "/evidence/cd701dad-2ed6-46b9-93eb-2265dad0810a",
+        "/evidence/d25298ee-fda9-4930-ba5a-185e88a13aac",
+        "/evidence/d5e0c3c9-3d98-4e45-baf1-9e5a180c58db",
+        "/evidence/e531a960-984f-49f3-9256-9a223d3ee069",
+        "/evidence/eb804a26-b6cf-482e-ade0-1d4013884974",
+        "/evidence/f5c0950f-f5ec-46bc-a45e-4a575f53b3b1",
+        "/evidence/fb4075ee-24b9-43f7-9f38-ff1b1604ae90",
+        "/evidence/fb74b092-998b-4f9a-b4b8-5d28241f3389",
+        "/graph",
+        "/missions",
+        "/missions/01530cf1-8333-485f-8fb7-677393593fab",
+        "/missions/0b074e6a-f859-444c-b748-fdd08387e384",
+        "/missions/0b5f8651-5d86-4968-bd98-e57ed7e84901",
+        "/missions/1d8e48d8-da57-48a8-a67c-1aef5f918a34",
+        "/missions/27cbe849-a801-49ef-8cb5-bfa891ade2bd",
+        "/missions/2a8b68ae-29c4-43e2-ab01-46bcdf3d407f",
+        "/missions/2fefe37d-3c77-4b67-805c-00b38aec6d7d",
+        "/missions/39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+        "/missions/5161e652-8766-471a-9276-6e2cf9a334ca",
+        "/missions/54ca4557-763b-4091-a0bd-95b9f19e2132",
+        "/missions/5520222d-b11c-4d53-826e-a95972a8d4e5",
+        "/missions/57055608-4127-4dd6-914e-7fea6d4f9754",
+        "/missions/64e213b1-8244-44a4-99a5-b7be5aff383a",
+        "/missions/6a9c8707-dfe7-4cab-a9cf-d3b72b294a67",
+        "/missions/75b99744-6dfc-4533-af54-105980f38b04",
+        "/missions/76cf1b7b-55a4-4df4-80b6-5b53dd364b2f",
+        "/missions/79236f38-88ce-460a-8ca2-3b605563871b",
+        "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+        "/missions/83b9ee6e-f3af-4e7e-9515-d69d54fd47c0",
+        "/missions/9372bdee-eb7b-4cd3-9535-138a34ad3f62",
+        "/missions/952cc1de-688c-415b-bee9-ce143a753af2",
+        "/missions/96e10786-2f66-4e58-a9f7-db5c339a6d7c",
+        "/missions/aa403ba0-0e27-4872-8723-0716f2beb8f2",
+        "/missions/cbcd46bc-de17-4c6c-8391-b1669403fc74",
+        "/missions/cea71e51-a268-46c3-a2ba-84e2cf045217",
+        "/missions/d8340572-e8d2-47fe-a303-395f06f304c2",
+        "/missions/dd966b0c-a33c-4bb2-9dc2-195d0e0d6675",
+        "/missions/f99ea146-1b11-4bc3-9e36-0b35a03546a7",
+        "/missions/new",
+        "/projects",
+        "/projects/041489e1-bb62-4bbe-bb57-90a924fce867",
+        "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+        "/projects/0f5c295f-6ac0-4bc9-823f-32f2306d6f2d",
+        "/projects/1ca2ce70-e6c2-4593-aeb8-b4aa9f3fff01",
+        "/projects/4500cb98-7ca0-4703-b557-f9726c273f57",
+        "/projects/59f606db-9db8-4ba9-a200-c9b66c650f2a",
+        "/projects/5b03d540-3b3a-4762-819a-44dab5261da7",
+        "/projects/6dc4d8b7-06f0-48ba-a2bd-bcf60c6f75da",
+        "/projects/8a5e3763-8249-4194-97d0-cda0e5ff0672",
+        "/projects/959cfd13-fbd8-4277-beae-df57b3e68d0e",
+        "/projects/a38e85ca-5c94-44c7-a723-9b7ebf7fad59",
+        "/projects/b1983379-f0ab-4ea0-9645-f1e180342d72",
+        "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+        "/projects/fbdfcca1-fce5-447b-b081-17761e52b173",
+        "/reports",
+        "/reports/00b0e4ed-270f-40fd-b1c1-756d99415700",
+        "/reports/039d5c3d-7ad0-4936-9789-32d422a2bec6",
+        "/reports/0613ab1a-1ae7-4784-bf03-579023d4a20f",
+        "/reports/11823386-c4d7-4c3e-847e-365d464a8425",
+        "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+        "/reports/28b2a481-3d77-4659-8e46-ebd4dceceb1a",
+        "/reports/41fff966-1c62-4921-87b4-f8ec4f486927",
+        "/reports/470c666d-5274-4d40-9e0f-c55ed97740fd",
+        "/reports/489c778e-8f18-4b75-abd4-a75635feb8bf",
+        "/reports/56b700a2-35c4-465e-8125-e2a63e83c6f5",
+        "/reports/64dab59f-8684-42fe-93dd-03c62a255c64",
+        "/reports/65ce8a0b-17b2-4598-876a-9791a06adcbe",
+        "/reports/6636c940-ab9f-41a5-a84c-170d1bf9e609",
+        "/reports/7064c47e-c198-45d5-b887-b18a1f86d7ce",
+        "/reports/8a519cd2-3e88-49a4-9c30-d74a8d62b89a",
+        "/reports/8af4f590-687e-4df5-919f-df6395bade33",
+        "/reports/8e0f2a64-a29b-4483-86b3-7479ff284d12",
+        "/reports/955eb67e-6142-4c91-80f9-dc411258f66d",
+        "/reports/964532c5-ea10-4fef-a164-697aef3881b4",
+        "/reports/b4279f55-2ec7-46c5-bed7-d7550e60464d",
+        "/reports/b7e144ca-a1c2-422a-84c8-59f35bf1d61b",
+        "/reports/c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+        "/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+        "/reports/fa1d8733-f7ea-4483-97d8-12693318b108",
+        "/reports/fb69cbfc-dd02-4167-a89a-ca9cfbb252b5",
+        "/reports/ffe8436e-3d95-42e4-be82-a45acec7dd78",
+        "/saved-searches",
+        "/search",
+        "/settings"
+      ],
+      "legacyInternalLinks": [],
+      "readOnly": true,
+      "directProductionApi": true,
+      "readOnlyApiProxy": false
+    },
+    "active_data_audit": {
+      "started_at": "2026-09-14T22:19:36.258Z",
+      "source_commit": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+      "deployment_ids": [
+        "0645b1b4-5b01-4ade-b883-28eb0dca598e",
+        "036a7867-9c76-4d25-a09c-9fb8a29b836a"
+      ],
+      "checks": [
+        {
+          "name": "attention cache 1",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 2",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 3",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 4",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 5",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 6",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 7",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 8",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 9",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 10",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 11",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 12",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 13",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 14",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 15",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 16",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 17",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 18",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 19",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "attention cache 20",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "reason sum equals Home attention",
+          "actual": 435,
+          "expected": 435,
+          "passed": true
+        },
+        {
+          "name": "aggregate total equals Home",
+          "actual": 435,
+          "expected": 435,
+          "passed": true
+        },
+        {
+          "name": "validation_failed count matches missions",
+          "actual": 8,
+          "expected": 8,
+          "passed": true
+        },
+        {
+          "name": "blocked count matches missions",
+          "actual": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "name": "stalled count matches missions",
+          "actual": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "name": "unreviewed count matches missions",
+          "actual": 427,
+          "expected": 427,
+          "passed": true
+        },
+        {
+          "name": "at_risk dashboard matches missions",
+          "actual": 8,
+          "expected": 8,
+          "passed": true
+        },
+        {
+          "name": "unreviewed dashboard matches missions",
+          "actual": 427,
+          "expected": 427,
+          "passed": true
+        },
+        {
+          "name": "light/1440 workspace counters",
+          "actual": [
+            "435",
+            "435",
+            "0"
+          ],
+          "expected": [
+            "435",
+            "435",
+            "0"
+          ],
+          "passed": true
+        },
+        {
+          "name": "light/1440 mission 39b44c86-2e2b-4d19-bf3f-e069db5f1a76 timestamp",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/1440 mission 952cc1de-688c-415b-bee9-ce143a753af2 timestamp",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/1440 mission 7b847edd-5433-4237-a899-57b47e6edf0a timestamp",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/1440/at_risk tile total",
+          "actual": 8,
+          "expected": 8,
+          "passed": true
+        },
+        {
+          "name": "light/1440/unreviewed tile total",
+          "actual": 427,
+          "expected": 427,
+          "passed": true
+        },
+        {
+          "name": "light/1440 Chicago timestamp",
+          "actual": "9/14/2026, 5:19:55 PM",
+          "expected": "9/14/2026, 5:19:55 PM",
+          "passed": true
+        },
+        {
+          "name": "light/1440/save-dialog overflow",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "light/1440/save-dialog axe",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "light/1440/save-dialog theme",
+          "actual": "light",
+          "expected": "light",
+          "passed": true
+        },
+        {
+          "name": "UI save uses current URL filters",
+          "actual": {
+            "view": "attention",
+            "reason": [
+              "unreviewed"
+            ],
+            "project_id": "0afcc588-e722-45bd-8320-f486601b877c"
+          },
+          "expected": {
+            "view": "attention",
+            "reason": [
+              "unreviewed"
+            ],
+            "project_id": "0afcc588-e722-45bd-8320-f486601b877c"
+          },
+          "passed": true
+        },
+        {
+          "name": "created view live total",
+          "actual": 3,
+          "expected": 3,
+          "passed": true
+        },
+        {
+          "name": "light/1440 live total for saved view 1f24e049-2e80-447a-ba4e-55c195db2ff0",
+          "actual": 3,
+          "expected": 3,
+          "passed": true
+        },
+        {
+          "name": "light/1440 renamed view persists",
+          "actual": "UX-12 validation 1789424378671 renamed",
+          "expected": "UX-12 validation 1789424378671 renamed",
+          "passed": true
+        },
+        {
+          "name": "light/1440 saved-view total",
+          "actual": 3,
+          "expected": 3,
+          "passed": true
+        },
+        {
+          "name": "light/1440/dashboard-strip overflow",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "light/1440/dashboard-strip axe",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "light/1440/dashboard-strip theme",
+          "actual": "light",
+          "expected": "light",
+          "passed": true
+        },
+        {
+          "name": "light/1440/saved-view-palette overflow",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "light/1440/saved-view-palette axe",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "light/1440/saved-view-palette theme",
+          "actual": "light",
+          "expected": "light",
+          "passed": true
+        },
+        {
+          "name": "light/1440 palette restores saved URL",
+          "actual": [
+            "unreviewed"
+          ],
+          "expected": [
+            "unreviewed"
+          ],
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home Needs attention total",
+          "actual": "435",
+          "expected": "435",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home Active missions total",
+          "actual": "0",
+          "expected": "0",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home Recent reports total",
+          "actual": "485",
+          "expected": "485",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home Recent projects total",
+          "actual": "51",
+          "expected": "51",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home Agent & evidence activity total",
+          "actual": "59",
+          "expected": "59",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home evidence count chicago-pilot-2026-09-14",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home evidence count design-platform-article-2026-09-14",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home evidence count deepsearch:08ec5dd8-788f-4ef8-ac92-2849bf2f2e6e",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home evidence count deepsearch:e1899775-3f30-40f1-a494-daff5414de66",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home evidence count deepsearch:bc97c5a3-ccf6-441e-a73f-545385c7bd80",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home evidence count deepsearch:64ff9dac-d043-4f74-8645-612cecc58d79",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamps use the live API values",
+          "actual": [
+            "2026-09-01T20:48:55.932091",
+            "2026-09-01T20:49:21.772899",
+            "2026-09-01T20:51:29.027358",
+            "2026-09-01T20:51:33.463665",
+            "2026-09-03T23:53:01.514411",
+            "2026-09-06T05:47:14.700247",
+            "2026-09-06T06:02:06.866348",
+            "2026-09-12T15:42:11.477630",
+            "2026-09-12T15:42:12.414504",
+            "2026-09-13T20:25:41.967641",
+            "2026-09-13T20:25:42.945249",
+            "2026-09-13T23:59:19.196123",
+            "2026-09-13T23:59:19.777593",
+            "2026-09-14T05:33:24.063066",
+            "2026-09-14T05:33:24.509119",
+            "2026-09-14T06:18:14.246889",
+            "2026-09-14T20:15:36.030943",
+            "2026-09-14T20:17:12.354043",
+            "2026-09-14T22:20:08.692841"
+          ],
+          "expected": [
+            "2026-09-01T20:48:55.932091",
+            "2026-09-01T20:49:21.772899",
+            "2026-09-01T20:51:29.027358",
+            "2026-09-01T20:51:33.463665",
+            "2026-09-03T23:53:01.514411",
+            "2026-09-06T05:47:14.700247",
+            "2026-09-06T06:02:06.866348",
+            "2026-09-12T15:42:11.477630",
+            "2026-09-12T15:42:12.414504",
+            "2026-09-13T20:25:41.967641",
+            "2026-09-13T20:25:42.945249",
+            "2026-09-13T23:59:19.196123",
+            "2026-09-13T23:59:19.777593",
+            "2026-09-14T05:33:24.063066",
+            "2026-09-14T05:33:24.509119",
+            "2026-09-14T06:18:14.246889",
+            "2026-09-14T20:15:36.030943",
+            "2026-09-14T20:17:12.354043",
+            "2026-09-14T22:20:08.692841"
+          ],
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 1",
+          "actual": "Sep 14, 5:20 PM",
+          "expected": "Sep 14, 5:20 PM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 2",
+          "actual": "Sep 14, 3:17 PM",
+          "expected": "Sep 14, 3:17 PM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 3",
+          "actual": "Sep 14, 12:33 AM",
+          "expected": "Sep 14, 12:33 AM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 4",
+          "actual": "Sep 13, 6:59 PM",
+          "expected": "Sep 13, 6:59 PM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 5",
+          "actual": "Sep 13, 3:25 PM",
+          "expected": "Sep 13, 3:25 PM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 6",
+          "actual": "Sep 12, 10:42 AM",
+          "expected": "Sep 12, 10:42 AM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 7",
+          "actual": "Sep 6, 1:02 AM",
+          "expected": "Sep 6, 1:02 AM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 8",
+          "actual": "Sep 6, 12:47 AM",
+          "expected": "Sep 6, 12:47 AM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 9",
+          "actual": "Sep 3, 6:53 PM",
+          "expected": "Sep 3, 6:53 PM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 10",
+          "actual": "Sep 1, 3:51 PM",
+          "expected": "Sep 1, 3:51 PM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 11",
+          "actual": "Sep 1, 3:51 PM",
+          "expected": "Sep 1, 3:51 PM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 12",
+          "actual": "Sep 1, 3:49 PM",
+          "expected": "Sep 1, 3:49 PM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 13",
+          "actual": "Sep 1, 3:48 PM",
+          "expected": "Sep 1, 3:48 PM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 14",
+          "actual": "Sep 14, 3:15 PM",
+          "expected": "Sep 14, 3:15 PM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 15",
+          "actual": "Sep 14, 1:18 AM",
+          "expected": "Sep 14, 1:18 AM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 16",
+          "actual": "Sep 14, 12:33 AM",
+          "expected": "Sep 14, 12:33 AM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 17",
+          "actual": "Sep 13, 6:59 PM",
+          "expected": "Sep 13, 6:59 PM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 18",
+          "actual": "Sep 13, 3:25 PM",
+          "expected": "Sep 13, 3:25 PM",
+          "passed": true
+        },
+        {
+          "name": "light/1440 Home timestamp 19",
+          "actual": "Sep 12, 10:42 AM",
+          "expected": "Sep 12, 10:42 AM",
+          "passed": true
+        },
+        {
+          "name": "light/1440/home overflow",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "light/1440/home axe",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "light/1440/home theme",
+          "actual": "light",
+          "expected": "light",
+          "passed": true
+        },
+        {
+          "name": "light/1440 browser/API errors",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "light/390 workspace counters",
+          "actual": [
+            "435",
+            "435",
+            "0"
+          ],
+          "expected": [
+            "435",
+            "435",
+            "0"
+          ],
+          "passed": true
+        },
+        {
+          "name": "light/390 mission 39b44c86-2e2b-4d19-bf3f-e069db5f1a76 timestamp",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/390 mission 952cc1de-688c-415b-bee9-ce143a753af2 timestamp",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/390 mission 7b847edd-5433-4237-a899-57b47e6edf0a timestamp",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/390/at_risk tile total",
+          "actual": 8,
+          "expected": 8,
+          "passed": true
+        },
+        {
+          "name": "light/390/unreviewed tile total",
+          "actual": 427,
+          "expected": 427,
+          "passed": true
+        },
+        {
+          "name": "light/390 Chicago timestamp",
+          "actual": "9/14/2026, 5:20:12 PM",
+          "expected": "9/14/2026, 5:20:12 PM",
+          "passed": true
+        },
+        {
+          "name": "light/390/save-dialog overflow",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "light/390/save-dialog axe",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "light/390/save-dialog theme",
+          "actual": "light",
+          "expected": "light",
+          "passed": true
+        },
+        {
+          "name": "light/390 live total for saved view 1f24e049-2e80-447a-ba4e-55c195db2ff0",
+          "actual": 3,
+          "expected": 3,
+          "passed": true
+        },
+        {
+          "name": "light/390 renamed view persists",
+          "actual": "UX-12 validation 1789424378671 renamed",
+          "expected": "UX-12 validation 1789424378671 renamed",
+          "passed": true
+        },
+        {
+          "name": "light/390 saved-view total",
+          "actual": 3,
+          "expected": 3,
+          "passed": true
+        },
+        {
+          "name": "light/390/dashboard-strip overflow",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "light/390/dashboard-strip axe",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "light/390/dashboard-strip theme",
+          "actual": "light",
+          "expected": "light",
+          "passed": true
+        },
+        {
+          "name": "light/390/saved-view-palette overflow",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "light/390/saved-view-palette axe",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "light/390/saved-view-palette theme",
+          "actual": "light",
+          "expected": "light",
+          "passed": true
+        },
+        {
+          "name": "light/390 palette restores saved URL",
+          "actual": [
+            "unreviewed"
+          ],
+          "expected": [
+            "unreviewed"
+          ],
+          "passed": true
+        },
+        {
+          "name": "light/390 Home Needs attention total",
+          "actual": "435",
+          "expected": "435",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home Active missions total",
+          "actual": "0",
+          "expected": "0",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home Recent reports total",
+          "actual": "485",
+          "expected": "485",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home Recent projects total",
+          "actual": "51",
+          "expected": "51",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home Agent & evidence activity total",
+          "actual": "59",
+          "expected": "59",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home evidence count chicago-pilot-2026-09-14",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/390 Home evidence count design-platform-article-2026-09-14",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/390 Home evidence count deepsearch:08ec5dd8-788f-4ef8-ac92-2849bf2f2e6e",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/390 Home evidence count deepsearch:e1899775-3f30-40f1-a494-daff5414de66",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/390 Home evidence count deepsearch:bc97c5a3-ccf6-441e-a73f-545385c7bd80",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/390 Home evidence count deepsearch:64ff9dac-d043-4f74-8645-612cecc58d79",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamps use the live API values",
+          "actual": [
+            "2026-09-01T20:48:55.932091",
+            "2026-09-01T20:49:21.772899",
+            "2026-09-01T20:51:29.027358",
+            "2026-09-01T20:51:33.463665",
+            "2026-09-03T23:53:01.514411",
+            "2026-09-06T05:47:14.700247",
+            "2026-09-06T06:02:06.866348",
+            "2026-09-12T15:42:11.477630",
+            "2026-09-12T15:42:12.414504",
+            "2026-09-13T20:25:41.967641",
+            "2026-09-13T20:25:42.945249",
+            "2026-09-13T23:59:19.196123",
+            "2026-09-13T23:59:19.777593",
+            "2026-09-14T05:33:24.063066",
+            "2026-09-14T05:33:24.509119",
+            "2026-09-14T06:18:14.246889",
+            "2026-09-14T20:15:36.030943",
+            "2026-09-14T20:17:12.354043",
+            "2026-09-14T22:20:20.225266"
+          ],
+          "expected": [
+            "2026-09-01T20:48:55.932091",
+            "2026-09-01T20:49:21.772899",
+            "2026-09-01T20:51:29.027358",
+            "2026-09-01T20:51:33.463665",
+            "2026-09-03T23:53:01.514411",
+            "2026-09-06T05:47:14.700247",
+            "2026-09-06T06:02:06.866348",
+            "2026-09-12T15:42:11.477630",
+            "2026-09-12T15:42:12.414504",
+            "2026-09-13T20:25:41.967641",
+            "2026-09-13T20:25:42.945249",
+            "2026-09-13T23:59:19.196123",
+            "2026-09-13T23:59:19.777593",
+            "2026-09-14T05:33:24.063066",
+            "2026-09-14T05:33:24.509119",
+            "2026-09-14T06:18:14.246889",
+            "2026-09-14T20:15:36.030943",
+            "2026-09-14T20:17:12.354043",
+            "2026-09-14T22:20:20.225266"
+          ],
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 1",
+          "actual": "Sep 14, 5:20 PM",
+          "expected": "Sep 14, 5:20 PM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 2",
+          "actual": "Sep 14, 3:17 PM",
+          "expected": "Sep 14, 3:17 PM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 3",
+          "actual": "Sep 14, 12:33 AM",
+          "expected": "Sep 14, 12:33 AM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 4",
+          "actual": "Sep 13, 6:59 PM",
+          "expected": "Sep 13, 6:59 PM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 5",
+          "actual": "Sep 13, 3:25 PM",
+          "expected": "Sep 13, 3:25 PM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 6",
+          "actual": "Sep 12, 10:42 AM",
+          "expected": "Sep 12, 10:42 AM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 7",
+          "actual": "Sep 6, 1:02 AM",
+          "expected": "Sep 6, 1:02 AM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 8",
+          "actual": "Sep 6, 12:47 AM",
+          "expected": "Sep 6, 12:47 AM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 9",
+          "actual": "Sep 3, 6:53 PM",
+          "expected": "Sep 3, 6:53 PM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 10",
+          "actual": "Sep 1, 3:51 PM",
+          "expected": "Sep 1, 3:51 PM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 11",
+          "actual": "Sep 1, 3:51 PM",
+          "expected": "Sep 1, 3:51 PM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 12",
+          "actual": "Sep 1, 3:49 PM",
+          "expected": "Sep 1, 3:49 PM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 13",
+          "actual": "Sep 1, 3:48 PM",
+          "expected": "Sep 1, 3:48 PM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 14",
+          "actual": "Sep 14, 3:15 PM",
+          "expected": "Sep 14, 3:15 PM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 15",
+          "actual": "Sep 14, 1:18 AM",
+          "expected": "Sep 14, 1:18 AM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 16",
+          "actual": "Sep 14, 12:33 AM",
+          "expected": "Sep 14, 12:33 AM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 17",
+          "actual": "Sep 13, 6:59 PM",
+          "expected": "Sep 13, 6:59 PM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 18",
+          "actual": "Sep 13, 3:25 PM",
+          "expected": "Sep 13, 3:25 PM",
+          "passed": true
+        },
+        {
+          "name": "light/390 Home timestamp 19",
+          "actual": "Sep 12, 10:42 AM",
+          "expected": "Sep 12, 10:42 AM",
+          "passed": true
+        },
+        {
+          "name": "light/390/home overflow",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "light/390/home axe",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "light/390/home theme",
+          "actual": "light",
+          "expected": "light",
+          "passed": true
+        },
+        {
+          "name": "light/390 browser/API errors",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "dark/1440 workspace counters",
+          "actual": [
+            "435",
+            "435",
+            "0"
+          ],
+          "expected": [
+            "435",
+            "435",
+            "0"
+          ],
+          "passed": true
+        },
+        {
+          "name": "dark/1440 mission 39b44c86-2e2b-4d19-bf3f-e069db5f1a76 timestamp",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/1440 mission 952cc1de-688c-415b-bee9-ce143a753af2 timestamp",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/1440 mission 7b847edd-5433-4237-a899-57b47e6edf0a timestamp",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/1440/at_risk tile total",
+          "actual": 8,
+          "expected": 8,
+          "passed": true
+        },
+        {
+          "name": "dark/1440/unreviewed tile total",
+          "actual": 427,
+          "expected": 427,
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Chicago timestamp",
+          "actual": "9/14/2026, 5:20:24 PM",
+          "expected": "9/14/2026, 5:20:24 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440/save-dialog overflow",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "dark/1440/save-dialog axe",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "dark/1440/save-dialog theme",
+          "actual": "dark",
+          "expected": "dark",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 live total for saved view 1f24e049-2e80-447a-ba4e-55c195db2ff0",
+          "actual": 3,
+          "expected": 3,
+          "passed": true
+        },
+        {
+          "name": "dark/1440 renamed view persists",
+          "actual": "UX-12 validation 1789424378671 renamed",
+          "expected": "UX-12 validation 1789424378671 renamed",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 saved-view total",
+          "actual": 3,
+          "expected": 3,
+          "passed": true
+        },
+        {
+          "name": "dark/1440/dashboard-strip overflow",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "dark/1440/dashboard-strip axe",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "dark/1440/dashboard-strip theme",
+          "actual": "dark",
+          "expected": "dark",
+          "passed": true
+        },
+        {
+          "name": "dark/1440/saved-view-palette overflow",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "dark/1440/saved-view-palette axe",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "dark/1440/saved-view-palette theme",
+          "actual": "dark",
+          "expected": "dark",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 palette restores saved URL",
+          "actual": [
+            "unreviewed"
+          ],
+          "expected": [
+            "unreviewed"
+          ],
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home Needs attention total",
+          "actual": "435",
+          "expected": "435",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home Active missions total",
+          "actual": "0",
+          "expected": "0",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home Recent reports total",
+          "actual": "485",
+          "expected": "485",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home Recent projects total",
+          "actual": "51",
+          "expected": "51",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home Agent & evidence activity total",
+          "actual": "59",
+          "expected": "59",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home evidence count chicago-pilot-2026-09-14",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home evidence count design-platform-article-2026-09-14",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home evidence count deepsearch:08ec5dd8-788f-4ef8-ac92-2849bf2f2e6e",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home evidence count deepsearch:e1899775-3f30-40f1-a494-daff5414de66",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home evidence count deepsearch:bc97c5a3-ccf6-441e-a73f-545385c7bd80",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home evidence count deepsearch:64ff9dac-d043-4f74-8645-612cecc58d79",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamps use the live API values",
+          "actual": [
+            "2026-09-01T20:48:55.932091",
+            "2026-09-01T20:49:21.772899",
+            "2026-09-01T20:51:29.027358",
+            "2026-09-01T20:51:33.463665",
+            "2026-09-03T23:53:01.514411",
+            "2026-09-06T05:47:14.700247",
+            "2026-09-06T06:02:06.866348",
+            "2026-09-12T15:42:11.477630",
+            "2026-09-12T15:42:12.414504",
+            "2026-09-13T20:25:41.967641",
+            "2026-09-13T20:25:42.945249",
+            "2026-09-13T23:59:19.196123",
+            "2026-09-13T23:59:19.777593",
+            "2026-09-14T05:33:24.063066",
+            "2026-09-14T05:33:24.509119",
+            "2026-09-14T06:18:14.246889",
+            "2026-09-14T20:15:36.030943",
+            "2026-09-14T20:17:12.354043",
+            "2026-09-14T22:20:33.040504"
+          ],
+          "expected": [
+            "2026-09-01T20:48:55.932091",
+            "2026-09-01T20:49:21.772899",
+            "2026-09-01T20:51:29.027358",
+            "2026-09-01T20:51:33.463665",
+            "2026-09-03T23:53:01.514411",
+            "2026-09-06T05:47:14.700247",
+            "2026-09-06T06:02:06.866348",
+            "2026-09-12T15:42:11.477630",
+            "2026-09-12T15:42:12.414504",
+            "2026-09-13T20:25:41.967641",
+            "2026-09-13T20:25:42.945249",
+            "2026-09-13T23:59:19.196123",
+            "2026-09-13T23:59:19.777593",
+            "2026-09-14T05:33:24.063066",
+            "2026-09-14T05:33:24.509119",
+            "2026-09-14T06:18:14.246889",
+            "2026-09-14T20:15:36.030943",
+            "2026-09-14T20:17:12.354043",
+            "2026-09-14T22:20:33.040504"
+          ],
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 1",
+          "actual": "Sep 14, 5:20 PM",
+          "expected": "Sep 14, 5:20 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 2",
+          "actual": "Sep 14, 3:17 PM",
+          "expected": "Sep 14, 3:17 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 3",
+          "actual": "Sep 14, 12:33 AM",
+          "expected": "Sep 14, 12:33 AM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 4",
+          "actual": "Sep 13, 6:59 PM",
+          "expected": "Sep 13, 6:59 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 5",
+          "actual": "Sep 13, 3:25 PM",
+          "expected": "Sep 13, 3:25 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 6",
+          "actual": "Sep 12, 10:42 AM",
+          "expected": "Sep 12, 10:42 AM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 7",
+          "actual": "Sep 6, 1:02 AM",
+          "expected": "Sep 6, 1:02 AM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 8",
+          "actual": "Sep 6, 12:47 AM",
+          "expected": "Sep 6, 12:47 AM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 9",
+          "actual": "Sep 3, 6:53 PM",
+          "expected": "Sep 3, 6:53 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 10",
+          "actual": "Sep 1, 3:51 PM",
+          "expected": "Sep 1, 3:51 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 11",
+          "actual": "Sep 1, 3:51 PM",
+          "expected": "Sep 1, 3:51 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 12",
+          "actual": "Sep 1, 3:49 PM",
+          "expected": "Sep 1, 3:49 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 13",
+          "actual": "Sep 1, 3:48 PM",
+          "expected": "Sep 1, 3:48 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 14",
+          "actual": "Sep 14, 3:15 PM",
+          "expected": "Sep 14, 3:15 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 15",
+          "actual": "Sep 14, 1:18 AM",
+          "expected": "Sep 14, 1:18 AM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 16",
+          "actual": "Sep 14, 12:33 AM",
+          "expected": "Sep 14, 12:33 AM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 17",
+          "actual": "Sep 13, 6:59 PM",
+          "expected": "Sep 13, 6:59 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 18",
+          "actual": "Sep 13, 3:25 PM",
+          "expected": "Sep 13, 3:25 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 Home timestamp 19",
+          "actual": "Sep 12, 10:42 AM",
+          "expected": "Sep 12, 10:42 AM",
+          "passed": true
+        },
+        {
+          "name": "dark/1440/home overflow",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "dark/1440/home axe",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "dark/1440/home theme",
+          "actual": "dark",
+          "expected": "dark",
+          "passed": true
+        },
+        {
+          "name": "dark/1440 browser/API errors",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "dark/390 workspace counters",
+          "actual": [
+            "435",
+            "435",
+            "0"
+          ],
+          "expected": [
+            "435",
+            "435",
+            "0"
+          ],
+          "passed": true
+        },
+        {
+          "name": "dark/390 mission 39b44c86-2e2b-4d19-bf3f-e069db5f1a76 timestamp",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/390 mission 952cc1de-688c-415b-bee9-ce143a753af2 timestamp",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/390 mission 7b847edd-5433-4237-a899-57b47e6edf0a timestamp",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/390/at_risk tile total",
+          "actual": 8,
+          "expected": 8,
+          "passed": true
+        },
+        {
+          "name": "dark/390/unreviewed tile total",
+          "actual": 427,
+          "expected": 427,
+          "passed": true
+        },
+        {
+          "name": "dark/390 Chicago timestamp",
+          "actual": "9/14/2026, 5:20:37 PM",
+          "expected": "9/14/2026, 5:20:37 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/390/save-dialog overflow",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "dark/390/save-dialog axe",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "dark/390/save-dialog theme",
+          "actual": "dark",
+          "expected": "dark",
+          "passed": true
+        },
+        {
+          "name": "dark/390 live total for saved view 1f24e049-2e80-447a-ba4e-55c195db2ff0",
+          "actual": 3,
+          "expected": 3,
+          "passed": true
+        },
+        {
+          "name": "dark/390 renamed view persists",
+          "actual": "UX-12 validation 1789424378671 renamed",
+          "expected": "UX-12 validation 1789424378671 renamed",
+          "passed": true
+        },
+        {
+          "name": "dark/390 saved-view total",
+          "actual": 3,
+          "expected": 3,
+          "passed": true
+        },
+        {
+          "name": "dark/390/dashboard-strip overflow",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "dark/390/dashboard-strip axe",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "dark/390/dashboard-strip theme",
+          "actual": "dark",
+          "expected": "dark",
+          "passed": true
+        },
+        {
+          "name": "dark/390/saved-view-palette overflow",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "dark/390/saved-view-palette axe",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "dark/390/saved-view-palette theme",
+          "actual": "dark",
+          "expected": "dark",
+          "passed": true
+        },
+        {
+          "name": "dark/390 palette restores saved URL",
+          "actual": [
+            "unreviewed"
+          ],
+          "expected": [
+            "unreviewed"
+          ],
+          "passed": true
+        },
+        {
+          "name": "UI delete persisted",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home Needs attention total",
+          "actual": "435",
+          "expected": "435",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home Active missions total",
+          "actual": "0",
+          "expected": "0",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home Recent reports total",
+          "actual": "485",
+          "expected": "485",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home Recent projects total",
+          "actual": "51",
+          "expected": "51",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home Agent & evidence activity total",
+          "actual": "59",
+          "expected": "59",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home evidence count chicago-pilot-2026-09-14",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home evidence count design-platform-article-2026-09-14",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home evidence count deepsearch:08ec5dd8-788f-4ef8-ac92-2849bf2f2e6e",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home evidence count deepsearch:e1899775-3f30-40f1-a494-daff5414de66",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home evidence count deepsearch:bc97c5a3-ccf6-441e-a73f-545385c7bd80",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home evidence count deepsearch:64ff9dac-d043-4f74-8645-612cecc58d79",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamps use the live API values",
+          "actual": [
+            "2026-09-01T20:48:55.932091",
+            "2026-09-01T20:49:21.772899",
+            "2026-09-01T20:51:29.027358",
+            "2026-09-01T20:51:33.463665",
+            "2026-09-03T23:53:01.514411",
+            "2026-09-06T05:47:14.700247",
+            "2026-09-06T06:02:06.866348",
+            "2026-09-12T15:42:11.477630",
+            "2026-09-12T15:42:12.414504",
+            "2026-09-13T20:25:41.967641",
+            "2026-09-13T20:25:42.945249",
+            "2026-09-13T23:59:19.196123",
+            "2026-09-13T23:59:19.777593",
+            "2026-09-14T05:33:24.063066",
+            "2026-09-14T05:33:24.509119",
+            "2026-09-14T06:18:14.246889",
+            "2026-09-14T20:15:36.030943",
+            "2026-09-14T20:17:12.354043",
+            "2026-09-14T22:20:48.560434"
+          ],
+          "expected": [
+            "2026-09-01T20:48:55.932091",
+            "2026-09-01T20:49:21.772899",
+            "2026-09-01T20:51:29.027358",
+            "2026-09-01T20:51:33.463665",
+            "2026-09-03T23:53:01.514411",
+            "2026-09-06T05:47:14.700247",
+            "2026-09-06T06:02:06.866348",
+            "2026-09-12T15:42:11.477630",
+            "2026-09-12T15:42:12.414504",
+            "2026-09-13T20:25:41.967641",
+            "2026-09-13T20:25:42.945249",
+            "2026-09-13T23:59:19.196123",
+            "2026-09-13T23:59:19.777593",
+            "2026-09-14T05:33:24.063066",
+            "2026-09-14T05:33:24.509119",
+            "2026-09-14T06:18:14.246889",
+            "2026-09-14T20:15:36.030943",
+            "2026-09-14T20:17:12.354043",
+            "2026-09-14T22:20:48.560434"
+          ],
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 1",
+          "actual": "Sep 14, 5:20 PM",
+          "expected": "Sep 14, 5:20 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 2",
+          "actual": "Sep 14, 3:17 PM",
+          "expected": "Sep 14, 3:17 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 3",
+          "actual": "Sep 14, 12:33 AM",
+          "expected": "Sep 14, 12:33 AM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 4",
+          "actual": "Sep 13, 6:59 PM",
+          "expected": "Sep 13, 6:59 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 5",
+          "actual": "Sep 13, 3:25 PM",
+          "expected": "Sep 13, 3:25 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 6",
+          "actual": "Sep 12, 10:42 AM",
+          "expected": "Sep 12, 10:42 AM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 7",
+          "actual": "Sep 6, 1:02 AM",
+          "expected": "Sep 6, 1:02 AM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 8",
+          "actual": "Sep 6, 12:47 AM",
+          "expected": "Sep 6, 12:47 AM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 9",
+          "actual": "Sep 3, 6:53 PM",
+          "expected": "Sep 3, 6:53 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 10",
+          "actual": "Sep 1, 3:51 PM",
+          "expected": "Sep 1, 3:51 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 11",
+          "actual": "Sep 1, 3:51 PM",
+          "expected": "Sep 1, 3:51 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 12",
+          "actual": "Sep 1, 3:49 PM",
+          "expected": "Sep 1, 3:49 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 13",
+          "actual": "Sep 1, 3:48 PM",
+          "expected": "Sep 1, 3:48 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 14",
+          "actual": "Sep 14, 3:15 PM",
+          "expected": "Sep 14, 3:15 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 15",
+          "actual": "Sep 14, 1:18 AM",
+          "expected": "Sep 14, 1:18 AM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 16",
+          "actual": "Sep 14, 12:33 AM",
+          "expected": "Sep 14, 12:33 AM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 17",
+          "actual": "Sep 13, 6:59 PM",
+          "expected": "Sep 13, 6:59 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 18",
+          "actual": "Sep 13, 3:25 PM",
+          "expected": "Sep 13, 3:25 PM",
+          "passed": true
+        },
+        {
+          "name": "dark/390 Home timestamp 19",
+          "actual": "Sep 12, 10:42 AM",
+          "expected": "Sep 12, 10:42 AM",
+          "passed": true
+        },
+        {
+          "name": "dark/390/home overflow",
+          "actual": false,
+          "expected": false,
+          "passed": true
+        },
+        {
+          "name": "dark/390/home axe",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "dark/390/home theme",
+          "actual": "dark",
+          "expected": "dark",
+          "passed": true
+        },
+        {
+          "name": "dark/390 browser/API errors",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        },
+        {
+          "name": "all original personal views preserved and audit views removed",
+          "actual": [],
+          "expected": [],
+          "passed": true
+        }
+      ],
+      "latency_ms": [
+        280.9758750000001,
+        336.40987499999983,
+        309.7295830000003,
+        778.3768340000001,
+        318.94045800000004,
+        318.3035,
+        324.33637500000077,
+        322.7340000000004,
+        1165.8744159999997,
+        323.2497910000002,
+        324.47016600000006,
+        321.4235410000001,
+        319.63504099999955,
+        1023.4972909999997,
+        317.9292080000014,
+        270.81474999999955,
+        322.93125000000146,
+        318.10004200000003,
+        261.01854099999946,
+        543.5005000000001
+      ],
+      "screenshots": [
+        "light-1440-save-dialog.png",
+        "light-1440-dashboard-strip.png",
+        "light-1440-saved-view-palette.png",
+        "light-1440-home.png",
+        "light-390-save-dialog.png",
+        "light-390-dashboard-strip.png",
+        "light-390-saved-view-palette.png",
+        "light-390-home.png",
+        "dark-1440-save-dialog.png",
+        "dark-1440-dashboard-strip.png",
+        "dark-1440-saved-view-palette.png",
+        "dark-1440-home.png",
+        "dark-390-save-dialog.png",
+        "dark-390-dashboard-strip.png",
+        "dark-390-saved-view-palette.png",
+        "dark-390-home.png"
+      ],
+      "cleanup": [],
+      "user_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+      "original_view_ids": [],
+      "latency": {
+        "calls": 20,
+        "method": "nearest-rank",
+        "p50": 321.4235410000001,
+        "p95": 1023.4972909999997
+      },
+      "attention": {
+        "generated_at": "2026-09-14T22:19:47.161778",
+        "stalled_after_seconds": 3600,
+        "total": 435,
+        "by_reason": {
+          "validation_failed": 8,
+          "blocked": 0,
+          "stalled": 0,
+          "unreviewed": 427
+        },
+        "dashboards": [
+          {
+            "key": "at_risk",
+            "total": 8
+          },
+          {
+            "key": "unreviewed",
+            "total": 427
+          }
+        ]
+      },
+      "saved_filters": {
+        "view": "attention",
+        "reason": [
+          "unreviewed"
+        ],
+        "project_id": "0afcc588-e722-45bd-8320-f486601b877c"
+      },
+      "saved_total": 3,
+      "finished_at": "2026-09-14T22:20:50.819Z",
+      "passed": true
+    },
+    "public_smoke": {
+      "tool": "playwright",
+      "generatedAt": "2026-09-14T22:15:37.395Z",
+      "completedAt": "2026-09-14T22:15:40.369Z",
+      "status": "passed",
+      "summary": {
+        "total": 5,
+        "expected": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "durationSeconds": 2.974,
+        "retries": 0
+      },
+      "environment": {
+        "node": "v24.6.0",
+        "ci": {
+          "provider": null
+        },
+        "projects": [
+          "chromium"
+        ],
+        "browsers": []
+      },
+      "tests": [
+        {
+          "title": "missions route responds at the public domain",
+          "file": "frontend/tests/e2e/production-smoke.spec.ts",
+          "line": 17,
+          "column": 7,
+          "status": "passed",
+          "durationMs": 757,
+          "annotations": [],
+          "attachments": [],
+          "errors": []
+        },
+        {
+          "title": "/admin/users is deployed as its own Next page",
+          "file": "frontend/tests/e2e/production-smoke.spec.ts",
+          "line": 23,
+          "column": 9,
+          "status": "passed",
+          "durationMs": 284,
+          "annotations": [],
+          "attachments": [],
+          "errors": []
+        },
+        {
+          "title": "/admin/spaces is deployed as its own Next page",
+          "file": "frontend/tests/e2e/production-smoke.spec.ts",
+          "line": 23,
+          "column": 9,
+          "status": "passed",
+          "durationMs": 258,
+          "annotations": [],
+          "attachments": [],
+          "errors": []
+        },
+        {
+          "title": "API health endpoint confirms production authorization and reconciler freshness",
+          "file": "frontend/tests/e2e/production-smoke.spec.ts",
+          "line": 33,
+          "column": 7,
+          "status": "passed",
+          "durationMs": 70,
+          "annotations": [],
+          "attachments": [],
+          "errors": []
+        },
+        {
+          "title": "every maintained migration preserves its destination and query parameters",
+          "file": "frontend/tests/e2e/route-migration.spec.ts",
+          "line": 5,
+          "column": 5,
+          "status": "passed",
+          "durationMs": 961,
+          "annotations": [],
+          "attachments": [
+            {
+              "name": "route-migration-coverage",
+              "contentType": "application/json",
+              "path": "/tmp/tracelab-s52-ux12/source-smoke-artifacts/route-migration-every-main-a90a2-nation-and-query-parameters-chromium/attachments/route-migration-coverage-cd82faf069628a65f3074b1368681916ed6f36c6.json"
+            }
+          ],
+          "errors": []
+        }
+      ],
+      "artifactPath": "/tmp/tracelab-s52-ux12/source-public-smoke.json"
+    },
+    "tested_source_files": [
+      {
+        "path": ".github/workflows/frontend-production-build.yml",
+        "sha256": "820af15526b19aeb9b2483d923facfa2719871ab309868176ed734f277954bf1"
+      },
+      {
+        "path": "alembic/versions/047_user_saved_views.py",
+        "sha256": "d2bb9d48c8d5612e892b42af9a1b89d20d6188c3fe0bf49adf1a814a8496161a"
+      },
+      {
+        "path": "app/adapters/repositories/sqlalchemy_home_repo.py",
+        "sha256": "7491af5907b5378dfe02258ed9b0e78908a19faa5fc963d0f9211741bb16e293"
+      },
+      {
+        "path": "app/adapters/repositories/sqlalchemy_mission_views_repo.py",
+        "sha256": "b4ad5f90c835b3316d9f7db356a45c27ba7b6f77a3d4a7d9042850ccd477e247"
+      },
+      {
+        "path": "app/api/v1/home.py",
+        "sha256": "33d3943bcf7840dff8243ef723fd4e306485e16e4ea5bd2b80c9a00d5e756dc2"
+      },
+      {
+        "path": "app/api/v1/mission_views.py",
+        "sha256": "9cb7ab1d0348a55d364e3bdec8ac18763e58bef21128a3e976bc72db90700ca5"
+      },
+      {
+        "path": "app/api/v1/missions.py",
+        "sha256": "6fa6935b82e086a0ee8676df309a0c798a9bd60803095c7b8f1439e9f2dd90a5"
+      },
+      {
+        "path": "app/dependencies.py",
+        "sha256": "3b28183b4937327a49d83f222fcc4350839b6c63d7554ed98f9d2dd546d7711f"
+      },
+      {
+        "path": "app/main.py",
+        "sha256": "0d007f4981fe95065b962b46f357f35ad326ef52ac760b8efa2623ee63283194"
+      },
+      {
+        "path": "app/models/__init__.py",
+        "sha256": "5b4d131e6d92c71cbaf56e00f4d52cc8b3d56749a782bf4c0fd8e9277520ed50"
+      },
+      {
+        "path": "app/models/user_saved_view.py",
+        "sha256": "1ba1090e15b1fccad3eaae3944f9f573593edeb8f08d7ad92b221ac031fb2c57"
+      },
+      {
+        "path": "app/ports/home.py",
+        "sha256": "1608da9c3286db04afee1b47596da54919b06cfaf207fddbc6337714e20f3ced"
+      },
+      {
+        "path": "app/ports/mission_views.py",
+        "sha256": "6a6ddf75243a704e3c3914ba300916edb22057fbac9f20bc88e791243213e87e"
+      },
+      {
+        "path": "app/schemas/home.py",
+        "sha256": "da9270c485917dac3d60cbcc51e2f378af1ee24da8ea69182c81042e6237f4a7"
+      },
+      {
+        "path": "app/schemas/mission_views.py",
+        "sha256": "2794fc07817d48d20d39e3e12a1bc4a5e0132ddc8c47764a556a78581724c442"
+      },
+      {
+        "path": "app/services/home.py",
+        "sha256": "0934d85110eda1de66d3611d6fbdf2a591af18352a5bef6c09e944b0a201c3e7"
+      },
+      {
+        "path": "app/services/mission_attention.py",
+        "sha256": "788df74420b9680a57e4a6a608a2d00a9574ebb7dc1039baff9558216ad397d9"
+      },
+      {
+        "path": "app/services/mission_service.py",
+        "sha256": "6ee2ff05d1c6ad6cf7aac7c5bf6a04f86537b5e825110ab610dfc9c6b61d97b6"
+      },
+      {
+        "path": "cmos/contracts/mcp-parity-manifest.json",
+        "sha256": "fbcb255e338daae48d00307a33ec2e0b204708cbf72d93a1755685d077ecd0d1"
+      },
+      {
+        "path": "frontend/scripts/ui-shell-smoke.mjs",
+        "sha256": "1d58142b40dfabe6a58f511b812f2343bd8871aced6449a8c34946280d7d4f56"
+      },
+      {
+        "path": "frontend/src/__tests__/home.test.tsx",
+        "sha256": "4adce3a6a29fd0daa4b2cf07b369fd7e01f339149c4b23d212b18b1e95bf10aa"
+      },
+      {
+        "path": "frontend/src/__tests__/mission-dashboards.test.tsx",
+        "sha256": "91338d60d7b1fc68af3a416f9d45f3a0cf8d155bc7e8d390dfd84ff370e26082"
+      },
+      {
+        "path": "frontend/src/__tests__/missions.test.tsx",
+        "sha256": "2205b7aa75e2eb91db77c6da8a7da26ff871cf0e66c2c7ac24bb14b81328bcd4"
+      },
+      {
+        "path": "frontend/src/components/AppShell.test.tsx",
+        "sha256": "a38b3666846153de7223830043b2beedbb89537c8f36bdfea739eefcd29408e3"
+      },
+      {
+        "path": "frontend/src/components/CommandPalette.test.tsx",
+        "sha256": "2967d2c4aef3f51ae12537a7f424660579b70f9f268cc3b6f10bb774fd25f3a4"
+      },
+      {
+        "path": "frontend/src/components/CommandPalette.tsx",
+        "sha256": "98c3240519a7418bbd54d7bf0f008a7a7b85d3320175c687041bad72cf2e3f16"
+      },
+      {
+        "path": "frontend/src/components/missions/MissionDashboards.tsx",
+        "sha256": "19a861a47bcc35b0aa18eedaa8e6b608d2cc59f72f3f6ddabb24e9e193e98f63"
+      },
+      {
+        "path": "frontend/src/lib/api/home.ts",
+        "sha256": "c5ca89d72dd4c5df6b1e26b7a7fa0980f6d7bf6caaaf6e4703877967eccfffda"
+      },
+      {
+        "path": "frontend/src/lib/api/http.ts",
+        "sha256": "b49782fee1d4b530cb4f9ce08f031ae152f7b6d842c66e297a23c1bfeeb5e660"
+      },
+      {
+        "path": "frontend/src/lib/api/missionViews.ts",
+        "sha256": "c454f6abfbe24e550ebcb23f02bfe3ff0702c490e067cd886084a888f5beb963"
+      },
+      {
+        "path": "frontend/src/lib/api/missions.ts",
+        "sha256": "e0b562fa3bc9c71378a407cd95be52056afbee7cbafa7077bfcda2dff3f2bfab"
+      },
+      {
+        "path": "frontend/src/lib/hooks/useMissions.ts",
+        "sha256": "78d21f390c3ddb79bb377601e157ff64c7d4aa801f577cb7a11acd1b9c8601e1"
+      },
+      {
+        "path": "frontend/src/pages/index.tsx",
+        "sha256": "3fc49e0387644558cd2526bfec576e8b51dd15e8ccd363a9ec33d08610d09182"
+      },
+      {
+        "path": "frontend/src/pages/missions/index.tsx",
+        "sha256": "0883da1243de61101032ddfd985e7451ca2f5719263758eb1800cebba66b463d"
+      },
+      {
+        "path": "frontend/src/types/mission.ts",
+        "sha256": "59cf5050e42885e2a8f6b790b709268d5e3848085228cf8a080c50231f5471bf"
+      },
+      {
+        "path": "frontend/tests/e2e/app-shell.spec.ts",
+        "sha256": "b1192aca51fdaceb028a26211d375eb6d069390111ae0a9bc7c908f43ee58b9d"
+      },
+      {
+        "path": "frontend/tests/e2e/mission-dashboards.spec.ts",
+        "sha256": "84c6c910a5068f7c05925cbe136e45db12310296ce7717bd81d3417bf9545669"
+      },
+      {
+        "path": "frontend/tests/e2e/mission-protocol.spec.ts",
+        "sha256": "c5c1e37e4bb274ed3eb3bad9ee66cdeeb04405f90e60a94f12ccc6ea98d57c98"
+      },
+      {
+        "path": "frontend/tests/e2e/search-command.spec.ts",
+        "sha256": "ca715ac50e4fc23e4a4f053be809cacdbc2d4be6b63f3efdd5e7756d2cec63e9"
+      },
+      {
+        "path": "scripts/rbac_verify.py",
+        "sha256": "3761768e9aebbd452dde8b4b08fbfc3344d4dd45e2521636c32c146fcd73092c"
+      },
+      {
+        "path": "tests/integration/test_e2e_rbac_live.py",
+        "sha256": "bee54828966b51bfbe122f43cd307bf6a7d3074e53dd6beda517bb974ecbfe5c"
+      },
+      {
+        "path": "tests/integration/test_mission_saved_views_postgres.py",
+        "sha256": "65800c49c5df198f59a939d516b20fe36aca8c35473ad94cf0ed1941b0af69d4"
+      },
+      {
+        "path": "tests/test_mission_saved_views.py",
+        "sha256": "b9725c6604a987cc2bd217f7b8b5f5d4e21d7f29708504cbf2c2bb3482ae6def"
+      },
+      {
+        "path": "tests/test_rbac_verify_harness.py",
+        "sha256": "100f8a4bfce0e33ccf5ad7601dd1b5a078af12981073379dfb09ec29aceb9334"
+      }
+    ],
+    "archive_manifest": "cmos/reports/sprint-52/ux-12-production-smoke/archive-manifest.json"
+  },
+  "ci_source": [
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34896852291,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852291",
+      "workflowName": "Backend Integration",
+      "jobs": [
+        {
+          "databaseId": 104152991213,
+          "name": "backend-integration",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852291/job/104152991213",
+          "startedAt": "2026-09-14T21:06:15Z",
+          "completedAt": "2026-09-14T21:09:07Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34896852357,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852357",
+      "workflowName": "Frontend Production Build",
+      "jobs": [
+        {
+          "databaseId": 104152990501,
+          "name": "build-frontend-production",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852357/job/104152990501",
+          "startedAt": "2026-09-14T21:06:14Z",
+          "completedAt": "2026-09-14T21:10:24Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34896852234,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852234",
+      "workflowName": "Secret Scan",
+      "jobs": [
+        {
+          "databaseId": 104152990192,
+          "name": "Secret Scan",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852234/job/104152990192",
+          "startedAt": "2026-09-14T21:06:15Z",
+          "completedAt": "2026-09-14T21:06:45Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34896852212,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852212",
+      "workflowName": "Backend Lint",
+      "jobs": [
+        {
+          "databaseId": 104152990323,
+          "name": "ruff-diff",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852212/job/104152990323",
+          "startedAt": "2026-09-14T21:06:14Z",
+          "completedAt": "2026-09-14T21:06:34Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34896852320,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852320",
+      "workflowName": "Frontend Checks",
+      "jobs": [
+        {
+          "databaseId": 104152990655,
+          "name": "type-check",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852320/job/104152990655",
+          "startedAt": "2026-09-14T21:06:14Z",
+          "completedAt": "2026-09-14T21:07:03Z"
+        },
+        {
+          "databaseId": 104152990858,
+          "name": "vitest",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852320/job/104152990858",
+          "startedAt": "2026-09-14T21:06:15Z",
+          "completedAt": "2026-09-14T21:07:09Z"
+        },
+        {
+          "databaseId": 104152991054,
+          "name": "lint",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852320/job/104152991054",
+          "startedAt": "2026-09-14T21:06:15Z",
+          "completedAt": "2026-09-14T21:07:06Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34896852265,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852265",
+      "workflowName": "MCP Package",
+      "jobs": [
+        {
+          "databaseId": 104152990156,
+          "name": "mcp-package",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852265/job/104152990156",
+          "startedAt": "2026-09-14T21:06:15Z",
+          "completedAt": "2026-09-14T21:06:59Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34896852263,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852263",
+      "workflowName": "Backend Tests",
+      "jobs": [
+        {
+          "databaseId": 104152990675,
+          "name": "backend-suite",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34896852263/job/104152990675",
+          "startedAt": "2026-09-14T21:06:16Z",
+          "completedAt": "2026-09-14T21:16:32Z"
+        }
+      ]
+    }
+  ],
+  "deployment": {
+    "checked_at": "2026-09-14T22:15:11.290191+00:00",
+    "commit": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+    "services": {
+      "TraceLab": {
+        "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+        "deployment_id": "0645b1b4-5b01-4ade-b883-28eb0dca598e",
+        "status": "SUCCESS",
+        "commit": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+        "created_at": "2026-09-14T21:06:11.145Z"
+      },
+      "frontend": {
+        "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+        "deployment_id": "036a7867-9c76-4d25-a09c-9fb8a29b836a",
+        "status": "SUCCESS",
+        "commit": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+        "created_at": "2026-09-14T21:06:11.144Z"
+      }
+    },
+    "both_success_for_commit": true
+  },
+  "visual_review": {
+    "passed": true,
+    "timezone": "America/Chicago",
+    "reviewed_images": [
+      {
+        "path": "light-1440-save-dialog.png",
+        "sha256": "1d5749f8605187db4b33581d299567e181dce50fe291e559ffb48a00930c6374",
+        "reviewed_at": "2026-09-14T22:20:29.933054+00:00",
+        "notes": "Readable name input, focus ring, description and separate Cancel/Save controls."
+      },
+      {
+        "path": "light-1440-dashboard-strip.png",
+        "sha256": "e112f31a3da53ec9711881c340d664d47af003b47721b8004766172af51a76e4",
+        "reviewed_at": "2026-09-14T22:20:29.933418+00:00",
+        "notes": "All controls readable; counts8/427 and saved total3 visible; Chicago5:19PM agrees with22:19UTC."
+      },
+      {
+        "path": "light-1440-saved-view-palette.png",
+        "sha256": "761318517cc9d5e8ce3d93fcaace0a702a7f7599884da6075248385134b6e414",
+        "reviewed_at": "2026-09-14T22:20:29.933671+00:00",
+        "notes": "Saved view and total3 fully visible; search input and navigation remain usable."
+      },
+      {
+        "path": "light-390-save-dialog.png",
+        "sha256": "6d76a87195de1010c2f7303d6794a33db9de64d058a5c221e3796a772f089573",
+        "reviewed_at": "2026-09-14T22:20:59.061590+00:00",
+        "notes": "Name input and wrapped description fit; Cancel and Save have separate readable touch targets."
+      },
+      {
+        "path": "light-390-dashboard-strip.png",
+        "sha256": "25c7365b7b31b5c47c5b2efcd181fde51d6a43b79ae992677e2abcaa13474c6a",
+        "reviewed_at": "2026-09-14T22:20:59.062017+00:00",
+        "notes": "Dashboard counts8/427 and live total3 remain legible; saved-view long name wraps beside usable Rename/Delete controls; Chicago timestamp wraps without clipping."
+      },
+      {
+        "path": "light-390-saved-view-palette.png",
+        "sha256": "ce5ae592ba7c925a6bab2477c068d68398cf6f5d7defe4a1f30d131bd969bab8",
+        "reviewed_at": "2026-09-14T22:20:59.062296+00:00",
+        "notes": "Saved-view name and total3 fit on one line; input, Search, close and navigation remain usable."
+      },
+      {
+        "path": "light-1440-home.png",
+        "sha256": "594b801bad322e3493dbf3abcf10bb87a3e73c35555f0bcb3a25676a2504a960",
+        "reviewed_at": "2026-09-14T22:20:59.062886+00:00",
+        "notes": "Home counters435/427/0, six attention rows, result/evidence links, report485/project51/activity59 totals and Chicago dates are readable."
+      },
+      {
+        "path": "light-390-home.png",
+        "sha256": "38f3004de035352eafe703030b81819f00584ebfd49f3dca6ce927c281a7701a",
+        "reviewed_at": "2026-09-14T22:20:59.063478+00:00",
+        "notes": "Inspected full-resolution full-page capture. Both new dashboard links, all Home sections, count badges, evidence links and Chicago timestamps wrap without squeezing controls."
+      },
+      {
+        "path": "dark-1440-save-dialog.png",
+        "sha256": "8af12e2316615ab42e3fa642df03e99c005d67282efd2c881c91b569b0a6b4af",
+        "reviewed_at": "2026-09-14T22:21:27.935439+00:00",
+        "notes": "Name input, focus ring, wrapped description and separate Cancel/Save targets are readable in Dark mode."
+      },
+      {
+        "path": "dark-1440-dashboard-strip.png",
+        "sha256": "06caf5b10d64d499e5a83d0c31f8c1843714bb66ffd180977ef6b5c8f5e6a59c",
+        "reviewed_at": "2026-09-14T22:21:27.935746+00:00",
+        "notes": "Counts8/427 and saved total3 match API audit. Names, live Chicago time and Rename/Delete controls fit without clipping."
+      },
+      {
+        "path": "dark-1440-saved-view-palette.png",
+        "sha256": "48f3cf661a9e9e285cc7f76eaedd5552bcc861d8790c2ad08d5b9122c7713bdb",
+        "reviewed_at": "2026-09-14T22:21:27.935947+00:00",
+        "notes": "Saved-view name and total3 visible; search, close, navigation and keyboard-help controls readable."
+      },
+      {
+        "path": "dark-1440-home.png",
+        "sha256": "f10d8fe234b7cb759529f08221c29cbb883033b142a8d47682be04afbfe11e62",
+        "reviewed_at": "2026-09-14T22:21:27.936531+00:00",
+        "notes": "Inspected full-resolution capture with real data. Both attention dashboard links,435/427/0 mission counters,485reports/51projects/59activity totals, evidence links and Chicago dates remain legible."
+      },
+      {
+        "path": "dark-390-save-dialog.png",
+        "sha256": "9588e85ea34a64b7308d04867ff0ca1152a07f962634b0eeac978e550a46ed21",
+        "reviewed_at": "2026-09-14T22:21:27.936708+00:00",
+        "notes": "Name input, focus ring, wrapped description and separate Cancel/Save targets are readable in Dark mode."
+      },
+      {
+        "path": "dark-390-dashboard-strip.png",
+        "sha256": "13ccb592b6e50dc22c3f289c8daeb7c7f83e6f9827f6d966dbcf4e20d0ef390e",
+        "reviewed_at": "2026-09-14T22:21:27.936923+00:00",
+        "notes": "Counts8/427 and saved total3 match API audit. Names, live Chicago time and Rename/Delete controls fit without clipping."
+      },
+      {
+        "path": "dark-390-saved-view-palette.png",
+        "sha256": "50dcd414e4cf841172720e20f000e83879a1d2916c223965744ce6ff84372e1b",
+        "reviewed_at": "2026-09-14T22:21:27.937076+00:00",
+        "notes": "Saved-view name and total3 visible; search, close, navigation and keyboard-help controls readable."
+      },
+      {
+        "path": "dark-390-home.png",
+        "sha256": "284fc8ad5ae18079116f2fccb5716f67a84cb6cb07b935fc407b2e738bc055bb",
+        "reviewed_at": "2026-09-14T22:21:27.937593+00:00",
+        "notes": "Inspected full-resolution capture with real data. Both attention dashboard links,435/427/0 mission counters,485reports/51projects/59activity totals, evidence links and Chicago dates remain legible."
+      }
+    ],
+    "completed_at": "2026-09-14T22:21:27.940831+00:00",
+    "limitations": [
+      "The live active-run count was0. Conditional progress checks had no active production rows; local and CI active-run fixtures cover progress behavior."
+    ]
+  },
+  "retained_failures": [
+    {
+      "kind": "production audit harness",
+      "evidence": {
+        "started_at": "2026-09-14T22:18:12.039Z",
+        "source_commit": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+        "deployment_ids": [
+          "0645b1b4-5b01-4ade-b883-28eb0dca598e",
+          "036a7867-9c76-4d25-a09c-9fb8a29b836a"
+        ],
+        "checks": [
+          {
+            "name": "attention cache 1",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 2",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 3",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 4",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 5",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 6",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 7",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 8",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 9",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 10",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 11",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 12",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 13",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 14",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 15",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 16",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 17",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 18",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 19",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 20",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "reason sum equals Home attention",
+            "actual": 435,
+            "expected": 435,
+            "passed": true
+          },
+          {
+            "name": "aggregate total equals Home",
+            "actual": 435,
+            "expected": 435,
+            "passed": true
+          },
+          {
+            "name": "validation_failed count matches missions",
+            "actual": 8,
+            "expected": 8,
+            "passed": true
+          },
+          {
+            "name": "blocked count matches missions",
+            "actual": 0,
+            "expected": 0,
+            "passed": true
+          },
+          {
+            "name": "stalled count matches missions",
+            "actual": 0,
+            "expected": 0,
+            "passed": true
+          },
+          {
+            "name": "unreviewed count matches missions",
+            "actual": 427,
+            "expected": 427,
+            "passed": true
+          },
+          {
+            "name": "at_risk dashboard matches missions",
+            "actual": 8,
+            "expected": 8,
+            "passed": true
+          },
+          {
+            "name": "unreviewed dashboard matches missions",
+            "actual": 427,
+            "expected": 427,
+            "passed": true
+          },
+          {
+            "name": "light/1440 workspace counters",
+            "actual": [
+              "435",
+              "435",
+              "0"
+            ],
+            "expected": [
+              "435",
+              "435",
+              "0"
+            ],
+            "passed": true
+          },
+          {
+            "name": "light/1440 mission 39b44c86-2e2b-4d19-bf3f-e069db5f1a76 timestamp",
+            "actual": true,
+            "expected": true,
+            "passed": true
+          },
+          {
+            "name": "light/1440 mission 952cc1de-688c-415b-bee9-ce143a753af2 timestamp",
+            "actual": true,
+            "expected": true,
+            "passed": true
+          },
+          {
+            "name": "light/1440 mission 7b847edd-5433-4237-a899-57b47e6edf0a timestamp",
+            "actual": true,
+            "expected": true,
+            "passed": true
+          },
+          {
+            "name": "light/1440/at_risk tile total",
+            "actual": 8,
+            "expected": 8,
+            "passed": true
+          },
+          {
+            "name": "light/1440/unreviewed tile total",
+            "actual": 427,
+            "expected": 427,
+            "passed": true
+          },
+          {
+            "name": "light/1440 Chicago timestamp",
+            "actual": "9/14/2026, 5:18:30 PM",
+            "expected": "9/14/2026, 5:18:30 PM",
+            "passed": true
+          },
+          {
+            "name": "light/1440/save-dialog overflow",
+            "actual": false,
+            "expected": false,
+            "passed": true
+          },
+          {
+            "name": "light/1440/save-dialog axe",
+            "actual": [],
+            "expected": [],
+            "passed": true
+          },
+          {
+            "name": "light/1440/save-dialog theme",
+            "actual": "light",
+            "expected": "light",
+            "passed": true
+          },
+          {
+            "name": "UI save uses current URL filters",
+            "actual": {
+              "view": "attention",
+              "reason": [
+                "unreviewed"
+              ],
+              "project_id": "0afcc588-e722-45bd-8320-f486601b877c"
+            },
+            "expected": {
+              "view": "attention",
+              "reason": [
+                "unreviewed"
+              ],
+              "project_id": "0afcc588-e722-45bd-8320-f486601b877c"
+            },
+            "passed": true
+          },
+          {
+            "name": "created view live total",
+            "actual": 3,
+            "expected": 3,
+            "passed": true
+          },
+          {
+            "name": "light/1440 live total for saved view aef6c171-d5d3-4274-bc30-2d45ac23d496",
+            "actual": 3,
+            "expected": 3,
+            "passed": true
+          },
+          {
+            "name": "light/1440 renamed view persists",
+            "actual": "UX-12 validation 1789424292702",
+            "expected": "UX-12 validation 1789424292702 renamed",
+            "passed": false
+          },
+          {
+            "name": "all original personal views preserved and audit views removed",
+            "actual": [],
+            "expected": [],
+            "passed": true
+          }
+        ],
+        "latency_ms": [
+          1112.7145830000002,
+          325.8744999999999,
+          291.64979200000016,
+          279.0640410000001,
+          320.851459,
+          549.7395419999998,
+          307.0260410000001,
+          318.16879100000006,
+          324.81583300000057,
+          295.24391600000035,
+          501.4545419999995,
+          506.96699999999964,
+          307.09770899999967,
+          317.4237499999999,
+          322.0935420000005,
+          324.2778330000001,
+          587.5827499999996,
+          1131.7279170000002,
+          276.11725000000115,
+          292.3735420000012
+        ],
+        "screenshots": [
+          "light-1440-save-dialog.png"
+        ],
+        "cleanup": [
+          {
+            "id": "aef6c171-d5d3-4274-bc30-2d45ac23d496",
+            "status": "removed-own-validation-view"
+          }
+        ],
+        "user_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+        "original_view_ids": [],
+        "latency": {
+          "calls": 20,
+          "method": "nearest-rank",
+          "p50": 320.851459,
+          "p95": 1112.7145830000002
+        },
+        "attention": {
+          "generated_at": "2026-09-14T22:18:21.383032",
+          "stalled_after_seconds": 3600,
+          "total": 435,
+          "by_reason": {
+            "validation_failed": 8,
+            "blocked": 0,
+            "stalled": 0,
+            "unreviewed": 427
+          },
+          "dashboards": [
+            {
+              "key": "at_risk",
+              "total": 8
+            },
+            {
+              "key": "unreviewed",
+              "total": 427
+            }
+          ]
+        },
+        "saved_filters": {
+          "view": "attention",
+          "reason": [
+            "unreviewed"
+          ],
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c"
+        },
+        "saved_total": 3,
+        "error": {
+          "name": "AssertionError",
+          "message": "light/1440 renamed view persists\n+ actual - expected\n\n+ 'UX-12 validation 1789424292702'\n- 'UX-12 validation 1789424292702 renamed'\n                                 ^\n"
+        },
+        "finished_at": "2026-09-14T22:18:40.414Z",
+        "passed": false
+      },
+      "result": "The audit fetched views before the asynchronous rename completed. It now waits for the successful PUT and closed dialog before readback. The single own-account audit view was removed successfully before rerun."
+    },
+    {
+      "kind": "production audit harness",
+      "evidence": {
+        "started_at": "2026-09-14T22:17:16.744Z",
+        "source_commit": "b5d9e1348cfd44f079f3e044df45f7a2fcec557e",
+        "deployment_ids": [
+          "0645b1b4-5b01-4ade-b883-28eb0dca598e",
+          "036a7867-9c76-4d25-a09c-9fb8a29b836a"
+        ],
+        "checks": [
+          {
+            "name": "attention cache 1",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 2",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 3",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 4",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 5",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 6",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 7",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 8",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 9",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 10",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 11",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 12",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 13",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 14",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 15",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 16",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 17",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 18",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 19",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "attention cache 20",
+            "actual": "private, no-store",
+            "expected": "private, no-store",
+            "passed": true
+          },
+          {
+            "name": "reason sum equals Home attention",
+            "actual": 435,
+            "expected": 435,
+            "passed": true
+          },
+          {
+            "name": "aggregate total equals Home",
+            "actual": 435,
+            "expected": 435,
+            "passed": true
+          },
+          {
+            "name": "validation_failed count matches missions",
+            "actual": 8,
+            "expected": 8,
+            "passed": true
+          },
+          {
+            "name": "blocked count matches missions",
+            "actual": 0,
+            "expected": 0,
+            "passed": true
+          },
+          {
+            "name": "stalled count matches missions",
+            "actual": 0,
+            "expected": 0,
+            "passed": true
+          },
+          {
+            "name": "unreviewed count matches missions",
+            "actual": 427,
+            "expected": 427,
+            "passed": true
+          },
+          {
+            "name": "at_risk dashboard matches missions",
+            "actual": 8,
+            "expected": 8,
+            "passed": true
+          },
+          {
+            "name": "unreviewed dashboard matches missions",
+            "actual": 427,
+            "expected": 427,
+            "passed": true
+          },
+          {
+            "name": "light/1440 workspace counters",
+            "actual": [
+              "435",
+              "435",
+              "0"
+            ],
+            "expected": [
+              "435",
+              "435",
+              "0"
+            ],
+            "passed": true
+          },
+          {
+            "name": "all original personal views preserved and audit views removed",
+            "actual": [],
+            "expected": [],
+            "passed": true
+          }
+        ],
+        "latency_ms": [
+          313.3714580000001,
+          582.1884160000002,
+          319.2793749999996,
+          321.9917499999997,
+          317.29833400000007,
+          839.8108750000001,
+          324.6592499999997,
+          316.0031250000002,
+          267.026167,
+          327.88416700000016,
+          317.1945420000002,
+          322.3355419999998,
+          772.2752910000008,
+          319.1455420000002,
+          286.98554200000035,
+          318.69466699999975,
+          325.0927499999998,
+          1159.6799999999994,
+          606.8827920000003,
+          324.06766699999935
+        ],
+        "screenshots": [],
+        "cleanup": [],
+        "user_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+        "original_view_ids": [],
+        "latency": {
+          "calls": 20,
+          "method": "nearest-rank",
+          "p50": 321.9917499999997,
+          "p95": 839.8108750000001
+        },
+        "attention": {
+          "generated_at": "2026-09-14T22:17:26.186052",
+          "stalled_after_seconds": 3600,
+          "total": 435,
+          "by_reason": {
+            "validation_failed": 8,
+            "blocked": 0,
+            "stalled": 0,
+            "unreviewed": 427
+          },
+          "dashboards": [
+            {
+              "key": "at_risk",
+              "total": 8
+            },
+            {
+              "key": "unreviewed",
+              "total": 427
+            }
+          ]
+        },
+        "saved_filters": {
+          "view": "attention",
+          "reason": [
+            "unreviewed"
+          ],
+          "project_id": "0afcc588-e722-45bd-8320-f486601b877c"
+        },
+        "saved_total": 3,
+        "error": {
+          "name": "Error",
+          "message": "expect(locator).toBeVisible() failed\n\nLocator: getByRole('region', { name: 'Mission list' }).locator('a[href=\"/missions/83b9ee6e-f3af-4e7e-9515-d69d54fd47c0\"]').getByRole('heading', { name: 'Equipment Identity Without a Central Authority: Unit and Fleet Profiles, Serial Decode, and the Missing VCdb Equivalent', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.be.visible\" with timeout 5000ms\n  - waiting for getByRole('region', { name: 'Mission list' }).locator('a[href=\"/missions/83b9ee6e-f3af-4e7e-9515-d69d54fd47c0\"]').getByRole('heading', { name: 'Equipment Identity Without a Central Authority: Unit and Fleet Profiles, Serial Decode, and the Missing VCdb Equivalent', exact: true })\n"
+        },
+        "finished_at": "2026-09-14T22:17:42.322Z",
+        "passed": false
+      },
+      "result": "The observer mixed a command-palette global mission response into the page-filter check. Scoped observation to the exact project/view/reason query; no application change. Cleanup verified before rerun."
+    },
+    {
+      "kind": "production audit harness",
+      "evidence": {
+        "passed": false,
+        "stage": "harness response-body observation before any saved-view writes",
+        "error": "Playwright Network.getResponseBody inspector cache eviction",
+        "cleanup_verified": true,
+        "audit_views_found": 0,
+        "original_ids_preserved": true
+      },
+      "result": "A passive Playwright response listener lost a body from the inspector cache before any view writes. Replaced only the observation mechanism with live route.fetch/fulfill for the three measured GETs; no mocked payloads. Verified original views were untouched before rerun."
+    },
+    {
+      "kind": "source PR Vitest teardown error",
+      "run_id": 34894550233,
+      "commit": "7fd2fd0f62b2753f57c0411492dba37b2ab796c4",
+      "result": "230 assertions passed but the job failed with one unhandled SWR retry after jsdom teardown. AppShell.test.tsx lacked the new mission-views mock. The fixture is now explicit; unhandled errors remain fatal."
+    },
+    {
+      "kind": "source PR integration failure",
+      "run_id": 34893441709,
+      "commit": "dc19a3b621b62da673cf0bb20b41efef838d1dc9",
+      "result": "135 passed,4 skipped,2 failed: route-wiring lockstep omitted the new endpoint families, and the new global-admin fixture assumed an empty PostgreSQL suite. Added both route families and scoped the fixture to a fresh project with an unrelated control completion."
+    },
+    {
+      "kind": "expected TDD red",
+      "log": "backend-red.log",
+      "result": "First new route test failed because the endpoint did not yet exist."
+    },
+    {
+      "kind": "test maintenance",
+      "log": "rbac-regression.log",
+      "result": "134 passed and one exact-inventory assertion failed before adding the five newly protected routes to its expected list. Final158 tests pass."
+    },
+    {
+      "kind": "test maintenance",
+      "log": "frontend-unit.log",
+      "result": "Two palette tests failed because the new saved-view request lacked a mock. All230 unit tests pass after updating the fixture."
+    },
+    {
+      "kind": "screenshot timeout",
+      "log": "browser.log",
+      "result": "19 passed; light390 workflow timed out on its final Home screenshot after workflow/axe assertions passed. Three-audit workflow budget is now60s; all59 final browser tests pass with zero retries/skips."
+    },
+    {
+      "kind": "test maintenance",
+      "log": "browser-final.log",
+      "result": "Full browser run interrupted after old shell fixtures returned empty objects for new endpoints. Updated shell/mission fixtures; final59 pass."
+    }
+  ],
+  "definition_of_done": {
+    "1": "Exact post-merge main push CI and deployed public smoke passed.",
+    "2": "136 baseline screenshots and16 extra Home/dashboard/Dialog/palette images archived in both themes and widths.",
+    "3": "No overflow, critical/serious axe findings, browser errors or API errors in accepted baseline or focused checks.",
+    "4": "Built-in and saved-view totals match live API pagination. Existing Home/Missions counters and UTC timestamps checked in the active-data audit; no active production runs were present for conditional progress checks.",
+    "5": "Loading, empty, service error and missing saved-view states are tested; native Dialog only, no alert/confirm.",
+    "6": "Semantic tokens including checkbox accent; token check, lint and production build passed.",
+    "7": "Eight route migrations retained;16 direct alias checks passed.",
+    "8": "All136 direct production browser checks began after both exact-SHA Railway services reportedSUCCESS; IDs recorded above.",
+    "9": "Real Home, mission dashboards, Save view Dialog and palette reviewed at1440/390 in Light/Dark under America/Chicago; image-level review recorded."
+  },
+  "limitations": [
+    "Production active_runs.total was0, so no live progress row was available for visual/assertion review. Active-run behavior is covered by local and CI fixtures; no skipped live checks are counted as passes.",
+    "Existing result materialization changes missions.updated_at and can resurface a reviewed completion as unreviewed; deferred to Sprint53 by426.",
+    "Saved views are personal only. Sharing and aggregate performance budgets remain outside this mission; measured20-call p50/p95 is recorded.",
+    "MCP-2 owns new attention/saved-view reads and repeatable mission reason forwarding. Preference writes remain REST/UI-only.",
+    "Existing backend skip/quarantine counts are explicitly recorded from exact-main console summaries; local/new tests have zero skips."
+  ],
+  "receipt_acceptance": "CMOS remains In Progress until this receipt is merged on main. Completion must cite this receipt’s own PR and merge SHA, then exact receipt-carrier main-push CI, both Railway SUCCESS deployment IDs and production smoke; those immutable post-merge facts are recorded in CMOS session closure."
+}

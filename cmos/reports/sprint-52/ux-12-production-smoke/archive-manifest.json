@@ -1,0 +1,817 @@
+[
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_.png",
+    "bytes": 424664,
+    "sha256": "53158c573493f9bd1f2db89cf3143bb4d86a46b58ebfca1a2350069967a2fcb1"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_404.png",
+    "bytes": 52815,
+    "sha256": "d9f1fd91a6e2c7bb7c585729eba70dc178eebed240b7fe132357b9f2747b60a9"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_admin_corrections.png",
+    "bytes": 117776,
+    "sha256": "723acb95aeddb9f18254e863543f48db0da5015d8e5de495b2e61129dfa091e2"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_admin_observability.png",
+    "bytes": 304993,
+    "sha256": "afe45b3d569f18d939a2102c99298b94c057427e1c6b355228c95bea5a97829c"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_admin_spaces.png",
+    "bytes": 354650,
+    "sha256": "1a4d34cc2429b110ead214d87425471109d24fb7395e09bf8a65aebb3e1a90c4"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_admin_users.png",
+    "bytes": 136755,
+    "sha256": "574ae628b86bcf222512bf8e41ac17e78e1ca5d85879db9325767677aac6ee84"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_collections.png",
+    "bytes": 620987,
+    "sha256": "1a1c40d92507b2e46918890cb7c13e1f50732920351bcad2b59d675326d8643c"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_collections_a3e6d809-af90-4652-903f-5ce5c8842bf8.png",
+    "bytes": 143897,
+    "sha256": "2d259751c8dd687be3b48942352262f098c3631170634930a2042372df76cd77"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_console.png",
+    "bytes": 306162,
+    "sha256": "01adb7f45b54b09647b8dc24955def85389b251af5f55ecd71056e9f1c09220a"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_console_corrections.png",
+    "bytes": 118055,
+    "sha256": "3eae80b3730d75c4afa2c7e10fdedde3f40253a41eae9ba53c62f6636ab4d9cc"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_console_missions.png",
+    "bytes": 936192,
+    "sha256": "61ae2e0ea1813d70bcf481b2e4f2c4eae4f777d41dd935f632c4d47b3b24258f"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_console_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png",
+    "bytes": 487383,
+    "sha256": "23b9f310867138b713a2c0ced1cfd60258598aa5d1c2d2a08ff5b005a698bab2"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_device.png",
+    "bytes": 70125,
+    "sha256": "de1ca4155ee519fd8d47d16c71316969f6a29ed47fd5778a1e481de5284fc410"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_documents.png",
+    "bytes": 215344,
+    "sha256": "0341afcfa2861dcfe6a3d5f01ca233dd0700c7d0fdd137ace81b4c2baaacbbb8"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_documents_d44bec3e-f665-439d-bc78-bc5385a4610d.png",
+    "bytes": 218327,
+    "sha256": "04ea6fe2c53ce08d65a6c482ec7842f3adc95c5b4af4a8dc98053dee76e1592e"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_documents_upload.png",
+    "bytes": 93847,
+    "sha256": "3782b03793e98eeeed8c70aa66aa157d748e50b9003a75120730f3d55f812076"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_evidence.png",
+    "bytes": 2044312,
+    "sha256": "def4f9d58298c147b46dacaea05166f218d9ccefd49c12cf70290e0bf9167491"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_evidence_1da242cc-517e-4fcb-9850-3c620e2b484e.png",
+    "bytes": 625562,
+    "sha256": "65a8a4e91b60d0fcfd50cdad769d056be32df53e691b0055fefe58169c8ee6b3"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_graph.png",
+    "bytes": 87115,
+    "sha256": "14bad5f3a57050d4ee8b5d3a30eef796e575676c42da9054969289aaa2dec6d0"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_graph?root=project:0afcc588-e722-45bd-8320-f486601b877c.png",
+    "bytes": 1252560,
+    "sha256": "5a67d07de2e24f44d5c521ef78a3cd92dedaf4e19434b2a00665483205064f83"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_invites.png",
+    "bytes": 138667,
+    "sha256": "9cbfd28b1ee9c757214d8f5f9b8f246c06fd6317436d2443941ff908f1295f21"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_missions.png",
+    "bytes": 935997,
+    "sha256": "d6c82f810f28688bd1b23c8da0907021b6222b10a58f8cc8999913616c414d80"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_missions?view=attention&reason=unreviewed.png",
+    "bytes": 923408,
+    "sha256": "aa17ce9976d3662d0be297e35846bff7458e84b05deab55602fae6c16df51543"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png",
+    "bytes": 487383,
+    "sha256": "23b9f310867138b713a2c0ced1cfd60258598aa5d1c2d2a08ff5b005a698bab2"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_missions_new.png",
+    "bytes": 223472,
+    "sha256": "f7e8d64ac07519988a3aeb09e10e73f7976f2819eff5c06200cdd60751e335d2"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_missions_queue.png",
+    "bytes": 123360,
+    "sha256": "1cea85eba42b02a703646e33ef19d1a7c6c9a6e1d6da0f09b448e2490a2bc402"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_projects.png",
+    "bytes": 244558,
+    "sha256": "6fd3a1a839c2051d78f4a3b2494c1ead01fb3bf443680ccb3c47a614796b90f6"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_projects_0afcc588-e722-45bd-8320-f486601b877c.png",
+    "bytes": 96580,
+    "sha256": "f6471083a3469045dca674559375ad3ddd1e0ca025cdf0723ddf502f2cf8b7a5"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_reports.png",
+    "bytes": 437902,
+    "sha256": "480da1dc6ea9bc7e96f0d6750eda19648b8bbc273bcca1146bac4a6a8715200b"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_reports_7064c47e-c198-45d5-b887-b18a1f86d7ce.png",
+    "bytes": 2620106,
+    "sha256": "971f3a78893dfef2b37de19c74fde11a5c2a97aedc0b06cb2d6681df7f25f44f"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_saved-searches.png",
+    "bytes": 112519,
+    "sha256": "c8e6935dfb76fd3ad477871baaa2c9b131544dc70be147b09a78d103a436ed06"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_search.png",
+    "bytes": 184705,
+    "sha256": "75e20ff267eac666ef8e9196b037b8706777f596474181e6f516e8e4fa1e5073"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_search_results.png",
+    "bytes": 184705,
+    "sha256": "75e20ff267eac666ef8e9196b037b8706777f596474181e6f516e8e4fa1e5073"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-1440-_settings.png",
+    "bytes": 138667,
+    "sha256": "9cbfd28b1ee9c757214d8f5f9b8f246c06fd6317436d2443941ff908f1295f21"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_.png",
+    "bytes": 373740,
+    "sha256": "284fc8ad5ae18079116f2fccb5716f67a84cb6cb07b935fc407b2e738bc055bb"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_404.png",
+    "bytes": 11321,
+    "sha256": "5048cdd9d357c434ad3a2ea0c10c81c884e31d54253f836a2ba8e9bd824aebc3"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_admin_corrections.png",
+    "bytes": 76609,
+    "sha256": "ccc4a41620fc9026c3257dfe9b8e46bf3fbeeb2146dd7267ab64d8adb7ec5cbf"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_admin_observability.png",
+    "bytes": 274127,
+    "sha256": "ca6a397c862d64bb313a52ab04d801ceed7cb2c8ae2487ad5c4a8af164cf069e"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_admin_spaces.png",
+    "bytes": 293293,
+    "sha256": "c78c810e96f031897d8bce9a3c0bb844388e7562b06e2202b7e221447f48747b"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_admin_users.png",
+    "bytes": 114166,
+    "sha256": "acf90782c84aab8097ffd8cc4efcfb051d427b34f166f560eb02a7721e02a78f"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_collections.png",
+    "bytes": 499774,
+    "sha256": "93fd781e89fe7e0c89f5b37e41dbcaabb0dad5825e41c36f1137094e408e6744"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_collections_a3e6d809-af90-4652-903f-5ce5c8842bf8.png",
+    "bytes": 100146,
+    "sha256": "6cd430901cc135549d62e9f31cee687303b2b4c17fddb5cb63564768d3ecc259"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_console.png",
+    "bytes": 274448,
+    "sha256": "3f7612db7004566fbc845842d7e301dec8c498d618d662e1e78a34dd5b19cb02"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_console_corrections.png",
+    "bytes": 76697,
+    "sha256": "4054b1945288499d7126c243989f7e235b99ce0e717f56c387a63adbb4c726b7"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_console_missions.png",
+    "bytes": 690961,
+    "sha256": "d4fa3e96828c5e1ee7d982f0d48118d4523fead9c757fc89012963fe65caadc0"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_console_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png",
+    "bytes": 405009,
+    "sha256": "4851a61b3063c51d477661eed267db9451f9bc2bed43997d8202752c18c9519c"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_device.png",
+    "bytes": 28196,
+    "sha256": "fa73b6e529a0a210bb3660190611efa0142e412187a5462d9c3d6d80e24c5b6d"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_documents.png",
+    "bytes": 177750,
+    "sha256": "2be36e9121b5dcef3b813045cafbcad14fb426d88f60cd93d91e99a506063b19"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_documents_d44bec3e-f665-439d-bc78-bc5385a4610d.png",
+    "bytes": 169035,
+    "sha256": "09d49d16b772d651638cf511da733cbd28758244a741f696bbf742a1c1ca70ab"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_documents_upload.png",
+    "bytes": 50918,
+    "sha256": "08245476c1d5aae27aa690161da8dce42ebe89c55d6a542b51773a23d9ebaa9e"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_evidence.png",
+    "bytes": 2300394,
+    "sha256": "03b4f4abab85980cad3f05080b8e18d8bd4903eef9fa96ffedd1be32ef16cd90"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_evidence_1da242cc-517e-4fcb-9850-3c620e2b484e.png",
+    "bytes": 589776,
+    "sha256": "35f232d689c35b9291d267291a2fadd67a3e6e6f503066a18fc6e9cad307bc05"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_graph.png",
+    "bytes": 45655,
+    "sha256": "f52358bc113bef7df6dccb23856b95042d0b5d5ebed712b5020b6c6241b30957"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_graph?root=project:0afcc588-e722-45bd-8320-f486601b877c.png",
+    "bytes": 1051768,
+    "sha256": "3c9e66e008f94a807f8d7b32775f6248d86fd7ca90eb90cb89c511fc0d09245a"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_invites.png",
+    "bytes": 95097,
+    "sha256": "de868a927ae9e207406927f4b080af54097c4a7403a40bf8db015defe6295bda"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_missions.png",
+    "bytes": 690672,
+    "sha256": "3149054e279df041f701a4d7dbd29d0cb243bc0d7556364154b5e78d7249ab5a"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_missions?view=attention&reason=unreviewed.png",
+    "bytes": 678829,
+    "sha256": "d5a979c279ffb40c2eea9462bd9b965e5083e0c89a4245279aec4872dcf69915"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png",
+    "bytes": 405009,
+    "sha256": "4851a61b3063c51d477661eed267db9451f9bc2bed43997d8202752c18c9519c"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_missions_new.png",
+    "bytes": 172175,
+    "sha256": "41141d8aa983c80099af0f64cfa8fdb21fbfedae525aa62dc7fd807fcfe72305"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_missions_queue.png",
+    "bytes": 82607,
+    "sha256": "9e2d510ee85264ce9c4b1f6727420e83907b013f62e102942314a64f515f88eb"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_projects.png",
+    "bytes": 148142,
+    "sha256": "fd50d229a0e92f0e69e5b066d26ec56fea44ca7ba1612cf2e7d362a814269370"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_projects_0afcc588-e722-45bd-8320-f486601b877c.png",
+    "bytes": 56928,
+    "sha256": "1939d12634f495f53164885123f48db5eac37816cb99ba23a4934678b1c919ad"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_reports.png",
+    "bytes": 449728,
+    "sha256": "7c5c7cd39b7c14dfc5a8543f03c629e383310a975e98154fc0c3c926d8a0d3e4"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_reports_7064c47e-c198-45d5-b887-b18a1f86d7ce.png",
+    "bytes": 2691083,
+    "sha256": "464e4d5fa198fd815a6897c01b2e22994e3300cc16f38c88fb361e38ef00631f"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_saved-searches.png",
+    "bytes": 71346,
+    "sha256": "d91917b0b44e55fe4a21e1d9d9219672b19cf955fbdb8ced82b7388f8b1d89e7"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_search.png",
+    "bytes": 141750,
+    "sha256": "6c40b4f6723b7a03fac7447433c35569bf9dd5ecb348adecbc46969b429365e9"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_search_results.png",
+    "bytes": 141750,
+    "sha256": "6c40b4f6723b7a03fac7447433c35569bf9dd5ecb348adecbc46969b429365e9"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/dark-390-_settings.png",
+    "bytes": 95097,
+    "sha256": "de868a927ae9e207406927f4b080af54097c4a7403a40bf8db015defe6295bda"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-audit.json",
+    "bytes": 45232,
+    "sha256": "ef06d420033a64cd9c78422b13b80b460300488844b4d051593cea77148d47a4"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-cleanup-scope.json",
+    "bytes": 183,
+    "sha256": "67efedc7ad05f86b2521a50287337aa1aebcd3bdacdddfdf4b34da92da4a8896"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-dark-1440-dashboard-strip.png",
+    "bytes": 28054,
+    "sha256": "06caf5b10d64d499e5a83d0c31f8c1843714bb66ffd180977ef6b5c8f5e6a59c"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-dark-1440-home.png",
+    "bytes": 424788,
+    "sha256": "f10d8fe234b7cb759529f08221c29cbb883033b142a8d47682be04afbfe11e62"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-dark-1440-save-dialog.png",
+    "bytes": 20379,
+    "sha256": "8af12e2316615ab42e3fa642df03e99c005d67282efd2c881c91b569b0a6b4af"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-dark-1440-saved-view-palette.png",
+    "bytes": 37746,
+    "sha256": "48f3cf661a9e9e285cc7f76eaedd5552bcc861d8790c2ad08d5b9122c7713bdb"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-dark-390-dashboard-strip.png",
+    "bytes": 27423,
+    "sha256": "13ccb592b6e50dc22c3f289c8daeb7c7f83e6f9827f6d966dbcf4e20d0ef390e"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-dark-390-home.png",
+    "bytes": 373740,
+    "sha256": "284fc8ad5ae18079116f2fccb5716f67a84cb6cb07b935fc407b2e738bc055bb"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-dark-390-save-dialog.png",
+    "bytes": 19803,
+    "sha256": "9588e85ea34a64b7308d04867ff0ca1152a07f962634b0eeac978e550a46ed21"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-dark-390-saved-view-palette.png",
+    "bytes": 36399,
+    "sha256": "50dcd414e4cf841172720e20f000e83879a1d2916c223965744ce6ff84372e1b"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-light-1440-dashboard-strip.png",
+    "bytes": 27924,
+    "sha256": "e112f31a3da53ec9711881c340d664d47af003b47721b8004766172af51a76e4"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-light-1440-home.png",
+    "bytes": 429025,
+    "sha256": "594b801bad322e3493dbf3abcf10bb87a3e73c35555f0bcb3a25676a2504a960"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-light-1440-save-dialog.png",
+    "bytes": 20041,
+    "sha256": "1d5749f8605187db4b33581d299567e181dce50fe291e559ffb48a00930c6374"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-light-1440-saved-view-palette.png",
+    "bytes": 37929,
+    "sha256": "761318517cc9d5e8ce3d93fcaace0a702a7f7599884da6075248385134b6e414"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-light-390-dashboard-strip.png",
+    "bytes": 27155,
+    "sha256": "25c7365b7b31b5c47c5b2efcd181fde51d6a43b79ae992677e2abcaa13474c6a"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-light-390-home.png",
+    "bytes": 376181,
+    "sha256": "38f3004de035352eafe703030b81819f00584ebfd49f3dca6ce927c281a7701a"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-light-390-save-dialog.png",
+    "bytes": 19549,
+    "sha256": "6d76a87195de1010c2f7303d6794a33db9de64d058a5c221e3796a772f089573"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/extra-light-390-saved-view-palette.png",
+    "bytes": 36552,
+    "sha256": "ce5ae592ba7c925a6bab2477c068d68398cf6f5d7defe4a1f30d131bd969bab8"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/inventory.json",
+    "bytes": 383,
+    "sha256": "c1cd24fb8881256c03e78ff227b7cf874b3599c6828ad530c1666bacdac52974"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_.png",
+    "bytes": 428821,
+    "sha256": "162b0852f7794effd4954760b397a7a2586bd0e8de3d469727d107a28585425a"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_404.png",
+    "bytes": 52829,
+    "sha256": "74fe88e2e2eddf29a7809462171724e5ec7e6b9e386bd736b4d050a832fc5a7d"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_admin_corrections.png",
+    "bytes": 117896,
+    "sha256": "60532eb846a0edf78e4e24ac0c3aa51d560aa06d34ffb5455c13743d1dbc3bf0"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_admin_observability.png",
+    "bytes": 306828,
+    "sha256": "6a5ccd7229ee173bdb94827b3bbdaea37dbd6e5a4d0edc8699fc44a15bdf2d9b"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_admin_spaces.png",
+    "bytes": 359647,
+    "sha256": "61a98a81e13e313f8c664c8a101f102117bf1268d49a8598ef0770fae5f2ba6e"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_admin_users.png",
+    "bytes": 137723,
+    "sha256": "705ad0742777ead6d5e43b1ccd988b0c0ec28ebcf9b4171ed0bec1759dd47962"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_collections.png",
+    "bytes": 621278,
+    "sha256": "61476050db066d9bd9cf85656f07d369a3fbe29743d368f1f59de775c4c9568b"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_collections_a3e6d809-af90-4652-903f-5ce5c8842bf8.png",
+    "bytes": 144292,
+    "sha256": "1e16e133494cb6ca59574ada2628074e3229a1950c44422a993b1e7ac025bda1"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_console.png",
+    "bytes": 306763,
+    "sha256": "47bf393b4d3fdd7fa5d8d045b5c67c49a3d01cc044b73a0b8969412b8f913326"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_console_corrections.png",
+    "bytes": 118065,
+    "sha256": "98d54e4f6fb529e28dc6e0f7b6142d35bf407dfe7f03691bf7a7cc1985e10823"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_console_missions.png",
+    "bytes": 941168,
+    "sha256": "c3d890744fb79b54f932b0d1e0b33206911b411e2d37bba6801c6707d0517e49"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_console_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png",
+    "bytes": 488936,
+    "sha256": "5215b50028fc0f0c9f514fa45f2b7e1680d80395fd6d290063b6084018f9f620"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_device.png",
+    "bytes": 71657,
+    "sha256": "2922c01d35c07ebf9f2c5be63a23970653d6abdb9ae6405c936874afe5cf2971"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_documents.png",
+    "bytes": 216406,
+    "sha256": "fd00308b46d6539b5651c4c47ed55b5a17765e9a7cdb60c3d8e9189e24b759b0"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_documents_d44bec3e-f665-439d-bc78-bc5385a4610d.png",
+    "bytes": 219090,
+    "sha256": "0694222dfde44832533c95c6edf22d786cdaaa14c24822a1b545e214089a90a9"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_documents_upload.png",
+    "bytes": 94155,
+    "sha256": "69c5f21f6cbd66bf0479ea3c791ff5a2f6c9049db8f051151809c4a028cc0831"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_evidence.png",
+    "bytes": 2066433,
+    "sha256": "211f542dfa8552bdc941980cdc197c986a9fe83cebceb2af91635650109498d4"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_evidence_1da242cc-517e-4fcb-9850-3c620e2b484e.png",
+    "bytes": 630369,
+    "sha256": "2e205892b4fa1478c368dd68991fc74c2fb2496c3e48c4b6438e16ce89be652c"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_graph.png",
+    "bytes": 87357,
+    "sha256": "509ada1cf5124658a999617241c4ee0c19565808d290d4b023c8d3042d5ac908"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_graph?root=project:0afcc588-e722-45bd-8320-f486601b877c.png",
+    "bytes": 1263298,
+    "sha256": "74f269f79ddda121e5d74d02c2f42a47e2fa3dc20e632c41c32172238009f0d3"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_invites.png",
+    "bytes": 138746,
+    "sha256": "a9b802957bbfc76c19356ff87aa70e4c3d47a44358696820c65117a46efc30a8"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_missions.png",
+    "bytes": 941160,
+    "sha256": "ccb13b0a0e2c60f5cccc495c59f7e9ad5cd42abe88fa13f911cd607f0d086405"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_missions?view=attention&reason=unreviewed.png",
+    "bytes": 927175,
+    "sha256": "2739ff7bf76f0753cad0146f6cff16997593b7873f340d2e51e81cd3f576b91d"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png",
+    "bytes": 488936,
+    "sha256": "5215b50028fc0f0c9f514fa45f2b7e1680d80395fd6d290063b6084018f9f620"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_missions_new.png",
+    "bytes": 225463,
+    "sha256": "dbff09ec38e2d5e0be31a745379ac770e55d9d0563aa356ef4f76c68b9315702"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_missions_queue.png",
+    "bytes": 123982,
+    "sha256": "dbb1a66dbf8435abecdc50eac3d4ea49b5f49a01ce68f2dcf092365ab2810504"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_projects.png",
+    "bytes": 246489,
+    "sha256": "5096c0f4f9c27ae8b80b3f046e52aec907f1b874f0765e5ee6d836a75624a5c9"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_projects_0afcc588-e722-45bd-8320-f486601b877c.png",
+    "bytes": 96827,
+    "sha256": "8756509d8c33ddde3c20c698b43e314a5731087682dea2c2cbe7babf0fef00f5"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_reports.png",
+    "bytes": 440079,
+    "sha256": "a47b63028595aa2162c53f20f7c9b465f8b61caa5680f4459dd62a59569d575f"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_reports_7064c47e-c198-45d5-b887-b18a1f86d7ce.png",
+    "bytes": 2634899,
+    "sha256": "7c4df06e111fd002a553b7cd4604f38338b84ccecdc33c792313b127b7c9bc9d"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_saved-searches.png",
+    "bytes": 111813,
+    "sha256": "a1ade0af829ecadf623a19fb7d6408f5f461c4820f5cd3c7b3a6fe19c26d806e"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_search.png",
+    "bytes": 184603,
+    "sha256": "f88c2696ee41fe7b45b030f080de05a10d2568e28b520bde97cd3d3aaab3c1ff"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_search_results.png",
+    "bytes": 184603,
+    "sha256": "f88c2696ee41fe7b45b030f080de05a10d2568e28b520bde97cd3d3aaab3c1ff"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-1440-_settings.png",
+    "bytes": 138746,
+    "sha256": "a9b802957bbfc76c19356ff87aa70e4c3d47a44358696820c65117a46efc30a8"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_.png",
+    "bytes": 376052,
+    "sha256": "e63421572b85e1725ef4493e58d18c825259a25a70baa06d58ef3f3166207177"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_404.png",
+    "bytes": 11203,
+    "sha256": "0205972435c5ace4db97e02d69329b2b5c88ab927da9c8b7606a46e3c9df6ba0"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_admin_corrections.png",
+    "bytes": 77333,
+    "sha256": "ad3068df3f51f548b64a43c216a7859bd305ced629fb96b41c1a5d7553040550"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_admin_observability.png",
+    "bytes": 274000,
+    "sha256": "665f95b4d433d3619c678302637ae9d97c4f9b8e693109e3724e9c9a2a13900f"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_admin_spaces.png",
+    "bytes": 295200,
+    "sha256": "b822bd1a35e223cc3d94b9d21a3442edd746dce3b997aa8a909920cc59ecf812"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_admin_users.png",
+    "bytes": 113678,
+    "sha256": "2cd032a4b2a816bad21171179de3e40282c4bfb6e338f58de4debc5714a2f5b9"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_collections.png",
+    "bytes": 497866,
+    "sha256": "7ad58db46b145f30ca69b5f0e7581ed7c209ac627f5ccb6c0322d0ba664463d5"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_collections_a3e6d809-af90-4652-903f-5ce5c8842bf8.png",
+    "bytes": 99587,
+    "sha256": "3298f494ec9685a78ec9d0488c3d322d36f69c7b7c72289e71756212cc70526f"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_console.png",
+    "bytes": 274448,
+    "sha256": "b4fc2da1298263541d3c390420df2f9d734db57d3d422dc18c567117088572f3"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_console_corrections.png",
+    "bytes": 77585,
+    "sha256": "caee08883f16af95ab04cf1eb93a0fe37aef1b98156b786bafd03ea3b2687ebe"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_console_missions.png",
+    "bytes": 692144,
+    "sha256": "485e7616400f656f9cd2e07bd176e2042fbe570dd8bea05180fe8c772c40fb02"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_console_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png",
+    "bytes": 407017,
+    "sha256": "bcbb9352f6c1268922887c689f692c4a01251157cfbfb0996a38d78ba022e05c"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_device.png",
+    "bytes": 29123,
+    "sha256": "6bd5f85ade929c7dd20d3f01ebeee712ad6886cfd339c459cd690dce416289ac"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_documents.png",
+    "bytes": 178475,
+    "sha256": "4b4447dea9a72e3721a7bbfd3a7cf69448337b40e8b3b47137cce895950654a0"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_documents_d44bec3e-f665-439d-bc78-bc5385a4610d.png",
+    "bytes": 167809,
+    "sha256": "bf814ebe85c45204dd915368246b3715cf845d3be4cfaee4bbb08d40ba7c8a3a"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_documents_upload.png",
+    "bytes": 50891,
+    "sha256": "bd93db1af83694de0ea58639acdef160a8d3284d28eb9bf88e688e550911ab5c"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_evidence.png",
+    "bytes": 2312836,
+    "sha256": "dc17b0c0b7cc817b277ad3709973a4083ab386ca9817a451564481e86ddc5d6e"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_evidence_1da242cc-517e-4fcb-9850-3c620e2b484e.png",
+    "bytes": 592302,
+    "sha256": "1697fe556050a49fa00ec41b60329a37a48622ab671a566eeafaa3e3089cca71"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_graph.png",
+    "bytes": 45578,
+    "sha256": "858598138476102426e2de2ebbffd148ada52f09cec4b3779be636c2fc33a0f8"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_graph?root=project:0afcc588-e722-45bd-8320-f486601b877c.png",
+    "bytes": 1059708,
+    "sha256": "a233b59b3791d6f256e30a22f0e08bedfdc5d5e3879b875ffe437cc649e72556"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_invites.png",
+    "bytes": 94571,
+    "sha256": "be665c6190c8101539801f93817a959ae534cade9251cc3bd237a845942c6534"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_missions.png",
+    "bytes": 692032,
+    "sha256": "8c3307e1d7e28b12d5029b3645b8a2b93d29942ffd43c567b4df22c9711d3e0d"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_missions?view=attention&reason=unreviewed.png",
+    "bytes": 678337,
+    "sha256": "a9b089cc982664ed883d29ae30390ce2aa7bae3a859ec3c3affbcb104f876da1"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_missions_7b847edd-5433-4237-a899-57b47e6edf0a.png",
+    "bytes": 407017,
+    "sha256": "bcbb9352f6c1268922887c689f692c4a01251157cfbfb0996a38d78ba022e05c"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_missions_new.png",
+    "bytes": 172986,
+    "sha256": "84aedc511ad0b26e04528dbab416f015303efd95e105fa2e0545c3bca152bccc"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_missions_queue.png",
+    "bytes": 82610,
+    "sha256": "dbd325f5cfeb4cf9466f4b1dcf081fdae50e5b1b9be2fa14e17d22f9b257aa84"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_projects.png",
+    "bytes": 148265,
+    "sha256": "a8c4bdbc7963463924ca3af5fd49f302831edeb6cf6d5376a6d322bfe348c225"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_projects_0afcc588-e722-45bd-8320-f486601b877c.png",
+    "bytes": 57065,
+    "sha256": "4192867ef63409214e218cccb8c2e13b2858e932bec41af5dc3331d0f5e0548c"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_reports.png",
+    "bytes": 449627,
+    "sha256": "276ad2715d1d500056b3553caeea2d9f3c2d84339fffde0030a1d3ae19395d22"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_reports_7064c47e-c198-45d5-b887-b18a1f86d7ce.png",
+    "bytes": 2694051,
+    "sha256": "040180cb831ce4c8efd4544edc5d249dfc738a8c0151bf06ed3e6516b763dc62"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_saved-searches.png",
+    "bytes": 69742,
+    "sha256": "51fabaf4117cb5749866d6692ad145b0d45e1e575500861117e7d76efdf2e061"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_search.png",
+    "bytes": 140719,
+    "sha256": "9e8b4684da2e3a7b42312fe1e006578504267457a27150020570e1031e26f55d"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_search_results.png",
+    "bytes": 140719,
+    "sha256": "9e8b4684da2e3a7b42312fe1e006578504267457a27150020570e1031e26f55d"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/light-390-_settings.png",
+    "bytes": 94571,
+    "sha256": "be665c6190c8101539801f93817a959ae534cade9251cc3bd237a845942c6534"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/local-browser-tests.json",
+    "bytes": 19549,
+    "sha256": "77cb5ba87a171f9c100138ce2c2fbfb82e1cc4b2b93bea12103ac3b0c47c5e51"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/production-baseline-invocation.json",
+    "bytes": 232,
+    "sha256": "7e75cb1c6cbde574faea405f359317c754ea0d98700ece86bda9bfebbcba214e"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/results.json",
+    "bytes": 170382,
+    "sha256": "22d1fa30df474fd7c3d3ee79d9e5cf128de4e87f90bfb8bb74269db26307e325"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/source-ci-summaries.json",
+    "bytes": 1068,
+    "sha256": "ba703df5411583e789fa18f188171a439b6c4c6a51be9ffe432a2e1917281e1e"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/source-frontend-ci-summaries.json",
+    "bytes": 1094,
+    "sha256": "4e9ce462261c1a8f7dadc2e20c1488759f6f90e22f6e811542c98d906d91c99f"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/source-public-smoke.json",
+    "bytes": 2420,
+    "sha256": "3679eb4c17f6b16bbb15103fdd153fbc3b8f98fa9771e4ee3abd45e390c996b5"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/summary.json",
+    "bytes": 8869,
+    "sha256": "0a98b66a5ba7ed469649795956a73d529dc88ae5080f3e459101cdfbdde887b6"
+  },
+  {
+    "path": "cmos/reports/sprint-52/ux-12-production-smoke/visual-review.json",
+    "bytes": 5714,
+    "sha256": "f7d862b56cb24be72fde53f8af8f22ba263566f2bb2382ed29269081a8d3604b"
+  }
+]
