@@ -1,0 +1,552 @@
+{
+  "tool": "playwright",
+  "generatedAt": "2026-09-14T02:43:08.394Z",
+  "completedAt": "2026-09-14T02:45:48.487Z",
+  "status": "passed",
+  "summary": {
+    "total": 47,
+    "expected": 47,
+    "passed": 47,
+    "failed": 0,
+    "skipped": 0,
+    "interrupted": 0,
+    "durationSeconds": 160.093,
+    "retries": 0
+  },
+  "environment": {
+    "node": "v24.6.0",
+    "ci": {
+      "provider": null
+    },
+    "projects": [
+      "chromium"
+    ],
+    "browsers": []
+  },
+  "tests": [
+    {
+      "title": "Home stays at the root and its search opens the shell palette",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "line": 33,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 1026,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "theme persists through hydration and OS changes without a wrong-color frame",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "line": 47,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 723,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "the head bootstrap resolves stored system to System dark before delayed hydration",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "line": 81,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 518,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "the head bootstrap resolves stored hc to System dark before delayed hydration",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "line": 81,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 460,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "Light persists across reload and OS changes with native keyboard focus",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "line": 101,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 551,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "mobile drawer traps focus, closes with Escape, and returns focus to its trigger",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "line": 118,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 648,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "command palette submits a real search request and supports keyboard dismissal",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "line": 139,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 1169,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "open modal surfaces meet the same axe severity and landmark gates",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "line": 167,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 874,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "login and registration share accessible light surfaces at 390px",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "line": 184,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 783,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "login and registration share accessible light surfaces at 1440px",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "line": 184,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 914,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "login and registration share accessible dark surfaces at 390px",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "line": 184,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 833,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "login and registration share accessible dark surfaces at 1440px",
+      "file": "frontend/tests/e2e/app-shell.spec.ts",
+      "line": 184,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 838,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "collection context, reviewed seed and evidence citations in light at 390",
+      "file": "frontend/tests/e2e/collection-context.spec.ts",
+      "line": 15,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 5286,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "collection context, reviewed seed and evidence citations in light at 820",
+      "file": "frontend/tests/e2e/collection-context.spec.ts",
+      "line": 15,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 5493,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "collection context, reviewed seed and evidence citations in light at 1440",
+      "file": "frontend/tests/e2e/collection-context.spec.ts",
+      "line": 15,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 5949,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "collection context, reviewed seed and evidence citations in dark at 390",
+      "file": "frontend/tests/e2e/collection-context.spec.ts",
+      "line": 15,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 5746,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "collection context, reviewed seed and evidence citations in dark at 820",
+      "file": "frontend/tests/e2e/collection-context.spec.ts",
+      "line": 15,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 5772,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "collection context, reviewed seed and evidence citations in dark at 1440",
+      "file": "frontend/tests/e2e/collection-context.spec.ts",
+      "line": 15,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 5895,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "author, inspect, audit and prepare a new run in light at 390",
+      "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+      "line": 14,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 4333,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "author, inspect, audit and prepare a new run in light at 820",
+      "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+      "line": 14,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 4201,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "author, inspect, audit and prepare a new run in light at 1440",
+      "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+      "line": 14,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 5798,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "author, inspect, audit and prepare a new run in dark at 390",
+      "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+      "line": 14,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 4305,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "author, inspect, audit and prepare a new run in dark at 820",
+      "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+      "line": 14,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 4446,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "author, inspect, audit and prepare a new run in dark at 1440",
+      "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+      "line": 14,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 4289,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "queue bookmark permanently redirects and retains filters",
+      "file": "frontend/tests/e2e/mission-protocol.spec.ts",
+      "line": 94,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 30,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "project tabs, independent uploads, chunks and personal favorites in light at 390",
+      "file": "frontend/tests/e2e/project-bundles.spec.ts",
+      "line": 14,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 5172,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "project tabs, independent uploads, chunks and personal favorites in light at 820",
+      "file": "frontend/tests/e2e/project-bundles.spec.ts",
+      "line": 14,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 5846,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "project tabs, independent uploads, chunks and personal favorites in light at 1440",
+      "file": "frontend/tests/e2e/project-bundles.spec.ts",
+      "line": 14,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 6012,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "project tabs, independent uploads, chunks and personal favorites in dark at 390",
+      "file": "frontend/tests/e2e/project-bundles.spec.ts",
+      "line": 14,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 5543,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "project tabs, independent uploads, chunks and personal favorites in dark at 820",
+      "file": "frontend/tests/e2e/project-bundles.spec.ts",
+      "line": 14,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 5763,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "project tabs, independent uploads, chunks and personal favorites in dark at 1440",
+      "file": "frontend/tests/e2e/project-bundles.spec.ts",
+      "line": 14,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 5939,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "every maintained migration preserves its destination and query parameters",
+      "file": "frontend/tests/e2e/route-migration.spec.ts",
+      "line": 5,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 187,
+      "annotations": [],
+      "attachments": [
+        {
+          "name": "route-migration-coverage",
+          "contentType": "application/json",
+          "path": "frontend/test-results/route-migration-every-main-a90a2-nation-and-query-parameters-chromium/attachments/route-migration-coverage-ed6693c2f4a23b6d3eb1207b1905732609cfd2b8.json"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in light at 390px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 63,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 4977,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "search preserves API results, filters and saved replay in light at 390px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 112,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 2926,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in light at 820px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 63,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 5780,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "search preserves API results, filters and saved replay in light at 820px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 112,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 3233,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in light at 1440px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 63,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 5188,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "search preserves API results, filters and saved replay in light at 1440px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 112,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 2885,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in dark at 390px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 63,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 4921,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "search preserves API results, filters and saved replay in dark at 390px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 112,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 3348,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in dark at 820px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 63,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 5411,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "search preserves API results, filters and saved replay in dark at 820px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 112,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 3062,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "palette keyboard reach, paging and focus in dark at 1440px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 63,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 5433,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "search preserves API results, filters and saved replay in dark at 1440px",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 112,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 3148,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "recent and saved search times use UTC even outside the UTC timezone",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 159,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 413,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "legacy search URL permanently redirects with its query intact",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 170,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 31,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "loading, no matches, service failure and missing saved search stay distinct",
+      "file": "frontend/tests/e2e/search-command.spec.ts",
+      "line": 176,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 1001,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    }
+  ],
+  "artifactPath": "/private/tmp/tracelab-ux-10-browser-tests.json"
+}

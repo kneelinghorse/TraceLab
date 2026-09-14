@@ -1,0 +1,246 @@
+{
+  "passed": 29,
+  "generatedLinks": 31,
+  "httpRequests": 30,
+  "checks": [
+    {
+      "tool": "search",
+      "action": "knowledge",
+      "links": 1,
+      "http": [
+        "POST /retrieval/search"
+      ]
+    },
+    {
+      "tool": "project",
+      "action": "list",
+      "links": 1,
+      "http": [
+        "GET /projects"
+      ]
+    },
+    {
+      "tool": "project",
+      "action": "create",
+      "links": 1,
+      "http": [
+        "POST /projects"
+      ]
+    },
+    {
+      "tool": "project",
+      "action": "update",
+      "links": 1,
+      "http": [
+        "PUT /projects/00000000-0000-4000-8000-000000000001"
+      ]
+    },
+    {
+      "tool": "project",
+      "action": "stats",
+      "links": 1,
+      "http": [
+        "GET /projects/00000000-0000-4000-8000-000000000001/stats"
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "list",
+      "links": 1,
+      "http": [
+        "GET /collections"
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "get",
+      "links": 2,
+      "http": [
+        "GET /collections/00000000-0000-4000-8000-000000000005"
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "create",
+      "links": 1,
+      "http": [
+        "POST /collections"
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "add",
+      "links": 1,
+      "http": [
+        "POST /collections/00000000-0000-4000-8000-000000000005/chunks"
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "synthesize",
+      "links": 2,
+      "http": [
+        "POST /synthesize"
+      ]
+    },
+    {
+      "tool": "collection",
+      "action": "export",
+      "links": 0,
+      "http": [
+        "GET /collections/00000000-0000-4000-8000-000000000005/export"
+      ]
+    },
+    {
+      "tool": "report",
+      "action": "list",
+      "links": 1,
+      "http": [
+        "GET /reports"
+      ]
+    },
+    {
+      "tool": "report",
+      "action": "get",
+      "links": 1,
+      "http": [
+        "GET /reports/00000000-0000-4000-8000-000000000004"
+      ]
+    },
+    {
+      "tool": "report",
+      "action": "create",
+      "links": 1,
+      "http": [
+        "POST /reports"
+      ]
+    },
+    {
+      "tool": "report",
+      "action": "export",
+      "links": 0,
+      "http": [
+        "GET /reports/00000000-0000-4000-8000-000000000004"
+      ]
+    },
+    {
+      "tool": "document",
+      "action": "get_content",
+      "links": 1,
+      "http": [
+        "GET /documents/00000000-0000-4000-8000-000000000002",
+        "GET /documents/00000000-0000-4000-8000-000000000002/chunks"
+      ]
+    },
+    {
+      "tool": "document",
+      "action": "upload",
+      "links": 1,
+      "http": [
+        "POST /documents/upload"
+      ]
+    },
+    {
+      "tool": "mission",
+      "action": "list",
+      "links": 1,
+      "http": [
+        "GET /missions"
+      ]
+    },
+    {
+      "tool": "mission",
+      "action": "get",
+      "links": 1,
+      "http": [
+        "GET /missions/00000000-0000-4000-8000-000000000003"
+      ]
+    },
+    {
+      "tool": "mission",
+      "action": "create",
+      "links": 1,
+      "http": [
+        "POST /missions"
+      ]
+    },
+    {
+      "tool": "mission",
+      "action": "update",
+      "links": 1,
+      "http": [
+        "PATCH /missions/00000000-0000-4000-8000-000000000003"
+      ]
+    },
+    {
+      "tool": "mission_execution",
+      "action": "submit",
+      "links": 1,
+      "http": [
+        "POST /missions/00000000-0000-4000-8000-000000000003/submit"
+      ]
+    },
+    {
+      "tool": "mission_execution",
+      "action": "status",
+      "links": 1,
+      "http": [
+        "GET /missions/00000000-0000-4000-8000-000000000003/status"
+      ]
+    },
+    {
+      "tool": "mission_execution",
+      "action": "preview",
+      "links": 1,
+      "http": [
+        "GET /missions/00000000-0000-4000-8000-000000000003/contract-preview"
+      ]
+    },
+    {
+      "tool": "evidence",
+      "action": "list",
+      "links": 2,
+      "http": [
+        "GET /evidence"
+      ]
+    },
+    {
+      "tool": "evidence",
+      "action": "search",
+      "links": 1,
+      "http": [
+        "GET /evidence/search"
+      ]
+    },
+    {
+      "tool": "evidence",
+      "action": "capture",
+      "links": 1,
+      "http": [
+        "POST /evidence/capture"
+      ]
+    },
+    {
+      "tool": "evidence",
+      "action": "note",
+      "links": 1,
+      "http": [
+        "PUT /evidence/notes/working"
+      ]
+    },
+    {
+      "tool": "evidence",
+      "action": "promote",
+      "links": 2,
+      "http": [
+        "POST /evidence/promote"
+      ]
+    }
+  ],
+  "transport": "real stdio MCP client against clean npm-pack install",
+  "package_version": "1.1.1",
+  "npm_registry_published": false,
+  "source_commit": "54333f9c55a24e1e657df9796a06a8d79044a337",
+  "esm_audit": "Only matches are a local __dirname declared from fileURLToPath(import.meta.url) and its use in auth/device-code.ts; installed entrypoint executes successfully.",
+  "ci_portability": "ripgrep audit with grep fallback; CI runner lacked rg, fallback added and package lane passed"
+}

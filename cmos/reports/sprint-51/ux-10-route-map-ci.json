@@ -1,0 +1,138 @@
+{
+  "baseURL": "http://127.0.0.1:3100",
+  "checkedAt": "2026-09-14T02:54:07.321Z",
+  "mapRows": 8,
+  "coveredRows": 8,
+  "checks": 16,
+  "passed": 16,
+  "results": [
+    {
+      "source": "/",
+      "requested": "/",
+      "status": 200,
+      "actual": "http://127.0.0.1:3100/",
+      "expected": "http://127.0.0.1:3100/",
+      "passed": true
+    },
+    {
+      "source": "/",
+      "requested": "/?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "status": 200,
+      "actual": "http://127.0.0.1:3100/?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "expected": "http://127.0.0.1:3100/?q=scope+%26+provenance&tag=first&tag=second&view=all",
+      "passed": true
+    },
+    {
+      "source": "/console",
+      "requested": "/console",
+      "status": 308,
+      "actual": "http://127.0.0.1:3100/admin/observability",
+      "expected": "http://127.0.0.1:3100/admin/observability",
+      "passed": true
+    },
+    {
+      "source": "/console",
+      "requested": "/console?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "status": 308,
+      "actual": "http://127.0.0.1:3100/admin/observability?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "expected": "http://127.0.0.1:3100/admin/observability?q=scope+%26+provenance&tag=first&tag=second&view=all",
+      "passed": true
+    },
+    {
+      "source": "/console/missions",
+      "requested": "/console/missions",
+      "status": 308,
+      "actual": "http://127.0.0.1:3100/missions",
+      "expected": "http://127.0.0.1:3100/missions",
+      "passed": true
+    },
+    {
+      "source": "/console/missions",
+      "requested": "/console/missions?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "status": 308,
+      "actual": "http://127.0.0.1:3100/missions?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "expected": "http://127.0.0.1:3100/missions?q=scope+%26+provenance&tag=first&tag=second&view=all",
+      "passed": true
+    },
+    {
+      "source": "/console/missions/:id",
+      "requested": "/console/missions/00000000-0000-4000-8000-000000000001",
+      "status": 308,
+      "actual": "http://127.0.0.1:3100/missions/00000000-0000-4000-8000-000000000001",
+      "expected": "http://127.0.0.1:3100/missions/00000000-0000-4000-8000-000000000001",
+      "passed": true
+    },
+    {
+      "source": "/console/missions/:id",
+      "requested": "/console/missions/00000000-0000-4000-8000-000000000001?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "status": 308,
+      "actual": "http://127.0.0.1:3100/missions/00000000-0000-4000-8000-000000000001?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "expected": "http://127.0.0.1:3100/missions/00000000-0000-4000-8000-000000000001?q=scope+%26+provenance&tag=first&tag=second&view=all",
+      "passed": true
+    },
+    {
+      "source": "/console/corrections",
+      "requested": "/console/corrections",
+      "status": 308,
+      "actual": "http://127.0.0.1:3100/admin/corrections",
+      "expected": "http://127.0.0.1:3100/admin/corrections",
+      "passed": true
+    },
+    {
+      "source": "/console/corrections",
+      "requested": "/console/corrections?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "status": 308,
+      "actual": "http://127.0.0.1:3100/admin/corrections?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "expected": "http://127.0.0.1:3100/admin/corrections?q=scope+%26+provenance&tag=first&tag=second&view=all",
+      "passed": true
+    },
+    {
+      "source": "/invites",
+      "requested": "/invites",
+      "status": 308,
+      "actual": "http://127.0.0.1:3100/settings#invites",
+      "expected": "http://127.0.0.1:3100/settings#invites",
+      "passed": true
+    },
+    {
+      "source": "/invites",
+      "requested": "/invites?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "status": 308,
+      "actual": "http://127.0.0.1:3100/settings?q=scope%20%26%20provenance&tag=first&tag=second&view=all#invites",
+      "expected": "http://127.0.0.1:3100/settings?q=scope+%26+provenance&tag=first&tag=second&view=all#invites",
+      "passed": true
+    },
+    {
+      "source": "/search/results",
+      "requested": "/search/results",
+      "status": 308,
+      "actual": "http://127.0.0.1:3100/search",
+      "expected": "http://127.0.0.1:3100/search",
+      "passed": true
+    },
+    {
+      "source": "/search/results",
+      "requested": "/search/results?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "status": 308,
+      "actual": "http://127.0.0.1:3100/search?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "expected": "http://127.0.0.1:3100/search?q=scope+%26+provenance&tag=first&tag=second&view=all",
+      "passed": true
+    },
+    {
+      "source": "/missions/queue",
+      "requested": "/missions/queue",
+      "status": 308,
+      "actual": "http://127.0.0.1:3100/missions?view=queue",
+      "expected": "http://127.0.0.1:3100/missions?view=queue",
+      "passed": true
+    },
+    {
+      "source": "/missions/queue",
+      "requested": "/missions/queue?q=scope%20%26%20provenance&tag=first&tag=second&view=all",
+      "status": 308,
+      "actual": "http://127.0.0.1:3100/missions?q=scope%20%26%20provenance&tag=first&tag=second&view=queue",
+      "expected": "http://127.0.0.1:3100/missions?view=queue&q=scope+%26+provenance&tag=first&tag=second",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,206 @@
+{
+  "mission": "UX-10",
+  "status": "passed",
+  "checked_at": "2026-09-14T03:09:29.685642+00:00",
+  "base_commit": "36a5fbedba702fba1e2047a889bd73e0f5020ff1",
+  "source_commit": "54333f9c55a24e1e657df9796a06a8d79044a337",
+  "merge_commit": "2081c73ddbf1ad826e061bbc9512e887591febae",
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/281",
+  "decisions": [
+    419
+  ],
+  "learnings": [
+    174
+  ],
+  "changes": [
+    "One executable eight-row route migration manifest drives Next, roadmap binding and production smoke. Seven aliases retain308 permanent redirects, encoded/repeated query parameters and destination query/fragment semantics; Home is an explicit200 behavior replacement.",
+    "Canonical TS browser-link helper covers entity responses and related navigation fields, validates configuration before login/tools, and preserves authored provenance/export content. Python mission projections mirror url through the resolved UUID.",
+    "31-route baseline now crawls same-origin anchors for every retired alias while discarding query/fragment secrets. CI and scheduled production smoke archive map coverage; installed-package CI exercises real stdio client and HTTP verbs.",
+    "Roadmap lists all seven Sprint53 alias retirements and closes Sprint51 while retaining the Sprint54 high-contrast deferral."
+  ],
+  "validation": {
+    "frontend": {
+      "unit_passed": 208,
+      "unit_skipped": 0,
+      "lint": "passed",
+      "types": "passed",
+      "production_build": "passed",
+      "browser_passed": 47,
+      "browser_skipped": 0,
+      "browser_receipt": "ux-10-browser-tests.json"
+    },
+    "python": {
+      "targeted_passed": 115,
+      "targeted_skipped": 0,
+      "warnings": 14,
+      "whole_changed_files_ruff": "passed",
+      "foundational_references": "passed",
+      "ci_backend": {
+        "passed": 2484,
+        "skipped_existing": 3,
+        "quarantined_existing": 12,
+        "warnings": 48,
+        "duration_seconds": 409.77
+      },
+      "ci_postgres": {
+        "passed": 134,
+        "skipped_existing": 4,
+        "warnings": 17,
+        "duration_seconds": 90.25
+      }
+    },
+    "mcp": {
+      "unit_passed": 90,
+      "unit_skipped": 0,
+      "installed_tarball_contract": "ux-10-mcp-package-contract.json",
+      "actions": 29,
+      "generated_links": 31,
+      "authenticated_http_requests": 30,
+      "production_receipt": "ux-10-mcp-production.json",
+      "production_actions": 15,
+      "production_links_200": 95,
+      "npm_publication": false
+    },
+    "route_map": {
+      "local": "ux-10-route-map-local.json",
+      "built_ci": "ux-10-route-map-ci.json",
+      "production": "ux-10-route-map-production.json",
+      "production_workflow": "ux-10-route-map-production-ci.json",
+      "map_rows": 8,
+      "covered_rows": 8,
+      "requests": 16,
+      "passed": 16
+    },
+    "local_baseline": "ux-10-local-baseline-summary.json",
+    "production_baseline": {
+      "receipt": "ux-10-production-smoke/summary.json",
+      "checks": 124,
+      "routes": 31,
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        1440,
+        390
+      ],
+      "legacy_links": 0,
+      "failures": 0,
+      "internal_link_paths": 129
+    }
+  },
+  "before": {
+    "accepted_sprint_baseline": "ux-9-production-smoke/summary.json",
+    "accepted_source": "91b592d40bd456820523100c8a4589a7589b69f5",
+    "preflight": "Existing seven production redirects already returned308 and preserved queries; four original public production smoke checks passed."
+  },
+  "regressions_proven_red": [
+    "Roadmap binding failed when the mission aliases shared a combined row instead of eight independent map rows.",
+    "Actual TS stdio client failed on the missing search document_url before implementation.",
+    "Actual Python MCP client failed on missing mission url before parity implementation."
+  ],
+  "test_authoring_corrections": [
+    "Contract fixtures now use existing GET report export content and GET contract-preview routes, rather than invented/export or/preview routes.",
+    "Vitest1 env stubbing needs deletion to represent undefined; the successful Python submit fixture must clear result markdown to satisfy the existing pristine-draft guard.",
+    "The private live follow-on link checker was corrected from response.status() to the Fetch status property."
+  ],
+  "ci_regression": {
+    "initial_run": 34800453162,
+    "cause": "New package audit assumed rg existed on Ubuntu runner.",
+    "fix_commit": "54333f9c55a24e1e657df9796a06a8d79044a337",
+    "resolution": "Audits use rg when available, grep fallback otherwise; current installed-package CI passed."
+  },
+  "ci_source": [
+    {
+      "name": "backend-integration",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34800573177/job/103842309124"
+    },
+    {
+      "name": "ruff-diff",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34800573157/job/103842268469"
+    },
+    {
+      "name": "backend-suite",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34800573158/job/103842310212"
+    },
+    {
+      "name": "vitest",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34800573160/job/103842268660"
+    },
+    {
+      "name": "build-frontend-production",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34800573165/job/103842268348"
+    },
+    {
+      "name": "mcp-package",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34800573170/job/103842268252"
+    },
+    {
+      "name": "Secret Scan",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34800573156/job/103842268327"
+    },
+    {
+      "name": "Secret Scan",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34800570564/job/103842260348"
+    },
+    {
+      "name": "type-check",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34800573160/job/103842268590"
+    },
+    {
+      "name": "lint",
+      "conclusion": "SUCCESS",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34800573160/job/103842268535"
+    }
+  ],
+  "deployment": {
+    "checkedAt": "2026-09-14T03:02:36.843Z",
+    "commit": "2081c73ddbf1ad826e061bbc9512e887591febae",
+    "api": {
+      "id": "e95d528d-d251-4de7-bb56-39e471d205c3",
+      "status": "SUCCESS",
+      "commit": "2081c73ddbf1ad826e061bbc9512e887591febae"
+    },
+    "frontend": {
+      "id": "1cbc8fa8-eac5-4c23-aae9-00fc7551e459",
+      "status": "SUCCESS",
+      "commit": "2081c73ddbf1ad826e061bbc9512e887591febae"
+    }
+  },
+  "scheduled_production_smoke": {
+    "conclusion": "success",
+    "createdAt": "2026-09-14T03:03:33Z",
+    "databaseId": 34801263815,
+    "headSha": "2081c73ddbf1ad826e061bbc9512e887591febae",
+    "status": "completed",
+    "updatedAt": "2026-09-14T03:04:56Z",
+    "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34801263815"
+  },
+  "visual_review": {
+    "representative_screenshots": [
+      "ux-10-production-smoke/light-1440-_.png",
+      "ux-10-production-smoke/light-390-_missions_queue.png",
+      "ux-10-production-smoke/light-390-_search_results.png",
+      "ux-10-production-smoke/dark-1440-_console.png",
+      "ux-10-production-smoke/dark-390-_invites.png"
+    ],
+    "notes": "Home and canonical queue/search/observability render with the established shell and responsive layout. Phone Settings narrow action-label wrapping is pre-existing, confirmed against the accepted UX9 dark390 invites capture, and recorded for Sprint53 hardening; automated baseline is not a claim of visual perfection."
+  },
+  "limitations": [
+    "High contrast remains deferred under THEME-2 to Sprint54; all62 failed measurements are retained and accepted Forge114a268 artifacts are unchanged.",
+    "The npm package changes are Unreleased. No registry publication was requested or performed; npm whoami returned401. Clean installed tarball and production API flows are verified, but existing npm1.1.1 installations do not gain these source changes automatically.",
+    "Python MCP remains production-dark; real in-memory MCP client coverage proves parity. No database column, authoring input, compiler/worker mapping or new server environment variable was introduced.",
+    "Three existing backend skips,12 quarantines and four existing PostgreSQL skips remain explicit. New targeted, frontend, browser and MCP tests have no skips.",
+    "Existing phone Settings API-key/invite action labels wrap narrowly at390px. Confirmed in prior accepted UX9 capture; recorded as a Sprint53 hardening next step rather than silently treating the automated baseline as complete visual proof."
+  ],
+  "remaining": []
+}
