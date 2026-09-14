@@ -165,15 +165,29 @@ Key decisions carried forward: hexagonal boundaries stay (routers → services �
 
 **Remaining plan:** Sprint 52's relationship graph, attention views, MCP parity audit and documentation refresh remain planned. Sprint 53 keeps performance, accessibility in accepted Light/Dark themes, drift measurement, further smoke automation and the seven alias retirements listed below. Neither sprint is opened by this closeout. Live mission log streaming remains dormant and is labeled unavailable; CI receipts name existing skips and quarantines rather than counting them as passes.
 
-### Sprint 52 — Relationships, Attention and Parity
+### Sprint 52 — Relationships, Attention and Parity (opened 2026-09-14)
 
-**Goal:** make the system's structure visible and keep the operator's attention where it belongs.
+**Goal:** make the system's structure visible and keep the operator's attention where it belongs, after closing the security and CI residue found by the Sprint 51 review.
 
-- Evidence and relationship graph view (Obsidian pattern) over projects, documents, evidence and reports.
-- Saved exception dashboards ("at risk missions", "unreviewed completions") on the aggregates.
-- Priority inbox: agent failures, completions, new evidence; email or in-app notification on mission completion.
-- MCP parity audit: every UI aggregate and action has an MCP or REST equivalent; gaps become missions.
-- Documentation refresh: `docs/frontend_architecture.md` and `cmos/foundational-docs/technical_architecture.md` rewritten to the new system.
+**Decisions at open:** a project owner keeps read access to every document in the project, even without Space membership (decision #424). The `@aquex/tracelab-mcp` package is published once, after the last MCP-affecting change, so parity is measured against source until then (decision #425). Completion notifications are in-app only: TraceLab has no email infrastructure, and email waits for a decision on provider and sender domain.
+
+| Mission | Deliverable | Depends on |
+|---|---|---|
+| CI-5 | `backend-integration` and `lint` become required checks with a before/after protection readback; Sprint 51 receipts that cited only PR-head CI get correction notes | — |
+| SEC-1 | Onboarding `POST /api/v1/documents` authorizes the project before any filesystem access, write or idempotent replay; `file_path` is confined to an ingest root | — |
+| SEC-2 | Project-owner document read path, one shared document policy, `/synthesize` aligned with `/reports`, `POLICY_VERSION` 1.1 and a recorded production `rbac_verify` run | SEC-1 |
+| MCP-1 | Checked-in MCP parity manifest and audit script measured against source; read gaps on existing surfaces closed | — |
+| GRAPH-1 | Caller-scoped, uncached relationship neighborhood API over the live relational tables | SEC-2, CI-5 |
+| UX-11 | `/graph` page with an accessible list equivalent of the same neighborhood | GRAPH-1 |
+| UX-12 | Saved exception dashboards: per-reason attention aggregate, reason-filtered mission views and personal saved views | — |
+| UX-13 | Priority inbox with a per-user seen watermark and an in-app unread badge | UX-12 |
+| MCP-2 | Non-destructive MCP action gaps and Sprint 52 surface reads closed; final parity audit at zero gaps | MCP-1, GRAPH-1, UX-11, UX-12, UX-13 |
+| MCP-3 | Single `@aquex/tracelab-mcp` 1.2.0 publish with a fresh-install production smoke | MCP-2 |
+| DOC-1 | `docs/frontend_architecture.md` and `cmos/foundational-docs/technical_architecture.md` rewritten as built; dead references fixed; the foundational-refs validator matches on path boundaries | CI-5, SEC-2, UX-11, UX-12, UX-13, MCP-2 |
+
+**Build order:** CI-5, SEC-1, SEC-2, MCP-1, GRAPH-1, UX-11, UX-12, UX-13, MCP-2, MCP-3, DOC-1. CMOS holds the full objective, context, success criteria and deliverables for each mission.
+
+**Exit criteria:** every mission is complete with its receipt merged under `cmos/reports/sprint-52/`, except MCP-3 if the npm publish is still waiting on Derek, which must be recorded. Main requires eight contexts. Production reports `policy_version` 1.1 and a recorded production `rbac_verify` run passes. `/graph`, the mission dashboards and `/inbox` pass the Light/Dark × 1440/390 direct-browser production baseline alongside the Sprint 51 routes. The MCP parity audit exits 0 on main. Both architecture documents describe the as-built system.
 
 ### Sprint 53 — Hardening and Measurement
 
@@ -184,6 +198,18 @@ Key decisions carried forward: hexagonal boundaries stay (routers → services �
 - Stage1 drift scan against the April 2026 fingerprint baseline; results archived as the new baseline.
 - Extend the existing deployed frontend smoke and route-map coverage with automated phone-width overflow checks (the S48 lesson).
 - Retirement of every legacy component and route alias that Sprint 51 marked deprecated.
+
+**Added at Sprint 52 planning:**
+
+- Gate `GET /api/v1/graph/stats`, which returns corpus-wide counts without authentication.
+- Scope `GET /api/v1/missions/{id}/related` by caller, including its related entities and its cache key.
+- Exclude soft-deleted mission result documents from `GET /api/v1/pedr/related` and remove its per-neighbor scope lookups.
+- Retire dead frontend client code: the `/mission-protocols` calls, `useQualityReport`, `getRelationshipContext`, `getWorkerHealth` and `ExportButtons`.
+- Promote `mcp-package` to a required check once it has five qualifying main pushes.
+- Stop result materialization's `updated_at` bump from resurfacing reviewed completions as unreviewed.
+- Performance budgets for the graph neighborhood, per-view attention totals and inbox summary polling.
+- A mutation-free production fixture that proves the project-owner document read path.
+- Smoke automation for docs-only and receipt-only merges, which still rebuild production.
 
 ### Beyond Sprint 53 (not scheduled)
 
@@ -308,3 +334,4 @@ _Truth in data, evidence as the connective tissue, one system._
 
 - **2026-09-14 UTC, Sprint 51 close** — Nine missions accepted with CI, exact Railway SUCCESS deployments and production receipts. THEME-2 remains deferred to Sprint54; Sprint52/53 stay planned. UX-10 binds the eight-row route map to16 production checks, verifies canonical generated MCP links while preserving authored provenance, and records a clean124-check internal-link baseline. The package source/tarball is verified and remains Unreleased on npm.
 - **2026-09-14 UTC, Sprint 51 review** — Definition of Done gains rules 8 and 9: the post-SUCCESS 31-route baseline rerun with deployment ids, and the active-data visual review under a non-UTC clock. Both already governed Sprint 51 through decision #400 and learning #173 but were missing from this section.
+- **2026-09-14 UTC, Sprint 52 open** — Sprint 52 created in CMOS with eleven missions (CI-5, SEC-1, SEC-2, MCP-1, GRAPH-1, UX-11, UX-12, UX-13, MCP-2, MCP-3, DOC-1) and identity synced to `sprint-52-active`. Derek decided that a project owner keeps document read access (decision #424) and that the MCP package publishes once after all MCP changes (decision #425). Deferrals found while grounding the slate were added to the Sprint 53 section.
