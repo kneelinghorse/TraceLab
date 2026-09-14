@@ -33,20 +33,23 @@ for (const theme of (process.env.UI_THEME?[process.env.UI_THEME]:['light','dark'
   const context=await browser.newContext({viewport:{width,height:1000},colorScheme:theme === 'dark' ? 'dark' : 'light'});
   await context.route(/https?:\/\/(api\.tracelab\.aquex\.ai|localhost:8000|127\.0\.0\.1:8103)\/.*/, async route => {
     const incoming = new URL(route.request().url());
+    const method = route.request().method();
+    // Facet metadata is an authenticated read even though its API uses POST.
+    const readOnly = method === 'GET' || (method === 'POST' && incoming.pathname === '/api/v1/facets');
     try {
       if (directProduction) {
         if (incoming.origin !== api) throw Error('Production UI requested a non-production API');
         if (route.request().method() === 'OPTIONS') { await route.continue(); return; }
-        if (route.request().method() !== 'GET') throw Error('Smoke forbids API writes');
+        if (!readOnly) throw Error('Smoke forbids API writes');
         const headers = {...route.request().headers(), 'x-api-key':creds.key};
         delete headers.authorization;
         await route.continue({headers}); return;
       }
       if (route.request().method() === 'OPTIONS') {
-        await route.fulfill({status:204, headers:{'access-control-allow-origin':base,'access-control-allow-headers':'authorization,content-type,x-api-key','access-control-allow-methods':'GET,OPTIONS'}}); return;
+        await route.fulfill({status:204, headers:{'access-control-allow-origin':base,'access-control-allow-headers':'authorization,content-type,x-api-key','access-control-allow-methods':'GET,POST,OPTIONS'}}); return;
       }
-      if (route.request().method() !== 'GET') throw Error('Smoke forbids API writes');
-      const response = await fetch(api + incoming.pathname + incoming.search, {headers:{'X-API-Key':creds.key}});
+      if (!readOnly) throw Error('Smoke forbids API writes');
+      const response = await fetch(api + incoming.pathname + incoming.search, {method, headers:{'X-API-Key':creds.key,'Content-Type':'application/json'}, ...(method === 'POST' ? {body:route.request().postData()} : {})});
       if (!response.ok) transportErrors.push({path:incoming.pathname,status:response.status});
       await route.fulfill({status:response.status,body:await response.text(),headers:{'content-type':'application/json','access-control-allow-origin':base}});
     } catch { transportErrors.push({path:incoming.pathname,error:'API smoke request failed'}); await route.abort().catch(() => {}); }

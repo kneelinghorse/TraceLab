@@ -27,26 +27,26 @@ export const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function R
     <div
       ref={ref}
       className={clsx(
-        "rounded-2xl border p-5 transition bg-surface backdrop-blur text-foreground",
+        "min-w-0 rounded-2xl border p-5 transition bg-surface backdrop-blur text-foreground",
         isHighlighted
           ? "border-warning-line shadow-lg shadow-sm"
           : "border-line hover:border-info-line",
       )}
     >
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-secondary">Chunk score</p>
           <p className="text-2xl font-semibold text-accent-text">{scoreLabel}</p>
         </div>
         {result.chunk_id && (
-          <code className="rounded-full border border-line bg-surface-alt px-3 py-1 text-xs text-secondary">
+          <code className="max-w-full break-all rounded-full border border-line bg-surface-alt px-3 py-1 text-xs text-secondary">
             {result.chunk_id}
           </code>
         )}
       </div>
 
       <div className="mt-4 space-y-2">
-        <div className="flex flex-wrap items-center gap-2 text-sm">
+        <div className="flex flex-wrap items-center gap-2 break-all text-sm">
           {result.project_id && (
             <Link
               href={`/projects/${result.project_id}`}
@@ -90,7 +90,7 @@ export const ResultCard = forwardRef<HTMLDivElement, ResultCardProps>(function R
         </div>
       </div>
 
-      <p className="mt-4 text-foreground leading-relaxed whitespace-pre-line">{chunkPreview}</p>
+      <p className="mt-4 break-words text-foreground leading-relaxed whitespace-pre-line">{chunkPreview}</p>
 
       <div className="mt-4 flex flex-wrap items-center justify-end gap-4">
         {result.chunk_id && (

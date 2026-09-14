@@ -5,5 +5,5 @@ const SearchPage = dynamic(() => import("@/features/search/SearchExperience").th
 });
 
 export default function SearchIndexPage() {
-  return <SearchPage initialSection="search" />;
+  return <SearchPage />;
 }

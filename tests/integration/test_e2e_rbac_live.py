@@ -129,7 +129,7 @@ def test_harness_pedr1c_routes_match_wired_surface():
 
     resource_id = "00000000-0000-0000-0000-000000000001"
     live_probed = {
-        (method, path.replace(resource_id, "{id}"))
+        (method, path.split("?", 1)[0].replace(resource_id, "{id}"))
         for method, path, _body in pedr1c_anon_routes(
             settings.api_v1_prefix,
             resource_id,
@@ -159,6 +159,7 @@ def test_harness_pedr1c_routes_match_wired_surface():
         or path in {
             f"{settings.api_v1_prefix}/search/history",
             f"{settings.api_v1_prefix}/search/replay/{{id}}",
+            f"{settings.api_v1_prefix}/navigation/search",
             f"{settings.api_v1_prefix}/synthesize",
         }
     }

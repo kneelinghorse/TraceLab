@@ -1,15 +1,16 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import type { FormEvent, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { AuthGate } from "@/components/AuthGate";
+import { CommandPalette } from "@/components/CommandPalette";
 import { Navigation, NavigationIcon, activeNavigationItem, navigationGroups } from "@/components/Navigation";
 import { ThemeSelect } from "@/components/ThemeSelect";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRole } from "@/contexts/RoleContext";
 import { keepDialogFocus } from "@/lib/dialog-focus";
-import { OPEN_COMMAND_PALETTE_EVENT } from "@/lib/command-palette";
+import { openCommandPalette } from "@/lib/command-palette";
 
 function Brand() {
   return <Link href="/" className="flex items-center gap-3 font-semibold tracking-tight text-foreground"><span aria-hidden="true" className="grid h-8 w-8 place-items-center rounded-lg bg-accent text-on-accent">T</span><span>TraceLab</span></Link>;
@@ -26,40 +27,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { isAdmin } = useRole();
   const router = useRouter();
   const drawer = useRef<HTMLDialogElement>(null);
-  const commands = useRef<HTMLDialogElement>(null);
-  const searchInput = useRef<HTMLInputElement>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [query, setQuery] = useState("");
   const items = navigationGroups.filter((group) => !group.admin || isAdmin).flatMap((group) => group.items);
   const active = activeNavigationItem(router.pathname, items);
-  const matching = items.filter((item) => item.label.toLowerCase().includes(query.trim().toLowerCase()));
-
-  function openCommands() {
-    setQuery("");
-    if (!commands.current?.open) commands.current?.showModal();
-    searchInput.current?.focus();
-  }
-
-  useEffect(() => {
-    function requested() {
-      if (!isAuthenticated) return;
-      setQuery("");
-      if (!commands.current?.open) commands.current?.showModal();
-      searchInput.current?.focus();
-    }
-    function keyboard(event: KeyboardEvent) {
-      if (isAuthenticated && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        requested();
-      }
-    }
-    window.addEventListener("keydown", keyboard);
-    window.addEventListener(OPEN_COMMAND_PALETTE_EVENT, requested);
-    return () => {
-      window.removeEventListener("keydown", keyboard);
-      window.removeEventListener(OPEN_COMMAND_PALETTE_EVENT, requested);
-    };
-  }, [isAuthenticated]);
 
   useEffect(() => {
     const media = window.matchMedia("(min-width: 900px)");
@@ -67,17 +37,6 @@ export function AppShell({ children }: { children: ReactNode }) {
     media.addEventListener("change", closeDrawer);
     return () => media.removeEventListener("change", closeDrawer);
   }, []);
-
-  function go(href: string) {
-    commands.current?.close();
-    drawer.current?.close();
-    void router.push(href);
-  }
-
-  function search(event: FormEvent) {
-    event.preventDefault();
-    if (query.trim()) go(`/search?q=${encodeURIComponent(query.trim())}`);
-  }
 
   function userMenu() {
     return <div className="space-y-4 border-t border-line p-4">
@@ -113,7 +72,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="app-toolbar">
         <button type="button" className="app-mobile-menu rounded-lg p-2 text-secondary hover:bg-surface-alt" aria-label="Open navigation" aria-expanded={drawerOpen} aria-controls="navigation-drawer" onClick={() => { drawer.current?.showModal(); setDrawerOpen(true); }}><NavigationIcon name="menu" /></button>
         <span className="min-w-0 flex-1 truncate text-sm font-medium text-secondary">{active?.label || "Workspace"}</span>
-        <button type="button" className="flex items-center gap-3 rounded-lg border border-line px-3 py-2 text-sm text-muted hover:border-line-strong" onClick={openCommands}><NavigationIcon name="search" /><span>Search</span><kbd className="hidden text-xs sm:inline">⌘ K</kbd></button>
+        <button type="button" className="flex items-center gap-3 rounded-lg border border-line px-3 py-2 text-sm text-muted hover:border-line-strong" onClick={openCommandPalette}><NavigationIcon name="search" /><span>Search</span><kbd className="hidden text-xs sm:inline">⌘ K</kbd></button>
       </header>
       <main id="main-content" tabIndex={-1} className="app-main context-detail" data-region="body">{children}</main>
     </div>
@@ -122,10 +81,6 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="app-sidebar-scroll"><Navigation onNavigate={() => drawer.current?.close()} /></div>
       {userMenu()}
     </dialog>
-    <dialog ref={commands} className="app-dialog app-command-dialog" aria-labelledby="command-title" onKeyDown={keepDialogFocus}>
-      <div className="flex items-center justify-between border-b border-line px-5 py-3"><h2 id="command-title" className="text-sm font-medium">Search and navigation</h2><button type="button" aria-label="Close search" className="rounded-lg p-2" onClick={() => commands.current?.close()}><NavigationIcon name="close" /></button></div>
-      <form onSubmit={search} className="flex items-center gap-3 border-b border-line p-4"><NavigationIcon name="search" /><label htmlFor="command-query" className="sr-only">Search research or find a section</label><input ref={searchInput} id="command-query" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search research or find a section…" className="min-w-0 flex-1 bg-transparent py-2 text-foreground placeholder:text-muted" autoComplete="off" /><button type="submit" className="rounded-lg bg-accent px-3 py-2 text-sm text-on-accent" disabled={!query.trim()}>Search</button></form>
-      <div className="max-h-[55vh] overflow-y-auto p-3"><p className="px-3 py-2 text-xs text-muted">Go to</p>{matching.map((item) => <button key={item.href} type="button" className="app-nav-link w-full text-left" onClick={() => go(item.href)}><NavigationIcon name={item.icon} />{item.label}</button>)}{matching.length === 0 && <p className="px-3 py-3 text-sm text-muted">Press Enter to search your research.</p>}</div>
-    </dialog>
+    <CommandPalette key={user?.user_id ?? "anonymous"} />
   </>;
 }

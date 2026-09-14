@@ -11,7 +11,7 @@ type RagSynthesisProps = {
 
 export function RagSynthesis({ payload, isLoading, error, onCitationClick }: RagSynthesisProps) {
   return (
-    <section className="panel h-full p-6 space-y-6">
+    <section className="panel p-6 space-y-6">
       <div>
         <p className="text-xs uppercase tracking-[0.3em] text-secondary">RAG Answer</p>
         <h2 className="text-2xl font-semibold text-foreground">Synthesized response with citations</h2>

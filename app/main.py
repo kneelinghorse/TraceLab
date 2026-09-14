@@ -30,6 +30,7 @@ from app.api.v1 import (
     mission_events,
     missions,
     monitoring,
+    navigation_search,
     pedr_preflight,
     pedr_related,
     pedr_search,
@@ -296,6 +297,12 @@ app.include_router(
     home.router,
     prefix=f"{settings.api_v1_prefix}/home",
     tags=["home"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    navigation_search.router,
+    prefix=f"{settings.api_v1_prefix}/navigation",
+    tags=["navigation"],
     dependencies=protected_dependencies,
 )
 app.include_router(

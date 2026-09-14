@@ -108,6 +108,8 @@ export interface SearchQueryParams {
   project_id?: string;
   document_id?: string;
   source_type?: string;
+  date_from?: string;
+  date_to?: string;
   hnsw_ef?: number;
   temperature?: number;
   max_tokens?: number;
@@ -150,6 +152,8 @@ export interface PEDRSearchParams {
   project_id?: string;
   document_id?: string;
   source_type?: string;
+  date_from?: string;
+  date_to?: string;
   enable_graph?: boolean;
   element_type?: PEDRElementType;
   element_types?: PEDRElementType[];
@@ -231,4 +235,12 @@ export interface PEDRSearchResult {
 export interface PEDRSearchResponse {
   results: PEDRSearchResult[];
   metadata: PEDRSearchMetadata;
+}
+
+export interface SearchFacetResponse {
+  projects: Array<{ value: string; label: string; count: number }>;
+  document_types: Array<{ value: string; label: string; count: number }>;
+  source_types: Array<{ value: string; label: string; count: number }>;
+  tags: Array<{ value: string; label: string; count: number }>;
+  date_range: { min: string | null; max: string | null };
 }

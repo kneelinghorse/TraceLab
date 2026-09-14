@@ -4,6 +4,7 @@ import type {
   PEDRSearchResponse,
   RagResponsePayload,
   SearchHistoryResponse,
+  SearchFacetResponse,
   SearchQueryParams,
   SearchReplayResponse,
   SemanticSearchResponse,
@@ -15,6 +16,10 @@ const HISTORY_PATH = "/search/history";
 const PEDR_PATH = "/pedr/search";
 
 export const searchApi = {
+  facets(params: { project_id?: string } = {}) {
+    return httpClient.post<SearchFacetResponse>("/facets", params);
+  },
+
   semanticSearch(params: SearchQueryParams) {
     return httpClient.post<SemanticSearchResponse>(SEMANTIC_PATH, params);
   },

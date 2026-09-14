@@ -13,6 +13,7 @@ from app.adapters.repositories.sqlalchemy_mission_repo import SQLAlchemyMissionR
 from app.adapters.repositories.sqlalchemy_project_repo import SQLAlchemyProjectRepository
 from app.core.config import settings
 from app.ports.external import EmbeddingPort, LLMPort, VectorDBPort
+from app.ports.navigation_search import NavigationSearchRepository
 from app.ports.repositories import DocumentRepository, MissionRepository, ProjectRepository
 from app.services.admin_stats import AdminStatsService
 from app.services.collection_context import CollectionContextService
@@ -48,6 +49,13 @@ def get_home_service() -> HomeService:
     from app.adapters.repositories.sqlalchemy_home_repo import SQLAlchemyHomeRepository
 
     return HomeService(SQLAlchemyHomeRepository())
+
+
+def get_navigation_search_repository() -> NavigationSearchRepository:
+    """Provide scoped SQL name lookup for the command palette."""
+    from app.adapters.repositories.sqlalchemy_navigation_search_repo import SQLAlchemyNavigationSearchRepository
+
+    return SQLAlchemyNavigationSearchRepository()
 
 
 def get_embedding_port() -> EmbeddingPort | None:
