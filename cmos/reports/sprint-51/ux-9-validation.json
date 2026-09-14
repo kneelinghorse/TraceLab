@@ -1,7 +1,7 @@
 {
   "mission": "UX-9",
-  "status": "visual_corrections_awaiting_ci_and_production",
-  "checked_at": "2026-09-14T01:03:57.556715+00:00",
+  "status": "passed",
+  "checked_at": "2026-09-14T02:08:00.091974+00:00",
   "base_commit": "f52088f6ffe0d89f3db856de6dbb282d527f998b",
   "decisions": [
     416,
@@ -9,7 +9,8 @@
   ],
   "learnings": [
     171,
-    172
+    172,
+    173
   ],
   "changes": [
     "Human-authenticated, scoped and paginated name lookup for six entity types, selecting identifiers/titles only",
@@ -48,9 +49,9 @@
       "files": 29
     },
     "built_browser": {
-      "passed": 45,
+      "passed": 46,
       "skipped": 0,
-      "ux9_tests": 14,
+      "ux9_tests": 15,
       "themes": [
         "light",
         "dark"
@@ -62,8 +63,8 @@
       ],
       "serious_critical_axe_findings": 0,
       "horizontal_overflow": 0,
-      "seconds": 88.254,
-      "includes": "Final Tab-to-Keyboard-help regression and long URL rendering in all six theme/viewport combinations"
+      "seconds": 91.007,
+      "includes": "Long citations retain readable actions in all six theme/viewport combinations; frozen-clock UTC timestamps render correctly outside UTC; full prior shell/search coverage retained"
     },
     "frontend_lint": "passed",
     "frontend_types": "passed",
@@ -111,7 +112,9 @@
   "visual_review": [
     "Phone Dark result cards, source/date controls, citation and history placement",
     "Desktop Light answer panel, totals and save/replay controls",
-    "Phone Light open palette with scoped group totals/pagination and keyboard help"
+    "Phone Light open palette with scoped group totals/pagination and keyboard help",
+    "Final production phone Dark saved-search replay with real sources and synthesis",
+    "Final production Light/Dark native command palette on desktop and phone"
   ],
   "limitations": [
     "High contrast deferred under THEME-2; accepted Forge token artifacts unchanged.",
@@ -119,12 +122,7 @@
     "Existing React act/dependency deprecation warnings remain; no failing test or lint warning is omitted.",
     "No MCP surface, database schema, environment variable or PEDR authorization policy change."
   ],
-  "remaining": [
-    "Both Railway deployments SUCCESS for the exact merged source",
-    "Real production six-type keyboard reach and non-admin API/UI scope equality; saved round trip",
-    "124 direct production Light/Dark route checks",
-    "Receipt publication and CMOS closure"
-  ],
+  "remaining": [],
   "ci_initial": {
     "head": "070748a0adb5afc8fa8844449e352895c4869392",
     "backend": {
@@ -161,41 +159,21 @@
   "source_commit": "b30ce74e494e757dff3a3f52c09360c2bf26b76d",
   "merge_commit": "ed21f7c35ac2948fad0f52fd8aa989f50fdf7425",
   "pr": 277,
-  "ci_final": {
-    "head": "b30ce74e494e757dff3a3f52c09360c2bf26b76d",
-    "backend": {
-      "run_id": 34794674773,
-      "passed": 2476,
-      "skipped": 3,
-      "deselected": 12,
-      "warnings": 48,
-      "seconds": 415.9
-    },
-    "postgres": {
-      "run_id": 34794674759,
-      "passed": 134,
-      "skipped": 4,
-      "warnings": 17,
-      "seconds": 93.26
-    },
-    "production_build": {
-      "run_id": 34794674800,
-      "browser_passed": 45
-    },
-    "frontend": {
-      "run_id": 34794674840,
-      "passed": 204,
-      "lint": "passed",
-      "types": "passed"
-    },
-    "ruff": 34794674746,
-    "secrets": [
-      34794674752,
-      34794673589
-    ]
-  },
   "production_initial": {
-    "deployment": "ux-9-deployment.json",
+    "deployment": {
+      "checkedAt": "2026-09-14T01:15:21.051Z",
+      "commit": "ed21f7c35ac2948fad0f52fd8aa989f50fdf7425",
+      "api": {
+        "id": "e1a01027-cd5d-44b7-bb53-600b9b6ed18b",
+        "status": "SUCCESS",
+        "commit": "ed21f7c35ac2948fad0f52fd8aa989f50fdf7425"
+      },
+      "frontend": {
+        "id": "49ec2150-0bf3-4a71-ba01-02efea5b4274",
+        "status": "SUCCESS",
+        "commit": "ed21f7c35ac2948fad0f52fd8aa989f50fdf7425"
+      }
+    },
     "live_failure": "ux-9-live-flow/attempt-2-cache-response-contract/receipt.json",
     "six_entity_keyboard_destinations": 6,
     "scoped_results_equal_api": 10,
@@ -245,5 +223,154 @@
     "baseline_failures": 0,
     "visual_review_passed": false,
     "live_receipt": "ux-9-live-flow/attempt-3-visual-corrections/receipt.json"
+  },
+  "accepted_source_commit": "91b592d40bd456820523100c8a4589a7589b69f5",
+  "deployment": {
+    "checkedAt": "2026-09-14T02:01:01.033Z",
+    "commit": "91b592d40bd456820523100c8a4589a7589b69f5",
+    "api": {
+      "id": "3bb2ab8b-9a5f-4314-8078-126d0eab328a",
+      "status": "SUCCESS",
+      "commit": "91b592d40bd456820523100c8a4589a7589b69f5"
+    },
+    "frontend": {
+      "id": "8b64daec-7017-4109-bf42-f5624dc530cc",
+      "status": "SUCCESS",
+      "commit": "91b592d40bd456820523100c8a4589a7589b69f5"
+    }
+  },
+  "production_smoke": {
+    "checkedAt": "2026-09-14T02:08:00.088400+00:00",
+    "commit": "91b592d40bd456820523100c8a4589a7589b69f5",
+    "base": "https://tracelab.aquex.ai",
+    "checks": 124,
+    "routes": 31,
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "widths": [
+      1440,
+      390
+    ],
+    "failures": [],
+    "readOnly": true,
+    "directProductionApi": true
+  },
+  "production_live": {
+    "receipt": "ux-9-live-flow/receipt.json",
+    "six_entity_keyboard_destinations": 6,
+    "scope_api_ui_equal_results": 10,
+    "excluded_projects": 19,
+    "saved_round_trip": {
+      "id": "d3a26125-73c7-431c-b770-f23244416101",
+      "query": "research workflows",
+      "cacheHit": true,
+      "qualityPresent": true,
+      "routingPresent": true,
+      "returnedChunkIds": [
+        "b4e0660b-a44c-4f61-8d05-2f052e910cce",
+        "f4d0ec39-2c6c-4a5c-9cf9-6406e5012cbf",
+        "d3718f0c-f7a6-434c-8be1-6cdfe1baad18",
+        "10045e2b-a815-4298-af0e-46411b12df0f",
+        "c5d328da-14b0-4966-97a2-345284fc3e7d",
+        "32ec2667-6bf0-44e2-829d-87e8cfe05ff2",
+        "9bd8b9d3-ebaf-42ea-8125-8d2c8487856a",
+        "3e17a3c1-377d-4310-94ac-7f048d47f51a",
+        "2488b1b7-689b-4a0e-a488-27d3b0f774c4",
+        "74554c12-9727-4015-83f1-a02b27eb1cab"
+      ],
+      "renderedChunkIds": [
+        "b4e0660b-a44c-4f61-8d05-2f052e910cce",
+        "f4d0ec39-2c6c-4a5c-9cf9-6406e5012cbf",
+        "d3718f0c-f7a6-434c-8be1-6cdfe1baad18",
+        "10045e2b-a815-4298-af0e-46411b12df0f",
+        "c5d328da-14b0-4966-97a2-345284fc3e7d",
+        "32ec2667-6bf0-44e2-829d-87e8cfe05ff2",
+        "9bd8b9d3-ebaf-42ea-8125-8d2c8487856a",
+        "3e17a3c1-377d-4310-94ac-7f048d47f51a",
+        "2488b1b7-689b-4a0e-a488-27d3b0f774c4",
+        "74554c12-9727-4015-83f1-a02b27eb1cab"
+      ],
+      "focusResultSize": {
+        "width": 71.03125,
+        "height": 16
+      },
+      "relativeTimes": [
+        "less than a minute ago",
+        "less than a minute ago",
+        "Last run less than a minute ago"
+      ]
+    },
+    "temporary_records_cleaned": true,
+    "screenshots": 13
+  },
+  "ci_before_cache_fix": {
+    "head": "b30ce74e494e757dff3a3f52c09360c2bf26b76d",
+    "backend": {
+      "run_id": 34794674773,
+      "passed": 2476,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 48,
+      "seconds": 415.9
+    },
+    "postgres": {
+      "run_id": 34794674759,
+      "passed": 134,
+      "skipped": 4,
+      "warnings": 17,
+      "seconds": 93.26
+    },
+    "production_build": {
+      "run_id": 34794674800,
+      "browser_passed": 45
+    },
+    "frontend": {
+      "run_id": 34794674840,
+      "passed": 204,
+      "lint": "passed",
+      "types": "passed"
+    },
+    "ruff": 34794674746,
+    "secrets": [
+      34794674752,
+      34794673589
+    ]
+  },
+  "ci_final": {
+    "head": "a732d5eedaa75d7c0175255fec43d3643f354fa2",
+    "pull_request": 279,
+    "all_checks_passed": true,
+    "backend": {
+      "run_id": 34797206898,
+      "passed": 2483,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 48,
+      "seconds": 387.35
+    },
+    "postgres": {
+      "run_id": 34797206941,
+      "passed": 134,
+      "skipped": 4,
+      "warnings": 17,
+      "seconds": 108.97
+    },
+    "production_build": {
+      "run_id": 34797206992,
+      "browser_passed": 46
+    },
+    "frontend": {
+      "run_id": 34797206970,
+      "passed": 204,
+      "lint": "passed",
+      "types": "passed"
+    },
+    "ruff": 34797207002,
+    "secrets": [
+      34797207175,
+      34797204454
+    ]
   }
 }
