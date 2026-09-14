@@ -56,17 +56,27 @@ def test_complete_scoped_context_and_cascade_on_postgres(db_session, monkeypatch
     repository = SQLAlchemyCollectionContextRepository()
     first = repository.documents(db_session, principal, collection.id, page=1, page_size=100)
     second = repository.documents(db_session, principal, collection.id, page=2, page_size=100)
-    assert first.total == second.total == 120
-    assert len(first.items) == 100 and len(second.items) == 20
+    assert first.total == second.total == 121
+    assert len(first.items) == 100 and len(second.items) == 21
     assert not ({doc.id for doc in first.items} & {doc.id for doc in second.items})
+    seed = CollectionContextService(repository).seed(db_session, principal, collection.id)
+    assert len(seed.references) == 121
+    assert str(documents[-1].id) in seed.context["document_ids"]
+    assert seed.background.startswith(collection.instructions)
+    # Project ownership retains sibling reads; a move to a foreign project revokes them.
+    private = Project(name="Private parent", owner_id=other.id)
+    db_session.add(private)
+    db_session.flush()
+    documents[-1].project_id = private.id
+    db_session.commit()
     seed = CollectionContextService(repository).seed(db_session, principal, collection.id)
     assert len(seed.references) == 120
     assert str(documents[-1].id) not in seed.context["document_ids"]
-    assert seed.background.startswith(collection.instructions)
     repository.attach(db_session, principal, collection.id, documents[0].id)
     assert repository.documents(db_session, principal, collection.id, page=1, page_size=20).total == 120
     collection_id = collection.id
     db_session.delete(collection)
     db_session.commit()
     assert db_session.query(CollectionDocument).filter_by(collection_id=collection_id).count() == 0
-    assert db_session.query(Document).filter_by(project_id=project.id).count() == 121
+    assert db_session.query(Document).filter_by(project_id=project.id).count() == 120
+    assert db_session.query(Document).filter_by(project_id=private.id).count() == 1
