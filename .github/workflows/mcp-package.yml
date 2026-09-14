@@ -1,0 +1,30 @@
+name: MCP Package
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  mcp-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: packages/tracelab-mcp/package-lock.json
+      - name: Install package dependencies
+        working-directory: packages/tracelab-mcp
+        run: npm ci
+      - name: Verify unit contracts
+        working-directory: packages/tracelab-mcp
+        run: npm run test:run
+      - name: Verify installed tarball through the real MCP client
+        working-directory: packages/tracelab-mcp
+        run: npm run test:package

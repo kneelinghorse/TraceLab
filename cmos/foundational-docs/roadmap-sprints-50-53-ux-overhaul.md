@@ -262,15 +262,30 @@ A UI mission is not done until all of the following are true. Each rule exists b
 
 ## Route Migration Map (maintained from Sprint 51)
 
-| Old route | Successor | Sprint |
-|---|---|---|
-| `/` (redirect to missions) | `/` Home | 50 (UX-2) |
-| `/console` | `/admin/observability` | 50 (UX-4) |
-| `/console/missions`, `/console/missions/{id}` | `/missions`, `/missions/{id}` | 50 (UX-4) |
-| `/console/corrections` | `/admin/corrections` | 50 (UX-4) |
-| `/invites` | `/settings#invites` | 50 (UX-0 shell, UX-5 permanent redirect) |
-| `/search/results` | `/search` (permanent 308; query string retained) | 51 (UX-9) |
-| `/missions/queue` | `/missions?view=queue` (permanent 308; query filters retained) | 51 (UX-6) |
+| Old route | Successor | Sprint | Behavior |
+|---|---|---|---|
+| `/` | `/` | 50 (UX-2) | Home returns 200, replacing the former redirect to missions |
+| `/console` | `/admin/observability` | 50 (UX-4) | Permanent 308 |
+| `/console/missions` | `/missions` | 50 (UX-4) | Permanent 308 |
+| `/console/missions/{id}` | `/missions/{id}` | 50 (UX-4) | Permanent 308 |
+| `/console/corrections` | `/admin/corrections` | 50 (UX-4) | Permanent 308 |
+| `/invites` | `/settings#invites` | 50 (UX-5) | Permanent 308; query precedes fragment |
+| `/search/results` | `/search` | 51 (UX-9) | Permanent 308 |
+| `/missions/queue` | `/missions?view=queue` | 51 (UX-6) | Permanent 308; destination selects the queue view |
+
+All redirects retain query parameters, including repeated values. The destination's explicit `view=queue` wins over an incoming `view`. Home is a replacement page, not an alias or a self-redirect. The executable map is `frontend/src/lib/route-migrations.json`; unit tests bind it to this maintained table, and the production smoke walks every row.
+
+### Deprecated aliases to retire in Sprint 53
+
+- `/console`
+- `/console/missions`
+- `/console/missions/{id}`
+- `/console/corrections`
+- `/invites`
+- `/search/results`
+- `/missions/queue`
+
+Keep these redirects active through Sprint 52. Canonical Home `/` is retained. Source URLs, authored references and exported document contents are preserved as evidence; this migration applies to generated application navigation links.
 
 ---
 

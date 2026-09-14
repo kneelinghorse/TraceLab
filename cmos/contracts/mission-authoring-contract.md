@@ -125,6 +125,36 @@ parameter, mission DB column, compiler version or worker SELECT field. Authors
 review the objective, criteria and project before the existing draft, preview
 and submit lifecycle. Execution state is never seeded.
 
+## Computed MCP browser links (UX-10, 2026-09-14)
+
+TS mission create/update projections (`mission.url`), list rows (`url`), get
+(`url`), execution submit/status (`url`) and the preview summary (`preview.url`)
+now carry canonical `/missions/{uuid}` browser URLs. The shared TS
+`canonicalLink` helper also builds project, document, collection, report and
+evidence navigation metadata. The Python MCP serializer and submit/status
+handlers mirror the mission `url`, using the resolved record UUID even when
+the caller supplied a human mission ID and the existing `FRONTEND_URL` setting.
+Python remains production-dark and retains its existing flat tool names.
+
+These fields are **computed response metadata only**: there is no authoring
+input, Pydantic field, DB column, compiler input or worker SELECT change.
+References, context, evidence source URLs, full previews and export bytes are
+opaque authored/provenance content and remain unchanged, including historical
+URLs. Canonicalization must not recursively rewrite those values.
+
+The TS process resolves the public TraceLab API to its public browser origin
+and loopback API hosts to `http://localhost:3000`. Other deployments require
+`TRACELAB_FRONTEND_URL` in the MCP process environment; configuration is
+validated before login or tool execution. This is not a new server variable.
+See the package README for the configuration contract.
+
+Regression guards: `packages/tracelab-mcp/scripts/check-canonical-links.mjs`
+uses a real stdio client across all eight clusters and 29 actions, verifying
+HTTP verbs, authentication, generated URLs and preservation of authored values.
+`scripts/check-package.sh` runs that contract against a clean tarball install.
+`TestCanonicalMissionLinks` in `tests/mcp_tools/test_mcp_missions_unit.py`
+exercises all five registered Python tools through an MCP client session.
+
 ## Top-level field map
 
 RECOVER-1 (2026-09-12) restores the legacy protocol adapter boundary: YAML
