@@ -87,8 +87,8 @@ jobs:
           npm run start -- --hostname 127.0.0.1 --port 3100 > "$RUNNER_TEMP/shell-server.log" 2>&1 &
           shell_server_pid=$!
           trap 'kill "$shell_server_pid" 2>/dev/null || true' EXIT
-          curl --fail --silent --retry 30 --retry-connrefused --retry-delay 1 http://127.0.0.1:3100/missions > /dev/null
-          npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/mission-protocol.spec.ts tests/e2e/project-bundles.spec.ts tests/e2e/collection-context.spec.ts tests/e2e/search-command.spec.ts tests/e2e/route-migration.spec.ts --workers=1
+          curl --fail --silent --retry 30 --retry-connrefused --retry-delay 1 http://127.0.0.1:3100/missions > /dev/null || exit $?
+          npx playwright test tests/e2e/app-shell.spec.ts tests/e2e/mission-protocol.spec.ts tests/e2e/project-bundles.spec.ts tests/e2e/collection-context.spec.ts tests/e2e/search-command.spec.ts tests/e2e/route-migration.spec.ts tests/e2e/graph.spec.ts --workers=1 || exit $?
       - name: Archive route migration coverage
         if: always()
         uses: actions/upload-artifact@v4

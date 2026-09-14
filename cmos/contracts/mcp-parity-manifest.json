@@ -908,6 +908,22 @@
       "rationale": "Forwards tag, created_from, created_until, source_id, report_id and document_id."
     },
     {
+      "id": "frontend/src/lib/api/graph.ts#graphApi.neighborhood:GET:/graph/neighborhood",
+      "api_file": "frontend/src/lib/api/graph.ts",
+      "operation": "graphApi.neighborhood",
+      "source_line": 15,
+      "method": "GET",
+      "path": "/api/v1/graph/neighborhood",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/graph.tsx"
+      ],
+      "mcp": null,
+      "classification": "deferred-MCP-2",
+      "baseline": "sprint-52-read-gap",
+      "rationale": "UX-11 adds the GRAPH-1 neighborhood as a live UI read. Decision 426 assigns the corresponding MCP read to MCP-2 after all Sprint 52 UI surfaces land."
+    },
+    {
       "id": "frontend/src/lib/api/home.ts#homeApi.favorites:GET:/home/favorites",
       "api_file": "frontend/src/lib/api/home.ts",
       "operation": "homeApi.favorites",
@@ -1218,7 +1234,8 @@
       "ui_consumers": [
         "frontend/src/components/AppShell.tsx",
         "frontend/src/components/CommandPalette.tsx",
-        "frontend/src/pages/_app.tsx"
+        "frontend/src/pages/_app.tsx",
+        "frontend/src/pages/graph.tsx"
       ],
       "mcp": "tracelab_search.navigate",
       "classification": "closed-MCP-1",

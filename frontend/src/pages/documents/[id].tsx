@@ -1,3 +1,4 @@
+import { RelationshipLink } from "@/components/graph/RelationshipLink";
 import { HttpError } from "@/lib/api/http";
 import { PaginationBar } from "@/components/ui/PaginationBar";
 import { PageState } from "@/components/ui/PageState";
@@ -147,7 +148,7 @@ function DocumentDetail() {
             <h1 className="break-words text-2xl font-bold text-foreground mb-4">
               {document.name}
             </h1>
-            <div className="mb-4 flex flex-wrap items-center gap-4"><StatusBadge {...documentState(document)} /><Link className="text-sm text-accent-text underline" href={`/projects/${document.project_id}`}>Open project</Link></div>
+            <div className="mb-4 flex flex-wrap items-center gap-4"><StatusBadge {...documentState(document)} /><Link className="text-sm text-accent-text underline" href={`/projects/${document.project_id}`}>Open project</Link><RelationshipLink type="document" id={document.id} /></div>
             <div className="mb-4"><AddToCollection documentId={document.id} /></div>
 
             {/* Document Stats - Prominently displayed */}

@@ -1,3 +1,4 @@
+import { RelationshipLink } from "@/components/graph/RelationshipLink";
 import { HttpError } from "@/lib/api/http";
 import { PageState } from "@/components/ui/PageState";
 import { useFeedback } from "@/components/ui/useFeedback";
@@ -194,6 +195,7 @@ export default function CollectionDetailPage() {
                     )}
                   </div>
                   <div className="flex max-w-full flex-wrap gap-2">
+                    <RelationshipLink type="collection" id={collection.id} />
                     <Link href={`/missions/new?collection=${collection.id}`} className="rounded bg-accent px-4 py-2 text-sm text-on-accent">Seed mission</Link>
                     <button
                       onClick={() => setIsReportModalOpen(true)}

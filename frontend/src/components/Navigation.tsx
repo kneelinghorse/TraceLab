@@ -24,6 +24,7 @@ export const navigationGroups: { label: string; admin?: boolean; items: Navigati
   ] },
   { label: "Discover", items: [
     { label: "Search", href: "/search", icon: "search" },
+    { label: "Relationships", href: "/graph", icon: "graph" },
     { label: "Saved searches", href: "/saved-searches", icon: "bookmark" },
   ] },
   { label: "Admin", admin: true, items: [
@@ -43,6 +44,7 @@ const iconPaths: Record<string, string> = {
   queue: "M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01",
   report: "M5 3h14v18H5V3Zm4 14v-4m3 4V8m3 9v-6",
   search: "M20 20l-5-5M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13Z",
+  graph: "M12 9V5m-2 9-5 4m9-4 5 4M12 3a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 6a3 3 0 1 0 0 6 3 3 0 0 0 0-6ZM4 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm16 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z",
   bookmark: "M6 3h12v18l-6-4-6 4V3Z",
   users: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm9-7a4 4 0 0 1 0 7m4 10v-2a4 4 0 0 0-3-4",
   spaces: "M3 3h7v7H3V3Zm11 0h7v7h-7V3ZM3 14h7v7H3v-7Zm11 0h7v7h-7v-7Z",

@@ -1,3 +1,4 @@
+import { RelationshipLink } from "@/components/graph/RelationshipLink";
 import { HttpError } from "@/lib/api/http";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PageState } from "@/components/ui/PageState";
@@ -214,6 +215,7 @@ export default function ReportDetailPage() {
                     <button type="button" onClick={handleToggleStatus} title={report.status === "final" ? "Click to change to draft" : "Click to finalize"}><StatusBadge status={report.status} /></button>
                   </div>
                   <div className="flex max-w-full flex-wrap gap-2">
+                    <RelationshipLink type="report" id={report.id} />
                     <div className="relative" ref={exportRef}>
                       <button
                         onClick={() => setShowExportMenu((v) => !v)}
