@@ -7,7 +7,7 @@ const chunkIds = ["00000000-0000-4000-8000-000000000003", "00000000-0000-4000-80
 const kinds = ["project", "document", "mission", "report", "collection", "evidence"];
 const entityPath = (kind: string) => `/${kind === "evidence" ? "evidence" : `${kind}s`}/${projectId}`;
 const results = chunkIds.map((chunk_id, index) => ({ chunk_id, document_id: documentId, project_id: projectId, content: `Authorized result ${index + 1}`, source_type: "transcript", rrf_score: 0.1 - index * 0.01, score: 0.1, chunk_index: index }));
-const rag = { answer: "An answer supported by the authorized results.", citations: [{ chunk_id: chunkIds[0], document_id: documentId, snippet: "Authorized support", score: 0.1 }], sources: [], latency_ms: 12, quality: { composite_score: 0.9, threshold: 0.8 }, routing: { selected_model: "test-model" }, cache: { hit: false } };
+const rag = { answer: "An answer supported by the authorized results. https://example.test/evidence/" + "provenance".repeat(15), citations: [{ chunk_id: chunkIds[0], document_id: documentId, snippet: "Authorized support", score: 0.1 }], sources: [], latency_ms: 12, quality: { composite_score: 0.9, threshold: 0.8 }, routing: { selected_model: "test-model" }, cache: { hit: false } };
 const entry = { id: projectId, name: "Saved scope", query_text: "saved scope", filters: { project_id: projectId, source_type: "transcript" }, top_k: 7, search_mode: "semantic", owner: "member", use_count: 0, created_at: "2026-09-13T00:00:00Z", updated_at: "2026-09-13T00:00:00Z" };
 
 async function fixture(page: Page) {
@@ -86,7 +86,9 @@ for (const theme of ["light", "dark"] as const) {
       await expect(dialog.getByRole("button", { name: "evidence named result", exact: true })).toBeFocused();
       await page.keyboard.press("Home");
       await expect(dialog.getByRole("button", { name: "project named result", exact: true })).toBeFocused();
-      await dialog.getByText("Keyboard help", { exact: true }).focus();
+      await page.keyboard.press("End");
+      await page.keyboard.press("Tab");
+      await expect(dialog.getByText("Keyboard help", { exact: true })).toBeFocused();
       await page.keyboard.press("Enter");
       await expect(dialog.getByText(/Escape closes this dialog and restores focus/)).toBeVisible();
       await audit(page, `palette-${theme}-${width}`);

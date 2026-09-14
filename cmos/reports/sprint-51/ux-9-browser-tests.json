@@ -1,7 +1,7 @@
 {
   "tool": "playwright",
-  "generatedAt": "2026-09-14T00:46:42.333Z",
-  "completedAt": "2026-09-14T00:48:28.235Z",
+  "generatedAt": "2026-09-14T01:01:52.443Z",
+  "completedAt": "2026-09-14T01:03:20.697Z",
   "status": "passed",
   "summary": {
     "total": 45,
@@ -10,7 +10,7 @@
     "failed": 0,
     "skipped": 0,
     "interrupted": 0,
-    "durationSeconds": 105.902,
+    "durationSeconds": 88.254,
     "retries": 0
   },
   "environment": {
@@ -30,7 +30,7 @@
       "line": 33,
       "column": 5,
       "status": "passed",
-      "durationMs": 488,
+      "durationMs": 278,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -41,7 +41,7 @@
       "line": 47,
       "column": 5,
       "status": "passed",
-      "durationMs": 670,
+      "durationMs": 554,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -52,7 +52,7 @@
       "line": 81,
       "column": 7,
       "status": "passed",
-      "durationMs": 311,
+      "durationMs": 218,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -63,7 +63,7 @@
       "line": 81,
       "column": 7,
       "status": "passed",
-      "durationMs": 394,
+      "durationMs": 223,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -74,7 +74,7 @@
       "line": 101,
       "column": 5,
       "status": "passed",
-      "durationMs": 440,
+      "durationMs": 313,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -85,7 +85,7 @@
       "line": 118,
       "column": 5,
       "status": "passed",
-      "durationMs": 607,
+      "durationMs": 370,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -96,7 +96,7 @@
       "line": 139,
       "column": 5,
       "status": "passed",
-      "durationMs": 1106,
+      "durationMs": 746,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -107,7 +107,7 @@
       "line": 167,
       "column": 5,
       "status": "passed",
-      "durationMs": 728,
+      "durationMs": 429,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -118,7 +118,7 @@
       "line": 184,
       "column": 9,
       "status": "passed",
-      "durationMs": 569,
+      "durationMs": 370,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -129,7 +129,7 @@
       "line": 184,
       "column": 9,
       "status": "passed",
-      "durationMs": 643,
+      "durationMs": 370,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -140,7 +140,7 @@
       "line": 184,
       "column": 9,
       "status": "passed",
-      "durationMs": 608,
+      "durationMs": 351,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -151,7 +151,7 @@
       "line": 184,
       "column": 9,
       "status": "passed",
-      "durationMs": 572,
+      "durationMs": 355,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -162,7 +162,7 @@
       "line": 15,
       "column": 7,
       "status": "passed",
-      "durationMs": 3797,
+      "durationMs": 3197,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -173,7 +173,7 @@
       "line": 15,
       "column": 7,
       "status": "passed",
-      "durationMs": 3811,
+      "durationMs": 3225,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -184,7 +184,7 @@
       "line": 15,
       "column": 7,
       "status": "passed",
-      "durationMs": 4079,
+      "durationMs": 3334,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -195,7 +195,7 @@
       "line": 15,
       "column": 7,
       "status": "passed",
-      "durationMs": 3985,
+      "durationMs": 3178,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -206,7 +206,7 @@
       "line": 15,
       "column": 7,
       "status": "passed",
-      "durationMs": 3875,
+      "durationMs": 3059,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -217,7 +217,7 @@
       "line": 15,
       "column": 7,
       "status": "passed",
-      "durationMs": 4237,
+      "durationMs": 3307,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -228,7 +228,7 @@
       "line": 14,
       "column": 7,
       "status": "passed",
-      "durationMs": 2644,
+      "durationMs": 2046,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -239,7 +239,7 @@
       "line": 14,
       "column": 7,
       "status": "passed",
-      "durationMs": 2815,
+      "durationMs": 2079,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -250,7 +250,7 @@
       "line": 14,
       "column": 7,
       "status": "passed",
-      "durationMs": 3567,
+      "durationMs": 2172,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -261,7 +261,7 @@
       "line": 14,
       "column": 7,
       "status": "passed",
-      "durationMs": 3485,
+      "durationMs": 2076,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -272,7 +272,7 @@
       "line": 14,
       "column": 7,
       "status": "passed",
-      "durationMs": 3458,
+      "durationMs": 2096,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -283,7 +283,7 @@
       "line": 14,
       "column": 7,
       "status": "passed",
-      "durationMs": 3613,
+      "durationMs": 2312,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -294,7 +294,7 @@
       "line": 94,
       "column": 5,
       "status": "passed",
-      "durationMs": 25,
+      "durationMs": 9,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -305,7 +305,7 @@
       "line": 14,
       "column": 7,
       "status": "passed",
-      "durationMs": 3936,
+      "durationMs": 2790,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -316,7 +316,7 @@
       "line": 14,
       "column": 7,
       "status": "passed",
-      "durationMs": 3237,
+      "durationMs": 2917,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -327,7 +327,7 @@
       "line": 14,
       "column": 7,
       "status": "passed",
-      "durationMs": 3690,
+      "durationMs": 3075,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -338,7 +338,7 @@
       "line": 14,
       "column": 7,
       "status": "passed",
-      "durationMs": 3113,
+      "durationMs": 2882,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -349,7 +349,7 @@
       "line": 14,
       "column": 7,
       "status": "passed",
-      "durationMs": 3277,
+      "durationMs": 2833,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -360,7 +360,7 @@
       "line": 14,
       "column": 7,
       "status": "passed",
-      "durationMs": 3562,
+      "durationMs": 3066,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -371,7 +371,7 @@
       "line": 61,
       "column": 9,
       "status": "passed",
-      "durationMs": 3996,
+      "durationMs": 3967,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -379,10 +379,10 @@
     {
       "title": "search preserves API results, filters and saved replay in light at 390px",
       "file": "frontend/tests/e2e/search-command.spec.ts",
-      "line": 108,
+      "line": 110,
       "column": 9,
       "status": "passed",
-      "durationMs": 1208,
+      "durationMs": 1086,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -393,7 +393,7 @@
       "line": 61,
       "column": 9,
       "status": "passed",
-      "durationMs": 4125,
+      "durationMs": 3933,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -401,10 +401,10 @@
     {
       "title": "search preserves API results, filters and saved replay in light at 820px",
       "file": "frontend/tests/e2e/search-command.spec.ts",
-      "line": 108,
+      "line": 110,
       "column": 9,
       "status": "passed",
-      "durationMs": 1204,
+      "durationMs": 1233,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -415,7 +415,7 @@
       "line": 61,
       "column": 9,
       "status": "passed",
-      "durationMs": 3872,
+      "durationMs": 4022,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -423,10 +423,10 @@
     {
       "title": "search preserves API results, filters and saved replay in light at 1440px",
       "file": "frontend/tests/e2e/search-command.spec.ts",
-      "line": 108,
+      "line": 110,
       "column": 9,
       "status": "passed",
-      "durationMs": 2144,
+      "durationMs": 2118,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -437,7 +437,7 @@
       "line": 61,
       "column": 9,
       "status": "passed",
-      "durationMs": 3910,
+      "durationMs": 3815,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -445,10 +445,10 @@
     {
       "title": "search preserves API results, filters and saved replay in dark at 390px",
       "file": "frontend/tests/e2e/search-command.spec.ts",
-      "line": 108,
+      "line": 110,
       "column": 9,
       "status": "passed",
-      "durationMs": 1139,
+      "durationMs": 1042,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -459,7 +459,7 @@
       "line": 61,
       "column": 9,
       "status": "passed",
-      "durationMs": 3896,
+      "durationMs": 3983,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -467,10 +467,10 @@
     {
       "title": "search preserves API results, filters and saved replay in dark at 820px",
       "file": "frontend/tests/e2e/search-command.spec.ts",
-      "line": 108,
+      "line": 110,
       "column": 9,
       "status": "passed",
-      "durationMs": 1115,
+      "durationMs": 1298,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -481,7 +481,7 @@
       "line": 61,
       "column": 9,
       "status": "passed",
-      "durationMs": 3918,
+      "durationMs": 4002,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -489,10 +489,10 @@
     {
       "title": "search preserves API results, filters and saved replay in dark at 1440px",
       "file": "frontend/tests/e2e/search-command.spec.ts",
-      "line": 108,
+      "line": 110,
       "column": 9,
       "status": "passed",
-      "durationMs": 2009,
+      "durationMs": 2114,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -500,10 +500,10 @@
     {
       "title": "legacy search URL permanently redirects with its query intact",
       "file": "frontend/tests/e2e/search-command.spec.ts",
-      "line": 151,
+      "line": 153,
       "column": 5,
       "status": "passed",
-      "durationMs": 5,
+      "durationMs": 6,
       "annotations": [],
       "attachments": [],
       "errors": []
@@ -511,14 +511,14 @@
     {
       "title": "loading, no matches, service failure and missing saved search stay distinct",
       "file": "frontend/tests/e2e/search-command.spec.ts",
-      "line": 157,
+      "line": 159,
       "column": 5,
       "status": "passed",
-      "durationMs": 614,
+      "durationMs": 616,
       "annotations": [],
       "attachments": [],
       "errors": []
     }
   ],
-  "artifactPath": "/private/tmp/tracelab-ux-9-browser-final.json"
+  "artifactPath": "/private/tmp/tracelab-ux-9-browser-accepted.json"
 }

@@ -1,7 +1,7 @@
 {
   "mission": "UX-9",
   "status": "local_verified_awaiting_ci_and_production",
-  "checked_at": "2026-09-14T00:51:02.216369+00:00",
+  "checked_at": "2026-09-14T01:03:57.556715+00:00",
   "base_commit": "f52088f6ffe0d89f3db856de6dbb282d527f998b",
   "decisions": [
     416
@@ -59,20 +59,36 @@
         1440
       ],
       "serious_critical_axe_findings": 0,
-      "horizontal_overflow": 0
+      "horizontal_overflow": 0,
+      "seconds": 90,
+      "includes": "Final Tab-to-Keyboard-help regression and long URL rendering in all six theme/viewport combinations"
     },
     "frontend_lint": "passed",
     "frontend_types": "passed",
     "production_build": "passed",
     "whole_changed_python_ruff": "passed",
-    "foundational_refs": "passed"
+    "foundational_refs": "passed",
+    "real_api_local_search": {
+      "checks": 4,
+      "failures": 0,
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        1440,
+        390
+      ],
+      "scope": "Read-only real API through local origin proxy; production acceptance still pending."
+    }
   },
   "regressions_observed_and_fixed": [
     "Original navigation endpoint returned404 before implementation",
     "Eight search-state/filter/replay tests failed before rewrite; final15 search tests pass",
     "Oversized RAG panel left1419px blank space at390px; content-fit browser assertion failed before removal of h-full",
     "Late native close event disabled a quickly reopened palette; unit reproduction failed before dialog.open guard",
-    "Integration route coverage assertion omitted new navigation family and compared query-bearing probes against path-only routing; updated exact coverage and reran full integration"
+    "Integration route coverage assertion omitted new navigation family and compared query-bearing probes against path-only routing; updated exact coverage and reran full integration",
+    "Shared focus trap skipped native Keyboard help summary; Tab reach assertion failed before explicit tabIndex=0 enrolled it in the existing focus loop."
   ],
   "test_authoring_corrections": [
     "Keyboard End expectation corrected to final evidence item; collection pagination precedes evidence in displayed order."
@@ -104,5 +120,38 @@
     "Real production six-type keyboard reach and non-admin API/UI scope equality; saved round trip",
     "124 direct production Light/Dark route checks",
     "Receipt publication and CMOS closure"
-  ]
+  ],
+  "ci_initial": {
+    "head": "070748a0adb5afc8fa8844449e352895c4869392",
+    "backend": {
+      "run_id": 34794007679,
+      "passed": 2476,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 48,
+      "seconds": 457.04
+    },
+    "postgres": {
+      "run_id": 34794007715,
+      "passed": 134,
+      "skipped": 4,
+      "warnings": 17,
+      "seconds": 90.17
+    },
+    "production_build": {
+      "run_id": 34794007672,
+      "browser_passed": 45
+    },
+    "frontend": {
+      "run_id": 34794007683,
+      "passed": 204,
+      "lint": "passed",
+      "types": "passed"
+    },
+    "ruff": 34794007678,
+    "secrets": [
+      34794007691,
+      34794005107
+    ]
+  }
 }
