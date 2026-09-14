@@ -2,14 +2,20 @@
 
 from __future__ import annotations
 
+import logging
 import time
 import uuid
 from collections.abc import Iterable, Iterator
 from typing import Any
 
+from pydantic import ValidationError
+
 from app.core.config import settings
 from app.core.qdrant_client import get_qdrant_client
+from app.schemas.rag import RagResponse
 from app.services.cache_metrics import cache_metrics
+
+logger = logging.getLogger(__name__)
 
 try:  # pragma: no cover - allow import without qdrant dependency
     from qdrant_client import QdrantClient
@@ -143,7 +149,7 @@ class SemanticCacheService:
                     field_schema=PayloadSchemaType.KEYWORD,
                 )
             except Exception:  # pragma: no cover - idempotent create
-                continue
+                logger.debug("Could not ensure semantic cache payload index %s", field)
 
     def check_cache(
         self, query_embedding: Iterable[float], metadata: dict[str, Any]
@@ -217,16 +223,19 @@ class SemanticCacheService:
             self.metrics.record_miss(project_id)
             return None
 
-        self.metrics.record_hit(project_id)
         created_at = payload.get("created_at", now_ts)
         age_seconds = max(0.0, now_ts - created_at)
         ttl_remaining = max(0.0, (expires_at - now_ts)) if expires_at else None
 
-        return {
+        response = {
             "answer": payload.get("answer", ""),
             "citations": payload.get("citations", []),
             "sources": payload.get("sources", []),
             "compression": payload.get("compression", {}),
+            "quality": payload.get("quality"),
+            "routing": payload.get("routing"),
+            "search_mode": payload.get("search_mode"),
+            "latency_ms": round((time.perf_counter() - start) * 1000, 2),
             "cache": {
                 "hit": True,
                 "score": float(hit.score),
@@ -234,6 +243,21 @@ class SemanticCacheService:
                 "ttl_seconds": ttl_remaining,
             },
         }
+        try:
+            RagResponse.model_validate(response)
+        except ValidationError:
+            # Older cache writers dropped required response metadata. Regenerate
+            # it through the normal pipeline instead of returning an HTTP 500 or
+            # inventing quality scores for an answer that was never assessed.
+            self.metrics.record_miss(project_id)
+            try:
+                self._delete_points([hit.id])
+                self.metrics.record_eviction()
+            except Exception:  # cache cleanup must not prevent fresh synthesis
+                self.metrics.record_error()
+            return None
+        self.metrics.record_hit(project_id)
+        return response
 
     def store_in_cache(
         self,
@@ -267,6 +291,9 @@ class SemanticCacheService:
             "citations": result.get("citations", []),
             "sources": result.get("sources", []),
             "compression": result.get("compression", {}),
+            "quality": result.get("quality"),
+            "routing": result.get("routing"),
+            "search_mode": result.get("search_mode"),
             "created_at": now_ts,
             "expires_at": expires_at,
         }
@@ -341,8 +368,7 @@ class SemanticCacheService:
                 with_payload=True,
                 with_vectors=False,
             )
-            for point in points:
-                yield point
+            yield from points
             if next_page_offset is None:
                 break
             offset = next_page_offset

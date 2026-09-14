@@ -1,0 +1,49 @@
+{
+  "mission": "UX-9",
+  "status": "local_verified_awaiting_ci_and_production",
+  "decision": 418,
+  "observed_on_commit": "ed21f7c35ac2948fad0f52fd8aa989f50fdf7425",
+  "production_failure_receipt": "ux-9-live-flow/attempt-2-cache-response-contract/receipt.json",
+  "cause": "SemanticCacheService persisted and returned answer/sources but dropped required quality/routing metadata. Test double cache retained these fields, hiding the real serializer gap.",
+  "change": "Persist and reconstruct required metadata; validate against RagResponse before declaring a hit. Invalid legacy entries count as misses, are evicted when possible, and run the normal synthesis pipeline. Cache cleanup failures do not prevent synthesis.",
+  "red_test": "Real saved-search endpoint + RagService + SemanticCacheService failed with the same two missing RagResponse fields before the fix. Only Qdrant transport and paid providers are faked.",
+  "regressions": [
+    "Complete cache hit preserves quality/routing without calling synthesis",
+    "Missing quality or routing regenerates",
+    "Malformed nested quality or routing regenerates",
+    "Old payload format regenerates",
+    "Failed legacy cache cleanup still regenerates",
+    "Every case subsequently replays through Qdrant serialization after clearing only application TTL cache"
+  ],
+  "validation": {
+    "backend_targeted": {
+      "passed": 63,
+      "skipped": 0,
+      "warnings": 14,
+      "seconds": 5.28,
+      "suites": [
+        "test_saved_searches",
+        "test_rag_service",
+        "test_rag_service_scope",
+        "test_search_history",
+        "test_qdrant_prewarm"
+      ]
+    },
+    "whole_changed_python_ruff": "passed",
+    "foundational_refs": "passed",
+    "targeted_integration": {
+      "passed": 0,
+      "skipped": 2,
+      "warnings": 14,
+      "seconds": 0.05,
+      "suite": "tests/integration/test_rag_pipeline.py",
+      "note": "Both existing integration cases are explicitly skipped in source; not counted as passing validation. Full PostgreSQL CI remains required."
+    }
+  },
+  "lint_compatibility": "Two pre-existing whole-file Ruff findings corrected minimally: index setup debug message and yield from.",
+  "limitations": [
+    "High contrast remains deferred; no Forge token changes.",
+    "No response contract weakening, schema migration, new env var, or authorization policy change.",
+    "Live flow and 124 route acceptance must be repeated after exact corrected deployments succeed."
+  ]
+}
