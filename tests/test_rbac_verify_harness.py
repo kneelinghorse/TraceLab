@@ -88,13 +88,14 @@ def test_harness_passes_against_enforced_app(
     owner_space = Workspace(name=f"harness-owner-{uuid4().hex[:8]}")
     db_session.add(owner_space)
     db_session.flush()
-    db_session.add(
-        Project(
-            name=f"Harness existing owner project {uuid4().hex[:8]}",
-            owner_id=owner_principal.id,
-            workspace_id=owner_space.id,
-        )
+    project = Project(
+        name=f"Harness existing owner project {uuid4().hex[:8]}",
+        owner_id=owner_principal.id,
+        workspace_id=owner_space.id,
     )
+    db_session.add(project)
+    db_session.flush()
+    db_session.add(Document(name="Existing production-like source", project_id=project.id, owner_id=owner_principal.id))
     db_session.commit()
     monkeypatch.setattr(
         RbacVerifier,
@@ -132,6 +133,10 @@ def test_harness_passes_against_enforced_app(
     assert code == 0, f"gaps: {[str(g) for g in verifier.gaps]}\nnotes: {verifier.notes}"
     assert pedr1c_calls, "run() skipped the PEDR-1C matrix"
     assert len(login_calls) == 5, "live harness must stay within the five-login/minute budget"
+    assert len(verifier.registration_checks) == 2
+    assert len(verifier.document_checks) == 6
+    assert all(row["status"] == 403 for row in verifier.document_checks if "included_document_ids" not in row)
+    assert all(row["included_document_ids"] == [] for row in verifier.document_checks if "included_document_ids" in row)
     assert set(verifier._principal_ids) == {
         "member",
         "viewer",
@@ -418,6 +423,77 @@ def test_registration_matrix_rejects_every_status_except_authorization_denial(st
         assert kwargs["json"]["project_id"] == project_id
         assert kwargs["json"]["file_path"].startswith("data/ingest/rbac-verify-")
         assert "Idempotency-Key" not in kwargs["headers"]
+
+
+@pytest.mark.parametrize("leak", ["viewer-read", "member-patch", "member-restore", "viewer-list"])
+def test_document_deny_matrix_detects_read_and_write_leaks_without_mutating_requests(leak):
+    project_id, document_id = str(uuid4()), str(uuid4())
+    calls = []
+
+    class LeakyTransport:
+        def request(self, method, path, **kwargs):
+            calls.append((method, path, kwargs))
+            role = kwargs["headers"]["Authorization"].removeprefix("Bearer ")
+            if "?project_id=" in path:
+                rows = [{"id": document_id, "project_id": project_id}] if role == "owner" or (role == "viewer" and leak == "viewer-list") else []
+                return _StubResponse(200, {"data": rows})
+            if (leak, role, method) in {("viewer-read", "viewer", "GET"), ("member-patch", "member", "PATCH"), ("member-restore", "member", "POST")}:
+                return _StubResponse(200, {"id": document_id})
+            return _StubResponse(403, {})
+
+    verifier = RbacVerifier(LeakyTransport(), log=lambda _message: None)
+    verifier.document_deny_matrix(project_id, {"owner": "owner", "member": "member", "viewer": "viewer"})
+    assert len(verifier.gaps) == 1
+    assert verifier.gaps[0].kind == ("DOCUMENT-LIST-LEAK" if leak == "viewer-list" else "DENY-LEAK-2xx")
+    assert len(verifier.document_checks) == 6
+    for method, path, kwargs in calls:
+        assert method != "DELETE"
+        if method == "PATCH":
+            assert kwargs["json"] == {}
+        if method == "POST":
+            assert path.endswith("/restore") and kwargs.get("json") is None
+
+
+def test_document_deny_matrix_records_empty_owner_project_without_seeding():
+    calls = []
+
+    class EmptyTransport:
+        def request(self, method, path, **kwargs):
+            calls.append((method, path))
+            return _StubResponse(200, {"data": []})
+
+    verifier = RbacVerifier(EmptyTransport(), log=lambda _message: None)
+    verifier.document_deny_matrix(str(uuid4()), {"owner": "owner"})
+    assert len(calls) == 1 and calls[0][0] == "GET"
+    assert verifier.gaps == []
+    assert any("no live document" in note for note in verifier.notes)
+
+
+@pytest.mark.parametrize("overblock", [False, True])
+def test_local_project_owner_read_matrix_detects_overblocking(client, db_session, monkeypatch, overblock):
+    monkeypatch.setattr(settings, "rbac_enabled", True)
+    user = User(email=f"{uuid4()}@example.test", display_name="Local project owner", password_hash=OWNER_PW, role=ROLE_MEMBER)
+    db_session.add(user)
+    db_session.flush()
+    project = Project(name="Local-only owned project", owner_id=user.id)
+    db_session.add(project)
+    db_session.flush()
+    doc = Document(name="Other-owned sibling", project_id=project.id, owner_id=uuid4())
+    db_session.add(doc)
+    db_session.commit()
+    token = create_access_token(subject=str(user.id))
+    assert db_session.query(SpaceMember).filter_by(user_id=user.id).count() == 0
+
+    class Transport:
+        def request(self, method, path, **kwargs):
+            if overblock:
+                return _StubResponse(403, {})
+            return client.request(method, path, **kwargs)
+
+    verifier = RbacVerifier(Transport(), log=lambda _message: None)
+    verifier.project_owner_document_read_matrix(str(project.id), str(doc.id), token)
+    assert len(verifier.gaps) == (2 if overblock else 0)
+    assert all(gap.kind == "PROJECT-OWNER-READ-OVERBLOCK" for gap in verifier.gaps)
 
 
 def test_pedr_scope_routes_cover_exact_mission_surface():

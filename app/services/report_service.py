@@ -13,11 +13,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql.elements import ColumnElement
 
 from app.core.database import SessionLocal
-from app.models.chunk import DocumentChunk
 from app.models.collection import CollectionItem
-from app.models.document import Document
-from app.models.project import Project
 from app.models.report import Report, ReportSource
+from app.services.document_policy import resolve_readable_chunks
 from app.services.synthesis import SynthesisService, get_synthesis_service
 
 logger = logging.getLogger(__name__)
@@ -89,25 +87,16 @@ class ReportService:
             # Resolve document access before any provider/cache call. Never hand a
             # readable collection back to synthesis for an unscoped re-expansion.
             with self.session_factory() as session:
-                query = session.query(DocumentChunk.id, Document.project_id).join(
-                    Document, Document.id == DocumentChunk.document_id
-                ).join(Project, Project.id == Document.project_id).filter(
-                    document_filter, Document.deleted_at.is_(None), Project.deleted_at.is_(None)
+                readable = resolve_readable_chunks(
+                    session, document_filter=document_filter,
+                    collection_id=collection_id, chunk_ids=chunk_ids,
+                    accessible_project_ids=accessible_project_ids,
                 )
-                if accessible_project_ids is not None:
-                    query = query.filter(Document.project_id.in_(accessible_project_ids))
-                if collection_id is not None:
-                    query = query.join(CollectionItem, CollectionItem.chunk_id == DocumentChunk.id).filter(
-                        CollectionItem.collection_id == collection_id
-                    ).order_by(CollectionItem.added_at, DocumentChunk.id)
-                else:
-                    query = query.filter(DocumentChunk.id.in_(chunk_ids or [])).order_by(DocumentChunk.id)
-                readable = query.all()
             if readable:
                 synthesis_result = self.synthesis_service.synthesize(
-                    chunk_ids=[row.id for row in readable], prompt=prompt,
+                    chunk_ids=[row[0] for row in readable], prompt=prompt,
                     output_format=output_format,
-                    accessible_project_ids=sorted({row.project_id for row in readable}, key=str),
+                    accessible_project_ids=sorted({row[1] for row in readable}, key=str),
                 )
             else:
                 synthesis_result = SynthesisService._empty_result(include_effective_chunk_ids=True)

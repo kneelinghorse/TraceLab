@@ -75,8 +75,10 @@ def test_each_entity_is_scoped_before_counting_and_reachable_beyond_100(client, 
     db_session.flush()
     rows = [object_row(db_session, kind, f"Needle {i:03}", owner_id=user.id, project_id=project.id) for i in range(113)]
     hidden_project = project.id
-    # Evidence in an owned project is readable even when its child owner differs.
-    if kind == "evidence":
+    if kind == "document":
+        rows.append(object_row(db_session, kind, "Needle 113 sibling", owner_id=other.id, project_id=project.id))
+    # Evidence and documents in an owned project retain sibling read access.
+    if kind in {"evidence", "document"}:
         private = Project(name="Private parent", owner_id=other.id)
         db_session.add(private)
         db_session.flush()
@@ -92,8 +94,8 @@ def test_each_entity_is_scoped_before_counting_and_reachable_beyond_100(client, 
         assert payload["query"] == "nEeDlE"
         assert len(payload["groups"]) == 1
         group = payload["groups"][0]
-        assert (group["entity_type"], group["total"], group["page"], group["page_size"]) == (kind, 113, page, 50)
-        assert len(group["items"]) == (50 if page < 3 else 13)
+        assert (group["entity_type"], group["total"], group["page"], group["page_size"]) == (kind, len(rows), page, 50)
+        assert len(group["items"]) == (50 if page < 3 else len(rows) - 100)
         assert all(set(item) == {"id", "title", "href"} for item in group["items"])
         assert str(hidden.id) not in response.text and "Private body" not in response.text
         seen.extend(item["id"] for item in group["items"])

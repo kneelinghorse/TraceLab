@@ -10,17 +10,22 @@ and no resolvable Space (governed via parent project_id) — IngestionJob.
 
 from __future__ import annotations
 
+from datetime import datetime
 from uuid import uuid4
 
 import pytest
 
 from app.core.authorization import accessible_filter
 from app.core.config import settings
-from app.core.security import ROLE_ADMIN, ROLE_MEMBER, ROLE_OWNER, AuthenticatedUser
+from app.core.security import ROLE_ADMIN, ROLE_MEMBER, ROLE_OWNER, ROLE_SERVICE, AuthenticatedUser
+from app.models.collection import Collection
 from app.models.document import Document
+from app.models.evidence_ledger import LedgerEntry, LedgerSource
 from app.models.ingestion_job import IngestionJob
+from app.models.insight import Insight
 from app.models.mission import Mission
 from app.models.project import Project
+from app.models.report import Report
 from app.models.space_member import SpaceMember
 from app.models.workspace import Workspace
 
@@ -185,4 +190,58 @@ class TestIngestionJobParentGoverned:
         self._job(db_session, proj.id, doc.id)
         af, rows = _apply(db_session, IngestionJob, _principal(uuid4()))
         # no owner_id column + not in the space -> false() -> nothing
+        assert rows == []
+
+
+@pytest.mark.parametrize("model", [Document, IngestionJob])
+@pytest.mark.parametrize("role", [ROLE_MEMBER, ROLE_SERVICE])
+def test_live_project_owner_reads_document_and_job_without_space(db_session, rbac_on, model, role):
+    """Job lists must agree with the parent-document read gate without a Space grant."""
+    me = uuid4()
+    projects = [
+        Project(name="Live owned", owner_id=me),
+        Project(name="Deleted owned", owner_id=me, deleted_at=datetime.utcnow()),
+        Project(name="Foreign", owner_id=uuid4()),
+    ]
+    db_session.add_all(projects)
+    db_session.flush()
+    documents = [Document(name=p.name, project_id=p.id, owner_id=uuid4()) for p in projects]
+    db_session.add_all(documents)
+    db_session.flush()
+    jobs = [IngestionJob(project_id=d.project_id, document_id=d.id) for d in documents]
+    db_session.add_all(jobs)
+    db_session.commit()
+    assert db_session.query(SpaceMember).filter_by(user_id=me).count() == 0
+    _, rows = _apply(db_session, model, _principal(me, role))
+    expected = (documents if model is Document else jobs)[0].id
+    assert {row.id for row in rows} == ({expected} if role == ROLE_MEMBER else set())
+
+
+@pytest.mark.parametrize("model", [Project, Collection, Mission, Report, Insight, LedgerEntry])
+def test_project_ownership_does_not_widen_other_model_filters(db_session, rbac_on, model):
+    """Owning a project must not expose other-owned reports, missions or ledger rows."""
+    me, other = uuid4(), uuid4()
+    project = _project(db_session, owner_id=me)
+    if model is Project:
+        row = Project(name="Foreign", owner_id=other)
+    elif model is Collection:
+        row = Collection(name="Foreign", owner_id=other)
+    elif model is Mission:
+        row = Mission(mission_id=uuid4().hex, title="Foreign", objective="Private", success_criteria=["Private"], project_id=project.id, owner_id=other)
+    elif model is Report:
+        row = Report(title="Foreign", content="Private", project_id=project.id, owner_id=other)
+    elif model is Insight:
+        row = Insight(title="Foreign", content="Private", project_id=project.id)
+    else:
+        source = LedgerSource(project_id=project.id, source_url="https://example.test/source", source_url_hash=uuid4().hex * 2)
+        db_session.add(source)
+        db_session.flush()
+        row = LedgerEntry(project_id=project.id, source_id=source.id, source_url=source.source_url, session_key="scope", claim="Private", disposition="supporting", owner_id=other)
+    db_session.add(row)
+    db_session.commit()
+    _, rows = _apply(db_session, model, _principal(me))
+    assert row.id not in {item.id for item in rows}
+    if model is Project:
+        assert {item.id for item in rows} == {project.id}
+    else:
         assert rows == []

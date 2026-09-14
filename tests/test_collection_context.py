@@ -59,8 +59,16 @@ def test_document_context_pages_and_seed_include_more_than_one_hundred_unique_so
     db_session.add(chunk)
     db_session.flush()
     db_session.add(CollectionItem(collection_id=collection.id, chunk_id=chunk.id))
-    # Losing read access removes the child from both totals and the seed immediately.
+    # Project ownership retains sibling reads even after document ownership changes.
     documents[-1].owner_id = other.id
+    db_session.commit()
+    assert client.get(path + "/documents", headers=headers).json()["total"] == 124
+    assert str(documents[-1].id) in client.get(path + "/mission-seed", headers=headers).json()["context"]["document_ids"]
+    # Moving it to a foreign project revokes access in both pagination and seed.
+    foreign = Project(name="Private parent", owner_id=other.id)
+    db_session.add(foreign)
+    db_session.flush()
+    documents[-1].project_id = foreign.id
     db_session.commit()
     first = client.get(path + "/documents?page=1&page_size=100", headers=headers)
     second = client.get(path + "/documents?page=2&page_size=100", headers=headers)
@@ -113,6 +121,12 @@ def test_context_requires_collection_and_document_access_and_excludes_deleted_pa
     assert client.get(path + "/mission-seed", headers=other_headers).status_code == 404
     assert client.get(path + "/documents", headers=other_headers).status_code == 404
     assert client.post(path + "/documents", json={"document_id": str(doc.id)}, headers=other_headers).status_code == 404
+    assert client.post(path + "/documents", json={"document_id": str(hidden.id)}, headers=headers).status_code == 201
+    foreign = Project(name="Private parent", owner_id=other.id)
+    db_session.add(foreign)
+    db_session.flush()
+    hidden.project_id = foreign.id
+    db_session.commit()
     assert client.post(path + "/documents", json={"document_id": str(hidden.id)}, headers=headers).status_code == 404
     assert client.post(path + "/documents", json={"document_id": str(doc.id)}, headers=headers).status_code == 201
     project.deleted_at = datetime.utcnow()
@@ -138,27 +152,31 @@ def test_project_collection_tab_includes_direct_documents_without_inventing_chun
 
 def test_collection_detail_and_export_do_not_reveal_unreadable_document_excerpts(context_fixture, db_session):
     client, owner, other, project, collection, headers, _ = context_fixture
-    docs = [Document(name="Visible", project_id=project.id, owner_id=owner.id), Document(name="Private", project_id=project.id, owner_id=other.id), Document(name="Deleted", project_id=project.id, owner_id=owner.id, deleted_at=datetime.utcnow())]
+    foreign = Project(name="Private parent", owner_id=other.id)
+    db_session.add(foreign)
+    db_session.flush()
+    docs = [Document(name="Visible", project_id=project.id, owner_id=owner.id), Document(name="Private", project_id=project.id, owner_id=other.id), Document(name="Deleted", project_id=project.id, owner_id=owner.id, deleted_at=datetime.utcnow()), Document(name="Foreign", project_id=foreign.id, owner_id=other.id)]
     db_session.add_all(docs)
     db_session.flush()
-    chunks = [DocumentChunk(document_id=doc.id, chunk_index=0, content=text) for doc, text in zip(docs, ["Readable source excerpt", "Private child secret", "Deleted child secret"], strict=True)]
+    chunks = [DocumentChunk(document_id=doc.id, chunk_index=0, content=text) for doc, text in zip(docs, ["Readable source excerpt", "Sibling source excerpt", "Deleted child secret", "Private child secret"], strict=True)]
     db_session.add_all(chunks)
     db_session.flush()
     db_session.add_all([CollectionItem(collection_id=collection.id, chunk_id=chunk.id) for chunk in chunks])
     db_session.commit()
     path = f"{API}/collections/{collection.id}"
     detail = client.get(path, headers=headers).json()
-    assert {item["chunk_id"] for item in detail["items"]} == {str(chunks[0].id)}
-    assert detail["item_count"] == 1
+    assert {item["chunk_id"] for item in detail["items"]} == {str(chunks[0].id), str(chunks[1].id)}
+    assert detail["item_count"] == 2
     exported = client.get(path + "/export", headers=headers)
     assert exported.status_code == 200
     assert "Readable source excerpt" in exported.text
+    assert "Sibling source excerpt" in exported.text
     assert "Private child secret" not in exported.text
     assert "Deleted child secret" not in exported.text
 
 
 def test_report_creation_resolves_readable_document_subset_before_synthesis(context_fixture, db_session):
-    """A report must not send a private sibling document to a provider or persist it as a source."""
+    """A report includes sibling documents but never sends foreign-project sources to a provider."""
     from unittest.mock import MagicMock
 
     from app.api.v1.reports import get_report_service_factory
@@ -168,24 +186,28 @@ def test_report_creation_resolves_readable_document_subset_before_synthesis(cont
     client, owner, other, project, collection, headers, _ = context_fixture
     public = Document(name="Readable source", project_id=project.id, owner_id=owner.id)
     private = Document(name="Private sibling", project_id=project.id, owner_id=other.id)
-    db_session.add_all([public, private])
+    foreign_project = Project(name="Private parent", owner_id=other.id)
+    db_session.add(foreign_project)
     db_session.flush()
-    chunks = [DocumentChunk(document_id=doc.id, chunk_index=0, content=doc.name) for doc in (public, private)]
+    foreign = Document(name="Foreign secret", project_id=foreign_project.id, owner_id=other.id)
+    db_session.add_all([public, private, foreign])
+    db_session.flush()
+    chunks = [DocumentChunk(document_id=doc.id, chunk_index=0, content=doc.name) for doc in (public, private, foreign)]
     db_session.add_all(chunks)
     db_session.flush()
     db_session.add_all([CollectionItem(collection_id=collection.id, chunk_id=chunk.id) for chunk in chunks])
     db_session.commit()
     synthesis = MagicMock()
-    synthesis.synthesize.return_value = {"content": "Readable findings", "citations": [], "effective_chunk_ids": [str(chunks[0].id)], "chunk_count": 1}
+    synthesis.synthesize.return_value = {"content": "Readable findings", "citations": [], "effective_chunk_ids": [str(chunk.id) for chunk in chunks[:2]], "chunk_count": 2}
     app.dependency_overrides[get_report_service_factory] = lambda: lambda: ReportService(synthesis_service=synthesis)
     try:
         response = client.post(f"{API}/reports", json={"title": "Scoped collection report", "collection_id": str(collection.id)}, headers=headers)
         assert response.status_code == 201, response.text
         call = synthesis.synthesize.call_args.kwargs
         assert call.get("collection_id") is None, "The provider must receive a resolved subset, never re-expand the parent"
-        assert call["chunk_ids"] == [chunks[0].id]
+        assert call["chunk_ids"] == [chunk.id for chunk in chunks[:2]]
         sources = db_session.query(ReportSource).filter(ReportSource.report_id == response.json()["id"], ReportSource.source_type == "chunk").all()
-        assert [str(source.source_id) for source in sources] == [str(chunks[0].id)]
+        assert {str(source.source_id) for source in sources} == {str(chunk.id) for chunk in chunks[:2]}
     finally:
         app.dependency_overrides.pop(get_report_service_factory, None)
 

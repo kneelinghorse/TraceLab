@@ -51,12 +51,20 @@ def test_project_stats_count_all_readable_children_not_one_page_or_other_owners(
         Report(project_id=project.id, title="Private report", content="Hidden", owner_id=other.id),
         Document(project_id=project.id, name="Deleted", owner_id=first.id, deleted_at=datetime.utcnow()),
     ])
+    foreign = Project(name="Private parent", owner_id=other.id)
+    db_session.add(foreign)
+    db_session.flush()
+    foreign_doc = Document(project_id=foreign.id, name="Foreign source", owner_id=other.id)
+    db_session.add(foreign_doc)
+    db_session.flush()
+    db_session.add(DocumentChunk(document_id=foreign_doc.id, chunk_index=0, content="Private", token_count=100))
     db_session.commit()
+    assert client.get(f"{API}/documents/{foreign_doc.id}", headers=headers).status_code == 403
     stats = client.get(f"{API}/projects/{project.id}/stats", headers=headers)
     assert stats.status_code == 200, stats.text
-    assert stats.json()["document_count"] == 123
-    assert stats.json()["chunk_count"] == 246
-    assert stats.json()["total_tokens"] == 1722
+    assert stats.json()["document_count"] == 124
+    assert stats.json()["chunk_count"] == 248
+    assert stats.json()["total_tokens"] == 1736
     assert stats.json()["report_count"] == 1
     listed = client.get(f"{API}/documents", params={"project_id": str(project.id), "page_size": 100}, headers=headers).json()
     assert listed["pagination"]["total"] == stats.json()["document_count"]
@@ -109,8 +117,15 @@ def test_project_collections_page_only_real_readable_chunk_relationships(client,
     params = {"project_id": str(project.id), "page": 2, "page_size": 20}
     response = client.get(f"{API}/collections", params=params, headers=headers)
     assert response.status_code == 200, response.text
-    assert response.json()["total"] == 22
-    assert len(response.json()["data"]) == 2
+    assert response.json()["total"] == 23
+    assert len(response.json()["data"]) == 3
+    # The sibling is readable only while it belongs to this caller-owned project.
+    foreign = Project(name="Private parent", owner_id=other.id)
+    db_session.add(foreign)
+    db_session.flush()
+    hidden.project_id = foreign.id
+    db_session.commit()
+    assert client.get(f"{API}/collections", params=params, headers=headers).json()["total"] == 22
     assert client.get(f"{API}/collections", params={**params, "project_id": str(uuid4())}, headers=headers).status_code == 404
 
 
