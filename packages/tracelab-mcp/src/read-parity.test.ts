@@ -100,6 +100,20 @@ describe('MCP-1 read parity', () => {
     });
   }
 
+  it('retains collection filters when the runtime lacks URLSearchParams.size', async () => {
+    respond({ data: [], total: 0 });
+    const descriptor = Object.getOwnPropertyDescriptor(URLSearchParams.prototype, 'size');
+    Object.defineProperty(URLSearchParams.prototype, 'size', { configurable: true, value: undefined });
+    try {
+      const client = new TraceLabClient({ baseUrl: base, apiKey: 'tl_read_contract' });
+      await client.listCollections({ project_id: id, page: 2, page_size: 3 });
+      expect(fetchMock).toHaveBeenCalledWith(`${base}/api/v1/collections?project_id=${id}&page=2&page_size=3`, expect.objectContaining({ method: 'GET' }));
+    } finally {
+      if (descriptor) Object.defineProperty(URLSearchParams.prototype, 'size', descriptor);
+      else Reflect.deleteProperty(URLSearchParams.prototype, 'size');
+    }
+  });
+
   it('keeps every home href and authored field, without caching snapshot totals', async () => {
     respond(home);
     respond({ ...home, missions: { total: 84, by_status: {} } });

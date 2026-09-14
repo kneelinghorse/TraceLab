@@ -718,8 +718,8 @@ export class TraceLabClient {
    * List all collections
    */
   async listCollections(options: PageQuery & { project_id?: string } = {}): Promise<CollectionListResponse> {
-    const params = readQueryParams(options);
-    return this.request<CollectionListResponse>('GET', `/api/v1/collections${params.size ? `?${params}` : ''}`);
+    const query = readQueryParams(options).toString();
+    return this.request<CollectionListResponse>('GET', `/api/v1/collections${query ? `?${query}` : ''}`);
   }
 
   /**
