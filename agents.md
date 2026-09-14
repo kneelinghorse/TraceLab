@@ -130,11 +130,11 @@ docker compose -f docker-compose.dev.yml -f .devcontainer/docker-compose.devcont
 
 ### Quality Tooling
 ```bash
-# Lint + format
+# Lint (CI enforces ruff-diff on changed files only)
 ruff check app/ tests/
-ruff format app/ tests/
+# Do NOT run `ruff format`: it is not enforced and churns pre-existing code (decision #311)
 
-# Type checking
+# Type checking: local diagnostic only; CI has had no mypy gate since CI-2 (decision #407)
 mypy app/ --config-file pyproject.toml
 
 # Pre-commit hooks (install once)
@@ -198,14 +198,14 @@ node cmos/context/integration_test_runner.js --output telemetry/events/testing-s
 ## Coding Standards & Style
 - **Python**: follow PEP 8 with type hints, pytest fixtures, and lint via `ruff`; keep FastAPI routers thin and push logic into `app/services`.
 - **Linting**: `ruff check` enforces E/F/W/I/UP/B/SIM/S rules. Config in `pyproject.toml`.
-- **Type checking**: `mypy` with strict mode on `app/core/` and `app/ports/`.
+- **Type checking**: `mypy` with `disallow_untyped_defs` on `app/core/` and `app/ports/` (not strict mode). It is a local diagnostic only: CI-2 removed the mypy lane and no Python type gate runs in CI (decision #407).
 - **TypeScript/Node utilities** (under `cmos/` or tooling scripts): use ES2020 modules, strict TS configs, and JSDoc for exported helpers.
 - Keep mission documentation single-sourced: updates to `docs/`, `foundational-docs/`, or `cmos/docs/` must reference the guiding template rather than duplicating content.
 - Reference `cmos/docs/AI-coding-assistant-workflows.md` for orchestration expectations and align commit notes with backlog mission IDs.
 
 ## Security & Quality Guardrails
 - Enforce OWASP controls listed in `cmos/docs/AI-coding-assistant-workflows.md` (no secrets in logs, parameterized DB access, TLS-only external calls).
-- Before concluding any mission that touches runtime code, execute `python cmos/scripts/validate_foundational_refs.py` for documentation links and rerun relevant pytest suites (`pytest tests/` or targeted folders).
+- Before concluding any mission that touches runtime code, execute `python cmos/scripts/validate_foundational_refs.py` (it confirms the roadmap and architecture template references in cmos/agents.md, cmos/README.md and cmos/context/MASTER_CONTEXT.json; it does not check that links resolve) and rerun relevant pytest suites (`pytest tests/` or targeted folders).
 - Use the tiered validation checklist from `cmos/docs/cmos_Playbook.md`: session events logged, backlog status updated, parity verified, telemetry reviewed.
 - Record blockers or deviations inside `cmos/context/MASTER_CONTEXT.json` via the SQLite client (`context/db_client.py`) rather than hand-editing JSON mirrors.
 

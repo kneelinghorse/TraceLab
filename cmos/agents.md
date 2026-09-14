@@ -12,7 +12,7 @@ application code.
 **Stack**: Python 3.11+, FastAPI, PostgreSQL 15, Alembic, React/Vite (frontend), SQLite (CMOS)
 **Architecture**: Hexagonal — ports (`app/ports/`) define contracts, adapters wire implementations,
 composition root in `app/dependencies.py`
-**CI**: GitHub Actions — ruff, mypy, pytest, frontend vitest run in parallel gates
+**CI**: GitHub Actions — six required checks on main: backend-suite, vitest, type-check, ruff-diff, build-frontend-production and Secret Scan (see `.github/ci/README.md`). No mypy gate since CI-2 (decision #407).
 
 ---
 
@@ -25,11 +25,11 @@ pytest -m unit -v
 # Integration tests (requires Docker — testcontainers)
 pytest -m integration -v
 
-# Lint + format
+# Lint (CI enforces ruff-diff on changed files only)
 ruff check app/ tests/
-ruff format app/ tests/
+# Do NOT run `ruff format`: it is not enforced and churns pre-existing code (decision #311)
 
-# Type checking
+# Type checking: local diagnostic only; CI has had no mypy gate since CI-2 (decision #407)
 mypy app/ --config-file pyproject.toml
 
 # Frontend unit tests

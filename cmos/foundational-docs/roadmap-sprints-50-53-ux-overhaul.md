@@ -204,6 +204,8 @@ A UI mission is not done until all of the following are true. Each rule exists b
 5. No `alert()` or `confirm()`; loading, empty and error states exist and are distinct from not-found.
 6. No hardcoded palette classes in touched pages; tokens only.
 7. Old routes touched by the mission redirect to their successors.
+8. After both Railway services report SUCCESS, the 31-route direct-browser production baseline (Light and Dark at 1440 and 390 px, 124 checks) is rerun, and the receipt records both deployment ids and the accepted merge commit (decision #400; learning #164, after Sprint 50's UX-4 smoke overlapped a rollout).
+9. The archived screenshots of touched routes are reviewed with real data under a non-UTC browser clock. In Sprint 51 the route, axe and overflow checks all passed while a citation action was squeezed to 7 px and saved-search timestamps showed five hours ahead (learning #173).
 
 ---
 
@@ -305,3 +307,4 @@ Keep these redirects active through Sprint 52. Canonical Home `/` is retained. S
 _Truth in data, evidence as the connective tissue, one system._
 
 - **2026-09-14 UTC, Sprint 51 close** — Nine missions accepted with CI, exact Railway SUCCESS deployments and production receipts. THEME-2 remains deferred to Sprint54; Sprint52/53 stay planned. UX-10 binds the eight-row route map to16 production checks, verifies canonical generated MCP links while preserving authored provenance, and records a clean124-check internal-link baseline. The package source/tarball is verified and remains Unreleased on npm.
+- **2026-09-14 UTC, Sprint 51 review** — Definition of Done gains rules 8 and 9: the post-SUCCESS 31-route baseline rerun with deployment ids, and the active-data visual review under a non-UTC clock. Both already governed Sprint 51 through decision #400 and learning #173 but were missing from this section.
