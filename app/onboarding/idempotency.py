@@ -63,6 +63,12 @@ class IdempotencyService:
         if not record:
             return None
 
+        if record.method != self.method or record.path != self.path:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Idempotency key reused with different method or path",
+            )
+
         expected_hash = record.request_hash
         incoming_hash = _hash_payload(request_payload)
         if expected_hash != incoming_hash:

@@ -159,6 +159,11 @@ def create_project(
     )
     cached = idempotency.check_replay(data.model_dump())
     if cached:
+        project_id = UUID(cached.data["id"])
+        project = _service.get_project(db, project_id)
+        if project is None:
+            raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+        authorize_or_403(current_user, "read", project, db)
         return JSONResponse(content=cached.data, status_code=cached.status_code)
 
     project = _service.create_project(db, data, owner_id=current_user.user_id)

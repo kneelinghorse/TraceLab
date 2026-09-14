@@ -396,6 +396,30 @@ def test_coverage_accounts_for_every_wired_route():
     assert not unaccounted, f"routes neither seeded nor anon-only: {[str(g) for g in unaccounted]}"
 
 
+@pytest.mark.parametrize("status_code", [201, 404, 400, 422])
+def test_registration_matrix_rejects_every_status_except_authorization_denial(status_code):
+    """A missing-file 404 must not disguise the original authorization bypass."""
+    calls = []
+
+    class LeakyTransport:
+        def request(self, method, path, **kwargs):
+            calls.append((method, path, kwargs))
+            return _StubResponse(status_code, {})
+
+    project_id = str(uuid4())
+    verifier = RbacVerifier(LeakyTransport(), log=lambda _message: None)
+    verifier.registration_matrix(project_id, {"member": "member-token", "viewer": "viewer-token"})
+    assert len(verifier.gaps) == 2
+    assert all(gap.expected == "403" and gap.actual == str(status_code) for gap in verifier.gaps)
+    assert {gap.role for gap in verifier.gaps} == {"member", "viewer"}
+    assert len(calls) == 2
+    for method, path, kwargs in calls:
+        assert (method, path) == ("POST", "/api/v1/documents")
+        assert kwargs["json"]["project_id"] == project_id
+        assert kwargs["json"]["file_path"].startswith("data/ingest/rbac-verify-")
+        assert "Idempotency-Key" not in kwargs["headers"]
+
+
 def test_pedr_scope_routes_cover_exact_mission_surface():
     """PEDR-1 keeps its four route probes separate from the per-id route registry."""
     project_id = str(uuid4())

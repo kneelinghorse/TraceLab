@@ -284,10 +284,13 @@ class TestBackgroundSiteWiring:
         assert str(doc.workspace_id) == str(ws_id)
 
     def test_onboarding_register_inherits_project_owner_and_workspace(
-        self, client, db_session, tmp_path
+        self, client, db_session, tmp_path, monkeypatch
     ):
         # onboarding sets owner/Space directly from the parent project (not the helper);
         # drive the real route with a temp file and assert the persisted row inherits.
+        from app.core.config import settings
+
+        monkeypatch.setattr(settings, "onboarding_ingest_root", str(tmp_path))
         owner = _make_user(db_session, "onb-owner@example.com")
         ws_id = uuid4()
         project = _make_project(db_session, owner_id=owner.id, workspace_id=ws_id)
