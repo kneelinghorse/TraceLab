@@ -935,14 +935,14 @@ describe('MCP handlers — T41.4 slim/full payload split for get_mission', () =>
 // T41.7 — Tool-grouping refactor: cluster surface + parity
 //
 // Surface invariants:
-//   1. Exactly 8 visible MCP tools, all named tracelab_*
+//   1. Exactly 9 visible MCP tools, all named tracelab_*
 //   2. Every legacy tool name maps to a (cluster, action) pair where
 //      action is in the cluster's action enum
 //   3. Each cluster dispatches to the correct per-action handler
 // ─────────────────────────────────────────────────────────────────────────
 
 describe('T41.7 — cluster surface', () => {
-  it('exposes exactly 8 tracelab_* tools and keeps descriptors aligned with action enums', async () => {
+  it('exposes exactly 9 tracelab_* tools and keeps descriptors aligned with action enums', async () => {
     const indexSource = await import('./index.js');
     const { CLUSTER_ACTIONS, CLUSTER_HANDLERS, TOOLS } = indexSource as unknown as {
       CLUSTER_ACTIONS: Record<string, readonly string[]>;
@@ -955,11 +955,12 @@ describe('T41.7 — cluster surface', () => {
       }>;
     };
     const toolNames = Object.keys(CLUSTER_ACTIONS);
-    expect(toolNames).toHaveLength(8);
+    expect(toolNames).toHaveLength(9);
     expect(toolNames.sort()).toEqual([
       'tracelab_collection',
       'tracelab_document',
       'tracelab_evidence',
+      'tracelab_home',
       'tracelab_mission',
       'tracelab_mission_execution',
       'tracelab_project',

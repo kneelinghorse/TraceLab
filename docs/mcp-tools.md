@@ -43,18 +43,24 @@ reused only when its API base matches `TRACELAB_API_URL`. Automation may set
 
 ## Tool surface
 
-The server exposes eight action-clustered tools:
+The current source exposes nine action-clustered tools / 40 actions:
 
 | Tool | Actions |
 | --- | --- |
-| `tracelab_search` | `knowledge` |
-| `tracelab_project` | `list`, `create`, `update`, `stats` |
-| `tracelab_collection` | `list`, `get`, `export`, `create`, `add`, `synthesize` |
+| `tracelab_search` | `knowledge`, `navigate`, `pedr` |
+| `tracelab_project` | `list`, `create`, `update`, `stats`, `get` |
+| `tracelab_collection` | `list`, `get`, `export`, `create`, `add`, `synthesize`, `documents`, `mission_seed` |
 | `tracelab_report` | `create`, `list`, `get`, `export` |
-| `tracelab_document` | `upload`, `get_content` |
+| `tracelab_document` | `upload`, `get_content`, `list` |
 | `tracelab_mission` | `create`, `list`, `get`, `update` |
-| `tracelab_mission_execution` | `submit`, `status`, `preview` |
-| `tracelab_evidence` | `capture`, `note`, `list`, `search`, `promote` |
+| `tracelab_mission_execution` | `submit`, `status`, `preview`, `logs`, `events` |
+| `tracelab_evidence` | `capture`, `note`, `list`, `search`, `promote`, `get` |
+| `tracelab_home` | `snapshot`, `favorites` |
+
+
+Sprint 52 additions below are **source-only and unreleased**. The package remains
+version 1.1.1; MCP-3 will publish once the sprint source and artifact checks pass.
+Installing 1.1.1 from npm does not yet provide these new actions.
 
 Each call names one cluster and selects an operation with `action`. For
 example, a mission list call is:
@@ -72,7 +78,12 @@ example, a mission list call is:
 ```
 
 See the package [README](../packages/tracelab-mcp/README.md) for full setup,
-action examples, authentication behavior, and troubleshooting.
+action examples, authentication behavior, and troubleshooting. Its
+[Sprint 52 read parameter table](../packages/tracelab-mcp/README.md#sprint-52-read-parameters-unreleased)
+documents all eleven new reads and the existing action extensions.
+`knowledge` keeps plain retrieval; optional `pedr` exposes multi-layer and graph
+diagnostics. Logs/events are persisted snapshots and explicitly report empty
+results; they do not promise live streaming.
 
 ## Contract authorities
 
@@ -84,3 +95,8 @@ action examples, authentication behavior, and troubleshooting.
 The Python server under `app/mcp_server/` is retained for local development
 and serializer-parity coverage. It is production-dark and is not the install
 path for Codex, Claude, or other external MCP clients.
+
+The [UI parity manifest](../cmos/contracts/mcp-parity-manifest.json) classifies
+every frontend API operation. Run `node scripts/mcp_parity_audit.mjs` from the
+repository root after installing MCP package dependencies. CI rejects new
+unclassified operations, stale consumers and mappings to absent source actions.

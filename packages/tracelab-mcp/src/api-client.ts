@@ -24,6 +24,9 @@ export interface RetrievalQuery {
   tags?: string[];
 }
 
+export interface PEDRQuery { query: string; top_k: number; project_id?: string; source_type?: string; date_from?: string; date_to?: string; enable_graph: boolean }
+export interface PEDRResponse { results: (RetrievedChunk & Record<string, unknown>)[]; metadata: Record<string, unknown> }
+
 export interface RetrievedChunk {
   chunk_id: string;
   content: string;
@@ -93,6 +96,7 @@ export interface PaginatedResponse<T> {
 }
 
 export interface Collection {
+  instructions?: string | null;
   id: string;
   name: string;
   description?: string;
@@ -121,6 +125,7 @@ export interface CollectionListResponse {
 }
 
 export interface CollectionCreate {
+  instructions?: string | null;
   name: string;
   description?: string;
 }
@@ -470,6 +475,12 @@ export interface EvidenceNote {
 }
 
 export interface EvidenceListRequest {
+  tag?: string;
+  created_from?: string;
+  created_until?: string;
+  source_id?: string;
+  report_id?: string;
+  document_id?: string;
   project_id: string;
   session_key?: string;
   mission_id?: string;
@@ -528,6 +539,42 @@ export class TraceLabAPIError extends Error {
   }
 }
 
+export interface PageQuery { page?: number; page_size?: number }
+export interface ReadEntity { id: string; [field: string]: unknown }
+export interface HrefEntity extends ReadEntity { href: string }
+export interface HomeSection<T> { total: number; items: T[] }
+export interface HomeMission extends ReadEntity { evidence_href?: string | null; report_id?: string | null }
+export interface HomeSnapshot {
+  missions: { total: number; by_status: Record<string, number> };
+  attention: HomeSection<HomeMission>;
+  active_runs: HomeSection<HomeMission>;
+  recent_reports: HomeSection<HrefEntity>;
+  recent_projects: HomeSection<HrefEntity>;
+  favorites: HomeSection<HrefEntity>;
+  evidence_activity: HomeSection<{ href: string; project_id: string; mission_id?: string | null }>;
+  [field: string]: unknown;
+}
+export type NavigationEntityType = 'project' | 'document' | 'mission' | 'report' | 'collection' | 'evidence';
+export interface NavigationQuery extends PageQuery { q: string; entity_type?: NavigationEntityType }
+export interface NavigationResponse {
+  query: string;
+  groups: { entity_type: NavigationEntityType; total: number; page: number; page_size: number; items: HrefEntity[] }[];
+}
+export interface DocumentListQuery extends PageQuery { project_id?: string; processed?: boolean; search?: string }
+export interface CollectionDocumentPage extends PageQuery { items: ReadEntity[]; total: number }
+export interface CollectionMissionSeed {
+  collection_id: string;
+  project_id?: string | null;
+  references: { document_id: string; href: string; url?: string; [field: string]: unknown }[];
+  [field: string]: unknown;
+}
+export interface EvidenceDetail { entry: EvidenceEntry; links: HrefEntity[] }
+export interface MissionEvent { mission_id?: string; [field: string]: unknown }
+
+function readQueryParams(options: object): URLSearchParams {
+  return new URLSearchParams(Object.entries(options).filter(([, value]) => value !== undefined).map(([key, value]): [string, string] => [key, String(value)]));
+}
+
 export class TraceLabClient {
   private baseUrl: string;
   private headers: Record<string, string>;
@@ -548,7 +595,8 @@ export class TraceLabClient {
   private async request<T>(
     method: string,
     path: string,
-    body?: unknown
+    body?: unknown,
+    rawText = false
   ): Promise<T> {
     const url = `${this.baseUrl}${path}`;
 
@@ -581,13 +629,57 @@ export class TraceLabClient {
 
     // Handle non-JSON responses (like markdown exports)
     const contentType = response.headers.get('content-type');
-    if (contentType?.includes('text/markdown') || contentType?.includes('text/plain')) {
+    if (rawText || contentType?.includes('text/markdown') || contentType?.includes('text/plain')) {
       const text = await response.text();
       return text as unknown as T;
     }
 
     const json = await response.json();
     return json as T;
+  }
+
+  async searchPedr(query: PEDRQuery): Promise<PEDRResponse> {
+    return this.request<PEDRResponse>('POST', '/api/v1/pedr/search', query);
+  }
+
+  async getHome(): Promise<HomeSnapshot> {
+    return this.request<HomeSnapshot>('GET', '/api/v1/home');
+  }
+
+  async getFavorites(options: PageQuery & { project_id?: string }): Promise<HomeSection<HrefEntity>> {
+    return this.request<HomeSection<HrefEntity>>('GET', `/api/v1/home/favorites?${readQueryParams(options)}`);
+  }
+
+  async navigate(options: NavigationQuery): Promise<NavigationResponse> {
+    return this.request<NavigationResponse>('GET', `/api/v1/navigation/search?${readQueryParams(options)}`);
+  }
+
+  async getEvidence(entryId: string): Promise<EvidenceDetail> {
+    return this.request<EvidenceDetail>('GET', `/api/v1/evidence/${entryId}`);
+  }
+
+  async listDocuments(options: DocumentListQuery): Promise<PaginatedResponse<Document>> {
+    return this.request<PaginatedResponse<Document>>('GET', `/api/v1/documents?${readQueryParams(options)}`);
+  }
+
+  async getProject(projectId: string): Promise<Project> {
+    return this.request<Project>('GET', `/api/v1/projects/${projectId}`);
+  }
+
+  async getCollectionDocuments(collectionId: string, options: PageQuery): Promise<CollectionDocumentPage> {
+    return this.request<CollectionDocumentPage>('GET', `/api/v1/collections/${collectionId}/documents?${readQueryParams(options)}`);
+  }
+
+  async getCollectionMissionSeed(collectionId: string): Promise<CollectionMissionSeed> {
+    return this.request<CollectionMissionSeed>('GET', `/api/v1/collections/${collectionId}/mission-seed`);
+  }
+
+  async getMissionLogs(missionId: string, limit: number): Promise<ReadEntity[]> {
+    return this.request<ReadEntity[]>('GET', `/api/v1/missions/${missionId}/logs?limit=${limit}`);
+  }
+
+  async getMissionEvents(options: { mission_id?: string; limit: number }): Promise<MissionEvent[]> {
+    return this.request<MissionEvent[]>('GET', `/api/v1/missions/events/recent?${readQueryParams(options)}`);
   }
 
   /**
@@ -625,8 +717,9 @@ export class TraceLabClient {
   /**
    * List all collections
    */
-  async listCollections(): Promise<CollectionListResponse> {
-    return this.request<CollectionListResponse>('GET', '/api/v1/collections');
+  async listCollections(options: PageQuery & { project_id?: string } = {}): Promise<CollectionListResponse> {
+    const params = readQueryParams(options);
+    return this.request<CollectionListResponse>('GET', `/api/v1/collections${params.size ? `?${params}` : ''}`);
   }
 
   /**
@@ -721,7 +814,11 @@ export class TraceLabClient {
    * Export a report as markdown text
    * For MVP, returns the content field directly
    */
-  async exportReport(reportId: string): Promise<string> {
+  async exportReport(reportId: string, format?: 'md' | 'json' | 'txt'): Promise<string> {
+    if (format !== undefined) {
+      // Preserve the export's bytes, including JSON whitespace and authored URLs.
+      return this.request<string>('GET', `/api/v1/reports/${reportId}/export?format=${format}`, undefined, true);
+    }
     const report = await this.getReport(reportId);
     return report.content;
   }
@@ -837,7 +934,8 @@ export class TraceLabClient {
     page = 1,
     pageSize = 20,
     status?: string,
-    projectId?: string
+    projectId?: string,
+    view?: 'all' | 'attention' | 'queue'
   ): Promise<MissionListResponse> {
     const params = new URLSearchParams({
       page: String(page),
@@ -849,6 +947,7 @@ export class TraceLabClient {
     if (projectId) {
       params.set('project_id', projectId);
     }
+    if (view !== undefined) params.set('view', view);
     return this.request<MissionListResponse>(
       'GET',
       `/api/v1/missions?${params}`
@@ -971,6 +1070,9 @@ function evidenceQueryParams(data: EvidenceListRequest, query?: string): URLSear
   if (data.session_key !== undefined) params.set('session_key', data.session_key);
   if (data.mission_id !== undefined) params.set('mission_id', data.mission_id);
   if (data.disposition !== undefined) params.set('disposition', data.disposition);
+  for (const field of ['tag', 'created_from', 'created_until', 'source_id', 'report_id', 'document_id'] as const) {
+    if (data[field] !== undefined) params.set(field, data[field]);
+  }
   if (data.page !== undefined) params.set('page', String(data.page));
   if (data.page_size !== undefined) params.set('page_size', String(data.page_size));
   return params;

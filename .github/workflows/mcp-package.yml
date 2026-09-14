@@ -21,10 +21,14 @@ jobs:
           cache-dependency-path: packages/tracelab-mcp/package-lock.json
       - name: Install package dependencies
         working-directory: packages/tracelab-mcp
-        run: npm ci
+        run: npm ci || exit $?
+      - name: Verify UI parity audit intent
+        run: node --test scripts/mcp_parity_audit.test.mjs || exit $?
+      - name: Audit live UI operations against MCP source actions
+        run: node scripts/mcp_parity_audit.mjs || exit $?
       - name: Verify unit contracts
         working-directory: packages/tracelab-mcp
-        run: npm run test:run
+        run: npm run test:run || exit $?
       - name: Verify installed tarball through the real MCP client
         working-directory: packages/tracelab-mcp
-        run: npm run test:package
+        run: npm run test:package || exit $?

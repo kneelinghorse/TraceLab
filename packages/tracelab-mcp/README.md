@@ -6,7 +6,7 @@ collection management, mission authoring, DeepSearch execution, and report
 generation, plus cross-session evidence capture — against a TraceLab knowledge
 base.
 
-- **8 action-clustered tools** (one tool per noun, dispatched by `action`)
+- **9 action-clustered tools / 40 actions in source** (one tool per noun, dispatched by `action`)
 - **RFC 8628 device-code login** — install, run, click a link, you're in
 - Works out of the box with **Claude Desktop**, **Claude Code**, and any
   Model Context Protocol client over stdio
@@ -174,19 +174,66 @@ never leak across deployments.
 
 ## Tools
 
-Eight action-clustered tools. Each cluster exposes multiple actions
+Nine action-clustered tools / 40 actions in source. Each cluster exposes multiple actions
 selected via the `action` parameter.
 
 | Cluster | Actions | Purpose |
 | --- | --- | --- |
-| `tracelab_search` | `knowledge` | Semantic search across the knowledge base. |
-| `tracelab_project` | `list`, `create`, `update`, `stats` | Project CRUD + aggregate stats. |
-| `tracelab_collection` | `list`, `get`, `export`, `create`, `add`, `synthesize` | Curate chunks into collections, then synthesize. |
+| `tracelab_search` | `knowledge`, `navigate`, `pedr` | Semantic search across the knowledge base. |
+| `tracelab_project` | `list`, `create`, `update`, `stats`, `get` | Project CRUD + aggregate stats. |
+| `tracelab_collection` | `list`, `get`, `export`, `create`, `add`, `synthesize`, `documents`, `mission_seed` | Curate chunks into collections, then synthesize. |
 | `tracelab_report` | `create`, `list`, `get`, `export` | Persistent named research reports. |
-| `tracelab_document` | `upload`, `get_content` | Document ingestion + full-text fetch. |
+| `tracelab_document` | `upload`, `get_content`, `list` | Document ingestion + full-text fetch. |
 | `tracelab_mission` | `create`, `list`, `get`, `update` | Mission CRUD against the DeepSearch authoring contract. |
-| `tracelab_mission_execution` | `submit`, `status`, `preview` | DeepSearch lifecycle: queue, poll status, preview the compiled contract. |
-| `tracelab_evidence` | `capture`, `note`, `list`, `search`, `promote` | Capture sourced findings and working notes, reuse them across sessions, and promote a session to a report or document. |
+| `tracelab_mission_execution` | `submit`, `status`, `preview`, `logs`, `events` | DeepSearch lifecycle: queue, poll status, preview the compiled contract. |
+| `tracelab_evidence` | `capture`, `note`, `list`, `search`, `promote`, `get` | Capture sourced findings and working notes, reuse them across sessions, and promote a session to a report or document. |
+| `tracelab_home` | `snapshot`, `favorites` | Caller-scoped home and favorite project reads. |
+
+
+Sprint 52 additions below are **source-only and unreleased**. The package remains
+version 1.1.1; MCP-3 will publish once the sprint source and artifact checks pass.
+Installing 1.1.1 from npm does not yet provide these new actions.
+
+### Sprint 52 read parameters (unreleased)
+
+Every action calls the authenticated REST API afresh. Server totals and authored
+fields are preserved. Entity responses add absolute browser links; existing
+`href` fields and authored/source URLs are retained.
+
+| Action | Required and optional parameters |
+| --- | --- |
+| `tracelab_home.snapshot` | No additional parameters. Returns the caller-scoped home sections, including server `missions.total`. |
+| `tracelab_home.favorites` | Optional `project_id`, `page` (default 1), `page_size` (default 6, max 100). |
+| `tracelab_search.navigate` | Required `q` (1–200 characters). Optional `entity_type`: project/document/mission/report/collection/evidence; `page` (1), `page_size` (5, max 50). |
+| `tracelab_search.pedr` | Required `query` (1–2000 characters). Optional `top_k` (10, max 100), `project_id`, `source_type`, `date_from`, `date_to` (YYYY-MM-DD), `enable_graph` (true, matching the UI). Returns full results and layer/graph diagnostics. |
+| `tracelab_evidence.get` | Required `entry_id` UUID. Returns the full entry and relationships; no separate project parameter is needed. |
+| `tracelab_document.list` | Optional `project_id`, `processed` (true or false), `search`, `page` (1), `page_size` (20, max 100). `total` comes from server pagination. |
+| `tracelab_project.get` | Required `project_id` UUID. |
+| `tracelab_collection.documents` | Required `collection_id` UUID. Optional `page` (1), `page_size` (20, max 100). |
+| `tracelab_collection.mission_seed` | Required `collection_id` UUID. Returns drafting instructions, background and source references. |
+| `tracelab_mission_execution.logs` | Required `mission_id` UUID. Optional `limit` (100, max 500). |
+| `tracelab_mission_execution.events` | Optional `mission_id` UUID, `limit` (50, max 200). |
+
+PEDR remains an explicit choice for multi-layer search and graph diagnostics;
+`knowledge` continues to use plain `/retrieval/search`. These are alternative
+retrieval paths, with no claim that PEDR ranks better. Logs/events are bounded
+snapshots of recorded activity. An empty list includes an explicit `empty` flag
+and message; it does not establish that streaming is active.
+
+Existing actions also gain UI parameters:
+
+- `tracelab_search.knowledge`: optional `source_type`, `date_from`, `date_to`
+  (YYYY-MM-DD), alongside the existing `query`, `limit`, `project_id` and `tags`.
+- `tracelab_mission.list`: optional `view` = `all`, `attention` or `queue`.
+- `tracelab_collection.list`: optional `project_id`, `page`, `page_size` (max 100).
+  `get` returns `instructions`; `create` accepts optional `instructions` (max
+  20,000 characters).
+- `tracelab_evidence.list` and `.search`: optional `tag`, `created_from`,
+  `created_until` (ISO datetimes), `source_id`, `report_id`, `document_id`, in
+  addition to existing project/session/mission/disposition/pagination filters.
+- `tracelab_report.export`: optional `format` = `md`, `json` or `txt` calls the
+  REST export route and returns its exact text. Omit `format` to retain the
+  legacy response of exact `report.content` bytes.
 
 ### Example calls
 

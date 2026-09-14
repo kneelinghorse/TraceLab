@@ -9,10 +9,21 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Eleven read actions: home snapshot/favorites, navigation, optional PEDR search,
+  project/evidence detail, document list, collection documents/mission seed,
+  and persisted mission logs/events (nine clusters total).
+- UI parity manifest and AST audit enforced in package CI; traces live page
+  consumers, retains dead client code, and rejects unclassified operations.
+- Mission view, collection scope/pagination/instructions, evidence source/date
+  filters, knowledge source/date filters, and explicit md/json/txt report export.
+  Server totals, authored fields and legacy no-format export bytes are preserved.
+- PEDR exposes graph controls and diagnostics without changing plain knowledge
+  retrieval. These changes remain unreleased at source version 1.1.1 until MCP-3.
+
 - Canonical browser navigation metadata on every entity response through one
   link helper, with an explicit `TRACELAB_FRONTEND_URL` override for custom
   deployments. Authored URLs, source provenance and export content are preserved.
-- A real stdio MCP contract covering all 29 actions, HTTP verbs, authentication,
+- A real stdio MCP contract covering all 40 source actions, HTTP verbs, authentication,
   canonical links and content preservation. CI installs an `npm pack` tarball
   in a clean directory and exercises its actual entrypoint.
 
