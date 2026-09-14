@@ -1,0 +1,1601 @@
+{
+  "mission_id": "MCP-1",
+  "sprint_id": "sprint-52",
+  "generated_at": "2026-09-14T16:31:22.660221+00:00",
+  "status": "validated_pending_receipt_merge",
+  "source": {
+    "base_commit": "a136fb2cf1c6a4cc05eda360d604e5acb3128667",
+    "pr": 294,
+    "url": "https://github.com/kneelinghorse/TraceLab/pull/294",
+    "head_commit": "e135a8a5c7250319e200dc49a7d387850cd0695c",
+    "merge_commit": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+    "merged_at": "2026-09-14T16:17:09Z"
+  },
+  "decisions": [
+    421,
+    423,
+    425,
+    426,
+    435,
+    436,
+    437
+  ],
+  "learnings_applied": [
+    167,
+    168,
+    174,
+    176,
+    177,
+    182,
+    183
+  ],
+  "scope": {
+    "ui_mission": false,
+    "frontend_runtime_changed": false,
+    "mcp_source_changed": true,
+    "npm_publish": false,
+    "package_version": "1.1.1",
+    "release_gate": "MCP-3",
+    "python_mcp_production_dark": true
+  },
+  "new_reads": [
+    "tracelab_home.snapshot",
+    "tracelab_home.favorites",
+    "tracelab_search.navigate",
+    "tracelab_search.pedr",
+    "tracelab_evidence.get",
+    "tracelab_document.list",
+    "tracelab_project.get",
+    "tracelab_collection.documents",
+    "tracelab_collection.mission_seed",
+    "tracelab_mission_execution.logs",
+    "tracelab_mission_execution.events"
+  ],
+  "extensions": [
+    "mission.list view",
+    "collection.list project/pagination",
+    "collection.get/create instructions",
+    "evidence.list/search six filters",
+    "report.export md/json/txt with no-format byte compatibility",
+    "knowledge source/date filters"
+  ],
+  "local_validation": {
+    "mcp_unit": {
+      "passed": 134,
+      "failed": 0,
+      "skipped": 0
+    },
+    "python_mcp_and_install": {
+      "passed": 42,
+      "failed": 0,
+      "skipped": 0,
+      "warnings": 5
+    },
+    "audit_intent": {
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    "parity": {
+      "operations": 102,
+      "live": 95,
+      "dead": 7,
+      "tools": 9,
+      "actions": 40,
+      "classifications": {
+        "covered": 18,
+        "partial": 0,
+        "closed-MCP-1": 19,
+        "rest-only-by-design": 39,
+        "deferred-MCP-2": 12,
+        "needs-derek": 7,
+        "dead-client-code": 7
+      }
+    },
+    "clean_package": {
+      "passed": 53,
+      "generatedLinks": 52,
+      "httpRequests": 54,
+      "checks": [
+        {
+          "tool": "search",
+          "action": "knowledge",
+          "links": 1,
+          "http": [
+            "POST /retrieval/search"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "project",
+          "action": "list",
+          "links": 1,
+          "http": [
+            "GET /projects"
+          ],
+          "queries": [
+            "page=1&page_size=20"
+          ]
+        },
+        {
+          "tool": "project",
+          "action": "create",
+          "links": 1,
+          "http": [
+            "POST /projects"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "project",
+          "action": "update",
+          "links": 1,
+          "http": [
+            "PUT /projects/00000000-0000-4000-8000-000000000001"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "project",
+          "action": "stats",
+          "links": 1,
+          "http": [
+            "GET /projects/00000000-0000-4000-8000-000000000001/stats"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "collection",
+          "action": "list",
+          "links": 1,
+          "http": [
+            "GET /collections"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "collection",
+          "action": "get",
+          "links": 2,
+          "http": [
+            "GET /collections/00000000-0000-4000-8000-000000000005"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "collection",
+          "action": "create",
+          "links": 1,
+          "http": [
+            "POST /collections"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "collection",
+          "action": "add",
+          "links": 1,
+          "http": [
+            "POST /collections/00000000-0000-4000-8000-000000000005/chunks"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "collection",
+          "action": "synthesize",
+          "links": 2,
+          "http": [
+            "POST /synthesize"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "collection",
+          "action": "export",
+          "links": 0,
+          "http": [
+            "GET /collections/00000000-0000-4000-8000-000000000005/export"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "report",
+          "action": "list",
+          "links": 1,
+          "http": [
+            "GET /reports"
+          ],
+          "queries": [
+            "page=1&page_size=20"
+          ]
+        },
+        {
+          "tool": "report",
+          "action": "get",
+          "links": 1,
+          "http": [
+            "GET /reports/00000000-0000-4000-8000-000000000004"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "report",
+          "action": "create",
+          "links": 1,
+          "http": [
+            "POST /reports"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "report",
+          "action": "export",
+          "links": 0,
+          "http": [
+            "GET /reports/00000000-0000-4000-8000-000000000004"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "document",
+          "action": "get_content",
+          "links": 1,
+          "http": [
+            "GET /documents/00000000-0000-4000-8000-000000000002",
+            "GET /documents/00000000-0000-4000-8000-000000000002/chunks"
+          ],
+          "queries": [
+            "",
+            "page=1&page_size=20"
+          ]
+        },
+        {
+          "tool": "document",
+          "action": "upload",
+          "links": 1,
+          "http": [
+            "POST /documents/upload"
+          ],
+          "queries": [
+            "project_id=00000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "tool": "mission",
+          "action": "list",
+          "links": 1,
+          "http": [
+            "GET /missions"
+          ],
+          "queries": [
+            "page=1&page_size=20"
+          ]
+        },
+        {
+          "tool": "mission",
+          "action": "get",
+          "links": 1,
+          "http": [
+            "GET /missions/00000000-0000-4000-8000-000000000003"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "mission",
+          "action": "create",
+          "links": 1,
+          "http": [
+            "POST /missions"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "mission",
+          "action": "update",
+          "links": 1,
+          "http": [
+            "PATCH /missions/00000000-0000-4000-8000-000000000003"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "mission_execution",
+          "action": "submit",
+          "links": 1,
+          "http": [
+            "POST /missions/00000000-0000-4000-8000-000000000003/submit"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "mission_execution",
+          "action": "status",
+          "links": 1,
+          "http": [
+            "GET /missions/00000000-0000-4000-8000-000000000003/status"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "mission_execution",
+          "action": "preview",
+          "links": 1,
+          "http": [
+            "GET /missions/00000000-0000-4000-8000-000000000003/contract-preview"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "evidence",
+          "action": "list",
+          "links": 2,
+          "http": [
+            "GET /evidence"
+          ],
+          "queries": [
+            "project_id=00000000-0000-4000-8000-000000000001&page=1&page_size=20"
+          ]
+        },
+        {
+          "tool": "evidence",
+          "action": "search",
+          "links": 1,
+          "http": [
+            "GET /evidence/search"
+          ],
+          "queries": [
+            "project_id=00000000-0000-4000-8000-000000000001&q=claim&page=1&page_size=20"
+          ]
+        },
+        {
+          "tool": "evidence",
+          "action": "capture",
+          "links": 1,
+          "http": [
+            "POST /evidence/capture"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "evidence",
+          "action": "note",
+          "links": 1,
+          "http": [
+            "PUT /evidence/notes/working"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "evidence",
+          "action": "promote",
+          "links": 2,
+          "http": [
+            "POST /evidence/promote"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "home",
+          "action": "snapshot",
+          "links": 5,
+          "http": [
+            "GET /home"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "home",
+          "action": "favorites",
+          "links": 1,
+          "http": [
+            "GET /home/favorites"
+          ],
+          "queries": [
+            "page=2&page_size=3&project_id=00000000-0000-4000-8000-000000000001"
+          ]
+        },
+        {
+          "tool": "search",
+          "action": "navigate",
+          "links": 1,
+          "http": [
+            "GET /navigation/search"
+          ],
+          "queries": [
+            "q=A+%26+B&entity_type=document&page=2&page_size=3"
+          ]
+        },
+        {
+          "tool": "evidence",
+          "action": "get",
+          "links": 2,
+          "http": [
+            "GET /evidence/00000000-0000-4000-8000-000000000006"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "document",
+          "action": "list",
+          "links": 1,
+          "http": [
+            "GET /documents"
+          ],
+          "queries": [
+            "project_id=00000000-0000-4000-8000-000000000001&processed=false&search=A+%26+B&page=2&page_size=3"
+          ]
+        },
+        {
+          "tool": "project",
+          "action": "get",
+          "links": 1,
+          "http": [
+            "GET /projects/00000000-0000-4000-8000-000000000001"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "collection",
+          "action": "documents",
+          "links": 2,
+          "http": [
+            "GET /collections/00000000-0000-4000-8000-000000000005/documents"
+          ],
+          "queries": [
+            "page=2&page_size=3"
+          ]
+        },
+        {
+          "tool": "collection",
+          "action": "mission_seed",
+          "links": 3,
+          "http": [
+            "GET /collections/00000000-0000-4000-8000-000000000005/mission-seed"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "mission_execution",
+          "action": "logs",
+          "links": 2,
+          "http": [
+            "GET /missions/00000000-0000-4000-8000-000000000003/logs"
+          ],
+          "queries": [
+            "limit=3"
+          ]
+        },
+        {
+          "tool": "mission_execution",
+          "action": "events",
+          "links": 1,
+          "http": [
+            "GET /missions/events/recent"
+          ],
+          "queries": [
+            "mission_id=00000000-0000-4000-8000-000000000003&limit=3"
+          ]
+        },
+        {
+          "tool": "mission",
+          "action": "list",
+          "links": 0,
+          "http": [
+            "GET /missions"
+          ],
+          "queries": [
+            "page=2&page_size=3&project_id=00000000-0000-4000-8000-000000000001&view=attention"
+          ]
+        },
+        {
+          "tool": "collection",
+          "action": "list",
+          "links": 0,
+          "http": [
+            "GET /collections"
+          ],
+          "queries": [
+            "project_id=00000000-0000-4000-8000-000000000001&page=2&page_size=3"
+          ]
+        },
+        {
+          "tool": "collection",
+          "action": "get",
+          "links": 0,
+          "http": [
+            "GET /collections/00000000-0000-4000-8000-000000000005"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "collection",
+          "action": "create",
+          "links": 0,
+          "http": [
+            "POST /collections"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "evidence",
+          "action": "list",
+          "links": 0,
+          "http": [
+            "GET /evidence"
+          ],
+          "queries": [
+            "project_id=00000000-0000-4000-8000-000000000001&tag=A+%26+B&created_from=2026-09-01&created_until=2026-09-14&source_id=00000000-0000-4000-8000-000000000006&report_id=00000000-0000-4000-8000-000000000004&page=1&page_size=20"
+          ]
+        },
+        {
+          "tool": "evidence",
+          "action": "search",
+          "links": 0,
+          "http": [
+            "GET /evidence/search"
+          ],
+          "queries": [
+            "project_id=00000000-0000-4000-8000-000000000001&q=A+%26+B&tag=A+%26+B&created_from=2026-09-01&created_until=2026-09-14&source_id=00000000-0000-4000-8000-000000000006&report_id=00000000-0000-4000-8000-000000000004&page=1&page_size=20"
+          ]
+        },
+        {
+          "tool": "evidence",
+          "action": "list",
+          "links": 0,
+          "http": [
+            "GET /evidence"
+          ],
+          "queries": [
+            "project_id=00000000-0000-4000-8000-000000000001&tag=A+%26+B&created_from=2026-09-01&created_until=2026-09-14&source_id=00000000-0000-4000-8000-000000000006&document_id=00000000-0000-4000-8000-000000000002&page=1&page_size=20"
+          ]
+        },
+        {
+          "tool": "evidence",
+          "action": "search",
+          "links": 0,
+          "http": [
+            "GET /evidence/search"
+          ],
+          "queries": [
+            "project_id=00000000-0000-4000-8000-000000000001&q=A+%26+B&tag=A+%26+B&created_from=2026-09-01&created_until=2026-09-14&source_id=00000000-0000-4000-8000-000000000006&document_id=00000000-0000-4000-8000-000000000002&page=1&page_size=20"
+          ]
+        },
+        {
+          "tool": "report",
+          "action": "export",
+          "links": 0,
+          "http": [
+            "GET /reports/00000000-0000-4000-8000-000000000004/export"
+          ],
+          "queries": [
+            "format=md"
+          ]
+        },
+        {
+          "tool": "report",
+          "action": "export",
+          "links": 0,
+          "http": [
+            "GET /reports/00000000-0000-4000-8000-000000000004/export"
+          ],
+          "queries": [
+            "format=json"
+          ]
+        },
+        {
+          "tool": "report",
+          "action": "export",
+          "links": 0,
+          "http": [
+            "GET /reports/00000000-0000-4000-8000-000000000004/export"
+          ],
+          "queries": [
+            "format=txt"
+          ]
+        },
+        {
+          "tool": "search",
+          "action": "pedr",
+          "links": 1,
+          "http": [
+            "POST /pedr/search"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "search",
+          "action": "pedr",
+          "links": 1,
+          "http": [
+            "POST /pedr/search"
+          ],
+          "queries": [
+            ""
+          ]
+        },
+        {
+          "tool": "search",
+          "action": "knowledge",
+          "links": 0,
+          "http": [
+            "POST /retrieval/search"
+          ],
+          "queries": [
+            ""
+          ]
+        }
+      ]
+    },
+    "foundational_references": true,
+    "git_diff_check": true,
+    "ruff_format_run": false,
+    "pytest_serialized": true,
+    "preserved_red_runs": [
+      {
+        "label": "node18-red",
+        "failed": 1,
+        "skipped": 43,
+        "reason": "Collection query dropped filters without URLSearchParams.size; fixed using serialized query string. Capability simulation, not a full Node18 package matrix."
+      },
+      {
+        "label": "evidence-fix-red",
+        "failed": 12,
+        "passed": 7,
+        "skipped": 24,
+        "reason": "Selected evidence tests reject incompatible timestamp/source/context inputs; unrelated tests deselected by name."
+      },
+      {
+        "label": "read-parity-red",
+        "failed": 21,
+        "passed": 1,
+        "reason": "New reads/extensions absent before implementation; legacy no-format export already passed."
+      },
+      {
+        "label": "build-first",
+        "reason": "URLSearchParams required tuple type annotation; fixed before passing build."
+      },
+      {
+        "label": "pedr-red",
+        "failed": 3,
+        "skipped": 22,
+        "reason": "Only three PEDR/knowledge filter tests selected, failed before implementation."
+      },
+      {
+        "label": "production-fixture-discovery-first",
+        "reason": "Runner used data instead of the existing report items key; corrected before production acceptance."
+      }
+    ]
+  },
+  "initial_source": {
+    "pr": 292,
+    "merge": {
+      "headRefOid": "76e7b1ab7cbd69f8d68c2633543aa562676ebf3e",
+      "mergeCommit": {
+        "oid": "cc0f2af8a239d1e094efff6e8eacde6c948461b9"
+      },
+      "mergedAt": "2026-09-14T15:26:49Z",
+      "number": 292,
+      "url": "https://github.com/kneelinghorse/TraceLab/pull/292"
+    },
+    "post_merge_main_push_ci": [
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34862204024,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "cc0f2af8a239d1e094efff6e8eacde6c948461b9",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34862204024",
+        "workflowName": "Backend Lint",
+        "jobs": [
+          {
+            "databaseId": 104037021229,
+            "name": "ruff-diff",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34862204024/job/104037021229",
+            "startedAt": "2026-09-14T15:26:55Z",
+            "completedAt": "2026-09-14T15:27:16Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34862204007,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "cc0f2af8a239d1e094efff6e8eacde6c948461b9",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34862204007",
+        "workflowName": "Secret Scan",
+        "jobs": [
+          {
+            "databaseId": 104037020927,
+            "name": "Secret Scan",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34862204007/job/104037020927",
+            "startedAt": "2026-09-14T15:26:55Z",
+            "completedAt": "2026-09-14T15:27:23Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34862204006,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "cc0f2af8a239d1e094efff6e8eacde6c948461b9",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34862204006",
+        "workflowName": "MCP Package",
+        "jobs": [
+          {
+            "databaseId": 104037020962,
+            "name": "mcp-package",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34862204006/job/104037020962",
+            "startedAt": "2026-09-14T15:26:56Z",
+            "completedAt": "2026-09-14T15:27:41Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34862204119,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "cc0f2af8a239d1e094efff6e8eacde6c948461b9",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34862204119",
+        "workflowName": "Frontend Checks",
+        "jobs": [
+          {
+            "databaseId": 104037022115,
+            "name": "lint",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34862204119/job/104037022115",
+            "startedAt": "2026-09-14T15:26:57Z",
+            "completedAt": "2026-09-14T15:28:00Z"
+          },
+          {
+            "databaseId": 104037022531,
+            "name": "vitest",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34862204119/job/104037022531",
+            "startedAt": "2026-09-14T15:26:56Z",
+            "completedAt": "2026-09-14T15:28:05Z"
+          },
+          {
+            "databaseId": 104037022545,
+            "name": "type-check",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34862204119/job/104037022545",
+            "startedAt": "2026-09-14T15:26:56Z",
+            "completedAt": "2026-09-14T15:27:48Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34862203825,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "cc0f2af8a239d1e094efff6e8eacde6c948461b9",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34862203825",
+        "workflowName": "Backend Integration",
+        "jobs": [
+          {
+            "databaseId": 104037021520,
+            "name": "backend-integration",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34862203825/job/104037021520",
+            "startedAt": "2026-09-14T15:26:57Z",
+            "completedAt": "2026-09-14T15:29:53Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34862204144,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "cc0f2af8a239d1e094efff6e8eacde6c948461b9",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34862204144",
+        "workflowName": "Frontend Production Build",
+        "jobs": [
+          {
+            "databaseId": 104037021669,
+            "name": "build-frontend-production",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34862204144/job/104037021669",
+            "startedAt": "2026-09-14T15:26:56Z",
+            "completedAt": "2026-09-14T15:30:47Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "cancelled",
+        "databaseId": 34862203902,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "cc0f2af8a239d1e094efff6e8eacde6c948461b9",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34862203902",
+        "workflowName": "Backend Tests",
+        "jobs": [
+          {
+            "databaseId": 104037020301,
+            "name": "backend-suite",
+            "status": "completed",
+            "conclusion": "cancelled",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34862203902/job/104037020301",
+            "startedAt": "2026-09-14T15:26:56Z",
+            "completedAt": "2026-09-14T15:48:30Z"
+          }
+        ]
+      }
+    ],
+    "deployments": {
+      "checked_at": "2026-09-14T15:31:01.619761+00:00",
+      "commit": "cc0f2af8a239d1e094efff6e8eacde6c948461b9",
+      "services": {
+        "TraceLab": {
+          "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+          "deployment_id": "91320591-bbe2-4bcf-a5d2-56ea9dd45876",
+          "status": "SUCCESS",
+          "commit": "cc0f2af8a239d1e094efff6e8eacde6c948461b9",
+          "created_at": "2026-09-14T15:26:51.279Z"
+        },
+        "frontend": {
+          "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+          "deployment_id": "a4901585-056e-40de-a7c4-547470e2fc60",
+          "status": "SUCCESS",
+          "commit": "cc0f2af8a239d1e094efff6e8eacde6c948461b9",
+          "created_at": "2026-09-14T15:26:51.278Z"
+        }
+      },
+      "both_success_for_commit": true
+    },
+    "production_outcome": "18 checks passed; evidence filter check 19 failed with422. Corrected in PR293 before acceptance.",
+    "backend_run_disposition": {
+      "run_id": 34862203902,
+      "conclusion": "cancelled",
+      "reason": "Superseded source already failed production validation. Cancelled after more than20minutes to obtain diagnostics. Logs show steady progress through54percent and no test failures before cancellation; this is not a passing run. Final-source main CI is the acceptance gate.",
+      "log_sha256": "b2f91a2242dd1e606f402afec3f66f6862387124389a6d6804e9860dbbb3bba4"
+    }
+  },
+  "intermediate_source": {
+    "pr": 293,
+    "merge": {
+      "headRefOid": "b071825d03f7e0028865fd7455ec445ffd9e9cd5",
+      "mergeCommit": {
+        "oid": "caf65b08d76f3c147b97be4d02295b8eb68b3e78"
+      },
+      "mergedAt": "2026-09-14T15:49:11Z",
+      "number": 293,
+      "url": "https://github.com/kneelinghorse/TraceLab/pull/293"
+    },
+    "post_merge_main_push_ci": [
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34864662953,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "caf65b08d76f3c147b97be4d02295b8eb68b3e78",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864662953",
+        "workflowName": "Backend Lint",
+        "jobs": [
+          {
+            "databaseId": 104045346926,
+            "name": "ruff-diff",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864662953/job/104045346926",
+            "startedAt": "2026-09-14T15:49:17Z",
+            "completedAt": "2026-09-14T15:49:36Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34864663223,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "caf65b08d76f3c147b97be4d02295b8eb68b3e78",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864663223",
+        "workflowName": "Secret Scan",
+        "jobs": [
+          {
+            "databaseId": 104045348723,
+            "name": "Secret Scan",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864663223/job/104045348723",
+            "startedAt": "2026-09-14T15:49:17Z",
+            "completedAt": "2026-09-14T15:49:45Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34864662988,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "caf65b08d76f3c147b97be4d02295b8eb68b3e78",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864662988",
+        "workflowName": "MCP Package",
+        "jobs": [
+          {
+            "databaseId": 104045346883,
+            "name": "mcp-package",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864662988/job/104045346883",
+            "startedAt": "2026-09-14T15:49:17Z",
+            "completedAt": "2026-09-14T15:50:04Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34864662828,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "caf65b08d76f3c147b97be4d02295b8eb68b3e78",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864662828",
+        "workflowName": "Frontend Checks",
+        "jobs": [
+          {
+            "databaseId": 104045346381,
+            "name": "type-check",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864662828/job/104045346381",
+            "startedAt": "2026-09-14T15:49:17Z",
+            "completedAt": "2026-09-14T15:50:06Z"
+          },
+          {
+            "databaseId": 104045346760,
+            "name": "vitest",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864662828/job/104045346760",
+            "startedAt": "2026-09-14T15:49:17Z",
+            "completedAt": "2026-09-14T15:50:28Z"
+          },
+          {
+            "databaseId": 104045346776,
+            "name": "lint",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864662828/job/104045346776",
+            "startedAt": "2026-09-14T15:49:17Z",
+            "completedAt": "2026-09-14T15:50:12Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34864662714,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "caf65b08d76f3c147b97be4d02295b8eb68b3e78",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864662714",
+        "workflowName": "Backend Integration",
+        "jobs": [
+          {
+            "databaseId": 104045345532,
+            "name": "backend-integration",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864662714/job/104045345532",
+            "startedAt": "2026-09-14T15:49:17Z",
+            "completedAt": "2026-09-14T15:52:29Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34864663146,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "caf65b08d76f3c147b97be4d02295b8eb68b3e78",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864663146",
+        "workflowName": "Frontend Production Build",
+        "jobs": [
+          {
+            "databaseId": 104045346758,
+            "name": "build-frontend-production",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864663146/job/104045346758",
+            "startedAt": "2026-09-14T15:49:18Z",
+            "completedAt": "2026-09-14T15:53:20Z"
+          }
+        ]
+      },
+      {
+        "attempt": 1,
+        "conclusion": "success",
+        "databaseId": 34864663105,
+        "event": "push",
+        "headBranch": "main",
+        "headSha": "caf65b08d76f3c147b97be4d02295b8eb68b3e78",
+        "status": "completed",
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864663105",
+        "workflowName": "Backend Tests",
+        "jobs": [
+          {
+            "databaseId": 104045347413,
+            "name": "backend-suite",
+            "status": "completed",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864663105/job/104045347413",
+            "startedAt": "2026-09-14T15:49:18Z",
+            "completedAt": "2026-09-14T16:03:55Z"
+          }
+        ]
+      }
+    ],
+    "ci_test_summaries": [
+      {
+        "workflow": "Backend Integration",
+        "run_id": 34864662714,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864662714",
+        "event": "push",
+        "head_sha": "caf65b08d76f3c147b97be4d02295b8eb68b3e78",
+        "attempt": 1,
+        "console_summary": "134 passed, 4 skipped, 17 warnings in 114.81s (0:01:54)",
+        "counts": {
+          "passed": 134,
+          "failed": 0,
+          "skipped": 4,
+          "deselected": 0
+        },
+        "log_sha256": "1193453263467e2a87f1f1554ca94bec654f683bf1df4f7090cb993bb6e445be"
+      },
+      {
+        "workflow": "Backend Tests",
+        "run_id": 34864663105,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34864663105",
+        "event": "push",
+        "head_sha": "caf65b08d76f3c147b97be4d02295b8eb68b3e78",
+        "attempt": 1,
+        "console_summary": "2604 passed, 3 skipped, 12 deselected, 48 warnings in 807.61s (0:13:27)",
+        "counts": {
+          "passed": 2604,
+          "failed": 0,
+          "skipped": 3,
+          "deselected": 12
+        },
+        "log_sha256": "16b530f7122ad0e109bac9f454e9fbb7a80e9f478517d54e0cbabc1aa416b3cc"
+      }
+    ],
+    "deployments": {
+      "checked_at": "2026-09-14T15:54:09.493145+00:00",
+      "commit": "caf65b08d76f3c147b97be4d02295b8eb68b3e78",
+      "services": {
+        "TraceLab": {
+          "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+          "deployment_id": "7da92409-291a-420a-b9a7-693346515758",
+          "status": "SUCCESS",
+          "commit": "caf65b08d76f3c147b97be4d02295b8eb68b3e78",
+          "created_at": "2026-09-14T15:49:12.740Z"
+        },
+        "frontend": {
+          "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+          "deployment_id": "9de4fd48-2ac0-4c54-84f7-32ef93906904",
+          "status": "SUCCESS",
+          "commit": "caf65b08d76f3c147b97be4d02295b8eb68b3e78",
+          "created_at": "2026-09-14T15:49:12.740Z"
+        }
+      },
+      "both_success_for_commit": true
+    },
+    "production_passed": 32,
+    "public_smoke": {
+      "tool": "playwright",
+      "generatedAt": "2026-09-14T15:54:23.859Z",
+      "completedAt": "2026-09-14T15:54:27.326Z",
+      "status": "passed",
+      "summary": {
+        "total": 5,
+        "expected": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "durationSeconds": 3.467,
+        "retries": 0
+      },
+      "environment": {
+        "node": "v24.6.0",
+        "ci": {
+          "provider": null
+        },
+        "projects": [
+          "chromium"
+        ],
+        "browsers": []
+      },
+      "tests": [
+        {
+          "title": "missions route responds at the public domain",
+          "file": "frontend/tests/e2e/production-smoke.spec.ts",
+          "line": 17,
+          "column": 7,
+          "status": "passed",
+          "durationMs": 760,
+          "annotations": [],
+          "attachments": [],
+          "errors": []
+        },
+        {
+          "title": "/admin/users is deployed as its own Next page",
+          "file": "frontend/tests/e2e/production-smoke.spec.ts",
+          "line": 23,
+          "column": 9,
+          "status": "passed",
+          "durationMs": 313,
+          "annotations": [],
+          "attachments": [],
+          "errors": []
+        },
+        {
+          "title": "/admin/spaces is deployed as its own Next page",
+          "file": "frontend/tests/e2e/production-smoke.spec.ts",
+          "line": 23,
+          "column": 9,
+          "status": "passed",
+          "durationMs": 349,
+          "annotations": [],
+          "attachments": [],
+          "errors": []
+        },
+        {
+          "title": "API health endpoint confirms production authorization and reconciler freshness",
+          "file": "frontend/tests/e2e/production-smoke.spec.ts",
+          "line": 33,
+          "column": 7,
+          "status": "passed",
+          "durationMs": 298,
+          "annotations": [],
+          "attachments": [],
+          "errors": []
+        },
+        {
+          "title": "every maintained migration preserves its destination and query parameters",
+          "file": "frontend/tests/e2e/route-migration.spec.ts",
+          "line": 5,
+          "column": 5,
+          "status": "passed",
+          "durationMs": 1005,
+          "annotations": [],
+          "attachments": [
+            {
+              "name": "route-migration-coverage",
+              "contentType": "application/json",
+              "path": "/tmp/tracelab-s52-mcp1/final-source-smoke-artifacts/route-migration-every-main-a90a2-nation-and-query-parameters-chromium/attachments/route-migration-coverage-4ac87676a46ad0759ebc554feeab8d27b3d1eceb.json"
+            }
+          ],
+          "errors": []
+        }
+      ],
+      "artifactPath": "/tmp/tracelab-s52-mcp1/source-public-smoke.json"
+    },
+    "superseded_reason": "PR294 preserves collection filters on early Node18; final-source production and CI repeated before acceptance."
+  },
+  "post_merge_main_push_ci": [
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34867639451,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639451",
+      "workflowName": "Backend Lint",
+      "jobs": [
+        {
+          "databaseId": 104055383347,
+          "name": "ruff-diff",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639451/job/104055383347",
+          "startedAt": "2026-09-14T16:17:15Z",
+          "completedAt": "2026-09-14T16:17:34Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34867639424,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639424",
+      "workflowName": "Secret Scan",
+      "jobs": [
+        {
+          "databaseId": 104055382276,
+          "name": "Secret Scan",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639424/job/104055382276",
+          "startedAt": "2026-09-14T16:17:15Z",
+          "completedAt": "2026-09-14T16:17:42Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34867639428,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639428",
+      "workflowName": "MCP Package",
+      "jobs": [
+        {
+          "databaseId": 104055382471,
+          "name": "mcp-package",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639428/job/104055382471",
+          "startedAt": "2026-09-14T16:17:16Z",
+          "completedAt": "2026-09-14T16:18:03Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34867639413,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639413",
+      "workflowName": "Frontend Checks",
+      "jobs": [
+        {
+          "databaseId": 104055383341,
+          "name": "type-check",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639413/job/104055383341",
+          "startedAt": "2026-09-14T16:17:15Z",
+          "completedAt": "2026-09-14T16:18:01Z"
+        },
+        {
+          "databaseId": 104055383518,
+          "name": "vitest",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639413/job/104055383518",
+          "startedAt": "2026-09-14T16:17:15Z",
+          "completedAt": "2026-09-14T16:18:20Z"
+        },
+        {
+          "databaseId": 104055383546,
+          "name": "lint",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639413/job/104055383546",
+          "startedAt": "2026-09-14T16:17:16Z",
+          "completedAt": "2026-09-14T16:18:11Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34867639349,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639349",
+      "workflowName": "Backend Integration",
+      "jobs": [
+        {
+          "databaseId": 104055382334,
+          "name": "backend-integration",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639349/job/104055382334",
+          "startedAt": "2026-09-14T16:17:16Z",
+          "completedAt": "2026-09-14T16:19:43Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34867639377,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639377",
+      "workflowName": "Frontend Production Build",
+      "jobs": [
+        {
+          "databaseId": 104055382533,
+          "name": "build-frontend-production",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639377/job/104055382533",
+          "startedAt": "2026-09-14T16:17:16Z",
+          "completedAt": "2026-09-14T16:21:05Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34867639534,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639534",
+      "workflowName": "Backend Tests",
+      "jobs": [
+        {
+          "databaseId": 104055383299,
+          "name": "backend-suite",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639534/job/104055383299",
+          "startedAt": "2026-09-14T16:17:15Z",
+          "completedAt": "2026-09-14T16:26:45Z"
+        }
+      ]
+    }
+  ],
+  "ci_test_summaries": [
+    {
+      "workflow": "Backend Integration",
+      "run_id": 34867639349,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639349",
+      "event": "push",
+      "head_sha": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+      "attempt": 1,
+      "console_summary": "134 passed, 4 skipped, 17 warnings in 77.17s (0:01:17)",
+      "counts": {
+        "passed": 134,
+        "failed": 0,
+        "skipped": 4,
+        "deselected": 0
+      },
+      "log_sha256": "02c7877a40c3949b1c89965d99cb3d8a38980ecc189c9d8caf3e941c28fae3fd"
+    },
+    {
+      "workflow": "Backend Tests",
+      "run_id": 34867639534,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34867639534",
+      "event": "push",
+      "head_sha": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+      "attempt": 1,
+      "console_summary": "2604 passed, 3 skipped, 12 deselected, 48 warnings in 480.11s (0:08:00)",
+      "counts": {
+        "passed": 2604,
+        "failed": 0,
+        "skipped": 3,
+        "deselected": 12
+      },
+      "log_sha256": "86c7aca83c90cb3aed28b54066e24bf5d00450ad9bfa6da171950206578e3c75"
+    }
+  ],
+  "deployments": {
+    "checked_at": "2026-09-14T16:22:39.511656+00:00",
+    "commit": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+    "services": {
+      "TraceLab": {
+        "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+        "deployment_id": "860cbb23-89c6-4cb5-a615-1e2a3e50737c",
+        "status": "SUCCESS",
+        "commit": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+        "created_at": "2026-09-14T16:17:11.220Z"
+      },
+      "frontend": {
+        "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+        "deployment_id": "097b9211-2b3e-45af-8e4a-4f788d7831ed",
+        "status": "SUCCESS",
+        "commit": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+        "created_at": "2026-09-14T16:17:11.220Z"
+      }
+    },
+    "both_success_for_commit": true
+  },
+  "production_receipt": "mcp-1-production.json",
+  "parity_receipt": "mcp-1-parity-audit.json",
+  "public_smoke": {
+    "tool": "playwright",
+    "generatedAt": "2026-09-14T16:23:01.588Z",
+    "completedAt": "2026-09-14T16:23:04.936Z",
+    "status": "passed",
+    "summary": {
+      "total": 5,
+      "expected": 5,
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "interrupted": 0,
+      "durationSeconds": 3.348,
+      "retries": 0
+    },
+    "environment": {
+      "node": "v24.6.0",
+      "ci": {
+        "provider": null
+      },
+      "projects": [
+        "chromium"
+      ],
+      "browsers": []
+    },
+    "tests": [
+      {
+        "title": "missions route responds at the public domain",
+        "file": "frontend/tests/e2e/production-smoke.spec.ts",
+        "line": 17,
+        "column": 7,
+        "status": "passed",
+        "durationMs": 853,
+        "annotations": [],
+        "attachments": [],
+        "errors": []
+      },
+      {
+        "title": "/admin/users is deployed as its own Next page",
+        "file": "frontend/tests/e2e/production-smoke.spec.ts",
+        "line": 23,
+        "column": 9,
+        "status": "passed",
+        "durationMs": 324,
+        "annotations": [],
+        "attachments": [],
+        "errors": []
+      },
+      {
+        "title": "/admin/spaces is deployed as its own Next page",
+        "file": "frontend/tests/e2e/production-smoke.spec.ts",
+        "line": 23,
+        "column": 9,
+        "status": "passed",
+        "durationMs": 303,
+        "annotations": [],
+        "attachments": [],
+        "errors": []
+      },
+      {
+        "title": "API health endpoint confirms production authorization and reconciler freshness",
+        "file": "frontend/tests/e2e/production-smoke.spec.ts",
+        "line": 33,
+        "column": 7,
+        "status": "passed",
+        "durationMs": 101,
+        "annotations": [],
+        "attachments": [],
+        "errors": []
+      },
+      {
+        "title": "every maintained migration preserves its destination and query parameters",
+        "file": "frontend/tests/e2e/route-migration.spec.ts",
+        "line": 5,
+        "column": 5,
+        "status": "passed",
+        "durationMs": 971,
+        "annotations": [],
+        "attachments": [
+          {
+            "name": "route-migration-coverage",
+            "contentType": "application/json",
+            "path": "/tmp/tracelab-s52-mcp1/node18-source-smoke-artifacts/route-migration-every-main-a90a2-nation-and-query-parameters-chromium/attachments/route-migration-coverage-d85f68fb7d3ba38d48499470ee272dd4f0caf5f6.json"
+          }
+        ],
+        "errors": []
+      }
+    ],
+    "artifactPath": "/tmp/tracelab-s52-mcp1/source-public-smoke.json"
+  },
+  "limitations": [
+    "Collection create with instructions is validated by local real-stdio contract; production performs no writes.",
+    "Logs/events are snapshots; empty rows do not prove streaming works.",
+    "PEDR functional checks do not measure ranking quality or relative speed."
+  ],
+  "closure_gate": "Complete only after this receipt is merged to main; record its own PR and merge SHA in CMOS, then verify carrier main push CI, both SUCCESS deployments and public smoke. A separate receipt cannot cite itself before merge."
+}

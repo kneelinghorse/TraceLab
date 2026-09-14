@@ -1,0 +1,1802 @@
+{
+  "totals": {
+    "operations": 102,
+    "live": 95,
+    "dead": 7,
+    "tools": 9,
+    "actions": 40,
+    "classifications": {
+      "covered": 18,
+      "partial": 0,
+      "closed-MCP-1": 19,
+      "rest-only-by-design": 39,
+      "deferred-MCP-2": 12,
+      "needs-derek": 7,
+      "dead-client-code": 7
+    }
+  },
+  "errors": [],
+  "reconciliation": {
+    "planning_commit": "efd3081",
+    "compared_main_commit": "a136fb2cf1c6a4cc05eda360d604e5acb3128667",
+    "planning_claim": {
+      "live": 96,
+      "auth_admin": 32,
+      "agent_facing": 64,
+      "covered_including_partial": 26,
+      "partial": 7,
+      "gaps": 38,
+      "read_gaps": 18,
+      "action_gaps": 20
+    },
+    "measured_at_both_commits": {
+      "operations": 102,
+      "live": 95,
+      "dead": 7,
+      "auth_admin": 32,
+      "agent_facing": 63,
+      "covered_including_partial": 26,
+      "partial": 8,
+      "gaps": 37,
+      "read_gaps": 18,
+      "action_gaps": 19
+    },
+    "added_operations": [],
+    "removed_operations": [],
+    "changed_live_state": [],
+    "explanation": "The same AST inventory at planning efd3081 and pre-MCP-1 main finds 95 live operations, including the XMLHttpRequest document upload. No source operation was removed or added. The planning aggregate overcounted live/agent/action gaps by one; the 19 concrete action-gap rows are retained. A further partial gap in knowledge source/date filters was found and closed under decision 435. No nonexistent 20th action is fabricated.",
+    "read_gap_outcomes": {
+      "closed": 11,
+      "rest_only": 7
+    },
+    "partial_gap_outcomes": {
+      "closed": 8
+    },
+    "dead_code_notes": [
+      "Unused /mission-protocols helpers (four operations).",
+      "Unused console relationship and worker-health operations.",
+      "Unused useQualityReport path (one operation).",
+      "ExportButtons has no live page consumer and no API transport; it is not an additional operation."
+    ],
+    "source_package": {
+      "version": "1.1.1",
+      "tools": 9,
+      "actions": 40,
+      "published": false,
+      "publish_mission": "MCP-3"
+    }
+  },
+  "operations": [
+    {
+      "id": "frontend/src/components/missions/MissionRunActivity.tsx#MissionRunActivity:GET:/missions/{mission.id}/logs",
+      "api_file": "frontend/src/components/missions/MissionRunActivity.tsx",
+      "operation": "MissionRunActivity",
+      "source_line": 23,
+      "method": "GET",
+      "path": "/api/v1/missions/{mission.id}/logs",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/missions/MissionRunActivity.tsx",
+        "frontend/src/pages/missions/[id].tsx"
+      ],
+      "mcp": "tracelab_mission_execution.logs",
+      "classification": "closed-MCP-1",
+      "baseline": "read-gap",
+      "rationale": "Bounded snapshot of persisted logs; an empty result is explicit and does not imply a live stream."
+    },
+    {
+      "id": "frontend/src/components/missions/MissionRunActivity.tsx#MissionRunActivity:GET:/missions/events/recent",
+      "api_file": "frontend/src/components/missions/MissionRunActivity.tsx",
+      "operation": "MissionRunActivity",
+      "source_line": 21,
+      "method": "GET",
+      "path": "/api/v1/missions/events/recent",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/missions/MissionRunActivity.tsx",
+        "frontend/src/pages/missions/[id].tsx"
+      ],
+      "mcp": "tracelab_mission_execution.events",
+      "classification": "closed-MCP-1",
+      "baseline": "read-gap",
+      "rationale": "Bounded snapshot of persisted events; an empty result is explicit and does not imply a live stream."
+    },
+    {
+      "id": "frontend/src/lib/api/admin-stats.ts#adminStatsApi.get:GET:/admin/stats",
+      "api_file": "frontend/src/lib/api/admin-stats.ts",
+      "operation": "adminStatsApi.get",
+      "source_line": 35,
+      "method": "GET",
+      "path": "/api/v1/admin/stats",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/observability.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/admin.ts#adminSpacesApi.addMember:POST:/admin/spaces/{spaceId}/members",
+      "api_file": "frontend/src/lib/api/admin.ts",
+      "operation": "adminSpacesApi.addMember",
+      "source_line": 89,
+      "method": "POST",
+      "path": "/api/v1/admin/spaces/{spaceId}/members",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/spaces.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/admin.ts#adminSpacesApi.assignProjectSpace:PATCH:/admin/projects/{projectId}/space",
+      "api_file": "frontend/src/lib/api/admin.ts",
+      "operation": "adminSpacesApi.assignProjectSpace",
+      "source_line": 97,
+      "method": "PATCH",
+      "path": "/api/v1/admin/projects/{projectId}/space",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/spaces.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/admin.ts#adminSpacesApi.create:POST:/admin/spaces",
+      "api_file": "frontend/src/lib/api/admin.ts",
+      "operation": "adminSpacesApi.create",
+      "source_line": 81,
+      "method": "POST",
+      "path": "/api/v1/admin/spaces",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/spaces.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/admin.ts#adminSpacesApi.list:GET:/admin/spaces",
+      "api_file": "frontend/src/lib/api/admin.ts",
+      "operation": "adminSpacesApi.list",
+      "source_line": 78,
+      "method": "GET",
+      "path": "/api/v1/admin/spaces",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/spaces.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/admin.ts#adminSpacesApi.listMembers:GET:/admin/spaces/{spaceId}/members",
+      "api_file": "frontend/src/lib/api/admin.ts",
+      "operation": "adminSpacesApi.listMembers",
+      "source_line": 84,
+      "method": "GET",
+      "path": "/api/v1/admin/spaces/{spaceId}/members",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/spaces.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/admin.ts#adminSpacesApi.removeMember:DELETE:/admin/spaces/{spaceId}/members/{userId}",
+      "api_file": "frontend/src/lib/api/admin.ts",
+      "operation": "adminSpacesApi.removeMember",
+      "source_line": 92,
+      "method": "DELETE",
+      "path": "/api/v1/admin/spaces/{spaceId}/members/{userId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/spaces.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/admin.ts#adminUsersApi.create:POST:/admin/users",
+      "api_file": "frontend/src/lib/api/admin.ts",
+      "operation": "adminUsersApi.create",
+      "source_line": 44,
+      "method": "POST",
+      "path": "/api/v1/admin/users",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/users.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/admin.ts#adminUsersApi.list:GET:/admin/users",
+      "api_file": "frontend/src/lib/api/admin.ts",
+      "operation": "adminUsersApi.list",
+      "source_line": 41,
+      "method": "GET",
+      "path": "/api/v1/admin/users",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/spaces.tsx",
+        "frontend/src/pages/admin/users.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/admin.ts#adminUsersApi.remove:DELETE:/admin/users/{userId}",
+      "api_file": "frontend/src/lib/api/admin.ts",
+      "operation": "adminUsersApi.remove",
+      "source_line": 53,
+      "method": "DELETE",
+      "path": "/api/v1/admin/users/{userId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/users.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/admin.ts#adminUsersApi.setActive:PATCH:/admin/users/{userId}/active",
+      "api_file": "frontend/src/lib/api/admin.ts",
+      "operation": "adminUsersApi.setActive",
+      "source_line": 50,
+      "method": "PATCH",
+      "path": "/api/v1/admin/users/{userId}/active",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/users.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/admin.ts#adminUsersApi.setRole:PATCH:/admin/users/{userId}/role",
+      "api_file": "frontend/src/lib/api/admin.ts",
+      "operation": "adminUsersApi.setRole",
+      "source_line": 47,
+      "method": "PATCH",
+      "path": "/api/v1/admin/users/{userId}/role",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/users.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/auth.ts#login:POST:/auth/login",
+      "api_file": "frontend/src/lib/api/auth.ts",
+      "operation": "login",
+      "source_line": 7,
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/contexts/AuthContext.tsx",
+        "frontend/src/pages/_app.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/auth.ts#refresh:POST:/auth/refresh",
+      "api_file": "frontend/src/lib/api/auth.ts",
+      "operation": "refresh",
+      "source_line": 23,
+      "method": "POST",
+      "path": "/api/v1/auth/refresh",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/contexts/AuthContext.tsx",
+        "frontend/src/pages/_app.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/auth.ts#register:POST:/auth/register",
+      "api_file": "frontend/src/lib/api/auth.ts",
+      "operation": "register",
+      "source_line": 15,
+      "method": "POST",
+      "path": "/api/v1/auth/register",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/contexts/AuthContext.tsx",
+        "frontend/src/pages/_app.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/collections.ts#collectionsApi.addChunk:POST:/collections/{collectionId}/chunks",
+      "api_file": "frontend/src/lib/api/collections.ts",
+      "operation": "collectionsApi.addChunk",
+      "source_line": 118,
+      "method": "POST",
+      "path": "/api/v1/collections/{collectionId}/chunks",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/AddToCollection.tsx",
+        "frontend/src/pages/documents/[id].tsx"
+      ],
+      "mcp": "tracelab_collection.add",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/collections.ts#collectionsApi.addDocument:POST:/collections/{collectionId}/documents",
+      "api_file": "frontend/src/lib/api/collections.ts",
+      "operation": "collectionsApi.addDocument",
+      "source_line": 70,
+      "method": "POST",
+      "path": "/api/v1/collections/{collectionId}/documents",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/AddToCollection.tsx",
+        "frontend/src/pages/documents/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "deferred-MCP-2",
+      "baseline": "action-gap",
+      "rationale": "Action inventory retained for MCP-2 disposition. Implement and validate the approved non-destructive action in MCP-2."
+    },
+    {
+      "id": "frontend/src/lib/api/collections.ts#collectionsApi.create:POST:/collections",
+      "api_file": "frontend/src/lib/api/collections.ts",
+      "operation": "collectionsApi.create",
+      "source_line": 90,
+      "method": "POST",
+      "path": "/api/v1/collections",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/AddToCollection.tsx",
+        "frontend/src/pages/collections/index.tsx",
+        "frontend/src/pages/documents/[id].tsx"
+      ],
+      "mcp": "tracelab_collection.create",
+      "classification": "closed-MCP-1",
+      "baseline": "partial",
+      "rationale": "Accepts and forwards collection instructions."
+    },
+    {
+      "id": "frontend/src/lib/api/collections.ts#collectionsApi.delete:DELETE:/collections/{collectionId}",
+      "api_file": "frontend/src/lib/api/collections.ts",
+      "operation": "collectionsApi.delete",
+      "source_line": 111,
+      "method": "DELETE",
+      "path": "/api/v1/collections/{collectionId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/collections/[id].tsx",
+        "frontend/src/pages/collections/index.tsx"
+      ],
+      "mcp": null,
+      "classification": "needs-derek",
+      "baseline": "action-gap",
+      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+    },
+    {
+      "id": "frontend/src/lib/api/collections.ts#collectionsApi.documents:GET:/collections/{collectionId}/documents",
+      "api_file": "frontend/src/lib/api/collections.ts",
+      "operation": "collectionsApi.documents",
+      "source_line": 67,
+      "method": "GET",
+      "path": "/api/v1/collections/{collectionId}/documents",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/collections/CollectionDocuments.tsx",
+        "frontend/src/pages/collections/[id].tsx"
+      ],
+      "mcp": "tracelab_collection.documents",
+      "classification": "closed-MCP-1",
+      "baseline": "read-gap",
+      "rationale": "Returns paginated linked documents with the server total."
+    },
+    {
+      "id": "frontend/src/lib/api/collections.ts#collectionsApi.exportMarkdown:GET:/collections/{collectionId}/export",
+      "api_file": "frontend/src/lib/api/collections.ts",
+      "operation": "collectionsApi.exportMarkdown",
+      "source_line": 136,
+      "method": "GET",
+      "path": "/api/v1/collections/{collectionId}/export",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/collections/[id].tsx"
+      ],
+      "mcp": "tracelab_collection.export",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/collections.ts#collectionsApi.get:GET:/collections/{collectionId}",
+      "api_file": "frontend/src/lib/api/collections.ts",
+      "operation": "collectionsApi.get",
+      "source_line": 97,
+      "method": "GET",
+      "path": "/api/v1/collections/{collectionId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/collections/[id].tsx"
+      ],
+      "mcp": "tracelab_collection.get",
+      "classification": "closed-MCP-1",
+      "baseline": "partial",
+      "rationale": "Preserves collection instructions on read."
+    },
+    {
+      "id": "frontend/src/lib/api/collections.ts#collectionsApi.list:GET:/collections",
+      "api_file": "frontend/src/lib/api/collections.ts",
+      "operation": "collectionsApi.list",
+      "source_line": 83,
+      "method": "GET",
+      "path": "/api/v1/collections",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/AddToCollection.tsx",
+        "frontend/src/components/projects/ProjectResources.tsx",
+        "frontend/src/pages/collections/index.tsx",
+        "frontend/src/pages/documents/[id].tsx",
+        "frontend/src/pages/projects/[id].tsx"
+      ],
+      "mcp": "tracelab_collection.list",
+      "classification": "closed-MCP-1",
+      "baseline": "partial",
+      "rationale": "Closes missing project_id/page/page_size forwarding."
+    },
+    {
+      "id": "frontend/src/lib/api/collections.ts#collectionsApi.missionSeed:GET:/collections/{collectionId}/mission-seed",
+      "api_file": "frontend/src/lib/api/collections.ts",
+      "operation": "collectionsApi.missionSeed",
+      "source_line": 76,
+      "method": "GET",
+      "path": "/api/v1/collections/{collectionId}/mission-seed",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/missions/new.tsx"
+      ],
+      "mcp": "tracelab_collection.mission_seed",
+      "classification": "closed-MCP-1",
+      "baseline": "read-gap",
+      "rationale": "Returns mission seed prose and references without rewriting authored URLs."
+    },
+    {
+      "id": "frontend/src/lib/api/collections.ts#collectionsApi.removeChunk:DELETE:/collections/{collectionId}/chunks/{chunkId}",
+      "api_file": "frontend/src/lib/api/collections.ts",
+      "operation": "collectionsApi.removeChunk",
+      "source_line": 125,
+      "method": "DELETE",
+      "path": "/api/v1/collections/{collectionId}/chunks/{chunkId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/collections/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "needs-derek",
+      "baseline": "action-gap",
+      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+    },
+    {
+      "id": "frontend/src/lib/api/collections.ts#collectionsApi.removeDocument:DELETE:/collections/{collectionId}/documents/{documentId}",
+      "api_file": "frontend/src/lib/api/collections.ts",
+      "operation": "collectionsApi.removeDocument",
+      "source_line": 73,
+      "method": "DELETE",
+      "path": "/api/v1/collections/{collectionId}/documents/{documentId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/collections/CollectionDocuments.tsx",
+        "frontend/src/pages/collections/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "needs-derek",
+      "baseline": "action-gap",
+      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+    },
+    {
+      "id": "frontend/src/lib/api/collections.ts#collectionsApi.update:PUT:/collections/{collectionId}",
+      "api_file": "frontend/src/lib/api/collections.ts",
+      "operation": "collectionsApi.update",
+      "source_line": 104,
+      "method": "PUT",
+      "path": "/api/v1/collections/{collectionId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/collections/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "deferred-MCP-2",
+      "baseline": "action-gap",
+      "rationale": "Action inventory retained for MCP-2 disposition. Implement and validate the approved non-destructive action in MCP-2."
+    },
+    {
+      "id": "frontend/src/lib/api/console.ts#clearCompletedCorrections:DELETE:/deepsearch/corrections/completed",
+      "api_file": "frontend/src/lib/api/console.ts",
+      "operation": "clearCompletedCorrections",
+      "source_line": 101,
+      "method": "DELETE",
+      "path": "/api/v1/deepsearch/corrections/completed",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/corrections.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/console.ts#getCorrectionStatus:GET:/deepsearch/corrections",
+      "api_file": "frontend/src/lib/api/console.ts",
+      "operation": "getCorrectionStatus",
+      "source_line": 48,
+      "method": "GET",
+      "path": "/api/v1/deepsearch/corrections",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/corrections.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/console.ts#getCorrectionTelemetry:GET:/deepsearch/corrections/telemetry",
+      "api_file": "frontend/src/lib/api/console.ts",
+      "operation": "getCorrectionTelemetry",
+      "source_line": 54,
+      "method": "GET",
+      "path": "/api/v1/deepsearch/corrections/telemetry",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/corrections.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/console.ts#getDeadLetterQueue:GET:/deepsearch/corrections/dead-letter",
+      "api_file": "frontend/src/lib/api/console.ts",
+      "operation": "getDeadLetterQueue",
+      "source_line": 115,
+      "method": "GET",
+      "path": "/api/v1/deepsearch/corrections/dead-letter",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/corrections.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/console.ts#getRelationshipContext:GET:/missions/{missionId}/related",
+      "api_file": "frontend/src/lib/api/console.ts",
+      "operation": "getRelationshipContext",
+      "source_line": 37,
+      "method": "GET",
+      "path": "/api/v1/missions/{missionId}/related",
+      "live": false,
+      "ui_consumers": [],
+      "mcp": null,
+      "classification": "dead-client-code",
+      "baseline": "dead-client-code",
+      "rationale": "No live page consumer. Retained in inventory, excluded from parity obligations."
+    },
+    {
+      "id": "frontend/src/lib/api/console.ts#getWorkerHealth:GET:/deepsearch/worker/health",
+      "api_file": "frontend/src/lib/api/console.ts",
+      "operation": "getWorkerHealth",
+      "source_line": 60,
+      "method": "GET",
+      "path": "/api/v1/deepsearch/worker/health",
+      "live": false,
+      "ui_consumers": [],
+      "mcp": null,
+      "classification": "dead-client-code",
+      "baseline": "dead-client-code",
+      "rationale": "No live page consumer. Retained in inventory, excluded from parity obligations."
+    },
+    {
+      "id": "frontend/src/lib/api/console.ts#processCorrections:POST:/deepsearch/corrections/process",
+      "api_file": "frontend/src/lib/api/console.ts",
+      "operation": "processCorrections",
+      "source_line": 91,
+      "method": "POST",
+      "path": "/api/v1/deepsearch/corrections/process",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/corrections.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/console.ts#triggerCorrections:POST:/deepsearch/corrections",
+      "api_file": "frontend/src/lib/api/console.ts",
+      "operation": "triggerCorrections",
+      "source_line": 80,
+      "method": "POST",
+      "path": "/api/v1/deepsearch/corrections",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/admin/corrections.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/deviceAuth.ts#approveDeviceGrant:POST:/auth/device/approve",
+      "api_file": "frontend/src/lib/api/deviceAuth.ts",
+      "operation": "approveDeviceGrant",
+      "source_line": 45,
+      "method": "POST",
+      "path": "/api/v1/auth/device/approve",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/device.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/deviceAuth.ts#denyDeviceGrant:POST:/auth/device/deny",
+      "api_file": "frontend/src/lib/api/deviceAuth.ts",
+      "operation": "denyDeviceGrant",
+      "source_line": 54,
+      "method": "POST",
+      "path": "/api/v1/auth/device/deny",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/device.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/deviceAuth.ts#previewDeviceGrant:GET:/auth/device/grants/{userCode}",
+      "api_file": "frontend/src/lib/api/deviceAuth.ts",
+      "operation": "previewDeviceGrant",
+      "source_line": 36,
+      "method": "GET",
+      "path": "/api/v1/auth/device/grants/{userCode}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/device.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/documents.ts#documentsApi.deleteDocument:DELETE:/documents/{documentId}",
+      "api_file": "frontend/src/lib/api/documents.ts",
+      "operation": "documentsApi.deleteDocument",
+      "source_line": 86,
+      "method": "DELETE",
+      "path": "/api/v1/documents/{documentId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/projects/ProjectResources.tsx",
+        "frontend/src/pages/documents/[id].tsx",
+        "frontend/src/pages/documents/index.tsx",
+        "frontend/src/pages/projects/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "needs-derek",
+      "baseline": "action-gap",
+      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+    },
+    {
+      "id": "frontend/src/lib/api/documents.ts#documentsApi.downloadDocument:GET:/documents/{documentId}/download",
+      "api_file": "frontend/src/lib/api/documents.ts",
+      "operation": "documentsApi.downloadDocument",
+      "source_line": 97,
+      "method": "GET",
+      "path": "/api/v1/documents/{documentId}/download",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/documents/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "read-gap",
+      "rationale": "Binary download stays REST-only; document.get_content supplies agent-readable text."
+    },
+    {
+      "id": "frontend/src/lib/api/documents.ts#documentsApi.getDocument:GET:/documents/{documentId}",
+      "api_file": "frontend/src/lib/api/documents.ts",
+      "operation": "documentsApi.getDocument",
+      "source_line": 37,
+      "method": "GET",
+      "path": "/api/v1/documents/{documentId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/documents/[id].tsx"
+      ],
+      "mcp": "tracelab_document.get_content",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/documents.ts#documentsApi.listChunks:GET:/documents/{documentId}/chunks",
+      "api_file": "frontend/src/lib/api/documents.ts",
+      "operation": "documentsApi.listChunks",
+      "source_line": 121,
+      "method": "GET",
+      "path": "/api/v1/documents/{documentId}/chunks",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/documents/[id].tsx"
+      ],
+      "mcp": "tracelab_document.get_content",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/documents.ts#documentsApi.listDocuments:GET:/documents",
+      "api_file": "frontend/src/lib/api/documents.ts",
+      "operation": "documentsApi.listDocuments",
+      "source_line": 30,
+      "method": "GET",
+      "path": "/api/v1/documents",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/projects/ProjectResources.tsx",
+        "frontend/src/features/search/SearchExperience.tsx",
+        "frontend/src/pages/documents/index.tsx",
+        "frontend/src/pages/projects/[id].tsx",
+        "frontend/src/pages/search/index.tsx"
+      ],
+      "mcp": "tracelab_document.list",
+      "classification": "closed-MCP-1",
+      "baseline": "read-gap",
+      "rationale": "Forwards project_id, processed (including false), search and pagination; uses server total."
+    },
+    {
+      "id": "frontend/src/lib/api/documents.ts#documentsApi.processDocument:POST:/documents/{documentId}/process",
+      "api_file": "frontend/src/lib/api/documents.ts",
+      "operation": "documentsApi.processDocument",
+      "source_line": 78,
+      "method": "POST",
+      "path": "/api/v1/documents/{documentId}/process",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/documents/DocumentUpload.tsx",
+        "frontend/src/components/projects/ProjectResources.tsx",
+        "frontend/src/pages/documents/[id].tsx",
+        "frontend/src/pages/documents/upload.tsx",
+        "frontend/src/pages/projects/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "deferred-MCP-2",
+      "baseline": "action-gap",
+      "rationale": "Action inventory retained for MCP-2 disposition. Implement and validate the approved non-destructive action in MCP-2."
+    },
+    {
+      "id": "frontend/src/lib/api/documents.ts#documentsApi.uploadDocument:POST:/documents/upload",
+      "api_file": "frontend/src/lib/api/documents.ts",
+      "operation": "documentsApi.uploadDocument",
+      "source_line": 52,
+      "method": "POST",
+      "path": "/api/v1/documents/upload",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/documents/DocumentUpload.tsx",
+        "frontend/src/components/projects/ProjectResources.tsx",
+        "frontend/src/pages/documents/upload.tsx",
+        "frontend/src/pages/projects/[id].tsx"
+      ],
+      "mcp": "tracelab_document.upload",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/evidence.ts#evidenceApi.get:GET:/evidence/{id}",
+      "api_file": "frontend/src/lib/api/evidence.ts",
+      "operation": "evidenceApi.get",
+      "source_line": 45,
+      "method": "GET",
+      "path": "/api/v1/evidence/{id}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/evidence/[id].tsx"
+      ],
+      "mcp": "tracelab_evidence.get",
+      "classification": "closed-MCP-1",
+      "baseline": "read-gap",
+      "rationale": "Reads full entry and relationships by entry_id without stripping provenance."
+    },
+    {
+      "id": "frontend/src/lib/api/evidence.ts#evidenceApi.list:GET:/evidence",
+      "api_file": "frontend/src/lib/api/evidence.ts",
+      "operation": "evidenceApi.list",
+      "source_line": 39,
+      "method": "GET",
+      "path": "/api/v1/evidence",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/evidence/EvidencePanel.tsx",
+        "frontend/src/components/evidence/ReportCitations.tsx",
+        "frontend/src/components/evidence/SessionNotes.tsx",
+        "frontend/src/components/projects/ProjectResources.tsx",
+        "frontend/src/pages/documents/[id].tsx",
+        "frontend/src/pages/evidence.tsx",
+        "frontend/src/pages/evidence/[id].tsx",
+        "frontend/src/pages/missions/[id].tsx",
+        "frontend/src/pages/projects/[id].tsx",
+        "frontend/src/pages/reports/[id].tsx"
+      ],
+      "mcp": "tracelab_evidence.list",
+      "classification": "closed-MCP-1",
+      "baseline": "partial",
+      "rationale": "Forwards tag, created_from, created_until, source_id, report_id and document_id."
+    },
+    {
+      "id": "frontend/src/lib/api/evidence.ts#evidenceApi.promote:POST:/evidence/promote",
+      "api_file": "frontend/src/lib/api/evidence.ts",
+      "operation": "evidenceApi.promote",
+      "source_line": 47,
+      "method": "POST",
+      "path": "/api/v1/evidence/promote",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/evidence/SessionNotes.tsx",
+        "frontend/src/pages/evidence.tsx",
+        "frontend/src/pages/evidence/[id].tsx"
+      ],
+      "mcp": "tracelab_evidence.promote",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/evidence.ts#evidenceApi.search:GET:/evidence/search",
+      "api_file": "frontend/src/lib/api/evidence.ts",
+      "operation": "evidenceApi.search",
+      "source_line": 42,
+      "method": "GET",
+      "path": "/api/v1/evidence/search",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/evidence.tsx"
+      ],
+      "mcp": "tracelab_evidence.search",
+      "classification": "closed-MCP-1",
+      "baseline": "partial",
+      "rationale": "Forwards tag, created_from, created_until, source_id, report_id and document_id."
+    },
+    {
+      "id": "frontend/src/lib/api/home.ts#homeApi.favorites:GET:/home/favorites",
+      "api_file": "frontend/src/lib/api/home.ts",
+      "operation": "homeApi.favorites",
+      "source_line": 41,
+      "method": "GET",
+      "path": "/api/v1/home/favorites",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/projects/FavoriteProjects.tsx",
+        "frontend/src/components/projects/ProjectFavorite.tsx",
+        "frontend/src/pages/index.tsx",
+        "frontend/src/pages/projects/[id].tsx"
+      ],
+      "mcp": "tracelab_home.favorites",
+      "classification": "closed-MCP-1",
+      "baseline": "read-gap",
+      "rationale": "Forwards project_id, page and page_size; preserves server total."
+    },
+    {
+      "id": "frontend/src/lib/api/home.ts#homeApi.get:GET:/home",
+      "api_file": "frontend/src/lib/api/home.ts",
+      "operation": "homeApi.get",
+      "source_line": 44,
+      "method": "GET",
+      "path": "/api/v1/home",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/index.tsx",
+        "frontend/src/pages/missions/index.tsx",
+        "frontend/src/pages/missions/queue.tsx"
+      ],
+      "mcp": "tracelab_home.snapshot",
+      "classification": "closed-MCP-1",
+      "baseline": "read-gap",
+      "rationale": "Caller-scoped snapshot preserves section totals and server hrefs; no MCP cache."
+    },
+    {
+      "id": "frontend/src/lib/api/home.ts#homeApi.pinProject:PUT:/home/favorites/projects/{id}",
+      "api_file": "frontend/src/lib/api/home.ts",
+      "operation": "homeApi.pinProject",
+      "source_line": 42,
+      "method": "PUT",
+      "path": "/api/v1/home/favorites/projects/{id}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/projects/ProjectFavorite.tsx",
+        "frontend/src/pages/projects/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "deferred-MCP-2",
+      "baseline": "action-gap",
+      "rationale": "Action inventory retained for MCP-2 disposition. Decision 426 keeps this per-user preference/acknowledgement write REST/UI-only; this deferral does not authorize exposing it."
+    },
+    {
+      "id": "frontend/src/lib/api/home.ts#homeApi.review:PUT:/home/missions/{mission.id}/review",
+      "api_file": "frontend/src/lib/api/home.ts",
+      "operation": "homeApi.review",
+      "source_line": 45,
+      "method": "PUT",
+      "path": "/api/v1/home/missions/{mission.id}/review",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/index.tsx",
+        "frontend/src/pages/missions/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "deferred-MCP-2",
+      "baseline": "action-gap",
+      "rationale": "Action inventory retained for MCP-2 disposition. Decision 426 keeps this per-user preference/acknowledgement write REST/UI-only; this deferral does not authorize exposing it."
+    },
+    {
+      "id": "frontend/src/lib/api/home.ts#homeApi.unpinProject:DELETE:/home/favorites/projects/{id}",
+      "api_file": "frontend/src/lib/api/home.ts",
+      "operation": "homeApi.unpinProject",
+      "source_line": 43,
+      "method": "DELETE",
+      "path": "/api/v1/home/favorites/projects/{id}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/projects/ProjectFavorite.tsx",
+        "frontend/src/pages/projects/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "deferred-MCP-2",
+      "baseline": "action-gap",
+      "rationale": "Action inventory retained for MCP-2 disposition. Decision 426 keeps this per-user preference/acknowledgement write REST/UI-only; this deferral does not authorize exposing it."
+    },
+    {
+      "id": "frontend/src/lib/api/missions.ts#createMission:POST:/mission-protocols",
+      "api_file": "frontend/src/lib/api/missions.ts",
+      "operation": "createMission",
+      "source_line": 117,
+      "method": "POST",
+      "path": "/api/v1/mission-protocols",
+      "live": false,
+      "ui_consumers": [],
+      "mcp": null,
+      "classification": "dead-client-code",
+      "baseline": "dead-client-code",
+      "rationale": "No live page consumer. Retained in inventory, excluded from parity obligations."
+    },
+    {
+      "id": "frontend/src/lib/api/missions.ts#fetchMission:GET:/mission-protocols/{missionId}",
+      "api_file": "frontend/src/lib/api/missions.ts",
+      "operation": "fetchMission",
+      "source_line": 113,
+      "method": "GET",
+      "path": "/api/v1/mission-protocols/{missionId}",
+      "live": false,
+      "ui_consumers": [],
+      "mcp": null,
+      "classification": "dead-client-code",
+      "baseline": "dead-client-code",
+      "rationale": "No live page consumer. Retained in inventory, excluded from parity obligations."
+    },
+    {
+      "id": "frontend/src/lib/api/missions.ts#fetchMissions:GET:/mission-protocols",
+      "api_file": "frontend/src/lib/api/missions.ts",
+      "operation": "fetchMissions",
+      "source_line": 108,
+      "method": "GET",
+      "path": "/api/v1/mission-protocols",
+      "live": false,
+      "ui_consumers": [],
+      "mcp": null,
+      "classification": "dead-client-code",
+      "baseline": "dead-client-code",
+      "rationale": "No live page consumer. Retained in inventory, excluded from parity obligations."
+    },
+    {
+      "id": "frontend/src/lib/api/missions.ts#fetchQualityReport:GET:/quality/missions/{missionId}/quality",
+      "api_file": "frontend/src/lib/api/missions.ts",
+      "operation": "fetchQualityReport",
+      "source_line": 125,
+      "method": "GET",
+      "path": "/api/v1/quality/missions/{missionId}/quality",
+      "live": false,
+      "ui_consumers": [],
+      "mcp": null,
+      "classification": "dead-client-code",
+      "baseline": "dead-client-code",
+      "rationale": "No live page consumer. Retained in inventory, excluded from parity obligations."
+    },
+    {
+      "id": "frontend/src/lib/api/missions.ts#missionsApi.create:POST:/missions",
+      "api_file": "frontend/src/lib/api/missions.ts",
+      "operation": "missionsApi.create",
+      "source_line": 50,
+      "method": "POST",
+      "path": "/api/v1/missions",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/missions/MissionForm.tsx",
+        "frontend/src/pages/missions/[id].tsx",
+        "frontend/src/pages/missions/new.tsx"
+      ],
+      "mcp": "tracelab_mission.create",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/missions.ts#missionsApi.delete:DELETE:/missions/{missionId}",
+      "api_file": "frontend/src/lib/api/missions.ts",
+      "operation": "missionsApi.delete",
+      "source_line": 64,
+      "method": "DELETE",
+      "path": "/api/v1/missions/{missionId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/missions/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "needs-derek",
+      "baseline": "action-gap",
+      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+    },
+    {
+      "id": "frontend/src/lib/api/missions.ts#missionsApi.get:GET:/missions/{missionId}",
+      "api_file": "frontend/src/lib/api/missions.ts",
+      "operation": "missionsApi.get",
+      "source_line": 43,
+      "method": "GET",
+      "path": "/api/v1/missions/{missionId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/missions/MissionForm.tsx",
+        "frontend/src/pages/missions/[id].tsx",
+        "frontend/src/pages/missions/new.tsx"
+      ],
+      "mcp": "tracelab_mission.get",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/missions.ts#missionsApi.list:GET:/missions",
+      "api_file": "frontend/src/lib/api/missions.ts",
+      "operation": "missionsApi.list",
+      "source_line": 28,
+      "method": "GET",
+      "path": "/api/v1/missions",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/projects/ProjectResources.tsx",
+        "frontend/src/pages/missions/index.tsx",
+        "frontend/src/pages/missions/queue.tsx",
+        "frontend/src/pages/projects/[id].tsx"
+      ],
+      "mcp": "tracelab_mission.list",
+      "classification": "closed-MCP-1",
+      "baseline": "partial",
+      "rationale": "Closes missing view=all|attention|queue forwarding."
+    },
+    {
+      "id": "frontend/src/lib/api/missions.ts#missionsApi.previewContract:GET:/missions/{missionId}/contract-preview",
+      "api_file": "frontend/src/lib/api/missions.ts",
+      "operation": "missionsApi.previewContract",
+      "source_line": 81,
+      "method": "GET",
+      "path": "/api/v1/missions/{missionId}/contract-preview",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/missions/ContractPreviewPanel.tsx",
+        "frontend/src/components/missions/MissionForm.tsx",
+        "frontend/src/pages/missions/[id].tsx",
+        "frontend/src/pages/missions/new.tsx"
+      ],
+      "mcp": "tracelab_mission_execution.preview",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/missions.ts#missionsApi.promoteReport:POST:/missions/{missionId}/promote-report",
+      "api_file": "frontend/src/lib/api/missions.ts",
+      "operation": "missionsApi.promoteReport",
+      "source_line": 92,
+      "method": "POST",
+      "path": "/api/v1/missions/{missionId}/promote-report",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/missions/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "deferred-MCP-2",
+      "baseline": "action-gap",
+      "rationale": "Action inventory retained for MCP-2 disposition. Implement and validate the approved non-destructive action in MCP-2."
+    },
+    {
+      "id": "frontend/src/lib/api/missions.ts#missionsApi.submitToDeepSearch:POST:/missions/{missionId}/submit",
+      "api_file": "frontend/src/lib/api/missions.ts",
+      "operation": "missionsApi.submitToDeepSearch",
+      "source_line": 71,
+      "method": "POST",
+      "path": "/api/v1/missions/{missionId}/submit",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/missions/MissionForm.tsx",
+        "frontend/src/pages/missions/[id].tsx",
+        "frontend/src/pages/missions/new.tsx"
+      ],
+      "mcp": "tracelab_mission_execution.submit",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/missions.ts#missionsApi.update:PATCH:/missions/{missionId}",
+      "api_file": "frontend/src/lib/api/missions.ts",
+      "operation": "missionsApi.update",
+      "source_line": 57,
+      "method": "PATCH",
+      "path": "/api/v1/missions/{missionId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/missions/MissionForm.tsx",
+        "frontend/src/pages/missions/[id].tsx",
+        "frontend/src/pages/missions/new.tsx"
+      ],
+      "mcp": "tracelab_mission.update",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/missions.ts#updateMission:PUT:/mission-protocols/{missionId}",
+      "api_file": "frontend/src/lib/api/missions.ts",
+      "operation": "updateMission",
+      "source_line": 121,
+      "method": "PUT",
+      "path": "/api/v1/mission-protocols/{missionId}",
+      "live": false,
+      "ui_consumers": [],
+      "mcp": null,
+      "classification": "dead-client-code",
+      "baseline": "dead-client-code",
+      "rationale": "No live page consumer. Retained in inventory, excluded from parity obligations."
+    },
+    {
+      "id": "frontend/src/lib/api/navigation.ts#navigationApi.search:GET:/navigation/search",
+      "api_file": "frontend/src/lib/api/navigation.ts",
+      "operation": "navigationApi.search",
+      "source_line": 10,
+      "method": "GET",
+      "path": "/api/v1/navigation/search",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/AppShell.tsx",
+        "frontend/src/components/CommandPalette.tsx",
+        "frontend/src/pages/_app.tsx"
+      ],
+      "mcp": "tracelab_search.navigate",
+      "classification": "closed-MCP-1",
+      "baseline": "read-gap",
+      "rationale": "Forwards q, entity_type, page and page_size; returns canonical entity links."
+    },
+    {
+      "id": "frontend/src/lib/api/projects.ts#projectsApi.createProject:POST:/projects",
+      "api_file": "frontend/src/lib/api/projects.ts",
+      "operation": "projectsApi.createProject",
+      "source_line": 47,
+      "method": "POST",
+      "path": "/api/v1/projects",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/projects/index.tsx"
+      ],
+      "mcp": "tracelab_project.create",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/projects.ts#projectsApi.deleteProject:DELETE:/projects/{projectId}",
+      "api_file": "frontend/src/lib/api/projects.ts",
+      "operation": "projectsApi.deleteProject",
+      "source_line": 55,
+      "method": "DELETE",
+      "path": "/api/v1/projects/{projectId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/projects/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "needs-derek",
+      "baseline": "action-gap",
+      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+    },
+    {
+      "id": "frontend/src/lib/api/projects.ts#projectsApi.getProject:GET:/projects/{projectId}",
+      "api_file": "frontend/src/lib/api/projects.ts",
+      "operation": "projectsApi.getProject",
+      "source_line": 43,
+      "method": "GET",
+      "path": "/api/v1/projects/{projectId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/projects/[id].tsx"
+      ],
+      "mcp": "tracelab_project.get",
+      "classification": "closed-MCP-1",
+      "baseline": "read-gap",
+      "rationale": "Returns the complete project response and a canonical browser link."
+    },
+    {
+      "id": "frontend/src/lib/api/projects.ts#projectsApi.getProjectStats:GET:/projects/{projectId}/stats",
+      "api_file": "frontend/src/lib/api/projects.ts",
+      "operation": "projectsApi.getProjectStats",
+      "source_line": 59,
+      "method": "GET",
+      "path": "/api/v1/projects/{projectId}/stats",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/projects/[id].tsx"
+      ],
+      "mcp": "tracelab_project.stats",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/projects.ts#projectsApi.listProjects:GET:/projects",
+      "api_file": "frontend/src/lib/api/projects.ts",
+      "operation": "projectsApi.listProjects",
+      "source_line": 28,
+      "method": "GET",
+      "path": "/api/v1/projects",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/missions/MissionForm.tsx",
+        "frontend/src/features/search/SearchExperience.tsx",
+        "frontend/src/pages/admin/spaces.tsx",
+        "frontend/src/pages/documents/index.tsx",
+        "frontend/src/pages/documents/upload.tsx",
+        "frontend/src/pages/evidence.tsx",
+        "frontend/src/pages/missions/[id].tsx",
+        "frontend/src/pages/missions/index.tsx",
+        "frontend/src/pages/missions/new.tsx",
+        "frontend/src/pages/missions/queue.tsx",
+        "frontend/src/pages/projects/index.tsx",
+        "frontend/src/pages/reports/index.tsx",
+        "frontend/src/pages/search/index.tsx"
+      ],
+      "mcp": "tracelab_project.list",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/projects.ts#projectsApi.updateProject:PUT:/projects/{projectId}",
+      "api_file": "frontend/src/lib/api/projects.ts",
+      "operation": "projectsApi.updateProject",
+      "source_line": 51,
+      "method": "PUT",
+      "path": "/api/v1/projects/{projectId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/projects/[id].tsx"
+      ],
+      "mcp": "tracelab_project.update",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/reports.ts#reportsApi.create:POST:/reports",
+      "api_file": "frontend/src/lib/api/reports.ts",
+      "operation": "reportsApi.create",
+      "source_line": 96,
+      "method": "POST",
+      "path": "/api/v1/reports",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/CreateReportModal.tsx",
+        "frontend/src/pages/collections/[id].tsx"
+      ],
+      "mcp": "tracelab_report.create",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/reports.ts#reportsApi.delete:DELETE:/reports/{reportId}",
+      "api_file": "frontend/src/lib/api/reports.ts",
+      "operation": "reportsApi.delete",
+      "source_line": 117,
+      "method": "DELETE",
+      "path": "/api/v1/reports/{reportId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/reports/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "needs-derek",
+      "baseline": "action-gap",
+      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+    },
+    {
+      "id": "frontend/src/lib/api/reports.ts#reportsApi.exportReport:GET:/reports/{reportId}/export",
+      "api_file": "frontend/src/lib/api/reports.ts",
+      "operation": "reportsApi.exportReport",
+      "source_line": 128,
+      "method": "GET",
+      "path": "/api/v1/reports/{reportId}/export",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/reports/[id].tsx"
+      ],
+      "mcp": "tracelab_report.export",
+      "classification": "closed-MCP-1",
+      "baseline": "partial",
+      "rationale": "Explicit md/json/txt uses REST export and preserves bytes; no format preserves legacy report.content bytes."
+    },
+    {
+      "id": "frontend/src/lib/api/reports.ts#reportsApi.get:GET:/reports/{reportId}",
+      "api_file": "frontend/src/lib/api/reports.ts",
+      "operation": "reportsApi.get",
+      "source_line": 103,
+      "method": "GET",
+      "path": "/api/v1/reports/{reportId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/reports/[id].tsx"
+      ],
+      "mcp": "tracelab_report.get",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/reports.ts#reportsApi.list:GET:/reports",
+      "api_file": "frontend/src/lib/api/reports.ts",
+      "operation": "reportsApi.list",
+      "source_line": 89,
+      "method": "GET",
+      "path": "/api/v1/reports",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/projects/ProjectResources.tsx",
+        "frontend/src/pages/projects/[id].tsx",
+        "frontend/src/pages/reports/index.tsx"
+      ],
+      "mcp": "tracelab_report.list",
+      "classification": "covered",
+      "baseline": "covered",
+      "rationale": "Existing action supplies this live UI operation through the authenticated REST API."
+    },
+    {
+      "id": "frontend/src/lib/api/reports.ts#reportsApi.update:PUT:/reports/{reportId}",
+      "api_file": "frontend/src/lib/api/reports.ts",
+      "operation": "reportsApi.update",
+      "source_line": 110,
+      "method": "PUT",
+      "path": "/api/v1/reports/{reportId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/reports/[id].tsx"
+      ],
+      "mcp": null,
+      "classification": "deferred-MCP-2",
+      "baseline": "action-gap",
+      "rationale": "Action inventory retained for MCP-2 disposition. Implement and validate the approved non-destructive action in MCP-2."
+    },
+    {
+      "id": "frontend/src/lib/api/savedSearches.ts#savedSearchesApi.create:POST:/saved-searches",
+      "api_file": "frontend/src/lib/api/savedSearches.ts",
+      "operation": "savedSearchesApi.create",
+      "source_line": 18,
+      "method": "POST",
+      "path": "/api/v1/saved-searches",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/SaveSearchButton.tsx",
+        "frontend/src/features/search/SearchExperience.tsx",
+        "frontend/src/pages/search/index.tsx"
+      ],
+      "mcp": null,
+      "classification": "deferred-MCP-2",
+      "baseline": "action-gap",
+      "rationale": "Action inventory retained for MCP-2 disposition. Decision 426 keeps this per-user preference/acknowledgement write REST/UI-only; this deferral does not authorize exposing it."
+    },
+    {
+      "id": "frontend/src/lib/api/savedSearches.ts#savedSearchesApi.execute:POST:/saved-searches/{id}/execute",
+      "api_file": "frontend/src/lib/api/savedSearches.ts",
+      "operation": "savedSearchesApi.execute",
+      "source_line": 30,
+      "method": "POST",
+      "path": "/api/v1/saved-searches/{id}/execute",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/features/search/SearchExperience.tsx",
+        "frontend/src/pages/search/index.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "read-gap",
+      "rationale": "Saved-search execution uses per-user UI preferences (decision 426); agents issue explicit queries."
+    },
+    {
+      "id": "frontend/src/lib/api/savedSearches.ts#savedSearchesApi.list:GET:/saved-searches",
+      "api_file": "frontend/src/lib/api/savedSearches.ts",
+      "operation": "savedSearchesApi.list",
+      "source_line": 14,
+      "method": "GET",
+      "path": "/api/v1/saved-searches",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/AppShell.tsx",
+        "frontend/src/components/CommandPalette.tsx",
+        "frontend/src/features/search/SearchExperience.tsx",
+        "frontend/src/pages/_app.tsx",
+        "frontend/src/pages/saved-searches.tsx",
+        "frontend/src/pages/search/index.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "read-gap",
+      "rationale": "Saved-search preferences are per-user UI state (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/savedSearches.ts#savedSearchesApi.remove:DELETE:/saved-searches/{id}",
+      "api_file": "frontend/src/lib/api/savedSearches.ts",
+      "operation": "savedSearchesApi.remove",
+      "source_line": 26,
+      "method": "DELETE",
+      "path": "/api/v1/saved-searches/{id}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/features/search/SearchExperience.tsx",
+        "frontend/src/pages/saved-searches.tsx",
+        "frontend/src/pages/search/index.tsx"
+      ],
+      "mcp": null,
+      "classification": "deferred-MCP-2",
+      "baseline": "action-gap",
+      "rationale": "Action inventory retained for MCP-2 disposition. Decision 426 keeps this per-user preference/acknowledgement write REST/UI-only; this deferral does not authorize exposing it."
+    },
+    {
+      "id": "frontend/src/lib/api/savedSearches.ts#savedSearchesApi.update:PUT:/saved-searches/{id}",
+      "api_file": "frontend/src/lib/api/savedSearches.ts",
+      "operation": "savedSearchesApi.update",
+      "source_line": 22,
+      "method": "PUT",
+      "path": "/api/v1/saved-searches/{id}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/saved-searches.tsx"
+      ],
+      "mcp": null,
+      "classification": "deferred-MCP-2",
+      "baseline": "action-gap",
+      "rationale": "Action inventory retained for MCP-2 disposition. Decision 426 keeps this per-user preference/acknowledgement write REST/UI-only; this deferral does not authorize exposing it."
+    },
+    {
+      "id": "frontend/src/lib/api/search.ts#searchApi.clearHistory:DELETE:/search/history",
+      "api_file": "frontend/src/lib/api/search.ts",
+      "operation": "searchApi.clearHistory",
+      "source_line": 36,
+      "method": "DELETE",
+      "path": "/api/v1/search/history",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/features/search/SearchExperience.tsx",
+        "frontend/src/pages/search/index.tsx"
+      ],
+      "mcp": null,
+      "classification": "deferred-MCP-2",
+      "baseline": "action-gap",
+      "rationale": "Action inventory retained for MCP-2 disposition. Decision 426 keeps this per-user preference/acknowledgement write REST/UI-only; this deferral does not authorize exposing it."
+    },
+    {
+      "id": "frontend/src/lib/api/search.ts#searchApi.facets:POST:/facets",
+      "api_file": "frontend/src/lib/api/search.ts",
+      "operation": "searchApi.facets",
+      "source_line": 20,
+      "method": "POST",
+      "path": "/api/v1/facets",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/features/search/SearchExperience.tsx",
+        "frontend/src/pages/search/index.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "read-gap",
+      "rationale": "Facet counts support the interactive search filter UI; raw knowledge/PEDR results remain agent-facing."
+    },
+    {
+      "id": "frontend/src/lib/api/search.ts#searchApi.history:GET:/search/history",
+      "api_file": "frontend/src/lib/api/search.ts",
+      "operation": "searchApi.history",
+      "source_line": 32,
+      "method": "GET",
+      "path": "/api/v1/search/history",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/AppShell.tsx",
+        "frontend/src/components/CommandPalette.tsx",
+        "frontend/src/features/search/SearchExperience.tsx",
+        "frontend/src/pages/_app.tsx",
+        "frontend/src/pages/search/index.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "read-gap",
+      "rationale": "Per-user search history is UI state (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/search.ts#searchApi.pedrSearch:POST:/pedr/search",
+      "api_file": "frontend/src/lib/api/search.ts",
+      "operation": "searchApi.pedrSearch",
+      "source_line": 48,
+      "method": "POST",
+      "path": "/api/v1/pedr/search",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/features/search/SearchExperience.tsx",
+        "frontend/src/pages/search/index.tsx"
+      ],
+      "mcp": "tracelab_search.pedr",
+      "classification": "closed-MCP-1",
+      "baseline": "read-gap",
+      "rationale": "Decision 435: user approved optional PEDR with graph toggle and UI filters after live verification; knowledge remains plain retrieval."
+    },
+    {
+      "id": "frontend/src/lib/api/search.ts#searchApi.ragQuery:POST:/search",
+      "api_file": "frontend/src/lib/api/search.ts",
+      "operation": "searchApi.ragQuery",
+      "source_line": 28,
+      "method": "POST",
+      "path": "/api/v1/search",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/features/search/SearchExperience.tsx",
+        "frontend/src/pages/search/index.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "read-gap",
+      "rationale": "LLM answer generation overlaps collection synthesis and is not a retrieval read; stays REST-only by design."
+    },
+    {
+      "id": "frontend/src/lib/api/search.ts#searchApi.replay:POST:/search/replay/{historyId}",
+      "api_file": "frontend/src/lib/api/search.ts",
+      "operation": "searchApi.replay",
+      "source_line": 40,
+      "method": "POST",
+      "path": "/api/v1/search/replay/{historyId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/features/search/SearchExperience.tsx",
+        "frontend/src/pages/search/index.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "read-gap",
+      "rationale": "Search-history replay is UI state (decision 426); agents can issue explicit knowledge or PEDR queries."
+    },
+    {
+      "id": "frontend/src/lib/api/search.ts#searchApi.semanticSearch:POST:/retrieval/search",
+      "api_file": "frontend/src/lib/api/search.ts",
+      "operation": "searchApi.semanticSearch",
+      "source_line": 24,
+      "method": "POST",
+      "path": "/api/v1/retrieval/search",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/features/search/SearchExperience.tsx",
+        "frontend/src/pages/search/index.tsx"
+      ],
+      "mcp": "tracelab_search.knowledge",
+      "classification": "closed-MCP-1",
+      "baseline": "partial",
+      "rationale": "Decision 435 also closes source_type/date_from/date_to forwarding to plain retrieval."
+    },
+    {
+      "id": "frontend/src/lib/api/settings.ts#apiKeysApi.create:POST:/auth/api-keys",
+      "api_file": "frontend/src/lib/api/settings.ts",
+      "operation": "apiKeysApi.create",
+      "source_line": 58,
+      "method": "POST",
+      "path": "/api/v1/auth/api-keys",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/settings.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/settings.ts#apiKeysApi.delete:DELETE:/auth/api-keys/{keyId}",
+      "api_file": "frontend/src/lib/api/settings.ts",
+      "operation": "apiKeysApi.delete",
+      "source_line": 61,
+      "method": "DELETE",
+      "path": "/api/v1/auth/api-keys/{keyId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/settings.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/settings.ts#apiKeysApi.list:GET:/auth/api-keys",
+      "api_file": "frontend/src/lib/api/settings.ts",
+      "operation": "apiKeysApi.list",
+      "source_line": 55,
+      "method": "GET",
+      "path": "/api/v1/auth/api-keys",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/settings.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/settings.ts#inviteCodesApi.create:POST:/auth/invite-codes",
+      "api_file": "frontend/src/lib/api/settings.ts",
+      "operation": "inviteCodesApi.create",
+      "source_line": 86,
+      "method": "POST",
+      "path": "/api/v1/auth/invite-codes",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/settings.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/settings.ts#inviteCodesApi.delete:DELETE:/auth/invite-codes/{codeId}",
+      "api_file": "frontend/src/lib/api/settings.ts",
+      "operation": "inviteCodesApi.delete",
+      "source_line": 89,
+      "method": "DELETE",
+      "path": "/api/v1/auth/invite-codes/{codeId}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/settings.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/settings.ts#inviteCodesApi.list:GET:/auth/invite-codes",
+      "api_file": "frontend/src/lib/api/settings.ts",
+      "operation": "inviteCodesApi.list",
+      "source_line": 83,
+      "method": "GET",
+      "path": "/api/v1/auth/invite-codes",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/settings.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/settings.ts#profileApi.get:GET:/auth/me",
+      "api_file": "frontend/src/lib/api/settings.ts",
+      "operation": "profileApi.get",
+      "source_line": 26,
+      "method": "GET",
+      "path": "/api/v1/auth/me",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/contexts/RoleContext.tsx",
+        "frontend/src/pages/_app.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/settings.ts#profileApi.update:PATCH:/auth/me",
+      "api_file": "frontend/src/lib/api/settings.ts",
+      "operation": "profileApi.update",
+      "source_line": 29,
+      "method": "PATCH",
+      "path": "/api/v1/auth/me",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/settings.tsx"
+      ],
+      "mcp": null,
+      "classification": "rest-only-by-design",
+      "baseline": "auth-admin",
+      "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    }
+  ],
+  "mission_id": "MCP-1",
+  "sprint_id": "sprint-52",
+  "source_merge": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+  "source_pr": 294,
+  "audit_command": "node scripts/mcp_parity_audit.mjs",
+  "audit_intent_tests": {
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0
+  },
+  "ci_job": "mcp-package"
+}

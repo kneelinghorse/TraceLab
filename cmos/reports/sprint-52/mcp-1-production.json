@@ -1,0 +1,903 @@
+{
+  "started_at": "2026-09-14T16:23:00.625Z",
+  "api": "https://api.tracelab.aquex.ai",
+  "frontend": "https://tracelab.aquex.ai",
+  "source_merge": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+  "read_only": true,
+  "fixture_ids": {
+    "project": "041489e1-bb62-4bbe-bb57-90a924fce867",
+    "document": "2f54e4ba-1ff2-4421-a632-172fe67e80a8",
+    "collection": "a3e6d809-af90-4652-903f-5ce5c8842bf8",
+    "report": "1ff22d77-fb90-4220-8d74-34fd5526dab7",
+    "evidence": "3c162ea5-5d4c-4ced-bd20-5c882c46e321",
+    "mission": "27cbe849-a801-49ef-8cb5-bfa891ade2bd",
+    "evidence_project": "8a5e3763-8249-4194-97d0-cda0e5ff0672"
+  },
+  "checks": [
+    {
+      "label": "source registry",
+      "started_at": "2026-09-14T16:23:00.752Z",
+      "tools": 9,
+      "actions": 40,
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:00.755Z"
+    },
+    {
+      "label": "home.snapshot server total and links",
+      "started_at": "2026-09-14T16:23:00.755Z",
+      "mcp_missions_total": 435,
+      "rest_missions_total": 435,
+      "generated_links": 24,
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:01.510Z"
+    },
+    {
+      "label": "home.favorites scoped page",
+      "started_at": "2026-09-14T16:23:01.510Z",
+      "total": 0,
+      "items": 0,
+      "generated_links": 0,
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:01.948Z"
+    },
+    {
+      "label": "search.navigate entity filter",
+      "started_at": "2026-09-14T16:23:01.948Z",
+      "groups": [
+        {
+          "entity_type": "project",
+          "total": 1
+        }
+      ],
+      "generated_links": 1,
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:02.629Z"
+    },
+    {
+      "label": "project.get full details",
+      "started_at": "2026-09-14T16:23:02.630Z",
+      "id": "041489e1-bb62-4bbe-bb57-90a924fce867",
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:03.050Z"
+    },
+    {
+      "label": "document.list processed=undefined",
+      "started_at": "2026-09-14T16:23:03.050Z",
+      "mcp_total": 5,
+      "rest_total": 5,
+      "items": 2,
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:03.480Z"
+    },
+    {
+      "label": "document.list processed=true",
+      "started_at": "2026-09-14T16:23:03.481Z",
+      "mcp_total": 5,
+      "rest_total": 5,
+      "items": 2,
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:03.917Z"
+    },
+    {
+      "label": "document.list processed=false",
+      "started_at": "2026-09-14T16:23:03.917Z",
+      "mcp_total": 0,
+      "rest_total": 0,
+      "items": 0,
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:04.346Z"
+    },
+    {
+      "label": "evidence.get preserves provenance and relationships",
+      "started_at": "2026-09-14T16:23:04.348Z",
+      "id": "3c162ea5-5d4c-4ced-bd20-5c882c46e321",
+      "generated_links": 1,
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:04.792Z"
+    },
+    {
+      "label": "collection.documents server total",
+      "started_at": "2026-09-14T16:23:04.793Z",
+      "total": 2,
+      "items": 2,
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:05.251Z"
+    },
+    {
+      "label": "collection.mission_seed authored inputs",
+      "started_at": "2026-09-14T16:23:05.251Z",
+      "references": 2,
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:05.683Z"
+    },
+    {
+      "label": "mission_execution.logs",
+      "started_at": "2026-09-14T16:23:05.684Z",
+      "rows": 10,
+      "empty": false,
+      "message": "Recorded log lines; live streaming is dormant.",
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:06.169Z"
+    },
+    {
+      "label": "mission_execution.events",
+      "started_at": "2026-09-14T16:23:06.172Z",
+      "rows": 0,
+      "empty": true,
+      "message": "No recent events are available.",
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:06.623Z"
+    },
+    {
+      "label": "mission.list view=all",
+      "started_at": "2026-09-14T16:23:06.625Z",
+      "total": 4,
+      "items": 2,
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:07.157Z"
+    },
+    {
+      "label": "mission.list view=attention",
+      "started_at": "2026-09-14T16:23:07.158Z",
+      "total": 4,
+      "items": 2,
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:07.907Z"
+    },
+    {
+      "label": "mission.list view=queue",
+      "started_at": "2026-09-14T16:23:07.908Z",
+      "total": 0,
+      "items": 0,
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:08.345Z"
+    },
+    {
+      "label": "collection.list project scope and page",
+      "started_at": "2026-09-14T16:23:08.345Z",
+      "total": 0,
+      "items": 0,
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:08.812Z"
+    },
+    {
+      "label": "collection.get instructions",
+      "started_at": "2026-09-14T16:23:08.813Z",
+      "instructions_present": true,
+      "instructions_bytes": 253,
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:09.260Z"
+    },
+    {
+      "label": "evidence.list source filters",
+      "started_at": "2026-09-14T16:23:09.260Z",
+      "entries": 1,
+      "filters": [
+        "project_id",
+        "source_id",
+        "tag",
+        "created_from",
+        "created_until",
+        "page",
+        "page_size"
+      ],
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:10.198Z"
+    },
+    {
+      "label": "evidence.list report filters",
+      "started_at": "2026-09-14T16:23:10.199Z",
+      "entries": 2,
+      "filters": [
+        "project_id",
+        "report_id",
+        "created_from",
+        "created_until",
+        "page",
+        "page_size"
+      ],
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:11.110Z"
+    },
+    {
+      "label": "evidence.list document filters",
+      "started_at": "2026-09-14T16:23:11.111Z",
+      "entries": 2,
+      "filters": [
+        "project_id",
+        "document_id",
+        "created_from",
+        "created_until",
+        "page",
+        "page_size"
+      ],
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:12.057Z"
+    },
+    {
+      "label": "evidence.search source filters",
+      "started_at": "2026-09-14T16:23:12.058Z",
+      "entries": 0,
+      "filters": [
+        "project_id",
+        "source_id",
+        "tag",
+        "created_from",
+        "created_until",
+        "page",
+        "page_size",
+        "q"
+      ],
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:12.959Z"
+    },
+    {
+      "label": "evidence.search report filters",
+      "started_at": "2026-09-14T16:23:12.960Z",
+      "entries": 2,
+      "filters": [
+        "project_id",
+        "report_id",
+        "created_from",
+        "created_until",
+        "page",
+        "page_size",
+        "q"
+      ],
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:13.914Z"
+    },
+    {
+      "label": "evidence.search document filters",
+      "started_at": "2026-09-14T16:23:13.914Z",
+      "entries": 2,
+      "filters": [
+        "project_id",
+        "document_id",
+        "created_from",
+        "created_until",
+        "page",
+        "page_size",
+        "q"
+      ],
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:14.849Z"
+    },
+    {
+      "label": "report.export format=undefined",
+      "started_at": "2026-09-14T16:23:14.850Z",
+      "bytes": 570,
+      "sha256": "4f8327c7246d1635e218ba2c1c9c527f5c6d7d70503a6cecbc9483c3a52b7691",
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:15.318Z"
+    },
+    {
+      "label": "report.export format=md",
+      "started_at": "2026-09-14T16:23:15.318Z",
+      "bytes": 674,
+      "sha256": "be62133528e5adc88f6bef134999c691549e73ce7bcb21a7e96271ea82e34b88",
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:15.778Z"
+    },
+    {
+      "label": "report.export format=json",
+      "started_at": "2026-09-14T16:23:15.779Z",
+      "bytes": 3466,
+      "sha256": "50dac16207e6ee58331750fb1acf23d25dd2ca98bcbe107fba9ddefd6ac9cc33",
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:16.246Z"
+    },
+    {
+      "label": "report.export format=txt",
+      "started_at": "2026-09-14T16:23:16.246Z",
+      "bytes": 773,
+      "sha256": "95a10a8a59cefb4fef28e69011c606c7ac2635da30d7e90eacb5afca8188c616",
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:16.714Z"
+    },
+    {
+      "label": "search.knowledge source/date filters",
+      "started_at": "2026-09-14T16:23:16.716Z",
+      "results": 0,
+      "route": "/retrieval/search",
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:18.571Z"
+    },
+    {
+      "label": "search.pedr graph=false",
+      "started_at": "2026-09-14T16:23:18.572Z",
+      "results": 3,
+      "metadata": {
+        "query": "TraceLab research",
+        "intent": "search",
+        "intent_confidence": 0.9,
+        "detected_type": null,
+        "type_confidence": 0,
+        "layers_used": [
+          "lexical",
+          "semantic"
+        ],
+        "layer_weights": {
+          "lexical": 0.25,
+          "semantic": 0.35,
+          "syntactic": 0.15,
+          "pragmatic": 0.1,
+          "governance": 0.15,
+          "graph": 0
+        },
+        "timings": {
+          "lexical_ms": 21.26915194094181,
+          "semantic_ms": 444.84753091819584,
+          "graph_ms": 0,
+          "syntactic_ms": 0.027940026484429836,
+          "pragmatic_ms": 0.037260004319250584,
+          "governance_ms": 5.615015979856253,
+          "fusion_ms": 0.2764790551736951,
+          "relational_ms": 0,
+          "total_ms": 452.6797040598467
+        },
+        "layer_diagnostics": [
+          {
+            "layer": "lexical",
+            "status": "ok",
+            "duration_ms": 21.27,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "semantic",
+            "status": "ok",
+            "duration_ms": 444.85,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "graph",
+            "status": "disabled",
+            "duration_ms": 0,
+            "result_count": 0,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "syntactic",
+            "status": "ok",
+            "duration_ms": 0.03,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "pragmatic",
+            "status": "ok",
+            "duration_ms": 0.04,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "governance",
+            "status": "ok",
+            "duration_ms": 5.62,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          }
+        ],
+        "degraded": false,
+        "graph_enabled": false,
+        "graph_candidates_expanded": null,
+        "total_candidates": 60,
+        "result_count": 3,
+        "rerank_mode": "full",
+        "hybrid_fallback_used": false
+      },
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:19.268Z"
+    },
+    {
+      "label": "search.pedr graph=true",
+      "started_at": "2026-09-14T16:23:19.269Z",
+      "results": 3,
+      "metadata": {
+        "query": "TraceLab research",
+        "intent": "search",
+        "intent_confidence": 0.9,
+        "detected_type": null,
+        "type_confidence": 0,
+        "layers_used": [
+          "lexical",
+          "semantic",
+          "graph"
+        ],
+        "layer_weights": {
+          "lexical": 0.22,
+          "semantic": 0.308,
+          "syntactic": 0.132,
+          "pragmatic": 0.08800000000000001,
+          "governance": 0.132,
+          "graph": 0.12
+        },
+        "timings": {
+          "lexical_ms": 16.218531993217766,
+          "semantic_ms": 730.9159970609471,
+          "graph_ms": 11.51,
+          "syntactic_ms": 0.04117004573345184,
+          "pragmatic_ms": 0.05263905040919781,
+          "governance_ms": 4.6549830585718155,
+          "fusion_ms": 0.33319799695163965,
+          "relational_ms": 0,
+          "total_ms": 749.0817180369049
+        },
+        "layer_diagnostics": [
+          {
+            "layer": "lexical",
+            "status": "ok",
+            "duration_ms": 16.22,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "semantic",
+            "status": "ok",
+            "duration_ms": 730.92,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "graph",
+            "status": "ok",
+            "duration_ms": 11.51,
+            "result_count": 80,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "syntactic",
+            "status": "ok",
+            "duration_ms": 0.04,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "pragmatic",
+            "status": "ok",
+            "duration_ms": 0.05,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          },
+          {
+            "layer": "governance",
+            "status": "ok",
+            "duration_ms": 4.65,
+            "result_count": 60,
+            "error": null,
+            "error_type": null
+          }
+        ],
+        "degraded": false,
+        "graph_enabled": true,
+        "graph_candidates_expanded": 80,
+        "total_candidates": 60,
+        "result_count": 3,
+        "rerank_mode": "full",
+        "hybrid_fallback_used": false
+      },
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:20.254Z"
+    },
+    {
+      "label": "search.pedr project/source/date filters",
+      "started_at": "2026-09-14T16:23:20.255Z",
+      "results": 0,
+      "degraded": false,
+      "filter_names": [
+        "query",
+        "top_k",
+        "project_id",
+        "source_type",
+        "date_from",
+        "date_to",
+        "enable_graph"
+      ],
+      "passed": true,
+      "finished_at": "2026-09-14T16:23:20.906Z"
+    }
+  ],
+  "limitations": [
+    "Collection create with instructions is validated by local real-stdio contract; production performs no writes.",
+    "Logs/events are snapshots; empty rows do not prove streaming works.",
+    "PEDR functional checks do not measure ranking quality or relative speed."
+  ],
+  "passed": true,
+  "finished_at": "2026-09-14T16:23:20.907Z",
+  "mission_id": "MCP-1",
+  "sprint_id": "sprint-52",
+  "deployments": {
+    "checked_at": "2026-09-14T16:22:39.511656+00:00",
+    "commit": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+    "services": {
+      "TraceLab": {
+        "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+        "deployment_id": "860cbb23-89c6-4cb5-a615-1e2a3e50737c",
+        "status": "SUCCESS",
+        "commit": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+        "created_at": "2026-09-14T16:17:11.220Z"
+      },
+      "frontend": {
+        "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+        "deployment_id": "097b9211-2b3e-45af-8e4a-4f788d7831ed",
+        "status": "SUCCESS",
+        "commit": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+        "created_at": "2026-09-14T16:17:11.220Z"
+      }
+    },
+    "both_success_for_commit": true
+  },
+  "artifact": {
+    "version": "1.1.1",
+    "published": false,
+    "source_head": "e135a8a5c7250319e200dc49a7d387850cd0695c",
+    "source_merge": "3cc7e3acd1690f835c3b799dbed231b74f274e7f",
+    "source_package_tree": "1d43bc462b94c773ec2270f08b3ee9e7aa9bceb9",
+    "sha256": "df531078aa23cff9edaffb013d329fa5b726c12cd2d4a80999125494b728da62",
+    "pack_metadata": [
+      {
+        "id": "@aquex/tracelab-mcp@1.1.1",
+        "name": "@aquex/tracelab-mcp",
+        "version": "1.1.1",
+        "size": 65307,
+        "unpackedSize": 324074,
+        "shasum": "2d02c38dff3412939bddb08d536af98d3af97b92",
+        "integrity": "sha512-SLKp26MJjZ9BB4wQN1E3sY3ZvDA/Jk6pZqAjV+JHw61yDC9YSFMHaVMtUFXG8L3z5Q8LFKTsRYEXEHYMOgfouw==",
+        "filename": "aquex-tracelab-mcp-1.1.1.tgz",
+        "files": [
+          {
+            "path": "CHANGELOG.md",
+            "size": 8995,
+            "mode": 420
+          },
+          {
+            "path": "LICENSE",
+            "size": 1062,
+            "mode": 420
+          },
+          {
+            "path": "README.md",
+            "size": 17093,
+            "mode": 420
+          },
+          {
+            "path": "dist/api-client.d.ts",
+            "size": 20369,
+            "mode": 420
+          },
+          {
+            "path": "dist/api-client.d.ts.map",
+            "size": 19267,
+            "mode": 420
+          },
+          {
+            "path": "dist/api-client.js",
+            "size": 13564,
+            "mode": 420
+          },
+          {
+            "path": "dist/api-client.js.map",
+            "size": 11332,
+            "mode": 420
+          },
+          {
+            "path": "dist/auth/credential-store.d.ts",
+            "size": 1655,
+            "mode": 420
+          },
+          {
+            "path": "dist/auth/credential-store.d.ts.map",
+            "size": 690,
+            "mode": 420
+          },
+          {
+            "path": "dist/auth/credential-store.js",
+            "size": 2958,
+            "mode": 420
+          },
+          {
+            "path": "dist/auth/credential-store.js.map",
+            "size": 2281,
+            "mode": 420
+          },
+          {
+            "path": "dist/auth/device-code.d.ts",
+            "size": 3884,
+            "mode": 420
+          },
+          {
+            "path": "dist/auth/device-code.d.ts.map",
+            "size": 2224,
+            "mode": 420
+          },
+          {
+            "path": "dist/auth/device-code.js",
+            "size": 11127,
+            "mode": 420
+          },
+          {
+            "path": "dist/auth/device-code.js.map",
+            "size": 8452,
+            "mode": 420
+          },
+          {
+            "path": "dist/canonical-link.d.ts",
+            "size": 644,
+            "mode": 420
+          },
+          {
+            "path": "dist/canonical-link.d.ts.map",
+            "size": 334,
+            "mode": 420
+          },
+          {
+            "path": "dist/canonical-link.js",
+            "size": 1632,
+            "mode": 420
+          },
+          {
+            "path": "dist/canonical-link.js.map",
+            "size": 1460,
+            "mode": 420
+          },
+          {
+            "path": "dist/index.d.ts",
+            "size": 4636,
+            "mode": 420
+          },
+          {
+            "path": "dist/index.d.ts.map",
+            "size": 1112,
+            "mode": 420
+          },
+          {
+            "path": "dist/index.js",
+            "size": 112727,
+            "mode": 420
+          },
+          {
+            "path": "dist/index.js.map",
+            "size": 74822,
+            "mode": 420
+          },
+          {
+            "path": "package.json",
+            "size": 1754,
+            "mode": 420
+          }
+        ],
+        "entryCount": 24,
+        "bundled": []
+      }
+    ],
+    "isolated_install": true,
+    "entrypoint_exercised_via_stdio": true
+  },
+  "authentication": {
+    "kind": "human X-API-Key",
+    "source": "existing local credential store",
+    "credential_logged": false,
+    "credential_in_receipt": false
+  },
+  "prior_failed_run": {
+    "started_at": "2026-09-14T15:31:15.645Z",
+    "api": "https://api.tracelab.aquex.ai",
+    "frontend": "https://tracelab.aquex.ai",
+    "source_merge": "cc0f2af8a239d1e094efff6e8eacde6c948461b9",
+    "read_only": true,
+    "fixture_ids": {
+      "project": "041489e1-bb62-4bbe-bb57-90a924fce867",
+      "document": "2f54e4ba-1ff2-4421-a632-172fe67e80a8",
+      "collection": "a3e6d809-af90-4652-903f-5ce5c8842bf8",
+      "report": "1ff22d77-fb90-4220-8d74-34fd5526dab7",
+      "evidence": "3c162ea5-5d4c-4ced-bd20-5c882c46e321",
+      "mission": "27cbe849-a801-49ef-8cb5-bfa891ade2bd",
+      "evidence_project": "8a5e3763-8249-4194-97d0-cda0e5ff0672"
+    },
+    "checks": [
+      {
+        "label": "source registry",
+        "started_at": "2026-09-14T15:31:15.765Z",
+        "tools": 9,
+        "actions": 40,
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:15.767Z"
+      },
+      {
+        "label": "home.snapshot server total and links",
+        "started_at": "2026-09-14T15:31:15.767Z",
+        "mcp_missions_total": 435,
+        "rest_missions_total": 435,
+        "generated_links": 24,
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:16.532Z"
+      },
+      {
+        "label": "home.favorites scoped page",
+        "started_at": "2026-09-14T15:31:16.533Z",
+        "total": 0,
+        "items": 0,
+        "generated_links": 0,
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:16.998Z"
+      },
+      {
+        "label": "search.navigate entity filter",
+        "started_at": "2026-09-14T15:31:16.998Z",
+        "groups": [
+          {
+            "entity_type": "project",
+            "total": 1
+          }
+        ],
+        "generated_links": 1,
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:17.693Z"
+      },
+      {
+        "label": "project.get full details",
+        "started_at": "2026-09-14T15:31:17.693Z",
+        "id": "041489e1-bb62-4bbe-bb57-90a924fce867",
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:18.128Z"
+      },
+      {
+        "label": "document.list processed=undefined",
+        "started_at": "2026-09-14T15:31:18.128Z",
+        "mcp_total": 5,
+        "rest_total": 5,
+        "items": 2,
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:18.584Z"
+      },
+      {
+        "label": "document.list processed=true",
+        "started_at": "2026-09-14T15:31:18.585Z",
+        "mcp_total": 5,
+        "rest_total": 5,
+        "items": 2,
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:19.068Z"
+      },
+      {
+        "label": "document.list processed=false",
+        "started_at": "2026-09-14T15:31:19.068Z",
+        "mcp_total": 0,
+        "rest_total": 0,
+        "items": 0,
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:19.515Z"
+      },
+      {
+        "label": "evidence.get preserves provenance and relationships",
+        "started_at": "2026-09-14T15:31:19.516Z",
+        "id": "3c162ea5-5d4c-4ced-bd20-5c882c46e321",
+        "generated_links": 1,
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:19.976Z"
+      },
+      {
+        "label": "collection.documents server total",
+        "started_at": "2026-09-14T15:31:19.976Z",
+        "total": 2,
+        "items": 2,
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:20.476Z"
+      },
+      {
+        "label": "collection.mission_seed authored inputs",
+        "started_at": "2026-09-14T15:31:20.476Z",
+        "references": 2,
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:20.945Z"
+      },
+      {
+        "label": "mission_execution.logs",
+        "started_at": "2026-09-14T15:31:20.945Z",
+        "rows": 10,
+        "empty": false,
+        "message": "Recorded log lines; live streaming is dormant.",
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:21.446Z"
+      },
+      {
+        "label": "mission_execution.events",
+        "started_at": "2026-09-14T15:31:21.447Z",
+        "rows": 0,
+        "empty": true,
+        "message": "No recent events are available.",
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:21.921Z"
+      },
+      {
+        "label": "mission.list view=all",
+        "started_at": "2026-09-14T15:31:21.922Z",
+        "total": 4,
+        "items": 2,
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:22.465Z"
+      },
+      {
+        "label": "mission.list view=attention",
+        "started_at": "2026-09-14T15:31:22.465Z",
+        "total": 4,
+        "items": 2,
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:23.270Z"
+      },
+      {
+        "label": "mission.list view=queue",
+        "started_at": "2026-09-14T15:31:23.271Z",
+        "total": 0,
+        "items": 0,
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:23.749Z"
+      },
+      {
+        "label": "collection.list project scope and page",
+        "started_at": "2026-09-14T15:31:23.750Z",
+        "total": 0,
+        "items": 0,
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:24.238Z"
+      },
+      {
+        "label": "collection.get instructions",
+        "started_at": "2026-09-14T15:31:24.239Z",
+        "instructions_present": true,
+        "instructions_bytes": 253,
+        "passed": true,
+        "finished_at": "2026-09-14T15:31:24.691Z"
+      },
+      {
+        "label": "evidence.list six filters",
+        "started_at": "2026-09-14T15:31:24.691Z",
+        "passed": false,
+        "error_type": "Error",
+        "error": "REST /evidence?project_id=8a5e3763-8249-4194-97d0-cda0e5ff0672&tag=research&created_from=2020-01-01T00%3A00%3A00Z&created_until=2026-12-31T23%3A59%3A59Z&source_id=sprint-52-no-match-filter&report_id=1ff22d77-fb90-4220-8d74-34fd5526dab7&document_id=2f54e4ba-1ff2-4421-a632-172fe67e80a8&page=1&page_size=2 returned 422",
+        "finished_at": "2026-09-14T15:31:25.123Z"
+      }
+    ],
+    "limitations": [
+      "Collection create with instructions is validated by local real-stdio contract; production performs no writes.",
+      "Logs/events are snapshots; empty rows do not prove streaming works.",
+      "PEDR functional checks do not measure ranking quality or relative speed."
+    ],
+    "passed": false,
+    "finished_at": "2026-09-14T15:31:25.124Z",
+    "deployments": {
+      "checked_at": "2026-09-14T15:31:01.619761+00:00",
+      "commit": "cc0f2af8a239d1e094efff6e8eacde6c948461b9",
+      "services": {
+        "TraceLab": {
+          "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+          "deployment_id": "91320591-bbe2-4bcf-a5d2-56ea9dd45876",
+          "status": "SUCCESS",
+          "commit": "cc0f2af8a239d1e094efff6e8eacde6c948461b9",
+          "created_at": "2026-09-14T15:26:51.279Z"
+        },
+        "frontend": {
+          "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+          "deployment_id": "a4901585-056e-40de-a7c4-547470e2fc60",
+          "status": "SUCCESS",
+          "commit": "cc0f2af8a239d1e094efff6e8eacde6c948461b9",
+          "created_at": "2026-09-14T15:26:51.278Z"
+        }
+      },
+      "both_success_for_commit": true
+    }
+  }
+}
