@@ -319,7 +319,7 @@
       "PS-2026-09-14-006: Sprint 53: fix Settings timestamps. frontend/src/pages/settings.tsx lines 292, 296 and 440 parse offset-free UTC with new Date(), so API-key and invite times shift outside UTC. Route them through parseApiTimestamp, add an America/Chicago fixed-clock browser test, and audit the other new Date(<api field>) sites. Do this with next-step #275 and add the invite date cell to its scope.",
       "PS-2026-09-14-006: Rewrite or retire the TraceLab UX Baseline artifact (claude.ai/code/artifact/c0767cdf-97e0-4d16-a750-029ceb09ba8e). It still publishes the post-Sprint-49 state: no sprint open, 27 of 27 routes overflowing, 12 ESLint errors, the stats fix unmerged. Rewrite it from the roadmap's Sprint 50 and 51 outcomes or add a superseded banner. This replaces dropped next-step #253.",
       "PS-2026-09-14-006: Derek-gated: publish @aquex/tracelab-mcp 1.2.0 carrying UX-10's canonical browser links; the registry and package.json are both still 1.1.1. Decide whether to publish before or after the Sprint 52 MCP parity audit, and state whether that audit measures source or the published package.",
-      "PS-2026-09-14-006: Sprint 52 doc rewrite: fix agents.md dead references (five missing cmos/docs files, the package_starter.sh path, missing cmos/ prefixes, README.md:179). Either banner cmos/foundational-docs/technical_architecture.md as pre-Sprint-50 or drop it from project_identity.foundational_docs until it is rewritten.",
+      "PS-2026-09-14-006: Sprint 52 doc rewrite: fix agents.md dead references (five missing cmos/docs files, the package_starter.sh path, missing cmos/ prefixes, README.md:179). Either banner the technical architecture doc in cmos/foundational-docs (technical_architecture.md) as pre-Sprint-50, or drop it from project_identity.foundational_docs until it is rewritten.",
       "PS-2026-09-14-006: Sprint 53: add a required-suite unit test asserting every Alembic revision id is at most 32 characters and there is exactly one head. Today only the non-required backend-integration lane would catch an over-long id, which would crash-loop the production deploy.",
       "PS-2026-09-14-006: Sprint 53: wire hygiene.spec.ts and evidence.spec.ts into the frontend-production-build Playwright list, drop console.spec.ts redirect cases that duplicate route-migration, and de-flake src/__tests__/admin/users.test.tsx, whose delete dialog failed required vitest on main in run 34797659698.",
       "PS-2026-09-14-006: Sprint 53: add Railway watchPatterns so receipt-only merges stop rebuilding production with no smoke. In the Sprint 52 open notes, cite the first scheduled Production Smoke run that covers the cb0cd8f rebuild, which deployed at 2026-09-14T03:20:47Z.",
@@ -333,7 +333,7 @@
   "context_health": {
     "sessions_since_reset": 190,
     "last_update": "2026-09-14T04:36:38.886Z",
-    "size_kb": 59.13,
+    "size_kb": 59.16,
     "size_limit_kb": 100,
     "warning_threshold_percent": 75,
     "retention_keep_sprints": 3
