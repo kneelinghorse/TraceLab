@@ -229,8 +229,11 @@ Existing actions also gain UI parameters:
   `get` returns `instructions`; `create` accepts optional `instructions` (max
   20,000 characters).
 - `tracelab_evidence.list` and `.search`: optional `tag`, `created_from`,
-  `created_until` (ISO datetimes), `source_id`, `report_id`, `document_id`, in
+  `created_until` (YYYY-MM-DD), `source_id` (UUID), `report_id`, `document_id`, in
   addition to existing project/session/mission/disposition/pagination filters.
+  Use at most one of `report_id` or `document_id`; it must belong to `project_id`.
+  The start date must not follow the end date, and `9999-12-31` is not a valid
+  end date. Tags are nonblank and at most 64 characters.
 - `tracelab_report.export`: optional `format` = `md`, `json` or `txt` calls the
   REST export route and returns its exact text. Omit `format` to retain the
   legacy response of exact `report.content` bytes.
