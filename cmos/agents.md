@@ -12,7 +12,7 @@ application code.
 **Stack**: Python 3.11+, FastAPI, PostgreSQL 15, Alembic, React/Vite (frontend), SQLite (CMOS)
 **Architecture**: Hexagonal — ports (`app/ports/`) define contracts, adapters wire implementations,
 composition root in `app/dependencies.py`
-**CI**: GitHub Actions — six required checks on main: backend-suite, vitest, type-check, ruff-diff, build-frontend-production and Secret Scan (see `.github/ci/README.md`). No mypy gate since CI-2 (decision #407).
+**CI**: GitHub Actions — eight required checks on main: backend-suite, vitest, type-check, ruff-diff, build-frontend-production, Secret Scan, backend-integration and lint (CI-5, decision #421; see `.github/ci/README.md`). No mypy gate since CI-2 (decision #407).
 
 ---
 

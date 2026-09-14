@@ -1,4 +1,23 @@
 {
+  "correction": {
+    "recorded_at": "2026-09-14T06:22:35.733152+00:00",
+    "mission": "CI-5",
+    "decision": 421,
+    "learning": 177,
+    "interpretation": "Existing CI fields describe PR-head runs only and do not establish that the post-merge main push passed. Historical fields are preserved.",
+    "failed_main_push": {
+      "run_id": 34797659698,
+      "attempt": 1,
+      "commit": "91b592d40bd456820523100c8a4589a7589b69f5",
+      "context": "vitest",
+      "conclusion": "failure",
+      "test": "src/__tests__/admin/users.test.tsx > UsersAdmin \u2014 error surfacing > surfaces a delete failure, dismisses the dialog, and does not reload",
+      "passed": 203,
+      "failed": 1,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34797659698"
+    },
+    "all_checks_passed_scope": "ci.all_checks_passed=true applies only to PR #279 head; required vitest failed on the merge commit."
+  },
   "mission": "UX-9",
   "status": "passed",
   "base_commit": "d7e253b6ae852163e02465dd14c9ff5c23cfebdd",

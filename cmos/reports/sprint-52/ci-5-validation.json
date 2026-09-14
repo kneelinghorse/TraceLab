@@ -1,0 +1,1391 @@
+{
+  "mission": "CI-5",
+  "status": "pending_post_merge_validation",
+  "checked_at": "2026-09-14T06:22:35.733152+00:00",
+  "base_commit": "7a3ceb61c387adc93e1fee0b82043dce2d341a84",
+  "decision_ids": [
+    421
+  ],
+  "learning_ids": [
+    176,
+    177
+  ],
+  "scope": "Branch protection and the six named documentation/receipt paths only. No runtime, workflow, test, threshold or quarantine changes.",
+  "protection": {
+    "before": {
+      "url": "https://api.github.com/repos/kneelinghorse/TraceLab/branches/main/protection",
+      "required_status_checks": {
+        "url": "https://api.github.com/repos/kneelinghorse/TraceLab/branches/main/protection/required_status_checks",
+        "strict": true,
+        "contexts": [
+          "backend-suite",
+          "vitest",
+          "type-check",
+          "ruff-diff",
+          "build-frontend-production",
+          "Secret Scan"
+        ],
+        "contexts_url": "https://api.github.com/repos/kneelinghorse/TraceLab/branches/main/protection/required_status_checks/contexts",
+        "checks": [
+          {
+            "context": "backend-suite",
+            "app_id": 15368
+          },
+          {
+            "context": "vitest",
+            "app_id": 15368
+          },
+          {
+            "context": "type-check",
+            "app_id": 15368
+          },
+          {
+            "context": "ruff-diff",
+            "app_id": 15368
+          },
+          {
+            "context": "build-frontend-production",
+            "app_id": 15368
+          },
+          {
+            "context": "Secret Scan",
+            "app_id": 15368
+          }
+        ]
+      },
+      "required_signatures": {
+        "url": "https://api.github.com/repos/kneelinghorse/TraceLab/branches/main/protection/required_signatures",
+        "enabled": false
+      },
+      "enforce_admins": {
+        "url": "https://api.github.com/repos/kneelinghorse/TraceLab/branches/main/protection/enforce_admins",
+        "enabled": false
+      },
+      "required_linear_history": {
+        "enabled": false
+      },
+      "allow_force_pushes": {
+        "enabled": false
+      },
+      "allow_deletions": {
+        "enabled": false
+      },
+      "block_creations": {
+        "enabled": false
+      },
+      "required_conversation_resolution": {
+        "enabled": false
+      },
+      "lock_branch": {
+        "enabled": false
+      },
+      "allow_fork_syncing": {
+        "enabled": false
+      }
+    },
+    "promotion_payload": {
+      "strict": true,
+      "checks": [
+        {
+          "context": "backend-suite",
+          "app_id": 15368
+        },
+        {
+          "context": "vitest",
+          "app_id": 15368
+        },
+        {
+          "context": "type-check",
+          "app_id": 15368
+        },
+        {
+          "context": "ruff-diff",
+          "app_id": 15368
+        },
+        {
+          "context": "build-frontend-production",
+          "app_id": 15368
+        },
+        {
+          "context": "Secret Scan",
+          "app_id": 15368
+        },
+        {
+          "context": "backend-integration",
+          "app_id": 15368
+        },
+        {
+          "context": "lint",
+          "app_id": 15368
+        }
+      ]
+    },
+    "after": {
+      "url": "https://api.github.com/repos/kneelinghorse/TraceLab/branches/main/protection",
+      "required_status_checks": {
+        "url": "https://api.github.com/repos/kneelinghorse/TraceLab/branches/main/protection/required_status_checks",
+        "strict": true,
+        "contexts": [
+          "backend-suite",
+          "vitest",
+          "type-check",
+          "ruff-diff",
+          "build-frontend-production",
+          "Secret Scan",
+          "backend-integration",
+          "lint"
+        ],
+        "contexts_url": "https://api.github.com/repos/kneelinghorse/TraceLab/branches/main/protection/required_status_checks/contexts",
+        "checks": [
+          {
+            "context": "backend-suite",
+            "app_id": 15368
+          },
+          {
+            "context": "vitest",
+            "app_id": 15368
+          },
+          {
+            "context": "type-check",
+            "app_id": 15368
+          },
+          {
+            "context": "ruff-diff",
+            "app_id": 15368
+          },
+          {
+            "context": "build-frontend-production",
+            "app_id": 15368
+          },
+          {
+            "context": "Secret Scan",
+            "app_id": 15368
+          },
+          {
+            "context": "backend-integration",
+            "app_id": 15368
+          },
+          {
+            "context": "lint",
+            "app_id": 15368
+          }
+        ]
+      },
+      "required_signatures": {
+        "url": "https://api.github.com/repos/kneelinghorse/TraceLab/branches/main/protection/required_signatures",
+        "enabled": false
+      },
+      "enforce_admins": {
+        "url": "https://api.github.com/repos/kneelinghorse/TraceLab/branches/main/protection/enforce_admins",
+        "enabled": false
+      },
+      "required_linear_history": {
+        "enabled": false
+      },
+      "allow_force_pushes": {
+        "enabled": false
+      },
+      "allow_deletions": {
+        "enabled": false
+      },
+      "block_creations": {
+        "enabled": false
+      },
+      "required_conversation_resolution": {
+        "enabled": false
+      },
+      "lock_branch": {
+        "enabled": false
+      },
+      "allow_fork_syncing": {
+        "enabled": false
+      }
+    },
+    "rollback_payload": {
+      "strict": true,
+      "checks": [
+        {
+          "context": "backend-suite",
+          "app_id": 15368
+        },
+        {
+          "context": "vitest",
+          "app_id": 15368
+        },
+        {
+          "context": "type-check",
+          "app_id": 15368
+        },
+        {
+          "context": "ruff-diff",
+          "app_id": 15368
+        },
+        {
+          "context": "build-frontend-production",
+          "app_id": 15368
+        },
+        {
+          "context": "Secret Scan",
+          "app_id": 15368
+        }
+      ]
+    },
+    "all_other_fields_unchanged": true
+  },
+  "streak_recheck": {
+    "checked_at": "2026-09-14T06:22:35.733152+00:00",
+    "head": "7a3ceb61c387adc93e1fee0b82043dce2d341a84",
+    "rule": "Original-attempt successful main push runs; failures reset; cancellations neither count nor reset. Lint inspected per job.",
+    "backend_integration": {
+      "qualifying_consecutive": 10,
+      "runs": [
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34812225107,
+          "headSha": "7a3ceb61c387adc93e1fee0b82043dce2d341a84",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34812225107"
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34807471446,
+          "headSha": "efd30818d8eb8f46476a49011514332f6c5c0a85",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34807471446"
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34802291852,
+          "headSha": "cb0cd8f999b2971c249e84dfbbaecb72c6b18daf",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34802291852"
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34801078119,
+          "headSha": "2081c73ddbf1ad826e061bbc9512e887591febae",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34801078119"
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34798716010,
+          "headSha": "36a5fbedba702fba1e2047a889bd73e0f5020ff1",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34798716010"
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34797659720,
+          "headSha": "91b592d40bd456820523100c8a4589a7589b69f5",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34797659720"
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34796691951,
+          "headSha": "d7e253b6ae852163e02465dd14c9ff5c23cfebdd",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34796691951"
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34795210850,
+          "headSha": "ed21f7c35ac2948fad0f52fd8aa989f50fdf7425",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34795210850"
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34793871687,
+          "headSha": "f52088f6ffe0d89f3db856de6dbb282d527f998b",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34793871687"
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34790859840,
+          "headSha": "16a05c092aace752f720f7f253cc9ae391ae7eb5",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34790859840"
+        },
+        {
+          "attempt": 1,
+          "conclusion": "failure",
+          "databaseId": 34788411358,
+          "headSha": "501268f40562b5c3c6994962a9e58df5b6f566a2",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34788411358"
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34785800297,
+          "headSha": "7350425249d393725b325715a3add581389fe1fd",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34785800297"
+        }
+      ]
+    },
+    "lint": {
+      "verified_consecutive": 12,
+      "runs": [
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34812225041,
+          "headSha": "7a3ceb61c387adc93e1fee0b82043dce2d341a84",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34812225041",
+          "lint_job": {
+            "completedAt": "2026-09-14T06:09:56Z",
+            "conclusion": "success",
+            "databaseId": 103875676422,
+            "name": "lint",
+            "startedAt": "2026-09-14T06:08:59Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-14T06:09:00Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-14T06:09:00Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T06:09:26Z",
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "startedAt": "2026-09-14T06:09:00Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T06:09:31Z",
+                "conclusion": "success",
+                "name": "Run actions/setup-node@v4",
+                "number": 3,
+                "startedAt": "2026-09-14T06:09:26Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T06:09:44Z",
+                "conclusion": "success",
+                "name": "Install frontend dependencies",
+                "number": 4,
+                "startedAt": "2026-09-14T06:09:31Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T06:09:53Z",
+                "conclusion": "success",
+                "name": "Lint",
+                "number": 5,
+                "startedAt": "2026-09-14T06:09:44Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T06:09:53Z",
+                "conclusion": "success",
+                "name": "Post Run actions/setup-node@v4",
+                "number": 9,
+                "startedAt": "2026-09-14T06:09:53Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T06:09:54Z",
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 10,
+                "startedAt": "2026-09-14T06:09:53Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T06:09:54Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 11,
+                "startedAt": "2026-09-14T06:09:54Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34812225041/job/103875676422"
+          }
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34807471366,
+          "headSha": "efd30818d8eb8f46476a49011514332f6c5c0a85",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34807471366",
+          "lint_job": {
+            "completedAt": "2026-09-14T04:51:10Z",
+            "conclusion": "success",
+            "databaseId": 103862055084,
+            "name": "lint",
+            "startedAt": "2026-09-14T04:50:10Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-14T04:50:12Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-14T04:50:11Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T04:50:32Z",
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "startedAt": "2026-09-14T04:50:12Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T04:50:39Z",
+                "conclusion": "success",
+                "name": "Run actions/setup-node@v4",
+                "number": 3,
+                "startedAt": "2026-09-14T04:50:32Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T04:50:56Z",
+                "conclusion": "success",
+                "name": "Install frontend dependencies",
+                "number": 4,
+                "startedAt": "2026-09-14T04:50:39Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T04:51:07Z",
+                "conclusion": "success",
+                "name": "Lint",
+                "number": 5,
+                "startedAt": "2026-09-14T04:50:56Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T04:51:07Z",
+                "conclusion": "success",
+                "name": "Post Run actions/setup-node@v4",
+                "number": 9,
+                "startedAt": "2026-09-14T04:51:07Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T04:51:07Z",
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 10,
+                "startedAt": "2026-09-14T04:51:07Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T04:51:07Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 11,
+                "startedAt": "2026-09-14T04:51:07Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34807471366/job/103862055084"
+          }
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34802291839,
+          "headSha": "cb0cd8f999b2971c249e84dfbbaecb72c6b18daf",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34802291839",
+          "lint_job": {
+            "completedAt": "2026-09-14T03:21:45Z",
+            "conclusion": "success",
+            "databaseId": 103847219523,
+            "name": "lint",
+            "startedAt": "2026-09-14T03:20:51Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-14T03:20:53Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-14T03:20:52Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T03:21:17Z",
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "startedAt": "2026-09-14T03:20:53Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T03:21:21Z",
+                "conclusion": "success",
+                "name": "Run actions/setup-node@v4",
+                "number": 3,
+                "startedAt": "2026-09-14T03:21:17Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T03:21:33Z",
+                "conclusion": "success",
+                "name": "Install frontend dependencies",
+                "number": 4,
+                "startedAt": "2026-09-14T03:21:21Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T03:21:42Z",
+                "conclusion": "success",
+                "name": "Lint",
+                "number": 5,
+                "startedAt": "2026-09-14T03:21:33Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T03:21:43Z",
+                "conclusion": "success",
+                "name": "Post Run actions/setup-node@v4",
+                "number": 9,
+                "startedAt": "2026-09-14T03:21:42Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T03:21:43Z",
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 10,
+                "startedAt": "2026-09-14T03:21:43Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T03:21:43Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 11,
+                "startedAt": "2026-09-14T03:21:43Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34802291839/job/103847219523"
+          }
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34801078078,
+          "headSha": "2081c73ddbf1ad826e061bbc9512e887591febae",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34801078078",
+          "lint_job": {
+            "completedAt": "2026-09-14T03:01:46Z",
+            "conclusion": "success",
+            "databaseId": 103843722113,
+            "name": "lint",
+            "startedAt": "2026-09-14T03:00:57Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-14T03:00:58Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-14T03:00:57Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T03:01:17Z",
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "startedAt": "2026-09-14T03:00:58Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T03:01:19Z",
+                "conclusion": "success",
+                "name": "Run actions/setup-node@v4",
+                "number": 3,
+                "startedAt": "2026-09-14T03:01:17Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T03:01:34Z",
+                "conclusion": "success",
+                "name": "Install frontend dependencies",
+                "number": 4,
+                "startedAt": "2026-09-14T03:01:19Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T03:01:45Z",
+                "conclusion": "success",
+                "name": "Lint",
+                "number": 5,
+                "startedAt": "2026-09-14T03:01:34Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T03:01:45Z",
+                "conclusion": "success",
+                "name": "Post Run actions/setup-node@v4",
+                "number": 9,
+                "startedAt": "2026-09-14T03:01:45Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T03:01:45Z",
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 10,
+                "startedAt": "2026-09-14T03:01:45Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T03:01:45Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 11,
+                "startedAt": "2026-09-14T03:01:45Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34801078078/job/103843722113"
+          }
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34798716002,
+          "headSha": "36a5fbedba702fba1e2047a889bd73e0f5020ff1",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34798716002",
+          "lint_job": {
+            "completedAt": "2026-09-14T02:18:20Z",
+            "conclusion": "success",
+            "databaseId": 103836823961,
+            "name": "lint",
+            "startedAt": "2026-09-14T02:17:28Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-14T02:17:29Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-14T02:17:29Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T02:17:48Z",
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "startedAt": "2026-09-14T02:17:29Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T02:17:52Z",
+                "conclusion": "success",
+                "name": "Run actions/setup-node@v4",
+                "number": 3,
+                "startedAt": "2026-09-14T02:17:48Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T02:18:07Z",
+                "conclusion": "success",
+                "name": "Install frontend dependencies",
+                "number": 4,
+                "startedAt": "2026-09-14T02:17:52Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T02:18:17Z",
+                "conclusion": "success",
+                "name": "Lint",
+                "number": 5,
+                "startedAt": "2026-09-14T02:18:07Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T02:18:17Z",
+                "conclusion": "success",
+                "name": "Post Run actions/setup-node@v4",
+                "number": 9,
+                "startedAt": "2026-09-14T02:18:17Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T02:18:18Z",
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 10,
+                "startedAt": "2026-09-14T02:18:17Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T02:18:18Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 11,
+                "startedAt": "2026-09-14T02:18:18Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34798716002/job/103836823961"
+          }
+        },
+        {
+          "attempt": 1,
+          "conclusion": "failure",
+          "databaseId": 34797659698,
+          "headSha": "91b592d40bd456820523100c8a4589a7589b69f5",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34797659698",
+          "lint_job": {
+            "completedAt": "2026-09-14T01:59:44Z",
+            "conclusion": "success",
+            "databaseId": 103833791674,
+            "name": "lint",
+            "startedAt": "2026-09-14T01:59:00Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-14T01:59:02Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-14T01:59:00Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:59:22Z",
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "startedAt": "2026-09-14T01:59:02Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:59:24Z",
+                "conclusion": "success",
+                "name": "Run actions/setup-node@v4",
+                "number": 3,
+                "startedAt": "2026-09-14T01:59:22Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:59:34Z",
+                "conclusion": "success",
+                "name": "Install frontend dependencies",
+                "number": 4,
+                "startedAt": "2026-09-14T01:59:24Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:59:42Z",
+                "conclusion": "success",
+                "name": "Lint",
+                "number": 5,
+                "startedAt": "2026-09-14T01:59:34Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:59:42Z",
+                "conclusion": "success",
+                "name": "Post Run actions/setup-node@v4",
+                "number": 9,
+                "startedAt": "2026-09-14T01:59:42Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:59:43Z",
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 10,
+                "startedAt": "2026-09-14T01:59:42Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:59:43Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 11,
+                "startedAt": "2026-09-14T01:59:43Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34797659698/job/103833791674"
+          }
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34796691964,
+          "headSha": "d7e253b6ae852163e02465dd14c9ff5c23cfebdd",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34796691964",
+          "lint_job": {
+            "completedAt": "2026-09-14T01:41:32Z",
+            "conclusion": "success",
+            "databaseId": 103831061042,
+            "name": "lint",
+            "startedAt": "2026-09-14T01:40:46Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-14T01:40:47Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-14T01:40:46Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:41:02Z",
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "startedAt": "2026-09-14T01:40:47Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:41:06Z",
+                "conclusion": "success",
+                "name": "Run actions/setup-node@v4",
+                "number": 3,
+                "startedAt": "2026-09-14T01:41:02Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:41:19Z",
+                "conclusion": "success",
+                "name": "Install frontend dependencies",
+                "number": 4,
+                "startedAt": "2026-09-14T01:41:06Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:41:29Z",
+                "conclusion": "success",
+                "name": "Lint",
+                "number": 5,
+                "startedAt": "2026-09-14T01:41:19Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:41:29Z",
+                "conclusion": "success",
+                "name": "Post Run actions/setup-node@v4",
+                "number": 9,
+                "startedAt": "2026-09-14T01:41:29Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:41:30Z",
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 10,
+                "startedAt": "2026-09-14T01:41:29Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:41:30Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 11,
+                "startedAt": "2026-09-14T01:41:30Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34796691964/job/103831061042"
+          }
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34795210826,
+          "headSha": "ed21f7c35ac2948fad0f52fd8aa989f50fdf7425",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34795210826",
+          "lint_job": {
+            "completedAt": "2026-09-14T01:14:15Z",
+            "conclusion": "success",
+            "databaseId": 103826837170,
+            "name": "lint",
+            "startedAt": "2026-09-14T01:13:24Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-14T01:13:26Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-14T01:13:25Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:13:40Z",
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "startedAt": "2026-09-14T01:13:26Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:13:45Z",
+                "conclusion": "success",
+                "name": "Run actions/setup-node@v4",
+                "number": 3,
+                "startedAt": "2026-09-14T01:13:40Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:14:03Z",
+                "conclusion": "success",
+                "name": "Install frontend dependencies",
+                "number": 4,
+                "startedAt": "2026-09-14T01:13:45Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:14:14Z",
+                "conclusion": "success",
+                "name": "Lint",
+                "number": 5,
+                "startedAt": "2026-09-14T01:14:03Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:14:14Z",
+                "conclusion": "success",
+                "name": "Post Run actions/setup-node@v4",
+                "number": 9,
+                "startedAt": "2026-09-14T01:14:14Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:14:14Z",
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 10,
+                "startedAt": "2026-09-14T01:14:14Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T01:14:14Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 11,
+                "startedAt": "2026-09-14T01:14:14Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34795210826/job/103826837170"
+          }
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34793871648,
+          "headSha": "f52088f6ffe0d89f3db856de6dbb282d527f998b",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34793871648",
+          "lint_job": {
+            "completedAt": "2026-09-14T00:49:42Z",
+            "conclusion": "success",
+            "databaseId": 103823101351,
+            "name": "lint",
+            "startedAt": "2026-09-14T00:48:57Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-14T00:48:59Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-14T00:48:58Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T00:49:12Z",
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "startedAt": "2026-09-14T00:48:59Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T00:49:15Z",
+                "conclusion": "success",
+                "name": "Run actions/setup-node@v4",
+                "number": 3,
+                "startedAt": "2026-09-14T00:49:12Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T00:49:30Z",
+                "conclusion": "success",
+                "name": "Install frontend dependencies",
+                "number": 4,
+                "startedAt": "2026-09-14T00:49:15Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T00:49:40Z",
+                "conclusion": "success",
+                "name": "Lint",
+                "number": 5,
+                "startedAt": "2026-09-14T00:49:30Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T00:49:40Z",
+                "conclusion": "success",
+                "name": "Post Run actions/setup-node@v4",
+                "number": 9,
+                "startedAt": "2026-09-14T00:49:40Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T00:49:40Z",
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 10,
+                "startedAt": "2026-09-14T00:49:40Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-14T00:49:40Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 11,
+                "startedAt": "2026-09-14T00:49:40Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34793871648/job/103823101351"
+          }
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34790859684,
+          "headSha": "16a05c092aace752f720f7f253cc9ae391ae7eb5",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34790859684",
+          "lint_job": {
+            "completedAt": "2026-09-13T23:51:23Z",
+            "conclusion": "success",
+            "databaseId": 103814680147,
+            "name": "lint",
+            "startedAt": "2026-09-13T23:50:45Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-13T23:50:46Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-13T23:50:45Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T23:50:53Z",
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "startedAt": "2026-09-13T23:50:46Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T23:50:56Z",
+                "conclusion": "success",
+                "name": "Run actions/setup-node@v4",
+                "number": 3,
+                "startedAt": "2026-09-13T23:50:53Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T23:51:11Z",
+                "conclusion": "success",
+                "name": "Install frontend dependencies",
+                "number": 4,
+                "startedAt": "2026-09-13T23:50:56Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T23:51:21Z",
+                "conclusion": "success",
+                "name": "Lint",
+                "number": 5,
+                "startedAt": "2026-09-13T23:51:11Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T23:51:21Z",
+                "conclusion": "success",
+                "name": "Post Run actions/setup-node@v4",
+                "number": 9,
+                "startedAt": "2026-09-13T23:51:21Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T23:51:22Z",
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 10,
+                "startedAt": "2026-09-13T23:51:21Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T23:51:22Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 11,
+                "startedAt": "2026-09-13T23:51:22Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34790859684/job/103814680147"
+          }
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34788411388,
+          "headSha": "501268f40562b5c3c6994962a9e58df5b6f566a2",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34788411388",
+          "lint_job": {
+            "completedAt": "2026-09-13T23:01:02Z",
+            "conclusion": "success",
+            "databaseId": 103808033231,
+            "name": "lint",
+            "startedAt": "2026-09-13T23:00:21Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-13T23:00:22Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-13T23:00:22Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T23:00:31Z",
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "startedAt": "2026-09-13T23:00:22Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T23:00:35Z",
+                "conclusion": "success",
+                "name": "Run actions/setup-node@v4",
+                "number": 3,
+                "startedAt": "2026-09-13T23:00:31Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T23:00:50Z",
+                "conclusion": "success",
+                "name": "Install frontend dependencies",
+                "number": 4,
+                "startedAt": "2026-09-13T23:00:35Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T23:01:00Z",
+                "conclusion": "success",
+                "name": "Lint",
+                "number": 5,
+                "startedAt": "2026-09-13T23:00:50Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T23:01:00Z",
+                "conclusion": "success",
+                "name": "Post Run actions/setup-node@v4",
+                "number": 9,
+                "startedAt": "2026-09-13T23:01:00Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T23:01:00Z",
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 10,
+                "startedAt": "2026-09-13T23:01:00Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T23:01:00Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 11,
+                "startedAt": "2026-09-13T23:01:00Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34788411388/job/103808033231"
+          }
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34785800173,
+          "headSha": "7350425249d393725b325715a3add581389fe1fd",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34785800173",
+          "lint_job": {
+            "completedAt": "2026-09-13T22:07:27Z",
+            "conclusion": "success",
+            "databaseId": 103800927716,
+            "name": "lint",
+            "startedAt": "2026-09-13T22:06:42Z",
+            "status": "completed",
+            "steps": [
+              {
+                "completedAt": "2026-09-13T22:06:43Z",
+                "conclusion": "success",
+                "name": "Set up job",
+                "number": 1,
+                "startedAt": "2026-09-13T22:06:42Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T22:06:58Z",
+                "conclusion": "success",
+                "name": "Run actions/checkout@v4",
+                "number": 2,
+                "startedAt": "2026-09-13T22:06:43Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T22:07:02Z",
+                "conclusion": "success",
+                "name": "Run actions/setup-node@v4",
+                "number": 3,
+                "startedAt": "2026-09-13T22:06:58Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T22:07:15Z",
+                "conclusion": "success",
+                "name": "Install frontend dependencies",
+                "number": 4,
+                "startedAt": "2026-09-13T22:07:02Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T22:07:24Z",
+                "conclusion": "success",
+                "name": "Lint",
+                "number": 5,
+                "startedAt": "2026-09-13T22:07:15Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T22:07:24Z",
+                "conclusion": "success",
+                "name": "Post Run actions/setup-node@v4",
+                "number": 9,
+                "startedAt": "2026-09-13T22:07:24Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T22:07:25Z",
+                "conclusion": "success",
+                "name": "Post Run actions/checkout@v4",
+                "number": 10,
+                "startedAt": "2026-09-13T22:07:24Z",
+                "status": "completed"
+              },
+              {
+                "completedAt": "2026-09-13T22:07:25Z",
+                "conclusion": "success",
+                "name": "Complete job",
+                "number": 11,
+                "startedAt": "2026-09-13T22:07:25Z",
+                "status": "completed"
+              }
+            ],
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34785800173/job/103800927716"
+          }
+        }
+      ]
+    },
+    "mcp_package": {
+      "qualifying_consecutive": 4,
+      "promoted": false,
+      "runs": [
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34812225008,
+          "headSha": "7a3ceb61c387adc93e1fee0b82043dce2d341a84",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34812225008"
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34807471422,
+          "headSha": "efd30818d8eb8f46476a49011514332f6c5c0a85",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34807471422"
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34802291803,
+          "headSha": "cb0cd8f999b2971c249e84dfbbaecb72c6b18daf",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34802291803"
+        },
+        {
+          "attempt": 1,
+          "conclusion": "success",
+          "databaseId": 34801078153,
+          "headSha": "2081c73ddbf1ad826e061bbc9512e887591febae",
+          "status": "completed",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34801078153"
+        }
+      ]
+    }
+  },
+  "receipt_corrections": [
+    "cmos/reports/sprint-51/ci-3-validation.json",
+    "cmos/reports/sprint-51/ux-8-validation.json",
+    "cmos/reports/sprint-51/ux-9-visual-fix-validation.json"
+  ],
+  "remaining": [
+    "First post-promotion PR required-check output",
+    "Post-merge main CI for eight required contexts plus mcp-package",
+    "Both Railway SUCCESS deployment IDs and production smoke",
+    "Merge final acceptance receipt before CMOS completion"
+  ]
+}
