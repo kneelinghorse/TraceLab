@@ -77,6 +77,29 @@ describe('MCP-1 read parity', () => {
     expect(fetchMock).toHaveBeenCalledWith(`${base}/api/v1/retrieval/search`, expect.objectContaining({ method: 'POST', body: JSON.stringify({ query: 'Research', top_k: 3, project_id: id, ...filters }) }));
   });
 
+  for (const action of ['list', 'search']) {
+    it.each(['report_id', 'document_id'])('accepts REST calendar dates and one %s filter for evidence.' + action, async field => {
+      respond({ entries: [], notes: [], total: 0, entry_total: 0 });
+      const filters = { tag: 'research', created_from: '2026-09-01', created_until: '2026-09-14', source_id: id, [field]: id };
+      await invoke('evidence', { action, project_id: id, ...(action === 'search' ? { q: 'research' } : {}), ...filters });
+      const requestUrl = new URL(fetchMock.mock.calls[0][0]);
+      for (const [key, value] of Object.entries(filters)) expect(requestUrl.searchParams.get(key)).toBe(value);
+      expect(requestUrl.pathname).toBe('/api/v1/evidence' + (action === 'search' ? '/search' : ''));
+    });
+    it.each([
+      { created_from: '2026-09-01T12:00:00Z' },
+      { created_until: '2026-02-30' },
+      { source_id: 'source/hash' },
+      { report_id: id, document_id: id },
+      { created_from: '2026-09-14', created_until: '2026-09-01' },
+      { created_until: '9999-12-31' },
+      { tag: '' },
+    ])('rejects API-invalid evidence.' + action + ' filters before HTTP: %j', async filters => {
+      await expect(invoke('evidence', { action, project_id: id, ...(action === 'search' ? { q: 'research' } : {}), ...filters })).rejects.toThrow();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+  }
+
   it('keeps every home href and authored field, without caching snapshot totals', async () => {
     respond(home);
     respond({ ...home, missions: { total: 84, by_status: {} } });

@@ -558,12 +558,12 @@ export const TOOLS: Tool[] = [
       type: 'object',
       properties: {
         entry_id: { type: 'string', format: 'uuid', description: 'Evidence entry UUID for get.' },
-        tag: { type: 'string', description: 'Exact tag filter for list/search.' },
-        created_from: { type: 'string', format: 'date-time' },
-        created_until: { type: 'string', format: 'date-time' },
-        source_id: { type: 'string' },
-        report_id: { type: 'string', format: 'uuid' },
-        document_id: { type: 'string', format: 'uuid' },
+        tag: { type: 'string', minLength: 1, maxLength: 64, description: 'Exact tag filter for list/search.' },
+        created_from: { type: 'string', format: 'date' },
+        created_until: { type: 'string', format: 'date' },
+        source_id: { type: 'string', format: 'uuid' },
+        report_id: { type: 'string', format: 'uuid', description: 'Evidence report context; mutually exclusive with document_id and must belong to project_id.' },
+        document_id: { type: 'string', format: 'uuid', description: 'Evidence document context; mutually exclusive with report_id and must belong to project_id.' },
         action: {
           type: 'string',
           enum: ['capture', 'note', 'list', 'search', 'promote', 'get'],
@@ -1017,11 +1017,11 @@ const PutEvidenceNoteInput = z.object({
   tags: EvidenceTagsSchema.optional(),
 });
 
-const ListEvidenceInput = z.object({
-  tag: z.string().optional(),
-  created_from: z.string().datetime({ offset: true }).optional(),
-  created_until: z.string().datetime({ offset: true }).optional(),
-  source_id: z.string().optional(),
+const EvidenceListInputBase = z.object({
+  tag: z.string().trim().min(1).max(64).optional(),
+  created_from: z.string().date().optional(),
+  created_until: z.string().date().optional(),
+  source_id: z.string().uuid().optional(),
   report_id: z.string().uuid().optional(),
   document_id: z.string().uuid().optional(),
   project_id: z.string().uuid(),
@@ -1032,9 +1032,16 @@ const ListEvidenceInput = z.object({
   page_size: z.number().int().min(1).max(100).optional().default(20),
 });
 
-const SearchEvidenceInput = ListEvidenceInput.extend({
+// Mirror the REST browser-filter rules before issuing a request.
+function validateEvidenceFilters(input: z.infer<typeof EvidenceListInputBase>, context: z.RefinementCtx) {
+  if (input.report_id && input.document_id) context.addIssue({ code: z.ZodIssueCode.custom, path: ['document_id'], message: 'Choose one report or document filter.' });
+  if (input.created_from && input.created_until && input.created_from > input.created_until) context.addIssue({ code: z.ZodIssueCode.custom, path: ['created_until'], message: 'Start date must not follow end date.' });
+  if (input.created_until === '9999-12-31') context.addIssue({ code: z.ZodIssueCode.custom, path: ['created_until'], message: 'End date is out of range.' });
+}
+const ListEvidenceInput = EvidenceListInputBase.superRefine(validateEvidenceFilters);
+const SearchEvidenceInput = EvidenceListInputBase.extend({
   q: requiredEvidenceText('q', 4000),
-});
+}).superRefine(validateEvidenceFilters);
 
 const PromoteEvidenceInput = z.object({
   project_id: z.string().uuid(),

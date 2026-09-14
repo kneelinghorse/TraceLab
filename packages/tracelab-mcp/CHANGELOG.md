@@ -17,6 +17,8 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 - Mission view, collection scope/pagination/instructions, evidence source/date
   filters, knowledge source/date filters, and explicit md/json/txt report export.
   Server totals, authored fields and legacy no-format export bytes are preserved.
+- Evidence filters match the deployed API: calendar dates, UUID source IDs,
+  one report/document context at a time, and validated date order.
 - PEDR exposes graph controls and diagnostics without changing plain knowledge
   retrieval. These changes remain unreleased at source version 1.1.1 until MCP-3.
 

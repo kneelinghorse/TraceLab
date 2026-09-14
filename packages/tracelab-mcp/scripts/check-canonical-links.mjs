@@ -163,10 +163,12 @@ try {
   await check('collection', { action: 'list', project_id: ids.project, page: 2, page_size: 3 }, ['GET /collections'], {}, undefined, [`project_id=${ids.project}&page=2&page_size=3`]);
   await check('collection', { action: 'get', collection_id: ids.collection }, [`GET /collections/${ids.collection}`], {}, value => assert.equal(value.instructions, markdown), ['']);
   await check('collection', { action: 'create', name: 'Collection', instructions: markdown }, ['POST /collections'], {}, value => { assert.equal(calls.at(-1).body.instructions, markdown); assert.equal(value.collection.instructions, markdown); }, ['']);
-  const filters = { tag: 'A & B', created_from: '2026-09-01T00:00:00Z', created_until: '2026-09-14T00:00:00Z', source_id: 'source/hash', report_id: ids.report, document_id: ids.document };
-  const filterQuery = new URLSearchParams(filters).toString();
-  await check('evidence', { action: 'list', project_id: ids.project, ...filters }, ['GET /evidence'], {}, undefined, [`project_id=${ids.project}&${filterQuery}&page=1&page_size=20`]);
-  await check('evidence', { action: 'search', project_id: ids.project, q: 'A & B', ...filters }, ['GET /evidence/search'], {}, undefined, [`project_id=${ids.project}&q=A+%26+B&${filterQuery}&page=1&page_size=20`]);
+  for (const relation of [{ report_id: ids.report }, { document_id: ids.document }]) {
+    const filters = { tag: 'A & B', created_from: '2026-09-01', created_until: '2026-09-14', source_id: ids.evidence, ...relation };
+    const filterQuery = new URLSearchParams(filters).toString();
+    await check('evidence', { action: 'list', project_id: ids.project, ...filters }, ['GET /evidence'], {}, undefined, [`project_id=${ids.project}&${filterQuery}&page=1&page_size=20`]);
+    await check('evidence', { action: 'search', project_id: ids.project, q: 'A & B', ...filters }, ['GET /evidence/search'], {}, undefined, [`project_id=${ids.project}&q=A+%26+B&${filterQuery}&page=1&page_size=20`]);
+  }
   await check('report', { action: 'export', report_id: ids.report, format: 'md' }, [`GET /reports/${ids.report}/export`], {}, value => assert.equal(value, markdown), ['format=md']);
   await check('report', { action: 'export', report_id: ids.report, format: 'json' }, [`GET /reports/${ids.report}/export`], {}, value => assert.equal(value, jsonExport), ['format=json']);
   await check('report', { action: 'export', report_id: ids.report, format: 'txt' }, [`GET /reports/${ids.report}/export`], {}, value => assert.equal(value, markdown), ['format=txt']);
