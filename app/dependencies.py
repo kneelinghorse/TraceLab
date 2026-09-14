@@ -14,6 +14,7 @@ from app.adapters.repositories.sqlalchemy_project_repo import SQLAlchemyProjectR
 from app.core.config import settings
 from app.ports.external import EmbeddingPort, LLMPort, VectorDBPort
 from app.ports.graph_neighborhood import GraphNeighborhoodRepository
+from app.ports.mission_views import MissionViewRepository
 from app.ports.navigation_search import NavigationSearchRepository
 from app.ports.repositories import DocumentRepository, MissionRepository, ProjectRepository
 from app.services.admin_stats import AdminStatsService
@@ -43,6 +44,13 @@ def get_collection_context_service() -> CollectionContextService:
     from app.adapters.repositories.sqlalchemy_collection_context_repo import SQLAlchemyCollectionContextRepository
 
     return CollectionContextService(SQLAlchemyCollectionContextRepository())
+
+
+def get_mission_view_repository() -> MissionViewRepository:
+    """Wire personal filters to live mission visibility."""
+    from app.adapters.repositories.sqlalchemy_mission_views_repo import SQLAlchemyMissionViewRepository
+
+    return SQLAlchemyMissionViewRepository()
 
 
 def get_home_service() -> HomeService:

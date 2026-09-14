@@ -8,10 +8,22 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.dependencies import get_home_service
-from app.schemas.home import HomeRecent, HomeResponse, HomeSection, ReviewCompletionRequest
+from app.schemas.home import HomeAttention, HomeRecent, HomeResponse, HomeSection, ReviewCompletionRequest
 from app.services.home import HomeService
 
 router = APIRouter()
+
+
+@router.get("/attention", response_model=HomeAttention)
+def get_attention(
+    response: Response,
+    project_id: UUID | None = None,
+    db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
+    service: HomeService = Depends(get_home_service),
+) -> HomeAttention:
+    response.headers["Cache-Control"] = "private, no-store"
+    return service.attention(db, user, project_id=project_id)
 
 
 @router.get("/favorites", response_model=HomeSection[HomeRecent])

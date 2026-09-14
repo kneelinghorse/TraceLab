@@ -28,6 +28,7 @@ async function fixture(page: Page) {
     else if (pathname.endsWith("/documents")) response = { data: [], pagination: { page: 1, page_size: 100, total: 117, pages: 2 } };
     else if (pathname.endsWith("/facets")) response = { source_types: [{ value: "transcript", count: 117 }], projects: [], document_types: [], tags: [], date_range: { min: null, max: null } };
     else if (pathname.endsWith("/search/history")) response = { entries: [{ ...entry, query_text: "Recent scope" }] };
+    else if (pathname.endsWith("/mission-views")) response = { items: [] };
     else if (pathname.endsWith("/saved-searches")) {
       if (route.request().method() === "POST") { const created = { ...entry, ...body, id: documentId }; saved = [...saved, created]; response = created; }
       else response = { items: saved, limit_per_user: 50 };

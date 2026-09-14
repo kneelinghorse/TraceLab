@@ -73,3 +73,16 @@ class HomeResponse(BaseModel):
 
 class ReviewCompletionRequest(BaseModel):
     updated_at: datetime
+
+
+class AttentionDashboard(BaseModel):
+    key: Literal["at_risk", "unreviewed"]
+    total: int
+
+
+class HomeAttention(BaseModel):
+    generated_at: datetime
+    stalled_after_seconds: int
+    total: int
+    by_reason: dict[str, int]
+    dashboards: list[AttentionDashboard]

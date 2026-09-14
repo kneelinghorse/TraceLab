@@ -272,6 +272,7 @@ export interface ApiMissionUpdate extends MissionAuthoringFields {
 }
 
 export interface MissionListParams {
+  reason?: string[];
   view?: "all" | "attention" | "queue";
   page?: number;
   page_size?: number;

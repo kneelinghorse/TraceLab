@@ -183,6 +183,11 @@ def pedr1c_anon_routes(
     """Alternate artifact routes that must reject anonymous callers."""
     return [
         *graph_scope_routes(prefix, resource_id),
+        ("get", f"{prefix}/home/attention", None),
+        ("get", f"{prefix}/mission-views", None),
+        ("post", f"{prefix}/mission-views", {}),
+        ("put", f"{prefix}/mission-views/{resource_id}", {}),
+        ("delete", f"{prefix}/mission-views/{resource_id}", None),
         ("get", f"{prefix}/navigation/search?q=rbac", None),
         ("get", f"{prefix}/collections", None),
         ("post", f"{prefix}/collections", {}),

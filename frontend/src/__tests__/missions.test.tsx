@@ -4,9 +4,10 @@ import type { ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
 import { SWRConfig } from "swr";
 import type { ApiMission, MissionStatus } from "@/types/mission";
-const mocks = vi.hoisted(() => ({ list: vi.fn(), get: vi.fn(), update: vi.fn(), review: vi.fn(), home: vi.fn(), projects: vi.fn(), httpGet: vi.fn(), push: vi.fn(), query: {} as Record<string, string> }));
+const mocks = vi.hoisted(() => ({ list: vi.fn(), get: vi.fn(), update: vi.fn(), review: vi.fn(), home: vi.fn(), attention: vi.fn(), views: vi.fn(), projects: vi.fn(), httpGet: vi.fn(), push: vi.fn(), query: {} as Record<string, string | string[]> }));
 vi.mock("@/lib/api/missions", () => ({ missionsApi: mocks }));
-vi.mock("@/lib/api/home", () => ({ homeApi: { get: mocks.home, review: mocks.review } }));
+vi.mock("@/lib/api/home", () => ({ homeApi: { get: mocks.home, review: mocks.review, attention: mocks.attention } }));
+vi.mock("@/lib/api/missionViews", async original => ({ ...await original<object>(), missionViewsApi: { list: mocks.views } }));
 vi.mock("@/lib/api/projects", () => ({ projectsApi: { listAllProjects: mocks.projects } }));
 vi.mock("@/lib/api/http", async importOriginal => ({ ...await importOriginal<object>(), httpClient: { get: mocks.httpGet } }));
 vi.mock("@/components/AuthGate", () => ({ AuthGate: ({ children }: { children: ReactNode }) => children }));
@@ -30,6 +31,8 @@ beforeEach(() => {
   mocks.home.mockResolvedValue({ missions: { total: 143 }, attention: { total: 4 }, active_runs: { total: 1 } });
   mocks.list.mockResolvedValue({ data: [mission("queued")], pagination: { total: 143, pages: 8, page: 1, page_size: 20 } });
   mocks.get.mockResolvedValue(mission());
+  mocks.attention.mockResolvedValue({ generated_at: "2026-09-14T00:00:00", dashboards: [{ key: "at_risk", total: 3 }, { key: "unreviewed", total: 1 }] });
+  mocks.views.mockResolvedValue({ items: [] });
 });
 it("uses server totals and query filters and never invents a queue position", async () => {
   mocks.query = { view: "queue", project_id: "project-1", page: "2" };
@@ -74,4 +77,17 @@ it("prepares a new run only after confirmation without mutating the old result",
   fireEvent.click(screen.getByRole("button", { name: "Continue" }));
   await waitFor(() => expect(mocks.push).toHaveBeenCalledWith({ pathname: "/missions/new", query: { from: "run-1" } }));
   expect(mocks.update).not.toHaveBeenCalled();
+});
+
+it("preserves repeated URL reasons in queries and clears them when leaving attention", async () => {
+  mocks.query = { view: "attention", reason: ["blocked", "stalled"], page: "2" };
+  mount(<MissionsPage />);
+  await screen.findByText("143 matching missions");
+  expect(mocks.list).toHaveBeenCalledWith(expect.objectContaining({ reason: ["blocked", "stalled"], page: 2 }));
+  expect(screen.getByLabelText("Blocked")).toBeChecked();
+  expect(screen.getByLabelText("Stalled queue")).toBeChecked();
+  fireEvent.click(screen.getByLabelText("Blocked"));
+  expect(mocks.push).toHaveBeenLastCalledWith({ pathname: "/missions", query: { view: "attention", reason: ["stalled"], page: 1 } }, undefined, { shallow: true });
+  fireEvent.click(screen.getByRole("button", { name: "Queue", exact: true }));
+  expect(mocks.push).toHaveBeenLastCalledWith({ pathname: "/missions", query: { view: "queue", page: 1 } }, undefined, { shallow: true });
 });

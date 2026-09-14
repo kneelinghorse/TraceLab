@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
+import { BUILTIN_DASHBOARDS, missionViewHref } from "@/lib/api/missionViews";
 import { useState } from "react";
 import type { ReactNode } from "react";
 import useSWR from "swr";
@@ -95,6 +96,7 @@ function HomeContent() {
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
         <Section title="Needs attention" count={data.attention.total} link={{ href: "/missions", label: "All missions" }}>
           <p className="border-b border-line px-5 py-3 text-xs text-muted">Validation failures first, then blocked runs, queues over {data.stalled_after_seconds / 3600} hour, and completions to review.</p>
+          <nav aria-label="Attention dashboards" className="flex flex-wrap gap-4 border-b border-line px-5 py-3 text-sm">{BUILTIN_DASHBOARDS.map(dashboard => <Link key={dashboard.key} href={missionViewHref(dashboard.filters)} className="text-accent-text underline underline-offset-4">{dashboard.label}</Link>)}</nav>
           <ol className="divide-y divide-line">{data.attention.items.map((mission) => {
             const reason = REASONS[mission.reason!];
             return <li key={mission.id} className="space-y-3 p-5">

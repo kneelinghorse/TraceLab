@@ -538,6 +538,11 @@ def test_pedr1c_anon_routes_cover_exact_alternate_surface():
 
     assert [(method, path) for method, path, _body in routes] == [
         ("get", f"/api/v1/graph/neighborhood?root_type=project&root_id={resource_id}"),
+        ("get", "/api/v1/home/attention"),
+        ("get", "/api/v1/mission-views"),
+        ("post", "/api/v1/mission-views"),
+        ("put", f"/api/v1/mission-views/{resource_id}"),
+        ("delete", f"/api/v1/mission-views/{resource_id}"),
         ("get", "/api/v1/navigation/search?q=rbac"),
         ("get", "/api/v1/collections"),
         ("post", "/api/v1/collections"),
