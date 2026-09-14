@@ -1,10 +1,11 @@
 {
   "mission": "UX-9",
-  "status": "local_verified_awaiting_ci_and_production",
+  "status": "production_failure_requires_cache_fix",
   "checked_at": "2026-09-14T01:03:57.556715+00:00",
   "base_commit": "f52088f6ffe0d89f3db856de6dbb282d527f998b",
   "decisions": [
-    416
+    416,
+    418
   ],
   "learnings": [
     171
@@ -60,7 +61,7 @@
       ],
       "serious_critical_axe_findings": 0,
       "horizontal_overflow": 0,
-      "seconds": 90,
+      "seconds": 88.254,
       "includes": "Final Tab-to-Keyboard-help regression and long URL rendering in all six theme/viewport combinations"
     },
     "frontend_lint": "passed",
@@ -115,7 +116,6 @@
     "No MCP surface, database schema, environment variable or PEDR authorization policy change."
   ],
   "remaining": [
-    "Source CI and merge",
     "Both Railway deployments SUCCESS for the exact merged source",
     "Real production six-type keyboard reach and non-admin API/UI scope equality; saved round trip",
     "124 direct production Light/Dark route checks",
@@ -153,5 +153,49 @@
       34794007691,
       34794005107
     ]
+  },
+  "source_commit": "b30ce74e494e757dff3a3f52c09360c2bf26b76d",
+  "merge_commit": "ed21f7c35ac2948fad0f52fd8aa989f50fdf7425",
+  "pr": 277,
+  "ci_final": {
+    "head": "b30ce74e494e757dff3a3f52c09360c2bf26b76d",
+    "backend": {
+      "run_id": 34794674773,
+      "passed": 2476,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 48,
+      "seconds": 415.9
+    },
+    "postgres": {
+      "run_id": 34794674759,
+      "passed": 134,
+      "skipped": 4,
+      "warnings": 17,
+      "seconds": 93.26
+    },
+    "production_build": {
+      "run_id": 34794674800,
+      "browser_passed": 45
+    },
+    "frontend": {
+      "run_id": 34794674840,
+      "passed": 204,
+      "lint": "passed",
+      "types": "passed"
+    },
+    "ruff": 34794674746,
+    "secrets": [
+      34794674752,
+      34794673589
+    ]
+  },
+  "production_initial": {
+    "deployment": "ux-9-deployment.json",
+    "live_failure": "ux-9-live-flow/attempt-2-cache-response-contract/receipt.json",
+    "six_entity_keyboard_destinations": 6,
+    "scoped_results_equal_api": 10,
+    "saved_search_execution": "HTTP500: semantic cache dropped required quality/routing",
+    "temporary_records_cleaned": true
   }
 }

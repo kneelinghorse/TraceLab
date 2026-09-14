@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
+import copy
+from types import SimpleNamespace
 from typing import Any
+from unittest.mock import Mock
 from uuid import uuid4
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.api.v1 import saved_searches as saved_router
+from app.core.cache import CacheRegistry
 from app.core.config import settings
 from app.core.security import (
     ROLE_SERVICE,
@@ -19,7 +24,11 @@ from app.models.project import Project
 from app.models.saved_search import SavedSearch
 from app.models.user import User
 from app.services import saved_search as saved_service_module
+from app.services.cache_manager import CacheManager
+from app.services.cache_metrics import CacheMetrics
+from app.services.rag_service import RagService
 from app.services.saved_search import SavedSearchService
+from app.services.semantic_cache import SemanticCacheService
 
 
 class _StubRagService:
@@ -110,6 +119,123 @@ class _StubRetrievalService:
                 "score": 0.91,
             }
         ]
+
+
+@pytest.mark.parametrize(
+    "invalid_field",
+    [
+        None,
+        "missing_quality",
+        "missing_routing",
+        "quality",
+        "routing",
+        "old_format",
+        "cleanup_failure",
+    ],
+)
+def test_saved_search_replays_real_semantic_cache(
+    monkeypatch, auth_headers, tmp_path, invalid_field
+):
+    """A cached answer must survive the same response contract as fresh synthesis.
+
+    Only Qdrant transport and paid providers are faked. Old/incomplete cache
+    entries must regenerate, without inventing quality or routing metadata.
+    """
+    expected = _StubRagService().run_query(search_mode="semantic")
+    qdrant = Mock()
+    qdrant.get_collections.return_value.collections = []
+    qdrant.scroll.return_value = ([], None)
+    qdrant.count.return_value.count = 1
+    cache = SemanticCacheService(client=qdrant, enabled=True)
+    cache.metrics = CacheMetrics()
+    cache.store_in_cache(
+        query_embedding=[1.0, 0.0, 0.0], result=expected, metadata={}
+    )
+    point = qdrant.upsert.call_args.kwargs["points"][0]
+    payload = copy.deepcopy(point.payload)
+    if invalid_field == "cleanup_failure":
+        payload.pop("quality", None)
+        qdrant.delete.side_effect = RuntimeError("Cache cleanup unavailable")
+    elif invalid_field == "old_format":
+        for field in ("quality", "routing", "search_mode", "latency_ms"):
+            payload.pop(field, None)
+    elif invalid_field and invalid_field.startswith("missing_"):
+        payload.pop(invalid_field.removeprefix("missing_"), None)
+    elif invalid_field:
+        payload[invalid_field] = {"invalid": True}
+    qdrant.search.return_value = [
+        SimpleNamespace(id=point.id, payload=payload, score=0.99)
+    ]
+
+    embedding = Mock()
+    embedding.generate_embedding.return_value = [1.0, 0.0, 0.0]
+    pedr = Mock()
+    source = expected["sources"][0]
+    pedr.search.return_value.results = [
+        SimpleNamespace(**source, rrf_score=source["score"], embedding=[1.0, 0.0, 0.0])
+    ]
+    service = RagService(
+        pedr_orchestrator=pedr,
+        embedding_service=embedding,
+        cache_service=cache,
+        client=Mock(),
+        cost_monitor=None,
+    )
+    service.cache_manager = CacheManager(
+        registry=CacheRegistry(), telemetry_path=tmp_path / "cache.jsonl"
+    )
+    generate = Mock(
+        return_value=(
+            expected["answer"],
+            expected["citations"],
+            expected["quality"],
+            copy.deepcopy(expected["routing"]),
+            [],
+        )
+    )
+    monkeypatch.setattr(service, "_generate_with_tiered_routing", generate)
+    monkeypatch.setattr(saved_router, "get_rag_service", lambda: service)
+    monkeypatch.setattr(saved_router, "get_retrieval_service", _StubRetrievalService)
+    client = TestClient(app)
+    created = client.post(
+        "/api/v1/saved-searches",
+        headers=auth_headers,
+        json={"name": "Cache contract", "query_text": "Cached research workflows"},
+    )
+    assert created.status_code == 201, created.text
+    execute_url = f"/api/v1/saved-searches/{created.json()['id']}/execute"
+    response = client.post(execute_url, headers=auth_headers)
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["rag"]["answer"] == expected["answer"]
+    assert body["rag"]["quality"] == expected["quality"]
+    assert body["rag"]["routing"]["selected_model"] == "gpt-test"
+    assert body["rag"]["cache"]["hit"] is (invalid_field is None)
+    assert body["saved_search"]["use_count"] == 1
+    assert generate.call_count == pedr.search.call_count == int(invalid_field is not None)
+    assert cache.metrics.miss_count == int(invalid_field is not None)
+    assert cache.metrics.error_count == int(invalid_field == "cleanup_failure")
+    if invalid_field:
+        qdrant.delete.assert_called_once_with(
+            collection_name=cache.collection_name, points_selector=[point.id], wait=True
+        )
+    else:
+        qdrant.delete.assert_not_called()
+        assert body["rag"]["routing"] == expected["routing"]
+
+    # Evict only the application TTL entry: replay must read the real Qdrant
+    # serialization, including the newly regenerated payload after a legacy miss.
+    service.cache_manager.clear()
+    latest = qdrant.upsert.call_args.kwargs["points"][0]
+    qdrant.search.return_value = [
+        SimpleNamespace(id=latest.id, payload=latest.payload, score=0.99)
+    ]
+    replay = client.post(execute_url, headers=auth_headers)
+    assert replay.status_code == 200, replay.text
+    assert replay.json()["rag"]["cache"]["hit"] is True
+    assert replay.json()["rag"]["quality"] == expected["quality"]
+    assert replay.json()["saved_search"]["use_count"] == 2
+    assert generate.call_count == int(invalid_field is not None)
 
 
 def test_saved_search_crud_flow(auth_headers):

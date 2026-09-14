@@ -1,0 +1,105 @@
+{
+  "startedAt": "2026-09-14T01:16:07.838Z",
+  "deployment": {
+    "checkedAt": "2026-09-14T01:15:21.051Z",
+    "commit": "ed21f7c35ac2948fad0f52fd8aa989f50fdf7425",
+    "api": {
+      "id": "e1a01027-cd5d-44b7-bb53-600b9b6ed18b",
+      "status": "SUCCESS",
+      "commit": "ed21f7c35ac2948fad0f52fd8aa989f50fdf7425"
+    },
+    "frontend": {
+      "id": "49ec2150-0bf3-4a71-ba01-02efea5b4274",
+      "status": "SUCCESS",
+      "commit": "ed21f7c35ac2948fad0f52fd8aa989f50fdf7425"
+    }
+  },
+  "steps": [
+    {
+      "name": "native-escape-restores-search-opener",
+      "at": "2026-09-14T01:16:13.769Z"
+    }
+  ],
+  "observations": [
+    {
+      "name": "light-1440-keyboard-project",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-1440-keyboard-document",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-1440-keyboard-mission",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-1440-keyboard-report",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-1440-keyboard-collection",
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "screenshots": [
+    "light-1440-keyboard-project.png",
+    "light-1440-keyboard-document.png",
+    "light-1440-keyboard-mission.png",
+    "light-1440-keyboard-report.png",
+    "light-1440-keyboard-collection.png"
+  ],
+  "keyboardDestinations": [
+    {
+      "kind": "project",
+      "query": "TraceLab Research",
+      "id": "0afcc588-e722-45bd-8320-f486601b877c",
+      "title": "TraceLab Research",
+      "href": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "total": 1
+    },
+    {
+      "kind": "document",
+      "query": "UX6-LIVE-20260913_report.md",
+      "id": "eb3074c0-f37e-4908-ac92-0d26d1882254",
+      "title": "UX6-LIVE-20260913_report.md",
+      "href": "/documents/eb3074c0-f37e-4908-ac92-0d26d1882254",
+      "total": 1
+    },
+    {
+      "kind": "mission",
+      "query": "UX-8 live audit: collection context for asynchronous job research",
+      "id": "39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+      "title": "UX-8 live audit: collection context for asynchronous job research",
+      "href": "/missions/39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+      "total": 1
+    },
+    {
+      "kind": "report",
+      "query": "Research: UX-6 live audit: asynchronous job status patterns",
+      "id": "c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+      "title": "Research: UX-6 live audit: asynchronous job status patterns",
+      "href": "/reports/c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+      "total": 1
+    },
+    {
+      "kind": "collection",
+      "query": "UX8-LIVE-20260913 Context",
+      "id": "a3e6d809-af90-4652-903f-5ce5c8842bf8",
+      "title": "UX8-LIVE-20260913 Context",
+      "href": "/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+      "total": 1
+    }
+  ],
+  "cleanup": [],
+  "passed": false,
+  "failure": {
+    "stage": "six entity keyboard destinations",
+    "message": "expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Search and navigation' }).getByRole('region', { name: /^Evidence \\(/ }).getByRole('button', { name: '﻿\\n\\n\\n\\nInternet Engineering Task Force (IETF)                  R. Fielding, Ed.\\nRequest for Comments: 9110                                         Adobe\\nSTD: 97                                               M. Nottingham, Ed.\\nObsoletes: 2818, 7230, 7231, 7232, 7233, 7235,                    Fastly', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.be.visible\" with timeout 5000ms\n  - waiting for getByRole('dialog', { name: 'Search and navigation' }).getByRole('region', { name: /^Evidence \\(/ }).getByRole('button', { name: '﻿\\n\\n\\n\\nInternet Engineering Task Force (IETF)                  R. Fielding, Ed.\\nRequest for Comments: 9110                                         Adobe\\nSTD: 97                                               M. Nottingham, Ed.\\nObsoletes: 2818, 7230, 7231, 7232, 7233, 7235,                    Fastly', exact: true })\n"
+  }
+}
