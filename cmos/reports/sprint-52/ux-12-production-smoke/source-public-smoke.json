@@ -1,0 +1,90 @@
+{
+  "tool": "playwright",
+  "generatedAt": "2026-09-14T22:15:37.395Z",
+  "completedAt": "2026-09-14T22:15:40.369Z",
+  "status": "passed",
+  "summary": {
+    "total": 5,
+    "expected": 5,
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "interrupted": 0,
+    "durationSeconds": 2.974,
+    "retries": 0
+  },
+  "environment": {
+    "node": "v24.6.0",
+    "ci": {
+      "provider": null
+    },
+    "projects": [
+      "chromium"
+    ],
+    "browsers": []
+  },
+  "tests": [
+    {
+      "title": "missions route responds at the public domain",
+      "file": "frontend/tests/e2e/production-smoke.spec.ts",
+      "line": 17,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 757,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "/admin/users is deployed as its own Next page",
+      "file": "frontend/tests/e2e/production-smoke.spec.ts",
+      "line": 23,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 284,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "/admin/spaces is deployed as its own Next page",
+      "file": "frontend/tests/e2e/production-smoke.spec.ts",
+      "line": 23,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 258,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "API health endpoint confirms production authorization and reconciler freshness",
+      "file": "frontend/tests/e2e/production-smoke.spec.ts",
+      "line": 33,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 70,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "every maintained migration preserves its destination and query parameters",
+      "file": "frontend/tests/e2e/route-migration.spec.ts",
+      "line": 5,
+      "column": 5,
+      "status": "passed",
+      "durationMs": 961,
+      "annotations": [],
+      "attachments": [
+        {
+          "name": "route-migration-coverage",
+          "contentType": "application/json",
+          "path": "/tmp/tracelab-s52-ux12/source-smoke-artifacts/route-migration-every-main-a90a2-nation-and-query-parameters-chromium/attachments/route-migration-coverage-cd82faf069628a65f3074b1368681916ed6f36c6.json"
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "artifactPath": "/tmp/tracelab-s52-ux12/source-public-smoke.json"
+}

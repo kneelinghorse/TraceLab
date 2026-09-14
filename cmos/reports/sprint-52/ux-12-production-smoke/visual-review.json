@@ -1,0 +1,106 @@
+{
+  "passed": true,
+  "timezone": "America/Chicago",
+  "reviewed_images": [
+    {
+      "path": "light-1440-save-dialog.png",
+      "sha256": "1d5749f8605187db4b33581d299567e181dce50fe291e559ffb48a00930c6374",
+      "reviewed_at": "2026-09-14T22:20:29.933054+00:00",
+      "notes": "Readable name input, focus ring, description and separate Cancel/Save controls."
+    },
+    {
+      "path": "light-1440-dashboard-strip.png",
+      "sha256": "e112f31a3da53ec9711881c340d664d47af003b47721b8004766172af51a76e4",
+      "reviewed_at": "2026-09-14T22:20:29.933418+00:00",
+      "notes": "All controls readable; counts8/427 and saved total3 visible; Chicago5:19PM agrees with22:19UTC."
+    },
+    {
+      "path": "light-1440-saved-view-palette.png",
+      "sha256": "761318517cc9d5e8ce3d93fcaace0a702a7f7599884da6075248385134b6e414",
+      "reviewed_at": "2026-09-14T22:20:29.933671+00:00",
+      "notes": "Saved view and total3 fully visible; search input and navigation remain usable."
+    },
+    {
+      "path": "light-390-save-dialog.png",
+      "sha256": "6d76a87195de1010c2f7303d6794a33db9de64d058a5c221e3796a772f089573",
+      "reviewed_at": "2026-09-14T22:20:59.061590+00:00",
+      "notes": "Name input and wrapped description fit; Cancel and Save have separate readable touch targets."
+    },
+    {
+      "path": "light-390-dashboard-strip.png",
+      "sha256": "25c7365b7b31b5c47c5b2efcd181fde51d6a43b79ae992677e2abcaa13474c6a",
+      "reviewed_at": "2026-09-14T22:20:59.062017+00:00",
+      "notes": "Dashboard counts8/427 and live total3 remain legible; saved-view long name wraps beside usable Rename/Delete controls; Chicago timestamp wraps without clipping."
+    },
+    {
+      "path": "light-390-saved-view-palette.png",
+      "sha256": "ce5ae592ba7c925a6bab2477c068d68398cf6f5d7defe4a1f30d131bd969bab8",
+      "reviewed_at": "2026-09-14T22:20:59.062296+00:00",
+      "notes": "Saved-view name and total3 fit on one line; input, Search, close and navigation remain usable."
+    },
+    {
+      "path": "light-1440-home.png",
+      "sha256": "594b801bad322e3493dbf3abcf10bb87a3e73c35555f0bcb3a25676a2504a960",
+      "reviewed_at": "2026-09-14T22:20:59.062886+00:00",
+      "notes": "Home counters435/427/0, six attention rows, result/evidence links, report485/project51/activity59 totals and Chicago dates are readable."
+    },
+    {
+      "path": "light-390-home.png",
+      "sha256": "38f3004de035352eafe703030b81819f00584ebfd49f3dca6ce927c281a7701a",
+      "reviewed_at": "2026-09-14T22:20:59.063478+00:00",
+      "notes": "Inspected full-resolution full-page capture. Both new dashboard links, all Home sections, count badges, evidence links and Chicago timestamps wrap without squeezing controls."
+    },
+    {
+      "path": "dark-1440-save-dialog.png",
+      "sha256": "8af12e2316615ab42e3fa642df03e99c005d67282efd2c881c91b569b0a6b4af",
+      "reviewed_at": "2026-09-14T22:21:27.935439+00:00",
+      "notes": "Name input, focus ring, wrapped description and separate Cancel/Save targets are readable in Dark mode."
+    },
+    {
+      "path": "dark-1440-dashboard-strip.png",
+      "sha256": "06caf5b10d64d499e5a83d0c31f8c1843714bb66ffd180977ef6b5c8f5e6a59c",
+      "reviewed_at": "2026-09-14T22:21:27.935746+00:00",
+      "notes": "Counts8/427 and saved total3 match API audit. Names, live Chicago time and Rename/Delete controls fit without clipping."
+    },
+    {
+      "path": "dark-1440-saved-view-palette.png",
+      "sha256": "48f3cf661a9e9e285cc7f76eaedd5552bcc861d8790c2ad08d5b9122c7713bdb",
+      "reviewed_at": "2026-09-14T22:21:27.935947+00:00",
+      "notes": "Saved-view name and total3 visible; search, close, navigation and keyboard-help controls readable."
+    },
+    {
+      "path": "dark-1440-home.png",
+      "sha256": "f10d8fe234b7cb759529f08221c29cbb883033b142a8d47682be04afbfe11e62",
+      "reviewed_at": "2026-09-14T22:21:27.936531+00:00",
+      "notes": "Inspected full-resolution capture with real data. Both attention dashboard links,435/427/0 mission counters,485reports/51projects/59activity totals, evidence links and Chicago dates remain legible."
+    },
+    {
+      "path": "dark-390-save-dialog.png",
+      "sha256": "9588e85ea34a64b7308d04867ff0ca1152a07f962634b0eeac978e550a46ed21",
+      "reviewed_at": "2026-09-14T22:21:27.936708+00:00",
+      "notes": "Name input, focus ring, wrapped description and separate Cancel/Save targets are readable in Dark mode."
+    },
+    {
+      "path": "dark-390-dashboard-strip.png",
+      "sha256": "13ccb592b6e50dc22c3f289c8daeb7c7f83e6f9827f6d966dbcf4e20d0ef390e",
+      "reviewed_at": "2026-09-14T22:21:27.936923+00:00",
+      "notes": "Counts8/427 and saved total3 match API audit. Names, live Chicago time and Rename/Delete controls fit without clipping."
+    },
+    {
+      "path": "dark-390-saved-view-palette.png",
+      "sha256": "50dcd414e4cf841172720e20f000e83879a1d2916c223965744ce6ff84372e1b",
+      "reviewed_at": "2026-09-14T22:21:27.937076+00:00",
+      "notes": "Saved-view name and total3 visible; search, close, navigation and keyboard-help controls readable."
+    },
+    {
+      "path": "dark-390-home.png",
+      "sha256": "284fc8ad5ae18079116f2fccb5716f67a84cb6cb07b935fc407b2e738bc055bb",
+      "reviewed_at": "2026-09-14T22:21:27.937593+00:00",
+      "notes": "Inspected full-resolution capture with real data. Both attention dashboard links,435/427/0 mission counters,485reports/51projects/59activity totals, evidence links and Chicago dates remain legible."
+    }
+  ],
+  "completed_at": "2026-09-14T22:21:27.940831+00:00",
+  "limitations": [
+    "The live active-run count was0. Conditional progress checks had no active production rows; local and CI active-run fixtures cover progress behavior."
+  ]
+}
