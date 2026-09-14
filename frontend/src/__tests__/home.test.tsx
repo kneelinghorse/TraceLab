@@ -42,6 +42,8 @@ describe("Home's operator workflow", () => {
     expect(within(screen.getByRole("region", { name: "Needs attention" })).getByText("32")).toBeVisible();
     expect(screen.getByRole("link", { name: "Open report" })).toHaveAttribute("href", "/reports/report-1");
     expect(screen.getByRole("link", { name: "Evidence (50)" })).toHaveAttribute("href", "/evidence?project_id=p&mission_id=mission-1");
+    expect(screen.getByRole("link", { name: "At risk missions" })).toHaveAttribute("href", "/missions?view=attention&reason=validation_failed&reason=blocked&reason=stalled");
+    expect(screen.getByRole("link", { name: "Unreviewed completions" })).toHaveAttribute("href", "/missions?view=attention&reason=unreviewed");
     expect(screen.getByText("Progress not reported yet.")).toBeVisible();
     expect(screen.queryByRole("progressbar")).toBeNull();
     expect(screen.getByRole("link", { name: "Inspect run" })).toHaveAttribute("href", "/missions/mission-2");

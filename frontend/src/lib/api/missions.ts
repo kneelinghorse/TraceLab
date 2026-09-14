@@ -32,6 +32,7 @@ export const missionsApi = {
         status: params.status,
         project_id: params.project_id,
         view: params.view,
+        ...(params.reason?.length ? { reason: params.reason } : {}),
       },
     });
   },

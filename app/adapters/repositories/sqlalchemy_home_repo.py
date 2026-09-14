@@ -5,7 +5,7 @@ from typing import Any
 from urllib.parse import urlencode
 from uuid import UUID
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import case, func, or_, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.orm import Query, Session, load_only, noload
@@ -19,6 +19,7 @@ from app.models.project import Project
 from app.models.report import Report
 from app.models.user_favorite import UserFavorite
 from app.schemas.home import (
+    HomeAttention,
     HomeEvidenceActivity,
     HomeMission,
     HomeMissionTotals,
@@ -27,7 +28,7 @@ from app.schemas.home import (
     HomeSection,
 )
 from app.services.home import observed_progress
-from app.services.mission_attention import STALLED_AFTER_SECONDS, attention_predicates
+from app.services.mission_attention import STALLED_AFTER_SECONDS, attention_predicates, attention_reason_clauses
 
 SECTION_LIMIT = 6
 
@@ -48,6 +49,21 @@ def _evidence_href(project_id, mission_id=None, session_key=None):
 
 
 class SQLAlchemyHomeRepository:
+    def attention(
+        self, db: Session, user: AuthenticatedUser, *, now: datetime, project_id: UUID | None = None,
+    ) -> HomeAttention:
+        query = _scoped(db, user, Mission)
+        if project_id is not None:
+            query = query.filter(Mission.project_id == project_id)
+        reasons = attention_reason_clauses(user.user_id, now=now)
+        counts = query.with_entities(*(func.count(case((clause, 1))) for clause in reasons.values())).one()
+        by_reason = dict(zip(reasons, counts, strict=True))
+        return HomeAttention(
+            generated_at=now, stalled_after_seconds=STALLED_AFTER_SECONDS,
+            total=sum(counts), by_reason=by_reason,
+            dashboards=[{"key": "at_risk", "total": sum(counts[:3])}, {"key": "unreviewed", "total": by_reason["unreviewed"]}],
+        )
+
     def favorites(
         self, db: Session, user: AuthenticatedUser, *, page: int = 1, page_size: int = SECTION_LIMIT,
         project_id: UUID | None = None,

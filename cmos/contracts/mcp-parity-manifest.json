@@ -1134,9 +1134,9 @@
         "frontend/src/pages/projects/[id].tsx"
       ],
       "mcp": "tracelab_mission.list",
-      "classification": "closed-MCP-1",
+      "classification": "partial",
       "baseline": "partial",
-      "rationale": "Closes missing view=all|attention|queue forwarding."
+      "rationale": "MCP-1 closed view=all|attention|queue forwarding. UX-12 adds repeatable reason filters; forwarding this new argument remains for MCP-2 along with the new dashboard reads."
     },
     {
       "id": "frontend/src/lib/api/missions.ts#missionsApi.previewContract:GET:/missions/{missionId}/contract-preview",
@@ -1789,6 +1789,94 @@
       "classification": "rest-only-by-design",
       "baseline": "auth-admin",
       "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+    },
+    {
+      "id": "frontend/src/lib/api/home.ts#homeApi.attention:GET:/home/attention",
+      "api_file": "frontend/src/lib/api/home.ts",
+      "operation": "homeApi.attention",
+      "method": "GET",
+      "path": "/api/v1/home/attention",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/missions/MissionDashboards.tsx",
+        "frontend/src/pages/missions/index.tsx",
+        "frontend/src/pages/missions/queue.tsx"
+      ],
+      "classification": "deferred-MCP-2",
+      "mcp": null,
+      "rationale": "UX-12 live attention/saved-view read; MCP-2 will expose this per decision 426.",
+      "source_line": 46
+    },
+    {
+      "id": "frontend/src/lib/api/missionViews.ts#missionViewsApi.create:POST:/mission-views",
+      "api_file": "frontend/src/lib/api/missionViews.ts",
+      "operation": "missionViewsApi.create",
+      "method": "POST",
+      "path": "/api/v1/mission-views",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/missions/MissionDashboards.tsx",
+        "frontend/src/pages/missions/index.tsx",
+        "frontend/src/pages/missions/queue.tsx"
+      ],
+      "classification": "rest-only-by-design",
+      "mcp": null,
+      "rationale": "Personal saved-view preferences are REST/UI-only by decision 426.",
+      "source_line": 26
+    },
+    {
+      "id": "frontend/src/lib/api/missionViews.ts#missionViewsApi.delete:DELETE:/mission-views/{id}",
+      "api_file": "frontend/src/lib/api/missionViews.ts",
+      "operation": "missionViewsApi.delete",
+      "method": "DELETE",
+      "path": "/api/v1/mission-views/{id}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/missions/MissionDashboards.tsx",
+        "frontend/src/pages/missions/index.tsx",
+        "frontend/src/pages/missions/queue.tsx"
+      ],
+      "classification": "rest-only-by-design",
+      "mcp": null,
+      "rationale": "Personal saved-view preferences are REST/UI-only by decision 426.",
+      "source_line": 28
+    },
+    {
+      "id": "frontend/src/lib/api/missionViews.ts#missionViewsApi.list:GET:/mission-views",
+      "api_file": "frontend/src/lib/api/missionViews.ts",
+      "operation": "missionViewsApi.list",
+      "method": "GET",
+      "path": "/api/v1/mission-views",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/AppShell.tsx",
+        "frontend/src/components/CommandPalette.tsx",
+        "frontend/src/components/missions/MissionDashboards.tsx",
+        "frontend/src/pages/_app.tsx",
+        "frontend/src/pages/missions/index.tsx",
+        "frontend/src/pages/missions/queue.tsx"
+      ],
+      "classification": "deferred-MCP-2",
+      "mcp": null,
+      "rationale": "UX-12 live attention/saved-view read; MCP-2 will expose this per decision 426.",
+      "source_line": 25
+    },
+    {
+      "id": "frontend/src/lib/api/missionViews.ts#missionViewsApi.rename:PUT:/mission-views/{id}",
+      "api_file": "frontend/src/lib/api/missionViews.ts",
+      "operation": "missionViewsApi.rename",
+      "method": "PUT",
+      "path": "/api/v1/mission-views/{id}",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/missions/MissionDashboards.tsx",
+        "frontend/src/pages/missions/index.tsx",
+        "frontend/src/pages/missions/queue.tsx"
+      ],
+      "classification": "rest-only-by-design",
+      "mcp": null,
+      "rationale": "Personal saved-view preferences are REST/UI-only by decision 426.",
+      "source_line": 27
     }
   ]
 }

@@ -3,6 +3,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 import { formatDistanceToNow } from "date-fns";
+import { MissionDashboards } from "@/components/missions/MissionDashboards";
+import { ATTENTION_REASONS, REASON_LABELS } from "@/lib/api/missionViews";
 import { AuthGate } from "@/components/AuthGate";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { PaginationBar } from "@/components/ui/PaginationBar";
@@ -36,14 +38,15 @@ function MissionsContent() {
   const router = useRouter();
   const { user } = useAuth();
   const view = VIEWS.find(value => value === router.query.view) ?? "all";
+  const reason = typeof router.query.reason === "string" ? [router.query.reason] : router.query.reason;
   const status = STATUSES.find(value => value === router.query.status);
   const projectId = typeof router.query.project_id === "string" ? router.query.project_id : undefined;
   const parsedPage = Number(router.query.page ?? 1);
   const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const projects = useSWR(["mission-project-options", user?.user_id], () => projectsApi.listAllProjects());
   const home = useSWR(["home", user?.user_id], () => homeApi.get(), { refreshInterval: 15000 });
-  const { missions, pagination, isLoading, error, refresh } = useApiMissions({ page, pageSize: 20, status, projectId, view });
-  function change(values: Record<string, string | number | undefined>) {
+  const { missions, pagination, isLoading, error, refresh } = useApiMissions({ page, pageSize: 20, status, projectId, view, reason });
+  function change(values: Record<string, string | string[] | number | undefined>) {
     const query = { ...router.query, ...values };
     Object.keys(query).forEach(key => { if (query[key] === undefined || query[key] === "") delete query[key]; });
     void router.push({ pathname: "/missions", query }, undefined, { shallow: true });
@@ -59,9 +62,11 @@ function MissionsContent() {
         {[["Missions", home.data.missions.total], ["Needs attention", home.data.attention.total], ["Running", home.data.active_runs.total]].map(([label, count]) => <div key={label}><dt className="text-sm text-muted">{label}</dt><dd className="mt-1 text-2xl font-semibold">{count}</dd></div>)}
       </dl>}
     </section>
+    <MissionDashboards filters={{ view, ...(reason?.length ? { reason } : {}), ...(status ? { status } : {}), ...(projectId ? { project_id: projectId } : {}) }} />
     <section className="panel p-4 sm:p-6" aria-label="Mission list">
-      <nav aria-label="Mission views" className="mb-4 flex flex-wrap gap-2">{VIEWS.map(value => <button key={value} aria-current={view === value ? "page" : undefined} onClick={() => change({ view: value, status: undefined, page: 1 })} className={`rounded-lg px-4 py-2 text-sm ${view === value ? "bg-accent text-on-accent" : "border border-line"}`}>{value === "all" ? "All missions" : value === "attention" ? "Needs attention" : "Queue"}</button>)}</nav>
+      <nav aria-label="Mission views" className="mb-4 flex flex-wrap gap-2">{VIEWS.map(value => <button key={value} aria-current={view === value ? "page" : undefined} onClick={() => change({ view: value, reason: undefined, status: undefined, page: 1 })} className={`rounded-lg px-4 py-2 text-sm ${view === value ? "bg-accent text-on-accent" : "border border-line"}`}>{value === "all" ? "All missions" : value === "attention" ? "Needs attention" : "Queue"}</button>)}</nav>
       <p className="mb-4 text-sm text-secondary">{view === "queue" ? "Queued and running missions. Queue position and wait time are not reported by the worker." : "Validation failures, blocked work, stalled queues and unreviewed results appear first."}</p>
+      {view === "attention" && <fieldset className="mb-5"><legend className="mb-2 text-sm font-medium">Attention reasons</legend><div className="flex flex-wrap gap-3">{ATTENTION_REASONS.map(value => <label key={value} className="flex items-center gap-2 text-sm"><input type="checkbox" className="accent-accent" checked={reason?.includes(value) ?? false} onChange={event => { const next = event.target.checked ? [...(reason ?? []), value] : reason?.filter(item => item !== value); change({ reason: next?.length ? next : undefined, page: 1 }); }} />{REASON_LABELS[value]}</label>)}</div><p className="mt-2 text-xs text-muted">No reasons selected includes all attention reasons.</p></fieldset>}
       <div className="mb-5 flex flex-wrap items-end gap-3">
         <div><label htmlFor="status-filter" className="form-label">Status</label><select id="status-filter" className="form-input" value={status ?? ""} onChange={event => change({ status: event.target.value, page: 1 })}><option value="">All statuses</option>{STATUSES.map(value => <option key={value} value={value}>{value.replaceAll("_", " ")}</option>)}</select></div>
         <div className="min-w-0 max-w-full"><label htmlFor="project-filter" className="form-label">Project</label><select id="project-filter" className="form-input max-w-full sm:max-w-72" value={projectId ?? ""} onChange={event => change({ project_id: event.target.value, page: 1 })}><option value="">All projects</option>{projects.data?.map(project => <option key={project.id} value={project.id}>{project.name}</option>)}</select></div>

@@ -274,6 +274,7 @@ def list_missions(
         None,
         description="Filter by project UUID",
     ),
+    reason: list[str] | None = Query(None, description="Repeatable attention reason; requires view=attention"),
     view: Literal["all", "attention", "queue"] | None = Query(
         None, description="Exceptions-first view; queue includes queued and running missions",
     ),
@@ -301,6 +302,7 @@ def list_missions(
             project_id=project_id,
             access_filter=accessible_filter(user, Mission, db),
             view=view,
+            reason=reason,
             user_id=user.user_id,
         )
         return PaginatedResponse(

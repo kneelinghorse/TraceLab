@@ -29,6 +29,7 @@ from app.api.v1 import (
     health,
     home,
     mission_events,
+    mission_views,
     missions,
     monitoring,
     navigation_search,
@@ -292,6 +293,12 @@ app.include_router(
     evidence.router,
     prefix=f"{settings.api_v1_prefix}/evidence",
     tags=["evidence"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    mission_views.router,
+    prefix=f"{settings.api_v1_prefix}/mission-views",
+    tags=["mission-views"],
     dependencies=protected_dependencies,
 )
 app.include_router(

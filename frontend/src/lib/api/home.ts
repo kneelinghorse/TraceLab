@@ -37,7 +37,13 @@ export interface HomeSnapshot {
   favorites: HomeSection<HomeRecent>;
   evidence_activity: HomeSection<HomeEvidenceActivity>;
 }
+export interface HomeAttention {
+  generated_at: string; stalled_after_seconds: number; total: number;
+  by_reason: Record<string, number>;
+  dashboards: { key: "at_risk" | "unreviewed"; total: number }[];
+}
 export const homeApi = {
+  attention: (projectId?: string) => httpClient.get<HomeAttention>("/home/attention", { params: { project_id: projectId } }),
   favorites: (params: { page?: number; page_size?: number; project_id?: string } = {}) => httpClient.get<HomeSection<HomeRecent>>("/home/favorites", { params }),
   pinProject: (id: string) => httpClient.put<void>(`/home/favorites/projects/${id}`),
   unpinProject: (id: string) => httpClient.delete<void>(`/home/favorites/projects/${id}`),

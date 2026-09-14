@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.security import AuthenticatedUser
 from app.ports.home import HomeRepository
-from app.schemas.home import HomeProgress, HomeRecent, HomeResponse, HomeSection
+from app.schemas.home import HomeAttention, HomeProgress, HomeRecent, HomeResponse, HomeSection
 
 
 def observed_progress(metadata: object) -> HomeProgress:
@@ -38,6 +38,9 @@ def observed_progress(metadata: object) -> HomeProgress:
 class HomeService:
     def __init__(self, repository: HomeRepository):
         self.repository = repository
+
+    def attention(self, db: Session, user: AuthenticatedUser, *, project_id: UUID | None = None) -> HomeAttention:
+        return self.repository.attention(db, user, now=datetime.now(UTC).replace(tzinfo=None), project_id=project_id)
 
     def snapshot(self, db: Session, user: AuthenticatedUser) -> HomeResponse:
         return self.repository.snapshot(db, user, now=datetime.now(UTC).replace(tzinfo=None))

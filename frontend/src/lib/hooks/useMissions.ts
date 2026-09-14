@@ -17,11 +17,12 @@ interface UseApiMissionsOptions {
   status?: MissionStatus;
   projectId?: string;
   view?: MissionListParams["view"];
+  reason?: string[];
 }
 
 export function useApiMissions(options: UseApiMissionsOptions = {}) {
   const { user } = useAuth();
-  const { page = 1, pageSize = 20, status, projectId, view } = options;
+  const { page = 1, pageSize = 20, status, projectId, view, reason } = options;
 
   const params: MissionListParams = {
     page,
@@ -29,9 +30,10 @@ export function useApiMissions(options: UseApiMissionsOptions = {}) {
     status,
     project_id: projectId,
     view,
+    ...(reason?.length ? { reason } : {}),
   };
 
-  const key = [API_MISSIONS_KEY, user?.user_id, page, pageSize, status ?? "all", projectId ?? "all", view];
+  const key = [API_MISSIONS_KEY, user?.user_id, page, pageSize, status ?? "all", projectId ?? "all", view, reason];
 
   const { data, error, isLoading, mutate: mutateList } = useSWR<PaginatedResponse<ApiMission>>(
     key,

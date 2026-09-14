@@ -8,6 +8,7 @@ import { PaginationBar } from "@/components/ui/PaginationBar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRole } from "@/contexts/RoleContext";
 import { navigationApi, type NavigationEntityType, type NavigationGroup } from "@/lib/api/navigation";
+import { missionViewsApi, missionViewHref } from "@/lib/api/missionViews";
 import { savedSearchesApi } from "@/lib/api/savedSearches";
 import { searchApi } from "@/lib/api/search";
 import { OPEN_COMMAND_PALETTE_EVENT } from "@/lib/command-palette";
@@ -67,6 +68,8 @@ export function CommandPalette() {
   const { data, error, isLoading, mutate } = useSWR(open && userId && term && term === debounced ? ["palette-names", userId, term] : null, () => navigationApi.search(term));
   const history = useSWR(open && userId ? ["palette-history", userId] : null, () => searchApi.history(5));
   const saved = useSWR(open && userId ? ["palette-saved", userId] : null, () => savedSearchesApi.list());
+  const views = useSWR(open && userId ? ["mission-views", userId] : null, () => missionViewsApi.list());
+  const viewItems = views.data?.items?.filter(entry => entry.name.toLowerCase().includes(term.toLowerCase())) ?? [];
   const groups = data?.groups?.filter(group => group.total > 0) ?? [];
   const items = navigationGroups.filter(group => !group.admin || isAdmin).flatMap(group => group.items).filter(item => item.label.toLowerCase().includes(term.toLowerCase()));
   const recent = history.data?.entries?.filter(entry => entry.query_text.toLowerCase().includes(term.toLowerCase())) ?? [];
@@ -96,6 +99,7 @@ export function CommandPalette() {
       {term && (term !== debounced || isLoading ? <PageState state="loading" title="Finding objects…" /> : error ? <PageState state="error" title="Could not find objects" onRetry={() => void mutate()} /> : groups.length ? groups.map(group => <EntityGroup key={`${term}-${group.entity_type}`} initial={group} query={term} userId={userId} go={go} />) : <PageState state="empty" title="No matching objects">Press Enter to search your research.</PageState>)}
       {history.error ? <PageState state="error" title="Could not load recent searches" onRetry={() => void history.mutate()} /> : recent.length > 0 && <section aria-label="Recent searches" className="py-2"><h3 className="px-3 py-2 text-xs text-muted">Recent searches</h3>{recent.map(entry => <button key={entry.id} type="button" data-command-item className={commandClass} onClick={() => go(`/search?history=${encodeURIComponent(entry.id)}`)}><span className="line-clamp-2 break-words">{entry.query_text}</span></button>)}</section>}
       {saved.error ? <PageState state="error" title="Could not load saved searches" onRetry={() => void saved.mutate()} /> : savedItems.length > 0 && <section aria-label="Saved searches" className="py-2"><h3 className="px-3 py-2 text-xs text-muted">Saved searches</h3>{savedItems.map(entry => <button key={entry.id} type="button" data-command-item className={commandClass} onClick={() => go(`/search?saved=${encodeURIComponent(entry.id)}`)}><span className="line-clamp-2 break-words">{entry.name}</span></button>)}</section>}
+      {views.error ? <PageState state="error" title="Could not load saved mission views" onRetry={() => void views.mutate()} /> : views.isLoading ? <PageState state="loading" title="Loading saved mission views…" /> : viewItems.length > 0 && <section aria-label="Saved mission views" className="py-2"><h3 className="px-3 py-2 text-xs text-muted">Saved mission views</h3>{viewItems.map(entry => <button key={entry.id} type="button" data-command-item className={commandClass} onClick={() => go(missionViewHref(entry.filters))}><span className="line-clamp-2 break-words">{entry.name} ({entry.total})</span></button>)}</section>}
       {!term && <section aria-label="Actions" className="py-2"><h3 className="px-3 py-2 text-xs text-muted">Actions</h3><button type="button" data-command-item className={commandClass} onClick={() => go("/missions/new")}>New mission</button><button type="button" data-command-item className={commandClass} onClick={() => go("/documents/upload")}>Upload documents</button></section>}
       {items.length > 0 && <section aria-label="Go to" className="py-2"><h3 className="px-3 py-2 text-xs text-muted">Go to</h3>{items.map(item => <button key={item.href} type="button" data-command-item className="app-nav-link w-full text-left" onClick={() => go(item.href)}><NavigationIcon name={item.icon} />{item.label}</button>)}</section>}
     </div>

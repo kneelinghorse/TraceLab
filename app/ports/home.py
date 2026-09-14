@@ -7,10 +7,14 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from app.core.security import AuthenticatedUser
-from app.schemas.home import HomeRecent, HomeResponse, HomeSection
+from app.schemas.home import HomeAttention, HomeRecent, HomeResponse, HomeSection
 
 
 class HomeRepository(Protocol):
+    def attention(
+        self, db: Session, user: AuthenticatedUser, *, now: datetime, project_id: UUID | None = None
+    ) -> HomeAttention: ...
+
     def favorites(
         self, db: Session, user: AuthenticatedUser, *, page: int = 1, page_size: int = 6, project_id: UUID | None = None
     ) -> HomeSection[HomeRecent]: ...

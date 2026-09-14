@@ -32,7 +32,7 @@ type ApiRequestOptions = RequestInit & {
   params?: RequestParams;
 };
 
-type RequestParams = Record<string, string | number | boolean | undefined>;
+type RequestParams = Record<string, string | number | boolean | string[] | undefined>;
 
 const normalizePath = (path: string): string => {
   if (!path) {
@@ -50,7 +50,8 @@ const buildSearch = (params?: RequestParams): string => {
     if (value === undefined || value === null) {
       return;
     }
-    searchParams.append(key, String(value));
+    if (Array.isArray(value)) value.forEach(item => searchParams.append(key, item));
+    else searchParams.append(key, String(value));
   });
   const query = searchParams.toString();
   return query ? `?${query}` : "";

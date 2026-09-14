@@ -10,13 +10,14 @@ import math
 from datetime import datetime
 from uuid import UUID
 
+from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
 
 from app.core.mission_events import emit_mission_status_change
 from app.models.mission import MISSION_STATUSES, Mission
 from app.schemas.mission import MissionCreate, MissionUpdate
 from app.schemas.pagination import PaginationMeta
-from app.services.mission_attention import attention_predicates
+from app.services.mission_attention import attention_predicates, attention_reason_clauses
 from app.services.ownership import project_owner_workspace
 
 
@@ -102,6 +103,7 @@ class MissionService:
         access_filter=None,
         view: str | None = None,
         user_id: UUID | None = None,
+        reason: list[str] | None = None,
     ) -> tuple[list[Mission], PaginationMeta]:
         """Return paginated missions with optional filtering.
 
@@ -134,10 +136,17 @@ class MissionService:
         if access_filter is not None:
             query = query.filter(access_filter)
 
+        now = datetime.utcnow()
+        if reason:
+            clauses = attention_reason_clauses(user_id, now=now)
+            if view != "attention" or any(value not in clauses for value in reason):
+                raise MissionValidationError("Reasons require view=attention and a valid attention reason")
+            query = query.filter(or_(*(clauses[value] for value in reason)))
+
         if view is not None:
             if view not in {"all", "attention", "queue"}:
                 raise MissionValidationError("Invalid mission view")
-            attention, rank = attention_predicates(user_id, now=datetime.utcnow())
+            attention, rank = attention_predicates(user_id, now=now)
             if view == "attention":
                 query = query.filter(attention)
             elif view == "queue":
