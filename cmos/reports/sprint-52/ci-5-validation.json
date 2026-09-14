@@ -2012,5 +2012,75 @@
     "mcp-package remains advisory; its later promotion is deferred to Sprint 53.",
     "Production smoke is the existing five-test public browser/API suite with sixteen route-migration checks. CI-5 is not a UI mission; the authenticated 124-check UI baseline is not claimed.",
     "This receipt accepts the source merge 279f875. Its carrier PR cannot contain its own merge SHA or post-merge outcomes; those are verified and cited in the CMOS completion note after the receipt reaches main."
-  ]
+  ],
+  "receipt_carrier_main_correction": {
+    "recorded_at": "2026-09-14T07:20:13.444994+00:00",
+    "learning_id": 177,
+    "carrier_pr": 286,
+    "commit": "b38da5a0ebdcc8091b764c8f3d0f046c873e6368",
+    "original_failure": {
+      "run_id": 34817113945,
+      "attempt": 1,
+      "event": "push",
+      "branch": "main",
+      "context": "vitest",
+      "conclusion": "failure",
+      "passed": 207,
+      "failed": 1,
+      "test": "src/__tests__/admin/users.test.tsx > UsersAdmin \u2014 error surfacing > surfaces a delete failure, dismisses the dialog, and does not reload",
+      "assertion": "expected dialog to be null",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34817113945"
+    },
+    "interpretation": "Source acceptance above remains scoped to 279f875. The receipt carrier b38da5a failed on the same delete-dialog assertion as the Sprint 51 main failure. No application, test, workflow, threshold or quarantine changes. This original failure is preserved independently of a later rerun.",
+    "rerun": {
+      "run_id": 34817113945,
+      "attempt": 2,
+      "context": "vitest",
+      "conclusion": "success",
+      "passed": 208,
+      "failed": 0,
+      "job_url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34817113945/job/103890897103",
+      "failed_jobs_only": true,
+      "test_or_code_change": false,
+      "original_failure_preserved": true
+    },
+    "deployments": {
+      "checked_at": "2026-09-14T07:20:22.387378+00:00",
+      "commit": "b38da5a0ebdcc8091b764c8f3d0f046c873e6368",
+      "services": {
+        "TraceLab": {
+          "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+          "deployment_id": "76b257b0-2dae-4a82-82b5-0102b3131322",
+          "status": "SUCCESS",
+          "commit": "b38da5a0ebdcc8091b764c8f3d0f046c873e6368",
+          "created_at": "2026-09-14T07:16:36.388Z"
+        },
+        "frontend": {
+          "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+          "deployment_id": "d283c6cb-c7f6-4a26-8892-c62ab7cd7429",
+          "status": "SUCCESS",
+          "commit": "b38da5a0ebdcc8091b764c8f3d0f046c873e6368",
+          "created_at": "2026-09-14T07:16:36.388Z"
+        }
+      },
+      "both_success_for_commit": true
+    },
+    "production_smoke": {
+      "after_both_services_success": true,
+      "checked_at": "2026-09-14T07:20:40.443Z",
+      "summary": {
+        "total": 5,
+        "expected": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "durationSeconds": 3.353,
+        "retries": 0
+      },
+      "migration_checks_passed": 16,
+      "migration_checks_total": 16
+    },
+    "limitation": "The known delete-dialog test flake is not fixed by CI-5; no test or runtime changes are authorized in this mission. A passing rerun does not erase the failed original main attempt."
+  }
 }
