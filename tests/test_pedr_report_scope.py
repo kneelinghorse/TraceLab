@@ -496,7 +496,8 @@ def test_scoped_collection_synthesis_empty_result_persists_collection_only(
     )
 
     assert response.report_id is not None
-    assert synthesis.calls[0]["accessible_project_ids"] == [allowed_project_id]
+    assert synthesis.calls == [], "Empty authorized context must not reach a provider or cache"
+    assert response.content == SynthesisService._empty_result(include_effective_chunk_ids=True)["content"]
     db_session.expire_all()
     report = db_session.get(Report, response.report_id)
     assert report is not None

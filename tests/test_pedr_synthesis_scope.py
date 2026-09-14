@@ -120,21 +120,17 @@ class _ExplodingDB:
         raise AssertionError("unrestricted synthesis must keep collection loading in the service")
 
 
-@pytest.mark.parametrize(
-    ("rbac_enabled", "role"),
-    [(False, ROLE_MEMBER), (True, ROLE_ADMIN), (True, ROLE_OWNER)],
-)
 def test_unrestricted_route_preserves_legacy_service_call(
-    monkeypatch, rbac_enabled: bool, role: str
+    monkeypatch,
 ):
-    """Flag-off and privileged callers retain the exact pre-scope call shape."""
-    monkeypatch.setattr(settings, "rbac_enabled", rbac_enabled)
+    """Flag-off callers retain the exact pre-scope call shape."""
+    monkeypatch.setattr(settings, "rbac_enabled", False)
     service = _RecordingService()
     collection_id = uuid4()
 
     response = synthesize(
         SynthesizeRequest(collection_id=collection_id, prompt="  Keep case  "),
-        current_user=_principal(role=role),
+        current_user=_principal(),
         db=_ExplodingDB(),
         service_factory=lambda: service,
     )
@@ -162,6 +158,57 @@ class _RecordingCache:
     def set(self, **kwargs):
         self.set_calls.append(kwargs)
         return "cache-id"
+
+
+@pytest.mark.parametrize("role", [ROLE_ADMIN, ROLE_OWNER])
+@pytest.mark.parametrize("input_kind", ["collection", "chunks"])
+@pytest.mark.parametrize("has_live_chunk", [True, False])
+def test_privileged_synthesis_resolves_live_documents_before_cache_and_provider(
+    db_session, monkeypatch, role, input_kind, has_live_chunk,
+):
+    """Privilege cannot send deleted sources to a provider or resurrect them in reports."""
+    from app.models.report import ReportSource
+
+    monkeypatch.setattr(settings, "rbac_enabled", True)
+    live = _project(db_session, name="Live")
+    deleted_parent = _project(db_session, name="Deleted")
+    deleted_parent.deleted_at = datetime.utcnow()
+    chunks = [
+        _chunk(db_session, project_id=live.id, content="Allowed research", deleted=not has_live_chunk),
+        _chunk(db_session, project_id=live.id, content="Deleted document secret", deleted=True),
+        _chunk(db_session, project_id=deleted_parent.id, content="Deleted parent secret"),
+    ]
+    collection = Collection(name="Mixed lifecycle sources")
+    db_session.add(collection)
+    db_session.flush()
+    db_session.add_all([CollectionItem(collection_id=collection.id, chunk_id=c.id) for c in chunks])
+    db_session.commit()
+    cache = _RecordingCache()
+    service, client = _service(cache_service=cache)
+    factory = MagicMock(return_value=service)
+    inputs = {"collection_id": collection.id} if input_kind == "collection" else {"chunk_ids": [c.id for c in chunks]}
+    result = synthesize(
+        SynthesizeRequest(**inputs, save_as_report=True, report_title="Live sources only"),
+        current_user=_principal(role=role), db=db_session, service_factory=factory,
+    )
+    expected = [chunks[0].id] if has_live_chunk else []
+    sources = db_session.query(ReportSource).filter_by(report_id=result.report_id, source_type="chunk").all()
+    assert {row.source_id for row in sources} == set(expected)
+    assert result.chunk_count == len(expected)
+    if has_live_chunk:
+        factory.assert_called_once_with()
+        client.chat.completions.create.assert_called_once()
+        messages = str(client.chat.completions.create.call_args.kwargs["messages"])
+        assert "Allowed research" in messages
+        assert "Deleted document secret" not in messages
+        assert "Deleted parent secret" not in messages
+        assert len(cache.get_calls) == len(cache.set_calls) == 1
+        for call in cache.get_calls + cache.set_calls:
+            assert call["chunk_ids"] == SynthesisService._scoped_cache_chunk_ids(expected, [live.id])
+    else:
+        factory.assert_not_called()
+        client.chat.completions.create.assert_not_called()
+        assert cache.get_calls == cache.set_calls == []
 
 
 class _ExplodingSessionFactory:

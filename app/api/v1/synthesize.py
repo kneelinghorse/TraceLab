@@ -22,6 +22,7 @@ from app.schemas.synthesis import (
     SynthesizeRequest,
     SynthesizeResponse,
 )
+from app.services.document_policy import document_read_policy, resolve_readable_chunks
 from app.services.ownership import default_workspace_id
 from app.services.synthesis import SynthesisService, get_synthesis_service
 from app.services.synthesis_cache import (
@@ -171,12 +172,27 @@ def synthesize(
             )
         authorize_or_403(current_user, "create", project, db)
 
-    if project_scope == []:
+    document_scope = document_read_policy(current_user, db)
+    readable = None
+    if document_scope is not None:
+        readable = [] if project_scope == [] else resolve_readable_chunks(
+            db, document_filter=document_scope,
+            collection_id=request.collection_id, chunk_ids=request.chunk_ids,
+            accessible_project_ids=project_scope,
+        )
+    if readable == [] or project_scope == []:
         result = SynthesisService._empty_result(include_effective_chunk_ids=True)
     else:
         try:
             service = service_factory()
-            if project_scope is None:
+            if readable is not None:
+                result = service.synthesize(
+                    chunk_ids=[row[0] for row in readable],
+                    prompt=request.prompt,
+                    output_format=request.format,
+                    accessible_project_ids=sorted({row[1] for row in readable}, key=str),
+                )
+            elif project_scope is None:
                 result = service.synthesize(
                     collection_id=request.collection_id,
                     chunk_ids=request.chunk_ids,
@@ -233,7 +249,7 @@ def synthesize(
                 chunk_ids=[
                     chunk_id if isinstance(chunk_id, UUID) else UUID(chunk_id)
                     for chunk_id in result.get(
-                        "effective_chunk_ids", request.chunk_ids or []
+                        "effective_chunk_ids", [] if document_scope is not None else request.chunk_ids or []
                     )
                 ],
                 project_id=request.project_id,

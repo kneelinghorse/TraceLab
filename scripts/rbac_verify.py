@@ -40,9 +40,11 @@ Checks:
       - direct and collection-backed report creation persists zero foreign sources.
   * onboarding document registration: anonymous -> 401; outsider member/viewer
     -> exactly 403 against the discovered owner project with an absent ingest path.
-    Other document / ingestion-job routes remain anon-401-only (seeding a document
-    needs a multipart upload). Reports and collection children receive the non-vacuous
-    PEDR-1C cross-tenant matrix above.
+    An existing owner-project document also receives member/viewer read/list deny
+    checks and non-mutating member PATCH/restore denies. Human project-owner read
+    grants are local-only: proving them live would require a production mutation.
+    Remaining ingestion-job routes retain anonymous checks. Reports and collection
+    children receive the non-vacuous PEDR-1C cross-tenant matrix above.
 
 The core (`RbacVerifier`) is transport-agnostic: it talks to any object exposing
 ``.request(method, url, headers=, json=)`` returning ``.status_code`` / ``.json()``
@@ -290,12 +292,9 @@ _ANON_ONLY_ROUTES = [
     ("put", "/reports/{id}"),
     ("delete", "/reports/{id}"),
     ("post", "/documents/{id}/process"),
-    ("get", "/documents/{id}"),
     ("get", "/documents/{id}/download"),
     ("get", "/documents/{id}/chunks"),
     ("delete", "/documents/{id}?confirm=true"),
-    ("post", "/documents/{id}/restore"),
-    ("patch", "/documents/{id}"),
     ("post", "/jobs?document_id={id}"),
     ("get", "/jobs/{id}"),
     ("delete", "/collections/{id}/chunks/{id}"),
@@ -303,6 +302,22 @@ _ANON_ONLY_ROUTES = [
 
 # Body-scoped registration is exercised without creating a production document.
 _REGISTRATION_AUTHZ_ROUTES = {("post", "/documents")}
+
+# These use a discovered live document; empty PATCH and restoring an active row
+# cannot change production content even if authorization regresses.
+_DOCUMENT_AUTHZ_ROUTES = {
+    ("get", "/documents/{id}"),
+    ("patch", "/documents/{id}"),
+    ("post", "/documents/{id}/restore"),
+}
+
+# This positive needs a non-privileged project owner and a sibling-owned document.
+# The bootstrap owner is privileged; creating that fixture live would mutate
+# production projects/documents. TestClient supplies it without an extra login.
+_LOCAL_ONLY_PROJECT_OWNER_READ_ROUTES = {
+    ("get", "/documents/{id}"),
+    ("get", "/documents?project_id={project_id}"),
+}
 
 # These routes remain in SeedSpec/check_coverage and are exercised by local
 # TestClient tests, but are deliberately excluded from the deployed authenticated
@@ -345,6 +360,8 @@ class RbacVerifier:
         self.gaps: list[Gap] = []
         self.notes: list[str] = []
         self.teardown_failures: list[str] = []  # leaked cruft -> non-zero exit
+        self.registration_checks: list[dict[str, Any]] = []
+        self.document_checks: list[dict[str, Any]] = []
         self._pedr1b_fixture: tuple[str, str] | None = None
         self._pedr1b_fixture_owner_role: str | None = None
         self._principal_ids: dict[str, str] = {}
@@ -589,6 +606,7 @@ class RbacVerifier:
         seeded = {(m, t) for spec in _seed_specs(self._prefix) for m, t in spec.routes}
         acknowledged = {(m, f"{self._prefix}{p}") for m, p in _ANON_ONLY_ROUTES}
         registration = {(m, f"{self._prefix}{p}") for m, p in _REGISTRATION_AUTHZ_ROUTES}
+        documents = {(m, f"{self._prefix}{p}") for m, p in _DOCUMENT_AUTHZ_ROUTES}
         local_only = {
             (method, f"{self._prefix}{path}")
             for _name, method, path in _LOCAL_ONLY_AUTHZ_ROUTES
@@ -604,7 +622,7 @@ class RbacVerifier:
                     "missing",
                 )
             )
-        for method, path in sorted(wired - seeded - acknowledged - registration):
+        for method, path in sorted(wired - seeded - acknowledged - registration - documents):
             self.gaps.append(Gap("UNACCOUNTED-ROUTE", "coverage", method, path, "seeded-registration-or-anon-only", "neither"))
 
     # -- the matrix ---------------------------------------------------------------
@@ -2500,10 +2518,56 @@ class RbacVerifier:
         for role in ("member", "viewer"):
             if token := principals.get(role):
                 response = self._call("post", path, token=token, json=body)
+                self.registration_checks.append({"role": role, "method": "post", "path": path, "status": response.status_code, "expected": 403})
                 self._record_exact_deny(
                     response, role=role, method="post", path=path,
                     expected=403, kind="REGISTRATION-AUTHZ-STATUS",
                 )
+
+    def document_deny_matrix(self, project_id: str, principals: dict[str, str]) -> None:
+        """Discover an existing source and prove outsider reads/writes fail closed."""
+        list_path = f"{self._prefix}/documents?project_id={project_id}&page_size=100"
+        listing = self._call("get", list_path, token=principals["owner"])
+        payload = self._json_object(listing)
+        rows = payload.get("data") if payload is not None else None
+        if listing.status_code != 200 or not isinstance(rows, list):
+            raise HarnessError(f"document fixture discovery failed: GET {list_path} -> {listing.status_code}")
+        documents = [row for row in rows if isinstance(row, dict) and row.get("id") and str(row.get("project_id")) == project_id and not row.get("deleted_at")]
+        if not documents:
+            self.notes.append("SEC-2 document deny probes skipped: discovered owner project has no live document; no production document was created.")
+            return
+        document_id = str(documents[0]["id"])
+        path = f"{self._prefix}/documents/{document_id}"
+        for role in ("member", "viewer"):
+            if not (token := principals.get(role)):
+                continue
+            detail = self._call("get", path, token=token)
+            self.document_checks.append({"role": role, "method": "get", "path": path, "status": detail.status_code, "expected": 403})
+            self._record_exact_deny(detail, role=role, method="get", path=path, expected=403, kind="DOCUMENT-READ-STATUS")
+            response = self._call("get", list_path, token=token)
+            body = self._json_object(response)
+            items = body.get("data") if body is not None else None
+            ids = [str(row.get("id")) for row in items if isinstance(row, dict)] if isinstance(items, list) else None
+            self.document_checks.append({"role": role, "method": "get", "path": list_path, "status": response.status_code, "included_document_ids": ids, "expected": "200 with zero outsider documents"})
+            self._record(response.status_code == 200 and ids == [], Gap("DOCUMENT-LIST-LEAK", role, "get", list_path, "200 with zero outsider documents", f"{response.status_code}, ids={ids}"))
+        if token := principals.get("member"):
+            for method, suffix, body in (("patch", "", {}), ("post", "/restore", None)):
+                response = self._call(method, path + suffix, token=token, json=body)
+                self.document_checks.append({"role": "member", "method": method, "path": path + suffix, "status": response.status_code, "expected": 403})
+                self._record_exact_deny(response, role="member", method=method, path=path + suffix, expected=403, kind="DOCUMENT-WRITE-STATUS")
+
+    def project_owner_document_read_matrix(self, project_id: str, document_id: str, token: str) -> None:
+        """Local-only positive fixture: reject over-blocking without privileged roles."""
+        for method, template in sorted(_LOCAL_ONLY_PROJECT_OWNER_READ_ROUTES):
+            path = self._prefix + template.format(id=document_id, project_id=project_id)
+            response = self._call(method, path, token=token)
+            payload = self._json_object(response)
+            if "?" in path:
+                rows = payload.get("data") if payload is not None else None
+                ids = [str(row.get("id")) for row in rows if isinstance(row, dict)] if isinstance(rows, list) else []
+            else:
+                ids = [str(payload.get("id"))] if payload is not None else []
+            self._record(response.status_code == 200 and document_id in ids, Gap("PROJECT-OWNER-READ-OVERBLOCK", "project_owner", method, path, "200 including sibling document", f"{response.status_code}, ids={ids}"))
 
     def seeded_matrix(
         self,
@@ -3052,6 +3116,8 @@ class RbacVerifier:
                 project_id = self.discover_owned_project(owner_token)
                 self._log("onboarding registration tenant-scope matrix...")
                 self.registration_matrix(project_id, principals)
+                self._log("existing-document tenant-scope matrix...")
+                self.document_deny_matrix(project_id, principals)
                 ctx: dict[str, Any] = {"project": project_id}
                 self._log(
                     f"reusing owner project={project_id}; running non-destructive "
@@ -3097,7 +3163,10 @@ class RbacVerifier:
                     f"{len(_ANON_ONLY_ROUTES)} per-id routes remain in the explicit "
                     "anon registry; reports/collection children also receive PEDR-1C "
                     "cross-tenant probes; onboarding registration has member/viewer "
-                    "deny probes, while other document/job routes remain anon-only"
+                    "deny probes; existing documents receive read/list/PATCH/restore "
+                    "deny probes. Project-owner document read positives are local-only "
+                    "because the bootstrap owner is privileged and live fixture creation "
+                    "would mutate production projects/documents."
                 )
             finally:
                 # Children before parents (mission references project); best-effort.

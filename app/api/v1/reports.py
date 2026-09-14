@@ -14,11 +14,9 @@ from app.core.authorization import (
     accessible_project_ids,
     authorize_or_403,
 )
-from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.collection import Collection
-from app.models.document import Document
 from app.models.project import Project
 from app.schemas.report import (
     CitationSchema,
@@ -31,6 +29,7 @@ from app.schemas.report import (
     ReportSourceSchema,
     ReportUpdate,
 )
+from app.services.document_policy import document_read_policy
 from app.services.ownership import default_workspace_id
 from app.services.report_service import ReportService, get_report_service
 
@@ -158,11 +157,9 @@ def create_report(
         )
         if project_scope is not None:
             create_kwargs["accessible_project_ids"] = project_scope
-        if settings.rbac_enabled:
-            document_scope = accessible_filter(current_user, Document, db)
-            create_kwargs["document_filter"] = (
-                document_scope if document_scope is not None else Document.deleted_at.is_(None)
-            )
+        document_scope = document_read_policy(current_user, db)
+        if document_scope is not None:
+            create_kwargs["document_filter"] = document_scope
         report, citations = service.create_report(**create_kwargs)
     except ValueError as exc:
         raise HTTPException(

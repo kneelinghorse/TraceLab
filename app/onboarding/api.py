@@ -316,9 +316,9 @@ def list_jobs(
     """List ingestion jobs the caller may access.
 
     IngestionJob carries no owner_id/workspace_id — it is governed via its parent
-    project's Space (T47.3 model-parity policy). With RBAC enabled, non-privileged
-    callers see only jobs whose owning project is in a Space they belong to; this
-    closes the cross-tenant jobs read leak (#260.3) the per-id flip left open.
+    project's Space or human project ownership (policy 1.1), matching the parent
+    document read path. This closes the cross-tenant jobs read leak (#260.3)
+    without hiding sibling-document jobs from their project owner.
     """
     query = db.query(IngestionJob)
     access = accessible_filter(user, IngestionJob, db)

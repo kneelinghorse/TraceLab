@@ -4,16 +4,18 @@
 config flag (default OFF): while OFF it is a pass-through no-op that allows
 everything, so day-one behavior is byte-identical (ZERO enforcement). Sprint C
 flips the flag ON to activate the deny-by-default policy below, AFTER the owner is
-bootstrapped. NO route calls this yet — wiring it into routes is Sprint C.
+bootstrapped.
 
 Policy when enabled (deny-by-default):
   1. owner / admin tier            -> allow (full access)
   2. the resource's owner          -> allow (resource.owner_id == caller)
-  3. Space membership over resource -> allow (caller is a member of the
+  3. live project's human owner    -> read its non-deleted Documents only;
+     no new write grant and no inherited grant for other resource types.
+  4. Space membership over resource -> allow (caller is a member of the
      resource's effective Space; child resources inherit their owning project's
      Space via project_id -> space_id). Requires a DB session; without one this
      branch fails closed.
-  4. otherwise                     -> deny
+  5. otherwise                     -> deny
 """
 
 from __future__ import annotations
@@ -33,7 +35,7 @@ if TYPE_CHECKING:
 # /admin/rbac-status (T47.1) and logged at startup so operators can confirm WHICH
 # policy a deploy is running. Bump this whenever the authorize() policy changes
 # (roles, allow paths, or fail-closed semantics) so the change is observable.
-POLICY_VERSION = "1.0"
+POLICY_VERSION = "1.1"
 
 # Tier with unconditional access under the enabled policy.
 _PRIVILEGED_ROLES = frozenset({ROLE_OWNER, ROLE_ADMIN})
@@ -121,11 +123,11 @@ def authorize(
     """Return whether ``user`` may perform ``action`` on ``resource``.
 
     No-op pass-through (returns True) while ``settings.rbac_enabled`` is False — the
-    Sprint 43 default — so enabling RBAC is a single flag flip. ``action`` is part of
-    the contract for Sprint C action-level policy; the current policy does not branch
-    on it (privileged roles and the resource owner are allowed for every action).
+    Sprint 43 default — so enabling RBAC is a single flag flip. Privileged roles
+    and resource owners retain every action. A human project owner additionally
+    reads non-deleted Documents in their live project; this never grants writes.
 
-    ``db`` is required only to evaluate the Space-membership allow path (Sprint C
+    ``db`` is required to evaluate project ownership or Space membership (Sprint C
     routes pass their request session). When the policy reaches that branch without
     a session it fails closed (deny) rather than touching a global session — the
     safe direction if a call site forgets to pass ``db``.
@@ -141,10 +143,27 @@ def authorize(
     if owner_id is not None and owner_id == user.user_id:
         return True
 
-    # Space membership is the final allow path; it needs a DB session to resolve
-    # the Space and read space_members. No session -> fail closed.
+    # Project ownership and the final Space-membership path need a DB session.
+    # No session -> fail closed.
     if db is None:
         return False
+    from app.models.document import Document
+    from app.models.project import Project
+
+    if (
+        action == "read"
+        and user.role != ROLE_SERVICE
+        and isinstance(resource, Document)
+        and resource.deleted_at is None
+    ):
+        project = db.get(Project, resource.project_id)
+        if (
+            project is not None
+            and project.deleted_at is None
+            and project.owner_id is not None
+            and project.owner_id == user.user_id
+        ):
+            return True
     return _has_space_membership(user, resource, db)
 
 
@@ -238,6 +257,8 @@ def accessible_filter(user: AuthenticatedUser, model: type, db: Session):
     Mirrors ``authorize``'s read allow-paths exactly:
       * ``rbac_enabled`` False -> ``None`` (byte-identical: every row, like authorize)
       * owner / admin tier      -> ``None`` (full access)
+      * Document / IngestionJob: human ownership of a live parent project also
+        grants reads, independently of Space membership. Other models are unchanged.
       * else: ``owner_id == caller``  OR  membership over the row's effective Space:
           - top-level row (no project_id, has workspace_id): ``workspace_id IN`` my
             spaces;
@@ -260,10 +281,20 @@ def accessible_filter(user: AuthenticatedUser, model: type, db: Session):
 
     from sqlalchemy import false, or_, select
 
+    from app.models.document import Document
+    from app.models.ingestion_job import IngestionJob
+    from app.models.project import Project
+
     conditions = []
     owner_id_col = getattr(model, "owner_id", None)
     if owner_id_col is not None:
         conditions.append(owner_id_col == user.user_id)
+
+    if model in (Document, IngestionJob) and user.role != ROLE_SERVICE and user.user_id is not None:
+        owned_projects = select(Project.id).where(
+            Project.owner_id == user.user_id, Project.deleted_at.is_(None)
+        )
+        conditions.append(model.project_id.in_(owned_projects))
 
     space_ids = _user_space_ids(user, db)
     if space_ids:
@@ -272,8 +303,6 @@ def accessible_filter(user: AuthenticatedUser, model: type, db: Session):
             # Child resource: governed by the OWNING project's Space, not its own
             # denormalized workspace_id (mirrors _effective_space_id). Orphans
             # (project_id NULL) are excluded by IN -> fail closed.
-            from app.models.project import Project
-
             accessible_projects = select(Project.id).where(Project.workspace_id.in_(space_ids))
             conditions.append(project_id_col.in_(accessible_projects))
         else:

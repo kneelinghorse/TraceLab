@@ -8,7 +8,9 @@ requirement).
 
 from __future__ import annotations
 
+from datetime import datetime
 from types import SimpleNamespace
+from unittest.mock import MagicMock
 from uuid import uuid4
 
 import pytest
@@ -19,6 +21,7 @@ from app.core.security import (
     ROLE_ADMIN,
     ROLE_MEMBER,
     ROLE_OWNER,
+    ROLE_SERVICE,
     ROLE_VIEWER,
     AuthenticatedUser,
 )
@@ -104,3 +107,54 @@ class TestAuthorizeFlagOn:
         # tests/unit/test_space_membership.py.
         resource = SimpleNamespace(owner_id=uuid4())
         assert authorization.authorize(_user(ROLE_MEMBER), "read", resource) is False
+
+
+class TestProjectOwnerDocumentRead:
+    """Project ownership grants sibling-document reads, never document writes."""
+
+    @pytest.fixture
+    def owned_project_document(self):
+        from app.models.document import Document
+        from app.models.project import Project
+
+        user = _user(ROLE_MEMBER)
+        project = Project(id=uuid4(), owner_id=user.user_id, workspace_id=uuid4())
+        document = Document(project_id=project.id, owner_id=uuid4())
+        db = MagicMock()
+        db.get.return_value = project
+        db.query.return_value.filter.return_value.first.return_value = None
+        return user, project, document, db
+
+    def test_live_project_owner_reads_other_owned_document_without_space(self, rbac_on, owned_project_document):
+        user, _, document, db = owned_project_document
+        assert authorization.authorize(user, "read", document, db) is True
+
+    @pytest.mark.parametrize("action", ["update", "process", "delete", "restore", "upload"])
+    def test_project_ownership_never_grants_document_writes(self, rbac_on, owned_project_document, action):
+        user, _, document, db = owned_project_document
+        assert authorization.authorize(user, action, document, db) is False
+
+    @pytest.mark.parametrize("deleted", ["project", "document"])
+    def test_deleted_context_does_not_grant_new_read_path(self, rbac_on, owned_project_document, deleted):
+        user, project, document, db = owned_project_document
+        (project if deleted == "project" else document).deleted_at = datetime.utcnow()
+        assert authorization.authorize(user, "read", document, db) is False
+
+    def test_service_does_not_inherit_human_project_ownership(self, rbac_on, owned_project_document):
+        user, _, document, db = owned_project_document
+        service = _user(ROLE_SERVICE, user_id=user.user_id)
+        assert authorization.authorize(service, "read", document, db) is False
+
+    def test_missing_session_fails_closed(self, rbac_on, owned_project_document):
+        user, _, document, _ = owned_project_document
+        assert authorization.authorize(user, "read", document) is False
+
+    @pytest.mark.parametrize("role", [ROLE_ADMIN, ROLE_OWNER])
+    def test_privileged_grants_are_unchanged(self, rbac_on, owned_project_document, role):
+        _, _, document, _ = owned_project_document
+        assert authorization.authorize(_user(role), "delete", document) is True
+
+    def test_flag_off_grants_are_unchanged(self, owned_project_document):
+        user, project, document, db = owned_project_document
+        project.deleted_at = datetime.utcnow()
+        assert authorization.authorize(user, "delete", document, db) is True

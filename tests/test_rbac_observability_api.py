@@ -76,6 +76,7 @@ class TestRbacStatusEndpoint:
         assert body["rbac_enabled"] is False  # default OFF in the test environment
         assert body["your_role"] == ROLE_ADMIN
         assert body["policy_version"] == POLICY_VERSION
+        assert POLICY_VERSION == "1.1"
         assert isinstance(body["owner_count"], int)
 
     def test_owner_gets_200(self, client, db_session):

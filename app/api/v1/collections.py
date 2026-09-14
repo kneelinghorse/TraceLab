@@ -7,7 +7,6 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
-from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
 from sqlalchemy.sql.elements import ColumnElement
 
@@ -16,7 +15,6 @@ from app.core.authorization import (
     accessible_project_ids,
     authorize_or_403,
 )
-from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.collection import Collection
@@ -37,23 +35,14 @@ from app.services.collection import (
     CollectionService,
     get_collection_service,
 )
+from app.services.document_policy import document_read_policy
 from app.services.ownership import default_workspace_id
 
 router = APIRouter()
 
 
-def _document_policy(user: AuthenticatedUser, db: Session) -> ColumnElement[bool] | None:
-    if not settings.rbac_enabled:
-        return None
-    clauses = [Document.deleted_at.is_(None), Document.project_id.in_(select(Project.id).where(Project.deleted_at.is_(None)))]
-    scope = accessible_filter(user, Document, db)
-    if scope is not None:
-        clauses.append(scope)
-    return and_(*clauses)
-
-
 def _policy_kwargs(user: AuthenticatedUser, db: Session) -> dict:
-    policy = _document_policy(user, db)
+    policy = document_read_policy(user, db)
     return {"document_filter": policy} if policy is not None else {}
 
 
