@@ -2,21 +2,22 @@
 /**
  * TraceLab MCP Server
  *
- * Provides 8 action-clustered tools for AI agents to perform complete
+ * Provides 9 action-clustered tools for AI agents to perform complete
  * research-to-output loops against TraceLab's knowledge base. T41.7
  * (sprint-41) collapsed the prior ~24 flat tools into topical clusters
  * matching the cmos-mcp pattern. Each cluster dispatches by an `action`
  * parameter to the existing per-action handlers below.
  *
  * Clusters:
- * 1. tracelab_search           — actions: knowledge
- * 2. tracelab_project          — actions: list, create, update, stats
- * 3. tracelab_collection       — actions: list, get, export, create, add, synthesize
+ * 1. tracelab_search           — actions: knowledge, navigate, pedr
+ * 2. tracelab_project          — actions: list, create, update, stats, get
+ * 3. tracelab_collection       — actions: list, get, export, create, add, synthesize, documents, mission_seed
  * 4. tracelab_report           — actions: create, list, get, export
- * 5. tracelab_document         — actions: upload, get_content
+ * 5. tracelab_document         — actions: upload, get_content, list
  * 6. tracelab_mission          — actions: create, list, get, update (CRUD)
- * 7. tracelab_mission_execution — actions: submit, status, preview (DS-bound lifecycle)
- * 8. tracelab_evidence         — actions: capture, note, list, search, promote
+ * 7. tracelab_mission_execution — actions: submit, status, preview, logs, events (DS-bound lifecycle)
+ * 8. tracelab_evidence         — actions: capture, note, list, search, promote, get
+ * 9. tracelab_home             — actions: snapshot, favorites
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -76,14 +77,23 @@ export const TOOLS: Tool[] = [
   {
     name: 'tracelab_search',
     description:
-      'Semantic search across the TraceLab knowledge base. Returns ranked chunks with content excerpts and document references. Actions: knowledge (find chunks matching a natural-language query). Required for action="knowledge": query. Related clusters: tracelab_document (read full text), tracelab_collection (organize chunks).',
+      'Search TraceLab content and navigate readable entities. Optional pedr performs multi-layer search and exposes graph/diagnostic metadata; no ranking-quality advantage is implied. knowledge remains plain retrieval. navigate uses q, entity_type, page and page_size. Returns ranked chunks with content excerpts and document references. Actions: knowledge (find chunks matching a natural-language query). Required for action="knowledge": query. Related clusters: tracelab_document (read full text), tracelab_collection (organize chunks).',
     inputSchema: {
       type: 'object',
       properties: {
+        source_type: { type: 'string', description: 'Source type filter for knowledge/pedr.' },
+        date_from: { type: 'string', format: 'date', description: 'Earliest collection date for knowledge/pedr.' },
+        date_to: { type: 'string', format: 'date', description: 'Latest collection date for knowledge/pedr.' },
+        top_k: { type: 'integer', minimum: 1, maximum: 100, description: 'PEDR results (default 10); knowledge uses limit.' },
+        enable_graph: { type: 'boolean', default: true, description: 'PEDR graph expansion; matches the UI default. knowledge remains plain retrieval.' },
+        q: { type: 'string', minLength: 1, maxLength: 200, description: 'Name query for navigate.' },
+        entity_type: { type: 'string', enum: ['project', 'document', 'mission', 'report', 'collection', 'evidence'] },
+        page: { type: 'integer', minimum: 1 },
+        page_size: { type: 'integer', minimum: 1, maximum: 50 },
         action: {
           type: 'string',
-          enum: ['knowledge'],
-          description: 'Search action. knowledge: semantic search across the knowledge base.',
+          enum: ['knowledge', 'navigate', 'pedr'],
+          description: 'Search action. knowledge: plain semantic retrieval. navigate: name lookup. pedr: multi-layer retrieval with optional graph expansion.',
         },
         query: {
           type: 'string',
@@ -114,18 +124,18 @@ export const TOOLS: Tool[] = [
   {
     name: 'tracelab_project',
     description:
-      'Projects organize documents and research. Actions: list (browse), create (new project), update (edit metadata), stats (aggregated counts: documents, chunks, reports, tokens). Required: action="create" needs name; action="update"/"stats" needs project_id.',
+      'Projects organize documents and research. Actions: get (full metadata; requires project_id), list (browse), create (new project), update (edit metadata), stats (aggregated counts: documents, chunks, reports, tokens). Required: action="create" needs name; action="update"/"stats" needs project_id.',
     inputSchema: {
       type: 'object',
       properties: {
         action: {
           type: 'string',
-          enum: ['list', 'create', 'update', 'stats'],
-          description: 'Project action. list: browse projects. create: new project. update: edit metadata. stats: aggregated counts for one project.',
+          enum: ['list', 'get', 'create', 'update', 'stats'],
+          description: 'Project action. get: full project details. list: browse projects. create: new project. update: edit metadata. stats: aggregated counts for one project.',
         },
         project_id: {
           type: 'string',
-          description: 'UUID of the project. Required for action="update" and action="stats".',
+          description: 'UUID of the project. Required for action="get", action="update" and action="stats".',
         },
         name: {
           type: 'string',
@@ -175,18 +185,21 @@ export const TOOLS: Tool[] = [
   {
     name: 'tracelab_collection',
     description:
-      'Collections group related chunks for synthesis. Actions: list, get (with chunks), export (as markdown), create, add (a chunk), synthesize (generate summary/report from chunks; optional save as report). Required: action="get"/"export" needs collection_id; action="create" needs name; action="add" needs collection_id+chunk_id; action="synthesize" needs collection_id.',
+      'Collections group related chunks for synthesis. Actions: documents (readable documents; page/page_size), mission_seed (authored mission inputs), list (project_id/page/page_size), get (with chunks and instructions), export (as markdown), create, add (a chunk), synthesize (generate summary/report from chunks; optional save as report). Required: action="get"/"export" needs collection_id; action="create" needs name; action="add" needs collection_id+chunk_id; action="synthesize" needs collection_id.',
     inputSchema: {
       type: 'object',
       properties: {
+        page: { type: 'integer', minimum: 1, description: 'Page number (1-indexed).' },
+        page_size: { type: 'integer', minimum: 1, maximum: 100, description: 'Results per page.' },
+        instructions: { type: 'string', maxLength: 20000, description: 'Research instructions for collection create; returned by get.' },
         action: {
           type: 'string',
-          enum: ['list', 'get', 'export', 'create', 'add', 'synthesize'],
-          description: 'Collection action. list: browse. get: detail with chunks. export: markdown bundle. create: new collection. add: add a chunk. synthesize: summary/report from chunks (citations included; optional save as report).',
+          enum: ['list', 'get', 'export', 'create', 'add', 'synthesize', 'documents', 'mission_seed'],
+          description: 'Collection action. documents: linked document page. mission_seed: mission drafting inputs. list: browse. get: detail with chunks. export: markdown bundle. create: new collection. add: add a chunk. synthesize: summary/report from chunks (citations included; optional save as report).',
         },
         collection_id: {
           type: 'string',
-          description: 'UUID of the collection. Required for action="get"/"export"/"add"/"synthesize".',
+          description: 'UUID of the collection. Required for action="get"/"export"/"add"/"synthesize"/"documents"/"mission_seed".',
         },
         name: {
           type: 'string',
@@ -227,7 +240,7 @@ export const TOOLS: Tool[] = [
         },
         project_id: {
           type: 'string',
-          description: 'For action="synthesize" with save_as_report=true: project UUID to associate the report with.',
+          description: 'Project scope for list; report project when synthesize saves a report.',
         },
       },
       required: ['action'],
@@ -239,14 +252,14 @@ export const TOOLS: Tool[] = [
   {
     name: 'tracelab_report',
     description:
-      'Persistent reports — synthesized artifacts that survive across sessions. Actions: create (from a collection or specific chunks), list (with optional project/status filter), get (full content + citations + sources), export (markdown). Required: action="create" needs title (and one of collection_id/chunk_ids); action="get"/"export" needs report_id.',
+      'Persistent reports — synthesized artifacts that survive across sessions. Actions: create (from a collection or specific chunks), list (with optional project/status filter), get (full content + citations + sources), export (explicit format md/json/txt; omitted format preserves report.content bytes). Required: action="create" needs title (and one of collection_id/chunk_ids); action="get"/"export" needs report_id.',
     inputSchema: {
       type: 'object',
       properties: {
         action: {
           type: 'string',
           enum: ['create', 'list', 'get', 'export'],
-          description: 'Report action. create: synthesize a new persistent report. list: browse with filters. get: full details. export: markdown.',
+          description: 'Report action. create: synthesize a new persistent report. list: browse with filters. get: full details. export: explicit md/json/txt, or legacy content when omitted.',
         },
         report_id: {
           type: 'string',
@@ -277,7 +290,7 @@ export const TOOLS: Tool[] = [
         },
         format: {
           type: 'string',
-          enum: ['summary', 'report', 'bullets', 'markdown'],
+          enum: ['summary', 'report', 'bullets', 'markdown', 'md', 'json', 'txt'],
           description: 'For action="create": output format (default: summary).',
         },
         status: {
@@ -306,14 +319,16 @@ export const TOOLS: Tool[] = [
   {
     name: 'tracelab_document',
     description:
-      'Document upload + retrieval. Actions: upload (new doc through ingestion pipeline; supports PDF, DOCX, PPTX, CSV, XLSX, MD, TXT, JSON, XML, YAML), get_content (paginated full text assembled from chunks). Required: action="upload" needs name, content (base64), content_type, project_id; action="get_content" needs document_id.',
+      'Document upload + retrieval. Actions: list (project_id, processed, search, page, page_size), upload (new doc through ingestion pipeline; supports PDF, DOCX, PPTX, CSV, XLSX, MD, TXT, JSON, XML, YAML), get_content (paginated full text assembled from chunks). Required: action="upload" needs name, content (base64), content_type, project_id; action="get_content" needs document_id.',
     inputSchema: {
       type: 'object',
       properties: {
+        processed: { type: 'boolean', description: 'For list: filter processed state, including false.' },
+        search: { type: 'string', description: 'For list: document name query.' },
         action: {
           type: 'string',
-          enum: ['upload', 'get_content'],
-          description: 'Document action. upload: ingest a new document. get_content: read full text with pagination.',
+          enum: ['upload', 'get_content', 'list'],
+          description: 'Document action. list: browse scoped documents. upload: ingest a new document. get_content: read full text with pagination.',
         },
         document_id: {
           type: 'string',
@@ -355,12 +370,12 @@ export const TOOLS: Tool[] = [
         },
         page: {
           type: 'number',
-          description: 'For action="get_content": page number for large documents (1-indexed, default: 1). Response includes has_more flag and next_page hint.',
+          description: 'For action="list"/"get_content": page number for large documents (1-indexed, default: 1). Response includes has_more flag and next_page hint.',
           minimum: 1,
         },
         page_size: {
           type: 'number',
-          description: 'For action="get_content": chunks per page (1-100, default: 20). Reduce for very long documents to stay within context limits.',
+          description: 'For action="list"/"get_content": items per page (1-100, default: 20). Reduce for very long documents to stay within context limits.',
           minimum: 1,
           maximum: 100,
         },
@@ -382,6 +397,7 @@ export const TOOLS: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
+        view: { type: 'string', enum: ['all', 'attention', 'queue'], description: 'Scoped list view.' },
         action: {
           type: 'string',
           enum: ['create', 'list', 'get', 'update'],
@@ -513,21 +529,22 @@ export const TOOLS: Tool[] = [
   {
     name: 'tracelab_mission_execution',
     description:
-      'Mission execution lifecycle (DeepSearch-bound). Use tracelab_mission for create/list/get/update. Actions: submit (queue for execution), status (lightweight progress poll), preview (compile DS contract without spending a paid loop — returns named_entities, objectives, evidence_slots, acceptance_checks, deliverable_schemas, coverage/validation thresholds; useful for iterating on authoring fields). All actions require mission_id. Related cluster: tracelab_mission.',
+      'Mission execution lifecycle (DeepSearch-bound). Use tracelab_mission for create/list/get/update. Actions: submit (queue for execution), status (lightweight progress poll), preview (compile DS contract without spending a paid loop — returns named_entities, objectives, evidence_slots, acceptance_checks, deliverable_schemas, coverage/validation thresholds; useful for iterating on authoring fields). logs returns recorded lines; events returns recent events. Empty results report unavailable observations; streaming is dormant. All actions except events require mission_id. Related cluster: tracelab_mission.',
     inputSchema: {
       type: 'object',
       properties: {
+        limit: { type: 'integer', minimum: 1, maximum: 500, description: 'logs: 1-500 (default 100); events: 1-200 (default 50).' },
         action: {
           type: 'string',
-          enum: ['submit', 'status', 'preview'],
-          description: 'Execution action. submit: queue for DeepSearch (draft → queued). status: lightweight status+progress poll. preview: compile contract without submitting (read-only, free).',
+          enum: ['submit', 'status', 'preview', 'logs', 'events'],
+          description: 'Execution action. logs: recorded lines. events: recent persisted events. submit: queue for DeepSearch (draft → queued). status: lightweight status+progress poll. preview: compile contract without submitting (read-only, free).',
         },
         mission_id: {
           type: 'string',
-          description: 'UUID of the mission. Required for all actions.',
+          description: 'UUID of the mission. Required except for events, where it is an optional filter.',
         },
       },
-      required: ['action', 'mission_id'],
+      required: ['action'],
     },
   },
   // ─────────────────────────────────────────────────────────────────────────
@@ -536,19 +553,26 @@ export const TOOLS: Tool[] = [
   {
     name: 'tracelab_evidence',
     description:
-      'Capture and reuse sourced research findings across agent sessions. Actions: capture (batch findings), note (upsert a keyed working note), list (entries and notes), search (query prior findings), promote (roll a session into a report or document). All actions require project_id; capture/note/promote require session_key; search requires q.',
+      'Capture and reuse sourced research findings across agent sessions. Actions: capture (batch findings), note (upsert a keyed working note), list (entries and notes), search (query prior findings), promote (roll a session into a report or document). get reads one entry with links and requires entry_id. Other actions require project_id; capture/note/promote require session_key; search requires q.',
     inputSchema: {
       type: 'object',
       properties: {
+        entry_id: { type: 'string', format: 'uuid', description: 'Evidence entry UUID for get.' },
+        tag: { type: 'string', description: 'Exact tag filter for list/search.' },
+        created_from: { type: 'string', format: 'date-time' },
+        created_until: { type: 'string', format: 'date-time' },
+        source_id: { type: 'string' },
+        report_id: { type: 'string', format: 'uuid' },
+        document_id: { type: 'string', format: 'uuid' },
         action: {
           type: 'string',
-          enum: ['capture', 'note', 'list', 'search', 'promote'],
-          description: 'Evidence action. capture: batch sourced findings. note: upsert a keyed working note. list: browse scoped entries and notes. search: query prior claims. promote: create a durable report or document from one session.',
+          enum: ['capture', 'note', 'list', 'search', 'promote', 'get'],
+          description: 'Evidence action. get: one entry and its links. capture: batch sourced findings. note: upsert a keyed working note. list: browse scoped entries and notes. search: query prior claims. promote: create a durable report or document from one session.',
         },
         project_id: {
           type: 'string',
           format: 'uuid',
-          description: 'Project UUID. Required for every action; authorization and reads are project-scoped.',
+          description: 'Project UUID. Required except for get, which authorizes the entry’s project on the server.',
         },
         session_key: {
           type: 'string',
@@ -677,6 +701,21 @@ export const TOOLS: Tool[] = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'tracelab_home',
+    description: 'Caller-scoped home snapshot and paginated favorite projects. Server totals are preserved; every request is fresh. Actions: snapshot (attention, active runs, recent reports/projects and evidence activity), favorites (page, page_size, project_id).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['snapshot', 'favorites'] },
+        page: { type: 'integer', minimum: 1 },
+        page_size: { type: 'integer', minimum: 1, maximum: 100 },
+        project_id: { type: 'string', format: 'uuid' },
+      },
+      required: ['action'],
+      additionalProperties: false,
+    },
+  },
 ];
 
 // Legacy → cluster action mapping (T41.7). Kept as a const for the
@@ -712,12 +751,18 @@ export { LEGACY_TO_CLUSTER };
 
 
 // Input validation schemas
+const SearchDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD');
+const SearchFilterFields = { source_type: z.string().optional(), date_from: SearchDate.optional(), date_to: SearchDate.optional() };
+
 const SearchKnowledgeInput = z.object({
+  ...SearchFilterFields,
   query: z.string().min(1),
   project_id: z.string().uuid().optional(),
   limit: z.number().min(1).max(50).optional().default(10),
   tags: z.array(z.string()).optional(),
 });
+
+const PedrSearchInput = z.object({ query: z.string().trim().min(1).max(2000), top_k: z.number().int().min(1).max(100).default(10), project_id: z.string().uuid().optional(), ...SearchFilterFields, enable_graph: z.boolean().default(true) });
 
 const ListProjectsInput = z.object({
   page: z.number().min(1).optional().default(1),
@@ -754,6 +799,7 @@ const ExportCollectionInput = z.object({
 });
 
 const CreateCollectionInput = z.object({
+  instructions: z.string().max(20000).optional(),
   name: z.string().min(1).max(255),
   description: z.string().max(2000).optional(),
 });
@@ -800,6 +846,7 @@ const GetReportInput = z.object({
 });
 
 const ExportReportInput = z.object({
+  format: z.enum(['md', 'json', 'txt']).optional(),
   report_id: z.string().uuid(),
 });
 
@@ -865,6 +912,7 @@ const CreateMissionInput = z.object({
 });
 
 const ListMissionsInput = z.object({
+  view: z.enum(['all', 'attention', 'queue']).optional(),
   status: z.enum(['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled', 'validation_failed']).optional(),
   project_id: z.string().uuid().optional(),
   page: z.number().min(1).optional().default(1),
@@ -970,6 +1018,12 @@ const PutEvidenceNoteInput = z.object({
 });
 
 const ListEvidenceInput = z.object({
+  tag: z.string().optional(),
+  created_from: z.string().datetime({ offset: true }).optional(),
+  created_until: z.string().datetime({ offset: true }).optional(),
+  source_id: z.string().optional(),
+  report_id: z.string().uuid().optional(),
+  document_id: z.string().uuid().optional(),
   project_id: z.string().uuid(),
   session_key: requiredEvidenceText('session_key', 255).optional(),
   mission_id: z.string().uuid().optional(),
@@ -989,7 +1043,38 @@ const PromoteEvidenceInput = z.object({
   target: z.enum(['report', 'document']).optional().default('report'),
 });
 
+const PageFields = {
+  page: z.number().int().min(1).default(1),
+  page_size: z.number().int().min(1).max(100).default(20),
+};
+const HomeSnapshotInput = z.object({});
+const FavoritesInput = z.object({ ...PageFields, page_size: PageFields.page_size.default(6), project_id: z.string().uuid().optional() });
+const NavigateInput = z.object({
+  q: z.string().trim().min(1).max(200),
+  entity_type: z.enum(['project', 'document', 'mission', 'report', 'collection', 'evidence']).optional(),
+  ...PageFields,
+  page_size: z.number().int().min(1).max(50).default(5),
+});
+const GetEvidenceInput = z.object({ entry_id: z.string().uuid() });
+const ListDocumentsInput = z.object({
+  project_id: z.string().uuid().optional(), processed: z.boolean().optional(), search: z.string().optional(), ...PageFields,
+});
+const ListCollectionsInput = z.object({ project_id: z.string().uuid().optional(), page: PageFields.page.optional(), page_size: PageFields.page_size.optional() });
+const CollectionDocumentsInput = GetCollectionInput.extend(PageFields);
+const MissionLogsInput = z.object({ mission_id: z.string().uuid(), limit: z.number().int().min(1).max(500).default(100) });
+const MissionEventsInput = z.object({ mission_id: z.string().uuid().optional(), limit: z.number().int().min(1).max(200).default(50) });
+
 // Tool handlers
+async function handleSearchPedr(args: unknown) {
+  const result = await client.searchPedr(PedrSearchInput.parse(args));
+  return rawJsonResponse({ ...result, results: result.results.map(item => ({
+    ...item,
+    url: item.url ?? canonicalLink('document', item.document_id) ?? canonicalLink('project', item.project_id),
+    document_url: canonicalLink('document', item.document_id),
+    project_url: canonicalLink('project', item.project_id),
+  })) });
+}
+
 async function handleSearchKnowledge(args: unknown) {
   const input = SearchKnowledgeInput.parse(args);
   const result = await client.searchKnowledge({
@@ -997,6 +1082,9 @@ async function handleSearchKnowledge(args: unknown) {
     top_k: input.limit,
     project_id: input.project_id,
     tags: input.tags,
+    source_type: input.source_type,
+    date_from: input.date_from,
+    date_to: input.date_to,
   });
 
   const chunks = result.results.map((chunk, i) => ({
@@ -1156,8 +1244,9 @@ async function handleGetProjectStats(args: unknown) {
   };
 }
 
-async function handleListCollections() {
-  const result = await client.listCollections();
+async function handleListCollections(args: unknown) {
+  const input = ListCollectionsInput.parse(args);
+  const result = await client.listCollections(input);
 
   return {
     content: [
@@ -1197,6 +1286,7 @@ async function handleGetCollection(args: unknown) {
             url: canonicalLink('collection', result.id),
             name: result.name,
             description: result.description,
+            instructions: result.instructions,
             item_count: result.item_count,
             items: result.items.map((item) => ({
               id: item.id,
@@ -1235,6 +1325,7 @@ async function handleCreateCollection(args: unknown) {
   const result = await client.createCollection({
     name: input.name,
     description: input.description,
+    instructions: input.instructions,
   });
 
   return {
@@ -1249,6 +1340,7 @@ async function handleCreateCollection(args: unknown) {
               url: canonicalLink('collection', result.id),
               name: result.name,
               description: result.description,
+              instructions: result.instructions,
               created_at: result.created_at,
             },
           },
@@ -1488,7 +1580,7 @@ async function handleGetReport(args: unknown) {
 
 async function handleExportReport(args: unknown) {
   const input = ExportReportInput.parse(args);
-  const markdown = await client.exportReport(input.report_id);
+  const markdown = await client.exportReport(input.report_id, input.format);
 
   return {
     content: [
@@ -1770,7 +1862,8 @@ export async function handleListMissions(args: unknown) {
     input.page,
     input.page_size,
     input.status,
-    input.project_id
+    input.project_id,
+    input.view
   );
 
   // T41.4: list responses are always slim — N×full was the original payload
@@ -2040,6 +2133,86 @@ async function handleGetMissionStatus(args: unknown) {
   };
 }
 
+function withHrefUrl<T extends { href: string }>(item: T) {
+  return { ...item, url: new URL(item.href, canonicalFrontendOrigin()).href };
+}
+
+async function handleHomeSnapshot(args: unknown) {
+  HomeSnapshotInput.parse(args);
+  const result = await client.getHome();
+  const mission = (item: import('./api-client.js').HomeMission) => ({
+    ...item, url: canonicalLink('mission', item.id),
+    report_url: canonicalLink('report', item.report_id),
+    evidence_url: item.evidence_href ? new URL(item.evidence_href, canonicalFrontendOrigin()).href : undefined,
+  });
+  return rawJsonResponse({
+    ...result,
+    attention: { ...result.attention, items: result.attention.items.map(mission) },
+    active_runs: { ...result.active_runs, items: result.active_runs.items.map(mission) },
+    recent_reports: { ...result.recent_reports, items: result.recent_reports.items.map(withHrefUrl) },
+    recent_projects: { ...result.recent_projects, items: result.recent_projects.items.map(withHrefUrl) },
+    favorites: { ...result.favorites, items: result.favorites.items.map(withHrefUrl) },
+    evidence_activity: { ...result.evidence_activity, items: result.evidence_activity.items.map(withHrefUrl) },
+  });
+}
+
+async function handleFavorites(args: unknown) {
+  const result = await client.getFavorites(FavoritesInput.parse(args));
+  return rawJsonResponse({ ...result, items: result.items.map(withHrefUrl) });
+}
+
+async function handleNavigate(args: unknown) {
+  const result = await client.navigate(NavigateInput.parse(args));
+  return rawJsonResponse({ ...result, groups: result.groups.map(group => ({ ...group, items: group.items.map(withHrefUrl) })) });
+}
+
+async function handleGetEvidence(args: unknown) {
+  const result = await client.getEvidence(GetEvidenceInput.parse(args).entry_id);
+  return rawJsonResponse({ ...result, entry: { ...result.entry, url: canonicalLink('evidence', result.entry.id) }, links: result.links.map(withHrefUrl) });
+}
+
+async function handleListDocuments(args: unknown) {
+  const result = await client.listDocuments(ListDocumentsInput.parse(args));
+  return rawJsonResponse({ ...result, data: result.data.map(document => ({ ...document, url: canonicalLink('document', document.id) })), total: result.pagination.total });
+}
+
+async function handleGetProject(args: unknown) {
+  const result = await client.getProject(GetProjectStatsInput.parse(args).project_id);
+  return rawJsonResponse({ ...result, url: canonicalLink('project', result.id) });
+}
+
+async function handleCollectionDocuments(args: unknown) {
+  const { collection_id, ...options } = CollectionDocumentsInput.parse(args);
+  const result = await client.getCollectionDocuments(collection_id, options);
+  return rawJsonResponse({ ...result, url: canonicalLink('collection', collection_id), items: result.items.map(document => ({ ...document, url: canonicalLink('document', document.id) })) });
+}
+
+async function handleCollectionMissionSeed(args: unknown) {
+  const result = await client.getCollectionMissionSeed(GetCollectionInput.parse(args).collection_id);
+  return rawJsonResponse({
+    ...result, url: canonicalLink('collection', result.collection_id), project_url: canonicalLink('project', result.project_id),
+    references: result.references.map(reference => ({
+      ...reference,
+      // References may already contain authored URLs. Preserve those bytes.
+      url: reference.url ?? new URL(reference.href, canonicalFrontendOrigin()).href,
+      document_url: canonicalLink('document', reference.document_id),
+    })),
+  });
+}
+
+async function handleMissionLogs(args: unknown) {
+  const input = MissionLogsInput.parse(args);
+  const result = await client.getMissionLogs(input.mission_id, input.limit);
+  const url = canonicalLink('mission', input.mission_id);
+  return rawJsonResponse({ logs: result.map(log => ({ ...log, url })), url, empty: result.length === 0, message: result.length === 0 ? 'No recorded logs are available; live log streaming is dormant.' : 'Recorded log lines; live streaming is dormant.' });
+}
+
+async function handleMissionEvents(args: unknown) {
+  const input = MissionEventsInput.parse(args);
+  const result = await client.getMissionEvents(input);
+  return rawJsonResponse({ events: result.map(event => ({ ...event, url: canonicalLink('mission', input.mission_id ?? event.mission_id) })), empty: result.length === 0, message: result.length === 0 ? 'No recent events are available.' : 'Recent events retained by this server.' });
+}
+
 function rawJsonResponse(result: unknown) {
   return {
     content: [
@@ -2118,10 +2291,14 @@ function unknownAction(tool: string, action: string, valid: readonly string[]) {
   };
 }
 
-const SEARCH_ACTIONS = ['knowledge'] as const;
+const SEARCH_ACTIONS = ['knowledge', 'navigate', 'pedr'] as const;
 export async function handleTracelabSearch(args: unknown) {
   const action = getAction(args);
   switch (action) {
+    case 'pedr':
+      return await handleSearchPedr(args);
+    case 'navigate':
+      return await handleNavigate(args);
     case 'knowledge':
       return await handleSearchKnowledge(args);
     default:
@@ -2129,10 +2306,12 @@ export async function handleTracelabSearch(args: unknown) {
   }
 }
 
-const PROJECT_ACTIONS = ['list', 'create', 'update', 'stats'] as const;
+const PROJECT_ACTIONS = ['list', 'get', 'create', 'update', 'stats'] as const;
 export async function handleTracelabProject(args: unknown) {
   const action = getAction(args);
   switch (action) {
+    case 'get':
+      return await handleGetProject(args);
     case 'list':
       return await handleListProjects(args);
     case 'create':
@@ -2153,12 +2332,18 @@ const COLLECTION_ACTIONS = [
   'create',
   'add',
   'synthesize',
+  'documents',
+  'mission_seed',
 ] as const;
 export async function handleTracelabCollection(args: unknown) {
   const action = getAction(args);
   switch (action) {
+    case 'documents':
+      return await handleCollectionDocuments(args);
+    case 'mission_seed':
+      return await handleCollectionMissionSeed(args);
     case 'list':
-      return await handleListCollections();
+      return await handleListCollections(args);
     case 'get':
       return await handleGetCollection(args);
     case 'export':
@@ -2191,10 +2376,12 @@ export async function handleTracelabReport(args: unknown) {
   }
 }
 
-const DOCUMENT_ACTIONS = ['upload', 'get_content'] as const;
+const DOCUMENT_ACTIONS = ['upload', 'get_content', 'list'] as const;
 export async function handleTracelabDocument(args: unknown) {
   const action = getAction(args);
   switch (action) {
+    case 'list':
+      return await handleListDocuments(args);
     case 'upload':
       return await handleUploadDocument(args);
     case 'get_content':
@@ -2221,10 +2408,14 @@ export async function handleTracelabMission(args: unknown) {
   }
 }
 
-const MISSION_EXECUTION_ACTIONS = ['submit', 'status', 'preview'] as const;
+const MISSION_EXECUTION_ACTIONS = ['submit', 'status', 'preview', 'logs', 'events'] as const;
 export async function handleTracelabMissionExecution(args: unknown) {
   const action = getAction(args);
   switch (action) {
+    case 'logs':
+      return await handleMissionLogs(args);
+    case 'events':
+      return await handleMissionEvents(args);
     case 'submit':
       return await handleSubmitMission(args);
     case 'status':
@@ -2240,10 +2431,12 @@ export async function handleTracelabMissionExecution(args: unknown) {
   }
 }
 
-const EVIDENCE_ACTIONS = ['capture', 'note', 'list', 'search', 'promote'] as const;
+const EVIDENCE_ACTIONS = ['capture', 'note', 'list', 'search', 'promote', 'get'] as const;
 export async function handleTracelabEvidence(args: unknown) {
   const action = getAction(args);
   switch (action) {
+    case 'get':
+      return await handleGetEvidence(args);
     case 'capture':
       return await handleCaptureEvidence(args);
     case 'note':
@@ -2259,10 +2452,21 @@ export async function handleTracelabEvidence(args: unknown) {
   }
 }
 
+const HOME_ACTIONS = ['snapshot', 'favorites'] as const;
+export async function handleTracelabHome(args: unknown) {
+  const action = getAction(args);
+  switch (action) {
+    case 'snapshot': return await handleHomeSnapshot(args);
+    case 'favorites': return await handleFavorites(args);
+    default: return unknownAction('tracelab_home', action, HOME_ACTIONS);
+  }
+}
+
 // Exported for the parity test in index.test.ts — every legacy tool name in
 // LEGACY_TO_CLUSTER must map to a (cluster, action) pair where action ∈ the
 // cluster's action enum. Compile-time guarded by the readonly tuples above.
 export const CLUSTER_ACTIONS = {
+  tracelab_home: HOME_ACTIONS,
   tracelab_search: SEARCH_ACTIONS,
   tracelab_project: PROJECT_ACTIONS,
   tracelab_collection: COLLECTION_ACTIONS,
@@ -2277,6 +2481,7 @@ export const CLUSTER_ACTIONS = {
 // descriptors, action enums, and dispatch handlers as independently-maintained
 // lists previously allowed a tool to appear in tests without being callable.
 export const CLUSTER_HANDLERS = {
+  tracelab_home: handleTracelabHome,
   tracelab_search: handleTracelabSearch,
   tracelab_project: handleTracelabProject,
   tracelab_collection: handleTracelabCollection,
