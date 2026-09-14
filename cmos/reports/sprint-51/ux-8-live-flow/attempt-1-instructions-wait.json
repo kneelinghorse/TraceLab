@@ -1,0 +1,53 @@
+{
+  "startedAt": "2026-09-13T23:03:55.668Z",
+  "projectId": "0afcc588-e722-45bd-8320-f486601b877c",
+  "reportId": "c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+  "documents": [
+    "eb3074c0-f37e-4908-ac92-0d26d1882254",
+    "e51e0fe0-9a08-4ed0-83ad-041a7396472d"
+  ],
+  "steps": [
+    {
+      "name": "collection-created-through-ui",
+      "at": "2026-09-13T23:04:00.957Z"
+    }
+  ],
+  "observations": [],
+  "screenshots": [],
+  "counts": {},
+  "exportsBefore": {
+    "reportId": "c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+    "checkedAt": "2026-09-13T22:27:43.071Z",
+    "exports": {
+      "md": {
+        "sha256": "6f02975390d53e819eb05a4c55ae4436a599eff6107a03beb808cb2ddaecdb69",
+        "bytes": 624
+      },
+      "json": {
+        "sha256": "1618ca3c0597acc97d82d73ec8c937cb6de7a6cf85ec2f6c35b58792bdbd889d",
+        "bytes": 1344
+      },
+      "txt": {
+        "sha256": "30e29c2fb2dd939b35748f1a21d591900e2b145ae509aba91827e6874a98eb43",
+        "bytes": 682
+      }
+    }
+  },
+  "exportsAfter": {},
+  "retainedArtifacts": [
+    {
+      "kind": "collection",
+      "id": "a3e6d809-af90-4652-903f-5ce5c8842bf8",
+      "reason": "Provenance for the acceptance mission"
+    }
+  ],
+  "actorId": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+  "collectionId": "a3e6d809-af90-4652-903f-5ce5c8842bf8",
+  "status": "failed",
+  "failure": {
+    "stage": "create collection",
+    "message": "Expected values to be strictly equal:\n+ actual - expected\n\n+ null\n- 'Use the included TraceLab research reports as prior context. Verify one concrete HTTP asynchronous-job recommendation against RFC 9110. Reuse relevant existing evidence, preserve uncertainty and cite the primary source. Keep this acceptance run focused.'\n"
+  },
+  "clientErrors": [],
+  "unexpectedResponses": []
+}

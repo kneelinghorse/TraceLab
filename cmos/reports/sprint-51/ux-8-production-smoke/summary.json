@@ -1,0 +1,23 @@
+{
+  "checked_at": "2026-09-13T23:58:12.278877+00:00",
+  "base": "https://tracelab.aquex.ai",
+  "routes": 31,
+  "checks": 124,
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "widths": [
+    1440,
+    390
+  ],
+  "failures": [],
+  "passed": true,
+  "readOnly": true,
+  "directProductionApi": true,
+  "theme_summaries": [
+    "light/summary.json",
+    "dark/summary.json"
+  ],
+  "deployments": "../ux-8-validation.json#correction_deployments"
+}

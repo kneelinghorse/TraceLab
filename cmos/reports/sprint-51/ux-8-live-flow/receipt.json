@@ -1,0 +1,275 @@
+{
+  "startedAt": "2026-09-13T23:03:55.668Z",
+  "projectId": "0afcc588-e722-45bd-8320-f486601b877c",
+  "reportId": "c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+  "documents": [
+    "eb3074c0-f37e-4908-ac92-0d26d1882254",
+    "e51e0fe0-9a08-4ed0-83ad-041a7396472d"
+  ],
+  "steps": [
+    {
+      "name": "collection-created-through-ui",
+      "at": "2026-09-13T23:04:00.957Z"
+    },
+    {
+      "name": "instructions-persisted",
+      "at": "2026-09-13T23:05:18.278Z"
+    },
+    {
+      "name": "document-picker-focus-attach-remove-and-reattach",
+      "at": "2026-09-13T23:05:37.119Z"
+    },
+    {
+      "name": "complete-seed-saved-and-contract-previewed",
+      "at": "2026-09-13T23:53:32.495Z"
+    },
+    {
+      "name": "seeded-mission-submitted",
+      "at": "2026-09-13T23:53:33.759Z"
+    },
+    {
+      "name": "actual-mcp-client-retains-seed-context",
+      "at": "2026-09-13T23:53:39.450Z"
+    },
+    {
+      "name": "every-authorized-citation-page-matches-api",
+      "at": "2026-09-13T23:53:45.825Z"
+    },
+    {
+      "name": "all-three-downloads-byte-identical-to-predeploy",
+      "at": "2026-09-13T23:53:48.047Z"
+    },
+    {
+      "name": "light-dark-production-views-and-citation-navigation",
+      "at": "2026-09-13T23:54:50.789Z"
+    }
+  ],
+  "observations": [
+    {
+      "name": "light-1440-edited-context",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-1440-reviewed-seed",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-1440-submitted-seed",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-1440-collections",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-1440-collection-context",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-1440-reports",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-1440-report-citations",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-390-collections",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-390-collection-context",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-390-reports",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-390-report-citations",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "dark-1440-collections",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "dark-1440-collection-context",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "dark-1440-reports",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "dark-1440-report-citations",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "dark-390-collections",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "dark-390-collection-context",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "dark-390-reports",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "dark-390-report-citations",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "dark-390-resolved-evidence",
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "screenshots": [
+    "light-1440-edited-context.png",
+    "light-1440-reviewed-seed.png",
+    "light-1440-submitted-seed.png",
+    "light-1440-collections.png",
+    "light-1440-collection-context.png",
+    "light-1440-reports.png",
+    "light-1440-report-citations.png",
+    "light-390-collections.png",
+    "light-390-collection-context.png",
+    "light-390-reports.png",
+    "light-390-report-citations.png",
+    "dark-1440-collections.png",
+    "dark-1440-collection-context.png",
+    "dark-1440-reports.png",
+    "dark-1440-report-citations.png",
+    "dark-390-collections.png",
+    "dark-390-collection-context.png",
+    "dark-390-reports.png",
+    "dark-390-report-citations.png",
+    "dark-390-resolved-evidence.png"
+  ],
+  "counts": {
+    "collections": 53,
+    "reports": 482
+  },
+  "exportsBefore": {
+    "reportId": "c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+    "checkedAt": "2026-09-13T22:27:43.071Z",
+    "exports": {
+      "md": {
+        "sha256": "6f02975390d53e819eb05a4c55ae4436a599eff6107a03beb808cb2ddaecdb69",
+        "bytes": 624
+      },
+      "json": {
+        "sha256": "1618ca3c0597acc97d82d73ec8c937cb6de7a6cf85ec2f6c35b58792bdbd889d",
+        "bytes": 1344
+      },
+      "txt": {
+        "sha256": "30e29c2fb2dd939b35748f1a21d591900e2b145ae509aba91827e6874a98eb43",
+        "bytes": 682
+      }
+    }
+  },
+  "exportsAfter": {
+    "md": {
+      "sha256": "6f02975390d53e819eb05a4c55ae4436a599eff6107a03beb808cb2ddaecdb69",
+      "bytes": 624
+    },
+    "json": {
+      "sha256": "1618ca3c0597acc97d82d73ec8c937cb6de7a6cf85ec2f6c35b58792bdbd889d",
+      "bytes": 1344
+    },
+    "txt": {
+      "sha256": "30e29c2fb2dd939b35748f1a21d591900e2b145ae509aba91827e6874a98eb43",
+      "bytes": 682
+    }
+  },
+  "retainedArtifacts": [
+    {
+      "kind": "collection",
+      "id": "a3e6d809-af90-4652-903f-5ce5c8842bf8",
+      "reason": "Provenance for the acceptance mission"
+    },
+    {
+      "kind": "mission",
+      "id": "39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+      "reason": "Actual collection-seeded acceptance execution"
+    }
+  ],
+  "actorId": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+  "collectionId": "a3e6d809-af90-4652-903f-5ce5c8842bf8",
+  "status": "passed",
+  "clientErrors": [],
+  "unexpectedResponses": [],
+  "resumedAt": "2026-09-13T23:53:26.040Z",
+  "failureHistory": [
+    {
+      "stage": "create collection",
+      "message": "Expected values to be strictly equal:\n+ actual - expected\n\n+ null\n- 'Use the included TraceLab research reports as prior context. Verify one concrete HTTP asynchronous-job recommendation against RFC 9110. Reuse relevant existing evidence, preserve uncertainty and cite the primary source. Keep this acceptance run focused.'\n"
+    },
+    {
+      "stage": "seed authoring",
+      "message": "expect(locator).toHaveValue(expected) failed\n\nLocator:  getByLabel('Project')\nExpected: \"0afcc588-e722-45bd-8320-f486601b877c\"\nReceived: \"\"\nTimeout:  5000ms\n\nCall log:\n  - Expect \"to.have.value\" with timeout 5000ms\n  - waiting for getByLabel('Project')\n    8 \u00d7 locator resolved to <select name=\"project_id\" class=\"form-input\" id=\"mission-project_id\">\u2026</select>\n      - unexpected value \"\"\n"
+    }
+  ],
+  "seed": {
+    "referenceCount": 2,
+    "documentIds": [
+      "e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+      "eb3074c0-f37e-4908-ac92-0d26d1882254"
+    ]
+  },
+  "missionId": "39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+  "authoringParity": true,
+  "submit": {
+    "status": "queued",
+    "mode": "worker",
+    "mission_id": "UX8-LIVE-20260913",
+    "uuid": "39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+    "message": "Mission queued for DeepSearch worker.",
+    "job_id": null,
+    "warnings": []
+  },
+  "mcp": {
+    "transport": "stdio",
+    "tool": "tracelab_mission",
+    "action": "get",
+    "missionId": "39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+    "referenceCount": 2,
+    "passed": true
+  },
+  "citations": {
+    "total": 44,
+    "pages": 3,
+    "distinctLinkedEntries": 44,
+    "firstId": "07ed4147-8c4c-4d47-b2c1-90568111322a"
+  },
+  "latestMission": {
+    "id": "39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+    "status": "in_progress",
+    "result_report_id": null,
+    "result_document_ids": []
+  },
+  "completedAt": "2026-09-13T23:54:52.391Z",
+  "missionCheckedAt": "2026-09-13T23:56:41.243386+00:00"
+}

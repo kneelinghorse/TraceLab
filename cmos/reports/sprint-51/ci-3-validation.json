@@ -1,0 +1,218 @@
+{
+  "mission": "CI-3",
+  "status": "passed",
+  "source_commit": "440a509e45ae0b0d82f731524e1a04c272edbe4c",
+  "pr": 274,
+  "decision": 414,
+  "problem": "The unchanged graph depth-two integration benchmark failed twice at 211.68 and 258.84 ms against its 200 ms limit. BFS fetched terminal adjacency that cannot expand.",
+  "change": "Only prefetch nodes whose depth is below max_depth. Preserve candidate insertion, score, order, global visited behavior, and scope filtering. Combine an existing nested condition without changing its logic to satisfy the touched-file Ruff gate.",
+  "regression": {
+    "red": "Both new SQL-observing cases failed on terminal-node query assertions before the change.",
+    "green": {
+      "passed": 65,
+      "skipped": 0,
+      "warnings": 14,
+      "seconds": 78.02,
+      "suites": [
+        "test_graph_layer",
+        "test_rbac_verify_harness"
+      ]
+    },
+    "intent": "Depth-one and depth-two frontiers with 201 branches retain every candidate and score while no terminal URN appears in adjacency query parameters. Depth-two query budget <=3."
+  },
+  "validation": {
+    "ruff": "passed",
+    "foundational_refs": "passed",
+    "ast_commit_guard": "passed",
+    "postgres": {
+      "passed": 133,
+      "skipped": 4,
+      "warnings": 15,
+      "seconds": 258.38,
+      "run": "full integration suite, sequential after local graph/harness"
+    },
+    "ci": "passed"
+  },
+  "limitations": [
+    "No change to the 200 ms threshold, quarantine, or ranking/scope policy.",
+    "Full integration has four existing conditional skips; final counts will be recorded.",
+    "Earlier CI spikes (211.68/258.84/212.57 ms) are not conclusively attributed. The terminal-query regression is fixed and instrumented CI passed twice; this is not a guarantee against future shared-runner wall-clock variance. The unchanged 200 ms assertion remains blocking to this workflow and now reports SQL/GC diagnostics on failure."
+  ],
+  "remaining": [],
+  "ci_integration": {
+    "run_id": 34788007802,
+    "status": "passed",
+    "head": "440a509e45ae0b0d82f731524e1a04c272edbe4c",
+    "performance_threshold_ms": 200,
+    "threshold_changed": false,
+    "passed": 133,
+    "skipped": 4,
+    "warnings": 17,
+    "seconds": 96.67
+  },
+  "source_pr": {
+    "number": 274,
+    "head": "440a509e45ae0b0d82f731524e1a04c272edbe4c",
+    "merge_commit": "501268f40562b5c3c6994962a9e58df5b6f566a2",
+    "merged_at": "2026-09-13T23:00:14Z"
+  },
+  "ci_final": {
+    "backend": {
+      "run_id": 34788007798,
+      "passed": 2455,
+      "skipped": 3,
+      "quarantined": 12,
+      "warnings": 48,
+      "seconds": 415.9
+    },
+    "integration": {
+      "run_id": 34788007802,
+      "passed": 133,
+      "skipped": 4,
+      "warnings": 17,
+      "seconds": 96.67
+    },
+    "production_build": {
+      "run_id": 34788007829,
+      "browser_passed": 31
+    },
+    "frontend": {
+      "run_id": 34788007933,
+      "passed": 185,
+      "lint": "passed",
+      "types": "passed"
+    },
+    "ruff_diff": {
+      "run_id": 34788007804,
+      "status": "passed"
+    },
+    "secrets": {
+      "run_ids": [
+        34788007810,
+        34788005365
+      ],
+      "status": "passed"
+    }
+  },
+  "deployments": {
+    "api": {
+      "deployment_id": "fc6050f9-ab2d-4e08-9d91-434b1e2fdf2f",
+      "commit": "501268f40562b5c3c6994962a9e58df5b6f566a2",
+      "status": "SUCCESS",
+      "verified_at": "2026-09-13T23:03:54.708151+00:00"
+    },
+    "frontend": {
+      "deployment_id": "bd348edf-06c1-42ba-a820-8468372a22db",
+      "commit": "501268f40562b5c3c6994962a9e58df5b6f566a2",
+      "status": "SUCCESS",
+      "verified_at": "2026-09-13T23:03:54.708161+00:00"
+    }
+  },
+  "repeat_failure": {
+    "pr": 275,
+    "run_id": 34788994120,
+    "passed": 132,
+    "failed": 1,
+    "skipped": 4,
+    "warnings": 17,
+    "seconds": 91.8,
+    "latency_ms": 212.57
+  },
+  "diagnostic_commit": "8a9240bcda9e643abf2eea7c5d4808e4f40114eb",
+  "profiling": {
+    "safe_isolated_full_suite": {
+      "passed": 133,
+      "skipped": 4,
+      "warnings": 15,
+      "seconds": 66.74,
+      "traversal_ms": 17.73,
+      "sql_queries": 4,
+      "sql_ms": [
+        0.67,
+        0.76,
+        0.65,
+        0.51
+      ]
+    },
+    "ci": {
+      "run_id": 34789402382,
+      "attempt_1": "passed",
+      "attempt_2": {
+        "status": "passed",
+        "passed": 133,
+        "skipped": 4,
+        "warnings": 17,
+        "seconds": 87.56
+      }
+    }
+  },
+  "decisions": [
+    414,
+    415
+  ],
+  "correction_pr": {
+    "number": 275,
+    "head": "8a9240bcda9e643abf2eea7c5d4808e4f40114eb",
+    "merge_commit": "16a05c092aace752f720f7f253cc9ae391ae7eb5",
+    "merged_at": "2026-09-13T23:50:39Z"
+  },
+  "correction_ci": {
+    "head": "8a9240bcda9e643abf2eea7c5d4808e4f40114eb",
+    "backend": {
+      "run_id": 34789402372,
+      "passed": 2455,
+      "skipped": 3,
+      "quarantined": 12,
+      "warnings": 48,
+      "seconds": 1733.03
+    },
+    "integration": {
+      "run_id": 34789402382,
+      "attempt": 2,
+      "passed": 133,
+      "skipped": 4,
+      "warnings": 17,
+      "seconds": 87.56
+    },
+    "production_build": {
+      "run_id": 34789402389,
+      "browser_passed": 31
+    },
+    "frontend": {
+      "run_id": 34789402399,
+      "passed": 187,
+      "lint": "passed",
+      "types": "passed"
+    },
+    "ruff_diff": {
+      "run_id": 34789402388,
+      "status": "passed"
+    },
+    "secrets": {
+      "run_ids": [
+        34789402383,
+        34789399675
+      ],
+      "status": "passed"
+    }
+  },
+  "correction_deployments": {
+    "api": {
+      "deployment_id": "0ccdeef8-d519-4cac-bd7b-b2fbe84ec065",
+      "commit": "16a05c092aace752f720f7f253cc9ae391ae7eb5",
+      "status": "SUCCESS",
+      "verified_at": "2026-09-13T23:53:25.613342+00:00"
+    },
+    "frontend": {
+      "deployment_id": "f3667b42-59a5-4d2b-8be3-dd9ce12c8e29",
+      "commit": "16a05c092aace752f720f7f253cc9ae391ae7eb5",
+      "status": "SUCCESS",
+      "verified_at": "2026-09-13T23:53:25.613999+00:00"
+    }
+  },
+  "checked_at": "2026-09-13T23:58:12.278877+00:00",
+  "cmos_health": {
+    "connected": true,
+    "wal": true
+  }
+}
