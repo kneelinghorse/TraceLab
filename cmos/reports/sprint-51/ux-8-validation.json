@@ -416,5 +416,12 @@
     "wal": true,
     "missions": 351,
     "sessions": 129
+  },
+  "post_acceptance_job_completion": {
+    "checked_at": "2026-09-14T00:50:13.548875+00:00",
+    "mission_id": "39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+    "status": "completed",
+    "report_id": "0613ab1a-1ae7-4784-bf03-579023d4a20f",
+    "verification": "Direct authenticated production GET /missions/{id}; no second submission."
   }
 }

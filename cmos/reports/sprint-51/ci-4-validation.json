@@ -1,0 +1,195 @@
+{
+  "mission": "CI-4",
+  "status": "passed",
+  "checked_at": "2026-09-14T00:50:13.547650+00:00",
+  "source_commit": "47a5936b7d8e9c1eef32f19b035714d8942d6d58",
+  "merge_commit": "f52088f6ffe0d89f3db856de6dbb282d527f998b",
+  "pr": 276,
+  "decision": 417,
+  "change": {
+    "job_timeout_minutes": 45,
+    "durations": 25,
+    "faulthandler_timeout_seconds": 120
+  },
+  "preserved": [
+    "Serialized execution",
+    "Exactly 12 existing quarantined nodes",
+    "Every other test",
+    "200ms graph performance assertion"
+  ],
+  "evidence": {
+    "prior_pass": {
+      "run_id": 34789402372,
+      "seconds": 1733.03
+    },
+    "prior_timeout": {
+      "run_id": 34791235325,
+      "progress_percent": 90,
+      "job_ceiling_minutes": 30,
+      "reported_test_failures": 0
+    },
+    "backend": {
+      "run_id": 34793289449,
+      "passed": 2455,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 48,
+      "seconds": 451.17,
+      "slowest": [
+        {
+          "seconds": 5.98,
+          "phase": "call",
+          "node": "tests/test_rbac_verify_harness.py::test_harness_passes_against_enforced_app"
+        },
+        {
+          "seconds": 4.73,
+          "phase": "call",
+          "node": "tests/test_rbac_verify_harness.py::test_run_reconciles_missing_id_artifact_before_user_purge"
+        },
+        {
+          "seconds": 3.71,
+          "phase": "call",
+          "node": "tests/test_deepsearch_ingestion.py::test_ingest_endpoint_returns_quality_gate_failure"
+        },
+        {
+          "seconds": 3.09,
+          "phase": "call",
+          "node": "tests/test_service_principal_route_boundary.py::test_service_credential_is_machine_only_in_every_rbac_state[api-key-rbac-on]"
+        },
+        {
+          "seconds": 3.05,
+          "phase": "call",
+          "node": "tests/test_correction_loop.py::TestWebhookClient::test_retry_on_failure"
+        },
+        {
+          "seconds": 3.05,
+          "phase": "call",
+          "node": "tests/test_correction_loop.py::TestWebhookClient::test_dead_letter_queue"
+        },
+        {
+          "seconds": 3.04,
+          "phase": "call",
+          "node": "tests/test_service_principal_route_boundary.py::test_service_credential_is_machine_only_in_every_rbac_state[api-key-rbac-off]"
+        },
+        {
+          "seconds": 2.37,
+          "phase": "call",
+          "node": "tests/test_auth_device.py::test_approve_respects_10_key_cap"
+        },
+        {
+          "seconds": 1.83,
+          "phase": "call",
+          "node": "tests/test_rbac_verify_harness.py::test_seeded_mission_cannot_queue_if_authorization_fails_open"
+        },
+        {
+          "seconds": 1.83,
+          "phase": "setup",
+          "node": "tests/test_rbac_route_enforcement_api.py::TestServiceRoleLogIngest::test_log_ingest_open_when_flag_off"
+        },
+        {
+          "seconds": 1.72,
+          "phase": "call",
+          "node": "tests/test_rbac_verify_harness.py::test_service_log_matrix_flags_leak_when_gate_off"
+        },
+        {
+          "seconds": 1.69,
+          "phase": "call",
+          "node": "tests/test_evidence_ledger_api.py::TestScopedReadPaths::test_list_and_search_filters_report_totals_before_pagination"
+        },
+        {
+          "seconds": 1.44,
+          "phase": "call",
+          "node": "tests/test_rbac_verify_harness.py::test_matrix_flags_leak_when_unenforced"
+        },
+        {
+          "seconds": 1.38,
+          "phase": "call",
+          "node": "tests/test_auth_hardening.py::TestAPIKeyLookupPerformance::test_different_keys_may_share_prefix"
+        },
+        {
+          "seconds": 1.34,
+          "phase": "setup",
+          "node": "tests/test_pedr_syntactic.py::TestInferElementType::test_infer_mission_from_objective"
+        },
+        {
+          "seconds": 1.31,
+          "phase": "call",
+          "node": "tests/test_rbac_verify_harness.py::test_service_log_matrix_flags_missing_service_principal"
+        },
+        {
+          "seconds": 1.21,
+          "phase": "call",
+          "node": "tests/test_rbac_verify_harness.py::test_run_reconciles_user_when_committed_response_is_lost"
+        },
+        {
+          "seconds": 1.18,
+          "phase": "call",
+          "node": "tests/test_auth_hardening.py::TestLoginRateLimit::test_successful_login_also_counts_toward_limit"
+        },
+        {
+          "seconds": 1.17,
+          "phase": "setup",
+          "node": "tests/test_synthesis_cache.py::TestComputeHash::test_compute_hash_handles_none_prompt"
+        },
+        {
+          "seconds": 1.1,
+          "phase": "call",
+          "node": "tests/test_t30_3_pedr_e2e_validation.py::TestCacheCorrectness::test_ttl_expiration"
+        },
+        {
+          "seconds": 1.1,
+          "phase": "call",
+          "node": "tests/unit/test_pedr_cache_standalone.py::TestPEDRCache::test_ttl_expiration"
+        },
+        {
+          "seconds": 1.0,
+          "phase": "call",
+          "node": "tests/test_deepsearch_evidence_projection.py::TestProjectionContract::test_long_canonical_url_associates_all_provenance_and_replays"
+        },
+        {
+          "seconds": 0.92,
+          "phase": "call",
+          "node": "tests/performance/test_concurrent_queries.py::test_concurrent_queries_reaches_target_throughput"
+        },
+        {
+          "seconds": 0.91,
+          "phase": "setup",
+          "node": "tests/test_pedr_syntactic.py::TestTypeFiltering::test_filter_by_multiple_types"
+        },
+        {
+          "seconds": 0.9,
+          "phase": "call",
+          "node": "tests/test_collection_context.py::test_document_context_pages_and_seed_include_more_than_one_hundred_unique_sources"
+        }
+      ]
+    },
+    "postgres": {
+      "run_id": 34793289501,
+      "passed": 133,
+      "skipped": 4,
+      "warnings": 17,
+      "seconds": 90.87
+    },
+    "production_build": {
+      "run_id": 34793289481,
+      "browser_tests": 31
+    },
+    "frontend": {
+      "run_id": 34793289544,
+      "passed": 187,
+      "lint": "passed",
+      "types": "passed"
+    },
+    "ruff_run": 34793289490,
+    "secret_runs": [
+      34793289520,
+      34793286961
+    ],
+    "yaml_and_bash_syntax": "passed"
+  },
+  "limitations": [
+    "The faster final run does not establish the cause of prior cross-run timing variance.",
+    "No test exceeded the stack-dump threshold in the successful diagnostic run.",
+    "Existing skip and quarantine counts were retained."
+  ]
+}
