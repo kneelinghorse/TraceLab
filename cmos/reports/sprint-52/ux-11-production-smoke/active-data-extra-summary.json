@@ -1,0 +1,23 @@
+{
+  "checked_at": "2026-09-14T19:33:05.807Z",
+  "base": "https://tracelab.aquex.ai",
+  "directProductionApi": true,
+  "readOnly": true,
+  "timezoneId": "America/Chicago",
+  "ids": {
+    "project": "0afcc588-e722-45bd-8320-f486601b877c",
+    "document": "d44bec3e-f665-439d-bc78-bc5385a4610d",
+    "mission": "7b847edd-5433-4237-a899-57b47e6edf0a",
+    "report": "1ff22d77-fb90-4220-8d74-34fd5526dab7",
+    "collection": "a3e6d809-af90-4652-903f-5ce5c8842bf8",
+    "evidence": "1da242cc-517e-4fcb-9850-3c620e2b484e"
+  },
+  "totals": {
+    "documents": 23,
+    "reports": 3,
+    "missions": 3,
+    "evidence": 547
+  },
+  "checks": 407,
+  "failures": []
+}
