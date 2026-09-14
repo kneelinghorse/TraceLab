@@ -1,0 +1,166 @@
+{
+  "mission_id": "SEC-2",
+  "sprint_id": "sprint-52",
+  "status": "passed",
+  "commit": "e64f32cd0c29a4b67a1644a6dc66409c2ddc8491",
+  "source_pr": "https://github.com/kneelinghorse/TraceLab/pull/290",
+  "deployment_ids": {
+    "TraceLab": "1bd32e00-9d73-4ddb-903e-efab15ab0a53",
+    "frontend": "19d01ce7-75c2-404f-818c-4871636d2c9f"
+  },
+  "deployments_success_observed_at": "2026-09-14T13:47:17.919600+00:00",
+  "authorization": {
+    "decision_id": 433,
+    "approved_by": "Derek",
+    "credential_source": "Existing Railway production bootstrap-owner environment; values stayed in remote process memory and were never printed or archived."
+  },
+  "started_at": "2026-09-14T14:17:24.547540+00:00",
+  "finished_at": "2026-09-14T14:18:05.104894+00:00",
+  "command": "python scripts/rbac_verify.py --base-url https://api.tracelab.aquex.ai",
+  "execution": "Invoked deployed scripts.rbac_verify.main with its unmodified CLI arguments, auth, matrix, and cleanup. Scratch observer records request method/path/status and result fields only; it does not modify request or response behavior.",
+  "script_sha256": "88e2b2c59f0a04d6ced58715eedb5bf50a72e81fe22cca20037e8c9b942f21de",
+  "exit_code": 0,
+  "exception_type": null,
+  "run_tag": "rbac-verify-08931d85cdf343e992220e7d7e5479d2",
+  "gaps": [],
+  "teardown_failures": [],
+  "registration_checks": [
+    {
+      "role": "member",
+      "method": "post",
+      "path": "/api/v1/documents",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "role": "viewer",
+      "method": "post",
+      "path": "/api/v1/documents",
+      "status": 403,
+      "expected": 403
+    }
+  ],
+  "document_checks": [
+    {
+      "role": "member",
+      "method": "get",
+      "path": "/api/v1/documents/d4d15129-bee9-48f1-96d0-b29d5a742d68",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "role": "member",
+      "method": "get",
+      "path": "/api/v1/documents?project_id=fbdfcca1-fce5-447b-b081-17761e52b173&page_size=100",
+      "status": 200,
+      "included_document_ids": [],
+      "expected": "200 with zero outsider documents"
+    },
+    {
+      "role": "viewer",
+      "method": "get",
+      "path": "/api/v1/documents/d4d15129-bee9-48f1-96d0-b29d5a742d68",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "role": "viewer",
+      "method": "get",
+      "path": "/api/v1/documents?project_id=fbdfcca1-fce5-447b-b081-17761e52b173&page_size=100",
+      "status": 200,
+      "included_document_ids": [],
+      "expected": "200 with zero outsider documents"
+    },
+    {
+      "role": "member",
+      "method": "patch",
+      "path": "/api/v1/documents/d4d15129-bee9-48f1-96d0-b29d5a742d68",
+      "status": 403,
+      "expected": 403
+    },
+    {
+      "role": "member",
+      "method": "post",
+      "path": "/api/v1/documents/d4d15129-bee9-48f1-96d0-b29d5a742d68/restore",
+      "status": 403,
+      "expected": 403
+    }
+  ],
+  "provisioned_principals": [
+    "member",
+    "second_owner",
+    "service",
+    "viewer"
+  ],
+  "notes": [
+    "pedr-preflight: owner baseline had zero matches; member/viewer scoped-empty checks are smoke only, not a non-vacuous isolation proof",
+    "authz matrix reuses a validated owner project and seeds only hard-deletable collection/mission fixtures; project DELETE is local-only (live anonymous 401 coverage retained); 11 per-id routes remain in the explicit anon registry; reports/collection children also receive PEDR-1C cross-tenant probes; onboarding registration has member/viewer deny probes; existing documents receive read/list/PATCH/restore deny probes. Project-owner document read positives are local-only because the bootstrap owner is privileged and live fixture creation would mutate production projects/documents."
+  ],
+  "request_count": 284,
+  "login_count": 5,
+  "teardown": {
+    "status": "passed",
+    "failures": [],
+    "verification": "Harness deletes seeded artifacts, reconciles artifacts by run tag before purging users, lists users after deletion, and lists API keys after deletion.",
+    "final_requests": [
+      {
+        "method": "DELETE",
+        "path": "/api/v1/admin/users/2dc45d04-289f-4d79-95a7-04e97dfd272e",
+        "status": 200
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/admin/users/13b761f1-1f04-43d9-baaa-e40be67499dc",
+        "status": 200
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/admin/users/dd1601a2-573f-4ae0-bd0d-4cb735b3066e",
+        "status": 200
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/admin/users/8ab901be-5ffe-40b7-bc57-172e1bf9a834",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/users",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/admin/users",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/auth/api-keys",
+        "status": 200
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/auth/api-keys/c950918e-d756-4965-bbfd-99747cf93007",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/auth/api-keys",
+        "status": 200
+      }
+    ]
+  },
+  "sec_1_follow_up": {
+    "pending_production_rbac_verify": false,
+    "status": "closed",
+    "closed_at": "2026-09-14T14:18:05.104894+00:00",
+    "evidence": "Both POST /api/v1/documents outsider member/viewer probes returned exactly 403; registration_checks records the rows. Historical SEC-1 receipt retains its original pending state."
+  },
+  "local_only": {
+    "project_owner_document_read_positive": "The bootstrap owner is privileged. A non-privileged project-owner positive would require production project/document mutations. The mounted local app proves this grant and its write denials; registered in scripts/rbac_verify.py."
+  },
+  "limitations": [
+    "PEDR preflight owner baseline had zero matches: that preflight empty-response check is smoke only. Other production scope matrices ran; this limitation is retained from the harness notes.",
+    "11 per-id routes retain anonymous-only coverage. Project DELETE and non-privileged project-owner document read positives are local-only, as specified."
+  ]
+}

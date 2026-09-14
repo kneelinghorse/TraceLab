@@ -1,0 +1,1827 @@
+{
+  "mission_id": "SEC-2",
+  "sprint_id": "sprint-52",
+  "generated_at": "2026-09-14T14:19:54.293625+00:00",
+  "status": "validated_pending_receipt_merge",
+  "source": {
+    "pr": 290,
+    "url": "https://github.com/kneelinghorse/TraceLab/pull/290",
+    "head_commit": "505f5a5f4bd75ef5c342374369d357c6bd8015c2",
+    "merge_commit": "e64f32cd0c29a4b67a1644a6dc66409c2ddc8491",
+    "merged_at": "2026-09-14T13:44:41Z"
+  },
+  "decisions": [
+    424,
+    432,
+    433
+  ],
+  "learnings_applied": [
+    168,
+    176,
+    177,
+    180,
+    181
+  ],
+  "scope": {
+    "ui_mission": false,
+    "migration_needed": false,
+    "mcp_source_changed": false
+  },
+  "implementation": {
+    "policy": "Human project ownership adds read-only sibling-document access for live records; global roles and write grants unchanged.",
+    "shared_helpers": "app/services/document_policy.py::document_read_policy and resolve_readable_chunks",
+    "consumers": [
+      "collections",
+      "reports",
+      "synthesize"
+    ],
+    "policy_version": "1.1"
+  },
+  "local_validation": {
+    "runs": [
+      {
+        "label": "policy-green",
+        "console_summary": "49 passed, 14 warnings in 6.33s",
+        "counts": {
+          "passed": 49,
+          "failed": 0,
+          "skipped": 0,
+          "deselected": 0
+        },
+        "duration_seconds": 6.33,
+        "skipped_tests": [],
+        "generated_at": "2026-09-14T13:06:40.147532+00:00",
+        "completed_at": "2026-09-14T13:06:46.446622+00:00"
+      },
+      {
+        "label": "consumers-first",
+        "console_summary": "76 passed, 14 warnings in 17.04s",
+        "counts": {
+          "passed": 76,
+          "failed": 0,
+          "skipped": 0,
+          "deselected": 0
+        },
+        "duration_seconds": 17.04,
+        "skipped_tests": [],
+        "generated_at": "2026-09-14T13:09:03.186312+00:00",
+        "completed_at": "2026-09-14T13:09:20.186585+00:00"
+      },
+      {
+        "label": "http-second",
+        "console_summary": "35 passed, 14 warnings in 28.23s",
+        "counts": {
+          "passed": 35,
+          "failed": 0,
+          "skipped": 0,
+          "deselected": 0
+        },
+        "duration_seconds": 28.23,
+        "skipped_tests": [],
+        "generated_at": "2026-09-14T13:13:40.383136+00:00",
+        "completed_at": "2026-09-14T13:14:08.587131+00:00"
+      },
+      {
+        "label": "harness-first",
+        "console_summary": "56 passed, 1 skipped, 14 warnings in 25.79s",
+        "counts": {
+          "passed": 56,
+          "failed": 0,
+          "skipped": 1,
+          "deselected": 0
+        },
+        "duration_seconds": 25.79,
+        "skipped_tests": [
+          {
+            "nodeid": "tests/integration/test_e2e_rbac_live.py::test_live_rbac_matrix",
+            "phases": [
+              {
+                "phase": "setup",
+                "outcome": "skipped",
+                "duration": 5.904200952500105e-05
+              },
+              {
+                "phase": "teardown",
+                "outcome": "passed",
+                "duration": 8.512509521096945e-05
+              }
+            ]
+          }
+        ],
+        "generated_at": "2026-09-14T13:15:53.427769+00:00",
+        "completed_at": "2026-09-14T13:16:19.194179+00:00"
+      },
+      {
+        "label": "report-scope-final",
+        "console_summary": "18 passed, 14 warnings in 3.62s",
+        "counts": {
+          "passed": 18,
+          "failed": 0,
+          "skipped": 0,
+          "deselected": 0
+        },
+        "duration_seconds": 3.62,
+        "skipped_tests": [],
+        "generated_at": "2026-09-14T13:23:59.343536+00:00",
+        "completed_at": "2026-09-14T13:24:02.930807+00:00"
+      },
+      {
+        "label": "backend-final",
+        "console_summary": "2604 passed, 3 skipped, 12 deselected, 47 warnings in 370.16s (0:06:10)",
+        "counts": {
+          "passed": 2604,
+          "failed": 0,
+          "skipped": 3,
+          "deselected": 12
+        },
+        "duration_seconds": 370.16,
+        "skipped_tests": [
+          {
+            "nodeid": "tests/test_auto_ingest.py::TestAutoIngestIntegration::test_auto_ingest_full_pipeline",
+            "phases": [
+              {
+                "phase": "setup",
+                "outcome": "skipped",
+                "duration": 7.362500764429569e-05
+              },
+              {
+                "phase": "teardown",
+                "outcome": "passed",
+                "duration": 4.437495954334736e-05
+              }
+            ]
+          },
+          {
+            "nodeid": "tests/test_pedr_unified_search.py::TestPEDRIntegration::test_create_orchestrator_factory",
+            "phases": [
+              {
+                "phase": "setup",
+                "outcome": "skipped",
+                "duration": 7.391697727143764e-05
+              },
+              {
+                "phase": "teardown",
+                "outcome": "passed",
+                "duration": 4.8874993808567524e-05
+              }
+            ]
+          },
+          {
+            "nodeid": "tests/test_pedr_unified_search.py::TestPEDRIntegration::test_full_search_pipeline",
+            "phases": [
+              {
+                "phase": "setup",
+                "outcome": "skipped",
+                "duration": 5.312496796250343e-05
+              },
+              {
+                "phase": "teardown",
+                "outcome": "passed",
+                "duration": 4.6791043132543564e-05
+              }
+            ]
+          }
+        ],
+        "generated_at": "2026-09-14T13:25:32.864497+00:00",
+        "completed_at": "2026-09-14T13:31:42.940652+00:00"
+      },
+      {
+        "label": "postgres-context",
+        "console_summary": "2 passed, 14 warnings in 6.11s",
+        "counts": {
+          "passed": 2,
+          "failed": 0,
+          "skipped": 0,
+          "deselected": 0
+        },
+        "duration_seconds": 6.11,
+        "skipped_tests": [],
+        "generated_at": "2026-09-14T13:32:00.658910+00:00",
+        "completed_at": "2026-09-14T13:32:06.716955+00:00"
+      }
+    ],
+    "skip_reporting": "Console counts and per-phase outcomes are authoritative; the telemetry plugin labels setup-skipped/teardown-passed cases as passed (learning #180).",
+    "read_gate_mutation": {
+      "removed": "action == read condition only",
+      "expected_failed_write_actions": [
+        "update",
+        "process",
+        "delete",
+        "restore",
+        "upload"
+      ],
+      "failed": 5,
+      "policy_restored": true,
+      "subsequent_full_backend_passed": true
+    },
+    "preserved_failed_runs": [
+      {
+        "label": "unit-red",
+        "reason": "Expected red: the old policy denies the new project-owner read grant.",
+        "failed": 1
+      },
+      {
+        "label": "http-first",
+        "reason": "Test expectations corrected for duplicate chunk addition, stats denial status and report response fields.",
+        "failed": 5
+      },
+      {
+        "label": "backend-full",
+        "reason": "An old empty-synthesis assertion expected a provider call; corrected to the required early empty result.",
+        "failed": 1,
+        "passed": 2603,
+        "skipped": 3,
+        "deselected": 12
+      },
+      {
+        "label": "report-scope-correction",
+        "reason": "An initial test edit matched the adjacent assertion; corrected before the 18-test passing rerun.",
+        "failed": 2
+      }
+    ]
+  },
+  "alternate_caller_sweep": {
+    "credential_types": [
+      "jwt",
+      "api_key"
+    ],
+    "rbac_states": [
+      true,
+      false
+    ],
+    "principals": [
+      "project_owner",
+      "member",
+      "viewer",
+      "admin",
+      "owner",
+      "service"
+    ],
+    "cells": 24,
+    "http_probes": 144,
+    "authentication_overrides": false,
+    "provider_only_override": true,
+    "results": [
+      {
+        "rbac_enabled": true,
+        "credential": "jwt",
+        "principal": "project_owner",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/7de9f0bf-f294-4498-8ed7-62abf20d23b3",
+            "status": 200,
+            "included_document_ids": [
+              "7de9f0bf-f294-4498-8ed7-62abf20d23b3"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=465621b5-2fdf-4019-b71e-26e8108c1f5e",
+            "status": 200,
+            "included_document_ids": [
+              "7de9f0bf-f294-4498-8ed7-62abf20d23b3"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/606719d5-aa8c-4b1f-9f2e-7c4775af82a2/export",
+            "status": 200,
+            "included_document_ids": [
+              "7de9f0bf-f294-4498-8ed7-62abf20d23b3"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": [
+              "7de9f0bf-f294-4498-8ed7-62abf20d23b3"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": [
+              "7de9f0bf-f294-4498-8ed7-62abf20d23b3"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": [
+              "7de9f0bf-f294-4498-8ed7-62abf20d23b3"
+            ]
+          }
+        ]
+      },
+      {
+        "rbac_enabled": false,
+        "credential": "jwt",
+        "principal": "project_owner",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/7713bf0f-829d-42eb-90a5-04dea7db930e",
+            "status": 200,
+            "included_document_ids": [
+              "7713bf0f-829d-42eb-90a5-04dea7db930e"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=263e5040-94fa-4eca-a1ff-4a2cf9503244",
+            "status": 200,
+            "included_document_ids": [
+              "7713bf0f-829d-42eb-90a5-04dea7db930e"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/9bc6809d-f120-40ca-87b0-ea585bc5ce78/export",
+            "status": 200,
+            "included_document_ids": [
+              "7713bf0f-829d-42eb-90a5-04dea7db930e"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": [
+              "7713bf0f-829d-42eb-90a5-04dea7db930e"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": [
+              "7713bf0f-829d-42eb-90a5-04dea7db930e"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": [
+              "7713bf0f-829d-42eb-90a5-04dea7db930e"
+            ]
+          }
+        ]
+      },
+      {
+        "rbac_enabled": true,
+        "credential": "api_key",
+        "principal": "project_owner",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/60e63311-cac4-41cb-b8ea-da25685d70d0",
+            "status": 200,
+            "included_document_ids": [
+              "60e63311-cac4-41cb-b8ea-da25685d70d0"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=58a9d4e7-cc15-4b89-85f2-785e35d73d88",
+            "status": 200,
+            "included_document_ids": [
+              "60e63311-cac4-41cb-b8ea-da25685d70d0"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/fa9dd1f3-fd68-4bc5-90b4-8c8356a6162d/export",
+            "status": 200,
+            "included_document_ids": [
+              "60e63311-cac4-41cb-b8ea-da25685d70d0"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": [
+              "60e63311-cac4-41cb-b8ea-da25685d70d0"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": [
+              "60e63311-cac4-41cb-b8ea-da25685d70d0"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": [
+              "60e63311-cac4-41cb-b8ea-da25685d70d0"
+            ]
+          }
+        ]
+      },
+      {
+        "rbac_enabled": false,
+        "credential": "api_key",
+        "principal": "project_owner",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/1285c9fe-dba4-4a44-a248-a52958f4a816",
+            "status": 200,
+            "included_document_ids": [
+              "1285c9fe-dba4-4a44-a248-a52958f4a816"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=6219f2d6-c899-40ff-b227-cce962df1528",
+            "status": 200,
+            "included_document_ids": [
+              "1285c9fe-dba4-4a44-a248-a52958f4a816"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/b32e5b5c-83bc-4215-83d7-eb6ce8bb4697/export",
+            "status": 200,
+            "included_document_ids": [
+              "1285c9fe-dba4-4a44-a248-a52958f4a816"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": [
+              "1285c9fe-dba4-4a44-a248-a52958f4a816"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": [
+              "1285c9fe-dba4-4a44-a248-a52958f4a816"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": [
+              "1285c9fe-dba4-4a44-a248-a52958f4a816"
+            ]
+          }
+        ]
+      },
+      {
+        "rbac_enabled": true,
+        "credential": "jwt",
+        "principal": "member",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/db9adb4a-d19d-4e59-bdea-e70d967fddd3",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=49ebe54a-bdb5-44e9-a456-642dfa9b98d9",
+            "status": 200,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/bb13850e-26f9-4642-bddb-086cd6d83cfa/export",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": []
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": []
+          }
+        ]
+      },
+      {
+        "rbac_enabled": false,
+        "credential": "jwt",
+        "principal": "member",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/33fb92c5-c6ab-4edb-8ab3-9111fb800e21",
+            "status": 200,
+            "included_document_ids": [
+              "33fb92c5-c6ab-4edb-8ab3-9111fb800e21"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=c6834c76-612f-4692-990d-479bc8eccb5c",
+            "status": 200,
+            "included_document_ids": [
+              "33fb92c5-c6ab-4edb-8ab3-9111fb800e21"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/ebea9b88-53ba-4237-aed1-b0103d7239c3/export",
+            "status": 200,
+            "included_document_ids": [
+              "33fb92c5-c6ab-4edb-8ab3-9111fb800e21"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": [
+              "33fb92c5-c6ab-4edb-8ab3-9111fb800e21"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": [
+              "33fb92c5-c6ab-4edb-8ab3-9111fb800e21"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": [
+              "33fb92c5-c6ab-4edb-8ab3-9111fb800e21"
+            ]
+          }
+        ]
+      },
+      {
+        "rbac_enabled": true,
+        "credential": "api_key",
+        "principal": "member",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/703f02ac-b3bf-4833-86cc-eb98cab87a41",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=8e6b7534-bb12-41c8-8c36-4135867af5c1",
+            "status": 200,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/64eaa61d-63ab-48ed-8646-de2c158dbe5d/export",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": []
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": []
+          }
+        ]
+      },
+      {
+        "rbac_enabled": false,
+        "credential": "api_key",
+        "principal": "member",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/2d87d065-628b-4bea-bf79-185aac36c872",
+            "status": 200,
+            "included_document_ids": [
+              "2d87d065-628b-4bea-bf79-185aac36c872"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=22cdfca5-498c-481e-b6b5-903f647c77f4",
+            "status": 200,
+            "included_document_ids": [
+              "2d87d065-628b-4bea-bf79-185aac36c872"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/be60835e-9c1f-48ab-afd2-6bd4c2aa87ab/export",
+            "status": 200,
+            "included_document_ids": [
+              "2d87d065-628b-4bea-bf79-185aac36c872"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": [
+              "2d87d065-628b-4bea-bf79-185aac36c872"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": [
+              "2d87d065-628b-4bea-bf79-185aac36c872"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": [
+              "2d87d065-628b-4bea-bf79-185aac36c872"
+            ]
+          }
+        ]
+      },
+      {
+        "rbac_enabled": true,
+        "credential": "jwt",
+        "principal": "viewer",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/3e368bb0-679a-4aaa-a521-70d1d9848c3e",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=75271487-2176-45b4-9349-619d4bb1cde1",
+            "status": 200,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/b949d4cb-84e6-48a8-b39c-9255554309ca/export",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": []
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": []
+          }
+        ]
+      },
+      {
+        "rbac_enabled": false,
+        "credential": "jwt",
+        "principal": "viewer",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/449a8c25-d6af-4377-8f00-871735078c41",
+            "status": 200,
+            "included_document_ids": [
+              "449a8c25-d6af-4377-8f00-871735078c41"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=e43b3281-42a3-4e5a-9988-295ae2815496",
+            "status": 200,
+            "included_document_ids": [
+              "449a8c25-d6af-4377-8f00-871735078c41"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/85526e79-ab48-4f86-aab8-a3c04c7ecb3b/export",
+            "status": 200,
+            "included_document_ids": [
+              "449a8c25-d6af-4377-8f00-871735078c41"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": [
+              "449a8c25-d6af-4377-8f00-871735078c41"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": [
+              "449a8c25-d6af-4377-8f00-871735078c41"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": [
+              "449a8c25-d6af-4377-8f00-871735078c41"
+            ]
+          }
+        ]
+      },
+      {
+        "rbac_enabled": true,
+        "credential": "api_key",
+        "principal": "viewer",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/85ab0287-4bae-4f57-a3ed-d5f45cfac129",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=1d129404-33e2-4c6d-887a-db6b62a4844b",
+            "status": 200,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/24e78f8f-6890-49fb-be74-a9d70c9c57ef/export",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": []
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": []
+          }
+        ]
+      },
+      {
+        "rbac_enabled": false,
+        "credential": "api_key",
+        "principal": "viewer",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/31b5d183-909d-4f81-8d50-661b32eddccd",
+            "status": 200,
+            "included_document_ids": [
+              "31b5d183-909d-4f81-8d50-661b32eddccd"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=289b97f1-4d33-42d8-a47c-d89c44d2e441",
+            "status": 200,
+            "included_document_ids": [
+              "31b5d183-909d-4f81-8d50-661b32eddccd"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/cbf04f75-6e0b-4794-a4ee-35004f354082/export",
+            "status": 200,
+            "included_document_ids": [
+              "31b5d183-909d-4f81-8d50-661b32eddccd"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": [
+              "31b5d183-909d-4f81-8d50-661b32eddccd"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": [
+              "31b5d183-909d-4f81-8d50-661b32eddccd"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": [
+              "31b5d183-909d-4f81-8d50-661b32eddccd"
+            ]
+          }
+        ]
+      },
+      {
+        "rbac_enabled": true,
+        "credential": "jwt",
+        "principal": "admin",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/4e5537a5-e930-40f4-a92c-0ed2c6cddf86",
+            "status": 200,
+            "included_document_ids": [
+              "4e5537a5-e930-40f4-a92c-0ed2c6cddf86"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=c854c6d6-fc19-4178-9968-5558a2cdd513",
+            "status": 200,
+            "included_document_ids": [
+              "4e5537a5-e930-40f4-a92c-0ed2c6cddf86"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/f421fe68-b076-48b7-8c53-8ba2f5dee75f/export",
+            "status": 200,
+            "included_document_ids": [
+              "4e5537a5-e930-40f4-a92c-0ed2c6cddf86"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": [
+              "4e5537a5-e930-40f4-a92c-0ed2c6cddf86"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": [
+              "4e5537a5-e930-40f4-a92c-0ed2c6cddf86"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": [
+              "4e5537a5-e930-40f4-a92c-0ed2c6cddf86"
+            ]
+          }
+        ]
+      },
+      {
+        "rbac_enabled": false,
+        "credential": "jwt",
+        "principal": "admin",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/d4acc89f-8f43-46ab-8d65-ca60f84c7ea7",
+            "status": 200,
+            "included_document_ids": [
+              "d4acc89f-8f43-46ab-8d65-ca60f84c7ea7"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=7dbe1f03-7b0a-4adc-90cc-8c946e664d78",
+            "status": 200,
+            "included_document_ids": [
+              "d4acc89f-8f43-46ab-8d65-ca60f84c7ea7"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/104b0947-2a4a-42d4-a178-4974527bba16/export",
+            "status": 200,
+            "included_document_ids": [
+              "d4acc89f-8f43-46ab-8d65-ca60f84c7ea7"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": [
+              "d4acc89f-8f43-46ab-8d65-ca60f84c7ea7"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": [
+              "d4acc89f-8f43-46ab-8d65-ca60f84c7ea7"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": [
+              "d4acc89f-8f43-46ab-8d65-ca60f84c7ea7"
+            ]
+          }
+        ]
+      },
+      {
+        "rbac_enabled": true,
+        "credential": "api_key",
+        "principal": "admin",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/0ca129b1-e768-4848-a7f4-bc1a955e326f",
+            "status": 200,
+            "included_document_ids": [
+              "0ca129b1-e768-4848-a7f4-bc1a955e326f"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=7ab6b3a4-cb1f-40c4-b96c-7e064d1c1ffc",
+            "status": 200,
+            "included_document_ids": [
+              "0ca129b1-e768-4848-a7f4-bc1a955e326f"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/eea3f696-a976-4692-a36d-fb5f5017cadf/export",
+            "status": 200,
+            "included_document_ids": [
+              "0ca129b1-e768-4848-a7f4-bc1a955e326f"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": [
+              "0ca129b1-e768-4848-a7f4-bc1a955e326f"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": [
+              "0ca129b1-e768-4848-a7f4-bc1a955e326f"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": [
+              "0ca129b1-e768-4848-a7f4-bc1a955e326f"
+            ]
+          }
+        ]
+      },
+      {
+        "rbac_enabled": false,
+        "credential": "api_key",
+        "principal": "admin",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/9c14f44f-ad22-4fd3-b593-a4d8367e6552",
+            "status": 200,
+            "included_document_ids": [
+              "9c14f44f-ad22-4fd3-b593-a4d8367e6552"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=f97f6846-85c1-4a99-bb7c-efe1c7ca17b0",
+            "status": 200,
+            "included_document_ids": [
+              "9c14f44f-ad22-4fd3-b593-a4d8367e6552"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/2066a635-3665-4eb2-9ffa-bf21024be876/export",
+            "status": 200,
+            "included_document_ids": [
+              "9c14f44f-ad22-4fd3-b593-a4d8367e6552"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": [
+              "9c14f44f-ad22-4fd3-b593-a4d8367e6552"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": [
+              "9c14f44f-ad22-4fd3-b593-a4d8367e6552"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": [
+              "9c14f44f-ad22-4fd3-b593-a4d8367e6552"
+            ]
+          }
+        ]
+      },
+      {
+        "rbac_enabled": true,
+        "credential": "jwt",
+        "principal": "owner",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/3cf5d241-179e-4577-ac06-29067ddb7507",
+            "status": 200,
+            "included_document_ids": [
+              "3cf5d241-179e-4577-ac06-29067ddb7507"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=1c786747-b6d3-4fcd-a14a-553ae8dc262d",
+            "status": 200,
+            "included_document_ids": [
+              "3cf5d241-179e-4577-ac06-29067ddb7507"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/f2cf962d-a8a8-400a-bec1-b395c4b28f17/export",
+            "status": 200,
+            "included_document_ids": [
+              "3cf5d241-179e-4577-ac06-29067ddb7507"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": [
+              "3cf5d241-179e-4577-ac06-29067ddb7507"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": [
+              "3cf5d241-179e-4577-ac06-29067ddb7507"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": [
+              "3cf5d241-179e-4577-ac06-29067ddb7507"
+            ]
+          }
+        ]
+      },
+      {
+        "rbac_enabled": false,
+        "credential": "jwt",
+        "principal": "owner",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/2b4f31fd-72e9-4721-b006-6dfff01990e9",
+            "status": 200,
+            "included_document_ids": [
+              "2b4f31fd-72e9-4721-b006-6dfff01990e9"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=39becd81-d353-4de1-8001-630b30eec914",
+            "status": 200,
+            "included_document_ids": [
+              "2b4f31fd-72e9-4721-b006-6dfff01990e9"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/a7bd7c65-d5de-45a5-9bf8-ffdc06efb0dc/export",
+            "status": 200,
+            "included_document_ids": [
+              "2b4f31fd-72e9-4721-b006-6dfff01990e9"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": [
+              "2b4f31fd-72e9-4721-b006-6dfff01990e9"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": [
+              "2b4f31fd-72e9-4721-b006-6dfff01990e9"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": [
+              "2b4f31fd-72e9-4721-b006-6dfff01990e9"
+            ]
+          }
+        ]
+      },
+      {
+        "rbac_enabled": true,
+        "credential": "api_key",
+        "principal": "owner",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/6952f656-84e1-4a29-85e0-b2564009c61a",
+            "status": 200,
+            "included_document_ids": [
+              "6952f656-84e1-4a29-85e0-b2564009c61a"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=e9191cfc-a6d5-47bc-892f-f535c4531f63",
+            "status": 200,
+            "included_document_ids": [
+              "6952f656-84e1-4a29-85e0-b2564009c61a"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/e1665c7f-1188-4b48-960d-a13e6f35425d/export",
+            "status": 200,
+            "included_document_ids": [
+              "6952f656-84e1-4a29-85e0-b2564009c61a"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": [
+              "6952f656-84e1-4a29-85e0-b2564009c61a"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": [
+              "6952f656-84e1-4a29-85e0-b2564009c61a"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": [
+              "6952f656-84e1-4a29-85e0-b2564009c61a"
+            ]
+          }
+        ]
+      },
+      {
+        "rbac_enabled": false,
+        "credential": "api_key",
+        "principal": "owner",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/2d3a1bb0-7dba-4517-bec1-795d97ccb9e4",
+            "status": 200,
+            "included_document_ids": [
+              "2d3a1bb0-7dba-4517-bec1-795d97ccb9e4"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=088b7e7d-5df3-4f97-8bbc-d7bcc6f7275b",
+            "status": 200,
+            "included_document_ids": [
+              "2d3a1bb0-7dba-4517-bec1-795d97ccb9e4"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/2de568c9-7a53-4bbe-90c7-e3f0816b5a09/export",
+            "status": 200,
+            "included_document_ids": [
+              "2d3a1bb0-7dba-4517-bec1-795d97ccb9e4"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 201,
+            "included_document_ids": [
+              "2d3a1bb0-7dba-4517-bec1-795d97ccb9e4"
+            ]
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 200,
+            "included_document_ids": [
+              "2d3a1bb0-7dba-4517-bec1-795d97ccb9e4"
+            ]
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 200,
+            "included_document_ids": [
+              "2d3a1bb0-7dba-4517-bec1-795d97ccb9e4"
+            ]
+          }
+        ]
+      },
+      {
+        "rbac_enabled": true,
+        "credential": "jwt",
+        "principal": "service",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/86ad4e3b-6ab1-4bc3-85fd-54075a30a996",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=86fc131b-678c-4310-964a-93b0cdc6f0b9",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/86258a26-1c2f-4fca-997c-52762ec3b91c/export",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 403,
+            "included_document_ids": []
+          }
+        ]
+      },
+      {
+        "rbac_enabled": false,
+        "credential": "jwt",
+        "principal": "service",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/6861ad1d-aa0c-4012-a351-d73e3dfb2feb",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=76697ca6-d2c7-4e25-818c-ad03867d46e6",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/317892cd-a44b-4071-afa9-2579a6b792b3/export",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 403,
+            "included_document_ids": []
+          }
+        ]
+      },
+      {
+        "rbac_enabled": true,
+        "credential": "api_key",
+        "principal": "service",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/bdff452a-658e-42b3-b79e-291a4e8f08a3",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=5976192a-f26c-4b3c-8236-c20d0efd1548",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/3170d19c-41e7-498e-8d91-d964df65e07f/export",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 403,
+            "included_document_ids": []
+          }
+        ]
+      },
+      {
+        "rbac_enabled": false,
+        "credential": "api_key",
+        "principal": "service",
+        "cells": [
+          {
+            "method": "GET",
+            "path": "/api/v1/documents/dd5c877d-8523-4bf2-936d-0ca89c6571d8",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/documents?project_id=6656ce3e-3859-463d-9091-c2e05346d816",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/collections/ef81a046-dbd9-4dd1-bf4f-47b5e1a7b4c3/export",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/reports",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "POST",
+            "path": "/api/v1/synthesize",
+            "status": 403,
+            "included_document_ids": []
+          },
+          {
+            "method": "GET",
+            "path": "/api/v1/jobs",
+            "status": 403,
+            "included_document_ids": []
+          }
+        ]
+      }
+    ]
+  },
+  "additional_checks": {
+    "ruff_changed_files": "passed",
+    "foundational_references": "passed",
+    "git_diff_check": "passed",
+    "ruff_format_run": false
+  },
+  "post_merge_main_push_ci": [
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34851143146,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e64f32cd0c29a4b67a1644a6dc66409c2ddc8491",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34851143146",
+      "workflowName": "Secret Scan",
+      "jobs": [
+        {
+          "databaseId": 103999104372,
+          "name": "Secret Scan",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34851143146/job/103999104372",
+          "startedAt": "2026-09-14T13:44:47Z",
+          "completedAt": "2026-09-14T13:45:13Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34851143069,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e64f32cd0c29a4b67a1644a6dc66409c2ddc8491",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34851143069",
+      "workflowName": "Backend Lint",
+      "jobs": [
+        {
+          "databaseId": 103999104790,
+          "name": "ruff-diff",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34851143069/job/103999104790",
+          "startedAt": "2026-09-14T13:44:47Z",
+          "completedAt": "2026-09-14T13:45:08Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34851143124,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e64f32cd0c29a4b67a1644a6dc66409c2ddc8491",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34851143124",
+      "workflowName": "MCP Package",
+      "jobs": [
+        {
+          "databaseId": 103999104148,
+          "name": "mcp-package",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34851143124/job/103999104148",
+          "startedAt": "2026-09-14T13:44:46Z",
+          "completedAt": "2026-09-14T13:45:26Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34851143129,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e64f32cd0c29a4b67a1644a6dc66409c2ddc8491",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34851143129",
+      "workflowName": "Frontend Checks",
+      "jobs": [
+        {
+          "databaseId": 103999105439,
+          "name": "vitest",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34851143129/job/103999105439",
+          "startedAt": "2026-09-14T13:44:47Z",
+          "completedAt": "2026-09-14T13:45:54Z"
+        },
+        {
+          "databaseId": 103999105825,
+          "name": "lint",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34851143129/job/103999105825",
+          "startedAt": "2026-09-14T13:44:47Z",
+          "completedAt": "2026-09-14T13:45:37Z"
+        },
+        {
+          "databaseId": 103999105959,
+          "name": "type-check",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34851143129/job/103999105959",
+          "startedAt": "2026-09-14T13:44:47Z",
+          "completedAt": "2026-09-14T13:45:43Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34851143108,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e64f32cd0c29a4b67a1644a6dc66409c2ddc8491",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34851143108",
+      "workflowName": "Backend Integration",
+      "jobs": [
+        {
+          "databaseId": 103999104957,
+          "name": "backend-integration",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34851143108/job/103999104957",
+          "startedAt": "2026-09-14T13:44:47Z",
+          "completedAt": "2026-09-14T13:47:25Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34851143134,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e64f32cd0c29a4b67a1644a6dc66409c2ddc8491",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34851143134",
+      "workflowName": "Frontend Production Build",
+      "jobs": [
+        {
+          "databaseId": 103999104399,
+          "name": "build-frontend-production",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34851143134/job/103999104399",
+          "startedAt": "2026-09-14T13:44:47Z",
+          "completedAt": "2026-09-14T13:48:12Z"
+        }
+      ]
+    },
+    {
+      "attempt": 1,
+      "conclusion": "success",
+      "databaseId": 34851143141,
+      "event": "push",
+      "headBranch": "main",
+      "headSha": "e64f32cd0c29a4b67a1644a6dc66409c2ddc8491",
+      "status": "completed",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34851143141",
+      "workflowName": "Backend Tests",
+      "jobs": [
+        {
+          "databaseId": 103999105520,
+          "name": "backend-suite",
+          "status": "completed",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34851143141/job/103999105520",
+          "startedAt": "2026-09-14T13:44:47Z",
+          "completedAt": "2026-09-14T13:53:46Z"
+        }
+      ]
+    }
+  ],
+  "main_suite_counts": {
+    "backend-suite": {
+      "passed": 2604,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 48,
+      "duration_seconds": 468.27
+    },
+    "backend-integration": {
+      "passed": 134,
+      "skipped": 4,
+      "warnings": 17,
+      "duration_seconds": 89.13
+    }
+  },
+  "preserved_pr_failure": {
+    "run_id": 34849134746,
+    "attempt": 1,
+    "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34849134746/attempts/1",
+    "head_commit": "22ec82c1fbd3699b8684606f6fcb54ebfb0c475a",
+    "passed": 133,
+    "failed": 1,
+    "skipped": 4,
+    "reason": "Old PostgreSQL collection-context assertion expected 120 readable documents; new intended project-owner grant returns 121. Updated this fixture with allow and foreign-project deny before pushing a new head. Failure metadata/log preserved before correction.",
+    "correction_commit": "505f5a5f4bd75ef5c342374369d357c6bd8015c2",
+    "acceptance_uses": "The post-merge main push runs above, not this PR-head run or its replacement."
+  },
+  "deployment": {
+    "checked_at": "2026-09-14T13:47:17.919600+00:00",
+    "commit": "e64f32cd0c29a4b67a1644a6dc66409c2ddc8491",
+    "services": {
+      "TraceLab": {
+        "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+        "deployment_id": "1bd32e00-9d73-4ddb-903e-efab15ab0a53",
+        "status": "SUCCESS",
+        "commit": "e64f32cd0c29a4b67a1644a6dc66409c2ddc8491",
+        "created_at": "2026-09-14T13:44:43.180Z"
+      },
+      "frontend": {
+        "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+        "deployment_id": "19d01ce7-75c2-404f-818c-4871636d2c9f",
+        "status": "SUCCESS",
+        "commit": "e64f32cd0c29a4b67a1644a6dc66409c2ddc8491",
+        "created_at": "2026-09-14T13:44:43.124Z"
+      }
+    },
+    "both_success_for_commit": true
+  },
+  "production_validation": {
+    "policy": {
+      "commit": "e64f32cd0c29a4b67a1644a6dc66409c2ddc8491",
+      "checked_at": "2026-09-14T13:47:53.374259+00:00",
+      "deployment_ids": {
+        "TraceLab": "1bd32e00-9d73-4ddb-903e-efab15ab0a53",
+        "frontend": "19d01ce7-75c2-404f-818c-4871636d2c9f"
+      },
+      "method": "GET",
+      "url": "https://api.tracelab.aquex.ai/api/v1/admin/rbac-status",
+      "status": 200,
+      "rbac_enabled": true,
+      "policy_version": "1.1",
+      "credential": "existing local MCP API key; held only in memory",
+      "production_rbac_verify_receipt": "sec-2-rbac-verify-production.json"
+    },
+    "public_smoke": {
+      "summary": {
+        "total": 5,
+        "expected": 5,
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "durationSeconds": 4.196,
+        "retries": 0
+      },
+      "generated_at": "2026-09-14T13:47:53.967Z",
+      "completed_at": "2026-09-14T13:47:58.163Z",
+      "route_migration": "8/8 route rows; 16/16 individual checks"
+    },
+    "rbac_verify": {
+      "receipt": "sec-2-rbac-verify-production.json",
+      "exit_code": 0,
+      "request_count": 284,
+      "login_count": 5,
+      "gaps": [],
+      "teardown_failures": [],
+      "registration_checks": 2,
+      "document_checks": 6
+    }
+  },
+  "success_criteria_evidence": [
+    {
+      "criterion": 1,
+      "evidence": "Read-only project ownership grant: policy-green (49 passed) and mounted HTTP owner-consumer positives; sibling document belongs to another user and caller has no Space membership."
+    },
+    {
+      "criterion": 2,
+      "evidence": "Writes unchanged: all five update/process/delete/restore/upload unit denials fail when the action == read gate is removed; policy restored before full green backend suite. Mounted app rejects all five write routes."
+    },
+    {
+      "criterion": 3,
+      "evidence": "Document/IngestionJob filters include owned live projects with zero Space membership, exclude service principals and deleted parents. Parametrized tests preserve Project/Collection/Mission/Report/Insight/LedgerEntry behavior."
+    },
+    {
+      "criterion": 4,
+      "evidence": "POLICY_VERSION 1.1 asserted locally and observed on the deployed admin/rbac-status endpoint with RBAC enabled."
+    },
+    {
+      "criterion": 5,
+      "evidence": "Mounted app tests include document detail/chunks/download/list, project stats, collection detail/count/export/chunk and document attachments, report source persistence, both synthesis inputs and saved report, navigation search, and job detail/list."
+    },
+    {
+      "criterion": 6,
+      "evidence": "The same mounted consumer fixture verifies foreign-project outsider denials or empty rows; project ownership does not grant writes to sibling documents."
+    },
+    {
+      "criterion": 7,
+      "evidence": "Privileged owner/admin synthesis uses the shared live-document/live-project chunk resolver before service factory/cache/provider access, for collection and direct inputs. Empty result is static, saved reports use effective IDs, flag-off call shape remains unchanged."
+    },
+    {
+      "criterion": 8,
+      "evidence": "All six listed old exclusion tests retained and updated with owner allow plus foreign-project deny; additional PostgreSQL and paginated context fixtures audited and corrected. Full local backend: 2604 passed, 3 skipped, 12 deselected."
+    },
+    {
+      "criterion": 9,
+      "evidence": "Recorded mounted-app alternate-caller sweep: 24 JWT/API-key x RBAC on/off x six-principal cells, each with six status-and-document-ID probes (144 total). No authentication override; provider-only override."
+    },
+    {
+      "criterion": 10,
+      "evidence": "Harness leak and over-block tests pass, 5-login budget preserved, route registry remains in lockstep. Live production run performed exactly five logins and all six document denial rows ran."
+    },
+    {
+      "criterion": 11,
+      "evidence": "Shared policy and authorization docstrings plus cmos/contracts/collection-context-and-reports.md describe the ownership read grant and live-record filters."
+    },
+    {
+      "criterion": 12,
+      "evidence": "All exact-merge main push checks passed attempt 1, including backend-suite and backend-integration. Both Railway services SUCCESS; deployment IDs in sec-2-deployment.json; live RBAC 1.1 check passed after both successes."
+    },
+    {
+      "criterion": 13,
+      "evidence": "Production rbac_verify exited 0: 284 requests, no gaps, no cleanup failures, two SEC-1 registration rows and six SEC-2 document rows. SEC-1 pending flag closes in sec-2-rbac-verify-production.json."
+    },
+    {
+      "criterion": 14,
+      "evidence": "Receipt is validated and ready for merge. Mission remains In Progress until this receipt is on main and its PR/merge SHA, post-merge main CI, both service deployments and production smoke are captured in CMOS."
+    }
+  ],
+  "limitations": [
+    "Local and CI suites report their skips explicitly. Three backend tests need external embeddings/OpenAI/Qdrant; 12 existing quarantines remain deselected. The live-only local harness wrapper is skipped locally; the separate production run above passed.",
+    "Project owners can now see sibling documents in lists, stats, collections, navigation, reports and synthesis; document/chunk/token counts may increase compared with Sprint 51 baselines.",
+    "Privileged synthesis now resolves readable chunks before cache identity selection: one extra DB resolution query and a one-time cache miss for a changed effective chunk set are expected.",
+    "PEDR preflight owner baseline had zero matches: that preflight empty-response check is smoke only. Other production scope matrices ran; this limitation is retained from the harness notes.",
+    "11 per-id routes retain anonymous-only coverage. Project DELETE and non-privileged project-owner document read positives are local-only, as specified."
+  ],
+  "receipt_completion_rule": "Do not complete SEC-2 until this receipt is merged on main. CMOS completion must cite its own receipt PR and merge SHA (learning #176) plus exact receipt-merge main push CI (learning #177), both SUCCESS deployments and production checks. Those future carrier IDs cannot be embedded self-referentially in this commit."
+}
