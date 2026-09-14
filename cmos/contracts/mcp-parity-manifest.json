@@ -54,23 +54,6 @@
   },
   "operations": [
     {
-      "id": "frontend/src/components/missions/MissionRunActivity.tsx#MissionRunActivity:GET:/missions/{mission.id}/logs",
-      "api_file": "frontend/src/components/missions/MissionRunActivity.tsx",
-      "operation": "MissionRunActivity",
-      "source_line": 23,
-      "method": "GET",
-      "path": "/api/v1/missions/{mission.id}/logs",
-      "live": true,
-      "ui_consumers": [
-        "frontend/src/components/missions/MissionRunActivity.tsx",
-        "frontend/src/pages/missions/[id].tsx"
-      ],
-      "mcp": "tracelab_mission_execution.logs",
-      "classification": "closed-MCP-1",
-      "baseline": "read-gap",
-      "rationale": "Bounded snapshot of persisted logs; an empty result is explicit and does not imply a live stream."
-    },
-    {
       "id": "frontend/src/components/missions/MissionRunActivity.tsx#MissionRunActivity:GET:/missions/events/recent",
       "api_file": "frontend/src/components/missions/MissionRunActivity.tsx",
       "operation": "MissionRunActivity",
@@ -86,6 +69,23 @@
       "classification": "closed-MCP-1",
       "baseline": "read-gap",
       "rationale": "Bounded snapshot of persisted events; an empty result is explicit and does not imply a live stream."
+    },
+    {
+      "id": "frontend/src/components/missions/MissionRunActivity.tsx#MissionRunActivity:GET:/missions/{mission.id}/logs",
+      "api_file": "frontend/src/components/missions/MissionRunActivity.tsx",
+      "operation": "MissionRunActivity",
+      "source_line": 23,
+      "method": "GET",
+      "path": "/api/v1/missions/{mission.id}/logs",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/missions/MissionRunActivity.tsx",
+        "frontend/src/pages/missions/[id].tsx"
+      ],
+      "mcp": "tracelab_mission_execution.logs",
+      "classification": "closed-MCP-1",
+      "baseline": "read-gap",
+      "rationale": "Bounded snapshot of persisted logs; an empty result is explicit and does not imply a live stream."
     },
     {
       "id": "frontend/src/lib/api/admin-stats.ts#adminStatsApi.get:GET:/admin/stats",
@@ -398,7 +398,7 @@
       "mcp": null,
       "classification": "needs-derek",
       "baseline": "action-gap",
-      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+      "rationale": "Destructive resource deletion/removal is gated on Derek\u2019s MCP-2 decision; no MCP delete is authorized here."
     },
     {
       "id": "frontend/src/lib/api/collections.ts#collectionsApi.documents:GET:/collections/{collectionId}/documents",
@@ -499,7 +499,7 @@
       "mcp": null,
       "classification": "needs-derek",
       "baseline": "action-gap",
-      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+      "rationale": "Destructive resource deletion/removal is gated on Derek\u2019s MCP-2 decision; no MCP delete is authorized here."
     },
     {
       "id": "frontend/src/lib/api/collections.ts#collectionsApi.removeDocument:DELETE:/collections/{collectionId}/documents/{documentId}",
@@ -516,7 +516,7 @@
       "mcp": null,
       "classification": "needs-derek",
       "baseline": "action-gap",
-      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+      "rationale": "Destructive resource deletion/removal is gated on Derek\u2019s MCP-2 decision; no MCP delete is authorized here."
     },
     {
       "id": "frontend/src/lib/api/collections.ts#collectionsApi.update:PUT:/collections/{collectionId}",
@@ -723,7 +723,7 @@
       "mcp": null,
       "classification": "needs-derek",
       "baseline": "action-gap",
-      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+      "rationale": "Destructive resource deletion/removal is gated on Derek\u2019s MCP-2 decision; no MCP delete is authorized here."
     },
     {
       "id": "frontend/src/lib/api/documents.ts#documentsApi.downloadDocument:GET:/documents/{documentId}/download",
@@ -908,6 +908,22 @@
       "rationale": "Forwards tag, created_from, created_until, source_id, report_id and document_id."
     },
     {
+      "id": "frontend/src/lib/api/graph.ts#graphApi.neighborhood:GET:/graph/neighborhood",
+      "api_file": "frontend/src/lib/api/graph.ts",
+      "operation": "graphApi.neighborhood",
+      "source_line": 15,
+      "method": "GET",
+      "path": "/api/v1/graph/neighborhood",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/graph.tsx"
+      ],
+      "mcp": null,
+      "classification": "deferred-MCP-2",
+      "baseline": "sprint-52-read-gap",
+      "rationale": "UX-11 adds the GRAPH-1 neighborhood as a live UI read. Decision 426 assigns the corresponding MCP read to MCP-2 after all Sprint 52 UI surfaces land."
+    },
+    {
       "id": "frontend/src/lib/api/home.ts#homeApi.favorites:GET:/home/favorites",
       "api_file": "frontend/src/lib/api/home.ts",
       "operation": "homeApi.favorites",
@@ -1083,7 +1099,7 @@
       "mcp": null,
       "classification": "needs-derek",
       "baseline": "action-gap",
-      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+      "rationale": "Destructive resource deletion/removal is gated on Derek\u2019s MCP-2 decision; no MCP delete is authorized here."
     },
     {
       "id": "frontend/src/lib/api/missions.ts#missionsApi.get:GET:/missions/{missionId}",
@@ -1218,7 +1234,8 @@
       "ui_consumers": [
         "frontend/src/components/AppShell.tsx",
         "frontend/src/components/CommandPalette.tsx",
-        "frontend/src/pages/_app.tsx"
+        "frontend/src/pages/_app.tsx",
+        "frontend/src/pages/graph.tsx"
       ],
       "mcp": "tracelab_search.navigate",
       "classification": "closed-MCP-1",
@@ -1255,7 +1272,7 @@
       "mcp": null,
       "classification": "needs-derek",
       "baseline": "action-gap",
-      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+      "rationale": "Destructive resource deletion/removal is gated on Derek\u2019s MCP-2 decision; no MCP delete is authorized here."
     },
     {
       "id": "frontend/src/lib/api/projects.ts#projectsApi.getProject:GET:/projects/{projectId}",
@@ -1364,7 +1381,7 @@
       "mcp": null,
       "classification": "needs-derek",
       "baseline": "action-gap",
-      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+      "rationale": "Destructive resource deletion/removal is gated on Derek\u2019s MCP-2 decision; no MCP delete is authorized here."
     },
     {
       "id": "frontend/src/lib/api/reports.ts#reportsApi.exportReport:GET:/reports/{reportId}/export",
