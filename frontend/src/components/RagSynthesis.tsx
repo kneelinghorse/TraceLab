@@ -51,8 +51,8 @@ export function RagSynthesis({ payload, isLoading, error, onCitationClick }: Rag
               <ol className="space-y-3">
                 {payload.citations.map((citation, index) => (
                   <li key={`${citation.chunk_id ?? index}`} className="rounded-2xl border border-line bg-background p-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
+                    <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
+                      <div className="min-w-0">
                         <p className="text-sm text-secondary">
                           <span className="font-semibold text-accent-text">[{index + 1}]</span> {citation.document_id ?? "Unknown doc"}
                         </p>
@@ -65,7 +65,7 @@ export function RagSynthesis({ payload, isLoading, error, onCitationClick }: Rag
                         <button
                           type="button"
                           onClick={() => onCitationClick(citation, index)}
-                          className="text-xs font-semibold text-accent-text hover:text-accent-text"
+                          className="shrink-0 whitespace-nowrap text-xs font-semibold text-accent-text hover:text-accent-text"
                         >
                           Focus result
                         </button>

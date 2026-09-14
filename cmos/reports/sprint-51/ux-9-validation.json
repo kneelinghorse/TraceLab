@@ -1,6 +1,6 @@
 {
   "mission": "UX-9",
-  "status": "production_failure_requires_cache_fix",
+  "status": "visual_corrections_awaiting_ci_and_production",
   "checked_at": "2026-09-14T01:03:57.556715+00:00",
   "base_commit": "f52088f6ffe0d89f3db856de6dbb282d527f998b",
   "decisions": [
@@ -8,7 +8,8 @@
     418
   ],
   "learnings": [
-    171
+    171,
+    172
   ],
   "changes": [
     "Human-authenticated, scoped and paginated name lookup for six entity types, selecting identifiers/titles only",
@@ -89,7 +90,10 @@
     "Oversized RAG panel left1419px blank space at390px; content-fit browser assertion failed before removal of h-full",
     "Late native close event disabled a quickly reopened palette; unit reproduction failed before dialog.open guard",
     "Integration route coverage assertion omitted new navigation family and compared query-bearing probes against path-only routing; updated exact coverage and reran full integration",
-    "Shared focus trap skipped native Keyboard help summary; Tab reach assertion failed before explicit tabIndex=0 enrolled it in the existing focus loop."
+    "Shared focus trap skipped native Keyboard help summary; Tab reach assertion failed before explicit tabIndex=0 enrolled it in the existing focus loop.",
+    "Actual Qdrant cache dropped required quality/routing and caused saved replay HTTP500; incompatible entries now regenerate.",
+    "Phone long citation squeezed Focus result action to7px; responsive row and nonshrinking label fix it.",
+    "Recent/saved UTC API timestamps appeared five hours ahead in Chicago; reuse the existing timestamp parser."
   ],
   "test_authoring_corrections": [
     "Keyboard End expectation corrected to final evidence item; collection pagination precedes evidence in displayed order."
@@ -197,5 +201,49 @@
     "scoped_results_equal_api": 10,
     "saved_search_execution": "HTTP500: semantic cache dropped required quality/routing",
     "temporary_records_cleaned": true
+  },
+  "ci_cache_fix": {
+    "head": "6ae59dcc9d8df720014677b4e95d66d1c72bf0ff",
+    "pull_request": 278,
+    "all_checks_passed": true,
+    "backend": {
+      "run_id": 34796224207,
+      "passed": 2483,
+      "skipped": 3,
+      "deselected": 12,
+      "warnings": 48,
+      "seconds": 411.78
+    },
+    "postgres": {
+      "run_id": 34796224284,
+      "passed": 134,
+      "skipped": 4,
+      "warnings": 17,
+      "seconds": 128.12
+    },
+    "production_build": {
+      "run_id": 34796224211,
+      "browser_passed": 45
+    },
+    "frontend": {
+      "run_id": 34796224204,
+      "passed": 204,
+      "lint": "passed",
+      "types": "passed"
+    },
+    "ruff": 34796224206,
+    "secrets": [
+      34796224210,
+      34796222508
+    ]
+  },
+  "cache_fix_production": {
+    "source": "d7e253b6ae852163e02465dd14c9ff5c23cfebdd",
+    "functional_live_passed": true,
+    "cache_hit_with_required_fields": true,
+    "baseline_checks": 124,
+    "baseline_failures": 0,
+    "visual_review_passed": false,
+    "live_receipt": "ux-9-live-flow/attempt-3-visual-corrections/receipt.json"
   }
 }

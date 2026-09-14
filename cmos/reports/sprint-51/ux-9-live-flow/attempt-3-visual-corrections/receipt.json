@@ -1,0 +1,344 @@
+{
+  "startedAt": "2026-09-14T01:42:59.973Z",
+  "deployment": {
+    "checkedAt": "2026-09-14T01:42:42.341Z",
+    "commit": "d7e253b6ae852163e02465dd14c9ff5c23cfebdd",
+    "api": {
+      "id": "24344990-3f33-4039-8b6e-4f94a45d3343",
+      "status": "SUCCESS",
+      "commit": "d7e253b6ae852163e02465dd14c9ff5c23cfebdd"
+    },
+    "frontend": {
+      "id": "f582d4bf-717d-4717-8639-6c4ce5f496ba",
+      "status": "SUCCESS",
+      "commit": "d7e253b6ae852163e02465dd14c9ff5c23cfebdd"
+    }
+  },
+  "steps": [
+    {
+      "name": "native-escape-restores-search-opener",
+      "at": "2026-09-14T01:43:05.557Z"
+    },
+    {
+      "name": "all-six-real-entity-types-open-by-name-with-keyboard",
+      "at": "2026-09-14T01:43:17.207Z"
+    },
+    {
+      "name": "non-admin-ui-equals-both-direct-api-responses-and-excludes-other-spaces",
+      "at": "2026-09-14T01:43:39.978Z"
+    },
+    {
+      "name": "saved-search-persists-and-runs-on-canonical-search-with-returned-results",
+      "at": "2026-09-14T01:43:42.408Z"
+    }
+  ],
+  "observations": [
+    {
+      "name": "light-1440-keyboard-project",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-1440-keyboard-document",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-1440-keyboard-mission",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-1440-keyboard-report",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-1440-keyboard-collection",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-1440-keyboard-evidence",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-1440-palette",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "light-390-palette",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "dark-1440-palette",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "dark-390-palette",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "dark-390-member-search-results",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "dark-390-saved-search",
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "dark-390-saved-execution",
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "screenshots": [
+    "light-1440-keyboard-project.png",
+    "light-1440-keyboard-document.png",
+    "light-1440-keyboard-mission.png",
+    "light-1440-keyboard-report.png",
+    "light-1440-keyboard-collection.png",
+    "light-1440-keyboard-evidence.png",
+    "light-1440-palette.png",
+    "light-390-palette.png",
+    "dark-1440-palette.png",
+    "dark-390-palette.png",
+    "dark-390-member-search-results.png",
+    "dark-390-saved-search.png",
+    "dark-390-saved-execution.png"
+  ],
+  "keyboardDestinations": [
+    {
+      "kind": "project",
+      "query": "TraceLab Research",
+      "id": "0afcc588-e722-45bd-8320-f486601b877c",
+      "title": "TraceLab Research",
+      "href": "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+      "total": 1
+    },
+    {
+      "kind": "document",
+      "query": "UX6-LIVE-20260913_report.md",
+      "id": "eb3074c0-f37e-4908-ac92-0d26d1882254",
+      "title": "UX6-LIVE-20260913_report.md",
+      "href": "/documents/eb3074c0-f37e-4908-ac92-0d26d1882254",
+      "total": 1
+    },
+    {
+      "kind": "mission",
+      "query": "UX-8 live audit: collection context for asynchronous job research",
+      "id": "39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+      "title": "UX-8 live audit: collection context for asynchronous job research",
+      "href": "/missions/39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+      "total": 1
+    },
+    {
+      "kind": "report",
+      "query": "Research: UX-6 live audit: asynchronous job status patterns",
+      "id": "c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+      "title": "Research: UX-6 live audit: asynchronous job status patterns",
+      "href": "/reports/c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+      "total": 1
+    },
+    {
+      "kind": "collection",
+      "query": "UX8-LIVE-20260913 Context",
+      "id": "a3e6d809-af90-4652-903f-5ce5c8842bf8",
+      "title": "UX8-LIVE-20260913 Context",
+      "href": "/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+      "total": 1
+    },
+    {
+      "kind": "evidence",
+      "query": "Internet Engineering Task Force (IETF)                  R. Fielding, Ed.",
+      "id": "07ed4147-8c4c-4d47-b2c1-90568111322a",
+      "title": "\ufeff\n\n\n\nInternet Engineering Task Force (IETF)                  R. Fielding, Ed.\nRequest for Comments: 9110                                         Adobe\nSTD: 97                                               M. Nottingham, Ed.\nObsoletes: 2818, 7230, 7231, 7232, 7233, 7235,                    Fastly",
+      "href": "/evidence/07ed4147-8c4c-4d47-b2c1-90568111322a",
+      "total": 2
+    }
+  ],
+  "cleanup": [
+    {
+      "kind": "saved-search",
+      "id": "ecc066a8-cfc6-4fcb-a657-6a02646e7aac",
+      "success": true
+    },
+    {
+      "kind": "temporary-search-history",
+      "id": "084a5b89-9e0d-42b9-b3f0-92c5ce89e445",
+      "success": true
+    },
+    {
+      "kind": "temporary-membership",
+      "id": "084a5b89-9e0d-42b9-b3f0-92c5ce89e445",
+      "success": true
+    },
+    {
+      "kind": "temporary-user",
+      "id": "084a5b89-9e0d-42b9-b3f0-92c5ce89e445",
+      "success": true
+    }
+  ],
+  "actorId": "084a5b89-9e0d-42b9-b3f0-92c5ce89e445",
+  "spaceId": "00000000-0000-0000-0000-000000000001",
+  "scope": {
+    "allowedProjectIds": [
+      "8a5e3763-8249-4194-97d0-cda0e5ff0672",
+      "041489e1-bb62-4bbe-bb57-90a924fce867",
+      "b1983379-f0ab-4ea0-9645-f1e180342d72",
+      "959cfd13-fbd8-4277-beae-df57b3e68d0e",
+      "4500cb98-7ca0-4703-b557-f9726c273f57",
+      "95dc6df6-5a69-42d5-9e33-b8e1e2726152",
+      "679f3044-059b-4d7f-8a3c-595b55934b83",
+      "59f606db-9db8-4ba9-a200-c9b66c650f2a",
+      "1f184e00-a15d-4f4d-92e8-50c26426c510",
+      "ae1d1122-36de-4ef9-8bba-10efc60f6b4a",
+      "ee394f56-8546-45af-9328-c178673511c7",
+      "bf9985d2-8b4e-4881-a18a-b7c7d8e1b18e",
+      "437f0922-94de-47fe-9e2c-bb7dd9f68e04",
+      "6a3db329-4658-4d1f-957a-1c94f2fa5b03",
+      "cbdd0d28-48ce-4459-8d18-937108421036",
+      "ef13d67b-3f19-4d19-8c69-f689becd29c9",
+      "bb146f1f-177b-4a68-bae4-f1d93ca3bd1a",
+      "44eaeaa6-6dba-42af-915a-439088d6fded",
+      "081fee61-b49c-4224-a6ac-0797f999bf49",
+      "17745be0-b7da-4fb9-b812-7bbecb63e61f",
+      "333ae558-c22f-4508-adc1-b979d1e99230",
+      "33f15bbb-c194-4645-82e8-fa768618e04f",
+      "d73bf078-df1e-49bc-aa6d-ffda5aba5105",
+      "fb2b3e87-a955-4a1c-9bcc-2b84cde9ed21",
+      "c20393d7-f0b8-4318-b0e6-e87cbd6d6375",
+      "0afcc588-e722-45bd-8320-f486601b877c",
+      "6b1a92cc-615f-42ac-b799-ab1da78f573e",
+      "20e2f89b-31ee-4fa5-9e77-f9e8c0a8abe7",
+      "717790ac-5999-4ca3-a363-933b8bb2518b",
+      "13e04078-a246-4276-823f-3d61d3ec58e0",
+      "ac3ba208-f086-437f-8c26-feadb1730ded",
+      "3aec17a3-a5c1-4ec1-8dda-ea619fd9b282"
+    ],
+    "outsideProjectIds": [
+      "a38e85ca-5c94-44c7-a723-9b7ebf7fad59",
+      "fbdfcca1-fce5-447b-b081-17761e52b173",
+      "fbd3bd03-5ddc-49ee-8013-529163a99290",
+      "0f5c295f-6ac0-4bc9-823f-32f2306d6f2d",
+      "5b03d540-3b3a-4762-819a-44dab5261da7",
+      "b2ec7b1a-2218-4682-b197-f79eeaca85bd",
+      "2ce8e144-d709-4900-9288-c355166d6e47",
+      "ee39d0eb-2bd8-4989-9545-003a103558a7",
+      "7ee51d1c-7aab-45d3-8352-ed1a76565370",
+      "ccd1fb80-8003-4c69-a910-435a9f3db404",
+      "d5bdd379-ce47-475b-af7a-1876db30b105",
+      "fe121324-3b28-4c6c-8cb5-6a1746fb9c6a",
+      "0e864cf2-710d-4037-9dd6-ada566be6ced",
+      "4299539a-b4bb-41d9-b7d1-25055a1fb2bb",
+      "00737581-0362-481f-ac36-f68120598b8b",
+      "c26dc1a5-940e-49dc-8151-c459463f24c1",
+      "60ffa72a-b30b-4579-be65-9932991a8939",
+      "6dc4d8b7-06f0-48ba-a2bd-bcf60c6f75da",
+      "1ca2ce70-e6c2-4593-aeb8-b4aa9f3fff01"
+    ],
+    "foreignProjectDenied": "a38e85ca-5c94-44c7-a723-9b7ebf7fad59",
+    "hiddenPaletteProjectId": "a38e85ca-5c94-44c7-a723-9b7ebf7fad59",
+    "query": {
+      "query": "research workflows",
+      "top_k": 10,
+      "enable_graph": false
+    },
+    "apiChunkIds": [
+      "c5d328da-14b0-4966-97a2-345284fc3e7d",
+      "3e17a3c1-377d-4310-94ac-7f048d47f51a",
+      "567f1773-4cb4-4d10-b26e-b03c15856251",
+      "f4d0ec39-2c6c-4a5c-9cf9-6406e5012cbf",
+      "b4e0660b-a44c-4f61-8d05-2f052e910cce",
+      "d3718f0c-f7a6-434c-8be1-6cdfe1baad18",
+      "10045e2b-a815-4298-af0e-46411b12df0f",
+      "2488b1b7-689b-4a0e-a488-27d3b0f774c4",
+      "74554c12-9727-4015-83f1-a02b27eb1cab",
+      "856b07d3-bc1e-421a-ac3d-47c5f52b2e68"
+    ],
+    "renderedChunkIds": [
+      "c5d328da-14b0-4966-97a2-345284fc3e7d",
+      "3e17a3c1-377d-4310-94ac-7f048d47f51a",
+      "567f1773-4cb4-4d10-b26e-b03c15856251",
+      "f4d0ec39-2c6c-4a5c-9cf9-6406e5012cbf",
+      "b4e0660b-a44c-4f61-8d05-2f052e910cce",
+      "d3718f0c-f7a6-434c-8be1-6cdfe1baad18",
+      "10045e2b-a815-4298-af0e-46411b12df0f",
+      "2488b1b7-689b-4a0e-a488-27d3b0f774c4",
+      "74554c12-9727-4015-83f1-a02b27eb1cab",
+      "856b07d3-bc1e-421a-ac3d-47c5f52b2e68"
+    ],
+    "independentApiChunkIds": [
+      "c5d328da-14b0-4966-97a2-345284fc3e7d",
+      "3e17a3c1-377d-4310-94ac-7f048d47f51a",
+      "567f1773-4cb4-4d10-b26e-b03c15856251",
+      "f4d0ec39-2c6c-4a5c-9cf9-6406e5012cbf",
+      "b4e0660b-a44c-4f61-8d05-2f052e910cce",
+      "d3718f0c-f7a6-434c-8be1-6cdfe1baad18",
+      "10045e2b-a815-4298-af0e-46411b12df0f",
+      "2488b1b7-689b-4a0e-a488-27d3b0f774c4",
+      "74554c12-9727-4015-83f1-a02b27eb1cab",
+      "856b07d3-bc1e-421a-ac3d-47c5f52b2e68"
+    ],
+    "returnedProjectIds": [
+      "fb2b3e87-a955-4a1c-9bcc-2b84cde9ed21",
+      "33f15bbb-c194-4645-82e8-fa768618e04f",
+      "17745be0-b7da-4fb9-b812-7bbecb63e61f"
+    ]
+  },
+  "savedSearchId": "ecc066a8-cfc6-4fcb-a657-6a02646e7aac",
+  "savedRoundTrip": {
+    "id": "ecc066a8-cfc6-4fcb-a657-6a02646e7aac",
+    "query": "research workflows",
+    "cacheHit": true,
+    "qualityPresent": true,
+    "routingPresent": true,
+    "returnedChunkIds": [
+      "b4e0660b-a44c-4f61-8d05-2f052e910cce",
+      "f4d0ec39-2c6c-4a5c-9cf9-6406e5012cbf",
+      "d3718f0c-f7a6-434c-8be1-6cdfe1baad18",
+      "10045e2b-a815-4298-af0e-46411b12df0f",
+      "c5d328da-14b0-4966-97a2-345284fc3e7d",
+      "32ec2667-6bf0-44e2-829d-87e8cfe05ff2",
+      "9bd8b9d3-ebaf-42ea-8125-8d2c8487856a",
+      "3e17a3c1-377d-4310-94ac-7f048d47f51a",
+      "2488b1b7-689b-4a0e-a488-27d3b0f774c4",
+      "74554c12-9727-4015-83f1-a02b27eb1cab"
+    ],
+    "renderedChunkIds": [
+      "b4e0660b-a44c-4f61-8d05-2f052e910cce",
+      "f4d0ec39-2c6c-4a5c-9cf9-6406e5012cbf",
+      "d3718f0c-f7a6-434c-8be1-6cdfe1baad18",
+      "10045e2b-a815-4298-af0e-46411b12df0f",
+      "c5d328da-14b0-4966-97a2-345284fc3e7d",
+      "32ec2667-6bf0-44e2-829d-87e8cfe05ff2",
+      "9bd8b9d3-ebaf-42ea-8125-8d2c8487856a",
+      "3e17a3c1-377d-4310-94ac-7f048d47f51a",
+      "2488b1b7-689b-4a0e-a488-27d3b0f774c4",
+      "74554c12-9727-4015-83f1-a02b27eb1cab"
+    ]
+  },
+  "redirect": {
+    "status": 308,
+    "location": "/search?q=scope%20%26%20provenance"
+  },
+  "browserErrors": [],
+  "apiErrors": [],
+  "passed": true,
+  "completedAt": "2026-09-14T01:43:42.490Z",
+  "visualReview": {
+    "passed": false,
+    "findings": [
+      "Phone citation action compressed to a vertical label alongside long snippet",
+      "Recent and saved timestamps without an offset interpreted as local time, displaying about five hours in the future"
+    ],
+    "automated_flow_passed": true
+  }
+}
