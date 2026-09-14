@@ -38,8 +38,10 @@ Checks:
       - foreign chunks cannot be added or removed through a caller-owned collection;
       - legacy mixed collections expose zero children/content/counts;
       - direct and collection-backed report creation persists zero foreign sources.
-  * documents / ingestion-jobs remain anon-401-only (seeding a document needs a
-    multipart upload). Reports and collection children also receive the non-vacuous
+  * onboarding document registration: anonymous -> 401; outsider member/viewer
+    -> exactly 403 against the discovered owner project with an absent ingest path.
+    Other document / ingestion-job routes remain anon-401-only (seeding a document
+    needs a multipart upload). Reports and collection children receive the non-vacuous
     PEDR-1C cross-tenant matrix above.
 
 The core (`RbacVerifier`) is transport-agnostic: it talks to any object exposing
@@ -108,6 +110,7 @@ def per_id_routes(prefix: str, rid: str) -> list[tuple[str, str]]:
         ("delete", f"{api}/documents/{rid}?confirm=true"),
         ("post", f"{api}/documents/{rid}/restore"),
         ("patch", f"{api}/documents/{rid}"),
+        ("post", f"{api}/documents"),  # parent project id is in the request body
         ("get", f"{api}/missions/{rid}/related"),
         ("get", f"{api}/missions/{rid}/quality"),
         ("get", f"{api}/missions/{rid}/logs"),
@@ -297,6 +300,9 @@ _ANON_ONLY_ROUTES = [
     ("get", "/jobs/{id}"),
     ("delete", "/collections/{id}/chunks/{id}"),
 ]
+
+# Body-scoped registration is exercised without creating a production document.
+_REGISTRATION_AUTHZ_ROUTES = {("post", "/documents")}
 
 # These routes remain in SeedSpec/check_coverage and are exercised by local
 # TestClient tests, but are deliberately excluded from the deployed authenticated
@@ -582,6 +588,7 @@ class RbacVerifier:
         wired = {(m, p.replace(marker, "{id}")) for m, p in per_id_routes(self._prefix, marker)}
         seeded = {(m, t) for spec in _seed_specs(self._prefix) for m, t in spec.routes}
         acknowledged = {(m, f"{self._prefix}{p}") for m, p in _ANON_ONLY_ROUTES}
+        registration = {(m, f"{self._prefix}{p}") for m, p in _REGISTRATION_AUTHZ_ROUTES}
         local_only = {
             (method, f"{self._prefix}{path}")
             for _name, method, path in _LOCAL_ONLY_AUTHZ_ROUTES
@@ -597,8 +604,8 @@ class RbacVerifier:
                     "missing",
                 )
             )
-        for method, path in sorted(wired - seeded - acknowledged):
-            self.gaps.append(Gap("UNACCOUNTED-ROUTE", "coverage", method, path, "seeded-or-anon-only", "neither"))
+        for method, path in sorted(wired - seeded - acknowledged - registration):
+            self.gaps.append(Gap("UNACCOUNTED-ROUTE", "coverage", method, path, "seeded-registration-or-anon-only", "neither"))
 
     # -- the matrix ---------------------------------------------------------------
     def _record(self, ok: bool, gap: Gap) -> None:
@@ -2482,6 +2489,22 @@ class RbacVerifier:
                     ),
                 )
 
+    def registration_matrix(self, project_id: str, principals: dict[str, str]) -> None:
+        """An absent ingest file keeps a fail-open probe non-mutating in production."""
+        path = f"{self._prefix}/documents"
+        body = {
+            "project_id": project_id,
+            "name": self._tagged("registration deny probe"),
+            "file_path": f"data/ingest/{self._run_tag}-absent.md",
+        }
+        for role in ("member", "viewer"):
+            if token := principals.get(role):
+                response = self._call("post", path, token=token, json=body)
+                self._record_exact_deny(
+                    response, role=role, method="post", path=path,
+                    expected=403, kind="REGISTRATION-AUTHZ-STATUS",
+                )
+
     def seeded_matrix(
         self,
         spec: SeedSpec,
@@ -3027,6 +3050,8 @@ class RbacVerifier:
                     spec for spec in specs if spec.name == "project"
                 )
                 project_id = self.discover_owned_project(owner_token)
+                self._log("onboarding registration tenant-scope matrix...")
+                self.registration_matrix(project_id, principals)
                 ctx: dict[str, Any] = {"project": project_id}
                 self._log(
                     f"reusing owner project={project_id}; running non-destructive "
@@ -3071,7 +3096,8 @@ class RbacVerifier:
                     "local-only (live anonymous 401 coverage retained); "
                     f"{len(_ANON_ONLY_ROUTES)} per-id routes remain in the explicit "
                     "anon registry; reports/collection children also receive PEDR-1C "
-                    "cross-tenant probes, while document/job routes remain anon-only"
+                    "cross-tenant probes; onboarding registration has member/viewer "
+                    "deny probes, while other document/job routes remain anon-only"
                 )
             finally:
                 # Children before parents (mission references project); best-effort.

@@ -71,16 +71,16 @@ def update_project(
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> Response:
     """Update project metadata with idempotent replay support."""
+    project = db.query(Project).filter(Project.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
+    authorize_or_403(user, "update", project, db)
+
     idempotency = _idempotency(request=request, key=idempotency_key, db=db)
     payload_dict = payload.model_dump(exclude_unset=True)
     cached = idempotency.check_replay(payload_dict)
     if cached:
         return JSONResponse(content=cached.data, status_code=cached.status_code)
-
-    project = db.query(Project).filter(Project.id == project_id).first()
-    if not project:
-        raise HTTPException(status_code=404, detail=f"Project {project_id} not found")
-    authorize_or_403(user, "update", project, db)
 
     for field, value in payload_dict.items():
         setattr(project, field, value)
@@ -109,34 +109,44 @@ def register_document(
     payload: DocumentCreate,
     request: Request,
     db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> Response:
     """Register a document for ingestion via the onboarding workflow."""
+    project = (
+        db.query(Project)
+        .filter(Project.id == payload.project_id, Project.deleted_at.is_(None))
+        .first()
+    )
+    if not project:
+        raise HTTPException(
+            status_code=404, detail=f"Project {payload.project_id} not found"
+        )
+    authorize_or_403(user, "upload", project, db)
+
     payload_dict = payload.model_dump()
     idempotency = _idempotency(request=request, key=idempotency_key, db=db)
     cached = idempotency.check_replay(payload_dict)
     if cached:
         return JSONResponse(content=cached.data, status_code=cached.status_code)
 
-    project = db.query(Project).filter(Project.id == payload.project_id).first()
-    if not project:
-        raise HTTPException(
-            status_code=404, detail=f"Project {payload.project_id} not found"
-        )
-
-    if not payload.file_path:
+    try:
+        path = settings.resolve_onboarding_file(payload.file_path)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="File not found in onboarding ingest root") from exc
+    except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="file_path is required for onboarding document registration",
-        )
-
-    path = Path(payload.file_path)
-    if not path.exists():
+            detail=str(exc),
+        ) from exc
+    except (OSError, RuntimeError) as exc:
         raise HTTPException(
-            status_code=404, detail=f"File not found at {payload.file_path}"
-        )
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="file_path cannot be resolved to a readable ingest file",
+        ) from exc
 
     mutable_payload = payload.model_dump(exclude_none=True)
+    mutable_payload["file_path"] = str(path)
     mutable_payload.setdefault("file_size", path.stat().st_size)
     mutable_payload.setdefault("mime_type", _infer_mime_type(path))
 
@@ -184,16 +194,16 @@ def update_document(
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> Response:
     """Update document metadata."""
+    document = db.query(Document).filter(Document.id == document_id).first()
+    if not document:
+        raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+    authorize_or_403(user, "update", document, db)
+
     payload_dict = payload.model_dump(exclude_unset=True)
     idempotency = _idempotency(request=request, key=idempotency_key, db=db)
     cached = idempotency.check_replay(payload_dict)
     if cached:
         return JSONResponse(content=cached.data, status_code=cached.status_code)
-
-    document = db.query(Document).filter(Document.id == document_id).first()
-    if not document:
-        raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
-    authorize_or_403(user, "update", document, db)
 
     for field, value in payload_dict.items():
         setattr(document, field, value)
@@ -234,6 +244,13 @@ def enqueue_ingestion_job(
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> Response:
     """Create an ingestion job and dispatch it to the background runner."""
+    document = db.query(Document).filter(Document.id == document_id).first()
+    if not document:
+        raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+    # IngestionJob has no owner_id/workspace_id; it is governed via its parent
+    # Document — enqueueing processing is a write against that document (T46.4).
+    authorize_or_403(user, "process", document, db)
+
     payload_dict = {"document_id": str(document_id)}
     idempotency = _idempotency(request=request, key=idempotency_key, db=db)
     cached = idempotency.check_replay(payload_dict)
@@ -244,12 +261,6 @@ def enqueue_ingestion_job(
             headers={"Location": f"{settings.api_v1_prefix}/jobs/{cached.data['id']}"},
         )
 
-    document = db.query(Document).filter(Document.id == document_id).first()
-    if not document:
-        raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
-    # IngestionJob has no owner_id/workspace_id; it is governed via its parent
-    # Document — enqueueing processing is a write against that document (T46.4).
-    authorize_or_403(user, "process", document, db)
     if not document.file_path:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

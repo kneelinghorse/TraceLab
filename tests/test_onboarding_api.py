@@ -8,6 +8,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 import app.api.v1.documents as documents_api
+from app.core.config import settings
 from app.main import app
 from app.services.chunking import ChunkingService
 from app.services.coverage_report import CoverageReportGenerator
@@ -67,6 +68,7 @@ def test_document_registration_and_job_flow(
     client: TestClient, project, tmp_path, monkeypatch, auth_headers
 ):
     """Register document, enqueue ingestion job, and observe completion."""
+    monkeypatch.setattr(settings, "onboarding_ingest_root", str(tmp_path))
     # Ensure ingestion service uses deterministic stubbed dependencies
     stub_service = DocumentIngestionService(
         redaction_service=_StubRedactionService(),

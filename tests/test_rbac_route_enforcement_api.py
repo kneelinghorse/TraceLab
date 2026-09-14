@@ -216,6 +216,7 @@ PER_ID_ROUTES = [
     ("delete", f"{API}/documents/{_RID}?confirm=true"),
     ("post", f"{API}/documents/{_RID}/restore"),
     ("patch", f"{API}/documents/{_RID}"),  # onboarding PATCH document
+    ("post", f"{API}/documents"),  # onboarding registration (project_id in body)
     # Adjacent mission-read routes (relationships.py / quality.py) surfaced by the
     # fail-open audit and wired to close the mission BOLA surface fully.
     ("get", f"{API}/missions/{_RID}/related"),

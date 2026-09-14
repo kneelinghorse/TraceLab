@@ -24,6 +24,7 @@ import pytest
 
 from scripts.rbac_verify import (
     _LOCAL_ONLY_AUTHZ_ROUTES,
+    _REGISTRATION_AUTHZ_ROUTES,
     RbacVerifier,
     _seed_specs,
     pedr1b_scope_routes,
@@ -75,6 +76,8 @@ def test_harness_routes_match_wired_per_id_routes():
     from tests.test_rbac_route_enforcement_api import _RID, PER_ID_ROUTES
 
     assert set(per_id_routes(settings.api_v1_prefix, _RID)) == set(PER_ID_ROUTES)
+    assert {("post", "/documents")} == _REGISTRATION_AUTHZ_ROUTES
+    assert ("post", f"{settings.api_v1_prefix}/documents") in _wired_routes()
     assert {
         ("project", "delete", "/projects/{id}?confirm=true")
     } == _LOCAL_ONLY_AUTHZ_ROUTES

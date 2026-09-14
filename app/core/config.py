@@ -1,5 +1,9 @@
 """Application configuration and settings management."""
 
+import os
+from pathlib import Path
+from stat import S_ISREG
+
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings
 
@@ -61,6 +65,24 @@ class Settings(BaseSettings):
 
     # API
     api_v1_prefix: str = "/api/v1"
+
+    # Host-file registration accepts only pre-placed files under this ingest root.
+    onboarding_ingest_root: str = "data/ingest"
+
+    def resolve_onboarding_file(self, file_path: str | None) -> Path:
+        """Resolve relative to cwd and reject escapes before reading file metadata."""
+        if not file_path or not file_path.strip():
+            raise ValueError("file_path is required for onboarding document registration")
+        root = Path(self.onboarding_ingest_root).resolve()
+        # Path.resolve(strict=False) in Python 3.11 stats the resolved target.
+        # realpath resolves symlinks without that final stat, so containment is
+        # checked before the regular-file/existence probe.
+        candidate = Path(os.path.realpath(file_path))
+        if not candidate.is_relative_to(root):
+            raise ValueError("file_path must be inside the onboarding ingest root")
+        if not S_ISREG(candidate.stat().st_mode):
+            raise ValueError("file_path must refer to a regular file")
+        return candidate
 
     # Security & authentication
     secret_key: str = "change-me"
