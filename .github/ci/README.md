@@ -27,8 +27,9 @@ two RAG pipeline cases retain an OpenAI/httpx compatibility skip.
 
 At that historical baseline, frontend lint reported 12
 errors and 13 warnings, full-repository Ruff 0.8.0 reported 1,893 findings, and
-mypy reported 970 errors. These were not passing gates. UX-5 subsequently made
-frontend lint blocking; CI-2's current disposition for Ruff/mypy is below.
+mypy reported 970 errors. These were not passing gates. UX-5 subsequently cleaned
+up frontend lint, but its check remained advisory until CI-5 promoted it on
+2026-09-14. CI-2's current disposition for Ruff/mypy is below.
 
 ## Quarantine contract
 
@@ -44,23 +45,49 @@ on `main` from the original attempt; manual reruns do not manufacture a streak.
 A failure resets the streak to zero. A concurrency cancellation neither counts
 nor resets it.
 
-- `backend-integration` becomes required after five consecutive qualifying green
-  runs. Promote it with a dedicated branch-protection change and verify the
-  required context through a GitHub API readback.
-- Playwright first lands as an advisory follow-up. It becomes required only
+- `backend-integration` became required in CI-5 after qualifying green runs and
+  a dedicated branch-protection change with a GitHub API readback.
+- No standalone Playwright advisory lane exists yet. It becomes required only
   after its deterministic job records five consecutive qualifying green runs.
-- ESLint first reaches zero errors and zero warnings in its separate
-  deploy-verified cleanup mission. Its advisory job then needs five consecutive
-  qualifying green runs before promotion.
+- ESLint reached zero errors and zero warnings in UX-5. CI-5 promoted its `lint`
+  job after verifying five consecutive qualifying green runs at the job level.
+- `mcp-package` remains advisory and follows the five-run ratchet. Its promotion
+  is deferred to Sprint 53; CI-5 does not change its status.
 - Any future full-repository Ruff or Python type-checking lane must first have
   a scoped remediation plan and reach a green baseline without a mechanical
   repository-wide rewrite. It then needs five consecutive qualifying green
   runs before promotion; CI-2 removes the existing never-green advisory jobs.
 
-Until promoted, the day-one required contexts are `backend-suite`, `vitest`,
-`type-check`, `ruff-diff`, `build-frontend-production`, and `Secret Scan`.
-Production smoke, `backend-integration`, Playwright, ESLint, full-repository
-Ruff, and mypy are not day-one required contexts.
+The eight current required contexts are `backend-suite`, `vitest`, `type-check`,
+`ruff-diff`, `build-frontend-production`, `Secret Scan`, `backend-integration`,
+and `lint`. Production smoke and `mcp-package` remain advisory; no standalone
+Playwright, full-repository Ruff, or mypy lane is required.
+
+## CI-5 required-check promotion (2026-09-14)
+
+Decision #421 applies the existing ratchet to `backend-integration` and frontend
+`lint`. At main `7a3ceb61c387adc93e1fee0b82043dce2d341a84`, integration had ten
+consecutive original-attempt green main pushes and lint had twelve verified
+consecutive original-attempt green main pushes. The latest five were:
+
+| Context | Main push run IDs, oldest to newest |
+| --- | --- |
+| `backend-integration` | `34798716010`, `34801078119`, `34802291852`, `34807471446`, `34812225107` |
+| `lint` | `34798716002`, `34801078078`, `34802291839`, `34807471366`, `34812225041` |
+
+Lint is measured per job: run `34797659698` failed on vitest while its lint job
+succeeded. `lint` is a generic context name bound to GitHub Actions app ID
+`15368`, as are all eight required contexts. Strict branch protection remains
+enabled; all other protection fields are preserved. The `mcp-package` lane had
+four qualifying main pushes at this check and stays on the ratchet.
+
+The [CI-5 receipt](../../cmos/reports/sprint-52/ci-5-validation.json) archives the
+full streak evidence, before/after protection readbacks, rollback payload,
+required PR checks, post-merge main CI, and both Railway deployment IDs. Sprint
+51 receipt corrections preserve the earlier PR-head results but explicitly
+record the failed main integration run `34788411358` (253.82 ms against the
+unchanged 200 ms gate), green follow-up `34790859840`, and failed main vitest
+run `34797659698` (learning #177).
 
 ## CI-2 lint-lane disposition (2026-09-13)
 

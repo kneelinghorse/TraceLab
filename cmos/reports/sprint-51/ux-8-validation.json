@@ -1,4 +1,33 @@
 {
+  "correction": {
+    "recorded_at": "2026-09-14T06:22:35.733152+00:00",
+    "mission": "CI-5",
+    "decision": 421,
+    "learning": 177,
+    "interpretation": "Existing CI fields describe PR-head runs only and do not establish that the post-merge main push passed. Historical fields are preserved.",
+    "failed_main_push": {
+      "run_id": 34788411358,
+      "attempt": 1,
+      "commit": "501268f40562b5c3c6994962a9e58df5b6f566a2",
+      "context": "backend-integration",
+      "conclusion": "failure",
+      "test": "tests/integration/test_graph_search.py::test_graph_layer_depth2_performance_under_200ms",
+      "latency_ms": 253.82,
+      "threshold_ms": 200,
+      "passed": 132,
+      "failed": 1,
+      "skipped": 4,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34788411358"
+    },
+    "green_follow_up_main_push": {
+      "run_id": 34790859840,
+      "attempt": 1,
+      "commit": "16a05c092aace752f720f7f253cc9ae391ae7eb5",
+      "context": "backend-integration",
+      "conclusion": "success",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34790859840"
+    }
+  },
   "mission": "UX-8",
   "status": "passed",
   "checked_at": "2026-09-13T23:58:12.278877+00:00",
