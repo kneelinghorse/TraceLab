@@ -109,7 +109,8 @@ def pending_terminal_notification(db: Session, mission_id: UUID, *, lock: bool =
     if not notifications_configured():
         return None
     query = db.query(Mission).filter(Mission.id == mission_id)
-    mission = (query.with_for_update() if lock else query).first()
+    # Lock only the mission row; Postgres refuses FOR UPDATE on the eagerly joined result_report.
+    mission = (query.with_for_update(of=Mission) if lock else query).first()
     if mission is None or mission.status not in NOTIFY_STATUSES or _already_notified(mission) or mission.owner_id is None:
         return None
     owner = db.query(User).filter(User.id == mission.owner_id).first()
