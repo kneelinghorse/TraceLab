@@ -4,25 +4,37 @@ import { PaginationBar } from "@/components/ui/PaginationBar";
 import { PageState } from "@/components/ui/PageState";
 import { Dialog } from "@/components/ui/Dialog";
 import { EvidencePanel } from "@/components/evidence/EvidencePanel";
+import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { TabList } from "@/components/ui/TabList";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useAuth } from "@/contexts/AuthContext";
-import { documentState } from "@/lib/document-state";
+import { documentState, isMarkdownDocument } from "@/lib/document-state";
 import { parseApiTimestamp } from "@/lib/api/timestamps";
 /**
  * Document detail page
+ *
+ * The extracted text is the first thing on the page (DOCV-1); stats, metadata
+ * and processing history live on the Overview tab, chunks and evidence keep
+ * their own tabs. `?tab=` selects the initial tab.
  */
 
 import { AddToCollection } from "@/components/AddToCollection";
 import { AuthGate } from "@/components/AuthGate";
 import { documentsApi } from "@/lib/api/documents";
-import type { Document, DocumentChunk } from "@/types/document";
+import type { Document, DocumentChunk, DocumentContent } from "@/types/document";
 import type { PaginatedResponse } from "@/types/pagination";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import useSWR from "swr";
+
+const TABS = ["Text", "Overview", "Chunks", "Evidence"] as const;
+type Tab = (typeof TABS)[number];
+
+function initialTab(value: string | string[] | undefined): Tab {
+  return typeof value === "string" && (TABS as readonly string[]).includes(value) ? (value as Tab) : "Text";
+}
 
 export default function DocumentDetailPage() {
   const { query } = useRouter();
@@ -40,15 +52,20 @@ function DocumentDetail() {
   const [downloading, setDownloading] = useState(false);
   const [chunksPage, setChunksPage] = useState(1);
   const [expandedChunks, setExpandedChunks] = useState<Set<string>>(new Set());
-  const [tab, setTab] = useState<"Overview" | "Chunks" | "Evidence">("Overview");
+  const [tab, setTab] = useState<Tab>(() => initialTab(router.query.tab));
 
   const { data: document, mutate, error: loadError, isLoading } = useSWR<Document>(
     id ? ["document", user?.user_id, id] : null,
     () => documentsApi.getDocument(id as string)
   );
 
+  const { data: content, isLoading: contentLoading, error: contentError, mutate: mutateContent } = useSWR<DocumentContent>(
+    document && id && tab === "Text" ? ["document-content", user?.user_id, id] : null,
+    () => documentsApi.getContent(id as string)
+  );
+
   const { data: chunksResponse, isLoading: chunksLoading, error: chunksError, mutate: mutateChunks } = useSWR<PaginatedResponse<DocumentChunk>>(
-    document && id ? ["chunks", user?.user_id, id, chunksPage] : null,
+    document && id && tab === "Chunks" ? ["chunks", user?.user_id, id, chunksPage] : null,
     () => documentsApi.listChunks(id as string, { page: chunksPage, pageSize: 10 })
   );
 
@@ -73,7 +90,7 @@ function DocumentDetail() {
       const result = await documentsApi.processDocument(id as string);
       const failed = Object.entries(result.stages ?? {}).filter(([, stage]) => stage.status === "failed").map(([name]) => name);
       if (result.status !== "completed" || failed.length) setActionError(`Processing needs attention: ${failed.join(", ") || result.status || "unknown"}.`);
-      await Promise.all([mutate(), mutateChunks()]);
+      await Promise.all([mutate(), mutateContent(), mutateChunks()]);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to process document";
       setActionError(message);
@@ -125,6 +142,10 @@ function DocumentDetail() {
   if (!router.isReady || isLoading) return <AuthGate><PageState state="loading" title="Loading document…" /></AuthGate>;
   if (!document) return <AuthGate><PageState state="empty" title="Document not found." /></AuthGate>;
 
+  const reportLink = document.links?.find((link) => link.kind === "report");
+  const missionLink = document.links?.find((link) => link.kind === "mission");
+  const hasStats = document.chunk_count != null || document.word_count != null || document.total_tokens != null;
+
   return (
     <AuthGate>
       <div className="min-h-screen bg-background">
@@ -148,109 +169,17 @@ function DocumentDetail() {
             <h1 className="break-words text-2xl font-bold text-foreground mb-4">
               {document.name}
             </h1>
-            <div className="mb-4 flex flex-wrap items-center gap-4"><StatusBadge {...documentState(document)} /><Link className="text-sm text-accent-text underline" href={`/projects/${document.project_id}`}>Open project</Link><RelationshipLink type="document" id={document.id} /></div>
+            <div className="mb-4 flex flex-wrap items-center gap-4">
+              <StatusBadge {...documentState(document)} />
+              <Link className="text-sm text-accent-text underline" href={`/projects/${document.project_id}`}>Open project</Link>
+              {reportLink && <Link className="text-sm text-accent-text underline underline-offset-4" href={reportLink.href} title={reportLink.title}>Open report</Link>}
+              {missionLink && <Link className="text-sm text-accent-text underline underline-offset-4" href={missionLink.href} title={missionLink.title}>Open mission</Link>}
+              <RelationshipLink type="document" id={document.id} />
+            </div>
             <div className="mb-4"><AddToCollection documentId={document.id} /></div>
 
-            {/* Document Stats - Prominently displayed */}
-            {(document.chunk_count != null || document.word_count != null || document.total_tokens != null) && (
-              <div className="mb-6 flex flex-wrap gap-4">
-                {document.chunk_count != null && (
-                  <div className="bg-info-surface border border-info-line rounded-lg px-4 py-3">
-                    <div className="text-2xl font-bold text-accent-text">
-                      {document.chunk_count}
-                    </div>
-                    <div className="text-sm text-accent-text">Chunks</div>
-                  </div>
-                )}
-                {document.word_count != null && (
-                  <div className="bg-success-surface border border-success-line rounded-lg px-4 py-3">
-                    <div className="text-2xl font-bold text-success">
-                      {document.word_count.toLocaleString()}
-                    </div>
-                    <div className="text-sm text-success">Words</div>
-                  </div>
-                )}
-                {document.total_tokens != null && (
-                  <div className="bg-info-surface border border-info-line rounded-lg px-4 py-3">
-                    <div className="text-2xl font-bold text-accent-text">
-                      {document.total_tokens.toLocaleString()}
-                    </div>
-                    <div className="text-sm text-accent-text">Tokens</div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Content Preview */}
-            {document.preview && (
-              <div className="mb-6 bg-background rounded-lg p-4">
-                <h3 className="text-sm font-medium text-foreground mb-2">
-                  Content Preview
-                </h3>
-                <p className="text-sm text-secondary whitespace-pre-wrap">
-                  {document.preview}
-                </p>
-              </div>
-            )}
-
-            {/* Metadata */}
-            <div className="grid gap-4 break-words text-sm sm:grid-cols-2">
-              <div>
-                <span className="text-muted">File Type:</span>
-                <span className="ml-2 text-foreground">
-                  {document.file_type || document.mime_type || "Unknown"}
-                </span>
-              </div>
-              {document.file_size && (
-                <div>
-                  <span className="text-muted">File Size:</span>
-                  <span className="ml-2 text-foreground">
-                    {(document.file_size / 1024).toFixed(2)} KB
-                  </span>
-                </div>
-              )}
-              {document.uploaded_at && (
-                <div>
-                  <span className="text-muted">Uploaded:</span>
-                  <span className="ml-2 text-foreground">
-                  {formatDistanceToNow(parseApiTimestamp(document.uploaded_at), { addSuffix: true })}
-                  </span>
-                </div>
-              )}
-              {document.source_type && (
-                <div>
-                  <span className="text-muted">Source:</span>
-                  <span className="ml-2 text-foreground">
-                    {document.source_type}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Processing Status */}
-            <div className="mt-6">
-              <h3 className="text-sm font-medium text-foreground mb-3">
-                Processing Status
-              </h3>
-              <div className="space-y-2">
-                <StatusRow label="Processed" status={document.processed} />
-                <StatusRow label="Chunked" status={document.chunked} />
-                <StatusRow label="Embedded" status={document.embedded} />
-              </div>
-              {document.validation_status && (
-                <div className="mt-4">
-                  <span className="text-sm text-muted">Validation Status: </span>
-                  <span className={`text-sm font-medium ${
-                    document.validation_status === "completed" ? "text-success" : "text-warning"
-                  }`}>
-                    {document.validation_status}
-                  </span>
-                </div>
-              )}
-            </div>
-
             {/* Actions */}
-            <div className="mt-6 flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4">
               <button
                 onClick={handleDownload}
                 disabled={downloading}
@@ -276,48 +205,156 @@ function DocumentDetail() {
             </div>
           </div>
 
-          <TabList id="document" label="Document sections" tabs={["Overview", "Chunks", "Evidence"] as const} value={tab} onChange={setTab} />
+          <TabList id="document" label="Document sections" tabs={TABS} value={tab} onChange={setTab} />
           <div id="document-panel" role="tabpanel" aria-labelledby={`document-${tab}`} className="mt-6">
-          {tab === "Evidence" && <EvidencePanel projectId={document.project_id} filters={{ document_id: document.id }} />}
-          {tab === "Overview" && !document.processing_events?.length && <p className="panel p-5 text-secondary">No processing history has been recorded.</p>}
+          {tab === "Text" && (
+            <DocumentText
+              document={document}
+              content={content}
+              loading={contentLoading}
+              error={contentError}
+              onRetry={() => void mutateContent()}
+            />
+          )}
 
-          {/* Processing Events */}
-          {tab === "Overview" && document.processing_events && document.processing_events.length > 0 && (
+          {tab === "Overview" && (
             <div className="bg-surface rounded-lg border border-line p-6 mb-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">
-                Processing History
-              </h2>
-              <div className="space-y-3">
-                {document.processing_events.map((event) => (
-                  <div
-                    key={event.id}
-                    className="border-l-4 border-info-line pl-4 py-2"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-foreground">
-                        {event.stage}
-                      </span>
-                      <span className={`text-sm ${
-                        event.status === "succeeded" ? "text-success" :
-                        event.status === "failed" ? "text-danger" :
-                        "text-warning"
-                      }`}>
-                        {event.status}
-                      </span>
+              {/* Document Stats */}
+              {hasStats && (
+                <div className="mb-6 flex flex-wrap gap-4">
+                  {document.chunk_count != null && (
+                    <div className="bg-info-surface border border-info-line rounded-lg px-4 py-3">
+                      <div className="text-2xl font-bold text-accent-text">
+                        {document.chunk_count}
+                      </div>
+                      <div className="text-sm text-accent-text">Chunks</div>
                     </div>
-                    {event.message && (
-                      <p className="text-sm text-secondary mt-1">
-                        {event.message}
-                      </p>
-                    )}
-                    <p className="text-xs text-muted mt-1">
-                      {formatDistanceToNow(parseApiTimestamp(event.created_at), { addSuffix: true })}
-                    </p>
+                  )}
+                  {document.word_count != null && (
+                    <div className="bg-success-surface border border-success-line rounded-lg px-4 py-3">
+                      <div className="text-2xl font-bold text-success">
+                        {document.word_count.toLocaleString()}
+                      </div>
+                      <div className="text-sm text-success">Words</div>
+                    </div>
+                  )}
+                  {document.total_tokens != null && (
+                    <div className="bg-info-surface border border-info-line rounded-lg px-4 py-3">
+                      <div className="text-2xl font-bold text-accent-text">
+                        {document.total_tokens.toLocaleString()}
+                      </div>
+                      <div className="text-sm text-accent-text">Tokens</div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Metadata */}
+              <div className="grid gap-4 break-words text-sm sm:grid-cols-2">
+                <div>
+                  <span className="text-muted">File Type:</span>
+                  <span className="ml-2 text-foreground">
+                    {document.file_type || document.mime_type || "Unknown"}
+                  </span>
+                </div>
+                {document.file_size && (
+                  <div>
+                    <span className="text-muted">File Size:</span>
+                    <span className="ml-2 text-foreground">
+                      {(document.file_size / 1024).toFixed(2)} KB
+                    </span>
                   </div>
-                ))}
+                )}
+                {document.uploaded_at && (
+                  <div>
+                    <span className="text-muted">Uploaded:</span>
+                    <span className="ml-2 text-foreground">
+                    {formatDistanceToNow(parseApiTimestamp(document.uploaded_at), { addSuffix: true })}
+                    </span>
+                  </div>
+                )}
+                {document.source_type && (
+                  <div>
+                    <span className="text-muted">Source:</span>
+                    <span className="ml-2 text-foreground">
+                      {document.source_type}
+                    </span>
+                  </div>
+                )}
+                {document.source_origin && (
+                  <div>
+                    <span className="text-muted">Origin:</span>
+                    <span className="ml-2 text-foreground">
+                      {document.source_origin}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Processing Status */}
+              <div className="mt-6">
+                <h3 className="text-sm font-medium text-foreground mb-3">
+                  Processing Status
+                </h3>
+                <div className="space-y-2">
+                  <StatusRow label="Processed" status={document.processed} />
+                  <StatusRow label="Chunked" status={document.chunked} />
+                  <StatusRow label="Embedded" status={document.embedded} />
+                </div>
+                {document.validation_status && (
+                  <div className="mt-4">
+                    <span className="text-sm text-muted">Validation Status: </span>
+                    <span className={`text-sm font-medium ${
+                      document.validation_status === "completed" ? "text-success" : "text-warning"
+                    }`}>
+                      {document.validation_status}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Processing Events */}
+              <div className="mt-6">
+                <h2 className="text-lg font-semibold text-foreground mb-4">
+                  Processing History
+                </h2>
+                {!document.processing_events?.length && <p className="text-secondary">No processing history has been recorded.</p>}
+                {document.processing_events && document.processing_events.length > 0 && (
+                  <div className="space-y-3">
+                    {document.processing_events.map((event) => (
+                      <div
+                        key={event.id}
+                        className="border-l-4 border-info-line pl-4 py-2"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-foreground">
+                            {event.stage}
+                          </span>
+                          <span className={`text-sm ${
+                            event.status === "succeeded" ? "text-success" :
+                            event.status === "failed" ? "text-danger" :
+                            "text-warning"
+                          }`}>
+                            {event.status}
+                          </span>
+                        </div>
+                        {event.message && (
+                          <p className="text-sm text-secondary mt-1">
+                            {event.message}
+                          </p>
+                        )}
+                        <p className="text-xs text-muted mt-1">
+                          {formatDistanceToNow(parseApiTimestamp(event.created_at), { addSuffix: true })}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
+
+          {tab === "Evidence" && <EvidencePanel projectId={document.project_id} filters={{ document_id: document.id }} />}
 
           {/* Document Chunks */}
           {tab === "Chunks" && (
@@ -391,6 +428,32 @@ function DocumentDetail() {
         </div>
       </div>
     </AuthGate>
+  );
+}
+
+function DocumentText({ document, content, loading, error, onRetry }: {
+  document: Document; content: DocumentContent | undefined; loading: boolean; error: unknown; onRetry: () => void;
+}) {
+  if (loading) return <PageState state="loading" title="Loading document text…" />;
+  if (error) return <PageState state="error" title="Document text could not be loaded." onRetry={onRetry} />;
+  if (!content || !content.content?.trim()) {
+    return (
+      <PageState state="empty" title="No text has been extracted from this document yet.">
+        {document.processed === true ? "The original file may be binary or empty. Download it to view the source." : "Process the document to extract its text, or download the original."}
+      </PageState>
+    );
+  }
+  const markdown = isMarkdownDocument({
+    name: content.name ?? document.name,
+    mime_type: content.mime_type ?? document.mime_type,
+    source_origin: content.source_origin ?? document.source_origin,
+  });
+  return (
+    <article aria-label="Document text" className="bg-surface rounded-lg border border-line p-6">
+      {markdown
+        ? <MarkdownRenderer content={content.content} />
+        : <div className="whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground [overflow-wrap:anywhere]">{content.content}</div>}
+    </article>
   );
 }
 

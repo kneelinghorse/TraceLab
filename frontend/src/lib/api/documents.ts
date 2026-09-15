@@ -2,7 +2,7 @@
  * Document API client
  */
 
-import type { Document, DocumentChunk, DocumentProcessResult, DocumentUploadResponse } from "@/types/document";
+import type { Document, DocumentChunk, DocumentContent, DocumentProcessResult, DocumentUploadResponse } from "@/types/document";
 import type { PaginatedResponse } from "@/types/pagination";
 import { AUTH_EXPIRED_EVENT, buildApiUrl, HttpError, httpClient } from "./http";
 import { clearStoredAuth, getStoredAuth } from "@/lib/auth/storage";
@@ -36,6 +36,14 @@ export const documentsApi = {
   async getDocument(documentId: string): Promise<Document> {
     const response = await httpClient.get(`/documents/${documentId}`);
     return response as Document;
+  },
+
+  /**
+   * Get the full extracted text of a document (plus its source report/mission links)
+   */
+  async getContent(documentId: string): Promise<DocumentContent> {
+    const response = await httpClient.get(`/documents/${documentId}/content`);
+    return response as DocumentContent;
   },
 
   /**

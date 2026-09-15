@@ -13,6 +13,7 @@ class EvidenceLink(BaseModel):
     title: str
     href: str
     relationship: str
+    mission_result: bool = False
 
 
 class EvidenceDetail(BaseModel):

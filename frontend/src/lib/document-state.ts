@@ -12,3 +12,10 @@ export function documentState(document: Partial<Document>): { label: string; sta
   if ([document.processed, document.chunked, document.embedded].every(value => value === false)) return { label: "Pending", status: "pending" };
   return { label: "Unknown", status: "unknown" };
 }
+
+/** Markdown is decided by MIME type, file name or synthesis origin; never by the file_type category. */
+export function isMarkdownDocument(document: { mime_type?: string | null; name?: string | null; source_origin?: string | null }): boolean {
+  if (document.mime_type?.toLowerCase().split(";")[0].trim() === "text/markdown") return true;
+  if (/\.(md|markdown)$/i.test(document.name ?? "")) return true;
+  return document.source_origin === "synthesized";
+}

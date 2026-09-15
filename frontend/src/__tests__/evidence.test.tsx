@@ -75,10 +75,22 @@ describe("the evidence browser", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Claim detail" })).toBeVisible();
     expect(screen.getByText("Verbatim source passage")).toBeVisible();
     expect(screen.getByRole("link", { name: "Research output" })).toHaveAttribute("href", "/reports/report");
+    // A report that only cites the entry is provenance, not the result to open.
+    expect(screen.queryByRole("link", { name: "Open report" })).toBeNull();
     expect(await screen.findByText("43 accessible sightings")).toBeVisible();
     expect(mocks.list).toHaveBeenCalledWith("alpha", 1, { source_id: "source-1" });
     fireEvent.click(screen.getByRole("button", { name: "Next sightings" }));
     await waitFor(() => expect(mocks.list).toHaveBeenCalledWith("alpha", 2, { source_id: "source-1" }));
+  });
+  it("offers Open report for the capturing mission's result report only", async () => {
+    mocks.router.query = { id: "detail" };
+    mocks.get.mockResolvedValue({ entry: entry("detail"), links: [
+      { kind: "report", id: "cited", title: "Citing synthesis", href: "/reports/cited", relationship: "Recorded source", mission_result: false },
+      { kind: "report", id: "result", title: "Mission result", href: "/reports/result", relationship: "Result of the capturing mission", mission_result: true },
+    ] });
+    await browser(<EvidenceDetailPage />);
+    expect(await screen.findByRole("link", { name: "Open report" })).toHaveAttribute("href", "/reports/result");
+    expect(screen.getAllByRole("link", { name: "Open report" })).toHaveLength(1);
   });
   it("requires an explicit confirmation before promoting the entire session and permits retry", async () => {
     mocks.router.query = { project_id: "alpha", session_key: "research-session" };

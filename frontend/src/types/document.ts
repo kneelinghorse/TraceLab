@@ -20,11 +20,35 @@ export interface Document {
   validation_status?: string;
   processing_events?: ProcessingEvent[];
 
+  // Provenance: the report/mission a synthesized or imported document came from
+  source_report_id?: string | null;
+  source_mission_id?: string | null;
+  source_origin?: "upload" | "synthesized" | "imported" | string | null;
+  links?: DocumentLink[];
+
   // Stats computed from chunks
   chunk_count?: number;
   total_tokens?: number;
   word_count?: number;
   preview?: string;
+}
+
+/** A report or mission the caller may read, resolved server-side. */
+export interface DocumentLink {
+  kind: "report" | "mission";
+  id: string;
+  title: string;
+  href: string;
+}
+
+/** Full extracted text, fetched on demand by GET /documents/{id}/content. */
+export interface DocumentContent {
+  id: string;
+  name: string;
+  mime_type?: string | null;
+  source_origin?: string | null;
+  content: string | null;
+  links: DocumentLink[];
 }
 
 export interface ProcessingEvent {
