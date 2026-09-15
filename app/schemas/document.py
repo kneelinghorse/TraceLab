@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
@@ -15,15 +15,17 @@ if TYPE_CHECKING:
     from app.schemas.tag import DocumentTagRead
 
 
-class DocumentBase(BaseModel):
-    """Shared attributes for document operations."""
+class DocumentReadBase(BaseModel):
+    """Document attributes safe to serialize on every read.
+
+    The extracted text and the original bytes are deliberately absent: reads
+    fetch them through ``GET /documents/{id}/content`` and ``/download``.
+    """
 
     project_id: UUID
     name: str
     file_path: str | None = None
     file_type: str | None = None
-    content: str | None = None
-    raw_content: bytes | None = None
     uploaded_at: datetime | None = None
     file_size: int | None = None
     mime_type: str | None = None
@@ -35,6 +37,13 @@ class DocumentBase(BaseModel):
     embedded: bool | None = False
     transcription_accuracy: Decimal | None = None
     validation_status: str | None = None
+
+
+class DocumentBase(DocumentReadBase):
+    """Shared attributes for document write operations."""
+
+    content: str | None = None
+    raw_content: bytes | None = None
 
 
 class DocumentCreate(DocumentBase):
@@ -65,19 +74,47 @@ class DocumentUpdate(BaseModel):
     validation_status: str | None = None
 
 
-class DocumentRead(DocumentBase):
-    """Representation of a persisted document."""
+class DocumentLink(BaseModel):
+    """A caller-readable report or mission this document came from."""
+
+    kind: Literal["report", "mission"]
+    id: str
+    title: str
+    href: str
+
+
+class DocumentRead(DocumentReadBase):
+    """Representation of a persisted document (no content or raw bytes)."""
 
     id: UUID
     chunks: list[DocumentChunkRead] | None = None
     tags: list[DocumentTagRead] | None = None
     processing_events: list[DocumentProcessingStatusRead] | None = None
 
+    # Provenance: where a synthesized or imported document came from
+    source_report_id: UUID | None = None
+    source_mission_id: UUID | None = None
+    source_origin: str | None = None
+    links: list[DocumentLink] = []
+
     # Stats computed from chunks
     chunk_count: int | None = None
     total_tokens: int | None = None
     word_count: int | None = None
     preview: str | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class DocumentContentRead(BaseModel):
+    """Full extracted text of one document, fetched on demand."""
+
+    id: UUID
+    name: str
+    mime_type: str | None = None
+    source_origin: str | None = None
+    content: str | None = None
+    links: list[DocumentLink] = []
 
     model_config = ConfigDict(from_attributes=True)
 

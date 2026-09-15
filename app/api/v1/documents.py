@@ -20,7 +20,7 @@ from fastapi import (
     status,
 )
 from fastapi.responses import FileResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, load_only
 
 from app.core.authorization import accessible_filter, authorize_or_403
 from app.core.database import get_db
@@ -28,13 +28,19 @@ from app.core.security import AuthenticatedUser, require_authenticated_user
 from app.models.document import Document
 from app.models.project import Project
 from app.schemas.chunk import DocumentChunkRead
-from app.schemas.document import DocumentListItem, DocumentRead
+from app.schemas.document import (
+    DocumentContentRead,
+    DocumentLink,
+    DocumentListItem,
+    DocumentRead,
+)
 from app.schemas.pagination import PaginatedResponse
 from app.services.cache_manager import get_cache_manager
 from app.services.coverage_report import CoverageReportGenerator
 from app.services.document_ingestion import DocumentIngestionService
 from app.services.document_parser import DocumentParser
 from app.services.document_query_service import DocumentQueryService
+from app.services.evidence_browser import document_links
 from app.services.ownership import default_workspace_id
 from app.services.processing_status import ProcessingStatusRecorder
 from app.services.soft_delete_service import DocumentSoftDeleteService
@@ -374,7 +380,43 @@ async def get_document(
     response.total_tokens = total_tokens
     response.word_count = word_count
     response.preview = preview
+    response.links = [DocumentLink(**link) for link in document_links(db, user, document)]
 
+    return response
+
+
+@router.get("/{document_id}/content", response_model=DocumentContentRead)
+async def get_document_content(
+    document_id: UUID,
+    db: Session = Depends(get_db),
+    user: AuthenticatedUser = Depends(require_authenticated_user),
+) -> DocumentContentRead:
+    """Return the document's full extracted text plus its source report/mission links."""
+    document = (
+        db.query(Document)
+        .options(
+            load_only(
+                Document.id,
+                Document.project_id,
+                Document.owner_id,
+                Document.workspace_id,
+                Document.name,
+                Document.mime_type,
+                Document.source_origin,
+                Document.source_report_id,
+                Document.source_mission_id,
+                Document.content,
+                Document.deleted_at,
+            )
+        )
+        .filter(Document.id == document_id, Document.deleted_at.is_(None))
+        .first()
+    )
+    if not document:
+        raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+    authorize_or_403(user, "read", document, db)
+    response = DocumentContentRead.model_validate(document)
+    response.links = [DocumentLink(**link) for link in document_links(db, user, document)]
     return response
 
 

@@ -26,13 +26,13 @@ status. The Sprint 03 "Mission Protocol UI" notes this page replaces are in git 
 | --- | --- | --- |
 | `/` | `index.tsx` | Home: recent activity (newest first), active runs, recent reports and projects, favorites, evidence activity |
 | `/projects`, `/projects/[id]` | `projects/index.tsx`, `projects/[id].tsx` | Project list and bundle |
-| `/documents`, `/documents/[id]`, `/documents/upload` | `documents/*.tsx` | Document list, detail, upload |
+| `/documents`, `/documents/[id]`, `/documents/upload` | `documents/*.tsx` | Document list, detail (full text first via `GET /documents/{id}/content`, Overview/Chunks/Evidence tabs, `?tab=` deep links, Open report/mission links from the server-resolved `links`), upload |
 | `/collections`, `/collections/[id]` | `collections/*.tsx` | Collections and collection context |
 | `/missions`, `/missions/[id]`, `/missions/new`, `/missions/queue` | `missions/*.tsx` | Mission list with views and reason filters, run detail, authoring, queue |
 | `/reports`, `/reports/[id]` | `reports/*.tsx` | Reports |
 | `/search` | `search/index.tsx` | Research search |
 | `/graph` | `graph.tsx` | Relationship neighborhood (Sprint 52, UX-11) |
-| `/evidence`, `/evidence/[id]` | `evidence.tsx`, `evidence/[id].tsx` | Evidence browser and entry detail |
+| `/evidence`, `/evidence/[id]` | `evidence.tsx`, `evidence/[id].tsx` | Evidence browser and entry detail (Open report for the capturing mission's result report, from the `mission_result` link flag) |
 | `/saved-searches` | `saved-searches.tsx` | Saved searches |
 | `/settings`, `/device` | `settings.tsx`, `device.tsx` | Account settings, device-code approval |
 | `/admin/users`, `/admin/spaces`, `/admin/observability`, `/admin/corrections` | `admin/*.tsx` | Admin surfaces behind `RequireAdmin` |

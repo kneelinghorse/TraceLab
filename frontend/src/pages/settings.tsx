@@ -19,6 +19,7 @@ export default function SettingsPage() {
           <h1 className="text-2xl font-bold text-foreground">Settings</h1>
           <ProfileSection />
           <AppearanceSection />
+          <NotificationsSection />
           <APIKeysSection />
           <InviteCodesSection />
         </div>
@@ -167,6 +168,77 @@ function AppearanceSection() {
       <h2 className="text-lg font-semibold text-foreground mb-1">Appearance</h2>
       <p className="text-sm text-muted mb-4">Choose a color theme for this browser. System follows your device setting.</p>
       <div className="max-w-xs"><ThemeSelect /></div>
+    </section>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Notifications section
+// ---------------------------------------------------------------------------
+
+function NotificationsSection() {
+  const [enabled, setEnabled] = useState<boolean | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    profileApi
+      .get()
+      .then((profile) => {
+        if (!active) return;
+        if (typeof profile.email_notifications_enabled === "boolean") setEnabled(profile.email_notifications_enabled);
+        else setLoadFailed(true);
+      })
+      .catch(() => {
+        if (active) setLoadFailed(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const handleToggle = async (next: boolean) => {
+    setIsSaving(true);
+    setMessage(null);
+    try {
+      // The checkbox shows what the server stored, not what was clicked.
+      const profile = await profileApi.update({ email_notifications_enabled: next });
+      setEnabled(profile.email_notifications_enabled);
+      setMessage({ type: "success", text: profile.email_notifications_enabled ? "Mission emails are on" : "Mission emails are off" });
+    } catch (err) {
+      setMessage({ type: "error", text: err instanceof Error ? err.message : "Failed to update notifications" });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <section id="notifications" className="scroll-mt-20 bg-surface rounded-lg border border-line p-6">
+      <h2 className="text-lg font-semibold text-foreground mb-1">Notifications</h2>
+      <p className="text-sm text-muted mb-4">Email me when one of my missions completes, fails validation or is blocked.</p>
+      {loadFailed ? (
+        <p className="text-sm text-danger">Could not load your notification preference.</p>
+      ) : enabled === null ? (
+        <p role="status" className="text-sm text-muted">Loading notification preference…</p>
+      ) : (
+        <label className="flex items-center gap-3 text-sm text-foreground">
+          <input
+            type="checkbox"
+            checked={enabled}
+            disabled={isSaving}
+            onChange={(e) => void handleToggle(e.target.checked)}
+            className="h-4 w-4 rounded border-line-strong"
+          />
+          Mission emails
+        </label>
+      )}
+      {message && (
+        <p role="status" className={`mt-3 text-sm ${message.type === "success" ? "text-success" : "text-danger"}`}>
+          {message.text}
+        </p>
+      )}
     </section>
   );
 }

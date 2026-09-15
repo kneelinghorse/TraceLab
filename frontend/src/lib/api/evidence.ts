@@ -31,7 +31,7 @@ export interface EvidenceFilters {
 }
 export interface EvidenceDetail {
   entry: LedgerEntry;
-  links: { kind: "mission" | "report"; id: string; title: string; href: string; relationship: string }[];
+  links: { kind: "mission" | "report"; id: string; title: string; href: string; relationship: string; mission_result?: boolean }[];
 }
 export interface PromotionResult { report_id: string; document_id: string | null; title: string; entry_count: number; note_count: number }
 export const evidenceApi = {
