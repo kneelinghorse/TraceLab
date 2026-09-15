@@ -104,7 +104,24 @@ def document_evidence_condition(
     return or_(*conditions) if conditions else false()
 
 
-def entry_links(db: Session, user: AuthenticatedUser, entry: LedgerEntry) -> list[dict[str, str]]:
+def document_links(db: Session, user: AuthenticatedUser, document: Document) -> list[dict[str, str]]:
+    """Report first, then mission; each resolved only when the caller may read it."""
+    mission = (
+        readable_query(db, user, Mission).filter(Mission.id == document.source_mission_id).first()
+        if document.source_mission_id
+        else None
+    )
+    report_id = document.source_report_id or (mission.result_report_id if mission is not None else None)
+    report = readable_query(db, user, Report).filter(Report.id == report_id).first() if report_id else None
+    links = []
+    if report is not None:
+        links.append({"kind": "report", "id": str(report.id), "title": report.title, "href": f"/reports/{report.id}"})
+    if mission is not None:
+        links.append({"kind": "mission", "id": str(mission.id), "title": mission.title, "href": f"/missions/{mission.id}"})
+    return links
+
+
+def entry_links(db: Session, user: AuthenticatedUser, entry: LedgerEntry) -> list[dict[str, str | bool]]:
     """Resolve persisted relationships with an independent access check per output."""
     links = []
     mission = (
@@ -118,24 +135,29 @@ def entry_links(db: Session, user: AuthenticatedUser, entry: LedgerEntry) -> lis
                 "title": mission.title,
                 "href": f"/missions/{mission.id}",
                 "relationship": "Captured by this mission",
+                "mission_result": False,
             }
         )
+    result_report_id = mission.result_report_id if mission else None
     report_ids = select(ReportSource.report_id).where(
         ReportSource.source_type == "ledger_entry", ReportSource.source_id == entry.id
     )
     reports = (
         readable_query(db, user, Report)
         .filter(Report.project_id == entry.project_id)
-        .filter(or_(Report.id.in_(report_ids), Report.id == (mission.result_report_id if mission else None)))
+        .filter(or_(Report.id.in_(report_ids), Report.id == result_report_id))
     )
     for report in reports.order_by(Report.updated_at.desc(), Report.id).limit(50):
+        is_result = result_report_id is not None and report.id == result_report_id
         links.append(
             {
                 "kind": "report",
                 "id": str(report.id),
                 "title": report.title,
                 "href": f"/reports/{report.id}",
-                "relationship": "Recorded source or mission result",
+                "relationship": "Result of the capturing mission" if is_result else "Recorded source",
+                # Lets the page offer "Open report" for the result, not for every report citing the entry (DOCV-1).
+                "mission_result": is_result,
             }
         )
     return links

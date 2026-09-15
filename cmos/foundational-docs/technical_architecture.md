@@ -93,6 +93,13 @@ after SUCCESS and only then runs its production checks.
 - Documents are parsed, redacted, chunked and embedded through the ingestion pipeline
   (`docs/document-processing.md`, `docs/ingestion_pipeline_developer_guide.md`); chunks live in
   PostgreSQL and vectors in Qdrant.
+- `GET /api/v1/documents/{id}` returns metadata, chunk stats, a 500-character preview, the
+  provenance columns (`source_report_id`, `source_mission_id`, `source_origin`) and caller-readable
+  `links` to the source report and mission; it no longer serializes `content` or `raw_content`.
+  `GET /api/v1/documents/{id}/content` serves the extracted text on demand under the same
+  authorization (DOCV-1, decision #459); the original bytes stay behind `/download`. Evidence
+  detail links flag the capturing mission's result report with `mission_result`, so the evidence
+  page offers the same Open report link for it.
 - PEDR, Protocol-Enhanced Deep Research (`docs/architecture/PEDR-search.md`, `docs/pedr-search.md`),
   fuses lexical and semantic retrieval layers plus optional graph expansion through Reciprocal Rank
   Fusion; `POST /api/v1/pedr/search` and the plain

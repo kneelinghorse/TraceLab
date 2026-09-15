@@ -1969,6 +1969,37 @@ class TestEvidenceBrowser:
         assert "Hidden result" not in str(detail)
 
 
+def test_evidence_links_flag_only_the_capturing_missions_result_report(client, db_session, rbac_on):
+    """DOCV-1: the page offers "Open report" for the mission result, not for every report that cites the entry."""
+    member = _user(db_session, "docv1-result-link@example.com")
+    project = Project(name="Result report provenance", owner_id=member.id)
+    db_session.add(project)
+    db_session.commit()
+    mission = _mission(db_session, project)
+    mission.owner_id = member.id
+    result = Report(project_id=project.id, title="Mission result", content="Result", owner_id=member.id)
+    citing = Report(project_id=project.id, title="Citing synthesis", content="Cites", owner_id=member.id)
+    db_session.add_all([result, citing])
+    db_session.flush()
+    mission.result_report_id = result.id
+    db_session.commit()
+    captured = _capture(
+        client,
+        _bearer(member),
+        project,
+        session_key="docv1-result-link",
+        mission=mission,
+        entries=[{"claim": "Result claim", "source_url": "https://example.test/result", "disposition": "supporting"}],
+    )
+    assert captured.status_code == 201, captured.text
+    entry_id = captured.json()["entries"][0]["id"]
+    db_session.add(ReportSource(report_id=citing.id, source_type="ledger_entry", source_id=UUID(entry_id)))
+    db_session.commit()
+    links = client.get(f"{API}/{entry_id}", headers=_bearer(member)).json()["links"]
+    flags = {(link["kind"], link["id"]): link["mission_result"] for link in links}
+    assert flags == {("mission", str(mission.id)): False, ("report", str(result.id)): True, ("report", str(citing.id)): False}
+
+
 def test_report_citations_resolve_each_source_kind_before_counting_and_paging(client, db_session, rbac_on):
     """Ledger IDs, result missions and literal URLs each resolve; hidden matches never inflate totals."""
     member = _user(db_session, "ux8-citations@example.test")
