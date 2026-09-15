@@ -3,6 +3,8 @@
 Sending is disabled until RESEND_API_KEY and RESEND_FROM_ADDRESS are set. Each
 terminal status is mailed at most once per mission, recorded in the mission's
 execution_metadata["notification"] subrecord, which the worker cannot forge.
+Owners whose address is at a reserved or local-only domain (such as the legacy
+tracelab.local accounts) are skipped, because those sends can only bounce.
 """
 
 from __future__ import annotations
@@ -26,6 +28,9 @@ logger = logging.getLogger(__name__)
 RESEND_ENDPOINT = "https://api.resend.com/emails"
 NOTIFY_STATUSES = frozenset({"completed", "validation_failed", "blocked"})
 STATUS_LABELS = {"completed": "completed", "validation_failed": "failed validation", "blocked": "was blocked"}
+# Reserved names (RFC 2606, RFC 6761, ICANN's .internal) never receive mail; a send there only bounces.
+RESERVED_EMAIL_DOMAINS = frozenset({"example.com", "example.net", "example.org"})
+RESERVED_EMAIL_TLDS = frozenset({"example", "internal", "invalid", "local", "localhost", "test"})
 
 
 @dataclass(frozen=True)
@@ -38,6 +43,17 @@ class Email:
 
 def notifications_configured() -> bool:
     return bool(settings.notification_emails_enabled and settings.resend_api_key and settings.resend_from_address)
+
+
+def deliverable_address(address: str | None) -> bool:
+    """False for a missing address or one at a reserved or local-only domain."""
+    local, _, domain = (address or "").strip().rpartition("@")
+    domain = domain.lower().rstrip(".")
+    if not local or "." not in domain:
+        return False
+    if any(domain == name or domain.endswith(f".{name}") for name in RESERVED_EMAIL_DOMAINS):
+        return False
+    return domain.rsplit(".", 1)[1] not in RESERVED_EMAIL_TLDS
 
 
 def build_terminal_email(mission: Mission, recipient: str) -> Email:
@@ -98,6 +114,9 @@ def pending_terminal_notification(db: Session, mission_id: UUID, *, lock: bool =
         return None
     owner = db.query(User).filter(User.id == mission.owner_id).first()
     if owner is None or not owner.is_active or not owner.email_notifications_enabled:
+        return None
+    if not deliverable_address(owner.email):
+        logger.info("Not emailing about mission %s: owner %s has no deliverable address", mission.mission_id, owner.id)
         return None
     return mission, build_terminal_email(mission, owner.email)
 
