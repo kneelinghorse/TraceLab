@@ -150,7 +150,7 @@ pre-commit install
 - After editing `packages/tracelab-mcp/src/`, rebuild before testing locally: `cd packages/tracelab-mcp && npm run build`. The `bin` entry (`dist/index.js`) won't exist on a fresh clone until you build.
 - `npm publish` automatically runs `prepublishOnly` → `npm run build`, so the published tarball is always built from current src — no manual step needed at publish time.
 - If the MCP appears stale in Claude Desktop, run `npm run build` and restart the client; do not re-add `dist/` to git.
-- **MCP tool surface (T41.7 foundation; LEDGER-1 extension):** 8 action-clustered tools, not the prior ~24 flat ones. Each cluster takes an `action` param plus action-specific keys: `tracelab_search` (knowledge), `tracelab_project` (list/create/update/stats), `tracelab_collection` (list/get/export/create/add/synthesize), `tracelab_report` (create/list/get/export), `tracelab_document` (upload/get_content), `tracelab_mission` (create/list/get/update — CRUD), `tracelab_mission_execution` (submit/status/preview — DS lifecycle), `tracelab_evidence` (capture/note/search/list/promote — cross-session research ledger). Legacy tool-name calls return a friendly migration error pointing at the new cluster+action. Mapping table and migration error live in `packages/tracelab-mcp/src/index.ts::LEGACY_TO_CLUSTER`.
+- **MCP tool surface (T41.7 foundation; LEDGER-1, MCP-1 and MCP-2 extensions):** 9 action-clustered tools / 51 actions in source, not the prior ~24 flat ones. Each cluster takes an `action` param plus action-specific keys; the authoritative tables are `docs/mcp-tools.md` and `packages/tracelab-mcp/README.md`, and `cmos/contracts/mcp-parity-manifest.json` classifies every UI operation against them (`node scripts/mcp_parity_audit.mjs` must exit 0). Legacy tool-name calls return a friendly migration error pointing at the new cluster+action. Mapping table and migration error live in `packages/tracelab-mcp/src/index.ts::LEGACY_TO_CLUSTER`.
 
 ### Evidence Ledger Research Convention
 
@@ -192,7 +192,7 @@ python cmos/scripts/seed_sqlite.py --data-root <planning-workspace>
 node cmos/context/integration_test_runner.js --output telemetry/events/testing-summary.json
 
 # Package starter bundle
-./scripts/package_starter.sh
+./cmos/scripts/package_starter.sh
 ```
 
 ## Coding Standards & Style
@@ -201,13 +201,13 @@ node cmos/context/integration_test_runner.js --output telemetry/events/testing-s
 - **Type checking**: `mypy` with `disallow_untyped_defs` on `app/core/` and `app/ports/` (not strict mode). It is a local diagnostic only: CI-2 removed the mypy lane and no Python type gate runs in CI (decision #407).
 - **TypeScript/Node utilities** (under `cmos/` or tooling scripts): use ES2020 modules, strict TS configs, and JSDoc for exported helpers.
 - Keep mission documentation single-sourced: updates to `docs/`, `foundational-docs/`, or `cmos/docs/` must reference the guiding template rather than duplicating content.
-- Reference `cmos/docs/AI-coding-assistant-workflows.md` for orchestration expectations and align commit notes with backlog mission IDs.
+- Reference `cmos/docs/operations-guide.md` and `cmos/docs/workflow-examples.md` for orchestration expectations and align commit notes with backlog mission IDs.
 
 ## Security & Quality Guardrails
-- Enforce OWASP controls listed in `cmos/docs/AI-coding-assistant-workflows.md` (no secrets in logs, parameterized DB access, TLS-only external calls).
+- Enforce the project's OWASP controls (no secrets in logs, parameterized DB access, TLS-only external calls); see `docs/authentication.md`, `docs/data-protection-audit.md` and `scripts/check_no_credential_literals.py`.
 - Before concluding any mission that touches runtime code, execute `python cmos/scripts/validate_foundational_refs.py` (it confirms the roadmap and architecture template references in cmos/agents.md, cmos/README.md and cmos/context/MASTER_CONTEXT.json; it does not check that links resolve) and rerun relevant pytest suites (`pytest tests/` or targeted folders).
-- Use the tiered validation checklist from `cmos/docs/cmos_Playbook.md`: session events logged, backlog status updated, parity verified, telemetry reviewed.
-- Record blockers or deviations inside `cmos/context/MASTER_CONTEXT.json` via the SQLite client (`context/db_client.py`) rather than hand-editing JSON mirrors.
+- Use the tiered validation checklist from `cmos/docs/operations-guide.md`: session events logged, backlog status updated, parity verified, telemetry reviewed.
+- Record blockers or deviations inside `cmos/context/MASTER_CONTEXT.json` via the SQLite client (`cmos/context/db_client.py`) rather than hand-editing JSON mirrors.
 
 ## MCP Contract Guard (sprint-41 codification)
 
@@ -255,7 +255,7 @@ documents the resync ritual for the vendored DS contract compiler at
 - **Ports** (`app/ports/`): `typing.Protocol` interfaces defining contracts for repositories and external services. New code should depend on ports, not concrete implementations.
 - **Adapters** (`app/adapters/`): Thin wrappers delegating to existing services. Repository adapters in `app/adapters/repositories/`, external service adapters in `app/adapters/external/`.
 - **Composition root** (`app/dependencies.py`): Factory functions wiring ports to adapters via `FastAPI Depends()`. Override in tests with `app.dependency_overrides`.
-- See `docs/adr/001-005` for architecture decision records.
+- See `docs/adr/` (ADRs 001 through 005) for architecture decision records.
 
 ### Dependency Injection Pattern
 ```python
@@ -284,11 +284,11 @@ def get_doc(doc_id: UUID, repo: DocumentRepository = Depends(get_document_reposi
 1. **Pre-flight**
    - Load this `agents.md`, then `cmos/agents.md` to understand workspace restrictions.
    - Run `./cmos/cli.py validate health` to verify database is accessible; check `./cmos/cli.py db show current` for active missions.
-   - Use CMOS MCP tools or CLI for all mission operations—the SQLite database is the single source of truth (flat files like `backlog.yaml` are read-only exports).
+   - Use CMOS MCP tools or CLI for all mission operations—the SQLite database is the single source of truth (committed exports such as `cmos/context/MASTER_CONTEXT.json` are read-only).
 
 2. **Execution**
    - Use `context.db_client.SQLiteClient` or existing automation scripts for all context/session updates (`project_context`, `master_context`, `session_events`).
-   - Append mission events via the runtime helper so updates land in both SQLite and `cmos/SESSIONS.jsonl`; include `summary` + `next_hint` per `cmos/docs/AI-coding-assistant-workflows.md`.
+   - Append mission events via the runtime helper so updates land in both SQLite and `cmos/SESSIONS.jsonl`; include `summary` + `next_hint` per `cmos/docs/session-management-guide.md`.
    - Keep edits scoped to the active mission; if work exceeds scope, create or split missions through the backlog tooling rather than ad-hoc commits.
 
 3. **Validation & Closure**
@@ -298,20 +298,21 @@ def get_doc(doc_id: UUID, repo: DocumentRepository = Depends(get_document_reposi
 
 4. **Restricted Areas**
    - Do not place application code, generated packages, or new dependencies inside `cmos/`; use the root starter layout. Treat `cmos/` as read-mostly research/history per its local guardrails.
-   - Never bypass the SQLite helpers with ad-hoc SQL; if manual inspection is required, prefer `sqlite3 db/cmos.sqlite` read-only queries or the DB Browser workflow in `cmos/docs/sqlite-db-browser-guide.md`.
+   - Never bypass the SQLite helpers with ad-hoc SQL; if manual inspection is required, prefer `sqlite3 cmos/db/cmos.sqlite` read-only queries guided by `cmos/docs/sqlite-schema-reference.md`.
 
 ## Reference Guides
 - `README.md` – core TraceLab architecture and developer workflow.
-- `cmos/docs/Agentic_Migration_Playbook.md` – agent memory layer expectations.
-- `cmos/docs/AI-coding-assistant-workflows.md` & `cmos/docs/cmos_Playbook.md` – orchestration, validation, and telemetry policies.
-- `cmos/docs/integration-testing-guide.md`, `cmos/docs/packaging-guide.md`, `cmos/docs/sqlite-*` – test, packaging, and database procedures.
+- `cmos/docs/legacy-migration-guide.md` and `cmos/docs/mission_runtime_migration.md` – agent memory layer and runtime migration expectations.
+- `cmos/docs/operations-guide.md`, `cmos/docs/workflow-examples.md` & `cmos/docs/session-management-guide.md` – orchestration, validation, session and telemetry policies (the operations guide replaced the former AI-coding-assistant-workflows, cmos_Playbook and packaging guides).
+- `cmos/docs/integration-testing-guide.md` and `cmos/docs/sqlite-schema-reference.md` – test and database procedures.
+- `docs/frontend_architecture.md` and `cmos/foundational-docs/technical_architecture.md` – the frontend and platform as built (rewritten in Sprint 52, DOC-1).
 - `cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md` – **the living vision and roadmap** for the d592c92 recovery and the UX overhaul (Sprints 50–53): intent, sprint plan, UI definition of done, route migration map. Authoritative for intent; CMOS is authoritative for status. Update at every sprint open and close.
-- `foundational-docs/roadmap_template.md` – canonical backlog + milestone template used for every sprint.
-- `foundational-docs/tech_arch_template.md` – authoritative technical architecture template for Mission Protocol deliverables.
+- `cmos/foundational-docs/roadmap_template.md` – canonical backlog + milestone template used for every sprint.
+- `cmos/foundational-docs/tech_arch_template.md` – authoritative technical architecture template for Mission Protocol deliverables.
 - `cmos/contracts/mission-authoring-contract.md` – single source of truth for the MCP param ↔ DB column ↔ REST ↔ DS worker mapping (T41.3).
 - `cmos/contracts/deepsearch-compiler-vendor.md` – resync ritual for the vendored DeepSearch contract compiler at `app/services/contract_compiler/` (T41.1).
 
 ---
-Last Updated: 2026-04-27
-Version: 2.1.0
+Last Updated: 2026-09-15
+Version: 2.2.0
 Maintained by: TraceLab Platform Team

@@ -141,18 +141,26 @@ npx playwright test tests/e2e/production-smoke.spec.ts
 ```
 TraceLab/
 ├── .devcontainer/     # Dev container configuration
+├── .github/           # CI workflows and the required-check baseline (.github/ci/)
+├── alembic/           # Database migrations (sole schema authority)
 ├── app/
 │   ├── api/           # API endpoints
 │   │   └── v1/        # API v1 routes
 │   ├── adapters/      # Hexagonal adapter implementations
-│   ├── core/          # Core configuration and database
+│   ├── core/          # Config, database, security, authorization, rate limiting
+│   ├── mcp_server/    # Python MCP kept for local development (production-dark)
 │   ├── models/        # SQLAlchemy models
 │   ├── ports/         # Protocol interfaces (hexagonal ports)
-│   ├── dependencies.py # Composition root (DI wiring)
+│   ├── schemas/       # Pydantic request/response contracts
 │   ├── services/      # Business logic services
-│   └── utils/         # Utility functions
-├── alembic/           # Database migrations
-├── docs/adr/          # Architecture Decision Records
+│   ├── dependencies.py # Composition root (DI wiring)
+│   └── main.py        # FastAPI app, router mounting, router-level auth
+├── cmos/              # Planning workbench: missions, sessions, receipts, foundational docs
+├── docs/              # Developer documentation (docs/adr/ holds the ADRs)
+├── frontend/          # Next.js web UI (see docs/frontend_architecture.md)
+├── packages/
+│   └── tracelab-mcp/  # @aquex/tracelab-mcp, the supported agent surface
+├── scripts/           # Operational and verification scripts
 ├── tests/             # Test files
 │   ├── unit/          # Unit tests (mocked, no DB)
 │   ├── integration/   # Integration tests (real PostgreSQL)
@@ -176,7 +184,7 @@ The application uses the following core tables:
 - `missions` - Mission Protocol integration (JSONB)
 - `quality_checks` - Quality audit trail
 
-See `cmos/docs/technical_architecture.md` for detailed schema documentation.
+See `cmos/foundational-docs/technical_architecture.md` for the as-built architecture and schema notes.
 
 ## Migrations
 

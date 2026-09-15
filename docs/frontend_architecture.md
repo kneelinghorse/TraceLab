@@ -1,71 +1,124 @@
-# Mission Protocol Frontend Architecture
+# Frontend Architecture (as built)
 
-TraceLab Sprint 03 introduces the Mission Protocol UI under `frontend/`, a Next.js 14 (Pages Router) application that visualizes the validation and quality gate pipeline described in `docs/quality_gates.md`.
+As of main `bf750cb70550a33f179b0ca4c2518454122ff87c` (2026-09-15, end of the Sprint 52 build). This page describes the
+frontend that ships from `frontend/` today. Intent and the sprint plan live in the living
+roadmap, `cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md`; CMOS holds mission
+status. The Sprint 03 "Mission Protocol UI" notes this page replaces are in git history
+(`git show 3a498c6:docs/frontend_architecture.md`).
 
-## Layout
+## Stack
 
-```
-frontend/
-├─ src/
-│  ├─ pages/
-│  │  ├─ missions/index.tsx   # Backlog + creation workspace
-│  │  └─ missions/[id].tsx    # Mission detail + gate telemetry
-│  ├─ components/
-│  │  ├─ MissionProtocolForm.tsx
-│  │  ├─ ProgressIndicator.tsx
-│  │  ├─ QualityGatePanel.tsx
-│  │  └─ EvidenceLinking.tsx
-│  ├─ lib/
-│  │  ├─ api/missions.ts      # REST client for FastAPI endpoints
-│  │  └─ hooks/useMissions.ts # SWR data hooks + polling
-│  ├─ types/
-│  │  ├─ mission.ts           # Pydantic-aligned types
-│  │  └─ forms.ts             # React Hook Form schema definition
-│  └─ styles/globals.css      # Tailwind tokens + glassmorphism theme
-└─ tests/
-   └─ e2e/                    # Playwright guardrails for critical flows
-```
+- **Next.js ^16 with the pages router**, React 19.2, SWR ^2.3 for data fetching and polling,
+  react-hook-form ^7.66 with zod ^4 for authoring forms, date-fns, react-markdown; Tailwind CSS 3.4
+  through PostCSS (`frontend/postcss.config.mjs`, directives in `frontend/src/styles/globals.css`); see
+  `frontend/package.json`.
+- **Design tokens.** `@oods/tokens` and `@oods/tw-variants` are vendored as immutable tarballs
+  (`frontend/vendor/oods-tokens-0.1.0.tgz`, `frontend/vendor/oods-tw-variants-0.1.0.tgz`) with provenance in
+  `frontend/vendor/oods-provenance.json` (OODS-Forge checkout `114a268`), and wired through
+  `frontend/tailwind.config.ts`. There is no `@oods/components-react` dependency: every component is
+  local to this repository.
+- Node 22 or newer. `npm run build` runs the token gate first (`frontend/scripts/check-token-colors.mjs`)
+  and then `next build`; Railway serves the result with `next start`.
 
-### Routing
+## Routes (`frontend/src/pages`)
 
-- `/missions` renders the backlog dashboard. The hero references the quality gate spec and lets researchers toggle between **Create** and **Edit** modes for the Mission Protocol form.
-- `/missions/[id]` loads a dedicated workspace for a mission, combining the edit form, progress ring, and live gate telemetry (polled every 15s from `/api/v1/quality/missions/:id/quality`).
+| Route | File | Notes |
+| --- | --- | --- |
+| `/` | `index.tsx` | Home: attention, active runs, recent reports and projects, favorites, evidence activity |
+| `/inbox` | `inbox.tsx` | Priority inbox (Sprint 52, UX-13) |
+| `/projects`, `/projects/[id]` | `projects/index.tsx`, `projects/[id].tsx` | Project list and bundle |
+| `/documents`, `/documents/[id]`, `/documents/upload` | `documents/*.tsx` | Document list, detail, upload |
+| `/collections`, `/collections/[id]` | `collections/*.tsx` | Collections and collection context |
+| `/missions`, `/missions/[id]`, `/missions/new`, `/missions/queue` | `missions/*.tsx` | Mission list with views and reason filters, run detail, authoring, queue |
+| `/reports`, `/reports/[id]` | `reports/*.tsx` | Reports |
+| `/search` | `search/index.tsx` | Research search |
+| `/graph` | `graph.tsx` | Relationship neighborhood (Sprint 52, UX-11) |
+| `/evidence`, `/evidence/[id]` | `evidence.tsx`, `evidence/[id].tsx` | Evidence browser and entry detail |
+| `/saved-searches` | `saved-searches.tsx` | Saved searches |
+| `/settings`, `/device` | `settings.tsx`, `device.tsx` | Account settings, device-code approval |
+| `/admin/users`, `/admin/spaces`, `/admin/observability`, `/admin/corrections` | `admin/*.tsx` | Admin surfaces behind `RequireAdmin` |
 
-### Components
+`_app.tsx` mounts `AuthProvider`, `RoleProvider`, `ThemeProvider` and `AppShell`; `_document.tsx`
+carries the theme bootstrap. Legacy routes redirect: `frontend/src/lib/route-migrations.json`
+(eight mappings) feeds `redirects()` in `frontend/next.config.ts`, and the canonical map is the
+roadmap's Route Migration Map section. Redirects are covered by `frontend/tests/e2e/route-migration.spec.ts`.
 
-| Component | Purpose | Quality Gate Tie-In |
-|-----------|---------|---------------------|
-| `MissionProtocolForm` | React Hook Form surface for Mission Protocol Draft data. Converts rich text inputs into the arrays required by the Pydantic models. | Ensures required research statement, synthesis, key insight, and evidence fields are populated before hitting the API. |
-| `EvidenceLinking` | Nested form section dedicated to insight ↔ chunk traceability. | Maps directly to the `traceability` gate and enforces chunk/insight IDs per evidence entry. |
-| `ProgressIndicator` | Circular progress ring driven by `completion_percentage` from the FastAPI backend. | Mirrors the `MissionProgressSnapshot` service to show readiness towards review/complete states. |
-| `QualityGatePanel` | Visual status board for every gate with last evaluation time and failure notes. | Consumes `/quality` API responses to surface blocking gates with actionable feedback from `docs/quality_gates.md`. |
+## Shell
 
-### Data Flow
+- `frontend/src/components/AppShell.tsx`: skip link, the sidebar (`Navigation.tsx`), a sticky toolbar with
+  the active section label, the Inbox link with its unread badge and the ⌘K search control, exactly one
+  `<main id="main-content">`, a mobile navigation drawer built on a native `<dialog>`, and
+  `CommandPalette.tsx`.
+- **Authentication.** `frontend/src/contexts/AuthContext.tsx` owns the session and
+  `frontend/src/lib/auth/storage.ts` persists it in local storage under `tracelab.auth.v2`;
+  `components/AuthGate.tsx` wraps every page; a 401 from any request clears the session
+  through the `tracelab:auth-expired` window event in `lib/api/http.ts`.
+- **Role channel.** `frontend/src/contexts/RoleContext.tsx` reads the role from a live
+  `GET /api/v1/auth/me` only, never from the token or stored auth; `components/RequireAdmin.tsx` fails
+  closed and admin navigation groups are filtered by `useRole().isAdmin`.
+- **Themes.** `components/ThemeSelect.tsx` and `contexts/ThemeContext.tsx` over `lib/theme.ts` offer
+  System, Light and Dark, persisted per user (`tracelab.theme.v1:<user id>`) and applied through
+  `data-theme` with semantic tokens only: no fixed palette classes and no `dark:` utilities, enforced by
+  `frontend/scripts/check-token-colors.mjs`. High contrast is deferred to THEME-2 in Sprint 54.
+- **Command palette.** ⌘K / Ctrl-K opens `CommandPalette.tsx`: name lookup through
+  `lib/api/navigation.ts` (`GET /api/v1/navigation/search`), recent and saved searches, saved mission
+  views, and "Go to" entries derived from `navigationGroups`.
 
-1. `useMissionList` / `useMissionDetail` (SWR) call `frontend/src/lib/api/missions.ts`, which wraps `fetch` calls to the FastAPI service at `NEXT_PUBLIC_API_BASE_URL`.
-2. The Mission form converts React Hook Form values ➜ `MissionCreatePayload`, invoking either `POST /api/v1/missions` or `PUT /api/v1/missions/{id}`.
-3. After any write, hooks revalidate mission data and the UI re-renders progress + gate panels.
-4. The Quality gate panel polls `/api/v1/quality/missions/{id}/quality`, ensuring UI state always matches the backend validators introduced in B3.3.
+## Data layer (`frontend/src/lib/api`)
 
-### Testing
+- `http.ts` builds every request from `NEXT_PUBLIC_API_BASE_URL` plus `NEXT_PUBLIC_API_PATH_PREFIX`
+  (default `/api/v1`), attaches the bearer token, raises `HttpError` with the status, and turns a 401
+  into a logout.
+- One client module per noun: admin, admin-stats, auth, collections, console, deviceAuth, documents,
+  evidence, graph, home, inbox, missionViews, missions, navigation, projects, reports, savedSearches,
+  search, settings.
+- `timestamps.ts` exports `parseApiTimestamp`, which treats offset-free API datetimes as UTC; pages
+  must use it instead of `new Date(value)`: learning #173 recorded offset-free timestamps showing five
+  hours ahead in Chicago.
+- SWR keys include the user id. Home, the mission dashboards and the inbox summary poll at the server's
+  `refresh_seconds` (30 s); the shared inbox poll (`lib/hooks/useInboxSummary.ts`) pauses in hidden tabs
+  and revalidates on focus.
+- Every transport in this directory is inventoried by `scripts/mcp_parity_audit.mjs` and classified in
+  `cmos/contracts/mcp-parity-manifest.json`, so the MCP surface and the UI cannot drift apart silently.
 
-`tests/e2e/mission-protocol.spec.ts` stubs backend responses to guarantee:
+## UI primitives (`frontend/src/components/ui`)
 
-- `/missions` renders backlog cards, quality hints, and React Hook Form validation errors.
-- `/missions/[id]` displays live gate statuses and exposes the Mission update workflow.
+`Dialog` (native `<dialog>` with focus retention), `PageState` (loading, empty and error with retry;
+pages render not-found as a distinct state), `PaginationBar`, `StatusBadge`, `TabList`, `Toast` and
+`useFeedback` (explicit confirmation and notices). No page uses `alert()` or `confirm()`.
 
-Run the suite from `frontend/`:
+## Sprint 52 surfaces
 
-```bash
-npm run test:e2e
-```
+- **Relationships** (`/graph`, UX-11 over GRAPH-1): a root picker, a depth 1–2 neighborhood diagram and an
+  accessible list equivalent over `GET /api/v1/graph/neighborhood` (`lib/api/graph.ts`).
+- **Mission dashboards** (UX-12): live attention counts from `GET /api/v1/home/attention`, repeatable
+  reason filters on `/missions`, and personal saved views (`lib/api/missionViews.ts`) that also appear in
+  the command palette.
+- **Priority inbox** (`/inbox`, UX-13): agent failures, mission completions and new evidence behind a
+  per-user seen watermark; the shell badge is named "Inbox, N unread" (hidden at zero, capped at 99+) with
+  a polite live region that announces increases only; "Mark all as seen" sends the server's
+  `generated_at` back verbatim and "Mark reviewed" reuses the Home review route.
+- Home, the evidence browser, project bundles, collection context and saved searches shipped in
+  Sprints 50–51; the roadmap records each with its receipt.
 
-Set `PLAYWRIGHT_BASE_URL` / `PLAYWRIGHT_PORT` if the UI runs on a non-default port.
+## Test lanes
 
-### Configuration & Env
+- `npm run test:unit` (vitest, jsdom) over `frontend/src/__tests__` and co-located `*.test.tsx`; the
+  required CI context is `vitest`.
+- `npm run type-check` and `npm run lint` (`eslint --max-warnings=0`); both are required contexts.
+- `build-frontend-production` (required): the production build with the token gate, a check that the
+  admin routes are in the pages manifest, then Playwright against `next start` for the specs listed in
+  `.github/workflows/frontend-production-build.yml` (app-shell, mission-protocol, project-bundles,
+  collection-context, search-command, route-migration, graph, mission-dashboards, inbox).
+- After deploy: `.github/workflows/production-smoke.yml` runs `frontend/tests/e2e/production-smoke.spec.ts`
+  on a schedule and on dispatch, and every UI mission reruns the read-only direct-browser baseline
+  `frontend/scripts/ui-shell-smoke.mjs` (every route, Light and Dark, 1440 and 390 px, axe and overflow
+  checks under an America/Chicago clock) only after both Railway services report SUCCESS. Receipts live
+  under `cmos/reports/sprint-N/`.
 
-- `NEXT_PUBLIC_API_BASE_URL` (default `http://localhost:8000`) must point at the FastAPI service.
-- Optional `NEXT_PUBLIC_DEFAULT_PROJECT_ID` seeds the Mission form’s project selector.
-- Tailwind tokens live in `src/styles/globals.css` for palette + glassmorphism helpers.
+## Configuration
 
-Refer back to `docs/quality_gates.md` whenever adding UI functionality—the components intentionally mirror those validation heuristics to keep the Mission Protocol experience trustworthy.
+- `NEXT_PUBLIC_API_BASE_URL` (default `http://localhost:8000`) and `NEXT_PUBLIC_API_PATH_PREFIX`
+  (default `/api/v1`) select the API. Production points at `https://api.tracelab.aquex.ai`.
+- Deployment variables and Railway settings are in `docs/frontend_deployment_decisions.md`; local
+  commands are in `frontend/README.md`.
