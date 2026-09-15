@@ -1,0 +1,164 @@
+{
+  "mission_id": "MCP-2",
+  "sprint_id": "sprint-52",
+  "started_at": "2026-09-15T02:14:30.978Z",
+  "finished_at": "2026-09-15T02:14:43.768Z",
+  "api": "https://api.tracelab.aquex.ai",
+  "frontend": "https://tracelab.aquex.ai",
+  "read_only": true,
+  "source_merge": "606da9096da627dc0ffbf4210439d0dbe1627a26",
+  "deployments": [
+    "c8361637-83c3-4e15-a7eb-1df1fbd3706b",
+    "65b5d7c8-cb6f-4316-b15b-411240c3e19e"
+  ],
+  "artifact": {
+    "version": "1.1.1",
+    "published": false,
+    "tarball_sha256": "664e0da07d1775b67a6563b0c9efc9c8975a80ba174cf1114afbdba9e0551a8f",
+    "isolated_install": true,
+    "entrypoint_exercised_via_stdio": true,
+    "pack_files": 24
+  },
+  "authentication": {
+    "kind": "human X-API-Key",
+    "source": "existing local credential store",
+    "credential_logged": false,
+    "credential_in_receipt": false
+  },
+  "fixture_ids": {
+    "project": "0afcc588-e722-45bd-8320-f486601b877c",
+    "user": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+    "role": "admin"
+  },
+  "checks": [
+    {
+      "label": "installed tarball registry",
+      "passed": true,
+      "tools": 9,
+      "actions": 51,
+      "version": "1.1.1",
+      "tarball_sha256": "664e0da07d1775b67a6563b0c9efc9c8975a80ba174cf1114afbdba9e0551a8f"
+    },
+    {
+      "label": "project.neighborhood depth 1 group totals",
+      "passed": true,
+      "ms": 582,
+      "groups": 4,
+      "nodes": 31,
+      "edges": 30,
+      "truncated": true,
+      "node_types": [
+        "document",
+        "evidence",
+        "mission",
+        "project",
+        "report"
+      ]
+    },
+    {
+      "label": "project.neighborhood depth 2 group totals",
+      "passed": true,
+      "ms": 509,
+      "groups": 76,
+      "nodes": 58,
+      "edges": 123,
+      "truncated": true,
+      "node_types": [
+        "document",
+        "evidence",
+        "mission",
+        "project",
+        "report"
+      ]
+    },
+    {
+      "label": "home.attention totals",
+      "passed": true,
+      "ms": 332,
+      "total": 434,
+      "by_reason": {
+        "validation_failed": 8,
+        "blocked": 0,
+        "stalled": 0,
+        "unreviewed": 426
+      },
+      "dashboards": [
+        {
+          "key": "at_risk",
+          "total": 8
+        },
+        {
+          "key": "unreviewed",
+          "total": 426
+        }
+      ]
+    },
+    {
+      "label": "home.attention project scope",
+      "passed": true,
+      "total": 2,
+      "project_id": "0afcc588-e722-45bd-8320-f486601b877c"
+    },
+    {
+      "label": "mission.list reason totals",
+      "passed": true,
+      "ms": 417,
+      "reason_total": 434,
+      "plain_total": 435
+    },
+    {
+      "label": "mission.views live totals",
+      "passed": true,
+      "ms": 314,
+      "views": 0,
+      "totals": []
+    },
+    {
+      "label": "home.inbox_summary equals REST",
+      "passed": true,
+      "ms": 355,
+      "unread": {
+        "failures": 0,
+        "completions": 0,
+        "evidence": 0,
+        "total": 0
+      },
+      "seen_through": "2026-09-15T01:12:21.477892"
+    },
+    {
+      "label": "home.inbox_list failures total",
+      "passed": true,
+      "ms": 353,
+      "total": 8,
+      "items": 5,
+      "unread": 0
+    },
+    {
+      "label": "home.inbox_list completions total",
+      "passed": true,
+      "ms": 338,
+      "total": 427,
+      "items": 5,
+      "unread": 0
+    },
+    {
+      "label": "home.inbox_list evidence total",
+      "passed": true,
+      "ms": 344,
+      "total": 59,
+      "items": 5,
+      "unread": 0
+    },
+    {
+      "label": "home.snapshot missions total",
+      "passed": true,
+      "ms": 433,
+      "total": 435
+    }
+  ],
+  "passed": true,
+  "limitations": [
+    "Write actions (cancel, promote_report, process, collection update/add_document, report update) are exercised only in the local fake-API stdio contract; production performs no writes.",
+    "Totals are compared at call time; production data can change between the REST and MCP calls, so a mismatch is retried by rerunning the script rather than tolerated."
+  ]
+}
