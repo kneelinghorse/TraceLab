@@ -43,19 +43,19 @@ reused only when its API base matches `TRACELAB_API_URL`. Automation may set
 
 ## Tool surface
 
-The current source exposes nine action-clustered tools / 40 actions:
+The current source exposes nine action-clustered tools / 51 actions:
 
 | Tool | Actions |
 | --- | --- |
 | `tracelab_search` | `knowledge`, `navigate`, `pedr` |
-| `tracelab_project` | `list`, `create`, `update`, `stats`, `get` |
-| `tracelab_collection` | `list`, `get`, `export`, `create`, `add`, `synthesize`, `documents`, `mission_seed` |
-| `tracelab_report` | `create`, `list`, `get`, `export` |
-| `tracelab_document` | `upload`, `get_content`, `list` |
-| `tracelab_mission` | `create`, `list`, `get`, `update` |
-| `tracelab_mission_execution` | `submit`, `status`, `preview`, `logs`, `events` |
+| `tracelab_project` | `list`, `get`, `create`, `update`, `stats`, `neighborhood` |
+| `tracelab_collection` | `list`, `get`, `export`, `create`, `add`, `synthesize`, `documents`, `mission_seed`, `update`, `add_document` |
+| `tracelab_report` | `create`, `list`, `get`, `export`, `update` |
+| `tracelab_document` | `upload`, `get_content`, `list`, `process` |
+| `tracelab_mission` | `create`, `list`, `get`, `update`, `views` |
+| `tracelab_mission_execution` | `submit`, `status`, `preview`, `logs`, `events`, `cancel`, `promote_report` |
 | `tracelab_evidence` | `capture`, `note`, `list`, `search`, `promote`, `get` |
-| `tracelab_home` | `snapshot`, `favorites` |
+| `tracelab_home` | `snapshot`, `favorites`, `attention`, `inbox_summary`, `inbox_list` |
 
 
 Sprint 52 additions below are **source-only and unreleased**. The package remains
@@ -80,7 +80,10 @@ example, a mission list call is:
 See the package [README](../packages/tracelab-mcp/README.md) for full setup,
 action examples, authentication behavior, and troubleshooting. Its
 [Sprint 52 read parameter table](../packages/tracelab-mcp/README.md#sprint-52-read-parameters-unreleased)
-documents all eleven new reads and the existing action extensions.
+documents the eleven MCP-1 reads and the existing action extensions, and its
+[Sprint 52 actions and reads table](../packages/tracelab-mcp/README.md#sprint-52-actions-and-reads-mcp-2-unreleased)
+covers the MCP-2 actions and reads. Per-user acknowledgements and every DELETE
+route stay in the web UI by decision #426.
 `knowledge` keeps plain retrieval; optional `pedr` exposes multi-layer and graph
 diagnostics. Logs/events are persisted snapshots and explicitly report empty
 results; they do not promise live streaming.

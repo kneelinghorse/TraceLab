@@ -30,6 +30,27 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 - A real stdio MCP contract covering all 40 source actions, HTTP verbs, authentication,
   canonical links and content preservation. CI installs an `npm pack` tarball
   in a clean directory and exercises its actual entrypoint.
+- MCP-2: six non-destructive actions on research objects that mirror the exact
+  web routes: `tracelab_mission_execution` `cancel` (the only status an agent
+  may write, enforced by a literal schema) and `promote_report`,
+  `tracelab_document` `process`, `tracelab_collection` `update` and
+  `add_document`, and `tracelab_report` `update`.
+- MCP-2: Sprint 52 surface reads: `tracelab_project` `neighborhood` (canonical
+  links for all six node types), `tracelab_home` `attention`, `inbox_summary`
+  and `inbox_list`, `tracelab_mission` `views`, and a repeatable `reason`
+  filter on `tracelab_mission` `list` that leaves the plain request URL
+  byte-identical. Nine clusters now expose 51 actions; the stdio contract
+  asserts the count and every new verb, path and query string.
+
+### Changed
+
+- Upload `next_steps` now name `tracelab_document(action="process")` and
+  `tracelab_search(action="knowledge")` instead of a REST path and the retired
+  `search_knowledge` tool.
+- The UI parity manifest dispositions every remaining gap: eleven rows closed by
+  MCP-2 source actions, and per-user acknowledgements (result review, inbox
+  mark-seen, favorites, saved searches, saved views) plus every DELETE route
+  recorded as REST/UI-only by decision #426 (no delete approval recorded).
 
 ## [1.1.1] — 2026-08-21
 

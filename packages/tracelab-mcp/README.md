@@ -6,7 +6,7 @@ collection management, mission authoring, DeepSearch execution, and report
 generation, plus cross-session evidence capture — against a TraceLab knowledge
 base.
 
-- **9 action-clustered tools / 40 actions in source** (one tool per noun, dispatched by `action`)
+- **9 action-clustered tools / 51 actions in source** (one tool per noun, dispatched by `action`)
 - **RFC 8628 device-code login** — install, run, click a link, you're in
 - Works out of the box with **Claude Desktop**, **Claude Code**, and any
   Model Context Protocol client over stdio
@@ -174,20 +174,20 @@ never leak across deployments.
 
 ## Tools
 
-Nine action-clustered tools / 40 actions in source. Each cluster exposes multiple actions
+Nine action-clustered tools / 51 actions in source. Each cluster exposes multiple actions
 selected via the `action` parameter.
 
 | Cluster | Actions | Purpose |
 | --- | --- | --- |
 | `tracelab_search` | `knowledge`, `navigate`, `pedr` | Semantic search across the knowledge base. |
-| `tracelab_project` | `list`, `create`, `update`, `stats`, `get` | Project CRUD + aggregate stats. |
-| `tracelab_collection` | `list`, `get`, `export`, `create`, `add`, `synthesize`, `documents`, `mission_seed` | Curate chunks into collections, then synthesize. |
-| `tracelab_report` | `create`, `list`, `get`, `export` | Persistent named research reports. |
-| `tracelab_document` | `upload`, `get_content`, `list` | Document ingestion + full-text fetch. |
-| `tracelab_mission` | `create`, `list`, `get`, `update` | Mission CRUD against the DeepSearch authoring contract. |
-| `tracelab_mission_execution` | `submit`, `status`, `preview`, `logs`, `events` | DeepSearch lifecycle: queue, poll status, preview the compiled contract. |
+| `tracelab_project` | `list`, `get`, `create`, `update`, `stats`, `neighborhood` | Project CRUD, aggregate stats and the scoped relationship neighborhood. |
+| `tracelab_collection` | `list`, `get`, `export`, `create`, `add`, `synthesize`, `documents`, `mission_seed`, `update`, `add_document` | Curate chunks and documents into collections, edit their instructions, then synthesize. |
+| `tracelab_report` | `create`, `list`, `get`, `export`, `update` | Persistent named research reports, including title/status updates. |
+| `tracelab_document` | `upload`, `get_content`, `list`, `process` | Document ingestion, explicit processing and full-text fetch. |
+| `tracelab_mission` | `create`, `list`, `get`, `update`, `views` | Mission CRUD against the DeepSearch authoring contract, plus the caller's saved mission views. |
+| `tracelab_mission_execution` | `submit`, `status`, `preview`, `logs`, `events`, `cancel`, `promote_report` | DeepSearch lifecycle: queue, poll status, preview the compiled contract, cancel, promote a finished report to a document. |
 | `tracelab_evidence` | `capture`, `note`, `list`, `search`, `promote`, `get` | Capture sourced findings and working notes, reuse them across sessions, and promote a session to a report or document. |
-| `tracelab_home` | `snapshot`, `favorites` | Caller-scoped home and favorite project reads. |
+| `tracelab_home` | `snapshot`, `favorites`, `attention`, `inbox_summary`, `inbox_list` | Caller-scoped home, attention and inbox reads (human credential required). |
 
 
 Sprint 52 additions below are **source-only and unreleased**. The package remains
@@ -224,7 +224,10 @@ Existing actions also gain UI parameters:
 
 - `tracelab_search.knowledge`: optional `source_type`, `date_from`, `date_to`
   (YYYY-MM-DD), alongside the existing `query`, `limit`, `project_id` and `tags`.
-- `tracelab_mission.list`: optional `view` = `all`, `attention` or `queue`.
+- `tracelab_mission.list`: optional `view` = `all`, `attention` or `queue`, and a
+  repeatable `reason` list (`validation_failed`, `blocked`, `stalled`, `unreviewed`)
+  that requires `view=attention`. Without `view` or `reason` the request URL is
+  unchanged.
 - `tracelab_collection.list`: optional `project_id`, `page`, `page_size` (max 100).
   `get` returns `instructions`; `create` accepts optional `instructions` (max
   20,000 characters).
@@ -237,6 +240,31 @@ Existing actions also gain UI parameters:
 - `tracelab_report.export`: optional `format` = `md`, `json` or `txt` calls the
   REST export route and returns its exact text. Omit `format` to retain the
   legacy response of exact `report.content` bytes.
+
+### Sprint 52 actions and reads (MCP-2, unreleased)
+
+Six non-destructive actions on research objects and five caller-scoped reads
+mirror the exact REST routes the web UI calls. Per-user acknowledgements
+(result review, inbox mark-seen, favorites, saved searches and saved-view
+writes) and every DELETE route stay in the web UI by decision #426; the MCP
+never performs them on the user's behalf.
+
+| Action | Route and parameters |
+| --- | --- |
+| `tracelab_mission_execution.cancel` | `PATCH /missions/{id}` with `{status: "cancelled"}`. Required `mission_id`; `status` is optional and only ever `cancelled`. |
+| `tracelab_mission_execution.promote_report` | `POST /missions/{id}/promote-report`. Required `mission_id` (completed mission with a report or markdown). Returns the new document with `document_url`. |
+| `tracelab_document.process` | `POST /documents/{id}/process`. Required `document_id`. Runs parse, PII redaction, chunking and embedding. |
+| `tracelab_collection.update` | `PUT /collections/{id}`. Required `collection_id` plus at least one of `name`, `description`, `instructions` (max 20,000 characters). |
+| `tracelab_collection.add_document` | `POST /collections/{id}/documents` with `{document_id}`. Required `collection_id`, `document_id`. |
+| `tracelab_report.update` | `PUT /reports/{id}`. Required `report_id` plus `title` and/or `status` (`draft` or `final`). |
+| `tracelab_project.neighborhood` | `GET /graph/neighborhood`. Required `root_type` (project/document/mission/report/collection/evidence) and `root_id`. Optional `depth` (1, max 2), `per_relation_limit` (12, max 50), `max_nodes` (60, max 150). Nodes carry canonical links; groups carry server totals. |
+| `tracelab_home.attention` | `GET /home/attention`. Optional `project_id`. Reason counts and dashboard totals. |
+| `tracelab_mission.views` | `GET /mission-views`. No parameters. The caller's saved mission views with live totals and UI-equivalent links. |
+| `tracelab_home.inbox_summary` | `GET /inbox/summary`. No parameters. Unread counts behind the caller's seen watermark. |
+| `tracelab_home.inbox_list` | `GET /inbox`. Required `section` (`failures`, `completions`, `evidence`). Optional `page` (1), `page_size` (20, max 100), `unread_only`. |
+
+Home, inbox, attention and evidence routes reject service principals: use the
+device-code login or a user API key.
 
 ### Example calls
 

@@ -10,14 +10,18 @@
  *
  * Clusters:
  * 1. tracelab_search           — actions: knowledge, navigate, pedr
- * 2. tracelab_project          — actions: list, create, update, stats, get
- * 3. tracelab_collection       — actions: list, get, export, create, add, synthesize, documents, mission_seed
- * 4. tracelab_report           — actions: create, list, get, export
- * 5. tracelab_document         — actions: upload, get_content, list
- * 6. tracelab_mission          — actions: create, list, get, update (CRUD)
- * 7. tracelab_mission_execution — actions: submit, status, preview, logs, events (DS-bound lifecycle)
+ * 2. tracelab_project          — actions: list, create, update, stats, get, neighborhood
+ * 3. tracelab_collection       — actions: list, get, export, create, add, synthesize, documents, mission_seed, update, add_document
+ * 4. tracelab_report           — actions: create, list, get, export, update
+ * 5. tracelab_document         — actions: upload, get_content, list, process
+ * 6. tracelab_mission          — actions: create, list, get, update, views (CRUD + saved views)
+ * 7. tracelab_mission_execution — actions: submit, status, preview, logs, events, cancel, promote_report (DS-bound lifecycle)
  * 8. tracelab_evidence         — actions: capture, note, list, search, promote, get
- * 9. tracelab_home             — actions: snapshot, favorites
+ * 9. tracelab_home             — actions: snapshot, favorites, attention, inbox_summary, inbox_list
+ *
+ * MCP-2 (sprint-52): per-user acknowledgements (result review, inbox mark-seen,
+ * favorites, saved searches and saved views) and every DELETE route stay
+ * REST/UI-only by decision #426; see cmos/contracts/mcp-parity-manifest.json.
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -124,13 +128,18 @@ export const TOOLS: Tool[] = [
   {
     name: 'tracelab_project',
     description:
-      'Projects organize documents and research. Actions: get (full metadata; requires project_id), list (browse), create (new project), update (edit metadata), stats (aggregated counts: documents, chunks, reports, tokens). Required: action="create" needs name; action="update"/"stats" needs project_id.',
+      'Projects organize documents and research. Actions: get (full metadata; requires project_id), list (browse), create (new project), update (edit metadata), stats (aggregated counts: documents, chunks, reports, tokens), neighborhood (scoped relationship graph around root_type + root_id; depth 1-2, per_relation_limit, max_nodes; nodes carry canonical links and groups carry server totals). Required: action="create" needs name; action="update"/"stats" needs project_id; action="neighborhood" needs root_type and root_id.',
     inputSchema: {
       type: 'object',
       properties: {
+        root_type: { type: 'string', enum: ['project', 'document', 'mission', 'report', 'collection', 'evidence'], description: 'neighborhood: type of the root object.' },
+        root_id: { type: 'string', format: 'uuid', description: 'neighborhood: UUID of the root object.' },
+        depth: { type: 'integer', minimum: 1, maximum: 2, description: 'neighborhood: hops from the root (default 1).' },
+        per_relation_limit: { type: 'integer', minimum: 1, maximum: 50, description: 'neighborhood: shown neighbors per relation (default 12, matching the UI).' },
+        max_nodes: { type: 'integer', minimum: 1, maximum: 150, description: 'neighborhood: global node cap (default 60, matching the UI).' },
         action: {
           type: 'string',
-          enum: ['list', 'get', 'create', 'update', 'stats'],
+          enum: ['list', 'get', 'create', 'update', 'stats', 'neighborhood'],
           description: 'Project action. get: full project details. list: browse projects. create: new project. update: edit metadata. stats: aggregated counts for one project.',
         },
         project_id: {
@@ -185,16 +194,17 @@ export const TOOLS: Tool[] = [
   {
     name: 'tracelab_collection',
     description:
-      'Collections group related chunks for synthesis. Actions: documents (readable documents; page/page_size), mission_seed (authored mission inputs), list (project_id/page/page_size), get (with chunks and instructions), export (as markdown), create, add (a chunk), synthesize (generate summary/report from chunks; optional save as report). Required: action="get"/"export" needs collection_id; action="create" needs name; action="add" needs collection_id+chunk_id; action="synthesize" needs collection_id.',
+      'Collections group related chunks for synthesis. Actions: documents (readable documents; page/page_size), mission_seed (authored mission inputs), list (project_id/page/page_size), get (with chunks and instructions), export (as markdown), create, add (a chunk), synthesize (generate summary/report from chunks; optional save as report), update (name, description and/or instructions), add_document (link a readable document by document_id). Required: action="get"/"export"/"update" needs collection_id; action="add_document" needs collection_id+document_id; action="create" needs name; action="add" needs collection_id+chunk_id; action="synthesize" needs collection_id.',
     inputSchema: {
       type: 'object',
       properties: {
         page: { type: 'integer', minimum: 1, description: 'Page number (1-indexed).' },
         page_size: { type: 'integer', minimum: 1, maximum: 100, description: 'Results per page.' },
         instructions: { type: 'string', maxLength: 20000, description: 'Research instructions for collection create; returned by get.' },
+        document_id: { type: 'string', format: 'uuid', description: 'add_document: UUID of the readable document to link.' },
         action: {
           type: 'string',
-          enum: ['list', 'get', 'export', 'create', 'add', 'synthesize', 'documents', 'mission_seed'],
+          enum: ['list', 'get', 'export', 'create', 'add', 'synthesize', 'documents', 'mission_seed', 'update', 'add_document'],
           description: 'Collection action. documents: linked document page. mission_seed: mission drafting inputs. list: browse. get: detail with chunks. export: markdown bundle. create: new collection. add: add a chunk. synthesize: summary/report from chunks (citations included; optional save as report).',
         },
         collection_id: {
@@ -252,13 +262,13 @@ export const TOOLS: Tool[] = [
   {
     name: 'tracelab_report',
     description:
-      'Persistent reports — synthesized artifacts that survive across sessions. Actions: create (from a collection or specific chunks), list (with optional project/status filter), get (full content + citations + sources), export (explicit format md/json/txt; omitted format preserves report.content bytes). Required: action="create" needs title (and one of collection_id/chunk_ids); action="get"/"export" needs report_id.',
+      'Persistent reports — synthesized artifacts that survive across sessions. Actions: create (from a collection or specific chunks), list (with optional project/status filter), get (full content + citations + sources), export (explicit format md/json/txt; omitted format preserves report.content bytes), update (title and/or status draft|final). Required: action="create" needs title (and one of collection_id/chunk_ids); action="update" needs report_id and title or status; action="get"/"export" needs report_id.',
     inputSchema: {
       type: 'object',
       properties: {
         action: {
           type: 'string',
-          enum: ['create', 'list', 'get', 'export'],
+          enum: ['create', 'list', 'get', 'export', 'update'],
           description: 'Report action. create: synthesize a new persistent report. list: browse with filters. get: full details. export: explicit md/json/txt, or legacy content when omitted.',
         },
         report_id: {
@@ -319,7 +329,7 @@ export const TOOLS: Tool[] = [
   {
     name: 'tracelab_document',
     description:
-      'Document upload + retrieval. Actions: list (project_id, processed, search, page, page_size), upload (new doc through ingestion pipeline; supports PDF, DOCX, PPTX, CSV, XLSX, MD, TXT, JSON, XML, YAML), get_content (paginated full text assembled from chunks). Required: action="upload" needs name, content (base64), content_type, project_id; action="get_content" needs document_id.',
+      'Document upload + retrieval. Actions: list (project_id, processed, search, page, page_size), upload (new doc through ingestion pipeline; supports PDF, DOCX, PPTX, CSV, XLSX, MD, TXT, JSON, XML, YAML), get_content (paginated full text assembled from chunks), process (run the ingestion pipeline for an uploaded document: parse, redact, chunk, embed). Required: action="upload" needs name, content (base64), content_type, project_id; action="get_content"/"process" needs document_id.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -327,7 +337,7 @@ export const TOOLS: Tool[] = [
         search: { type: 'string', description: 'For list: document name query.' },
         action: {
           type: 'string',
-          enum: ['upload', 'get_content', 'list'],
+          enum: ['upload', 'get_content', 'list', 'process'],
           description: 'Document action. list: browse scoped documents. upload: ingest a new document. get_content: read full text with pagination.',
         },
         document_id: {
@@ -393,14 +403,15 @@ export const TOOLS: Tool[] = [
   {
     name: 'tracelab_mission',
     description:
-      'Research mission CRUD. Use tracelab_mission_execution for submit/status/preview (DeepSearch-bound lifecycle). Actions: create, list, get, update. project_id is required at create (T41.6) and editable on update (T41.5). action="get" returns slim payload by default; pass include_execution_metadata=true for full execution_metadata/result_protocol/result_markdown (T41.4). Required: action="create" needs mission_id, title, objective, success_criteria, project_id; action="get"/"update" needs mission_id. Related cluster: tracelab_mission_execution.',
+      'Research mission CRUD. Use tracelab_mission_execution for submit/status/preview/cancel/promote_report (DeepSearch-bound lifecycle). Actions: create, list, get, update, views (saved mission views owned by the caller, with live totals; requires a human credential). list accepts repeatable reason values (validation_failed, blocked, stalled, unreviewed) together with view=attention. project_id is required at create (T41.6) and editable on update (T41.5). action="get" returns slim payload by default; pass include_execution_metadata=true for full execution_metadata/result_protocol/result_markdown (T41.4). Required: action="create" needs mission_id, title, objective, success_criteria, project_id; action="get"/"update" needs mission_id. Related cluster: tracelab_mission_execution.',
     inputSchema: {
       type: 'object',
       properties: {
         view: { type: 'string', enum: ['all', 'attention', 'queue'], description: 'Scoped list view.' },
+        reason: { type: 'array', items: { type: 'string', enum: ['validation_failed', 'blocked', 'stalled', 'unreviewed'] }, minItems: 1, description: 'list: repeatable attention reasons; requires view=attention.' },
         action: {
           type: 'string',
-          enum: ['create', 'list', 'get', 'update'],
+          enum: ['create', 'list', 'get', 'update', 'views'],
           description: 'Mission CRUD action. create: new mission. list: browse with filters. get: full details (slim by default). update: modify before submission.',
         },
         mission_id: {
@@ -529,14 +540,15 @@ export const TOOLS: Tool[] = [
   {
     name: 'tracelab_mission_execution',
     description:
-      'Mission execution lifecycle (DeepSearch-bound). Use tracelab_mission for create/list/get/update. Actions: submit (queue for execution), status (lightweight progress poll), preview (compile DS contract without spending a paid loop — returns named_entities, objectives, evidence_slots, acceptance_checks, deliverable_schemas, coverage/validation thresholds; useful for iterating on authoring fields). logs returns recorded lines; events returns recent events. Empty results report unavailable observations; streaming is dormant. All actions except events require mission_id. Related cluster: tracelab_mission.',
+      'Mission execution lifecycle (DeepSearch-bound). Use tracelab_mission for create/list/get/update. Actions: cancel (the only status an agent may write: cancelled), promote_report (turn the report or markdown of a completed mission into a searchable document), submit (queue for execution), status (lightweight progress poll), preview (compile DS contract without spending a paid loop — returns named_entities, objectives, evidence_slots, acceptance_checks, deliverable_schemas, coverage/validation thresholds; useful for iterating on authoring fields). logs returns recorded lines; events returns recent events. Empty results report unavailable observations; streaming is dormant. All actions except events require mission_id. Related cluster: tracelab_mission.',
     inputSchema: {
       type: 'object',
       properties: {
         limit: { type: 'integer', minimum: 1, maximum: 500, description: 'logs: 1-500 (default 100); events: 1-200 (default 50).' },
+        status: { type: 'string', enum: ['cancelled'], description: 'cancel: optional and only ever "cancelled"; any other value is rejected.' },
         action: {
           type: 'string',
-          enum: ['submit', 'status', 'preview', 'logs', 'events'],
+          enum: ['submit', 'status', 'preview', 'logs', 'events', 'cancel', 'promote_report'],
           description: 'Execution action. logs: recorded lines. events: recent persisted events. submit: queue for DeepSearch (draft → queued). status: lightweight status+progress poll. preview: compile contract without submitting (read-only, free).',
         },
         mission_id: {
@@ -703,11 +715,13 @@ export const TOOLS: Tool[] = [
   },
   {
     name: 'tracelab_home',
-    description: 'Caller-scoped home snapshot and paginated favorite projects. Server totals are preserved; every request is fresh. Actions: snapshot (attention, active runs, recent reports/projects and evidence activity), favorites (page, page_size, project_id).',
+    description: 'Caller-scoped home, attention and inbox reads. Server totals are preserved; every request is fresh. A human credential is required (device-code login or a user API key); service principals are rejected. Actions: snapshot (attention, active runs, recent reports/projects and evidence activity), favorites (page, page_size, project_id), attention (reason counts and dashboard totals; optional project_id), inbox_summary (unread counts behind the caller\'s seen watermark), inbox_list (section failures|completions|evidence, page, page_size, unread_only). Marking the inbox as seen and reviewing results stay in the UI (decision #395).',
     inputSchema: {
       type: 'object',
       properties: {
-        action: { type: 'string', enum: ['snapshot', 'favorites'] },
+        action: { type: 'string', enum: ['snapshot', 'favorites', 'attention', 'inbox_summary', 'inbox_list'] },
+        section: { type: 'string', enum: ['failures', 'completions', 'evidence'], description: 'inbox_list: required section.' },
+        unread_only: { type: 'boolean', description: 'inbox_list: only items newer than the seen watermark.' },
         page: { type: 'integer', minimum: 1 },
         page_size: { type: 'integer', minimum: 1, maximum: 100 },
         project_id: { type: 'string', format: 'uuid' },
@@ -911,12 +925,19 @@ const CreateMissionInput = z.object({
   ...MissionAuthoringFieldsSchema,
 });
 
+const AttentionReasonSchema = z.enum(['validation_failed', 'blocked', 'stalled', 'unreviewed']);
+
 const ListMissionsInput = z.object({
   view: z.enum(['all', 'attention', 'queue']).optional(),
+  // UX-12: repeatable attention reasons; the API rejects them without view=attention.
+  reason: z.array(AttentionReasonSchema).min(1).optional(),
   status: z.enum(['draft', 'queued', 'in_progress', 'completed', 'blocked', 'cancelled', 'validation_failed']).optional(),
   project_id: z.string().uuid().optional(),
   page: z.number().min(1).optional().default(1),
   page_size: z.number().min(1).max(100).optional().default(20),
+}).refine((input) => input.reason === undefined || input.view === 'attention', {
+  message: 'reason requires view="attention"',
+  path: ['reason'],
 });
 
 const GetMissionInput = z.object({
@@ -1070,6 +1091,45 @@ const ListCollectionsInput = z.object({ project_id: z.string().uuid().optional()
 const CollectionDocumentsInput = GetCollectionInput.extend(PageFields);
 const MissionLogsInput = z.object({ mission_id: z.string().uuid(), limit: z.number().int().min(1).max(500).default(100) });
 const MissionEventsInput = z.object({ mission_id: z.string().uuid().optional(), limit: z.number().int().min(1).max(200).default(50) });
+
+// MCP-2 (sprint-52): non-destructive actions and Sprint 52 surface reads.
+// cancel is deliberately not a generic status write: the literal is the only
+// value Zod accepts and the only value the client ever sends.
+const CancelMissionInput = z.object({ mission_id: z.string().uuid(), status: z.literal('cancelled').default('cancelled') });
+const PromoteReportInput = z.object({ mission_id: z.string().uuid() });
+const ProcessDocumentInput = z.object({ document_id: z.string().uuid() });
+const UpdateCollectionInput = z.object({
+  collection_id: z.string().uuid(),
+  name: z.string().trim().min(1).max(255).optional(),
+  description: z.string().max(2000).optional(),
+  instructions: z.string().max(20000).optional(),
+}).refine((input) => input.name !== undefined || input.description !== undefined || input.instructions !== undefined, {
+  message: 'Provide at least one of name, description or instructions',
+});
+const AddDocumentToCollectionInput = z.object({ collection_id: z.string().uuid(), document_id: z.string().uuid() });
+const UpdateReportInput = z.object({
+  report_id: z.string().uuid(),
+  title: z.string().trim().min(1).max(255).optional(),
+  status: z.enum(['draft', 'final']).optional(),
+}).refine((input) => input.title !== undefined || input.status !== undefined, {
+  message: 'Provide at least one of title or status',
+});
+const NeighborhoodInput = z.object({
+  root_type: z.enum(['project', 'document', 'mission', 'report', 'collection', 'evidence']),
+  root_id: z.string().uuid(),
+  depth: z.union([z.literal(1), z.literal(2)]).default(1),
+  per_relation_limit: z.number().int().min(1).max(50).default(12),
+  max_nodes: z.number().int().min(1).max(150).default(60),
+});
+const AttentionInput = z.object({ project_id: z.string().uuid().optional() });
+const MissionViewsInput = z.object({});
+const InboxSummaryInput = z.object({});
+const InboxListInput = z.object({
+  section: z.enum(['failures', 'completions', 'evidence']),
+  page: z.number().int().min(1).default(1),
+  page_size: z.number().int().min(1).max(100).default(20),
+  unread_only: z.boolean().optional(),
+});
 
 // Tool handlers
 async function handleSearchPedr(args: unknown) {
@@ -1672,8 +1732,8 @@ async function handleUploadDocument(args: unknown) {
             next_steps: [
               `Document ID: ${result.id}`,
               'The document is now queued for processing (parsing, PII redaction, chunking, embedding).',
-              `To process immediately, call POST /api/v1/documents/${result.id}/process`,
-              'Once processed, the document will be searchable via search_knowledge.',
+              `To process immediately, call tracelab_document(action="process", document_id="${result.id}").`,
+              'Once processed, the document is searchable via tracelab_search(action="knowledge").',
             ],
           },
           null,
@@ -1870,7 +1930,8 @@ export async function handleListMissions(args: unknown) {
     input.page_size,
     input.status,
     input.project_id,
-    input.view
+    input.view,
+    input.reason
   );
 
   // T41.4: list responses are always slim — N×full was the original payload
@@ -2231,6 +2292,86 @@ function rawJsonResponse(result: unknown) {
   };
 }
 
+// MCP-2 (sprint-52): non-destructive actions on research objects.
+async function handleCancelMission(args: unknown) {
+  const input = CancelMissionInput.parse(args);
+  const result = await client.cancelMission(input.mission_id);
+  return rawJsonResponse({
+    message: `Mission "${result.mission_id}" cancelled`,
+    mission: { id: result.id, url: canonicalLink('mission', result.id), mission_id: result.mission_id, title: result.title, status: result.status, updated_at: result.updated_at },
+  });
+}
+
+async function handlePromoteMissionReport(args: unknown) {
+  const input = PromoteReportInput.parse(args);
+  const result = await client.promoteMissionReport(input.mission_id);
+  return rawJsonResponse({ ...result, url: canonicalLink('mission', input.mission_id), document_url: canonicalLink('document', result.document_id) });
+}
+
+async function handleProcessDocument(args: unknown) {
+  const input = ProcessDocumentInput.parse(args);
+  const result = await client.processDocument(input.document_id);
+  return rawJsonResponse({ ...result, document_id: input.document_id, url: canonicalLink('document', input.document_id) });
+}
+
+async function handleUpdateCollection(args: unknown) {
+  const { collection_id, ...data } = UpdateCollectionInput.parse(args);
+  const result = await client.updateCollection(collection_id, data);
+  return rawJsonResponse({ message: `Collection "${result.name}" updated`, collection: { ...result, url: canonicalLink('collection', result.id) } });
+}
+
+async function handleAddDocumentToCollection(args: unknown) {
+  const input = AddDocumentToCollectionInput.parse(args);
+  const result = await client.addDocumentToCollection(input.collection_id, input.document_id);
+  return rawJsonResponse({ ...result, url: canonicalLink('document', result.id), collection_url: canonicalLink('collection', input.collection_id) });
+}
+
+async function handleUpdateReport(args: unknown) {
+  const { report_id, ...data } = UpdateReportInput.parse(args);
+  const result = await client.updateReport(report_id, data);
+  return rawJsonResponse({ message: `Report "${result.title}" updated`, report: { ...result, url: canonicalLink('report', result.id) } });
+}
+
+// MCP-2 (sprint-52): Sprint 52 surface reads. Generated links go through the
+// canonical helper; hrefs and authored fields are preserved (learning #174).
+async function handleNeighborhood(args: unknown) {
+  const input = NeighborhoodInput.parse(args);
+  const result = await client.getNeighborhood({ root_type: input.root_type, root_id: input.root_id, depth: input.depth, per_relation_limit: input.per_relation_limit, max_nodes: input.max_nodes });
+  const withLink = (node: import('./api-client.js').GraphNode) => ({ ...node, url: canonicalLink(node.type, node.id) });
+  return rawJsonResponse({ ...result, root: withLink(result.root), nodes: result.nodes.map(withLink) });
+}
+
+async function handleAttention(args: unknown) {
+  return rawJsonResponse(await client.getAttention(AttentionInput.parse(args)));
+}
+
+/** Mirror the UI's saved-view link so agents land on the same filtered list. */
+function missionViewHref(filters: import('./api-client.js').MissionViewFilters): string {
+  const params = new URLSearchParams();
+  if (filters.view) params.set('view', filters.view);
+  for (const reason of filters.reason ?? []) params.append('reason', reason);
+  if (filters.status) params.set('status', filters.status);
+  if (filters.project_id) params.set('project_id', filters.project_id);
+  const query = params.toString();
+  return `/missions${query ? `?${query}` : ''}`;
+}
+
+async function handleMissionViews(args: unknown) {
+  MissionViewsInput.parse(args);
+  const result = await client.listMissionViews();
+  return rawJsonResponse({ ...result, items: result.items.map(view => ({ ...view, href: missionViewHref(view.filters), url: new URL(missionViewHref(view.filters), canonicalFrontendOrigin()).href })) });
+}
+
+async function handleInboxSummary(args: unknown) {
+  InboxSummaryInput.parse(args);
+  return rawJsonResponse(await client.getInboxSummary());
+}
+
+async function handleInboxList(args: unknown) {
+  const result = await client.listInbox(InboxListInput.parse(args));
+  return rawJsonResponse({ ...result, items: result.items.map(withHrefUrl) });
+}
+
 async function handleCaptureEvidence(args: unknown) {
   const input = CaptureEvidenceInput.parse(args);
   const result = await client.captureEvidence(input);
@@ -2313,10 +2454,12 @@ export async function handleTracelabSearch(args: unknown) {
   }
 }
 
-const PROJECT_ACTIONS = ['list', 'get', 'create', 'update', 'stats'] as const;
+const PROJECT_ACTIONS = ['list', 'get', 'create', 'update', 'stats', 'neighborhood'] as const;
 export async function handleTracelabProject(args: unknown) {
   const action = getAction(args);
   switch (action) {
+    case 'neighborhood':
+      return await handleNeighborhood(args);
     case 'get':
       return await handleGetProject(args);
     case 'list':
@@ -2341,10 +2484,16 @@ const COLLECTION_ACTIONS = [
   'synthesize',
   'documents',
   'mission_seed',
+  'update',
+  'add_document',
 ] as const;
 export async function handleTracelabCollection(args: unknown) {
   const action = getAction(args);
   switch (action) {
+    case 'update':
+      return await handleUpdateCollection(args);
+    case 'add_document':
+      return await handleAddDocumentToCollection(args);
     case 'documents':
       return await handleCollectionDocuments(args);
     case 'mission_seed':
@@ -2366,10 +2515,12 @@ export async function handleTracelabCollection(args: unknown) {
   }
 }
 
-const REPORT_ACTIONS = ['create', 'list', 'get', 'export'] as const;
+const REPORT_ACTIONS = ['create', 'list', 'get', 'export', 'update'] as const;
 export async function handleTracelabReport(args: unknown) {
   const action = getAction(args);
   switch (action) {
+    case 'update':
+      return await handleUpdateReport(args);
     case 'create':
       return await handleCreateReport(args);
     case 'list':
@@ -2383,10 +2534,12 @@ export async function handleTracelabReport(args: unknown) {
   }
 }
 
-const DOCUMENT_ACTIONS = ['upload', 'get_content', 'list'] as const;
+const DOCUMENT_ACTIONS = ['upload', 'get_content', 'list', 'process'] as const;
 export async function handleTracelabDocument(args: unknown) {
   const action = getAction(args);
   switch (action) {
+    case 'process':
+      return await handleProcessDocument(args);
     case 'list':
       return await handleListDocuments(args);
     case 'upload':
@@ -2398,10 +2551,12 @@ export async function handleTracelabDocument(args: unknown) {
   }
 }
 
-const MISSION_ACTIONS = ['create', 'list', 'get', 'update'] as const;
+const MISSION_ACTIONS = ['create', 'list', 'get', 'update', 'views'] as const;
 export async function handleTracelabMission(args: unknown) {
   const action = getAction(args);
   switch (action) {
+    case 'views':
+      return await handleMissionViews(args);
     case 'create':
       return await handleCreateMission(args);
     case 'list':
@@ -2415,10 +2570,14 @@ export async function handleTracelabMission(args: unknown) {
   }
 }
 
-const MISSION_EXECUTION_ACTIONS = ['submit', 'status', 'preview', 'logs', 'events'] as const;
+const MISSION_EXECUTION_ACTIONS = ['submit', 'status', 'preview', 'logs', 'events', 'cancel', 'promote_report'] as const;
 export async function handleTracelabMissionExecution(args: unknown) {
   const action = getAction(args);
   switch (action) {
+    case 'cancel':
+      return await handleCancelMission(args);
+    case 'promote_report':
+      return await handlePromoteMissionReport(args);
     case 'logs':
       return await handleMissionLogs(args);
     case 'events':
@@ -2459,12 +2618,15 @@ export async function handleTracelabEvidence(args: unknown) {
   }
 }
 
-const HOME_ACTIONS = ['snapshot', 'favorites'] as const;
+const HOME_ACTIONS = ['snapshot', 'favorites', 'attention', 'inbox_summary', 'inbox_list'] as const;
 export async function handleTracelabHome(args: unknown) {
   const action = getAction(args);
   switch (action) {
     case 'snapshot': return await handleHomeSnapshot(args);
     case 'favorites': return await handleFavorites(args);
+    case 'attention': return await handleAttention(args);
+    case 'inbox_summary': return await handleInboxSummary(args);
+    case 'inbox_list': return await handleInboxList(args);
     default: return unknownAction('tracelab_home', action, HOME_ACTIONS);
   }
 }

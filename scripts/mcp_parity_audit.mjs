@@ -9,7 +9,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(path.join(ROOT, 'packages/tracelab-mcp/package.json'));
 const ts = require('typescript');
 const methods = new Set(['get', 'post', 'put', 'patch', 'delete', 'head', 'options']);
-const classifications = new Set(['covered', 'partial', 'closed-MCP-1', 'rest-only-by-design', 'deferred-MCP-2', 'needs-derek', 'dead-client-code']);
+const classifications = new Set(['covered', 'partial', 'closed-MCP-1', 'closed-MCP-2', 'rest-only-by-design', 'deferred-MCP-2', 'needs-derek', 'dead-client-code']);
 
 function filesUnder(directory) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
@@ -171,7 +171,7 @@ export function audit(operations, manifest, actions) {
       const separator = row.mcp.lastIndexOf('.');
       const tool = row.mcp.slice(0, separator), action = row.mcp.slice(separator + 1);
       if (!actions[tool]?.includes(action)) errors.push(`Missing CLUSTER_ACTIONS action ${row.mcp}: ${operation.id}`);
-    } else if (row.mcp !== null || ['covered', 'partial', 'closed-MCP-1'].includes(row.classification)) errors.push(`Invalid or missing MCP mapping: ${operation.id}`);
+    } else if (row.mcp !== null || ['covered', 'partial', 'closed-MCP-1', 'closed-MCP-2'].includes(row.classification)) errors.push(`Invalid or missing MCP mapping: ${operation.id}`);
   }
   for (const id of rows.keys()) errors.push(`Stale manifest operation: ${id}`);
   return errors;
