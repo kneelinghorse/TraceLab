@@ -43,7 +43,7 @@ reused only when its API base matches `TRACELAB_API_URL`. Automation may set
 
 ## Tool surface
 
-The current source exposes nine action-clustered tools / 51 actions:
+Version 1.2.0 exposes nine action-clustered tools / 51 actions:
 
 | Tool | Actions |
 | --- | --- |
@@ -58,9 +58,9 @@ The current source exposes nine action-clustered tools / 51 actions:
 | `tracelab_home` | `snapshot`, `favorites`, `attention`, `inbox_summary`, `inbox_list` |
 
 
-Sprint 52 additions below are **source-only and unreleased**. The package remains
-version 1.1.1; MCP-3 will publish once the sprint source and artifact checks pass.
-Installing 1.1.1 from npm does not yet provide these new actions.
+Sprint 52 additions ship in **1.2.0**, the single publish that decision #425
+called for after every Sprint 52 MCP change landed. Installing 1.1.1 from npm
+does not provide these actions.
 
 Each call names one cluster and selects an operation with `action`. For
 example, a mission list call is:
@@ -79,9 +79,9 @@ example, a mission list call is:
 
 See the package [README](../packages/tracelab-mcp/README.md) for full setup,
 action examples, authentication behavior, and troubleshooting. Its
-[Sprint 52 read parameter table](../packages/tracelab-mcp/README.md#sprint-52-read-parameters-unreleased)
+[Sprint 52 read parameter table](../packages/tracelab-mcp/README.md#sprint-52-read-parameters-120)
 documents the eleven MCP-1 reads and the existing action extensions, and its
-[Sprint 52 actions and reads table](../packages/tracelab-mcp/README.md#sprint-52-actions-and-reads-mcp-2-unreleased)
+[Sprint 52 actions and reads table](../packages/tracelab-mcp/README.md#sprint-52-actions-and-reads-mcp-2-120)
 covers the MCP-2 actions and reads. Per-user acknowledgements and every DELETE
 route stay in the web UI by decision #426.
 `knowledge` keeps plain retrieval; optional `pedr` exposes multi-layer and graph
