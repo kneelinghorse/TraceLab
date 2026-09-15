@@ -191,35 +191,25 @@ Key decisions carried forward: hexagonal boundaries stay (routers → services �
 
 **What moved to Sprint 53:** the thirteen Sprint 51 next-steps (#254, #262, #275, #279–#290) and three Sprint 52 follow-ups (#307 argument-level parity check, #312 inbox `updated_at` resurfacing, #323 hygiene: the unused `@tailwindcss/postcss` dependency and the `npm pkg fix` warning raised at publish) were carried in CMOS; the email provider mission (decision #455) is added below. THEME-2 stays deferred to Sprint 54.
 
-### Sprint 53 — Hardening and Measurement
+### Sprint 53 — UX Correction (re-planned 2026-09-15)
 
-**Goal:** prove the overhaul holds and automate the proof.
+**Goal:** fix what Derek's 2026-09-15 walkthrough of the deployed app found, in his order. The hardening slate below moved to Sprint 54.
 
-- Accessibility AA sweep in accepted Light and Dark themes; High contrast acceptance is deferred under THEME-2 to Sprint54 (decision #408). Include the pre-existing phone Settings action-label wrapping recorded in UX-10 (Revoke/Copy/Delete and invite status; visible in the accepted UX-9 baseline too).
-- Performance budgets on Home, search and mission run view.
-- Stage1 drift scan against the April 2026 fingerprint baseline; results archived as the new baseline.
-- Extend the existing deployed frontend smoke and route-map coverage with automated phone-width overflow checks (the S48 lesson).
-- Retirement of every legacy component and route alias that Sprint 51 marked deprecated.
+Missions (CMOS is authoritative for status):
 
-**Added at Sprint 52 planning:**
+- **PAL-2** — Re-pin the vendored tokens to Forge's current Brand A. The third palette verification confirmed TraceLab renders Brand A from `114a268` verbatim (zero overrides), that Forge never certified that bundle, and that Forge rewrote Brand A to a neutral palette on 2026-09-12/13 (601 of 916 vendored variables differ). Built first because every later screenshot depends on it.
+- **FAV-1** — Favicon and app icon set. None exists today; the sidebar "T" is a styled span.
+- **NAV-2** — Theme switcher moves to an Appearance section on `/settings`; sidebar footer shrinks to the account row.
+- **ACT-1** — Recent activity replaces the inbox, Needs attention, dashboards and the review concept. Home shows one newest-first stream across missions, evidence and reports; status is a label and never affects order; an entry is new until opened or marked viewed; nav badges count new items. Removes `/inbox`, `/home/attention`, mission reviews, the inbox watermark and attention-rank ordering.
+- **PROJ-2** — One create pattern: `/projects/new` and `/collections/new` like `/missions/new`; `research_type` hidden from the UI, column kept.
+- **DOCV-1** — Document reader: full text is the default document view, stats and chunks become tabs, slim content endpoint, and documents and evidence link to the rendered report.
+- **MISS-2** — Missions page back to a multi-column card grid: stats strip, dashboards, saved views (backend, MCP tool, migration 047) and the attention buttons removed; newest-first default with a sort control and one filter row.
+- **NOTIFY-1** — Email notifications via Resend (decision #455; Derek chose Resend and holds the key; `RESEND_API_KEY` and `RESEND_FROM_ADDRESS` on the Railway TraceLab service).
+- **CI-6** — Post-deploy smoke on every main push, including receipt-only merges (next-step #286).
 
-- Gate `GET /api/v1/graph/stats`, which returns corpus-wide counts without authentication.
-- Scope `GET /api/v1/missions/{id}/related` by caller, including its related entities and its cache key.
-- Exclude soft-deleted mission result documents from `GET /api/v1/pedr/related` and remove its per-neighbor scope lookups.
-- Retire dead frontend client code: the `/mission-protocols` calls, `useQualityReport`, `getRelationshipContext`, `getWorkerHealth` and `ExportButtons`.
-- Promote `mcp-package` to a required check once it has five qualifying main pushes.
-- Stop result materialization's `updated_at` bump from resurfacing reviewed completions as unreviewed.
-- Performance budgets for the graph neighborhood, per-view attention totals and inbox summary polling.
-- A mutation-free production fixture that proves the project-owner document read path.
-- Smoke automation for docs-only and receipt-only merges, which still rebuild production.
+After the missions land: live testing of missions in motion (queue, progress, active runs) with Derek before any further UI planning.
 
-
-**Added at Sprint 52 close:**
-
-- Email notification provider (decision #455): Derek chooses the vendor and account; the mission wires completion and failure notifications on top of the per-user inbox model (`user_inbox_state` watermark, `mission_attention` predicates), keeps in-app delivery as the source of truth, and records credential handling. Until it ships, notifications stay in-app only.
-- MCP deletes stay REST/UI-only as a standing rule (decision #454); the parity manifest's `rest-only-by-design` rows for the seven DELETE routes need no further approval note.
-- Package hygiene: run `npm pkg fix` on `packages/tracelab-mcp` (npm auto-corrected a field at the 1.2.0 publish) and drop the unused `@tailwindcss/postcss` dependency from `frontend/package.json`.
-- The sixteen next-steps carried in CMOS: #254, #262, #275, #279–#290 from Sprint 51; #307 (argument-level parity check in `scripts/mcp_parity_audit.mjs`), #312 (inbox `updated_at` resurfacing after result materialization) and #323 from Sprint 52.
+**Moved to Sprint 54 (formerly the Sprint 53 hardening slate):** AA sweep in Light and Dark, performance budgets (baseline-relative per decision #458), Stage1 drift scan, automated phone-width overflow checks, retirement of deprecated aliases and legacy components, the Sprint 52 planning deferrals (gate `GET /api/v1/graph/stats`, scope `/missions/{id}/related`, `/pedr/related` soft-delete exclusion, dead frontend client code, promote `mcp-package` to required, owner read-path fixture), package hygiene, argument-level parity check (#307), and THEME-2. Next-step #312 (reviewed-completion resurfacing) is obsolete once ACT-1 removes reviews.
 
 ### Beyond Sprint 53 (not scheduled)
 
@@ -346,3 +336,4 @@ _Truth in data, evidence as the connective tissue, one system._
 - **2026-09-14 UTC, Sprint 51 review** — Definition of Done gains rules 8 and 9: the post-SUCCESS 31-route baseline rerun with deployment ids, and the active-data visual review under a non-UTC clock. Both already governed Sprint 51 through decision #400 and learning #173 but were missing from this section.
 - **2026-09-14 UTC, Sprint 52 open** — Sprint 52 created in CMOS with eleven missions (CI-5, SEC-1, SEC-2, MCP-1, GRAPH-1, UX-11, UX-12, UX-13, MCP-2, MCP-3, DOC-1) and identity synced to `sprint-52-active`. Derek decided that a project owner keeps document read access (decision #424) and that the MCP package publishes once after all MCP changes (decision #425). Deferrals found while grounding the slate were added to the Sprint 53 section.
 - **2026-09-15 UTC, Sprint 52 close** — Eleven missions accepted with post-merge main-push CI, both Railway deployment ids and production receipts each. `@aquex/tracelab-mcp` 1.2.0 is published (Derek ran the OTP-gated publish; agent-prepared tag checkout and fresh-install smoke). Derek closed the two open questions: no MCP deletes (decision #454) and yes to an email provider (decision #455, Sprint 53). Sixteen next-steps carried to the Sprint 53 shell; identity synced to `sprint-52-complete`; `cmos/context/MASTER_CONTEXT.json` regenerated per decision #420.
+- **2026-09-15 UTC, Sprint 53 open** — Sprint 53 re-planned from Derek's walkthrough of the deployed app (favicon, theme switcher placement, status-pinned attention and inbox with no dismissal, three project-create patterns and dead research types, no document reader, single-column missions page with dashboards and saved views, palette). Nine missions created (PAL-2, FAV-1, NAV-2, ACT-1, PROJ-2, DOCV-1, MISS-2, NOTIFY-1, CI-6); hardening slate moved to Sprint 54; identity synced to `sprint-53-active`; `cmos/context/MASTER_CONTEXT.json` regenerated per decision #420.
