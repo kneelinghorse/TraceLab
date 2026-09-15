@@ -1,0 +1,799 @@
+{
+  "mission_id": "MCP-2",
+  "sprint_id": "sprint-52",
+  "generated_at": "2026-09-15T02:15:20.837650+00:00",
+  "status": "validated_pending_receipt_merge",
+  "session_id": "PS-2026-09-15-002",
+  "source": {
+    "base_commit": "9587a4db698471c943a9d81ef625671e6b9a13d0",
+    "pr": "https://github.com/kneelinghorse/TraceLab/pull/304",
+    "source_head": "05b8efac8b0e39fa20a8302f25fae335e6d22690",
+    "merge_commit": "606da9096da627dc0ffbf4210439d0dbe1627a26",
+    "package_version": "1.1.1",
+    "published": false
+  },
+  "decisions": [
+    425,
+    426,
+    449
+  ],
+  "learnings_applied": [
+    174,
+    176,
+    177,
+    191
+  ],
+  "scope": {
+    "tools": 9,
+    "actions": 51,
+    "actions_before": 40,
+    "new_actions": [
+      "tracelab_mission_execution.cancel",
+      "tracelab_mission_execution.promote_report",
+      "tracelab_document.process",
+      "tracelab_collection.update",
+      "tracelab_collection.add_document",
+      "tracelab_report.update",
+      "tracelab_project.neighborhood",
+      "tracelab_home.attention",
+      "tracelab_mission.views",
+      "tracelab_home.inbox_summary",
+      "tracelab_home.inbox_list"
+    ],
+    "extended_actions": [
+      "tracelab_mission.list reason (repeatable, requires view=attention; plain URL byte-identical)"
+    ],
+    "upload_next_steps": "point at tracelab_document(action=\"process\") and tracelab_search(action=\"knowledge\"); no REST path or search_knowledge mention",
+    "planning_estimate_note": "The spec expected 50 actions; the repeatable reason filter extends tracelab_mission.list rather than adding an action, so the measured count is 51."
+  },
+  "local_validation": {
+    "mcp_unit": {
+      "command": "npm run test:run",
+      "passed": 146,
+      "failed": 0,
+      "skipped": 0,
+      "new_file": "src/mcp2-actions.test.ts (12 tests)",
+      "count_assertion": "index.test.ts asserts 9 tools / 51 actions"
+    },
+    "stdio_contract": {
+      "command": "npm run test:contract",
+      "passed": 66,
+      "generated_links": 68,
+      "http_requests": 67,
+      "count_assertion": "check-canonical-links.mjs asserts 9 tools / 51 actions and the exact verbs, paths, query strings and bodies of every MCP-2 action"
+    },
+    "clean_package": {
+      "command": "npm run test:package",
+      "passed": 66,
+      "generated_links": 68,
+      "http_requests": 67,
+      "note": "npm pack tarball installed in a clean directory; same stdio contract against the installed entrypoint"
+    },
+    "audit_tests": {
+      "command": "node --test scripts/mcp_parity_audit.test.mjs",
+      "passed": 4,
+      "failed": 0
+    },
+    "parity_audit": {
+      "command": "node scripts/mcp_parity_audit.mjs",
+      "exit": 0,
+      "operations": 111,
+      "live": 104,
+      "dead": 7,
+      "tools": 9,
+      "actions": 51,
+      "classifications": {
+        "covered": 18,
+        "partial": 0,
+        "closed-MCP-1": 18,
+        "closed-MCP-2": 11,
+        "rest-only-by-design": 57,
+        "deferred-MCP-2": 0,
+        "needs-derek": 0,
+        "dead-client-code": 7
+      }
+    },
+    "lint": {
+      "claimed": false,
+      "reason": "eslint is neither a package dev dependency nor a step in .github/workflows/mcp-package.yml; the package lint script cannot run locally and CI does not gate on it"
+    },
+    "pre_merge_production_dry_run": {
+      "note": "The read-only harness was dry-run against the current source tarball before merge: 12/12 checks passed; the post-merge run is the one recorded in mcp-2-production.json"
+    }
+  },
+  "parity": {
+    "totals": {
+      "operations": 111,
+      "live": 104,
+      "dead": 7,
+      "tools": 9,
+      "actions": 51,
+      "classifications": {
+        "covered": 18,
+        "partial": 0,
+        "closed-MCP-1": 18,
+        "closed-MCP-2": 11,
+        "rest-only-by-design": 57,
+        "deferred-MCP-2": 0,
+        "needs-derek": 0,
+        "dead-client-code": 7
+      }
+    },
+    "errors": [],
+    "closed_mcp2_rows": [
+      {
+        "operation": "collectionsApi.addDocument",
+        "method": "POST",
+        "path": "/api/v1/collections/{collectionId}/documents",
+        "mcp": "tracelab_collection.add_document"
+      },
+      {
+        "operation": "collectionsApi.update",
+        "method": "PUT",
+        "path": "/api/v1/collections/{collectionId}",
+        "mcp": "tracelab_collection.update"
+      },
+      {
+        "operation": "documentsApi.processDocument",
+        "method": "POST",
+        "path": "/api/v1/documents/{documentId}/process",
+        "mcp": "tracelab_document.process"
+      },
+      {
+        "operation": "graphApi.neighborhood",
+        "method": "GET",
+        "path": "/api/v1/graph/neighborhood",
+        "mcp": "tracelab_project.neighborhood"
+      },
+      {
+        "operation": "missionsApi.list",
+        "method": "GET",
+        "path": "/api/v1/missions",
+        "mcp": "tracelab_mission.list"
+      },
+      {
+        "operation": "missionsApi.promoteReport",
+        "method": "POST",
+        "path": "/api/v1/missions/{missionId}/promote-report",
+        "mcp": "tracelab_mission_execution.promote_report"
+      },
+      {
+        "operation": "reportsApi.update",
+        "method": "PUT",
+        "path": "/api/v1/reports/{reportId}",
+        "mcp": "tracelab_report.update"
+      },
+      {
+        "operation": "homeApi.attention",
+        "method": "GET",
+        "path": "/api/v1/home/attention",
+        "mcp": "tracelab_home.attention"
+      },
+      {
+        "operation": "missionViewsApi.list",
+        "method": "GET",
+        "path": "/api/v1/mission-views",
+        "mcp": "tracelab_mission.views"
+      },
+      {
+        "operation": "inboxApi.list",
+        "method": "GET",
+        "path": "/api/v1/inbox",
+        "mcp": "tracelab_home.inbox_list"
+      },
+      {
+        "operation": "inboxApi.summary",
+        "method": "GET",
+        "path": "/api/v1/inbox/summary",
+        "mcp": "tracelab_home.inbox_summary"
+      }
+    ],
+    "rest_only_by_design_rows": [
+      {
+        "operation": "adminStatsApi.get",
+        "method": "GET",
+        "path": "/api/v1/admin/stats",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "adminSpacesApi.addMember",
+        "method": "POST",
+        "path": "/api/v1/admin/spaces/{spaceId}/members",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "adminSpacesApi.assignProjectSpace",
+        "method": "PATCH",
+        "path": "/api/v1/admin/projects/{projectId}/space",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "adminSpacesApi.create",
+        "method": "POST",
+        "path": "/api/v1/admin/spaces",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "adminSpacesApi.list",
+        "method": "GET",
+        "path": "/api/v1/admin/spaces",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "adminSpacesApi.listMembers",
+        "method": "GET",
+        "path": "/api/v1/admin/spaces/{spaceId}/members",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "adminSpacesApi.removeMember",
+        "method": "DELETE",
+        "path": "/api/v1/admin/spaces/{spaceId}/members/{userId}",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "adminUsersApi.create",
+        "method": "POST",
+        "path": "/api/v1/admin/users",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "adminUsersApi.list",
+        "method": "GET",
+        "path": "/api/v1/admin/users",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "adminUsersApi.remove",
+        "method": "DELETE",
+        "path": "/api/v1/admin/users/{userId}",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "adminUsersApi.setActive",
+        "method": "PATCH",
+        "path": "/api/v1/admin/users/{userId}/active",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "adminUsersApi.setRole",
+        "method": "PATCH",
+        "path": "/api/v1/admin/users/{userId}/role",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "login",
+        "method": "POST",
+        "path": "/api/v1/auth/login",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "refresh",
+        "method": "POST",
+        "path": "/api/v1/auth/refresh",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "register",
+        "method": "POST",
+        "path": "/api/v1/auth/register",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "collectionsApi.delete",
+        "method": "DELETE",
+        "path": "/api/v1/collections/{collectionId}",
+        "rationale": "Destructive delete: no approval recorded. Decision #426 keeps MCP deletes REST/UI-only unless Derek authorizes them (open question 2, still unanswered at MCP-2 on 2026-09-15); agent sessions act with the human user's credentials, so the blast radius stays with the UI."
+      },
+      {
+        "operation": "collectionsApi.removeChunk",
+        "method": "DELETE",
+        "path": "/api/v1/collections/{collectionId}/chunks/{chunkId}",
+        "rationale": "Destructive delete: no approval recorded. Decision #426 keeps MCP deletes REST/UI-only unless Derek authorizes them (open question 2, still unanswered at MCP-2 on 2026-09-15); agent sessions act with the human user's credentials, so the blast radius stays with the UI."
+      },
+      {
+        "operation": "collectionsApi.removeDocument",
+        "method": "DELETE",
+        "path": "/api/v1/collections/{collectionId}/documents/{documentId}",
+        "rationale": "Destructive delete: no approval recorded. Decision #426 keeps MCP deletes REST/UI-only unless Derek authorizes them (open question 2, still unanswered at MCP-2 on 2026-09-15); agent sessions act with the human user's credentials, so the blast radius stays with the UI."
+      },
+      {
+        "operation": "clearCompletedCorrections",
+        "method": "DELETE",
+        "path": "/api/v1/deepsearch/corrections/completed",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "getCorrectionStatus",
+        "method": "GET",
+        "path": "/api/v1/deepsearch/corrections",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "getCorrectionTelemetry",
+        "method": "GET",
+        "path": "/api/v1/deepsearch/corrections/telemetry",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "getDeadLetterQueue",
+        "method": "GET",
+        "path": "/api/v1/deepsearch/corrections/dead-letter",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "processCorrections",
+        "method": "POST",
+        "path": "/api/v1/deepsearch/corrections/process",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "triggerCorrections",
+        "method": "POST",
+        "path": "/api/v1/deepsearch/corrections",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "approveDeviceGrant",
+        "method": "POST",
+        "path": "/api/v1/auth/device/approve",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "denyDeviceGrant",
+        "method": "POST",
+        "path": "/api/v1/auth/device/deny",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "previewDeviceGrant",
+        "method": "GET",
+        "path": "/api/v1/auth/device/grants/{userCode}",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "documentsApi.deleteDocument",
+        "method": "DELETE",
+        "path": "/api/v1/documents/{documentId}",
+        "rationale": "Destructive delete: no approval recorded. Decision #426 keeps MCP deletes REST/UI-only unless Derek authorizes them (open question 2, still unanswered at MCP-2 on 2026-09-15); agent sessions act with the human user's credentials, so the blast radius stays with the UI."
+      },
+      {
+        "operation": "documentsApi.downloadDocument",
+        "method": "GET",
+        "path": "/api/v1/documents/{documentId}/download",
+        "rationale": "Binary download stays REST-only; document.get_content supplies agent-readable text."
+      },
+      {
+        "operation": "homeApi.pinProject",
+        "method": "PUT",
+        "path": "/api/v1/home/favorites/projects/{id}",
+        "rationale": "Per-user acknowledgement or preference write. Decisions #395 and #409 make review and acknowledgement explicit human actions, and decision #426 keeps result review, inbox mark-seen, favorites, saved searches and saved views REST/UI-only; an agent must not perform them on the user's behalf."
+      },
+      {
+        "operation": "homeApi.review",
+        "method": "PUT",
+        "path": "/api/v1/home/missions/{mission.id}/review",
+        "rationale": "Per-user acknowledgement or preference write. Decisions #395 and #409 make review and acknowledgement explicit human actions, and decision #426 keeps result review, inbox mark-seen, favorites, saved searches and saved views REST/UI-only; an agent must not perform them on the user's behalf."
+      },
+      {
+        "operation": "homeApi.unpinProject",
+        "method": "DELETE",
+        "path": "/api/v1/home/favorites/projects/{id}",
+        "rationale": "Per-user acknowledgement or preference write. Decisions #395 and #409 make review and acknowledgement explicit human actions, and decision #426 keeps result review, inbox mark-seen, favorites, saved searches and saved views REST/UI-only; an agent must not perform them on the user's behalf."
+      },
+      {
+        "operation": "missionsApi.delete",
+        "method": "DELETE",
+        "path": "/api/v1/missions/{missionId}",
+        "rationale": "Destructive delete: no approval recorded. Decision #426 keeps MCP deletes REST/UI-only unless Derek authorizes them (open question 2, still unanswered at MCP-2 on 2026-09-15); agent sessions act with the human user's credentials, so the blast radius stays with the UI."
+      },
+      {
+        "operation": "projectsApi.deleteProject",
+        "method": "DELETE",
+        "path": "/api/v1/projects/{projectId}",
+        "rationale": "Destructive delete: no approval recorded. Decision #426 keeps MCP deletes REST/UI-only unless Derek authorizes them (open question 2, still unanswered at MCP-2 on 2026-09-15); agent sessions act with the human user's credentials, so the blast radius stays with the UI."
+      },
+      {
+        "operation": "reportsApi.delete",
+        "method": "DELETE",
+        "path": "/api/v1/reports/{reportId}",
+        "rationale": "Destructive delete: no approval recorded. Decision #426 keeps MCP deletes REST/UI-only unless Derek authorizes them (open question 2, still unanswered at MCP-2 on 2026-09-15); agent sessions act with the human user's credentials, so the blast radius stays with the UI."
+      },
+      {
+        "operation": "savedSearchesApi.create",
+        "method": "POST",
+        "path": "/api/v1/saved-searches",
+        "rationale": "Per-user acknowledgement or preference write. Decisions #395 and #409 make review and acknowledgement explicit human actions, and decision #426 keeps result review, inbox mark-seen, favorites, saved searches and saved views REST/UI-only; an agent must not perform them on the user's behalf."
+      },
+      {
+        "operation": "savedSearchesApi.execute",
+        "method": "POST",
+        "path": "/api/v1/saved-searches/{id}/execute",
+        "rationale": "Saved-search execution uses per-user UI preferences (decision 426); agents issue explicit queries."
+      },
+      {
+        "operation": "savedSearchesApi.list",
+        "method": "GET",
+        "path": "/api/v1/saved-searches",
+        "rationale": "Saved-search preferences are per-user UI state (decision 426)."
+      },
+      {
+        "operation": "savedSearchesApi.remove",
+        "method": "DELETE",
+        "path": "/api/v1/saved-searches/{id}",
+        "rationale": "Per-user acknowledgement or preference write. Decisions #395 and #409 make review and acknowledgement explicit human actions, and decision #426 keeps result review, inbox mark-seen, favorites, saved searches and saved views REST/UI-only; an agent must not perform them on the user's behalf."
+      },
+      {
+        "operation": "savedSearchesApi.update",
+        "method": "PUT",
+        "path": "/api/v1/saved-searches/{id}",
+        "rationale": "Per-user acknowledgement or preference write. Decisions #395 and #409 make review and acknowledgement explicit human actions, and decision #426 keeps result review, inbox mark-seen, favorites, saved searches and saved views REST/UI-only; an agent must not perform them on the user's behalf."
+      },
+      {
+        "operation": "searchApi.clearHistory",
+        "method": "DELETE",
+        "path": "/api/v1/search/history",
+        "rationale": "Per-user acknowledgement or preference write. Decisions #395 and #409 make review and acknowledgement explicit human actions, and decision #426 keeps result review, inbox mark-seen, favorites, saved searches and saved views REST/UI-only; an agent must not perform them on the user's behalf."
+      },
+      {
+        "operation": "searchApi.facets",
+        "method": "POST",
+        "path": "/api/v1/facets",
+        "rationale": "Facet counts support the interactive search filter UI; raw knowledge/PEDR results remain agent-facing."
+      },
+      {
+        "operation": "searchApi.history",
+        "method": "GET",
+        "path": "/api/v1/search/history",
+        "rationale": "Per-user search history is UI state (decision 426)."
+      },
+      {
+        "operation": "searchApi.ragQuery",
+        "method": "POST",
+        "path": "/api/v1/search",
+        "rationale": "LLM answer generation overlaps collection synthesis and is not a retrieval read; stays REST-only by design."
+      },
+      {
+        "operation": "searchApi.replay",
+        "method": "POST",
+        "path": "/api/v1/search/replay/{historyId}",
+        "rationale": "Search-history replay is UI state (decision 426); agents can issue explicit knowledge or PEDR queries."
+      },
+      {
+        "operation": "apiKeysApi.create",
+        "method": "POST",
+        "path": "/api/v1/auth/api-keys",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "apiKeysApi.delete",
+        "method": "DELETE",
+        "path": "/api/v1/auth/api-keys/{keyId}",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "apiKeysApi.list",
+        "method": "GET",
+        "path": "/api/v1/auth/api-keys",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "inviteCodesApi.create",
+        "method": "POST",
+        "path": "/api/v1/auth/invite-codes",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "inviteCodesApi.delete",
+        "method": "DELETE",
+        "path": "/api/v1/auth/invite-codes/{codeId}",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "inviteCodesApi.list",
+        "method": "GET",
+        "path": "/api/v1/auth/invite-codes",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "profileApi.get",
+        "method": "GET",
+        "path": "/api/v1/auth/me",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "profileApi.update",
+        "method": "PATCH",
+        "path": "/api/v1/auth/me",
+        "rationale": "Authentication, account administration or operator correction control stays REST/UI-only (decision 426)."
+      },
+      {
+        "operation": "missionViewsApi.create",
+        "method": "POST",
+        "path": "/api/v1/mission-views",
+        "rationale": "Personal saved-view preferences are REST/UI-only by decision 426."
+      },
+      {
+        "operation": "missionViewsApi.delete",
+        "method": "DELETE",
+        "path": "/api/v1/mission-views/{id}",
+        "rationale": "Personal saved-view preferences are REST/UI-only by decision 426."
+      },
+      {
+        "operation": "missionViewsApi.rename",
+        "method": "PUT",
+        "path": "/api/v1/mission-views/{id}",
+        "rationale": "Personal saved-view preferences are REST/UI-only by decision 426."
+      },
+      {
+        "operation": "inboxApi.markSeen",
+        "method": "PUT",
+        "path": "/api/v1/inbox/seen",
+        "rationale": "The per-user inbox seen watermark is an explicit acknowledgement; per-user acknowledgement writes stay REST/UI-only by decision 426."
+      }
+    ],
+    "destructive_disposition": "no approval recorded (decision #426 open question 2)",
+    "receipt": "cmos/reports/sprint-52/mcp-2-parity-audit.json"
+  },
+  "post_merge_main_push_ci": [
+    {
+      "workflow": "Backend Integration",
+      "run_id": 34919667640,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667640",
+      "event": "push",
+      "head_sha": "606da9096da627dc0ffbf4210439d0dbe1627a26",
+      "head_branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-15T02:03:02Z",
+      "jobs": [
+        {
+          "id": 104224725849,
+          "name": "backend-integration",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667640/job/104224725849",
+          "started_at": "2026-09-15T02:03:05Z",
+          "completed_at": "2026-09-15T02:06:00Z"
+        }
+      ]
+    },
+    {
+      "workflow": "Backend Lint",
+      "run_id": 34919667625,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667625",
+      "event": "push",
+      "head_sha": "606da9096da627dc0ffbf4210439d0dbe1627a26",
+      "head_branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-15T02:03:02Z",
+      "jobs": [
+        {
+          "id": 104224725701,
+          "name": "ruff-diff",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667625/job/104224725701",
+          "started_at": "2026-09-15T02:03:06Z",
+          "completed_at": "2026-09-15T02:03:28Z"
+        }
+      ]
+    },
+    {
+      "workflow": "Backend Tests",
+      "run_id": 34919667621,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667621",
+      "event": "push",
+      "head_sha": "606da9096da627dc0ffbf4210439d0dbe1627a26",
+      "head_branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-15T02:03:02Z",
+      "jobs": [
+        {
+          "id": 104224725842,
+          "name": "backend-suite",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667621/job/104224725842",
+          "started_at": "2026-09-15T02:03:06Z",
+          "completed_at": "2026-09-15T02:13:57Z"
+        }
+      ]
+    },
+    {
+      "workflow": "Frontend Checks",
+      "run_id": 34919667660,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667660",
+      "event": "push",
+      "head_sha": "606da9096da627dc0ffbf4210439d0dbe1627a26",
+      "head_branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-15T02:03:02Z",
+      "jobs": [
+        {
+          "id": 104224726035,
+          "name": "lint",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667660/job/104224726035",
+          "started_at": "2026-09-15T02:03:06Z",
+          "completed_at": "2026-09-15T02:04:10Z"
+        },
+        {
+          "id": 104224726055,
+          "name": "type-check",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667660/job/104224726055",
+          "started_at": "2026-09-15T02:03:06Z",
+          "completed_at": "2026-09-15T02:04:11Z"
+        },
+        {
+          "id": 104224726076,
+          "name": "vitest",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667660/job/104224726076",
+          "started_at": "2026-09-15T02:03:11Z",
+          "completed_at": "2026-09-15T02:04:33Z"
+        }
+      ]
+    },
+    {
+      "workflow": "Frontend Production Build",
+      "run_id": 34919667631,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667631",
+      "event": "push",
+      "head_sha": "606da9096da627dc0ffbf4210439d0dbe1627a26",
+      "head_branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-15T02:03:02Z",
+      "jobs": [
+        {
+          "id": 104224725651,
+          "name": "build-frontend-production",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667631/job/104224725651",
+          "started_at": "2026-09-15T02:03:06Z",
+          "completed_at": "2026-09-15T02:07:43Z"
+        }
+      ]
+    },
+    {
+      "workflow": "MCP Package",
+      "run_id": 34919667622,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667622",
+      "event": "push",
+      "head_sha": "606da9096da627dc0ffbf4210439d0dbe1627a26",
+      "head_branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-15T02:03:02Z",
+      "jobs": [
+        {
+          "id": 104224725413,
+          "name": "mcp-package",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667622/job/104224725413",
+          "started_at": "2026-09-15T02:03:06Z",
+          "completed_at": "2026-09-15T02:03:58Z"
+        }
+      ]
+    },
+    {
+      "workflow": "Secret Scan",
+      "run_id": 34919667704,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667704",
+      "event": "push",
+      "head_sha": "606da9096da627dc0ffbf4210439d0dbe1627a26",
+      "head_branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-15T02:03:03Z",
+      "jobs": [
+        {
+          "id": 104224725815,
+          "name": "Secret Scan",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667704/job/104224725815",
+          "started_at": "2026-09-15T02:03:06Z",
+          "completed_at": "2026-09-15T02:03:43Z"
+        }
+      ]
+    }
+  ],
+  "mcp_package_run": {
+    "run_id": 34919667622,
+    "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34919667622",
+    "conclusion": "success",
+    "required_context": false
+  },
+  "deployments": {
+    "checked_at": "2026-09-15T02:05:33Z",
+    "commit": "606da9096da627dc0ffbf4210439d0dbe1627a26",
+    "services": {
+      "TraceLab": {
+        "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+        "deployment_id": "c8361637-83c3-4e15-a7eb-1df1fbd3706b",
+        "status": "SUCCESS",
+        "commit": "606da9096da627dc0ffbf4210439d0dbe1627a26",
+        "created_at": "2026-09-15T02:03:02.197Z"
+      },
+      "frontend": {
+        "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+        "deployment_id": "65b5d7c8-cb6f-4316-b15b-411240c3e19e",
+        "status": "SUCCESS",
+        "commit": "606da9096da627dc0ffbf4210439d0dbe1627a26",
+        "created_at": "2026-09-15T02:03:02.197Z"
+      }
+    },
+    "both_success_for_commit": true
+  },
+  "production_receipt": "cmos/reports/sprint-52/mcp-2-production.json",
+  "production_summary": {
+    "passed": true,
+    "checks": 12,
+    "failed": [],
+    "tarball_sha256": "664e0da07d1775b67a6563b0c9efc9c8975a80ba174cf1114afbdba9e0551a8f",
+    "read_only": true
+  },
+  "public_smoke": {
+    "total": 4,
+    "expected": 4,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "interrupted": 0,
+    "durationSeconds": 2.084,
+    "retries": 0
+  },
+  "tested_source_files": [
+    {
+      "path": "cmos/contracts/mcp-parity-manifest.json",
+      "sha256": "b7e45f02acffbb0e700359e76f396ae872215add3f03c250df36cbd615c727ba"
+    },
+    {
+      "path": "docs/mcp-tools.md",
+      "sha256": "df432e8cfa5590bbd281704da0207772883e0bc2f46a704c181a99caeb7648f9"
+    },
+    {
+      "path": "packages/tracelab-mcp/CHANGELOG.md",
+      "sha256": "417b79f76cc60fae3a6fb7f70430d26b76fa70d6c49a76a097bd6664ddd3d90d"
+    },
+    {
+      "path": "packages/tracelab-mcp/README.md",
+      "sha256": "c5a9d273ec5215d71f526ac12d4e1924ee1598da84d832a391b29b28b487f4d6"
+    },
+    {
+      "path": "packages/tracelab-mcp/scripts/check-canonical-links.mjs",
+      "sha256": "757f37fc236c1c8dbc9e3c64f4c794a4b85196dee3097b8a10884ff6b8c4b6eb"
+    },
+    {
+      "path": "packages/tracelab-mcp/src/api-client.ts",
+      "sha256": "ad3716f6b75a05f9e0078093cc82d82fb805f2b92c1e4431f2c2be1ea665ac76"
+    },
+    {
+      "path": "packages/tracelab-mcp/src/index.test.ts",
+      "sha256": "186ae7e1df65941b11a4189a15ca94076d3c5c668bd61ff6aa35958f1eb61e04"
+    },
+    {
+      "path": "packages/tracelab-mcp/src/index.ts",
+      "sha256": "69b6b00a0ab180fc37d9553e9795a1efe3302a54d23f1e2068762d75c03f8d50"
+    },
+    {
+      "path": "packages/tracelab-mcp/src/mcp2-actions.test.ts",
+      "sha256": "0e18750c367a3551148b8659b5fdd85cccc4021c85bea8c447a18d199b91ac27"
+    },
+    {
+      "path": "scripts/mcp_parity_audit.mjs",
+      "sha256": "7bd0cb8e4eb46a89554421de11ff6d85c28c1551210ef92a9bb71603dd2a1942"
+    }
+  ],
+  "limitations": [
+    "Write actions (cancel, promote_report, document process, collection update/add_document, report update) are verified only in the local real-stdio fake-API contract and the clean-install lane; production performs no writes.",
+    "The operator account had no saved mission views at run time, so tracelab_mission.views was compared against an empty REST list in production; the item shape and UI-equivalent links are covered by the local contract and vitest.",
+    "The MCP Package workflow is not a required main context (Sprint 53 deferral in decision #426), so its post-merge run id is cited explicitly rather than enforced by branch protection.",
+    "Lint is not claimed: eslint is not installed in the package and the MCP Package workflow has no lint step.",
+    "Destructive deletes stay REST/UI-only with 'no approval recorded'; Derek's decision #426 question 2 remains open.",
+    "The action count is 51, not the planned 50: the repeatable reason filter extends tracelab_mission.list instead of adding an action."
+  ],
+  "closure_gate": "CMOS MCP-2 remains In Progress until this receipt is merged on main and the receipt-carrier main push (including the non-required MCP Package run) and both Railway deployments are verified; those facts are recorded in the CMOS session closure."
+}
