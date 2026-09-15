@@ -27,7 +27,7 @@ def configured(monkeypatch):
 
 
 def owner(db, **kwargs):
-    user = User(email=f"{uuid4()}@example.test", display_name="Owner", password_hash=_HASH, role="member", **kwargs)
+    user = User(email=f"{uuid4().hex}@owners.tracelab.aquex.ai", display_name="Owner", password_hash=_HASH, role="member", **kwargs)
     db.add(user)
     db.flush()
     return user
@@ -72,6 +72,40 @@ def test_nothing_is_due_without_config_owner_opt_in_or_terminal_status(configure
     assert pending_terminal_notification(db_session, mission(db_session, "cancelled", owner_id=user.id).id) is None
     assert pending_terminal_notification(db_session, mission(db_session, "in_progress", owner_id=user.id).id) is None
     assert pending_terminal_notification(db_session, uuid4()) is None
+
+
+@pytest.mark.parametrize(
+    ("address", "deliverable"),
+    [
+        ("owner@tracelab.aquex.ai", True),
+        ("Owner.Name@Mail.Aquex.AI", True),
+        ("owner@tracelab.local", False),
+        ("owner@example.com", False),
+        ("owner@lists.example.org", False),
+        ("owner@example.test", False),
+        ("root@localhost", False),
+        ("no-at-sign", False),
+        ("@tracelab.aquex.ai", False),
+        ("", False),
+        (None, False),
+    ],
+)
+def test_reserved_and_local_only_domains_are_not_deliverable(address, deliverable):
+    assert notifications.deliverable_address(address) is deliverable
+
+
+def test_an_owner_at_an_undeliverable_address_gets_no_claim_and_no_request(configured, db_session, httpx_mock, monkeypatch):
+    user = owner(db_session)
+    user.email = "owner@tracelab.local"
+    row = mission(db_session, "completed", owner_id=user.id)
+    import app.core.database as database
+    monkeypatch.setattr(database, "SessionLocal", lambda: db_session)
+    monkeypatch.setattr(db_session, "close", lambda: None)
+    assert pending_terminal_notification(db_session, row.id) is None
+    assert asyncio.run(notifications.notify_terminal_status(row.id)) is False
+    assert httpx_mock.get_requests() == []
+    db_session.refresh(row)
+    assert "notification" not in (row.execution_metadata or {})
 
 
 def test_sends_once_per_status_and_again_when_the_status_changes(configured, db_session, httpx_mock, monkeypatch):
