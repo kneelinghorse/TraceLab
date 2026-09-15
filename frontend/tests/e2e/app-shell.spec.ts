@@ -12,6 +12,8 @@ test.beforeEach(async ({ page }) => {
     const pathname = new URL(route.request().url()).pathname;
     let body: unknown = {};
     if (pathname.endsWith("/auth/me")) body = { user_id: "alice", email: "alice@example.test", display_name: "Alice", role: "admin" };
+    else if (pathname.endsWith("/auth/api-keys")) body = { keys: [] };
+    else if (pathname.endsWith("/auth/invite-codes")) body = { codes: [] };
     else if (pathname.endsWith("/home")) body = {
       generated_at: "2026-09-13T00:00:00Z", refresh_seconds: 30, stalled_after_seconds: 3600,
       missions: { total: 433, by_status: { completed: 424 } },
@@ -65,6 +67,10 @@ test("theme persists through hydration and OS changes without a wrong-color fram
   const paints = await page.evaluate(() => (window as unknown as { paintedThemes: string[] }).paintedThemes);
   expect(paints.length).toBeGreaterThan(0);
   expect(paints.every(theme => theme === "dark")).toBe(true);
+  // The switcher lives in Settings; the authenticated shell no longer carries one (NAV-2).
+  await expect(page.getByRole("combobox", { name: "Color theme" })).toHaveCount(0);
+  await page.goto("/settings");
+  await expect(page.getByRole("heading", { name: "Appearance", exact: true })).toBeVisible();
   await expect(page.getByRole("combobox", { name: "Color theme" }).locator("option:checked")).toHaveText("System (Dark)");
   const darkBackground = await page.locator("body").evaluate(node => getComputedStyle(node).backgroundColor);
   await page.getByRole("combobox", { name: "Color theme" }).selectOption("light");
@@ -96,13 +102,14 @@ for (const storedChoice of ["system", "hc"]) {
     }
     await expect(page.getByRole("heading", { name: "Missions", exact: true })).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await page.goto("/settings");
     await expect(page.getByRole("combobox", { name: "Color theme" })).toHaveValue("system");
     await expect(page.getByRole("option", { name: "High contrast" })).toHaveCount(0);
   });
 }
 
 test("Light persists across reload and OS changes with native keyboard focus", async ({ page }) => {
-  await page.goto("/missions");
+  await page.goto("/settings");
   const selector = page.getByRole("combobox", { name: "Color theme" });
   await selector.focus();
   // Native type-ahead selects Light, then Enter commits it.
