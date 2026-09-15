@@ -238,6 +238,7 @@ class WebhookHandler:
             return metadata
         incoming = payload.execution_metadata.model_dump(exclude_none=True)
         incoming.pop("result_materialization", None)
+        incoming.pop("notification", None)
         metadata.update(incoming)
         return metadata
 

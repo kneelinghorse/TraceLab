@@ -18,6 +18,7 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False)
     display_name = Column(String(255), nullable=False)
     password_hash = Column(String(255), nullable=False)
+    email_notifications_enabled = Column(Boolean, nullable=False, default=True, server_default="1")
     # Least-privilege default (Sprint 47 T47.1). Was "admin", which silently minted
     # an admin for every User() without an explicit role — every invite registration
     # became an admin. "member" == ROLE_MEMBER (kept as a literal to avoid importing

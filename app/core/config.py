@@ -125,6 +125,12 @@ class Settings(BaseSettings):
     # deployments override via env var.
     frontend_url: str = "http://localhost:3000"
 
+    # Mission completion/failure emails via Resend (NOTIFY-1, decision #455).
+    # Sending stays off until both values are set on the deployment.
+    resend_api_key: str | None = None
+    resend_from_address: str | None = None
+    notification_emails_enabled: bool = True
+
     # PEDR cache settings
     pedr_cache_max_size: int = 1000  # Max cached queries
     pedr_cache_ttl_seconds: int = 300  # 5 minutes TTL
