@@ -1,0 +1,60 @@
+{
+  "mission": {
+    "id": "103c4ad0-ddaa-40a5-a67f-83e3aff8ecbe",
+    "mission_id": "TL-ENG-R001",
+    "project": "TraceLab Engineering (5229e75e-8ad3-4ac5-94de-093a177562c6), owned by the deniedart.com account",
+    "completed_at": "2026-09-15T22:30:01.107703",
+    "result_report_id": "39d5b2dd-8fbe-406b-80e5-bc5e035822f7"
+  },
+  "configuration": {
+    "railway_variables_present_on_TraceLab": [
+      "RESEND_API_KEY",
+      "RESEND_FROM_ADDRESS",
+      "FRONTEND_URL"
+    ],
+    "values_read": false,
+    "NOTIFICATION_EMAILS_ENABLED": "unset (settings default true)",
+    "sender_domain_dns": {
+      "resend._domainkey.aquex.ai": "DKIM TXT present",
+      "send.aquex.ai": "SPF TXT and MX present"
+    }
+  },
+  "first_attempt": {
+    "deployment": {
+      "commit": "e751df8880a4c5a7dd95480c061c96b5d46ad550",
+      "TraceLab": "d81d9749-7019-4712-9ef3-1beaf42a1299"
+    },
+    "webhook": "POST /api/v1/webhooks/deepsearch returned 200 at 2026-09-15T22:30:05Z and scheduled the email task",
+    "result": "Mission notification failed: sqlalchemy.exc.NotSupportedError (psycopg2.errors.FeatureNotSupported) FOR UPDATE cannot be applied to the nullable side of an outer join",
+    "emails_sent": 0
+  },
+  "recipient_finding": {
+    "production_projects": 51,
+    "owned_by_legacy_owner_account_at_tracelab_local": 45,
+    "owned_by_deniedart_com_account": 6
+  },
+  "fix": {
+    "pr": 323,
+    "merge_commit": "1bca77688d892cb9a04f93a4bb7db46d34d4b9ca",
+    "railway": {
+      "TraceLab": "37e3043f-3fca-405d-b446-715cac84e140",
+      "frontend": "8683c2a3-2245-48f6-9419-132cf467556b"
+    },
+    "post_deploy": "unauthenticated content route 401, /auth/me carries email_notifications_enabled, public smoke 4 passed"
+  },
+  "production_send": {
+    "method": "railway ssh into the deployed TraceLab service; python3 asserted that pending_terminal_notification uses with_for_update(of=Mission) and that the mission had no notification record, then ran notify_terminal_status once",
+    "result": "sent True",
+    "notification_record": {
+      "status": "completed",
+      "to_domain": "deniedart.com",
+      "claimed_at": "2026-09-15T22:51:42.733719+00:00",
+      "sent_at": "2026-09-15T22:51:43.089631+00:00",
+      "message_id_present": true
+    }
+  },
+  "arrival_confirmation": "pending: Derek confirms the email reached the inbox",
+  "not_verified_in_production": [
+    "per-user opt-out suppression (covered by tests)"
+  ]
+}

@@ -1,0 +1,344 @@
+{
+  "base": "https://tracelab.aquex.ai",
+  "checkedAt": "2026-09-15T21:10:09.637Z",
+  "checks": 4,
+  "failures": [],
+  "results": [
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "pageStatus": 200,
+      "links": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "type": null,
+          "sizes": "48x48"
+        },
+        {
+          "rel": "icon",
+          "href": "/icon.svg",
+          "type": "image/svg+xml",
+          "sizes": null
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png",
+          "type": null,
+          "sizes": null
+        }
+      ],
+      "assets": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "type": null,
+          "sizes": "48x48",
+          "url": "https://tracelab.aquex.ai/favicon.ico",
+          "status": 200,
+          "contentType": "image/x-icon",
+          "bytes": 2792,
+          "sha256": "ce7ce7f0dec0e3c3c2e3e2922050e5560b91907c93d1cfceb57550e0d6fa5fc2"
+        },
+        {
+          "rel": "icon",
+          "href": "/icon.svg",
+          "type": "image/svg+xml",
+          "sizes": null,
+          "url": "https://tracelab.aquex.ai/icon.svg",
+          "status": 200,
+          "contentType": "image/svg+xml",
+          "bytes": 216,
+          "sha256": "fc47420fb4e4bbb29e55d2eda02269ef38adb315f8bceaf49958ed591c142e5f"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png",
+          "type": null,
+          "sizes": null,
+          "url": "https://tracelab.aquex.ai/apple-touch-icon.png",
+          "status": 200,
+          "contentType": "image/png",
+          "bytes": 2676,
+          "sha256": "10e96d189fce1f64e2d39a6dad689c672fa578499bb4517b56cea16b7b79a9f9"
+        }
+      ],
+      "rendered": [
+        {
+          "id": "svg16",
+          "naturalWidth": 150,
+          "naturalHeight": 150
+        },
+        {
+          "id": "svg32",
+          "naturalWidth": 150,
+          "naturalHeight": 150
+        },
+        {
+          "id": "ico16",
+          "naturalWidth": 48,
+          "naturalHeight": 48
+        },
+        {
+          "id": "ico32",
+          "naturalWidth": 48,
+          "naturalHeight": 48
+        }
+      ],
+      "screenshot": "chromium-light-tab-icons.png",
+      "ok": true
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "pageStatus": 200,
+      "links": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "type": null,
+          "sizes": "48x48"
+        },
+        {
+          "rel": "icon",
+          "href": "/icon.svg",
+          "type": "image/svg+xml",
+          "sizes": null
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png",
+          "type": null,
+          "sizes": null
+        }
+      ],
+      "assets": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "type": null,
+          "sizes": "48x48",
+          "url": "https://tracelab.aquex.ai/favicon.ico",
+          "status": 200,
+          "contentType": "image/x-icon",
+          "bytes": 2792,
+          "sha256": "ce7ce7f0dec0e3c3c2e3e2922050e5560b91907c93d1cfceb57550e0d6fa5fc2"
+        },
+        {
+          "rel": "icon",
+          "href": "/icon.svg",
+          "type": "image/svg+xml",
+          "sizes": null,
+          "url": "https://tracelab.aquex.ai/icon.svg",
+          "status": 200,
+          "contentType": "image/svg+xml",
+          "bytes": 216,
+          "sha256": "fc47420fb4e4bbb29e55d2eda02269ef38adb315f8bceaf49958ed591c142e5f"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png",
+          "type": null,
+          "sizes": null,
+          "url": "https://tracelab.aquex.ai/apple-touch-icon.png",
+          "status": 200,
+          "contentType": "image/png",
+          "bytes": 2676,
+          "sha256": "10e96d189fce1f64e2d39a6dad689c672fa578499bb4517b56cea16b7b79a9f9"
+        }
+      ],
+      "rendered": [
+        {
+          "id": "svg16",
+          "naturalWidth": 150,
+          "naturalHeight": 150
+        },
+        {
+          "id": "svg32",
+          "naturalWidth": 150,
+          "naturalHeight": 150
+        },
+        {
+          "id": "ico16",
+          "naturalWidth": 48,
+          "naturalHeight": 48
+        },
+        {
+          "id": "ico32",
+          "naturalWidth": 48,
+          "naturalHeight": 48
+        }
+      ],
+      "screenshot": "chromium-dark-tab-icons.png",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "pageStatus": 200,
+      "links": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "type": null,
+          "sizes": "48x48"
+        },
+        {
+          "rel": "icon",
+          "href": "/icon.svg",
+          "type": "image/svg+xml",
+          "sizes": null
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png",
+          "type": null,
+          "sizes": null
+        }
+      ],
+      "assets": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "type": null,
+          "sizes": "48x48",
+          "url": "https://tracelab.aquex.ai/favicon.ico",
+          "status": 200,
+          "contentType": "image/x-icon",
+          "bytes": 2792,
+          "sha256": "ce7ce7f0dec0e3c3c2e3e2922050e5560b91907c93d1cfceb57550e0d6fa5fc2"
+        },
+        {
+          "rel": "icon",
+          "href": "/icon.svg",
+          "type": "image/svg+xml",
+          "sizes": null,
+          "url": "https://tracelab.aquex.ai/icon.svg",
+          "status": 200,
+          "contentType": "image/svg+xml",
+          "bytes": 216,
+          "sha256": "fc47420fb4e4bbb29e55d2eda02269ef38adb315f8bceaf49958ed591c142e5f"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png",
+          "type": null,
+          "sizes": null,
+          "url": "https://tracelab.aquex.ai/apple-touch-icon.png",
+          "status": 200,
+          "contentType": "image/png",
+          "bytes": 2676,
+          "sha256": "10e96d189fce1f64e2d39a6dad689c672fa578499bb4517b56cea16b7b79a9f9"
+        }
+      ],
+      "rendered": [
+        {
+          "id": "svg16",
+          "naturalWidth": 16,
+          "naturalHeight": 16
+        },
+        {
+          "id": "svg32",
+          "naturalWidth": 32,
+          "naturalHeight": 32
+        },
+        {
+          "id": "ico16",
+          "naturalWidth": 48,
+          "naturalHeight": 48
+        },
+        {
+          "id": "ico32",
+          "naturalWidth": 48,
+          "naturalHeight": 48
+        }
+      ],
+      "screenshot": "webkit-light-tab-icons.png",
+      "ok": true
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "pageStatus": 200,
+      "links": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "type": null,
+          "sizes": "48x48"
+        },
+        {
+          "rel": "icon",
+          "href": "/icon.svg",
+          "type": "image/svg+xml",
+          "sizes": null
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png",
+          "type": null,
+          "sizes": null
+        }
+      ],
+      "assets": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "type": null,
+          "sizes": "48x48",
+          "url": "https://tracelab.aquex.ai/favicon.ico",
+          "status": 200,
+          "contentType": "image/x-icon",
+          "bytes": 2792,
+          "sha256": "ce7ce7f0dec0e3c3c2e3e2922050e5560b91907c93d1cfceb57550e0d6fa5fc2"
+        },
+        {
+          "rel": "icon",
+          "href": "/icon.svg",
+          "type": "image/svg+xml",
+          "sizes": null,
+          "url": "https://tracelab.aquex.ai/icon.svg",
+          "status": 200,
+          "contentType": "image/svg+xml",
+          "bytes": 216,
+          "sha256": "fc47420fb4e4bbb29e55d2eda02269ef38adb315f8bceaf49958ed591c142e5f"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png",
+          "type": null,
+          "sizes": null,
+          "url": "https://tracelab.aquex.ai/apple-touch-icon.png",
+          "status": 200,
+          "contentType": "image/png",
+          "bytes": 2676,
+          "sha256": "10e96d189fce1f64e2d39a6dad689c672fa578499bb4517b56cea16b7b79a9f9"
+        }
+      ],
+      "rendered": [
+        {
+          "id": "svg16",
+          "naturalWidth": 16,
+          "naturalHeight": 16
+        },
+        {
+          "id": "svg32",
+          "naturalWidth": 32,
+          "naturalHeight": 32
+        },
+        {
+          "id": "ico16",
+          "naturalWidth": 48,
+          "naturalHeight": 48
+        },
+        {
+          "id": "ico32",
+          "naturalWidth": 48,
+          "naturalHeight": 48
+        }
+      ],
+      "screenshot": "webkit-dark-tab-icons.png",
+      "ok": true
+    }
+  ]
+}

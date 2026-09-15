@@ -1,0 +1,44 @@
+{
+  "checkedAt": "2026-09-15T21:25Z",
+  "deployment": {
+    "commit": "617333ada553402d80b158641a8362664c2451bb",
+    "railway": {
+      "TraceLab": "ef1961f8-a17c-4c5f-8325-985c18e31c29",
+      "frontend": "589eedd0-2bce-44cb-b306-63e9aef7a65e"
+    }
+  },
+  "method": "Read-only requests to https://api.tracelab.aquex.ai with the operator's API key (key never printed); unauthenticated probes with curl. No writes.",
+  "probes": {
+    "GET /inbox (frontend)": "308 -> https://tracelab.aquex.ai/",
+    "GET /api/v1/activity/summary (unauthenticated)": 401,
+    "GET /api/v1/inbox/summary": 404,
+    "GET /api/v1/documents/{id}/content (unauthenticated)": 401,
+    "GET /api/v1/auth/me email_notifications_enabled present": true
+  },
+  "ACT-1": {
+    "activity_summary": { "new_total": 978, "by_type": { "mission": 435, "report": 484, "evidence": 59 } },
+    "activity_page": { "total": 980, "new_total": 978, "page": 1, "page_size": 8 },
+    "item_keys": ["href", "id", "new", "occurred_at", "status", "subtitle", "title", "type"],
+    "newest_first": true,
+    "statuses_on_page": [null, "draft", null, null, null, "draft", "completed", null],
+    "note": "Status is a label only: the page mixes evidence, report and mission items strictly by occurred_at. Nearly everything is new because the operator has not opened or marked items since the feature shipped."
+  },
+  "DOCV-1": {
+    "document_read_omits_content_and_raw_content": true,
+    "document_with_links": {
+      "id": "d44bec3e-f665-439d-bc78-bc5385a4610d",
+      "links": [["report", "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7"], ["mission", "/missions/27cbe849-a801-49ef-8cb5-bfa891ade2bd"]]
+    },
+    "content_endpoint": { "chars": 26488, "mime_type": "text/markdown", "source_origin": "upload", "links": 2 },
+    "evidence_entry": {
+      "id": "1da242cc-517e-4fcb-9850-3c620e2b484e",
+      "links": [["mission", false, "Captured by this mission"], ["report", true, "Result of the capturing mission"]]
+    }
+  },
+  "NOTIFY-1": {
+    "migration_050_live": true,
+    "operator_opted_in": true,
+    "railway_variables": "RESEND_API_KEY (re_ prefix) and RESEND_FROM_ADDRESS (sender domain aquex.ai) on the TraceLab service only",
+    "production_send": "not yet verified: needs a real mission to reach a terminal status through the DeepSearch webhook"
+  }
+}

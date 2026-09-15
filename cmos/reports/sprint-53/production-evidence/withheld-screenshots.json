@@ -1,0 +1,9 @@
+{
+  "reason": "The Settings captures show the signed-in account's email address in plain text and this repository is public. They were reviewed in the session and are kept out of the repository; their SHA-256 hashes identify the reviewed files.",
+  "sha256": {
+    "dark-1440-_settings.png": "87263c9c95d9e06575686f722c71986a68e6df42eab1748d2458742610f2318d",
+    "dark-390-_settings.png": "f55047e38e4f46b1833e4dee7f95b98b9de5a22b290eed9356adbc3bd23086d9",
+    "light-1440-_settings.png": "877803c03ec099ab0c8d433997dd4acd646116ed240cedfb7a423df56594a4a5",
+    "light-390-_settings.png": "f92ac944e44e202ada3248822a59425c32675d7b766d64e4b7e4a1db5b373c83"
+  }
+}

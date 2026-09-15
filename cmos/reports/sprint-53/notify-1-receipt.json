@@ -1,0 +1,70 @@
+{
+  "mission": "NOTIFY-1",
+  "status": "accepted; email arrival pending Derek's confirmation",
+  "pr": 320,
+  "merge_commit": "617333ada553402d80b158641a8362664c2451bb",
+  "note": "#320 merged into the stacked ACT-1 branch instead of main (learning #203); PR #321 landed it on main as 617333a.",
+  "local_verification": "PR #320 records its own local verification; combined stack check before #321: single alembic head, 66 focused backend tests, parity audit 0 errors after the profileApi.get row fix, type-check, lint, vitest 239/239",
+  "fix": {
+    "pr": 323,
+    "merge_commit": "1bca77688d892cb9a04f93a4bb7db46d34d4b9ca",
+    "summary": "The first real completion's email task failed on PostgreSQL: SELECT ... FOR UPDATE included the eagerly joined result_report, the nullable side of an outer join. The claim now locks only the mission row (with_for_update(of=Mission)). Owners whose address is at a reserved or local-only domain are skipped, because 45 of 51 production projects belong to the legacy owner account at tracelab.local.",
+    "local_verification": "Postgres claim test failed on the production error, then passed; tests/test_notifications.py 20/20; 8 related backend files 159/159; full integration lane 137 passed, 4 skipped; Ruff 0.8.0 clean; secret scan passed; rebased onto 77b5c8d with only #324's frontend files differing"
+  },
+  "production": {
+    "evidence": "cmos/reports/sprint-53/production-evidence/notify-1-production.json",
+    "send": "sent True from inside the deployed TraceLab service; the mission records the completed notification with sent_at and a Resend message id",
+    "arrival_confirmation": "pending: Derek confirms the email reached the inbox"
+  },
+  "limitations": [
+    "After the fix deployed, the production send was triggered by running notify_terminal_status inside the deployed service; the webhook that schedules the task was observed in production logs at 22:30:05Z for the same mission.",
+    "The per-user opt-out is covered by tests and was not exercised in production."
+  ],
+  "learnings_added": [
+    204,
+    206
+  ],
+  "sprint": "sprint-53",
+  "gate": "Decision #464: GitHub Actions stays off. Receipts cite the local CI-equivalent verification recorded in each PR, both Railway deployment ids, the post-deploy public smoke, the Light/Dark 1440/390 baseline from the deployed commit's own ui-shell-smoke.mjs, and an image review under America/Chicago. Decision #465: PRs with that local evidence are merged with --admin.",
+  "final_production": {
+    "commit": "1bca77688d892cb9a04f93a4bb7db46d34d4b9ca",
+    "railway": {
+      "TraceLab": "37e3043f-3fca-405d-b446-715cac84e140",
+      "frontend": "8683c2a3-2245-48f6-9419-132cf467556b"
+    },
+    "public_smoke": "cmos/reports/sprint-53/production-evidence/public-smoke.json",
+    "baseline": {
+      "window": [
+        "2026-09-15T22:52:06Z",
+        "2026-09-15T22:58:16Z"
+      ],
+      "checks": 144,
+      "routes": 36,
+      "failures": 0,
+      "suppressed_writes": 12,
+      "timezone": "America/Chicago",
+      "evidence": "cmos/reports/sprint-53/production-evidence"
+    },
+    "visual_review": "cmos/reports/sprint-53/production-evidence/visual-review.json",
+    "withheld_screenshots": "cmos/reports/sprint-53/production-evidence/withheld-screenshots.json",
+    "first_post_merge_baseline": {
+      "commit": "e751df8880a4c5a7dd95480c061c96b5d46ad550",
+      "railway": {
+        "TraceLab": "d81d9749-7019-4712-9ef3-1beaf42a1299",
+        "frontend": "4eb8a0c9-07fc-41ad-b16e-f0e0347a4aa1"
+      },
+      "checks": 144,
+      "routes": 36,
+      "failures": 0,
+      "summary": "cmos/reports/sprint-53/production-evidence/e751df8-summary.json",
+      "visual_review": "cmos/reports/sprint-53/production-evidence/e751df8-visual-review.json",
+      "public_smoke": "cmos/reports/sprint-53/production-evidence/e751df8-public-smoke.json",
+      "finding": "The image review found markdown tables unreadable at 390 px on /documents/[id]; PR #324 fixed it before this final baseline."
+    }
+  },
+  "decisions": [
+    459,
+    464,
+    465
+  ]
+}
