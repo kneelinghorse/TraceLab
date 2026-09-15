@@ -6,7 +6,7 @@ export function ThemeSelect() {
   const { choice, resolved, setChoice } = useTheme();
   return (
     <label className="flex items-center justify-between gap-3 text-sm text-muted">
-      <span>Appearance</span>
+      <span>Theme</span>
       <select
         aria-label="Color theme"
         className="rounded-lg border border-line bg-surface px-2 py-1.5 text-foreground"
