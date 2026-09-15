@@ -70,6 +70,30 @@ test("Home keeps viewed activity rows at AA contrast in the light theme", async 
   expect(violations).toEqual([]);
 });
 
+test("document tables scroll sideways on a phone instead of breaking words apart", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 900 });
+  const table = [
+    "| Entity | What it records | Rationale / alternatives | Applicability conditions | Evidence behind decision | Revision history |",
+    "| --- | --- | --- | --- | --- | --- |",
+    "| design rationale | Arguments behind design decisions | Yes, in QOC forms | Partial criteria | Data unavailable in primary sources | Data unavailable in primary sources |",
+  ].join("\n");
+  const record = { id: "doc-table", project_id: "project-1", name: "comparison_report.md", mime_type: "text/markdown", source_origin: "synthesized", processed: true, chunked: true, embedded: true, links: [] };
+  await page.route("**/api/v1/documents/doc-table**", async route => {
+    const pathname = new URL(route.request().url()).pathname;
+    if (pathname.endsWith("/content")) await route.fulfill({ json: { ...record, content: `# Comparison\n\n${table}\n` } });
+    else if (pathname.endsWith("/chunks")) await route.fulfill({ json: { data: [], pagination: { page: 1, page_size: 10, total: 0, pages: 1 } } });
+    else await route.fulfill({ json: record });
+  });
+  await page.goto("/documents/doc-table");
+  const region = page.getByRole("region", { name: "Scrollable table" });
+  await expect(region).toBeVisible();
+  // The shell's overflow-wrap:anywhere let every column shrink to a letter or two at 390 px.
+  const header = region.locator("th", { hasText: "Applicability conditions" });
+  expect((await header.boundingBox())?.width ?? 0).toBeGreaterThan(90);
+  expect(await region.evaluate(el => el.scrollWidth > el.clientWidth)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+});
+
 test("theme persists through hydration and OS changes without a wrong-color frame", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
