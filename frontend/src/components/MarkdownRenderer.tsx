@@ -78,7 +78,8 @@ const components: Components = {
   hr() {
     return <hr className="border-line my-6" />;
   },
-  // Keep wide tables readable without overflowing the page.
+  // Keep wide tables readable without overflowing the page. Cells opt out of the
+  // shell's overflow-wrap:anywhere so columns keep whole words and the region scrolls.
   table({ children }) {
     return (
       <div tabIndex={0} role="region" aria-label="Scrollable table" className="overflow-x-auto my-4">
@@ -90,14 +91,14 @@ const components: Components = {
   },
   th({ children }) {
     return (
-      <th className="px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground">
+      <th className="px-4 py-2 bg-surface border-b border-line text-left text-sm font-semibold text-foreground break-normal">
         {children}
       </th>
     );
   },
   td({ children }) {
     return (
-      <td className="px-4 py-2 border-b border-line text-sm text-secondary">
+      <td className="px-4 py-2 border-b border-line text-sm text-secondary break-normal">
         {children}
       </td>
     );
