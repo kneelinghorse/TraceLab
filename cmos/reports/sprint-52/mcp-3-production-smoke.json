@@ -1,0 +1,150 @@
+{
+  "mission_id": "MCP-3",
+  "sprint_id": "sprint-52",
+  "started_at": "2026-09-15T05:42:30.196Z",
+  "finished_at": "2026-09-15T05:42:38.585Z",
+  "version": "1.2.0",
+  "api": "https://api.tracelab.aquex.ai",
+  "frontend": "https://tracelab.aquex.ai",
+  "read_only": true,
+  "install": {
+    "command": "npx -y @aquex/tracelab-mcp@1.2.0",
+    "fresh_directory": true,
+    "minimal_environment": [
+      "PATH",
+      "HOME",
+      "TRACELAB_API_URL",
+      "TRACELAB_API_KEY",
+      "TRACELAB_FRONTEND_URL"
+    ],
+    "server_version": "1.2.0"
+  },
+  "authentication": {
+    "kind": "human X-API-Key",
+    "source": "existing local credential store",
+    "credential_logged": false,
+    "credential_in_receipt": false
+  },
+  "checks": [
+    {
+      "label": "published package starts and lists tools",
+      "passed": true,
+      "tools": 9,
+      "actions": 51,
+      "server_version": "1.2.0",
+      "startup_stderr": [
+        "TraceLab MCP server started",
+        "API URL: https://api.tracelab.aquex.ai",
+        "Auth: API Key (env)"
+      ]
+    },
+    {
+      "label": "listTools matches the parity manifest tool set",
+      "passed": true,
+      "manifest_tools": [
+        "tracelab_collection",
+        "tracelab_document",
+        "tracelab_evidence",
+        "tracelab_home",
+        "tracelab_mission",
+        "tracelab_mission_execution",
+        "tracelab_project",
+        "tracelab_report",
+        "tracelab_search"
+      ]
+    },
+    {
+      "label": "tracelab_search.navigate read-only",
+      "passed": true,
+      "ms": 308,
+      "generated_links": 1
+    },
+    {
+      "label": "tracelab_project.get read-only",
+      "passed": true,
+      "ms": 318,
+      "generated_links": 1
+    },
+    {
+      "label": "tracelab_collection.list read-only",
+      "passed": true,
+      "ms": 301,
+      "generated_links": 1
+    },
+    {
+      "label": "tracelab_report.list read-only",
+      "passed": true,
+      "ms": 330,
+      "generated_links": 5
+    },
+    {
+      "label": "tracelab_document.list read-only",
+      "passed": true,
+      "ms": 236,
+      "generated_links": 5
+    },
+    {
+      "label": "tracelab_mission.list read-only",
+      "passed": true,
+      "ms": 613,
+      "generated_links": 3
+    },
+    {
+      "label": "tracelab_mission_execution.status read-only",
+      "passed": true,
+      "ms": 391,
+      "generated_links": 1
+    },
+    {
+      "label": "tracelab_evidence.list read-only",
+      "passed": true,
+      "ms": 328,
+      "generated_links": 6
+    },
+    {
+      "label": "tracelab_home.inbox_summary read-only",
+      "passed": true,
+      "ms": 266,
+      "generated_links": 0
+    },
+    {
+      "label": "canonical links resolve with HTTP 200",
+      "passed": true,
+      "checked": 20,
+      "non_200": [],
+      "sample": [
+        {
+          "tool": "evidence",
+          "url": "https://tracelab.aquex.ai/projects/0afcc588-e722-45bd-8320-f486601b877c",
+          "status": 200
+        },
+        {
+          "tool": "collection",
+          "url": "https://tracelab.aquex.ai/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+          "status": 200
+        },
+        {
+          "tool": "report",
+          "url": "https://tracelab.aquex.ai/reports/7064c47e-c198-45d5-b887-b18a1f86d7ce",
+          "status": 200
+        },
+        {
+          "tool": "report",
+          "url": "https://tracelab.aquex.ai/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+          "status": 200
+        },
+        {
+          "tool": "report",
+          "url": "https://tracelab.aquex.ai/reports/0613ab1a-1ae7-4784-bf03-579023d4a20f",
+          "status": 200
+        },
+        {
+          "tool": "report",
+          "url": "https://tracelab.aquex.ai/reports/c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+          "status": 200
+        }
+      ]
+    }
+  ],
+  "passed": true
+}
