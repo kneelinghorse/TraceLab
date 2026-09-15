@@ -20,6 +20,7 @@ from app.ports.repositories import DocumentRepository, MissionRepository, Projec
 from app.services.admin_stats import AdminStatsService
 from app.services.collection_context import CollectionContextService
 from app.services.home import HomeService
+from app.services.inbox import InboxService
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +59,13 @@ def get_home_service() -> HomeService:
     from app.adapters.repositories.sqlalchemy_home_repo import SQLAlchemyHomeRepository
 
     return HomeService(SQLAlchemyHomeRepository())
+
+
+def get_inbox_service() -> InboxService:
+    """Wire the inbox's scoped sections and watermark repository to its service."""
+    from app.adapters.repositories.sqlalchemy_inbox_repo import SQLAlchemyInboxRepository
+
+    return InboxService(SQLAlchemyInboxRepository())
 
 
 def get_navigation_search_repository() -> NavigationSearchRepository:

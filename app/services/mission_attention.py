@@ -11,17 +11,22 @@ from app.models.mission_review import MissionReview
 STALLED_AFTER_SECONDS = 3600
 
 
+def reviewed_clause(user_id: UUID | None):
+    """This user has reviewed the mission's exact current result version."""
+    return select(MissionReview.mission_id).where(
+        MissionReview.user_id == user_id,
+        MissionReview.mission_id == Mission.id,
+        MissionReview.mission_updated_at == Mission.updated_at,
+    ).exists()
+
+
 def attention_reason_clauses(user_id: UUID | None, *, now: datetime):
     """Return mutually exclusive reasons in the established attention priority.
 
     A review only covers this user's exact result version. Missing worker
     progress never implies failure; only queued age defines the stalled group.
     """
-    reviewed = select(MissionReview.mission_id).where(
-        MissionReview.user_id == user_id,
-        MissionReview.mission_id == Mission.id,
-        MissionReview.mission_updated_at == Mission.updated_at,
-    ).exists()
+    reviewed = reviewed_clause(user_id)
     stale = and_(
         Mission.status == "queued",
         func.coalesce(Mission.queued_at, Mission.created_at) <= now - timedelta(seconds=STALLED_AFTER_SECONDS),

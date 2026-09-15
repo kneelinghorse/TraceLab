@@ -184,6 +184,9 @@ def pedr1c_anon_routes(
     return [
         *graph_scope_routes(prefix, resource_id),
         ("get", f"{prefix}/home/attention", None),
+        ("get", f"{prefix}/inbox/summary", None),
+        ("get", f"{prefix}/inbox?section=failures", None),
+        ("put", f"{prefix}/inbox/seen", {}),
         ("get", f"{prefix}/mission-views", None),
         ("post", f"{prefix}/mission-views", {}),
         ("put", f"{prefix}/mission-views/{resource_id}", {}),

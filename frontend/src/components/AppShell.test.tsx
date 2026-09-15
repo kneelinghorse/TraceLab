@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   auth: { isAuthenticated: true, isReady: true, user: { user_id: "alice", display_name: "Alice", email: "alice@example.test" }, logout: vi.fn() },
   role: { isAdmin: false },
   router: { pathname: "/missions/[id]", push: vi.fn() },
+  inbox: { total: 0 },
 }));
 vi.mock("next/router", () => ({ useRouter: () => mocks.router }));
 vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => mocks.auth }));
@@ -13,9 +14,11 @@ vi.mock("@/lib/api/navigation", () => ({ navigationApi: { search: async () => ({
 vi.mock("@/lib/api/search", () => ({ searchApi: { history: async () => ({ entries: [] }) } }));
 vi.mock("@/lib/api/savedSearches", () => ({ savedSearchesApi: { list: async () => ({ items: [] }) } }));
 vi.mock("@/lib/api/missionViews", async original => ({ ...await original<object>(), missionViewsApi: { list: async () => ({ items: [] }) } }));
+vi.mock("@/lib/api/inbox", async original => ({ ...await original<object>(), inboxApi: { summary: async () => ({ generated_at: "2026-09-13T00:00:00", refresh_seconds: 30, seen_through: "2026-09-13T00:00:00", default_lookback_seconds: 604800, unread: { failures: mocks.inbox.total, completions: 0, evidence: 0, total: mocks.inbox.total } }) } }));
 vi.mock("@/components/LoginPanel", () => ({ LoginPanel: () => <p>Sign in form</p> }));
 vi.mock("@/components/RegisterPanel", () => ({ RegisterPanel: () => <p>Registration form</p> }));
 
+import { SWRConfig } from "swr";
 import { AppShell } from "@/components/AppShell";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { openCommandPalette } from "@/lib/command-palette";
@@ -24,12 +27,14 @@ beforeEach(() => {
   localStorage.clear();
   mocks.auth.isAuthenticated = true;
   mocks.role.isAdmin = false;
+  mocks.inbox.total = 0;
   mocks.router.push.mockReset();
   vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
   HTMLDialogElement.prototype.showModal = function () { this.setAttribute("open", ""); };
   HTMLDialogElement.prototype.close = function () { this.removeAttribute("open"); this.dispatchEvent(new Event("close")); };
 });
-function shell() { return render(<ThemeProvider><AppShell><h1>Queue work</h1></AppShell></ThemeProvider>); }
+const fresh = { provider: () => new Map(), dedupingInterval: 0, shouldRetryOnError: false };
+function shell() { return render(<SWRConfig value={fresh}><ThemeProvider><AppShell><h1>Queue work</h1></AppShell></ThemeProvider></SWRConfig>); }
 
 describe("the shared shell", () => {
   it("opens focused search from the Home entry point", () => {
@@ -50,6 +55,18 @@ describe("the shared shell", () => {
     expect(within(nav).getByRole("link", { name: "Relationships" }).getAttribute("href")).toBe("/graph");
   });
 
+  it("carries the unread inbox badge in the toolbar, the sidebar and the drawer, hidden at zero", async () => {
+    mocks.inbox.total = 2;
+    shell();
+    expect(await within(screen.getByRole("banner")).findByRole("link", { name: "Inbox, 2 unread" })).toBeTruthy();
+    const nav = screen.getByRole("navigation", { name: "Main navigation" });
+    expect(within(nav).getByRole("link", { name: "Inbox, 2 unread" }).getAttribute("href")).toBe("/inbox");
+    fireEvent.click(screen.getByRole("button", { name: "Open navigation" }));
+    expect(within(screen.getByRole("dialog", { name: "Navigation" })).getByRole("link", { name: "Inbox, 2 unread" })).toBeTruthy();
+    expect(screen.getAllByTestId("inbox-unread").map((badge) => badge.textContent)).toEqual(["2", "2", "2"]);
+    expect(within(nav).queryByRole("link", { name: "Inbox", exact: true })).toBeNull();
+  });
+
   it("keeps admin destinations out of both navigation and command search for non-admins", () => {
     const view = shell();
     expect(screen.queryByRole("link", { name: "Users" })).toBeNull();
@@ -57,7 +74,7 @@ describe("the shared shell", () => {
     const dialog = screen.getByRole("dialog", { name: "Search and navigation" });
     expect(within(dialog).queryByRole("button", { name: "Users" })).toBeNull();
     mocks.role.isAdmin = true;
-    view.rerender(<ThemeProvider><AppShell><h1>Queue work</h1></AppShell></ThemeProvider>);
+    view.rerender(<SWRConfig value={fresh}><ThemeProvider><AppShell><h1>Queue work</h1></AppShell></ThemeProvider></SWRConfig>);
     expect(screen.getByRole("link", { name: "Users" })).toBeTruthy();
     expect(within(dialog).getByRole("button", { name: "Users" })).toBeTruthy();
   });

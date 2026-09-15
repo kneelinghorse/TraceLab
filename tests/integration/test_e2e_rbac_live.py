@@ -167,6 +167,7 @@ def test_harness_pedr1c_routes_match_wired_surface():
         or path.startswith(f"{settings.api_v1_prefix}/reports")
         or path.startswith(f"{settings.api_v1_prefix}/saved-searches")
         or path.startswith(f"{settings.api_v1_prefix}/mission-views")
+        or path.startswith(f"{settings.api_v1_prefix}/inbox")
         or path in {
             f"{settings.api_v1_prefix}/search/history",
             f"{settings.api_v1_prefix}/search/replay/{{id}}",

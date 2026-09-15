@@ -7,8 +7,8 @@
     "queries_with_new_graph_results": 0,
     "queries_with_rank_changes": 4,
     "total_new_results_surfaced": 0,
-    "avg_graph_latency_ms": 0.58,
-    "max_graph_latency_ms": 1.04
+    "avg_graph_latency_ms": 0.61,
+    "max_graph_latency_ms": 1.03
   },
   "per_query": [
     {
@@ -18,9 +18,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 6,
       "graph_candidates_expanded": 5,
-      "graph_layer_ms": 1.04,
-      "total_ms_off": 0.83,
-      "total_ms_on": 1.75
+      "graph_layer_ms": 1.03,
+      "total_ms_off": 1.2,
+      "total_ms_on": 1.97
     },
     {
       "query": "how to reduce API latency",
@@ -29,9 +29,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 6,
       "graph_candidates_expanded": 7,
-      "graph_layer_ms": 0.88,
-      "total_ms_off": 0.74,
-      "total_ms_on": 1.6
+      "graph_layer_ms": 0.91,
+      "total_ms_off": 0.86,
+      "total_ms_on": 2.07
     },
     {
       "query": "mobile-first design approach",
@@ -40,9 +40,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 0,
       "graph_candidates_expanded": 2,
-      "graph_layer_ms": 0.72,
-      "total_ms_off": 0.67,
-      "total_ms_on": 1.32
+      "graph_layer_ms": 0.57,
+      "total_ms_off": 0.91,
+      "total_ms_on": 1.81
     },
     {
       "query": "find all UX research findings",
@@ -51,9 +51,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 0,
       "graph_candidates_expanded": 0,
-      "graph_layer_ms": 0.0,
-      "total_ms_off": 0.18,
-      "total_ms_on": 0.19
+      "graph_layer_ms": 0.03,
+      "total_ms_off": 0.83,
+      "total_ms_on": 0.74
     },
     {
       "query": "database optimization recommendations",
@@ -62,9 +62,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 0,
       "graph_candidates_expanded": 3,
-      "graph_layer_ms": 0.65,
-      "total_ms_off": 0.62,
-      "total_ms_on": 1.28
+      "graph_layer_ms": 0.99,
+      "total_ms_off": 2.18,
+      "total_ms_on": 2.65
     },
     {
       "query": "competitive analysis graph search",
@@ -73,9 +73,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 0,
       "graph_candidates_expanded": 0,
-      "graph_layer_ms": 0.0,
-      "total_ms_off": 0.18,
-      "total_ms_on": 0.18
+      "graph_layer_ms": 0.01,
+      "total_ms_off": 0.32,
+      "total_ms_on": 0.25
     },
     {
       "query": "onboarding drop-off rate",
@@ -84,9 +84,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 6,
       "graph_candidates_expanded": 5,
-      "graph_layer_ms": 0.88,
-      "total_ms_off": 0.69,
-      "total_ms_on": 1.57
+      "graph_layer_ms": 0.96,
+      "total_ms_off": 1.06,
+      "total_ms_on": 1.78
     },
     {
       "query": "cloud cost reduction strategies",
@@ -95,8 +95,8 @@
       "new_results_from_graph": 0,
       "rank_changes": 0,
       "graph_candidates_expanded": 2,
-      "graph_layer_ms": 0.6,
-      "total_ms_off": 0.6,
+      "graph_layer_ms": 0.5,
+      "total_ms_off": 0.71,
       "total_ms_on": 1.2
     },
     {
@@ -107,8 +107,8 @@
       "rank_changes": 0,
       "graph_candidates_expanded": 0,
       "graph_layer_ms": 0.0,
-      "total_ms_off": 0.18,
-      "total_ms_on": 0.19
+      "total_ms_off": 0.19,
+      "total_ms_on": 0.18
     },
     {
       "query": "A/B testing onboarding redesign",
@@ -117,9 +117,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 6,
       "graph_candidates_expanded": 5,
-      "graph_layer_ms": 0.88,
-      "total_ms_off": 0.8,
-      "total_ms_on": 1.59
+      "graph_layer_ms": 0.92,
+      "total_ms_off": 0.86,
+      "total_ms_on": 1.72
     },
     {
       "query": "infrastructure caching layer",
@@ -128,9 +128,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 0,
       "graph_candidates_expanded": 2,
-      "graph_layer_ms": 0.69,
-      "total_ms_off": 0.6,
-      "total_ms_on": 1.28
+      "graph_layer_ms": 0.85,
+      "total_ms_off": 1.68,
+      "total_ms_on": 2.5
     },
     {
       "query": "market share competitor analysis",
@@ -139,9 +139,9 @@
       "new_results_from_graph": 0,
       "rank_changes": 0,
       "graph_candidates_expanded": 2,
-      "graph_layer_ms": 0.59,
-      "total_ms_off": 0.61,
-      "total_ms_on": 1.19
+      "graph_layer_ms": 0.52,
+      "total_ms_off": 0.84,
+      "total_ms_on": 1.32
     }
   ]
 }

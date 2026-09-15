@@ -21,6 +21,7 @@ test.beforeEach(async ({ page }) => {
     };
     else if (pathname.endsWith("/home/attention")) body = { generated_at: "2026-09-13T00:00:00Z", total: 0, stalled_after_seconds: 3600, by_reason: { validation_failed: 0, blocked: 0, stalled: 0, unreviewed: 0 }, dashboards: [{ key: "at_risk", total: 0 }, { key: "unreviewed", total: 0 }] };
     else if (pathname.endsWith("/mission-views")) body = { items: [] };
+    else if (pathname.endsWith("/inbox/summary")) body = { generated_at: "2026-09-13T00:00:00", refresh_seconds: 30, seen_through: "2026-09-13T00:00:00", default_lookback_seconds: 604800, unread: { failures: 0, completions: 0, evidence: 0, total: 0 } };
     else if (pathname.endsWith("/projects") || pathname.endsWith("/missions") || pathname.endsWith("/documents")) body = { data: [], pagination: { page: 1, page_size: 20, total: 0, pages: 1 } };
     else if (pathname.endsWith("/search/history")) body = { entries: [] };
     else if (pathname.endsWith("/saved-searches")) body = { items: [] };
