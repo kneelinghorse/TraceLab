@@ -1,0 +1,512 @@
+{
+  "mission": "DOC-1",
+  "sprint": "sprint-52",
+  "status": "validated",
+  "generated_at": "2026-09-15T04:18:04.017240+00:00",
+  "session_id": "PS-2026-09-15-004",
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/308",
+  "base_commit": "bf750cb70550a33f179b0ca4c2518454122ff87c",
+  "source_commit": "c790307",
+  "merge_commit": "6e39732b23ab3ed6e777df4966c3815d24d5fb3f",
+  "documents": {
+    "stamps": {
+      "docs/frontend_architecture.md": "As of main `bf750cb70550a33f179b0ca4c2518454122ff87c` (2026-09-15, end of the Sprint 52 build). This page describes the",
+      "cmos/foundational-docs/technical_architecture.md": "As of main `bf750cb70550a33f179b0ca4c2518454122ff87c` (2026-09-15, end of the Sprint 52 build). This document describes the"
+    },
+    "frontend_architecture": {
+      "path": "docs/frontend_architecture.md",
+      "forbidden_names": {
+        "MissionProtocolForm": 0,
+        "ProgressIndicator": 0,
+        "QualityGatePanel": 0,
+        "types/forms.ts": 0,
+        "glassmorphism": 0
+      },
+      "route_files": [
+        "frontend/src/pages/_app.tsx",
+        "frontend/src/pages/_document.tsx",
+        "frontend/src/pages/admin/corrections.tsx",
+        "frontend/src/pages/admin/observability.tsx",
+        "frontend/src/pages/admin/spaces.tsx",
+        "frontend/src/pages/admin/users.tsx",
+        "frontend/src/pages/collections/[id].tsx",
+        "frontend/src/pages/collections/index.tsx",
+        "frontend/src/pages/device.tsx",
+        "frontend/src/pages/documents/[id].tsx",
+        "frontend/src/pages/documents/index.tsx",
+        "frontend/src/pages/documents/upload.tsx",
+        "frontend/src/pages/evidence.tsx",
+        "frontend/src/pages/evidence/[id].tsx",
+        "frontend/src/pages/graph.tsx",
+        "frontend/src/pages/inbox.tsx",
+        "frontend/src/pages/index.tsx",
+        "frontend/src/pages/missions/[id].tsx",
+        "frontend/src/pages/missions/index.tsx",
+        "frontend/src/pages/missions/new.tsx",
+        "frontend/src/pages/missions/queue.tsx",
+        "frontend/src/pages/projects/[id].tsx",
+        "frontend/src/pages/projects/index.tsx",
+        "frontend/src/pages/reports/[id].tsx",
+        "frontend/src/pages/reports/index.tsx",
+        "frontend/src/pages/saved-searches.tsx",
+        "frontend/src/pages/search/index.tsx",
+        "frontend/src/pages/settings.tsx"
+      ]
+    },
+    "technical_architecture": {
+      "path": "cmos/foundational-docs/technical_architecture.md",
+      "keyword_counts": {
+        "RBAC": 6,
+        "Space": 7,
+        "PEDR": 6,
+        "MCP": 20,
+        "Alembic": 3
+      },
+      "historical_note": "git show b9e3ee9:cmos/foundational-docs/technical_architecture.md; cmos/reports/white-papers/tracelab-technical-architecture.md"
+    }
+  },
+  "dead_references": {
+    "files": [
+      "agents.md",
+      "README.md",
+      "docs/README.md",
+      "cmos/docs/operations-guide.md"
+    ],
+    "notes": [
+      "agents.md: five missing cmos/docs files retargeted or removed; cmos/scripts/package_starter.sh; cmos/ prefixes on context/db_client.py, db/cmos.sqlite and both foundational-docs templates; docs/adr/ (was docs/adr/001-005); cmos/context/MASTER_CONTEXT.json (was backlog.yaml); footer Last Updated 2026-09-15 / Version 2.2.0",
+      "README.md: cmos/foundational-docs/technical_architecture.md (was cmos/docs/technical_architecture.md); project tree rewritten as built (app/utils/ removed; .github, cmos, docs, frontend, packages/tracelab-mcp, scripts, app/schemas, app/mcp_server, app/main.py added)",
+      "docs/README.md: AI-coding-assistant-workflows.md link replaced by cmos/reports/, cmos/docs/README.md and cmos/docs/operations-guide.md",
+      "cmos/docs/operations-guide.md: cmos/context/MASTER_CONTEXT.json at the former :104 and :228 locations; Last Updated 2026-09-15; Sprint-Boundary Identity Sync (Runbook) section retained; retired documents named without paths; cmos/research/ marked as created on first export"
+    ]
+  },
+  "validator": {
+    "shared_module": "cmos/context/foundational_refs.py",
+    "entry_points": [
+      "cmos/scripts/validate_foundational_refs.py",
+      "cmos/cli.py validate docs (_validate_foundational_refs)"
+    ],
+    "matcher": "(?<![\\w-])<needle>(?![\\w-])",
+    "unit_test": "tests/unit/test_validate_foundational_refs.py",
+    "red_log": {
+      "path": "cmos/reports/sprint-52/doc-1-tooling/validator-test-red.log",
+      "content": "FAILED tests/unit/test_validate_foundational_refs.py::test_legitimate_foundational_paths_are_not_flagged[cmos/foundational-docs/technical_architecture.md]\nFAILED tests/unit/test_validate_foundational_refs.py::test_legitimate_foundational_paths_are_not_flagged[cmos/foundational-docs/roadmap.md]\nERROR tests/unit/test_validate_foundational_refs.py::test_script_and_cli_share_one_matcher\n2 failed, 6 passed, 4 warnings, 1 error in 0.15s"
+    },
+    "green_log": {
+      "path": "cmos/reports/sprint-52/doc-1-tooling/validator-test-green.log",
+      "content": "9 passed, 4 warnings in 0.08s"
+    },
+    "final_log": {
+      "path": "cmos/reports/sprint-52/doc-1-tooling/validator-test-final.log",
+      "content": "9 passed, 4 warnings in 0.11s"
+    },
+    "cli_ruff_cleanup": "cmos/cli.py: pre-existing ruff findings cleared because ruff-diff lints whole changed files; validate docs, validate health and db show current exercised locally",
+    "manual_guard": "The validator stays a manual guard, not a CI gate (mission's decided default)."
+  },
+  "path_check": {
+    "script": "cmos/reports/sprint-52/doc-1-tooling/check_doc_paths.py",
+    "allowlist": {
+      "path": "cmos/reports/sprint-52/doc-1-tooling/path-allowlist.json",
+      "entries": {
+        "cmos/reports/sprint-N/": "placeholder: N stands for the sprint number of the receipt being cited",
+        "cmos/research/": "created on demand: `./cmos/cli.py research export` mkdirs cmos/research/ on first export (cmos/cli.py, research export handler); no export has been committed yet"
+      }
+    },
+    "output": "cmos/reports/sprint-52/doc-1-tooling/path-check.txt",
+    "report": "cmos/reports/sprint-52/doc-1-tooling/path-check.json",
+    "summary": {
+      "docs/frontend_architecture.md": {
+        "resolved": 61,
+        "git": 1,
+        "allowlisted": 1,
+        "unresolved": 0
+      },
+      "cmos/foundational-docs/technical_architecture.md": {
+        "resolved": 52,
+        "git": 1,
+        "allowlisted": 1,
+        "unresolved": 0
+      },
+      "agents.md": {
+        "resolved": 75,
+        "git": 0,
+        "allowlisted": 0,
+        "unresolved": 0
+      },
+      "README.md": {
+        "resolved": 44,
+        "git": 0,
+        "allowlisted": 0,
+        "unresolved": 0
+      },
+      "docs/README.md": {
+        "resolved": 22,
+        "git": 0,
+        "allowlisted": 0,
+        "unresolved": 0
+      },
+      "cmos/docs/operations-guide.md": {
+        "resolved": 28,
+        "git": 0,
+        "allowlisted": 1,
+        "unresolved": 0
+      }
+    },
+    "total_unresolved": 0
+  },
+  "post_merge_main": {
+    "validators": "main commit: 6e39732b23ab3ed6e777df4966c3815d24d5fb3f\nchecked at: 2026-09-15T04:07:08Z\n$ python3 cmos/scripts/validate_foundational_refs.py\nFoundational reference validation succeeded.\nexit=0\n$ ./cmos/cli.py validate docs\nFoundational reference validation succeeded.\nexit=0\n$ ruff check cmos/cli.py cmos/context/foundational_refs.py cmos/scripts/validate_foundational_refs.py tests/unit/test_validate_foundational_refs.py cmos/reports/sprint-52/doc-1-tooling/check_doc_paths.py\nAll checks passed!\nexit=0\n$ python3 -m pytest tests/unit/test_validate_foundational_refs.py -q\n9 passed, 4 warnings in 0.10s\n$ python3 cmos/reports/sprint-52/doc-1-tooling/check_doc_paths.py (six documents)\nTOTAL unresolved: 0\nexit=0",
+    "backend_suite_deselected": "run_id=34927547886\njob_id=104248700435\npytest_summary=2684 passed, 3 skipped, 12 deselected, 48 warnings in 543.02s (0:09:03) ====\ndeselected=12 deselected"
+  },
+  "ci": {
+    "main_push_runs": [
+      {
+        "workflow": "Backend Integration",
+        "run_id": 34927547933,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34927547933",
+        "event": "push",
+        "head_sha": "6e39732b23ab3ed6e777df4966c3815d24d5fb3f",
+        "head_branch": "main",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-09-15T04:06:49Z",
+        "jobs": [
+          {
+            "id": 104248700468,
+            "name": "backend-integration",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34927547933/job/104248700468"
+          }
+        ]
+      },
+      {
+        "workflow": "Backend Lint",
+        "run_id": 34927547990,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34927547990",
+        "event": "push",
+        "head_sha": "6e39732b23ab3ed6e777df4966c3815d24d5fb3f",
+        "head_branch": "main",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-09-15T04:06:49Z",
+        "jobs": [
+          {
+            "id": 104248701446,
+            "name": "ruff-diff",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34927547990/job/104248701446"
+          }
+        ]
+      },
+      {
+        "workflow": "Backend Tests",
+        "run_id": 34927547886,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34927547886",
+        "event": "push",
+        "head_sha": "6e39732b23ab3ed6e777df4966c3815d24d5fb3f",
+        "head_branch": "main",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-09-15T04:06:48Z",
+        "jobs": [
+          {
+            "id": 104248700435,
+            "name": "backend-suite",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34927547886/job/104248700435"
+          }
+        ]
+      },
+      {
+        "workflow": "Frontend Checks",
+        "run_id": 34927548025,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34927548025",
+        "event": "push",
+        "head_sha": "6e39732b23ab3ed6e777df4966c3815d24d5fb3f",
+        "head_branch": "main",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-09-15T04:06:49Z",
+        "jobs": [
+          {
+            "id": 104248701526,
+            "name": "type-check",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34927548025/job/104248701526"
+          },
+          {
+            "id": 104248701714,
+            "name": "vitest",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34927548025/job/104248701714"
+          },
+          {
+            "id": 104248701835,
+            "name": "lint",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34927548025/job/104248701835"
+          }
+        ]
+      },
+      {
+        "workflow": "Frontend Production Build",
+        "run_id": 34927547901,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34927547901",
+        "event": "push",
+        "head_sha": "6e39732b23ab3ed6e777df4966c3815d24d5fb3f",
+        "head_branch": "main",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-09-15T04:06:48Z",
+        "jobs": [
+          {
+            "id": 104248699720,
+            "name": "build-frontend-production",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34927547901/job/104248699720"
+          }
+        ]
+      },
+      {
+        "workflow": "MCP Package",
+        "run_id": 34927547987,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34927547987",
+        "event": "push",
+        "head_sha": "6e39732b23ab3ed6e777df4966c3815d24d5fb3f",
+        "head_branch": "main",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-09-15T04:06:49Z",
+        "jobs": [
+          {
+            "id": 104248701144,
+            "name": "mcp-package",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34927547987/job/104248701144"
+          }
+        ]
+      },
+      {
+        "workflow": "Secret Scan",
+        "run_id": 34927547991,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34927547991",
+        "event": "push",
+        "head_sha": "6e39732b23ab3ed6e777df4966c3815d24d5fb3f",
+        "head_branch": "main",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-09-15T04:06:49Z",
+        "jobs": [
+          {
+            "id": 104248701111,
+            "name": "Secret Scan",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34927547991/job/104248701111"
+          }
+        ]
+      }
+    ],
+    "required_contexts": [
+      "backend-suite",
+      "vitest",
+      "type-check",
+      "ruff-diff",
+      "build-frontend-production",
+      "Secret Scan",
+      "backend-integration",
+      "lint"
+    ],
+    "missing_required": [],
+    "all_success": true
+  },
+  "deployment": {
+    "checked_at": "2026-09-15T04:09:12Z",
+    "commit": "6e39732b23ab3ed6e777df4966c3815d24d5fb3f",
+    "services": {
+      "TraceLab": {
+        "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+        "deployment_id": "511c92f5-e231-4cef-ae3a-960e490364e9",
+        "status": "SUCCESS",
+        "commit": "6e39732b23ab3ed6e777df4966c3815d24d5fb3f",
+        "created_at": "2026-09-15T04:06:48.244Z"
+      },
+      "frontend": {
+        "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+        "deployment_id": "b106577f-7b13-40a6-bfe7-4771b6ddda89",
+        "status": "SUCCESS",
+        "commit": "6e39732b23ab3ed6e777df4966c3815d24d5fb3f",
+        "created_at": "2026-09-15T04:06:48.244Z"
+      }
+    },
+    "both_success_for_commit": true
+  },
+  "public_smoke": {
+    "tool": "playwright",
+    "generatedAt": "2026-09-15T04:17:36.203Z",
+    "completedAt": "2026-09-15T04:17:37.958Z",
+    "status": "passed",
+    "summary": {
+      "total": 4,
+      "expected": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "interrupted": 0,
+      "durationSeconds": 1.755,
+      "retries": 0
+    },
+    "environment": {
+      "node": "v24.6.0",
+      "ci": {
+        "provider": null
+      },
+      "projects": [
+        "chromium"
+      ],
+      "browsers": []
+    },
+    "tests": [
+      {
+        "title": "API health endpoint confirms production authorization and reconciler freshness",
+        "file": "frontend/tests/e2e/production-smoke.spec.ts",
+        "line": 33,
+        "column": 7,
+        "status": "passed",
+        "durationMs": 138,
+        "annotations": [],
+        "attachments": [],
+        "errors": []
+      },
+      {
+        "title": "/admin/spaces is deployed as its own Next page",
+        "file": "frontend/tests/e2e/production-smoke.spec.ts",
+        "line": 23,
+        "column": 9,
+        "status": "passed",
+        "durationMs": 782,
+        "annotations": [],
+        "attachments": [],
+        "errors": []
+      },
+      {
+        "title": "/admin/users is deployed as its own Next page",
+        "file": "frontend/tests/e2e/production-smoke.spec.ts",
+        "line": 23,
+        "column": 9,
+        "status": "passed",
+        "durationMs": 782,
+        "annotations": [],
+        "attachments": [],
+        "errors": []
+      },
+      {
+        "title": "missions route responds at the public domain",
+        "file": "frontend/tests/e2e/production-smoke.spec.ts",
+        "line": 17,
+        "column": 7,
+        "status": "passed",
+        "durationMs": 879,
+        "annotations": [],
+        "attachments": [],
+        "errors": []
+      }
+    ],
+    "artifactPath": "/private/tmp/claude-501/-Users-systemsystems-portfolio-TraceLab/f57b0397-720d-4d21-a15b-ad4fa81feecb/scratchpad/doc1/public-smoke.json"
+  },
+  "registration": {
+    "checked_at": "2026-09-15T03:49:51.022259+00:00",
+    "source": "cmos/db/cmos.sqlite table contexts (project identity JSON)",
+    "matches": [
+      {
+        "context_id": "project_identity",
+        "source_path": "cmos/contexts/project-identity.json",
+        "updated_at": "2026-09-15T02:40:58.429Z",
+        "foundational_docs": [
+          "cmos/foundational-docs/roadmap-sprints-50-53-ux-overhaul.md",
+          "cmos/foundational-docs/technical_architecture.md",
+          "cmos/foundational-docs/roadmap_template.md",
+          "cmos/foundational-docs/tech_arch_template.md"
+        ]
+      }
+    ],
+    "technical_architecture_registered": true
+  },
+  "tested_source_files": [
+    {
+      "path": "README.md",
+      "sha256": "e8ede3b5de71f86aabc658bce5e43a9e034e9f398cfa8842a9e79a74a136521b"
+    },
+    {
+      "path": "agents.md",
+      "sha256": "e75765c5ebd74aa40062931a3deb9c09dd4a1a1179e32f8a871ce977d2685782"
+    },
+    {
+      "path": "cmos/cli.py",
+      "sha256": "005bf6d8b3b6ee9ebf4bc79f14e965505edd739d85123d7e70b90321a2759818"
+    },
+    {
+      "path": "cmos/context/foundational_refs.py",
+      "sha256": "6a71f6c3615a60c8fcf74aa05d43b65b72f298ef0faadc9af5b66eb250af1540"
+    },
+    {
+      "path": "cmos/docs/operations-guide.md",
+      "sha256": "66cf0ec25fdea9acf5f12ff1fb5dfb92192ae2aeae55d2845f5888afe4e2d40c"
+    },
+    {
+      "path": "cmos/foundational-docs/technical_architecture.md",
+      "sha256": "b2a37346e3dc551145c969efe1af5b050d9bea5aaa3a48801fa78d72ddf80a73"
+    },
+    {
+      "path": "cmos/reports/sprint-52/doc-1-tooling/check_doc_paths.py",
+      "sha256": "de7650da63dd7d1137ea6c92576a2c4ce68e001bfb192af7113bd5d7706f8e42"
+    },
+    {
+      "path": "cmos/reports/sprint-52/doc-1-tooling/path-allowlist.json",
+      "sha256": "4afb79817e4fcc20f0e9d3e53d58018b1ea9f39eaba8df1386f4298e74fa0a93"
+    },
+    {
+      "path": "cmos/reports/sprint-52/doc-1-tooling/path-check.json",
+      "sha256": "bcd191a7b18067cc5634cf3518c080f5460e9cdb3f8067603ba88bf5411fe795"
+    },
+    {
+      "path": "cmos/reports/sprint-52/doc-1-tooling/path-check.txt",
+      "sha256": "dd304120707f1235a1eaef2910d758d5beca871fb829aec7f918ff6615bb2be7"
+    },
+    {
+      "path": "cmos/scripts/validate_foundational_refs.py",
+      "sha256": "89a113f9fbd5356e540f2385d8fbb7cecb3ac70bea029652a382b13c8d20ccbc"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "e321f7bddd720cfbb175e999b7a8897181029def2a180c23bedaf31618a9e5db"
+    },
+    {
+      "path": "docs/frontend_architecture.md",
+      "sha256": "14be17b5f0150e085e6b2a534945dbc4d7defdd85157a3cf6e115b501e5fddee"
+    },
+    {
+      "path": "tests/unit/test_validate_foundational_refs.py",
+      "sha256": "9beccc27084486a355b66e12157201426af0b6cad632374c29367d9a1bf1740c"
+    }
+  ],
+  "limitations": [
+    "MCP: source is 1.2.0 on main while npm serves 1.1.1 until the MCP-3 single publish (decision #425); both documents say so.",
+    "frontend/package.json lists @tailwindcss/postcss ^4 next to tailwindcss ^3.4; postcss.config.mjs uses the tailwindcss plugin, so the document describes Tailwind 3.4 and does not mention the unused dependency.",
+    "cmos/research/ and cmos/reports/sprint-N/ are allowlisted placeholders (reasons in path-allowlist.json).",
+    "The path check resolves bare file names against a short list of conventional base directories; the verbose output records which base resolved each token."
+  ],
+  "definition_of_done": {
+    "frontend_doc_as_built": "documents.frontend_architecture + documents.stamps",
+    "tech_doc_as_built": "documents.technical_architecture (keyword_counts) + historical note",
+    "path_check_zero_unresolved": "path_check",
+    "agents_md_fixed": "dead_references.notes[0]",
+    "readme_docs_readme_fixed": "dead_references.notes[1..2]",
+    "operations_guide_fixed": "dead_references.notes[3]",
+    "shared_matcher_with_red_green_test": "validator",
+    "merged_main_validators_ruff_backend_suite": "post_merge_main + ci",
+    "deployment_ids_and_main_push_runs": "deployment + ci.main_push_runs",
+    "receipt_merged_and_registration": "receipt PR cited in CMOS completion notes; registration"
+  },
+  "receipt_sha256_inputs": {
+    "path-check.json": "bcd191a7b18067cc5634cf3518c080f5460e9cdb3f8067603ba88bf5411fe795"
+  }
+}
