@@ -39,7 +39,7 @@ BASES = (
     "frontend/src/contexts", "frontend/scripts", "app", "cmos/docs", "cmos/context",
     "cmos/scripts", ".github/workflows", "packages/tracelab-mcp", "scripts", "tests",
 )
-TOKEN = re.compile(r"[A-Za-z0-9_@$./*:\[\]{}<>~-]+")
+PATH_PATTERN = re.compile(r"[A-Za-z0-9_@$./*:\[\]{}<>~-]+")
 BACKTICK = re.compile(r"`([^`]+)`")
 LINK = re.compile(r"\]\(([^)\s]+)\)")
 GIT_SHOW = re.compile(r"git show ([0-9a-f]{7,40}):([^\s`'\")]+)")
@@ -79,13 +79,13 @@ def extract(line: str) -> list[tuple[str, bool]]:
     for match in BACKTICK.finditer(line):
         span = match.group(1).strip()
         if " " in span:
-            found.extend((token, True) for token in TOKEN.findall(span))
+            found.extend((token, True) for token in PATH_PATTERN.findall(span))
         else:
             found.append((span, True))
     outside = BACKTICK.sub(" ", line)
     found.extend((match.group(1), True) for match in LINK.finditer(outside))
     outside = LINK.sub(" ", outside)
-    found.extend((token, False) for token in TOKEN.findall(outside))
+    found.extend((token, False) for token in PATH_PATTERN.findall(outside))
     return found
 
 
