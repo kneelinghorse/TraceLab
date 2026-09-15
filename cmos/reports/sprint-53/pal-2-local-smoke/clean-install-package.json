@@ -1,0 +1,17 @@
+{
+  "name": "clean",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@oods/tokens": "file:../pack/oods-tokens-0.1.0.tgz",
+    "@oods/tw-variants": "file:../pack/oods-tw-variants-0.1.0.tgz"
+  }
+}

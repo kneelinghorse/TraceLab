@@ -1,18 +1,19 @@
 {
   "source_repository": "OODS-Forge",
-  "checkout_head": "114a268ea10b9141bc96925c69132179c7c4b334",
+  "checkout_head": "04182b116703088773ab7e414c6d7d6721c6c24e",
   "packaging": "npm pack --ignore-scripts from existing built artifacts; immutable tarballs, no registry publishing",
   "packages": [
     {
       "file": "vendor/oods-tokens-0.1.0.tgz",
-      "sha256": "69422edecf1d2853a844003bebbe2e4b514987e86a9fa1d860946f873c1c28c5",
-      "size_bytes": 238478
+      "sha256": "b4c0c645f872e9084c8250dce252e3bb6160de7cce0c5015d043a228fee8f025",
+      "size_bytes": 249288
     },
     {
       "file": "vendor/oods-tw-variants-0.1.0.tgz",
-      "sha256": "30b3ebfae93f7e8a5f0c0b35dcef2269254baff12bb480ebaad15365a3a5a34a",
-      "size_bytes": 13166
+      "sha256": "94c0a7d0def3666856fe7ba0ee8afac6863adbcfbcd0279d1f43ee7907a19819",
+      "size_bytes": 14309
     }
   ],
-  "clean_install_smoke": "passed: CSS exposes Brand A light/dark/hc; Tailwind generates context rules using packaged plugin"
+  "clean_install_smoke": "passed 2026-09-15: CSS exposes Brand A light/dark/hc scopes; Tailwind plugin default export loads from the packaged tarball",
+  "checkout_note": "Forge main merge of PR #118 (2026-09-15); Brand A rewritten to the neutral palette in 403479399..747a48813 (2026-09-12/13). Previous pin 114a268 was never certified by Forge (THEME-1 validation)."
 }
