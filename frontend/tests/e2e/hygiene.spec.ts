@@ -44,10 +44,11 @@ for (const theme of ["light","dark"] as const) for (const width of [390,1440]) {
     await expect(dialog).not.toBeVisible();
     await expect(remove).toBeFocused();
     await page.goto("/collections");
-    await page.getByRole("button",{name:"New Collection",exact:true}).click();
+    await page.getByRole("link",{name:"New collection",exact:true}).click();
+    await expect(page).toHaveURL(/\/collections\/new$/);
     await page.getByLabel("Collection name",{exact:true}).fill("Unsaved collection");
     await accessible(page);
-    await page.getByRole("button",{name:"Cancel",exact:true}).click();
+    await page.getByRole("link",{name:"Cancel",exact:true}).click();
     await page.goto("/collections/collection");
     await page.getByRole("button",{name:"Edit",exact:true}).click();
     await expect(page.getByLabel("Collection name",{exact:true})).toHaveValue("Auditable research");

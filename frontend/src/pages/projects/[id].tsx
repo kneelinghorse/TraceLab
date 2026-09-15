@@ -22,8 +22,6 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import useSWR, { mutate as globalMutate } from "swr";
 
-const RESEARCH_TYPES = ["strategic", "tactical", "generative", "evaluative"] as const;
-
 export default function ProjectDetailPage() {
   const { query } = useRouter();
   return <ProjectDetail key={typeof query.id === "string" ? query.id : "loading"} />;
@@ -53,7 +51,7 @@ function ProjectDetail() {
 
   // Edit mode
   const [editing, setEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ name: "", description: "", research_type: "" });
+  const [editForm, setEditForm] = useState({ name: "", description: "" });
   const [saving, setSaving] = useState(false);
 
   // Delete state
@@ -65,7 +63,6 @@ function ProjectDetail() {
       setEditForm({
         name: project.name,
         description: project.description || "",
-        research_type: project.research_type || "",
       });
       setEditing(true);
     }
@@ -73,7 +70,7 @@ function ProjectDetail() {
 
   const cancelEditing = () => {
     setEditing(false);
-    setEditForm({ name: "", description: "", research_type: "" });
+    setEditForm({ name: "", description: "" });
   };
 
   const handleSave = async () => {
@@ -84,7 +81,6 @@ function ProjectDetail() {
       await projectsApi.updateProject(projectId, {
         name: editForm.name.trim(),
         description: editForm.description.trim(),
-        research_type: editForm.research_type || undefined,
       });
       await mutateProject();
       // Invalidate project list caches
@@ -187,22 +183,6 @@ function ProjectDetail() {
                     className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-secondary mb-1">Research Type</label>
-                  <select
-                    aria-label="Research type"
-                    value={editForm.research_type}
-                    onChange={(e) => setEditForm((prev) => ({ ...prev, research_type: e.target.value }))}
-                    className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
-                  >
-                    <option value="">Select...</option>
-                    {RESEARCH_TYPES.map((type) => (
-                      <option key={type} value={type}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
-                      </option>
-                    ))}
-                  </select>
-                </div>
                 <div className="flex gap-3">
                   <button
                     onClick={handleSave}
@@ -229,7 +209,6 @@ function ProjectDetail() {
                       <p className="mt-2 break-words text-secondary">{project.description}</p>
                     )}
                     <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted">
-                      <span>Research Type: {project.research_type || "Not set"}</span>
                       <StatusBadge status={project.status || "unknown"} />
                       {project.created_at && (
                         <span>Created {formatDistanceToNow(parseApiTimestamp(project.created_at), { addSuffix: true })}</span>

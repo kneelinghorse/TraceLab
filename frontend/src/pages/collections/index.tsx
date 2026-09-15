@@ -18,10 +18,6 @@ export default function CollectionsPage() {
   const { user } = useAuth();
   const { askConfirmation, notify, feedback } = useFeedback();
   const [page, setPage] = useState(1);
-  const [isCreating, setIsCreating] = useState(false);
-  const [newName, setNewName] = useState("");
-  const [newDescription, setNewDescription] = useState("");
-  const [createError, setCreateError] = useState<string | null>(null);
 
   const { data: response, mutate, isLoading, error } = useSWR(
     ["collections", user?.user_id, page],
@@ -30,29 +26,6 @@ export default function CollectionsPage() {
 
   const collections = response?.data ?? [];
   const pages = Math.ceil((response?.total ?? 0) / 20);
-
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newName.trim()) {
-      setCreateError("Name is required");
-      return;
-    }
-
-    setCreateError(null);
-    try {
-      await collectionsApi.create({
-        name: newName.trim(),
-        description: newDescription.trim() || undefined,
-      });
-      setNewName("");
-      setNewDescription("");
-      setIsCreating(false);
-      mutate();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to create collection";
-      setCreateError(message);
-    }
-  };
 
   const handleDelete = async (collection: Collection) => {
     if (!await askConfirmation(`Delete collection "${collection.name}"? The documents and excerpts will remain available.`)) {
@@ -74,79 +47,14 @@ export default function CollectionsPage() {
       <div className="min-h-screen bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground">Collections</h1>
-            <p className="mt-2 text-secondary">
-              Keep instructions, documents and excerpts together to guide your next mission
-            </p>
-          </div>
-
-          {/* Create Collection */}
-          <div className="mb-6">
-            {!isCreating ? (
-              <button
-                onClick={() => setIsCreating(true)}
-                className="px-6 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent transition-colors"
-              >
-                New Collection
-              </button>
-            ) : (
-              <form onSubmit={handleCreate} className="bg-surface rounded-lg border border-line p-6">
-                <h2 className="text-lg font-semibold text-foreground mb-4">Create Collection</h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-secondary mb-1">
-                      Name *
-                    </label>
-                    <input
-                      type="text"
-                      aria-label="Collection name"
-                      value={newName}
-                      onChange={(e) => setNewName(e.target.value)}
-                      placeholder="e.g., Key Research Findings"
-                      className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
-                      autoFocus
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-secondary mb-1">
-                      Description
-                    </label>
-                    <textarea
-                      aria-label="Collection description"
-                      value={newDescription}
-                      onChange={(e) => setNewDescription(e.target.value)}
-                      placeholder="Optional description..."
-                      rows={2}
-                      className="w-full px-4 py-2 border border-line-strong rounded-lg bg-surface text-foreground"
-                    />
-                  </div>
-                  {createError && (
-                    <p className="text-sm text-danger">{createError}</p>
-                  )}
-                  <div className="flex gap-3">
-                    <button
-                      type="submit"
-                      className="px-4 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent transition-colors"
-                    >
-                      Create
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsCreating(false);
-                        setNewName("");
-                        setNewDescription("");
-                        setCreateError(null);
-                      }}
-                      className="px-4 py-2 text-secondary hover:text-foreground transition-colors"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </form>
-            )}
+          <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Collections</h1>
+              <p className="mt-2 text-secondary">
+                Keep instructions, documents and excerpts together to guide your next mission
+              </p>
+            </div>
+            <Link href="/collections/new" className="px-6 py-2 bg-accent text-on-accent rounded-lg hover:bg-accent transition-colors">New collection</Link>
           </div>
 
           {response && !error && <p className="mb-4 text-sm text-secondary">{response.total.toLocaleString()} collections</p>}
