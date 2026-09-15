@@ -1829,13 +1829,14 @@
       "id": "frontend/src/lib/api/settings.ts#profileApi.get:GET:/auth/me",
       "api_file": "frontend/src/lib/api/settings.ts",
       "operation": "profileApi.get",
-      "source_line": 26,
+      "source_line": 28,
       "method": "GET",
       "path": "/api/v1/auth/me",
       "live": true,
       "ui_consumers": [
         "frontend/src/contexts/RoleContext.tsx",
-        "frontend/src/pages/_app.tsx"
+        "frontend/src/pages/_app.tsx",
+        "frontend/src/pages/settings.tsx"
       ],
       "mcp": null,
       "classification": "rest-only-by-design",
