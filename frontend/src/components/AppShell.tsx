@@ -44,8 +44,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, []);
 
   function userMenu() {
-    return <div className="space-y-4 border-t border-line p-4">
-      <ThemeSelect />
+    return <div className="border-t border-line px-4 py-3">
       <div className="flex items-center justify-between gap-2">
         <Link href="/settings" className="min-w-0 text-sm font-medium text-foreground" onClick={() => drawer.current?.close()}><span className="block truncate">{user?.display_name || user?.email || "Account"}</span><span className="text-xs font-normal text-muted">Settings</span></Link>
         <button type="button" onClick={logout} className="shrink-0 rounded-lg px-2 py-2 text-xs text-muted hover:bg-surface-alt">Sign out</button>

@@ -4,6 +4,7 @@ import { useFeedback } from "@/components/ui/useFeedback";
  */
 
 import { AuthGate } from "@/components/AuthGate";
+import { ThemeSelect } from "@/components/ThemeSelect";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiKeysApi, inviteCodesApi, profileApi } from "@/lib/api/settings";
 import type { APIKeyInfo, APIKeyResponse, InviteCode } from "@/lib/api/settings";
@@ -17,6 +18,7 @@ export default function SettingsPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
           <h1 className="text-2xl font-bold text-foreground">Settings</h1>
           <ProfileSection />
+          <AppearanceSection />
           <APIKeysSection />
           <InviteCodesSection />
         </div>
@@ -151,6 +153,20 @@ function ProfileSection() {
           {isSaving ? "Saving..." : "Save changes"}
         </button>
       </form>
+    </section>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Appearance section
+// ---------------------------------------------------------------------------
+
+function AppearanceSection() {
+  return (
+    <section id="appearance" className="scroll-mt-20 bg-surface rounded-lg border border-line p-6">
+      <h2 className="text-lg font-semibold text-foreground mb-1">Appearance</h2>
+      <p className="text-sm text-muted mb-4">Choose a color theme for this browser. System follows your device setting.</p>
+      <div className="max-w-xs"><ThemeSelect /></div>
     </section>
   );
 }
