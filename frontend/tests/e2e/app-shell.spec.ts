@@ -38,7 +38,7 @@ test("Home stays at the root and its search opens the shell palette", async ({ p
   await expect(page.getByRole("heading", { name: "Home", exact: true })).toBeVisible();
   await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole("link", { name: "433 missions" })).toBeVisible();
-  await expect(page.getByText("You’re up to date.")).toBeVisible();
+  await expect(page.getByText("Nothing has happened yet.")).toBeVisible();
   const search = page.getByRole("button", { name: /Search research or jump to a section/ });
   await search.click();
   await expect(page.getByRole("textbox", { name: "Search research or find a section" })).toBeFocused();
