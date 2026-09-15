@@ -1,0 +1,2303 @@
+{
+  "mission": "UX-13",
+  "status": "source validated in production; own receipt merge required before CMOS completion",
+  "checked_at": "2026-09-15T01:15:07.363419+00:00",
+  "session_id": "PS-2026-09-15-001",
+  "base_commit": "19cf92dc0868bffefd2818d568c2559aeb15cc88",
+  "pr": "https://github.com/kneelinghorse/TraceLab/pull/302",
+  "source_commit": "9f52366e9452324e6286b338a042f11c5e315d01",
+  "merge_commit": "43d6c36e63e0b1441377fd32fba64c2192f6f722",
+  "decisions": [
+    426,
+    447
+  ],
+  "learnings": [
+    167,
+    173,
+    176,
+    177
+  ],
+  "changes": [
+    "Migration 048_user_inbox_state: one per-user watermark row with user cascade, plus ix_missions_status_completed_at added up front because the production round trip already exceeds the 150 ms p95 budget and caching is excluded.",
+    "GET /api/v1/inbox/summary, GET /api/v1/inbox and PUT /api/v1/inbox/seen under protected_dependencies, private/no-store, RBAC-scoped totals counted before paging, occurred_at = coalesce(completed_at, updated_at).",
+    "Watermark advances only forward on an explicit mark; older values are no-ops, future values are 422, aware datetimes normalize to naive UTC; the client sends the server's generated_at string verbatim.",
+    "Rows, not events: DeepSearch-style direct terminal writes appear as unread completions or failures on the next poll.",
+    "One shared ledger scope (app/services/evidence_scope.py) and one reviewed_clause serve Home and the inbox; parity is asserted by tests.",
+    "Shell unread badge in toolbar, sidebar and drawer with accessible name 'Inbox, N unread', hidden at zero, 99+ cap, polite increase-only live region, SWR poll paused in hidden tabs.",
+    "/inbox page with distinct loading, empty, error and not-found states, Mark all as seen and Mark reviewed via PUT /home/missions/{id}/review; no alert/confirm; parseApiTimestamp.",
+    "rbac_verify anonymous-401 rows for the three routes; harness and live-surface tests updated; parity manifest classifies inbox reads deferred-MCP-2 and mark-seen rest-only-by-design."
+  ],
+  "validation": {
+    "local": {
+      "checked_at": "2026-09-15T00:42:18Z",
+      "backend_ci_lane": {
+        "passed": 2675,
+        "skipped": 3,
+        "deselected": 12,
+        "log": "backend-ci-lane.log",
+        "scope": "full non-integration suite with CI's 12 quarantined deselects; the 3 skips are pre-existing",
+        "duration": "469.95s (0:07:49)"
+      },
+      "backend_focused": {
+        "passed": 171,
+        "skipped": 0,
+        "deselected": 0,
+        "log": "backend-focused.log",
+        "scope": "inbox, Home, saved views, rbac harness, missions API and mission views suites"
+      },
+      "postgres": {
+        "passed": 12,
+        "skipped": 1,
+        "deselected": 0,
+        "log": "postgres.log",
+        "scope": "PostgreSQL 15 testcontainers: inbox migration round-trip, cascade and index; monotonic upsert and Home parity; Home, saved views, migration coverage and rbac live-surface tests, run by explicit file path"
+      },
+      "frontend_unit": {
+        "passed": 241,
+        "skipped": 0,
+        "log": "frontend-unit.log"
+      },
+      "browser": {
+        "tool": "playwright",
+        "lane": "the nine CI specs against next start on 127.0.0.1:3100",
+        "generatedAt": "2026-09-15T00:29:14.213Z",
+        "completedAt": "2026-09-15T00:31:05.302Z",
+        "status": "passed",
+        "summary": {
+          "total": 64,
+          "expected": 64,
+          "passed": 64,
+          "failed": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "durationSeconds": 111.089,
+          "retries": 0
+        },
+        "log": "local-browser-lane.log",
+        "results": "local-browser-tests.json"
+      },
+      "production_build": {
+        "log": "frontend-build.log",
+        "pages_manifest_has_inbox": true
+      },
+      "mcp_parity_audit": {
+        "totals": {
+          "operations": 111,
+          "live": 104,
+          "dead": 7,
+          "tools": 9,
+          "actions": 40,
+          "classifications": {
+            "covered": 18,
+            "partial": 1,
+            "closed-MCP-1": 18,
+            "rest-only-by-design": 43,
+            "deferred-MCP-2": 17,
+            "needs-derek": 7,
+            "dead-client-code": 7
+          }
+        },
+        "errors": [],
+        "report": "mcp-parity-audit.json"
+      },
+      "other_checks": [
+        "ruff check on every changed Python file",
+        "frontend lint (eslint --max-warnings=0)",
+        "frontend type-check (tsc --noEmit)",
+        "npm run check:tokens (OODS color gate)",
+        "python cmos/scripts/validate_foundational_refs.py"
+      ],
+      "logs": [
+        {
+          "path": "logs/backend-ci-lane.log",
+          "sha256": "6d4a11457c625b80dea915ec8412ff176bedcf1fff36edda4880c3dab709b529"
+        },
+        {
+          "path": "logs/backend-focused.log",
+          "sha256": "35b452b8c3583d7406c601aaea022621bd791d8c2faa50a2f7ff4a7f69691c5c"
+        },
+        {
+          "path": "logs/frontend-build.log",
+          "sha256": "0b7ec0f7f6b59dd0b7d1b698346d9feec8d0d4b5a2457e7cef3781cb42a671af"
+        },
+        {
+          "path": "logs/frontend-unit.log",
+          "sha256": "c98795e9aca0f2bfa54b79f0bae100d9610744cc80007f8d2cf7bf4a6b75045c"
+        },
+        {
+          "path": "logs/inbox-liveflow.log",
+          "sha256": "8884d5d77116ed5c24bbc8f3830eaf5b0298ee7ca327c6673f1869acd99c90c4"
+        },
+        {
+          "path": "logs/inbox-readonly.log",
+          "sha256": "886ffa96b66475de1333744cbc42a1a3ad0b1cc4f6aaa20b0dab86edf27f8386"
+        },
+        {
+          "path": "logs/local-browser-lane.log",
+          "sha256": "8987534785935336dbb08bdd8f9ed0143fe7115c89edc57108b4d189a4c4a819"
+        },
+        {
+          "path": "logs/local-browser-tests.json",
+          "sha256": "ffefda165e91c0c85256aee4d3bcea5b5e129c5885a88581234be2094df8dc3f"
+        },
+        {
+          "path": "logs/mcp-parity-audit.json",
+          "sha256": "6b6f4ff52914b8a32702ee280225883c0e0c50a47182d29207a077d08a3554a7"
+        },
+        {
+          "path": "logs/postgres.log",
+          "sha256": "8c42c5be37d3c1ca154dafc323b10a0ca05b138dd7161df08d18487bca93b06a"
+        },
+        {
+          "path": "logs/production-baseline.log",
+          "sha256": "67438751f83f3ae28fabc892d3c08ba076d59fe531bff4c0052f649a6e4a8682"
+        },
+        {
+          "path": "logs/public-smoke.log",
+          "sha256": "4fe928ce968b23a9109621b5d662977f7e6f2b8b5381e5353ecee2490fc66bfa"
+        }
+      ]
+    },
+    "ci_main_push": [
+      {
+        "workflow": "Backend Integration",
+        "run_id": 34914801643,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34914801643",
+        "event": "push",
+        "head_sha": "43d6c36e63e0b1441377fd32fba64c2192f6f722",
+        "head_branch": "main",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-09-15T00:50:04Z",
+        "jobs": [
+          {
+            "id": 104209999868,
+            "name": "backend-integration",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34914801643/job/104209999868",
+            "started_at": "2026-09-15T00:50:07Z",
+            "completed_at": "2026-09-15T00:53:16Z"
+          }
+        ]
+      },
+      {
+        "workflow": "Backend Lint",
+        "run_id": 34914801743,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34914801743",
+        "event": "push",
+        "head_sha": "43d6c36e63e0b1441377fd32fba64c2192f6f722",
+        "head_branch": "main",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-09-15T00:50:04Z",
+        "jobs": [
+          {
+            "id": 104210000686,
+            "name": "ruff-diff",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34914801743/job/104210000686",
+            "started_at": "2026-09-15T00:50:08Z",
+            "completed_at": "2026-09-15T00:50:39Z"
+          }
+        ]
+      },
+      {
+        "workflow": "Backend Tests",
+        "run_id": 34914801764,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34914801764",
+        "event": "push",
+        "head_sha": "43d6c36e63e0b1441377fd32fba64c2192f6f722",
+        "head_branch": "main",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-09-15T00:50:04Z",
+        "jobs": [
+          {
+            "id": 104210000670,
+            "name": "backend-suite",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34914801764/job/104210000670",
+            "started_at": "2026-09-15T00:50:07Z",
+            "completed_at": "2026-09-15T01:00:54Z"
+          }
+        ]
+      },
+      {
+        "workflow": "Frontend Checks",
+        "run_id": 34914801652,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34914801652",
+        "event": "push",
+        "head_sha": "43d6c36e63e0b1441377fd32fba64c2192f6f722",
+        "head_branch": "main",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-09-15T00:50:04Z",
+        "jobs": [
+          {
+            "id": 104210000410,
+            "name": "vitest",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34914801652/job/104210000410",
+            "started_at": "2026-09-15T00:50:07Z",
+            "completed_at": "2026-09-15T00:51:16Z"
+          },
+          {
+            "id": 104210000434,
+            "name": "type-check",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34914801652/job/104210000434",
+            "started_at": "2026-09-15T00:50:08Z",
+            "completed_at": "2026-09-15T00:50:57Z"
+          },
+          {
+            "id": 104210000487,
+            "name": "lint",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34914801652/job/104210000487",
+            "started_at": "2026-09-15T00:50:08Z",
+            "completed_at": "2026-09-15T00:51:16Z"
+          }
+        ]
+      },
+      {
+        "workflow": "Frontend Production Build",
+        "run_id": 34914801706,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34914801706",
+        "event": "push",
+        "head_sha": "43d6c36e63e0b1441377fd32fba64c2192f6f722",
+        "head_branch": "main",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-09-15T00:50:04Z",
+        "jobs": [
+          {
+            "id": 104210000029,
+            "name": "build-frontend-production",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34914801706/job/104210000029",
+            "started_at": "2026-09-15T00:50:07Z",
+            "completed_at": "2026-09-15T00:54:06Z"
+          }
+        ]
+      },
+      {
+        "workflow": "MCP Package",
+        "run_id": 34914801883,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34914801883",
+        "event": "push",
+        "head_sha": "43d6c36e63e0b1441377fd32fba64c2192f6f722",
+        "head_branch": "main",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-09-15T00:50:04Z",
+        "jobs": [
+          {
+            "id": 104210000523,
+            "name": "mcp-package",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34914801883/job/104210000523",
+            "started_at": "2026-09-15T00:50:08Z",
+            "completed_at": "2026-09-15T00:50:54Z"
+          }
+        ]
+      },
+      {
+        "workflow": "Secret Scan",
+        "run_id": 34914801664,
+        "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34914801664",
+        "event": "push",
+        "head_sha": "43d6c36e63e0b1441377fd32fba64c2192f6f722",
+        "head_branch": "main",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-09-15T00:50:04Z",
+        "jobs": [
+          {
+            "id": 104209999933,
+            "name": "Secret Scan",
+            "conclusion": "success",
+            "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34914801664/job/104209999933",
+            "started_at": "2026-09-15T00:50:07Z",
+            "completed_at": "2026-09-15T00:50:37Z"
+          }
+        ]
+      }
+    ],
+    "ci_required_contexts": {
+      "required": [
+        "backend-suite",
+        "vitest",
+        "type-check",
+        "ruff-diff",
+        "build-frontend-production",
+        "Secret Scan",
+        "backend-integration",
+        "lint"
+      ],
+      "missing": [],
+      "not_success": []
+    },
+    "production_baseline": {
+      "base": "https://tracelab.aquex.ai",
+      "timezoneId": "America/Chicago",
+      "checkedAt": "2026-09-15T01:10:44.407Z",
+      "checks": 140,
+      "routes": 35,
+      "failures": [],
+      "internalLinkPaths": [
+        "/",
+        "/404",
+        "/admin/corrections",
+        "/admin/observability",
+        "/admin/spaces",
+        "/admin/users",
+        "/collections",
+        "/collections/06ad13d9-2131-424c-9ca4-d9a11bc9a401",
+        "/collections/093190b6-dbd3-4a31-aa62-a67fab032e9a",
+        "/collections/18301f66-7cc8-405e-91a5-e03845d284e1",
+        "/collections/27fcefd3-a049-46c4-bf81-d5df8a1b0629",
+        "/collections/4af409b7-cb46-4c02-9aff-38b25376bf21",
+        "/collections/4f95814b-8416-473a-9632-bb1601f1a654",
+        "/collections/6680c114-dbce-45c9-9335-2a81a7c16b50",
+        "/collections/6b9ba524-9bdc-4a14-9d9f-6a4ff210a069",
+        "/collections/7acc9636-1988-4bd7-b68f-a91b0b862d93",
+        "/collections/7c1b78de-76ed-43a1-ac73-b8bbece848a8",
+        "/collections/907c8a7f-a083-49b0-8015-d5f0b4cfd316",
+        "/collections/a3e6d809-af90-4652-903f-5ce5c8842bf8",
+        "/collections/afac19c4-40f6-4471-bb42-c1a148b7620a",
+        "/collections/bef2b57c-3904-425d-b969-ca7cb8453adc",
+        "/collections/c4e663c6-5d38-4a82-9760-7412fb46a137",
+        "/collections/ca279662-9224-47b7-80d6-341aeda41540",
+        "/collections/df9c1b16-d0a7-401b-ab67-62921d260c05",
+        "/collections/e64e675e-d99f-48f1-9721-92e3f502e795",
+        "/collections/f044f358-49eb-4c6f-ada9-511e3e9abae9",
+        "/collections/f4912548-ce6a-43ba-941e-02c584050b92",
+        "/device",
+        "/documents",
+        "/documents/16bad45e-c426-46bb-8f04-d30a0e94efff",
+        "/documents/1e18775d-48e1-4e32-a59c-8188a176abb9",
+        "/documents/276d7724-d647-430c-9440-9c5b793de5d2",
+        "/documents/2f54e4ba-1ff2-4421-a632-172fe67e80a8",
+        "/documents/471f28f5-7cd3-4b7f-a973-0108f7f7cebd",
+        "/documents/7ffc1da9-6d95-4f76-b1ef-dcdab36a2b5b",
+        "/documents/9099ee49-43a8-44bd-a4c7-a779ce9cbee2",
+        "/documents/9124e081-59ba-47bb-b34d-96273bd1140a",
+        "/documents/960c52f3-ae2f-4916-9112-51dcf781b470",
+        "/documents/980021d8-41f2-48a7-8731-f939a8f596d9",
+        "/documents/a28eab37-03f3-492e-83fe-f48e502fc223",
+        "/documents/a86d36c7-80ca-4753-91dd-6f92c5a81c47",
+        "/documents/a8b7c2d0-283d-486e-a915-633ca251df29",
+        "/documents/ae3b3a88-b5dc-4130-ac77-a33cfcea388f",
+        "/documents/b6cf2e2c-8aec-4d7f-84e4-5f4ed2e2e978",
+        "/documents/d44bec3e-f665-439d-bc78-bc5385a4610d",
+        "/documents/d8c50c51-11f7-4649-b214-6aff8ed92521",
+        "/documents/e4f32d07-e596-4c8b-9712-5717a13595ce",
+        "/documents/e51e0fe0-9a08-4ed0-83ad-041a7396472d",
+        "/documents/eb3074c0-f37e-4908-ac92-0d26d1882254",
+        "/documents/f40c4015-87d8-461f-80b5-4b9b653e0efb",
+        "/documents/f6c0f798-8c3a-4d1e-b8ea-0633a4d22801",
+        "/documents/upload",
+        "/evidence",
+        "/evidence/1aeff4dc-5ab9-4dae-ac6e-9a713b38bab9",
+        "/evidence/1da242cc-517e-4fcb-9850-3c620e2b484e",
+        "/evidence/1e634b05-e218-4c60-a245-b4ff51b785a3",
+        "/evidence/21d22f19-6873-49d2-b662-fdbb024fdc47",
+        "/evidence/2334c0a8-e336-413d-8d55-c69359e44c63",
+        "/evidence/2e0276ba-e261-44b6-8e13-15091673eeb4",
+        "/evidence/2f5ddc05-c6eb-48b9-b664-4c20f40f30ee",
+        "/evidence/2f6af96a-ccf0-4c2d-8b40-f7d1c396ee76",
+        "/evidence/31f2bf8c-b225-4916-91d4-63e1762447da",
+        "/evidence/34656428-9635-4b1c-96f8-f4bb51e643b7",
+        "/evidence/362ae5f0-5461-46a1-b24f-676d1c2adfda",
+        "/evidence/3770d155-31a8-47e6-ba9a-54b544653827",
+        "/evidence/3ffa8783-4365-4fbe-84fe-f16c964a6d2f",
+        "/evidence/4671b863-3ff8-4424-941a-d250239aba14",
+        "/evidence/56d05c22-f1fa-4a7a-ac84-676061f53e1f",
+        "/evidence/5b2b486e-0c9c-4b91-843c-0f3f425997c4",
+        "/evidence/5b985352-d0d6-4417-bacc-6fb3031baa3f",
+        "/evidence/5c26d8d2-8d59-4af1-8f92-8235ed6bd83b",
+        "/evidence/60e5d2dd-5814-4ef3-abdb-2269f1b85647",
+        "/evidence/650aafc0-b8cb-4b57-bfcc-5d3a34e3601d",
+        "/evidence/65df244e-9c69-47f9-864a-fa2cd3850783",
+        "/evidence/68ee91e6-7ea0-49e1-8336-84a4b1993565",
+        "/evidence/70140c24-4cf7-4b51-b8a1-14dc4430b233",
+        "/evidence/75dfed70-b738-454e-b5b7-2b8b19939c90",
+        "/evidence/7be3e009-12c0-4e4c-b9f9-e4a7b83fd68c",
+        "/evidence/8007e7f6-ee61-4d84-9e21-f2b9c47f91d4",
+        "/evidence/81d9fae0-03cd-4374-9998-c1d446a5122e",
+        "/evidence/91b240ec-fbe8-493d-9ddd-88187db132d6",
+        "/evidence/ab8cfebb-d898-4ac6-b393-e1c50edf9532",
+        "/evidence/b1f59d0a-9460-4b96-bccf-63ecdb8c6996",
+        "/evidence/bdd6e865-dff9-4a6d-a612-394b13a737d2",
+        "/evidence/c7f090bf-cf77-477d-9b31-f939241a2245",
+        "/evidence/c8103bb0-4c39-49fc-8982-f4ba5245678a",
+        "/evidence/cd701dad-2ed6-46b9-93eb-2265dad0810a",
+        "/evidence/d25298ee-fda9-4930-ba5a-185e88a13aac",
+        "/evidence/d5e0c3c9-3d98-4e45-baf1-9e5a180c58db",
+        "/evidence/e531a960-984f-49f3-9256-9a223d3ee069",
+        "/evidence/eb804a26-b6cf-482e-ade0-1d4013884974",
+        "/evidence/f5c0950f-f5ec-46bc-a45e-4a575f53b3b1",
+        "/evidence/fb4075ee-24b9-43f7-9f38-ff1b1604ae90",
+        "/evidence/fb74b092-998b-4f9a-b4b8-5d28241f3389",
+        "/graph",
+        "/inbox",
+        "/missions",
+        "/missions/01530cf1-8333-485f-8fb7-677393593fab",
+        "/missions/0b074e6a-f859-444c-b748-fdd08387e384",
+        "/missions/0b5f8651-5d86-4968-bd98-e57ed7e84901",
+        "/missions/1d8e48d8-da57-48a8-a67c-1aef5f918a34",
+        "/missions/27cbe849-a801-49ef-8cb5-bfa891ade2bd",
+        "/missions/2a8b68ae-29c4-43e2-ab01-46bcdf3d407f",
+        "/missions/2fefe37d-3c77-4b67-805c-00b38aec6d7d",
+        "/missions/39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+        "/missions/3c7e81fe-cdef-411c-ac46-763939592e1a",
+        "/missions/4ac5da7d-3b2e-438d-91b8-697940631f09",
+        "/missions/5161e652-8766-471a-9276-6e2cf9a334ca",
+        "/missions/54ca4557-763b-4091-a0bd-95b9f19e2132",
+        "/missions/5520222d-b11c-4d53-826e-a95972a8d4e5",
+        "/missions/57055608-4127-4dd6-914e-7fea6d4f9754",
+        "/missions/64e213b1-8244-44a4-99a5-b7be5aff383a",
+        "/missions/6a9c8707-dfe7-4cab-a9cf-d3b72b294a67",
+        "/missions/75b99744-6dfc-4533-af54-105980f38b04",
+        "/missions/76cf1b7b-55a4-4df4-80b6-5b53dd364b2f",
+        "/missions/79236f38-88ce-460a-8ca2-3b605563871b",
+        "/missions/7b847edd-5433-4237-a899-57b47e6edf0a",
+        "/missions/7cc63118-76cb-4b34-ac26-a54f686f42b2",
+        "/missions/83b9ee6e-f3af-4e7e-9515-d69d54fd47c0",
+        "/missions/88c9f3ff-38dc-4ecd-8490-1f8051d849f8",
+        "/missions/9372bdee-eb7b-4cd3-9535-138a34ad3f62",
+        "/missions/952cc1de-688c-415b-bee9-ce143a753af2",
+        "/missions/96e10786-2f66-4e58-a9f7-db5c339a6d7c",
+        "/missions/aa403ba0-0e27-4872-8723-0716f2beb8f2",
+        "/missions/cbcd46bc-de17-4c6c-8391-b1669403fc74",
+        "/missions/cea71e51-a268-46c3-a2ba-84e2cf045217",
+        "/missions/d8340572-e8d2-47fe-a303-395f06f304c2",
+        "/missions/dd966b0c-a33c-4bb2-9dc2-195d0e0d6675",
+        "/missions/f99ea146-1b11-4bc3-9e36-0b35a03546a7",
+        "/missions/new",
+        "/projects",
+        "/projects/041489e1-bb62-4bbe-bb57-90a924fce867",
+        "/projects/0afcc588-e722-45bd-8320-f486601b877c",
+        "/projects/0f5c295f-6ac0-4bc9-823f-32f2306d6f2d",
+        "/projects/1ca2ce70-e6c2-4593-aeb8-b4aa9f3fff01",
+        "/projects/4500cb98-7ca0-4703-b557-f9726c273f57",
+        "/projects/59f606db-9db8-4ba9-a200-c9b66c650f2a",
+        "/projects/5b03d540-3b3a-4762-819a-44dab5261da7",
+        "/projects/6dc4d8b7-06f0-48ba-a2bd-bcf60c6f75da",
+        "/projects/8a5e3763-8249-4194-97d0-cda0e5ff0672",
+        "/projects/959cfd13-fbd8-4277-beae-df57b3e68d0e",
+        "/projects/a38e85ca-5c94-44c7-a723-9b7ebf7fad59",
+        "/projects/b1983379-f0ab-4ea0-9645-f1e180342d72",
+        "/projects/fbd3bd03-5ddc-49ee-8013-529163a99290",
+        "/projects/fbdfcca1-fce5-447b-b081-17761e52b173",
+        "/reports",
+        "/reports/00b0e4ed-270f-40fd-b1c1-756d99415700",
+        "/reports/039d5c3d-7ad0-4936-9789-32d422a2bec6",
+        "/reports/0613ab1a-1ae7-4784-bf03-579023d4a20f",
+        "/reports/11823386-c4d7-4c3e-847e-365d464a8425",
+        "/reports/1ff22d77-fb90-4220-8d74-34fd5526dab7",
+        "/reports/28b2a481-3d77-4659-8e46-ebd4dceceb1a",
+        "/reports/41fff966-1c62-4921-87b4-f8ec4f486927",
+        "/reports/470c666d-5274-4d40-9e0f-c55ed97740fd",
+        "/reports/489c778e-8f18-4b75-abd4-a75635feb8bf",
+        "/reports/56b700a2-35c4-465e-8125-e2a63e83c6f5",
+        "/reports/64dab59f-8684-42fe-93dd-03c62a255c64",
+        "/reports/65ce8a0b-17b2-4598-876a-9791a06adcbe",
+        "/reports/6636c940-ab9f-41a5-a84c-170d1bf9e609",
+        "/reports/7064c47e-c198-45d5-b887-b18a1f86d7ce",
+        "/reports/8a519cd2-3e88-49a4-9c30-d74a8d62b89a",
+        "/reports/8af4f590-687e-4df5-919f-df6395bade33",
+        "/reports/8e0f2a64-a29b-4483-86b3-7479ff284d12",
+        "/reports/955eb67e-6142-4c91-80f9-dc411258f66d",
+        "/reports/964532c5-ea10-4fef-a164-697aef3881b4",
+        "/reports/b4279f55-2ec7-46c5-bed7-d7550e60464d",
+        "/reports/b7e144ca-a1c2-422a-84c8-59f35bf1d61b",
+        "/reports/c2b3bc43-b25c-481e-80d7-02a6afc76e27",
+        "/reports/f4d46a82-2e25-4f5c-a2f8-68d565ad51be",
+        "/reports/fa1d8733-f7ea-4483-97d8-12693318b108",
+        "/reports/fb69cbfc-dd02-4167-a89a-ca9cfbb252b5",
+        "/reports/ffe8436e-3d95-42e4-be82-a45acec7dd78",
+        "/saved-searches",
+        "/search",
+        "/settings"
+      ],
+      "legacyInternalLinks": [],
+      "readOnly": true,
+      "directProductionApi": true,
+      "readOnlyApiProxy": false
+    },
+    "production_baseline_route_count": 35,
+    "inbox_production": {
+      "started_at": "2026-09-15T01:10:44.857Z",
+      "finished_at": "2026-09-15T01:11:29.596Z",
+      "base": "https://tracelab.aquex.ai",
+      "api": "https://api.tracelab.aquex.ai",
+      "mode": "readonly",
+      "timezoneId": "America/Chicago",
+      "user_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+      "deployment_ids": [
+        "147d25cc-856f-4328-b142-b948c015d6da",
+        "7024787e-c06a-4bc0-a6f6-ab349d51ad53"
+      ],
+      "source_commit": "43d6c36e63e0b1441377fd32fba64c2192f6f722",
+      "latency": {
+        "calls": 20,
+        "method": "nearest-rank",
+        "summary_ms": {
+          "p50": 438.0578750000004,
+          "p95": 581.2210409999989,
+          "samples": [
+            508.50704199999984,
+            436.4352079999999,
+            400.5037080000002,
+            466.05145800000037,
+            551.3750420000006,
+            510.7637080000004,
+            411.8553750000001,
+            518.1563340000002,
+            509.04712499999914,
+            438.0578750000004,
+            432.9192920000005,
+            618.7179169999999,
+            405.5264580000003,
+            458.3136250000007,
+            437.47733400000106,
+            581.2210409999989,
+            428.79120800000055,
+            505.88429200000246,
+            407.17762500000026,
+            430.9234580000011
+          ]
+        },
+        "auth_me_baseline_ms": {
+          "p50": 464.4727090000001,
+          "p95": 530.2897910000011,
+          "samples": [
+            433.04387500000007,
+            464.4727090000001,
+            512.2254579999999,
+            469.519417,
+            498.3389159999997,
+            396.6480419999998,
+            500.51775,
+            392.0911249999999,
+            498.510624999999,
+            412.5837080000001,
+            466.44154100000014,
+            430.1087090000001,
+            402.8659580000003,
+            554.3790840000001,
+            433.9344170000004,
+            530.2897910000011,
+            501.8051659999983,
+            523.7840829999986,
+            416.19574999999895,
+            429.6174580000006
+          ]
+        }
+      },
+      "summary": {
+        "generated_at": "2026-09-15T01:11:04.570452",
+        "refresh_seconds": 30,
+        "seen_through": "2026-09-08T01:11:04.570452",
+        "default_lookback_seconds": 604800,
+        "unread": {
+          "failures": 0,
+          "completions": 4,
+          "evidence": 6,
+          "total": 10
+        }
+      },
+      "sections": {
+        "failures": {
+          "total": 8,
+          "unread_total": 0,
+          "first": {
+            "id": "83b9ee6e-f3af-4e7e-9515-d69d54fd47c0",
+            "occurred_at": "2026-08-29T17:54:56.782263",
+            "unread": false
+          }
+        },
+        "completions": {
+          "total": 427,
+          "unread_total": 4,
+          "first": {
+            "id": "27cbe849-a801-49ef-8cb5-bfa891ade2bd",
+            "occurred_at": "2026-09-14T05:33:20.313568",
+            "unread": true
+          }
+        },
+        "evidence": {
+          "total": 59,
+          "unread_total": 6,
+          "first": {
+            "id": "8a5e3763-8249-4194-97d0-cda0e5ff0672::chicago-pilot-2026-09-14:mcp-agent",
+            "occurred_at": "2026-09-14T20:15:36.030943",
+            "unread": true
+          }
+        }
+      },
+      "checks": [
+        {
+          "name": "summary cache 1",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 2",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 3",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 4",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 5",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 6",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 7",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 8",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 9",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 10",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 11",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 12",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 13",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 14",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 15",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 16",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 17",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 18",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 19",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary cache 20",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "summary fields",
+          "actual": [
+            "default_lookback_seconds",
+            "generated_at",
+            "refresh_seconds",
+            "seen_through",
+            "unread"
+          ],
+          "expected": [
+            "default_lookback_seconds",
+            "generated_at",
+            "refresh_seconds",
+            "seen_through",
+            "unread"
+          ],
+          "passed": true
+        },
+        {
+          "name": "summary total equals section sum",
+          "actual": 10,
+          "expected": 10,
+          "passed": true
+        },
+        {
+          "name": "failures cache",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "failures unread total equals summary",
+          "actual": 0,
+          "expected": 0,
+          "passed": true
+        },
+        {
+          "name": "failures unread items flagged",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "failures ordered by occurred_at desc",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "failures items carry href, occurred_at and unread",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "failures total counted before paging",
+          "actual": 8,
+          "expected": 8,
+          "passed": true
+        },
+        {
+          "name": "completions cache",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "completions unread total equals summary",
+          "actual": 4,
+          "expected": 4,
+          "passed": true
+        },
+        {
+          "name": "completions unread items flagged",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "completions ordered by occurred_at desc",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "completions items carry href, occurred_at and unread",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "completions total counted before paging",
+          "actual": 427,
+          "expected": 427,
+          "passed": true
+        },
+        {
+          "name": "evidence cache",
+          "actual": "private, no-store",
+          "expected": "private, no-store",
+          "passed": true
+        },
+        {
+          "name": "evidence unread total equals summary",
+          "actual": 6,
+          "expected": 6,
+          "passed": true
+        },
+        {
+          "name": "evidence unread items flagged",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "evidence ordered by occurred_at desc",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "evidence items carry href, occurred_at and unread",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "evidence total counted before paging",
+          "actual": 59,
+          "expected": 59,
+          "passed": true
+        },
+        {
+          "name": "unknown section is 422",
+          "actual": 422,
+          "expected": 422,
+          "passed": true
+        },
+        {
+          "name": "evidence groups equal Home evidence_activity total",
+          "actual": 59,
+          "expected": 59,
+          "passed": true
+        },
+        {
+          "name": "failures total equals attention validation_failed + blocked",
+          "actual": 8,
+          "expected": 8,
+          "passed": true
+        },
+        {
+          "name": "completions total equals missions by_status completed",
+          "actual": 427,
+          "expected": 427,
+          "passed": true
+        },
+        {
+          "name": "light-1440 toolbar badge name",
+          "actual": "Inbox, 10 unread",
+          "expected": "Inbox, 10 unread",
+          "passed": true
+        },
+        {
+          "name": "light-1440 unread headline",
+          "actual": "10 unread",
+          "expected": "10 unread",
+          "passed": true
+        },
+        {
+          "name": "light-1440 failures heading total",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light-1440 completions heading total",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light-1440 completions heading unread",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light-1440 evidence heading total",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light-1440 evidence heading unread",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light-1440 sidebar badge name",
+          "actual": "Inbox, 10 unread",
+          "expected": "Inbox, 10 unread",
+          "passed": true
+        },
+        {
+          "name": "light-390 toolbar badge name",
+          "actual": "Inbox, 10 unread",
+          "expected": "Inbox, 10 unread",
+          "passed": true
+        },
+        {
+          "name": "light-390 unread headline",
+          "actual": "10 unread",
+          "expected": "10 unread",
+          "passed": true
+        },
+        {
+          "name": "light-390 failures heading total",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light-390 completions heading total",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light-390 completions heading unread",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light-390 evidence heading total",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light-390 evidence heading unread",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "light-390 drawer badge name",
+          "actual": "Inbox, 10 unread",
+          "expected": "Inbox, 10 unread",
+          "passed": true
+        },
+        {
+          "name": "dark-1440 toolbar badge name",
+          "actual": "Inbox, 10 unread",
+          "expected": "Inbox, 10 unread",
+          "passed": true
+        },
+        {
+          "name": "dark-1440 unread headline",
+          "actual": "10 unread",
+          "expected": "10 unread",
+          "passed": true
+        },
+        {
+          "name": "dark-1440 failures heading total",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark-1440 completions heading total",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark-1440 completions heading unread",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark-1440 evidence heading total",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark-1440 evidence heading unread",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark-1440 sidebar badge name",
+          "actual": "Inbox, 10 unread",
+          "expected": "Inbox, 10 unread",
+          "passed": true
+        },
+        {
+          "name": "dark-390 toolbar badge name",
+          "actual": "Inbox, 10 unread",
+          "expected": "Inbox, 10 unread",
+          "passed": true
+        },
+        {
+          "name": "dark-390 unread headline",
+          "actual": "10 unread",
+          "expected": "10 unread",
+          "passed": true
+        },
+        {
+          "name": "dark-390 failures heading total",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark-390 completions heading total",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark-390 completions heading unread",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark-390 evidence heading total",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark-390 evidence heading unread",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "dark-390 drawer badge name",
+          "actual": "Inbox, 10 unread",
+          "expected": "Inbox, 10 unread",
+          "passed": true
+        }
+      ],
+      "screenshots": [
+        "light-1440-inbox.png",
+        "light-1440-toolbar-badge.png",
+        "light-1440-sidebar-badge.png",
+        "light-390-inbox.png",
+        "light-390-toolbar-badge.png",
+        "light-390-drawer-badge.png",
+        "dark-1440-inbox.png",
+        "dark-1440-toolbar-badge.png",
+        "dark-1440-sidebar-badge.png",
+        "dark-390-inbox.png",
+        "dark-390-toolbar-badge.png",
+        "dark-390-drawer-badge.png"
+      ],
+      "live_flow": null,
+      "passed": true,
+      "browser": [
+        {
+          "theme": "light",
+          "width": 1440,
+          "scrollWidth": 1440,
+          "mainCount": 1,
+          "violations": [],
+          "pageErrors": [],
+          "transportErrors": []
+        },
+        {
+          "theme": "light",
+          "width": 390,
+          "scrollWidth": 390,
+          "mainCount": 1,
+          "violations": [],
+          "pageErrors": [],
+          "transportErrors": []
+        },
+        {
+          "theme": "dark",
+          "width": 1440,
+          "scrollWidth": 1440,
+          "mainCount": 1,
+          "violations": [],
+          "pageErrors": [],
+          "transportErrors": []
+        },
+        {
+          "theme": "dark",
+          "width": 390,
+          "scrollWidth": 390,
+          "mainCount": 1,
+          "violations": [],
+          "pageErrors": [],
+          "transportErrors": []
+        }
+      ]
+    },
+    "public_smoke": {
+      "tool": "playwright",
+      "generatedAt": "2026-09-15T01:01:26.493Z",
+      "completedAt": "2026-09-15T01:01:29.185Z",
+      "status": "passed",
+      "summary": {
+        "total": 4,
+        "expected": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "durationSeconds": 2.692,
+        "retries": 0
+      },
+      "environment": {
+        "node": "v24.6.0",
+        "ci": {
+          "provider": null
+        },
+        "projects": [
+          "chromium"
+        ],
+        "browsers": []
+      },
+      "tests": [
+        {
+          "title": "API health endpoint confirms production authorization and reconciler freshness",
+          "file": "frontend/tests/e2e/production-smoke.spec.ts",
+          "line": 33,
+          "column": 7,
+          "status": "passed",
+          "durationMs": 332,
+          "annotations": [],
+          "attachments": [],
+          "errors": []
+        },
+        {
+          "title": "/admin/users is deployed as its own Next page",
+          "file": "frontend/tests/e2e/production-smoke.spec.ts",
+          "line": 23,
+          "column": 9,
+          "status": "passed",
+          "durationMs": 885,
+          "annotations": [],
+          "attachments": [],
+          "errors": []
+        },
+        {
+          "title": "/admin/spaces is deployed as its own Next page",
+          "file": "frontend/tests/e2e/production-smoke.spec.ts",
+          "line": 23,
+          "column": 9,
+          "status": "passed",
+          "durationMs": 892,
+          "annotations": [],
+          "attachments": [],
+          "errors": []
+        },
+        {
+          "title": "missions route responds at the public domain",
+          "file": "frontend/tests/e2e/production-smoke.spec.ts",
+          "line": 17,
+          "column": 7,
+          "status": "passed",
+          "durationMs": 985,
+          "annotations": [],
+          "attachments": [],
+          "errors": []
+        }
+      ],
+      "artifactPath": "/private/tmp/claude-501/-Users-systemsystems-portfolio-TraceLab/f57b0397-720d-4d21-a15b-ad4fa81feecb/scratchpad/ux13/public-smoke.json"
+    },
+    "tested_source_files": [
+      {
+        "path": ".github/workflows/frontend-production-build.yml",
+        "sha256": "0dd0ddb303827844960dd98ae6c4665883a74712e141415e21e205690bbbfaff"
+      },
+      {
+        "path": "alembic/versions/048_user_inbox_state.py",
+        "sha256": "c897055a01df03d67f22aa5a62a2eb074e837f3b49c918ce583548e8df03f17b"
+      },
+      {
+        "path": "app/adapters/repositories/sqlalchemy_home_repo.py",
+        "sha256": "acee096efb29f51fcbfcd18da63441022cb0b0db50e5f35e60d52d8d122d99ae"
+      },
+      {
+        "path": "app/adapters/repositories/sqlalchemy_inbox_repo.py",
+        "sha256": "1f09558e3445a02d1669976ed36e3017c534d8cd263dd2e6ae56efa0d96812ac"
+      },
+      {
+        "path": "app/api/v1/inbox.py",
+        "sha256": "c5b1dab5a0cf113ed946a8f0b1f7cd4c342bb5b1823f8cf039108efe55d65d30"
+      },
+      {
+        "path": "app/dependencies.py",
+        "sha256": "78801ba94d607d710d3a135a875560768c4c9f2abbcbb14804138cdb39bd63fc"
+      },
+      {
+        "path": "app/main.py",
+        "sha256": "503676a05306ca5779a9db844c82551a74eddcde9117e6a1aa5e82fb4dd386dd"
+      },
+      {
+        "path": "app/models/__init__.py",
+        "sha256": "49717657d953e27735453fc1aab988bee09d3762e9bb866ff7ded90c23fdd271"
+      },
+      {
+        "path": "app/models/mission.py",
+        "sha256": "00b80cb37d62546b2c0e0dbda0d060fcd7b0a154ef2cb85ce63b23ec90bad817"
+      },
+      {
+        "path": "app/models/user_inbox_state.py",
+        "sha256": "536eb8ec6d7b83c89b0105cf350bd154bf519c214dd1825f09ab16e35655e2b7"
+      },
+      {
+        "path": "app/ports/inbox.py",
+        "sha256": "66f52e01183cab4a59a0484512047463c38c2d99c1fdebb1ebf6f955d105f75c"
+      },
+      {
+        "path": "app/schemas/inbox.py",
+        "sha256": "519d40398624334e4be7468deaff61d5151077b43d3861dae2888eb3ff6902c8"
+      },
+      {
+        "path": "app/services/evidence_scope.py",
+        "sha256": "ece043b1284b89887252ef2c57423b56846ee89708e1f2a3117db264d98791c6"
+      },
+      {
+        "path": "app/services/inbox.py",
+        "sha256": "75f0c963bced844e7cf2fad46222365b7a2aa5bbcfdb12b41a9faddbc7337b03"
+      },
+      {
+        "path": "app/services/mission_attention.py",
+        "sha256": "936ff91083b18da05ada16e178817bd9ad442d32b09ff38d8272ff66c7f3907d"
+      },
+      {
+        "path": "cmos/contracts/mcp-parity-manifest.json",
+        "sha256": "440f2bd5c25a307014c3e020095338fed8ccf087c8cbac7af4d40ce5764d3395"
+      },
+      {
+        "path": "cmos/reports/sprint-37/graph-search-e2e-validation.json",
+        "sha256": "a550b4afe9dad40c2c8e09181524086bb726027952074d31accea5f3dd8e6e04"
+      },
+      {
+        "path": "cmos/telemetry/events/sprint-26-graph-telemetry.jsonl",
+        "sha256": "75adbc6ed99b949f096987672e7a2f19a8f60f0fab843c559c871d296a4446e0"
+      },
+      {
+        "path": "frontend/scripts/ui-shell-smoke.mjs",
+        "sha256": "15b73f9598ecc0c752476e173c4c7f1419a81a8c9f91bd247adf6cc2fb556238"
+      },
+      {
+        "path": "frontend/src/__tests__/inbox.test.tsx",
+        "sha256": "3bc645158b660b9cbd63541e4e50c9e90ca0f97a056a2cb9bf887733265f9060"
+      },
+      {
+        "path": "frontend/src/components/AppShell.test.tsx",
+        "sha256": "55d8b36260250d5244094d9e8afaf271a9687a6d34a9f480554cb6e694e617d3"
+      },
+      {
+        "path": "frontend/src/components/AppShell.tsx",
+        "sha256": "6e122f88407c8248bff4ead444e3d51de0d73d8bfff4de3d9600596b2402e720"
+      },
+      {
+        "path": "frontend/src/components/InboxBadge.tsx",
+        "sha256": "6eb08c8750a027706e792fa1ad62c21329997775efd13fd98079cf7b8ddeee61"
+      },
+      {
+        "path": "frontend/src/components/Navigation.tsx",
+        "sha256": "fd7ddb56de46805608e19e343aa0e32a024a451d249d901b4b87a3c1f08593db"
+      },
+      {
+        "path": "frontend/src/lib/api/inbox.ts",
+        "sha256": "404fa34f33e7073395ba58817b3a22b75b54dd1c803aac1948cf461afa863c73"
+      },
+      {
+        "path": "frontend/src/lib/hooks/useInboxSummary.ts",
+        "sha256": "a9d28f05856052fd50cdaf1bb97f9072ae3c83bb7bb191d1ebede32ac3a62e1f"
+      },
+      {
+        "path": "frontend/src/pages/inbox.tsx",
+        "sha256": "c72964824d9eb5c4e5579a662c3fbb16aa64359f9a9ca2e218cdbe9565697662"
+      },
+      {
+        "path": "frontend/tests/e2e/app-shell.spec.ts",
+        "sha256": "0b8ba5a4de02330a15eee61fc7b199b5a157fd4c7ec3083d372ca295f82a3549"
+      },
+      {
+        "path": "frontend/tests/e2e/graph.spec.ts",
+        "sha256": "60c94160c09c58200350ece613c18ab200a4eefb36fb44301cd9d46b0aa03f3e"
+      },
+      {
+        "path": "frontend/tests/e2e/inbox.spec.ts",
+        "sha256": "400be35268c652baa991bb859a282ddd726a98e5831300fb98b254ddf2c53925"
+      },
+      {
+        "path": "frontend/tests/e2e/mission-dashboards.spec.ts",
+        "sha256": "992b3238da0b57c27560150e4cce87146689d33249c7046fca4a9e45f9eb1e33"
+      },
+      {
+        "path": "frontend/tests/e2e/search-command.spec.ts",
+        "sha256": "5b4c4a6daac51953d52a83a0e3e11dcb0e43e9260253d3d8adfa90f3051d495c"
+      },
+      {
+        "path": "scripts/rbac_verify.py",
+        "sha256": "b6d6036ad95c9cb9d61529dcd43ebb2e70b5a651c326b59c64e48c109fc06f8d"
+      },
+      {
+        "path": "telemetry/events/quality-automation.jsonl",
+        "sha256": "5a88b97e9861a8c6ed940e8b71e6d6d4cb6dd7509f95c36e68fea6e212a98d73"
+      },
+      {
+        "path": "telemetry/events/quality-gates.jsonl",
+        "sha256": "9505fafdf7cd63892f294f3653dbc28596c035f3b6f34763ac7362e13dee407b"
+      },
+      {
+        "path": "tests/integration/test_e2e_rbac_live.py",
+        "sha256": "5eba0c3cb33fcfcfdb77e8f03512214a8e9caef059af1879d96e87a1455359e5"
+      },
+      {
+        "path": "tests/integration/test_inbox_postgres.py",
+        "sha256": "6352aed33cfa3def6e666e6c43c621be50ef351d76cb97bbaeeddfdafc3acda4"
+      },
+      {
+        "path": "tests/test_inbox_api.py",
+        "sha256": "060cb8a233e169257223bcaaf4023a1e99bbd6d3a5f6f8d01d5675b0c6dd030c"
+      },
+      {
+        "path": "tests/test_rbac_verify_harness.py",
+        "sha256": "05615be94e9a7d96b30a8c3ef910f171ff579cba93c437b85c5f4f409200429c"
+      }
+    ],
+    "archive_manifest": "cmos/reports/sprint-52/ux-13-production-smoke/archive-manifest.json"
+  },
+  "deployment": {
+    "checked_at": "2026-09-15T00:53:31Z",
+    "commit": "43d6c36e63e0b1441377fd32fba64c2192f6f722",
+    "services": {
+      "TraceLab": {
+        "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+        "deployment_id": "147d25cc-856f-4328-b142-b948c015d6da",
+        "status": "SUCCESS",
+        "commit": "43d6c36e63e0b1441377fd32fba64c2192f6f722",
+        "created_at": "2026-09-15T00:50:03.621Z"
+      },
+      "frontend": {
+        "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+        "deployment_id": "7024787e-c06a-4bc0-a6f6-ab349d51ad53",
+        "status": "SUCCESS",
+        "commit": "43d6c36e63e0b1441377fd32fba64c2192f6f722",
+        "created_at": "2026-09-15T00:50:03.620Z"
+      }
+    },
+    "both_success_for_commit": true
+  },
+  "live_flow": {
+    "started_at": "2026-09-15T01:11:29.880Z",
+    "finished_at": "2026-09-15T01:12:26.645Z",
+    "base": "https://tracelab.aquex.ai",
+    "api": "https://api.tracelab.aquex.ai",
+    "mode": "liveflow",
+    "timezoneId": "America/Chicago",
+    "user_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+    "deployment_ids": [
+      "147d25cc-856f-4328-b142-b948c015d6da",
+      "7024787e-c06a-4bc0-a6f6-ab349d51ad53"
+    ],
+    "source_commit": "43d6c36e63e0b1441377fd32fba64c2192f6f722",
+    "latency": {
+      "calls": 20,
+      "method": "nearest-rank",
+      "summary_ms": {
+        "p50": 462.35175000000163,
+        "p95": 524.116708,
+        "samples": [
+          486.339375,
+          463.68891699999995,
+          524.116708,
+          437.1034580000005,
+          452.4154580000004,
+          440.896291,
+          523.6079589999999,
+          666.155291,
+          517.9057920000014,
+          477.7869580000006,
+          517.5520830000005,
+          411.6052500000005,
+          473.4451250000002,
+          415.661333,
+          426.78237499999886,
+          421.0110000000004,
+          402.3992909999997,
+          462.35175000000163,
+          493.9706249999981,
+          409.2427089999983
+        ]
+      },
+      "auth_me_baseline_ms": {
+        "p50": 426.89500000000044,
+        "p95": 523.9253330000001,
+        "samples": [
+          419.82954199999995,
+          523.9253330000001,
+          518.9849159999999,
+          446.7366670000001,
+          425.15850000000046,
+          422.6121659999999,
+          428.4495000000006,
+          478.3438750000005,
+          428.54312500000015,
+          451.59170900000026,
+          404.2211669999997,
+          509.2676670000001,
+          393.54395900000054,
+          409.20616699999846,
+          452.7893750000003,
+          407.3670829999992,
+          401.66962500000045,
+          554.9498750000021,
+          426.89500000000044,
+          411.3337079999983
+        ]
+      }
+    },
+    "summary": {
+      "generated_at": "2026-09-15T01:11:49.181868",
+      "refresh_seconds": 30,
+      "seen_through": "2026-09-08T01:11:49.181868",
+      "default_lookback_seconds": 604800,
+      "unread": {
+        "failures": 0,
+        "completions": 4,
+        "evidence": 6,
+        "total": 10
+      }
+    },
+    "sections": {
+      "failures": {
+        "total": 8,
+        "unread_total": 0,
+        "first": {
+          "id": "83b9ee6e-f3af-4e7e-9515-d69d54fd47c0",
+          "occurred_at": "2026-08-29T17:54:56.782263",
+          "unread": false
+        }
+      },
+      "completions": {
+        "total": 427,
+        "unread_total": 4,
+        "first": {
+          "id": "27cbe849-a801-49ef-8cb5-bfa891ade2bd",
+          "occurred_at": "2026-09-14T05:33:20.313568",
+          "unread": true
+        }
+      },
+      "evidence": {
+        "total": 59,
+        "unread_total": 6,
+        "first": {
+          "id": "8a5e3763-8249-4194-97d0-cda0e5ff0672::chicago-pilot-2026-09-14:mcp-agent",
+          "occurred_at": "2026-09-14T20:15:36.030943",
+          "unread": true
+        }
+      }
+    },
+    "checks": [
+      {
+        "name": "summary cache 1",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 2",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 3",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 4",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 5",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 6",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 7",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 8",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 9",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 10",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 11",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 12",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 13",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 14",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 15",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 16",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 17",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 18",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 19",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary cache 20",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "summary fields",
+        "actual": [
+          "default_lookback_seconds",
+          "generated_at",
+          "refresh_seconds",
+          "seen_through",
+          "unread"
+        ],
+        "expected": [
+          "default_lookback_seconds",
+          "generated_at",
+          "refresh_seconds",
+          "seen_through",
+          "unread"
+        ],
+        "passed": true
+      },
+      {
+        "name": "summary total equals section sum",
+        "actual": 10,
+        "expected": 10,
+        "passed": true
+      },
+      {
+        "name": "failures cache",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "failures unread total equals summary",
+        "actual": 0,
+        "expected": 0,
+        "passed": true
+      },
+      {
+        "name": "failures unread items flagged",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "failures ordered by occurred_at desc",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "failures items carry href, occurred_at and unread",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "failures total counted before paging",
+        "actual": 8,
+        "expected": 8,
+        "passed": true
+      },
+      {
+        "name": "completions cache",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "completions unread total equals summary",
+        "actual": 4,
+        "expected": 4,
+        "passed": true
+      },
+      {
+        "name": "completions unread items flagged",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "completions ordered by occurred_at desc",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "completions items carry href, occurred_at and unread",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "completions total counted before paging",
+        "actual": 427,
+        "expected": 427,
+        "passed": true
+      },
+      {
+        "name": "evidence cache",
+        "actual": "private, no-store",
+        "expected": "private, no-store",
+        "passed": true
+      },
+      {
+        "name": "evidence unread total equals summary",
+        "actual": 6,
+        "expected": 6,
+        "passed": true
+      },
+      {
+        "name": "evidence unread items flagged",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "evidence ordered by occurred_at desc",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "evidence items carry href, occurred_at and unread",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "evidence total counted before paging",
+        "actual": 59,
+        "expected": 59,
+        "passed": true
+      },
+      {
+        "name": "unknown section is 422",
+        "actual": 422,
+        "expected": 422,
+        "passed": true
+      },
+      {
+        "name": "evidence groups equal Home evidence_activity total",
+        "actual": 59,
+        "expected": 59,
+        "passed": true
+      },
+      {
+        "name": "failures total equals attention validation_failed + blocked",
+        "actual": 8,
+        "expected": 8,
+        "passed": true
+      },
+      {
+        "name": "completions total equals missions by_status completed",
+        "actual": 427,
+        "expected": 427,
+        "passed": true
+      },
+      {
+        "name": "light-1440 toolbar badge name",
+        "actual": "Inbox, 10 unread",
+        "expected": "Inbox, 10 unread",
+        "passed": true
+      },
+      {
+        "name": "light-1440 unread headline",
+        "actual": "10 unread",
+        "expected": "10 unread",
+        "passed": true
+      },
+      {
+        "name": "light-1440 failures heading total",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "light-1440 completions heading total",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "light-1440 completions heading unread",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "light-1440 evidence heading total",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "light-1440 evidence heading unread",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "light-1440 sidebar badge name",
+        "actual": "Inbox, 10 unread",
+        "expected": "Inbox, 10 unread",
+        "passed": true
+      },
+      {
+        "name": "light-390 toolbar badge name",
+        "actual": "Inbox, 10 unread",
+        "expected": "Inbox, 10 unread",
+        "passed": true
+      },
+      {
+        "name": "light-390 unread headline",
+        "actual": "10 unread",
+        "expected": "10 unread",
+        "passed": true
+      },
+      {
+        "name": "light-390 failures heading total",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "light-390 completions heading total",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "light-390 completions heading unread",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "light-390 evidence heading total",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "light-390 evidence heading unread",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "light-390 drawer badge name",
+        "actual": "Inbox, 10 unread",
+        "expected": "Inbox, 10 unread",
+        "passed": true
+      },
+      {
+        "name": "dark-1440 toolbar badge name",
+        "actual": "Inbox, 10 unread",
+        "expected": "Inbox, 10 unread",
+        "passed": true
+      },
+      {
+        "name": "dark-1440 unread headline",
+        "actual": "10 unread",
+        "expected": "10 unread",
+        "passed": true
+      },
+      {
+        "name": "dark-1440 failures heading total",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "dark-1440 completions heading total",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "dark-1440 completions heading unread",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "dark-1440 evidence heading total",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "dark-1440 evidence heading unread",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "dark-1440 sidebar badge name",
+        "actual": "Inbox, 10 unread",
+        "expected": "Inbox, 10 unread",
+        "passed": true
+      },
+      {
+        "name": "dark-390 toolbar badge name",
+        "actual": "Inbox, 10 unread",
+        "expected": "Inbox, 10 unread",
+        "passed": true
+      },
+      {
+        "name": "dark-390 unread headline",
+        "actual": "10 unread",
+        "expected": "10 unread",
+        "passed": true
+      },
+      {
+        "name": "dark-390 failures heading total",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "dark-390 completions heading total",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "dark-390 completions heading unread",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "dark-390 evidence heading total",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "dark-390 evidence heading unread",
+        "actual": true,
+        "expected": true,
+        "passed": true
+      },
+      {
+        "name": "dark-390 drawer badge name",
+        "actual": "Inbox, 10 unread",
+        "expected": "Inbox, 10 unread",
+        "passed": true
+      }
+    ],
+    "browser": [
+      {
+        "theme": "light",
+        "width": 1440,
+        "scrollWidth": 1440,
+        "mainCount": 1,
+        "violations": [],
+        "pageErrors": [],
+        "transportErrors": []
+      },
+      {
+        "theme": "light",
+        "width": 390,
+        "scrollWidth": 390,
+        "mainCount": 1,
+        "violations": [],
+        "pageErrors": [],
+        "transportErrors": []
+      },
+      {
+        "theme": "dark",
+        "width": 1440,
+        "scrollWidth": 1440,
+        "mainCount": 1,
+        "violations": [],
+        "pageErrors": [],
+        "transportErrors": []
+      },
+      {
+        "theme": "dark",
+        "width": 390,
+        "scrollWidth": 390,
+        "mainCount": 1,
+        "violations": [],
+        "pageErrors": [],
+        "transportErrors": []
+      }
+    ],
+    "screenshots": [
+      "light-1440-inbox.png",
+      "light-1440-toolbar-badge.png",
+      "light-1440-sidebar-badge.png",
+      "light-390-inbox.png",
+      "light-390-toolbar-badge.png",
+      "light-390-drawer-badge.png",
+      "dark-1440-inbox.png",
+      "dark-1440-toolbar-badge.png",
+      "dark-1440-sidebar-badge.png",
+      "dark-390-inbox.png",
+      "dark-390-toolbar-badge.png",
+      "dark-390-drawer-badge.png"
+    ],
+    "live_flow": {
+      "user_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+      "before": {
+        "generated_at": "2026-09-15T01:12:14.541621",
+        "seen_through": "2026-09-08T01:12:14.541621",
+        "unread": {
+          "failures": 0,
+          "completions": 4,
+          "evidence": 6,
+          "total": 10
+        }
+      },
+      "target": {
+        "id": "39b44c86-2e2b-4d19-bf3f-e069db5f1a76",
+        "label": "UX8-LIVE-20260913",
+        "title": "UX-8 live audit: collection context for asynchronous job research",
+        "updated_at": "2026-09-13T23:59:19.396824",
+        "href": "/missions/39b44c86-2e2b-4d19-bf3f-e069db5f1a76"
+      },
+      "review_response": {
+        "status": 204,
+        "at": "2026-09-15T01:12:19.789Z"
+      },
+      "writes": [
+        {
+          "at": "2026-09-15T01:12:19.010Z",
+          "method": "PUT",
+          "path": "/api/v1/home/missions/39b44c86-2e2b-4d19-bf3f-e069db5f1a76/review",
+          "body": {
+            "updated_at": "2026-09-13T23:59:19.396824"
+          }
+        },
+        {
+          "at": "2026-09-15T01:12:23.474Z",
+          "method": "PUT",
+          "path": "/api/v1/inbox/seen",
+          "body": {
+            "seen_through": "2026-09-15T01:12:21.477892"
+          }
+        }
+      ],
+      "seen_response": {
+        "seen_through": "2026-09-15T01:12:21.477892"
+      },
+      "after": {
+        "generated_at": "2026-09-15T01:12:26.202568",
+        "seen_through": "2026-09-15T01:12:21.477892",
+        "unread": {
+          "failures": 0,
+          "completions": 0,
+          "evidence": 0,
+          "total": 0
+        }
+      },
+      "checks": [
+        {
+          "name": "review response 204",
+          "actual": 204,
+          "expected": 204,
+          "passed": true
+        },
+        {
+          "name": "reviewed completion reads reviewed and not unread",
+          "actual": {
+            "reviewed": true,
+            "unread": false
+          },
+          "expected": {
+            "reviewed": true,
+            "unread": false
+          },
+          "passed": true
+        },
+        {
+          "name": "review lowers unread completions by one",
+          "actual": 3,
+          "expected": 3,
+          "passed": true
+        },
+        {
+          "name": "mark seen response 200",
+          "actual": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "client sent a server generated_at string verbatim",
+          "actual": true,
+          "expected": true,
+          "passed": true
+        },
+        {
+          "name": "server stored the sent watermark",
+          "actual": "2026-09-15T01:12:21.477892",
+          "expected": "2026-09-15T01:12:21.477892",
+          "passed": true
+        },
+        {
+          "name": "summary reports the new watermark",
+          "actual": "2026-09-15T01:12:21.477892",
+          "expected": "2026-09-15T01:12:21.477892",
+          "passed": true
+        },
+        {
+          "name": "nothing older than the watermark stays unread",
+          "actual": 0,
+          "expected": 0,
+          "passed": true
+        }
+      ],
+      "transportErrors": [],
+      "pageErrors": [],
+      "passed": true
+    },
+    "passed": true
+  },
+  "visual_review": {
+    "passed": true,
+    "timezone": "America/Chicago",
+    "reviewer": "claude-fable-5.1 (session PS-2026-09-15-001), image-level review of the archived captures",
+    "reviewed_images": [
+      {
+        "path": "cmos/reports/sprint-52/ux-13-production-smoke/light-1440-inbox.png",
+        "sha256": "0bc2701716eb1845beba57812c16f286c1a7ea96c64887339986d17490df3b42",
+        "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+        "notes": "Priority order intact: Agent failures (8), Mission completions (427, 4 unread), New evidence (59, 6 unread). Header reads '10 unread \u00b7 seen through Sep 7, 8:11 PM' and 'Updated Sep 14, 8:11 PM' for 01:11 UTC, so the Chicago clock renders correctly. Unread pills, status badges, Mark reviewed buttons and pagination readable; toolbar and sidebar both show the 10 badge."
+      },
+      {
+        "path": "cmos/reports/sprint-52/ux-13-production-smoke/dark-1440-inbox.png",
+        "sha256": "e24b7f64c3aa068ecbc765dc1bbb5c48fcccf14bdf43ab621796cacd08956923",
+        "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+        "notes": "Same structure and counts in Dark with token surfaces; accent unread dots and pills legible; no raw palette colors."
+      },
+      {
+        "path": "cmos/reports/sprint-52/ux-13-production-smoke/light-390-inbox.png",
+        "sha256": "2357d98964202e3b75af0724f4333c1a8062973eb1ce0f9efc98f1124a309972",
+        "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+        "notes": "Single-column layout, measured scrollWidth 390 (no horizontal overflow); section pills wrap; headings and Mark reviewed buttons stack. Full-page image is very tall, so fine text was checked through the crops rather than this image."
+      },
+      {
+        "path": "cmos/reports/sprint-52/ux-13-production-smoke/dark-390-inbox.png",
+        "sha256": "9120a8eefe22a13c3d1b213781739bd8595a32a01597b1f0b11be4eb4d91a635",
+        "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+        "notes": "Dark counterpart of the 390 page; same structure, no overflow."
+      },
+      {
+        "path": "cmos/reports/sprint-52/ux-13-production-smoke/light-1440-toolbar-badge.png",
+        "sha256": "b050ac37e1c923810215859f4506e492120c53ead51c312f6aba9eaec2ad8a44",
+        "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+        "notes": "Toolbar link 'Inbox' with an accent pill '10' beside the Search control; accessible name measured as 'Inbox, 10 unread'."
+      },
+      {
+        "path": "cmos/reports/sprint-52/ux-13-production-smoke/light-390-toolbar-badge.png",
+        "sha256": "a9eaf00e37491d941e389376410e831244064f89afd232c765e9272abc195d2e",
+        "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+        "notes": "At 390 the toolbar shows the inbox icon with the '10' pill (label hidden below sm) next to Search; the menu button remains available."
+      },
+      {
+        "path": "cmos/reports/sprint-52/ux-13-production-smoke/dark-390-toolbar-badge.png",
+        "sha256": "a268c10e6096c2ce6ac51cd333f16d0d998959d3c864226880e35ae4389fe2c3",
+        "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+        "notes": "Dark toolbar at 390 with the same icon-plus-pill badge."
+      },
+      {
+        "path": "cmos/reports/sprint-52/ux-13-production-smoke/light-390-drawer-badge.png",
+        "sha256": "c48e8153e89266ba3ac811bd7632d20d0b79ba9a0d119fae2cf05db1468a26b8",
+        "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+        "notes": "Mobile drawer open: the Inbox item is highlighted as current with the '10' pill aligned right; groups and appearance select intact."
+      },
+      {
+        "path": "cmos/reports/sprint-52/ux-13-production-smoke/dark-390-drawer-badge.png",
+        "sha256": "64fa06a7ea00efc3c4a664bdfcb6bd6885e9d164282d2a44eea1dc99cba6c28e",
+        "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+        "notes": "Dark drawer with the same current Inbox item and badge."
+      },
+      {
+        "path": "cmos/reports/sprint-52/ux-13-production-smoke/dark-1440-sidebar-badge.png",
+        "sha256": "f4ccb8de2045a4fdbff06f2466ff47029038a58932eaac8d7d20c7391ff2fdfe",
+        "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+        "notes": "Desktop sidebar in Dark: Inbox current with the '10' pill; the rest of the navigation unchanged."
+      },
+      {
+        "path": "cmos/reports/sprint-52/ux-13-live-flow/liveflow-reviewed.png",
+        "sha256": "ae39d983d86edced5239a4cffd0973dd91e95cfb8aed61fd1808adff3fda4ce2",
+        "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+        "notes": "After Mark reviewed on UX8-LIVE-20260913 the item shows 'Completed Reviewed' with no unread pill or button and the header drops to 9 unread. The visible skip link and mid-page sidebar are a fixed-element artifact of the full-page capture after the click, not a layout change."
+      },
+      {
+        "path": "cmos/reports/sprint-52/ux-13-live-flow/liveflow-after.png",
+        "sha256": "99ff420e864633df02de511a6d0b0dd049a91841eaaaab55d22bcd429376d50a",
+        "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+        "notes": "After Mark all as seen the header reads '0 unread \u00b7 seen through Sep 14, 8:12 PM', the toolbar link has no pill, section headings show no unread counts and the button is disabled."
+      }
+    ],
+    "completed_at": "2026-09-15T01:15:07.139903+00:00",
+    "limitations": [
+      "The 390 px full-page captures were reviewed at reduced scale for structure and overflow; the badge and drawer crops carry the legible detail at that width.",
+      "Only the operator's own account was reviewed; there was no active in_progress mission at review time, so the failures section held read items only (8 total, 0 unread within the 7-day window)."
+    ]
+  },
+  "retained_failures": [
+    {
+      "kind": "test maintenance",
+      "where": "tests/test_inbox_api.py::test_mark_seen_is_explicit_monotonic_utc_and_never_hides_later_items",
+      "result": "First run returned 422 for the timezone-aware mark: the test marked through generated_at + 1 s, which the server correctly rejected as later than its clock. The fixture now uses generated_at + 1 ms and waits 10 ms; the 422-for-future rule is asserted separately and unchanged."
+    },
+    {
+      "kind": "test maintenance",
+      "where": "tests/integration/test_inbox_postgres.py::test_postgres_watermark_upsert_is_monotonic_and_sections_match_home",
+      "result": "First run failed because the test user was an admin on the shared testcontainers database and other suites' missions filled page one; rescoped to a member with rbac_enabled=True so only its own rows are visible. A second failure expected an evidence group created 'now' to be read after marking seen ten minutes ago; the fixture entry is now dated 20 minutes earlier. Repository behavior was correct in both cases."
+    },
+    {
+      "kind": "test maintenance",
+      "where": "frontend/src/components/AppShell.test.tsx",
+      "result": "The new badge test first saw a zero badge because the file had no SWR provider and the summary cached by earlier tests deduped the fetch; the shell test now renders inside a fresh SWRConfig cache. It then queried the closed navigation dialog, which jsdom hides; the test opens the drawer before asserting the drawer badge."
+    },
+    {
+      "kind": "parity audit",
+      "where": "scripts/mcp_parity_audit.mjs",
+      "result": "After the three inbox rows were added the audit reported 'Stale route/consumer inventory' for homeApi.review because the inbox page now reuses PUT /home/missions/{id}/review; the manifest row's ui_consumers was updated from the inventory and the audit exits 0 with zero unclassified operations."
+    },
+    {
+      "kind": "local backend lane stop",
+      "where": "tests/sprint_03/test_api_stability.py::test_api_uptime_and_latency_meet_targets",
+      "result": "A first local full run with -x stopped on this CI-quarantined historical evaluator; the lane was rerun with .github/ci/backend-quarantine.txt's exact 12 deselects: 2675 passed, 3 pre-existing skips, 12 deselected."
+    },
+    {
+      "kind": "merge tooling",
+      "where": "gh pr merge --delete-branch",
+      "result": "The remote squash merge succeeded (43d6c36) but gh's local checkout of main failed because the full backend run had appended to six tracked telemetry files; those side effects were discarded with git checkout and main was synced manually. No mission file was affected."
+    }
+  ],
+  "definition_of_done": {
+    "1": "Production build and every main-push run for merge 43d6c36 succeeded (Backend Tests 34914801764, Backend Integration 34914801643, Frontend Production Build 34914801706, Frontend Checks 34914801652, Backend Lint 34914801743, MCP Package 34914801883, Secret Scan 34914801664); the deployed site passed the 4-test public smoke and the inbox route responds on tracelab.aquex.ai.",
+    "2": "140 baseline captures across 35 routes plus 12 inbox and badge captures (page, toolbar, sidebar or drawer) and 3 live-flow captures archived under cmos/reports/sprint-52/ux-13-production-smoke/ and ux-13-live-flow/, all at 1440 and 390 px in Light and Dark.",
+    "3": "Baseline reported zero failures over 140 checks (overflow, axe critical/serious, landmarks, theme, errors); the inbox checks measured scrollWidth equal to the viewport at 390 px and zero critical or serious axe findings in all four theme/width combinations.",
+    "4": "76 production checks passed: badge names and unread headline equal GET /inbox/summary totals, section heading totals equal GET /inbox totals, unread_only totals equal summary counts, totals are stable across pages, and Home parity holds (evidence groups = Home evidence_activity total, failures = attention validation_failed + blocked, completions = missions by_status completed). Summary latency over 20 calls p50 438 ms / p95 581 ms against a GET /auth/me baseline of p50 464 ms / p95 530 ms from the same client; the p95 exceeds 150 ms on network alone, and the sanctioned index ix_missions_status_completed_at is in migration 048.",
+    "5": "grep for alert( and confirm( over the touched components returns zero; vitest and Playwright assert distinct loading, empty, error and not-found (unknown section) states.",
+    "6": "npm run check:tokens passed locally and inside the CI production build; no palette or dark: utilities in the touched files.",
+    "7": "No route was migrated; the route-migration lane passed 16/16 in the local and CI browser lanes and the baseline reports no legacy internal links.",
+    "8": "Both Railway services reported SUCCESS for 43d6c36 (TraceLab 147d25cc-856f-4328-b142-b948c015d6da, frontend 7024787e-c06a-4bc0-a6f6-ab349d51ad53) before the 140-check, 35-route direct-browser baseline and every other production check began.",
+    "9": "12 archived captures were reviewed image by image under America/Chicago with the operator's real data; the watermark and update timestamps render five hours behind UTC as expected, and notes are recorded in visual-review.json."
+  },
+  "limitations": [
+    "In-app notification only: no email provider exists in the codebase (grep for smtp/sendgrid/resend/mailgun/postmark/aiosmtplib/fastapi_mail is empty), so email completion notifications remain an open Derek question from decision #426.",
+    "For missions changed through the API path, blocked and validation_failed rows have no completed_at, so occurred_at falls back to updated_at; result materialization and edits bump updated_at and can resurface an already seen failure as unread. Reviewed completions resurfacing after materialization is the same Sprint 53 deferral recorded by decision #426.",
+    "ix_missions_status_completed_at ships in migration 048 up front rather than after a measured breach: the production round trip already exceeds the 150 ms p95 budget from any client (the receipt records summary and GET /auth/me baseline p50/p95 over 20 calls), the criterion forbids caching, and the index is the only remedy it sanctions.",
+    "The own-account live flow performed two real writes on the operator's production account: one PUT /home/missions/{id}/review and one PUT /inbox/seen. The reviewed mission and the new watermark are recorded in ux-13-live-flow/live-flow.json; the review cannot be undone, and items older than the watermark now read as seen for that account.",
+    "MCP reads of /inbox and /inbox/summary are deferred to MCP-2 (deferred-MCP-2 in the parity manifest); mark-seen stays REST/UI-only by decision #426.",
+    "The direct-browser production baseline, public smoke and inbox checks are read-only and run under America/Chicago; the postgres.log skip is tests/integration/test_e2e_rbac_live.py::test_live_rbac_matrix, which is skipped unless RBAC_VERIFY_BASE_URL is set and is not counted as a pass."
+  ],
+  "receipt_acceptance": "CMOS remains In Progress until this receipt is merged on main. Completion must cite this receipt's own PR and merge SHA, then the exact receipt-carrier main-push CI runs, both Railway SUCCESS deployment ids and the production smoke; those immutable post-merge facts are recorded in CMOS session closure."
+}

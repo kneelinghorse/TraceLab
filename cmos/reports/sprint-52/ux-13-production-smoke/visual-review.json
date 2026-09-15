@@ -1,0 +1,84 @@
+{
+  "passed": true,
+  "timezone": "America/Chicago",
+  "reviewer": "claude-fable-5.1 (session PS-2026-09-15-001), image-level review of the archived captures",
+  "reviewed_images": [
+    {
+      "path": "cmos/reports/sprint-52/ux-13-production-smoke/light-1440-inbox.png",
+      "sha256": "0bc2701716eb1845beba57812c16f286c1a7ea96c64887339986d17490df3b42",
+      "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+      "notes": "Priority order intact: Agent failures (8), Mission completions (427, 4 unread), New evidence (59, 6 unread). Header reads '10 unread \u00b7 seen through Sep 7, 8:11 PM' and 'Updated Sep 14, 8:11 PM' for 01:11 UTC, so the Chicago clock renders correctly. Unread pills, status badges, Mark reviewed buttons and pagination readable; toolbar and sidebar both show the 10 badge."
+    },
+    {
+      "path": "cmos/reports/sprint-52/ux-13-production-smoke/dark-1440-inbox.png",
+      "sha256": "e24b7f64c3aa068ecbc765dc1bbb5c48fcccf14bdf43ab621796cacd08956923",
+      "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+      "notes": "Same structure and counts in Dark with token surfaces; accent unread dots and pills legible; no raw palette colors."
+    },
+    {
+      "path": "cmos/reports/sprint-52/ux-13-production-smoke/light-390-inbox.png",
+      "sha256": "2357d98964202e3b75af0724f4333c1a8062973eb1ce0f9efc98f1124a309972",
+      "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+      "notes": "Single-column layout, measured scrollWidth 390 (no horizontal overflow); section pills wrap; headings and Mark reviewed buttons stack. Full-page image is very tall, so fine text was checked through the crops rather than this image."
+    },
+    {
+      "path": "cmos/reports/sprint-52/ux-13-production-smoke/dark-390-inbox.png",
+      "sha256": "9120a8eefe22a13c3d1b213781739bd8595a32a01597b1f0b11be4eb4d91a635",
+      "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+      "notes": "Dark counterpart of the 390 page; same structure, no overflow."
+    },
+    {
+      "path": "cmos/reports/sprint-52/ux-13-production-smoke/light-1440-toolbar-badge.png",
+      "sha256": "b050ac37e1c923810215859f4506e492120c53ead51c312f6aba9eaec2ad8a44",
+      "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+      "notes": "Toolbar link 'Inbox' with an accent pill '10' beside the Search control; accessible name measured as 'Inbox, 10 unread'."
+    },
+    {
+      "path": "cmos/reports/sprint-52/ux-13-production-smoke/light-390-toolbar-badge.png",
+      "sha256": "a9eaf00e37491d941e389376410e831244064f89afd232c765e9272abc195d2e",
+      "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+      "notes": "At 390 the toolbar shows the inbox icon with the '10' pill (label hidden below sm) next to Search; the menu button remains available."
+    },
+    {
+      "path": "cmos/reports/sprint-52/ux-13-production-smoke/dark-390-toolbar-badge.png",
+      "sha256": "a268c10e6096c2ce6ac51cd333f16d0d998959d3c864226880e35ae4389fe2c3",
+      "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+      "notes": "Dark toolbar at 390 with the same icon-plus-pill badge."
+    },
+    {
+      "path": "cmos/reports/sprint-52/ux-13-production-smoke/light-390-drawer-badge.png",
+      "sha256": "c48e8153e89266ba3ac811bd7632d20d0b79ba9a0d119fae2cf05db1468a26b8",
+      "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+      "notes": "Mobile drawer open: the Inbox item is highlighted as current with the '10' pill aligned right; groups and appearance select intact."
+    },
+    {
+      "path": "cmos/reports/sprint-52/ux-13-production-smoke/dark-390-drawer-badge.png",
+      "sha256": "64fa06a7ea00efc3c4a664bdfcb6bd6885e9d164282d2a44eea1dc99cba6c28e",
+      "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+      "notes": "Dark drawer with the same current Inbox item and badge."
+    },
+    {
+      "path": "cmos/reports/sprint-52/ux-13-production-smoke/dark-1440-sidebar-badge.png",
+      "sha256": "f4ccb8de2045a4fdbff06f2466ff47029038a58932eaac8d7d20c7391ff2fdfe",
+      "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+      "notes": "Desktop sidebar in Dark: Inbox current with the '10' pill; the rest of the navigation unchanged."
+    },
+    {
+      "path": "cmos/reports/sprint-52/ux-13-live-flow/liveflow-reviewed.png",
+      "sha256": "ae39d983d86edced5239a4cffd0973dd91e95cfb8aed61fd1808adff3fda4ce2",
+      "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+      "notes": "After Mark reviewed on UX8-LIVE-20260913 the item shows 'Completed Reviewed' with no unread pill or button and the header drops to 9 unread. The visible skip link and mid-page sidebar are a fixed-element artifact of the full-page capture after the click, not a layout change."
+    },
+    {
+      "path": "cmos/reports/sprint-52/ux-13-live-flow/liveflow-after.png",
+      "sha256": "99ff420e864633df02de511a6d0b0dd049a91841eaaaab55d22bcd429376d50a",
+      "reviewed_at": "2026-09-15T01:15:07.139903+00:00",
+      "notes": "After Mark all as seen the header reads '0 unread \u00b7 seen through Sep 14, 8:12 PM', the toolbar link has no pill, section headings show no unread counts and the button is disabled."
+    }
+  ],
+  "completed_at": "2026-09-15T01:15:07.139903+00:00",
+  "limitations": [
+    "The 390 px full-page captures were reviewed at reduced scale for structure and overflow; the badge and drawer crops carry the legible detail at that width.",
+    "Only the operator's own account was reviewed; there was no active in_progress mission at review time, so the failures section held read items only (8 total, 0 unread within the 7-day window)."
+  ]
+}

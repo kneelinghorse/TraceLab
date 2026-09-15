@@ -1,0 +1,73 @@
+{
+  "tool": "playwright",
+  "generatedAt": "2026-09-15T01:01:26.493Z",
+  "completedAt": "2026-09-15T01:01:29.185Z",
+  "status": "passed",
+  "summary": {
+    "total": 4,
+    "expected": 4,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "interrupted": 0,
+    "durationSeconds": 2.692,
+    "retries": 0
+  },
+  "environment": {
+    "node": "v24.6.0",
+    "ci": {
+      "provider": null
+    },
+    "projects": [
+      "chromium"
+    ],
+    "browsers": []
+  },
+  "tests": [
+    {
+      "title": "API health endpoint confirms production authorization and reconciler freshness",
+      "file": "frontend/tests/e2e/production-smoke.spec.ts",
+      "line": 33,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 332,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "/admin/users is deployed as its own Next page",
+      "file": "frontend/tests/e2e/production-smoke.spec.ts",
+      "line": 23,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 885,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "/admin/spaces is deployed as its own Next page",
+      "file": "frontend/tests/e2e/production-smoke.spec.ts",
+      "line": 23,
+      "column": 9,
+      "status": "passed",
+      "durationMs": 892,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    },
+    {
+      "title": "missions route responds at the public domain",
+      "file": "frontend/tests/e2e/production-smoke.spec.ts",
+      "line": 17,
+      "column": 7,
+      "status": "passed",
+      "durationMs": 985,
+      "annotations": [],
+      "attachments": [],
+      "errors": []
+    }
+  ],
+  "artifactPath": "/private/tmp/claude-501/-Users-systemsystems-portfolio-TraceLab/f57b0397-720d-4d21-a15b-ad4fa81feecb/scratchpad/ux13/public-smoke.json"
+}

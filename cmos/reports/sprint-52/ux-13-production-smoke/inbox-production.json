@@ -1,0 +1,635 @@
+{
+  "started_at": "2026-09-15T01:10:44.857Z",
+  "finished_at": "2026-09-15T01:11:29.596Z",
+  "base": "https://tracelab.aquex.ai",
+  "api": "https://api.tracelab.aquex.ai",
+  "mode": "readonly",
+  "timezoneId": "America/Chicago",
+  "user_id": "007c8cb6-7d70-48fc-bcb4-3a0e46bc0519",
+  "deployment_ids": [
+    "147d25cc-856f-4328-b142-b948c015d6da",
+    "7024787e-c06a-4bc0-a6f6-ab349d51ad53"
+  ],
+  "source_commit": "43d6c36e63e0b1441377fd32fba64c2192f6f722",
+  "latency": {
+    "calls": 20,
+    "method": "nearest-rank",
+    "summary_ms": {
+      "p50": 438.0578750000004,
+      "p95": 581.2210409999989,
+      "samples": [
+        508.50704199999984,
+        436.4352079999999,
+        400.5037080000002,
+        466.05145800000037,
+        551.3750420000006,
+        510.7637080000004,
+        411.8553750000001,
+        518.1563340000002,
+        509.04712499999914,
+        438.0578750000004,
+        432.9192920000005,
+        618.7179169999999,
+        405.5264580000003,
+        458.3136250000007,
+        437.47733400000106,
+        581.2210409999989,
+        428.79120800000055,
+        505.88429200000246,
+        407.17762500000026,
+        430.9234580000011
+      ]
+    },
+    "auth_me_baseline_ms": {
+      "p50": 464.4727090000001,
+      "p95": 530.2897910000011,
+      "samples": [
+        433.04387500000007,
+        464.4727090000001,
+        512.2254579999999,
+        469.519417,
+        498.3389159999997,
+        396.6480419999998,
+        500.51775,
+        392.0911249999999,
+        498.510624999999,
+        412.5837080000001,
+        466.44154100000014,
+        430.1087090000001,
+        402.8659580000003,
+        554.3790840000001,
+        433.9344170000004,
+        530.2897910000011,
+        501.8051659999983,
+        523.7840829999986,
+        416.19574999999895,
+        429.6174580000006
+      ]
+    }
+  },
+  "summary": {
+    "generated_at": "2026-09-15T01:11:04.570452",
+    "refresh_seconds": 30,
+    "seen_through": "2026-09-08T01:11:04.570452",
+    "default_lookback_seconds": 604800,
+    "unread": {
+      "failures": 0,
+      "completions": 4,
+      "evidence": 6,
+      "total": 10
+    }
+  },
+  "sections": {
+    "failures": {
+      "total": 8,
+      "unread_total": 0,
+      "first": {
+        "id": "83b9ee6e-f3af-4e7e-9515-d69d54fd47c0",
+        "occurred_at": "2026-08-29T17:54:56.782263",
+        "unread": false
+      }
+    },
+    "completions": {
+      "total": 427,
+      "unread_total": 4,
+      "first": {
+        "id": "27cbe849-a801-49ef-8cb5-bfa891ade2bd",
+        "occurred_at": "2026-09-14T05:33:20.313568",
+        "unread": true
+      }
+    },
+    "evidence": {
+      "total": 59,
+      "unread_total": 6,
+      "first": {
+        "id": "8a5e3763-8249-4194-97d0-cda0e5ff0672::chicago-pilot-2026-09-14:mcp-agent",
+        "occurred_at": "2026-09-14T20:15:36.030943",
+        "unread": true
+      }
+    }
+  },
+  "checks": [
+    {
+      "name": "summary cache 1",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 2",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 3",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 4",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 5",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 6",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 7",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 8",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 9",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 10",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 11",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 12",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 13",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 14",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 15",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 16",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 17",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 18",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 19",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary cache 20",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "summary fields",
+      "actual": [
+        "default_lookback_seconds",
+        "generated_at",
+        "refresh_seconds",
+        "seen_through",
+        "unread"
+      ],
+      "expected": [
+        "default_lookback_seconds",
+        "generated_at",
+        "refresh_seconds",
+        "seen_through",
+        "unread"
+      ],
+      "passed": true
+    },
+    {
+      "name": "summary total equals section sum",
+      "actual": 10,
+      "expected": 10,
+      "passed": true
+    },
+    {
+      "name": "failures cache",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "failures unread total equals summary",
+      "actual": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "name": "failures unread items flagged",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "failures ordered by occurred_at desc",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "failures items carry href, occurred_at and unread",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "failures total counted before paging",
+      "actual": 8,
+      "expected": 8,
+      "passed": true
+    },
+    {
+      "name": "completions cache",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "completions unread total equals summary",
+      "actual": 4,
+      "expected": 4,
+      "passed": true
+    },
+    {
+      "name": "completions unread items flagged",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "completions ordered by occurred_at desc",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "completions items carry href, occurred_at and unread",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "completions total counted before paging",
+      "actual": 427,
+      "expected": 427,
+      "passed": true
+    },
+    {
+      "name": "evidence cache",
+      "actual": "private, no-store",
+      "expected": "private, no-store",
+      "passed": true
+    },
+    {
+      "name": "evidence unread total equals summary",
+      "actual": 6,
+      "expected": 6,
+      "passed": true
+    },
+    {
+      "name": "evidence unread items flagged",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "evidence ordered by occurred_at desc",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "evidence items carry href, occurred_at and unread",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "evidence total counted before paging",
+      "actual": 59,
+      "expected": 59,
+      "passed": true
+    },
+    {
+      "name": "unknown section is 422",
+      "actual": 422,
+      "expected": 422,
+      "passed": true
+    },
+    {
+      "name": "evidence groups equal Home evidence_activity total",
+      "actual": 59,
+      "expected": 59,
+      "passed": true
+    },
+    {
+      "name": "failures total equals attention validation_failed + blocked",
+      "actual": 8,
+      "expected": 8,
+      "passed": true
+    },
+    {
+      "name": "completions total equals missions by_status completed",
+      "actual": 427,
+      "expected": 427,
+      "passed": true
+    },
+    {
+      "name": "light-1440 toolbar badge name",
+      "actual": "Inbox, 10 unread",
+      "expected": "Inbox, 10 unread",
+      "passed": true
+    },
+    {
+      "name": "light-1440 unread headline",
+      "actual": "10 unread",
+      "expected": "10 unread",
+      "passed": true
+    },
+    {
+      "name": "light-1440 failures heading total",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "light-1440 completions heading total",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "light-1440 completions heading unread",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "light-1440 evidence heading total",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "light-1440 evidence heading unread",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "light-1440 sidebar badge name",
+      "actual": "Inbox, 10 unread",
+      "expected": "Inbox, 10 unread",
+      "passed": true
+    },
+    {
+      "name": "light-390 toolbar badge name",
+      "actual": "Inbox, 10 unread",
+      "expected": "Inbox, 10 unread",
+      "passed": true
+    },
+    {
+      "name": "light-390 unread headline",
+      "actual": "10 unread",
+      "expected": "10 unread",
+      "passed": true
+    },
+    {
+      "name": "light-390 failures heading total",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "light-390 completions heading total",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "light-390 completions heading unread",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "light-390 evidence heading total",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "light-390 evidence heading unread",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "light-390 drawer badge name",
+      "actual": "Inbox, 10 unread",
+      "expected": "Inbox, 10 unread",
+      "passed": true
+    },
+    {
+      "name": "dark-1440 toolbar badge name",
+      "actual": "Inbox, 10 unread",
+      "expected": "Inbox, 10 unread",
+      "passed": true
+    },
+    {
+      "name": "dark-1440 unread headline",
+      "actual": "10 unread",
+      "expected": "10 unread",
+      "passed": true
+    },
+    {
+      "name": "dark-1440 failures heading total",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "dark-1440 completions heading total",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "dark-1440 completions heading unread",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "dark-1440 evidence heading total",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "dark-1440 evidence heading unread",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "dark-1440 sidebar badge name",
+      "actual": "Inbox, 10 unread",
+      "expected": "Inbox, 10 unread",
+      "passed": true
+    },
+    {
+      "name": "dark-390 toolbar badge name",
+      "actual": "Inbox, 10 unread",
+      "expected": "Inbox, 10 unread",
+      "passed": true
+    },
+    {
+      "name": "dark-390 unread headline",
+      "actual": "10 unread",
+      "expected": "10 unread",
+      "passed": true
+    },
+    {
+      "name": "dark-390 failures heading total",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "dark-390 completions heading total",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "dark-390 completions heading unread",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "dark-390 evidence heading total",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "dark-390 evidence heading unread",
+      "actual": true,
+      "expected": true,
+      "passed": true
+    },
+    {
+      "name": "dark-390 drawer badge name",
+      "actual": "Inbox, 10 unread",
+      "expected": "Inbox, 10 unread",
+      "passed": true
+    }
+  ],
+  "browser": [
+    {
+      "theme": "light",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "violations": [],
+      "pageErrors": [],
+      "transportErrors": []
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "violations": [],
+      "pageErrors": [],
+      "transportErrors": []
+    },
+    {
+      "theme": "dark",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "mainCount": 1,
+      "violations": [],
+      "pageErrors": [],
+      "transportErrors": []
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "scrollWidth": 390,
+      "mainCount": 1,
+      "violations": [],
+      "pageErrors": [],
+      "transportErrors": []
+    }
+  ],
+  "screenshots": [
+    "light-1440-inbox.png",
+    "light-1440-toolbar-badge.png",
+    "light-1440-sidebar-badge.png",
+    "light-390-inbox.png",
+    "light-390-toolbar-badge.png",
+    "light-390-drawer-badge.png",
+    "dark-1440-inbox.png",
+    "dark-1440-toolbar-badge.png",
+    "dark-1440-sidebar-badge.png",
+    "dark-390-inbox.png",
+    "dark-390-toolbar-badge.png",
+    "dark-390-drawer-badge.png"
+  ],
+  "live_flow": null,
+  "passed": true
+}
