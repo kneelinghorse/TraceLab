@@ -37,6 +37,7 @@ async function fixture(page: Page, options: { failure?: boolean; gate?: Promise<
     } else if (url.pathname.endsWith("/search/history")) data = { entries: [] };
     else if (url.pathname.endsWith("/saved-searches")) data = { items: [] };
     else if (url.pathname.endsWith("/navigation/search")) data = { groups: [] };
+    else if (url.pathname.endsWith("/inbox/summary")) data = { generated_at: "2026-09-13T00:00:00", refresh_seconds: 30, seen_through: "2026-09-13T00:00:00", default_lookback_seconds: 604800, unread: { failures: 0, completions: 0, evidence: 0, total: 0 } };
     else { await route.fulfill({ status: 404, json: { detail: "Fixture not found" } }); return; }
     await route.fulfill({ json: data });
   });

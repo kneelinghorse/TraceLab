@@ -398,7 +398,7 @@
       "mcp": null,
       "classification": "needs-derek",
       "baseline": "action-gap",
-      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+      "rationale": "Destructive resource deletion/removal is gated on Derek\u2019s MCP-2 decision; no MCP delete is authorized here."
     },
     {
       "id": "frontend/src/lib/api/collections.ts#collectionsApi.documents:GET:/collections/{collectionId}/documents",
@@ -499,7 +499,7 @@
       "mcp": null,
       "classification": "needs-derek",
       "baseline": "action-gap",
-      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+      "rationale": "Destructive resource deletion/removal is gated on Derek\u2019s MCP-2 decision; no MCP delete is authorized here."
     },
     {
       "id": "frontend/src/lib/api/collections.ts#collectionsApi.removeDocument:DELETE:/collections/{collectionId}/documents/{documentId}",
@@ -516,7 +516,7 @@
       "mcp": null,
       "classification": "needs-derek",
       "baseline": "action-gap",
-      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+      "rationale": "Destructive resource deletion/removal is gated on Derek\u2019s MCP-2 decision; no MCP delete is authorized here."
     },
     {
       "id": "frontend/src/lib/api/collections.ts#collectionsApi.update:PUT:/collections/{collectionId}",
@@ -723,7 +723,7 @@
       "mcp": null,
       "classification": "needs-derek",
       "baseline": "action-gap",
-      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+      "rationale": "Destructive resource deletion/removal is gated on Derek\u2019s MCP-2 decision; no MCP delete is authorized here."
     },
     {
       "id": "frontend/src/lib/api/documents.ts#documentsApi.downloadDocument:GET:/documents/{documentId}/download",
@@ -986,6 +986,7 @@
       "path": "/api/v1/home/missions/{mission.id}/review",
       "live": true,
       "ui_consumers": [
+        "frontend/src/pages/inbox.tsx",
         "frontend/src/pages/index.tsx",
         "frontend/src/pages/missions/[id].tsx"
       ],
@@ -1099,7 +1100,7 @@
       "mcp": null,
       "classification": "needs-derek",
       "baseline": "action-gap",
-      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+      "rationale": "Destructive resource deletion/removal is gated on Derek\u2019s MCP-2 decision; no MCP delete is authorized here."
     },
     {
       "id": "frontend/src/lib/api/missions.ts#missionsApi.get:GET:/missions/{missionId}",
@@ -1272,7 +1273,7 @@
       "mcp": null,
       "classification": "needs-derek",
       "baseline": "action-gap",
-      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+      "rationale": "Destructive resource deletion/removal is gated on Derek\u2019s MCP-2 decision; no MCP delete is authorized here."
     },
     {
       "id": "frontend/src/lib/api/projects.ts#projectsApi.getProject:GET:/projects/{projectId}",
@@ -1381,7 +1382,7 @@
       "mcp": null,
       "classification": "needs-derek",
       "baseline": "action-gap",
-      "rationale": "Destructive resource deletion/removal is gated on Derek’s MCP-2 decision; no MCP delete is authorized here."
+      "rationale": "Destructive resource deletion/removal is gated on Derek\u2019s MCP-2 decision; no MCP delete is authorized here."
     },
     {
       "id": "frontend/src/lib/api/reports.ts#reportsApi.exportReport:GET:/reports/{reportId}/export",
@@ -1877,6 +1878,57 @@
       "mcp": null,
       "rationale": "Personal saved-view preferences are REST/UI-only by decision 426.",
       "source_line": 27
+    },
+    {
+      "id": "frontend/src/lib/api/inbox.ts#inboxApi.list:GET:/inbox",
+      "api_file": "frontend/src/lib/api/inbox.ts",
+      "operation": "inboxApi.list",
+      "method": "GET",
+      "path": "/api/v1/inbox",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/inbox.tsx"
+      ],
+      "classification": "deferred-MCP-2",
+      "mcp": null,
+      "baseline": "sprint-52-read-gap",
+      "rationale": "UX-13 adds the scoped inbox sections as a live UI read. Decision 426 assigns the corresponding MCP read to MCP-2 after all Sprint 52 UI surfaces land.",
+      "source_line": 17
+    },
+    {
+      "id": "frontend/src/lib/api/inbox.ts#inboxApi.markSeen:PUT:/inbox/seen",
+      "api_file": "frontend/src/lib/api/inbox.ts",
+      "operation": "inboxApi.markSeen",
+      "method": "PUT",
+      "path": "/api/v1/inbox/seen",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/pages/inbox.tsx"
+      ],
+      "classification": "rest-only-by-design",
+      "mcp": null,
+      "baseline": "sprint-52-preference-write",
+      "rationale": "The per-user inbox seen watermark is an explicit acknowledgement; per-user acknowledgement writes stay REST/UI-only by decision 426.",
+      "source_line": 19
+    },
+    {
+      "id": "frontend/src/lib/api/inbox.ts#inboxApi.summary:GET:/inbox/summary",
+      "api_file": "frontend/src/lib/api/inbox.ts",
+      "operation": "inboxApi.summary",
+      "method": "GET",
+      "path": "/api/v1/inbox/summary",
+      "live": true,
+      "ui_consumers": [
+        "frontend/src/components/AppShell.tsx",
+        "frontend/src/components/Navigation.tsx",
+        "frontend/src/pages/_app.tsx",
+        "frontend/src/pages/inbox.tsx"
+      ],
+      "classification": "deferred-MCP-2",
+      "mcp": null,
+      "baseline": "sprint-52-read-gap",
+      "rationale": "UX-13 polls the unread inbox summary for the shell badge and the inbox page. Decision 426 assigns the corresponding MCP read to MCP-2.",
+      "source_line": 16
     }
   ]
 }

@@ -5,12 +5,15 @@ import type { ReactNode } from "react";
 
 import { AuthGate } from "@/components/AuthGate";
 import { CommandPalette } from "@/components/CommandPalette";
+import { InboxAnnouncer, UnreadBadge } from "@/components/InboxBadge";
 import { Navigation, NavigationIcon, activeNavigationItem, navigationGroups } from "@/components/Navigation";
 import { ThemeSelect } from "@/components/ThemeSelect";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRole } from "@/contexts/RoleContext";
+import { inboxBadgeName } from "@/lib/api/inbox";
 import { keepDialogFocus } from "@/lib/dialog-focus";
 import { openCommandPalette } from "@/lib/command-palette";
+import { useInboxSummary } from "@/lib/hooks/useInboxSummary";
 
 function Brand() {
   return <Link href="/" className="flex items-center gap-3 font-semibold tracking-tight text-foreground"><span aria-hidden="true" className="grid h-8 w-8 place-items-center rounded-lg bg-accent text-on-accent">T</span><span>TraceLab</span></Link>;
@@ -25,6 +28,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const hydrated = useSyncExternalStore(subscribeHydration, clientSnapshot, serverSnapshot);
   const { isAuthenticated, user, logout } = useAuth();
   const { isAdmin } = useRole();
+  const { data: inbox } = useInboxSummary();
+  const unread = inbox?.unread?.total ?? 0;
   const router = useRouter();
   const drawer = useRef<HTMLDialogElement>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -72,8 +77,10 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="app-toolbar">
         <button type="button" className="app-mobile-menu rounded-lg p-2 text-secondary hover:bg-surface-alt" aria-label="Open navigation" aria-expanded={drawerOpen} aria-controls="navigation-drawer" onClick={() => { drawer.current?.showModal(); setDrawerOpen(true); }}><NavigationIcon name="menu" /></button>
         <span className="min-w-0 flex-1 truncate text-sm font-medium text-secondary">{active?.label || "Workspace"}</span>
+        <Link href="/inbox" aria-label={unread > 0 ? inboxBadgeName(unread) : "Inbox"} className="flex items-center gap-2 rounded-lg border border-line px-3 py-2 text-sm text-muted hover:border-line-strong"><NavigationIcon name="inbox" /><span className="hidden sm:inline">Inbox</span><UnreadBadge total={unread} /></Link>
         <button type="button" className="flex items-center gap-3 rounded-lg border border-line px-3 py-2 text-sm text-muted hover:border-line-strong" onClick={openCommandPalette}><NavigationIcon name="search" /><span>Search</span><kbd className="hidden text-xs sm:inline">⌘ K</kbd></button>
       </header>
+      <InboxAnnouncer total={inbox?.unread?.total} />
       <main id="main-content" tabIndex={-1} className="app-main context-detail" data-region="body">{children}</main>
     </div>
     <dialog id="navigation-drawer" ref={drawer} aria-label="Navigation" className="app-dialog app-drawer" onKeyDown={keepDialogFocus} onClose={() => setDrawerOpen(false)}>

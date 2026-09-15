@@ -350,6 +350,7 @@ class Mission(Base):
             "queued_at",
         ),
         Index("ix_missions_workspace_owner_created_at", "workspace_id", "owner_id", "created_at"),
+        Index("ix_missions_status_completed_at", "status", "completed_at"),
         {"extend_existing": True},
     )
 

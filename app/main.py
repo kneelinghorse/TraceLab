@@ -28,6 +28,7 @@ from app.api.v1 import (
     graph_neighborhood,
     health,
     home,
+    inbox,
     mission_events,
     mission_views,
     missions,
@@ -305,6 +306,12 @@ app.include_router(
     home.router,
     prefix=f"{settings.api_v1_prefix}/home",
     tags=["home"],
+    dependencies=protected_dependencies,
+)
+app.include_router(
+    inbox.router,
+    prefix=f"{settings.api_v1_prefix}/inbox",
+    tags=["inbox"],
     dependencies=protected_dependencies,
 )
 app.include_router(

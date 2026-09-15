@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 
+import { UnreadBadge } from "@/components/InboxBadge";
 import { useRole } from "@/contexts/RoleContext";
+import { inboxBadgeName } from "@/lib/api/inbox";
+import { useInboxSummary } from "@/lib/hooks/useInboxSummary";
 
 export type NavigationItem = { label: string; href: string; icon: string };
 export const navigationGroups: { label: string; admin?: boolean; items: NavigationItem[] }[] = [
   { label: "", items: [
     { label: "Home", href: "/", icon: "home" },
+    { label: "Inbox", href: "/inbox", icon: "inbox" },
     { label: "Projects", href: "/projects", icon: "folder" },
   ] },
   { label: "Data", items: [
@@ -36,6 +40,7 @@ export const navigationGroups: { label: string; admin?: boolean; items: Navigati
 
 const iconPaths: Record<string, string> = {
   home: "M3 10 12 3l9 7M5 9v12h5v-7h4v7h5V9",
+  inbox: "M4 4h16v16H4V4Zm0 10h4l2 3h4l2-3h4",
   folder: "M3 7V5h6l2 2h10v13H3V7Z",
   document: "M5 3h9l5 5v13H5V3Zm9 0v6h5M8 13h8M8 17h6",
   evidence: "m8 8 3-3a4 4 0 0 1 6 6l-3 3M16 16l-3 3a4 4 0 0 1-6-6l3-3M8 16l8-8",
@@ -65,6 +70,8 @@ export function activeNavigationItem(path: string, items: NavigationItem[]) {
 export function Navigation({ onNavigate }: { onNavigate?: () => void }) {
   const { pathname } = useRouter();
   const { isAdmin } = useRole();
+  const { data: inbox } = useInboxSummary();
+  const unread = inbox?.unread?.total ?? 0;
   const groups = navigationGroups.filter((group) => !group.admin || isAdmin);
   const active = activeNavigationItem(pathname, groups.flatMap((group) => group.items));
   return (
@@ -73,8 +80,8 @@ export function Navigation({ onNavigate }: { onNavigate?: () => void }) {
         <div key={group.label || "home"}>
           {group.label && <p className="app-nav-group">{group.label}</p>}
           {group.items.map((item) => (
-            <Link key={item.href} href={item.href} className="app-nav-link" aria-current={active?.href === item.href ? "page" : undefined} onClick={onNavigate}>
-              <NavigationIcon name={item.icon} /><span>{item.label}</span>
+            <Link key={item.href} href={item.href} className="app-nav-link" aria-current={active?.href === item.href ? "page" : undefined} aria-label={item.href === "/inbox" && unread > 0 ? inboxBadgeName(unread) : undefined} onClick={onNavigate}>
+              <NavigationIcon name={item.icon} /><span>{item.label}</span>{item.href === "/inbox" && <UnreadBadge total={unread} className="ml-auto" />}
             </Link>
           ))}
         </div>

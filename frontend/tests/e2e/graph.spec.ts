@@ -52,6 +52,7 @@ async function fixture(page: Page, options: { status?: number; empty?: boolean; 
       if (options.status && options.status !== 200) { await route.fulfill({ status: options.status, json: { detail: "Fixture root unavailable" } }); return; }
       await route.fulfill({ json: neighborhood(url.searchParams.get("root_type") as Kind, Number(url.searchParams.get("depth")), options.empty) }); return;
     }
+    if (url.pathname.endsWith("/inbox/summary")) { await route.fulfill({ json: { generated_at: "2026-09-13T00:00:00", refresh_seconds: 30, seen_through: "2026-09-13T00:00:00", default_lookback_seconds: 604800, unread: { failures: 0, completions: 0, evidence: 0, total: 0 } } }); return; }
     await route.fulfill({ status: 404, json: { detail: "No fixture for this route" } });
   });
   return requests;
