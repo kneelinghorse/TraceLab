@@ -1,6 +1,5 @@
 import Head from "next/head";
 import Link from "next/link";
-import { BUILTIN_DASHBOARDS, missionViewHref } from "@/lib/api/missionViews";
 import { useState } from "react";
 import type { ReactNode } from "react";
 import useSWR from "swr";
@@ -9,16 +8,13 @@ import { AuthGate } from "@/components/AuthGate";
 import { FavoriteProjects } from "@/components/projects/FavoriteProjects";
 import { NavigationIcon } from "@/components/Navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { activityApi } from "@/lib/api/activity";
+import type { ActivityItem } from "@/lib/api/activity";
 import { homeApi } from "@/lib/api/home";
-import type { HomeMission, HomeRecent, HomeSection } from "@/lib/api/home";
+import type { HomeRecent, HomeSection } from "@/lib/api/home";
+import { markViewed } from "@/lib/hooks/useActivitySummary";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { openCommandPalette } from "@/lib/command-palette";
-
-const REASONS = {
-  validation_failed: { label: "Validation failed", color: "text-danger bg-danger-surface" },
-  blocked: { label: "Blocked", color: "text-danger bg-danger-surface" },
-  stalled: { label: "Waiting in queue", color: "text-warning bg-warning-surface" },
-  unreviewed: { label: "Ready for review", color: "text-success bg-success-surface" },
-};
 
 function updated(value: string) {
   // API timestamps are UTC, including older offset-free SQL timestamps.
@@ -37,11 +33,21 @@ function Section({ title, count, children, link }: { title: string; count: numbe
   </section>;
 }
 
-function ResultLinks({ mission }: { mission: HomeMission }) {
-  return <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-    {mission.report_id ? <Link href={`/reports/${mission.report_id}`} className="text-accent-text underline underline-offset-4">Open report</Link> : <span className="text-muted">No accessible report</span>}
-    {mission.evidence_href ? <Link href={mission.evidence_href} className="text-accent-text underline underline-offset-4">Evidence ({mission.evidence_count.toLocaleString()})</Link> : <span className="text-muted">No accessible evidence</span>}
-  </div>;
+const TYPE_LABELS = { mission: "Mission", report: "Report", evidence: "Evidence" } as const;
+
+function ActivityRow({ item, onOpen, onViewed, busy }: { item: ActivityItem; onOpen: (item: ActivityItem) => void; onViewed: (item: ActivityItem) => void; busy: boolean }) {
+  return <li className={`flex flex-wrap items-start gap-3 px-5 py-4 ${item.new ? "" : "opacity-80"}`} data-new={item.new || undefined}>
+    <span aria-hidden="true" className={`mt-2 h-2 w-2 shrink-0 rounded-full ${item.new ? "bg-accent" : "bg-transparent"}`} />
+    <div className="min-w-0 flex-1">
+      <div className="flex flex-wrap items-center gap-2 text-xs text-muted"><span>{TYPE_LABELS[item.type]}</span>{item.status && <StatusBadge status={item.status} />}{item.new && <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-on-accent">New</span>}</div>
+      <Link href={item.href} onClick={() => onOpen(item)} className="mt-1 block break-words font-medium text-foreground hover:text-accent-text">{item.title}</Link>
+      {item.subtitle && <p className="mt-0.5 break-all text-xs text-muted">{item.subtitle}</p>}
+    </div>
+    <div className="flex shrink-0 flex-col items-end gap-2 text-xs text-muted">
+      <time dateTime={item.occurred_at}>{updated(item.occurred_at)}</time>
+      {item.new && <button type="button" disabled={busy} onClick={() => onViewed(item)} className="rounded border border-line px-2 py-1 text-secondary hover:bg-surface-alt disabled:opacity-50">Mark viewed</button>}
+    </div>
+  </li>;
 }
 
 function Recents({ title, data, href }: { title: string; data: HomeSection<HomeRecent>; href: string }) {
@@ -59,26 +65,36 @@ function HomeContent() {
   const { data, error, isLoading, isValidating, mutate } = useSWR(["home", user?.user_id], homeApi.get, {
     refreshInterval: (snapshot) => (snapshot?.refresh_seconds ?? 30) * 1000,
   });
-  const [reviewing, setReviewing] = useState<string | null>(null);
-  const [reviewError, setReviewError] = useState<string | null>(null);
+  const [more, setMore] = useState<ActivityItem[]>([]);
+  const [morePage, setMorePage] = useState(1);
+  const [moreError, setMoreError] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  async function review(mission: HomeMission) {
-    setReviewing(mission.id);
-    setReviewError(null);
+  function viewedItem(item: ActivityItem) {
+    return { type: item.type, id: item.id, occurred_at: item.occurred_at };
+  }
+  function open(item: ActivityItem) {
+    if (item.new) void markViewed([viewedItem(item)]);
+  }
+  async function viewed(item: ActivityItem) {
+    setBusy(true);
+    try { await markViewed([viewedItem(item)]); await mutate(); } finally { setBusy(false); }
+  }
+  async function loadMore() {
+    setMoreError(false);
     try {
-      await homeApi.review(mission);
-      await mutate();
+      const next = await activityApi.list({ page: morePage + 1, page_size: data?.activity.page_size ?? 10 });
+      setMore((current) => [...current, ...next.items]);
+      setMorePage(next.page);
     } catch {
-      setReviewError("Review could not be saved. Refresh Home to check for a changed result, then try again.");
-    } finally {
-      setReviewing(null);
+      setMoreError(true);
     }
   }
 
   return <div className="mx-auto max-w-7xl space-y-7 px-4 py-8 sm:px-6 lg:py-10">
     <Head><title>Home · TraceLab</title></Head>
     <header className="flex flex-wrap items-end justify-between gap-5">
-      <div><p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted">Research workspace</p><h1 className="text-3xl font-semibold tracking-tight">Home</h1><p className="mt-2 max-w-xl text-secondary">What needs your attention, and what changed while you were away.</p></div>
+      <div><p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted">Research workspace</p><h1 className="text-3xl font-semibold tracking-tight">Home</h1><p className="mt-2 max-w-xl text-secondary">What happened most recently across your missions, reports and evidence.</p></div>
       <Link href="/missions/new" className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-on-accent"><NavigationIcon name="mission" />New mission</Link>
     </header>
     <button type="button" onClick={openCommandPalette} className="panel flex w-full items-center gap-3 px-5 py-4 text-left text-secondary hover:border-line-strong">
@@ -86,7 +102,6 @@ function HomeContent() {
     </button>
     {isLoading && <div role="status" className="panel p-8 text-secondary">Loading your workspace…</div>}
     {error && <div role="alert" className="rounded-lg border border-line bg-danger-surface p-5 text-danger"><p>{data ? "Home could not refresh. The last successful snapshot is shown below." : "Home could not load. Try again to retrieve your workspace."}</p><button type="button" onClick={() => void mutate()} className="mt-3 rounded border border-current px-3 py-2 text-sm">Try again</button></div>}
-    {reviewError && <p role="alert" className="rounded-lg bg-danger-surface p-4 text-danger">{reviewError}</p>}
     {data && <>
       {data.favorites && <FavoriteProjects key={user?.user_id} initial={data.favorites} />}
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted">
@@ -94,22 +109,14 @@ function HomeContent() {
         <div className="flex flex-wrap items-center gap-3"><p>Updated <time dateTime={data.generated_at}>{updated(data.generated_at)}</time> · refreshes every {data.refresh_seconds}s</p><button type="button" onClick={() => void mutate()} disabled={isValidating} className="rounded border border-line px-3 py-1.5 text-secondary disabled:opacity-50">{isValidating ? "Refreshing…" : "Refresh"}</button></div>
       </div>
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
-        <Section title="Needs attention" count={data.attention.total} link={{ href: "/missions", label: "All missions" }}>
-          <p className="border-b border-line px-5 py-3 text-xs text-muted">Validation failures first, then blocked runs, queues over {data.stalled_after_seconds / 3600} hour, and completions to review.</p>
-          <nav aria-label="Attention dashboards" className="flex flex-wrap gap-4 border-b border-line px-5 py-3 text-sm">{BUILTIN_DASHBOARDS.map(dashboard => <Link key={dashboard.key} href={missionViewHref(dashboard.filters)} className="text-accent-text underline underline-offset-4">{dashboard.label}</Link>)}</nav>
-          <ol className="divide-y divide-line">{data.attention.items.map((mission) => {
-            const reason = REASONS[mission.reason!];
-            return <li key={mission.id} className="space-y-3 p-5">
-              <div className="flex flex-wrap items-center gap-2"><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${reason.color}`}>{reason.label}</span><span className="break-all text-xs text-muted">{mission.mission_id}</span></div>
-              <Link href={`/missions/${mission.id}`} className="block break-words font-semibold hover:text-accent-text">{mission.title}</Link>
-              {(mission.status === "completed" || mission.status === "validation_failed") && <ResultLinks mission={mission} />}
-              {mission.reason === "unreviewed" && <button type="button" disabled={reviewing !== null} onClick={() => void review(mission)} className="rounded-lg border border-line px-3 py-2 text-sm text-secondary hover:bg-surface-alt disabled:opacity-50">{reviewing === mission.id ? "Saving review…" : "Mark reviewed"}</button>}
-            </li>;
-          })}</ol>
-          {data.attention.total === 0 && <div className="p-6"><p className="font-medium">You’re up to date.</p><p className="mt-1 text-sm text-secondary">No missions need your attention right now.</p></div>}
-          {data.attention.total > data.attention.items.length && <p className="border-t border-line px-5 py-3 text-xs text-muted">Showing the first {data.attention.items.length} of {data.attention.total.toLocaleString()} items. Reviewed completions leave this queue.</p>}
+        <Section title="Recent activity" count={data.activity.total} link={{ href: "/missions", label: "All missions" }}>
+          <p className="border-b border-line px-5 py-3 text-xs text-muted">Newest first. {data.activity.new_total > 0 ? `${data.activity.new_total.toLocaleString()} new since you last looked.` : "Nothing new since you last looked."}</p>
+          <ol className="divide-y divide-line" aria-label="Activity items">{[...data.activity.items, ...more].map((item) => <ActivityRow key={`${item.type}:${item.id}`} item={item} onOpen={open} onViewed={(target) => void viewed(target)} busy={busy} />)}</ol>
+          {data.activity.total === 0 && <div className="p-6"><p className="font-medium">Nothing has happened yet.</p><p className="mt-1 text-sm text-secondary">Missions, reports and evidence will appear here as they happen.</p></div>}
+          {moreError && <p role="alert" className="border-t border-line px-5 py-3 text-sm text-danger">More activity could not load. <button type="button" className="underline" onClick={() => void loadMore()}>Try again</button></p>}
+          {data.activity.total > data.activity.items.length + more.length && <div className="border-t border-line px-5 py-3"><button type="button" onClick={() => void loadMore()} className="text-sm text-accent-text underline underline-offset-4">Show more</button><span className="ml-3 text-xs text-muted">Showing {data.activity.items.length + more.length} of {data.activity.total.toLocaleString()}</span></div>}
         </Section>
-        <Section title="Active missions" count={data.active_runs.total} link={{ href: "/missions?view=queue", label: "Open queue" }}>
+        <Section title="Active missions" count={data.active_runs.total} link={{ href: "/missions?status=in_progress", label: "All running" }}>
           <ul className="divide-y divide-line">{data.active_runs.items.map((mission) => <li key={mission.id} className="space-y-3 p-5">
             <Link href={`/missions/${mission.id}`} className="block break-words font-semibold hover:text-accent-text">{mission.title}</Link>
             <p className="text-sm text-secondary">{mission.progress.phase ? mission.progress.phase.replaceAll("_", " ") : "Phase not reported"}</p>

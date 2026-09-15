@@ -6,14 +6,14 @@ const mocks = vi.hoisted(() => ({
   auth: { isAuthenticated: true, isReady: true, user: { user_id: "alice", display_name: "Alice", email: "alice@example.test" }, logout: vi.fn() },
   role: { isAdmin: false },
   router: { pathname: "/missions", push: vi.fn() },
-  names: vi.fn(), history: vi.fn(), saved: vi.fn(), views: vi.fn(),
+  names: vi.fn(), history: vi.fn(), saved: vi.fn(),
 }));
 vi.mock("next/router", () => ({ useRouter: () => mocks.router }));
 vi.mock("@/contexts/AuthContext", () => ({ useAuth: () => mocks.auth }));
 vi.mock("@/contexts/RoleContext", () => ({ useRole: () => mocks.role }));
 vi.mock("@/lib/api/navigation", () => ({ navigationApi: { search: mocks.names } }));
 vi.mock("@/lib/api/search", () => ({ searchApi: { history: mocks.history } }));
-vi.mock("@/lib/api/missionViews", async original => ({ ...await original<object>(), missionViewsApi: { list: mocks.views } }));
+vi.mock("@/lib/api/activity", async original => ({ ...await original<object>(), activityApi: { summary: async () => ({ generated_at: "2026-09-13T00:00:00", new_total: 0, by_type: {} }) } }));
 vi.mock("@/lib/api/savedSearches", () => ({ savedSearchesApi: { list: mocks.saved } }));
 
 import { AppShell } from "@/components/AppShell";
@@ -32,7 +32,6 @@ beforeEach(() => {
   mocks.names.mockResolvedValue(response());
   mocks.history.mockResolvedValue({ entries: [] });
   mocks.saved.mockResolvedValue({ items: [] });
-  mocks.views.mockResolvedValue({ items: [] });
   vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })));
   HTMLDialogElement.prototype.showModal = function () { this.setAttribute("open", ""); };
   HTMLDialogElement.prototype.close = function () { this.removeAttribute("open"); this.dispatchEvent(new Event("close")); };
@@ -127,13 +126,4 @@ describe("scoped palette data and actions", () => {
     expect(screen.getByRole("button", { name: "Upload documents", exact: true })).toBeTruthy();
     expect(screen.getByText("Keyboard help")).toBeTruthy();
   });
-});
-
-it("opens saved mission filters with all reasons and a live server total", async () => {
-  mocks.views.mockResolvedValue({ items: [{ id: "view", name: "Risk", total: 117, filters: { view: "attention", reason: ["blocked", "stalled"], project_id: "p" } }] });
-  render(shell());
-  expect(mocks.views).not.toHaveBeenCalled();
-  open();
-  fireEvent.click(await screen.findByRole("button", { name: "Risk (117)" }));
-  expect(mocks.router.push).toHaveBeenCalledWith("/missions?view=attention&reason=blocked&reason=stalled&project_id=p");
 });

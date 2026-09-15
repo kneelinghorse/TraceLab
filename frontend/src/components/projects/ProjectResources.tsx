@@ -33,7 +33,7 @@ async function load(tab: ResourceTab, projectId: string, page: number) {
     return { total: result.total, rows: result.data.map(row => ({ id: row.id, title: row.name, href: `/collections/${row.id}`, summary: row.description, status: undefined })) };
   }
   if (tab === "Missions") {
-    const result = await missionsApi.list({ project_id: projectId, page, page_size: PAGE_SIZE, view: "all" });
+    const result = await missionsApi.list({ project_id: projectId, page, page_size: PAGE_SIZE });
     return { total: result.pagination.total, rows: result.data.map(row => ({ id: row.id, title: row.title, href: `/missions/${row.id}`, summary: row.objective, status: row.status })) };
   }
   const result = await reportsApi.list({ project_id: projectId, page, page_size: PAGE_SIZE });

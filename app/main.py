@@ -12,6 +12,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.api.v1 import (
+    activity,
     admin,
     admin_users,
     auth,
@@ -28,9 +29,7 @@ from app.api.v1 import (
     graph_neighborhood,
     health,
     home,
-    inbox,
     mission_events,
-    mission_views,
     missions,
     monitoring,
     navigation_search,
@@ -297,21 +296,15 @@ app.include_router(
     dependencies=protected_dependencies,
 )
 app.include_router(
-    mission_views.router,
-    prefix=f"{settings.api_v1_prefix}/mission-views",
-    tags=["mission-views"],
-    dependencies=protected_dependencies,
-)
-app.include_router(
     home.router,
     prefix=f"{settings.api_v1_prefix}/home",
     tags=["home"],
     dependencies=protected_dependencies,
 )
 app.include_router(
-    inbox.router,
-    prefix=f"{settings.api_v1_prefix}/inbox",
-    tags=["inbox"],
+    activity.router,
+    prefix=f"{settings.api_v1_prefix}/activity",
+    tags=["activity"],
     dependencies=protected_dependencies,
 )
 app.include_router(

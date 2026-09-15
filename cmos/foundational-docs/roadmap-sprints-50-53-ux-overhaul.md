@@ -293,7 +293,8 @@ A UI mission is not done until all of the following are true. Each rule exists b
 | `/console/corrections` | `/admin/corrections` | 50 (UX-4) | Permanent 308 |
 | `/invites` | `/settings#invites` | 50 (UX-5) | Permanent 308; query precedes fragment |
 | `/search/results` | `/search` | 51 (UX-9) | Permanent 308 |
-| `/missions/queue` | `/missions?view=queue` | 51 (UX-6) | Permanent 308; destination selects the queue view |
+| `/missions/queue` | `/missions?status=queued` | 51 (UX-6); retargeted 53 (ACT-1) | Permanent 308; the queue view was retired with the attention model |
+| `/inbox` | `/` | 53 (ACT-1) | Permanent 308; the inbox was replaced by the recent activity stream on Home |
 
 All redirects retain query parameters, including repeated values. The destination's explicit `view=queue` wins over an incoming `view`. Home is a replacement page, not an alias or a self-redirect. The executable map is `frontend/src/lib/route-migrations.json`; unit tests bind it to this maintained table, and the production smoke walks every row.
 

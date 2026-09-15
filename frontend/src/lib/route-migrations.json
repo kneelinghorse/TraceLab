@@ -6,5 +6,6 @@
   { "source": "/console/corrections", "destination": "/admin/corrections", "kind": "redirect", "sprint": "50 (UX-4)" },
   { "source": "/invites", "destination": "/settings#invites", "kind": "redirect", "sprint": "50 (UX-5)" },
   { "source": "/search/results", "destination": "/search", "kind": "redirect", "sprint": "51 (UX-9)" },
-  { "source": "/missions/queue", "destination": "/missions?view=queue", "kind": "redirect", "sprint": "51 (UX-6)" }
+  { "source": "/missions/queue", "destination": "/missions?status=queued", "kind": "redirect", "sprint": "51 (UX-6); retargeted 53 (ACT-1)" },
+  { "source": "/inbox", "destination": "/", "kind": "redirect", "sprint": "53 (ACT-1)" }
 ]

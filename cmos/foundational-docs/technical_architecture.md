@@ -11,7 +11,7 @@ rather than duplicating contracts. Intent and sprint history are in
 | --- | --- | --- |
 | API | `app/` (FastAPI, Python 3.11) | Railway service `TraceLab`, `https://api.tracelab.aquex.ai` |
 | Web UI | `frontend/` (Next.js 16 pages router) | Railway service `frontend`, `https://tracelab.aquex.ai`; see `docs/frontend_architecture.md` |
-| Relational store | PostgreSQL 15 | Railway service; schema owned by Alembic (head `048_user_inbox_state`) |
+| Relational store | PostgreSQL 15 | Railway service; schema owned by Alembic (head `049_recent_activity`) |
 | Vector store | Qdrant | Railway service; PEDR retrieval layers |
 | Research worker | DeepSearch (separate repository) | Railway service `worker-service deepSearch`; reached only through the mission lifecycle |
 | Agent surface | `packages/tracelab-mcp` | Local stdio MCP server published as `@aquex/tracelab-mcp` |
@@ -24,13 +24,13 @@ after SUCCESS and only then runs its production checks.
 
 - `app/api/v1/` routers stay thin and call services. Mounted routers include auth and device-code
   auth, projects, documents, collections and collection context, reports, missions, mission events,
-  mission views, home, inbox, graph neighborhood, relationships, navigation search, evidence, search,
+  home, activity, graph neighborhood, relationships, navigation search, evidence, search,
   retrieval, PEDR search/preflight/related, facets, saved searches, search history, synthesize, quality
   and automated quality, admin,
   admin users, spaces, project admin, corrections, decision links, monitoring, redaction, cache,
   Qdrant admin, DeepSearch and webhooks, and health.
 - `app/services/` holds orchestration (mission service, webhook handler, result materialization,
-  document policy, evidence scope, mission attention, home, inbox, report promotion, the vendored
+  document policy, evidence scope, home, activity, report promotion, the vendored
   DeepSearch contract compiler under `app/services/contract_compiler/`).
 - `app/ports/` are `typing.Protocol` contracts; `app/adapters/` implement them (SQLAlchemy
   repositories, OpenAI and Qdrant adapters); `app/dependencies.py` is the composition root wired
@@ -77,15 +77,16 @@ after SUCCESS and only then runs its production checks.
 - Evidence ledger (`app/models/evidence_ledger.py`): `ledger_sources`, `ledger_entries`,
   `ledger_notes`, `deepsearch_ledger_batches` and `deepsearch_evidence_outbox`; the contract is
   `cmos/contracts/evidence-ledger-contract.md`.
-- Per-user operator state: `user_favorites`, `user_mission_reviews` (an explicit review of one
-  result version), `user_saved_views` and `user_inbox_state` (one seen-through watermark per user).
+- Per-user operator state: `user_favorites` and `user_item_views` (one row per opened mission, report
+  or evidence group, keyed by type and id and stamped with the revision that was viewed; migration
+  `049_recent_activity` replaced `user_mission_reviews`, `user_saved_views` and `user_inbox_state`).
 - Missions carry the DeepSearch lease boundary (`deepsearch_lease_*`, `deepsearch_attempt_count`,
   `deepsearch_result_key`, migration `039_deepsearch_lease_v1`) and the twelve compiler
   fields mapped in `cmos/contracts/mission-authoring-contract.md`.
 - **Alembic is the sole schema authority.** The runtime no longer calls `create_all`, and
   `tests/integration/test_migration_coverage.py` proves a migrations-only database contains every
   model table. Revision ids must stay at or under 32 characters, the width of
-  `alembic_version.version_num`. The current head is `048_user_inbox_state`.
+  `alembic_version.version_num`. The current head is `049_recent_activity`.
 
 ## Retrieval and search
 
@@ -98,12 +99,12 @@ after SUCCESS and only then runs its production checks.
   `POST /api/v1/retrieval/search` are both scoped by `accessible_project_ids`. Facets, hybrid search,
   the evidence browser and the relationship neighborhood (`GET /api/v1/graph/neighborhood`, computed
   from the live relational tables; it does not read `graph_edges`) are RBAC-scoped reads.
-- Operator aggregates (`/home`, `/home/attention`, `/mission-views`, `/inbox`, `/navigation/search`,
+- Operator aggregates (`/home`, `/activity`, `/activity/summary`, `/navigation/search`,
   `/graph/neighborhood`, collection context and admin stats) are computed per request with server-side
   totals, answer with `Cache-Control: private, no-store`, and are never cached, so a revoked membership takes effect on
-  the next request (learning #167). Home and the inbox share one ledger scope in
-  `app/services/evidence_scope.py` and one attention predicate set in
-  `app/services/mission_attention.py`.
+  the next request (learning #167). Home and the activity stream share one ledger scope in
+  `app/services/evidence_scope.py`; the stream orders by when each item last happened
+  (`app/adapters/repositories/sqlalchemy_activity_repo.py`) and status never affects order (decision #459).
 
 ## Missions and DeepSearch
 
@@ -117,10 +118,10 @@ after SUCCESS and only then runs its production checks.
   /missions/{id}/contract-preview` compiles without spending a run.
 - `app/core/mission_events.py` is an in-memory, per-process ring buffer; `GET /missions/events/recent`
   and the SSE stream are snapshots, not delivery guarantees. Operator surfaces therefore poll: the
-  inbox reads rows, so completions written directly by the worker appear on the next poll.
-- Per-user acknowledgements (result review, inbox mark-seen, favorites, saved searches and saved
-  views) are explicit human actions and stay REST/UI-only (decision #426; the explicit per-user,
-  per-result-version review model comes from decisions #395 and #409).
+  activity stream reads rows, so completions written directly by the worker appear on the next poll.
+- Per-user acknowledgements (viewed marks, favorites and saved searches) are explicit human actions
+  and stay REST/UI-only (decision #426). Viewed marks are per user and per item revision, so a changed
+  item becomes new again (decision #459 replaced the review and inbox models of decisions #395 and #409).
 
 ## MCP package
 

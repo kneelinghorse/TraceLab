@@ -24,8 +24,7 @@ status. The Sprint 03 "Mission Protocol UI" notes this page replaces are in git 
 
 | Route | File | Notes |
 | --- | --- | --- |
-| `/` | `index.tsx` | Home: attention, active runs, recent reports and projects, favorites, evidence activity |
-| `/inbox` | `inbox.tsx` | Priority inbox (Sprint 52, UX-13) |
+| `/` | `index.tsx` | Home: recent activity (newest first), active runs, recent reports and projects, favorites, evidence activity |
 | `/projects`, `/projects/[id]` | `projects/index.tsx`, `projects/[id].tsx` | Project list and bundle |
 | `/documents`, `/documents/[id]`, `/documents/upload` | `documents/*.tsx` | Document list, detail, upload |
 | `/collections`, `/collections/[id]` | `collections/*.tsx` | Collections and collection context |
@@ -46,7 +45,7 @@ roadmap's Route Migration Map section. Redirects are covered by `frontend/tests/
 ## Shell
 
 - `frontend/src/components/AppShell.tsx`: skip link, the sidebar (`Navigation.tsx`), a sticky toolbar with
-  the active section label, the Inbox link with its unread badge and the ⌘K search control, exactly one
+  the active section label and the ⌘K search control, exactly one
   `<main id="main-content">`, a mobile navigation drawer built on a native `<dialog>`, and
   `CommandPalette.tsx`.
 - **Authentication.** `frontend/src/contexts/AuthContext.tsx` owns the session and
@@ -70,14 +69,14 @@ roadmap's Route Migration Map section. Redirects are covered by `frontend/tests/
   (default `/api/v1`), attaches the bearer token, raises `HttpError` with the status, and turns a 401
   into a logout.
 - One client module per noun: admin, admin-stats, auth, collections, console, deviceAuth, documents,
-  evidence, graph, home, inbox, missionViews, missions, navigation, projects, reports, savedSearches,
+  activity, evidence, graph, home, missions, navigation, projects, reports, savedSearches,
   search, settings.
 - `timestamps.ts` exports `parseApiTimestamp`, which treats offset-free API datetimes as UTC; pages
   must use it instead of `new Date(value)`: learning #173 recorded offset-free timestamps showing five
   hours ahead in Chicago.
-- SWR keys include the user id. Home, the mission dashboards and the inbox summary poll at the server's
-  `refresh_seconds` (30 s); the shared inbox poll (`lib/hooks/useInboxSummary.ts`) pauses in hidden tabs
-  and revalidates on focus.
+- SWR keys include the user id. Home and the activity summary poll at the server's `refresh_seconds`
+  (30 s); the shared summary poll (`lib/hooks/useActivitySummary.ts`) also owns `markViewed`, which records
+  an opened item and revalidates the badges and Home.
 - Every transport in this directory is inventoried by `scripts/mcp_parity_audit.mjs` and classified in
   `cmos/contracts/mcp-parity-manifest.json`, so the MCP surface and the UI cannot drift apart silently.
 
@@ -91,13 +90,13 @@ pages render not-found as a distinct state), `PaginationBar`, `StatusBadge`, `Ta
 
 - **Relationships** (`/graph`, UX-11 over GRAPH-1): a root picker, a depth 1–2 neighborhood diagram and an
   accessible list equivalent over `GET /api/v1/graph/neighborhood` (`lib/api/graph.ts`).
-- **Mission dashboards** (UX-12): live attention counts from `GET /api/v1/home/attention`, repeatable
-  reason filters on `/missions`, and personal saved views (`lib/api/missionViews.ts`) that also appear in
-  the command palette.
-- **Priority inbox** (`/inbox`, UX-13): agent failures, mission completions and new evidence behind a
-  per-user seen watermark; the shell badge is named "Inbox, N unread" (hidden at zero, capped at 99+) with
-  a polite live region that announces increases only; "Mark all as seen" sends the server's
-  `generated_at` back verbatim and "Mark reviewed" reuses the Home review route.
+- **Recent activity** (Sprint 53, ACT-1, decision #459): Home shows one newest-first stream over missions,
+  reports and evidence groups (`GET /api/v1/activity`, `lib/api/activity.ts`). Status is a label and never
+  changes the order. An item is new until the user opens it (mission and report pages call `markViewed`
+  on load; activity rows mark on click) or presses "Mark viewed"; `GET /api/v1/activity/summary` feeds the
+  sidebar badges on Missions, Evidence and Reports, named "Missions, N new" and hidden at zero. The mission
+  dashboards, saved views, priority inbox and "Mark reviewed" from Sprint 52 were removed; `/inbox`
+  redirects to Home.
 - Home, the evidence browser, project bundles, collection context and saved searches shipped in
   Sprints 50–51; the roadmap records each with its receipt.
 
@@ -109,7 +108,7 @@ pages render not-found as a distinct state), `PaginationBar`, `StatusBadge`, `Ta
 - `build-frontend-production` (required): the production build with the token gate, a check that the
   admin routes are in the pages manifest, then Playwright against `next start` for the specs listed in
   `.github/workflows/frontend-production-build.yml` (app-shell, mission-protocol, project-bundles,
-  collection-context, search-command, route-migration, graph, mission-dashboards, inbox).
+  collection-context, search-command, route-migration, graph).
 - After deploy: `.github/workflows/production-smoke.yml` runs `frontend/tests/e2e/production-smoke.spec.ts`
   on a schedule and on dispatch, and every UI mission reruns the read-only direct-browser baseline
   `frontend/scripts/ui-shell-smoke.mjs` (every route, Light and Dark, 1440 and 390 px, axe and overflow

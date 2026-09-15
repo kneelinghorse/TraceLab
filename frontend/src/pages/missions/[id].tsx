@@ -5,11 +5,12 @@ import { HttpError } from "@/lib/api/http";
 import { PageState } from "@/components/ui/PageState";
 import { useFeedback } from "@/components/ui/useFeedback";
 import { MissionRunActivity } from "@/components/missions/MissionRunActivity";
-import { homeApi } from "@/lib/api/home";
+import { missionOccurredAt } from "@/lib/api/activity";
+import { markViewed } from "@/lib/hooks/useActivitySummary";
 import { apiErrorMessage } from "@/lib/api/errors";
 import { Dialog } from "@/components/ui/Dialog";
 import { EvidencePanel } from "@/components/evidence/EvidencePanel";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { formatDistanceToNow } from "date-fns";
@@ -48,6 +49,11 @@ function MissionDetailContent() {
   const [acting, setActing] = useState(false);
   const { askConfirmation, notify, feedback } = useFeedback();
   const { mission, isLoading, error, refresh } = useApiMission(missionId);
+  const occurredAt = mission ? missionOccurredAt(mission) : null;
+  useEffect(() => {
+    // Opening a mission marks it viewed at its current revision (decision #459).
+    if (mission && occurredAt) void markViewed([{ type: "mission", id: mission.id, occurred_at: occurredAt }]);
+  }, [mission?.id, occurredAt]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmitToDeepSearch = async () => {
     if (!missionId) return;
@@ -116,12 +122,6 @@ function MissionDetailContent() {
   const handleRerun = async () => {
     if (!mission || !await askConfirmation("Prepare another run with a new mission ID? Review the copied inputs before submitting; this run stays unchanged.")) return;
     void router.push({ pathname: "/missions/new", query: { from: mission.id } });
-  };
-  const handleReview = async () => {
-    if (!mission) return;
-    setActing(true);
-    try { await homeApi.review(mission); notify("Result marked reviewed", "success"); }
-    catch (err) { notify(err); } finally { setActing(false); }
   };
 
   if (!missionId) {
@@ -236,7 +236,6 @@ function MissionDetailContent() {
                 <div className="mt-6 flex flex-wrap gap-3">
                   {["queued", "in_progress"].includes(mission.status) && <button disabled={acting} className="rounded-lg border border-danger-line px-4 py-2 text-sm text-danger" onClick={() => void handleCancelRun()}>Cancel run</button>}
                   {["completed", "blocked", "cancelled", "validation_failed"].includes(mission.status) && <button disabled={acting} className="rounded-lg border border-line px-4 py-2 text-sm" onClick={() => void handleRerun()}>Re-run</button>}
-                  {mission.status === "completed" && <button disabled={acting} className="rounded-lg border border-line px-4 py-2 text-sm" onClick={() => void handleReview()}>Mark reviewed</button>}
 
                   {isDraft && (
                     <button

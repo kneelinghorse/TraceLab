@@ -16,24 +16,22 @@ interface UseApiMissionsOptions {
   pageSize?: number;
   status?: MissionStatus;
   projectId?: string;
-  view?: MissionListParams["view"];
-  reason?: string[];
+  sort?: MissionListParams["sort"];
 }
 
 export function useApiMissions(options: UseApiMissionsOptions = {}) {
   const { user } = useAuth();
-  const { page = 1, pageSize = 20, status, projectId, view, reason } = options;
+  const { page = 1, pageSize = 20, status, projectId, sort } = options;
 
   const params: MissionListParams = {
     page,
     page_size: pageSize,
     status,
     project_id: projectId,
-    view,
-    ...(reason?.length ? { reason } : {}),
+    sort,
   };
 
-  const key = [API_MISSIONS_KEY, user?.user_id, page, pageSize, status ?? "all", projectId ?? "all", view, reason];
+  const key = [API_MISSIONS_KEY, user?.user_id, page, pageSize, status ?? "all", projectId ?? "all", sort ?? "created_desc"];
 
   const { data, error, isLoading, mutate: mutateList } = useSWR<PaginatedResponse<ApiMission>>(
     key,

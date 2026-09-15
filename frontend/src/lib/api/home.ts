@@ -1,3 +1,4 @@
+import type { ActivityPage } from "@/lib/api/activity";
 import { httpClient } from "@/lib/api/http";
 
 export interface HomeSection<T> { total: number; items: T[] }
@@ -9,7 +10,6 @@ export interface HomeMission {
   updated_at: string;
   started_at: string | null;
   completed_at: string | null;
-  reason: "validation_failed" | "blocked" | "stalled" | "unreviewed" | null;
   progress: { phase: string | null; percent: number | null; current_step: number | null; total_steps: number | null };
   report_id: string | null;
   evidence_count: number;
@@ -28,25 +28,17 @@ export interface HomeEvidenceActivity {
 export interface HomeSnapshot {
   generated_at: string;
   refresh_seconds: number;
-  stalled_after_seconds: number;
   missions: { total: number; by_status: Record<string, number> };
-  attention: HomeSection<HomeMission>;
+  activity: ActivityPage;
   active_runs: HomeSection<HomeMission>;
   recent_reports: HomeSection<HomeRecent>;
   recent_projects: HomeSection<HomeRecent>;
   favorites: HomeSection<HomeRecent>;
   evidence_activity: HomeSection<HomeEvidenceActivity>;
 }
-export interface HomeAttention {
-  generated_at: string; stalled_after_seconds: number; total: number;
-  by_reason: Record<string, number>;
-  dashboards: { key: "at_risk" | "unreviewed"; total: number }[];
-}
 export const homeApi = {
-  attention: (projectId?: string) => httpClient.get<HomeAttention>("/home/attention", { params: { project_id: projectId } }),
   favorites: (params: { page?: number; page_size?: number; project_id?: string } = {}) => httpClient.get<HomeSection<HomeRecent>>("/home/favorites", { params }),
   pinProject: (id: string) => httpClient.put<void>(`/home/favorites/projects/${id}`),
   unpinProject: (id: string) => httpClient.delete<void>(`/home/favorites/projects/${id}`),
   get: () => httpClient.get<HomeSnapshot>("/home"),
-  review: (mission: Pick<HomeMission, "id" | "updated_at">) => httpClient.put<void>(`/home/missions/${mission.id}/review`, { updated_at: mission.updated_at }),
 };

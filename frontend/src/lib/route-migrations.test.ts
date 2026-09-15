@@ -24,7 +24,7 @@ it("keeps permanent redirects for all aliases without redirecting canonical Home
   const redirects = await config.redirects!();
   const aliases = migrations.filter(row => row.kind === "redirect");
   expect(new Set(migrations.map(row => row.source)).size).toBe(migrations.length);
-  expect(aliases).toHaveLength(7);
+  expect(aliases).toHaveLength(8);
   expect(redirects).toHaveLength(aliases.length);
   for (const row of aliases) {
     expect(redirects).toContainEqual({ source: row.source, destination: row.destination, permanent: true });

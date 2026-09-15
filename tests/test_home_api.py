@@ -1,4 +1,4 @@
-"""Home must prioritize real work and never infer totals from a result page."""
+"""Home must show what happened most recently and never infer totals from a result page."""
 
 from datetime import datetime, timedelta
 from uuid import uuid4
@@ -50,16 +50,16 @@ def mission(db, status="draft", **kwargs):
     return row
 
 
-def test_totals_are_database_counts_beyond_100_and_attention_reorders_on_refresh(client, db_session):
+def test_totals_are_database_counts_beyond_100_and_activity_is_newest_first(client, db_session):
     _, headers = actor(db_session, role="admin")
-    for _ in range(137):
-        mission(db_session)
     now = datetime.utcnow()
-    done = mission(db_session, "completed", completed_at=now)
+    for _ in range(137):
+        mission(db_session, updated_at=now - timedelta(days=10))
+    done = mission(db_session, "completed", completed_at=now - timedelta(hours=1))
     stale = mission(db_session, "queued", queued_at=now - timedelta(hours=2))
-    blocked = mission(db_session, "blocked")
-    running = mission(db_session, "in_progress")
-    mission(db_session, "queued", queued_at=now)
+    blocked = mission(db_session, "blocked", updated_at=now - timedelta(days=3))
+    running = mission(db_session, "in_progress", started_at=now)
+    old_queue = mission(db_session, "queued", queued_at=now - timedelta(days=4))
     db_session.commit()
 
     response = client.get(API, headers=headers)
@@ -70,37 +70,19 @@ def test_totals_are_database_counts_beyond_100_and_attention_reorders_on_refresh
     assert {k: v for k, v in body["missions"]["by_status"].items() if v} == direct
     listed = client.get(f"{settings.api_v1_prefix}/missions?page_size=100", headers=headers).json()
     assert body["missions"]["total"] == listed["pagination"]["total"]
-    assert [row["id"] for row in body["attention"]["items"]] == [str(blocked.id), str(stale.id), str(done.id)]
+    ids = [row["id"] for row in body["activity"]["items"]]
+    assert ids[:5] == [str(running.id), str(done.id), str(stale.id), str(blocked.id), str(old_queue.id)]
+    assert body["activity"]["total"] == 142 and len(body["activity"]["items"]) == 10
     assert body["active_runs"]["total"] == 1
     assert body["active_runs"]["items"][0]["progress"]["percent"] is None
 
     running.status = "validation_failed"
+    running.updated_at = now + timedelta(seconds=1)
     db_session.commit()
     refreshed = client.get(API, headers=headers).json()
-    assert refreshed["attention"]["items"][0]["id"] == str(running.id)
-    assert refreshed["attention"]["total"] == 4
+    assert refreshed["activity"]["items"][0]["id"] == str(running.id)
+    assert refreshed["activity"]["items"][0]["status"] == "validation_failed"
     assert refreshed["active_runs"]["total"] == 0
-
-
-def test_review_is_explicit_per_user_and_rejects_a_stale_result(client, db_session):
-    _, first = actor(db_session, role="admin")
-    _, second = actor(db_session, role="admin")
-    row = mission(db_session, "completed", completed_at=datetime.utcnow())
-    db_session.commit()
-    item = client.get(API, headers=first).json()["attention"]["items"][0]
-    path = f"{API}/missions/{row.id}/review"
-    for _ in range(2):
-        assert client.put(path, headers=first, json={"updated_at": item["updated_at"]}).status_code == 204
-    assert client.get(API, headers=first).json()["attention"]["total"] == 0
-    assert client.get(API, headers=second).json()["attention"]["total"] == 1
-
-    row.updated_at = row.updated_at + timedelta(seconds=1)
-    db_session.commit()
-    assert client.get(API, headers=first).json()["attention"]["total"] == 1
-    assert client.put(path, headers=first, json={"updated_at": item["updated_at"]}).status_code == 409
-    row.status = "in_progress"
-    db_session.commit()
-    assert client.put(path, headers=first, json={"updated_at": row.updated_at.isoformat()}).status_code == 409
 
 
 def test_every_section_and_result_link_is_scoped_before_counting(client, db_session, monkeypatch):
@@ -149,18 +131,12 @@ def test_every_section_and_result_link_is_scoped_before_counting(client, db_sess
     group = body["evidence_activity"]["items"][0]
     assert group["entry_count"] == 25
     assert group["mission_id"] == str(done.id)
-    items = {item["id"]: item for item in body["attention"]["items"]}
-    assert items[str(done.id)]["report_id"] == str(report.id)
-    assert items[str(done.id)]["evidence_count"] == 25
-    assert items[str(mismatched.id)]["report_id"] is None
+    ids = {item["id"] for item in body["activity"]["items"]}
+    assert {str(done.id), str(mismatched.id), str(report.id)} <= ids
+    assert body["activity"]["total"] == 4
     assert str(secret.id) not in str(body)
     assert str(private.id) not in str(body)
-    assert (
-        client.put(
-            f"{API}/missions/{hidden.id}/review", headers=headers, json={"updated_at": hidden.updated_at.isoformat()}
-        ).status_code
-        == 404
-    )
+    assert str(hidden.id) not in str(body)
 
 
 def test_progress_only_projects_observed_values_and_does_not_invent_loop_percent(client, db_session):
@@ -223,7 +199,7 @@ def test_empty_home_does_not_leak_totals_and_ledger_requires_project_access(clie
     body = response.json()
     assert body["missions"]["total"] == 0
     assert all(count == 0 for count in body["missions"]["by_status"].values())
-    assert body["attention"] == {"total": 0, "items": []}
+    assert body["activity"]["total"] == 1 and body["activity"]["items"][0]["type"] == "evidence"
     assert body["active_runs"] == {"total": 0, "items": []}
     assert body["evidence_activity"]["total"] == 1
     assert body["evidence_activity"]["items"][0]["project_id"] == str(owned.id)

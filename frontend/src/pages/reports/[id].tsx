@@ -11,6 +11,7 @@ import { parseApiTimestamp } from "@/lib/api/timestamps";
  */
 
 import { AuthGate } from "@/components/AuthGate";
+import { markViewed } from "@/lib/hooks/useActivitySummary";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { reportsApi, type ReportDetail, type ReportStatus } from "@/lib/api/reports";
 import { formatDistanceToNow } from "date-fns";
@@ -48,6 +49,9 @@ export default function ReportDetailPage() {
     id ? ["report", user?.user_id, id] : null,
     () => reportsApi.get(id as string)
   );
+  useEffect(() => {
+    if (report) void markViewed([{ type: "report", id: report.id, occurred_at: report.updated_at }]);
+  }, [report?.id, report?.updated_at]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleStartEdit = () => {
     if (!report) return;

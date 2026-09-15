@@ -184,10 +184,10 @@ selected via the `action` parameter.
 | `tracelab_collection` | `list`, `get`, `export`, `create`, `add`, `synthesize`, `documents`, `mission_seed`, `update`, `add_document` | Curate chunks and documents into collections, edit their instructions, then synthesize. |
 | `tracelab_report` | `create`, `list`, `get`, `export`, `update` | Persistent named research reports, including title/status updates. |
 | `tracelab_document` | `upload`, `get_content`, `list`, `process` | Document ingestion, explicit processing and full-text fetch. |
-| `tracelab_mission` | `create`, `list`, `get`, `update`, `views` | Mission CRUD against the DeepSearch authoring contract, plus the caller's saved mission views. |
+| `tracelab_mission` | `create`, `list`, `get`, `update` | Mission CRUD against the DeepSearch authoring contract; `list` sorts by created/updated time. |
 | `tracelab_mission_execution` | `submit`, `status`, `preview`, `logs`, `events`, `cancel`, `promote_report` | DeepSearch lifecycle: queue, poll status, preview the compiled contract, cancel, promote a finished report to a document. |
 | `tracelab_evidence` | `capture`, `note`, `list`, `search`, `promote`, `get` | Capture sourced findings and working notes, reuse them across sessions, and promote a session to a report or document. |
-| `tracelab_home` | `snapshot`, `favorites`, `attention`, `inbox_summary`, `inbox_list` | Caller-scoped home, attention and inbox reads (human credential required). |
+| `tracelab_home` | `snapshot`, `favorites`, `activity`, `activity_summary` | Caller-scoped home and recent-activity reads (human credential required). |
 
 
 Sprint 52 additions below ship in **1.2.0**, the single publish that decision #425
@@ -225,10 +225,10 @@ Existing actions also gain UI parameters:
 
 - `tracelab_search.knowledge`: optional `source_type`, `date_from`, `date_to`
   (YYYY-MM-DD), alongside the existing `query`, `limit`, `project_id` and `tags`.
-- `tracelab_mission.list`: optional `view` = `all`, `attention` or `queue`, and a
-  repeatable `reason` list (`validation_failed`, `blocked`, `stalled`, `unreviewed`)
-  that requires `view=attention`. Without `view` or `reason` the request URL is
-  unchanged.
+- `tracelab_mission.list`: optional `sort` = `created_desc` (default),
+  `created_asc`, `updated_desc` or `updated_asc`. Without `sort` the request URL
+  is unchanged. (The 1.2.0 `view` and `reason` parameters were removed with the
+  attention surface; see the unreleased notes below.)
 - `tracelab_collection.list`: optional `project_id`, `page`, `page_size` (max 100).
   `get` returns `instructions`; `create` accepts optional `instructions` (max
   20,000 characters).
@@ -244,11 +244,10 @@ Existing actions also gain UI parameters:
 
 ### Sprint 52 actions and reads (MCP-2, 1.2.0)
 
-Six non-destructive actions on research objects and five caller-scoped reads
-mirror the exact REST routes the web UI calls. Per-user acknowledgements
-(result review, inbox mark-seen, favorites, saved searches and saved-view
-writes) and every DELETE route stay in the web UI by decision #426; the MCP
-never performs them on the user's behalf.
+Six non-destructive actions on research objects and caller-scoped reads mirror
+the exact REST routes the web UI calls. Per-user acknowledgements (favorites,
+saved searches and the activity viewed watermark) and every DELETE route stay in
+the web UI by decision #426; the MCP never performs them on the user's behalf.
 
 | Action | Route and parameters |
 | --- | --- |
@@ -259,12 +258,24 @@ never performs them on the user's behalf.
 | `tracelab_collection.add_document` | `POST /collections/{id}/documents` with `{document_id}`. Required `collection_id`, `document_id`. |
 | `tracelab_report.update` | `PUT /reports/{id}`. Required `report_id` plus `title` and/or `status` (`draft` or `final`). |
 | `tracelab_project.neighborhood` | `GET /graph/neighborhood`. Required `root_type` (project/document/mission/report/collection/evidence) and `root_id`. Optional `depth` (1, max 2), `per_relation_limit` (12, max 50), `max_nodes` (60, max 150). Nodes carry canonical links; groups carry server totals. |
-| `tracelab_home.attention` | `GET /home/attention`. Optional `project_id`. Reason counts and dashboard totals. |
-| `tracelab_mission.views` | `GET /mission-views`. No parameters. The caller's saved mission views with live totals and UI-equivalent links. |
-| `tracelab_home.inbox_summary` | `GET /inbox/summary`. No parameters. Unread counts behind the caller's seen watermark. |
-| `tracelab_home.inbox_list` | `GET /inbox`. Required `section` (`failures`, `completions`, `evidence`). Optional `page` (1), `page_size` (20, max 100), `unread_only`. |
 
-Home, inbox, attention and evidence routes reject service principals: use the
+### Recent activity (ACT-1, unreleased — next major)
+
+Decision #459 replaced the inbox, "needs attention", mission reviews and saved
+mission views with one recency-ordered activity stream. The 1.2.0 actions
+`tracelab_home.attention`, `tracelab_home.inbox_summary`,
+`tracelab_home.inbox_list` and `tracelab_mission.views` are gone, as are the
+`view`/`reason` parameters of `tracelab_mission.list` and the `attention`
+section of `tracelab_home.snapshot` (which now carries `activity`).
+
+| Action | Route and parameters |
+| --- | --- |
+| `tracelab_home.activity` | `GET /activity`. Optional `page` (1), `page_size` (20, max 100). Missions, reports and evidence in one recency order; each item has `type`, `id`, `title`, `subtitle`, `status`, `occurred_at`, `href`, `url` and a caller-relative `new` flag. Server `total` and `new_total` are preserved. |
+| `tracelab_home.activity_summary` | `GET /activity/summary`. No parameters. `new_total` and `by_type` counts. |
+
+Marking activity as viewed (`PUT /activity/viewed`) stays in the web UI.
+
+Home, activity and evidence routes reject service principals: use the
 device-code login or a user API key.
 
 ### Example calls
