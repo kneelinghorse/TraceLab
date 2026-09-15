@@ -1,0 +1,274 @@
+{
+  "mission_id": "MCP-3",
+  "sprint_id": "sprint-52",
+  "generated_at": "2026-09-15T05:43:17.563625+00:00",
+  "status": "validated_pending_receipt_merge",
+  "source": {
+    "base_commit": "63821c95c3fd259d57a1ba7cebd31f7637b01670",
+    "pr": "https://github.com/kneelinghorse/TraceLab/pull/306",
+    "source_head": "156c63fd04a82e22d818ffbf2edd957c5a08f19a",
+    "merge_commit": "c4a2441a42f7804b9bf178f93a67bce270cd5583",
+    "tag": "tracelab-mcp-v1.2.0",
+    "tag_on_remote": "a4b3b487b35ce4eb04d3f3f4e969d4158727cfc6\trefs/tags/tracelab-mcp-v1.2.0"
+  },
+  "decisions": [
+    425,
+    426
+  ],
+  "learnings_applied": [
+    74,
+    176,
+    177
+  ],
+  "version": {
+    "package_json": "1.2.0",
+    "package_lock": "1.2.0",
+    "npm_registry": "1.2.0",
+    "npm_publish_time": "2026-09-15T05:41:39.575Z"
+  },
+  "publish": {
+    "ran_by": "Derek",
+    "timestamp": "2026-09-15T05:41:39.575Z",
+    "from": "clean checkout of the merge commit",
+    "verified_with": "npm view @aquex/tracelab-mcp version"
+  },
+  "changelog": {
+    "released_section": "[1.2.0] \u2014 2026-09-15",
+    "unreleased_empty": true,
+    "former_unreleased_entries": 12
+  },
+  "tables_match_cluster_actions": {
+    "tools": 9,
+    "actions": 51,
+    "files": {
+      "packages/tracelab-mcp/README.md": {
+        "rows": 9,
+        "mismatches": [],
+        "extra": []
+      },
+      "docs/mcp-tools.md": {
+        "rows": 9,
+        "mismatches": [],
+        "extra": []
+      }
+    }
+  },
+  "post_merge_main_push_ci": [
+    {
+      "workflow": "Backend Integration",
+      "run_id": 34922987701,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987701",
+      "event": "push",
+      "head_sha": "c4a2441a42f7804b9bf178f93a67bce270cd5583",
+      "head_branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-15T02:54:53Z",
+      "jobs": [
+        {
+          "id": 104234949962,
+          "name": "backend-integration",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987701/job/104234949962"
+        }
+      ]
+    },
+    {
+      "workflow": "Backend Lint",
+      "run_id": 34922987663,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987663",
+      "event": "push",
+      "head_sha": "c4a2441a42f7804b9bf178f93a67bce270cd5583",
+      "head_branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-15T02:54:53Z",
+      "jobs": [
+        {
+          "id": 104234949604,
+          "name": "ruff-diff",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987663/job/104234949604"
+        }
+      ]
+    },
+    {
+      "workflow": "Backend Tests",
+      "run_id": 34922987716,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987716",
+      "event": "push",
+      "head_sha": "c4a2441a42f7804b9bf178f93a67bce270cd5583",
+      "head_branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-15T02:54:53Z",
+      "jobs": [
+        {
+          "id": 104234949669,
+          "name": "backend-suite",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987716/job/104234949669"
+        }
+      ]
+    },
+    {
+      "workflow": "Frontend Checks",
+      "run_id": 34922987692,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987692",
+      "event": "push",
+      "head_sha": "c4a2441a42f7804b9bf178f93a67bce270cd5583",
+      "head_branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-15T02:54:53Z",
+      "jobs": [
+        {
+          "id": 104234949759,
+          "name": "type-check",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987692/job/104234949759"
+        },
+        {
+          "id": 104234949945,
+          "name": "lint",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987692/job/104234949945"
+        },
+        {
+          "id": 104234949991,
+          "name": "vitest",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987692/job/104234949991"
+        }
+      ]
+    },
+    {
+      "workflow": "Frontend Production Build",
+      "run_id": 34922987667,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987667",
+      "event": "push",
+      "head_sha": "c4a2441a42f7804b9bf178f93a67bce270cd5583",
+      "head_branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-15T02:54:53Z",
+      "jobs": [
+        {
+          "id": 104234949352,
+          "name": "build-frontend-production",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987667/job/104234949352"
+        }
+      ]
+    },
+    {
+      "workflow": "MCP Package",
+      "run_id": 34922987749,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987749",
+      "event": "push",
+      "head_sha": "c4a2441a42f7804b9bf178f93a67bce270cd5583",
+      "head_branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-15T02:54:53Z",
+      "jobs": [
+        {
+          "id": 104234949855,
+          "name": "mcp-package",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987749/job/104234949855"
+        }
+      ]
+    },
+    {
+      "workflow": "Secret Scan",
+      "run_id": 34922987720,
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987720",
+      "event": "push",
+      "head_sha": "c4a2441a42f7804b9bf178f93a67bce270cd5583",
+      "head_branch": "main",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-15T02:54:53Z",
+      "jobs": [
+        {
+          "id": 104234949513,
+          "name": "Secret Scan",
+          "conclusion": "success",
+          "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987720/job/104234949513"
+        }
+      ]
+    }
+  ],
+  "cited_runs": {
+    "mcp-package": {
+      "run_id": 34922987749,
+      "conclusion": "success",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987749"
+    },
+    "backend-suite": {
+      "run_id": 34922987716,
+      "conclusion": "success",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987716"
+    },
+    "build-frontend-production": {
+      "run_id": 34922987667,
+      "conclusion": "success",
+      "url": "https://github.com/kneelinghorse/TraceLab/actions/runs/34922987667"
+    }
+  },
+  "deployments": {
+    "checked_at": "2026-09-15T02:57:31Z",
+    "commit": "c4a2441a42f7804b9bf178f93a67bce270cd5583",
+    "services": {
+      "TraceLab": {
+        "service_id": "bb03daef-7b08-4ef9-b0db-b7b5d49c0721",
+        "deployment_id": "248f9bdb-afd3-4352-a248-cd74736866dd",
+        "status": "SUCCESS",
+        "commit": "c4a2441a42f7804b9bf178f93a67bce270cd5583",
+        "created_at": "2026-09-15T02:54:52.851Z"
+      },
+      "frontend": {
+        "service_id": "0b8d6bcf-1fa8-4649-ad0e-0a6bf76a12b7",
+        "deployment_id": "cf1cd92a-76a8-430b-901d-975f2effe040",
+        "status": "SUCCESS",
+        "commit": "c4a2441a42f7804b9bf178f93a67bce270cd5583",
+        "created_at": "2026-09-15T02:54:52.851Z"
+      }
+    },
+    "both_success_for_commit": true
+  },
+  "public_smoke": {
+    "total": 4,
+    "expected": 4,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "interrupted": 0,
+    "durationSeconds": 1.982,
+    "retries": 0
+  },
+  "fresh_install_smoke": {
+    "receipt": "cmos/reports/sprint-52/mcp-3-production-smoke.json",
+    "passed": true,
+    "checks": 12,
+    "failed": [],
+    "install": {
+      "command": "npx -y @aquex/tracelab-mcp@1.2.0",
+      "fresh_directory": true,
+      "minimal_environment": [
+        "PATH",
+        "HOME",
+        "TRACELAB_API_URL",
+        "TRACELAB_API_KEY",
+        "TRACELAB_FRONTEND_URL"
+      ],
+      "server_version": "1.2.0"
+    }
+  },
+  "limitations": [
+    "The fresh npx smoke runs one read-only action per tool; write actions are covered by the package's local stdio contract, not exercised against production.",
+    "Canonical links are resolved with an unauthenticated GET on the public frontend; a 200 proves the route is served, not that the operator's data renders."
+  ],
+  "closure_gate": "CMOS MCP-3 is marked Completed only after this receipt merges on main and the receipt-carrier main push and both Railway deployments are verified."
+}
